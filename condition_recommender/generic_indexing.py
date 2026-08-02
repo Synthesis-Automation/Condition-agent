@@ -31,7 +31,7 @@ from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "4.0"
+GENERIC_INDEX_SCHEMA_VERSION = "5.0"
 
 
 @dataclass(frozen=True)

@@ -38,12 +38,6 @@ from .models import (
     ReactionCoreRemoteClass,
     ReactionCoreRemoteSubgraph,
 )
-from .rendering import (
-    build_core_presentation,
-    multi_center_edit_label as _multi_center_edit_label,
-    single_center_transition_label as _single_center_transition_label,
-    state_label as _state_label,
-)
 from .quality import assess_reaction_core_quality, validate_core_edits
 from .remote import (
     _build_remote_subgraphs_for_side,
@@ -177,11 +171,6 @@ def _build_atom_state(
     *,
     side: str,
     location: _Location,
-    active_coordinates: set[_Coordinate],
-    remote_classes: Mapping[
-        tuple[str, int, int, int],
-        ReactionCoreRemoteClass,
-    ],
     atom_map_number: Optional[int] = None,
 ) -> ReactionCoreAtomState:
     component, molecule, atom_index = location
@@ -220,14 +209,6 @@ def _build_atom_state(
         radical_electrons=state_payload["radical_electrons"],
         isotope=state_payload["isotope"],
         neighbor_tokens=neighbor_tokens,
-        concise_label=_state_label(
-            molecule=molecule,
-            component_index=component.component_index,
-            atom_index=atom_index,
-            active_coordinates=active_coordinates,
-            remote_classes=remote_classes,
-            side=side,
-        ),
         state_key=_digest("RAS2", state_payload, length=24),
     )
 
@@ -599,16 +580,6 @@ def build_reaction_core_projection(
         reactant_by_map=reactant_by_map,
         product_by_map=product_by_map,
     )
-    remote_classes = {
-        (
-            port.side,
-            port.core_component_index,
-            port.core_atom_index,
-            port.attachment_atom_index,
-        ): subgraph.remote_class
-        for subgraph in remote_subgraphs
-        for port in subgraph.attachment_ports
-    }
     event_components = _event_components(identities, adjacency)
     primary_identities = set()
     for event in event_components:
@@ -668,8 +639,6 @@ def build_reaction_core_projection(
             _build_atom_state(
                 side="reactant",
                 location=before_location,
-                active_coordinates=reactant_active,
-                remote_classes=remote_classes,
                 atom_map_number=(
                     int(identity[1]) if identity[0] == "map" else None
                 ),
@@ -681,8 +650,6 @@ def build_reaction_core_projection(
             _build_atom_state(
                 side="product",
                 location=after_location,
-                active_coordinates=product_active,
-                remote_classes=remote_classes,
                 atom_map_number=(
                     int(identity[1]) if identity[0] == "map" else None
                 ),
@@ -905,15 +872,6 @@ def build_reaction_core_projection(
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
         },
     )
-    generic_label = (
-        _multi_center_edit_label(edits)
-        if len(primary) > 1
-        else _single_center_transition_label(
-            primary_identity=next(iter(primary_identities)),
-            transition_by_identity=transition_by_identity,
-            edits=edits,
-        )
-    )
     checked_edit_count, consistency_issues = validate_core_edits(
         edits,
         reactant_by_map=reactant_by_map,
@@ -954,14 +912,6 @@ def build_reaction_core_projection(
         warnings.add("REACTION_CORE_QUALITY_REVIEW")
     elif quality.status == "blocked":
         warnings.add("REACTION_CORE_QUALITY_BLOCKED")
-    presentation = build_core_presentation(
-        equation=generic_label,
-        edits=edits,
-        state_changes=state_changes,
-        remote_subgraphs=remote_subgraphs,
-        evidence_status=_evidence_status(str(evidence)),
-        quality=quality,
-    )
     core_id = _digest(
         "RCP2",
         {
@@ -990,8 +940,6 @@ def build_reaction_core_projection(
         remote_subgraphs=remote_subgraphs,
         edit_tokens=edit_tokens,
         participant_tokens=participant_tokens,
-        generic_label=generic_label,
-        presentation=presentation,
         quality=quality,
         active_atom_count=len(identities),
         event_count=len(events),

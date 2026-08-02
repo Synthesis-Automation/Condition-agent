@@ -10,7 +10,7 @@
       "unprotected_xh_tags": ["unprotected_XH"],
       "competing_site_types": ["leaving_group", "transfer_group"],
       "challenging_leaving_groups": ["Cl", "F"],
-      "protodeboronation_contexts": ["HeteroAr"],
+      "protodeboronation_contexts": ["HetAr"],
       "protodeboronation_handles": ["B(OH)2"]
     },
     "c_n_coupling": {

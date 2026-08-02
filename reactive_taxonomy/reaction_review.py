@@ -1,9 +1,4 @@
-"""Shared chemist-facing review summary for reaction analyses and records.
-
-The summary keeps the structural display label and minimized reaction-core
-label side by side.  Neither label is promoted to observed chemistry when its
-underlying evidence is unavailable, and neither is used for signature identity.
-"""
+"""Shared chemist-facing review summary for reaction analyses and records."""
 
 from __future__ import annotations
 
@@ -15,7 +10,7 @@ from .descriptors import render_reactivity_profile
 from .reaction_models import ReactionAnalysis
 
 
-REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "3.0"
+REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "4.0"
 _SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
@@ -23,12 +18,12 @@ _SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇�
 class ReactionReviewSummary:
     """Priority chemistry fields shared by GUI and dataset review views."""
 
-    detailed_reaction_label: str
-    reaction_core_equation: str
+    reaction_label: str
     spectators: str
     electronic_steric_analysis: str
-    display_status: str
-    display_evidence: str
+    label_status: str
+    label_basis: str
+    label_evidence: str
     core_evidence_status: str
     schema_version: str = REACTION_REVIEW_SUMMARY_SCHEMA_VERSION
 
@@ -118,8 +113,6 @@ def build_reaction_review_summary(
     core = _member(source, "reaction_core")
     signature = _member(source, "reaction_signature")
 
-    detailed_label = str(_member(display, "detailed", "") or "")
-
     spectators = _member(signature, "spectator_groups")
     if spectators is None:
         spectators = _member(source, "spectator_groups", ())
@@ -135,12 +128,12 @@ def build_reaction_review_summary(
         partners = _member(signature, "partners", ())
 
     return ReactionReviewSummary(
-        detailed_reaction_label=detailed_label,
-        reaction_core_equation=str(_member(core, "generic_label", "") or ""),
+        reaction_label=str(_member(display, "text", "") or ""),
         spectators=_spectator_summary(spectators),
         electronic_steric_analysis=_partner_environment_summary(partners),
-        display_status=str(_member(display, "status", "") or ""),
-        display_evidence=str(_member(display, "evidence", "") or ""),
+        label_status=str(_member(display, "status", "") or ""),
+        label_basis=str(_member(display, "basis", "") or ""),
+        label_evidence=str(_member(display, "evidence", "") or ""),
         core_evidence_status=str(
             _member(core, "evidence_status", "") or ""
         ),
@@ -149,13 +142,11 @@ def build_reaction_review_summary(
 
 def format_reaction_review_summary(summary: ReactionReviewSummary) -> str:
     """Render the four evidence-preserving priority lines for a GUI review."""
-    detailed = summary.detailed_reaction_label or "Unavailable"
-    graphic = summary.reaction_core_equation or "Unavailable"
+    label = summary.reaction_label or "Unavailable"
     spectators = summary.spectators or "None detected"
     profile = summary.electronic_steric_analysis or "Unavailable"
     lines = [
-        f"Detailed reaction label: {detailed}",
-        f"Graphic core label: {graphic}",
+        f"Reaction label: {label}",
     ]
     lines.extend(
         (

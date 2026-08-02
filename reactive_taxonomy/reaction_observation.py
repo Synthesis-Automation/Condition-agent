@@ -138,8 +138,8 @@ def build_reaction_observation(
             if candidate is not None
         )
         shape_keys = {candidate.shape_core_key for candidate in hypothesis_cores}
-        labels = {candidate.generic_label for candidate in hypothesis_cores}
-        if hypothesis_cores and len(shape_keys) == 1 and len(labels) == 1:
+        typed_keys = {candidate.typed_core_key for candidate in hypothesis_cores}
+        if hypothesis_cores and len(shape_keys) == 1 and len(typed_keys) == 1:
             core = replace(
                 min(hypothesis_cores, key=lambda candidate: candidate.core_id),
                 evidence="ambiguous_correspondence_core_consensus",

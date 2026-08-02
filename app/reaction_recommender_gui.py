@@ -180,7 +180,7 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
     label_evidence = _display_name(str(reaction_label.get("status") or "unavailable"))
     lines = [
         (
-            f"Reaction: {reaction_label.get('concise') or 'Unresolved'}  •  "
+            f"Reaction: {reaction_label.get('text') or 'Unresolved'}  •  "
             f"Label evidence: {label_evidence}"
         ),
         (
@@ -893,7 +893,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             "Displayed precedent context",
             (
                 "Reaction label: "
-                f"{(selected_context.get('reaction_label') or {}).get('concise') or 'Unresolved'}"
+                f"{(selected_context.get('reaction_label') or {}).get('text') or 'Unresolved'}"
             ),
             (
                 "Selected hit reaction SMILES: "

@@ -8,7 +8,8 @@ def test_mapped_reaction_builds_minimum_core() -> None:
     core = result.reaction_core
     assert core is not None
     assert core.evidence_status == "verified"
-    assert core.generic_label
+    assert not hasattr(core, "generic_label")
+    assert not hasattr(core, "presentation")
     assert core.shape_core_key.startswith("RSH2:")
     assert core.center_transition_key.startswith("RCS2:")
 
@@ -20,7 +21,7 @@ def test_inferred_correspondence_builds_core_with_internal_atom_ids() -> None:
     core = result.reaction_core
     assert core is not None
     assert core.evidence_status == "inferred"
-    assert core.generic_label == "Ar–B + Ar–Br → Ar–Ar"
+    assert core.typed_core_key.startswith("RCT2:")
     assert "site:" not in " ".join(core.participant_tokens)
 
 
@@ -28,7 +29,8 @@ def test_small_split_reagent_is_handled_without_reaction_rule() -> None:
     result = featurize_reaction("C=C.BrBr>>BrCCBr")
     assert result.evidence_quality == "global_atom_correspondence"
     assert result.reaction_core is not None
-    assert "Br–Br" in result.reaction_core.generic_label
+    assert result.reaction_signature is not None
+    assert "Br-Br:SINGLE" in result.reaction_signature.broken_bond_types
     assert result.interpretation is not None
     assert result.interpretation.primary_pattern_id == "net_addition"
 
@@ -50,4 +52,4 @@ def test_core_is_deterministic_and_partner_order_invariant() -> None:
     assert forward.reaction_core is not None
     assert reverse.reaction_core is not None
     assert forward.reaction_core.shape_core_key == reverse.reaction_core.shape_core_key
-    assert forward.reaction_core.generic_label == reverse.reaction_core.generic_label
+    assert forward.reaction_core.typed_core_key == reverse.reaction_core.typed_core_key

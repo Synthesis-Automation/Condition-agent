@@ -8,7 +8,6 @@
       "predicate_id": "reductive_amination_like",
       "specificity": 96,
       "display_importance": 98,
-      "display_label": "reductive amination",
       "compatible_named_families": ["reductive_amination"]
     },
     {
@@ -16,40 +15,35 @@
       "tier": "synthesis",
       "predicate_id": "amide_formation_like",
       "specificity": 92,
-      "display_importance": 96,
-      "display_label": "amide formation"
+      "display_importance": 96
     },
     {
       "id": "ester_formation_like",
       "tier": "synthesis",
       "predicate_id": "ester_formation_like",
       "specificity": 90,
-      "display_importance": 94,
-      "display_label": "ester formation"
+      "display_importance": 94
     },
     {
       "id": "carbamate_formation_like",
       "tier": "synthesis",
       "predicate_id": "carbamate_formation_like",
       "specificity": 94,
-      "display_importance": 96,
-      "display_label": "carbamate formation"
+      "display_importance": 96
     },
     {
       "id": "carbonate_formation_like",
       "tier": "synthesis",
       "predicate_id": "carbonate_formation_like",
       "specificity": 94,
-      "display_importance": 96,
-      "display_label": "carbonate formation"
+      "display_importance": 96
     },
     {
       "id": "urea_formation_like",
       "tier": "synthesis",
       "predicate_id": "urea_formation_like",
       "specificity": 94,
-      "display_importance": 96,
-      "display_label": "urea formation"
+      "display_importance": 96
     },
     {
       "id": "sp2_c_n_substitution_like",
@@ -57,7 +51,6 @@
       "predicate_id": "sp2_c_n_substitution_like",
       "specificity": 88,
       "display_importance": 94,
-      "display_label": "C(sp²)–N bond formation",
       "compatible_named_families": ["snar_amination", "buchwald_hartwig_c_n", "ullmann_c_n"],
       "requires_condition_evidence": true
     },
@@ -67,7 +60,6 @@
       "predicate_id": "sp3_c_n_substitution_like",
       "specificity": 86,
       "display_importance": 92,
-      "display_label": "C(sp³)–N bond formation",
       "compatible_named_families": ["n_alkylation"]
     },
     {
@@ -76,7 +68,6 @@
       "predicate_id": "sp2_c_o_substitution_like",
       "specificity": 88,
       "display_importance": 94,
-      "display_label": "C(sp²)–O bond formation",
       "compatible_named_families": ["snar_etherification", "buchwald_hartwig_c_o", "ullmann_c_o"],
       "requires_condition_evidence": true
     },
@@ -86,7 +77,6 @@
       "predicate_id": "sp3_c_o_substitution_like",
       "specificity": 86,
       "display_importance": 92,
-      "display_label": "C(sp³)–O bond formation",
       "compatible_named_families": ["williamson_ether", "mitsunobu"],
       "requires_condition_evidence": true
     },
@@ -95,16 +85,14 @@
       "tier": "synthesis",
       "predicate_id": "sulfonamide_formation_like",
       "specificity": 94,
-      "display_importance": 97,
-      "display_label": "sulfonamide formation"
+      "display_importance": 97
     },
     {
       "id": "o_sulfonylation_like",
       "tier": "synthesis",
       "predicate_id": "o_sulfonylation_like",
       "specificity": 94,
-      "display_importance": 97,
-      "display_label": "O-sulfonylation"
+      "display_importance": 97
     },
     {
       "id": "organoboron_c_c_coupling_like",
@@ -120,7 +108,6 @@
       "predicate_id": "organoboron_c_n_coupling_like",
       "specificity": 96,
       "display_importance": 98,
-      "display_label": "organoboron C–N coupling",
       "compatible_named_families": ["chan_lam_c_n"],
       "requires_condition_evidence": true
     },
@@ -130,7 +117,6 @@
       "predicate_id": "organoboron_c_o_coupling_like",
       "specificity": 96,
       "display_importance": 98,
-      "display_label": "organoboron C–O coupling",
       "compatible_named_families": ["chan_lam_c_o"],
       "requires_condition_evidence": true
     },
@@ -140,7 +126,6 @@
       "predicate_id": "organoboron_c_s_coupling_like",
       "specificity": 96,
       "display_importance": 98,
-      "display_label": "organoboron C–S coupling",
       "compatible_named_families": ["chan_lam_c_s"],
       "requires_condition_evidence": true
     },
@@ -150,7 +135,6 @@
       "predicate_id": "sonogashira_coupling_like",
       "specificity": 95,
       "display_importance": 97,
-      "display_label": "alkynyl C–C coupling",
       "compatible_named_families": ["sonogashira"]
     },
     {
@@ -159,7 +143,6 @@
       "predicate_id": "borylation_like",
       "specificity": 92,
       "display_importance": 95,
-      "display_label": "C–B bond formation",
       "compatible_named_families": ["miyaura_borylation"]
     },
     {
@@ -195,56 +178,49 @@
       "tier": "synthesis",
       "predicate_id": "nitro_reduction_like",
       "specificity": 90,
-      "display_importance": 95,
-      "display_label": "nitro reduction to amine"
+      "display_importance": 95
     },
     {
       "id": "amine_deprotection_like",
       "tier": "synthesis",
       "predicate_id": "amine_deprotection_like",
       "specificity": 88,
-      "display_importance": 94,
-      "display_label": "amine deprotection"
+      "display_importance": 94
     },
     {
       "id": "alcohol_deprotection_like",
       "tier": "synthesis",
       "predicate_id": "alcohol_deprotection_like",
       "specificity": 88,
-      "display_importance": 94,
-      "display_label": "alcohol deprotection"
+      "display_importance": 94
     },
     {
       "id": "ester_hydrolysis_like",
       "tier": "synthesis",
       "predicate_id": "ester_hydrolysis_like",
       "specificity": 90,
-      "display_importance": 95,
-      "display_label": "ester hydrolysis"
+      "display_importance": 95
     },
     {
       "id": "acid_chloride_formation_like",
       "tier": "synthesis",
       "predicate_id": "acid_chloride_formation_like",
       "specificity": 92,
-      "display_importance": 95,
-      "display_label": "acid chloride formation"
+      "display_importance": 95
     },
     {
       "id": "alcohol_to_halide_like",
       "tier": "synthesis",
       "predicate_id": "alcohol_to_halide_like",
       "specificity": 88,
-      "display_importance": 93,
-      "display_label": "alcohol-to-halide conversion"
+      "display_importance": 93
     },
     {
       "id": "cyanation_like",
       "tier": "synthesis",
       "predicate_id": "cyanation_like",
       "specificity": 92,
-      "display_importance": 95,
-      "display_label": "nitrile formation"
+      "display_importance": 95
     },
     {
       "id": "sulfide_oxidation_like",
@@ -258,8 +234,7 @@
       "tier": "synthesis",
       "predicate_id": "carboxyl_derivative_reduction_like",
       "specificity": 90,
-      "display_importance": 94,
-      "display_label": "carboxylic-acid derivative reduction"
+      "display_importance": 94
     },
     {
       "id": "carbonyl_alpha_c_h_sp2_c_c_coupling_like",
@@ -267,7 +242,6 @@
       "predicate_id": "carbonyl_alpha_c_h_sp2_c_c_coupling_like",
       "specificity": 93,
       "display_importance": 96,
-      "display_label": "C(sp²)–C coupling at carbonyl α-C–H",
       "compatible_named_families": ["carbonyl_alpha_c_h_coupling"]
     },
     {
@@ -290,8 +264,7 @@
       "tier": "synthesis",
       "predicate_id": "decarboxylative_coupling_like",
       "specificity": 90,
-      "display_importance": 95,
-      "display_label": "decarboxylative C–C coupling"
+      "display_importance": 95
     }
   ]
 }

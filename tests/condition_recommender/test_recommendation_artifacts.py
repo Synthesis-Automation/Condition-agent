@@ -77,7 +77,7 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert tuple(review_rows[0])[:10] == (
         "canonical_reaction_smiles",
-        "reaction_core_label",
+        "reaction_label",
         "primary_reaction_pattern",
         "primary_reaction_pattern_count",
         "reaction_pattern_matches",

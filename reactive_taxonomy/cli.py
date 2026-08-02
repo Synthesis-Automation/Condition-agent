@@ -55,11 +55,7 @@ _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_mapping_equivalence_key",
     "reaction_core_quality_status",
     "reaction_core_quality_reasons",
-    "reaction_core_bond_changes",
     "reaction_core_state_changes",
-    "reaction_core_retained_context",
-    "reaction_core_departing_context",
-    "reaction_core_appearing_context",
     "reaction_core_event_count",
     "reaction_core_primary_center_count",
     "reaction_core_remote_classes",
@@ -68,10 +64,9 @@ _REACTION_CORE_CSV_FIELDS = (
 )
 
 _REACTION_RING_CSV_FIELDS = (
-    "reaction_display_label_detailed",
-    "reaction_display_source",
-    "reaction_display_status",
-    "reaction_display_confidence",
+    "reaction_label_status",
+    "reaction_label_basis",
+    "reaction_label_confidence",
     "formed_ring_sizes",
     "ring_count_delta",
     "ring_change_count",
@@ -383,14 +378,14 @@ def _reaction_summary(result: Any) -> str:
         f"transformation: {result.transformation_class or '-'}",
         f"named family: {result.named_family or '-'}",
         f"compatible families: {_joined(result.compatible_named_families)}",
-        f"reaction label: {reaction_label.concise if reaction_label else '-'}",
+        f"reaction label: {reaction_label.text if reaction_label else '-'}",
         f"label status: {reaction_label.status if reaction_label else 'unavailable'}",
         f"mapped bond changes: {len(result.mapped_bond_changes)}",
     ]
     if result.product_connection:
         lines.append(
-            f"product connection: {result.product_connection.concise_label} "
-            f"[{result.product_connection.connection_type}; {result.product_connection.evidence}]"
+            f"product connection: {result.product_connection.connection_type} "
+            f"[{result.product_connection.evidence}]"
         )
     lines.append(f"spectator groups: {len(result.spectator_groups)}")
     for group in result.spectator_groups:
@@ -464,7 +459,6 @@ def _reaction_core_lines(result: Any) -> list[str]:
     )
     lines = [
         "Reaction minimization:",
-        f"  Minimized reaction: {core.generic_label}",
         (
             f"  Core evidence: {core.evidence_status} "
             f"({core.evidence}; confidence {core.confidence:.3f})"
@@ -509,7 +503,7 @@ def _reaction_core_lines(result: Any) -> list[str]:
 def _reaction_concise_summary(result: Any) -> str:
     reaction_label = result.reaction_label
     lines = [
-        f"Reaction: {reaction_label.concise if reaction_label else '-'}",
+        f"Reaction: {reaction_label.text if reaction_label else '-'}",
         f"Status: {'valid' if result.valid else 'invalid'}",
         f"Evidence: {result.evidence_quality}",
         f"Transformation: {result.transformation_class or 'unknown'}",
@@ -517,8 +511,7 @@ def _reaction_concise_summary(result: Any) -> str:
     ]
     if result.product_connection:
         lines.append(
-            f"Product connection: {result.product_connection.concise_label} "
-            f"({result.product_connection.connection_type})"
+            f"Product connection: {result.product_connection.connection_type}"
         )
     else:
         lines.append("Product connection: not verified")
@@ -714,8 +707,7 @@ def _reaction_csv_columns(
         if field == reaction_smiles_column:
             columns.extend(
                 (
-                    "reaction_core_label",
-                    "reaction_display_label",
+                    "reaction_label",
                     "spectator_groups",
                 )
             )
@@ -759,7 +751,6 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     )
     atom_transitions = reaction_core.get("atom_transitions") or []
     core_quality = reaction_core.get("quality") or {}
-    core_presentation = reaction_core.get("presentation") or {}
     topology = analysis.get("reaction_topology") or {}
     ring_changes = topology.get("ring_changes") or []
     reaction_label = analysis.get("reaction_label") or {}
@@ -789,8 +780,7 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "evidence_quality": analysis.get("evidence_quality") or "",
         "transformation_class": analysis.get("transformation_class") or "",
         "named_family": analysis.get("named_family") or "",
-        "reaction_core_label": reaction_core.get("generic_label") or "",
-        "reaction_display_label": reaction_label.get("concise") or "",
+        "reaction_label": reaction_label.get("text") or "",
         "spectator_groups": "; ".join(
             str(group.get("group_id") or "") for group in spectator_groups
         ),
@@ -799,10 +789,9 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             f"{render_reactivity_profile(partner.get('reactivity_profile'))}"
             for partner in signature_partners
         ),
-        "reaction_display_label_detailed": reaction_label.get("detailed") or "",
-        "reaction_display_source": reaction_label.get("source") or "",
-        "reaction_display_status": reaction_label.get("status") or "",
-        "reaction_display_confidence": (
+        "reaction_label_status": reaction_label.get("status") or "",
+        "reaction_label_basis": reaction_label.get("basis") or "",
+        "reaction_label_confidence": (
             reaction_label.get("confidence")
             if reaction_label.get("confidence") is not None
             else ""
@@ -838,20 +827,8 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             tuple(core_quality.get("review_reasons") or ())
             + tuple(core_quality.get("blocking_reasons") or ())
         ),
-        "reaction_core_bond_changes": "; ".join(
-            core_presentation.get("bond_changes") or ()
-        ),
-        "reaction_core_state_changes": "; ".join(
-            core_presentation.get("atom_state_changes") or ()
-        ),
-        "reaction_core_retained_context": "; ".join(
-            core_presentation.get("retained_context") or ()
-        ),
-        "reaction_core_departing_context": "; ".join(
-            core_presentation.get("departing_context") or ()
-        ),
-        "reaction_core_appearing_context": "; ".join(
-            core_presentation.get("appearing_context") or ()
+        "reaction_core_state_changes": _json_dump(
+            reaction_core.get("state_changes") or (), compact=True
         ),
         "reaction_core_event_count": reaction_core.get("event_count") or "",
         "reaction_core_primary_center_count": (
@@ -885,8 +862,7 @@ def _write_batch_csv(
     if concise:
         columns = [
             "reaction_smiles",
-            "reaction_core_label",
-            "reaction_display_label",
+            "reaction_label",
             "partner_analysis",
             "spectator_groups",
             *_REACTION_RING_CSV_FIELDS,
@@ -1000,7 +976,7 @@ def _command_self_test(args: argparse.Namespace) -> int:
         print("\nreaction feature checks")
         for result in reaction_results:
             print(f"  {'PASS' if result.valid else 'FAIL'} "
-                  f"{result.reaction_label.concise if result.reaction_label else result.input_reaction_smiles}: "
+                  f"{result.reaction_label.text if result.reaction_label else result.input_reaction_smiles}: "
                   f"{result.evidence_quality}, family={result.named_family or 'unknown'}")
         print(f"\noverall: {'PASS' if passed else 'FAIL'}")
     return 0 if passed else 1
@@ -1044,7 +1020,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help=(
             "for reaction CSV output, write only reaction_smiles, "
-            "reaction_display_label, and spectator_groups"
+            "reaction_label and spectator_groups"
         ),
     )
     batch_parser.add_argument("--label-style", choices=("unicode", "ascii", "hte_legacy"), default="unicode")

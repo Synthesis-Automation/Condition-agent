@@ -198,8 +198,8 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.review_output.setObjectName("priorityReviewOutput")
         self.review_output.setReadOnly(True)
         self.review_output.setPlaceholderText(
-            "Detailed label, graphic core label, spectators, and local "
-            "electronic/steric analysis appear here."
+            "Reaction label, spectators, and local electronic/steric "
+            "analysis appear here."
         )
         self.review_output.setLineWrapMode(
             QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth
@@ -212,7 +212,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.output = QtWidgets.QPlainTextEdit()
         self.output.setObjectName("analysisOutput")
         self.output.setReadOnly(True)
-        self.output.setPlaceholderText("Concise featurization results appear here.")
+        self.output.setPlaceholderText("Featurization results appear here.")
         self.output.setLineWrapMode(
             QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth
         )

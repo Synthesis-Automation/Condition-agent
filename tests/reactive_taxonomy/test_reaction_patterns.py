@@ -47,8 +47,10 @@ def test_decarboxylative_coupling_is_optional_not_part_of_core() -> None:
         "decarboxylative_coupling_like"
     )
     assert result.reaction_label is not None
-    assert result.reaction_label.source == "optional_pattern"
-    assert result.reaction_label.concise == "decarboxylative C–C coupling"
+    assert result.reaction_label.basis == "reaction_sites"
+    assert result.reaction_label.text == (
+        "Alk–C(O)OH + HetAr–H → Alk–CH₂–HetAr"
+    )
 
 
 def test_pattern_registry_cannot_change_structural_observation(monkeypatch) -> None:

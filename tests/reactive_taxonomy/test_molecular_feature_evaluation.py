@@ -72,8 +72,8 @@ def test_chemist_packet_is_blind_and_has_review_fields(tmp_path: Path) -> None:
     assert "detected_group_labels" in rows[0]
     assert "detected_site_labels" in rows[0]
     aniline = next(row for row in rows if row["case_id"] == "primary_aniline")
-    assert aniline["detected_group_labels"] == "R–NH2 (1)"
-    assert aniline["detected_site_labels"] == "Ar–H (5); Ar–NH2 (1)"
+    assert aniline["detected_group_labels"] == "R–NH₂ (1)"
+    assert aniline["detected_site_labels"] == "Ar–H (5); Ar–NH₂ (1)"
     for field in (
         "reviewer_id",
         "reactive_sites_correct",
@@ -93,7 +93,7 @@ def test_chemist_packet_is_blind_and_has_review_fields(tmp_path: Path) -> None:
     assert "benchmark expectations" in review_html
     assert "detected reactive-site atoms" in review_html
     assert "Reactive-site labels:" in review_html
-    assert "Ar–NH2 (1)" in review_html
+    assert "Ar–NH₂ (1)" in review_html
     assert "Canonical site signatures:" in review_html
 
 

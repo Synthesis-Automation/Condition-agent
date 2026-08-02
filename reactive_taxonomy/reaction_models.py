@@ -11,9 +11,9 @@ from .models import MoleculeAnalysis, MolecularStructureObservation
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.4"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "3.0"
-REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.4"
-REACTION_PATTERN_MATCH_SCHEMA_VERSION = "3.1"
-REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v10"
+REACTION_CORE_PROJECTION_SCHEMA_VERSION = "3.0"
+REACTION_PATTERN_MATCH_SCHEMA_VERSION = "4.0"
+REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v11"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
 REACTION_TOPOLOGY_SCHEMA_VERSION = "2.0"
 
@@ -417,60 +417,33 @@ class FragmentSourceRequirement:
 
 
 @dataclass(frozen=True)
-class ReactionLabelClause:
-    """One deterministic, evidence-backed human-readable edit clause."""
-
-    edit_type: Literal["formed", "broken", "order_changed", "hydrogen_change"]
-    concise: str
-    detailed: str
-    elements: Tuple[str, ...]
-    atom_map_numbers: Tuple[int, ...]
-    old_order: Optional[str]
-    new_order: Optional[str]
-    evidence: str
-    confidence: float
-
-
-@dataclass(frozen=True)
 class RenderedReactionLabel:
-    """Structured display label that never participates in signature identity."""
+    """The sole chemist-facing reaction label plus non-display provenance."""
 
-    concise: str
-    detailed: str
+    text: str
     status: Literal[
-        "observed_edits",
-        "generic_pattern",
+        "structural_equation",
         "conflicting_evidence",
         "multi_event",
         "ring_formation",
-        "core_projection",
         "partial_product_correspondence",
         "unavailable",
     ]
-    source: Literal[
-        "generic_topology",
-        "optional_pattern",
-        "reaction_core",
+    basis: Literal[
+        "reaction_sites",
+        "local_context",
         "literal_edits",
+        "ring_topology",
         "partial_product_correspondence",
         "unavailable",
     ]
-    clauses: Tuple[ReactionLabelClause, ...]
     evidence: str
     confidence: float
     warnings: Tuple[str, ...]
     style: str
     definition_version: str
-    structural_label: Optional[str] = None
-    transformation_label: Optional[str] = None
-    pattern_id: Optional[str] = None
-    pattern_definition_version: Optional[str] = None
-    contextual_label: Optional[str] = None
-    reactant_context_label: Optional[str] = None
-    product_context_label: Optional[str] = None
-    event_labels: Tuple[str, ...] = ()
     event_count: int = 0
-    schema_version: str = "5.0"
+    schema_version: str = "1.0"
 
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:
@@ -548,7 +521,6 @@ class ProductConnection:
     endpoint_2: ProductConnectionEndpoint
     bond_order: str
     connection_type: str
-    concise_label: str
     evidence: str
     schema_version: str = "1.0"
 
@@ -560,7 +532,6 @@ class ProductTransformation:
     edits: Tuple[ReactionEdit, ...]
     stereo_changes: Tuple[ReactionStereoChange, ...]
     formed_connection_labels: Tuple[str, ...]
-    concise_label: Optional[str]
     exact_product_verified: bool
     evidence: str
 
@@ -789,7 +760,6 @@ class ReactionCoreAtomState:
     radical_electrons: int
     isotope: int
     neighbor_tokens: Tuple[str, ...]
-    concise_label: str
     state_key: str
 
 
@@ -857,20 +827,6 @@ class ReactionCoreQuality:
 
 
 @dataclass(frozen=True)
-class ReactionCorePresentation:
-    """Chemist-facing rendering excluded from all reaction-core identities."""
-
-    equation: str
-    bond_changes: Tuple[str, ...]
-    atom_state_changes: Tuple[str, ...]
-    retained_context: Tuple[str, ...]
-    departing_context: Tuple[str, ...]
-    appearing_context: Tuple[str, ...]
-    evidence_label: str
-    quality_label: str
-
-
-@dataclass(frozen=True)
 class ReactionCoreAttachmentPort:
     """One cut connection between an active atom and a remote subgraph."""
 
@@ -929,8 +885,6 @@ class ReactionCoreProjection:
     remote_subgraphs: Tuple[ReactionCoreRemoteSubgraph, ...]
     edit_tokens: Tuple[str, ...]
     participant_tokens: Tuple[str, ...]
-    generic_label: str
-    presentation: ReactionCorePresentation
     quality: ReactionCoreQuality
     active_atom_count: int
     event_count: int
@@ -1020,7 +974,6 @@ class ReactionPatternMatch:
     matched_edit_indices: Tuple[int, ...]
     evidence: Tuple[str, ...]
     occurrence_count: int = 1
-    display_label: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
     requires_condition_evidence: bool = False
     warnings: Tuple[str, ...] = ()
@@ -1085,7 +1038,7 @@ class ReactionInterpretation:
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "6.1"
+    schema_version: str = "7.0"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (
@@ -1128,7 +1081,7 @@ class ReactionAnalysis:
     interpretation: Optional[ReactionInterpretation] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "9.0"
+    schema_version: str = "10.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -1178,7 +1131,6 @@ __all__ = [
     "ReactionEventRelation",
     "ReactionFallbackDescriptor",
     "ReactionFamilyEnvironment",
-    "ReactionLabelClause",
     "ReactionInterpretation",
     "ReactionObservation",
     "ReactionPartner",

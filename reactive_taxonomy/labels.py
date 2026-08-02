@@ -7,6 +7,14 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List
 
+from .notation import (
+    available_styles,
+    format_chemist_text,
+    notation_style,
+    render_context_notation,
+    render_fragment_notation,
+)
+
 
 _RENDERING_PATH = Path(__file__).with_name("definitions") / "rendering.v1.json"
 
@@ -17,24 +25,37 @@ def load_rendering_taxonomy() -> Dict[str, Any]:
         return json.load(handle)
 
 
-def available_styles() -> tuple[str, ...]:
-    return tuple(load_rendering_taxonomy()["styles"])
-
-
 def _style(style: str) -> Dict[str, str]:
-    payload = load_rendering_taxonomy()
-    if style not in payload["styles"]:
-        raise ValueError(f"Unknown rendering style: {style}")
-    return payload["styles"][style]
-
-
-def _context_label(token: str, bond: str) -> str:
-    template = load_rendering_taxonomy().get("context_labels", {}).get(token, token)
-    return str(template).format(bond=bond)
+    styling = notation_style(style)
+    return {
+        "bond": styling["single"],
+        "double": styling["double"],
+        "triple": styling["triple"],
+        "negative_charge": styling["negative_charge"],
+        "positive_charge": styling["positive_charge"],
+    }
 
 
 def render_context(token: str, *, style: str = "unicode") -> str:
-    return _context_label(token, _style(style)["bond"])
+    return render_context_notation(token, style=style)
+
+
+def _render_context_or_fragment(token: str, *, style: str) -> str:
+    try:
+        return render_context_notation(token, style=style)
+    except ValueError:
+        return render_fragment_notation(token, style=style)
+
+
+def _render_contexts(tokens: List[str], *, style: str) -> List[str]:
+    """Render classification contexts, excluding non-display activation facets."""
+    rendered = []
+    for token in tokens:
+        try:
+            rendered.append(render_context_notation(token, style=style))
+        except ValueError:
+            continue
+    return rendered
 
 
 def render_anion(
@@ -47,18 +68,26 @@ def render_anion(
     """Render an explicitly charged heteroatom nucleophile."""
     styling = _style(style)
     bond = styling["bond"]
-    context = _context_label(contexts[0], bond) if contexts else ""
+    rendered_contexts = _render_contexts(contexts, style=style)
+    context = rendered_contexts[0] if rendered_contexts else ""
     magnitude = abs(int(charge))
     sign = styling["negative_charge"] if charge < 0 else styling["positive_charge"]
     charge_label = (str(magnitude) if magnitude > 1 else "") + sign
     prefix = f"{context}{bond}" if context else ""
-    return f"{prefix}{center}{charge_label}"
+    return format_chemist_text(f"{prefix}{center}{charge_label}", style=style)
 
 
 def render_edge(context: str, handle: str, *, style: str = "unicode") -> str:
     bond = _style(style)["bond"]
     template = load_rendering_taxonomy().get("edge_template", "{context}{bond}{handle}")
-    return str(template).format(context=_context_label(context, bond), bond=bond, handle=handle)
+    return format_chemist_text(
+        str(template).format(
+            context=_render_context_or_fragment(context, style=style),
+            bond=bond,
+            handle=handle,
+        ),
+        style=style,
+    )
 
 
 def render_named_handle(template_id: str, *, context: str = "", style: str = "unicode") -> str:
@@ -68,12 +97,12 @@ def render_named_handle(template_id: str, *, context: str = "", style: str = "un
     template = templates.get(template_id)
     if template is None:
         raise ValueError(f"Unknown named handle template: {template_id}")
-    return str(template).format(
+    return format_chemist_text(str(template).format(
         bond=bond,
         double=_style(style)["double"],
         triple=_style(style)["triple"],
-        context=_context_label(context, bond) if context else "",
-    )
+        context=render_context_notation(context, style=style) if context else "",
+    ), style=style)
 
 
 def render_unsaturated_bond(
@@ -110,24 +139,24 @@ def render_unsaturated_bond(
         left = endpoint("left", h_left, substituent_left)
         right = endpoint("right", h_right, substituent_right)
         stereo_suffix = f" ({stereochemistry})" if stereochemistry in {"E", "Z"} else ""
-        return str(rules["template"]).format(
+        return format_chemist_text(str(rules["template"]).format(
             left=left,
             right=right,
             double=styling["double"],
             stereo_suffix=stereo_suffix,
-        )
+        ), style=style)
     if bond_order == 3:
         rules = templates["alkyne"]
         substituent_count = sum(int(value) for value in endpoint_substituent_counts)
         key = "acetylene" if substituent_count == 0 else (
             "terminal" if substituent_count == 1 else "internal"
         )
-        return str(rules[key]).format(
+        return format_chemist_text(str(rules[key]).format(
             bond=styling["bond"],
             triple=styling["triple"],
             r1=1,
             r2=2,
-        )
+        ), style=style)
     raise ValueError(f"Unsupported unsaturated bond order: {bond_order}")
 
 
@@ -182,16 +211,16 @@ def render_xh(
     )
     if rule is None:
         return f"{center}{bond}H"
-    rendered_contexts = [_context_label(token, bond) for token in contexts]
+    rendered_contexts = _render_contexts(contexts, style=style)
     context = rendered_contexts[0] if rendered_contexts else "H"
     suffix = "2" if h_count == 2 else ("R" if h_count == 1 and len(contexts) > 1 else ("" if h_count == 1 else str(h_count)))
-    return str(rule["template"]).format(
+    return format_chemist_text(str(rule["template"]).format(
         bond=bond,
         context=context,
         contexts=bond.join(rendered_contexts) if rendered_contexts else "H",
         suffix=suffix,
         triple=styling["triple"],
-    )
+    ), style=style)
 
 
 __all__ = ["available_styles", "load_rendering_taxonomy", "render_context", "render_edge", "render_named_handle", "render_unsaturated_bond", "render_xh"]

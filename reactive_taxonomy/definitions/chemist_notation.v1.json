@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "chemist_notation.v1",
+  "default_style": "unicode",
+  "styles": {
+    "unicode": {
+      "single": "–",
+      "double": "=",
+      "triple": "≡",
+      "aromatic": ":",
+      "arrow": "→",
+      "times": "×",
+      "negative_charge": "⁻",
+      "positive_charge": "⁺"
+    },
+    "ascii": {
+      "single": "-",
+      "double": "=",
+      "triple": "#",
+      "aromatic": ":",
+      "arrow": "->",
+      "times": "x",
+      "negative_charge": "-",
+      "positive_charge": "+"
+    },
+    "hte_legacy": {
+      "single": "-",
+      "double": "=",
+      "triple": "#",
+      "aromatic": ":",
+      "arrow": "->",
+      "times": "x",
+      "negative_charge": "-",
+      "positive_charge": "+"
+    }
+  },
+  "fragment_notations": [
+    {
+      "id": "generic_organic",
+      "symbol": "R",
+      "meaning": "Organic substituent whose more specific class is unresolved"
+    },
+    {
+      "id": "alkyl",
+      "symbol": "Alk",
+      "meaning": "Non-aromatic substituent attached through an sp3 carbon"
+    },
+    {
+      "id": "cycloalkyl",
+      "symbol": "c-Alk",
+      "meaning": "Saturated cyclic substituent attached through an aliphatic ring carbon"
+    },
+    {
+      "id": "benzyl",
+      "symbol": "Bn",
+      "meaning": "Benzyl substituent attached through the methylene carbon"
+    },
+    {
+      "id": "allyl",
+      "symbol": "Allyl",
+      "meaning": "Allylic substituent attached through an sp3 carbon adjacent to C=C"
+    },
+    {
+      "id": "propargyl",
+      "symbol": "Propargyl",
+      "meaning": "Propargylic substituent attached through an sp3 carbon adjacent to C triple C"
+    },
+    {
+      "id": "aryl",
+      "symbol": "Ar",
+      "meaning": "Carbocyclic aromatic group attached through an aromatic carbon"
+    },
+    {
+      "id": "heteroaryl",
+      "symbol": "HetAr",
+      "meaning": "Heteroaromatic ring system attached through an aromatic carbon"
+    },
+    {
+      "id": "alkenyl",
+      "symbol": "Alkenyl",
+      "meaning": "Non-aromatic substituent attached through an sp2 carbon"
+    },
+    {
+      "id": "alkynyl",
+      "symbol": "Alkynyl",
+      "meaning": "Non-aromatic substituent attached through an sp carbon"
+    },
+    {
+      "id": "acyl_context",
+      "symbol": "C(O)R",
+      "meaning": "Substituent attached through a carbonyl carbon"
+    },
+    {
+      "id": "generic_heteroatom",
+      "symbol": "Het",
+      "meaning": "Heteroatom whose element is unresolved"
+    },
+    {
+      "id": "halogen",
+      "symbol": "X",
+      "meaning": "Halogen atom: F, Cl, Br, or I"
+    },
+    {
+      "id": "nitrogen",
+      "symbol": "N",
+      "meaning": "Nitrogen attachment context"
+    },
+    {
+      "id": "oxygen",
+      "symbol": "O",
+      "meaning": "Oxygen attachment context"
+    },
+    {
+      "id": "sulfur",
+      "symbol": "S",
+      "meaning": "Sulfur attachment context"
+    },
+    {
+      "id": "phosphorus",
+      "symbol": "P",
+      "meaning": "Phosphorus attachment context"
+    },
+    {
+      "id": "hydrogen",
+      "symbol": "H",
+      "meaning": "Hydrogen"
+    },
+    {
+      "id": "other",
+      "symbol": "?",
+      "meaning": "Unsupported or unresolved fragment class"
+    }
+  ],
+  "context_notations": {
+    "SO2R": "R{single}S(O)2",
+    "P(O)R2": "R2P(O)",
+    "C(O)NR": "R2N{single}C(O)",
+    "C(O)OR": "RO{single}C(O)",
+    "C(O)R": "R{single}C(O)",
+    "HetAr": "{heteroaryl}",
+    "Ar": "{aryl}",
+    "Alkenyl": "{alkenyl}",
+    "Alkynyl": "{alkynyl}",
+    "Alkyl": "{alkyl}",
+    "N": "{nitrogen}",
+    "O": "{oxygen}",
+    "S": "{sulfur}",
+    "Other": "{other}"
+  },
+  "remote_class_notations": {
+    "aryl": "aryl",
+    "heteroaryl": "heteroaryl",
+    "alkyl": "alkyl",
+    "alkenyl": "alkenyl",
+    "alkynyl": "alkynyl",
+    "acyl": "acyl_context",
+    "ring_aliphatic": "cycloalkyl",
+    "heteroatom": "generic_heteroatom",
+    "generic_R": "generic_organic"
+  },
+  "fragment_index_symbols": [
+    "HetAr",
+    "Alkenyl",
+    "Alkynyl",
+    "c-Alk",
+    "Alk",
+    "Ar",
+    "R"
+  ]
+}

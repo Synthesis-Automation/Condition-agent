@@ -26,7 +26,7 @@ def _co_occurring_patterns(
             (
                 match
                 for match in pattern_matches
-                if match.tier == "synthesis" and match.display_label
+                if match.tier == "synthesis"
             ),
             key=lambda match: (
                 not any(

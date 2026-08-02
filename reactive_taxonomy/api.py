@@ -177,7 +177,9 @@ def interpret_molecular_reactivity(
         molecule = parse_smiles(component.input_smiles)
         if molecule is None:
             continue
-        motifs = detect_molecular_motifs(molecule, component.component_index)
+        motifs = detect_molecular_motifs(
+            molecule, component.component_index, label_style=label_style
+        )
         match_index = MatchIndex(molecule)
         raw: List[ReactiveSiteCandidate] = []
         for site_type, detector in DETECTORS.items():

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from .chemistry.smarts_cache import compile_smarts
+from .notation import format_chemist_text
 from .models import MolecularMotifMatch
 
 _PATH = Path(__file__).with_name("definitions") / "molecular_motifs.v1.json"
@@ -24,7 +25,9 @@ def load_molecular_motif_definitions() -> Tuple[Dict[str, Any], ...]:
     ))
 
 
-def detect_molecular_motifs(mol: Any, component_index: int) -> List[MolecularMotifMatch]:
+def detect_molecular_motifs(
+    mol: Any, component_index: int, *, label_style: str = "unicode"
+) -> List[MolecularMotifMatch]:
     """Detect deduplicated molecular motifs in one component."""
     candidates: List[Tuple[Dict[str, Any], MolecularMotifMatch]] = []
     seen = set()
@@ -48,7 +51,10 @@ def detect_molecular_motifs(mol: Any, component_index: int) -> List[MolecularMot
                 anchor_position = map_positions.get(1, 0)
                 candidates.append((definition, MolecularMotifMatch(
                     motif_id=str(definition["id"]),
-                    chemist_label=str(definition.get("label") or definition["id"]),
+                    chemist_label=format_chemist_text(
+                        str(definition.get("label") or definition["id"]),
+                        style=label_style,
+                    ),
                     component_index=component_index,
                     atom_indices=atoms,
                     anchor_atom_index=int(match[anchor_position]),

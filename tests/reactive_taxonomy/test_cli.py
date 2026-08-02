@@ -22,7 +22,7 @@ def test_molecule_and_reaction_json(capsys) -> None:
     assert main(["reaction", reaction, "--format", "json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["evidence_quality"] == "global_atom_correspondence"
-    assert payload["reaction_label"]["concise"] == "C–B + C–Br → C–C"
+    assert payload["reaction_label"]["text"] == "Ar–Br + Ar–B(OH)₂ → Ar–Ar"
 
 
 def test_concise_molecule_and_reaction_output(capsys) -> None:
@@ -35,7 +35,7 @@ def test_concise_molecule_and_reaction_output(capsys) -> None:
     reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
     assert main(["reaction", reaction, "--concise"]) == 0
     reaction_output = capsys.readouterr().out
-    assert "Reaction: C–B + C–Br → C–C" in reaction_output
+    assert "Reaction: Ar–Br + Ar–B(OH)₂ → Ar–Ar" in reaction_output
     assert "Evidence: global_atom_correspondence" in reaction_output
     assert "Product connection: not verified" in reaction_output
     assert "selected interpretation" not in reaction_output
@@ -57,10 +57,7 @@ def test_concise_reaction_output_exposes_minimized_core(capsys) -> None:
     output = capsys.readouterr().out
 
     assert "Reaction minimization:" in output
-    assert (
-        "Minimized reaction: C(H)(Ar)(=O) + O(H)(R) "
-        "→ C(H)(Ar)(O-R)2"
-    ) in output
+    assert "Minimized reaction:" not in output
     assert "Core evidence: verified (validated_atom_mapping" in output
     assert "Core shape (retrieval): RSH2:" in output
     assert "Center transition (diagnostic only): RCS2:" in output
@@ -177,9 +174,8 @@ def test_batch_autodetects_clean_reaction_column(tmp_path, capsys) -> None:
         reader = csv.DictReader(handle)
         assert reader.fieldnames is not None
         smiles_index = reader.fieldnames.index("rxn_smiles_clean")
-        assert reader.fieldnames[smiles_index + 1 : smiles_index + 4] == [
-            "reaction_core_label",
-            "reaction_display_label",
+        assert reader.fieldnames[smiles_index + 1 : smiles_index + 3] == [
+            "reaction_label",
             "spectator_groups",
         ]
         rows = list(reader)
@@ -223,10 +219,9 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         assert reader.fieldnames is not None
-        assert reader.fieldnames[:5] == [
+        assert reader.fieldnames[:4] == [
             "reaction_smiles",
-            "reaction_core_label",
-            "reaction_display_label",
+            "reaction_label",
             "partner_analysis",
             "spectator_groups",
         ]
@@ -234,7 +229,7 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
         assert "reaction_core_quality_status" in reader.fieldnames
         assert "reaction_core_state_changes" in reader.fieldnames
         assert "reaction_core_remote_subgraphs" in reader.fieldnames
-        assert "reaction_display_label_detailed" in reader.fieldnames
+        assert "reaction_label_basis" in reader.fieldnames
         assert "formed_ring_sizes" in reader.fieldnames
         assert "ring_count_delta" in reader.fieldnames
         assert "ring_change_count" in reader.fieldnames
@@ -281,14 +276,11 @@ def test_batch_reaction_csv_exposes_minimized_core(tmp_path, capsys) -> None:
         row = next(csv.DictReader(handle))
 
     assert row["reaction_core_available"] == "True"
-    assert list(row)[:3] == [
+    assert list(row)[:2] == [
         "reaction_smiles",
-        "reaction_core_label",
-        "reaction_display_label",
+        "reaction_label",
     ]
-    assert row["reaction_core_label"] == (
-        "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
-    )
+    assert row["reaction_label"]
     assert row["reaction_core_evidence_status"] == "verified"
     assert row["reaction_core_exact_key"].startswith("RCX2:")
     assert row["reaction_core_typed_key"].startswith("RCT2:")

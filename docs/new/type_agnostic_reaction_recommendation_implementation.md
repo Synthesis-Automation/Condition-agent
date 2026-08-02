@@ -86,7 +86,7 @@ The current code declares:
 | Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `1.2` |
 | Recommendation record | `8.0` |
-| Generic converter definition | `generic_conversion.v8.0` |
+| Generic converter definition | `generic_conversion.v9.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
 | Concise reaction review | `9.0` |
 | Shared chemist review summary | `3.0` |
@@ -519,10 +519,10 @@ named_family = None
 Source-declared family is stored as provenance outside
 `featurize_reaction()`. It cannot determine the structural output.
 
-One `render_reaction()` entry point builds the chemist-facing label after
-structural analysis. It records whether the result came from generic topology,
-an optional edit pattern, the minimum-core projection, or literal edits. Its
-wording and rendering version do not affect signature identity.
+One `render_reaction()` entry point builds the chemist-facing label after all
+structural analysis. It emits one `text` value and records its structural basis,
+evidence, confidence, and warnings as metadata. Its wording and rendering
+version do not affect signature identity.
 
 ### 3.3 Recommendation records
 
@@ -533,11 +533,9 @@ The converter serializes:
   signature, completeness, fallback, and conflicts;
 - reaction-core projection, evidence status, exact/typed/shape/center keys,
   atom transitions, events, remote subgraphs, attachment ports, and warnings;
-- one primary `reaction_display_label` review column and a separate
-  `reaction_display_label_detailed` column, both projected from the canonical
-  nested `reaction_label` object;
-- a separate `reaction_core_label` audit column immediately after reaction
-  SMILES;
+- one `reaction_label` review column, projected from the canonical nested
+  `reaction_label.text`, with separate status, basis, confidence, and warning
+  metadata columns;
 - optional external-mapping disposition, mapped proposal, coverage, confidence,
   provider/model identity, matched internal hypotheses, and warnings;
 - chemistry, condition, stage, outcome, and index-eligibility statuses;

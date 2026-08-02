@@ -42,9 +42,9 @@ def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
             context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
             token = handle.GetSymbol()
             display_context = {
-                "benzylic": "Benzyl",
-                "allylic": "Allyl",
-                "propargylic": "Propargyl",
+                "benzylic": "benzyl",
+                "allylic": "allyl",
+                "propargylic": "propargyl",
             }.get(context.subtype, context.token)
             sites.append(ReactiveSiteCandidate(
                 site_type="leaving_group", topology="edge",
@@ -143,9 +143,9 @@ def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
         token = _sulfonate_token(sulfur)
         context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
         display_context = {
-            "benzylic": "Benzyl",
-            "allylic": "Allyl",
-            "propargylic": "Propargyl",
+            "benzylic": "benzyl",
+            "allylic": "allyl",
+            "propargylic": "propargyl",
         }.get(context.subtype, context.token)
         handle_atoms = tuple(unique_indices([handle.GetIdx(), sulfur.GetIdx(), *(n.GetIdx() for n in sulfur.GetNeighbors() if n.GetIdx() != handle.GetIdx())]))
         sites.append(ReactiveSiteCandidate(

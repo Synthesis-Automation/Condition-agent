@@ -93,7 +93,7 @@ class ContextClassification:
     classification_method: str
     facet: str = "fallback"
     semantic_id: str = "other"
-    display_token: Optional[str] = None
+    notation_id: str = "Other"
     subtype: Optional[str] = None
     matched_pattern: Optional[str] = None
     features: Dict[str, Any] = field(default_factory=dict)

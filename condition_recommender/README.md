@@ -172,15 +172,10 @@ be replaced by a reaction-name guess.
 Converted records serialize `reaction_observation` and the optional
 `reaction_interpretation` separately. The nested `reaction_signature` is built
 from the observation and remains generic; interpretation roles and named-family
-evidence stay in the interpretation. Review CSVs expose one primary
-`reaction_display_label` from the shared renderer, plus
-`reaction_core_label` immediately after the reaction-SMILES column as an audit
-field for the unpolished minimum-core
-projection. Neither display field participates in identity or retrieval.
-The shared display renderer composes verified interpretation and topology language with
-additional core context when that context is informative, marks review-only
-cores as provisional, and renders unresolved products explicitly rather than
-ending labels with an incomplete reaction arrow.
+evidence stay in the interpretation. Review CSVs expose one `reaction_label`
+from the shared terminal renderer, plus status, basis, confidence, and warning
+metadata. The reaction core has no display field. Label text does not
+participate in identity or retrieval.
 
 ### Reaction-core retrieval
 

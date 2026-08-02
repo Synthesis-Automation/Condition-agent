@@ -20,17 +20,15 @@ from .pattern_serialization import (
 )
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "10.0"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "11.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
-    "reaction_core_label",
+    "reaction_label",
     *REACTION_PATTERN_REVIEW_FIELDS,
-    "reaction_display_label",
-    "reaction_display_label_detailed",
-    "reaction_display_source",
-    "reaction_display_status",
-    "reaction_display_confidence",
-    "reaction_display_warnings",
+    "reaction_label_status",
+    "reaction_label_basis",
+    "reaction_label_confidence",
+    "reaction_label_warnings",
     "original_reaction_type",
     "transformation_class",
     "ring_change_count",
@@ -41,11 +39,7 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_core_status",
     "reaction_core_quality_status",
     "reaction_core_quality_reasons",
-    "reaction_core_bond_changes",
     "reaction_core_state_changes",
-    "reaction_core_retained_context",
-    "reaction_core_departing_context",
-    "reaction_core_appearing_context",
     "reaction_core_unavailability_reasons",
     "reaction_core_remote_classes",
     "fallback_evidence_mode",
@@ -236,7 +230,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         reaction_core if isinstance(reaction_core, Mapping) else {}
     )
     quality_value = reaction_core_value.get("quality") or {}
-    presentation_value = reaction_core_value.get("presentation") or {}
     fallback = record.get("fallback_descriptor")
     fallback_value = fallback if isinstance(fallback, Mapping) else {}
     completeness = record.get("reaction_completeness")
@@ -289,26 +282,20 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or record.get("reaction_smiles")
             or ""
         ),
-        "reaction_core_label": str(
-            reaction_core_value.get("generic_label") or ""
-        ),
+        "reaction_label": str(display_value.get("text") or ""),
         **flattened_reaction_pattern_fields(
             interpretation_value,
             named_family=record.get("named_family"),
             separator="; ",
         ),
-        "reaction_display_label": str(
-            display_value.get("concise") or ""
-        ),
-        "reaction_display_label_detailed": review_summary.detailed_reaction_label,
-        "reaction_display_source": str(display_value.get("source") or ""),
-        "reaction_display_status": str(
+        "reaction_label_status": str(
             display_value.get("status") or "unavailable"
         ),
-        "reaction_display_confidence": _text_or_blank(
+        "reaction_label_basis": str(display_value.get("basis") or ""),
+        "reaction_label_confidence": _text_or_blank(
             display_value.get("confidence")
         ),
-        "reaction_display_warnings": "; ".join(
+        "reaction_label_warnings": "; ".join(
             str(value) for value in display_value.get("warnings") or ()
         ),
         "original_reaction_type": str(record.get("source_declared_family") or ""),
@@ -338,20 +325,10 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             tuple(quality_value.get("review_reasons") or ())
             + tuple(quality_value.get("blocking_reasons") or ())
         ),
-        "reaction_core_bond_changes": "; ".join(
-            presentation_value.get("bond_changes") or ()
-        ),
-        "reaction_core_state_changes": "; ".join(
-            presentation_value.get("atom_state_changes") or ()
-        ),
-        "reaction_core_retained_context": "; ".join(
-            presentation_value.get("retained_context") or ()
-        ),
-        "reaction_core_departing_context": "; ".join(
-            presentation_value.get("departing_context") or ()
-        ),
-        "reaction_core_appearing_context": "; ".join(
-            presentation_value.get("appearing_context") or ()
+        "reaction_core_state_changes": json.dumps(
+            reaction_core_value.get("state_changes") or (),
+            ensure_ascii=False,
+            sort_keys=True,
         ),
         "reaction_core_unavailability_reasons": "; ".join(
             core_unavailability_reasons

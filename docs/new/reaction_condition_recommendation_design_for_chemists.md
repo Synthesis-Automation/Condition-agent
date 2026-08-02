@@ -488,7 +488,7 @@ For example, a result may say:
 
 ```text
 Query:
-  HeteroAr–Br + Ar–NH2 -> HeteroAr–NH–Ar
+  HetAr–Br + Ar–NH2 -> HetAr–NH–Ar
   transformation: sp2 C–N substitution
   family: unresolved
 

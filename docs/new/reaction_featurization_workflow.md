@@ -2,7 +2,7 @@
 
 The system is graph-first, type-agnostic, and label-last. Molecular structures
 and normalized graph changes are the source of truth. Molecular reactivity
-hypotheses, synthesis patterns, family names, and display labels are optional
+hypotheses, synthesis patterns, family names, and the reaction label are optional
 annotations and cannot create or override structural evidence.
 
 ## Canonical workflow
@@ -25,7 +25,7 @@ Add optional annotations
   ├─ molecular motifs and reactive-site hypotheses
   └─ generic transformation and synthesis-pattern matches
   ↓
-Render one concise/detailed reaction label
+Render one reaction label
   ↓
 Serialize for conversion and recommendation
 ```
@@ -45,7 +45,7 @@ been built.
 | `ReactionSignature` | Versioned generic chemistry identity | Display labels, source names, motifs, reactive-site hypotheses, family identity |
 | Molecular interpretation | Motif matches, reactive-site hypotheses, local reactivity profiles, connectivity hypotheses | Reaction evidence or identity |
 | Reaction interpretation | Patterns supported by existing edits, optional family evidence | Atom correspondence, edits, predicted products |
-| Rendering | One chemist-facing concise and detailed label | Chemistry identity or recommendation routing |
+| Rendering | One chemist-facing reaction label | Chemistry identity or recommendation routing |
 
 ## 1. Parse molecular graph facts
 
@@ -133,7 +133,7 @@ bond-order direction, and ring opening or closure. Reusable graph queries live
 in `reaction_pattern_predicates.py`; validated v2 metadata lives in
 `transformation_patterns.v2.json` and `synthesis_patterns.v2.json`.
 
-Synthesis patterns combine those facts into chemist-facing structural classes.
+Synthesis patterns combine those facts into optional structural annotations.
 For example, SNAr, Buchwald–Hartwig C–N, and Ullmann C–N products share one
 `sp2_c_n_substitution_like` pattern because their graph-observable change is the
 same. The pattern retains all compatible named families and requires condition
@@ -146,23 +146,43 @@ or reconstruction instructions. They may rank display interpretations or add
 optional family evidence; they cannot modify structural facts.
 
 When two synthesis patterns are supported by non-overlapping edit subsets, the
-interpretation retains both as `co_occurring_pattern_ids`. Rendering may present
-them as a composite label, but does not infer their temporal order.
+interpretation retains both as `co_occurring_pattern_ids`. They remain typed
+annotations and do not replace graph-derived reaction rendering.
 
 ## 5. Render and serialize
 
-[`render_reaction()`](../reactive_taxonomy/reaction_rendering.py) returns one
-`RenderedReactionLabel` with `concise` and `detailed` text plus evidence,
-confidence, provenance, and warnings. Rendering may polish a minimum-core label
-or add a supported pattern overlay, but display text never participates in core,
-signature, conversion admission, or retrieval identity.
+[`render_reaction()`](../../reactive_taxonomy/reaction_rendering.py) is the sole
+terminal reaction renderer. `RenderedReactionLabel.text` is the only complete
+reaction label; `status`, `basis`, `evidence`, `confidence`, and `warnings` are
+metadata. The renderer consumes finalized edits, topology, signature events,
+reactive-site labels, and local contexts. It does not read source reaction names
+or use optional named-family annotations to override graph evidence.
+
+All molecular-site and reaction rendering resolves shorthand through
+`chemist_notation.v1.json`. The canonical fragment vocabulary is:
+
+| Symbol | Definition |
+|---|---|
+| `R` | Organic substituent whose more specific class is unresolved |
+| `Alk` | Non-aromatic substituent attached through an sp3 carbon |
+| `c-Alk` | Saturated cyclic substituent attached through an aliphatic ring carbon |
+| `Ar` | Carbocyclic aromatic group attached through an aromatic carbon |
+| `HetAr` | Heteroaromatic ring system attached through an aromatic carbon |
+| `Bn`, `Allyl`, `Propargyl` | Benzyl, allylic, and propargylic substituents at the named attachment atom |
+| `X` | F, Cl, Br, or I |
+| `Het` | Heteroatom whose element is unresolved |
+
+There are no notation aliases. In particular, `HeteroAr` is invalid; the sole
+heteroaryl symbol is `HetAr`.
 
 Review CSV exports use the same label contract:
 
 ```text
-reaction_core_label
-reaction_display_label
-reaction_display_label_detailed
+reaction_label
+reaction_label_status
+reaction_label_basis
+reaction_label_confidence
+reaction_label_warnings
 ```
 
 They also expose optional interpretation without parsing display text:
@@ -182,15 +202,15 @@ For example, Suzuki chemistry may resolve to `suzuki_miyaura`, while an sp2
 C–N substitution retains SNAr, Buchwald–Hartwig, and Ullmann as compatible
 types until condition evidence distinguishes them.
 
-The first is the low-level minimum-core label. The latter two are concise and
-detailed projections from the single renderer. Canonical nested JSON or Parquet
-remains the lossless converted artifact; CSV is a review view.
+There are no separate core, graphic, concise, detailed, or contextual reaction
+labels. Canonical nested JSON or Parquet remains the lossless converted artifact;
+CSV is a review view.
 
 ## Invariants
 
 - Parse graph facts before running molecular annotation definitions.
 - Correspondence and normalized edits do not depend on reaction patterns.
-- The minimum core is the base generic reaction representation.
+- The minimum core is structured graph evidence and contains no display label.
 - Molecular annotations and reaction patterns are optional overlays.
 - Patterns consume edits; they never generate them.
 - Ambiguity, conflicts, confidence, and provenance remain explicit.

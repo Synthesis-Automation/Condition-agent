@@ -138,15 +138,6 @@ def flattened_reaction_core_fields(
     """Expose minimized-core identity and canonical review JSON."""
     value = core or {}
     quality = value.get("quality") or {}
-    presentation = value.get("presentation") or {}
-    summary_sections = (
-        presentation.get("equation"),
-        *tuple(presentation.get("bond_changes") or ()),
-        *tuple(presentation.get("atom_state_changes") or ()),
-        *tuple(presentation.get("retained_context") or ()),
-        *tuple(presentation.get("departing_context") or ()),
-        *tuple(presentation.get("appearing_context") or ()),
-    )
     return {
         "reaction_core_id": value.get("core_id", ""),
         "reaction_core_exact": value.get("exact_core_key", ""),
@@ -169,10 +160,6 @@ def flattened_reaction_core_fields(
             ensure_ascii=False,
             sort_keys=True,
         ),
-        "reaction_core_chemist_summary": " | ".join(
-            str(section) for section in summary_sections if section
-        ),
-        "reaction_core_label": value.get("generic_label", ""),
         "reaction_core_evidence_status": value.get("evidence_status", ""),
         "reaction_core_json": json.dumps(
             core,

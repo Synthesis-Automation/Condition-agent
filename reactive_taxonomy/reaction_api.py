@@ -6,7 +6,6 @@ from dataclasses import replace
 
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
-from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_edits import (
     EditNormalizationResult,
     normalize_mapped_edits,
@@ -22,7 +21,6 @@ from .reaction_parser import interpret_parsed_molecules, parse_reaction_smiles
 from .reaction_stoichiometry import infer_reactant_multiplicity
 from .partial_product_correspondence import (
     infer_partial_product_transformation,
-    render_partial_product_transformation,
 )
 from .reaction_signatures import build_observation_signature
 
@@ -92,7 +90,7 @@ def featurize_reaction(
         mapped_bond_changes=mapped_changes,
         warnings=warnings,
     )
-    parsed = interpret_parsed_molecules(parsed)
+    parsed = interpret_parsed_molecules(parsed, label_style=label_style)
     spectators = derive_observed_spectator_groups(
         parsed.reactants,
         observation.edits,
@@ -103,23 +101,9 @@ def featurize_reaction(
     reaction_completeness = observation.completeness
     assert reaction_completeness is not None
     warnings = list(observation.warnings)
-    contextual_label = (
-        None
-        if edit_result.evidence
-        in {
-            "conflicting_edit_evidence",
-            "conflicting_stereochemical_evidence",
-        }
-        else build_contextual_transformation_label(
-            parsed.reactants, edit_result.edits, style=label_style
-        )
-    )
     reaction_signature = (
         build_observation_signature(
             observation,
-            contextual_product_label=(
-                contextual_label.after if contextual_label is not None else None
-            ),
             warnings=warnings,
         )
         if (
@@ -156,34 +140,13 @@ def featurize_reaction(
         if partial_product_transformation is not None
         else edit_result.evidence
     )
-    fallback_label = None
-    fallback_status = "unavailable"
-    fallback_detailed_label = None
-    if partial_product_transformation is not None:
-        fallback_label, fallback_detailed_label = render_partial_product_transformation(
-            partial_product_transformation,
-            reactants=parsed.reactants,
-            products=parsed.products,
-            style=label_style,
-        )
-        fallback_status = "partial_product_correspondence"
     reaction_label = render_reaction(
         observation,
         interpretation,
+        reactants=parsed.reactants,
+        signature=reaction_signature,
+        partial_transformation=partial_product_transformation,
         style=label_style,
-        fallback_label=fallback_label,
-        fallback_status=fallback_status,
-        fallback_detailed_label=fallback_detailed_label,
-        fallback_evidence=(
-            partial_product_transformation.evidence
-            if partial_product_transformation is not None and not edit_result.edits
-            else None
-        ),
-        fallback_confidence=(
-            partial_product_transformation.confidence
-            if partial_product_transformation is not None and not edit_result.edits
-            else None
-        ),
     )
     fallback_descriptor = build_reaction_fallback_descriptor(
         reactants=parsed.reactants,

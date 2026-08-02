@@ -63,7 +63,7 @@ def heteroatom_lone_pair(
         return "sulfonamide_like", "low", "acidic"
     if values & {"C(O)R", "C(O)NR", "C(O)OR"}:
         return "amide_like", "low", "moderately_acidic"
-    if values & {"Ar", "HeteroAr"}:
+    if values & {"Ar", "HetAr"}:
         return "aryl_delocalized", "medium", "weakly_acidic"
     if atom.GetSymbol() == "N":
         return "amine_like", "high", "weakly_acidic"
@@ -156,7 +156,7 @@ def build_heteroatom_context(
         else "carbonyl_delocalized"
         if set(contexts) & {"C(O)R", "C(O)NR", "C(O)OR"}
         else "aryl_delocalized"
-        if set(contexts) & {"Ar", "HeteroAr"}
+        if set(contexts) & {"Ar", "HetAr"}
         else "localized"
     )
     contributions = tuple(

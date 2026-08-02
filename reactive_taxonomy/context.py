@@ -157,7 +157,7 @@ def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
             "aromatic_ring_system",
             facet="scaffold",
             semantic_id="carbocyclic_aromatic",
-            display_token="Ar",
+            notation_id="Ar",
         )
     ring_atoms: Set[int] = set().union(*(set(ring) for ring in rings))
     heteroatom_details = []
@@ -181,7 +181,7 @@ def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
     heteroatoms = sorted({
         str(record["element"]) for record in heteroatom_details
     })
-    token = "HeteroAr" if heteroatoms else "Ar"
+    token = "HetAr" if heteroatoms else "Ar"
     subtype = _heteroaromatic_subtype(rings, heteroatom_details)
     element_counts = {
         element: sum(
@@ -205,7 +205,7 @@ def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
         semantic_id=(
             "heteroaromatic" if heteroatoms else "carbocyclic_aromatic"
         ),
-        display_token=token,
+        notation_id=token,
         subtype=subtype,
         features={
             "heteroatoms": heteroatoms,
@@ -256,7 +256,7 @@ def _sp3_carbon_context(mol: Any, atom: Any, excluded: Set[int]) -> ContextClass
         classification_method="sp3_attachment_environment",
         facet="scaffold",
         semantic_id="alkyl",
-        display_token="Alkyl",
+        notation_id="Alkyl",
         subtype=subtype,
         features={
             "element": "C",
@@ -301,9 +301,7 @@ def classify_context(
                 semantic_id=str(
                     definitions[candidate].get("semantic_id") or "other"
                 ),
-                display_token=str(
-                    definitions[candidate].get("display_token") or candidate
-                ),
+                notation_id=str(definitions[candidate]["notation_id"]),
                 matched_pattern=candidate,
                 features={"excluded_atom_indices": sorted(excluded_set)},
             )
@@ -338,7 +336,7 @@ def classify_context(
             "Alkenyl": "alkenyl",
             "Alkynyl": "alkynyl",
         }.get(token, "other"),
-        display_token=token,
+        notation_id=token,
         features={"element": symbol, "hybridization": str(atom.GetHybridization()), "aromatic": atom.GetIsAromatic()},
     )
 

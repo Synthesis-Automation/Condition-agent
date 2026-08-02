@@ -1,6 +1,6 @@
 {
-  "schema_version": "3.0",
-  "taxonomy_version": "3.0",
+  "schema_version": "4.0",
+  "taxonomy_version": "4.0",
   "identity_definitions": [
     "signature_features.v3.json"
   ],
@@ -12,8 +12,7 @@
     "reactivity_descriptor_rules.v1.json",
     "aromatic_systems.v1.json",
     "molecular_motifs.v1.json",
-    "reaction_label_patterns.v1.json",
-    "reaction_label_rendering.v1.json",
+    "chemist_notation.v1.json",
     "rendering.v1.json",
     "reactivity_rendering.v1.json",
     "synthesis_patterns.v2.json",

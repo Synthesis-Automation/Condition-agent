@@ -59,7 +59,7 @@ def test_interpretation_adds_optional_family_semantics() -> None:
     assert signature is not None
     assert all(partner.role is None for partner in signature.partners)
     rendered = render_reaction(observation, interpretation)
-    assert rendered.source != "verified_interpretation"
+    assert rendered.basis == "literal_edits"
 
 
 def test_signature_and_core_do_not_depend_on_optional_annotations(monkeypatch) -> None:
@@ -83,7 +83,7 @@ def test_signature_and_core_do_not_depend_on_optional_annotations(monkeypatch) -
     assert generic.named_family is None
     assert interpreted.reaction_label is not None
     assert generic.reaction_label is not None
-    assert interpreted.reaction_label.concise == generic.reaction_label.concise
+    assert interpreted.reaction_label.text == generic.reaction_label.text
 
 
 def test_molecular_reactivity_hypotheses_cannot_change_observation(monkeypatch) -> None:
@@ -92,7 +92,7 @@ def test_molecular_reactivity_hypotheses_cannot_change_observation(monkeypatch) 
     monkeypatch.setattr(
         reaction_api_module,
         "interpret_parsed_molecules",
-        lambda parsed: parsed,
+        lambda parsed, **_: parsed,
     )
     without_annotations = featurize_reaction(reaction)
 
@@ -112,9 +112,9 @@ def test_cycloaddition_uses_generic_topology_renderer() -> None:
     result = featurize_reaction(reaction)
 
     assert result.reaction_label is not None
-    assert result.reaction_label.source == "generic_topology"
-    assert result.reaction_label.concise == (
-        "C≡C + N=N=N → aromatic 5-membered C₂N₃ ring"
+    assert result.reaction_label.basis == "ring_topology"
+    assert result.reaction_label.text == (
+        "R¹–C≡C–H + R–N₃ → aromatic 5-membered C₂N₃ ring"
     )
 
 
@@ -127,7 +127,7 @@ def test_analysis_serializes_one_canonical_reaction_label_contract() -> None:
         "reaction_display_label",
         "reaction_label_status",
     } == set()
-    assert payload["reaction_label"]["concise"]
-    assert payload["reaction_label"]["detailed"]
-    assert payload["reaction_label"]["schema_version"] == "5.0"
+    assert payload["reaction_label"]["text"]
+    assert payload["reaction_label"]["basis"]
+    assert payload["reaction_label"]["schema_version"] == "1.0"
     assert payload["interpretation"]["pattern_matches"]

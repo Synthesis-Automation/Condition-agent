@@ -90,9 +90,9 @@ def _recommendation() -> GenericConditionRecommendation:
                 "reaction_id": "reaction-1",
                 "reaction_smiles": "BrC.B(O)O>>CC",
                 "reaction_label": {
-                    "concise": "Precedent Ar–Br coupling",
-                    "detailed": "Precedent Ar–Br coupling",
-                    "status": "observed_edits",
+                    "text": "Precedent Ar–Br coupling",
+                    "status": "structural_equation",
+                    "basis": "reaction_sites",
                 },
                 "spectator_groups": (
                     {
@@ -131,9 +131,9 @@ def _result() -> GenericRecommendationResult:
         valid=True,
         query_signature_id="RS3:query",
         reaction_label={
-            "concise": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
-            "detailed": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
-            "status": "observed_edits",
+            "text": "Ar¹–Br + Ar²–B(OH)₂ → Ar¹–Ar²",
+            "status": "structural_equation",
+            "basis": "reaction_sites",
         },
         named_family="suzuki_miyaura",
         transformation_class="c_c_transfer_coupling",
@@ -271,8 +271,8 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     window._render_result(_result())
 
     summary = window.summary_box.toPlainText()
-    assert "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in summary
-    assert "Label evidence: Observed Edits" in summary
+    assert "Ar¹–Br + Ar²–B(OH)₂ → Ar¹–Ar²" in summary
+    assert "Label evidence: Structural Equation" in summary
     assert "Suzuki Miyaura" in summary
     assert "Mode: Verified Signature" in summary
     assert "R–C≡N [nitrile] (reactant 1, d=3)" in summary
@@ -294,7 +294,7 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     details = window.details_box.toPlainText()
     assert "Potassium carbonate" in details
     assert "Reaction label: Precedent Ar–Br coupling" in details
-    assert "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" not in details
+    assert "Ar¹–Br + Ar²–B(OH)₂ → Ar¹–Ar²" not in details
     assert "Selected hit reaction SMILES: BrC.B(O)O>>CC" in details
     assert "Selected hit reaction SMILES: IC.B(O)O>>CC" not in details
     assert "Spectator groups: R–O–R [ether] (reactant 2, d=2)" in details

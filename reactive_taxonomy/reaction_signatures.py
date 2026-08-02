@@ -28,7 +28,7 @@ from .reaction_models import (
 
 _DEFINITIONS = Path(__file__).with_name("definitions")
 _SIGNATURE_RULES_PATH = _DEFINITIONS / "signature_features.v3.json"
-_TAXONOMY_MANIFEST_PATH = _DEFINITIONS / "taxonomy_manifest.v3.json"
+_TAXONOMY_MANIFEST_PATH = _DEFINITIONS / "taxonomy_manifest.v4.json"
 
 
 def _canonical_json(value: Any) -> str:
@@ -242,7 +242,6 @@ def build_reaction_signature(
     spectators: Tuple[ReactionSpectatorGroup, ...],
     topology: ReactionTopology,
     completeness: ReactionCompletenessAssessment,
-    contextual_product_label: Optional[str] = None,
     warnings: Iterable[str] = (),
 ) -> Optional[ReactionSignature]:
     """Build a versioned signature solely from finalized observations."""
@@ -445,7 +444,6 @@ def build_reaction_signature(
             for event in events
             for label in event.formed_connection_labels
         ),
-        concise_label=contextual_product_label,
         exact_product_verified=bool(
             edit_result.evidence.startswith("validated_atom_mapping")
             or edit_result.evidence.startswith("validated_mapping")
@@ -512,7 +510,6 @@ def build_reaction_signature(
 def build_observation_signature(
     observation: ReactionObservation,
     *,
-    contextual_product_label: Optional[str] = None,
     warnings: Iterable[str] = (),
 ) -> Optional[ReactionSignature]:
     """Build generic signature identity directly from one observation."""
@@ -535,7 +532,6 @@ def build_observation_signature(
         spectators=(),
         topology=observation.topology,
         completeness=observation.completeness,
-        contextual_product_label=contextual_product_label,
         warnings=tuple(observation.warnings) + tuple(warnings),
     )
 

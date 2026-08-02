@@ -1,4 +1,4 @@
-"""Review rendering uses the canonical reaction label and minimum core."""
+"""Review rendering uses the sole canonical reaction label."""
 
 from reactive_taxonomy import featurize_reaction
 from reactive_taxonomy.reaction_review import build_reaction_review_summary
@@ -10,13 +10,11 @@ def test_review_summary_uses_single_label_contract() -> None:
     )
     summary = build_reaction_review_summary(analysis)
     assert analysis.reaction_label is not None
-    assert summary.detailed_reaction_label == analysis.reaction_label.detailed
+    assert summary.reaction_label == analysis.reaction_label.text
     assert analysis.reaction_core is not None
-    assert summary.reaction_core_equation == analysis.reaction_core.generic_label
+    assert not hasattr(summary, "reaction_core_equation")
 
 
 def test_unavailable_review_label_remains_explicit() -> None:
     summary = build_reaction_review_summary(featurize_reaction("CC.O>>N#N"))
-    assert summary.detailed_reaction_label == (
-        "No normalized edits or supported structural interpretation"
-    )
+    assert summary.reaction_label == "Unavailable"

@@ -235,7 +235,7 @@ def test_converter_uses_inferred_core_without_external_mapping() -> None:
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
     assert len(build_generic_index([record.to_dict()]).rows) == 1
     review = concise_reaction_review_row(record.to_dict())
-    assert review["reaction_core_label"]
+    assert review["reaction_label"]
     assert review["reaction_core_status"] == "available_inferred"
     assert review["reaction_core_unavailability_reasons"] == ""
 
@@ -454,20 +454,18 @@ def test_conversion_engine_reports_external_mapping_dispositions(tmp_path) -> No
     assert "external_mapping_status" in review_header
     assert "external_atom_mapping_json" in review_header
     review_fields = review_header.split(",")
-    label_index = review_fields.index("reaction_display_label")
+    label_index = review_fields.index("reaction_label_status")
     smiles_index = review_fields.index("reaction_smiles")
     assert review_fields[smiles_index : smiles_index + 3] == [
         "reaction_smiles",
-        "reaction_core_label",
+        "reaction_label",
         "canonical_reaction_smiles",
     ]
-    assert review_fields[label_index : label_index + 6] == [
-        "reaction_display_label",
-        "reaction_display_label_detailed",
-        "reaction_display_source",
-        "reaction_display_status",
-        "reaction_display_confidence",
-        "reaction_display_warnings",
+    assert review_fields[label_index : label_index + 4] == [
+        "reaction_label_status",
+        "reaction_label_basis",
+        "reaction_label_confidence",
+        "reaction_label_warnings",
     ]
 
 

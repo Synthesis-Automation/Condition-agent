@@ -111,8 +111,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "8.0"
-    assert record.converter_definition_version == "generic_conversion.v8.0"
+    assert record.schema_version == "9.0"
+    assert record.converter_definition_version == "generic_conversion.v9.0"
     assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
@@ -129,8 +129,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe_core_id.startswith("RCORE1:")
     assert record.reference_condition_series_id.startswith("RCS1:")
     payload = record.to_dict()
-    assert payload["reaction_label"]["concise"]
-    assert payload["reaction_label"]["detailed"]
+    assert payload["reaction_label"]["text"]
+    assert payload["reaction_label"]["basis"]
     assert set(payload) & {
         "reaction_label_status",
         "reaction_display_label",
@@ -149,14 +149,13 @@ def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
 
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.reaction_core is not None
-    assert record.reaction_core["schema_version"] == "2.4"
+    assert record.reaction_core["schema_version"] == "3.0"
     assert record.reaction_core["algorithm_version"] == (
-        "reaction_core_projection.v10"
+        "reaction_core_projection.v11"
     )
     assert record.reaction_core["shape_core_key"].startswith("RSH2:")
-    assert record.reaction_core["generic_label"] == (
-        "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
-    )
+    assert "generic_label" not in record.reaction_core
+    assert "presentation" not in record.reaction_core
 
 
 def test_cycloaddition_ring_observation_is_chemist_readable_in_review() -> None:
@@ -172,12 +171,9 @@ def test_cycloaddition_ring_observation_is_chemist_readable_in_review() -> None:
     assert change["formed_bond_types"] == ("C-N", "C-N")
     review = concise_reaction_review_row(record.to_dict())
     assert record.reaction_label is not None
-    assert record.reaction_label["source"] == "generic_topology"
-    assert review["reaction_display_label"] == (
-        "C≡C + N=N=N → aromatic 5-membered C₂N₃ ring"
-    )
-    assert review["reaction_display_label_detailed"].startswith(
-        "2-component ring formation:"
+    assert record.reaction_label["basis"] == "ring_topology"
+    assert review["reaction_label"].endswith(
+        "aromatic 5-membered C₂N₃ ring"
     )
     assert review["ring_change_count"] == "1"
     assert review["formed_ring_sizes"] == "5"
@@ -239,17 +235,9 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.named_family is None
     assert record.evidence_quality == "validated_atom_mapping"
-    assert record.reaction_label["concise"] == "H2C=CH2 → H3C–CH3"
-    assert record.reaction_label["status"] == "generic_pattern"
-    assert record.reaction_label["pattern_id"] == "hydrogenation"
-    assert record.reaction_label["transformation_label"] == (
-        "C=C hydrogenation"
-    )
-    assert record.reaction_label["product_context_label"] == "H3C–CH3"
-    assert record.reaction_label["structural_label"] == (
-        "C=C → C–C; 2 × H gain at C"
-    )
-    assert len(record.reaction_label["clauses"]) == 3
+    assert record.reaction_label["text"] == "CH₂=CH₂ → CH₃–CH₃"
+    assert record.reaction_label["status"] == "structural_equation"
+    assert record.reaction_label["basis"] == "local_context"
     assert record.reaction_signature["order_changes"] == ("C-C:DOUBLE>SINGLE",)
     assert record.resolved_recipe_id.startswith("RCR1:")
 
@@ -265,8 +253,8 @@ def test_exact_multi_event_signature_is_verified() -> None:
     assert record.reaction_signature["event_scope"] == "multi_event"
     assert record.reaction_label is not None
     assert record.reaction_label["event_count"] == 2
-    assert len(record.reaction_label["event_labels"]) == 2
-    assert " + " in record.reaction_label["concise"]
+    assert "event_labels" not in record.reaction_label
+    assert " + " in record.reaction_label["text"]
 
 
 def test_global_correspondence_is_verified_structural_evidence() -> None:
@@ -382,7 +370,7 @@ def test_partial_product_observation_is_serialized_but_not_indexed() -> None:
     assert record.index_eligibility == IndexEligibility.INELIGIBLE
     assert record.reaction_signature is None
     assert record.reaction_completeness["status"] == "incomplete"
-    assert record.reaction_label["concise"] == ("R–C(=O)–OH → R–C(=O)–Cl [Cl source missing]")
+    assert record.reaction_label["text"] == "R–C(=O)–O → R–C(=O)–Cl"
     assert record.reaction_label["status"] == "partial_product_correspondence"
     assert record.transformation_class == "acyl_heteroatom_substitution"
     assert record.transformation_confidence == 0.8
@@ -392,12 +380,8 @@ def test_partial_product_observation_is_serialized_but_not_indexed() -> None:
     )
 
     review = concise_reaction_review_row(record.to_dict())
-    assert review["reaction_display_status"] == "partial_product_correspondence"
-    assert review["reaction_display_label_detailed"] == (
-        "R–C(=O)–OH → R–C(=O)–Cl; "
-        "partial conserved-scaffold observation; "
-        "the reactants do not account for Cl in the product."
-    )
+    assert review["reaction_label_status"] == "partial_product_correspondence"
+    assert review["reaction_label_basis"] == "partial_product_correspondence"
     assert review["partial_transformation_class"] == "acyl_heteroatom_substitution"
     assert review["missing_product_atom_elements"] == "Cl"
     assert "PRODUCT_ATOM_SOURCE_UNRESOLVED:Cl" in review["warnings"]
@@ -656,15 +640,15 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "10.0"
+    assert report["schema_version"] == "11.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
-        "reaction_display_label"
+        "reaction_label"
     )
     assert CONCISE_REACTION_REVIEW_FIELDS[:2] == (
         "canonical_reaction_smiles",
-        "reaction_core_label",
+        "reaction_label",
     )
     assert CONCISE_REACTION_REVIEW_FIELDS[2:10] == (
         "primary_reaction_pattern",
@@ -676,17 +660,11 @@ def test_concise_reaction_review_export_has_only_requested_columns(
         "reaction_pattern_confidence",
         "reaction_pattern_requires_condition_evidence",
     )
-    assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 6] == (
-        "reaction_display_label",
-        "reaction_display_label_detailed",
-        "reaction_display_source",
-        "reaction_display_status",
-        "reaction_display_confidence",
-        "reaction_display_warnings",
+    assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 1] == (
+        "reaction_label",
     )
     assert review_rows[0]["canonical_reaction_smiles"]
-    assert review_rows[0]["reaction_display_label"]
-    assert review_rows[0]["reaction_display_label_detailed"]
+    assert review_rows[0]["reaction_label"]
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
     assert review_rows[0]["primary_reaction_pattern"] == (
         "organoboron_c_c_coupling_like"
@@ -700,7 +678,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0][
         "reaction_pattern_requires_condition_evidence"
     ] == "False"
-    assert review_rows[0]["reaction_display_status"] == "observed_edits"
+    assert review_rows[0]["reaction_label_status"] == "structural_equation"
     assert review_rows[0]["transformation_class"] == (
         "generic_graph_transformation"
     )
@@ -719,7 +697,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["evidence_quality"] == "global_atom_correspondence"
     assert review_rows[0]["reaction_completeness_status"] == "verified"
     assert review_rows[0]["reaction_core_status"] == "available_inferred"
-    assert review_rows[0]["reaction_core_label"] == "Ar–B + Ar–Br → Ar–Ar"
+    assert review_rows[0]["reaction_label"] == "Ar–Br + Ar–B(OH)₂ → Ar–Ar"
     assert review_rows[0]["reaction_core_unavailability_reasons"] == ""
     assert review_rows[0]["chemistry_status"] == "verified"
     assert review_rows[0]["condition_stage_status"] == "single_stage"
@@ -752,11 +730,9 @@ def test_review_exports_multi_site_pattern_count() -> None:
 
     assert row["primary_reaction_pattern"] == "sp2_c_n_substitution_like"
     assert row["primary_reaction_pattern_count"] == "2"
-    assert row["reaction_core_label"] == (
-        "2 × Ar–Br + 2 × H–N → 2 × Ar–N"
-    )
-    assert row["reaction_display_label"] == (
-        "2 × (C–Br + N–H → C–N)"
+    assert row["reaction_label"] == (
+        "Ar–Br + R–C(O)–NH₂ + R–C(O)–NH₂ "
+        "→ Ar–NH–R–C(O) + Ar–NH–R–C(O)"
     )
 
 
@@ -774,9 +750,7 @@ def test_review_exports_co_occurring_tandem_patterns() -> None:
     assert row["co_occurring_reaction_patterns"] == (
         "sp2_c_n_substitution_like; amine_deprotection_like"
     )
-    assert row["reaction_display_label"] == (
-        "C(sp²)–N bond formation + amine deprotection"
-    )
+    assert row["reaction_label"] == "HetAr–Br + RO–C(O)–NHR → HetAr–NH–Alk"
 
 
 def test_review_exports_carbonyl_alpha_c_h_coupling_not_heck() -> None:
@@ -875,16 +849,15 @@ def test_concise_review_formats_spectators_and_partner_environment() -> None:
     assert row["index_eligibility"] == "eligible"
 
 
-def test_concise_review_uses_shared_detailed_and_graphic_labels() -> None:
+def test_concise_review_uses_the_single_reaction_label() -> None:
     row = concise_reaction_review_row(
         {
             "reaction_label": {
-                "concise": "structural concise label",
-                "detailed": "structural detailed label",
-                "status": "observed_edits",
+                "text": "R–X + R′ → R–R′",
+                "status": "structural_equation",
+                "basis": "reaction_sites",
             },
             "reaction_core": {
-                "generic_label": "R–X + R′ → R–R′",
                 "evidence_status": "verified",
             },
             "reaction_signature": {
@@ -894,8 +867,7 @@ def test_concise_review_uses_shared_detailed_and_graphic_labels() -> None:
         }
     )
 
-    assert row["reaction_display_label_detailed"] == "structural detailed label"
-    assert row["reaction_core_label"] == "R–X + R′ → R–R′"
+    assert row["reaction_label"] == "R–X + R′ → R–R′"
     assert row["reaction_core_status"] == "available_verified"
     assert row["reaction_core_unavailability_reasons"] == ""
 
@@ -1031,7 +1003,7 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     monkeypatch.setattr(
         sharded_module,
         "reaction_label_definition_versions",
-        lambda: {"reaction_label_rendering.v1.json": "changed"},
+        lambda: {"chemist_notation.v1.json": "changed"},
     )
     invalidated = convert_datasets_sharded(
         dataset,

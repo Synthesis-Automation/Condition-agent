@@ -48,12 +48,11 @@ def test_window_analyzes_reaction_and_molecule() -> None:
             "RXNMapper: not_requested_resolved_internal_evidence"
             in reaction_output
         )
-        assert "Reaction: C–B + C–Br → C–C" in reaction_output
+        assert "Reaction: Ar–Br + Ar–B(OH)₂ → Ar–Ar" in reaction_output
         assert "Evidence: global_atom_correspondence" in reaction_output
         assert priority_review.startswith(
-            "Detailed reaction label: C–B + C–Br → C–C"
+            "Reaction label: Ar–Br + Ar–B(OH)₂ → Ar–Ar"
         )
-        assert "Graphic core label: Ar–B + Ar–Br → Ar–Ar" in priority_review
         assert "Spectators: None detected" in priority_review
         assert "Electronic / steric analysis: Unavailable" in priority_review
         assert "reaction input · valid" in window.status_label.text()
@@ -146,10 +145,7 @@ def test_window_displays_mapped_reaction_minimization() -> None:
         output = window.output.toPlainText()
 
         assert "Reaction minimization:" in output
-        assert (
-            "Minimized reaction: C(H)(Ar)(=O) + O(H)(R) "
-            "→ C(H)(Ar)(O-R)2"
-        ) in output
+        assert "Reaction: R–CH=O + Alk–OH" in output
         assert "Core evidence: verified (validated_atom_mapping" in output
         assert "Core shape (retrieval): RSH2:" in output
         assert "Center transition (diagnostic only): RCS2:" in output

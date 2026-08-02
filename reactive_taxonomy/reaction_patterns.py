@@ -1124,11 +1124,6 @@ def match_reaction_patterns(
                 matched_edit_indices=indices,
                 evidence=(observation.evidence_quality,),
                 occurrence_count=_occurrence_count(observation, indices),
-                display_label=(
-                    str(definition.get("display_label"))
-                    if definition.get("display_label")
-                    else None
-                ),
                 compatible_named_families=tuple(
                     definition.get("compatible_named_families") or ()
                 ),

@@ -49,12 +49,12 @@ _CORE_LEVELS = (
 _REVIEW_FIELDS = (
     "case_id",
     "query_reaction_smiles",
-    "query_core_equation",
+    "query_reaction_label",
     "query_quality_status",
     "retrieval_level",
     "independent_compatible_candidate_count",
     "precedent_reaction_smiles",
-    "precedent_core_equations",
+    "precedent_reaction_labels",
     "chemist_core_match",
     "chemist_notes",
 )
@@ -67,13 +67,9 @@ def _quality_status(core: Mapping[str, Any]) -> str:
     return "missing"
 
 
-def _core_equation(core: Mapping[str, Any]) -> str:
-    presentation = core.get("presentation")
-    if isinstance(presentation, Mapping):
-        equation = str(presentation.get("equation") or "")
-        if equation:
-            return equation
-    return str(core.get("generic_label") or "")
+def _reaction_label(value: Mapping[str, Any]) -> str:
+    """Return the one terminal reaction label from a serialized contract."""
+    return str(value.get("text") or "")
 
 
 def _mean(values: Iterable[int]) -> float | None:
@@ -312,7 +308,7 @@ def evaluate_reaction_core_index(
                 {
                     "case_id": row.observation_id or row.reaction_id,
                     "query_reaction_smiles": row.reaction_smiles,
-                    "query_core_equation": _core_equation(core),
+                    "query_reaction_label": _reaction_label(row.reaction_label),
                     "query_quality_status": _quality_status(core),
                     "retrieval_level": base_level,
                     "independent_compatible_candidate_count": (
@@ -321,8 +317,8 @@ def evaluate_reaction_core_index(
                     "precedent_reaction_smiles": " || ".join(
                         value.reaction_smiles for value in precedent_rows
                     ),
-                    "precedent_core_equations": " || ".join(
-                        _core_equation(value.reaction_core)
+                    "precedent_reaction_labels": " || ".join(
+                        _reaction_label(value.reaction_label)
                         for value in precedent_rows
                     ),
                     "chemist_core_match": "",

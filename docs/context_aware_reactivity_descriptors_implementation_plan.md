@@ -899,6 +899,6 @@ Start with Phases 0-2 only:
 5. render the proposed clean aromatic summary in a test-only or opt-in view;
 6. prove that current signature IDs and recommendation behavior are unchanged.
 
-This slice directly addresses the confusing `Ar`/`HeteroAr` output while
+This slice directly addresses the confusing `Ar`/`HetAr` output while
 establishing the reusable contract needed for alkyl and other contexts. It does
 not prematurely activate new retrieval or condition-rule behavior.

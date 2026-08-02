@@ -118,7 +118,7 @@ Examples:
 
 ```text
 Ar–Br
-HeteroAr–Cl
+HetAr–Cl
 Alkenyl–OTf
 Alkyl–OMs
 ```
@@ -166,7 +166,7 @@ Examples:
 
 ```text
 Ar–B(OH)2
-HeteroAr–B(OR)2
+HetAr–B(OR)2
 Alkenyl–BF3K
 Ar–ZnX
 Ar–MgX
@@ -224,7 +224,7 @@ Initial context tokens:
 
 ```text
 Ar
-HeteroAr
+HetAr
 Alkenyl
 Alkynyl
 Alkyl
@@ -245,7 +245,7 @@ Other
 | Token | Meaning |
 | --- | --- |
 | `Ar` | Aromatic carbocyclic context |
-| `HeteroAr` | Aromatic heterocyclic context |
+| `HetAr` | Aromatic heterocyclic context |
 | `Alkenyl` | Non-aromatic sp2 carbon context |
 | `Alkynyl` | sp carbon context |
 | `Alkyl` | Non-aromatic saturated carbon context |
@@ -418,7 +418,7 @@ Examples:
 
 ```text
 LG|Ar|Br
-LG|HeteroAr|Cl
+LG|HetAr|Cl
 LG|Alkenyl|OTf
 LG|Alkyl|OMs
 ```
@@ -526,10 +526,10 @@ Acyl and sulfonyl centers use `reaction_mode: substitution`. Aldehyde and ketone
   "topology": "atom",
   "atom_roles": {"center": [3]},
   "handle_token": "HetArH",
-  "ring_context": "HeteroAr",
+  "ring_context": "HetAr",
   "h_count": 1,
   "canonical_signature": "CH|HetArH",
-  "chemist_label": "HeteroAr–H"
+  "chemist_label": "HetAr–H"
 }
 ```
 
@@ -588,7 +588,7 @@ SO2R
 > C(O)NR
 > C(O)OR
 > C(O)R
-> HeteroAr
+> HetAr
 > Ar
 > Alkenyl
 > Alkynyl
@@ -620,7 +620,7 @@ The N-attached sulfur must be `SO2R`, not `S`.
 Classify an attached aromatic carbon as:
 
 - `Ar` if its aromatic ring contains only carbon;
-- `HeteroAr` if the relevant aromatic ring contains at least one heteroatom.
+- `HetAr` if the relevant aromatic ring contains at least one heteroatom.
 
 For fused or ambiguous systems, use the ring system containing the attachment atom.
 
@@ -769,7 +769,7 @@ Label rendering must be deterministic and separate from site detection.
 
 ```text
 LG|Ar|Br                 → Ar–Br
-LG|HeteroAr|Cl           → HeteroAr–Cl
+LG|HetAr|Cl              → HetAr–Cl
 LG|Alkenyl|OTf           → Alkenyl–OTf
 LG|Alkyl|OMs             → R–OMs
 ```
@@ -778,7 +778,7 @@ LG|Alkyl|OMs             → R–OMs
 
 ```text
 TM|Ar|B(OH)2             → Ar–B(OH)2
-TM|HeteroAr|BPin         → HeteroAr–BPin
+TM|HetAr|BPin            → HetAr–BPin
 TM|Alkenyl|ZnX           → Alkenyl–ZnX
 ```
 
@@ -970,7 +970,7 @@ only as a legacy loader contract and is not used by current definitions.
   "required_roles": {
     "electrophile": {
       "site_type": "leaving_group",
-      "anchor_context_any": ["Ar", "HeteroAr", "Alkenyl"]
+      "anchor_context_any": ["Ar", "HetAr", "Alkenyl"]
     },
     "nucleophile": {
       "site_type": "pronucleophile_XH",
@@ -993,7 +993,7 @@ only as a legacy loader contract and is not used by current definitions.
 Minimal grammar:
 
 ```text
-Ar/HeteroAr/Alkenyl–X + N–H → C–N
+Ar/HetAr/Alkenyl–X + N–H → C–N
 ```
 
 Applicable reaction families may include:
@@ -1010,19 +1010,19 @@ The minimal site grammar identifies the transformation class. Catalyst/reagent e
 ## 12.3 C–O coupling
 
 ```text
-Ar/HeteroAr/Alkenyl–X + O–H → C–O
+Ar/HetAr/Alkenyl–X + O–H → C–O
 ```
 
 ## 12.4 C–S coupling
 
 ```text
-Ar/HeteroAr/Alkenyl–X + S–H → C–S
+Ar/HetAr/Alkenyl–X + S–H → C–S
 ```
 
 ## 12.5 Suzuki-type C–C coupling
 
 ```text
-Ar/HeteroAr/Alkenyl–X + C–B → C–C
+Ar/HetAr/Alkenyl–X + C–B → C–C
 ```
 
 Required site types:
@@ -1062,7 +1062,7 @@ transfer_group(B) + pronucleophile_XH
 ## 12.8 Sonogashira-type coupling
 
 ```text
-Ar/HeteroAr/Alkenyl–X + C(sp)–H → C–C
+Ar/HetAr/Alkenyl–X + C(sp)–H → C–C
 ```
 
 Required site types:
@@ -1126,7 +1126,7 @@ condition or mechanistic evidence.
 ## 12.14 Terminal-alkene Heck coupling
 
 ```text
-Ar/HeteroAr–X + H2C=CHR → Ar/HeteroAr–CH=CHR
+Ar/HetAr–X + H2C=CHR → Ar/HetAr–CH=CHR
 ```
 
 Required site types are `leaving_group` and
@@ -1139,7 +1139,7 @@ operator must not invent E/Z geometry.
 ## 12.15 Friedel–Crafts acylation
 
 ```text
-Ar/HeteroAr–H + R–C(O)X → Ar/HeteroAr–C(O)–R
+Ar/HetAr–H + R–C(O)X → Ar/HetAr–C(O)–R
 ```
 
 Required site types are
@@ -1616,7 +1616,7 @@ The system should be extensible, but v1 should prioritize common synthetic handl
 | SMILES | Expected signature | Expected label |
 |---|---|---|
 | `Brc1ccccc1` | `LG|Ar|Br` | `Ar–Br` |
-| `Clc1ncccc1` | `LG|HeteroAr|Cl` | `HeteroAr–Cl` |
+| `Clc1ncccc1` | `LG|HetAr|Cl` | `HetAr–Cl` |
 | `CCOS(=O)(=O)C` | `LG|Alkyl|OMs` when detected as mesylate | `R–OMs` |
 
 ## 22.2 Pronucleophiles

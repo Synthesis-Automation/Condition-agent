@@ -35,7 +35,7 @@ GENERIC_REVIEW_FIELDS = (
     "outcome_status",
     "index_eligibility",
     "reaction_smiles",
-    "reaction_core_label",
+    "reaction_label",
     "canonical_reaction_smiles",
     *REACTION_PATTERN_REVIEW_FIELDS,
     "evidence_quality",
@@ -56,12 +56,10 @@ GENERIC_REVIEW_FIELDS = (
     "transformation_confidence",
     "named_family",
     "family_confidence",
-    "reaction_display_label",
-    "reaction_display_label_detailed",
-    "reaction_display_source",
-    "reaction_display_status",
-    "reaction_display_confidence",
-    "reaction_display_warnings",
+    "reaction_label_status",
+    "reaction_label_basis",
+    "reaction_label_confidence",
+    "reaction_label_warnings",
     "yield_pct",
     "temperature_c",
     "time_h",
@@ -100,7 +98,6 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_core_quality_status",
     "reaction_core_quality_reasons",
     "reaction_core_state_changes",
-    "reaction_core_chemist_summary",
     "reaction_core_evidence_status",
     "reaction_core_json",
     "fallback_descriptor_id",
@@ -147,8 +144,10 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "outcome_status": record.outcome_status.value,
         "index_eligibility": record.index_eligibility.value,
         "reaction_smiles": record.reaction_smiles,
-        "reaction_core_label": (
-            (record.reaction_core or {}).get("generic_label", "")
+        "reaction_label": (
+            record.reaction_label.get("text", "")
+            if record.reaction_label
+            else ""
         ),
         "canonical_reaction_smiles": record.canonical_reaction_smiles or "",
         **flattened_reaction_pattern_fields(
@@ -222,20 +221,25 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "transformation_confidence": record.transformation_confidence,
         "named_family": record.named_family or "",
         "family_confidence": record.family_confidence,
-        "reaction_display_label": (
-            record.reaction_label.get("concise", "")
-            if record.reaction_label
-            else ""
-        ),
-        "reaction_display_status": (
+        "reaction_label_status": (
             record.reaction_label.get("status", "")
             if record.reaction_label
             else ""
         ),
-        "reaction_display_label_detailed": (
-            record.reaction_label.get("detailed", "")
+        "reaction_label_basis": (
+            record.reaction_label.get("basis", "")
             if record.reaction_label
             else ""
+        ),
+        "reaction_label_confidence": (
+            record.reaction_label.get("confidence", "")
+            if record.reaction_label
+            else ""
+        ),
+        "reaction_label_warnings": _joined(
+            record.reaction_label.get("warnings", ())
+            if record.reaction_label
+            else ()
         ),
         "yield_pct": record.yield_pct if record.yield_pct is not None else "",
         "temperature_c": (
@@ -262,21 +266,6 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             topology["ring_count_delta"]
             if topology.get("ring_count_delta") is not None
             else ""
-        ),
-        "reaction_display_source": (
-            record.reaction_label.get("source", "")
-            if record.reaction_label
-            else ""
-        ),
-        "reaction_display_confidence": (
-            record.reaction_label.get("confidence", "")
-            if record.reaction_label
-            else ""
-        ),
-        "reaction_display_warnings": _joined(
-            record.reaction_label.get("warnings", ())
-            if record.reaction_label
-            else ()
         ),
         **flattened_ring_change_fields(record.reaction_signature),
         "reaction_event_count": signature.get("event_count", ""),

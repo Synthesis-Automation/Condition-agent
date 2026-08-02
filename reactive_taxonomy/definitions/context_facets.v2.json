@@ -6,7 +6,7 @@
     "C(O)NR",
     "C(O)OR",
     "C(O)R",
-    "HeteroAr",
+    "HetAr",
     "Ar",
     "Alkenyl",
     "Alkynyl",
@@ -30,7 +30,7 @@
       },
       "facet": "activation",
       "semantic_id": "sulfonyl",
-      "display_token": "SO2R"
+      "notation_id": "SO2R"
     },
     {
       "id": "P(O)R2",
@@ -42,7 +42,7 @@
       },
       "facet": "activation",
       "semantic_id": "phosphoryl",
-      "display_token": "P(O)R2"
+      "notation_id": "P(O)R2"
     },
     {
       "id": "C(O)NR",
@@ -55,7 +55,7 @@
       },
       "facet": "activation",
       "semantic_id": "amide_carbonyl",
-      "display_token": "C(O)NR"
+      "notation_id": "C(O)NR"
     },
     {
       "id": "C(O)OR",
@@ -68,7 +68,7 @@
       },
       "facet": "activation",
       "semantic_id": "ester_carbonyl",
-      "display_token": "C(O)OR"
+      "notation_id": "C(O)OR"
     },
     {
       "id": "C(O)R",
@@ -80,10 +80,10 @@
       },
       "facet": "activation",
       "semantic_id": "carbonyl",
-      "display_token": "C(O)R"
+      "notation_id": "C(O)R"
     },
     {
-      "id": "HeteroAr",
+      "id": "HetAr",
       "classification_method": "aromatic_ring_system",
       "constraints": {
         "anchor_element": "C",
@@ -91,7 +91,7 @@
       },
       "facet": "scaffold",
       "semantic_id": "heteroaromatic",
-      "display_token": "HeteroAr"
+      "notation_id": "HetAr"
     },
     {
       "id": "Ar",
@@ -102,7 +102,7 @@
       },
       "facet": "scaffold",
       "semantic_id": "carbocyclic_aromatic",
-      "display_token": "Ar"
+      "notation_id": "Ar"
     },
     {
       "id": "Alkenyl",
@@ -114,7 +114,7 @@
       },
       "facet": "scaffold",
       "semantic_id": "alkenyl",
-      "display_token": "Alkenyl"
+      "notation_id": "Alkenyl"
     },
     {
       "id": "Alkynyl",
@@ -126,7 +126,7 @@
       },
       "facet": "scaffold",
       "semantic_id": "alkynyl",
-      "display_token": "Alkynyl"
+      "notation_id": "Alkynyl"
     },
     {
       "id": "Alkyl",
@@ -141,7 +141,7 @@
       },
       "facet": "scaffold",
       "semantic_id": "alkyl",
-      "display_token": "Alkyl"
+      "notation_id": "Alkyl"
     },
     {
       "id": "N",
@@ -151,7 +151,7 @@
       },
       "facet": "element",
       "semantic_id": "nitrogen",
-      "display_token": "N"
+      "notation_id": "N"
     },
     {
       "id": "O",
@@ -161,7 +161,7 @@
       },
       "facet": "element",
       "semantic_id": "oxygen",
-      "display_token": "O"
+      "notation_id": "O"
     },
     {
       "id": "S",
@@ -171,14 +171,14 @@
       },
       "facet": "element",
       "semantic_id": "sulfur",
-      "display_token": "S"
+      "notation_id": "S"
     },
     {
       "id": "Other",
       "classification_method": "fallback",
       "facet": "fallback",
       "semantic_id": "other",
-      "display_token": "Other"
+      "notation_id": "Other"
     }
   ]
 }

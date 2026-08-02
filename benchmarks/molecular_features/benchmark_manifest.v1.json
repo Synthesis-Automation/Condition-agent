@@ -55,7 +55,7 @@
       "LG|Ar|Br": [[0, 1]],
       "PI|Nitrile": [[5, 6]]
     },
-    "heteroaryl_chloride": {"LG|HeteroAr|Cl": [[0, 1]]},
+    "heteroaryl_chloride": {"LG|HetAr|Cl": [[0, 1]]},
     "aryl_boronic_acid": {"TM|Ar|B(OH)2": [[0, 1, 2, 3]]},
     "acetyl_chloride": {"EC|Acyl|Alkyl|Cl|activated": [[0, 1, 2, 3]]},
     "acetic_acid": {
@@ -69,7 +69,7 @@
     "secondary_sulfonamide": {"XH|N|H1|SO2R,Alkyl": [[4]]},
     "terminal_alkene": {"PI|Alkene": [[1, 2]]},
     "terminal_alkyne": {"PI|Alkyne": [[1, 2]], "XH|Csp|H1|Alkynyl": [[2]]},
-    "aminopyridine": {"XH|N|H2|HeteroAr": [[0]]},
+    "aminopyridine": {"XH|N|H2|HetAr": [[0]]},
     "hindered_electron_poor_aryl_bromide": {
       "LG|Ar|Br": [[0, 1]],
       "PI|Nitrile": [[8, 9]]
@@ -152,7 +152,7 @@
       "smiles": "Clc1ncccc1",
       "expected_valid": true,
       "expected_group_counts": {"aryl_halide": 1, "heteroaryl_nitrogen": 1},
-      "expected_site_counts": {"CH|HetArH": 4, "LG|HeteroAr|Cl": 1}
+      "expected_site_counts": {"CH|HetArH": 4, "LG|HetAr|Cl": 1}
     },
     {
       "case_id": "aryl_boronic_acid",
@@ -261,10 +261,10 @@
       "smiles": "Nc1ccccn1",
       "expected_valid": true,
       "expected_group_counts": {"heteroaryl_nitrogen": 1, "primary_amine": 1},
-      "expected_site_counts": {"CH|HetArH": 4, "XH|N|H2|HeteroAr": 1},
+      "expected_site_counts": {"CH|HetArH": 4, "XH|N|H2|HetAr": 1},
       "environment_expectations": [
         {
-          "site_signature": "XH|N|H2|HeteroAr",
+          "site_signature": "XH|N|H2|HetAr",
           "steric_equals": {"center_substitution_class": "primary"},
           "electronic_class": "neutral",
           "nearby_group_ids_present": ["heteroaryl_nitrogen", "primary_amine"]

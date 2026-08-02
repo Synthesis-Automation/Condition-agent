@@ -19,7 +19,7 @@ _METAL_TOKENS = {
     "Sn": "SnR3",
     "Si": "SiR3",
 }
-_ANCHOR_CONTEXT_RANK = {"HeteroAr": 50, "Ar": 45, "Alkenyl": 40, "Alkynyl": 35, "Alkyl": 10}
+_ANCHOR_CONTEXT_RANK = {"HetAr": 50, "Ar": 45, "Alkenyl": 40, "Alkynyl": 35, "Alkyl": 10}
 
 
 def _boron_token(boron: Any) -> str:

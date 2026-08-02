@@ -78,7 +78,9 @@ def parse_reaction_smiles(
     )
 
 
-def interpret_parsed_molecules(parsed: ParsedReaction) -> ParsedReaction:
+def interpret_parsed_molecules(
+    parsed: ParsedReaction, *, label_style: str = "unicode"
+) -> ParsedReaction:
     """Attach optional molecular annotations after structural observation."""
 
     def annotate(component: ReactionComponent) -> ReactionComponent:
@@ -87,7 +89,9 @@ def interpret_parsed_molecules(parsed: ParsedReaction) -> ParsedReaction:
             component,
             molecule_analysis=MoleculeAnalysis(
                 structure=structure,
-                interpretation=interpret_molecular_reactivity(structure),
+                interpretation=interpret_molecular_reactivity(
+                    structure, label_style=label_style
+                ),
             ),
         )
 

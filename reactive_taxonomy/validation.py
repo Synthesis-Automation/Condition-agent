@@ -31,14 +31,13 @@ def validate_taxonomy() -> List[str]:
         return [f"taxonomy_load_failed:{exc}"]
     expected = {
         "context_facets.v2",
+        "chemist_notation.v1",
         "descriptor_rules.v1",
         "molecular_motifs.v1",
         "site_interfaces.v2",
         "site_patterns.v2",
-        "taxonomy_manifest.v3",
+        "taxonomy_manifest.v4",
         "rendering.v1",
-        "reaction_label_patterns.v1",
-        "reaction_label_rendering.v1",
         "reactivity_descriptor_rules.v1",
         "aromatic_systems.v1",
         "reactivity_rendering.v1",
@@ -97,7 +96,7 @@ def validate_taxonomy() -> List[str]:
             "fallback",
         }:
             errors.append(f"invalid_context_facet:{context_id}")
-        if not record.get("semantic_id") or not record.get("display_token"):
+        if not record.get("semantic_id") or not record.get("notation_id"):
             errors.append(f"incomplete_context_identity:{context_id}")
         method = str(record.get("classification_method") or "")
         if method not in allowed_methods:
@@ -156,7 +155,7 @@ def validate_taxonomy() -> List[str]:
             errors.append(f"invalid_emitted_interface:{adapter_id}")
         if not adapter.get("requires_roles"):
             errors.append(f"missing_interface_roles:{adapter_id}")
-    manifest = payload["taxonomy_manifest.v3"]
+    manifest = payload["taxonomy_manifest.v4"]
     identity_files = set(manifest.get("identity_definitions") or ())
     annotation_files = set(manifest.get("annotation_definitions") or ())
     manifest_files = identity_files | annotation_files
@@ -165,7 +164,7 @@ def validate_taxonomy() -> List[str]:
         for filename in manifest_files
         if not (DEFINITIONS_DIR / filename).is_file()
     }
-    if manifest.get("taxonomy_version") != "3.0":
+    if manifest.get("taxonomy_version") != "4.0":
         errors.append("invalid_taxonomy_manifest_version")
     if missing_manifest_files:
         errors.append(
@@ -288,12 +287,13 @@ def validate_taxonomy() -> List[str]:
             if rule.get("owned_role") not in (pattern.get("atom_roles") or {}):
                 errors.append(f"invalid_suppression_role:{pattern_id}")
     rendering = payload["rendering.v1"]
-    styles = rendering.get("styles") or {}
-    if rendering.get("default_style") not in styles:
-        errors.append("invalid_default_rendering_style")
+    notation = payload["chemist_notation.v1"]
+    styles = notation.get("styles") or {}
+    if notation.get("default_style") not in styles:
+        errors.append("invalid_default_notation_style")
     for style_id, style in styles.items():
-        if not isinstance(style, dict) or not style.get("bond"):
-            errors.append(f"invalid_rendering_style:{style_id}")
+        if not isinstance(style, dict) or not style.get("single"):
+            errors.append(f"invalid_notation_style:{style_id}")
         elif not style.get("double") or not style.get("triple"):
             errors.append(f"missing_unsaturated_bond_style:{style_id}")
         elif not style.get("negative_charge") or not style.get(
@@ -332,9 +332,29 @@ def validate_taxonomy() -> List[str]:
             "internal",
         }:
             errors.append("invalid_alkyne_templates")
-    rendering_contexts = set((rendering.get("context_labels") or {}).keys())
-    if not rendering_contexts <= set(tokens):
-        errors.append("unknown_rendering_context")
+    fragment_records = notation.get("fragment_notations") or []
+    fragment_ids = [str(record.get("id") or "") for record in fragment_records]
+    fragment_symbols = [str(record.get("symbol") or "") for record in fragment_records]
+    if not fragment_ids or len(fragment_ids) != len(set(fragment_ids)):
+        errors.append("invalid_fragment_notation_ids")
+    if not all(fragment_symbols) or len(fragment_symbols) != len(set(fragment_symbols)):
+        errors.append("invalid_fragment_notation_symbols")
+    context_notations = notation.get("context_notations") or {}
+    if set(context_notations) != set(tokens):
+        errors.append("context_notation_mismatch")
+    if any(
+        str(record.get("notation_id") or "") not in context_notations
+        for record in context_records
+    ):
+        errors.append("unknown_context_notation")
+    expected_remote_classes = {
+        "aryl", "heteroaryl", "alkyl", "alkenyl", "alkynyl", "acyl",
+        "ring_aliphatic", "heteroatom", "generic_R",
+    }
+    if set(notation.get("remote_class_notations") or {}) != expected_remote_classes:
+        errors.append("remote_class_notation_mismatch")
+    if "HeteroAr" in json.dumps(payload, sort_keys=True):
+        errors.append("removed_heteroar_notation_present")
     rendering_rules = rendering.get("xh_rules") or []
     rendering_rule_ids = [str(rule.get("id") or "") for rule in rendering_rules]
     if len(rendering_rule_ids) != len(set(rendering_rule_ids)):
@@ -355,57 +375,6 @@ def validate_taxonomy() -> List[str]:
         for level in ("L0", "L1", "L2")
     ):
         errors.append("missing_signature_reaction_topology")
-    label_rendering = payload["reaction_label_rendering.v1"]
-    label_styles = label_rendering.get("styles") or {}
-    if label_rendering.get("default_style") not in label_styles:
-        errors.append("invalid_default_reaction_label_style")
-    if set(label_styles) != set(styles):
-        errors.append("reaction_label_style_mismatch")
-    fragment_symbols = label_rendering.get("fragment_context_symbols") or []
-    if not fragment_symbols or len(fragment_symbols) != len(set(fragment_symbols)):
-        errors.append("invalid_reaction_fragment_context_symbols")
-    edit_types = {"formed", "broken", "order_changed", "hydrogen_change"}
-    clause_order = label_rendering.get("clause_order") or []
-    if set(clause_order) != edit_types or len(clause_order) != len(edit_types):
-        errors.append("invalid_reaction_label_clause_order")
-    required_label_templates = {
-        "formed",
-        "broken",
-        "order_changed",
-        "hydrogen_gain",
-        "hydrogen_loss",
-        "counted_clause",
-        "mapped_atom",
-        "conflict",
-        "exact_detail",
-        "contextual_detail",
-        "event_detail",
-    }
-    if not required_label_templates <= set(label_rendering.get("templates") or {}):
-        errors.append("missing_reaction_label_templates")
-    label_patterns = payload["reaction_label_patterns.v1"].get("patterns") or []
-    pattern_ids = [str(pattern.get("id") or "") for pattern in label_patterns]
-    allowed_pattern_matchers = {
-        "substitution",
-        "hydrogenation",
-        "complete_alkyne_hydrogenation",
-        "partial_alkyne_hydrogenation",
-        "heteroatom_bond_reduction",
-        "dehydrogenation",
-        "heteroatom_bond_oxidation",
-        "reductive_bond_cleavage",
-        "intramolecular_bond_formation",
-    }
-    if not pattern_ids or any(not pattern_id for pattern_id in pattern_ids):
-        errors.append("missing_reaction_label_pattern_id")
-    if len(pattern_ids) != len(set(pattern_ids)):
-        errors.append("duplicate_reaction_label_pattern_ids")
-    for pattern in label_patterns:
-        pattern_id = str(pattern.get("id") or "<missing>")
-        if pattern.get("matcher") not in allowed_pattern_matchers:
-            errors.append(f"invalid_reaction_label_pattern_matcher:{pattern_id}")
-        if set(pattern.get("templates") or {}) != set(label_styles):
-            errors.append(f"reaction_label_pattern_style_mismatch:{pattern_id}")
     return errors
 
 

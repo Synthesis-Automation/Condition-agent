@@ -179,7 +179,6 @@ The current `ProductConnection` is valuable for single-bond-forming reactions an
 class ProductTransformation:
     edits: tuple[ReactionEdit, ...]
     formed_connection_labels: tuple[str, ...]
-    concise_label: str | None
     exact_product_verified: bool
     evidence: str
 ```
@@ -425,7 +424,7 @@ For every atom participating in an edit, capture:
 
 - element, charge, aromaticity, hybridization, ring membership, and hydrogen count;
 - reactive handle and leaving/transfer group;
-- attachment-side context such as `Ar`, `HeteroAr`, `Alkenyl`, `Alkyl`, or `Acyl`;
+- attachment-side context such as `Ar`, `HetAr`, `Alkenyl`, `Alkyl`, or `Acyl`;
 - context-relative steric accessibility with auditable branch contributions;
 - a context-specific electronic activation axis with interpretable contributors;
 - nearby functional groups by graph distance;
@@ -471,10 +470,10 @@ Examples:
 ```text
 Ar-Cl + Ar-B(OH)2 -> Ar-Ar
 Alkenyl-Cl + Ar-B(OH)2 -> Ar-Alkenyl
-HeteroAr-Br + R-NH2 -> HeteroAr-NH-R
+HetAr-Br + Alk-NH2 -> HetAr-NH-Alk
 unknown family: C-N substitution
 unknown family: Ar-CH=CH2 -> Ar-CH2-CH3
-reductive amination: HeteroAr-CH=O + Ar-NH2 -> HeteroAr-CH2-NH-Ar
+reductive amination: HetAr-CH=O + Ar-NH2 -> HetAr-CH2-NH-Ar
 unmatched edit pattern: C-O bond cleavage; C-N bond formation
 ```
 

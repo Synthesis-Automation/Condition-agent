@@ -33,8 +33,8 @@ def test_sp2_c_n_pattern_retains_named_family_ambiguity() -> None:
     assert match.requires_condition_evidence
     assert result.interpretation.co_occurring_pattern_ids == ()
     assert result.reaction_label is not None
-    assert result.reaction_label.concise == "C(sp²)–N bond formation"
-    assert "named family requires condition evidence" in result.reaction_label.detailed
+    assert result.reaction_label.text == "Ar–Br + Alk–NH₂ → Ar–NH–Alk"
+    assert result.reaction_label.basis == "reaction_sites"
 
 
 def test_multi_site_sp2_c_n_pattern_preserves_both_events() -> None:
@@ -68,13 +68,10 @@ def test_multi_site_sp2_c_n_pattern_preserves_both_events() -> None:
     assert pattern.occurrence_count == 2
     assert pattern.matched_edit_indices == (0, 1, 2, 3, 4, 5)
     assert result.reaction_core is not None
-    assert result.reaction_core.generic_label == (
-        "2 × Ar–Br + 2 × H–N → 2 × Ar–N"
-    )
+    assert not hasattr(result.reaction_core, "generic_label")
     assert result.reaction_label is not None
-    assert result.reaction_label.concise == (
-        "2 × (C–Br + N–H → C–N)"
-    )
+    assert result.reaction_label.status == "multi_event"
+    assert result.reaction_label.event_count == 2
 
 
 def test_explicit_multi_site_reagent_copies_avoid_inference_warning() -> None:
@@ -120,10 +117,7 @@ def test_tandem_c_n_coupling_and_deprotection_are_both_retained() -> None:
         "amine_deprotection_like",
     )
     assert result.reaction_label is not None
-    assert result.reaction_label.concise == (
-        "C(sp²)–N bond formation + amine deprotection"
-    )
-    assert "temporal order is not inferred" in result.reaction_label.detailed
+    assert result.reaction_label.text == "HetAr–Br + RO–C(O)–NHR → HetAr–NH–Alk"
 
 
 def test_public_pattern_identification_accepts_reaction_smiles() -> None:
@@ -172,7 +166,7 @@ def test_chan_lam_like_connectivity_is_distinct_from_suzuki_and_sp2_substitution
         match.pattern_id for match in chan_lam.interpretation.pattern_matches
     }
     assert chan_lam.reaction_label is not None
-    assert chan_lam.reaction_label.concise == "organoboron C–N coupling"
+    assert chan_lam.reaction_label.text == "Ar–B(OH)₂ + Alk–NH₂ → Ar–NH–Alk"
 
     assert suzuki.interpretation is not None
     assert suzuki.interpretation.primary_pattern_id == (
@@ -197,8 +191,8 @@ def test_carbonyl_alpha_c_h_coupling_is_not_mislabeled_as_heck() -> None:
         match.pattern_id for match in alpha_c_h.interpretation.pattern_matches
     }
     assert alpha_c_h.reaction_label is not None
-    assert alpha_c_h.reaction_label.concise == (
-        "C(sp²)–C coupling at carbonyl α-C–H"
+    assert alpha_c_h.reaction_label.text == (
+        "Ar–Br + activated C–H → Ar–Alk–R–C(O)–CH"
     )
 
     assert heck.interpretation is not None

@@ -10,19 +10,15 @@ def test_unmapped_alkene_hydrogenation_receives_inferred_label() -> None:
 
     assert result.valid
     assert result.evidence_quality == "unique_scaffold_correspondence"
-    assert result.reaction_label.concise == "Ar–CH=CH2 → Ar–CH2–CH3"
-    assert result.reaction_label.status == "generic_pattern"
+    assert result.reaction_label.text == "Ar–CH=CH₂ → Ar–CH₂–CH₃"
+    assert result.reaction_label.status == "structural_equation"
     assert result.reaction_label is not None
-    assert result.reaction_label.pattern_id == "hydrogenation"
-    assert result.reaction_label.transformation_label == "C=C hydrogenation"
-    assert result.reaction_label.reactant_context_label == "Ar–CH=CH2"
-    assert result.reaction_label.product_context_label == "Ar–CH2–CH3"
+    assert result.reaction_label.basis == "local_context"
     assert result.reaction_label.confidence == 0.85
     assert result.reaction_signature is not None
     assert result.reaction_signature.product_transformation is not None
-    assert (
-        result.reaction_signature.product_transformation.concise_label
-        == "Ar–CH2–CH3"
+    assert not hasattr(
+        result.reaction_signature.product_transformation, "concise_label"
     )
     assert "INFERRED_ATOM_CORRESPONDENCE" in result.warnings
 
@@ -35,13 +31,12 @@ def test_unmapped_carbonyl_redox_receives_generic_labels() -> None:
         "CC(O)c1ccccc1.[O]>>CC(=O)c1ccccc1"
     )
 
-    assert reduction.reaction_label.concise == "Ar–CH=O → Ar–CH2–OH"
+    assert reduction.reaction_label.text == "Ar–CH=O → Ar–CH₂–OH"
     assert reduction.reaction_label is not None
-    assert reduction.reaction_label.pattern_id == "heteroatom_bond_reduction"
-    assert reduction.reaction_label.transformation_label == "C=O reduction"
-    assert oxidation.reaction_label.concise == "Ar–CH(R)–OH → Ar–C(R)=O"
+    assert reduction.reaction_label.basis == "local_context"
+    assert oxidation.reaction_label.text == "Alk–Ar–CH–OH → Alk–Ar–C=O"
     assert oxidation.reaction_label is not None
-    assert oxidation.reaction_label.pattern_id == "heteroatom_bond_oxidation"
+    assert oxidation.reaction_label.basis == "local_context"
 
 
 def test_unmapped_complete_alkyne_hydrogenation_receives_generic_label() -> None:
@@ -49,12 +44,9 @@ def test_unmapped_complete_alkyne_hydrogenation_receives_generic_label() -> None
         "C#Cc1ccccc1.[H][H]>>CCc1ccccc1"
     )
 
-    assert result.reaction_label.concise == "Ar–C≡CH → Ar–CH2–CH3"
+    assert result.reaction_label.text == "Ar–C≡CH → Ar–CH₂–CH₃"
     assert result.reaction_label is not None
-    assert result.reaction_label.pattern_id == "complete_alkyne_hydrogenation"
-    assert result.reaction_label.structural_label == (
-        "C≡C → C–C; 4 × H gain at C"
-    )
+    assert result.reaction_label.basis == "local_context"
 
 
 def test_symmetry_equivalent_correspondence_is_order_invariant() -> None:
@@ -81,8 +73,8 @@ def test_contextual_label_style_changes_display_only() -> None:
         "C=Cc1ccccc1.[H][H]>>CCc1ccccc1", label_style="ascii"
     )
 
-    assert unicode_result.reaction_label.concise == "Ar–CH=CH2 → Ar–CH2–CH3"
-    assert ascii_result.reaction_label.concise == "Ar-CH=CH2 -> Ar-CH2-CH3"
+    assert unicode_result.reaction_label.text == "Ar–CH=CH₂ → Ar–CH₂–CH₃"
+    assert ascii_result.reaction_label.text == "Ar-CH=CH2 -> Ar-CH2-CH3"
     assert unicode_result.reaction_signature is not None
     assert ascii_result.reaction_signature is not None
     assert unicode_result.reaction_signature.signature_id == (
@@ -97,12 +89,11 @@ def test_multiple_order_changes_render_as_repeated_events() -> None:
     )
 
     assert result.reaction_label is not None
-    assert result.reaction_label.contextual_label is None
-    assert result.reaction_label.pattern_id is None
+    assert result.reaction_label.basis == "local_context"
     assert result.reaction_signature is not None
     assert result.reaction_signature.event_count == 2
-    assert result.reaction_label.concise == "2 × C=C hydrogenation"
     assert result.reaction_label.status == "multi_event"
+    assert result.reaction_label.event_count == 2
 
 
 def test_beta_elimination_resolves_previously_ambiguous_correspondence() -> None:
@@ -139,8 +130,8 @@ def test_global_correspondence_recovers_aldol_graph_edits() -> None:
     assert all(
         edit.confidence == 0.8 for edit in result.reaction_signature.edits
     )
-    assert result.reaction_label.concise == "C-H + C=O -> C-C + C-O + O-H"
-    assert result.reaction_label.status == "observed_edits"
+    assert result.reaction_label.text.startswith("R-CH=O + activated C-H ->")
+    assert result.reaction_label.status == "structural_equation"
     assert "INFERRED_GLOBAL_ATOM_CORRESPONDENCE" in result.warnings
 
 
@@ -155,8 +146,10 @@ def test_global_correspondence_recovers_cycloaddition_graph_edits() -> None:
     assert result.transformation_class == "generic_graph_transformation"
     assert result.reaction_signature.topology.reaction_scope == "intermolecular"
     assert result.reaction_label is not None
-    assert "->" in result.reaction_label.concise
-    assert result.reaction_label.concise == "C#C + N=N=N -> aromatic 5-membered C2N3 ring"
+    assert "->" in result.reaction_label.text
+    assert result.reaction_label.text == (
+        "R1-C#C-H + R-N3 -> aromatic 5-membered C2N3 ring"
+    )
     assert result.reaction_label.status == "ring_formation"
     assert result.reaction_signature.topology.formed_ring_sizes == (5,)
 
@@ -171,7 +164,7 @@ def test_global_correspondence_recovers_condensation_graph_edits() -> None:
     assert result.reaction_signature is not None
     assert result.transformation_class == "generic_graph_transformation"
     assert result.interpretation.primary_pattern_id == "net_coupling"
-    assert result.reaction_label.concise == "C=O + 2 x N-H -> C=N"
+    assert result.reaction_label.text == "R-CH=O + Alk-NH2 -> Alk-CH=N-Alk"
     assert result.reaction_signature.formed_bond_types == ("C-N:DOUBLE",)
     assert result.reaction_signature.broken_bond_types == ("C-O:DOUBLE",)
     assert result.reaction_signature.order_changes == ()

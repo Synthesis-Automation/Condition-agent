@@ -39,11 +39,11 @@ def _attach_core_and_rerender(
     *,
     warnings: Iterable[str],
 ) -> ReactionAnalysis:
-    """Attach a compatible core to both contracts and refresh presentation.
+    """Attach a compatible core to both contracts and refresh the label.
 
     External mapping may add retained-context information after the internal
     reaction interpretation was completed. Identity, signature, and family
-    interpretation remain unchanged; only the evidence-aware display label is
+    interpretation remain unchanged; only the evidence-aware terminal label is
     rendered again from the enriched observation.
     """
     combined_warnings = tuple(sorted(set(base.warnings).union(warnings)))
@@ -68,6 +68,10 @@ def _attach_core_and_rerender(
         reaction_label=render_reaction(
             enriched_observation,
             base.interpretation,
+            reactants=base.reactants,
+            signature=base.reaction_signature,
+            partial_transformation=base.partial_product_transformation,
+            style=(base.reaction_label.style if base.reaction_label else "unicode"),
         ),
         warnings=combined_warnings,
     )

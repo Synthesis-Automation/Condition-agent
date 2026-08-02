@@ -17,7 +17,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
         if atom.GetIdx() not in candidate_centers:
             continue
         context = classify_context(mol, atom.GetIdx(), match_index=match_index)
-        token = "HetArH" if context.token == "HeteroAr" else "ArH"
+        token = "HetArH" if context.token == "HetAr" else "ArH"
         h_count = int(atom.GetTotalNumHs(includeNeighbors=True))
         sites.append(ReactiveSiteCandidate(
             site_type="aromatic_CH", topology="atom",

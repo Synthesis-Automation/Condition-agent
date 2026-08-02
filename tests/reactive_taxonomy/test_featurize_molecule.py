@@ -34,7 +34,7 @@ def test_site_reports_pattern_provenance() -> None:
 def test_context_taxonomy_declares_classification_methods() -> None:
     payload = load_context_taxonomy()
     records = {record["id"]: record for record in payload["contexts"]}
-    assert records["HeteroAr"]["classification_method"] == "aromatic_ring_system"
+    assert records["HetAr"]["classification_method"] == "aromatic_ring_system"
     assert records["Alkyl"]["classification_method"] == "atom_property"
     assert records["C(O)NR"]["classification_method"] == "mapped_smarts"
     assert records["C(O)NR"]["atom_roles"]["context_anchor"] == 1
@@ -42,7 +42,7 @@ def test_context_taxonomy_declares_classification_methods() -> None:
 
 def test_leaving_groups() -> None:
     assert "LG|Ar|Br" in signatures("Brc1ccccc1")
-    assert "LG|HeteroAr|Cl" in signatures("Clc1ncccc1")
+    assert "LG|HetAr|Cl" in signatures("Clc1ncccc1")
     assert "LG|Alkyl|OMs" in signatures("CCOS(=O)(=O)C")
 
 
@@ -75,7 +75,7 @@ def test_explicit_sulfur_anions_are_separate_nucleophile_sites() -> None:
         (site.site_type, site.canonical_signature, site.chemist_label)
         for site in methylthiolate.reactive_site_hypotheses
     } == {
-        ("nucleophile_anion", "NU-|S|-1|Alkyl", "R–S⁻")
+        ("nucleophile_anion", "NU-|S|-1|Alkyl", "Alk–S⁻")
     }
 
 
@@ -155,7 +155,7 @@ def test_acyl_halide_owns_halogen_site() -> None:
 def test_ammonia_is_supported_nh_pronucleophile() -> None:
     result = analyze_molecule("N")
     assert [site.canonical_signature for site in result.reactive_site_hypotheses] == ["XH|N|H3|"]
-    assert result.reactive_site_hypotheses[0].chemist_label == "NH3"
+    assert result.reactive_site_hypotheses[0].chemist_label == "NH₃"
 
 
 def test_expanded_condensation_and_nitrogen_classes() -> None:
@@ -177,8 +177,8 @@ def test_aromatic_nh_is_one_ring_context() -> None:
             if site.site_type == "pronucleophile_XH"
         ]
         assert len(sites) == 1
-        assert sites[0].canonical_signature == "XH|N_aromatic|H1|HeteroAr"
-        assert sites[0].chemist_label == "AromN–H"
+        assert sites[0].canonical_signature == "XH|N_aromatic|H1|HetAr"
+        assert sites[0].chemist_label == "HetAr–[nH]"
         assert sites[0].details["center_element"] == "N"
         assert sites[0].details["derived_family"] == "aromatic_nh"
 
@@ -189,8 +189,8 @@ def test_bromopyrrole_keeps_both_distinct_sites() -> None:
         if site.site_type in {"leaving_group", "pronucleophile_XH"}
     }
     assert legacy_sites == {
-        "LG|HeteroAr|Br",
-        "XH|N_aromatic|H1|HeteroAr",
+        "LG|HetAr|Br",
+        "XH|N_aromatic|H1|HetAr",
     }
 
 
@@ -199,7 +199,7 @@ def test_rendering_styles_preserve_signature() -> None:
     ascii_site = analyze_molecule("Nc1ccccc1", label_style="ascii").reactive_site_hypotheses[0]
     hte_site = analyze_molecule("Nc1ccccc1", label_style="hte_legacy").reactive_site_hypotheses[0]
     assert available_styles() == ("unicode", "ascii", "hte_legacy")
-    assert unicode_site.chemist_label == "Ar–NH2"
+    assert unicode_site.chemist_label == "Ar–NH₂"
     assert ascii_site.chemist_label == "Ar-NH2"
     assert hte_site.chemist_label == "Ar-NH2"
     assert len({unicode_site.canonical_signature, ascii_site.canonical_signature, hte_site.canonical_signature}) == 1
@@ -214,7 +214,7 @@ def test_rendering_styles_preserve_signature() -> None:
         if site.details.get("center_token") == "N"
     )
     assert amide_nh.chemist_label == "R–C(O)–NHR"
-    assert sulfonamide_nh.chemist_label == "R–S(O)2–NHR"
+    assert sulfonamide_nh.chemist_label == "R–S(O)₂–NHR"
 
 
 def test_availability_distinguishes_chemical_site_state() -> None:
@@ -232,7 +232,7 @@ def test_availability_distinguishes_chemical_site_state() -> None:
 def test_rich_context_record_is_exposed() -> None:
     site = analyze_molecule("Nc1ccccn1").reactive_site_hypotheses[0]
     context = site.context_features["contexts"][0]
-    assert context["token"] == "HeteroAr"
+    assert context["token"] == "HetAr"
     assert context["classification_method"] == "aromatic_ring_system"
     assert context["subtype"] == "pyridine_like"
     assert context["features"]["heteroatoms"] == ["N"]
@@ -246,7 +246,7 @@ def test_rich_context_record_is_exposed() -> None:
         "distance_from_attachment": 1,
     }]
     assert context["features"]["ring_system_key"] == (
-        "HeteroAr|rings=6|hetero=N:pyridine_like:d1|fused=0"
+        "HetAr|rings=6|hetero=N:pyridine_like:d1|fused=0"
     )
     assert len(context["fragment_atom_indices"]) == 6
 
@@ -264,8 +264,8 @@ def test_heteroaromatic_context_preserves_broad_token_and_nitrogen_position() ->
             if candidate.site_type == "leaving_group"
         )
         context = site.context_features["contexts"][0]
-        assert site.canonical_signature == "LG|HeteroAr|Br"
-        assert context["token"] == "HeteroAr"
+        assert site.canonical_signature == "LG|HetAr|Br"
+        assert context["token"] == "HetAr"
         assert context["subtype"] == "pyridine_like"
         assert (
             context["features"]["heteroatom_details"][0][
@@ -289,7 +289,7 @@ def test_graph_defined_heteroaromatic_subtypes_cover_common_ring_classes() -> No
             if candidate.site_type == "leaving_group"
         )
         context = site.context_features["contexts"][0]
-        assert context["token"] == "HeteroAr"
+        assert context["token"] == "HetAr"
         assert context["subtype"] == expected_subtype
         assert context["features"]["heteroatom_counts"] == {
             expected_element: 1
@@ -309,7 +309,7 @@ def test_charged_heteroaromatic_nitrogen_states_are_distinct_contexts() -> None:
             if candidate.site_type == "leaving_group"
         )
         context = site.context_features["contexts"][0]
-        assert context["token"] == "HeteroAr"
+        assert context["token"] == "HetAr"
         assert context["subtype"] == expected_subtype
         assert context["features"]["heteroatom_details"][0][
             "formal_charge"
@@ -318,10 +318,10 @@ def test_charged_heteroaromatic_nitrogen_states_are_distinct_contexts() -> None:
 
 def test_alkyl_leaving_groups_preserve_benzylic_allylic_and_propargylic_subtypes() -> None:
     examples = {
-        "ClCc1ccccc1": ("benzylic", "Benzyl–Cl"),
+        "ClCc1ccccc1": ("benzylic", "Bn–Cl"),
         "ClCC=C": ("allylic", "Allyl–Cl"),
         "ClCC#C": ("propargylic", "Propargyl–Cl"),
-        "CCCCl": ("simple_alkyl", "R–Cl"),
+        "CCCCl": ("simple_alkyl", "Alk–Cl"),
     }
     for smiles, (subtype, label) in examples.items():
         site = next(
@@ -340,7 +340,7 @@ def test_benzyl_chloride_and_aryl_bromide_are_separate_sites() -> None:
     result = analyze_molecule("ClCc1ccccc1Br")
     assert {
         site.chemist_label for site in result.reactive_site_hypotheses if site.site_type == "leaving_group"
-    } == {"Benzyl–Cl", "Ar–Br"}
+    } == {"Bn–Cl", "Ar–Br"}
 
 
 def test_aldehydes_and_ketones_are_carbonyl_addition_centers() -> None:
@@ -352,7 +352,7 @@ def test_aldehydes_and_ketones_are_carbonyl_addition_centers() -> None:
 
     ketone = next(site for site in analyze_molecule("CC(=O)C").reactive_site_hypotheses if site.site_type == "electrophilic_center")
     assert ketone.canonical_signature == "EC|Carbonyl|ketone|Alkyl,Alkyl|addition"
-    assert ketone.chemist_label == "R2C=O"
+    assert ketone.chemist_label == "R²C=O"
 
 
 def test_acyl_substitution_and_carbonyl_addition_are_distinct() -> None:
@@ -372,7 +372,7 @@ def test_aromatic_ch_sites_are_atom_localized_and_ring_classified() -> None:
     pyridine_sites = [site for site in analyze_molecule("c1ccncc1").reactive_site_hypotheses if site.site_type == "aromatic_CH"]
     assert len(pyridine_sites) == 5
     assert {site.details["handle_token"] for site in pyridine_sites} == {"HetArH"}
-    assert {site.chemist_label for site in pyridine_sites} == {"HeteroAr–H"}
+    assert {site.chemist_label for site in pyridine_sites} == {"HetAr–H"}
 
 
 def test_unsaturated_carbon_bonds_are_bond_localized() -> None:
@@ -381,7 +381,7 @@ def test_unsaturated_carbon_bonds_are_bond_localized() -> None:
     assert alkene.canonical_signature == "PI|Alkene"
     assert alkene.details["bond_order"] == 2
     assert set(alkene.details["atom_roles"]) == {"endpoint_a", "endpoint_b"}
-    assert alkene.chemist_label == "H2C=CHR1"
+    assert alkene.chemist_label == "H₂C=CHR¹"
     assert alkene.details["endpoint_h_counts"] == [2, 1]
     assert alkene.details["endpoint_substituent_counts"] == [0, 1]
 
@@ -389,16 +389,16 @@ def test_unsaturated_carbon_bonds_are_bond_localized() -> None:
     assert {site.site_type for site in alkyne_sites} == {"unsaturated_bond", "pronucleophile_XH"}
     assert next(
         site for site in alkyne_sites if site.site_type == "unsaturated_bond"
-    ).chemist_label == "R1–C≡C–H"
+    ).chemist_label == "R¹–C≡C–H"
 
 
 def test_alkene_labels_expose_all_hydrogen_and_substituent_positions() -> None:
     examples = {
-        "C=C": "H2C=CH2",
-        "CC=C": "H2C=CHR1",
-        "CC=CC": "R1HC=CHR2",
-        "C=C(C)c1ccccc1": "H2C=CR1R2",
-        "CC(C)=C(C)C": "R1R2C=CR3R4",
+        "C=C": "H₂C=CH₂",
+        "CC=C": "H₂C=CHR¹",
+        "CC=CC": "R¹HC=CHR²",
+        "C=C(C)c1ccccc1": "H₂C=CR¹R²",
+        "CC(C)=C(C)C": "R¹R²C=CR³R⁴",
     }
 
     for smiles, expected in examples.items():
@@ -425,16 +425,16 @@ def test_alkene_labels_retain_defined_e_z_stereochemistry() -> None:
         if site.site_type == "unsaturated_bond"
     )
 
-    assert trans.chemist_label == "R1HC=CHR2 (E)"
-    assert cis.chemist_label == "R1HC=CHR2 (Z)"
+    assert trans.chemist_label == "R¹HC=CHR² (E)"
+    assert cis.chemist_label == "R¹HC=CHR² (Z)"
 
 
 def test_alkyne_labels_distinguish_acetylene_terminal_and_internal() -> None:
     examples = {
         "C#C": "H–C≡C–H",
-        "CC#C": "R1–C≡C–H",
-        "CC#CC": "R1–C≡C–R2",
-        "c1ccccc1C#Cc1ccccc1": "R1–C≡C–R2",
+        "CC#C": "R¹–C≡C–H",
+        "CC#CC": "R¹–C≡C–R²",
+        "c1ccccc1C#Cc1ccccc1": "R¹–C≡C–R²",
     }
 
     for smiles, expected in examples.items():
@@ -466,7 +466,7 @@ def test_unsaturated_labels_support_ascii_style_without_changing_signature() -> 
         if site.site_type == "unsaturated_bond"
     )
 
-    assert unicode_site.chemist_label == "R1–C≡C–H"
+    assert unicode_site.chemist_label == "R¹–C≡C–H"
     assert ascii_site.chemist_label == "R1-C#C-H"
     assert unicode_site.canonical_signature == ascii_site.canonical_signature
 
@@ -525,7 +525,7 @@ def test_organic_azide_resonance_forms_share_one_dipolar_handle() -> None:
         assert len(sites) == 1
         site = sites[0]
         assert site.canonical_signature == "DG|Azide|Organic"
-        assert site.chemist_label == "R–N3"
+        assert site.chemist_label == "R–N₃"
         assert site.details["matched_pattern"] == matched_pattern
         assert site.details["net_group_charge"] == 0
         assert site.details["reaction_modes"] == ["cycloaddition", "reduction"]
@@ -558,19 +558,19 @@ def test_organic_heteroatom_pair_bonds_are_typed_handles() -> None:
     examples = {
         "CN=NC": (
             "HB|Azo",
-            "R1–N=N–R2",
+            "R¹–N=N–R²",
             ["isomerization", "reduction"],
             "azo",
         ),
         "CSSC": (
             "HB|Disulfide",
-            "R1–S–S–R2",
+            "R¹–S–S–R²",
             ["exchange", "reduction"],
             "disulfide",
         ),
         "COOC": (
             "HB|Peroxide",
-            "R1–O–O–R2",
+            "R¹–O–O–R²",
             ["homolysis", "reduction"],
             "peroxide",
         ),

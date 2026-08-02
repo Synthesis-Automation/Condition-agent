@@ -21,7 +21,7 @@ This is difficult to compare across partners. In particular:
   the same steric environment at different abstraction levels;
 - the current electronic score is a distance-weighted functional-group tag sum,
   not a physical electron-density calculation;
-- `Ar` and `HeteroAr` omit ring identity, ring size, fusion, and the positions and
+- `Ar` and `HetAr` omit ring identity, ring size, fusion, and the positions and
   electronic types of ring heteroatoms;
 - an aryl electrophile and an aromatic N-H partner are affected by different
   electronic quantities. Ring electron demand is useful for the former, while
@@ -188,7 +188,7 @@ benzene-style positions.
 Store the sorted sizes of aromatic rings in the connected aromatic system, the
 number of aromatic rings, and whether the system is fused. This distinguishes,
 for example, benzene from pyridine, pyridine from pyrimidine, and pyrrole from
-indole without relying only on `Ar` versus `HeteroAr`.
+indole without relying only on `Ar` versus `HetAr`.
 
 ## 5. Steric descriptor
 
@@ -295,7 +295,7 @@ N partner AromN-H — <ring family>; access open; N lone pair delocalized/low
 
 Default display rules:
 
-- show ring family and ring size for every `Ar` or `HeteroAr` anchor;
+- show ring family and ring size for every `Ar` or `HetAr` anchor;
 - show heteroatom positions only when present;
 - show ortho occupancy only for aromatic anchors;
 - show N substitution and lone-pair availability for an N reactive center;

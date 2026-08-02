@@ -222,8 +222,7 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
     )
 
     assert assessment.status == "external_mapping_internal_consensus"
-    assert assessment.analysis.reaction_label.concise
-    assert assessment.analysis.reaction_label.detailed
+    assert assessment.analysis.reaction_label.text
     assert "EXTERNAL_MAPPING_INTERNAL_CONSENSUS" in (
         assessment.analysis.reaction_label.warnings
     )
@@ -233,7 +232,7 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
     assert assessment.analysis.reaction_core.evidence == (
         "external_mapping_internal_consensus"
     )
-    assert assessment.analysis.reaction_core.generic_label
+    assert not hasattr(assessment.analysis.reaction_core, "generic_label")
     for transition in assessment.analysis.reaction_core.atom_transitions:
         for state, components in (
             (transition.before_state, base.reactants),
@@ -253,7 +252,7 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
     )
     assert build_reaction_review_summary(
         assessment.analysis
-    ).detailed_reaction_label
+    ).reaction_label
 
 
 def test_forced_resolved_mapping_rerenders_material_core_context() -> None:
@@ -282,17 +281,9 @@ def test_forced_resolved_mapping_rerenders_material_core_context() -> None:
         assessment.analysis.observation.core
         == assessment.analysis.reaction_core
     )
-    assert assessment.analysis.reaction_label.source == "reaction_core"
-    assert assessment.analysis.reaction_label.concise == (
-        "Provisional core (external atom mapping): "
-        "S(R)2 + O → S(R)2(=O)"
-    )
-    assert assessment.analysis.reaction_label.evidence == (
-        "external_mapping_internal_consensus"
-    )
-    assert "retained context: R (C)" in (
-        assessment.analysis.reaction_label.detailed
-    )
+    assert assessment.analysis.reaction_label.text == "O + S → S–Alk–Alk=O"
+    assert assessment.analysis.reaction_label.basis == "reaction_sites"
+    assert assessment.analysis.reaction_label.evidence == base.evidence_quality
 
 
 def test_forced_mapping_projects_maps_without_smiles_coordinate_round_trip() -> None:
@@ -367,10 +358,8 @@ def test_forced_mapping_builds_one_core_with_two_suzuki_events() -> None:
     }
     assert base.reaction_signature is None
     assert assessment.analysis.reaction_signature is not None
-    assert assessment.analysis.reaction_label.concise
+    assert assessment.analysis.reaction_label.text
     assert assessment.analysis.reaction_label.status == "multi_event"
     assert assessment.analysis.reaction_core is not None
     assert assessment.analysis.reaction_core.event_count == 2
-    assert assessment.analysis.reaction_core.generic_label == (
-        "2 × Ar–B + 2 × Ar–Br → 2 × Ar–Ar"
-    )
+    assert not hasattr(assessment.analysis.reaction_core, "generic_label")

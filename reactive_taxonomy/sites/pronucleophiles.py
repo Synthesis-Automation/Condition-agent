@@ -79,7 +79,7 @@ def _activation_contexts(
                 classification_method="mapped_smarts",
                 facet="activation",
                 semantic_id=f"{relationship}_{token}",
-                display_token=f"{relationship}:{token}",
+                notation_id="Other",
                 subtype=token,
                 matched_pattern=pattern_id,
                 features={
@@ -156,15 +156,15 @@ def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
             contexts = [record.token for record in context_records]
         if symbol == "N" and atom.GetIsAromatic():
             center = "N_aromatic"
-            contexts = ["HeteroAr"]
+            contexts = ["HetAr"]
             if context_records:
                 merged_atoms = tuple(sorted({idx for record in context_records for idx in record.fragment_atom_indices}))
                 context_records = [type(context_records[0])(
-                    token="HeteroAr", attachment_atom_index=atom.GetIdx(), fragment_atom_indices=merged_atoms,
+                    token="HetAr", attachment_atom_index=atom.GetIdx(), fragment_atom_indices=merged_atoms,
                     classification_method="aromatic_ring_system",
                     facet="scaffold",
                     semantic_id="heteroaromatic",
-                    display_token="HeteroAr",
+                    notation_id="HetAr",
                     subtype="aromatic_nh_ring",
                     features={"ring_neighbor_count": len(context_records)},
                 )]
