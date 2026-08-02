@@ -36,7 +36,7 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert not window.force_core_mapping_check.isChecked()
         assert window.force_core_mapping_check.objectName() == "forceCoreMapping"
         assert window.render_style_combo.objectName() == "renderStylePreset"
-        assert window.render_style_combo.currentData() == "acs_1996_compact"
+        assert window.render_style_combo.currentData() == "current"
 
         window.input_edit.setText(REACTION_EXAMPLE)
         assert window.kind_label.text() == "Detected: reaction"
@@ -179,23 +179,35 @@ def test_drawing_style_switch_rerenders_without_reanalysis(monkeypatch) -> None:
     try:
         window.input_edit.setText("CCO")
         window.analyze()
-        assert calls == ["acs_1996_compact"]
-        assert window.structure_image_label._trim_svg_white_space
-        assert window.structure_image_label._svg_max_upscale == 6.0
-        compact_pixmap = window.structure_image_label.pixmap()
-        compact_width = compact_pixmap.width() / compact_pixmap.devicePixelRatio()
-
-        current_index = window.render_style_combo.findData("current")
-        window.render_style_combo.setCurrentIndex(current_index)
-
-        assert calls == ["acs_1996_compact", "current"]
+        assert calls == ["current"]
         assert window.structure_image_label._trim_svg_white_space
         assert window.structure_image_label._svg_max_upscale is None
         current_pixmap = window.structure_image_label.pixmap()
         current_width = current_pixmap.width() / current_pixmap.devicePixelRatio()
+
+        compact_index = window.render_style_combo.findData("acs_1996_compact")
+        window.render_style_combo.setCurrentIndex(compact_index)
+
+        assert calls == ["current", "acs_1996_compact"]
+        assert window.structure_image_label._trim_svg_white_space
+        assert window.structure_image_label._svg_max_upscale == 6.0
+        compact_pixmap = window.structure_image_label.pixmap()
+        compact_width = compact_pixmap.width() / compact_pixmap.devicePixelRatio()
         assert compact_width > current_width * 0.15
         assert compact_width < current_width * 0.60
         assert window.output.toPlainText().startswith("MOLECULE FEATURIZATION")
     finally:
         window.close()
         application.processEvents()
+
+
+def test_main_window_starts_maximized() -> None:
+    events = []
+
+    class FakeWindow:
+        def showMaximized(self) -> None:
+            events.append("maximized")
+
+    gui._show_main_window(FakeWindow())
+
+    assert events == ["maximized"]

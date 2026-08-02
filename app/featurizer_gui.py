@@ -40,6 +40,7 @@ REACTION_EXAMPLE = (
 MOLECULE_EXAMPLE = "Brc1ccc(N)cc1C#N"
 REACTION_IMAGE_SIZE = (680, 168)
 MOLECULE_IMAGE_SIZE = (480, 300)
+DEFAULT_RENDER_PRESET = "current"
 
 
 def detect_input_kind(text: str) -> InputKind:
@@ -236,13 +237,12 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.render_style_combo.setObjectName("renderStylePreset")
         for preset_id, label in available_render_presets():
             self.render_style_combo.addItem(label, preset_id)
-        compact_index = self.render_style_combo.findData("acs_1996_compact")
-        if compact_index >= 0:
-            self.render_style_combo.setCurrentIndex(compact_index)
+        default_index = self.render_style_combo.findData(DEFAULT_RENDER_PRESET)
+        if default_index >= 0:
+            self.render_style_combo.setCurrentIndex(default_index)
         self.render_style_combo.setToolTip(
-            "ACS 1996 uses RDKit's native publication-style monochrome "
-            "drawing, 14.4-pixel bonds, and fixed 10-pixel atom labels before "
-            "uniform display scaling."
+            "Current is the default project drawing style. Other presets can "
+            "be selected without rerunning the chemistry analysis."
         )
         graph_header.addWidget(self.render_style_combo)
         graph_layout.addLayout(graph_header)
@@ -606,6 +606,11 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.status_label.setText("Result copied to clipboard")
 
 
+def _show_main_window(window: ReactiveTaxonomyWindow) -> None:
+    """Show the featurizer in its requested initial state."""
+    window.showMaximized()
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Launch the Qt6 featurization application."""
     application = QtWidgets.QApplication(
@@ -613,7 +618,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     application.setApplicationName("Reactive Taxonomy Featurizer")
     window = ReactiveTaxonomyWindow()
-    window.show()
+    _show_main_window(window)
     return application.exec()
 
 
