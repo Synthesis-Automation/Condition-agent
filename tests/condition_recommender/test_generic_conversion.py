@@ -654,7 +654,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "9.0"
+    assert report["schema_version"] == "9.1"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
@@ -664,8 +664,9 @@ def test_concise_reaction_review_export_has_only_requested_columns(
         "canonical_reaction_smiles",
         "reaction_core_label",
     )
-    assert CONCISE_REACTION_REVIEW_FIELDS[2:8] == (
+    assert CONCISE_REACTION_REVIEW_FIELDS[2:9] == (
         "primary_reaction_pattern",
+        "primary_reaction_pattern_count",
         "reaction_pattern_matches",
         "identified_reaction_type",
         "compatible_reaction_types",
@@ -687,6 +688,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["primary_reaction_pattern"] == (
         "organoboron_c_c_coupling_like"
     )
+    assert review_rows[0]["primary_reaction_pattern_count"] == "1"
     assert review_rows[0]["reaction_pattern_matches"].startswith(
         "organoboron_c_c_coupling_like"
     )
@@ -724,6 +726,26 @@ def test_review_exports_ambiguous_structural_pattern_candidates() -> None:
         "buchwald_hartwig_c_n; snar_amination; ullmann_c_n"
     )
     assert row["reaction_pattern_requires_condition_evidence"] == "True"
+
+
+def test_review_exports_multi_site_pattern_count() -> None:
+    record = convert_record(
+        _raw(
+            "Brc1ccc(Br)cc1.CC(N)=O"
+            ">>CC(=O)Nc1ccc(NC(C)=O)cc1"
+        )
+    )
+
+    row = concise_reaction_review_row(record.to_dict())
+
+    assert row["primary_reaction_pattern"] == "sp2_c_n_substitution_like"
+    assert row["primary_reaction_pattern_count"] == "2"
+    assert row["reaction_core_label"] == (
+        "2 × Ar–Br + 2 × H–N → 2 × Ar–N"
+    )
+    assert row["reaction_display_label"] == (
+        "2 × (C–Br + N–H → C–N)"
+    )
 
 
 def test_review_exports_carbonyl_alpha_c_h_coupling_not_heck() -> None:

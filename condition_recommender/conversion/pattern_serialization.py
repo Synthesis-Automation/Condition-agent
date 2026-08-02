@@ -7,6 +7,7 @@ from typing import Any, Dict, Mapping
 
 REACTION_PATTERN_REVIEW_FIELDS = (
     "primary_reaction_pattern",
+    "primary_reaction_pattern_count",
     "reaction_pattern_matches",
     "identified_reaction_type",
     "compatible_reaction_types",
@@ -40,6 +41,11 @@ def flattened_reaction_pattern_fields(
     )
     return {
         "primary_reaction_pattern": primary_id,
+        "primary_reaction_pattern_count": (
+            str(primary.get("occurrence_count") or 1)
+            if primary is not None
+            else ""
+        ),
         "reaction_pattern_matches": separator.join(
             str(match["pattern_id"]) for match in matches
         ),

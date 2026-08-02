@@ -38,7 +38,7 @@ def test_unaccounted_product_atoms_block_signature_generation() -> None:
     assert result.reaction_signature is None
 
 
-def test_insufficient_partner_multiplicity_is_not_synthesized() -> None:
+def test_exact_insufficient_partner_multiplicity_is_explicitly_inferred() -> None:
     result = featurize_reaction(
         "Sc1ccccc1.O=[N+]([O-])c1c(F)cccc1F"
         ">>O=[N+]([O-])c1c(Sc2ccccc2)cccc1Sc1ccccc1",
@@ -47,11 +47,14 @@ def test_insufficient_partner_multiplicity_is_not_synthesized() -> None:
 
     completeness = result.reaction_completeness
     assert completeness is not None
-    assert completeness.status == "incomplete"
-    assert not completeness.suspected_insufficient_reactant_multiplicity
-    assert completeness.suspected_missing_reactant
-    assert "MISSING_REACTANT_SUSPECTED" in completeness.warnings
-    assert result.reaction_signature is None
+    assert completeness.status == "verified"
+    assert completeness.suspected_insufficient_reactant_multiplicity
+    assert not completeness.suspected_missing_reactant
+    assert "INFERRED_REACTANT_MULTIPLICITY" in completeness.warnings
+    assert result.reaction_signature is not None
+    assert result.reaction_signature.event_count == 2
+    assert len(result.reactants) == 3
+    assert result.reactants[2].inferred_copy_of_component_index == 0
 
 
 def test_partial_mapping_is_reported_per_heavy_atom() -> None:

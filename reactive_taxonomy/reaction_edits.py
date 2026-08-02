@@ -1289,6 +1289,7 @@ def resolve_structural_evidence(
     *,
     mapped_override: Optional[EditNormalizationResult] = None,
     mapped_provider: str = "supplied_atom_mapping",
+    additional_warnings: Tuple[str, ...] = (),
 ) -> EditNormalizationResult:
     """Resolve only observed mapping and graph-correspondence evidence.
 
@@ -1306,22 +1307,34 @@ def resolve_structural_evidence(
             (),
             "unresolved",
             0.0,
-            mapped.warnings,
+            tuple(sorted(set(mapped.warnings + additional_warnings))),
             False,
             evidence_candidates=mapped_candidates,
         )
     if mapped.valid:
-        return replace(mapped, evidence_candidates=mapped_candidates)
+        return replace(
+            mapped,
+            warnings=tuple(sorted(set(mapped.warnings + additional_warnings))),
+            evidence_candidates=mapped_candidates,
+        )
 
     inferred = normalize_inferred_scaffold_edits(reactants, products)
     combined_candidates = mapped_candidates + inferred.evidence_candidates
     if inferred.valid:
-        return replace(inferred, evidence_candidates=combined_candidates)
+        return replace(
+            inferred,
+            warnings=tuple(sorted(set(inferred.warnings + additional_warnings))),
+            evidence_candidates=combined_candidates,
+        )
     return EditNormalizationResult(
         (),
         inferred.evidence,
         0.0,
-        tuple(sorted(set(mapped.warnings + inferred.warnings))),
+        tuple(
+            sorted(
+                set(mapped.warnings + inferred.warnings + additional_warnings)
+            )
+        ),
         False,
         connectivity_edit_graph=(
             mapped.connectivity_edit_graph

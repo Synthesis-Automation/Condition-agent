@@ -296,11 +296,16 @@ def _event_labels(
     concise_parts = []
     for label in sorted(counts, key=first_position.get):
         count = counts[label]
+        counted_label = (
+            f"({label})"
+            if count > 1 and styling["arrow"] in label
+            else label
+        )
         concise_parts.append(
             str(rendering["templates"]["counted_clause"]).format(
                 count=count,
                 times=styling["times"],
-                clause=label,
+                clause=counted_label,
             )
             if count > 1
             else label

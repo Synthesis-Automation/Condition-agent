@@ -94,7 +94,9 @@ def build_reaction_completeness(
     if reactant_maps_missing:
         warnings.append("REACTANT_MAPS_MISSING_FROM_PRODUCTS")
 
-    insufficient_multiplicity = False
+    insufficient_multiplicity = (
+        "INFERRED_REACTANT_MULTIPLICITY" in edit_result.warnings
+    )
     suspected_missing_reactant = bool(product_element_excess)
     if product_element_excess:
         warnings.append("UNACCOUNTED_PRODUCT_HEAVY_ATOMS")
@@ -103,6 +105,8 @@ def build_reaction_completeness(
             if insufficient_multiplicity
             else "MISSING_REACTANT_SUSPECTED"
         )
+    elif insufficient_multiplicity:
+        warnings.append("INFERRED_REACTANT_MULTIPLICITY")
 
     correspondence_verified = edit_result.evidence in {
         "fragmented_scaffold_correspondence",
@@ -121,7 +125,11 @@ def build_reaction_completeness(
         evidence = "product_element_excess"
     elif correspondence_verified:
         status = "verified"
-        evidence = edit_result.evidence
+        evidence = (
+            f"{edit_result.evidence}_with_inferred_reactant_multiplicity"
+            if insufficient_multiplicity
+            else edit_result.evidence
+        )
     elif mapping_verified:
         status = "verified"
         evidence = "complete_product_atom_mapping"

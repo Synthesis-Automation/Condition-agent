@@ -10,7 +10,7 @@ annotations and cannot create or override structural evidence.
 ```text
 Reaction SMILES
   ↓
-Parse molecular graph facts
+Parse molecular graph facts and normalize component inventory
   ↓
 Infer atom correspondence
   ↓
@@ -59,6 +59,13 @@ components, canonical SMILES, supplied maps, warnings, and errors.
 `MolecularInterpretation` is a separate contract. The composed
 `MoleculeAnalysis` is convenient for molecular tools, but only its `structure`
 projection may enter a reaction observation.
+
+[`infer_reactant_multiplicity()`](../reactive_taxonomy/reaction_stoichiometry.py)
+handles omitted stoichiometric repetition conservatively. It adds a whole
+supplied reactant copy only when one bounded structural inventory exactly
+accounts for the product-side heavy-element deficit. The inferred copy and its
+source component remain explicit, and correspondence must still validate the
+expanded inventory. Ambiguous deficits remain unresolved.
 
 ## 2. Infer correspondence and normalize edits
 
@@ -152,6 +159,7 @@ They also expose optional interpretation without parsing display text:
 
 ```text
 primary_reaction_pattern
+primary_reaction_pattern_count
 reaction_pattern_matches
 identified_reaction_type
 compatible_reaction_types

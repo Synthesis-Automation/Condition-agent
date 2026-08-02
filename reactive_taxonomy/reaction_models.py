@@ -12,7 +12,7 @@ from .models import MoleculeAnalysis, MolecularStructureObservation
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.4"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "3.0"
 REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.4"
-REACTION_PATTERN_MATCH_SCHEMA_VERSION = "3.0"
+REACTION_PATTERN_MATCH_SCHEMA_VERSION = "3.1"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v10"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
 REACTION_TOPOLOGY_SCHEMA_VERSION = "2.0"
@@ -57,6 +57,7 @@ class ReactionComponent:
     canonical_smiles: str
     atom_mapped: bool
     molecule_analysis: MoleculeAnalysis
+    inferred_copy_of_component_index: Optional[int] = None
 
     def structure_only(self) -> "ReactionStructureComponent":
         """Project this component onto graph facts only."""
@@ -67,6 +68,9 @@ class ReactionComponent:
             canonical_smiles=self.canonical_smiles,
             atom_mapped=self.atom_mapped,
             molecular_structure=self.molecule_analysis.structure,
+            inferred_copy_of_component_index=(
+                self.inferred_copy_of_component_index
+            ),
         )
 
 
@@ -80,6 +84,7 @@ class ReactionStructureComponent:
     canonical_smiles: str
     atom_mapped: bool
     molecular_structure: MolecularStructureObservation
+    inferred_copy_of_component_index: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -300,7 +305,7 @@ class ReactionCompletenessAssessment:
     suspected_insufficient_reactant_multiplicity: bool
     evidence: str
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
 
 
 @dataclass(frozen=True)
@@ -1014,6 +1019,7 @@ class ReactionPatternMatch:
     display_importance: int
     matched_edit_indices: Tuple[int, ...]
     evidence: Tuple[str, ...]
+    occurrence_count: int = 1
     display_label: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
     requires_condition_evidence: bool = False
@@ -1027,6 +1033,8 @@ class ReactionPatternMatch:
             raise ValueError("reaction pattern confidence must be between 0 and 1")
         if self.specificity < 0 or self.display_importance < 0:
             raise ValueError("reaction pattern ranking values cannot be negative")
+        if self.occurrence_count < 1:
+            raise ValueError("reaction pattern occurrence count must be positive")
         if tuple(sorted(set(self.matched_edit_indices))) != self.matched_edit_indices:
             raise ValueError("reaction pattern edit indices must be unique and sorted")
 

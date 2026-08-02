@@ -36,6 +36,71 @@ def test_sp2_c_n_pattern_retains_named_family_ambiguity() -> None:
     assert "named family requires condition evidence" in result.reaction_label.detailed
 
 
+def test_multi_site_sp2_c_n_pattern_preserves_both_events() -> None:
+    result = featurize_reaction(
+        "Brc1ccc(Br)cc1.CC(N)=O"
+        ">>CC(=O)Nc1ccc(NC(C)=O)cc1"
+    )
+
+    assert result.reaction_completeness is not None
+    assert result.reaction_completeness.status == "verified"
+    assert (
+        result.reaction_completeness.suspected_insufficient_reactant_multiplicity
+    )
+    assert result.reactants[2].inferred_copy_of_component_index == 1
+    assert result.reaction_signature is not None
+    assert result.reaction_signature.event_count == 2
+    assert result.reaction_signature.formed_bond_types == (
+        "C-N:SINGLE",
+        "C-N:SINGLE",
+    )
+    assert result.reaction_signature.broken_bond_types == (
+        "Br-C:SINGLE",
+        "Br-C:SINGLE",
+    )
+    assert result.interpretation is not None
+    pattern = next(
+        match
+        for match in result.interpretation.pattern_matches
+        if match.pattern_id == "sp2_c_n_substitution_like"
+    )
+    assert pattern.occurrence_count == 2
+    assert pattern.matched_edit_indices == (0, 1, 2, 3, 4, 5)
+    assert result.reaction_core is not None
+    assert result.reaction_core.generic_label == (
+        "2 × Ar–Br + 2 × H–N → 2 × Ar–N"
+    )
+    assert result.reaction_label is not None
+    assert result.reaction_label.concise == (
+        "2 × (C–Br + N–H → C–N)"
+    )
+
+
+def test_explicit_multi_site_reagent_copies_avoid_inference_warning() -> None:
+    result = featurize_reaction(
+        "Brc1ccc(Br)cc1.CC(N)=O.CC(N)=O"
+        ">>CC(=O)Nc1ccc(NC(C)=O)cc1"
+    )
+
+    assert result.reaction_signature is not None
+    assert result.reaction_signature.event_count == 2
+    assert "INFERRED_REACTANT_MULTIPLICITY" not in result.warnings
+    assert all(
+        component.inferred_copy_of_component_index is None
+        for component in result.reactants
+    )
+
+    shorthand = featurize_reaction(
+        "Brc1ccc(Br)cc1.CC(N)=O"
+        ">>CC(=O)Nc1ccc(NC(C)=O)cc1"
+    )
+    assert shorthand.reaction_signature is not None
+    assert (
+        shorthand.reaction_signature.signature_id
+        == result.reaction_signature.signature_id
+    )
+
+
 def test_public_pattern_identification_accepts_reaction_smiles() -> None:
     interpretation = identify_reaction_patterns(
         "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"

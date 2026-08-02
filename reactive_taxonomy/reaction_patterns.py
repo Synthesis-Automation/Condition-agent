@@ -18,6 +18,7 @@ from .reaction_models import (
     ReactionPatternMatch,
 )
 from .reaction_pattern_predicates import ReactionPatternContext, unique_indices
+from .reaction_events import partition_reaction_edits
 
 
 REACTION_PATTERN_DEFINITION_SCHEMA_VERSION = "2.0"
@@ -105,13 +106,14 @@ def _net_substitution(observation: ReactionObservation) -> tuple[int, ...]:
     edits = observation.edits
     broken = _indices(edits, lambda edit: edit.edit_type == "broken")
     formed = _indices(edits, lambda edit: edit.edit_type == "formed")
+    matched = []
     for broken_index in broken:
         broken_atoms = {_atom_key(edits[broken_index], 1), _atom_key(edits[broken_index], 2)}
         for formed_index in formed:
             formed_atoms = {_atom_key(edits[formed_index], 1), _atom_key(edits[formed_index], 2)}
             if (broken_atoms - {None}) & (formed_atoms - {None}):
-                return tuple(sorted((broken_index, formed_index)))
-    return ()
+                matched.extend((broken_index, formed_index))
+    return tuple(sorted(set(matched)))
 
 
 def _net_elimination(observation: ReactionObservation) -> tuple[int, ...]:
@@ -469,6 +471,7 @@ def _centered_replacement(
     carbon_kind: str,
 ) -> tuple[int, ...]:
     """Match C–leaving-group replacement at one carbon center."""
+    matched = []
     for formed_index, formed in enumerate(context.edits):
         if (
             formed.edit_type != "formed"
@@ -492,12 +495,31 @@ def _centered_replacement(
             if other_elements and other_elements <= _LEAVING_ELEMENTS:
                 leaving.append(broken_index)
         if leaving:
-            hydrogen = context.indices(
-                lambda edit: edit.edit_type == "hydrogen_change"
-                and edit.atom_1.element == installed_element
+            installed = context.endpoint_for_element(formed, installed_element)
+            hydrogen = (
+                context.edits_at(installed[2], edit_type="hydrogen_change")
+                if installed is not None
+                else ()
             )
-            return unique_indices(leaving, (formed_index,), hydrogen)
-    return ()
+            matched.extend(unique_indices(leaving, (formed_index,), hydrogen))
+    return tuple(sorted(set(matched)))
+
+
+def _occurrence_count(
+    observation: ReactionObservation,
+    matched_edit_indices: tuple[int, ...],
+) -> int:
+    """Count distinct edit events touched by one pattern match."""
+    matched_edits = {
+        id(observation.edits[index]) for index in matched_edit_indices
+    }
+    return max(
+        1,
+        sum(
+            any(id(edit) in matched_edits for edit in event)
+            for event in partition_reaction_edits(observation.edits)
+        ),
+    )
 
 
 def _sp2_c_n_substitution_like(context: ReactionPatternContext) -> tuple[int, ...]:
@@ -1088,6 +1110,7 @@ def match_reaction_patterns(
                 display_importance=int(definition.get("display_importance", 0)),
                 matched_edit_indices=indices,
                 evidence=(observation.evidence_quality,),
+                occurrence_count=_occurrence_count(observation, indices),
                 display_label=(
                     str(definition.get("display_label"))
                     if definition.get("display_label")

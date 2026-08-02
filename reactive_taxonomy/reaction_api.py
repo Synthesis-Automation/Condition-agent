@@ -19,6 +19,7 @@ from .reaction_observation import build_reaction_observation
 from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_rendering import render_reaction
 from .reaction_parser import interpret_parsed_molecules, parse_reaction_smiles
+from .reaction_stoichiometry import infer_reactant_multiplicity
 from .partial_product_correspondence import (
     infer_partial_product_transformation,
     render_partial_product_transformation,
@@ -52,6 +53,21 @@ def featurize_reaction(
             warnings=parsed.warnings,
             error=parsed.error,
         )
+    multiplicity_warnings: tuple[str, ...] = ()
+    if _mapped_edit_override is None:
+        multiplicity = infer_reactant_multiplicity(
+            parsed.reactants,
+            parsed.products,
+        )
+        multiplicity_warnings = multiplicity.warnings
+        if multiplicity.inferred_copy_count:
+            parsed = replace(
+                parsed,
+                reactants=multiplicity.reactants,
+                warnings=tuple(
+                    sorted(set(parsed.warnings + multiplicity.warnings))
+                ),
+            )
     supplied_mapping = (
         _mapped_edit_override
         if _mapped_edit_override is not None
@@ -65,6 +81,7 @@ def featurize_reaction(
         parsed.products,
         mapped_override=_mapped_edit_override,
         mapped_provider=_mapped_provider,
+        additional_warnings=multiplicity_warnings,
     )
     observation = build_reaction_observation(
         input_reaction_smiles=reaction_smiles,

@@ -20,6 +20,7 @@ from .reaction_models import (
 )
 from .reaction_topology import build_reaction_topology
 from .reaction_parser import parse_reaction_smiles
+from .reaction_stoichiometry import infer_reactant_multiplicity
 
 
 def _synthetic_atom_maps(
@@ -198,6 +199,18 @@ def observe_reaction(reaction_smiles: str) -> ReactionObservation:
             warnings=parsed.warnings,
             error=parsed.error,
         )
+    multiplicity = infer_reactant_multiplicity(
+        parsed.reactants,
+        parsed.products,
+    )
+    if multiplicity.inferred_copy_count:
+        parsed = replace(
+            parsed,
+            reactants=multiplicity.reactants,
+            warnings=tuple(
+                sorted(set(parsed.warnings + multiplicity.warnings))
+            ),
+        )
     supplied_mapping = normalize_mapped_edits(
         parsed.reactants, parsed.products
     )
@@ -205,6 +218,7 @@ def observe_reaction(reaction_smiles: str) -> ReactionObservation:
         parsed.reactants,
         parsed.products,
         mapped_override=supplied_mapping,
+        additional_warnings=multiplicity.warnings,
     )
     return build_reaction_observation(
         input_reaction_smiles=reaction_smiles,
