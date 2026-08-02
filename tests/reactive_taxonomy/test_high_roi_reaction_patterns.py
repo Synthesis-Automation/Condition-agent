@@ -31,6 +31,7 @@ def test_sp2_c_n_pattern_retains_named_family_ambiguity() -> None:
     )
     match = result.interpretation.pattern_matches[0]
     assert match.requires_condition_evidence
+    assert result.interpretation.co_occurring_pattern_ids == ()
     assert result.reaction_label is not None
     assert result.reaction_label.concise == "C(sp²)–N bond formation"
     assert "named family requires condition evidence" in result.reaction_label.detailed
@@ -99,6 +100,30 @@ def test_explicit_multi_site_reagent_copies_avoid_inference_warning() -> None:
         shorthand.reaction_signature.signature_id
         == result.reaction_signature.signature_id
     )
+
+
+def test_tandem_c_n_coupling_and_deprotection_are_both_retained() -> None:
+    result = featurize_reaction(
+        "CC(C)(C)OC(=O)NCCN."
+        "O=c1oc2cc(Br)ccc2cc1-c1ccccc1"
+        ">>NCCNc1ccc2cc(-c3ccccc3)c(=O)oc2c1"
+    )
+
+    assert result.reaction_signature is not None
+    assert "INFERRED_SINGLE_CUT_FRAGMENT_CORRESPONDENCE" in result.warnings
+    assert result.interpretation is not None
+    assert result.interpretation.primary_pattern_id == (
+        "sp2_c_n_substitution_like"
+    )
+    assert result.interpretation.co_occurring_pattern_ids == (
+        "sp2_c_n_substitution_like",
+        "amine_deprotection_like",
+    )
+    assert result.reaction_label is not None
+    assert result.reaction_label.concise == (
+        "C(sp²)–N bond formation + amine deprotection"
+    )
+    assert "temporal order is not inferred" in result.reaction_label.detailed
 
 
 def test_public_pattern_identification_accepts_reaction_smiles() -> None:

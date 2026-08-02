@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Mapping, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .chemistry.smarts_cache import compile_smarts
@@ -161,6 +161,172 @@ def _induced_molecule(molecule: Any, atom_indices: Tuple[int, ...]) -> Any:
     induced = editable.GetMol()
     Chem.GetSymmSSSR(induced)
     return induced
+
+
+def _single_cut_fragment_correspondence_candidates(
+    reactant: ReactionComponent,
+    product: ReactionComponent,
+    *,
+    max_matches: int,
+    max_fragments: int = 32,
+) -> tuple[Tuple[Tuple[AtomPair, ...], ...], Tuple[str, ...]]:
+    """Map the largest exact fragment exposed by one non-ring bond cut.
+
+    This bounded fallback supports records where one reactant both loses a
+    terminal fragment and participates in another event.  It proposes only
+    atom-origin alternatives; edit minimization remains responsible for
+    accepting a complete reaction correspondence.
+    """
+    from rdkit import Chem
+
+    reactant_mol = parse_smiles(reactant.input_smiles)
+    product_mol = parse_smiles(product.input_smiles)
+    if reactant_mol is None or product_mol is None:
+        return (), ("GLOBAL_CORRESPONDENCE_FRAGMENT_PARSE_FAILED",)
+    candidates: set[Tuple[AtomPair, ...]] = set()
+    fragment_count = 0
+    for bond in reactant_mol.GetBonds():
+        if bond.IsInRing():
+            continue
+        editable = Chem.RWMol(reactant_mol)
+        editable.RemoveBond(
+            int(bond.GetBeginAtomIdx()),
+            int(bond.GetEndAtomIdx()),
+        )
+        fragments = Chem.GetMolFrags(
+            editable.GetMol(),
+            asMols=False,
+            sanitizeFrags=False,
+        )
+        if len(fragments) < 2:
+            continue
+        for fragment in fragments:
+            atom_indices = tuple(
+                sorted(
+                    int(index)
+                    for index in fragment
+                    if reactant_mol.GetAtomWithIdx(int(index)).GetAtomicNum() > 1
+                )
+            )
+            if len(atom_indices) < 2:
+                continue
+            fragment_count += 1
+            if fragment_count > max_fragments:
+                return (), ("GLOBAL_CORRESPONDENCE_FRAGMENT_LIMIT",)
+            query = _induced_molecule(reactant_mol, atom_indices)
+            matches = product_mol.GetSubstructMatches(
+                query,
+                uniquify=False,
+                maxMatches=max_matches + 1,
+            )
+            if len(matches) > max_matches:
+                return (), ("GLOBAL_CORRESPONDENCE_FRAGMENT_MATCH_LIMIT",)
+            source_indices = tuple(
+                int(
+                    query.GetAtomWithIdx(index).GetIntProp(
+                        "_correspondence_original_index"
+                    )
+                )
+                for index in range(query.GetNumAtoms())
+            )
+            for match in matches:
+                candidates.add(
+                    tuple(
+                        sorted(
+                            (
+                                reactant.component_index,
+                                source_index,
+                                product.component_index,
+                                int(product_index),
+                            )
+                            for source_index, product_index in zip(
+                                source_indices, match
+                            )
+                        )
+                    )
+                )
+    if not candidates:
+        return (), ()
+    largest = max(len(candidate) for candidate in candidates)
+    return tuple(
+        sorted(candidate for candidate in candidates if len(candidate) == largest)
+    ), ()
+
+
+def _global_correspondence_assignments(
+    options: Mapping[int, Tuple[Tuple[AtomPair, ...], ...]],
+    product_heavy_atoms: frozenset[int],
+    *,
+    max_combinations: int,
+    max_candidates: int,
+) -> tuple[set[Tuple[AtomPair, ...]], bool]:
+    """Return non-overlapping component assignments covering the product."""
+    ordered_components = tuple(
+        sorted(
+            options,
+            key=lambda component_index: (
+                -max(len(mapping) for mapping in options[component_index]),
+                component_index,
+            ),
+        )
+    )
+    remaining_coverage = []
+    running: set[int] = set()
+    for component_index in reversed(ordered_components):
+        running = running.union(
+            product_atom
+            for mapping in options[component_index]
+            for _, _, _, product_atom in mapping
+        )
+        remaining_coverage.append(frozenset(running))
+    remaining_coverage.reverse()
+
+    results: set[Tuple[AtomPair, ...]] = set()
+    attempted = 0
+    limit_reached = False
+
+    def search(
+        position: int,
+        covered: frozenset[int],
+        selected: Tuple[Tuple[AtomPair, ...], ...],
+    ) -> None:
+        nonlocal attempted, limit_reached
+        if limit_reached:
+            return
+        attempted += 1
+        if attempted > max_combinations:
+            limit_reached = True
+            return
+        if covered == product_heavy_atoms:
+            if len(selected) >= 2:
+                results.add(
+                    tuple(sorted(pair for mapping in selected for pair in mapping))
+                )
+                if len(results) > max_candidates:
+                    limit_reached = True
+            return
+        if position >= len(ordered_components):
+            return
+        if not product_heavy_atoms <= covered.union(
+            remaining_coverage[position]
+        ):
+            return
+        component_index = ordered_components[position]
+        search(position + 1, covered, selected)
+        for mapping in options[component_index]:
+            mapped_product_atoms = frozenset(
+                product_atom for _, _, _, product_atom in mapping
+            )
+            if covered.intersection(mapped_product_atoms):
+                continue
+            search(
+                position + 1,
+                covered.union(mapped_product_atoms),
+                selected + (mapping,),
+            )
+
+    search(0, frozenset(), ())
+    return results, limit_reached
 
 
 def _fragment_correspondence_options(
@@ -638,69 +804,53 @@ def infer_global_correspondence_candidates(
             ),
             False,
         )
-    ordered_components = tuple(
-        sorted(
-            options,
-            key=lambda component_index: (
-                -max(len(mapping) for mapping in options[component_index]),
-                component_index,
-            ),
-        )
+    results, limit_reached = _global_correspondence_assignments(
+        options,
+        product_heavy_atoms,
+        max_combinations=max_combinations,
+        max_candidates=max_candidates,
     )
-    remaining_coverage = []
-    running: set[int] = set()
-    for component_index in reversed(ordered_components):
-        running = running.union(
-            product_atom
-            for mapping in options[component_index]
-            for _, _, _, product_atom in mapping
+    if limit_reached:
+        return ScaffoldCorrespondenceCandidates(
+            (),
+            tuple(
+                sorted(
+                    set(warnings).union(
+                        {"GLOBAL_CORRESPONDENCE_SEARCH_LIMIT"}
+                    )
+                )
+            ),
+            False,
         )
-        remaining_coverage.append(frozenset(running))
-    remaining_coverage.reverse()
-
-    results = set()
-    attempted = 0
-    limit_reached = False
-
-    def search(
-        position: int,
-        covered: frozenset[int],
-        selected: Tuple[Tuple[AtomPair, ...], ...],
-    ) -> None:
-        nonlocal attempted, limit_reached
-        if limit_reached:
-            return
-        attempted += 1
-        if attempted > max_combinations:
-            limit_reached = True
-            return
-        if covered == product_heavy_atoms:
-            if len(selected) >= 2:
-                results.add(tuple(sorted(pair for mapping in selected for pair in mapping)))
-                if len(results) > max_candidates:
-                    limit_reached = True
-            return
-        if position >= len(ordered_components):
-            return
-        if not product_heavy_atoms <= covered.union(
-            remaining_coverage[position]
-        ):
-            return
-        component_index = ordered_components[position]
-        search(position + 1, covered, selected)
-        for mapping in options[component_index]:
-            mapped_product_atoms = frozenset(
-                product_atom for _, _, _, product_atom in mapping
+    if not results:
+        fragment_options = dict(options)
+        fragment_warnings = []
+        for reactant in reactants:
+            candidates, candidate_warnings = (
+                _single_cut_fragment_correspondence_candidates(
+                    reactant,
+                    product,
+                    max_matches=max_component_matches,
+                )
             )
-            if covered.intersection(mapped_product_atoms):
-                continue
-            search(
-                position + 1,
-                covered.union(mapped_product_atoms),
-                selected + (mapping,),
-            )
-
-    search(0, frozenset(), ())
+            fragment_warnings.extend(candidate_warnings)
+            if candidates:
+                fragment_options[reactant.component_index] = tuple(
+                    sorted(
+                        set(fragment_options.get(reactant.component_index, ())).union(
+                            candidates
+                        )
+                    )
+                )
+        warnings.extend(fragment_warnings)
+        results, limit_reached = _global_correspondence_assignments(
+            fragment_options,
+            product_heavy_atoms,
+            max_combinations=max_combinations,
+            max_candidates=max_candidates,
+        )
+        if results:
+            warnings.append("INFERRED_SINGLE_CUT_FRAGMENT_CORRESPONDENCE")
     if limit_reached:
         return ScaffoldCorrespondenceCandidates(
             (),

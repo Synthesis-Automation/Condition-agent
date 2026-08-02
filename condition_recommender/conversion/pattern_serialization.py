@@ -9,6 +9,7 @@ REACTION_PATTERN_REVIEW_FIELDS = (
     "primary_reaction_pattern",
     "primary_reaction_pattern_count",
     "reaction_pattern_matches",
+    "co_occurring_reaction_patterns",
     "identified_reaction_type",
     "compatible_reaction_types",
     "reaction_pattern_confidence",
@@ -48,6 +49,11 @@ def flattened_reaction_pattern_fields(
         ),
         "reaction_pattern_matches": separator.join(
             str(match["pattern_id"]) for match in matches
+        ),
+        "co_occurring_reaction_patterns": separator.join(
+            str(pattern_id)
+            for pattern_id in value.get("co_occurring_pattern_ids") or ()
+            if pattern_id
         ),
         "identified_reaction_type": str(
             named_family or value.get("named_family") or ""

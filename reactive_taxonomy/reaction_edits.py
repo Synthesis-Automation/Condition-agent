@@ -1184,6 +1184,15 @@ def normalize_inferred_scaffold_edits(
         evidence=evidence,
         confidence=confidence,
     )
+    success_warnings = tuple(
+        sorted(
+            {inferred_warning}.union(
+                warning
+                for warning in correspondence.warnings
+                if warning.startswith("INFERRED_")
+            )
+        )
+    )
     verified_candidate = ReactionEvidenceCandidate(
         provider=_correspondence_provider(evidence),
         status="verified",
@@ -1191,13 +1200,13 @@ def normalize_inferred_scaffold_edits(
         confidence=confidence,
         edits=selected[1],
         stereo_changes=selected[2],
-        warnings=(inferred_warning,),
+        warnings=success_warnings,
     )
     return EditNormalizationResult(
         selected[1],
         evidence,
         confidence,
-        (inferred_warning,),
+        success_warnings,
         True,
         selected[2],
         connectivity_graph,

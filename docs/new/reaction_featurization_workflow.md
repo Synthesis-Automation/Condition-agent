@@ -75,6 +75,12 @@ expanded inventory. Ambiguous deficits remain unresolved.
 2. bounded whole-graph, scaffold, and fragmented-scaffold correspondence; and
 3. an optional externally mapped proposal after structural validation.
 
+For multi-reactant records, a bounded fallback may expose the largest exact
+fragment created by one non-ring attachment cut. This supports tandem records
+where a substrate loses a protecting fragment at one locus while reacting at
+another. It remains an atom-origin hypothesis and does not assign a reaction
+type.
+
 There are no reaction-specific reconstruction rules in this evidence path.
 Substitution, elimination, reductive amination, and similar concepts do not
 select mappings or generate edits.
@@ -139,6 +145,10 @@ Pattern definitions contain no operators, structural slots, predicted edits,
 or reconstruction instructions. They may rank display interpretations or add
 optional family evidence; they cannot modify structural facts.
 
+When two synthesis patterns are supported by non-overlapping edit subsets, the
+interpretation retains both as `co_occurring_pattern_ids`. Rendering may present
+them as a composite label, but does not infer their temporal order.
+
 ## 5. Render and serialize
 
 [`render_reaction()`](../reactive_taxonomy/reaction_rendering.py) returns one
@@ -161,6 +171,7 @@ They also expose optional interpretation without parsing display text:
 primary_reaction_pattern
 primary_reaction_pattern_count
 reaction_pattern_matches
+co_occurring_reaction_patterns
 identified_reaction_type
 compatible_reaction_types
 reaction_pattern_confidence

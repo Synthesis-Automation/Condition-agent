@@ -93,6 +93,14 @@ def render_reaction(
         ),
         None,
     )
+    co_occurring_labels = tuple(
+        match.display_label
+        for pattern_id in (
+            interpretation.co_occurring_pattern_ids if interpretation else ()
+        )
+        for match in (interpretation.pattern_matches if interpretation else ())
+        if match.pattern_id == pattern_id and match.display_label
+    )
     rendered = _build_reaction_label(
         reactants=observation.reactants,
         edits=observation.edits,
@@ -114,6 +122,7 @@ def render_reaction(
         interpretation_pattern_id=(
             primary_pattern.pattern_id if primary_pattern is not None else None
         ),
+        interpretation_composite_labels=co_occurring_labels,
         interpretation_family_candidates=(
             primary_pattern.compatible_named_families
             if primary_pattern is not None

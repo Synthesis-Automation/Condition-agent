@@ -20,7 +20,7 @@ from .pattern_serialization import (
 )
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "9.1"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "9.2"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_core_label",

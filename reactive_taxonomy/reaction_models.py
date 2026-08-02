@@ -1076,6 +1076,7 @@ class ReactionInterpretation:
 
     pattern_matches: Tuple[ReactionPatternMatch, ...] = ()
     primary_pattern_id: Optional[str] = None
+    co_occurring_pattern_ids: Tuple[str, ...] = ()
     partners: Tuple[ReactionPartner, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
@@ -1084,7 +1085,7 @@ class ReactionInterpretation:
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "6.0"
+    schema_version: str = "6.1"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (
@@ -1094,6 +1095,8 @@ class ReactionInterpretation:
         pattern_ids = {pattern.pattern_id for pattern in self.pattern_matches}
         if self.primary_pattern_id and self.primary_pattern_id not in pattern_ids:
             raise ValueError("primary pattern must refer to a matched pattern")
+        if any(value not in pattern_ids for value in self.co_occurring_pattern_ids):
+            raise ValueError("co-occurring patterns must refer to matched patterns")
 
 
 @dataclass(frozen=True)

@@ -519,6 +519,7 @@ def _build_reaction_label(
     reaction_core: Optional[ReactionCoreProjection] = None,
     interpretation_pattern_label: Optional[str] = None,
     interpretation_pattern_id: Optional[str] = None,
+    interpretation_composite_labels: Sequence[str] = (),
     interpretation_family_candidates: Sequence[str] = (),
     interpretation_requires_condition_evidence: bool = False,
     warnings: Iterable[str] = (),
@@ -582,6 +583,20 @@ def _build_reaction_label(
         )
         status = "conflicting_evidence"
         source = "literal_edits"
+    elif len(interpretation_composite_labels) > 1 and clauses:
+        concise = " + ".join(interpretation_composite_labels)
+        detailed = styling["separator"].join(
+            (
+                concise,
+                "co-occurring structural patterns; temporal order is not inferred",
+                str(rendering["templates"]["literal_edit_audit"]).format(
+                    clauses=detailed_clauses
+                ),
+            )
+        )
+        transformation_label = concise
+        status = "generic_pattern"
+        source = "optional_pattern"
     elif len(events) > 1 and clauses:
         rendered_event_labels, concise, detailed = _event_labels(
             events,

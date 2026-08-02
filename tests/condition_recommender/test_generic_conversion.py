@@ -654,7 +654,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "9.1"
+    assert report["schema_version"] == "9.2"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
@@ -664,10 +664,11 @@ def test_concise_reaction_review_export_has_only_requested_columns(
         "canonical_reaction_smiles",
         "reaction_core_label",
     )
-    assert CONCISE_REACTION_REVIEW_FIELDS[2:9] == (
+    assert CONCISE_REACTION_REVIEW_FIELDS[2:10] == (
         "primary_reaction_pattern",
         "primary_reaction_pattern_count",
         "reaction_pattern_matches",
+        "co_occurring_reaction_patterns",
         "identified_reaction_type",
         "compatible_reaction_types",
         "reaction_pattern_confidence",
@@ -745,6 +746,25 @@ def test_review_exports_multi_site_pattern_count() -> None:
     )
     assert row["reaction_display_label"] == (
         "2 × (C–Br + N–H → C–N)"
+    )
+
+
+def test_review_exports_co_occurring_tandem_patterns() -> None:
+    record = convert_record(
+        _raw(
+            "CC(C)(C)OC(=O)NCCN."
+            "O=c1oc2cc(Br)ccc2cc1-c1ccccc1"
+            ">>NCCNc1ccc2cc(-c3ccccc3)c(=O)oc2c1"
+        )
+    )
+
+    row = concise_reaction_review_row(record.to_dict())
+
+    assert row["co_occurring_reaction_patterns"] == (
+        "sp2_c_n_substitution_like; amine_deprotection_like"
+    )
+    assert row["reaction_display_label"] == (
+        "C(sp²)–N bond formation + amine deprotection"
     )
 
 

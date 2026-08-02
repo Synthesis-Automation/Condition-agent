@@ -829,6 +829,7 @@ def _heteroatom_deprotection_like(
     context: ReactionPatternContext,
     element: str,
 ) -> tuple[int, ...]:
+    matched = []
     hydrogen = context.indices(
         lambda edit: edit.edit_type == "hydrogen_change"
         and edit.atom_1.element == element
@@ -856,8 +857,20 @@ def _heteroatom_deprotection_like(
         )
         formed = context.edits_at(key, edit_type="formed")
         if broken and not formed:
-            return unique_indices(broken, (hydrogen_index,))
-    return ()
+            matched.extend(unique_indices(broken, (hydrogen_index,)))
+    if element == "N":
+        for broken_index, broken_edit in enumerate(context.edits):
+            if (
+                broken_edit.edit_type != "broken"
+                or context.element_pair(broken_edit) != {"C", "N"}
+            ):
+                continue
+            carbon = context.endpoint_for_element(broken_edit, "C")
+            if carbon is None or not context.is_carbonyl_carbon(carbon[2]):
+                continue
+            if context.has_neighbor(carbon[2], element="O", order="SINGLE"):
+                matched.append(broken_index)
+    return tuple(sorted(set(matched)))
 
 
 def _amine_deprotection_like(context: ReactionPatternContext) -> tuple[int, ...]:
