@@ -165,10 +165,13 @@ def decide_admission(
         outcome_reasons = ["invalid_yield"]
 
     raw_conditions_present = bool(
-        record.catalyst_cas or record.reagent_cas or record.solvent_cas
+        record.catalyst_cas
+        or record.reagent_cas
+        or record.solvent_cas
+        or record.condition_component_inputs
     )
     condition_reasons: list[str] = []
-    condition_stage_status = _condition_stage_status(record.stages)
+    condition_stage_status = _condition_stage_status(record)
     if not raw_conditions_present:
         condition_status = ConditionStatus.UNUSABLE
         condition_reasons.append("no_condition_identifiers")
@@ -199,7 +202,7 @@ def decide_admission(
             record.reagent_cas,
             record.solvent_cas,
         )
-    )
+    ) + len(record.condition_component_inputs)
     normalized_identifier_count = sum(
         len(values)
         for values in (
@@ -207,7 +210,7 @@ def decide_admission(
             conditions.reagent_cas,
             conditions.solvent_cas,
         )
-    )
+    ) + len(record.condition_component_inputs)
     if (
         raw_conditions_present
         and normalized_identifier_count < raw_identifier_count
@@ -251,7 +254,7 @@ def decide_admission(
                 )
             )
         )
-    )
+    ) or len(record.condition_component_inputs)
     if (
         chemistry_status == ChemistryStatus.REJECTED
         or condition_status == ConditionStatus.UNUSABLE
@@ -293,8 +296,17 @@ def decide_admission(
     )
 
 
-def _condition_stage_status(raw_stages: str) -> ConditionStageStatus:
-    value = str(raw_stages or "").strip()
+def _condition_stage_status(record: RawReactionRecord) -> ConditionStageStatus:
+    if record.condition_process_stages:
+        stage_indices = tuple(
+            stage.stage_index for stage in record.condition_process_stages
+        )
+        if len(stage_indices) == 1 and stage_indices == (1,):
+            return ConditionStageStatus.SINGLE_STAGE
+        if stage_indices == tuple(range(1, len(stage_indices) + 1)):
+            return ConditionStageStatus.STRUCTURED_MULTISTAGE
+        return ConditionStageStatus.UNASSIGNED_MULTISTAGE
+    value = str(record.stages or "").strip()
     if not value:
         return ConditionStageStatus.SINGLE_STAGE
     try:

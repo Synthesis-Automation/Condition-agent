@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterator, Mapping, Optional, Tuple
 
+from condition_registry import ConditionComponentInput, ConditionProcessStage
+
 from ..condition_normalization import optional_float, split_identifiers
 
 _COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
@@ -36,9 +38,7 @@ def _normalized_headers(row: Mapping[str, Any]) -> Dict[str, str]:
     return {str(key).strip().lower(): str(key) for key in row if key is not None}
 
 
-def _value(
-    row: Mapping[str, Any], field_name: str, headers: Mapping[str, str]
-) -> str:
+def _value(row: Mapping[str, Any], field_name: str, headers: Mapping[str, str]) -> str:
     for alias in _COLUMN_ALIASES[field_name]:
         source_key = headers.get(alias)
         if source_key is not None:
@@ -69,6 +69,11 @@ class RawReactionRecord:
     stages: str
     steps: str
     notes: str
+    condition_component_inputs: Tuple[ConditionComponentInput, ...] = ()
+    condition_process_stages: Tuple[ConditionProcessStage, ...] = ()
+    condition_declared_absences: Tuple[str, ...] = ()
+    primary_outcome_type: str = ""
+    upstream_observation_id: str = ""
     raw_fields: Dict[str, Any] = field(default_factory=dict)
     schema_version: str = "1.0"
 
@@ -89,13 +94,12 @@ def adapt_row(
         )
     except ValueError:
         effective_row_number = source_row_number
-    effective_dataset = (
-        _value(row, "source_dataset", headers) or source_dataset
-    )
+    effective_dataset = _value(row, "source_dataset", headers) or source_dataset
     effective_source_path = _value(row, "source_path", headers) or source_path
-    reaction_id = _value(
-        row, "reaction_id", headers
-    ) or f"{effective_dataset}:row-{effective_row_number}"
+    reaction_id = (
+        _value(row, "reaction_id", headers)
+        or f"{effective_dataset}:row-{effective_row_number}"
+    )
     return RawReactionRecord(
         source_dataset=effective_dataset,
         source_path=effective_source_path,
@@ -112,9 +116,7 @@ def adapt_row(
         reagent_cas=split_identifiers(_value(row, "reagent_cas", headers)),
         catalyst_cas=split_identifiers(_value(row, "catalyst_cas", headers)),
         solvent_cas=split_identifiers(_value(row, "solvent_cas", headers)),
-        experimental_procedure=_value(
-            row, "experimental_procedure", headers
-        ),
+        experimental_procedure=_value(row, "experimental_procedure", headers),
         stages=_value(row, "stages", headers),
         steps=_value(row, "steps", headers),
         notes=_value(row, "notes", headers),
@@ -156,9 +158,43 @@ def discover_csv_datasets(path: str | Path) -> Tuple[Path, ...]:
     )
 
 
+def iter_conversion_records(path: str | Path) -> Iterator[RawReactionRecord]:
+    """Stream either a raw CSV or a chemistry-free intermediate artifact."""
+    source = Path(path)
+    if source.name.casefold().endswith(".observations.jsonl.gz"):
+        from .intermediate import iter_intermediate_records
+
+        yield from iter_intermediate_records(source)
+        return
+    yield from iter_csv_records(source)
+
+
+def discover_conversion_datasets(path: str | Path) -> Tuple[Path, ...]:
+    """Discover raw CSVs or preprocessed observation files deterministically."""
+    source = Path(path)
+
+    def supported(item: Path) -> bool:
+        return item.suffix.casefold() == ".csv" or item.name.casefold().endswith(
+            ".observations.jsonl.gz"
+        )
+
+    if source.is_file():
+        return (source,) if supported(source) else ()
+    if not source.is_dir():
+        return ()
+    return tuple(
+        sorted(
+            (item for item in source.rglob("*") if item.is_file() and supported(item)),
+            key=lambda item: item.relative_to(source).as_posix().casefold(),
+        )
+    )
+
+
 __all__ = [
     "RawReactionRecord",
     "adapt_row",
+    "discover_conversion_datasets",
     "discover_csv_datasets",
+    "iter_conversion_records",
     "iter_csv_records",
 ]

@@ -77,9 +77,7 @@ def canonical_reaction_identity(
         return None
     canonical = f"{'.'.join(reactants)}>{'.'.join(agents)}>{'.'.join(products)}"
     return CanonicalReactionIdentity(
-        reaction_id=_digest(
-            "CRX1", {"reactants": reactants, "products": products}
-        ),
+        reaction_id=_digest("CRX1", {"reactants": reactants, "products": products}),
         canonical_reaction_smiles=canonical,
         reactants=reactants,
         agents=agents,
@@ -94,6 +92,34 @@ def raw_recipe_id(record: RawReactionRecord) -> str:
         "reagent": tuple(sorted(set(record.reagent_cas))),
         "solvent": tuple(sorted(set(record.solvent_cas))),
     }
+    if (
+        record.condition_component_inputs
+        or record.condition_process_stages
+        or record.condition_declared_absences
+    ):
+        payload["components"] = tuple(
+            sorted(
+                (
+                    item.raw_identifier,
+                    item.source_field,
+                    item.identifier_type,
+                    item.source_role_hint,
+                    item.amount,
+                    item.amount_unit,
+                )
+                for item in record.condition_component_inputs
+            )
+        )
+        payload["stages"] = tuple(
+            (
+                item.stage_index,
+                item.temperature_c,
+                item.time_h,
+                item.atmosphere,
+            )
+            for item in record.condition_process_stages
+        )
+        payload["declared_absences"] = record.condition_declared_absences
     return _digest("RAWCOND1", payload)
 
 

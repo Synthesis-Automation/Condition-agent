@@ -6,7 +6,11 @@ from dataclasses import asdict
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Hashable, TypeVar
 
-from condition_registry import ResolvedConditionRecipe, build_resolved_recipe
+from condition_registry import (
+    ResolvedConditionRecipe,
+    build_resolved_recipe,
+    build_resolved_recipe_from_inputs,
+)
 from reactive_taxonomy import (
     AtomMappingProvider,
     ExternalMappingAssessment,
@@ -171,13 +175,46 @@ def convert_record(
         record.catalyst_cas,
         record.reagent_cas,
         record.solvent_cas,
+        tuple(
+            (
+                item.raw_identifier,
+                item.source_field,
+                item.identifier_type,
+                item.source_role_hint,
+                item.amount,
+                item.amount_unit,
+                repr(sorted(item.provenance.items())),
+            )
+            for item in record.condition_component_inputs
+        ),
         analysis.transformation_class,
         analysis.named_family,
         record.temperature_c,
         record.time_h,
+        tuple(
+            (
+                item.stage_index,
+                item.temperature_c,
+                item.time_h,
+                item.atmosphere,
+                repr(sorted(item.provenance.items())),
+            )
+            for item in record.condition_process_stages
+        ),
+        record.condition_declared_absences,
     )
 
     def build_recipe() -> ResolvedConditionRecipe:
+        if record.condition_component_inputs:
+            return build_resolved_recipe_from_inputs(
+                record.condition_component_inputs,
+                transformation_class=analysis.transformation_class,
+                named_family=analysis.named_family,
+                temperature_c=record.temperature_c,
+                time_h=record.time_h,
+                stages=record.condition_process_stages,
+                declared_absences=record.condition_declared_absences,
+            )
         return build_resolved_recipe(
             {
                 "catalyst_cas": record.catalyst_cas,
@@ -246,6 +283,24 @@ def convert_record(
         "input_schema_version": record.schema_version,
         "admission_policy_version": decision.policy_version,
     }
+    if (
+        record.primary_outcome_type
+        or record.condition_component_inputs
+        or record.condition_process_stages
+        or record.condition_declared_absences
+    ):
+        source.update(
+            {
+                "primary_outcome_type": record.primary_outcome_type,
+                "condition_component_inputs": tuple(
+                    asdict(item) for item in record.condition_component_inputs
+                ),
+                "condition_process_stages": tuple(
+                    asdict(item) for item in record.condition_process_stages
+                ),
+                "condition_declared_absences": (record.condition_declared_absences),
+            }
+        )
     return RecommendationRecord(
         reaction_id=record.reaction_id,
         source_row_number=record.source_row_number,
@@ -286,9 +341,7 @@ def convert_record(
             else None
         ),
         reaction_observation=(
-            asdict(analysis.observation)
-            if analysis.observation is not None
-            else None
+            asdict(analysis.observation) if analysis.observation is not None else None
         ),
         reaction_interpretation=(
             asdict(analysis.interpretation)
@@ -300,16 +353,14 @@ def convert_record(
         ),
         **signature_record_fields(analysis),
         external_atom_mapping=(
-            assessment.to_provenance_dict()
-            if assessment is not None
-            else None
+            assessment.to_provenance_dict() if assessment is not None else None
         ),
         source_dataset=record.source_dataset,
         source_path=record.source_path,
         source_declared_family=record.source_declared_family,
         reference_id=reference_identity.reference_id,
         reference_identity=reference_identity.to_dict(),
-        observation_id=observation_id(record),
+        observation_id=record.upstream_observation_id or observation_id(record),
         canonical_reaction_id=canonical_identity.reaction_id
         if canonical_identity
         else None,

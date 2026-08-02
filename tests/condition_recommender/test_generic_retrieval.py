@@ -1096,7 +1096,7 @@ def test_ambiguous_query_abstains_without_independent_consensus_support() -> Non
 def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     output = tmp_path / "generic_conversion_chan_lam_pilot"
     convert_datasets(
-        "data-processor/reaction_dataset/ChanLam_Narylation.csv",
+        "raw_dataset/literature_reaction_dataset/ChanLam_Narylation.csv",
         output,
         max_rows=100,
     )

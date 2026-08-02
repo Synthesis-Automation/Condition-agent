@@ -1,5 +1,40 @@
 # Condition Recommender
 
+## Source-data preprocessing
+
+Heterogeneous raw CSV files can first be normalized into the versioned,
+chemistry-free `source_observation.v1` contract. Each selected source file
+produces one independently reusable `<source>.observations.jsonl.gz` artifact
+and one checksum/audit report. The source checksum, adapter version,
+intermediate schema, and output checksum control cache reuse.
+
+Launch the Qt application from the repository root:
+
+```powershell
+python -m app.data_preprocessor_gui
+```
+
+Or preprocess explicitly selected files from the command line:
+
+```powershell
+python -m condition_recommender.preprocess_cli `
+  raw_dataset/HiTEA/8_SEPT_APPROVED_full_dataset.csv `
+  --output-dir datasets/intermediate
+```
+
+Available adapters cover the literature CSV contract, the HiTEA approved CSV,
+and the original weak-label v2.1 CSV. Automatic selection requires one exact,
+unambiguous header match. Conditions are stored as source-faithful component
+claims, identifier evidence, quantities, and ordered process stages. This
+stage does not parse molecules, validate atom mapping, assign reaction
+families, resolve registry substances, or make admission decisions.
+
+The generic conversion engine accepts either raw CSV files or the generated
+`*.observations.jsonl.gz` artifacts. Structure-backed observations continue
+through normal chemistry and condition-registry conversion. Label-only records
+are retained and condition-normalized but remain structurally ineligible for
+the generic precedent index.
+
 `condition_recommender` contains several condition-recommendation approaches at
 different stages of maturity. They share reaction observations from
 `reactive_taxonomy` and canonical condition identities and recipes from

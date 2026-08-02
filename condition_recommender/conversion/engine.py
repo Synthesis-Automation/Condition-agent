@@ -26,7 +26,7 @@ from ..models import (
 )
 from .flatten import GENERIC_REVIEW_FIELDS, flatten_generic_record
 from .generic import GenericConversionCache, convert_record
-from .input_schema import discover_csv_datasets, iter_csv_records
+from .input_schema import discover_conversion_datasets, iter_conversion_records
 
 
 def _markdown(report: Dict[str, Any]) -> str:
@@ -62,7 +62,7 @@ def convert_datasets(
     mapping_provider: AtomMappingProvider | None = None,
 ) -> Dict[str, Any]:
     """Convert one CSV or a directory of CSVs through the common engine."""
-    paths = discover_csv_datasets(dataset_path)
+    paths = discover_conversion_datasets(dataset_path)
     if not paths:
         raise ValueError(f"No CSV datasets found at {dataset_path}")
     destination = Path(output_dir)
@@ -110,7 +110,7 @@ def convert_datasets(
         for path in paths:
             if stop:
                 break
-            for raw_record in iter_csv_records(path):
+            for raw_record in iter_conversion_records(path):
                 if max_rows is not None and row_count >= max_rows:
                     stop = True
                     break
@@ -135,20 +135,14 @@ def convert_datasets(
                 evidence_counts[record.evidence_quality] += 1
                 if record.external_atom_mapping is not None:
                     external_mapping_status_counts[
-                        str(
-                            record.external_atom_mapping.get("status")
-                            or "missing"
-                        )
+                        str(record.external_atom_mapping.get("status") or "missing")
                     ] += 1
                 fragment_source_support_status_counts.update(
                     str(value.get("status") or "missing")
                     for value in record.fragment_source_support
                 )
                 completeness_counts[
-                    str(
-                        (record.reaction_completeness or {}).get("status")
-                        or "missing"
-                    )
+                    str((record.reaction_completeness or {}).get("status") or "missing")
                 ] += 1
                 source_counts[record.source_dataset] += 1
                 source_tiers[record.source_dataset][tier] += 1
@@ -232,9 +226,7 @@ def convert_datasets(
                 if mapping_provider is not None
                 else None
             ),
-            "status_counts": dict(
-                sorted(external_mapping_status_counts.items())
-            ),
+            "status_counts": dict(sorted(external_mapping_status_counts.items())),
         },
         "reaction_completeness_status_counts": dict(
             sorted(completeness_counts.items())

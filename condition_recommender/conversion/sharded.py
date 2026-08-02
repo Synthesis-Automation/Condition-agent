@@ -39,7 +39,11 @@ from ..models import (
     RECOMMENDATION_RECORD_SCHEMA_VERSION,
 )
 from .generic import GenericConversionCache, convert_record
-from .input_schema import RawReactionRecord, discover_csv_datasets, iter_csv_records
+from .input_schema import (
+    RawReactionRecord,
+    discover_conversion_datasets,
+    iter_conversion_records,
+)
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
 SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v4.0"
@@ -100,9 +104,7 @@ def _definition_contract(
                 mapping_metadata.model_id if mapping_metadata is not None else None
             ),
             "model_sha256": (
-                mapping_metadata.model_sha256
-                if mapping_metadata is not None
-                else None
+                mapping_metadata.model_sha256 if mapping_metadata is not None else None
             ),
         },
     }
@@ -232,8 +234,7 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
         for field, counts in values.items()
     } | {
         "signature_count": sum(
-            int(payload.get("reaction_signature") is not None)
-            for payload in payloads
+            int(payload.get("reaction_signature") is not None) for payload in payloads
         ),
         "admission_reason_counts": dict(
             sorted(
@@ -265,9 +266,7 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
                 Counter(
                     str(
                         (
-                            (payload.get("reaction_signature") or {}).get(
-                                "topology"
-                            )
+                            (payload.get("reaction_signature") or {}).get("topology")
                             or {}
                         ).get("reaction_scope")
                         or "unknown"
@@ -280,9 +279,7 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
             sorted(
                 Counter(
                     str(
-                        (
-                            payload.get("reaction_completeness") or {}
-                        ).get("status")
+                        (payload.get("reaction_completeness") or {}).get("status")
                         or "missing"
                     )
                     for payload in payloads
@@ -387,9 +384,7 @@ def _manifest_payload(
             {
                 "path": str(path.resolve()),
                 "sha256": source_checksums[str(path.resolve())],
-                "covered_row_count": source_row_counts.get(
-                    str(path.resolve()), 0
-                ),
+                "covered_row_count": source_row_counts.get(str(path.resolve()), 0),
                 "coverage_complete": coverage_complete,
             }
             for path in paths
@@ -402,6 +397,8 @@ def _manifest_payload(
             ),
         ),
     }
+
+
 def _merge_counts(
     entries: Iterable[Mapping[str, Any]],
     field: str,
@@ -467,9 +464,7 @@ def _write_catalogs(
             {
                 **series[key],
                 "recipe_core_ids": sorted(series[key]["recipe_core_ids"]),
-                "canonical_reaction_ids": sorted(
-                    series[key]["canonical_reaction_ids"]
-                ),
+                "canonical_reaction_ids": sorted(series[key]["canonical_reaction_ids"]),
             }
             for key in sorted(series)
         ),
@@ -495,7 +490,9 @@ def _merge_shards(manifest: Mapping[str, Any], destination: Path) -> Dict[str, A
     return {
         "path": output.name,
         "sha256": _sha256(output),
-        "row_count": sum(int(entry["output_row_count"]) for entry in manifest["shards"]),
+        "row_count": sum(
+            int(entry["output_row_count"]) for entry in manifest["shards"]
+        ),
     }
 
 
@@ -513,9 +510,7 @@ def validate_sharded_conversion(
         issues.append("unsupported_manifest_schema")
     stored_contract = manifest.get("definition_contract") or {}
     stored_mapping = stored_contract.get("external_atom_mapping") or {}
-    validation_provider = (
-        RxnMapperProvider() if stored_mapping.get("enabled") else None
-    )
+    validation_provider = RxnMapperProvider() if stored_mapping.get("enabled") else None
     if stored_contract != _definition_contract(validation_provider):
         issues.append("stale_definition_contract")
     observation_ids = set()
@@ -523,9 +518,7 @@ def validate_sharded_conversion(
     verified_rows = 0
     covered_source_rows = Counter()
     for entry in manifest.get("shards") or ():
-        covered_source_rows[str(entry["source_path"])] += int(
-            entry["input_row_count"]
-        )
+        covered_source_rows[str(entry["source_path"])] += int(entry["input_row_count"])
         if entry.get("status") != "complete":
             issues.append(f"incomplete_shard:{entry.get('shard_id')}")
             continue
@@ -558,12 +551,10 @@ def validate_sharded_conversion(
                 issues.append(f"row_count_mismatch:{entry['shard_id']}")
     for source_entry in manifest.get("source_files") or ():
         source_path = str(source_entry["path"])
-        if covered_source_rows[source_path] != int(
-            source_entry["covered_row_count"]
-        ):
+        if covered_source_rows[source_path] != int(source_entry["covered_row_count"]):
             issues.append(f"source_coverage_mismatch:{source_path}")
         if source_entry.get("coverage_complete"):
-            actual_rows = sum(1 for _ in iter_csv_records(source_path))
+            actual_rows = sum(1 for _ in iter_conversion_records(source_path))
             if actual_rows != int(source_entry["covered_row_count"]):
                 issues.append(f"incomplete_source_coverage:{source_path}")
     report = {
@@ -592,9 +583,7 @@ def convert_datasets_sharded(
     merge_records: bool = True,
     use_rxnmapper: bool = False,
     progress: bool = False,
-    progress_callback: Optional[
-        Callable[[ShardedConversionProgress], None]
-    ] = None,
+    progress_callback: Optional[Callable[[ShardedConversionProgress], None]] = None,
     cancel_check: Optional[Callable[[], bool]] = None,
 ) -> Dict[str, Any]:
     """Convert a corpus into deterministic, restartable canonical shards."""
@@ -611,7 +600,7 @@ def convert_datasets_sharded(
         )
     if checkpoint_interval < 1:
         raise ValueError("checkpoint_interval must be positive")
-    paths = discover_csv_datasets(dataset_path)
+    paths = discover_conversion_datasets(dataset_path)
     if not paths:
         raise ValueError(f"No CSV datasets found at {dataset_path}")
 
@@ -734,15 +723,12 @@ def convert_datasets_sharded(
             source_sha256 = source_checksums[source_path]
             notify(
                 "source_processing",
-                (
-                    f"Processing {file_number}/{len(paths)} (total): "
-                    f"{path.name}"
-                ),
+                (f"Processing {file_number}/{len(paths)} (total): {path.name}"),
                 shard_count=len(entries),
                 row_count=accepted_row_count,
             )
             for part_number, raw_records in enumerate(
-                _chunks(iter_csv_records(path), shard_size)
+                _chunks(iter_conversion_records(path), shard_size)
             ):
                 if cancel_check is not None and cancel_check():
                     cancelled = True
@@ -846,9 +832,7 @@ def convert_datasets_sharded(
             "catalogs",
             "Building compressed recipe and reference catalogs…",
             shard_count=len(entries),
-            row_count=sum(
-                int(entry.get("input_row_count") or 0) for entry in entries
-            ),
+            row_count=sum(int(entry.get("input_row_count") or 0) for entry in entries),
         )
         catalogs = _write_catalogs(manifest, destination)
         if merge_records:
@@ -912,9 +896,7 @@ def convert_datasets_sharded(
         "transformation_class_counts": _merge_counts(
             complete_entries, "transformation_class_counts"
         ),
-        "named_family_counts": _merge_counts(
-            complete_entries, "named_family_counts"
-        ),
+        "named_family_counts": _merge_counts(complete_entries, "named_family_counts"),
         "reaction_scope_counts": _merge_counts(
             complete_entries, "reaction_scope_counts"
         ),
@@ -947,10 +929,7 @@ def convert_datasets_sharded(
     _atomic_json(destination / "conversion_report.json", report)
     notify(
         "completed",
-        (
-            f"Canonical conversion complete: "
-            f"{report['output_row_count']} record(s)."
-        ),
+        (f"Canonical conversion complete: {report['output_row_count']} record(s)."),
         shard_count=len(entries),
         row_count=int(report["output_row_count"]),
     )

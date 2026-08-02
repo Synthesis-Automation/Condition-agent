@@ -20,7 +20,7 @@ from condition_recommender.conversion.artifacts import (  # noqa: E402
     build_recommendation_artifacts,
 )
 from condition_recommender.conversion.input_schema import (  # noqa: E402
-    discover_csv_datasets,
+    discover_conversion_datasets,
 )
 from reactive_taxonomy import RxnMapperProvider  # noqa: E402
 
@@ -102,7 +102,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.source_edit = QtWidgets.QLineEdit()
         self.source_edit.setObjectName("sourceFolder")
         self.source_edit.setPlaceholderText(
-            "Folder containing reaction CSV files; subfolders are included"
+            "Folder containing raw CSVs or preprocessed observations"
         )
         self.output_edit = QtWidgets.QLineEdit()
         self.output_edit.setObjectName("outputFolder")
@@ -151,14 +151,10 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "signature while consensus mapping supplies only a missing core. "
             "One worker is used to avoid loading multiple model copies."
         )
-        self.use_rxnmapper_check.toggled.connect(
-            self._sync_rxnmapper_worker_setting
-        )
+        self.use_rxnmapper_check.toggled.connect(self._sync_rxnmapper_worker_setting)
         self._sync_rxnmapper_worker_setting(True)
 
-        self.start_button = QtWidgets.QPushButton(
-            "Generate Recommendation Data"
-        )
+        self.start_button = QtWidgets.QPushButton("Generate Recommendation Data")
         self.start_button.setObjectName("generateButton")
         self.start_button.setDefault(True)
         self.start_button.setStyleSheet(
@@ -208,7 +204,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         title.setStyleSheet("font-size: 20px; font-weight: 600;")
         layout.addWidget(title)
         description = QtWidgets.QLabel(
-            "Convert every reaction CSV in a folder tree once, then produce "
+            "Convert every raw CSV or preprocessed observation file in a folder "
+            "tree once, then produce "
             "compressed recommendation data and a concise review CSV from the "
             "same canonical records. Interrupted conversions can reuse "
             "completed shards."
@@ -276,7 +273,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
     def choose_source_folder(self) -> None:
         folder = QtWidgets.QFileDialog.getExistingDirectory(
             self,
-            "Choose reaction dataset folder",
+            "Choose raw or preprocessed dataset folder",
             self.source_edit.text() or str(PROJECT_ROOT),
         )
         if not folder:
@@ -304,14 +301,14 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def refresh_source_summary(self) -> None:
         source = Path(self.source_edit.text().strip())
-        paths = discover_csv_datasets(source)
+        paths = discover_conversion_datasets(source)
         if not paths:
             self.source_summary.setText(
-                "No CSV dataset files were found in this folder."
+                "No raw CSV or preprocessed observation files were found."
             )
             return
         self.source_summary.setText(
-            f"Found {len(paths)} CSV file(s), including subfolders."
+            f"Found {len(paths)} conversion input file(s), including subfolders."
         )
 
     def _append_status(self, message: str) -> None:
@@ -342,14 +339,14 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(
                 self,
                 "Dataset folder required",
-                "Choose an existing folder containing reaction CSV files.",
+                "Choose a folder containing raw CSVs or preprocessed observations.",
             )
             return
-        if not discover_csv_datasets(source):
+        if not discover_conversion_datasets(source):
             QtWidgets.QMessageBox.warning(
                 self,
-                "No CSV files",
-                "No CSV files were found in the selected folder or subfolders.",
+                "No conversion inputs",
+                "No supported input files were found in the selected folder tree.",
             )
             return
         if not output_text:
@@ -438,8 +435,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.progress_bar.setRange(0, 0)
         if progress.phase == "canonical_shard_completed":
             self.progress_bar.setFormat(
-                f"{progress.shard_count} shard(s) • "
-                f"{progress.row_count} reactions"
+                f"{progress.shard_count} shard(s) • {progress.row_count} reactions"
             )
         elif progress.phase.startswith("review"):
             self.progress_bar.setFormat(

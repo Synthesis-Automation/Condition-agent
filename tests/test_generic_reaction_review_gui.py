@@ -18,7 +18,7 @@ def test_review_window_reports_recursive_csv_count(qtbot, tmp_path: Path) -> Non
     window.source_edit.setText(str(source))
     window.refresh_source_summary()
 
-    assert "Found 2 CSV file(s)" in window.source_summary.text()
+    assert "Found 2 conversion input file(s)" in window.source_summary.text()
     assert window.status_box.isReadOnly()
     assert not window.cancel_button.isEnabled()
     assert Path(window.output_edit.text()) == gui.DEFAULT_OUTPUT_FOLDER
