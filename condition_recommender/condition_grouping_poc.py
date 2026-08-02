@@ -258,6 +258,7 @@ class ConditionGroupingRun:
     report_json_path: Path
     report_markdown_path: Path
     groups_path: Path
+    cores_path: Path
     assignments_path: Path
     model_path: Path
 
@@ -565,7 +566,7 @@ def _safe_round(value: Optional[float], digits: int = 6) -> Optional[float]:
     return round(float(value), digits) if value is not None else None
 
 
-def _assignment_status(similarity: float, margin: float) -> str:
+def condition_group_assignment_status(similarity: float, margin: float) -> str:
     """Apply an explicit, uncalibrated POC review policy."""
 
     if (
@@ -724,6 +725,7 @@ def run_condition_grouping_poc(
     group_id_by_label: Dict[int, str] = {}
     group_records = []
     assignment_rows = []
+    core_assignment_by_id: Dict[str, Dict[str, Any]] = {}
     core_status_counts: Counter[str] = Counter()
     material_status_counts: Counter[str] = Counter()
 
@@ -908,10 +910,18 @@ def run_condition_grouping_poc(
         )
         for index in indices:
             core = cores[index]
-            status = _assignment_status(
+            status = condition_group_assignment_status(
                 float(assigned_similarity[index]), float(margins[index])
             )
             core_status_counts[status] += 1
+            core_assignment_by_id[core.core_id] = {
+                "condition_group_id": group_id,
+                "centroid_similarity": round(
+                    float(assigned_similarity[index]), 6
+                ),
+                "assignment_margin": round(float(margins[index]), 6),
+                "assignment_status": status,
+            }
             for material in core.materials:
                 material_status_counts[status] += 1
                 other_context = tuple(
@@ -978,6 +988,100 @@ def run_condition_grouping_poc(
         key=lambda item: (-item["observation_count"], item["condition_group_id"])
     )
     assignment_rows.sort(key=lambda item: item["material_id"])
+    core_records = []
+    for core in cores:
+        core_materials = sorted(
+            core.materials,
+            key=lambda material: (
+                -material.observation_count,
+                material.material_id,
+            ),
+        )
+        observation_count = core.observation_count
+        reactions: Counter[str] = Counter()
+        yield_sum = yield_count = uncertain_count = 0
+        for material in core_materials:
+            reactions.update(material.reaction_types)
+            yield_sum += material.yield_sum
+            yield_count += material.yield_count
+            uncertain_count += material.uncertain_count
+        temperatures = _counter_sum(core_materials, "temperatures")
+        times = _counter_sum(core_materials, "times")
+        protocol_variants = tuple(
+            {
+                "material_id": material.material_id,
+                "complete_condition_display": material.parsed.canonical_display,
+                "solvent_system": " + ".join(
+                    material.parsed.role_names("solvent")
+                ),
+                "additive_system": " + ".join(
+                    material.parsed.role_names("additive")
+                ),
+                "other_context_components": tuple(
+                    component.name
+                    for component in material.parsed.context_components
+                    if component.role not in MEDIUM_COMPONENT_ROLES
+                    and component.role not in MODIFIER_COMPONENT_ROLES
+                ),
+                "observation_count": material.observation_count,
+                "support_share": round(
+                    material.observation_count / observation_count, 6
+                ),
+                "exact_recipe_id_count": len(material.recipe_ids),
+                "condition_identity_uncertainty_rate": round(
+                    material.uncertain_count / material.observation_count, 6
+                ),
+                "temperature_c": _numeric_cross_reference(
+                    material.temperatures, material.observation_count
+                ),
+                "time_h": _numeric_cross_reference(
+                    material.times, material.observation_count
+                ),
+            }
+            for material in core_materials
+        )
+        core_records.append(
+            {
+                "schema_version": CONDITION_GROUPING_POC_SCHEMA_VERSION,
+                "definition_version": CONDITION_GROUPING_POC_DEFINITION_VERSION,
+                "condition_core_id": core.core_id,
+                "core_display": core.core_display,
+                **core_assignment_by_id[core.core_id],
+                "observation_count": observation_count,
+                "material_variant_count": len(core_materials),
+                "exact_recipe_id_count": len(core.recipe_ids),
+                "mean_yield_pct": round(yield_sum / yield_count, 4)
+                if yield_count
+                else None,
+                "yield_observation_count": yield_count,
+                "condition_identity_uncertainty_rate": round(
+                    uncertain_count / observation_count, 6
+                ),
+                "solvent_components": _top_items(
+                    _role_component_counts(core_materials).get(
+                        "solvent", Counter()
+                    )
+                ),
+                "solvent_systems": _top_items(
+                    _role_profile_counts(core_materials, "solvent")
+                ),
+                "additive_components": _top_items(
+                    _role_component_counts(core_materials).get(
+                        "additive", Counter()
+                    )
+                ),
+                "additive_systems": _top_items(
+                    _role_profile_counts(core_materials, "additive")
+                ),
+                "temperature_c": _numeric_cross_reference(
+                    temperatures, observation_count
+                ),
+                "time_h": _numeric_cross_reference(times, observation_count),
+                "top_reaction_types": _top_items(reactions),
+                "protocol_variants": protocol_variants,
+            }
+        )
+    core_records.sort(key=lambda item: item["condition_core_id"])
     sampled_size = min(max(0, silhouette_sample_size), len(cores))
     sampled_silhouette = None
     if sampled_size >= max(2, len(by_label)):
@@ -1114,6 +1218,10 @@ def run_condition_grouping_poc(
     with groups_path.open("w", encoding="utf-8", newline="\n") as handle:
         for record in group_records:
             handle.write(_canonical_json(record) + "\n")
+    cores_path = destination / "condition_cores.jsonl"
+    with cores_path.open("w", encoding="utf-8", newline="\n") as handle:
+        for record in core_records:
+            handle.write(_canonical_json(record) + "\n")
     assignments_path = destination / "condition_group_assignments.csv"
     with assignments_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=tuple(assignment_rows[0]))
@@ -1136,6 +1244,7 @@ def run_condition_grouping_poc(
     )
     report["artifacts"] = {
         "groups": groups_path.name,
+        "cores": cores_path.name,
         "assignments": assignments_path.name,
         "model": model_path.name,
         "model_sha256": _sha256_file(model_path),
@@ -1152,6 +1261,7 @@ def run_condition_grouping_poc(
         report_json_path=report_json_path,
         report_markdown_path=report_markdown_path,
         groups_path=groups_path,
+        cores_path=cores_path,
         assignments_path=assignments_path,
         model_path=model_path,
     )
@@ -1167,6 +1277,7 @@ __all__ = [
     "ParsedConditionComponent",
     "ParsedConditionDisplay",
     "build_condition_cores",
+    "condition_group_assignment_status",
     "load_weak_label_materials",
     "parse_condition_display",
     "run_condition_grouping_poc",

@@ -9427,6 +9427,7 @@
   ],
   "artifacts": {
     "groups": "condition_groups.jsonl",
+    "cores": "condition_cores.jsonl",
     "assignments": "condition_group_assignments.csv",
     "model": "condition_grouping_model.joblib",
     "model_sha256": "57dbd0a39858f669645a55c39037cdaa252ee9a5e88096e7c34ce60eac5f99f9"

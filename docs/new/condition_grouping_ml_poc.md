@@ -54,6 +54,8 @@ python -m condition_recommender.condition_grouping_poc_cli `
 
 The output contains:
 
+- `condition_cores.jsonl`: exact decisive cores with observed protocol variants,
+  solvent/additive frequencies, operating summaries, and learned-group links;
 - `condition_groups.jsonl`: a statistical medoid, the most prevalent exact core,
   role-consensus coverage, core support, solvent/additive cross-references,
   operating summaries, and representative cores;
@@ -64,6 +66,24 @@ The output contains:
 - `condition_grouping_model.joblib`: the snapshot-bound POC model;
 - `condition_grouping_report.json`: machine-readable run and quality report; and
 - `condition_grouping_report.md`: concise human review summary.
+
+## Complete protocol context from a core
+
+The completion API first looks for an observed exact `CCOREPOC1`. If found, it
+returns solvent/additive choices and complete material variants reported with
+that exact core. If the core is unseen, it may return context from the nearest
+`CGPOC2`, explicitly labeled as a broader learned prior rather than an observed
+protocol.
+
+```powershell
+python -m condition_recommender.condition_completion_poc_cli `
+  results/condition_grouping_poc/v2_core `
+  "K3PO4 [base]; dppfPdCl2 [catalyst]; dppf [ligand]" `
+  --top-k 5
+```
+
+Completion does not bypass reaction/recipe compatibility filters. Frequency is
+reported as precedent support and must not be presented as proof of optimality.
 
 ## Promotion boundary
 

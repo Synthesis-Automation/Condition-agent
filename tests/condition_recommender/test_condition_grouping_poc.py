@@ -6,6 +6,7 @@ import csv
 import json
 from pathlib import Path
 
+from condition_recommender.condition_completion_poc import complete_condition_core
 from condition_recommender.condition_grouping_poc import (
     build_condition_cores,
     load_weak_label_materials,
@@ -29,6 +30,7 @@ def _write_fixture(path: Path) -> None:
     rows = []
     recipes = (
         ("Pd(OAc)2", "XPhos", "K2CO3", "Dioxane"),
+        ("Pd(OAc)2", "XPhos", "K2CO3", "THF"),
         ("Pd(OAc)2", "XPhos", "Cs2CO3", "Dioxane"),
         ("Pd2(dba)3", "SPhos", "K2CO3", "THF"),
         ("CuI", "No ligand", "K3PO4", "DMSO"),
@@ -116,9 +118,9 @@ def test_material_aggregation_excludes_operating_variants(tmp_path: Path) -> Non
     _write_fixture(source)
     materials, audit = load_weak_label_materials(source)
 
-    assert len(materials) == 6
-    assert audit["row_count"] == 6
-    assert audit["unique_recipe_id_count"] == 6
+    assert len(materials) == 7
+    assert audit["row_count"] == 7
+    assert audit["unique_recipe_id_count"] == 7
     assert audit["parse_warning_counts"] == {}
     cores, unresolved = build_condition_cores(materials)
     assert len(cores) == 6
@@ -179,3 +181,57 @@ def test_grouping_poc_writes_reproducible_review_artifacts(tmp_path: Path) -> No
         == 6
     )
     assert first_groups[0]["context_cross_references"]["solvent_systems"]
+    assert first.cores_path.exists()
+
+
+def test_completion_returns_observed_variants_for_exact_core(tmp_path: Path) -> None:
+    source = tmp_path / "weak.csv"
+    _write_fixture(source)
+    run = run_condition_grouping_poc(
+        source,
+        tmp_path / "artifacts",
+        cluster_count=2,
+        latent_dimensions=3,
+        seed=7,
+        silhouette_sample_size=6,
+    )
+
+    result = complete_condition_core(
+        "K2CO3 [base]; Pd(OAc)2 [catalyst]; XPhos [ligand]",
+        run.report_json_path.parent,
+        top_k=5,
+    )
+
+    assert result["valid"] is True
+    assert result["completion_level"] == "exact_core"
+    assert result["core_observation_count"] == 2
+    assert {item["value"] for item in result["solvent_options"]} == {
+        "dioxane",
+        "thf",
+    }
+    assert len(result["suggested_protocol_variants"]) == 2
+
+
+def test_completion_uses_labeled_group_prior_for_unseen_core(tmp_path: Path) -> None:
+    source = tmp_path / "weak.csv"
+    _write_fixture(source)
+    run = run_condition_grouping_poc(
+        source,
+        tmp_path / "artifacts",
+        cluster_count=2,
+        latent_dimensions=3,
+        seed=7,
+        silhouette_sample_size=6,
+    )
+
+    result = complete_condition_core(
+        "K2CO3 [base]; PdCl2 [catalyst]; PPh3 [ligand]",
+        run.report_json_path.parent,
+        top_k=3,
+    )
+
+    assert result["valid"] is True
+    assert result["completion_level"] == "learned_group"
+    assert result["suggested_protocol_variants"] == ()
+    assert result["solvent_options"]
+    assert "UNSEEN_CORE_GROUP_LEVEL_CONTEXT_ONLY" in result["warnings"]
