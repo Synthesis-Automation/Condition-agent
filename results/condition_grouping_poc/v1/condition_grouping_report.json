@@ -1,0 +1,4967 @@
+{
+  "artifact_type": "weak_label_condition_grouping_poc",
+  "schema_version": "1.0",
+  "definition_version": "condition_grouping_poc.v1",
+  "dataset": {
+    "path": "C:\\Git-softwares\\Condition-agent\\datasets\\reaction_label\\v2.1_cleaned.csv",
+    "sha256": "a74f864d7d2a8f980405be977befc48bfcd430e5381dd03e5e6edf621ee326c2",
+    "row_count": 59277,
+    "unique_material_count": 25047,
+    "unique_recipe_id_count": 44977,
+    "parse_warning_counts": {}
+  },
+  "feature_policy": {
+    "included": [
+      "source_condition_component_names",
+      "source_condition_roles",
+      "role_topology",
+      "catalyst_ligand_pairs",
+      "solvent_mixtures",
+      "declared_absences"
+    ],
+    "excluded": [
+      "source_reaction_type",
+      "reactive_site_labels_and_signatures",
+      "yield_pct",
+      "z_score",
+      "temperature_c",
+      "time_h",
+      "procedure_text"
+    ]
+  },
+  "model": {
+    "kind": "tfidf_svd_minibatch_kmeans",
+    "requested_cluster_count": 384,
+    "populated_cluster_count": 384,
+    "feature_count": 1284,
+    "latent_dimension_count": 48,
+    "seed": 17,
+    "sample_weight": "sqrt_observation_count",
+    "scikit_learn_version": "1.7.2"
+  },
+  "quality": {
+    "sampled_silhouette_size": 4000,
+    "sampled_silhouette_score": 0.311056,
+    "mean_centroid_similarity": 0.927297,
+    "p10_centroid_similarity": 0.854066,
+    "median_assignment_margin": 0.078871,
+    "p10_assignment_margin": 0.027442,
+    "median_unique_materials_per_group": 49.0,
+    "median_observations_per_group": 111.0,
+    "singleton_group_count": 1,
+    "assignment_status_counts": {
+      "supported": 14833,
+      "provisional": 8135,
+      "review": 2079
+    },
+    "assignment_status_policy": {
+      "supported": {
+        "minimum_similarity": 0.9,
+        "minimum_margin": 0.05
+      },
+      "provisional": {
+        "minimum_similarity": 0.8,
+        "minimum_margin": 0.02
+      },
+      "review": "otherwise",
+      "calibrated": false
+    }
+  },
+  "largest_groups": [
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:13080393c6a5e2957f82b3c1ac3fe42c3c1c32cf2ca7c8886a6807bad7786044",
+      "snapshot_cluster_label": 68,
+      "prototype_material_id": "CMAT1:585c21559d0a6ddeab81b1a5e9c0b8701f018f78c1548c561d7c0b47564d7584",
+      "prototype_display": "CsOH.H2O [base]; NBP [solvent]; No ligand",
+      "unique_material_count": 437,
+      "exact_recipe_id_count": 847,
+      "observation_count": 1098,
+      "mean_yield_pct": 19.4663,
+      "yield_observation_count": 1098,
+      "condition_identity_uncertainty_rate": 0.396175,
+      "temperature_coverage_rate": 0.376138,
+      "time_coverage_rate": 0.376138,
+      "mean_centroid_similarity": 0.952029,
+      "p10_centroid_similarity": 0.879563,
+      "median_centroid_similarity": 0.978417,
+      "mean_assignment_margin": 0.060035,
+      "topology_purity": 1.0,
+      "top_role_components": {
+        "absence:ligand": [
+          {
+            "value": "No ligand",
+            "count": 1098
+          }
+        ],
+        "base": [
+          {
+            "value": "LiHMDS",
+            "count": 99
+          },
+          {
+            "value": "NaH",
+            "count": 91
+          },
+          {
+            "value": "DIPEA",
+            "count": 87
+          },
+          {
+            "value": "KHMDS",
+            "count": 86
+          },
+          {
+            "value": "KOtBu",
+            "count": 81
+          },
+          {
+            "value": "lutidine",
+            "count": 73
+          },
+          {
+            "value": "KOtPent",
+            "count": 49
+          },
+          {
+            "value": "CsF",
+            "count": 47
+          },
+          {
+            "value": "TMG",
+            "count": 42
+          },
+          {
+            "value": "K3PO4",
+            "count": 34
+          }
+        ],
+        "solvent": [
+          {
+            "value": "DMSO",
+            "count": 131
+          },
+          {
+            "value": "PhMe",
+            "count": 110
+          },
+          {
+            "value": "DMF",
+            "count": 95
+          },
+          {
+            "value": "tAmOH",
+            "count": 81
+          },
+          {
+            "value": "EtOH",
+            "count": 78
+          },
+          {
+            "value": "TPGS-750M",
+            "count": 71
+          },
+          {
+            "value": "anisole",
+            "count": 55
+          },
+          {
+            "value": "acetone",
+            "count": 50
+          },
+          {
+            "value": "DCM",
+            "count": 41
+          },
+          {
+            "value": "MeTHF",
+            "count": 40
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Alkylation",
+          "count": 336
+        },
+        {
+          "value": "Condensation",
+          "count": 267
+        },
+        {
+          "value": "SNAr",
+          "count": 200
+        },
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 111
+        },
+        {
+          "value": "Wittig",
+          "count": 72
+        },
+        {
+          "value": "Addition",
+          "count": 55
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 35
+        },
+        {
+          "value": "Cyclization",
+          "count": 20
+        },
+        {
+          "value": "CH-Activation",
+          "count": 1
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 1
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:585c21559d0a6ddeab81b1a5e9c0b8701f018f78c1548c561d7c0b47564d7584",
+          "condition_display": "CsOH.H2O [base]; NBP [solvent]; No ligand",
+          "observation_count": 2,
+          "centroid_similarity": 0.997336,
+          "assignment_margin": 0.061792
+        },
+        {
+          "material_id": "CMAT1:9afe8383d343d2968e8cbf0925ecfaa9a7e20d033f9b71393da8d742e23742f0",
+          "condition_display": "LDA [base]; NBP [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996918,
+          "assignment_margin": 0.066869
+        },
+        {
+          "material_id": "CMAT1:f655760e78befdd49c5f628e8a50db34f6a436c0fde6612a581a6007f3ed818b",
+          "condition_display": "NaHMDS [base]; NBP [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996812,
+          "assignment_margin": 0.066622
+        },
+        {
+          "material_id": "CMAT1:32273df478e2719c8fadb92745927f94730ccfcf3a25e837d7c98b7d378a7f38",
+          "condition_display": "P2Et [base]; NBP [solvent]; No ligand",
+          "observation_count": 2,
+          "centroid_similarity": 0.996782,
+          "assignment_margin": 0.066768
+        },
+        {
+          "material_id": "CMAT1:bc4d4df46fc6c050e82a88d137e31446d46490543463d132b56ef3db1cccb678",
+          "condition_display": "iPrMgCl.LiCl [base]; NBP [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996741,
+          "assignment_margin": 0.065363
+        },
+        {
+          "material_id": "CMAT1:27459bf6febfb69f31fd9bf50b55e7d02d369391c30b21fcbb8aff3f9a9b9edc",
+          "condition_display": "CsOH.H2O [base]; EtOAc [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996704,
+          "assignment_margin": 0.058801
+        },
+        {
+          "material_id": "CMAT1:cccb039cdaf79e682d56985aad2e984de63c60e702bb413e3b508a88b4115dcf",
+          "condition_display": "NaH [base]; EtOAc [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996598,
+          "assignment_margin": 0.06453
+        },
+        {
+          "material_id": "CMAT1:0b405106fcaf109d5a505628da9341f8348915158b93bd4be8790adb2d56ad16",
+          "condition_display": "KOtPent [base]; NBP [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996541,
+          "assignment_margin": 0.054093
+        },
+        {
+          "material_id": "CMAT1:6b101ee87cd3f9391a4809d073b2c3ebee2f3ed090e92749813573f5ccdb838b",
+          "condition_display": "CsOH.H2O [base]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.99645,
+          "assignment_margin": 0.058466
+        },
+        {
+          "material_id": "CMAT1:3970a1b783ac71d3b73b0046557c993433840d1bc1731766581dce6bd9a5c3ad",
+          "condition_display": "LiOTMS [base]; chlorobenzene [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996409,
+          "assignment_margin": 0.066254
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:d5204693db07c70118c0d170cdff2ba90e2cb16bd53eba8ee257da25a2f958a0",
+      "snapshot_cluster_label": 11,
+      "prototype_material_id": "CMAT1:16e97619e5517d2059f1c020cfde5563e445a1d5dc8fc224a8505befb6f242e6",
+      "prototype_display": "HOPO [additive]; NMI [base]; CDT [coupling_reagent]; acetone [solvent]; No ligand",
+      "unique_material_count": 541,
+      "exact_recipe_id_count": 672,
+      "observation_count": 967,
+      "mean_yield_pct": 43.5176,
+      "yield_observation_count": 967,
+      "condition_identity_uncertainty_rate": 0.533609,
+      "temperature_coverage_rate": 0.694933,
+      "time_coverage_rate": 0.694933,
+      "mean_centroid_similarity": 0.939085,
+      "p10_centroid_similarity": 0.871274,
+      "median_centroid_similarity": 0.949707,
+      "mean_assignment_margin": 0.085765,
+      "topology_purity": 0.462254,
+      "top_role_components": {
+        "absence:ligand": [
+          {
+            "value": "No ligand",
+            "count": 967
+          }
+        ],
+        "additive": [
+          {
+            "value": "HOPO",
+            "count": 461
+          },
+          {
+            "value": "HOSu",
+            "count": 128
+          },
+          {
+            "value": "HOPS",
+            "count": 63
+          },
+          {
+            "value": "LiCl",
+            "count": 50
+          },
+          {
+            "value": "OxymaPure",
+            "count": 42
+          },
+          {
+            "value": "DMAP",
+            "count": 31
+          },
+          {
+            "value": "water",
+            "count": 18
+          },
+          {
+            "value": "TBAC",
+            "count": 17
+          },
+          {
+            "value": "HOBt",
+            "count": 15
+          },
+          {
+            "value": "HFIP",
+            "count": 11
+          }
+        ],
+        "base": [
+          {
+            "value": "NMI",
+            "count": 196
+          },
+          {
+            "value": "NEt3",
+            "count": 146
+          },
+          {
+            "value": "NMM",
+            "count": 123
+          },
+          {
+            "value": "K3PO4",
+            "count": 59
+          },
+          {
+            "value": "DIPEA",
+            "count": 35
+          },
+          {
+            "value": "K2CO3",
+            "count": 19
+          },
+          {
+            "value": "DBU",
+            "count": 13
+          },
+          {
+            "value": "DMAP",
+            "count": 12
+          },
+          {
+            "value": "NaHCO3",
+            "count": 12
+          },
+          {
+            "value": "KOH",
+            "count": 11
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "DIC",
+            "count": 766
+          },
+          {
+            "value": "EDC",
+            "count": 95
+          },
+          {
+            "value": "T3P",
+            "count": 54
+          },
+          {
+            "value": "BOP-Cl",
+            "count": 10
+          },
+          {
+            "value": "DMTMM BF4",
+            "count": 10
+          },
+          {
+            "value": "MukayamaReagent",
+            "count": 10
+          },
+          {
+            "value": "CDI",
+            "count": 7
+          },
+          {
+            "value": "DMF dimethylacetal",
+            "count": 6
+          },
+          {
+            "value": "CDT",
+            "count": 5
+          },
+          {
+            "value": "CyanuricChloride",
+            "count": 2
+          }
+        ],
+        "solvent": [
+          {
+            "value": "water",
+            "count": 148
+          },
+          {
+            "value": "DMI",
+            "count": 110
+          },
+          {
+            "value": "MeTHF",
+            "count": 110
+          },
+          {
+            "value": "EtOAc",
+            "count": 82
+          },
+          {
+            "value": "anisole",
+            "count": 77
+          },
+          {
+            "value": "PhMe",
+            "count": 74
+          },
+          {
+            "value": "iPrOAc",
+            "count": 61
+          },
+          {
+            "value": "DCM",
+            "count": 55
+          },
+          {
+            "value": "TPGS-750M",
+            "count": 52
+          },
+          {
+            "value": "cyclohexane",
+            "count": 48
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Amide coupling",
+          "count": 925
+        },
+        {
+          "value": "Condensation",
+          "count": 34
+        },
+        {
+          "value": "Cyclization",
+          "count": 8
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:16e97619e5517d2059f1c020cfde5563e445a1d5dc8fc224a8505befb6f242e6",
+          "condition_display": "HOPO [additive]; NMI [base]; CDT [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.995642,
+          "assignment_margin": 0.095446
+        },
+        {
+          "material_id": "CMAT1:d8a7a0da72e4107a65e1a74d761bcc13e8aa75f278d563bb5622fbc7d0869773",
+          "condition_display": "HOPO [additive]; NMI [base]; CDI [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994936,
+          "assignment_margin": 0.097516
+        },
+        {
+          "material_id": "CMAT1:a717c4f866e0854f43337056b0aaf81881230b8de675cda89c5e32501cd7621b",
+          "condition_display": "HOSu [additive]; NMI [base]; EDC [coupling_reagent]; EtOAc [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.99479,
+          "assignment_margin": 0.091838
+        },
+        {
+          "material_id": "CMAT1:32a46c082bcb5ce48b05414f42002d4d0c126d49706128aa3ea30dd074b55a1b",
+          "condition_display": "HOPO [additive]; NMM [base]; T3P [coupling_reagent]; TPGS-750M [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994741,
+          "assignment_margin": 0.09134
+        },
+        {
+          "material_id": "CMAT1:44a6c4cf209e9f0505ca5ab9c74157d51683a502599f29edd8aecbd90209294f",
+          "condition_display": "HOPO [additive]; NMM [base]; CDI [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994722,
+          "assignment_margin": 0.091281
+        },
+        {
+          "material_id": "CMAT1:3ea83d06d9357f1596cf1139cecf555a61a1bd5c2dbefccc606203568cdf30f6",
+          "condition_display": "HOPO [additive]; NMM [base]; CDT [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994628,
+          "assignment_margin": 0.089134
+        },
+        {
+          "material_id": "CMAT1:8884f27a13baf43214774d0132926a3603eb0e2ef0de080e09edd37afeb86ef8",
+          "condition_display": "HOSu [additive]; DMAP [base]; DIC [coupling_reagent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994401,
+          "assignment_margin": 0.087701
+        },
+        {
+          "material_id": "CMAT1:7c4139c5a8bd570df2f6898c33fd62b9aee953cbbb9d4d9d7b2f914bee309961",
+          "condition_display": "DMAP [additive]; DIC [coupling_reagent]; Coolade [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994384,
+          "assignment_margin": 0.095229
+        },
+        {
+          "material_id": "CMAT1:3ac3b8307530987b5987721dee821e176f87bdb16764679246201fd0c358b66d",
+          "condition_display": "HOPO [additive]; NMI [base]; EDC [coupling_reagent]; EtOAc [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994308,
+          "assignment_margin": 0.09487
+        },
+        {
+          "material_id": "CMAT1:ac1d30fff1336bf4bc7763861015d6f4364615dfcbe71cf5b1dc0633117036f0",
+          "condition_display": "HOSu [additive]; DIC [coupling_reagent]; DCM [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994204,
+          "assignment_margin": 0.094491
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:5fe5e2ff8917bcf819356d850eb741feb2f7f11c4d4b66d7b361716c7c6b54c4",
+      "snapshot_cluster_label": 382,
+      "prototype_material_id": "CMAT1:01ab032eb2c24798e866f28618fae1528e7a077f23fbb74f461ede652766a3b7",
+      "prototype_display": "NaBHT [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; TBME [solvent]",
+      "unique_material_count": 165,
+      "exact_recipe_id_count": 581,
+      "observation_count": 867,
+      "mean_yield_pct": 19.9905,
+      "yield_observation_count": 867,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.561707,
+      "time_coverage_rate": 0.561707,
+      "mean_centroid_similarity": 0.945591,
+      "p10_centroid_similarity": 0.915761,
+      "median_centroid_similarity": 0.947728,
+      "mean_assignment_margin": 0.084697,
+      "topology_purity": 0.961938,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "CsF",
+            "count": 4
+          },
+          {
+            "value": "KOAc",
+            "count": 4
+          },
+          {
+            "value": "LiCl",
+            "count": 4
+          }
+        ],
+        "base": [
+          {
+            "value": "NaOtBu",
+            "count": 224
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 188
+          },
+          {
+            "value": "KHMDS",
+            "count": 82
+          },
+          {
+            "value": "K2CO3",
+            "count": 62
+          },
+          {
+            "value": "LiHMDS",
+            "count": 58
+          },
+          {
+            "value": "K3PO4",
+            "count": 44
+          },
+          {
+            "value": "KOtBu",
+            "count": 44
+          },
+          {
+            "value": "TMSOK",
+            "count": 26
+          },
+          {
+            "value": "DBU",
+            "count": 20
+          },
+          {
+            "value": "KOH",
+            "count": 12
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "QPhos Pd(crotyl)Cl",
+            "count": 866
+          },
+          {
+            "value": "QPhosPd G6 Br",
+            "count": 1
+          }
+        ],
+        "ligand": [
+          {
+            "value": "QPhos",
+            "count": 867
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 235
+          },
+          {
+            "value": "tAmOH",
+            "count": 188
+          },
+          {
+            "value": "Dioxane",
+            "count": 133
+          },
+          {
+            "value": "MeTHF",
+            "count": 96
+          },
+          {
+            "value": "MeCN",
+            "count": 65
+          },
+          {
+            "value": "THF",
+            "count": 28
+          },
+          {
+            "value": "anisole",
+            "count": 20
+          },
+          {
+            "value": "CPME",
+            "count": 14
+          },
+          {
+            "value": "DMSO",
+            "count": 12
+          },
+          {
+            "value": "Ph2O",
+            "count": 11
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 684
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 51
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 49
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 31
+        },
+        {
+          "value": "Stannylation",
+          "count": 24
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 17
+        },
+        {
+          "value": "Heck",
+          "count": 11
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:01ab032eb2c24798e866f28618fae1528e7a077f23fbb74f461ede652766a3b7",
+          "condition_display": "NaBHT [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; TBME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.995203,
+          "assignment_margin": 0.102247
+        },
+        {
+          "material_id": "CMAT1:5f2a7199622e7af0fa33d386c796269ae7802e9de97c2eeaa35eeed21f1505f6",
+          "condition_display": "NaBHT [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993768,
+          "assignment_margin": 0.099342
+        },
+        {
+          "material_id": "CMAT1:f6233d69f025a5710d2ca1a8bf6e1911dae63c86fcebecaa04bc3b2b3118b8fb",
+          "condition_display": "KOtBu [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993558,
+          "assignment_margin": 0.099922
+        },
+        {
+          "material_id": "CMAT1:47fc57adcc28f2aeb6cac208d8160e929644cc6a3e10bf63f91643b0e5830be3",
+          "condition_display": "KHMDS [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993089,
+          "assignment_margin": 0.110154
+        },
+        {
+          "material_id": "CMAT1:978190cb56c54cf715724ce2be062ba4fe6a25d108199108553168277f74fa56",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992514,
+          "assignment_margin": 0.098433
+        },
+        {
+          "material_id": "CMAT1:26393666ec84150b10c40f99f83f5209b308335ff1376a1d23d829a384a0219a",
+          "condition_display": "LiHMDS [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; Ph2O [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992511,
+          "assignment_margin": 0.113007
+        },
+        {
+          "material_id": "CMAT1:6ad9c5b63a6ea5b2f9750a57f6871edb019ccfc67d28e924a8a727aefac0a0a2",
+          "condition_display": "LiHMDS [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; nBuOAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991783,
+          "assignment_margin": 0.108833
+        },
+        {
+          "material_id": "CMAT1:89ef903a84596608eaa2dc8ea497ec026ef0a201f9e937a6541e30f6a685fd18",
+          "condition_display": "KHMDS [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991162,
+          "assignment_margin": 0.104227
+        },
+        {
+          "material_id": "CMAT1:1ffec72e1d6b6dce4788a3099c6fdaa7e04f2d8f53b70936f331f18885d60912",
+          "condition_display": "TMSOK [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; o-Xylene [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990594,
+          "assignment_margin": 0.100361
+        },
+        {
+          "material_id": "CMAT1:be24f514a3455d2be47b972d109fcd6d42b5893f6ef8fc873ef03eb90c8b091b",
+          "condition_display": "KHMDS [base]; QPhos Pd(crotyl)Cl [catalyst]; QPhos [ligand]; DMAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990065,
+          "assignment_margin": 0.111744
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:a334b814944448a5a95c0249ca72d3f4555d0781b171b8cf13b02d5850feafb1",
+      "snapshot_cluster_label": 257,
+      "prototype_material_id": "CMAT1:8b7780302e908d596b78f4f8d4534db779c472573780825f303f2b0f2f6fc0f3",
+      "prototype_display": "CsF [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; PhCN [solvent]",
+      "unique_material_count": 175,
+      "exact_recipe_id_count": 479,
+      "observation_count": 811,
+      "mean_yield_pct": 25.9369,
+      "yield_observation_count": 811,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.364982,
+      "time_coverage_rate": 0.364982,
+      "mean_centroid_similarity": 0.943841,
+      "p10_centroid_similarity": 0.9086,
+      "median_centroid_similarity": 0.94246,
+      "mean_assignment_margin": 0.053618,
+      "topology_purity": 0.897657,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "Cu(MeCN)4BF4",
+            "count": 1
+          },
+          {
+            "value": "CuI",
+            "count": 1
+          },
+          {
+            "value": "LiCl",
+            "count": 1
+          },
+          {
+            "value": "LiI",
+            "count": 1
+          },
+          {
+            "value": "ZnBr2",
+            "count": 1
+          }
+        ],
+        "base": [
+          {
+            "value": "DBU",
+            "count": 165
+          },
+          {
+            "value": "NaOtBu",
+            "count": 127
+          },
+          {
+            "value": "NEt3",
+            "count": 80
+          },
+          {
+            "value": "TMG",
+            "count": 64
+          },
+          {
+            "value": "K2CO3",
+            "count": 59
+          },
+          {
+            "value": "K3PO4",
+            "count": 48
+          },
+          {
+            "value": "KHMDS",
+            "count": 33
+          },
+          {
+            "value": "KOH",
+            "count": 33
+          },
+          {
+            "value": "LiHMDS",
+            "count": 32
+          },
+          {
+            "value": "TMSOK",
+            "count": 25
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "tBuBrettPhos Pd(allyl)OTf",
+            "count": 811
+          }
+        ],
+        "ligand": [
+          {
+            "value": "tBuBrettPhos",
+            "count": 811
+          }
+        ],
+        "solvent": [
+          {
+            "value": "DMSO",
+            "count": 196
+          },
+          {
+            "value": "Dioxane",
+            "count": 142
+          },
+          {
+            "value": "tAmOH",
+            "count": 127
+          },
+          {
+            "value": "anisole",
+            "count": 107
+          },
+          {
+            "value": "EtOH",
+            "count": 66
+          },
+          {
+            "value": "MeTHF",
+            "count": 64
+          },
+          {
+            "value": "MeCN",
+            "count": 35
+          },
+          {
+            "value": "DMI",
+            "count": 28
+          },
+          {
+            "value": "Propionitrile",
+            "count": 14
+          },
+          {
+            "value": "iPrOH",
+            "count": 14
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 412
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 275
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 50
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 48
+        },
+        {
+          "value": "Heck",
+          "count": 13
+        },
+        {
+          "value": "Negishi",
+          "count": 10
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 3
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:8b7780302e908d596b78f4f8d4534db779c472573780825f303f2b0f2f6fc0f3",
+          "condition_display": "CsF [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; PhCN [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994884,
+          "assignment_margin": 0.056116
+        },
+        {
+          "material_id": "CMAT1:fe02a87b7db11af3e71b778df8e1cd1384f3f44260f59c350f7633985d0fadae",
+          "condition_display": "TMG [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994219,
+          "assignment_margin": 0.055041
+        },
+        {
+          "material_id": "CMAT1:085903a1dd658adcda416a88f56f7eeff3f4ae3ad23f06cc816d17e46ca4cdc6",
+          "condition_display": "KOtPent [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; Ph2O [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.994085,
+          "assignment_margin": 0.056008
+        },
+        {
+          "material_id": "CMAT1:86a4a37f8b0eb20ead3e7af2416822f5ef589eb74177c6ea6647790ccfe8a71c",
+          "condition_display": "N-Methyldicyclohexylamin [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; Propionitrile [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992797,
+          "assignment_margin": 0.047131
+        },
+        {
+          "material_id": "CMAT1:177b522f35a6c411f83799be6bafbae705c8ef50011d5996720a163ac60c796b",
+          "condition_display": "Li2CO3 [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.99277,
+          "assignment_margin": 0.053434
+        },
+        {
+          "material_id": "CMAT1:668692c4f4eaa2a7845029f3f31083f05c881d2ebabc8c89ae8327d781111a27",
+          "condition_display": "TMP [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.992483,
+          "assignment_margin": 0.0529
+        },
+        {
+          "material_id": "CMAT1:b128444703a20ef42ec0f235c1f16794e413f5509b9d5ecc9240e6aa18249452",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.991364,
+          "assignment_margin": 0.053498
+        },
+        {
+          "material_id": "CMAT1:d820988a7b422400ff767d6a3a9803dd61b98f9bdda8b019ac3745e2886b6f33",
+          "condition_display": "KOtPent [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; CPME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.991194,
+          "assignment_margin": 0.053181
+        },
+        {
+          "material_id": "CMAT1:8a9dbd21602a859ec4a738e00dbaf2e130fd9341e2a505c2a3703482f374fc7f",
+          "condition_display": "NEt3 [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; PrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.990939,
+          "assignment_margin": 0.052972
+        },
+        {
+          "material_id": "CMAT1:245e0dcbd110e789899598f2cfc6739c68fb5e304a15e5634ad4bf56e3bad261",
+          "condition_display": "KHMDS [base]; tBuBrettPhos Pd(allyl)OTf [catalyst]; tBuBrettPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990131,
+          "assignment_margin": 0.04452
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:ced0d9c9aa264a48e4dbf22f5c515d59a69574f9a83083a06c636e80fb4b49d6",
+      "snapshot_cluster_label": 169,
+      "prototype_material_id": "CMAT1:96452a929f643d604e41d77c0a6afac19b88fb2249bd71ed441aabb1025b964d",
+      "prototype_display": "CsF [base]; (R)-BINAP Pd(allyl)Cl [catalyst]; BINAP [ligand]; PhCN [solvent]",
+      "unique_material_count": 205,
+      "exact_recipe_id_count": 496,
+      "observation_count": 726,
+      "mean_yield_pct": 13.8255,
+      "yield_observation_count": 726,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.402204,
+      "time_coverage_rate": 0.402204,
+      "mean_centroid_similarity": 0.922401,
+      "p10_centroid_similarity": 0.873893,
+      "median_centroid_similarity": 0.9229,
+      "mean_assignment_margin": 0.0603,
+      "topology_purity": 0.983471,
+      "top_role_components": {
+        "base": [
+          {
+            "value": "NaOtBu",
+            "count": 191
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 157
+          },
+          {
+            "value": "KHMDS",
+            "count": 79
+          },
+          {
+            "value": "LiHMDS",
+            "count": 54
+          },
+          {
+            "value": "K2CO3",
+            "count": 39
+          },
+          {
+            "value": "KOtBu",
+            "count": 34
+          },
+          {
+            "value": "K3PO4",
+            "count": 24
+          },
+          {
+            "value": "Na2CO3",
+            "count": 20
+          },
+          {
+            "value": "KOH",
+            "count": 18
+          },
+          {
+            "value": "DBU",
+            "count": 16
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "rac-BINAP Pd G3",
+            "count": 417
+          },
+          {
+            "value": "(R)-BINAP Pd(allyl)Cl",
+            "count": 309
+          }
+        ],
+        "ligand": [
+          {
+            "value": "BINAP",
+            "count": 726
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 238
+          },
+          {
+            "value": "tAmOH",
+            "count": 184
+          },
+          {
+            "value": "MeTHF",
+            "count": 94
+          },
+          {
+            "value": "MeCN",
+            "count": 59
+          },
+          {
+            "value": "THF",
+            "count": 26
+          },
+          {
+            "value": "DMAc",
+            "count": 19
+          },
+          {
+            "value": "anisole",
+            "count": 16
+          },
+          {
+            "value": "CPME",
+            "count": 11
+          },
+          {
+            "value": "Ph2O",
+            "count": 11
+          },
+          {
+            "value": "Propionitrile",
+            "count": 11
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 600
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 36
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 24
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 24
+        },
+        {
+          "value": "Heck",
+          "count": 19
+        },
+        {
+          "value": "Negishi",
+          "count": 12
+        },
+        {
+          "value": "CH-Activation",
+          "count": 6
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 5
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:96452a929f643d604e41d77c0a6afac19b88fb2249bd71ed441aabb1025b964d",
+          "condition_display": "CsF [base]; (R)-BINAP Pd(allyl)Cl [catalyst]; BINAP [ligand]; PhCN [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991322,
+          "assignment_margin": 0.071694
+        },
+        {
+          "material_id": "CMAT1:3cde95d9da9b288d9ba7b5aa864c35e3d314bc386f40f182a44c52e3ec412443",
+          "condition_display": "KHMDS [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; DMAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.987418,
+          "assignment_margin": 0.055801
+        },
+        {
+          "material_id": "CMAT1:dccd94fcfb2650fe216e850c9c64b03ad55bf99e5d7899e3b74ed855c576abaa",
+          "condition_display": "LiHMDS [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; nBuOAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.98519,
+          "assignment_margin": 0.05274
+        },
+        {
+          "material_id": "CMAT1:700c881d1a91943adb87d58685b8504af9baaf9afd501558f5758ec60c0f76b6",
+          "condition_display": "LiHMDS [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; DMAc [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.98495,
+          "assignment_margin": 0.055851
+        },
+        {
+          "material_id": "CMAT1:4c18f68a830367ddc301b1f91491e3c63821ee939f1c63420195cc11ffa1af33",
+          "condition_display": "KHMDS [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.983756,
+          "assignment_margin": 0.050054
+        },
+        {
+          "material_id": "CMAT1:1fb84ac0b1be170c27525adae30080f90a9d0ef33c46a98abb60f879e911a249",
+          "condition_display": "LiHMDS [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.982858,
+          "assignment_margin": 0.050248
+        },
+        {
+          "material_id": "CMAT1:0ae2e9d5d434fba0e8a7eaacd677689003c4633e8b4df8c3f48833e24ec9ff74",
+          "condition_display": "NaBHT [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.982134,
+          "assignment_margin": 0.037635
+        },
+        {
+          "material_id": "CMAT1:94e24ecd51b42fa49c4d18c8963ad04dd6df70c40e7e0d2783e14bd25b63b926",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.981606,
+          "assignment_margin": 0.035725
+        },
+        {
+          "material_id": "CMAT1:6852c9072ed51aa59852363f701bafb4205947bba7058a5f3da86d3d1a25079b",
+          "condition_display": "KOtBu [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.981402,
+          "assignment_margin": 0.055478
+        },
+        {
+          "material_id": "CMAT1:6089325965c90de2398c47ddc7789a21f2bbaa56b1a5b0ff73e574f36d22bd0e",
+          "condition_display": "K2CO3, KOPiv [base]; rac-BINAP Pd G3 [catalyst]; BINAP [ligand]; DMAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.980964,
+          "assignment_margin": 0.039445
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:504b1359f9d0e17c0514c964cce7c945938957c0bbd6967e3e545990490eed27",
+      "snapshot_cluster_label": 122,
+      "prototype_material_id": "CMAT1:e521b8fffe32ad9d6736f9183ff0a4d0c49f1bd694cda693ac128f73c23ebb07",
+      "prototype_display": "N-Methyldicyclohexylamin [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; ethylene glycol [solvent]",
+      "unique_material_count": 200,
+      "exact_recipe_id_count": 447,
+      "observation_count": 608,
+      "mean_yield_pct": 20.9976,
+      "yield_observation_count": 608,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.335526,
+      "time_coverage_rate": 0.335526,
+      "mean_centroid_similarity": 0.943404,
+      "p10_centroid_similarity": 0.905695,
+      "median_centroid_similarity": 0.945964,
+      "mean_assignment_margin": 0.05827,
+      "topology_purity": 0.939145,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "LiCl",
+            "count": 6
+          },
+          {
+            "value": "Octanoic acid",
+            "count": 3
+          }
+        ],
+        "base": [
+          {
+            "value": "Cs2CO3",
+            "count": 105
+          },
+          {
+            "value": "K2CO3",
+            "count": 100
+          },
+          {
+            "value": "LiHMDS",
+            "count": 41
+          },
+          {
+            "value": "KHMDS",
+            "count": 34
+          },
+          {
+            "value": "KOH",
+            "count": 32
+          },
+          {
+            "value": "K3PO4",
+            "count": 31
+          },
+          {
+            "value": "Na2CO3",
+            "count": 27
+          },
+          {
+            "value": "DBU",
+            "count": 24
+          },
+          {
+            "value": "NEt3",
+            "count": 23
+          },
+          {
+            "value": "KOtBu",
+            "count": 19
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "tBuXPhos Pd(allyl)OTf",
+            "count": 597
+          },
+          {
+            "value": "Me4tBuXPhos Pd G3",
+            "count": 8
+          },
+          {
+            "value": "[Pd(allyl)(Me4-tBu-XPhos)]OTf",
+            "count": 3
+          }
+        ],
+        "ligand": [
+          {
+            "value": "Me4tBuXPhos",
+            "count": 608
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 113
+          },
+          {
+            "value": "tAmOH",
+            "count": 96
+          },
+          {
+            "value": "THF",
+            "count": 77
+          },
+          {
+            "value": "MeTHF",
+            "count": 65
+          },
+          {
+            "value": "anisole",
+            "count": 41
+          },
+          {
+            "value": "DMSO",
+            "count": 37
+          },
+          {
+            "value": "MeCN",
+            "count": 35
+          },
+          {
+            "value": "CPME",
+            "count": 26
+          },
+          {
+            "value": "DMF",
+            "count": 16
+          },
+          {
+            "value": "DMAc",
+            "count": 15
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 239
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 181
+        },
+        {
+          "value": "CC-Coupling",
+          "count": 41
+        },
+        {
+          "value": "Heck",
+          "count": 39
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 37
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 37
+        },
+        {
+          "value": "Negishi",
+          "count": 16
+        },
+        {
+          "value": "Negishi, in-situ",
+          "count": 10
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 8
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:e521b8fffe32ad9d6736f9183ff0a4d0c49f1bd694cda693ac128f73c23ebb07",
+          "condition_display": "N-Methyldicyclohexylamin [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; ethylene glycol [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.996774,
+          "assignment_margin": 0.082156
+        },
+        {
+          "material_id": "CMAT1:4d86dd57902a53034ca05a0f3deec2663716f11154ac073ecc4464a99c6d39f8",
+          "condition_display": "N-Methyldicyclohexylamin [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; BnOH [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.996187,
+          "assignment_margin": 0.08389
+        },
+        {
+          "material_id": "CMAT1:c5ff807976aea0fecede56e19e2866b4990aacb1f7c26ea3719fc69976f6945c",
+          "condition_display": "CsF [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; PhCN [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.995882,
+          "assignment_margin": 0.083135
+        },
+        {
+          "material_id": "CMAT1:f186c88b47636650cdc14c481b7c9d6f576b9f7dabd6fd5afa81cffff88c0a98",
+          "condition_display": "N-Methyldicyclohexylamin [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; BuOH [solvent]",
+          "observation_count": 4,
+          "centroid_similarity": 0.995724,
+          "assignment_margin": 0.081207
+        },
+        {
+          "material_id": "CMAT1:b60a71da7cad928816448827ef69e128de0e1d294435c3116cb57f3ac78d608f",
+          "condition_display": "K2HPO4 [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.99569,
+          "assignment_margin": 0.083223
+        },
+        {
+          "material_id": "CMAT1:85f05a9218cfca1466d10d7ed5c2d8b1208a362a0b022f19e33f6a3f69b06e13",
+          "condition_display": "TMG [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; BnOH [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.995571,
+          "assignment_margin": 0.081606
+        },
+        {
+          "material_id": "CMAT1:17507d17b84665a710019c6777edec6b56c8ac4d2ca1384f502438e14a34fea2",
+          "condition_display": "NaBHT [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.995508,
+          "assignment_margin": 0.077671
+        },
+        {
+          "material_id": "CMAT1:07dfbb17e570a53ea71d02ec1d24b917f3dab9c64da360fac8548a022f1b62cc",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994434,
+          "assignment_margin": 0.073383
+        },
+        {
+          "material_id": "CMAT1:066970ac778f14e41e6ed7618fe32b9e880569433649f9e4facdafdc48e883e9",
+          "condition_display": "LiOtBu [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; CPME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.99377,
+          "assignment_margin": 0.080755
+        },
+        {
+          "material_id": "CMAT1:9b0be349ba656890aa32ffc8a6f553d49a5bb9e7ed74a6afe6261030e1c5203b",
+          "condition_display": "Li2CO3 [base]; tBuXPhos Pd(allyl)OTf [catalyst]; Me4tBuXPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.993248,
+          "assignment_margin": 0.072567
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:38d10d8ae0114a70ac3984c91278c47208ff5b9d365a7df6a91a65331c7554c5",
+      "snapshot_cluster_label": 32,
+      "prototype_material_id": "CMAT1:948e2dd5d7ae943efbdda71c09848249cf925159ed42c8ca14d4afc22a75e8a9",
+      "prototype_display": "LiOH anh [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; CPME [solvent]",
+      "unique_material_count": 211,
+      "exact_recipe_id_count": 432,
+      "observation_count": 604,
+      "mean_yield_pct": 17.7745,
+      "yield_observation_count": 604,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.519868,
+      "time_coverage_rate": 0.519868,
+      "mean_centroid_similarity": 0.922936,
+      "p10_centroid_similarity": 0.881531,
+      "median_centroid_similarity": 0.924195,
+      "mean_assignment_margin": 0.070885,
+      "topology_purity": 0.758278,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "water",
+            "count": 47
+          },
+          {
+            "value": "Octanoic acid",
+            "count": 16
+          },
+          {
+            "value": "Potassium 2-ethylhexanoate",
+            "count": 15
+          },
+          {
+            "value": "Sodium trifluoroacetate",
+            "count": 14
+          },
+          {
+            "value": "TBAB",
+            "count": 13
+          },
+          {
+            "value": "TBAC",
+            "count": 9
+          },
+          {
+            "value": "Sodium octanoate",
+            "count": 7
+          },
+          {
+            "value": "TMSCl",
+            "count": 4
+          },
+          {
+            "value": "1,2-dibromoethane",
+            "count": 2
+          },
+          {
+            "value": "AdCOOH",
+            "count": 1
+          }
+        ],
+        "base": [
+          {
+            "value": "NaOtBu",
+            "count": 144
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 116
+          },
+          {
+            "value": "KOtBu",
+            "count": 39
+          },
+          {
+            "value": "K2CO3",
+            "count": 37
+          },
+          {
+            "value": "KHMDS",
+            "count": 36
+          },
+          {
+            "value": "DBU",
+            "count": 34
+          },
+          {
+            "value": "LiHMDS",
+            "count": 26
+          },
+          {
+            "value": "K3PO4",
+            "count": 22
+          },
+          {
+            "value": "TMSOK",
+            "count": 17
+          },
+          {
+            "value": "DIPEA",
+            "count": 11
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "cBridP Pd(allyl)Cl",
+            "count": 604
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "PyBrOP",
+            "count": 8
+          }
+        ],
+        "ligand": [
+          {
+            "value": "cBridP",
+            "count": 604
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 171
+          },
+          {
+            "value": "tAmOH",
+            "count": 107
+          },
+          {
+            "value": "Dioxane",
+            "count": 72
+          },
+          {
+            "value": "MeTHF",
+            "count": 56
+          },
+          {
+            "value": "MeCN",
+            "count": 45
+          },
+          {
+            "value": "anisole",
+            "count": 22
+          },
+          {
+            "value": "Brij 35",
+            "count": 20
+          },
+          {
+            "value": "THF",
+            "count": 20
+          },
+          {
+            "value": "CPME",
+            "count": 19
+          },
+          {
+            "value": "water",
+            "count": 17
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 427
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 70
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 38
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 25
+        },
+        {
+          "value": "Suzuki-Miyaura, in situ",
+          "count": 20
+        },
+        {
+          "value": "Negishi, in-situ",
+          "count": 15
+        },
+        {
+          "value": "CH-Activation",
+          "count": 9
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:948e2dd5d7ae943efbdda71c09848249cf925159ed42c8ca14d4afc22a75e8a9",
+          "condition_display": "LiOH anh [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.984315,
+          "assignment_margin": 0.079401
+        },
+        {
+          "material_id": "CMAT1:4ad0605990873e98fd94c176343eec7e3d4ba8bd237da9294d9fab3160f003d9",
+          "condition_display": "KOtBu [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.983909,
+          "assignment_margin": 0.08428
+        },
+        {
+          "material_id": "CMAT1:be57ecbcf808e9e199ccf6bf90b723723acc6f722a2736bce5b10f07a999b5f2",
+          "condition_display": "KOtPent [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; Ph2O [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.983787,
+          "assignment_margin": 0.087807
+        },
+        {
+          "material_id": "CMAT1:f5a77d1efdfcc3a95f4dc60e09043192e7ce2f912afad50c2b19f286f8da0602",
+          "condition_display": "Sodium phenoxide [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; Propionitrile [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.982731,
+          "assignment_margin": 0.084735
+        },
+        {
+          "material_id": "CMAT1:bf1c617ee936734b10528fdeb1dfde5358edb656e2b713bcfa616acdbb77d917",
+          "condition_display": "KOtPent [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; CPME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.981462,
+          "assignment_margin": 0.081655
+        },
+        {
+          "material_id": "CMAT1:07f01643f9822a8094569fe111f2389bcc1d3470bf1468478546038619e742f9",
+          "condition_display": "KHMDS [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.980953,
+          "assignment_margin": 0.091519
+        },
+        {
+          "material_id": "CMAT1:924eea43930cf44d30d56fef40f4c5e5860d238d5db80dfce415a501712ce185",
+          "condition_display": "LiHMDS [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.979409,
+          "assignment_margin": 0.093996
+        },
+        {
+          "material_id": "CMAT1:941bd6b73ba16767a5315ec4713db0a28f8fef94d3f2afaba0da06eb5e8c5fc7",
+          "condition_display": "LiHMDS [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; DMAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.978831,
+          "assignment_margin": 0.097887
+        },
+        {
+          "material_id": "CMAT1:adb691b2d75603679781e10cbc04151f8642f3a355f362fdd46fc8734f17b810",
+          "condition_display": "TMSOK [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.976551,
+          "assignment_margin": 0.095759
+        },
+        {
+          "material_id": "CMAT1:6a4b3c45f9a8d68ea8a453fe0861d4d3eadaf7575830dc7cb70cd59a97f1c8a7",
+          "condition_display": "TMSOK [base]; cBridP Pd(allyl)Cl [catalyst]; cBridP [ligand]; CPME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.97607,
+          "assignment_margin": 0.089425
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:790925c3f0ac14d309541f4422607c04817106804bdd6a7d731e01775c06a3a6",
+      "snapshot_cluster_label": 74,
+      "prototype_material_id": "CMAT1:f7eb77578f9afa75e99dbcbfe044d1730f4e679b46419792c1aac1c90e68bd43",
+      "prototype_display": "KOtPent [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; Ph2O [solvent]",
+      "unique_material_count": 164,
+      "exact_recipe_id_count": 467,
+      "observation_count": 598,
+      "mean_yield_pct": 21.8712,
+      "yield_observation_count": 598,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.448161,
+      "time_coverage_rate": 0.448161,
+      "mean_centroid_similarity": 0.931336,
+      "p10_centroid_similarity": 0.858431,
+      "median_centroid_similarity": 0.945346,
+      "mean_assignment_margin": 0.08353,
+      "topology_purity": 0.911371,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "water",
+            "count": 22
+          },
+          {
+            "value": "LiCl",
+            "count": 4
+          },
+          {
+            "value": "Sodium trifluoroacetate",
+            "count": 3
+          },
+          {
+            "value": "KOAc",
+            "count": 1
+          },
+          {
+            "value": "NaBHT",
+            "count": 1
+          },
+          {
+            "value": "Potassium 2-ethylhexanoate",
+            "count": 1
+          }
+        ],
+        "base": [
+          {
+            "value": "Cs2CO3",
+            "count": 118
+          },
+          {
+            "value": "NaOtBu",
+            "count": 108
+          },
+          {
+            "value": "K3PO4",
+            "count": 85
+          },
+          {
+            "value": "KHMDS",
+            "count": 50
+          },
+          {
+            "value": "LiHMDS",
+            "count": 42
+          },
+          {
+            "value": "K2CO3",
+            "count": 39
+          },
+          {
+            "value": "Na2CO3",
+            "count": 34
+          },
+          {
+            "value": "TMSOK",
+            "count": 19
+          },
+          {
+            "value": "DBU",
+            "count": 16
+          },
+          {
+            "value": "KOH",
+            "count": 15
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "BrettPhos Pd(crotyl)OTf",
+            "count": 590
+          },
+          {
+            "value": "BrettPhos Pd(crotyl)OTf, CuI",
+            "count": 3
+          },
+          {
+            "value": "BrettPhos Pd G3",
+            "count": 2
+          },
+          {
+            "value": "BrettPhos Pd G3, Cu(MeCN)4BF4",
+            "count": 1
+          },
+          {
+            "value": "BrettPhos Pd(crotyl)OTf, Copper(I) thiophene-2-carboxylate",
+            "count": 1
+          },
+          {
+            "value": "BrettPhos Pd(crotyl)OTf, Cu(MeCN)4BF4",
+            "count": 1
+          },
+          {
+            "value": "Copper(I) thiophene-2-carboxylate",
+            "count": 1
+          }
+        ],
+        "ligand": [
+          {
+            "value": "BrettPhos",
+            "count": 598
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 146
+          },
+          {
+            "value": "tAmOH",
+            "count": 113
+          },
+          {
+            "value": "MeTHF",
+            "count": 78
+          },
+          {
+            "value": "anisole",
+            "count": 76
+          },
+          {
+            "value": "Dioxane",
+            "count": 51
+          },
+          {
+            "value": "CPME",
+            "count": 20
+          },
+          {
+            "value": "DMAc",
+            "count": 16
+          },
+          {
+            "value": "DMI",
+            "count": 15
+          },
+          {
+            "value": "DMSO",
+            "count": 14
+          },
+          {
+            "value": "MeCN",
+            "count": 10
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 422
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 114
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 28
+        },
+        {
+          "value": "Negishi",
+          "count": 20
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 7
+        },
+        {
+          "value": "Sonogashira",
+          "count": 7
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:f7eb77578f9afa75e99dbcbfe044d1730f4e679b46419792c1aac1c90e68bd43",
+          "condition_display": "KOtPent [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; Ph2O [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.994903,
+          "assignment_margin": 0.111326
+        },
+        {
+          "material_id": "CMAT1:4eb6927e2f07358058dea6fd58431af908fe97bc26e80d1455a121b9d83e940e",
+          "condition_display": "TMG [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994637,
+          "assignment_margin": 0.106971
+        },
+        {
+          "material_id": "CMAT1:74e436edcffd4600a7ede8ef2ebb0758f8b52c70828ade0874f24c8d42f6ce40",
+          "condition_display": "KHMDS [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993414,
+          "assignment_margin": 0.116701
+        },
+        {
+          "material_id": "CMAT1:81798f5d3aeed8ace8cd8da97a56cac1ccc3236f510e427aeb8c0d4206a4ccb0",
+          "condition_display": "LiHMDS [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; nBuOAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.99289,
+          "assignment_margin": 0.115042
+        },
+        {
+          "material_id": "CMAT1:a1dfc5d83bede6fbd9eb1d1bc7f197379f8d0f79e3e38a741a3d26a899b34ccb",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992814,
+          "assignment_margin": 0.107997
+        },
+        {
+          "material_id": "CMAT1:888d8581cfc9f797110f63164c38185acf746e74ac127073c375bd90f9124e4f",
+          "condition_display": "KOtPent [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; CPME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.992375,
+          "assignment_margin": 0.100601
+        },
+        {
+          "material_id": "CMAT1:864cb20708454349889303fda4f594afe6c0e0a64eb8573f186e23f664067a05",
+          "condition_display": "KOtBu [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992322,
+          "assignment_margin": 0.104218
+        },
+        {
+          "material_id": "CMAT1:40abee3a1dfe2bf0f93cd779ffb3d6748fcb25aea57876bf0d3f89ee80873f8e",
+          "condition_display": "KHMDS [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; DMAc [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.992295,
+          "assignment_margin": 0.116247
+        },
+        {
+          "material_id": "CMAT1:c1335a78c3f254a646c573dfc5e9855226d0df20f50a2dd77050a394d23c61c9",
+          "condition_display": "LiHMDS [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; DMAc [solvent]",
+          "observation_count": 3,
+          "centroid_similarity": 0.991229,
+          "assignment_margin": 0.116375
+        },
+        {
+          "material_id": "CMAT1:512df48627ad3e4addf2d2712d651ca86b3348a162f34b0192a313b839b762d8",
+          "condition_display": "LiHMDS [base]; BrettPhos Pd(crotyl)OTf [catalyst]; BrettPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991083,
+          "assignment_margin": 0.118559
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:dfdf0e268de656417e9e0d0cbda8c92340b70d8009fc4b6c427aa1d66627f200",
+      "snapshot_cluster_label": 66,
+      "prototype_material_id": "CMAT1:8cba556a0b3949e9792a73fd520585aece0368e550d028f0a3abdc3a097cdaa3",
+      "prototype_display": "CsF [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; PhCN [solvent]",
+      "unique_material_count": 180,
+      "exact_recipe_id_count": 461,
+      "observation_count": 598,
+      "mean_yield_pct": 15.4178,
+      "yield_observation_count": 598,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.436455,
+      "time_coverage_rate": 0.436455,
+      "mean_centroid_similarity": 0.939263,
+      "p10_centroid_similarity": 0.903125,
+      "median_centroid_similarity": 0.938821,
+      "mean_assignment_margin": 0.061997,
+      "topology_purity": 0.973244,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "Cu(MeCN)4BF4",
+            "count": 1
+          },
+          {
+            "value": "CuI",
+            "count": 1
+          },
+          {
+            "value": "LiCl",
+            "count": 1
+          },
+          {
+            "value": "LiI",
+            "count": 1
+          },
+          {
+            "value": "ZnBr2",
+            "count": 1
+          }
+        ],
+        "base": [
+          {
+            "value": "Cs2CO3",
+            "count": 188
+          },
+          {
+            "value": "KHMDS",
+            "count": 71
+          },
+          {
+            "value": "LiHMDS",
+            "count": 50
+          },
+          {
+            "value": "KOtBu",
+            "count": 43
+          },
+          {
+            "value": "K3PO4",
+            "count": 42
+          },
+          {
+            "value": "DBU",
+            "count": 29
+          },
+          {
+            "value": "KOH",
+            "count": 27
+          },
+          {
+            "value": "DIPEA",
+            "count": 21
+          },
+          {
+            "value": "TMSOK",
+            "count": 16
+          },
+          {
+            "value": "NaH",
+            "count": 13
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "XantPhos Pd(allyl)Cl",
+            "count": 598
+          }
+        ],
+        "ligand": [
+          {
+            "value": "XantPhos",
+            "count": 598
+          },
+          {
+            "value": "Xantphos",
+            "count": 4
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 138
+          },
+          {
+            "value": "tAmOH",
+            "count": 134
+          },
+          {
+            "value": "Dioxane",
+            "count": 86
+          },
+          {
+            "value": "MeCN",
+            "count": 41
+          },
+          {
+            "value": "MeTHF",
+            "count": 41
+          },
+          {
+            "value": "DMSO",
+            "count": 25
+          },
+          {
+            "value": "THF",
+            "count": 23
+          },
+          {
+            "value": "anisole",
+            "count": 18
+          },
+          {
+            "value": "DMAc",
+            "count": 13
+          },
+          {
+            "value": "Propionitrile",
+            "count": 11
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 403
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 57
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 45
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 31
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 28
+        },
+        {
+          "value": "CH-Activation",
+          "count": 14
+        },
+        {
+          "value": "Negishi",
+          "count": 10
+        },
+        {
+          "value": "CS-Coupling",
+          "count": 6
+        },
+        {
+          "value": "Heck",
+          "count": 4
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:8cba556a0b3949e9792a73fd520585aece0368e550d028f0a3abdc3a097cdaa3",
+          "condition_display": "CsF [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; PhCN [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.995456,
+          "assignment_margin": 0.064082
+        },
+        {
+          "material_id": "CMAT1:f57c07c76ea80fad547fa010b3805a2c4b7ffd071da12ac9e8914a497c27e22a",
+          "condition_display": "NaBHT [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994205,
+          "assignment_margin": 0.069249
+        },
+        {
+          "material_id": "CMAT1:8f2b80268704896c1128cea7967fdfbf3f6ef1ae162d5afe34a91747ae4a5dfc",
+          "condition_display": "NaOtPent [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993423,
+          "assignment_margin": 0.058327
+        },
+        {
+          "material_id": "CMAT1:ebb2e896fed130dc1ae496289c4fb25df772135d434b7ac20eacfcffdb383055",
+          "condition_display": "KF [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993231,
+          "assignment_margin": 0.057986
+        },
+        {
+          "material_id": "CMAT1:c4888aba9c0d508fa5b7d163ae223dcd6e4f7a11f31a974e3396b6f9690d15c2",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992725,
+          "assignment_margin": 0.070636
+        },
+        {
+          "material_id": "CMAT1:2e4ab6273878a6b0f015490a9cc2f1da94d8e342d4129d3ce67d70339e926556",
+          "condition_display": "LiHMDS [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991864,
+          "assignment_margin": 0.058168
+        },
+        {
+          "material_id": "CMAT1:d5be6dab3608c24a3c23f34b20bd424b3fc160e8010c2d38a2fd0300b645b168",
+          "condition_display": "LiOH anh [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991414,
+          "assignment_margin": 0.054196
+        },
+        {
+          "material_id": "CMAT1:8b14279d7f78e3863c59e10d93366ad9dabde3ecee2524f0d5fd026fc94ef234",
+          "condition_display": "KHMDS [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.99084,
+          "assignment_margin": 0.083902
+        },
+        {
+          "material_id": "CMAT1:6f5fc5dd6c8200c712555f753afaac79c09131f9647c07fca481c6850995d0ff",
+          "condition_display": "KOtBu [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990246,
+          "assignment_margin": 0.045799
+        },
+        {
+          "material_id": "CMAT1:0c6826731b693cad557a514d557bafcef7b5c927c4ad85237ccbc2e95de03c70",
+          "condition_display": "LiHMDS [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; nBuOAc [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.9901,
+          "assignment_margin": 0.069753
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:69d567895a18e9ccf6564c6b6e9ba09ae46bc7e56c2c3b0399b79f004ed7dfe0",
+      "snapshot_cluster_label": 52,
+      "prototype_material_id": "CMAT1:cdf6551897a71027b6c458f5b7c24b6dbaa063c57c4cbb78ade530c1e053efdc",
+      "prototype_display": "CsF [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; PhCN [solvent]",
+      "unique_material_count": 156,
+      "exact_recipe_id_count": 410,
+      "observation_count": 590,
+      "mean_yield_pct": 13.2477,
+      "yield_observation_count": 590,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.418644,
+      "time_coverage_rate": 0.418644,
+      "mean_centroid_similarity": 0.949422,
+      "p10_centroid_similarity": 0.919273,
+      "median_centroid_similarity": 0.949895,
+      "mean_assignment_margin": 0.071684,
+      "topology_purity": 0.957627,
+      "top_role_components": {
+        "base": [
+          {
+            "value": "Cs2CO3",
+            "count": 157
+          },
+          {
+            "value": "NaOtBu",
+            "count": 144
+          },
+          {
+            "value": "KHMDS",
+            "count": 45
+          },
+          {
+            "value": "LiHMDS",
+            "count": 36
+          },
+          {
+            "value": "K3PO4",
+            "count": 32
+          },
+          {
+            "value": "DBU",
+            "count": 25
+          },
+          {
+            "value": "TMSOK",
+            "count": 18
+          },
+          {
+            "value": "KOtBu",
+            "count": 15
+          },
+          {
+            "value": "NaH",
+            "count": 14
+          },
+          {
+            "value": "KOH",
+            "count": 13
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "JosiphosSL-J009-1 Pd G3",
+            "count": 590
+          }
+        ],
+        "ligand": [
+          {
+            "value": "JosiphosSL-J009-1",
+            "count": 590
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 147
+          },
+          {
+            "value": "tAmOH",
+            "count": 113
+          },
+          {
+            "value": "Dioxane",
+            "count": 104
+          },
+          {
+            "value": "MeTHF",
+            "count": 46
+          },
+          {
+            "value": "MeCN",
+            "count": 44
+          },
+          {
+            "value": "DMSO",
+            "count": 29
+          },
+          {
+            "value": "THF",
+            "count": 13
+          },
+          {
+            "value": "Propionitrile",
+            "count": 12
+          },
+          {
+            "value": "anisole",
+            "count": 12
+          },
+          {
+            "value": "DMI",
+            "count": 9
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 372
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 77
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 51
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 49
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 20
+        },
+        {
+          "value": "Negishi",
+          "count": 13
+        },
+        {
+          "value": "CH-Activation",
+          "count": 4
+        },
+        {
+          "value": "Heck",
+          "count": 4
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:cdf6551897a71027b6c458f5b7c24b6dbaa063c57c4cbb78ade530c1e053efdc",
+          "condition_display": "CsF [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; PhCN [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.995238,
+          "assignment_margin": 0.074221
+        },
+        {
+          "material_id": "CMAT1:362b762484efc16223f72bd791040b8b537ccb76bb84210f0f12a275d6e81bf9",
+          "condition_display": "KF [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994368,
+          "assignment_margin": 0.074043
+        },
+        {
+          "material_id": "CMAT1:e743c48b2c2963e7cbcc46b86337393044781d2555c9eb0434ca5d762c22989d",
+          "condition_display": "KOtBu [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993521,
+          "assignment_margin": 0.085019
+        },
+        {
+          "material_id": "CMAT1:27d231df4be0c6fe153cf0f21a793178372f4ad748f8ab0ab25d1a524abeaf29",
+          "condition_display": "NaBHT [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992653,
+          "assignment_margin": 0.073674
+        },
+        {
+          "material_id": "CMAT1:62c7c41348f43e8a7589be27a890ab8abaef4a879158b2af018b718d24b23cb5",
+          "condition_display": "LiHMDS [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; Ph2O [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991627,
+          "assignment_margin": 0.087076
+        },
+        {
+          "material_id": "CMAT1:90b7c20644196f281743856ba447c2a84445c743656f97c1756c7735b4a6d5cb",
+          "condition_display": "KHMDS [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.99112,
+          "assignment_margin": 0.083164
+        },
+        {
+          "material_id": "CMAT1:ddfecd623ead2740554301badfe7ce59284d26d8790daf7177411548e44edb0b",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990768,
+          "assignment_margin": 0.067652
+        },
+        {
+          "material_id": "CMAT1:5be1fe5773037a1f0973030d4caa998cdf269a06550a235e1194a9ba3a8a624f",
+          "condition_display": "TMSOK [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; DME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.990499,
+          "assignment_margin": 0.081302
+        },
+        {
+          "material_id": "CMAT1:b5803e8b45fc8a4f9f01d0d7a21a74dd318a702d20ecbfb1b6730b7142cedd48",
+          "condition_display": "KHMDS [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; DMAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990266,
+          "assignment_margin": 0.079422
+        },
+        {
+          "material_id": "CMAT1:ea15de7e1bbf4e122c0541af2471df88749fab115b0b8ad37d747ef31b1d57db",
+          "condition_display": "TMSOK [base]; JosiphosSL-J009-1 Pd G3 [catalyst]; JosiphosSL-J009-1 [ligand]; Ph2O [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.989888,
+          "assignment_margin": 0.084996
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:82ac41fd619448bdb5d6f7d89ceabcdb8586f4d1d87cf3a00df6daf606693fdd",
+      "snapshot_cluster_label": 332,
+      "prototype_material_id": "CMAT1:227ad0ccdf8edc312f1453c8c5001050be5a090e4796d20a6e4901994ce90355",
+      "prototype_display": "N-Methyldicyclohexylamin [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; ethylene glycol [solvent]",
+      "unique_material_count": 183,
+      "exact_recipe_id_count": 331,
+      "observation_count": 527,
+      "mean_yield_pct": 29.5144,
+      "yield_observation_count": 527,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.297913,
+      "time_coverage_rate": 0.297913,
+      "mean_centroid_similarity": 0.930857,
+      "p10_centroid_similarity": 0.867041,
+      "median_centroid_similarity": 0.940405,
+      "mean_assignment_margin": 0.055005,
+      "topology_purity": 0.950664,
+      "top_role_components": {
+        "base": [
+          {
+            "value": "K2CO3",
+            "count": 133
+          },
+          {
+            "value": "NEt3",
+            "count": 90
+          },
+          {
+            "value": "KHMDS",
+            "count": 44
+          },
+          {
+            "value": "LiHMDS",
+            "count": 39
+          },
+          {
+            "value": "TMSOK",
+            "count": 37
+          },
+          {
+            "value": "K3PO4",
+            "count": 33
+          },
+          {
+            "value": "KOtBu",
+            "count": 15
+          },
+          {
+            "value": "DIPEA",
+            "count": 12
+          },
+          {
+            "value": "KOAc",
+            "count": 10
+          },
+          {
+            "value": "KOtPent",
+            "count": 10
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "AlphosPd)2cod",
+            "count": 334
+          },
+          {
+            "value": "AlPhosPd G6 Br",
+            "count": 185
+          },
+          {
+            "value": "[Pd(allyl)(AlPhos)]OTf",
+            "count": 6
+          },
+          {
+            "value": "AlphosPd)2cod, CuI",
+            "count": 2
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "PyBrOP",
+            "count": 2
+          }
+        ],
+        "ligand": [
+          {
+            "value": "AlPhos",
+            "count": 527
+          }
+        ],
+        "solvent": [
+          {
+            "value": "EtOH",
+            "count": 89
+          },
+          {
+            "value": "THF",
+            "count": 82
+          },
+          {
+            "value": "PhMe",
+            "count": 80
+          },
+          {
+            "value": "tAmOH",
+            "count": 65
+          },
+          {
+            "value": "Dioxane",
+            "count": 53
+          },
+          {
+            "value": "DMI",
+            "count": 35
+          },
+          {
+            "value": "anisole",
+            "count": 26
+          },
+          {
+            "value": "MeTHF",
+            "count": 18
+          },
+          {
+            "value": "MeCN",
+            "count": 14
+          },
+          {
+            "value": "iPrOH",
+            "count": 12
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 243
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 214
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 22
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 18
+        },
+        {
+          "value": "Heck",
+          "count": 16
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 8
+        },
+        {
+          "value": "CH-Activation",
+          "count": 4
+        },
+        {
+          "value": "Sonogashira",
+          "count": 2
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:227ad0ccdf8edc312f1453c8c5001050be5a090e4796d20a6e4901994ce90355",
+          "condition_display": "N-Methyldicyclohexylamin [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; ethylene glycol [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992363,
+          "assignment_margin": 0.061227
+        },
+        {
+          "material_id": "CMAT1:3d26cd1b500b7293320ac0540b98a03bb0e270d007b9bbeea1af01acd253e18a",
+          "condition_display": "TMG [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; BnOH [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992299,
+          "assignment_margin": 0.063885
+        },
+        {
+          "material_id": "CMAT1:1e2686178a408986a8aafc6721f40fea614ba04cca844fc1f59b28cf4e20acca",
+          "condition_display": "N-Methyldicyclohexylamin [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; BnOH [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991514,
+          "assignment_margin": 0.062939
+        },
+        {
+          "material_id": "CMAT1:c3179ba20c77af90949dfc3be813a055c5be8fcb1e4a8a251312ba9fc8b682a4",
+          "condition_display": "NaBHT [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991331,
+          "assignment_margin": 0.060477
+        },
+        {
+          "material_id": "CMAT1:6999f00730a5254944039bce93d180d936d0e0b6b2815c406298525db43a2574",
+          "condition_display": "TMG [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991259,
+          "assignment_margin": 0.062696
+        },
+        {
+          "material_id": "CMAT1:5233b96f1f0e017fb9626ffbf04f0fcef07b9190f1a760b3b4dec74ba0aa746f",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.991219,
+          "assignment_margin": 0.062278
+        },
+        {
+          "material_id": "CMAT1:eb6c910509ac35b6faa0629236187be014173ad67399a286e7a6975813feb166",
+          "condition_display": "LiHMDS [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; nBuOAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990538,
+          "assignment_margin": 0.070804
+        },
+        {
+          "material_id": "CMAT1:fa95cfb3261888de1b50edad932256d09164dcfa5ac603ee94b7adad9be52b8e",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.990309,
+          "assignment_margin": 0.064668
+        },
+        {
+          "material_id": "CMAT1:f82962bd33bb63cdd83b5aa9938b52fecbd7ad350f6ae64860007db304304bb5",
+          "condition_display": "Li2CO3 [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.989915,
+          "assignment_margin": 0.062812
+        },
+        {
+          "material_id": "CMAT1:5c6196921b631b27c4758a10ea146cf77e9cc14438d84413694d773e14e50d64",
+          "condition_display": "TMP [base]; AlphosPd)2cod [catalyst]; AlPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.989308,
+          "assignment_margin": 0.063264
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:1ddfcf4a4fda9e1422429971b6ad0f21d85c33c6fadf050a2390363fcca26d35",
+      "snapshot_cluster_label": 295,
+      "prototype_material_id": "CMAT1:56c83a63e1d7ab68af0d700a1735684d61dcfdc5ee604855207cc8f10c4eac4d",
+      "prototype_display": "KOtPent [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; Ph2O [solvent]",
+      "unique_material_count": 174,
+      "exact_recipe_id_count": 384,
+      "observation_count": 494,
+      "mean_yield_pct": 20.6439,
+      "yield_observation_count": 494,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.376518,
+      "time_coverage_rate": 0.376518,
+      "mean_centroid_similarity": 0.945193,
+      "p10_centroid_similarity": 0.907579,
+      "median_centroid_similarity": 0.94712,
+      "mean_assignment_margin": 0.058821,
+      "topology_purity": 0.94332,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "Brij 35, Octanoic acid",
+            "count": 6
+          },
+          {
+            "value": "1,2-dibromoethane, Brij 35",
+            "count": 2
+          },
+          {
+            "value": "AcOH",
+            "count": 2
+          },
+          {
+            "value": "AcOH, Brij 35",
+            "count": 2
+          },
+          {
+            "value": "Brij 35, Potassium 2-ethylhexanoate",
+            "count": 2
+          },
+          {
+            "value": "Octanoic acid",
+            "count": 2
+          },
+          {
+            "value": "LiCl",
+            "count": 1
+          }
+        ],
+        "base": [
+          {
+            "value": "NaOtBu",
+            "count": 98
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 86
+          },
+          {
+            "value": "KOtBu",
+            "count": 38
+          },
+          {
+            "value": "LiHMDS",
+            "count": 34
+          },
+          {
+            "value": "TMSOK",
+            "count": 32
+          },
+          {
+            "value": "K3PO4",
+            "count": 28
+          },
+          {
+            "value": "K2CO3",
+            "count": 25
+          },
+          {
+            "value": "KHMDS",
+            "count": 25
+          },
+          {
+            "value": "KOH",
+            "count": 15
+          },
+          {
+            "value": "DIPEA",
+            "count": 11
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "(DiMeIHept Cl) Pd(cinnamyl)Cl",
+            "count": 494
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "PyBrOP",
+            "count": 2
+          }
+        ],
+        "ligand": [
+          {
+            "value": "DiMeIHept Cl",
+            "count": 494
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 104
+          },
+          {
+            "value": "tAmOH",
+            "count": 87
+          },
+          {
+            "value": "Dioxane",
+            "count": 84
+          },
+          {
+            "value": "MeTHF",
+            "count": 40
+          },
+          {
+            "value": "MeCN",
+            "count": 36
+          },
+          {
+            "value": "THF",
+            "count": 27
+          },
+          {
+            "value": "anisole",
+            "count": 23
+          },
+          {
+            "value": "DMI",
+            "count": 13
+          },
+          {
+            "value": "DMAc",
+            "count": 10
+          },
+          {
+            "value": "DMSO",
+            "count": 10
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 306
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 67
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 53
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 33
+        },
+        {
+          "value": "Suzuki-Miyaura, in situ",
+          "count": 16
+        },
+        {
+          "value": "CH-Activation",
+          "count": 7
+        },
+        {
+          "value": "CS-Coupling",
+          "count": 6
+        },
+        {
+          "value": "Negishi",
+          "count": 6
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:56c83a63e1d7ab68af0d700a1735684d61dcfdc5ee604855207cc8f10c4eac4d",
+          "condition_display": "KOtPent [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; Ph2O [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.99687,
+          "assignment_margin": 0.064796
+        },
+        {
+          "material_id": "CMAT1:7229f6dc5b27274f65abeb676f1de8040df180c2107ad72838ff1ce2e78ce580",
+          "condition_display": "KOPiv [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; nBuOAc [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.996369,
+          "assignment_margin": 0.058191
+        },
+        {
+          "material_id": "CMAT1:c7a46c1a8a3e50dcd0216ad41da7b9939c22c71c4ef1e2e0337225650508c080",
+          "condition_display": "K2HPO4 [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.99624,
+          "assignment_margin": 0.061389
+        },
+        {
+          "material_id": "CMAT1:b0720cad2f0e145a1e94aba7e09bd130fae12539167886ba2c5d7f3b44b0b69b",
+          "condition_display": "KF [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.995488,
+          "assignment_margin": 0.051362
+        },
+        {
+          "material_id": "CMAT1:5e2c478c115351818d746f9894b78bfca861bc259ac8b4c9b608e50a3a6d7656",
+          "condition_display": "KOtBu [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994361,
+          "assignment_margin": 0.068644
+        },
+        {
+          "material_id": "CMAT1:6017af9f7a3b2647c1d9972a5a4b6a644468c8e8de73a701167e88a85419d145",
+          "condition_display": "KOtPent [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; CPME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.993994,
+          "assignment_margin": 0.067383
+        },
+        {
+          "material_id": "CMAT1:e8291011ace629eda1d543719f088caf8c9324d183f3248b3ad26643d40ed683",
+          "condition_display": "Sodium phenoxide [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; Propionitrile [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993628,
+          "assignment_margin": 0.051222
+        },
+        {
+          "material_id": "CMAT1:6d883747670beedcc9d1096f1c0036fa73b58e951e2e8740ef9bbe74a0edde44",
+          "condition_display": "LiHMDS [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; Ph2O [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993422,
+          "assignment_margin": 0.07457
+        },
+        {
+          "material_id": "CMAT1:f1087a1fe7969d2adb105ab95688318e801a0e9db1e8541d11c82f17ed1b279e",
+          "condition_display": "KHMDS [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993078,
+          "assignment_margin": 0.07467
+        },
+        {
+          "material_id": "CMAT1:fc25690a56ce4959e789fd20736fd5a73c0cf7b7baea1d648b057d7e91dc7015",
+          "condition_display": "LiHMDS [base]; (DiMeIHept Cl) Pd(cinnamyl)Cl [catalyst]; DiMeIHept Cl [ligand]; nBuOAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.993015,
+          "assignment_margin": 0.07335
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:26dbd3f1556df3b1b420605138035726c6a2b64a6e574640d24f3229c2f16b92",
+      "snapshot_cluster_label": 228,
+      "prototype_material_id": "CMAT1:7e5403ebbf73a7d2454990434098f178363815260b0fc1b804d93457b5dc4270",
+      "prototype_display": "KOtPent [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; Ph2O [solvent]",
+      "unique_material_count": 137,
+      "exact_recipe_id_count": 353,
+      "observation_count": 492,
+      "mean_yield_pct": 14.3796,
+      "yield_observation_count": 492,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.365854,
+      "time_coverage_rate": 0.365854,
+      "mean_centroid_similarity": 0.949956,
+      "p10_centroid_similarity": 0.916915,
+      "median_centroid_similarity": 0.954248,
+      "mean_assignment_margin": 0.048684,
+      "topology_purity": 0.95122,
+      "top_role_components": {
+        "additive": [
+          {
+            "value": "Octanoic acid",
+            "count": 3
+          },
+          {
+            "value": "CsF",
+            "count": 2
+          },
+          {
+            "value": "KOAc",
+            "count": 2
+          },
+          {
+            "value": "LiCl",
+            "count": 2
+          }
+        ],
+        "base": [
+          {
+            "value": "Cs2CO3",
+            "count": 152
+          },
+          {
+            "value": "KHMDS",
+            "count": 46
+          },
+          {
+            "value": "LiHMDS",
+            "count": 32
+          },
+          {
+            "value": "K3PO4",
+            "count": 30
+          },
+          {
+            "value": "KOH",
+            "count": 28
+          },
+          {
+            "value": "KOtBu",
+            "count": 28
+          },
+          {
+            "value": "TMSOK",
+            "count": 28
+          },
+          {
+            "value": "DBU",
+            "count": 26
+          },
+          {
+            "value": "K2CO3",
+            "count": 24
+          },
+          {
+            "value": "KOtPent",
+            "count": 13
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "BippyPhos Pd(allyl)OTf",
+            "count": 492
+          }
+        ],
+        "ligand": [
+          {
+            "value": "BippyPhos",
+            "count": 492
+          }
+        ],
+        "solvent": [
+          {
+            "value": "PhMe",
+            "count": 122
+          },
+          {
+            "value": "tAmOH",
+            "count": 115
+          },
+          {
+            "value": "Dioxane",
+            "count": 66
+          },
+          {
+            "value": "MeCN",
+            "count": 62
+          },
+          {
+            "value": "DMSO",
+            "count": 35
+          },
+          {
+            "value": "anisole",
+            "count": 21
+          },
+          {
+            "value": "DMI",
+            "count": 15
+          },
+          {
+            "value": "THF",
+            "count": 11
+          },
+          {
+            "value": "DMF",
+            "count": 8
+          },
+          {
+            "value": "CPME",
+            "count": 7
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 322
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 74
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 49
+        },
+        {
+          "value": "Stannylation",
+          "count": 18
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 17
+        },
+        {
+          "value": "Heck",
+          "count": 8
+        },
+        {
+          "value": "Negishi, in-situ",
+          "count": 3
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 1
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:7e5403ebbf73a7d2454990434098f178363815260b0fc1b804d93457b5dc4270",
+          "condition_display": "KOtPent [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; Ph2O [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.995799,
+          "assignment_margin": 0.053159
+        },
+        {
+          "material_id": "CMAT1:feae0d2fd9eed493d9f5ff6d306030c5676f4cedd0a434cb3a29f0609e3a16b1",
+          "condition_display": "KHMDS [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994623,
+          "assignment_margin": 0.057388
+        },
+        {
+          "material_id": "CMAT1:0b0f2d696562be4cd709c5640daa22ff652b356d1cbed822f2e2914302d98da2",
+          "condition_display": "TMG [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.994543,
+          "assignment_margin": 0.052594
+        },
+        {
+          "material_id": "CMAT1:a889335669570e3d0e685194b6ab273213786edbe7a404f035a8b506316c0bf6",
+          "condition_display": "KHMDS [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992372,
+          "assignment_margin": 0.053915
+        },
+        {
+          "material_id": "CMAT1:f76c0ac3cb91e00c795f48eb19b2a734dfd6cebf4abd6ae79d8a86e767c62a42",
+          "condition_display": "KOtPent [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; CPME [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.992367,
+          "assignment_margin": 0.047696
+        },
+        {
+          "material_id": "CMAT1:3873093e72de8ffca224027db8112e8fbbb93cc461c33a44b2e9e67d30bb055e",
+          "condition_display": "LiHMDS [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; nBuOAc [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.992013,
+          "assignment_margin": 0.054785
+        },
+        {
+          "material_id": "CMAT1:344e3cda719b79a363ef21a98de87fd7aaf5e0f9acab3b35915168ff4f10b335",
+          "condition_display": "KOtBu [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.99151,
+          "assignment_margin": 0.036126
+        },
+        {
+          "material_id": "CMAT1:fee36019e690e9cbb22660f8bcafd15e2dffb35a92868e195916168160f66e07",
+          "condition_display": "TMSOK [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; Ph2O [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.99012,
+          "assignment_margin": 0.045869
+        },
+        {
+          "material_id": "CMAT1:de69e07367d5dfaa7e1f6ab430d69d2a17290b5154bcf8dfdb2b84b68259131a",
+          "condition_display": "NMM [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.98997,
+          "assignment_margin": 0.05035
+        },
+        {
+          "material_id": "CMAT1:ef6fe35c430710b7ddfbffe79f7fcdf188c4d81b14cdbb38ca131d06bbee8515",
+          "condition_display": "TMSOK [base]; BippyPhos Pd(allyl)OTf [catalyst]; BippyPhos [ligand]; TBME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.988373,
+          "assignment_margin": 0.043875
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:706e29d9879b98739ccd1b0551da103f95d3580356bfcab56a47761467ac2a48",
+      "snapshot_cluster_label": 139,
+      "prototype_material_id": "CMAT1:048936a2ab36d562fbfd388b70c806ed56c3c01937164387024c406168ff545d",
+      "prototype_display": "BSTFA [additive]; HOSu [additive]; NMM [base]; DIC [coupling_reagent]; MeCN [solvent]; No ligand",
+      "unique_material_count": 199,
+      "exact_recipe_id_count": 311,
+      "observation_count": 488,
+      "mean_yield_pct": 48.1502,
+      "yield_observation_count": 488,
+      "condition_identity_uncertainty_rate": 0.495902,
+      "temperature_coverage_rate": 0.704918,
+      "time_coverage_rate": 0.704918,
+      "mean_centroid_similarity": 0.968412,
+      "p10_centroid_similarity": 0.916773,
+      "median_centroid_similarity": 0.984617,
+      "mean_assignment_margin": 0.065272,
+      "topology_purity": 0.612705,
+      "top_role_components": {
+        "absence:ligand": [
+          {
+            "value": "No ligand",
+            "count": 488
+          }
+        ],
+        "additive": [
+          {
+            "value": "HOPO",
+            "count": 270
+          },
+          {
+            "value": "HOSu",
+            "count": 56
+          },
+          {
+            "value": "BSTFA",
+            "count": 47
+          },
+          {
+            "value": "Imidazole",
+            "count": 32
+          },
+          {
+            "value": "BSA",
+            "count": 30
+          },
+          {
+            "value": "OxymaPure",
+            "count": 15
+          },
+          {
+            "value": "DMAP",
+            "count": 13
+          },
+          {
+            "value": "BSA, OxymaPure",
+            "count": 8
+          },
+          {
+            "value": "DMF",
+            "count": 7
+          },
+          {
+            "value": "BSTFA, OxymaPure",
+            "count": 5
+          }
+        ],
+        "base": [
+          {
+            "value": "NMM",
+            "count": 161
+          },
+          {
+            "value": "NMI",
+            "count": 73
+          },
+          {
+            "value": "NEt3",
+            "count": 47
+          },
+          {
+            "value": "DIPEA",
+            "count": 24
+          },
+          {
+            "value": "lutidine",
+            "count": 18
+          },
+          {
+            "value": "DBU",
+            "count": 13
+          },
+          {
+            "value": "pyridine",
+            "count": 8
+          },
+          {
+            "value": "K3PO4",
+            "count": 4
+          },
+          {
+            "value": "NMI, NMM",
+            "count": 4
+          },
+          {
+            "value": "DMAP",
+            "count": 3
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "DIC",
+            "count": 366
+          },
+          {
+            "value": "EDC",
+            "count": 49
+          },
+          {
+            "value": "T3P",
+            "count": 15
+          },
+          {
+            "value": "CDI",
+            "count": 14
+          },
+          {
+            "value": "CyanuricChloride",
+            "count": 11
+          },
+          {
+            "value": "COMU",
+            "count": 7
+          },
+          {
+            "value": "pyBOP",
+            "count": 7
+          },
+          {
+            "value": "PivCl",
+            "count": 6
+          },
+          {
+            "value": "PyClOP",
+            "count": 4
+          },
+          {
+            "value": "CDT",
+            "count": 3
+          }
+        ],
+        "solvent": [
+          {
+            "value": "MeCN",
+            "count": 488
+          },
+          {
+            "value": "iPrOAc",
+            "count": 25
+          },
+          {
+            "value": "PhMe",
+            "count": 14
+          },
+          {
+            "value": "EtOAc",
+            "count": 8
+          },
+          {
+            "value": "water",
+            "count": 8
+          },
+          {
+            "value": "xylenes",
+            "count": 6
+          },
+          {
+            "value": "THF",
+            "count": 5
+          },
+          {
+            "value": "MeTHF",
+            "count": 4
+          },
+          {
+            "value": "anisole",
+            "count": 4
+          },
+          {
+            "value": "cyclohexane",
+            "count": 4
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Amide coupling",
+          "count": 464
+        },
+        {
+          "value": "Condensation",
+          "count": 24
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:048936a2ab36d562fbfd388b70c806ed56c3c01937164387024c406168ff545d",
+          "condition_display": "BSTFA [additive]; HOSu [additive]; NMM [base]; DIC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.99825,
+          "assignment_margin": 0.114763
+        },
+        {
+          "material_id": "CMAT1:c01c2ac1bf2f07e7b13ed9bfca18acb399e562ad42833263ed5ecccc5582e90a",
+          "condition_display": "OxymaPure [additive]; NMM [base]; EDC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997751,
+          "assignment_margin": 0.110198
+        },
+        {
+          "material_id": "CMAT1:565709d01e02590a095d57b813b5ba5c0ea2ef564ebf576d6325a5b5f18fc019",
+          "condition_display": "HOSu [additive]; NMI, NMM [base]; EDC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997561,
+          "assignment_margin": 0.10759
+        },
+        {
+          "material_id": "CMAT1:49b8672bddaec0b945e95a819122dd0ce02f38ece7198aa23c0976dfe45d093d",
+          "condition_display": "BSTFA [additive]; HOSu [additive]; NMI [base]; DIC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997522,
+          "assignment_margin": 0.103193
+        },
+        {
+          "material_id": "CMAT1:aa794567b3100f85f8fb71d7dfd638a74293430bdedde4d429ac069e834afff4",
+          "condition_display": "HOPO [additive]; NMM [base]; PivCl [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997339,
+          "assignment_margin": 0.092952
+        },
+        {
+          "material_id": "CMAT1:f3314ff3231faf51e35935ec43acae58937d3d29d31276dd3765c05e45ad756d",
+          "condition_display": "HOPO [additive]; lutidine [base]; EDC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997328,
+          "assignment_margin": 0.095843
+        },
+        {
+          "material_id": "CMAT1:9614e33eaff3a4c203f5c2b123e2f11b796a0567c96fdef9bf3319ad3388a703",
+          "condition_display": "BSTFA [additive]; DMAP [additive]; NMM [base]; DIC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997218,
+          "assignment_margin": 0.106821
+        },
+        {
+          "material_id": "CMAT1:02a1797cac488eaa857e62cb4ea95f6f506226116a961601dd1acfa293ad98f3",
+          "condition_display": "BSTFA [additive]; DMAP [additive]; NMI [base]; DIC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997092,
+          "assignment_margin": 0.112683
+        },
+        {
+          "material_id": "CMAT1:b25997919608ef597ec5076a519172781100076b5253a8b71ea8bb15498cef68",
+          "condition_display": "HOSu [additive]; lutidine [base]; EDC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996987,
+          "assignment_margin": 0.111112
+        },
+        {
+          "material_id": "CMAT1:33324f3035635b0bdb46a65be72ff7c054ac24b9f5030962a044544939e7ab32",
+          "condition_display": "BSA, OxymaPure [additive]; NMM [base]; EDC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996805,
+          "assignment_margin": 0.108417
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:ae683d0f2f1e05a90c5a7ea1f6f4685b5b39a93e2a5caeac9760894a788a0c5b",
+      "snapshot_cluster_label": 282,
+      "prototype_material_id": "CMAT1:6dee5d70b52afc19be54baa8ead44412660a412e3e82d4e6f6756f7c0343c659",
+      "prototype_display": "Li2CO3 [base]; T3P [coupling_reagent]; acetone [solvent]; No ligand",
+      "unique_material_count": 332,
+      "exact_recipe_id_count": 431,
+      "observation_count": 488,
+      "mean_yield_pct": 22.7899,
+      "yield_observation_count": 488,
+      "condition_identity_uncertainty_rate": 0.598361,
+      "temperature_coverage_rate": 0.372951,
+      "time_coverage_rate": 0.372951,
+      "mean_centroid_similarity": 0.960828,
+      "p10_centroid_similarity": 0.907082,
+      "median_centroid_similarity": 0.979547,
+      "mean_assignment_margin": 0.049527,
+      "topology_purity": 1.0,
+      "top_role_components": {
+        "absence:ligand": [
+          {
+            "value": "No ligand",
+            "count": 488
+          }
+        ],
+        "base": [
+          {
+            "value": "NMI",
+            "count": 151
+          },
+          {
+            "value": "NMM",
+            "count": 118
+          },
+          {
+            "value": "NEt3",
+            "count": 31
+          },
+          {
+            "value": "KHMDS",
+            "count": 28
+          },
+          {
+            "value": "KOtPent",
+            "count": 28
+          },
+          {
+            "value": "DMAP",
+            "count": 20
+          },
+          {
+            "value": "lutidine",
+            "count": 17
+          },
+          {
+            "value": "NaOtPent",
+            "count": 16
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 12
+          },
+          {
+            "value": "TMG",
+            "count": 12
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "PyBrOP",
+            "count": 71
+          },
+          {
+            "value": "pyBOP",
+            "count": 59
+          },
+          {
+            "value": "T3P",
+            "count": 57
+          },
+          {
+            "value": "BOP-Cl",
+            "count": 40
+          },
+          {
+            "value": "CDI",
+            "count": 34
+          },
+          {
+            "value": "PivCl",
+            "count": 30
+          },
+          {
+            "value": "TCFH",
+            "count": 28
+          },
+          {
+            "value": "PyClOP",
+            "count": 25
+          },
+          {
+            "value": "CyanuricChloride",
+            "count": 23
+          },
+          {
+            "value": "COMU",
+            "count": 22
+          }
+        ],
+        "solvent": [
+          {
+            "value": "DCM",
+            "count": 91
+          },
+          {
+            "value": "DMF",
+            "count": 66
+          },
+          {
+            "value": "EtOAc",
+            "count": 52
+          },
+          {
+            "value": "tAmOH",
+            "count": 48
+          },
+          {
+            "value": "anisole",
+            "count": 46
+          },
+          {
+            "value": "acetone",
+            "count": 31
+          },
+          {
+            "value": "iPrOH",
+            "count": 27
+          },
+          {
+            "value": "DMAc",
+            "count": 25
+          },
+          {
+            "value": "TBME",
+            "count": 24
+          },
+          {
+            "value": "DMSO",
+            "count": 19
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Amide coupling",
+          "count": 314
+        },
+        {
+          "value": "Condensation",
+          "count": 71
+        },
+        {
+          "value": "SNAr",
+          "count": 41
+        },
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 35
+        },
+        {
+          "value": "Cyclization",
+          "count": 27
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:6dee5d70b52afc19be54baa8ead44412660a412e3e82d4e6f6756f7c0343c659",
+          "condition_display": "Li2CO3 [base]; T3P [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996788,
+          "assignment_margin": 0.04942
+        },
+        {
+          "material_id": "CMAT1:6cf195d61bbbcd68501d87429023835f31c2192333e81a8d7848462695037efb",
+          "condition_display": "Li2CO3 [base]; PivCl [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.9953,
+          "assignment_margin": 0.047811
+        },
+        {
+          "material_id": "CMAT1:56d9ef8e4f120df94dd8fb8ddcc192c66b377b0e1767e0807af7e567a32772f7",
+          "condition_display": "NMI [base]; MsCl [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994965,
+          "assignment_margin": 0.053025
+        },
+        {
+          "material_id": "CMAT1:8ef302f77eb05872f2d57943ad46788a327744f3c0a5a65fdfbe1d0c44f99bb2",
+          "condition_display": "NMI [base]; TCFH [coupling_reagent]; DCM [solvent]; No ligand",
+          "observation_count": 7,
+          "centroid_similarity": 0.994745,
+          "assignment_margin": 0.052791
+        },
+        {
+          "material_id": "CMAT1:bad67023395b8e0a8a52526e86bd784701500679d6404dc52df25db112f4f127",
+          "condition_display": "NMI [base]; HATU [coupling_reagent]; DCM [solvent]; No ligand",
+          "observation_count": 3,
+          "centroid_similarity": 0.994565,
+          "assignment_margin": 0.051743
+        },
+        {
+          "material_id": "CMAT1:160abd825d71a6b220fe6bf370aa01a9ff5a378b12733aba4443048f2566a991",
+          "condition_display": "NMI [base]; MukayamaReagent [coupling_reagent]; DCM [solvent]; No ligand",
+          "observation_count": 7,
+          "centroid_similarity": 0.994506,
+          "assignment_margin": 0.051044
+        },
+        {
+          "material_id": "CMAT1:e9d20ca8d7471a4446a8ba7cd75610a9f3c9b4aaa7738d63ccd9d540c7d56440",
+          "condition_display": "Li2CO3 [base]; MsCl [coupling_reagent]; acetone [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994476,
+          "assignment_margin": 0.05007
+        },
+        {
+          "material_id": "CMAT1:a23a5d1c9ac85066c4460b8927a2eb8e9ab3d53ff4a36c0d3666d7e07bd26fcd",
+          "condition_display": "NMI [base]; PivCl [coupling_reagent]; DCM [solvent]; No ligand",
+          "observation_count": 2,
+          "centroid_similarity": 0.994393,
+          "assignment_margin": 0.054375
+        },
+        {
+          "material_id": "CMAT1:85a11fc87365a3777f3e76e97eef2c86dad6a6ae7238f645659c8c059af30921",
+          "condition_display": "NMI [base]; CyanuricChloride [coupling_reagent]; DCM [solvent]; No ligand",
+          "observation_count": 4,
+          "centroid_similarity": 0.994348,
+          "assignment_margin": 0.051542
+        },
+        {
+          "material_id": "CMAT1:f8fd711a3e51f53adaf2f90362d9ddf9027db10e33f27c0e99cb56d0235eaf12",
+          "condition_display": "NMI [base]; BOP-Cl [coupling_reagent]; EtOAc [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.994332,
+          "assignment_margin": 0.051821
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:3f05406bfa64bbf62ce14915861bf5be803fed66538900ddb6226050ad4d118b",
+      "snapshot_cluster_label": 4,
+      "prototype_material_id": "CMAT1:af79fb035bb51d2d719577fd44a86e877d6855ad3da043c95809b38ad5704ad4",
+      "prototype_display": "NMI, NMM [base]; T3P [coupling_reagent]; MeCN [solvent]; No ligand",
+      "unique_material_count": 123,
+      "exact_recipe_id_count": 397,
+      "observation_count": 472,
+      "mean_yield_pct": 27.7727,
+      "yield_observation_count": 472,
+      "condition_identity_uncertainty_rate": 0.461864,
+      "temperature_coverage_rate": 0.472458,
+      "time_coverage_rate": 0.472458,
+      "mean_centroid_similarity": 0.979732,
+      "p10_centroid_similarity": 0.949585,
+      "median_centroid_similarity": 0.993008,
+      "mean_assignment_margin": 0.09199,
+      "topology_purity": 0.995763,
+      "top_role_components": {
+        "absence:ligand": [
+          {
+            "value": "No ligand",
+            "count": 472
+          }
+        ],
+        "base": [
+          {
+            "value": "NMI",
+            "count": 132
+          },
+          {
+            "value": "DIPEA",
+            "count": 106
+          },
+          {
+            "value": "NMM",
+            "count": 88
+          },
+          {
+            "value": "lutidine",
+            "count": 50
+          },
+          {
+            "value": "NEt3",
+            "count": 28
+          },
+          {
+            "value": "DMAP",
+            "count": 17
+          },
+          {
+            "value": "KOtPent",
+            "count": 8
+          },
+          {
+            "value": "NaOtPent",
+            "count": 8
+          },
+          {
+            "value": "K3PO4",
+            "count": 5
+          },
+          {
+            "value": "KF",
+            "count": 5
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "T3P",
+            "count": 70
+          },
+          {
+            "value": "CDI",
+            "count": 41
+          },
+          {
+            "value": "DIC",
+            "count": 38
+          },
+          {
+            "value": "BOP-Cl",
+            "count": 34
+          },
+          {
+            "value": "TCFH",
+            "count": 34
+          },
+          {
+            "value": "CyanuricChloride",
+            "count": 33
+          },
+          {
+            "value": "pyBOP",
+            "count": 33
+          },
+          {
+            "value": "PyBrOP",
+            "count": 28
+          },
+          {
+            "value": "PyClOP",
+            "count": 25
+          },
+          {
+            "value": "COMU",
+            "count": 24
+          }
+        ],
+        "solvent": [
+          {
+            "value": "MeCN",
+            "count": 472
+          },
+          {
+            "value": "DMF",
+            "count": 2
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Amide coupling",
+          "count": 439
+        },
+        {
+          "value": "Condensation",
+          "count": 28
+        },
+        {
+          "value": "SNAr",
+          "count": 5
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:af79fb035bb51d2d719577fd44a86e877d6855ad3da043c95809b38ad5704ad4",
+          "condition_display": "NMI, NMM [base]; T3P [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.997573,
+          "assignment_margin": 0.112908
+        },
+        {
+          "material_id": "CMAT1:76f1adc775801ecae9db8d43615ec52f34bd7867db890dc24db42fa0547d26fe",
+          "condition_display": "Imidazole [base]; T3P [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 2,
+          "centroid_similarity": 0.997473,
+          "assignment_margin": 0.109718
+        },
+        {
+          "material_id": "CMAT1:b16a43de899a2b402facb7aa20a5e314dd11b8b17f36622fa803a0e8e46792e5",
+          "condition_display": "lutidine [base]; EDC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996921,
+          "assignment_margin": 0.103375
+        },
+        {
+          "material_id": "CMAT1:524d7c03eaefd38a36e9eefc926d2399bc50b02a70374617be71c7e939331db8",
+          "condition_display": "Li2CO3 [base]; T3P [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996863,
+          "assignment_margin": 0.107138
+        },
+        {
+          "material_id": "CMAT1:cfaab0ef9ee23049cc4264ca2861ec9bf7e08cda38229a51cac7f30236c2b6da",
+          "condition_display": "TMG [base]; EDC [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996684,
+          "assignment_margin": 0.105634
+        },
+        {
+          "material_id": "CMAT1:c731af2ea61b186392899bc711c4718210bbc4b4374d854c16695982e789c056",
+          "condition_display": "DMAP [base]; T3P [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 3,
+          "centroid_similarity": 0.996588,
+          "assignment_margin": 0.105402
+        },
+        {
+          "material_id": "CMAT1:58ee58cbf16ecfb976e6450a82639ef576229da5608868f21637fc587184e0cd",
+          "condition_display": "NMI [base]; COMU [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 8,
+          "centroid_similarity": 0.996381,
+          "assignment_margin": 0.105561
+        },
+        {
+          "material_id": "CMAT1:56cdec33ec5167dfbe043a3f1cb840ae07a1d51249b38d976ddf067c6ea55be0",
+          "condition_display": "lutidine [base]; T3P [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 13,
+          "centroid_similarity": 0.996362,
+          "assignment_margin": 0.10908
+        },
+        {
+          "material_id": "CMAT1:213da466ded24eb796303a601cf69bd9aace1c13448949f170f26f3f77bdfb47",
+          "condition_display": "NMI, NMM [base]; CDI [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996221,
+          "assignment_margin": 0.114712
+        },
+        {
+          "material_id": "CMAT1:a91212d238d3729cd73452465c6121a37be275fb2ddf233d0c713ea13434a530",
+          "condition_display": "KF [base]; T3P [coupling_reagent]; MeCN [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.996206,
+          "assignment_margin": 0.109839
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:6710d1e5ff9c50fac49c17d9999345264b7a2e0c4d62a814181df81cf5c4f7f9",
+      "snapshot_cluster_label": 44,
+      "prototype_material_id": "CMAT1:b29ad95e76fb43ba80e82d081494f123532e6240aa36391f821b215acb08765b",
+      "prototype_display": "NaOtPent [base]; pyBOP [coupling_reagent]; THF [solvent]; No ligand",
+      "unique_material_count": 147,
+      "exact_recipe_id_count": 307,
+      "observation_count": 447,
+      "mean_yield_pct": 26.0595,
+      "yield_observation_count": 447,
+      "condition_identity_uncertainty_rate": 0.574944,
+      "temperature_coverage_rate": 0.422819,
+      "time_coverage_rate": 0.422819,
+      "mean_centroid_similarity": 0.979721,
+      "p10_centroid_similarity": 0.916304,
+      "median_centroid_similarity": 0.990262,
+      "mean_assignment_margin": 0.10726,
+      "topology_purity": 0.957494,
+      "top_role_components": {
+        "absence:ligand": [
+          {
+            "value": "No ligand",
+            "count": 447
+          }
+        ],
+        "base": [
+          {
+            "value": "DIPEA",
+            "count": 95
+          },
+          {
+            "value": "NMM",
+            "count": 46
+          },
+          {
+            "value": "NMI",
+            "count": 31
+          },
+          {
+            "value": "NEt3",
+            "count": 29
+          },
+          {
+            "value": "NaOtBu",
+            "count": 23
+          },
+          {
+            "value": "lutidine",
+            "count": 22
+          },
+          {
+            "value": "KHMDS",
+            "count": 20
+          },
+          {
+            "value": "KOtPent",
+            "count": 20
+          },
+          {
+            "value": "LiHMDS",
+            "count": 13
+          },
+          {
+            "value": "DBU, NEt3",
+            "count": 12
+          }
+        ],
+        "coupling_reagent": [
+          {
+            "value": "PivCl",
+            "count": 96
+          },
+          {
+            "value": "PyBrOP",
+            "count": 61
+          },
+          {
+            "value": "T3P",
+            "count": 49
+          },
+          {
+            "value": "pyBOP",
+            "count": 46
+          },
+          {
+            "value": "BOP-Cl",
+            "count": 20
+          },
+          {
+            "value": "COMU",
+            "count": 19
+          },
+          {
+            "value": "CDI",
+            "count": 17
+          },
+          {
+            "value": "CyanuricChloride",
+            "count": 16
+          },
+          {
+            "value": "PyClOP",
+            "count": 15
+          },
+          {
+            "value": "TCFH",
+            "count": 15
+          }
+        ],
+        "solvent": [
+          {
+            "value": "THF",
+            "count": 447
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Amide coupling",
+          "count": 305
+        },
+        {
+          "value": "Condensation",
+          "count": 108
+        },
+        {
+          "value": "SNAr",
+          "count": 26
+        },
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 8
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:b29ad95e76fb43ba80e82d081494f123532e6240aa36391f821b215acb08765b",
+          "condition_display": "NaOtPent [base]; pyBOP [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 8,
+          "centroid_similarity": 0.998512,
+          "assignment_margin": 0.138112
+        },
+        {
+          "material_id": "CMAT1:167ac5e9fd10b78b6fe29b4e2dd10af3115717fd4ea2e96c067fd450210587e7",
+          "condition_display": "DMAP, NEt3 [base]; PivCl [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 11,
+          "centroid_similarity": 0.998197,
+          "assignment_margin": 0.136693
+        },
+        {
+          "material_id": "CMAT1:fafbbd44e9a5fbdb14432291414ff6f474d9fa2d145d9a3e6b590f44ee6cf091",
+          "condition_display": "LiOtBu [base]; pyBOP [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 4,
+          "centroid_similarity": 0.998196,
+          "assignment_margin": 0.137694
+        },
+        {
+          "material_id": "CMAT1:b757770f680e265d13b8e8688f8f196fa11d655afbfe650f430d6958cfcac842",
+          "condition_display": "NEt3, NMI [base]; PivCl [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 11,
+          "centroid_similarity": 0.998111,
+          "assignment_margin": 0.137594
+        },
+        {
+          "material_id": "CMAT1:a8e31c4e211a80b06c961f89e66422045116ec88434e1f05ca95d3bcac5677c1",
+          "condition_display": "NEt3, NMM [base]; PivCl [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 11,
+          "centroid_similarity": 0.998111,
+          "assignment_margin": 0.137594
+        },
+        {
+          "material_id": "CMAT1:3c3ec7dc3a9140ac349d713759a34bd94f9ae15fa7c034f34456fe5348f99aca",
+          "condition_display": "DBU, NEt3 [base]; PivCl [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 11,
+          "centroid_similarity": 0.998111,
+          "assignment_margin": 0.137594
+        },
+        {
+          "material_id": "CMAT1:d6ad1e2e74db18ffac18e2315910029484059ee2fa93b5e134cf281aab527452",
+          "condition_display": "DIPEA, NEt3 [base]; PivCl [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 11,
+          "centroid_similarity": 0.998111,
+          "assignment_margin": 0.137594
+        },
+        {
+          "material_id": "CMAT1:fd69df2949a2eb0b3a203571fa0791d39c00a5e8240473c7685d117372b7abef",
+          "condition_display": "lutidine, NEt3 [base]; PivCl [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 11,
+          "centroid_similarity": 0.998111,
+          "assignment_margin": 0.137594
+        },
+        {
+          "material_id": "CMAT1:89c4f4b12701ab31ee8ef36d43855d7d00ba66e2d4e470900b65535069b4bcd0",
+          "condition_display": "NEt3, pyridine [base]; PivCl [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 11,
+          "centroid_similarity": 0.998101,
+          "assignment_margin": 0.135433
+        },
+        {
+          "material_id": "CMAT1:5dbd76fde80687256e014b2f86fe83be5b70ff60784989c5eae35753d8f0502b",
+          "condition_display": "DMAP, NEt3 [base]; CDT [coupling_reagent]; THF [solvent]; No ligand",
+          "observation_count": 1,
+          "centroid_similarity": 0.998007,
+          "assignment_margin": 0.138744
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:e5adf913b0f1c9a75358706dce540cabdfc8b71eeec6dca7159242cc4bcfca71",
+      "snapshot_cluster_label": 250,
+      "prototype_material_id": "CMAT1:67be5bd47bbbceaebf705faff503ec423297a2b000c93da734c23c28b49fbaf5",
+      "prototype_display": "NaOH [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; iPrOH [solvent]; water [solvent]",
+      "unique_material_count": 83,
+      "exact_recipe_id_count": 342,
+      "observation_count": 447,
+      "mean_yield_pct": 22.1859,
+      "yield_observation_count": 447,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.328859,
+      "time_coverage_rate": 0.328859,
+      "mean_centroid_similarity": 0.913904,
+      "p10_centroid_similarity": 0.856833,
+      "median_centroid_similarity": 0.906317,
+      "mean_assignment_margin": 0.089458,
+      "topology_purity": 0.986577,
+      "top_role_components": {
+        "base": [
+          {
+            "value": "K3PO4",
+            "count": 249
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 63
+          },
+          {
+            "value": "Na2CO3",
+            "count": 55
+          },
+          {
+            "value": "KOH",
+            "count": 50
+          },
+          {
+            "value": "NaHCO3",
+            "count": 26
+          },
+          {
+            "value": "NaOH",
+            "count": 3
+          },
+          {
+            "value": "KOPiv",
+            "count": 1
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "XantPhos Pd(allyl)Cl",
+            "count": 447
+          }
+        ],
+        "ligand": [
+          {
+            "value": "XantPhos",
+            "count": 447
+          }
+        ],
+        "solvent": [
+          {
+            "value": "water",
+            "count": 446
+          },
+          {
+            "value": "tAmOH",
+            "count": 94
+          },
+          {
+            "value": "PhMe",
+            "count": 66
+          },
+          {
+            "value": "MeCN",
+            "count": 59
+          },
+          {
+            "value": "Dioxane",
+            "count": 53
+          },
+          {
+            "value": "THF",
+            "count": 29
+          },
+          {
+            "value": "MeTHF",
+            "count": 24
+          },
+          {
+            "value": "EtOH",
+            "count": 20
+          },
+          {
+            "value": "iPrOAc",
+            "count": 20
+          },
+          {
+            "value": "MeOH",
+            "count": 13
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 221
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 198
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 22
+        },
+        {
+          "value": "CH-Activation",
+          "count": 5
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 1
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:67be5bd47bbbceaebf705faff503ec423297a2b000c93da734c23c28b49fbaf5",
+          "condition_display": "NaOH [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; iPrOH [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.980969,
+          "assignment_margin": 0.063821
+        },
+        {
+          "material_id": "CMAT1:ab87764b1e2ebf49d0035a78d5d7a0bbbc04aca0340c25651a2db7bff891c5ce",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; water [solvent]; xylenes [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.97978,
+          "assignment_margin": 0.120071
+        },
+        {
+          "material_id": "CMAT1:376d290e8b30c3724c5f32fc0a1f655637f637a1c3c533a0f64243bb632076b4",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; PrOH [solvent]; water [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.978242,
+          "assignment_margin": 0.124568
+        },
+        {
+          "material_id": "CMAT1:5295b059a242bf4116b5824038fb61316cdc94a9b8fa0684659664968c08a13e",
+          "condition_display": "NaHCO3 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; TBME [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.977988,
+          "assignment_margin": 0.087638
+        },
+        {
+          "material_id": "CMAT1:a31d058c7b4006ca38289b9c00ca03c7d2ce5e67c9d0f855693e8b0ea9a72db2",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; TBME [solvent]; water [solvent]",
+          "observation_count": 4,
+          "centroid_similarity": 0.977712,
+          "assignment_margin": 0.12557
+        },
+        {
+          "material_id": "CMAT1:283d489aa14a045742126282026db264f93baad34b4ce4aaf85c38e4e7f1e0cb",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; TPGS-750M [solvent]; water [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.977495,
+          "assignment_margin": 0.122352
+        },
+        {
+          "material_id": "CMAT1:26832a146035957c5c3eb2d5c11c7aa5730cdcca0656ff3134e361daa34dcedc",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; nBuOAc [solvent]; water [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.976673,
+          "assignment_margin": 0.11526
+        },
+        {
+          "material_id": "CMAT1:9183101010814ddfa70dc88137d4fc78269285f5f11d53d5a6bae1c24db022db",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; o-Xylene [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.975876,
+          "assignment_margin": 0.118549
+        },
+        {
+          "material_id": "CMAT1:97613484357dc16dc623bf759d3c072c41db82a739d2241fe3b2775f1b4bf442",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; MeOH [solvent]; water [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.975442,
+          "assignment_margin": 0.118684
+        },
+        {
+          "material_id": "CMAT1:9d09a0121f9dc9217d5fc10fc97c0bb272f59a44c3f4e44b956141e0928acf5f",
+          "condition_display": "K3PO4 [base]; XantPhos Pd(allyl)Cl [catalyst]; XantPhos [ligand]; ethylene glycol [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.975176,
+          "assignment_margin": 0.125067
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:c1f795b902e6aba4050a4b470efaecca4fe8c43ff1e6511d5603953e9d9fe183",
+      "snapshot_cluster_label": 248,
+      "prototype_material_id": "CMAT1:5bb33bb022c202115536f4500826395a85521a87bb78520ab7e5c455a41ad25d",
+      "prototype_display": "K2HPO4 [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; TPGS-750M [solvent]",
+      "unique_material_count": 124,
+      "exact_recipe_id_count": 243,
+      "observation_count": 443,
+      "mean_yield_pct": 33.6262,
+      "yield_observation_count": 443,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.23702,
+      "time_coverage_rate": 0.23702,
+      "mean_centroid_similarity": 0.893984,
+      "p10_centroid_similarity": 0.819542,
+      "median_centroid_similarity": 0.896481,
+      "mean_assignment_margin": 0.096784,
+      "topology_purity": 0.772009,
+      "top_role_components": {
+        "base": [
+          {
+            "value": "NEt3",
+            "count": 192
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 51
+          },
+          {
+            "value": "DBU",
+            "count": 28
+          },
+          {
+            "value": "TMSOK",
+            "count": 26
+          },
+          {
+            "value": "K3PO4",
+            "count": 21
+          },
+          {
+            "value": "NaOtBu",
+            "count": 19
+          },
+          {
+            "value": "KOH",
+            "count": 16
+          },
+          {
+            "value": "DIPEA",
+            "count": 9
+          },
+          {
+            "value": "LiHMDS",
+            "count": 6
+          },
+          {
+            "value": "TMP",
+            "count": 5
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "AdBrettPhosPd G6 Br",
+            "count": 443
+          }
+        ],
+        "ligand": [
+          {
+            "value": "Ad-BrettPhos",
+            "count": 443
+          }
+        ],
+        "solvent": [
+          {
+            "value": "DMSO",
+            "count": 168
+          },
+          {
+            "value": "EtOH",
+            "count": 137
+          },
+          {
+            "value": "tAmOH",
+            "count": 48
+          },
+          {
+            "value": "PhMe",
+            "count": 23
+          },
+          {
+            "value": "anisole",
+            "count": 22
+          },
+          {
+            "value": "Dioxane",
+            "count": 20
+          },
+          {
+            "value": "DMI",
+            "count": 13
+          },
+          {
+            "value": "MeCN",
+            "count": 13
+          },
+          {
+            "value": "iPrOH",
+            "count": 12
+          },
+          {
+            "value": "water",
+            "count": 9
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 263
+        },
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 131
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 32
+        },
+        {
+          "value": "CH-Activation",
+          "count": 5
+        },
+        {
+          "value": "Heck",
+          "count": 5
+        },
+        {
+          "value": "CO-Coupling",
+          "count": 4
+        },
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 3
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:5bb33bb022c202115536f4500826395a85521a87bb78520ab7e5c455a41ad25d",
+          "condition_display": "K2HPO4 [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; TPGS-750M [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.986682,
+          "assignment_margin": 0.096311
+        },
+        {
+          "material_id": "CMAT1:da19b48c865f0b21fe10052acb1003d8f34d4136499af9714be9af795873cf44",
+          "condition_display": "TMP [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.986129,
+          "assignment_margin": 0.075931
+        },
+        {
+          "material_id": "CMAT1:74a7d3c8bfaba5401cec54c08e8972a2bab0248cd5ffda9df91713a31fa4d0be",
+          "condition_display": "NEt3 [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; PrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.985903,
+          "assignment_margin": 0.099797
+        },
+        {
+          "material_id": "CMAT1:0cc9ca4c9d36f6e60388522ac1eb80a5ee256f9f8a636076dff62d8a45db2510",
+          "condition_display": "NEt3 [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; ethylene glycol [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.985582,
+          "assignment_margin": 0.099316
+        },
+        {
+          "material_id": "CMAT1:fd11247f916b7532e691dbc90b572aba610950f2d4f236bd9842bd3dc2a4821e",
+          "condition_display": "Li2CO3 [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.985193,
+          "assignment_margin": 0.076056
+        },
+        {
+          "material_id": "CMAT1:bf7f2328cd496b90dfef9139ceee7be152c05fd8786389f884a4a3984038b5a7",
+          "condition_display": "NEt3 [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; CPME [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.98406,
+          "assignment_margin": 0.103532
+        },
+        {
+          "material_id": "CMAT1:d8090327752455fa74c1098f1a2f9fc9d7e13f250b32bae85bafde2c983caff6",
+          "condition_display": "Potassium 2-ethylhexanoate [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; iPrOH [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.982892,
+          "assignment_margin": 0.064182
+        },
+        {
+          "material_id": "CMAT1:8ab1a7364e0ae0efe04599843487ceca49278544bcafbb745656d471c8252a78",
+          "condition_display": "NEt3 [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; Propionitrile [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.982193,
+          "assignment_margin": 0.101218
+        },
+        {
+          "material_id": "CMAT1:1fe986acf46c684f7e99a4e56537733457b427b1724a599c0687ae3118d9649a",
+          "condition_display": "TMSOK [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; propylene carbonate [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.9798,
+          "assignment_margin": 0.099772
+        },
+        {
+          "material_id": "CMAT1:656c7ee888685bcaaec9559281310e263c4a033eb295b7a97c8c0bada96b4915",
+          "condition_display": "TMSOK [base]; AdBrettPhosPd G6 Br [catalyst]; Ad-BrettPhos [ligand]; HFIP [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.979525,
+          "assignment_margin": 0.100309
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "definition_version": "condition_grouping_poc.v1",
+      "condition_group_id": "CGPOC1:943fca0451c24dc75c214d7c822812357ae9dd21dbeeb542e5c40343e12f2d5d",
+      "snapshot_cluster_label": 335,
+      "prototype_material_id": "CMAT1:7b77eae13d9a5531de577c4f43390afae2f1f407e1fe405f232389fad1096c00",
+      "prototype_display": "NaHCO3 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; TBME [solvent]; water [solvent]",
+      "unique_material_count": 93,
+      "exact_recipe_id_count": 337,
+      "observation_count": 442,
+      "mean_yield_pct": 34.0155,
+      "yield_observation_count": 442,
+      "condition_identity_uncertainty_rate": 1.0,
+      "temperature_coverage_rate": 0.31448,
+      "time_coverage_rate": 0.31448,
+      "mean_centroid_similarity": 0.913956,
+      "p10_centroid_similarity": 0.864326,
+      "median_centroid_similarity": 0.913653,
+      "mean_assignment_margin": 0.075764,
+      "topology_purity": 0.968326,
+      "top_role_components": {
+        "base": [
+          {
+            "value": "K3PO4",
+            "count": 175
+          },
+          {
+            "value": "Cs2CO3",
+            "count": 78
+          },
+          {
+            "value": "Na2CO3",
+            "count": 71
+          },
+          {
+            "value": "K2CO3",
+            "count": 55
+          },
+          {
+            "value": "KOH",
+            "count": 31
+          },
+          {
+            "value": "NaHCO3",
+            "count": 30
+          },
+          {
+            "value": "CsF",
+            "count": 1
+          },
+          {
+            "value": "KF",
+            "count": 1
+          }
+        ],
+        "catalyst": [
+          {
+            "value": "SPhos Pd(crotyl)Cl",
+            "count": 437
+          },
+          {
+            "value": "SPhos Pd(allyl)OTf",
+            "count": 5
+          }
+        ],
+        "ligand": [
+          {
+            "value": "SPhos",
+            "count": 442
+          }
+        ],
+        "solvent": [
+          {
+            "value": "water",
+            "count": 439
+          },
+          {
+            "value": "Dioxane",
+            "count": 81
+          },
+          {
+            "value": "PhMe",
+            "count": 77
+          },
+          {
+            "value": "CPME",
+            "count": 50
+          },
+          {
+            "value": "MeCN",
+            "count": 47
+          },
+          {
+            "value": "EtOH",
+            "count": 41
+          },
+          {
+            "value": "iPrOAc",
+            "count": 35
+          },
+          {
+            "value": "MeTHF",
+            "count": 27
+          },
+          {
+            "value": "MeOH",
+            "count": 24
+          },
+          {
+            "value": "Brij 35",
+            "count": 17
+          }
+        ]
+      },
+      "top_reaction_types": [
+        {
+          "value": "Suzuki-Miyaura",
+          "count": 323
+        },
+        {
+          "value": "Arylation, acidic C-H",
+          "count": 68
+        },
+        {
+          "value": "Buchwald-Hartwig",
+          "count": 50
+        },
+        {
+          "value": "CN-Coupling",
+          "count": 1
+        }
+      ],
+      "representatives": [
+        {
+          "material_id": "CMAT1:7b77eae13d9a5531de577c4f43390afae2f1f407e1fe405f232389fad1096c00",
+          "condition_display": "NaHCO3 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; TBME [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.981634,
+          "assignment_margin": 0.101192
+        },
+        {
+          "material_id": "CMAT1:bdf4b568ec9537fbf9ef8f427eedaf9c53a066e971b936e2504c3dfbeead3c91",
+          "condition_display": "NaHCO3 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; MeOH [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.98082,
+          "assignment_margin": 0.110463
+        },
+        {
+          "material_id": "CMAT1:97872bb9f034b40e1a5b84c356475c244664faff616c77f605828663517f3eee",
+          "condition_display": "NaHCO3 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; Brij 35 [solvent]; water [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.97716,
+          "assignment_margin": 0.086097
+        },
+        {
+          "material_id": "CMAT1:88547dc42b9650d03e99f831a6b5c5d349eb243227e34770d1b27d049c8fa674",
+          "condition_display": "NaHCO3 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; EtOH [solvent]; water [solvent]",
+          "observation_count": 3,
+          "centroid_similarity": 0.9713,
+          "assignment_margin": 0.114926
+        },
+        {
+          "material_id": "CMAT1:4be10e3c0a3b6721e77781c3eb27ce75f5f70f89ee6c798866befb814909736e",
+          "condition_display": "KOH [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; EtOH [solvent]; water [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.967594,
+          "assignment_margin": 0.108796
+        },
+        {
+          "material_id": "CMAT1:f85dd2a156413523e9af8e474f1dcad6dcbba4eab64af0f9623041ec218b9c84",
+          "condition_display": "K3PO4 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; MeOH [solvent]; water [solvent]",
+          "observation_count": 5,
+          "centroid_similarity": 0.966167,
+          "assignment_margin": 0.10779
+        },
+        {
+          "material_id": "CMAT1:a61d47ae163852c3b3d8e06cc48a7086a243dcd3006a7457d3c632bf6c4f522b",
+          "condition_display": "K3PO4 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; PrOH [solvent]; water [solvent]",
+          "observation_count": 5,
+          "centroid_similarity": 0.965076,
+          "assignment_margin": 0.101374
+        },
+        {
+          "material_id": "CMAT1:30395a93a202591943738d5a676f57922490d244c66718a0e9341b90e68ae392",
+          "condition_display": "K3PO4 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; TPGS-750M [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.964106,
+          "assignment_margin": 0.093436
+        },
+        {
+          "material_id": "CMAT1:38274333ad7e04efa93eb174296add30d34f9c0bd378ef3f184c39799076ba55",
+          "condition_display": "K3PO4 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; nBuOAc [solvent]; water [solvent]",
+          "observation_count": 2,
+          "centroid_similarity": 0.963757,
+          "assignment_margin": 0.098297
+        },
+        {
+          "material_id": "CMAT1:ea7115404aadf20f9a876e39e06c1b9b10771e882a4c6dac563181622fae13b6",
+          "condition_display": "K3PO4 [base]; SPhos Pd(crotyl)Cl [catalyst]; SPhos [ligand]; TBME [solvent]; water [solvent]",
+          "observation_count": 1,
+          "centroid_similarity": 0.963292,
+          "assignment_margin": 0.098318
+        }
+      ],
+      "warnings": [
+        "EXPERIMENTAL_SNAPSHOT_BOUND_GROUP_ID",
+        "STATISTICAL_GROUP_NOT_INTERCHANGEABILITY_CLAIM"
+      ]
+    }
+  ],
+  "warnings": [
+    "POC_ONLY_NOT_PRODUCTION_CONDITION_IDENTITY",
+    "GROUP_IDS_CHANGE_WHEN_DATA_OR_MODEL_SETTINGS_CHANGE",
+    "WEAK_LABEL_SOURCE_COMPONENT_ROLES_NOT_INDEPENDENTLY_VALIDATED"
+  ],
+  "artifacts": {
+    "groups": "condition_groups.jsonl",
+    "assignments": "condition_group_assignments.csv",
+    "model": "condition_grouping_model.joblib",
+    "model_sha256": "051348c328ac04657e33b56d1c65ee17c304c5c768cc94466fcae38cbcbb5081"
+  }
+}
