@@ -19,6 +19,7 @@ from .sharded import (
     ShardedConversionProgress,
     convert_datasets_sharded,
 )
+from .input_schema import ConversionDatasetInput
 
 RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "1.1"
 
@@ -55,18 +56,30 @@ def _artifact_entry(path: Path, root: Path) -> Dict[str, Any]:
     }
 
 
-def _validate_paths(dataset_path: Path, output_dir: Path) -> None:
-    source = dataset_path.resolve()
+def _selected_paths(dataset_path: ConversionDatasetInput) -> tuple[Path, ...]:
+    if isinstance(dataset_path, (str, Path)):
+        return (Path(dataset_path),)
+    return tuple(Path(value) for value in dataset_path)
+
+
+def _validate_paths(
+    dataset_path: ConversionDatasetInput,
+    output_dir: Path,
+) -> None:
     destination = output_dir.resolve()
-    if source.is_dir() and (destination == source or source in destination.parents):
-        raise ValueError(
-            "Output folder must be outside the source dataset folder so "
-            "generated CSV files are not discovered as source data."
-        )
+    for selected in _selected_paths(dataset_path):
+        source = selected.resolve()
+        if source.is_dir() and (
+            destination == source or source in destination.parents
+        ):
+            raise ValueError(
+                "Output folder must be outside the source folder(s) so "
+                "generated CSV files are not discovered as source data."
+            )
 
 
 def build_recommendation_artifacts(
-    dataset_path: str | Path,
+    dataset_path: ConversionDatasetInput,
     output_dir: str | Path,
     *,
     shard_size: int = 1_000,
@@ -85,9 +98,9 @@ def build_recommendation_artifacts(
     contains only retrieval-eligible fields and lookup maps, while the CSV is a
     concise review projection and is never used as recommendation input.
     """
-    source = Path(dataset_path)
     destination = Path(output_dir)
-    _validate_paths(source, destination)
+    selected_paths = _selected_paths(dataset_path)
+    _validate_paths(selected_paths, destination)
     destination.mkdir(parents=True, exist_ok=True)
 
     latest_source_file_count = 0
@@ -129,7 +142,7 @@ def build_recommendation_artifacts(
     effective_workers = 1 if use_rxnmapper else workers
     try:
         conversion_report = convert_datasets_sharded(
-            source,
+            selected_paths,
             destination,
             shard_size=shard_size,
             mode="full",
@@ -267,7 +280,10 @@ def build_recommendation_artifacts(
     report: Dict[str, Any] = {
         "schema_version": RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION,
         "artifact_type": "recommendation_artifact_build",
-        "source_path": str(source.resolve()),
+        "source_path": (
+            str(selected_paths[0].resolve()) if len(selected_paths) == 1 else None
+        ),
+        "source_paths": [str(path.resolve()) for path in selected_paths],
         "output_dir": str(destination.resolve()),
         "settings": {
             "shard_size": shard_size,

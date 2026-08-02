@@ -174,3 +174,6 @@ data/kmn_index/
 
 # Claude Code temporary working directories
 tmpclaude-*
+
+# Generated and local recommendation datasets
+/datasets/

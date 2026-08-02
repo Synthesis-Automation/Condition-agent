@@ -19,6 +19,7 @@ from condition_recommender.conversion.generic import (
 )
 from condition_recommender.conversion.input_schema import (
     adapt_row,
+    discover_conversion_datasets,
     discover_csv_datasets,
 )
 from condition_recommender.conversion.sharded import (
@@ -337,7 +338,7 @@ def test_ambiguous_edit_hypotheses_are_serialized_but_not_indexed() -> None:
 
     review = concise_reaction_review_row(record.to_dict())
     assert review["edit_hypothesis_count"] == "2"
-    assert review["edit_hypothesis_ids"].count("REH1:") == 2
+    assert "edit_hypothesis_ids" not in review
 
 
 def test_ambiguous_record_serializes_ineligible_fallback_descriptor() -> None:
@@ -415,6 +416,7 @@ def test_multi_atom_product_origin_gap_is_serialized_for_review() -> None:
     fragment = partial["installed_fragment"]
     assert fragment["canonical_fragment_smiles"] == "C#N"
     assert fragment["rooted_fragment_smiles"] == "*C#N"
+    assert fragment["fragment_key"].startswith("PFG1:")
     assert fragment["source_status"] == "unresolved"
     assert fragment["source_candidates"] == ()
     provenance = partial["product_atom_provenance"]
@@ -428,7 +430,7 @@ def test_multi_atom_product_origin_gap_is_serialized_for_review() -> None:
     review = concise_reaction_review_row(record.to_dict())
     assert review["removed_fragment"] == "Br"
     assert review["installed_fragment"] == "C#N"
-    assert review["installed_fragment_key"].startswith("PFG1:")
+    assert "installed_fragment_key" not in review
     assert review["fragment_source_status"] == "unresolved"
     assert review["fragment_source_candidates"] == ""
     assert review["missing_product_atom_elements"] == "C; N"
@@ -654,7 +656,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "9.2"
+    assert report["schema_version"] == "10.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
@@ -702,9 +704,18 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["transformation_class"] == (
         "generic_graph_transformation"
     )
-    assert review_rows[0]["fallback_descriptor_id"].startswith("RFD3:")
     assert review_rows[0]["fallback_retrieval_eligible"] == "True"
-    assert review_rows[0]["signature_id"].startswith("RS3:")
+    assert not {
+        "signature_id",
+        "reaction_core_id",
+        "reaction_core_shape_key",
+        "reaction_core_mapping_equivalence_key",
+        "fallback_descriptor_id",
+        "external_mapping_matched_hypotheses",
+        "edit_hypothesis_ids",
+        "installed_fragment_key",
+        "partial_transformation_key",
+    }.intersection(CONCISE_REACTION_REVIEW_FIELDS)
     assert review_rows[0]["evidence_quality"] == "global_atom_correspondence"
     assert review_rows[0]["reaction_completeness_status"] == "verified"
     assert review_rows[0]["reaction_core_status"] == "available_inferred"
@@ -926,6 +937,23 @@ def test_recursive_dataset_folder_converts_to_one_concise_review_csv(
         assert len(list(csv.DictReader(handle))) == 2
     assert progress[0].phase == "discovered"
     assert progress[-1].phase == "completed"
+
+
+def test_conversion_input_discovery_accepts_files_and_folders_without_duplicates(
+    tmp_path: Path,
+) -> None:
+    folder = tmp_path / "folder"
+    folder.mkdir()
+    first = folder / "first.csv"
+    second = folder / "second.observations.jsonl.gz"
+    ignored = folder / "notes.txt"
+    first.write_text("reaction_smiles\n", encoding="utf-8")
+    second.write_bytes(b"")
+    ignored.write_text("not a dataset", encoding="utf-8")
+
+    discovered = discover_conversion_datasets((first, folder, ignored))
+
+    assert discovered == (first, second)
 
 
 def test_recursive_concise_review_cancellation_removes_temporary_file(

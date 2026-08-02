@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -42,7 +42,7 @@ class ReviewConversionWorker(QtCore.QObject):
 
     def __init__(
         self,
-        source_folder: str,
+        source_inputs: str | Iterable[str],
         output_folder: str,
         *,
         shard_size: int = 1_000,
@@ -51,7 +51,9 @@ class ReviewConversionWorker(QtCore.QObject):
         use_rxnmapper: bool = True,
     ) -> None:
         super().__init__()
-        self.source_folder = source_folder
+        self.source_inputs = (
+            source_inputs if isinstance(source_inputs, str) else tuple(source_inputs)
+        )
         self.output_folder = output_folder
         self.shard_size = shard_size
         self.workers = workers
@@ -68,7 +70,7 @@ class ReviewConversionWorker(QtCore.QObject):
         """Build artifacts and emit a terminal result."""
         try:
             report = build_recommendation_artifacts(
-                self.source_folder,
+                self.source_inputs,
                 self.output_folder,
                 shard_size=self.shard_size,
                 workers=self.workers,
@@ -99,18 +101,19 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self._completed_output: Optional[Path] = None
 
         cpu_count = max(1, os.cpu_count() or 1)
-        self.source_edit = QtWidgets.QLineEdit()
-        self.source_edit.setObjectName("sourceFolder")
-        self.source_edit.setPlaceholderText(
-            "Folder containing raw CSVs or preprocessed observations"
+        self.source_list = QtWidgets.QListWidget()
+        self.source_list.setObjectName("sourceInputs")
+        self.source_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection
         )
+        self.source_list.setAlternatingRowColors(True)
         self.output_edit = QtWidgets.QLineEdit()
         self.output_edit.setObjectName("outputFolder")
         self.output_edit.setPlaceholderText(
             "Folder for canonical data, review CSV, and index"
         )
         self.output_edit.setText(self._automatic_output)
-        self.source_summary = QtWidgets.QLabel("No source folder selected.")
+        self.source_summary = QtWidgets.QLabel("No source files or folders selected.")
         self.source_summary.setWordWrap(True)
 
         self.shard_size_spin = QtWidgets.QSpinBox()
@@ -190,7 +193,6 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         )
 
         self._build_layout()
-        self.source_edit.editingFinished.connect(self.refresh_source_summary)
         self.start_button.clicked.connect(self.start_conversion)
         self.cancel_button.clicked.connect(self.cancel_conversion)
         self.open_button.clicked.connect(self.open_output_folder)
@@ -204,8 +206,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         title.setStyleSheet("font-size: 20px; font-weight: 600;")
         layout.addWidget(title)
         description = QtWidgets.QLabel(
-            "Convert every raw CSV or preprocessed observation file in a folder "
-            "tree once, then produce "
+            "Convert selected raw CSV or preprocessed observation files, or "
+            "every supported file in selected folder trees, then produce "
             "compressed recommendation data and a concise review CSV from the "
             "same canonical records. Interrupted conversions can reuse "
             "completed shards."
@@ -213,16 +215,32 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         description.setWordWrap(True)
         layout.addWidget(description)
 
+        source_buttons = QtWidgets.QHBoxLayout()
+        add_files_button = QtWidgets.QPushButton("Add Files…")
+        add_files_button.setObjectName("addSourceFilesButton")
+        add_files_button.clicked.connect(self.choose_source_files)
+        add_folder_button = QtWidgets.QPushButton("Add Folder…")
+        add_folder_button.setObjectName("addSourceFolderButton")
+        add_folder_button.clicked.connect(self.choose_source_folder)
+        remove_button = QtWidgets.QPushButton("Remove Selected")
+        remove_button.setObjectName("removeSourceInputsButton")
+        remove_button.clicked.connect(self.remove_selected_inputs)
+        clear_button = QtWidgets.QPushButton("Clear")
+        clear_button.setObjectName("clearSourceInputsButton")
+        clear_button.clicked.connect(self.clear_source_inputs)
+        source_buttons.addWidget(add_files_button)
+        source_buttons.addWidget(add_folder_button)
+        source_buttons.addWidget(remove_button)
+        source_buttons.addWidget(clear_button)
+        source_buttons.addStretch()
+        layout.addLayout(source_buttons)
+        layout.addWidget(self.source_list, stretch=1)
+        layout.addWidget(self.source_summary)
+
         form = QtWidgets.QFormLayout()
         form.setFieldGrowthPolicy(
             QtWidgets.QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow
         )
-        source_row = QtWidgets.QHBoxLayout()
-        source_row.addWidget(self.source_edit)
-        source_button = QtWidgets.QPushButton("Browse…")
-        source_button.clicked.connect(self.choose_source_folder)
-        source_row.addWidget(source_button)
-        form.addRow("Dataset folder:", source_row)
 
         output_row = QtWidgets.QHBoxLayout()
         output_row.addWidget(self.output_edit)
@@ -242,7 +260,6 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         form.addRow("", self.use_rxnmapper_check)
         form.addRow("", self.build_index_check)
         layout.addLayout(form)
-        layout.addWidget(self.source_summary)
 
         outputs = QtWidgets.QLabel(
             "Outputs: shard_manifest.json + compressed shards (canonical "
@@ -274,17 +291,57 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         folder = QtWidgets.QFileDialog.getExistingDirectory(
             self,
             "Choose raw or preprocessed dataset folder",
-            self.source_edit.text() or str(PROJECT_ROOT),
+            str(PROJECT_ROOT),
         )
-        if not folder:
-            return
-        self.source_edit.setText(folder)
-        suggested = str(DEFAULT_OUTPUT_FOLDER)
-        if not self.output_edit.text() or (
-            self.output_edit.text() == self._automatic_output
-        ):
-            self.output_edit.setText(suggested)
-            self._automatic_output = suggested
+        if folder:
+            self.add_source_inputs((folder,))
+
+    @QtCore.pyqtSlot()
+    def choose_source_files(self) -> None:
+        files, _ = QtWidgets.QFileDialog.getOpenFileNames(
+            self,
+            "Choose raw or preprocessed reaction files",
+            str(PROJECT_ROOT),
+            (
+                "Conversion inputs (*.csv *.CSV *.observations.jsonl.gz);;"
+                "CSV files (*.csv *.CSV);;All files (*)"
+            ),
+        )
+        if files:
+            self.add_source_inputs(files)
+
+    def source_inputs(self) -> tuple[str, ...]:
+        """Return the selected files and folders in visible order."""
+        return tuple(
+            self.source_list.item(index).data(QtCore.Qt.ItemDataRole.UserRole)
+            for index in range(self.source_list.count())
+        )
+
+    def add_source_inputs(self, paths: Iterable[str]) -> None:
+        """Add files or folders without duplicating an existing selection."""
+        existing = {str(Path(value).resolve()).casefold() for value in self.source_inputs()}
+        for value in paths:
+            path = Path(value)
+            resolved = str(path.resolve())
+            if resolved.casefold() in existing:
+                continue
+            label = f"[Folder] {path.name}" if path.is_dir() else path.name
+            item = QtWidgets.QListWidgetItem(label)
+            item.setToolTip(resolved)
+            item.setData(QtCore.Qt.ItemDataRole.UserRole, resolved)
+            self.source_list.addItem(item)
+            existing.add(resolved.casefold())
+        self.refresh_source_summary()
+
+    @QtCore.pyqtSlot()
+    def remove_selected_inputs(self) -> None:
+        for item in self.source_list.selectedItems():
+            self.source_list.takeItem(self.source_list.row(item))
+        self.refresh_source_summary()
+
+    @QtCore.pyqtSlot()
+    def clear_source_inputs(self) -> None:
+        self.source_list.clear()
         self.refresh_source_summary()
 
     @QtCore.pyqtSlot()
@@ -300,15 +357,18 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def refresh_source_summary(self) -> None:
-        source = Path(self.source_edit.text().strip())
-        paths = discover_conversion_datasets(source)
+        selections = self.source_inputs()
+        paths = discover_conversion_datasets(selections)
         if not paths:
             self.source_summary.setText(
                 "No raw CSV or preprocessed observation files were found."
             )
             return
+        folder_count = sum(Path(value).is_dir() for value in selections)
+        file_count = len(selections) - folder_count
         self.source_summary.setText(
-            f"Found {len(paths)} conversion input file(s), including subfolders."
+            f"Found {len(paths)} conversion input file(s) from "
+            f"{file_count} selected file(s) and {folder_count} folder(s)."
         )
 
     def _append_status(self, message: str) -> None:
@@ -333,20 +393,21 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
     def start_conversion(self) -> None:
         if self.thread is not None:
             return
-        source = Path(self.source_edit.text().strip())
+        source_inputs = self.source_inputs()
         output_text = self.output_edit.text().strip()
-        if not source.is_dir():
+        if not source_inputs:
             QtWidgets.QMessageBox.warning(
                 self,
-                "Dataset folder required",
-                "Choose a folder containing raw CSVs or preprocessed observations.",
+                "Conversion inputs required",
+                "Add at least one supported file or folder.",
             )
             return
-        if not discover_conversion_datasets(source):
+        discovered = discover_conversion_datasets(source_inputs)
+        if not discovered:
             QtWidgets.QMessageBox.warning(
                 self,
                 "No conversion inputs",
-                "No supported input files were found in the selected folder tree.",
+                "No supported input files were found in the selection.",
             )
             return
         if not output_text:
@@ -369,21 +430,29 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             )
             return
         output = Path(output_text)
-        source_resolved = source.resolve()
         output_resolved = output.resolve()
-        if (
-            output_resolved == source_resolved
-            or source_resolved in output_resolved.parents
-        ):
+        invalid_folders = [
+            Path(value)
+            for value in source_inputs
+            if Path(value).is_dir()
+            and (
+                output_resolved == Path(value).resolve()
+                or Path(value).resolve() in output_resolved.parents
+            )
+        ]
+        if invalid_folders:
             QtWidgets.QMessageBox.warning(
                 self,
                 "Separate output folder required",
-                "Choose an output folder outside the source dataset folder.",
+                "Choose an output folder outside every selected source folder.",
             )
             return
 
         self.status_box.clear()
-        self._append_status(f"Source: {source}")
+        self._append_status(
+            f"Selected inputs: {len(source_inputs)}; discovered files: "
+            f"{len(discovered)}"
+        )
         self._append_status(f"Output folder: {output}")
         self._append_status(
             f"Settings: {self.shard_size_spin.value()} rows/shard, "
@@ -400,7 +469,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
 
         thread = QtCore.QThread(self)
         worker = ReviewConversionWorker(
-            str(source),
+            source_inputs,
             str(output),
             shard_size=self.shard_size_spin.value(),
             workers=self.worker_count_spin.value(),

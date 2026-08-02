@@ -26,7 +26,11 @@ from ..models import (
 )
 from .flatten import GENERIC_REVIEW_FIELDS, flatten_generic_record
 from .generic import GenericConversionCache, convert_record
-from .input_schema import discover_conversion_datasets, iter_conversion_records
+from .input_schema import (
+    ConversionDatasetInput,
+    discover_conversion_datasets,
+    iter_conversion_records,
+)
 
 
 def _markdown(report: Dict[str, Any]) -> str:
@@ -55,7 +59,7 @@ def _markdown(report: Dict[str, Any]) -> str:
 
 
 def convert_datasets(
-    dataset_path: str | Path,
+    dataset_path: ConversionDatasetInput,
     output_dir: str | Path,
     *,
     max_rows: Optional[int] = None,
@@ -64,7 +68,7 @@ def convert_datasets(
     """Convert one CSV or a directory of CSVs through the common engine."""
     paths = discover_conversion_datasets(dataset_path)
     if not paths:
-        raise ValueError(f"No CSV datasets found at {dataset_path}")
+        raise ValueError("No supported conversion datasets were found")
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     tier_counts = Counter()
@@ -186,7 +190,14 @@ def convert_datasets(
         "schema_version": "2.1",
         "converter_version": GENERIC_CONVERTER_DEFINITION_VERSION,
         "reaction_signature_schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
-        "dataset_path": str(Path(dataset_path)),
+        "dataset_path": (
+            str(dataset_path) if isinstance(dataset_path, (str, Path)) else None
+        ),
+        "dataset_paths": (
+            [str(dataset_path)]
+            if isinstance(dataset_path, (str, Path))
+            else [str(path) for path in dataset_path]
+        ),
         "input_files": [str(path) for path in paths],
         "file_count": len(paths),
         "max_rows": max_rows,

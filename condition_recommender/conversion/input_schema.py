@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterator, Mapping, Optional, Tuple
+from typing import Any, Dict, Iterator, Mapping, Optional, Sequence, Tuple, TypeAlias
 
 from condition_registry import ConditionComponentInput, ConditionProcessStage
 
@@ -32,6 +32,8 @@ _COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
     "steps": ("steps",),
     "notes": ("notes",),
 }
+
+ConversionDatasetInput: TypeAlias = str | Path | Sequence[str | Path]
 
 
 def _normalized_headers(row: Mapping[str, Any]) -> Dict[str, str]:
@@ -169,28 +171,52 @@ def iter_conversion_records(path: str | Path) -> Iterator[RawReactionRecord]:
     yield from iter_csv_records(source)
 
 
-def discover_conversion_datasets(path: str | Path) -> Tuple[Path, ...]:
-    """Discover raw CSVs or preprocessed observation files deterministically."""
-    source = Path(path)
+def discover_conversion_datasets(path: ConversionDatasetInput) -> Tuple[Path, ...]:
+    """Discover supported inputs from one path or an explicit path collection.
+
+    A collection may mix individual files and folders. Folder contents are
+    discovered recursively, exact duplicates are removed, and the caller's
+    selection order is retained.
+    """
 
     def supported(item: Path) -> bool:
         return item.suffix.casefold() == ".csv" or item.name.casefold().endswith(
             ".observations.jsonl.gz"
         )
 
-    if source.is_file():
-        return (source,) if supported(source) else ()
-    if not source.is_dir():
-        return ()
-    return tuple(
-        sorted(
-            (item for item in source.rglob("*") if item.is_file() and supported(item)),
-            key=lambda item: item.relative_to(source).as_posix().casefold(),
+    def discover_one(source: Path) -> Tuple[Path, ...]:
+        if source.is_file():
+            return (source,) if supported(source) else ()
+        if not source.is_dir():
+            return ()
+        return tuple(
+            sorted(
+                (
+                    item
+                    for item in source.rglob("*")
+                    if item.is_file() and supported(item)
+                ),
+                key=lambda item: item.relative_to(source).as_posix().casefold(),
+            )
         )
+
+    sources = (Path(path),) if isinstance(path, (str, Path)) else tuple(
+        Path(value) for value in path
     )
+    discovered = []
+    seen = set()
+    for source in sources:
+        for item in discover_one(source):
+            identity = str(item.resolve()).casefold()
+            if identity in seen:
+                continue
+            seen.add(identity)
+            discovered.append(item)
+    return tuple(discovered)
 
 
 __all__ = [
+    "ConversionDatasetInput",
     "RawReactionRecord",
     "adapt_row",
     "discover_conversion_datasets",

@@ -6,19 +6,28 @@ from condition_recommender.conversion.artifacts import (
 )
 
 
-def test_review_window_reports_recursive_csv_count(qtbot, tmp_path: Path) -> None:
+def test_review_window_accepts_folder_and_individual_file_inputs(
+    qtbot, tmp_path: Path
+) -> None:
     source = tmp_path / "datasets"
     nested = source / "nested"
     nested.mkdir(parents=True)
     (source / "first.csv").write_text("reaction_smiles\n", encoding="utf-8")
     (nested / "second.CSV").write_text("reaction_smiles\n", encoding="utf-8")
+    selected = tmp_path / "selected.observations.jsonl.gz"
+    selected.write_bytes(b"")
     window = gui.GenericReactionReviewWindow()
     qtbot.addWidget(window)
 
-    window.source_edit.setText(str(source))
-    window.refresh_source_summary()
+    window.add_source_inputs((str(source), str(selected), str(selected)))
 
-    assert "Found 2 conversion input file(s)" in window.source_summary.text()
+    assert window.source_list.count() == 2
+    assert window.source_inputs() == (
+        str(source.resolve()),
+        str(selected.resolve()),
+    )
+    assert "Found 3 conversion input file(s)" in window.source_summary.text()
+    assert "1 selected file(s) and 1 folder(s)" in window.source_summary.text()
     assert window.status_box.isReadOnly()
     assert not window.cancel_button.isEnabled()
     assert Path(window.output_edit.text()) == gui.DEFAULT_OUTPUT_FOLDER

@@ -166,6 +166,9 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         add_button = QtWidgets.QPushButton("Add CSV Files…")
         add_button.setObjectName("addFilesButton")
         add_button.clicked.connect(self.choose_source_files)
+        add_folder_button = QtWidgets.QPushButton("Add Folder…")
+        add_folder_button.setObjectName("addFolderButton")
+        add_folder_button.clicked.connect(self.choose_source_folder)
         remove_button = QtWidgets.QPushButton("Remove Selected")
         remove_button.setObjectName("removeFilesButton")
         remove_button.clicked.connect(self.remove_selected_files)
@@ -173,6 +176,7 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         clear_button.setObjectName("clearFilesButton")
         clear_button.clicked.connect(self.clear_source_files)
         file_buttons.addWidget(add_button)
+        file_buttons.addWidget(add_folder_button)
         file_buttons.addWidget(remove_button)
         file_buttons.addWidget(clear_button)
         file_buttons.addStretch()
@@ -248,6 +252,29 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         )
         if files:
             self.add_source_files(files)
+
+    @QtCore.pyqtSlot()
+    def choose_source_folder(self) -> None:
+        folder = QtWidgets.QFileDialog.getExistingDirectory(
+            self,
+            "Choose source CSV folder",
+            str(PROJECT_ROOT / "raw_dataset"),
+        )
+        if folder:
+            self.add_source_folder(folder)
+
+    def add_source_folder(self, value: str) -> None:
+        """Recursively add a folder's CSV files in deterministic order."""
+        root = Path(value)
+        files = sorted(
+            (
+                path
+                for path in root.rglob("*")
+                if path.is_file() and path.suffix.casefold() == ".csv"
+            ),
+            key=lambda path: path.relative_to(root).as_posix().casefold(),
+        )
+        self.add_source_files(str(path) for path in files)
 
     @QtCore.pyqtSlot()
     def remove_selected_files(self) -> None:

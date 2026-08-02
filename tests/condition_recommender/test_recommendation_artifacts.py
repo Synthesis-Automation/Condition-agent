@@ -118,6 +118,37 @@ def test_artifact_workflow_reuses_completed_shards(tmp_path: Path) -> None:
     assert resumed["reused_shard_count"] == 1
 
 
+def test_artifact_workflow_converts_only_explicitly_selected_files(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    selected_paths = []
+    for name in ("selected-one.csv", "selected-two.csv", "not-selected.csv"):
+        path = source / name
+        row = _source_row(name)
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(row))
+            writer.writeheader()
+            writer.writerow(row)
+        if name.startswith("selected-"):
+            selected_paths.append(path)
+
+    output = tmp_path / "recommendation_data"
+    report = build_recommendation_artifacts(
+        selected_paths,
+        output,
+        shard_size=1,
+        build_fast_index=False,
+    )
+
+    assert report["record_count"] == 2
+    assert report["source_path"] is None
+    assert report["source_paths"] == [
+        str(path.resolve()) for path in selected_paths
+    ]
+
+
 def test_artifact_workflow_rejects_output_inside_source(
     tmp_path: Path,
 ) -> None:

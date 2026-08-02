@@ -40,6 +40,7 @@ from ..models import (
 )
 from .generic import GenericConversionCache, convert_record
 from .input_schema import (
+    ConversionDatasetInput,
     RawReactionRecord,
     discover_conversion_datasets,
     iter_conversion_records,
@@ -361,7 +362,7 @@ def _convert_shard_task(
 
 def _manifest_payload(
     *,
-    dataset_path: str | Path,
+    dataset_path: ConversionDatasetInput,
     mode: str,
     shard_size: int,
     max_shards: Optional[int],
@@ -372,10 +373,18 @@ def _manifest_payload(
     entries: Sequence[Mapping[str, Any]],
     coverage_complete: bool,
 ) -> Dict[str, Any]:
+    selected_paths = (
+        (Path(dataset_path),)
+        if isinstance(dataset_path, (str, Path))
+        else tuple(Path(value) for value in dataset_path)
+    )
     return {
         "schema_version": SHARD_MANIFEST_SCHEMA_VERSION,
         "artifact_type": "generic_sharded_conversion",
-        "dataset_path": str(Path(dataset_path).resolve()),
+        "dataset_path": (
+            str(selected_paths[0].resolve()) if len(selected_paths) == 1 else None
+        ),
+        "dataset_paths": [str(path.resolve()) for path in selected_paths],
         "mode": mode,
         "shard_size": shard_size,
         "max_shards": max_shards,
@@ -572,7 +581,7 @@ def validate_sharded_conversion(
 
 
 def convert_datasets_sharded(
-    dataset_path: str | Path,
+    dataset_path: ConversionDatasetInput,
     output_dir: str | Path,
     *,
     shard_size: int = 1_000,
@@ -602,7 +611,7 @@ def convert_datasets_sharded(
         raise ValueError("checkpoint_interval must be positive")
     paths = discover_conversion_datasets(dataset_path)
     if not paths:
-        raise ValueError(f"No CSV datasets found at {dataset_path}")
+        raise ValueError("No supported conversion datasets were found")
 
     def notify(
         phase: str,
@@ -624,7 +633,7 @@ def convert_datasets_sharded(
 
     notify(
         "discovered",
-        f"Found {len(paths)} CSV dataset file(s).",
+        f"Found {len(paths)} conversion input file(s).",
     )
     destination = Path(output_dir)
     shards_dir = destination / "shards"

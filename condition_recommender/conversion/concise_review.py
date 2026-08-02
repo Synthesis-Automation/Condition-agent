@@ -20,7 +20,7 @@ from .pattern_serialization import (
 )
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "9.2"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "10.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_core_label",
@@ -37,10 +37,6 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "formed_ring_sizes",
     "ring_count_delta",
     "ring_change_summaries",
-    "signature_id",
-    "reaction_core_id",
-    "reaction_core_shape_key",
-    "reaction_core_mapping_equivalence_key",
     "reaction_core_evidence_status",
     "reaction_core_status",
     "reaction_core_quality_status",
@@ -52,7 +48,6 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_core_appearing_context",
     "reaction_core_unavailability_reasons",
     "reaction_core_remote_classes",
-    "fallback_descriptor_id",
     "fallback_evidence_mode",
     "fallback_retrieval_eligible",
     "fallback_ineligibility_reasons",
@@ -60,19 +55,15 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "external_mapping_status",
     "external_mapping_provider",
     "external_mapping_confidence",
-    "external_mapping_matched_hypotheses",
     "transformation_confidence",
     "stereochemical_changes",
     "reaction_completeness_status",
     "edit_hypothesis_count",
-    "edit_hypothesis_ids",
     "product_heavy_atom_coverage",
     "product_element_excess",
     "partial_transformation_class",
     "removed_fragment",
     "installed_fragment",
-    "installed_fragment_key",
-    "partial_transformation_key",
     "fragment_source_status",
     "fragment_source_candidates",
     "condition_source_support_status",
@@ -336,14 +327,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "ring_change_summaries": " | ".join(
             ring_change_summary(dict(change)) for change in ring_changes
         ),
-        "signature_id": str(signature_value.get("signature_id") or ""),
-        "reaction_core_id": str(reaction_core_value.get("core_id") or ""),
-        "reaction_core_shape_key": str(
-            reaction_core_value.get("shape_core_key") or ""
-        ),
-        "reaction_core_mapping_equivalence_key": str(
-            reaction_core_value.get("mapping_equivalence_key") or ""
-        ),
         "reaction_core_evidence_status": str(
             reaction_core_value.get("evidence_status") or ""
         ),
@@ -384,7 +367,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
                 }
             )
         ),
-        "fallback_descriptor_id": str(fallback_value.get("descriptor_id") or ""),
         "fallback_evidence_mode": str(fallback_value.get("evidence_mode") or ""),
         "fallback_retrieval_eligible": _text_or_blank(
             fallback_value.get("retrieval_eligible")
@@ -403,21 +385,12 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "external_mapping_confidence": _text_or_blank(
             external_mapping_value.get("mapper_confidence")
         ),
-        "external_mapping_matched_hypotheses": "; ".join(
-            str(value)
-            for value in external_mapping_value.get("matched_hypothesis_ids") or ()
-        ),
         "transformation_confidence": _text_or_blank(
             record.get("transformation_confidence")
         ),
         "stereochemical_changes": _stereochemical_change_summary(signature_value),
         "reaction_completeness_status": str(completeness_value.get("status") or ""),
         "edit_hypothesis_count": str(len(hypotheses)),
-        "edit_hypothesis_ids": "; ".join(
-            str(value.get("hypothesis_id") or "")
-            for value in hypotheses
-            if value.get("hypothesis_id")
-        ),
         "product_heavy_atom_coverage": _text_or_blank(
             completeness_value.get("product_heavy_atom_coverage")
         ),
@@ -435,10 +408,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "removed_fragment": str(partial_value.get("removed_fragment_smiles") or ""),
         "installed_fragment": str(
             installed_value.get("canonical_fragment_smiles") or ""
-        ),
-        "installed_fragment_key": str(installed_value.get("fragment_key") or ""),
-        "partial_transformation_key": str(
-            fallback_value.get("partial_transformation_key") or ""
         ),
         "fragment_source_status": str(installed_value.get("source_status") or ""),
         "fragment_source_candidates": json.dumps(

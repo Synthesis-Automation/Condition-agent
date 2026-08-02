@@ -604,8 +604,9 @@ subfolders and creates:
 - `reaction_review.csv`: the compact file for quick human review, including
   structural-evidence and admission diagnostics, spectators, and
   reactive-partner steric/electronic context. When RXNMapper is enabled it also
-  shows mapping disposition, provider, confidence, and matched internal
-  hypotheses. It is not used as recommendation input.
+  shows mapping disposition, provider, and confidence. Machine-only hash
+  identifiers and internal grouping keys are omitted; they remain available in
+  the canonical shards. The CSV is not used as recommendation input.
 - `generic_index.json.gz`: a compressed, ready-to-load recommendation index.
   This is enabled by default because it makes repeated recommendations start
   faster.

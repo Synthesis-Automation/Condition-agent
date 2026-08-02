@@ -25,6 +25,29 @@ def test_preprocessor_window_adds_files_and_exposes_incremental_defaults(
     assert not window.cancel_button.isEnabled()
 
 
+def test_preprocessor_window_adds_folder_as_individual_csv_files(
+    qtbot, tmp_path: Path
+) -> None:
+    nested = tmp_path / "nested"
+    nested.mkdir()
+    first = nested / "first.csv"
+    second = tmp_path / "second.CSV"
+    ignored = tmp_path / "notes.txt"
+    first.write_text("unknown\nfirst\n", encoding="utf-8")
+    second.write_text("unknown\nsecond\n", encoding="utf-8")
+    ignored.write_text("ignored", encoding="utf-8")
+    window = gui.SourceDataPreprocessorWindow()
+    qtbot.addWidget(window)
+
+    window.add_source_folder(str(tmp_path))
+
+    assert window.source_files() == (
+        str(first.resolve()),
+        str(second.resolve()),
+    )
+    assert window.source_list.count() == 2
+
+
 def test_preprocessor_worker_forwards_progress_and_result(monkeypatch) -> None:
     progress = PreprocessingProgress(
         phase="completed",
