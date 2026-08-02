@@ -199,9 +199,9 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         layout.addLayout(form)
 
         outputs = QtWidgets.QLabel(
-            "Per source: <name>.observations.jsonl.gz + "
-            "<name>.preprocessing.json. Unchanged files are verified by source, "
-            "adapter, schema, and output checksums before reuse."
+            "Per source: <name>.observations.jsonl.gz. No separate JSON log is "
+            "created. Unchanged artifacts are validated from their embedded "
+            "provenance before reuse."
         )
         outputs.setWordWrap(True)
         outputs.setStyleSheet(

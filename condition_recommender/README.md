@@ -5,8 +5,9 @@
 Heterogeneous raw CSV files can first be normalized into the versioned,
 chemistry-free `source_observation.v1` contract. Each selected source file
 produces one independently reusable `<source>.observations.jsonl.gz` artifact
-and one checksum/audit report. The source checksum, adapter version,
-intermediate schema, and output checksum control cache reuse.
+without a separate JSON log. Embedded source provenance, adapter version, and
+intermediate schema metadata control cache reuse; the returned in-memory summary
+still includes the output checksum and row statistics.
 
 Launch the Qt application from the repository root:
 

@@ -42,51 +42,76 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    temporary.replace(path)
-
-
-def _paths(source: Path, output_dir: Path) -> tuple[Path, Path]:
-    base = source.name
-    return (
-        output_dir / f"{base}.observations.jsonl.gz",
-        output_dir / f"{base}.preprocessing.json",
-    )
+def _output_path(source: Path, output_dir: Path) -> Path:
+    return output_dir / f"{source.name}.observations.jsonl.gz"
 
 
 def _cached_report(
     *,
-    report_path: Path,
     output_path: Path,
+    source: Path,
     source_sha256: str,
     adapter_id: str,
     adapter_version: str,
 ) -> Optional[Dict[str, Any]]:
-    if not report_path.is_file() or not output_path.is_file():
+    """Validate and summarize an existing artifact without a sidecar log."""
+    if not output_path.is_file():
         return None
+    warning_counts: Counter[str] = Counter()
+    kind_counts: Counter[str] = Counter()
+    status_counts: Counter[str] = Counter()
+    row_count = 0
     try:
-        report = json.loads(report_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+        with gzip.open(output_path, "rt", encoding="utf-8") as handle:
+            for line in handle:
+                record = json.loads(line)
+                if not isinstance(record, Mapping):
+                    return None
+                provenance = record.get("source", {})
+                if not isinstance(provenance, Mapping):
+                    return None
+                if (
+                    record.get("schema_version")
+                    != INTERMEDIATE_OBSERVATION_SCHEMA_VERSION
+                    or provenance.get("source_file") != source.name
+                    or provenance.get("source_file_sha256") != source_sha256
+                    or provenance.get("adapter_id") != adapter_id
+                    or provenance.get("adapter_version") != adapter_version
+                ):
+                    return None
+                warnings = set(record.get("warnings") or ())
+                conditions = record.get("conditions") or {}
+                if not isinstance(conditions, Mapping):
+                    return None
+                warnings.update(conditions.get("warnings") or ())
+                warning_counts.update(warnings)
+                kind_counts[str(record.get("observation_kind") or "")] += 1
+                status_counts[str(record.get("ingestion_status") or "")] += 1
+                row_count += 1
+    except (EOFError, OSError, UnicodeError, json.JSONDecodeError, TypeError):
         return None
-    expected = {
+    if row_count == 0:
+        return None
+    return {
+        "artifact_type": "source_preprocessing",
+        "source_path": str(source.resolve()),
+        "source_file": source.name,
         "source_sha256": source_sha256,
         "adapter_id": adapter_id,
         "adapter_version": adapter_version,
         "intermediate_schema_version": INTERMEDIATE_OBSERVATION_SCHEMA_VERSION,
         "preprocessor_definition_version": PREPROCESSOR_DEFINITION_VERSION,
+        "input_row_count": row_count,
+        "output_row_count": row_count,
+        "observation_kind_counts": dict(sorted(kind_counts.items())),
+        "ingestion_status_counts": dict(sorted(status_counts.items())),
+        "warning_counts": dict(sorted(warning_counts.items())),
+        "output_path": str(output_path.resolve()),
+        "output_size_bytes": output_path.stat().st_size,
+        "output_sha256": _sha256(output_path),
+        "coverage_complete": True,
+        "reused": True,
     }
-    if any(report.get(key) != value for key, value in expected.items()):
-        return None
-    if report.get("output_sha256") != _sha256(output_path):
-        return None
-    result = dict(report)
-    result["reused"] = True
-    return result
 
 
 def preprocess_file(
@@ -114,22 +139,11 @@ def preprocess_file(
         detect_adapter(source) if adapter_id == "auto" else get_adapter(adapter_id)
     )
     source_sha256 = _sha256(source)
-    output_path, report_path = _paths(source, destination)
-    if report_path.is_file():
-        try:
-            existing_report = json.loads(report_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            existing_report = {}
-        existing_source = str(existing_report.get("source_path") or "")
-        if existing_source and Path(existing_source).resolve() != source.resolve():
-            raise ValueError(
-                f"Output name collision for {source.name}; use a separate "
-                "output subfolder for files with the same name"
-            )
+    output_path = _output_path(source, destination)
     if not force:
         cached = _cached_report(
-            report_path=report_path,
             output_path=output_path,
+            source=source,
             source_sha256=source_sha256,
             adapter_id=adapter.adapter_id,
             adapter_version=adapter.adapter_version,
@@ -234,9 +248,7 @@ def preprocess_file(
         "output_sha256": _sha256(output_path),
         "coverage_complete": True,
         "reused": False,
-        "report_path": str(report_path.resolve()),
     }
-    _atomic_json(report_path, report)
     if progress_callback is not None:
         progress_callback(
             PreprocessingProgress(

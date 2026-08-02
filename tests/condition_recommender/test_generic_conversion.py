@@ -13,6 +13,7 @@ from condition_recommender.conversion.concise_review import (
     export_concise_reaction_review_csv,
 )
 from condition_recommender.conversion.engine import convert_datasets
+from condition_recommender.conversion.flatten import flatten_generic_record
 from condition_recommender.conversion.generic import (
     GenericConversionCache,
     convert_record,
@@ -870,6 +871,21 @@ def test_concise_review_uses_the_single_reaction_label() -> None:
     assert row["reaction_label"] == "R–X + R′ → R–R′"
     assert row["reaction_core_status"] == "available_verified"
     assert row["reaction_core_unavailability_reasons"] == ""
+
+
+def test_review_csv_rows_leave_unavailable_reaction_label_blank() -> None:
+    record = convert_record(_raw("CC.O>>N#N"))
+
+    concise_row = concise_reaction_review_row(record.to_dict())
+    tier_row = flatten_generic_record(record)
+
+    assert record.reaction_label is not None
+    assert record.reaction_label["status"] == "unavailable"
+    assert record.reaction_label["text"] == "Unavailable"
+    assert concise_row["reaction_label"] == ""
+    assert concise_row["reaction_label_status"] == "unavailable"
+    assert tier_row["reaction_label"] == ""
+    assert tier_row["reaction_label_status"] == "unavailable"
 
 
 def test_recursive_dataset_folder_converts_to_one_concise_review_csv(

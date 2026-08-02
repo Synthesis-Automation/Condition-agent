@@ -214,7 +214,7 @@ def test_preprocessing_cache_is_checksum_and_adapter_bound(tmp_path: Path) -> No
     assert not first["reused"]
     assert reused["reused"]
     assert Path(reused["output_path"]).read_bytes() == first_bytes
-    assert Path(reused["report_path"]).is_file()
+    assert not (output / "literature.csv.preprocessing.json").exists()
 
     changed = _literature_row()
     changed["yield_pct"] = "82"

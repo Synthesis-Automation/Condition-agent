@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 
 from reactive_taxonomy import build_reaction_review_summary
 
+from .flatten import review_reaction_label_text
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 from .pattern_serialization import (
@@ -282,7 +283,7 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or record.get("reaction_smiles")
             or ""
         ),
-        "reaction_label": str(display_value.get("text") or ""),
+        "reaction_label": review_reaction_label_text(display_value),
         **flattened_reaction_pattern_fields(
             interpretation_value,
             named_family=record.get("named_family"),

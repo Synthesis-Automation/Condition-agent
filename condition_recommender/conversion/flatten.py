@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Mapping
 
 from ..models import RecommendationRecord
 from .signature_serialization import (
@@ -112,6 +112,13 @@ GENERIC_REVIEW_FIELDS = (
 )
 
 
+def review_reaction_label_text(label: Mapping[str, Any] | None) -> str:
+    """Return display text only when a reaction label is available."""
+    if not label or str(label.get("status") or "").casefold() == "unavailable":
+        return ""
+    return str(label.get("text") or "")
+
+
 def _joined(values: Iterable[Any]) -> str:
     return "|".join(str(value) for value in values)
 
@@ -144,11 +151,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "outcome_status": record.outcome_status.value,
         "index_eligibility": record.index_eligibility.value,
         "reaction_smiles": record.reaction_smiles,
-        "reaction_label": (
-            record.reaction_label.get("text", "")
-            if record.reaction_label
-            else ""
-        ),
+        "reaction_label": review_reaction_label_text(record.reaction_label),
         "canonical_reaction_smiles": record.canonical_reaction_smiles or "",
         **flattened_reaction_pattern_fields(
             record.reaction_interpretation,
