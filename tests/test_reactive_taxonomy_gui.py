@@ -67,6 +67,11 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         )
         assert window.full_structure_panel.title() == "Full structure"
         assert window.minimized_panel.title() == "Minimized reaction"
+        result_layout = (
+            window.full_structure_panel.parentWidget().parentWidget().layout()
+        )
+        assert result_layout.stretch(0) == 9
+        assert result_layout.stretch(1) == 11
         core_pixmap = window.core_image_label.pixmap()
         assert core_pixmap is not None
         assert not core_pixmap.isNull()

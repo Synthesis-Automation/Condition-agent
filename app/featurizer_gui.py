@@ -281,8 +281,8 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         minimized_layout.addWidget(self.core_graphic_note)
         graph_layout.addWidget(self.minimized_panel, 1)
 
-        result_layout.addWidget(analysis_column, stretch=1)
-        result_layout.addWidget(graph_column, stretch=1)
+        result_layout.addWidget(analysis_column, stretch=9)
+        result_layout.addWidget(graph_column, stretch=11)
         layout.addWidget(result_panel, 1)
 
         self.status_label = QtWidgets.QLabel("Ready")
