@@ -164,10 +164,7 @@ data-processor/dataset/*.gz
 
 # Cache files and large binary artifacts
 *.pkl
-results/hte_cache/
-results/generic_sampling/
-results/generic_conversion/
-results/generic_evaluation/
+/results/
 
 # KMN index files (large ML artifacts — rebuild with scripts/build_kmn_index.py)
 data/kmn_index/
