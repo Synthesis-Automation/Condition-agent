@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "definition_id": "reaction_display_projection.v1.4",
+  "definition_id": "reaction_display_projection.v1.5",
   "aromatic_system_policy": "retain_aromatic_bond_component",
   "aromatic_valence_completion_policy": "retain_exocyclic_multiple_bonds",
   "multiple_bond_policy": "retain_contiguous_multiple_bond_unit",
-  "active_heteroatom_shell_policy": "retain_direct_noncarbon_neighbors",
+  "active_heteroatom_shell_policy": "retain_direct_noncarbon_neighbors_and_adjacent_nonaromatic_multiple_bond_systems",
   "saturated_carbon_policy": "retain_active_atom_only",
   "aromatic_carbon_boundary_policy": "remove_and_hydrogen_cap",
   "aromatic_heteroatom_boundary_policy": "retain_R_attachment",
@@ -16,5 +16,5 @@
   "hidden_connector_label_template": "S{index}",
   "intramolecular_note_template": "Intramolecular; forms a {ring_size}-membered ring",
   "intramolecular_note_without_size": "Intramolecular reaction",
-  "rendering_note": "This display-only projection starts from observed edit endpoints. It retains complete aromatic bond-connected systems, exocyclic non-aromatic multiple bonds required to complete aromatic valence, contiguous non-aromatic multiple-bond units, directly attached non-carbon atoms, and otherwise only the active saturated center. Omitted non-aromatic branches become indexed R-group substituent placeholders. An omitted connected subgraph touching multiple displayed ports becomes a labeled hidden connector rendered with nonchemical zero-order dashed bonds. Unchanged terminal substituents cut from aromatic carbon are hydrogen-capped in the graphic but retained as positional substituent records."
+  "rendering_note": "This display-only projection starts from observed edit endpoints. It retains complete aromatic bond-connected systems, exocyclic non-aromatic multiple bonds required to complete aromatic valence, contiguous non-aromatic multiple-bond units, directly attached non-carbon atoms, and non-aromatic carbon multiple-bond systems directly attached to active heteroatoms; otherwise it retains only the active saturated center. Omitted non-aromatic branches become indexed R-group substituent placeholders. An omitted connected subgraph touching multiple displayed ports becomes a labeled hidden connector rendered with nonchemical zero-order dashed bonds. Unchanged terminal substituents cut from aromatic carbon are hydrogen-capped in the graphic but retained as positional substituent records."
 }

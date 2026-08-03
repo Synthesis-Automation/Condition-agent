@@ -133,14 +133,15 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         definition = dict(json.load(handle))
     expected = {
         "schema_version": "1.0",
-        "definition_id": "reaction_display_projection.v1.4",
+        "definition_id": "reaction_display_projection.v1.5",
         "aromatic_system_policy": "retain_aromatic_bond_component",
         "aromatic_valence_completion_policy": (
             "retain_exocyclic_multiple_bonds"
         ),
         "multiple_bond_policy": "retain_contiguous_multiple_bond_unit",
         "active_heteroatom_shell_policy": (
-            "retain_direct_noncarbon_neighbors"
+            "retain_direct_noncarbon_neighbors_and_adjacent_"
+            "nonaromatic_multiple_bond_systems"
         ),
         "saturated_carbon_policy": "retain_active_atom_only",
         "aromatic_carbon_boundary_policy": "remove_and_hydrogen_cap",
@@ -309,9 +310,33 @@ def _reaction_interface_closure(
             aromatic_policy_atoms.update(system)
             aromatic_systems.add(tuple(sorted(system)))
 
+    # An edited heteroatom can be the mapped endpoint of cleavage while the
+    # functional group it belongs to remains unchanged. Preserve an adjacent
+    # carbon pi-system so ester hydrolysis is shown as C(=O)OR -> C(=O)OH,
+    # rather than the misleading isolated OR -> OH. Aromatic neighbors follow
+    # Aromatic substituent handling remains governed by its separate policy.
+    adjacent_pi_seeds: set[int] = set()
+    for atom_index in sorted(active_atom_indices):
+        atom = molecule.GetAtomWithIdx(atom_index)
+        if atom.GetAtomicNum() in {0, 1, 6}:
+            continue
+        for neighbor in atom.GetNeighbors():
+            if neighbor.GetAtomicNum() != 6:
+                continue
+            neighbor_index = int(neighbor.GetIdx())
+            if neighbor.GetIsAromatic():
+                continue
+            if any(
+                not bond.GetIsAromatic()
+                and bond.GetBondTypeAsDouble() >= 2.0
+                for bond in neighbor.GetBonds()
+            ):
+                retained.add(neighbor_index)
+                adjacent_pi_seeds.add(neighbor_index)
+
     pending = [
         value
-        for value in sorted(active_atom_indices)
+        for value in sorted(active_atom_indices.union(adjacent_pi_seeds))
         if not molecule.GetAtomWithIdx(value).GetIsAromatic()
     ]
     visited = set(pending)

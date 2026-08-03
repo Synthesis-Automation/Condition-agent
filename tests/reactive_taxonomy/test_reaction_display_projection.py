@@ -78,6 +78,53 @@ def test_aliphatic_amide_formation_keeps_r_c_o_oh_handle() -> None:
     )
 
 
+def test_ester_hydrolysis_retains_acyl_pi_system_from_active_oxygen() -> None:
+    projection = _projection(
+        "[CH3:1][O:2][C:3]([CH3:4])=[O:5]"
+        ">>[OH:2][C:3]([CH3:4])=[O:5]"
+    )
+
+    assert projection.minimum_reaction_smiles == (
+        "*C(=O)OC>>*C(=O)O"
+    )
+    assert projection.render_reaction_smiles == (
+        "COC(=O)[*:1]>>O=C(O)[*:1]"
+    )
+
+
+def test_ordinary_ether_cleavage_does_not_gain_pi_system_context() -> None:
+    projection = _projection(
+        "[CH3:1][O:2][CH3:3]>>[OH:2][CH3:3]"
+    )
+
+    assert projection.minimum_reaction_smiles == "*OC>>*O"
+    assert projection.render_reaction_smiles == "CO[*:1]>>O[*:1]"
+
+
+def test_multisite_amide_formation_and_ester_hydrolysis_keep_both_acyls() -> None:
+    projection = _projection(
+        "COC(=O)[C@H](CSCCCC(=O)O)"
+        "NC(=O)OCC1c2ccccc2-c2ccccc21.Nc1ccccc1"
+        ">>O=C(CCCSC[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)"
+        "C(=O)O)Nc1ccccc1"
+    )
+
+    assert projection.minimum_reaction_smiles == (
+        "*C(=O)O.*C(=O)OC.*N>>*C(=O)O.*NC(*)=O"
+    )
+    assert projection.render_reaction_smiles == (
+        "COC(=O)[*:1].O=C(O)[*:2].N[*:3]"
+        ">>O=C(N[*:3])[*:1].O=C(O)[*:2]"
+    )
+    assert {
+        (connector.side, connector.port_display_labels)
+        for connector in projection.connectors
+    } == {
+        ("reactant", ("R¹", "R²")),
+        ("product", ("R¹", "R²")),
+    }
+
+
 @pytest.mark.parametrize(
     ("reaction_smiles", "minimum_reaction_smiles"),
     (
