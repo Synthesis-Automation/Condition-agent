@@ -38,6 +38,78 @@ class ReactionPatternContext:
         """Return the observation's normalized edits."""
         return self.observation.edits
 
+    def core_event_ids_for_indices(
+        self,
+        edit_indices: Sequence[int],
+    ) -> tuple[str, ...]:
+        """Return reaction-core events touched by normalized edit indices."""
+        core = self.observation.core
+        if core is None:
+            return ()
+        selected = set(int(value) for value in edit_indices)
+        return tuple(
+            sorted(
+                {
+                    event.event_id
+                for event in core.events
+                if selected.intersection(event.edit_indices)
+                }
+            )
+        )
+
+    def core_profile_ids_for_events(
+        self,
+        event_ids: Sequence[str],
+    ) -> tuple[str, ...]:
+        """Return omitted-fragment profiles attached to selected core events."""
+        core = self.observation.core
+        if core is None:
+            return ()
+        selected = set(str(value) for value in event_ids)
+        transition_ids = {
+            transition_id
+            for event in core.events
+            if event.event_id in selected
+            for transition_id in event.transition_ids
+        }
+        transitions = {
+            transition.transition_id: transition
+            for transition in core.atom_transitions
+            if transition.transition_id in transition_ids
+        }
+        active_coordinates = set()
+        for transition in transitions.values():
+            for state in (transition.before_state, transition.after_state):
+                if state is not None:
+                    active_coordinates.add(
+                        (state.side, state.component_index, state.atom_index)
+                    )
+        return tuple(
+            sorted(
+                {
+                    port.substituent_profile.profile_id
+                    for remote in core.remote_subgraphs
+                    for port in remote.attachment_ports
+                    if (
+                        port.side,
+                        port.core_component_index,
+                        port.core_atom_index,
+                    )
+                    in active_coordinates
+                }
+            )
+        )
+
+    def core_event_coverage(self, event_ids: Sequence[str]) -> float:
+        """Return the fraction of minimized events touched by a pattern."""
+        core = self.observation.core
+        if core is None or not core.events:
+            return 0.0
+        selected = set(str(value) for value in event_ids)
+        return len(selected.intersection(event.event_id for event in core.events)) / len(
+            core.events
+        )
+
     def indices(self, predicate: EditPredicate) -> tuple[int, ...]:
         """Return sorted edit indices satisfying ``predicate``."""
         return tuple(

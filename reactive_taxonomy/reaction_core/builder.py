@@ -10,6 +10,7 @@ with one or more attachment ports.
 from __future__ import annotations
 
 from collections import Counter, defaultdict, deque
+from dataclasses import replace
 from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
 from ..chemistry.rdkit_utils import parse_smiles
@@ -34,6 +35,8 @@ from .models import (
     ReactionCoreAtomState,
     ReactionCoreAtomTransition,
     ReactionCoreEvent,
+    ReactionCoreEventPath,
+    ReactionCoreEventRelation,
     ReactionCoreProjection,
     ReactionCoreRemoteClass,
     ReactionCoreRemoteSubgraph,
@@ -44,6 +47,9 @@ from .remote import (
     _with_remote_continuity,
 )
 from .state_changes import build_state_changes
+
+
+_REACTION_CORE_IDENTITY_SCHEMA_VERSION = "3.0"
 
 
 def _component_locations(
@@ -235,7 +241,7 @@ def _edit_graph(
     incidents: Dict[_AtomIdentity, list[tuple[object, ...]]] = defaultdict(list)
     public_tokens = []
     records = []
-    for edit in edits:
+    for edit_index, edit in enumerate(edits):
         left_override = (atom_map_overrides or {}).get(
             (
                 edit.atom_1.side,
@@ -319,7 +325,7 @@ def _edit_graph(
             f"{edit.old_order or 'NONE'}>{edit.new_order or 'NONE'}"
         )
         public_tokens.append(token)
-        records.append((token, tuple(record_identities)))
+        records.append((edit_index, token, tuple(record_identities)))
     graph_payload = tuple(
         sorted(
             (
@@ -337,6 +343,178 @@ def _edit_graph(
         graph_payload,
         tuple(sorted(public_tokens)),
         tuple(records),
+    )
+
+
+def _event_state_coordinates(
+    event: ReactionCoreEvent,
+    transitions_by_id: Mapping[str, ReactionCoreAtomTransition],
+    *,
+    side: str,
+) -> Dict[int, set[int]]:
+    values: Dict[int, set[int]] = defaultdict(set)
+    for transition_id in event.transition_ids:
+        transition = transitions_by_id[transition_id]
+        state = (
+            transition.before_state
+            if side == "reactant"
+            else transition.after_state
+        )
+        if state is not None:
+            values[int(state.component_index)].add(int(state.atom_index))
+    return values
+
+
+def _shortest_event_path(
+    components: Sequence[ReactionComponent],
+    *,
+    side: str,
+    component_index: int,
+    left_atom_indices: set[int],
+    right_atom_indices: set[int],
+) -> Optional[ReactionCoreEventPath]:
+    from rdkit import Chem
+
+    component = next(
+        (
+            value
+            for value in components
+            if int(value.component_index) == int(component_index)
+        ),
+        None,
+    )
+    molecule = parse_smiles(component.input_smiles) if component is not None else None
+    if molecule is None:
+        return None
+    candidates = []
+    for left in sorted(left_atom_indices):
+        for right in sorted(right_atom_indices):
+            if left == right:
+                candidates.append((1, (int(left),), left, right))
+                continue
+            try:
+                path = tuple(int(value) for value in Chem.GetShortestPath(
+                    molecule, int(left), int(right)
+                ))
+            except Exception:
+                continue
+            if path:
+                candidates.append((len(path), path, left, right))
+    if not candidates:
+        return None
+    _, path, start, end = min(candidates)
+    return ReactionCoreEventPath(
+        side=side,  # type: ignore[arg-type]
+        component_index=int(component_index),
+        start_atom_index=int(start),
+        end_atom_index=int(end),
+        atom_indices=path,
+        bond_count=len(path) - 1,
+    )
+
+
+def _build_event_relations(
+    events: Sequence[ReactionCoreEvent],
+    transitions: Sequence[ReactionCoreAtomTransition],
+    *,
+    reactants: Sequence[ReactionComponent],
+    products: Sequence[ReactionComponent],
+) -> Tuple[ReactionCoreEventRelation, ...]:
+    transitions_by_id = {
+        transition.transition_id: transition for transition in transitions
+    }
+    coordinates = {
+        (event.event_id, side): _event_state_coordinates(
+            event,
+            transitions_by_id,
+            side=side,
+        )
+        for event in events
+        for side in ("reactant", "product")
+    }
+    relations = []
+    for index, left in enumerate(events):
+        for right in events[index + 1 :]:
+            left_reactant = coordinates[(left.event_id, "reactant")]
+            right_reactant = coordinates[(right.event_id, "reactant")]
+            left_product = coordinates[(left.event_id, "product")]
+            right_product = coordinates[(right.event_id, "product")]
+            shared_reactant = tuple(
+                sorted(set(left_reactant).intersection(right_reactant))
+            )
+            shared_product = tuple(
+                sorted(set(left_product).intersection(right_product))
+            )
+            shared_transition_ids = set(left.transition_ids).intersection(
+                right.transition_ids
+            )
+            shared_active_coordinates = any(
+                left_reactant[component].intersection(right_reactant[component])
+                for component in shared_reactant
+            ) or any(
+                left_product[component].intersection(right_product[component])
+                for component in shared_product
+            )
+            paths = []
+            for side, components, left_coordinates, right_coordinates, shared in (
+                (
+                    "reactant",
+                    reactants,
+                    left_reactant,
+                    right_reactant,
+                    shared_reactant,
+                ),
+                (
+                    "product",
+                    products,
+                    left_product,
+                    right_product,
+                    shared_product,
+                ),
+            ):
+                for component_index in shared:
+                    path = _shortest_event_path(
+                        components,
+                        side=side,
+                        component_index=component_index,
+                        left_atom_indices=left_coordinates[component_index],
+                        right_atom_indices=right_coordinates[component_index],
+                    )
+                    if path is not None:
+                        paths.append(path)
+            relation_type = (
+                "shared_active_atom"
+                if shared_transition_ids or shared_active_coordinates
+                else "same_component"
+                if shared_reactant or shared_product
+                else "independent"
+            )
+            relations.append(
+                ReactionCoreEventRelation(
+                    event_id_1=left.event_id,
+                    event_id_2=right.event_id,
+                    relation_type=relation_type,  # type: ignore[arg-type]
+                    shared_reactant_component_indices=shared_reactant,
+                    shared_product_component_indices=shared_product,
+                    shortest_paths=tuple(
+                        sorted(
+                            paths,
+                            key=lambda value: (
+                                value.side,
+                                value.component_index,
+                                value.bond_count,
+                                value.atom_indices,
+                            ),
+                        )
+                    ),
+                    evidence="molecular_graph_shortest_path",
+                )
+            )
+    return tuple(
+        sorted(
+            relations,
+            key=lambda value: (value.event_id_1, value.event_id_2),
+        )
     )
 
 
@@ -726,12 +904,43 @@ def build_reaction_core_projection(
         event_edit_tokens = tuple(
             sorted(
                 token
-                for token, record_identities in edit_records
-                if set(record_identities).intersection(event_set)
+                for _, token, record_identities in edit_records
+                if set(record_identities).issubset(event_set)
+            )
+        )
+        event_edit_indices = tuple(
+            sorted(
+                edit_index
+                for edit_index, _, record_identities in edit_records
+                if set(record_identities).issubset(event_set)
             )
         )
         transition_ids = tuple(
             sorted(transition_by_identity[identity].transition_id for identity in event)
+        )
+        reactant_component_indices = tuple(
+            sorted(
+                {
+                    int(state.component_index)
+                    for identity in event
+                    if (
+                        state := transition_by_identity[identity].before_state
+                    )
+                    is not None
+                }
+            )
+        )
+        product_component_indices = tuple(
+            sorted(
+                {
+                    int(state.component_index)
+                    for identity in event
+                    if (
+                        state := transition_by_identity[identity].after_state
+                    )
+                    is not None
+                }
+            )
         )
         events.append(
             ReactionCoreEvent(
@@ -759,9 +968,37 @@ def build_reaction_core_projection(
                 ),
                 transition_ids=transition_ids,
                 edit_tokens=event_edit_tokens,
+                edit_indices=event_edit_indices,
+                reactant_component_indices=reactant_component_indices,
+                product_component_indices=product_component_indices,
             )
         )
+    events_by_base_id: Dict[str, list[ReactionCoreEvent]] = defaultdict(list)
+    for event in events:
+        events_by_base_id[event.event_id].append(event)
+    events = [
+        replace(event, event_id=f"{base_id}:{ordinal}")
+        for base_id, group in sorted(events_by_base_id.items())
+        for ordinal, event in enumerate(
+            sorted(
+                group,
+                key=lambda value: (
+                    value.reactant_component_indices,
+                    value.product_component_indices,
+                    value.transition_ids,
+                    value.edit_indices,
+                ),
+            ),
+            start=1,
+        )
+    ]
     events = sorted(events, key=lambda event: (event.edit_tokens, event.event_id))
+    event_relations = _build_event_relations(
+        events,
+        transitions,
+        reactants=reactants,
+        products=products,
+    )
 
     primary = tuple(
         transition
@@ -836,7 +1073,7 @@ def build_reaction_core_projection(
                 key=repr,
             )
         ),
-        "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+        "schema_version": _REACTION_CORE_IDENTITY_SCHEMA_VERSION,
     }
     typed_identity_payload = {
         "edit_graph": edit_graph_payload,
@@ -851,7 +1088,7 @@ def build_reaction_core_projection(
                 key=repr,
             )
         ),
-        "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+        "schema_version": _REACTION_CORE_IDENTITY_SCHEMA_VERSION,
     }
     exact_key = _digest("RCX2", exact_identity_payload)
     typed_key = _digest("RCT2", typed_identity_payload)
@@ -863,14 +1100,14 @@ def build_reaction_core_projection(
             "participant_tokens": participant_tokens,
             "retained_remote_subgraphs": retained_shape,
             "event_count": len(events),
-            "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+            "schema_version": _REACTION_CORE_IDENTITY_SCHEMA_VERSION,
         },
     )
     center_transition_key = _digest(
         "RCS2",
         {
             "centers": center_transition_payload,
-            "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+            "schema_version": _REACTION_CORE_IDENTITY_SCHEMA_VERSION,
         },
     )
     checked_edit_count, consistency_issues = validate_core_edits(
@@ -924,7 +1161,7 @@ def build_reaction_core_projection(
                 mapping_equivalence_key,
             ),
             "algorithm_version": REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
-            "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+            "schema_version": _REACTION_CORE_IDENTITY_SCHEMA_VERSION,
         },
         length=64,
     )
@@ -938,6 +1175,7 @@ def build_reaction_core_projection(
         atom_transitions=transitions,
         state_changes=state_changes,
         events=tuple(events),
+        event_relations=event_relations,
         remote_subgraphs=remote_subgraphs,
         edit_tokens=edit_tokens,
         participant_tokens=participant_tokens,

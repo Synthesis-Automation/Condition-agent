@@ -21,7 +21,7 @@ from .pattern_serialization import (
 )
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "11.0"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "11.1"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_label",
@@ -43,6 +43,7 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_core_state_changes",
     "reaction_core_unavailability_reasons",
     "reaction_core_remote_classes",
+    "reaction_core_substituent_profiles",
     "fallback_evidence_mode",
     "fallback_retrieval_eligible",
     "fallback_ineligibility_reasons",
@@ -342,6 +343,29 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
                         reaction_core_value.get("remote_subgraphs") or ()
                     )
                     if isinstance(value, Mapping) and value.get("remote_class")
+                }
+            )
+        ),
+        "reaction_core_substituent_profiles": "; ".join(
+            sorted(
+                {
+                    ":".join(
+                        str(value)
+                        for value in (
+                            remote.get("side") or "unknown",
+                            profile.get("base_class") or "generic_R",
+                            profile.get("carbon_substitution") or "unresolved",
+                            profile.get("local_environment_key") or "",
+                        )
+                    )
+                    for remote in (
+                        reaction_core_value.get("remote_subgraphs") or ()
+                    )
+                    if isinstance(remote, Mapping)
+                    for port in remote.get("attachment_ports") or ()
+                    if isinstance(port, Mapping)
+                    for profile in (port.get("substituent_profile") or {},)
+                    if isinstance(profile, Mapping)
                 }
             )
         ),

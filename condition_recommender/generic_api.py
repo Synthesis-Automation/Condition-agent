@@ -168,6 +168,7 @@ def recommend_indexed_signature(
             else "default"
         ),
         ranking_weights=ranking_weights,
+        query_reaction_core=reaction_core,
     )
     if any(
         caution.startswith("Reaction-scope mismatch:")

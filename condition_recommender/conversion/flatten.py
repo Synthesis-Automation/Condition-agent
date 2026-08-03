@@ -98,6 +98,7 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_core_quality_status",
     "reaction_core_quality_reasons",
     "reaction_core_state_changes",
+    "reaction_core_substituent_profiles",
     "reaction_core_evidence_status",
     "reaction_core_json",
     "fallback_descriptor_id",

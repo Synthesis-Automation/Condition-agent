@@ -8,7 +8,7 @@ because invalid user input is represented by the public analysis models.
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Any, Iterator, Optional
+from typing import Any, Iterable, Iterator, Optional
 
 
 def _chem_module() -> Any:
@@ -60,3 +60,31 @@ def mol_to_canonical_smiles(mol: Any) -> Optional[str]:
         return str(chem.MolToSmiles(mol, canonical=True, isomericSmiles=True))
     except Exception:
         return None
+
+
+def prepare_fragment_serialization_copy(
+    mol: Any,
+    atom_indices: Iterable[int],
+) -> Any:
+    """Copy a molecule and clear stereo that crosses a fragment boundary.
+
+    RDKit's fragment canonicalizer inspects double-bond stereo annotations on
+    the parent molecule. A stereobond wholly outside ``atomsToUse`` can violate
+    its traversal precondition. Stereo wholly inside the selected induced
+    subgraph is retained; only annotations that the fragment cannot represent
+    are cleared.
+    """
+    chem = _chem_module()
+    if chem is None or mol is None:
+        return None
+    selected = {int(value) for value in atom_indices}
+    copied = chem.Mol(mol)
+    for bond in copied.GetBonds():
+        if (
+            int(bond.GetBeginAtomIdx()) in selected
+            and int(bond.GetEndAtomIdx()) in selected
+        ):
+            continue
+        bond.SetStereo(chem.BondStereo.STEREONONE)
+        bond.SetBondDir(chem.BondDir.NONE)
+    return copied

@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 
 from .chemistry.smarts_cache import compile_smarts
 from .reaction_patterns import load_reaction_pattern_definitions
+from .reaction_core.substituents import load_substituent_profile_definition
 
 
 DEFINITIONS_DIR = Path(__file__).with_name("definitions")
@@ -42,6 +43,7 @@ def validate_taxonomy() -> List[str]:
         "aromatic_systems.v1",
         "reactivity_rendering.v1",
         "signature_features.v3",
+        "substituent_profiles.v1",
     }
     missing = expected - set(payload)
     if missing:
@@ -175,6 +177,10 @@ def validate_taxonomy() -> List[str]:
         load_reaction_pattern_definitions()
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         errors.append(f"invalid_reaction_patterns:{exc}")
+    try:
+        load_substituent_profile_definition()
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        errors.append(f"invalid_substituent_profiles:{exc}")
     for required_identity in {"signature_features.v3.json"}:
         if required_identity not in identity_files:
             errors.append(f"missing_identity_definition:{required_identity}")

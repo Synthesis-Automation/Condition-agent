@@ -20,7 +20,7 @@ def _co_occurring_patterns(
 ) -> tuple[str, ...]:
     """Select non-overlapping synthesis-pattern interpretations."""
     selected = []
-    occupied: set[int] = set()
+    occupied_edits: set[int] = set()
     synthesis_matches = tuple(
         sorted(
             (
@@ -43,11 +43,11 @@ def _co_occurring_patterns(
         indices = set(match.matched_edit_indices)
         if (
             not indices
-            or occupied.intersection(indices)
+            or bool(occupied_edits.intersection(indices))
         ):
             continue
         selected.append(match.pattern_id)
-        occupied.update(indices)
+        occupied_edits.update(indices)
     return tuple(selected) if len(selected) > 1 else ()
 
 

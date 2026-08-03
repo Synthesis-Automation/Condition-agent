@@ -17,6 +17,7 @@
     "reactivity_rendering.v1.json",
     "synthesis_patterns.v2.json",
     "transformation_patterns.v2.json",
-    "source_label_crosswalk.v1.json"
+    "source_label_crosswalk.v1.json",
+    "substituent_profiles.v1.json"
   ]
 }

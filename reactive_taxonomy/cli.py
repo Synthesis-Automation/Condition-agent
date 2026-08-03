@@ -59,6 +59,7 @@ _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_event_count",
     "reaction_core_primary_center_count",
     "reaction_core_remote_classes",
+    "reaction_core_substituent_profiles",
     "reaction_core_remote_subgraphs",
     "reaction_core_warnings",
 )
@@ -772,6 +773,24 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         )
         for subgraph in remote_subgraphs
     )
+    profile_summary = sorted(
+        {
+            ":".join(
+                str(value)
+                for value in (
+                    subgraph.get("side") or "unknown",
+                    profile.get("base_class") or "generic_R",
+                    profile.get("carbon_substitution") or "unresolved",
+                    profile.get("local_environment_key") or "",
+                )
+            )
+            for subgraph in remote_subgraphs
+            for port in subgraph.get("attachment_ports") or ()
+            if isinstance(port, Mapping)
+            for profile in (port.get("substituent_profile") or {},)
+            if isinstance(profile, Mapping)
+        }
+    )
 
     return {
         "source_row": record["source_row"],
@@ -840,6 +859,7 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             else ""
         ),
         "reaction_core_remote_classes": "; ".join(remote_classes),
+        "reaction_core_substituent_profiles": "; ".join(profile_summary),
         "reaction_core_remote_subgraphs": "; ".join(remote_summary),
         "reaction_core_warnings": "; ".join(
             str(value) for value in reaction_core.get("warnings") or []

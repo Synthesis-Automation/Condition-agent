@@ -577,6 +577,48 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         placeholder_labels = tuple(
             label_by_index[index] for index in sorted(label_by_index)
         )
+        profile_source = tuple(
+            value
+            for value in projection.substituents
+            if value.side == "reactant"
+            and value.placeholder_index is not None
+            and value.display_label
+        ) or tuple(
+            value
+            for value in projection.substituents
+            if value.side == "product"
+            and value.placeholder_index is not None
+            and value.display_label
+        )
+        profile_legend = []
+        seen_profile_labels = set()
+        for value in sorted(
+            profile_source,
+            key=lambda item: int(item.placeholder_index or 0),
+        ):
+            label = str(value.display_label)
+            if label in seen_profile_labels:
+                continue
+            seen_profile_labels.add(label)
+            profile = value.substituent_profile
+            descriptors = []
+            if profile.carbon_substitution not in {
+                "not_carbon",
+                "not_applicable",
+                "unresolved",
+            }:
+                descriptors.append(profile.carbon_substitution)
+            descriptors.append(profile.base_class.replace("_", " "))
+            descriptors.extend(
+                name
+                for name, present in (
+                    ("benzylic", profile.benzylic),
+                    ("allylic", profile.allylic),
+                    ("propargylic", profile.propargylic),
+                )
+                if present
+            )
+            profile_legend.append(f"{label}={' '.join(descriptors)}")
         hidden_aromatic = tuple(
             sorted(
                 {
@@ -617,6 +659,8 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         )
         if placeholder_labels:
             note += f"; labels: {', '.join(placeholder_labels)}"
+        if profile_legend:
+            note += f"; R profiles: {', '.join(profile_legend)}"
         if hidden_aromatic:
             note += f"; hidden aromatic: {', '.join(hidden_aromatic)}"
         if hidden_connectors:

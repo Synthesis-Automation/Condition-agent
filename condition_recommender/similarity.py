@@ -9,7 +9,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
-from .signature_features import environment_profile_similarity
+from .signature_features import (
+    environment_profile_similarity,
+    substituent_profile_similarity,
+)
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_similarity.v1.json"
 _DEFINITION_ID = "generic_similarity.v1"
@@ -182,6 +185,9 @@ def _reaction_topology_similarity(
 def assess_signature_similarity(
     query: Mapping[str, Any],
     precedent: Mapping[str, Any],
+    *,
+    query_reaction_core: Mapping[str, Any] | None = None,
+    precedent_reaction_core: Mapping[str, Any] | None = None,
 ) -> SimilarityAssessment:
     """Calculate a complete, auditable structural similarity assessment."""
     edit_fields = (
@@ -202,6 +208,10 @@ def assess_signature_similarity(
     precedent_transformation = str(precedent.get("transformation_class") or "")
     query_family = str(query.get("named_family") or "")
     precedent_family = str(precedent.get("named_family") or "")
+    profile_similarity = substituent_profile_similarity(
+        query_reaction_core,
+        precedent_reaction_core,
+    )
     components = {
         "edit_topology": jaccard(query_edits, precedent_edits),
         "reaction_events": _multiset_jaccard(
@@ -215,7 +225,11 @@ def assess_signature_similarity(
             _partner_tokens(query, "anchor_contexts"),
             _partner_tokens(precedent, "anchor_contexts"),
         ),
-        "environment": environment_profile_similarity(query, precedent),
+        "environment": (
+            profile_similarity
+            if profile_similarity is not None
+            else environment_profile_similarity(query, precedent)
+        ),
         "spectators": jaccard(
             _spectator_tokens(query), _spectator_tokens(precedent)
         ),

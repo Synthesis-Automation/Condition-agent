@@ -7,7 +7,10 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Iterable, Optional, Tuple
 
-from .chemistry.rdkit_utils import parse_smiles
+from .chemistry.rdkit_utils import (
+    parse_smiles,
+    prepare_fragment_serialization_copy,
+)
 from .reaction_correspondence import (
     AtomPair,
     infer_partial_scaffold_correspondence_candidates,
@@ -124,9 +127,10 @@ def _fragment_smiles(
 ) -> str:
     from rdkit import Chem
 
+    copied = prepare_fragment_serialization_copy(molecule, atom_indices)
     return str(
         Chem.MolFragmentToSmiles(
-            molecule,
+            copied,
             atomsToUse=list(atom_indices),
             canonical=True,
             isomericSmiles=True,

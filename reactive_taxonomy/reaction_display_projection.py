@@ -14,7 +14,13 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
-from .chemistry.rdkit_utils import parse_smiles, rdkit_available
+from .chemistry.rdkit_utils import (
+    parse_smiles,
+    prepare_fragment_serialization_copy,
+    rdkit_available,
+)
+from .reaction_core.substituents import build_substituent_profile
+from .reaction_models import ReactionCoreSubstituentProfile
 from .reaction_render_context import ReactionRenderContext
 
 try:  # pragma: no cover - exercised through the public availability check
@@ -62,6 +68,7 @@ class ReactionDisplaySubstituent:
     atom_map_numbers: Tuple[int, ...]
     fragment_smiles: str
     remote_class: Optional[str]
+    substituent_profile: ReactionCoreSubstituentProfile
     continuity: str
     boundary_action: Literal["r_placeholder", "aromatic_hydrogen_cap"]
     placeholder_index: Optional[int]
@@ -252,6 +259,7 @@ class _SubstituentDraft:
     atom_map_numbers: Tuple[int, ...]
     fragment_smiles: str
     remote_class: Optional[str]
+    substituent_profile: ReactionCoreSubstituentProfile
     continuity: str
     boundary_action: Literal["r_placeholder", "aromatic_hydrogen_cap"]
     aromatic_relations: Tuple[ReactionDisplayAromaticRelation, ...]
@@ -461,7 +469,7 @@ def _shortest_path_within(
 
 
 def _fragment_smiles(molecule: Any, atom_indices: Tuple[int, ...]) -> str:
-    copy = Chem.Mol(molecule)
+    copy = prepare_fragment_serialization_copy(molecule, atom_indices)
     for atom in copy.GetAtoms():
         atom.SetAtomMapNum(0)
     fragment_smiles = str(
@@ -710,6 +718,15 @@ def _display_component_draft(
         )
         if not atom_maps:
             atom_maps = correspondence_maps
+        substituent_profile = build_substituent_profile(
+            molecule,
+            fragment_atom_indices=omitted_atoms,
+            attachment_atom_index=attachment_index,
+            core_atom_index=retained_index,
+            attachment_bond_order=str(bond.GetBondType()).upper(),
+        )
+        if remote_class is None:
+            remote_class = substituent_profile.base_class
         dummy_atom_index = None
         if should_cap:
             removed_substituent_count += 1
@@ -745,6 +762,7 @@ def _display_component_draft(
                 atom_map_numbers=atom_maps,
                 fragment_smiles=_fragment_smiles(molecule, omitted_atoms),
                 remote_class=remote_class,
+                substituent_profile=substituent_profile,
                 continuity=continuity,
                 boundary_action=boundary_action,
                 aromatic_relations=_aromatic_relations(
@@ -1091,6 +1109,7 @@ def _public_substituent(
         atom_map_numbers=draft.atom_map_numbers,
         fragment_smiles=draft.fragment_smiles,
         remote_class=draft.remote_class,
+        substituent_profile=draft.substituent_profile,
         continuity=draft.continuity,
         boundary_action=draft.boundary_action,
         placeholder_index=draft.placeholder_index,

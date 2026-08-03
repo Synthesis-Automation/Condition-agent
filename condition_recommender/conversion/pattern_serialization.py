@@ -14,6 +14,9 @@ REACTION_PATTERN_REVIEW_FIELDS = (
     "compatible_reaction_types",
     "reaction_pattern_confidence",
     "reaction_pattern_requires_condition_evidence",
+    "primary_reaction_pattern_core_events",
+    "primary_reaction_pattern_substituent_profiles",
+    "primary_reaction_pattern_core_coverage",
 )
 
 
@@ -44,6 +47,25 @@ def flattened_reaction_pattern_fields(
         "primary_reaction_pattern": primary_id,
         "primary_reaction_pattern_count": (
             str(primary.get("occurrence_count") or 1)
+            if primary is not None
+            else ""
+        ),
+        "primary_reaction_pattern_core_events": separator.join(
+            str(value)
+            for value in (
+                primary.get("matched_core_event_ids") if primary else ()
+            )
+            or ()
+        ),
+        "primary_reaction_pattern_substituent_profiles": separator.join(
+            str(value)
+            for value in (
+                primary.get("matched_substituent_profile_ids") if primary else ()
+            )
+            or ()
+        ),
+        "primary_reaction_pattern_core_coverage": (
+            str(primary.get("covered_core_event_fraction"))
             if primary is not None
             else ""
         ),

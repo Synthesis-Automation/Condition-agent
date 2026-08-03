@@ -10,7 +10,7 @@ from ..reaction_models import ReactionAtomReference, ReactionComponent
 AtomIdentity = Tuple[object, ...]
 Coordinate = Tuple[int, int]
 Location = Tuple[ReactionComponent, Any, int]
-EditRecord = Tuple[str, Tuple[AtomIdentity, ...]]
+EditRecord = Tuple[int, str, Tuple[AtomIdentity, ...]]
 
 
 def atom_identity(reference: ReactionAtomReference) -> AtomIdentity:

@@ -160,6 +160,17 @@ def flattened_reaction_core_fields(
             ensure_ascii=False,
             sort_keys=True,
         ),
+        "reaction_core_substituent_profiles": json.dumps(
+            tuple(
+                port.get("substituent_profile") or {}
+                for remote in value.get("remote_subgraphs") or ()
+                if isinstance(remote, dict)
+                for port in remote.get("attachment_ports") or ()
+                if isinstance(port, dict)
+            ),
+            ensure_ascii=False,
+            sort_keys=True,
+        ),
         "reaction_core_evidence_status": value.get("evidence_status", ""),
         "reaction_core_json": json.dumps(
             core,

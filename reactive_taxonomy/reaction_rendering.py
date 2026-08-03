@@ -74,6 +74,43 @@ def reaction_label_definition_versions() -> dict[str, str]:
     return dict(sorted(versions.items()))
 
 
+def _render_provenance(context: ReactionRenderContext) -> dict[str, object]:
+    """Return graph-event, R-profile, and pattern provenance for one label."""
+    core = context.reaction_core
+    core_event_ids = tuple(event.event_id for event in core.events) if core else ()
+    substituent_profile_ids = tuple(
+        sorted(
+            {
+                port.substituent_profile.profile_id
+                for remote in core.remote_subgraphs
+                for port in remote.attachment_ports
+            }
+        )
+    ) if core else ()
+    matches = (
+        context.interpretation.pattern_matches
+        if context.interpretation is not None
+        else ()
+    )
+    pattern_ids = tuple(match.pattern_id for match in matches)
+    classified = {
+        index
+        for match in matches
+        for index in match.matched_edit_indices
+    }
+    unclassified = tuple(
+        index
+        for index in range(len(context.observation.edits))
+        if index not in classified
+    )
+    return {
+        "core_event_ids": core_event_ids,
+        "substituent_profile_ids": substituent_profile_ids,
+        "pattern_ids": pattern_ids,
+        "unclassified_edit_indices": unclassified,
+    }
+
+
 def _bond(order: str | None, style: str) -> str:
     glyphs = notation_style(style)
     return {
@@ -434,6 +471,7 @@ def render_reaction(
     warnings = tuple(sorted(set(observation.warnings)))
     versions = reaction_label_definition_versions()
     definition_version = ";".join(f"{key}={value}" for key, value in versions.items())
+    render_provenance = _render_provenance(context)
     conflict = observation.evidence_quality in {
         "conflicting_edit_evidence",
         "conflicting_stereochemical_evidence",
@@ -448,6 +486,7 @@ def render_reaction(
             warnings=warnings,
             style=style,
             definition_version=definition_version,
+            **render_provenance,
         )
     if partial_transformation is not None and not observation.edits:
         text = _partial_equation(partial_transformation, style=style)
@@ -460,6 +499,7 @@ def render_reaction(
             warnings=tuple(sorted(set(warnings + partial_transformation.warnings))),
             style=style,
             definition_version=definition_version,
+            **render_provenance,
         )
     if not observation.edits:
         return RenderedReactionLabel(
@@ -471,20 +511,37 @@ def render_reaction(
             warnings=warnings,
             style=style,
             definition_version=definition_version,
+            **render_provenance,
         )
-    event_count = len(signature.events) if signature is not None else (
-        observation.core.event_count if observation.core is not None else 1
+    core = observation.core
+    event_count = core.event_count if core is not None else (
+        len(signature.events) if signature is not None else 1
+    )
+    core_edit_indices = tuple(
+        sorted(
+            {
+                index
+                for event in core.events
+                for index in event.edit_indices
+                if 0 <= index < len(observation.edits)
+            }
+        )
+    ) if core is not None else ()
+    render_edits = (
+        tuple(observation.edits[index] for index in core_edit_indices)
+        if set(core_edit_indices) == set(range(len(observation.edits)))
+        else observation.edits
     )
     equation = _ring_equation(observation, reactants, style=style)
     basis = "ring_topology" if equation is not None else "reaction_sites"
     if equation is None:
-        equation = _site_equation(reactants, observation.edits, style=style)
+        equation = _site_equation(reactants, render_edits, style=style)
     if equation is None:
-        equation = _context_equation(reactants, observation.edits, style=style)
+        equation = _context_equation(reactants, render_edits, style=style)
         basis = "local_context"
     if equation is None:
         fragments = []
-        for edit in observation.edits:
+        for edit in render_edits:
             endpoint = edit.atom_1.element
             if edit.atom_2 is not None:
                 endpoint += _bond(edit.new_order or edit.old_order, style) + edit.atom_2.element
@@ -505,6 +562,7 @@ def render_reaction(
         style=style,
         definition_version=definition_version,
         event_count=event_count,
+        **render_provenance,
     )
 
 

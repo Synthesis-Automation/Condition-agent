@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "substituent_profiles.v1",
+  "algorithm_version": "substituent_profile.v1",
+  "base_classes": [
+    "aryl",
+    "heteroaryl",
+    "alkyl",
+    "alkenyl",
+    "alkynyl",
+    "acyl",
+    "ring_aliphatic",
+    "heteroatom",
+    "generic_R"
+  ],
+  "carbon_substitution_classes": [
+    "not_carbon",
+    "not_applicable",
+    "methyl",
+    "primary",
+    "secondary",
+    "tertiary",
+    "quaternary",
+    "unresolved"
+  ],
+  "feature_levels": {
+    "L0": ["base_class"],
+    "L1": [
+      "carbon_substitution",
+      "cyclic",
+      "benzylic",
+      "allylic",
+      "propargylic"
+    ],
+    "L2": [
+      "alpha_branch_count",
+      "beta_branch_count",
+      "ring_sizes",
+      "aromatic_substituent_relations",
+      "radius_1_heteroatoms",
+      "radius_2_heteroatoms"
+    ],
+    "L3": ["local_environment_key"]
+  }
+}

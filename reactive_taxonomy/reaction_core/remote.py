@@ -6,7 +6,10 @@ from collections import deque
 from dataclasses import replace
 from typing import Any, Mapping, Optional, Sequence, Tuple
 
-from ..chemistry.rdkit_utils import parse_smiles
+from ..chemistry.rdkit_utils import (
+    parse_smiles,
+    prepare_fragment_serialization_copy,
+)
 from ..reaction_models import ReactionComponent
 from .common import Coordinate as _Coordinate, Location as _Location
 from .common import atom_map_number as _atom_map_number
@@ -16,6 +19,7 @@ from .models import (
     ReactionCoreRemoteClass,
     ReactionCoreRemoteSubgraph,
 )
+from .substituents import build_substituent_profile
 
 
 def _connected_remote_components(
@@ -59,7 +63,7 @@ def _connected_remote_components(
 def _fragment_smiles(molecule: Any, atom_indices: Sequence[int]) -> str:
     from rdkit import Chem
 
-    copied = Chem.Mol(molecule)
+    copied = prepare_fragment_serialization_copy(molecule, atom_indices)
     for atom in copied.GetAtoms():
         atom.SetAtomMapNum(0)
     try:
@@ -185,6 +189,15 @@ def _build_remote_subgraphs_for_side(
                             ),
                             attachment_element=attachment.GetSymbol(),
                             bond_order=str(bond.GetBondType()).upper(),
+                            substituent_profile=build_substituent_profile(
+                                molecule,
+                                fragment_atom_indices=atom_indices,
+                                attachment_atom_index=attachment_index,
+                                core_atom_index=core_index,
+                                attachment_bond_order=str(
+                                    bond.GetBondType()
+                                ).upper(),
+                            ),
                         )
                     )
             if not ports:

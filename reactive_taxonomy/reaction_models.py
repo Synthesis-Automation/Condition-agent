@@ -11,8 +11,10 @@ from .models import MoleculeAnalysis, MolecularStructureObservation
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.4"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "3.0"
-REACTION_CORE_PROJECTION_SCHEMA_VERSION = "3.0"
-REACTION_PATTERN_MATCH_SCHEMA_VERSION = "4.0"
+REACTION_CORE_PROJECTION_SCHEMA_VERSION = "3.1"
+REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION = "1.0"
+REACTION_CORE_EVENT_RELATION_SCHEMA_VERSION = "1.0"
+REACTION_PATTERN_MATCH_SCHEMA_VERSION = "4.1"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v11"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
 REACTION_TOPOLOGY_SCHEMA_VERSION = "2.0"
@@ -443,7 +445,11 @@ class RenderedReactionLabel:
     style: str
     definition_version: str
     event_count: int = 0
-    schema_version: str = "1.0"
+    core_event_ids: Tuple[str, ...] = ()
+    substituent_profile_ids: Tuple[str, ...] = ()
+    pattern_ids: Tuple[str, ...] = ()
+    unclassified_edit_indices: Tuple[int, ...] = ()
+    schema_version: str = "1.1"
 
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:
@@ -744,6 +750,77 @@ ReactionCoreRemoteClass = Literal[
 
 
 @dataclass(frozen=True)
+class ReactionCoreAromaticSubstituentRelation:
+    """Position of one remote aromatic substituent relative to an active atom."""
+
+    reactive_atom_index: int
+    ring_atom_index: int
+    aromatic_distance: int
+    positional_relation: Literal["ipso", "ortho", "meta", "para", "other"]
+    substituent_attachment_atom_index: int
+    substituent_element: str
+    substituent_bond_order: str
+    substituent_fragment_smiles: str
+
+    def __post_init__(self) -> None:
+        if self.aromatic_distance < 0:
+            raise ValueError("aromatic substituent distance cannot be negative")
+
+
+@dataclass(frozen=True)
+class ReactionCoreSubstituentProfile:
+    """Port-specific chemistry of one graph fragment omitted as an R group."""
+
+    profile_id: str
+    base_class: ReactionCoreRemoteClass
+    attachment_element: str
+    attachment_bond_order: str
+    attachment_aromatic: bool
+    attachment_hybridization: str
+    carbon_substitution: Literal[
+        "not_carbon",
+        "not_applicable",
+        "methyl",
+        "primary",
+        "secondary",
+        "tertiary",
+        "quaternary",
+        "unresolved",
+    ]
+    cyclic: bool
+    ring_sizes: Tuple[int, ...]
+    benzylic: bool
+    allylic: bool
+    propargylic: bool
+    alpha_branch_count: int
+    beta_branch_count: int
+    radius_1_heteroatoms: Tuple[str, ...]
+    radius_2_heteroatoms: Tuple[str, ...]
+    aromatic_substituent_relations: Tuple[
+        ReactionCoreAromaticSubstituentRelation, ...
+    ]
+    local_environment_key: str
+    feature_tokens: Tuple[str, ...]
+    definition_version: str
+    algorithm_version: str
+    schema_version: str = REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.profile_id.startswith("RSP1:"):
+            raise ValueError("substituent profile IDs must use the RSP1 namespace")
+        if not self.local_environment_key.startswith("RSE1:"):
+            raise ValueError(
+                "substituent environment keys must use the RSE1 namespace"
+            )
+        if self.alpha_branch_count < 0 or self.beta_branch_count < 0:
+            raise ValueError("substituent branching counts cannot be negative")
+        if tuple(sorted(set(self.ring_sizes))) != self.ring_sizes:
+            raise ValueError("substituent ring sizes must be unique and sorted")
+        if tuple(sorted(set(self.feature_tokens))) != self.feature_tokens:
+            raise ValueError("substituent feature tokens must be unique and sorted")
+
+
+@dataclass(frozen=True)
 class ReactionCoreAtomState:
     """One observed atom state on one side of a minimized reaction center."""
 
@@ -838,6 +915,7 @@ class ReactionCoreAttachmentPort:
     attachment_atom_map_number: Optional[int]
     attachment_element: str
     bond_order: str
+    substituent_profile: ReactionCoreSubstituentProfile
 
 
 @dataclass(frozen=True)
@@ -867,6 +945,43 @@ class ReactionCoreEvent:
     event_id: str
     transition_ids: Tuple[str, ...]
     edit_tokens: Tuple[str, ...]
+    edit_indices: Tuple[int, ...]
+    reactant_component_indices: Tuple[int, ...]
+    product_component_indices: Tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class ReactionCoreEventPath:
+    """Shortest observed molecular path between two reaction-core events."""
+
+    side: Literal["reactant", "product"]
+    component_index: int
+    start_atom_index: int
+    end_atom_index: int
+    atom_indices: Tuple[int, ...]
+    bond_count: int
+
+    def __post_init__(self) -> None:
+        if self.bond_count < 0:
+            raise ValueError("reaction event path bond count cannot be negative")
+        if self.atom_indices and len(self.atom_indices) != self.bond_count + 1:
+            raise ValueError("reaction event path size does not match bond count")
+
+
+@dataclass(frozen=True)
+class ReactionCoreEventRelation:
+    """Graph-derived relationship between two minimized reaction events."""
+
+    event_id_1: str
+    event_id_2: str
+    relation_type: Literal[
+        "same_component", "shared_active_atom", "independent", "unresolved"
+    ]
+    shared_reactant_component_indices: Tuple[int, ...]
+    shared_product_component_indices: Tuple[int, ...]
+    shortest_paths: Tuple[ReactionCoreEventPath, ...]
+    evidence: str
+    schema_version: str = REACTION_CORE_EVENT_RELATION_SCHEMA_VERSION
 
 
 @dataclass(frozen=True)
@@ -882,6 +997,7 @@ class ReactionCoreProjection:
     atom_transitions: Tuple[ReactionCoreAtomTransition, ...]
     state_changes: Tuple[ReactionCoreStateChange, ...]
     events: Tuple[ReactionCoreEvent, ...]
+    event_relations: Tuple[ReactionCoreEventRelation, ...]
     remote_subgraphs: Tuple[ReactionCoreRemoteSubgraph, ...]
     edit_tokens: Tuple[str, ...]
     participant_tokens: Tuple[str, ...]
@@ -921,6 +1037,13 @@ class ReactionCoreProjection:
             for transition in self.atom_transitions
         ):
             raise ValueError("a reaction-core projection requires a primary center")
+        event_ids = {event.event_id for event in self.events}
+        if any(
+            relation.event_id_1 not in event_ids
+            or relation.event_id_2 not in event_ids
+            for relation in self.event_relations
+        ):
+            raise ValueError("reaction-core event relation refers to an unknown event")
 
 
 @dataclass(frozen=True)
@@ -972,6 +1095,9 @@ class ReactionPatternMatch:
     specificity: int
     display_importance: int
     matched_edit_indices: Tuple[int, ...]
+    matched_core_event_ids: Tuple[str, ...]
+    matched_substituent_profile_ids: Tuple[str, ...]
+    covered_core_event_fraction: float
     evidence: Tuple[str, ...]
     occurrence_count: int = 1
     compatible_named_families: Tuple[str, ...] = ()
@@ -990,6 +1116,18 @@ class ReactionPatternMatch:
             raise ValueError("reaction pattern occurrence count must be positive")
         if tuple(sorted(set(self.matched_edit_indices))) != self.matched_edit_indices:
             raise ValueError("reaction pattern edit indices must be unique and sorted")
+        if tuple(sorted(set(self.matched_core_event_ids))) != (
+            self.matched_core_event_ids
+        ):
+            raise ValueError("reaction pattern core-event IDs must be unique and sorted")
+        if tuple(sorted(set(self.matched_substituent_profile_ids))) != (
+            self.matched_substituent_profile_ids
+        ):
+            raise ValueError(
+                "reaction pattern substituent-profile IDs must be unique and sorted"
+            )
+        if not 0.0 <= self.covered_core_event_fraction <= 1.0:
+            raise ValueError("reaction pattern core-event coverage must be in [0, 1]")
 
 
 @dataclass(frozen=True)

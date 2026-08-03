@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "9.0"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v9.0"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "9.1"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v9.1"
 
 
 class AdmissionTier(str, Enum):

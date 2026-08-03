@@ -275,7 +275,7 @@ def _explanation(
         "reaction_topology": "reaction topology",
         "handles": "reactive handles",
         "contexts": "attachment contexts",
-        "environment": "local environments",
+        "environment": "R-group and attachment environments",
         "spectators": "spectator groups",
         "transformation": "transformation class",
         "family": "named family",
@@ -299,6 +299,12 @@ def _explanation(
                 f"{name.removeprefix('reaction_center_').replace('_', ' ')} {score:.2f}"
                 for name, score in local_scores
             )
+        )
+    environment_score = similarity_components.get("environment")
+    if environment_score is not None and environment_score < 0.5:
+        notes.append(
+            "R-group/attachment environment differs from the query "
+            f"(similarity {environment_score:.2f})"
         )
     if query_scope and precedent_scope and query_scope != precedent_scope:
         notes.append(
@@ -330,6 +336,7 @@ def rank_condition_recipes(
             SimilarityAssessment,
         ]
     ] = None,
+    query_reaction_core: Mapping[str, Any] | None = None,
 ) -> Tuple[GenericConditionRecommendation, ...]:
     """Aggregate recipe cores and rank them with a complete score trace."""
     rules = load_generic_ranking_rules()
@@ -355,7 +362,12 @@ def rank_condition_recipes(
             query_value: Mapping[str, Any],
             row: GenericIndexedReaction,
         ) -> SimilarityAssessment:
-            return assess_signature_similarity(query_value, row.signature)
+            return assess_signature_similarity(
+                query_value,
+                row.signature,
+                query_reaction_core=query_reaction_core,
+                precedent_reaction_core=row.reaction_core,
+            )
 
     scored = [
         ScoredPrecedent(

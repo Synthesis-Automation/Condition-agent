@@ -1,7 +1,7 @@
 # Type-Agnostic Reaction Recommendation: Implementation Status and Roadmap
 
 **Status:** Consolidated implementation reference  
-**Reviewed against code, definitions, tests, and local artifacts:** 2026-08-01
+**Reviewed against code, definitions, tests, and local artifacts:** 2026-08-03
 **Companion design:** 
 [`reaction_condition_recommendation_design_for_chemists.md`](reaction_condition_recommendation_design_for_chemists.md)
 
@@ -48,11 +48,12 @@ reactive_taxonomy       condition_registry
 | Molecular structure and annotations | Implemented | Structure-only graph observations plus optional motifs, reactive-site hypotheses, connectivity hypotheses, and typed reactivity profiles |
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
 | Structural evidence | Implemented | Validated maps and bounded scaffold, global, and fragmented correspondence produce normalized edits or explicit alternatives; reaction patterns never generate edits |
-| Optional patterns | Implemented | Generic transformation and synthesis-pattern matches consume completed observations and may add display/family evidence only |
+| Optional patterns | Implemented | Generic transformation and synthesis-pattern matches consume completed observations and cite normalized edits, core events, and R profiles; they may add display/family evidence only |
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
 | Reaction signatures | Implemented | Deterministic graph-only RS3 L0–L4 signatures, events, ring-change observations, topology, and unknown-family support |
-| Reaction minimization | V2.4 integrated, calibration pending | Template-free minimum-core projection from mapped or inferred correspondence, with atom transitions, remote subgraphs, typed attachment ports, robust shape keys, and review export |
+| Reaction minimization | V3.1 integrated, calibration pending | Template-free minimum-core projection with edit-provenanced events, inter-event shortest paths, remote subgraphs, port-specific R profiles, stable existing identity keys, and review export |
+| R-group representation | V1 shadow integration | Exact omitted fragments remain graph-provenanced while every attachment port receives L0-L3 class, substitution, resonance, branching, ring, heteroatom, and local-environment features |
 | Reactivity descriptors | Optional annotation | Typed context-aware molecular profiles are available above structural observation and do not affect core or signature identity |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
@@ -72,26 +73,28 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `9.0` |
+| Reaction analysis | `10.0` |
 | Reaction observation | `3.0` |
-| Reaction interpretation | `5.0` |
-| Rendered reaction label | `4.0` |
+| Reaction interpretation | `7.0` |
+| Rendered reaction label | `1.1` |
 | Reaction signature / ID namespace | `3.4` / `RS3` |
 | Reaction ring change | `1.0` |
 | Reaction topology | `2.0` |
-| Reaction core projection / algorithm | `2.4` / `reaction_core_projection.v10` |
+| Reaction core projection / algorithm | `3.1` / `reaction_core_projection.v11` |
+| Reaction substituent profile | `1.0` / `substituent_profile.v1` |
+| Reaction-pattern match | `4.1` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `8.0` |
-| Generic converter definition | `generic_conversion.v9.0` |
+| Recommendation record | `9.1` |
+| Generic converter definition | `generic_conversion.v9.1` |
 | Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
-| Concise reaction review | `9.0` |
+| Concise reaction review | `11.1` |
 | Shared chemist review summary | `3.0` |
 | Recommendation artifact workflow | `1.1` |
-| Generic persisted index | `3.0` |
+| Generic persisted index | `5.0` |
 | Generic recommendation result | `2.4` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.8` |
@@ -351,8 +354,9 @@ warning.
 The featurizer GUI shows the complete reaction graph above the **Minimized
 reaction** panel. Its note exposes the minimum reaction SMILES, `R` count,
 hidden connectors, removed aromatic-substituent count, evidence status,
-confidence, and intramolecular annotation. Missing-core behavior remains
-explicit rather than inventing a display projection.
+confidence, a port-specific R-profile legend, and intramolecular annotation.
+Missing-core behavior remains explicit rather than inventing a display
+projection.
 
 ### 2.6 External RXNMapper Fischer POC
 
@@ -557,17 +561,24 @@ observations.
 - graph-derived local reactivity profiles and unchanged spectators in the
   optional annotation layer;
 - a serialized, template-free `ReactionCoreProjection` for mapped edit
-  observations. The version 2 schema keeps every edit-participating atom as an atom transition,
+  observations. The version 3.1 schema keeps every edit-participating atom as an atom transition,
   chooses a smaller set of primary centers only for explanation, removes each
   unchanged remote connected component once, and records every cut as a typed
-  attachment port on that remote subgraph;
+  attachment port on that remote subgraph. Core events cite normalized edit
+  indices and component provenance; distinct events record their shared
+  molecule and shortest observed connector path;
+- port-specific `ReactionCoreSubstituentProfile` records with L0 class, L1
+  substitution/resonance context, L2 branching/ring/heteroatom context, and L3
+  deterministic local-environment keys. Existing RCX2/RCT2/RSH2 identity
+  payloads remain on their prior identity version during shadow evaluation;
 - four purpose-specific reaction-core identities: exact `RCX2`, typed `RCT2`,
   mapping-robust shape `RSH2`, and diagnostic center transition `RCS2`.
 
-The remote classes (`aryl`, `heteroaryl`, `alkyl`, and related classes) are
-derived from the removed molecular graph. They are not selected from a reaction
-template or inferred from a source reaction name. Exact fragment SMILES and
-graph-derived fragment statistics remain available beside the concise class.
+The remote classes (`aryl`, `heteroaryl`, `alkyl`, and related classes) and
+their richer port profiles are derived from the removed molecular graph. They
+are not selected from a reaction template, R-number display label, or source
+reaction name. Exact fragment SMILES and graph-derived fragment statistics
+remain available beside the concise class.
 
 `RCX2`, `RCT2`, and `RSH2` form an exact-to-local-to-context retrieval ladder.
 `RSH2` includes generic primary-center transitions, graph-derived participant
@@ -583,8 +594,8 @@ it. It does not change reaction-signature identity, named-family assignment, or
 converter admission. Its schema and algorithm versions are serialized
 explicitly, and stale core artifacts are rejected. The CLI and desktop
 featurizer expose the minimized label, evidence, `RSH2`, diagnostic `RCS2`,
-core size, remote subgraphs, attachment counts, and warnings; reaction batch
-CSV exports the corresponding audit fields.
+core size, event relationships, remote subgraphs, attachment profiles, and
+warnings; reaction batch CSV exports the corresponding audit fields.
 
 The internal `CEG1` connectivity-edit graph is the normalized structural
 evidence from which the minimum core and RS3 signature are derived; it is not a
@@ -592,7 +603,8 @@ separate public identity.
 
 ### 3.2 Interpretation
 
-Generic transformation and synthesis patterns are derived from existing edits.
+Generic transformation and synthesis patterns are derived from existing edits
+and cite the core event IDs and substituent profiles supporting each match.
 They are optional `ReactionInterpretation` values and contain no operators,
 structural slots, predicted products, or edit-generation instructions. Mapped
 or otherwise verified unknown chemistry can receive:

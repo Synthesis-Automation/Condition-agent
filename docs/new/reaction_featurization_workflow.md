@@ -19,11 +19,15 @@ Normalize observed edits or retain explicit edit hypotheses
 Build ReactionObservation
   ├─ topology and completeness
   ├─ minimum ReactionCoreProjection
+  │    ├─ edit-provenanced reaction events
+  │    ├─ shortest-path relationships between multiple sites
+  │    └─ omitted fragments with port-specific R-group profiles
   └─ generic ReactionSignature when evidence is sufficient
   ↓
 Add optional annotations
   ├─ molecular motifs and reactive-site hypotheses
-  └─ generic transformation and synthesis-pattern matches
+  └─ generic transformation and synthesis-pattern matches that cite
+     core event IDs, edit indices, and attachment-profile IDs
   ↓
 Build one terminal ReactionRenderContext
   ├─ render the reaction label
@@ -43,7 +47,7 @@ been built.
 | --- | --- | --- |
 | Molecular structure | Parsed atoms, bonds, components, maps, charge, aromaticity, stereo | Motifs, reactive sites, reaction families |
 | Correspondence and edits | Atom-origin alternatives, formed/broken/order/H changes, confidence, provenance | Named reactions and reaction-site routing |
-| `ReactionObservation` | Structure-only components, edits or hypotheses, topology, completeness, minimum core | Molecular annotations, patterns, family labels, display text |
+| `ReactionObservation` | Structure-only components, edits or hypotheses, topology, completeness, minimum core, event relationships, omitted-fragment profiles | Molecular annotations, patterns, family labels, display text |
 | `ReactionSignature` | Versioned generic chemistry identity | Display labels, source names, motifs, reactive-site hypotheses, family identity |
 | Molecular interpretation | Motif matches, reactive-site hypotheses, local reactivity profiles, connectivity hypotheses | Reaction evidence or identity |
 | Reaction interpretation | Patterns supported by existing edits, optional family evidence | Atom correspondence, edits, predicted products |
@@ -107,8 +111,26 @@ projects parsed components to `ReactionStructureComponent` and builds:
 For inferred correspondence, deterministic internal atom IDs allow the minimum
 core to be generated without mutating or pretending that the input was mapped.
 The core keeps active atom transitions, connected events, remote graph shape,
-and attachment ports. It does not use motifs, reactive-site hypotheses, source
-labels, or family names.
+attachment ports, and shortest observed paths between distinct edit events in
+the same molecule. Every core event records its normalized edit indices and
+reactant/product component provenance. It does not use motifs, reactive-site
+hypotheses, source labels, or family names.
+
+Every attachment port carries a versioned `ReactionCoreSubstituentProfile`
+derived from the omitted graph rather than its display label. The profile
+separates fragment identity from port chemistry and exposes four abstraction
+levels:
+
+| Level | Port information |
+| --- | --- |
+| L0 | alkyl, ring alkyl, aryl, heteroaryl, alkenyl, alkynyl, acyl, or heteroatom |
+| L1 | methyl/primary/secondary/tertiary, cyclic, benzylic, allylic, or propargylic |
+| L2 | alpha/beta branching, ring sizes, and nearby heteroatoms |
+| L3 | deterministic radius-two local-environment key |
+
+`R1`, `R2`, and similar drawing symbols identify continuity. They are not
+chemical classifications. The exact fragment SMILES and all atom/port
+provenance remain serialized beside the profile.
 
 The signature hashes normalized chemistry and identity-bearing definition
 versions. It is invariant to irrelevant component order and serialization. A
@@ -129,7 +151,9 @@ but disabling their definitions must leave the observation, minimum core, and
 signature unchanged.
 
 [`match_reaction_patterns()`](../reactive_taxonomy/reaction_patterns.py) then
-matches optional patterns against the completed observation. Generic patterns
+matches optional patterns against the completed observation. Each match records
+the normalized edit indices, core event IDs, attached substituent-profile IDs,
+and fraction of core events that support it. Generic patterns
 include net substitution, elimination, addition, coupling, bond cleavage,
 bond-order direction, and ring opening or closure. Reusable graph queries live
 in `reaction_pattern_predicates.py`; validated v2 metadata lives in
@@ -149,7 +173,10 @@ optional family evidence; they cannot modify structural facts.
 
 When two synthesis patterns are supported by non-overlapping edit subsets, the
 interpretation retains both as `co_occurring_pattern_ids`. They remain typed
-annotations and do not replace graph-derived reaction rendering.
+annotations and do not replace graph-derived reaction rendering. Distinct
+patterns may occupy non-overlapping edit subsets of one connected core event;
+this supports tandem operations on the same atom without inventing a false
+event split.
 
 ## 5. Build terminal presentation context, render, and serialize
 
@@ -173,8 +200,9 @@ not parse or depend on each other.
 [`render_reaction()`](../../reactive_taxonomy/reaction_rendering.py) is the sole
 terminal reaction renderer. `RenderedReactionLabel.text` is the only complete
 reaction label; `status`, `basis`, `evidence`, `confidence`, and `warnings` are
-metadata. The renderer consumes finalized edits, topology, signature events,
-reactive-site labels, and local contexts. It does not read source reaction names
+metadata. The renderer orders and selects normalized edits through the core
+events and serializes the contributing core event IDs, R-profile IDs, pattern
+IDs, and any unclassified edit indices. It does not read source reaction names
 or use optional named-family annotations to override graph evidence.
 
 [`build_reaction_core_graphic()`](../../visualization/reaction_core_graphic.py)
@@ -235,8 +263,11 @@ CSV is a review view.
 - Parse graph facts before running molecular annotation definitions.
 - Correspondence and normalized edits do not depend on reaction patterns.
 - The minimum core is structured graph evidence and contains no display label.
+- R-group chemistry is derived per attachment port; `R1`/`R2` remain continuity
+  labels only.
 - Molecular annotations and reaction patterns are optional overlays.
-- Patterns consume edits; they never generate them.
+- Patterns consume core-provenanced edits and cite their event/profile evidence;
+  they never generate edits.
 - Ambiguity, conflicts, confidence, and provenance remain explicit.
 - Rendering explains chemistry but does not define chemistry identity.
 - Text and minimized graphics consume the same `ReactionRenderContext` and

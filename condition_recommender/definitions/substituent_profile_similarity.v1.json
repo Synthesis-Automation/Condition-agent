@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "substituent_profile_similarity.v1",
+  "calibration_status": "chemistry_prior_not_statistically_calibrated",
+  "level_weights": {
+    "L0": 0.35,
+    "L1": 0.30,
+    "L2": 0.25,
+    "L3": 0.10
+  },
+  "missing_profile_policy": "use_existing_environment_profile"
+}

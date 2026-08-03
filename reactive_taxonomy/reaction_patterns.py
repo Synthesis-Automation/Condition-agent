@@ -1114,6 +1114,16 @@ def match_reaction_patterns(
         indices = tuple(sorted(set(predicate(context))))
         if not indices:
             continue
+        core_event_ids = context.core_event_ids_for_indices(indices)
+        if observation.core is not None:
+            core_covered_indices = {
+                edit_index
+                for event in observation.core.events
+                if event.event_id in set(core_event_ids)
+                for edit_index in event.edit_indices
+            }
+            if not set(indices).issubset(core_covered_indices):
+                continue
         matches.append(
             ReactionPatternMatch(
                 pattern_id=str(definition["id"]),
@@ -1122,8 +1132,22 @@ def match_reaction_patterns(
                 specificity=int(definition.get("specificity", 0)),
                 display_importance=int(definition.get("display_importance", 0)),
                 matched_edit_indices=indices,
-                evidence=(observation.evidence_quality,),
-                occurrence_count=_occurrence_count(observation, indices),
+                matched_core_event_ids=core_event_ids,
+                matched_substituent_profile_ids=(
+                    context.core_profile_ids_for_events(core_event_ids)
+                ),
+                covered_core_event_fraction=context.core_event_coverage(
+                    core_event_ids
+                ),
+                evidence=(
+                    observation.evidence_quality,
+                    *(('reaction_core_events',) if core_event_ids else ()),
+                ),
+                occurrence_count=(
+                    len(core_event_ids)
+                    if core_event_ids
+                    else _occurrence_count(observation, indices)
+                ),
                 compatible_named_families=tuple(
                     definition.get("compatible_named_families") or ()
                 ),

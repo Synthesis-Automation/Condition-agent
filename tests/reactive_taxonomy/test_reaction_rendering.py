@@ -24,6 +24,10 @@ def test_reaction_label_is_derived_from_normalized_edits() -> None:
         "style",
         "definition_version",
         "event_count",
+        "core_event_ids",
+        "substituent_profile_ids",
+        "pattern_ids",
+        "unclassified_edit_indices",
         "schema_version",
     }
 

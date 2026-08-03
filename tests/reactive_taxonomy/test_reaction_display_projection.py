@@ -291,3 +291,19 @@ def test_aromatic_valence_completion_retains_exocyclic_carbonyl() -> None:
     )
     assert "c(=O)" in projection.reactants[0].display_smiles
     assert "c(=O)" in projection.products[0].display_smiles
+
+
+def test_fragment_projection_ignores_stereobonds_outside_omitted_fragment() -> None:
+    """Parent stereobonds outside atomsToUse must not break serialization."""
+    projection = _projection(
+        "CC(C)(C)O[C:18](=O)[N:17]1[C@@H:8]("
+        "[CH2:7][CH2:6][C:5](=[O:19])[CH2:4]/[CH:3]=[CH:2]/[CH3:1])"
+        "[CH2:9][CH2:10][CH2:11][C@H:12]1[C:13](=[O:14])"
+        "[CH2:15][CH3:16]>>[CH3:1]/[CH:2]=[CH:3]\\[CH:4]="
+        "[C:5]1/[CH2:6][CH2:7][C@H:8]2[CH2:9][CH2:10][CH2:11]"
+        "[C@@H:12]([C:13](=[O:14])[CH2:15][CH3:16])[N:17]12"
+    )
+
+    assert projection.minimum_reaction_smiles == (
+        "*CC(*)=O.*N(*)C(=O)OC(C)(C)C>>*C=C(*)N(*)*"
+    )

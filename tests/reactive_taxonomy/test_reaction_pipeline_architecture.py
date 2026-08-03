@@ -134,5 +134,5 @@ def test_analysis_serializes_one_canonical_reaction_label_contract() -> None:
     } == set()
     assert payload["reaction_label"]["text"]
     assert payload["reaction_label"]["basis"]
-    assert payload["reaction_label"]["schema_version"] == "1.0"
+    assert payload["reaction_label"]["schema_version"] == "1.1"
     assert payload["interpretation"]["pattern_matches"]
