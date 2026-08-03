@@ -61,7 +61,12 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert not reaction_pixmap.isNull()
         assert window.graph_heading.text() == "Reaction graph"
         assert window.structure_image_label.toolTip() == REACTION_EXAMPLE
-        assert window.graph_tabs.currentIndex() == 1
+        graph_layout = window.full_structure_panel.parentWidget().layout()
+        assert graph_layout.indexOf(window.full_structure_panel) < (
+            graph_layout.indexOf(window.minimized_panel)
+        )
+        assert window.full_structure_panel.title() == "Full structure"
+        assert window.minimized_panel.title() == "Minimized reaction"
         core_pixmap = window.core_image_label.pixmap()
         assert core_pixmap is not None
         assert not core_pixmap.isNull()
@@ -82,7 +87,9 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert not molecule_pixmap.isNull()
         assert window.graph_heading.text() == "Compound graph"
         assert window.structure_image_label.toolTip() == "Brc1ccccc1"
-        assert not window.graph_tabs.isTabEnabled(1)
+        assert window.core_image_label.text() == (
+            "Reaction minimization applies only to reactions."
+        )
     finally:
         window.close()
         application.processEvents()
@@ -153,7 +160,6 @@ def test_window_displays_mapped_reaction_minimization() -> None:
         core_pixmap = window.core_image_label.pixmap()
         assert core_pixmap is not None
         assert not core_pixmap.isNull()
-        assert window.graph_tabs.currentIndex() == 1
         assert "Display-only minimum:" in window.core_graphic_note.text()
         assert "R groups:" in window.core_graphic_note.text()
         assert "removed unchanged aromatic substituents:" in (
@@ -172,7 +178,6 @@ def test_window_uses_r_group_display_minimization() -> None:
         window.input_edit.setText("C=CC1=CC=CC=C1>>CCc1ccccc1")
         window.analyze()
 
-        assert window.graph_tabs.currentIndex() == 1
         core_pixmap = window.core_image_label.pixmap()
         assert core_pixmap is not None
         assert not core_pixmap.isNull()

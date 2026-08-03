@@ -248,19 +248,24 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         )
         graph_header.addWidget(self.render_style_combo)
         graph_layout.addLayout(graph_header)
-        self.graph_tabs = QtWidgets.QTabWidget()
-        self.graph_tabs.setObjectName("reactionGraphicTabs")
-
+        self.full_structure_panel = QtWidgets.QGroupBox("Full structure")
+        self.full_structure_panel.setObjectName("fullStructurePanel")
+        full_structure_layout = QtWidgets.QVBoxLayout(
+            self.full_structure_panel
+        )
+        full_structure_layout.setContentsMargins(6, 10, 6, 6)
         self.structure_image_label = StructureImageLabel(
             placeholder="Reaction or compound graph will appear here.",
             object_name="featurizedStructureGraph",
             minimum_height=220,
         )
-        self.graph_tabs.addTab(self.structure_image_label, "Full structure")
+        full_structure_layout.addWidget(self.structure_image_label)
+        graph_layout.addWidget(self.full_structure_panel, 1)
 
-        minimized_panel = QtWidgets.QWidget()
-        minimized_layout = QtWidgets.QVBoxLayout(minimized_panel)
-        minimized_layout.setContentsMargins(0, 0, 0, 0)
+        self.minimized_panel = QtWidgets.QGroupBox("Minimized reaction")
+        self.minimized_panel.setObjectName("minimizedReactionPanel")
+        minimized_layout = QtWidgets.QVBoxLayout(self.minimized_panel)
+        minimized_layout.setContentsMargins(6, 10, 6, 6)
         minimized_layout.setSpacing(4)
         self.core_image_label = StructureImageLabel(
             placeholder="Mapped minimized reaction will appear here.",
@@ -274,8 +279,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.core_graphic_note.setObjectName("coreGraphicNote")
         self.core_graphic_note.setWordWrap(True)
         minimized_layout.addWidget(self.core_graphic_note)
-        self.graph_tabs.addTab(minimized_panel, "Minimized reaction")
-        graph_layout.addWidget(self.graph_tabs)
+        graph_layout.addWidget(self.minimized_panel, 1)
 
         result_layout.addWidget(analysis_column, stretch=1)
         result_layout.addWidget(graph_column, stretch=1)
@@ -522,10 +526,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.core_graphic_note.setText(
                 "Enter a reaction SMILES to generate a minimized graphic."
             )
-            self.graph_tabs.setTabEnabled(1, False)
-            self.graph_tabs.setCurrentIndex(0)
             return
-        self.graph_tabs.setTabEnabled(1, True)
         core = getattr(analysis, "reaction_core", None)
         if core is None:
             self.core_image_label.clear_image(
@@ -535,7 +536,6 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                 "Supply atom mapping, use RXNMapper for an unresolved "
                 "reaction, or enable resolved-reaction mapping."
             )
-            self.graph_tabs.setCurrentIndex(0)
             return
         try:
             projection = build_reaction_display_projection(
@@ -551,7 +551,6 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                 "Unable to render minimized reaction."
             )
             self.core_graphic_note.setText(str(exc))
-            self.graph_tabs.setCurrentIndex(0)
             return
         if not self.core_image_label.set_image_bytes(
             graphic.image_bytes,
@@ -561,7 +560,6 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.core_graphic_note.setText(
                 "The minimized renderer returned an unsupported image."
             )
-            self.graph_tabs.setCurrentIndex(0)
             return
         removed_substituent_count = sum(
             component.removed_substituent_count
@@ -608,7 +606,6 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             note += "; external mapping requires expert review"
         self.core_graphic_note.setText(note)
         self.core_image_label.setToolTip(note)
-        self.graph_tabs.setCurrentIndex(1)
 
     @QtCore.pyqtSlot()
     def _rerender_last_structure(self) -> None:
