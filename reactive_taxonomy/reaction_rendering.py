@@ -21,11 +21,10 @@ from .reaction_models import (
     PartialProductTransformation,
     ReactionComponent,
     ReactionEdit,
-    ReactionInterpretation,
     ReactionObservation,
-    ReactionSignature,
     RenderedReactionLabel,
 )
+from .reaction_render_context import ReactionRenderContext
 
 _REACTION_LABEL_DEFINITION_FILES = (
     "chemist_notation.v1.json",
@@ -423,16 +422,14 @@ def _ring_equation(
 
 
 def render_reaction(
-    observation: ReactionObservation,
-    interpretation: ReactionInterpretation | None = None,
-    *,
-    reactants: Sequence[ReactionComponent] = (),
-    signature: ReactionSignature | None = None,
-    partial_transformation: PartialProductTransformation | None = None,
-    style: str = "unicode",
+    context: ReactionRenderContext,
 ) -> RenderedReactionLabel:
     """Render the sole reaction label from completed upstream contracts."""
-    del interpretation  # Optional names/patterns must not override graph evidence.
+    observation = context.observation
+    reactants = context.reactants
+    signature = context.signature
+    partial_transformation = context.partial_transformation
+    style = context.style
     notation_style(style)
     warnings = tuple(sorted(set(observation.warnings)))
     versions = reaction_label_definition_versions()

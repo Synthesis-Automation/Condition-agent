@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Tuple
 
 from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles, rdkit_available
+from reactive_taxonomy.notation import format_chemist_text, render_remote_class
+from reactive_taxonomy.reaction_render_context import ReactionRenderContext
 
 from .rendering import apply_render_preset
 
@@ -25,7 +27,7 @@ except ImportError:  # pragma: no cover
 
 _DEFINITION_PATH = (
     Path(__file__).with_name("definitions")
-    / "reaction_core_graphic.v1.json"
+    / "reaction_core_graphic.v2.json"
 )
 _SUPPORTED_FORMATS = frozenset({"png", "svg"})
 _BOND_TYPES = {
@@ -80,15 +82,12 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     """Load and validate the versioned placeholder-rendering definition."""
     with _DEFINITION_PATH.open("r", encoding="utf-8") as handle:
         definition = dict(json.load(handle))
-    if str(definition.get("schema_version") or "") != "1.4":
+    if str(definition.get("schema_version") or "") != "2.0":
         raise ValueError("unsupported reaction-core graphic schema")
     if str(definition.get("definition_id") or "") != (
-        "reaction_core_graphic.v1.4"
+        "reaction_core_graphic.v2.0"
     ):
         raise ValueError("unexpected reaction-core graphic definition ID")
-    labels = definition.get("remote_class_labels")
-    if not isinstance(labels, Mapping) or not labels:
-        raise ValueError("reaction-core graphic requires remote-class labels")
     continuities = tuple(
         str(value)
         for value in definition.get("continuities_replaced_by_labels") or ()
@@ -184,7 +183,7 @@ def _render_remote_explicitly(subgraph: Any) -> bool:
 
 
 def _topology_protected_subgraph_ids(
-    analysis: Any,
+    analysis: ReactionRenderContext,
     *,
     side: str | None = None,
 ) -> set[str]:
@@ -228,7 +227,7 @@ def _topology_protected_subgraph_ids(
 
 
 def _multisite_scaffold_collapses(
-    analysis: Any,
+    analysis: ReactionRenderContext,
 ) -> Tuple[_MultisiteScaffoldCollapse, ...]:
     """Recognize one retained ring remainder split by several active sites."""
     from rdkit import Chem
@@ -368,7 +367,7 @@ def _multisite_scaffold_collapses(
 
 
 def _placeholder_assignments(
-    analysis: Any,
+    analysis: ReactionRenderContext,
 ) -> tuple[
     Dict[tuple[Any, ...], str],
     Tuple[ReactionCoreGraphicPlaceholder, ...],
@@ -376,7 +375,6 @@ def _placeholder_assignments(
 ]:
     core = analysis.reaction_core
     definition = load_reaction_core_graphic_definition()
-    labels = definition["remote_class_labels"]
     scaffold_collapses = _multisite_scaffold_collapses(analysis)
     topology_protected = _topology_protected_subgraph_ids(analysis)
     collapsed_subgraph_ids = {
@@ -415,18 +413,24 @@ def _placeholder_assignments(
         )
     identities_by_base: Dict[str, list[tuple[Any, ...]]] = {}
     for identity, record in representative_by_identity.items():
-        base = str(labels.get(record[0]) or "R")
+        base = render_remote_class(str(record[0]), style=analysis.style)
         identities_by_base.setdefault(base, []).append(identity)
     assignments: Dict[tuple[Any, ...], str] = {}
+    assignment_order: Dict[tuple[Any, ...], tuple[str, int]] = {}
     template = str(definition["indexed_label_template"])
     for base, identities in sorted(identities_by_base.items()):
         ordered = sorted(identities, key=repr)
         for index, identity in enumerate(ordered, start=1):
-            assignments[identity] = (
+            raw_label = (
                 template.format(label=base, index=index)
                 if len(ordered) > 1
                 else base
             )
+            assignments[identity] = format_chemist_text(
+                raw_label,
+                style=analysis.style,
+            )
+            assignment_order[identity] = (base, index)
     placeholders = tuple(
         ReactionCoreGraphicPlaceholder(
             label=assignments[identity],
@@ -436,7 +440,7 @@ def _placeholder_assignments(
         )
         for identity, record in sorted(
             representative_by_identity.items(),
-            key=lambda item: assignments[item[0]],
+            key=lambda item: assignment_order[item[0]],
         )
     )
     return assignments, placeholders, scaffold_collapses
@@ -511,7 +515,7 @@ def _embedded_core_placeholders(
 
 
 def _build_side_molecules(
-    analysis: Any,
+    analysis: ReactionRenderContext,
     *,
     side: str,
     assignments: Mapping[tuple[Any, ...], str],
@@ -673,13 +677,17 @@ def _style_draw_options(
 
 
 def build_reaction_core_graphic(
-    analysis: Any,
+    analysis: ReactionRenderContext,
     *,
     size: tuple[int, int] = (960, 260),
     image_format: str = "svg",
     render_preset: str = "current",
 ) -> ReactionCoreGraphic:
-    """Build a compact graphic from active atoms and retained remote groups."""
+    """Render the minimized graph from the shared terminal context."""
+    if not isinstance(analysis, ReactionRenderContext):
+        raise TypeError(
+            "build_reaction_core_graphic requires a ReactionRenderContext"
+        )
     _require_rdkit()
     core = getattr(analysis, "reaction_core", None)
     if core is None:
@@ -761,7 +769,7 @@ def build_reaction_core_graphic(
 
 
 def render_reaction_core_image_bytes(
-    analysis: Any,
+    analysis: ReactionRenderContext,
     *,
     size: tuple[int, int] = (960, 260),
     image_format: str = "svg",

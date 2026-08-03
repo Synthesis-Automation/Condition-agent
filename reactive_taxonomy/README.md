@@ -46,8 +46,9 @@ conflicting internal observation.
 - `observe_reaction(reaction_smiles)` returns the interpretation-free reaction
   observation, minimum core, topology, and evidence alternatives.
 - `interpret_reaction(observation)` adds optional pattern and family annotations.
-- `render_reaction(observation, interpretation)` produces the unified concise and
-  detailed display label.
+- `build_reaction_render_context(...)` combines completed chemistry for sibling
+  terminal text and minimized-graphic renderers.
+- `render_reaction(context)` produces the sole reaction label.
 - `featurize_reaction(reaction_smiles)` composes the canonical public analysis.
 
 ## Definitions

@@ -25,7 +25,9 @@ Add optional annotations
   ├─ molecular motifs and reactive-site hypotheses
   └─ generic transformation and synthesis-pattern matches
   ↓
-Render one reaction label
+Build one terminal ReactionRenderContext
+  ├─ render the reaction label
+  └─ render the minimized reaction graphic on demand
   ↓
 Serialize for conversion and recommendation
 ```
@@ -149,7 +151,24 @@ When two synthesis patterns are supported by non-overlapping edit subsets, the
 interpretation retains both as `co_occurring_pattern_ids`. They remain typed
 annotations and do not replace graph-derived reaction rendering.
 
-## 5. Render and serialize
+## 5. Build terminal presentation context, render, and serialize
+
+[`build_reaction_render_context()`](../../reactive_taxonomy/reaction_render_context.py)
+combines the completed observation, minimum core, signature, annotated
+components, topology, partial-product evidence, interpretation, and notation
+style. It is the sole typed input shared by the sibling terminal renderers.
+
+```text
+Completed reaction analysis
+  ↓
+ReactionRenderContext
+  ├─ render_reaction()                 → RenderedReactionLabel.text
+  └─ build_reaction_core_graphic()     → minimized SVG or PNG
+```
+
+The minimum `ReactionCoreProjection` remains structural evidence built in
+stage 3. Only its graphical presentation occurs here. The graphic and text do
+not parse or depend on each other.
 
 [`render_reaction()`](../../reactive_taxonomy/reaction_rendering.py) is the sole
 terminal reaction renderer. `RenderedReactionLabel.text` is the only complete
@@ -157,6 +176,11 @@ reaction label; `status`, `basis`, `evidence`, `confidence`, and `warnings` are
 metadata. The renderer consumes finalized edits, topology, signature events,
 reactive-site labels, and local contexts. It does not read source reaction names
 or use optional named-family annotations to override graph evidence.
+
+[`build_reaction_core_graphic()`](../../visualization/reaction_core_graphic.py)
+uses the same context, including the same canonical notation style. Its own
+definition controls only graphical abstraction policy; it contains no private
+`R`/`Alk`/`Ar`/`HetAr` vocabulary.
 
 All molecular-site and reaction rendering resolves shorthand through
 `chemist_notation.v1.json`. The canonical fragment vocabulary is:
@@ -215,3 +239,5 @@ CSV is a review view.
 - Patterns consume edits; they never generate them.
 - Ambiguity, conflicts, confidence, and provenance remain explicit.
 - Rendering explains chemistry but does not define chemistry identity.
+- Text and minimized graphics consume the same `ReactionRenderContext` and
+  canonical notation registry.

@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0",
+  "definition_id": "reaction_core_graphic.v2.0",
+  "continuities_replaced_by_labels": [
+    "retained"
+  ],
+  "collapse_retained_multisite_scaffolds": true,
+  "preserve_intramolecular_tethers": true,
+  "render_nonretained_subgraphs_explicitly": true,
+  "explicit_retained_subgraphs": {
+    "max_heavy_atom_count": 1,
+    "remote_classes": [
+      "heteroatom"
+    ]
+  },
+  "indexed_label_template": "{label}{index}",
+  "rendering_note": "Placeholder symbols are resolved exclusively through reactive_taxonomy/definitions/chemist_notation.v1.json. Only unchanged retained remote subgraphs are abstracted. Departing, appearing, changed, and unresolved subgraphs remain explicit. Configured small chemically informative retained fragments also remain explicit. A retained multi-port subgraph spanning two or more active atoms remains explicit when an intramolecular edit forms a ring, preserving the tether and cycle topology. Outside that case, a multi-port ring or scaffold remainder surrounding one active atom absorbs that atom into its placeholder. Multiple retained ring paths split by two or more active sites are reunited as one mapped multi-site scaffold placeholder; other multi-port fragments use one boundary node per port."
+}

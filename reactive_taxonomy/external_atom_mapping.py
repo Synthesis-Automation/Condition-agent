@@ -27,6 +27,7 @@ from .reaction_models import (
 )
 from .reaction_parser import ParsedReaction, parse_reaction_smiles
 from .reaction_rendering import render_reaction
+from .reaction_render_context import build_reaction_render_context
 
 
 EXTERNAL_ATOM_MAPPING_SCHEMA_VERSION = "1.0"
@@ -65,14 +66,16 @@ def _attach_core_and_rerender(
         base,
         reaction_core=reaction_core,
         observation=enriched_observation,
-        reaction_label=render_reaction(
-            enriched_observation,
-            base.interpretation,
+        reaction_label=render_reaction(build_reaction_render_context(
+            observation=enriched_observation,
             reactants=base.reactants,
+            agents=base.agents,
+            products=base.products,
             signature=base.reaction_signature,
             partial_transformation=base.partial_product_transformation,
             style=(base.reaction_label.style if base.reaction_label else "unicode"),
-        ),
+            interpretation=base.interpretation,
+        )),
         warnings=combined_warnings,
     )
 

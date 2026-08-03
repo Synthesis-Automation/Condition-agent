@@ -15,6 +15,11 @@ from .reaction_signatures import (
 from .reaction_observation import observe_reaction
 from .reaction_interpretation import interpret_reaction
 from .reaction_rendering import reaction_label_definition_versions, render_reaction
+from .reaction_render_context import (
+    ReactionRenderContext,
+    build_reaction_render_context,
+    reaction_render_context_from_analysis,
+)
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .external_atom_mapping import (
     analyze_reaction_with_external_mapping,
@@ -246,6 +251,7 @@ __all__ = [
     "ReactionRingChange",
     "ReactionSignature",
     "ReactionReviewSummary",
+    "ReactionRenderContext",
     "ReactionSpectatorGroup",
     "ReactionStereoChange",
     "ReactionTopology",
@@ -267,6 +273,7 @@ __all__ = [
     "build_reaction_core_projection",
     "build_observation_signature",
     "build_reaction_review_summary",
+    "build_reaction_render_context",
     "detect_molecular_motifs",
     "detect_reactive_site_hypotheses",
     "evaluate_molecular_features",
@@ -288,6 +295,7 @@ __all__ = [
     "normalize_site_assignment",
     "observe_reaction",
     "reaction_signature_definition_versions",
+    "reaction_render_context_from_analysis",
     "render_reaction",
     "reaction_label_definition_versions",
     "format_reaction_review_summary",

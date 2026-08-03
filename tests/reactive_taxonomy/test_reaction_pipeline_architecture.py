@@ -58,7 +58,12 @@ def test_interpretation_adds_optional_family_semantics() -> None:
     signature = build_observation_signature(observation)
     assert signature is not None
     assert all(partner.role is None for partner in signature.partners)
-    rendered = render_reaction(observation, interpretation)
+    from reactive_taxonomy import build_reaction_render_context
+
+    rendered = render_reaction(build_reaction_render_context(
+        observation=observation,
+        interpretation=interpretation,
+    ))
     assert rendered.basis == "literal_edits"
 
 

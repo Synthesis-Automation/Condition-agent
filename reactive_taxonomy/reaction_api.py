@@ -17,6 +17,7 @@ from .reaction_interpretation import interpret_reaction
 from .reaction_observation import build_reaction_observation
 from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_rendering import render_reaction
+from .reaction_render_context import build_reaction_render_context
 from .reaction_parser import interpret_parsed_molecules, parse_reaction_smiles
 from .reaction_stoichiometry import infer_reactant_multiplicity
 from .partial_product_correspondence import (
@@ -140,14 +141,17 @@ def featurize_reaction(
         if partial_product_transformation is not None
         else edit_result.evidence
     )
-    reaction_label = render_reaction(
-        observation,
-        interpretation,
+    render_context = build_reaction_render_context(
+        observation=observation,
         reactants=parsed.reactants,
+        agents=parsed.agents,
+        products=parsed.products,
         signature=reaction_signature,
         partial_transformation=partial_product_transformation,
         style=label_style,
+        interpretation=interpretation,
     )
+    reaction_label = render_reaction(render_context)
     fallback_descriptor = build_reaction_fallback_descriptor(
         reactants=parsed.reactants,
         products=parsed.products,

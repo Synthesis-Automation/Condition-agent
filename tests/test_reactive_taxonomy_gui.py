@@ -155,7 +155,7 @@ def test_window_displays_mapped_reaction_minimization() -> None:
         assert not core_pixmap.isNull()
         assert window.graph_tabs.currentIndex() == 1
         assert "Ar = Fc1ccccc1" in window.core_graphic_note.text()
-        assert "R = C" in window.core_graphic_note.text()
+        assert "Alk = C" in window.core_graphic_note.text()
     finally:
         window.close()
         application.processEvents()

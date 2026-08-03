@@ -21,6 +21,7 @@ from reactive_taxonomy import (  # noqa: E402
     analyze_molecule,
     featurize_reaction,
     format_reaction_review_summary,
+    reaction_render_context_from_analysis,
 )
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
 from visualization import (  # noqa: E402
@@ -537,7 +538,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             return
         try:
             graphic = build_reaction_core_graphic(
-                analysis,
+                reaction_render_context_from_analysis(analysis),
                 size=REACTION_IMAGE_SIZE,
                 image_format="svg",
                 render_preset=render_preset,

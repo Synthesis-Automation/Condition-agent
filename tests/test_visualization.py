@@ -11,6 +11,7 @@ from reactive_taxonomy import (
     AtomMappingProviderMetadata,
     analyze_reaction_with_external_mapping,
     featurize_reaction,
+    reaction_render_context_from_analysis,
     validate_external_atom_mapping,
 )
 from visualization import (
@@ -307,23 +308,23 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
     analysis = featurize_reaction(MAPPED_CLICK_REACTION)
 
     graphic = build_reaction_core_graphic(
-        analysis,
+        reaction_render_context_from_analysis(analysis),
         size=(1200, 260),
         image_format="svg",
     )
     png = render_reaction_core_image_bytes(
-        analysis,
+        reaction_render_context_from_analysis(analysis),
         size=(1200, 260),
         image_format="png",
     )
 
     assert b"<svg" in graphic.image_bytes[:512]
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
-    assert graphic.definition_id == "reaction_core_graphic.v1.4"
-    assert graphic.schema_version == "1.4"
+    assert graphic.definition_id == "reaction_core_graphic.v2.0"
+    assert graphic.schema_version == "2.0"
     assert [placeholder.label for placeholder in graphic.placeholders] == [
-        "R1",
-        "R2",
+        "Alk¹",
+        "Alk²",
     ]
     assert {
         placeholder.fragment_smiles for placeholder in graphic.placeholders
@@ -349,13 +350,14 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
         "max_heavy_atom_count": 1,
         "remote_classes": ["heteroatom"],
     }
+    assert "remote_class_labels" not in load_reaction_core_graphic_definition()
 
 
 def test_reaction_core_renderer_supports_compact_acs_style() -> None:
     analysis = featurize_reaction(MAPPED_CLICK_REACTION)
 
     graphic = build_reaction_core_graphic(
-        analysis,
+        reaction_render_context_from_analysis(analysis),
         size=(1200, 260),
         image_format="svg",
         render_preset="acs_1996_compact",
@@ -369,12 +371,12 @@ def test_reaction_core_renderer_supports_multi_port_ring_boundaries() -> None:
     analysis = featurize_reaction(MAPPED_RING_ACYLATION)
 
     graphic = build_reaction_core_graphic(
-        analysis,
+        reaction_render_context_from_analysis(analysis),
         size=(1200, 260),
         image_format="svg",
     )
     png = render_reaction_core_image_bytes(
-        analysis,
+        reaction_render_context_from_analysis(analysis),
         size=(1200, 260),
         image_format="png",
     )
@@ -400,16 +402,16 @@ def test_reaction_core_renderer_reunites_repeated_suzuki_scaffold() -> None:
     analysis = featurize_reaction(MAPPED_REPEATED_SUZUKI)
 
     graphic = build_reaction_core_graphic(
-        analysis,
+        reaction_render_context_from_analysis(analysis),
         size=(1200, 260),
         image_format="svg",
     )
 
     assert b"<svg" in graphic.image_bytes[:512]
     assert [placeholder.label for placeholder in graphic.placeholders] == [
-        "Ar1",
-        "Ar2",
-        "Ar3",
+        "Ar¹",
+        "Ar²",
+        "Ar³",
     ]
     central_scaffolds = tuple(
         placeholder
@@ -431,15 +433,15 @@ def test_renderer_reunites_externally_mapped_repeated_suzuki_scaffold() -> None:
 
     assert assessment.status == "external_mapping_only"
     graphic = build_reaction_core_graphic(
-        assessment.analysis,
+        reaction_render_context_from_analysis(assessment.analysis),
         size=(1200, 260),
         image_format="svg",
     )
 
     assert [placeholder.label for placeholder in graphic.placeholders] == [
-        "Ar1",
-        "Ar2",
-        "Ar3",
+        "Ar¹",
+        "Ar²",
+        "Ar³",
     ]
     assert sum(
         placeholder.fragment_smiles == "c1ccccc1"
@@ -454,9 +456,10 @@ def test_renderer_keeps_departing_carboxyl_oxygens_explicit() -> None:
     )
 
     analysis = featurize_reaction(MAPPED_DECARBOXYLATIVE_COUPLING)
-    assignments, _, collapses = _placeholder_assignments(analysis)
+    context = reaction_render_context_from_analysis(analysis)
+    assignments, _, collapses = _placeholder_assignments(context)
     reactants = _build_side_molecules(
-        analysis,
+        context,
         side="reactant",
         assignments=assignments,
         scaffold_collapses=collapses,
@@ -467,7 +470,7 @@ def test_renderer_keeps_departing_carboxyl_oxygens_explicit() -> None:
         for molecule in reactants
     )
     graphic = build_reaction_core_graphic(
-        analysis,
+        context,
         size=(1200, 260),
         image_format="svg",
     )
@@ -490,7 +493,8 @@ def test_renderer_preserves_intramolecular_ring_tethers(
     )
 
     analysis = featurize_reaction(reaction_smiles)
-    assignments, placeholders, collapses = _placeholder_assignments(analysis)
+    context = reaction_render_context_from_analysis(analysis)
+    assignments, placeholders, collapses = _placeholder_assignments(context)
 
     assert analysis.reaction_topology is not None
     assert analysis.reaction_topology.reaction_scope == "intramolecular"
@@ -503,7 +507,7 @@ def test_renderer_preserves_intramolecular_ring_tethers(
         ("product", analysis.products),
     ):
         reduced = _build_side_molecules(
-            analysis,
+            context,
             side=side,
             assignments=assignments,
             scaffold_collapses=collapses,
@@ -516,7 +520,7 @@ def test_renderer_preserves_intramolecular_ring_tethers(
         assert reduced[0].GetNumBonds() == expected.GetNumBonds()
 
     graphic = build_reaction_core_graphic(
-        analysis,
+        context,
         size=(1200, 260),
         image_format="svg",
     )
@@ -539,7 +543,7 @@ def test_external_mapping_preserves_intramolecular_core_topology() -> None:
     assert core is not None
     assert not hasattr(core, "abstraction")
     graphic = build_reaction_core_graphic(
-        assessment.analysis,
+        reaction_render_context_from_analysis(assessment.analysis),
         size=(1200, 260),
         image_format="svg",
     )
@@ -551,7 +555,9 @@ def test_reaction_core_renderer_accepts_inferred_minimum_core() -> None:
     analysis = featurize_reaction("CCO>>CC=O")
 
     assert analysis.reaction_core is not None
-    graphic = build_reaction_core_graphic(analysis)
+    graphic = build_reaction_core_graphic(
+        reaction_render_context_from_analysis(analysis)
+    )
     assert graphic.image_bytes
 
 

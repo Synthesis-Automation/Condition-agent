@@ -18,6 +18,7 @@ from reactive_taxonomy import (  # noqa: E402
     RxnMapperProvider,
     analyze_reaction_with_external_mapping,
     featurize_reaction,
+    reaction_render_context_from_analysis,
 )
 from visualization import build_reaction_core_graphic  # noqa: E402
 
@@ -60,16 +61,17 @@ def build_poc(
         force_resolved_shadow=True,
     )
     analysis = assessment.analysis
+    render_context = reaction_render_context_from_analysis(analysis)
     core = analysis.reaction_core
     if core is None:
         raise RuntimeError("RXNMapper did not produce a drawable reaction core")
     svg = build_reaction_core_graphic(
-        analysis,
+        render_context,
         size=(1200, 260),
         image_format="svg",
     )
     png = build_reaction_core_graphic(
-        analysis,
+        render_context,
         size=(1200, 260),
         image_format="png",
     )
