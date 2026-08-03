@@ -20,6 +20,12 @@ from .reaction_render_context import (
     build_reaction_render_context,
     reaction_render_context_from_analysis,
 )
+from .reaction_display_projection import (
+    ReactionDisplayComponent,
+    ReactionDisplayProjection,
+    build_reaction_display_projection,
+    load_reaction_display_projection_definition,
+)
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .external_atom_mapping import (
     analyze_reaction_with_external_mapping,
@@ -252,6 +258,8 @@ __all__ = [
     "ReactionSignature",
     "ReactionReviewSummary",
     "ReactionRenderContext",
+    "ReactionDisplayComponent",
+    "ReactionDisplayProjection",
     "ReactionSpectatorGroup",
     "ReactionStereoChange",
     "ReactionTopology",
@@ -271,6 +279,7 @@ __all__ = [
     "StericProfile",
     "available_styles",
     "build_reaction_core_projection",
+    "build_reaction_display_projection",
     "build_observation_signature",
     "build_reaction_review_summary",
     "build_reaction_render_context",
@@ -286,6 +295,7 @@ __all__ = [
     "reaction_fallback_definition_versions",
     "load_molecular_motif_definitions",
     "load_handle_patterns",
+    "load_reaction_display_projection_definition",
     "load_molecular_feature_benchmark",
     "load_contextual_source_label_mappings",
     "load_source_label_mappings",

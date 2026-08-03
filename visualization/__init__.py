@@ -19,6 +19,11 @@ from .reaction_core_graphic import (
     load_reaction_core_graphic_definition,
     render_reaction_core_image_bytes,
 )
+from .reaction_display_graphic import (
+    ReactionDisplayGraphic,
+    build_reaction_display_graphic,
+    render_reaction_display_image_bytes,
+)
 
 __all__ = [
     "DEFAULT_MOLECULE_SIZE",
@@ -28,6 +33,8 @@ __all__ = [
     "available_render_presets",
     "ReactionCoreGraphic",
     "ReactionCoreGraphicPlaceholder",
+    "ReactionDisplayGraphic",
+    "build_reaction_display_graphic",
     "build_reaction_core_graphic",
     "load_reaction_core_graphic_definition",
     "load_render_style_definitions",
@@ -36,4 +43,5 @@ __all__ = [
     "render_reaction_image",
     "render_reaction_image_bytes",
     "render_reaction_core_image_bytes",
+    "render_reaction_display_image_bytes",
 ]

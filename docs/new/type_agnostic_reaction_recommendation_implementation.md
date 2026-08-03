@@ -268,6 +268,43 @@ drawing feasibility and UI usefulness, not validated mapper accuracy. The
 featurizer keeps resolved-reaction shadow mapping off by default and exposes it
 as an explicit option for generating this review graphic.
 
+#### Aromatic-ring/R-group display-minimization POC
+
+`benchmarks/reaction_display_minimization_poc.py` evaluates a second,
+display-only minimization policy on representative Suzuki, hydrogenation, and
+click rows selected from `raw_dataset/examples/sample_reactions.csv`. Source
+reaction labels select the review rows only and are not passed to chemistry,
+mapping, minimization, or rendering.
+
+The versioned `reaction_display_projection.v1.0` policy retains the complete
+aromatic-bond-connected system containing an inherited active aromatic atom.
+Unchanged substituents attached through aromatic carbon are removed and the
+aromatic valence is hydrogen-capped. For non-aromatic reaction systems,
+omitted frameworks are represented by `R`; the serialized minimum reaction
+SMILES uses `*` as the graph-level placeholder. Departing or appearing
+fragments remain explicit, as do small unresolved heteroatoms needed to avoid
+hiding reactive handles such as `B(OH)2`.
+
+Newly formed aromatic rings do not inherit the aromatic-substituent removal
+policy. Thus a click product retains its five-membered triazole core while its
+two unchanged substituents become `R`. A true intramolecular projection carries
+a visible note and the graph-derived formed-ring size when uniquely available;
+the abstracted tether is disclosed in warnings.
+
+The three POC projections are:
+
+| Sample | Display projection |
+| --- | --- |
+| Electron-rich aryl Suzuki | `Ph-Br + Ph-B(OH)2 -> Ph-Ph` |
+| Styrene hydrogenation | `R-CH=CH2 -> R-CH2-CH3` |
+| Ether-substituted click | `R-C#CH + R-N3 -> R,R-triazole` |
+
+SVG, PNG, and structured review artifacts are written beneath
+`results/reaction_display_poc/`. These projections are presentation artifacts,
+not reaction identities or retrieval inputs. The click example requires an
+external atom-mapping proposal and retains the corresponding expert-review
+warning.
+
 ### 2.6 External RXNMapper Fischer POC
 
 The optional offline dependency is pinned in `requirements-mapping.txt`.

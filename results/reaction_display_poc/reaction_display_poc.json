@@ -1,0 +1,281 @@
+{
+  "artifact_type": "reaction_display_minimization_poc",
+  "example_count": 3,
+  "examples": [
+    {
+      "input_reaction_smiles": "Brc1ccc(OC)cc1.c1ccc(B(O)O)cc1>>COc1ccc(-c2ccccc2)cc1",
+      "mapping": {
+        "attempted": false,
+        "confidence": null,
+        "provider": null,
+        "status": "not_needed",
+        "warnings": []
+      },
+      "minimum_reaction_smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+      "png_path": "results/reaction_display_poc/suzuki_electron_rich_arbr.png",
+      "projection": {
+        "annotation": null,
+        "confidence": 0.8,
+        "evidence_status": "inferred",
+        "formed_ring_sizes": [],
+        "products": [
+          {
+            "active_atom_indices": [
+              5,
+              6
+            ],
+            "display_smiles": "c1ccc(-c2ccccc2)cc1",
+            "r_group_count": 0,
+            "removed_substituent_count": 1,
+            "retained_aromatic_system_count": 2,
+            "retained_atom_indices": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13
+            ],
+            "side": "product",
+            "source_component_index": 0
+          }
+        ],
+        "reactants": [
+          {
+            "active_atom_indices": [
+              0,
+              1
+            ],
+            "display_smiles": "Brc1ccccc1",
+            "r_group_count": 0,
+            "removed_substituent_count": 1,
+            "retained_aromatic_system_count": 1,
+            "retained_atom_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              7,
+              8
+            ],
+            "side": "reactant",
+            "source_component_index": 0
+          },
+          {
+            "active_atom_indices": [
+              3,
+              4
+            ],
+            "display_smiles": "OB(O)c1ccccc1",
+            "r_group_count": 0,
+            "removed_substituent_count": 0,
+            "retained_aromatic_system_count": 1,
+            "retained_atom_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            "side": "reactant",
+            "source_component_index": 1
+          }
+        ],
+        "reaction_scope": "intermolecular",
+        "warnings": [
+          "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
+          "REACTION_CORE_PARTIAL_ATOM_PROVENANCE",
+          "REACTION_CORE_QUALITY_REVIEW",
+          "REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED"
+        ]
+      },
+      "source_selection": {
+        "example": "Electron-rich ArBr",
+        "labels_used_for_chemistry": false,
+        "reaction_type": "Suzuki"
+      },
+      "svg_path": "results/reaction_display_poc/suzuki_electron_rich_arbr.svg"
+    },
+    {
+      "input_reaction_smiles": "C=CC1=CC=CC=C1>>CCc1ccccc1",
+      "mapping": {
+        "attempted": false,
+        "confidence": null,
+        "provider": null,
+        "status": "not_needed",
+        "warnings": []
+      },
+      "minimum_reaction_smiles": "*C=C>>*CC",
+      "png_path": "results/reaction_display_poc/hydrogenation_styrene_ethylbenzene.png",
+      "projection": {
+        "annotation": null,
+        "confidence": 0.85,
+        "evidence_status": "inferred",
+        "formed_ring_sizes": [],
+        "products": [
+          {
+            "active_atom_indices": [
+              0,
+              1
+            ],
+            "display_smiles": "*CC",
+            "r_group_count": 1,
+            "removed_substituent_count": 0,
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              0,
+              1
+            ],
+            "side": "product",
+            "source_component_index": 0
+          }
+        ],
+        "reactants": [
+          {
+            "active_atom_indices": [
+              0,
+              1
+            ],
+            "display_smiles": "*C=C",
+            "r_group_count": 1,
+            "removed_substituent_count": 0,
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              0,
+              1
+            ],
+            "side": "reactant",
+            "source_component_index": 0
+          }
+        ],
+        "reaction_scope": "unimolecular",
+        "warnings": [
+          "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
+          "REACTION_CORE_QUALITY_REVIEW"
+        ]
+      },
+      "source_selection": {
+        "example": "Styrene ethylbenzene",
+        "labels_used_for_chemistry": false,
+        "reaction_type": "Hydrogenation"
+      },
+      "svg_path": "results/reaction_display_poc/hydrogenation_styrene_ethylbenzene.svg"
+    },
+    {
+      "input_reaction_smiles": "C#CCCOC.CC[N-][N+]#N>>CCn1ncc(CCOC)n1",
+      "mapping": {
+        "attempted": true,
+        "confidence": 0.9843139765816707,
+        "provider": "rxnmapper",
+        "status": "external_mapping_only",
+        "warnings": [
+          "EXTERNAL_MAPPING_WITHOUT_INTERNAL_CONSENSUS",
+          "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"
+        ]
+      },
+      "minimum_reaction_smiles": "*C#C.*[N-][N+]#N>>*c1cnn(*)n1",
+      "png_path": "results/reaction_display_poc/click_ether_substituted_triazole.png",
+      "projection": {
+        "annotation": null,
+        "confidence": 0.9843139765816707,
+        "evidence_status": "external",
+        "formed_ring_sizes": [
+          5
+        ],
+        "products": [
+          {
+            "active_atom_indices": [
+              2,
+              3,
+              4,
+              5,
+              10
+            ],
+            "display_smiles": "*c1cnn(*)n1",
+            "r_group_count": 2,
+            "removed_substituent_count": 0,
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              2,
+              3,
+              4,
+              5,
+              10
+            ],
+            "side": "product",
+            "source_component_index": 0
+          }
+        ],
+        "reactants": [
+          {
+            "active_atom_indices": [
+              0,
+              1
+            ],
+            "display_smiles": "*C#C",
+            "r_group_count": 1,
+            "removed_substituent_count": 0,
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              0,
+              1
+            ],
+            "side": "reactant",
+            "source_component_index": 0
+          },
+          {
+            "active_atom_indices": [
+              2,
+              3,
+              4
+            ],
+            "display_smiles": "*[N-][N+]#N",
+            "r_group_count": 1,
+            "removed_substituent_count": 0,
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              2,
+              3,
+              4
+            ],
+            "side": "reactant",
+            "source_component_index": 1
+          }
+        ],
+        "reaction_scope": "mixed",
+        "warnings": [
+          "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
+          "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL"
+        ]
+      },
+      "source_selection": {
+        "example": "Ether-substituted triazole",
+        "labels_used_for_chemistry": false,
+        "reaction_type": "Click"
+      },
+      "svg_path": "results/reaction_display_poc/click_ether_substituted_triazole.svg"
+    }
+  ],
+  "limitations": [
+    "Display projections are not reaction identities.",
+    "Unchanged substituents removed from aromatic carbon remain available in the complete reaction analysis.",
+    "An external atom-mapping proposal is review evidence until independently validated."
+  ],
+  "placeholder_smiles_meaning": {
+    "*": "R"
+  },
+  "schema_version": "1.0",
+  "source_csv": "raw_dataset/examples/sample_reactions.csv",
+  "source_labels_used_for_chemistry": false
+}
