@@ -1,14 +1,16 @@
 {
   "schema_version": "1.0",
-  "definition_id": "reaction_display_projection.v1.1",
+  "definition_id": "reaction_display_projection.v1.2",
   "aromatic_system_policy": "retain_aromatic_bond_component",
+  "multiple_bond_policy": "retain_contiguous_multiple_bond_unit",
+  "active_heteroatom_shell_policy": "retain_direct_noncarbon_neighbors",
+  "saturated_carbon_policy": "retain_active_atom_only",
   "aromatic_carbon_boundary_policy": "remove_and_hydrogen_cap",
   "aromatic_heteroatom_boundary_policy": "retain_R_attachment",
   "nonaromatic_boundary_policy": "retain_R_attachment",
-  "multiple_bonded_heteroatom_policy": "retain_explicit",
   "placeholder_smiles": "*",
-  "placeholder_label": "R",
+  "placeholder_label_template": "R{index}",
   "intramolecular_note_template": "Intramolecular; forms a {ring_size}-membered ring",
   "intramolecular_note_without_size": "Intramolecular reaction",
-  "rendering_note": "This display-only projection retains complete aromatic bond-connected systems containing active aromatic atoms, removes unchanged substituents from aromatic carbon, and replaces omitted non-aromatic frameworks with R. Non-carbon atoms multiply bonded directly to active atoms remain explicit so functional handles such as C=O, S=O, P=O, C=N, and C=N triple bond are not converted to R. Aromatic heteroatom attachments are retained as R when deletion could change valence or charge."
+  "rendering_note": "This display-only projection starts from observed edit endpoints. It retains complete aromatic bond-connected systems, contiguous non-aromatic multiple-bond units, directly attached non-carbon atoms, and otherwise only the active saturated center. Omitted non-aromatic branches become indexed R-group substituent placeholders. Unchanged substituents cut from aromatic carbon are hydrogen-capped in the graphic but retained as positional substituent records."
 }

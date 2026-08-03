@@ -40,6 +40,8 @@ SAMPLE_SELECTORS = (
     ("Suzuki", "Electron-rich ArBr"),
     ("Hydrogenation", "Styrene ethylbenzene"),
     ("Click", "Ether-substituted triazole"),
+    ("Amide: Benzoic acid + aniline", ""),
+    ("Buchwald-Hartwig amination", "Ph-Br + diethylamine"),
 )
 
 
@@ -146,7 +148,10 @@ def build_poc(
                 "minimum_reaction_smiles": (
                     projection.minimum_reaction_smiles
                 ),
+                "render_reaction_smiles": projection.render_reaction_smiles,
                 "projection": {
+                    "schema_version": projection.schema_version,
+                    "definition_id": projection.definition_id,
                     "reaction_scope": projection.reaction_scope,
                     "formed_ring_sizes": list(projection.formed_ring_sizes),
                     "annotation": projection.annotation,

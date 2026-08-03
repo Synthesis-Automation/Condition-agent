@@ -1,5 +1,7 @@
 """Regressions for the display-only reaction minimization POC."""
 
+import pytest
+
 from reactive_taxonomy import (
     build_reaction_display_projection,
     featurize_reaction,
@@ -32,6 +34,22 @@ def test_suzuki_retains_aromatic_rings_and_removes_spectator_methoxy() -> None:
     assert sum(
         value.removed_substituent_count for value in projection.products
     ) == 1
+    hidden = [
+        value
+        for value in projection.substituents
+        if value.boundary_action == "aromatic_hydrogen_cap"
+    ]
+    assert len(hidden) == 2
+    assert {value.fragment_smiles for value in hidden} == {"CO"}
+    assert {
+        (
+            relation.positional_relation,
+            relation.aromatic_ring_distance,
+            relation.same_ring,
+        )
+        for value in hidden
+        for relation in value.aromatic_relations
+    } == {("para", 3, True)}
 
 
 def test_nonaromatic_hydrogenation_replaces_remote_aryl_with_r() -> None:
@@ -58,6 +76,46 @@ def test_aliphatic_amide_formation_keeps_r_c_o_oh_handle() -> None:
     assert projection.minimum_reaction_smiles == (
         "*C(=O)O.*N>>*NC(*)=O"
     )
+
+
+@pytest.mark.parametrize(
+    ("reaction_smiles", "minimum_reaction_smiles"),
+    (
+        ("CCBr.N>>CCN", "*CBr.N>>*CN"),
+        ("CC=CBr.N>>CC=CN", "*C=CBr.N>>*C=CN"),
+        ("CC#CBr.N>>CC#CN", "*C#CBr.N>>*C#CN"),
+        ("CC(=O)Cl.CN>>CC(=O)NC", "*C(=O)Cl.*N>>*NC(*)=O"),
+    ),
+)
+def test_reaction_interface_closure_follows_local_bonding(
+    reaction_smiles: str,
+    minimum_reaction_smiles: str,
+) -> None:
+    projection = _projection(reaction_smiles)
+    assert projection.minimum_reaction_smiles == minimum_reaction_smiles
+
+
+def test_noncarbon_x_h_center_records_distinct_substituent_groups() -> None:
+    projection = _projection(
+        "Brc1ccccc1.CNC>>CN(C)c1ccccc1"
+    )
+    assert projection.minimum_reaction_smiles == (
+        "*N*.Brc1ccccc1>>*N(*)c1ccccc1"
+    )
+    assert projection.render_reaction_smiles == (
+        "N([*:1])[*:2].Brc1ccccc1"
+        ">>c1ccc(N([*:1])[*:2])cc1"
+    )
+    nitrogen_substituents = [
+        value
+        for value in projection.substituents
+        if value.center_element == "N" and value.display_label
+    ]
+    assert {value.display_label for value in nitrogen_substituents} == {
+        "R¹",
+        "R²",
+    }
+    assert all(value.fragment_smiles == "C" for value in nitrogen_substituents)
 
 
 def test_click_reaction_keeps_new_ring_and_uses_two_r_groups() -> None:
@@ -97,3 +155,19 @@ def test_projection_is_invariant_to_reactant_component_order() -> None:
         ">>COc1ccc(-c2ccccc2)cc1"
     )
     assert first.minimum_reaction_smiles == second.minimum_reaction_smiles
+    assert first.render_reaction_smiles == second.render_reaction_smiles
+
+
+def test_indexed_r_groups_are_invariant_to_reactant_order() -> None:
+    first = _projection(
+        "O=C(O)c1ccccc1.Nc1ccccc1"
+        ">>O=C(Nc1ccccc1)c1ccccc1"
+    )
+    second = _projection(
+        "Nc1ccccc1.O=C(O)c1ccccc1"
+        ">>O=C(Nc1ccccc1)c1ccccc1"
+    )
+    assert first.render_reaction_smiles == second.render_reaction_smiles
+    assert first.render_reaction_smiles == (
+        "O=C(O)[*:1].N[*:2]>>O=C(N[*:2])[*:1]"
+    )

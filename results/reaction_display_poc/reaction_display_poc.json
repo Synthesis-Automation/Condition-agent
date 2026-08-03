@@ -1,6 +1,6 @@
 {
   "artifact_type": "reaction_display_minimization_poc",
-  "example_count": 3,
+  "example_count": 5,
   "examples": [
     {
       "input_reaction_smiles": "Brc1ccc(OC)cc1.c1ccc(B(O)O)cc1>>COc1ccc(-c2ccccc2)cc1",
@@ -16,6 +16,7 @@
       "projection": {
         "annotation": null,
         "confidence": 0.8,
+        "definition_id": "reaction_display_projection.v1.2",
         "evidence_status": "inferred",
         "formed_ring_sizes": [],
         "products": [
@@ -27,6 +28,7 @@
             "display_smiles": "c1ccc(-c2ccccc2)cc1",
             "r_group_count": 0,
             "removed_substituent_count": 1,
+            "render_smiles": "c1ccc(-c2ccccc2)cc1",
             "retained_aromatic_system_count": 2,
             "retained_atom_indices": [
               2,
@@ -43,7 +45,43 @@
               13
             ],
             "side": "product",
-            "source_component_index": 0
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [
+                  {
+                    "aromatic_ring_distance": 3,
+                    "attachment_ring_atom_index": 2,
+                    "positional_relation": "para",
+                    "reactive_atom_index": 5,
+                    "reactive_atom_map_number": null,
+                    "same_ring": true
+                  }
+                ],
+                "atom_indices": [
+                  0,
+                  1
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 1,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "O",
+                "boundary_action": "aromatic_hydrogen_cap",
+                "center_atom_index": 2,
+                "center_atom_map_number": null,
+                "center_element": "C",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": null,
+                "fragment_smiles": "CO",
+                "placeholder_index": null,
+                "remote_class": null,
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:7b6bd7e893b37067029f8b2a"
+              }
+            ]
           }
         ],
         "reactants": [
@@ -55,6 +93,7 @@
             "display_smiles": "Brc1ccccc1",
             "r_group_count": 0,
             "removed_substituent_count": 1,
+            "render_smiles": "Brc1ccccc1",
             "retained_aromatic_system_count": 1,
             "retained_atom_indices": [
               0,
@@ -66,7 +105,43 @@
               8
             ],
             "side": "reactant",
-            "source_component_index": 0
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [
+                  {
+                    "aromatic_ring_distance": 3,
+                    "attachment_ring_atom_index": 4,
+                    "positional_relation": "para",
+                    "reactive_atom_index": 1,
+                    "reactive_atom_map_number": null,
+                    "same_ring": true
+                  }
+                ],
+                "atom_indices": [
+                  5,
+                  6
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 5,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "O",
+                "boundary_action": "aromatic_hydrogen_cap",
+                "center_atom_index": 4,
+                "center_atom_map_number": null,
+                "center_element": "C",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": null,
+                "fragment_smiles": "CO",
+                "placeholder_index": null,
+                "remote_class": null,
+                "side": "reactant",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:e1093900bc4b2bb4fca4b510"
+              }
+            ]
           },
           {
             "active_atom_indices": [
@@ -76,6 +151,7 @@
             "display_smiles": "OB(O)c1ccccc1",
             "r_group_count": 0,
             "removed_substituent_count": 0,
+            "render_smiles": "OB(O)c1ccccc1",
             "retained_aromatic_system_count": 1,
             "retained_atom_indices": [
               0,
@@ -89,10 +165,12 @@
               8
             ],
             "side": "reactant",
-            "source_component_index": 1
+            "source_component_index": 1,
+            "substituents": []
           }
         ],
         "reaction_scope": "intermolecular",
+        "schema_version": "1.0",
         "warnings": [
           "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
           "REACTION_CORE_PARTIAL_ATOM_PROVENANCE",
@@ -100,6 +178,7 @@
           "REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED"
         ]
       },
+      "render_reaction_smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
       "source_selection": {
         "example": "Electron-rich ArBr",
         "labels_used_for_chemistry": false,
@@ -121,6 +200,7 @@
       "projection": {
         "annotation": null,
         "confidence": 0.85,
+        "definition_id": "reaction_display_projection.v1.2",
         "evidence_status": "inferred",
         "formed_ring_sizes": [],
         "products": [
@@ -132,13 +212,45 @@
             "display_smiles": "*CC",
             "r_group_count": 1,
             "removed_substituent_count": 0,
+            "render_smiles": "CC[*:1]",
             "retained_aromatic_system_count": 0,
             "retained_atom_indices": [
               0,
               1
             ],
             "side": "product",
-            "source_component_index": 0
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 2,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 1,
+                "center_atom_map_number": null,
+                "center_element": "C",
+                "center_hybridization": "SP3",
+                "continuity": "retained",
+                "display_label": "R",
+                "fragment_smiles": "c1ccccc1",
+                "placeholder_index": 1,
+                "remote_class": "aryl",
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:27fde1bffad755e8e82eaec0"
+              }
+            ]
           }
         ],
         "reactants": [
@@ -150,21 +262,55 @@
             "display_smiles": "*C=C",
             "r_group_count": 1,
             "removed_substituent_count": 0,
+            "render_smiles": "C=C[*:1]",
             "retained_aromatic_system_count": 0,
             "retained_atom_indices": [
               0,
               1
             ],
             "side": "reactant",
-            "source_component_index": 0
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 2,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 1,
+                "center_atom_map_number": null,
+                "center_element": "C",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R",
+                "fragment_smiles": "c1ccccc1",
+                "placeholder_index": 1,
+                "remote_class": "aryl",
+                "side": "reactant",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:36d98447f3b4ea179b14ea0a"
+              }
+            ]
           }
         ],
         "reaction_scope": "unimolecular",
+        "schema_version": "1.0",
         "warnings": [
           "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
           "REACTION_CORE_QUALITY_REVIEW"
         ]
       },
+      "render_reaction_smiles": "C=C[*:1]>>CC[*:1]",
       "source_selection": {
         "example": "Styrene ethylbenzene",
         "labels_used_for_chemistry": false,
@@ -189,6 +335,7 @@
       "projection": {
         "annotation": null,
         "confidence": 0.9843139765816707,
+        "definition_id": "reaction_display_projection.v1.2",
         "evidence_status": "external",
         "formed_ring_sizes": [
           5
@@ -205,6 +352,7 @@
             "display_smiles": "*c1cnn(*)n1",
             "r_group_count": 2,
             "removed_substituent_count": 0,
+            "render_smiles": "c1nn([*:1])nc1[*:2]",
             "retained_aromatic_system_count": 0,
             "retained_atom_indices": [
               2,
@@ -214,7 +362,69 @@
               10
             ],
             "side": "product",
-            "source_component_index": 0
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  0,
+                  1
+                ],
+                "atom_map_numbers": [
+                  1,
+                  2
+                ],
+                "attachment_atom_index": 1,
+                "attachment_atom_map_number": 2,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 2,
+                "center_atom_map_number": 3,
+                "center_element": "N",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R¹",
+                "fragment_smiles": "CC",
+                "placeholder_index": 1,
+                "remote_class": "alkyl",
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:60ba0f092b290b5bd9e88e93"
+              },
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  6,
+                  7,
+                  8,
+                  9
+                ],
+                "atom_map_numbers": [
+                  7,
+                  8,
+                  9,
+                  10
+                ],
+                "attachment_atom_index": 6,
+                "attachment_atom_map_number": 7,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 5,
+                "center_atom_map_number": 6,
+                "center_element": "C",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R²",
+                "fragment_smiles": "CCOC",
+                "placeholder_index": 2,
+                "remote_class": "alkyl",
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:fe581dd055f505b43386ca40"
+              }
+            ]
           }
         ],
         "reactants": [
@@ -226,13 +436,48 @@
             "display_smiles": "*C#C",
             "r_group_count": 1,
             "removed_substituent_count": 0,
+            "render_smiles": "C#C[*:2]",
             "retained_aromatic_system_count": 0,
             "retained_atom_indices": [
               0,
               1
             ],
             "side": "reactant",
-            "source_component_index": 0
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  2,
+                  3,
+                  4,
+                  5
+                ],
+                "atom_map_numbers": [
+                  7,
+                  8,
+                  9,
+                  10
+                ],
+                "attachment_atom_index": 2,
+                "attachment_atom_map_number": 7,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 1,
+                "center_atom_map_number": 6,
+                "center_element": "C",
+                "center_hybridization": "SP",
+                "continuity": "retained",
+                "display_label": "R²",
+                "fragment_smiles": "CCOC",
+                "placeholder_index": 2,
+                "remote_class": "alkyl",
+                "side": "reactant",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:3e58d7c4e9c1025bb6f97264"
+              }
+            ]
           },
           {
             "active_atom_indices": [
@@ -243,6 +488,7 @@
             "display_smiles": "*[N-][N+]#N",
             "r_group_count": 1,
             "removed_substituent_count": 0,
+            "render_smiles": "N#[N+][N-][*:1]",
             "retained_aromatic_system_count": 0,
             "retained_atom_indices": [
               2,
@@ -250,21 +496,464 @@
               4
             ],
             "side": "reactant",
-            "source_component_index": 1
+            "source_component_index": 1,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  0,
+                  1
+                ],
+                "atom_map_numbers": [
+                  1,
+                  2
+                ],
+                "attachment_atom_index": 1,
+                "attachment_atom_map_number": 2,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 2,
+                "center_atom_map_number": 3,
+                "center_element": "N",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R¹",
+                "fragment_smiles": "CC",
+                "placeholder_index": 1,
+                "remote_class": "alkyl",
+                "side": "reactant",
+                "source_component_index": 1,
+                "substituent_id": "RDS1:8b8f81698cc8e47ec30565ec"
+              }
+            ]
           }
         ],
         "reaction_scope": "mixed",
+        "schema_version": "1.0",
         "warnings": [
           "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
           "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL"
         ]
       },
+      "render_reaction_smiles": "C#C[*:2].N#[N+][N-][*:1]>>c1nn([*:1])nc1[*:2]",
       "source_selection": {
         "example": "Ether-substituted triazole",
         "labels_used_for_chemistry": false,
         "reaction_type": "Click"
       },
       "svg_path": "results/reaction_display_poc/click_ether_substituted_triazole.svg"
+    },
+    {
+      "input_reaction_smiles": "O=C(O)c1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccccc1",
+      "mapping": {
+        "attempted": false,
+        "confidence": null,
+        "provider": null,
+        "status": "not_needed",
+        "warnings": []
+      },
+      "minimum_reaction_smiles": "*C(=O)O.*N>>*NC(*)=O",
+      "png_path": "results/reaction_display_poc/amide_benzoic_acid_aniline_.png",
+      "projection": {
+        "annotation": null,
+        "confidence": 0.8,
+        "definition_id": "reaction_display_projection.v1.2",
+        "evidence_status": "inferred",
+        "formed_ring_sizes": [],
+        "products": [
+          {
+            "active_atom_indices": [
+              1,
+              2
+            ],
+            "display_smiles": "*NC(*)=O",
+            "r_group_count": 2,
+            "removed_substituent_count": 0,
+            "render_smiles": "O=C(N[*:2])[*:1]",
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              0,
+              1,
+              2
+            ],
+            "side": "product",
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 3,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 2,
+                "center_atom_map_number": null,
+                "center_element": "N",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R²",
+                "fragment_smiles": "c1ccccc1",
+                "placeholder_index": 2,
+                "remote_class": "aryl",
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:418f9eebfeee20f4ba9662ed"
+              },
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 9,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 1,
+                "center_atom_map_number": null,
+                "center_element": "C",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R¹",
+                "fragment_smiles": "c1ccccc1",
+                "placeholder_index": 1,
+                "remote_class": "aryl",
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:f7f3d607eb98c3461ce17150"
+              }
+            ]
+          }
+        ],
+        "reactants": [
+          {
+            "active_atom_indices": [
+              1,
+              2
+            ],
+            "display_smiles": "*C(=O)O",
+            "r_group_count": 1,
+            "removed_substituent_count": 0,
+            "render_smiles": "O=C(O)[*:1]",
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              0,
+              1,
+              2
+            ],
+            "side": "reactant",
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 3,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 1,
+                "center_atom_map_number": null,
+                "center_element": "C",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R¹",
+                "fragment_smiles": "c1ccccc1",
+                "placeholder_index": 1,
+                "remote_class": "aryl",
+                "side": "reactant",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:9b515db9997c148c823638c1"
+              }
+            ]
+          },
+          {
+            "active_atom_indices": [
+              0
+            ],
+            "display_smiles": "*N",
+            "r_group_count": 1,
+            "removed_substituent_count": 0,
+            "render_smiles": "N[*:2]",
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              0
+            ],
+            "side": "reactant",
+            "source_component_index": 1,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 1,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 0,
+                "center_atom_map_number": null,
+                "center_element": "N",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R²",
+                "fragment_smiles": "c1ccccc1",
+                "placeholder_index": 2,
+                "remote_class": "aryl",
+                "side": "reactant",
+                "source_component_index": 1,
+                "substituent_id": "RDS1:ba3cc79f2aea02cf7d0fe745"
+              }
+            ]
+          }
+        ],
+        "reaction_scope": "intermolecular",
+        "schema_version": "1.0",
+        "warnings": [
+          "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
+          "REACTION_CORE_PARTIAL_ATOM_PROVENANCE",
+          "REACTION_CORE_QUALITY_REVIEW"
+        ]
+      },
+      "render_reaction_smiles": "O=C(O)[*:1].N[*:2]>>O=C(N[*:2])[*:1]",
+      "source_selection": {
+        "example": "",
+        "labels_used_for_chemistry": false,
+        "reaction_type": "Amide: Benzoic acid + aniline"
+      },
+      "svg_path": "results/reaction_display_poc/amide_benzoic_acid_aniline_.svg"
+    },
+    {
+      "input_reaction_smiles": "Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1",
+      "mapping": {
+        "attempted": false,
+        "confidence": null,
+        "provider": null,
+        "status": "not_needed",
+        "warnings": []
+      },
+      "minimum_reaction_smiles": "*N*.Brc1ccccc1>>*N(*)c1ccccc1",
+      "png_path": "results/reaction_display_poc/buchwald_hartwig_amination_ph_br_diethylamine.png",
+      "projection": {
+        "annotation": null,
+        "confidence": 0.8,
+        "definition_id": "reaction_display_projection.v1.2",
+        "evidence_status": "inferred",
+        "formed_ring_sizes": [],
+        "products": [
+          {
+            "active_atom_indices": [
+              2,
+              5
+            ],
+            "display_smiles": "*N(*)c1ccccc1",
+            "r_group_count": 2,
+            "removed_substituent_count": 0,
+            "render_smiles": "c1ccc(N([*:1])[*:2])cc1",
+            "retained_aromatic_system_count": 1,
+            "retained_atom_indices": [
+              2,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ],
+            "side": "product",
+            "source_component_index": 0,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  3,
+                  4
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 3,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 2,
+                "center_atom_map_number": null,
+                "center_element": "N",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R²",
+                "fragment_smiles": "CC",
+                "placeholder_index": 2,
+                "remote_class": "alkyl",
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:15e92a0e3fb274e9b52b6b41"
+              },
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  0,
+                  1
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 1,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 2,
+                "center_atom_map_number": null,
+                "center_element": "N",
+                "center_hybridization": "SP2",
+                "continuity": "retained",
+                "display_label": "R¹",
+                "fragment_smiles": "CC",
+                "placeholder_index": 1,
+                "remote_class": "alkyl",
+                "side": "product",
+                "source_component_index": 0,
+                "substituent_id": "RDS1:60ba0f092b290b5bd9e88e93"
+              }
+            ]
+          }
+        ],
+        "reactants": [
+          {
+            "active_atom_indices": [
+              2
+            ],
+            "display_smiles": "*N*",
+            "r_group_count": 2,
+            "removed_substituent_count": 0,
+            "render_smiles": "N([*:1])[*:2]",
+            "retained_aromatic_system_count": 0,
+            "retained_atom_indices": [
+              2
+            ],
+            "side": "reactant",
+            "source_component_index": 1,
+            "substituents": [
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  3,
+                  4
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 3,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 2,
+                "center_atom_map_number": null,
+                "center_element": "N",
+                "center_hybridization": "SP3",
+                "continuity": "retained",
+                "display_label": "R²",
+                "fragment_smiles": "CC",
+                "placeholder_index": 2,
+                "remote_class": "alkyl",
+                "side": "reactant",
+                "source_component_index": 1,
+                "substituent_id": "RDS1:35248a82afaac2a7b9535f31"
+              },
+              {
+                "aromatic_relations": [],
+                "atom_indices": [
+                  0,
+                  1
+                ],
+                "atom_map_numbers": [],
+                "attachment_atom_index": 1,
+                "attachment_atom_map_number": null,
+                "attachment_bond_order": "SINGLE",
+                "attachment_element": "C",
+                "boundary_action": "r_placeholder",
+                "center_atom_index": 2,
+                "center_atom_map_number": null,
+                "center_element": "N",
+                "center_hybridization": "SP3",
+                "continuity": "retained",
+                "display_label": "R¹",
+                "fragment_smiles": "CC",
+                "placeholder_index": 1,
+                "remote_class": "alkyl",
+                "side": "reactant",
+                "source_component_index": 1,
+                "substituent_id": "RDS1:8b8f81698cc8e47ec30565ec"
+              }
+            ]
+          },
+          {
+            "active_atom_indices": [
+              0,
+              1
+            ],
+            "display_smiles": "Brc1ccccc1",
+            "r_group_count": 0,
+            "removed_substituent_count": 0,
+            "render_smiles": "Brc1ccccc1",
+            "retained_aromatic_system_count": 1,
+            "retained_atom_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "side": "reactant",
+            "source_component_index": 0,
+            "substituents": []
+          }
+        ],
+        "reaction_scope": "intermolecular",
+        "schema_version": "1.0",
+        "warnings": [
+          "DISPLAY_PROJECTION_NOT_REACTION_IDENTITY",
+          "REACTION_CORE_PARTIAL_ATOM_PROVENANCE",
+          "REACTION_CORE_QUALITY_REVIEW"
+        ]
+      },
+      "render_reaction_smiles": "N([*:1])[*:2].Brc1ccccc1>>c1ccc(N([*:1])[*:2])cc1",
+      "source_selection": {
+        "example": "Ph-Br + diethylamine",
+        "labels_used_for_chemistry": false,
+        "reaction_type": "Buchwald-Hartwig amination"
+      },
+      "svg_path": "results/reaction_display_poc/buchwald_hartwig_amination_ph_br_diethylamine.svg"
     }
   ],
   "limitations": [

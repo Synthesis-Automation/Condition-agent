@@ -276,18 +276,31 @@ click rows selected from `raw_dataset/examples/sample_reactions.csv`. Source
 reaction labels select the review rows only and are not passed to chemistry,
 mapping, minimization, or rendering.
 
-The versioned `reaction_display_projection.v1.1` policy retains the complete
-aromatic-bond-connected system containing an inherited active aromatic atom.
+The versioned `reaction_display_projection.v1.2` policy starts from observed
+edit endpoints and applies one graph-defined reaction-interface closure. An
+active aromatic atom retains its complete aromatic-bond-connected system. A
+non-aromatic active atom retains its contiguous multiple-bond unit, directly
+attached non-carbon shell, and otherwise only the active saturated center.
+Consequently aryl, alkenyl, alkynyl, and acyl leaving-group interfaces retain
+`Ar-X`, `C=C-X`, `C#C-X`, and `C(=O)-X`, while an alkyl bromide becomes
+`R-CH2-Br`.
+
 Unchanged substituents attached through aromatic carbon are removed and the
-aromatic valence is hydrogen-capped. For non-aromatic reaction systems,
-omitted frameworks are represented by `R`; the serialized minimum reaction
-SMILES uses `*` as the graph-level placeholder. Departing or appearing
-fragments remain explicit, as do small unresolved heteroatoms needed to avoid
-hiding reactive handles such as `B(OH)2`. A non-carbon atom multiply bonded
-directly to an active atom also remains explicit. This prevents functional
-handles such as `C=O`, `S=O`, `P=O`, `C=N`, and nitriles from being replaced
-by `R`; for example, an amidation acid is rendered as `R-C(=O)OH`, not
-`R-C(=R)OH`.
+aromatic valence is hydrogen-capped. Other omitted frameworks become `R`; the
+serialized minimum reaction SMILES uses `*` as the graph-level placeholder.
+Distinct substituent groups receive stable mapped placeholders rendered as
+`R¹`, `R²`, and so on. Non-carbon X-H centers retain their element, charge,
+and hydrogen state while attached carbon fragments become R groups, producing
+forms such as `R-NH2`, `R¹R²NH`, and `R-SH`.
+
+Every omitted fragment remains a typed `ReactionDisplaySubstituent` record
+with its exact fragment SMILES, atom and map provenance, attachment state,
+remote class, continuity, and graphical label. Hidden aromatic substituents
+also record their distance from each active ring atom and derive `ipso`,
+`ortho`, `meta`, or `para` only for a simple six-membered aromatic system.
+Fused and other ring systems preserve graph distance and use `other` rather
+than forcing a positional name. Thus presentation abstraction does not erase
+electronic or steric context needed elsewhere in the chemistry analysis.
 
 Newly formed aromatic rings do not inherit the aromatic-substituent removal
 policy. Thus a click product retains its five-membered triazole core while its
@@ -302,6 +315,8 @@ The three POC projections are:
 | Electron-rich aryl Suzuki | `Ph-Br + Ph-B(OH)2 -> Ph-Ph` |
 | Styrene hydrogenation | `R-CH=CH2 -> R-CH2-CH3` |
 | Ether-substituted click | `R-C#CH + R-N3 -> R,R-triazole` |
+| Benzoic acid amidation | `R¹-C(=O)OH + R²-NH2 -> R¹-C(=O)-NH-R²` |
+| Aryl coupling with a secondary amine | `Ar-Br + R¹R²NH -> Ar-NR¹R²` |
 
 SVG, PNG, and structured review artifacts are written beneath
 `results/reaction_display_poc/`. These projections are presentation artifacts,

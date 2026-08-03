@@ -21,8 +21,10 @@ from .reaction_render_context import (
     reaction_render_context_from_analysis,
 )
 from .reaction_display_projection import (
+    ReactionDisplayAromaticRelation,
     ReactionDisplayComponent,
     ReactionDisplayProjection,
+    ReactionDisplaySubstituent,
     build_reaction_display_projection,
     load_reaction_display_projection_definition,
 )
@@ -260,6 +262,8 @@ __all__ = [
     "ReactionRenderContext",
     "ReactionDisplayComponent",
     "ReactionDisplayProjection",
+    "ReactionDisplayAromaticRelation",
+    "ReactionDisplaySubstituent",
     "ReactionSpectatorGroup",
     "ReactionStereoChange",
     "ReactionTopology",

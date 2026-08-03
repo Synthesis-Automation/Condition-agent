@@ -13,6 +13,8 @@ from reactive_taxonomy.reaction_display_projection import (
 
 from .rendering import apply_render_preset
 
+_DRAW_LABEL_TRANSLATION = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789")
+
 try:  # pragma: no cover - public helpers exercise availability
     from rdkit import Chem
     from rdkit.Chem import Draw, rdChemReactions
@@ -51,18 +53,25 @@ def _require_rdkit() -> None:
 
 def _prepare_reaction(projection: ReactionDisplayProjection) -> Any:
     reaction = rdChemReactions.ReactionFromSmarts(
-        projection.minimum_reaction_smiles,
+        projection.render_reaction_smiles,
         useSmiles=True,
     )
     if reaction is None:
         raise ValueError("minimum reaction SMILES could not be parsed")
     molecules = tuple(reaction.GetReactants()) + tuple(reaction.GetProducts())
+    labels = {
+        int(value.placeholder_index): str(value.display_label)
+        for value in projection.substituents
+        if value.placeholder_index is not None and value.display_label
+    }
     for molecule in molecules:
         for atom in molecule.GetAtoms():
-            atom.SetAtomMapNum(0)
             if atom.GetAtomicNum() == 0:
-                atom.SetProp("atomLabel", "R")
-                atom.SetProp("_displayLabel", "R")
+                label = labels.get(int(atom.GetAtomMapNum()), "R")
+                draw_label = label.translate(_DRAW_LABEL_TRANSLATION)
+                atom.SetProp("atomLabel", draw_label)
+                atom.SetProp("_displayLabel", draw_label)
+            atom.SetAtomMapNum(0)
         try:
             Chem.SanitizeMol(molecule)
         except Exception:

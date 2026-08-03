@@ -571,6 +571,25 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             component.r_group_count
             for component in projection.reactants + projection.products
         )
+        label_by_index = {
+            int(value.placeholder_index): str(value.display_label)
+            for value in projection.substituents
+            if value.placeholder_index is not None and value.display_label
+        }
+        placeholder_labels = tuple(
+            label_by_index[index] for index in sorted(label_by_index)
+        )
+        hidden_aromatic = tuple(
+            sorted(
+                {
+                    f"{relation.positional_relation} "
+                    f"{value.fragment_smiles}"
+                    for value in projection.substituents
+                    if value.boundary_action == "aromatic_hydrogen_cap"
+                    for relation in value.aromatic_relations
+                }
+            )
+        )
         note = (
             f"Display-only minimum: {projection.minimum_reaction_smiles}; "
             f"{projection.evidence_status} evidence; "
@@ -579,6 +598,10 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             f"removed unchanged aromatic substituents: "
             f"{removed_substituent_count}"
         )
+        if placeholder_labels:
+            note += f"; labels: {', '.join(placeholder_labels)}"
+        if hidden_aromatic:
+            note += f"; hidden aromatic: {', '.join(hidden_aromatic)}"
         if projection.annotation:
             note += f"; {projection.annotation}"
         if projection.evidence_status == "external":
