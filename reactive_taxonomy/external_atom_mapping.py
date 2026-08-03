@@ -10,9 +10,19 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import itertools
 from dataclasses import dataclass, replace
 from importlib import metadata, resources
-from typing import Any, Iterable, Literal, Optional, Protocol, Sequence, Tuple
+from typing import (
+    Any,
+    Iterable,
+    Literal,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+    Tuple,
+)
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_connectivity import build_connectivity_edit_graph
@@ -438,6 +448,232 @@ def _project_reactant_boundary_atoms(
     return f"{rendered_left}>{middle}>{right}", projected
 
 
+def _mapping_atom_invariant(atom: Any) -> tuple[int, int, int]:
+    """Return the conservative atom invariants allowed for map exchange."""
+    return (
+        int(atom.GetAtomicNum()),
+        int(atom.GetIsotope()),
+        int(atom.GetFormalCharge()),
+    )
+
+
+def _mapped_graph_profiles(
+    molecules: Sequence[Any],
+    *,
+    map_overrides: Optional[Mapping[tuple[int, int], int]] = None,
+) -> tuple[dict[tuple[int, int], str], dict[int, int]]:
+    """Return mapped heavy-atom bonds and hydrogen counts for one side."""
+    bonds: dict[tuple[int, int], str] = {}
+    hydrogens: dict[int, int] = {}
+    overrides = map_overrides or {}
+    for component_index, molecule in enumerate(molecules):
+        for atom in molecule.GetAtoms():
+            if atom.GetAtomicNum() <= 1:
+                continue
+            atom_index = int(atom.GetIdx())
+            map_number = int(
+                overrides.get(
+                    (component_index, atom_index),
+                    int(atom.GetAtomMapNum()),
+                )
+            )
+            if map_number > 0:
+                hydrogens[map_number] = int(
+                    atom.GetTotalNumHs(includeNeighbors=True)
+                )
+        for bond in molecule.GetBonds():
+            left_atom = bond.GetBeginAtom()
+            right_atom = bond.GetEndAtom()
+            if left_atom.GetAtomicNum() <= 1 or right_atom.GetAtomicNum() <= 1:
+                continue
+            left = int(
+                overrides.get(
+                    (component_index, int(left_atom.GetIdx())),
+                    int(left_atom.GetAtomMapNum()),
+                )
+            )
+            right = int(
+                overrides.get(
+                    (component_index, int(right_atom.GetIdx())),
+                    int(right_atom.GetAtomMapNum()),
+                )
+            )
+            if left <= 0 or right <= 0:
+                continue
+            bonds[tuple(sorted((left, right)))] = str(
+                bond.GetBondType()
+            ).upper()
+    return bonds, hydrogens
+
+
+def _mapping_edit_score(
+    reactant_profile: tuple[dict[tuple[int, int], str], dict[int, int]],
+    product_molecules: Sequence[Any],
+    product_map_overrides: Mapping[tuple[int, int], int],
+) -> tuple[int, int, int]:
+    """Score a map assignment by total, heavy-bond, then hydrogen edits."""
+    reactant_bonds, reactant_hydrogens = reactant_profile
+    product_bonds, product_hydrogens = _mapped_graph_profiles(
+        product_molecules,
+        map_overrides=product_map_overrides,
+    )
+    bond_edits = sum(
+        reactant_bonds.get(pair) != product_bonds.get(pair)
+        for pair in set(reactant_bonds).union(product_bonds)
+    )
+    hydrogen_edits = sum(
+        reactant_hydrogens[map_number] != product_hydrogens[map_number]
+        for map_number in set(reactant_hydrogens).intersection(
+            product_hydrogens
+        )
+    )
+    return bond_edits + hydrogen_edits, bond_edits, hydrogen_edits
+
+
+def _reconcile_equivalent_product_atom_maps(
+    mapped_reaction_smiles: str,
+    *,
+    max_group_size: int = 6,
+) -> tuple[str, int, Tuple[str, ...]]:
+    """Repair unique, edit-reducing external map permutations.
+
+    Reactant maps remain the reference. Product map numbers may be exchanged
+    only among non-stereogenic heavy atoms with identical element, isotope,
+    and charge. A proposal is accepted only when it uniquely and strictly
+    reduces the mapped graph-edit score. Tied improvements are retained as
+    ambiguity rather than resolved arbitrarily.
+    """
+    from rdkit import Chem
+
+    parsed = parse_reaction_smiles(mapped_reaction_smiles)
+    if not parsed.valid:
+        return mapped_reaction_smiles, 0, ()
+    reactant_molecules = tuple(
+        molecule
+        for component in parsed.reactants
+        for molecule in (parse_smiles(component.input_smiles),)
+        if molecule is not None
+    )
+    product_molecules = tuple(
+        molecule
+        for component in parsed.products
+        for molecule in (parse_smiles(component.input_smiles),)
+        if molecule is not None
+    )
+    if len(reactant_molecules) != len(parsed.reactants) or len(
+        product_molecules
+    ) != len(parsed.products):
+        return mapped_reaction_smiles, 0, ()
+    for molecule in (*reactant_molecules, *product_molecules):
+        Chem.AssignStereochemistry(molecule, cleanIt=True, force=True)
+
+    reactant_invariants: dict[int, tuple[int, int, int]] = {}
+    for molecule in reactant_molecules:
+        for atom in molecule.GetAtoms():
+            map_number = int(atom.GetAtomMapNum())
+            if map_number > 0 and atom.GetAtomicNum() > 1:
+                reactant_invariants[map_number] = _mapping_atom_invariant(atom)
+
+    assignments: dict[tuple[int, int], int] = {}
+    groups: dict[
+        tuple[int, int, int], list[tuple[int, int]]
+    ] = {}
+    for component_index, molecule in enumerate(product_molecules):
+        for atom in molecule.GetAtoms():
+            map_number = int(atom.GetAtomMapNum())
+            if map_number <= 0 or atom.GetAtomicNum() <= 1:
+                continue
+            coordinate = (component_index, int(atom.GetIdx()))
+            assignments[coordinate] = map_number
+            if (
+                atom.GetChiralTag() != Chem.ChiralType.CHI_UNSPECIFIED
+                or atom.HasProp("_CIPCode")
+            ):
+                continue
+            groups.setdefault(_mapping_atom_invariant(atom), []).append(
+                coordinate
+            )
+
+    reactant_profile = _mapped_graph_profiles(reactant_molecules)
+    warnings: set[str] = set()
+    changed_atom_count = 0
+    for invariant, coordinates_list in sorted(groups.items()):
+        coordinates = tuple(sorted(coordinates_list))
+        if len(coordinates) < 2 or len(coordinates) > max_group_size:
+            continue
+        map_numbers = tuple(assignments[coordinate] for coordinate in coordinates)
+        if len(set(map_numbers)) != len(map_numbers):
+            continue
+        if any(
+            map_number in reactant_invariants
+            and reactant_invariants[map_number] != invariant
+            for map_number in map_numbers
+        ):
+            continue
+        baseline_score = _mapping_edit_score(
+            reactant_profile,
+            product_molecules,
+            assignments,
+        )
+        best_score = baseline_score
+        best_permutations: list[tuple[int, ...]] = []
+        for permutation in itertools.permutations(sorted(map_numbers)):
+            if permutation == map_numbers:
+                continue
+            candidate = dict(assignments)
+            candidate.update(zip(coordinates, permutation))
+            score = _mapping_edit_score(
+                reactant_profile,
+                product_molecules,
+                candidate,
+            )
+            if score < best_score:
+                best_score = score
+                best_permutations = [permutation]
+            elif score == best_score and score < baseline_score:
+                best_permutations.append(permutation)
+        if best_score >= baseline_score:
+            continue
+        unique_best = tuple(sorted(set(best_permutations)))
+        if len(unique_best) != 1:
+            warnings.add(
+                "EXTERNAL_MAPPING_RECONCILIATION_AMBIGUOUS:"
+                f"{Chem.GetPeriodicTable().GetElementSymbol(invariant[0])}:"
+                f"{len(unique_best)}"
+            )
+            continue
+        selected = unique_best[0]
+        changed_atom_count += sum(
+            assignments[coordinate] != map_number
+            for coordinate, map_number in zip(coordinates, selected)
+        )
+        assignments.update(zip(coordinates, selected))
+
+    if changed_atom_count == 0:
+        return mapped_reaction_smiles, 0, tuple(sorted(warnings))
+    rendered_products = []
+    for component_index, molecule in enumerate(product_molecules):
+        copy = Chem.Mol(molecule)
+        for atom in copy.GetAtoms():
+            coordinate = (component_index, int(atom.GetIdx()))
+            if coordinate in assignments:
+                atom.SetAtomMapNum(assignments[coordinate])
+        rendered_products.append(
+            Chem.MolToSmiles(copy, canonical=False, isomericSmiles=True)
+        )
+    if ">>" in mapped_reaction_smiles:
+        left, _ = mapped_reaction_smiles.split(">>", 1)
+        reconciled = f"{left}>>{'.'.join(rendered_products)}"
+    else:
+        left, middle, _ = mapped_reaction_smiles.split(">", 2)
+        reconciled = f"{left}>{middle}>{'.'.join(rendered_products)}"
+    warnings.add(
+        "EXTERNAL_MAPPING_RECONCILED_EQUIVALENT_ATOMS:"
+        f"{changed_atom_count}"
+    )
+    return reconciled, changed_atom_count, tuple(sorted(warnings))
+
+
 def _externalize_normalization(
     normalization: EditNormalizationResult,
     confidence: float,
@@ -580,7 +816,13 @@ def validate_external_atom_mapping(
             "EXTERNAL_MAPPING_PROJECTED_REACTANT_BOUNDARY_ATOMS:"
             f"{projected_boundary_count}"
         )
-        mapped = parse_reaction_smiles(normalized_mapped_smiles)
+    (
+        normalized_mapped_smiles,
+        _,
+        reconciliation_warnings,
+    ) = _reconcile_equivalent_product_atom_maps(normalized_mapped_smiles)
+    warnings.update(reconciliation_warnings)
+    mapped = parse_reaction_smiles(normalized_mapped_smiles)
     normalized = normalize_mapped_edits(mapped.reactants, mapped.products)
     confidence = (
         float(mapper_confidence)
@@ -1071,6 +1313,22 @@ def analyze_reaction_with_external_mapping(
     )
     if mapped_analysis.reaction_signature is None:
         warning = "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE"
+        reaction_core, coordinates_projected = _mapped_core_proposal(
+            base=base,
+            mapped=mapped_parsed,
+            mapping=replace(mapping, normalization=override),
+            evidence=evidence,
+            confidence=confidence,
+        )
+        coordinate_warnings = (
+            ()
+            if coordinates_projected
+            else ("EXTERNAL_MAPPING_CORE_COORDINATE_PROJECTION_FAILED",)
+        )
+        assessment_core_warnings = (
+            warning,
+            "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW",
+        ) + coordinate_warnings
         return ExternalMappingAssessment(
             input_reaction_smiles=reaction_smiles,
             status="external_mapping_signature_unavailable",
@@ -1083,13 +1341,10 @@ def analyze_reaction_with_external_mapping(
                             (external_candidate,),
                         ),
                     ),
-                    mapped_analysis.reaction_core,
-                    warnings=(
-                        warning,
-                        "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW",
-                    ),
+                    reaction_core,
+                    warnings=assessment_core_warnings,
                 )
-                if mapped_analysis.reaction_core is not None
+                if reaction_core is not None
                 else replace(
                     base,
                     evidence_candidates=_merge_evidence_candidates(
@@ -1097,14 +1352,18 @@ def analyze_reaction_with_external_mapping(
                         (external_candidate,),
                     ),
                     warnings=tuple(
-                        sorted(set(base.warnings).union((warning,)))
+                        sorted(
+                            set(base.warnings).union(
+                                assessment_core_warnings
+                            )
+                        )
                     ),
                 )
             ),
             provider_metadata=provider.metadata,
             mapping_result=mapping,
             matched_hypothesis_ids=matched_ids,
-            warnings=(warning, "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"),
+            warnings=assessment_core_warnings,
         )
     effective_warnings = tuple(
         sorted(set(mapped_analysis.warnings).union(assessment_warnings))

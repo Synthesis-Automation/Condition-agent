@@ -9,8 +9,10 @@ from reactive_taxonomy import (
     EXTERNAL_MAPPING_EVIDENCE,
     RxnMapperProvider,
     analyze_reaction_with_external_mapping,
+    build_reaction_display_projection,
     build_reaction_review_summary,
     featurize_reaction,
+    reaction_render_context_from_analysis,
     validate_external_atom_mapping,
 )
 from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles
@@ -78,6 +80,23 @@ REORDERED_STEREO_MAPPING = (
     "[CH3:1][O:2][C@H:3]1[CH2:4][C@H:5]([NH2:6])[CH2:13]1"
     ">>[CH3:1][O:2][C@H:3]1[CH2:4][C@H:5]("
     "[NH:6][c:7]2[cH:8][cH:9][cH:10][cH:11][n:12]2)[CH2:13]1"
+)
+ACYL_CHLORIDE_REACTION = "CCCCCCCCC(=O)O>>CCCCCCCCC(=O)Cl"
+ACYL_CHLORIDE_MAPPING = (
+    "[OH:12][C:9]([CH2:8][CH2:7][CH2:6][CH2:5]"
+    "[CH2:4][CH2:3][CH2:2][CH3:1])=[O:10]"
+    ">>[CH3:1][CH2:2][CH2:3][CH2:4][CH2:5][CH2:6]"
+    "[CH2:7][CH2:8][C:9](=[O:10])[Cl:11]"
+)
+SUBSTITUTED_ACYL_CHLORIDE_REACTION = (
+    "Cc1c(F)c([N+](=O)[O-])cc(C(=O)O)c1Cl"
+    ">>Cc1c(F)c([N+](=O)[O-])cc(C(=O)Cl)c1Cl"
+)
+SUBSTITUTED_ACYL_CHLORIDE_MAPPING = (
+    "[OH:16][C:11]([c:10]1[cH:9][c:5]([N+:6](=[O:7])[O-:8])"
+    "[c:3]([F:4])[c:2]([CH3:1])[c:14]1[Cl:13])=[O:12]"
+    ">>[CH3:1][c:2]1[c:3]([F:4])[c:5]([N+:6](=[O:7])[O-:8])"
+    "[cH:9][c:10]([C:11](=[O:12])[Cl:13])[c:14]1[Cl:15]"
 )
 
 
@@ -231,6 +250,154 @@ def test_external_mapping_still_rejects_a_real_stereo_change() -> None:
     assert not result.valid
     assert not result.structure_preserved
     assert result.error == "MAPPER_CHANGED_REACTION_STRUCTURE"
+
+
+def test_signature_unavailable_core_uses_original_acyl_coordinates() -> None:
+    base = featurize_reaction(ACYL_CHLORIDE_REACTION)
+
+    assessment = analyze_reaction_with_external_mapping(
+        ACYL_CHLORIDE_REACTION,
+        _ResolvedFixtureProvider(
+            mapped_reaction=ACYL_CHLORIDE_MAPPING,
+            allowed_pairs=frozenset({("C", "Cl"), ("C", "O")}),
+        ),
+        base_analysis=base,
+    )
+
+    assert assessment.status == "external_mapping_signature_unavailable"
+    assert assessment.analysis.reaction_core is not None
+    assert {
+        (
+            transition.atom_map_number,
+            (
+                transition.before_state.atom_index
+                if transition.before_state is not None
+                else None
+            ),
+            (
+                transition.after_state.atom_index
+                if transition.after_state is not None
+                else None
+            ),
+        )
+        for transition in assessment.analysis.reaction_core.atom_transitions
+    } == {
+        (9, 8, 8),
+        (11, None, 10),
+        (12, 10, None),
+    }
+
+    projection = build_reaction_display_projection(
+        reaction_render_context_from_analysis(assessment.analysis)
+    )
+    assert projection.minimum_reaction_smiles == (
+        "*C(=O)O>>*C(=O)Cl"
+    )
+    assert projection.render_reaction_smiles == (
+        "O=C(O)[*:1]>>O=C(Cl)[*:1]"
+    )
+
+
+def test_external_mapping_repairs_unique_spectator_chlorine_swap() -> None:
+    mapping = validate_external_atom_mapping(
+        SUBSTITUTED_ACYL_CHLORIDE_REACTION,
+        SUBSTITUTED_ACYL_CHLORIDE_MAPPING,
+        provider_metadata=METADATA,
+        mapper_confidence=0.68,
+    )
+
+    assert mapping.valid
+    assert mapping.normalization is not None
+    assert "EXTERNAL_MAPPING_RECONCILED_EQUIVALENT_ATOMS:2" in (
+        mapping.warnings
+    )
+    assert {
+        (
+            edit.edit_type,
+            tuple(
+                sorted(
+                    (
+                        edit.atom_1.element,
+                        edit.atom_2.element if edit.atom_2 else "H",
+                    )
+                )
+            ),
+        )
+        for edit in mapping.normalization.edits
+    } == {
+        ("broken", ("C", "O")),
+        ("formed", ("C", "Cl")),
+    }
+
+    assessment = analyze_reaction_with_external_mapping(
+        SUBSTITUTED_ACYL_CHLORIDE_REACTION,
+        _ResolvedFixtureProvider(
+            mapped_reaction=SUBSTITUTED_ACYL_CHLORIDE_MAPPING,
+            allowed_pairs=frozenset({("C", "Cl"), ("C", "O")}),
+        ),
+        base_analysis=featurize_reaction(
+            SUBSTITUTED_ACYL_CHLORIDE_REACTION
+        ),
+    )
+    assert assessment.analysis.reaction_core is not None
+    assert "REACTION_CORE_NO_OP_PRIMARY_CENTER" not in (
+        assessment.analysis.reaction_core.warnings
+    )
+    projection = build_reaction_display_projection(
+        reaction_render_context_from_analysis(assessment.analysis)
+    )
+    assert projection.minimum_reaction_smiles == (
+        "*C(=O)O>>*C(=O)Cl"
+    )
+    assert projection.render_reaction_smiles == (
+        "O=C(O)[*:1]>>O=C(Cl)[*:1]"
+    )
+
+
+def test_external_mapping_preserves_ambiguous_chlorine_reassignment() -> None:
+    reaction = "CC(Cl)Cl>>ClCC(Cl)Cl"
+    ambiguous_mapping = (
+        "[CH3:4][CH:6]([Cl:1])[Cl:2]"
+        ">>[CH2:4]([Cl:2])[CH:6]([Cl:3])[Cl:1]"
+    )
+
+    result = validate_external_atom_mapping(
+        reaction,
+        ambiguous_mapping,
+        provider_metadata=METADATA,
+        mapper_confidence=0.5,
+    )
+
+    assert result.valid
+    assert result.mapped_reaction_smiles == ambiguous_mapping
+    assert "EXTERNAL_MAPPING_RECONCILIATION_AMBIGUOUS:Cl:2" in (
+        result.warnings
+    )
+    assert not any(
+        warning.startswith("EXTERNAL_MAPPING_RECONCILED_EQUIVALENT_ATOMS")
+        for warning in result.warnings
+    )
+
+
+def test_external_mapping_does_not_rewrite_a_minimal_assignment() -> None:
+    reaction = "CC(Cl)Cl>>ClCC(Cl)Cl"
+    minimal_mapping = (
+        "[CH3:4][CH:6]([Cl:1])[Cl:2]"
+        ">>[CH2:4]([Cl:3])[CH:6]([Cl:1])[Cl:2]"
+    )
+
+    result = validate_external_atom_mapping(
+        reaction,
+        minimal_mapping,
+        provider_metadata=METADATA,
+        mapper_confidence=0.5,
+    )
+
+    assert result.valid
+    assert result.mapped_reaction_smiles == minimal_mapping
+    assert not any(
+        "RECONCIL" in warning for warning in result.warnings
+    )
 
 
 class _FakeMapper:

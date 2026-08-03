@@ -243,11 +243,14 @@ def _edit_graph(
                 edit.atom_1.atom_index,
             )
         )
-        left = (
-            ("map", int(left_override))
-            if left_override is not None
-            else _atom_identity(edit.atom_1)
-        )
+        left = _atom_identity(edit.atom_1)
+        # Externally normalized edits already carry validated map numbers in
+        # mapper coordinates.  Coordinate overrides describe the original
+        # input molecules and must only supply identity for an unmapped edit;
+        # otherwise an unrelated original atom at the same numeric index can
+        # replace the edit's true mapped identity.
+        if left[0] != "map" and left_override is not None:
+            left = ("map", int(left_override))
         identities.add(left)
         incidence[left] += 1
         atom_labels[left] = (
@@ -276,11 +279,9 @@ def _edit_graph(
                     edit.atom_2.atom_index,
                 )
             )
-            right = (
-                ("map", int(right_override))
-                if right_override is not None
-                else _atom_identity(edit.atom_2)
-            )
+            right = _atom_identity(edit.atom_2)
+            if right[0] != "map" and right_override is not None:
+                right = ("map", int(right_override))
             identities.add(right)
             incidence[right] += 1
             heavy_incidence[left] += 1
