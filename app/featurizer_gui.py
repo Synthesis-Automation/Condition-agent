@@ -588,6 +588,25 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                 }
             )
         )
+        connector_source = tuple(
+            value
+            for value in projection.connectors
+            if value.side == "reactant"
+        ) or tuple(
+            value
+            for value in projection.connectors
+            if value.side == "product"
+        )
+        hidden_connectors = tuple(
+            f"{value.display_label} "
+            f"{'⋯'.join(value.port_display_labels)} "
+            + (
+                f"({len(value.shortest_path_atom_indices)} hidden-path atoms)"
+                if value.shortest_path_atom_indices
+                else f"({len(value.placeholder_indices)} shared ports)"
+            )
+            for value in connector_source
+        )
         note = (
             f"Display-only minimum: {projection.minimum_reaction_smiles}; "
             f"{projection.evidence_status} evidence; "
@@ -600,6 +619,8 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             note += f"; labels: {', '.join(placeholder_labels)}"
         if hidden_aromatic:
             note += f"; hidden aromatic: {', '.join(hidden_aromatic)}"
+        if hidden_connectors:
+            note += f"; hidden connectors: {', '.join(hidden_connectors)}"
         if projection.annotation:
             note += f"; {projection.annotation}"
         if projection.evidence_status == "external":

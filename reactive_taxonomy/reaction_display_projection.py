@@ -70,6 +70,26 @@ class ReactionDisplaySubstituent:
 
 
 @dataclass(frozen=True)
+class ReactionDisplayConnector:
+    """One omitted connected subgraph shared by multiple display ports."""
+
+    connector_id: str
+    display_label: str
+    side: Literal["reactant", "product"]
+    source_component_index: int
+    port_substituent_ids: Tuple[str, ...]
+    placeholder_indices: Tuple[int, ...]
+    port_display_labels: Tuple[str, ...]
+    attachment_atom_indices: Tuple[int, ...]
+    atom_indices: Tuple[int, ...]
+    atom_map_numbers: Tuple[int, ...]
+    fragment_smiles: str
+    hidden_atom_count: int
+    shortest_path_atom_indices: Tuple[int, ...]
+    shortest_path_bond_count: Optional[int]
+
+
+@dataclass(frozen=True)
 class ReactionDisplayComponent:
     """One source component after display-only graph abstraction."""
 
@@ -83,6 +103,7 @@ class ReactionDisplayComponent:
     removed_substituent_count: int
     r_group_count: int
     substituents: Tuple[ReactionDisplaySubstituent, ...]
+    connectors: Tuple[ReactionDisplayConnector, ...]
 
 
 @dataclass(frozen=True)
@@ -94,6 +115,7 @@ class ReactionDisplayProjection:
     reactants: Tuple[ReactionDisplayComponent, ...]
     products: Tuple[ReactionDisplayComponent, ...]
     substituents: Tuple[ReactionDisplaySubstituent, ...]
+    connectors: Tuple[ReactionDisplayConnector, ...]
     reaction_scope: str
     formed_ring_sizes: Tuple[int, ...]
     annotation: str | None
@@ -111,8 +133,11 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         definition = dict(json.load(handle))
     expected = {
         "schema_version": "1.0",
-        "definition_id": "reaction_display_projection.v1.2",
+        "definition_id": "reaction_display_projection.v1.4",
         "aromatic_system_policy": "retain_aromatic_bond_component",
+        "aromatic_valence_completion_policy": (
+            "retain_exocyclic_multiple_bonds"
+        ),
         "multiple_bond_policy": "retain_contiguous_multiple_bond_unit",
         "active_heteroatom_shell_policy": (
             "retain_direct_noncarbon_neighbors"
@@ -123,6 +148,9 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         "nonaromatic_boundary_policy": "retain_R_attachment",
         "placeholder_smiles": "*",
         "placeholder_label_template": "R{index}",
+        "hidden_connector_policy": "collapse_shared_omitted_component",
+        "hidden_connector_bond_type": "zero_order_dashed",
+        "hidden_connector_label_template": "S{index}",
     }
     for key, value in expected.items():
         if definition.get(key) != value:
@@ -232,6 +260,22 @@ class _SubstituentDraft:
 
 
 @dataclass
+class _ConnectorDraft:
+    """Mutable shared-omission record until scaffold labels are assigned."""
+
+    side: Literal["reactant", "product"]
+    source_component_index: int
+    ports: Tuple[_SubstituentDraft, ...]
+    atom_indices: Tuple[int, ...]
+    atom_map_numbers: Tuple[int, ...]
+    fragment_smiles: str
+    shortest_path_atom_indices: Tuple[int, ...]
+    shortest_path_bond_count: Optional[int]
+    connector_index: Optional[int] = None
+    display_label: Optional[str] = None
+
+
+@dataclass
 class _ComponentDraft:
     """One drawable component before global R-group label assignment."""
 
@@ -244,6 +288,7 @@ class _ComponentDraft:
     removed_substituent_count: int
     r_group_count: int
     substituents: list[_SubstituentDraft]
+    connectors: list[_ConnectorDraft]
 
 
 def _reaction_interface_closure(
@@ -282,6 +327,16 @@ def _reaction_interface_closure(
             if not neighbor.GetIsAromatic() and neighbor_index not in visited:
                 visited.add(neighbor_index)
                 pending.append(neighbor_index)
+
+    # Complete retained aromatic valence before spectator abstraction. An
+    # exocyclic C=O, C=N, S=O, or analogous multiple bond is part of the
+    # drawable pi-system even when that bond is unchanged by the reaction.
+    for atom_index in tuple(sorted(aromatic_policy_atoms)):
+        atom = molecule.GetAtomWithIdx(atom_index)
+        for bond in atom.GetBonds():
+            if bond.GetIsAromatic() or bond.GetBondTypeAsDouble() < 2.0:
+                continue
+            retained.add(int(bond.GetOtherAtomIdx(atom_index)))
 
     # Preserve the elemental shell of a local reaction interface. This keeps
     # C(=O)OH, B(OH)2, S(=O)2, and analogous handles explicit while ordinary
@@ -324,14 +379,80 @@ def _omitted_components(
     return tuple(components)
 
 
+def _connected_component_by_atom(
+    molecule: Any,
+    atom_indices: set[int],
+) -> Dict[int, int]:
+    """Index connected components within an induced atom subgraph."""
+    remaining = set(atom_indices)
+    component_by_atom: Dict[int, int] = {}
+    component_index = 0
+    while remaining:
+        seed = min(remaining)
+        remaining.remove(seed)
+        pending = [seed]
+        component_by_atom[seed] = component_index
+        while pending:
+            current = pending.pop()
+            for neighbor in molecule.GetAtomWithIdx(current).GetNeighbors():
+                neighbor_index = int(neighbor.GetIdx())
+                if neighbor_index in remaining:
+                    remaining.remove(neighbor_index)
+                    component_by_atom[neighbor_index] = component_index
+                    pending.append(neighbor_index)
+        component_index += 1
+    return component_by_atom
+
+
+def _shortest_path_within(
+    molecule: Any,
+    *,
+    allowed_atom_indices: set[int],
+    start: int,
+    end: int,
+) -> Tuple[int, ...]:
+    """Return a deterministic shortest path constrained to omitted atoms."""
+    pending = [start]
+    previous: Dict[int, Optional[int]] = {start: None}
+    while pending:
+        current = pending.pop(0)
+        if current == end:
+            path = []
+            cursor: Optional[int] = current
+            while cursor is not None:
+                path.append(cursor)
+                cursor = previous[cursor]
+            return tuple(reversed(path))
+        neighbors = sorted(
+            int(value.GetIdx())
+            for value in molecule.GetAtomWithIdx(current).GetNeighbors()
+            if int(value.GetIdx()) in allowed_atom_indices
+        )
+        for neighbor in neighbors:
+            if neighbor not in previous:
+                previous[neighbor] = current
+                pending.append(neighbor)
+    raise ValueError("shared omitted ports are not connected")
+
+
 def _fragment_smiles(molecule: Any, atom_indices: Tuple[int, ...]) -> str:
     copy = Chem.Mol(molecule)
     for atom in copy.GetAtoms():
         atom.SetAtomMapNum(0)
-    return str(
+    fragment_smiles = str(
         Chem.MolFragmentToSmiles(
             copy,
             atomsToUse=list(atom_indices),
+            canonical=True,
+            isomericSmiles=True,
+        )
+    )
+    fragment = Chem.MolFromSmiles(fragment_smiles)
+    if fragment is None:
+        return fragment_smiles
+    return str(
+        Chem.MolToSmiles(
+            fragment,
             canonical=True,
             isomericSmiles=True,
         )
@@ -344,7 +465,7 @@ def _remote_metadata(
     side: str,
     component_index: int,
     atom_indices: Tuple[int, ...],
-) -> tuple[Optional[str], str]:
+) -> tuple[Optional[str], str, Tuple[int, ...]]:
     omitted = set(atom_indices)
     matches = []
     for subgraph in core.remote_subgraphs:
@@ -358,7 +479,7 @@ def _remote_metadata(
         if overlap:
             matches.append((overlap, omitted == subgraph_atoms, subgraph))
     if not matches:
-        return None, "unresolved"
+        return None, "unresolved", ()
     matches.sort(
         key=lambda value: (
             not value[1],
@@ -368,7 +489,10 @@ def _remote_metadata(
     )
     _, exact, best = matches[0]
     remote_class = str(best.remote_class) if exact else None
-    return remote_class, str(best.continuity)
+    correspondence_maps = (
+        tuple(int(value) for value in best.atom_map_numbers) if exact else ()
+    )
+    return remote_class, str(best.continuity), correspondence_maps
 
 
 def _ring_distance(
@@ -509,6 +633,9 @@ def _display_component_draft(
         for component in omitted_components
         for atom_index in component
     }
+    retained_component_by_atom = _connected_component_by_atom(
+        molecule, retained
+    )
     boundary_bonds: list[tuple[int, int, Any]] = []
     for bond in molecule.GetBonds():
         begin, end = int(bond.GetBeginAtomIdx()), int(bond.GetEndAtomIdx())
@@ -516,6 +643,12 @@ def _display_component_draft(
             boundary_bonds.append((begin, end, bond))
         elif end in retained and begin not in retained:
             boundary_bonds.append((end, begin, bond))
+    boundary_retained_components: Dict[Tuple[int, ...], set[int]] = {}
+    for retained_index, attachment_index, _ in boundary_bonds:
+        omitted_component = component_by_atom[attachment_index]
+        boundary_retained_components.setdefault(omitted_component, set()).add(
+            retained_component_by_atom[retained_index]
+        )
     for retained_index, attachment_index, bond in sorted(
         boundary_bonds,
         key=lambda value: (
@@ -528,6 +661,12 @@ def _display_component_draft(
             retained_index in aromatic_policy_atom_indices
             and atom.GetIsAromatic()
             and atom.GetAtomicNum() == 6
+            and len(
+                boundary_retained_components[
+                    component_by_atom[attachment_index]
+                ]
+            )
+            == 1
         )
         omitted_atoms = component_by_atom[attachment_index]
         attachment_atom = molecule.GetAtomWithIdx(attachment_index)
@@ -538,12 +677,14 @@ def _display_component_draft(
                 if molecule.GetAtomWithIdx(value).GetAtomMapNum() > 0
             )
         )
-        remote_class, continuity = _remote_metadata(
+        remote_class, continuity, correspondence_maps = _remote_metadata(
             core,
             side=side,
             component_index=component_index,
             atom_indices=omitted_atoms,
         )
+        if not atom_maps:
+            atom_maps = correspondence_maps
         dummy_atom_index = None
         if should_cap:
             removed_substituent_count += 1
@@ -591,6 +732,102 @@ def _display_component_draft(
             )
         )
 
+    connector_ports: Dict[Tuple[int, ...], list[_SubstituentDraft]] = {}
+    for substituent in substituents:
+        if substituent.boundary_action == "r_placeholder":
+            connector_ports.setdefault(substituent.atom_indices, []).append(
+                substituent
+            )
+    connectors: list[_ConnectorDraft] = []
+    for omitted_atoms, ports in sorted(connector_ports.items()):
+        ports_by_retained_component: Dict[int, list[_SubstituentDraft]] = {}
+        for port in ports:
+            ports_by_retained_component.setdefault(
+                retained_component_by_atom[port.center_atom_index], []
+            ).append(port)
+        if len(ports_by_retained_component) < 2:
+            continue
+        allowed_atoms = set(omitted_atoms)
+        if len(ports_by_retained_component) == 2:
+            first_component, second_component = sorted(
+                ports_by_retained_component
+            )
+            candidates = []
+            for first in ports_by_retained_component[first_component]:
+                for second in ports_by_retained_component[second_component]:
+                    path = _shortest_path_within(
+                        molecule,
+                        allowed_atom_indices=allowed_atoms,
+                        start=first.attachment_atom_index,
+                        end=second.attachment_atom_index,
+                    )
+                    candidates.append(
+                        (
+                            len(path),
+                            first.center_atom_index,
+                            first.attachment_atom_index,
+                            second.center_atom_index,
+                            second.attachment_atom_index,
+                            first,
+                            second,
+                            path,
+                        )
+                    )
+            best = min(candidates, key=lambda value: value[:5])
+            ordered_ports = (best[5], best[6])
+            shortest_path = best[7]
+            shortest_path_bond_count: Optional[int] = len(shortest_path) - 1
+        else:
+            selected_ports = []
+            for retained_component in sorted(ports_by_retained_component):
+                candidates = []
+                for port in ports_by_retained_component[retained_component]:
+                    other_ports = (
+                        other
+                        for other_component, values in (
+                            ports_by_retained_component.items()
+                        )
+                        if other_component != retained_component
+                        for other in values
+                    )
+                    nearest = min(
+                        len(
+                            _shortest_path_within(
+                                molecule,
+                                allowed_atom_indices=allowed_atoms,
+                                start=port.attachment_atom_index,
+                                end=other.attachment_atom_index,
+                            )
+                        )
+                        for other in other_ports
+                    )
+                    candidates.append(
+                        (
+                            nearest,
+                            port.center_atom_index,
+                            port.attachment_atom_index,
+                            port,
+                        )
+                    )
+                selected_ports.append(
+                    min(candidates, key=lambda value: value[:3])[3]
+                )
+            ordered_ports = tuple(selected_ports)
+            shortest_path = ()
+            shortest_path_bond_count = None
+        connectors.append(
+            _ConnectorDraft(
+                side=side,
+                source_component_index=component_index,
+                ports=ordered_ports,
+                atom_indices=omitted_atoms,
+                atom_map_numbers=ordered_ports[0].atom_map_numbers,
+                fragment_smiles=ordered_ports[0].fragment_smiles,
+                shortest_path_atom_indices=shortest_path,
+                shortest_path_bond_count=shortest_path_bond_count,
+            )
+        )
+
     for atom_index in aromatic_carbons_to_cap:
         atom = editable.GetAtomWithIdx(old_to_new[atom_index])
         if atom.GetFormalCharge() == 0 and atom.GetNumRadicalElectrons() == 0:
@@ -614,6 +851,7 @@ def _display_component_draft(
         removed_substituent_count=removed_substituent_count,
         r_group_count=r_group_count,
         substituents=substituents,
+        connectors=connectors,
     )
 
 
@@ -676,8 +914,6 @@ def _placeholder_label(index: int, count: int) -> str:
 
 
 def _placeholder_base_identity(draft: _SubstituentDraft) -> tuple[Any, ...]:
-    if draft.atom_map_numbers:
-        return ("mapped_fragment", draft.atom_map_numbers)
     return (
         "fragment",
         draft.fragment_smiles,
@@ -737,6 +973,80 @@ def _assign_placeholder_labels(components: list[_ComponentDraft]) -> None:
         atom.SetProp("_displayLabel", draft.display_label)
 
 
+def _connector_base_identity(draft: _ConnectorDraft) -> tuple[Any, ...]:
+    placeholder_indices = tuple(
+        sorted(
+            int(port.placeholder_index)
+            for port in draft.ports
+            if port.placeholder_index is not None
+        )
+    )
+    if len(placeholder_indices) != len(draft.ports):
+        raise ValueError("hidden connector port is missing an R-group label")
+    if draft.atom_map_numbers:
+        return (
+            "mapped_connector",
+            draft.atom_map_numbers,
+            placeholder_indices,
+        )
+    return (
+        "connector",
+        draft.fragment_smiles,
+        placeholder_indices,
+    )
+
+
+def _assign_connector_labels(components: list[_ComponentDraft]) -> None:
+    connectors = [
+        connector
+        for component in components
+        for connector in component.connectors
+    ]
+    for draft in connectors:
+        original_first = draft.ports[0]
+        draft.ports = tuple(
+            sorted(
+                draft.ports,
+                key=lambda port: int(port.placeholder_index or 0),
+            )
+        )
+        if (
+            len(draft.ports) == 2
+            and draft.ports[0] is not original_first
+            and draft.shortest_path_atom_indices
+        ):
+            draft.shortest_path_atom_indices = tuple(
+                reversed(draft.shortest_path_atom_indices)
+            )
+    grouped: Dict[tuple[str, tuple[Any, ...]], list[_ConnectorDraft]] = {}
+    for draft in connectors:
+        grouped.setdefault(
+            (draft.side, _connector_base_identity(draft)), []
+        ).append(draft)
+    instance_keys: Dict[int, tuple[Any, ...]] = {}
+    for (side, base), values in grouped.items():
+        del side
+        ordered = sorted(
+            values,
+            key=lambda value: (
+                value.source_component_index,
+                value.atom_indices,
+            ),
+        )
+        for ordinal, draft in enumerate(ordered, start=1):
+            instance_keys[id(draft)] = (base, ordinal)
+    ordered_keys = sorted(set(instance_keys.values()), key=repr)
+    index_by_key = {
+        identity: index for index, identity in enumerate(ordered_keys, start=1)
+    }
+    for draft in connectors:
+        index = index_by_key[instance_keys[id(draft)]]
+        draft.connector_index = index
+        draft.display_label = (
+            f"S{str(index).translate(_SUPERSCRIPT_DIGITS)}"
+        )
+
+
 def _public_substituent(
     draft: _SubstituentDraft,
 ) -> ReactionDisplaySubstituent:
@@ -764,6 +1074,46 @@ def _public_substituent(
     )
 
 
+def _public_connector(draft: _ConnectorDraft) -> ReactionDisplayConnector:
+    if draft.connector_index is None or draft.display_label is None:
+        raise ValueError("hidden connector has not been labeled")
+    placeholder_indices = tuple(
+        int(port.placeholder_index)
+        for port in draft.ports
+        if port.placeholder_index is not None
+    )
+    port_display_labels = tuple(
+        str(port.display_label)
+        for port in draft.ports
+        if port.display_label is not None
+    )
+    if (
+        len(placeholder_indices) != len(draft.ports)
+        or len(port_display_labels) != len(draft.ports)
+    ):
+        raise ValueError("hidden connector has an unlabeled display port")
+    return ReactionDisplayConnector(
+        connector_id=f"S{draft.connector_index}",
+        display_label=draft.display_label,
+        side=draft.side,
+        source_component_index=draft.source_component_index,
+        port_substituent_ids=tuple(
+            _substituent_id(port) for port in draft.ports
+        ),
+        placeholder_indices=placeholder_indices,
+        port_display_labels=port_display_labels,
+        attachment_atom_indices=tuple(
+            port.attachment_atom_index for port in draft.ports
+        ),
+        atom_indices=draft.atom_indices,
+        atom_map_numbers=draft.atom_map_numbers,
+        fragment_smiles=draft.fragment_smiles,
+        hidden_atom_count=len(draft.atom_indices),
+        shortest_path_atom_indices=draft.shortest_path_atom_indices,
+        shortest_path_bond_count=draft.shortest_path_bond_count,
+    )
+
+
 def _finalize_component(draft: _ComponentDraft) -> ReactionDisplayComponent:
     render_smiles = str(
         Chem.MolToSmiles(
@@ -785,6 +1135,12 @@ def _finalize_component(draft: _ComponentDraft) -> ReactionDisplayComponent:
             key=lambda value: value.substituent_id,
         )
     )
+    connectors = tuple(
+        sorted(
+            (_public_connector(value) for value in draft.connectors),
+            key=lambda value: value.connector_id,
+        )
+    )
     return ReactionDisplayComponent(
         side=draft.side,
         source_component_index=draft.source_component_index,
@@ -796,6 +1152,7 @@ def _finalize_component(draft: _ComponentDraft) -> ReactionDisplayComponent:
         removed_substituent_count=draft.removed_substituent_count,
         r_group_count=draft.r_group_count,
         substituents=substituents,
+        connectors=connectors,
     )
 
 
@@ -871,6 +1228,7 @@ def build_reaction_display_projection(
     reactant_drafts = _side_component_drafts(analysis, side="reactant")
     product_drafts = _side_component_drafts(analysis, side="product")
     _assign_placeholder_labels(reactant_drafts + product_drafts)
+    _assign_connector_labels(reactant_drafts + product_drafts)
     reactants = _finalize_components(reactant_drafts)
     products = _finalize_components(product_drafts)
     if not reactants or not products:
@@ -901,10 +1259,26 @@ def build_reaction_display_projection(
             ),
         )
     )
+    connectors = tuple(
+        sorted(
+            (
+                connector
+                for component in reactants + products
+                for connector in component.connectors
+            ),
+            key=lambda value: (
+                value.side,
+                value.source_component_index,
+                value.connector_id,
+            ),
+        )
+    )
     topology = analysis.reaction_topology
     annotation = _intramolecular_annotation(topology, definition)
     warnings = list(core.warnings)
     warnings.append("DISPLAY_PROJECTION_NOT_REACTION_IDENTITY")
+    if connectors:
+        warnings.append("HIDDEN_CONNECTOR_ABSTRACTED_IN_DISPLAY")
     if annotation is not None:
         warnings.append("INTRAMOLECULAR_TETHER_ABSTRACTED_IN_DISPLAY")
     return ReactionDisplayProjection(
@@ -915,6 +1289,7 @@ def build_reaction_display_projection(
         reactants=reactants,
         products=products,
         substituents=substituents,
+        connectors=connectors,
         reaction_scope=(
             str(topology.reaction_scope) if topology is not None else "unresolved"
         ),
@@ -931,6 +1306,7 @@ def build_reaction_display_projection(
 __all__ = [
     "ReactionDisplayAromaticRelation",
     "ReactionDisplayComponent",
+    "ReactionDisplayConnector",
     "ReactionDisplayProjection",
     "ReactionDisplaySubstituent",
     "build_reaction_display_projection",

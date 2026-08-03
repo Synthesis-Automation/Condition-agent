@@ -195,6 +195,34 @@ def test_window_uses_r_group_display_minimization() -> None:
         application.processEvents()
 
 
+def test_window_reports_multisite_hidden_connector() -> None:
+    application = (
+        QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    )
+    window = ReactiveTaxonomyWindow()
+    reaction = (
+        "Cc1c([N+](=O)[O-])cnc2c1c("
+        "C1=CCN(C(=O)OC(C)(C)C)C(C)(C)C1)cn2C"
+        ">>Cc1c(N)cnc2c1c("
+        "C1CCN(C(=O)OC(C)(C)C)C(C)(C)C1)cn2C"
+    )
+    try:
+        window.use_rxnmapper_check.setChecked(False)
+        window.input_edit.setText(reaction)
+        window.analyze()
+
+        core_pixmap = window.core_image_label.pixmap()
+        assert core_pixmap is not None
+        assert not core_pixmap.isNull()
+        assert "hidden connectors: S¹ R³⋯R⁴ " in (
+            window.core_graphic_note.text()
+        )
+        assert "(4 hidden-path atoms)" in window.core_graphic_note.text()
+    finally:
+        window.close()
+        application.processEvents()
+
+
 def test_drawing_style_switch_rerenders_without_reanalysis(monkeypatch) -> None:
     application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
     calls = []

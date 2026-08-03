@@ -276,7 +276,7 @@ click rows selected from `raw_dataset/examples/sample_reactions.csv`. Source
 reaction labels select the review rows only and are not passed to chemistry,
 mapping, minimization, or rendering.
 
-The versioned `reaction_display_projection.v1.2` policy starts from observed
+The versioned `reaction_display_projection.v1.4` policy starts from observed
 edit endpoints and applies one graph-defined reaction-interface closure. An
 active aromatic atom retains its complete aromatic-bond-connected system. A
 non-aromatic active atom retains its contiguous multiple-bond unit, directly
@@ -284,6 +284,13 @@ attached non-carbon shell, and otherwise only the active saturated center.
 Consequently aryl, alkenyl, alkynyl, and acyl leaving-group interfaces retain
 `Ar-X`, `C=C-X`, `C#C-X`, and `C(=O)-X`, while an alkyl bromide becomes
 `R-CH2-Br`.
+
+A retained aromatic system also retains every attached non-aromatic multiple
+bond needed to complete its valence. Thus exocyclic `C=O`, `C=N`, `S=O`, and
+analogous pi bonds remain explicit even when unchanged. Ordinary single-bond
+aromatic substituents remain eligible for removal. This prevents invalid,
+non-kekulizable display fragments during partial aromatic reduction or
+dearomatization.
 
 Unchanged substituents attached through aromatic carbon are removed and the
 aromatic valence is hydrogen-capped. Other omitted frameworks become `R`; the
@@ -293,6 +300,12 @@ Distinct substituent groups receive stable mapped placeholders rendered as
 and hydrogen state while attached carbon fragments become R groups, producing
 forms such as `R-NH2`, `R¹R²NH`, and `R-SH`.
 
+Placeholder identity preferentially uses validated or inferred atom
+correspondence retained by the reaction core. Canonical fragment SMILES is
+only a fallback. This prevents a stereochemical `@`/`@@` serialization change
+caused by altered neighbor ordering from relabeling the same substituent on
+opposite sides of the reaction arrow.
+
 Every omitted fragment remains a typed `ReactionDisplaySubstituent` record
 with its exact fragment SMILES, atom and map provenance, attachment state,
 remote class, continuity, and graphical label. Hidden aromatic substituents
@@ -301,6 +314,17 @@ also record their distance from each active ring atom and derive `ipso`,
 Fused and other ring systems preserve graph distance and use `other` rather
 than forcing a positional name. Thus presentation abstraction does not erase
 electronic or steric context needed elsewhere in the chemistry analysis.
+
+When one omitted connected subgraph touches distinct retained reaction-site
+islands from the same source molecule, the projection records a typed
+`ReactionDisplayConnector`. For a two-island connector, it selects the
+shortest path constrained to omitted atoms and renders the two R-group ports
+with a labeled zero-order dashed tether. This line means "connected through
+hidden atoms," never a chemical bond. A shared omission touching more than two
+site islands is represented by one scaffold node rather than all pairwise
+lines. Terminal omissions and two ports belonging to the same retained site do
+not receive a tether. Exact hidden atoms, attachments, SMILES, path length,
+component provenance, and stable connector label remain serialized.
 
 Newly formed aromatic rings do not inherit the aromatic-substituent removal
 policy. Thus a click product retains its five-membered triazole core while its
@@ -324,12 +348,11 @@ not reaction identities or retrieval inputs. The click example requires an
 external atom-mapping proposal and retains the corresponding expert-review
 warning.
 
-The featurizer GUI's **Minimized reaction** tab consumes this display
-projection and renderer. Its note exposes the minimum reaction SMILES, `R`
-count, removed aromatic-substituent count, evidence status, confidence, and
-intramolecular annotation. The complete reaction graph remains available in
-the sibling tab, and missing-core behavior remains explicit rather than
-inventing a display projection.
+The featurizer GUI shows the complete reaction graph above the **Minimized
+reaction** panel. Its note exposes the minimum reaction SMILES, `R` count,
+hidden connectors, removed aromatic-substituent count, evidence status,
+confidence, and intramolecular annotation. Missing-core behavior remains
+explicit rather than inventing a display projection.
 
 ### 2.6 External RXNMapper Fischer POC
 

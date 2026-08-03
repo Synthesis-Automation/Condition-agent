@@ -52,21 +52,56 @@ def _require_rdkit() -> None:
 
 
 def _prepare_reaction(projection: ReactionDisplayProjection) -> Any:
-    reaction = rdChemReactions.ReactionFromSmarts(
-        projection.render_reaction_smiles,
-        useSmiles=True,
-    )
-    if reaction is None:
-        raise ValueError("minimum reaction SMILES could not be parsed")
-    molecules = tuple(reaction.GetReactants()) + tuple(reaction.GetProducts())
     labels = {
         int(value.placeholder_index): str(value.display_label)
         for value in projection.substituents
         if value.placeholder_index is not None and value.display_label
     }
-    for molecule in molecules:
+
+    def prepare_component(component: Any) -> Any:
+        molecule = Chem.MolFromSmiles(component.render_smiles)
+        if molecule is None:
+            raise ValueError("minimum reaction component could not be parsed")
+        atom_by_placeholder = {
+            int(atom.GetAtomMapNum()): int(atom.GetIdx())
+            for atom in molecule.GetAtoms()
+            if atom.GetAtomicNum() == 0 and atom.GetAtomMapNum() > 0
+        }
+        editable = Chem.RWMol(molecule)
+        for connector in component.connectors:
+            port_atoms = []
+            for placeholder_index in connector.placeholder_indices:
+                atom_index = atom_by_placeholder.get(int(placeholder_index))
+                if atom_index is None:
+                    raise ValueError(
+                        "hidden connector references an unknown display port"
+                    )
+                port_atoms.append(atom_index)
+            connector_label = str(connector.display_label).translate(
+                _DRAW_LABEL_TRANSLATION
+            )
+            if len(port_atoms) == 2:
+                if editable.GetBondBetweenAtoms(*port_atoms) is not None:
+                    raise ValueError(
+                        "hidden connector ports already have a chemical bond"
+                    )
+                editable.AddBond(
+                    port_atoms[0], port_atoms[1], Chem.BondType.ZERO
+                )
+                connector_bond = editable.GetBondBetweenAtoms(*port_atoms)
+                connector_bond.SetProp("bondNote", connector_label)
+            else:
+                scaffold = Chem.Atom(0)
+                scaffold.SetProp("atomLabel", connector_label)
+                scaffold.SetProp("_displayLabel", connector_label)
+                scaffold_index = editable.AddAtom(scaffold)
+                for port_atom in port_atoms:
+                    editable.AddBond(
+                        port_atom, scaffold_index, Chem.BondType.ZERO
+                    )
+        molecule = editable.GetMol()
         for atom in molecule.GetAtoms():
-            if atom.GetAtomicNum() == 0:
+            if atom.GetAtomicNum() == 0 and atom.GetAtomMapNum() > 0:
                 label = labels.get(int(atom.GetAtomMapNum()), "R")
                 draw_label = label.translate(_DRAW_LABEL_TRANSLATION)
                 atom.SetProp("atomLabel", draw_label)
@@ -76,6 +111,13 @@ def _prepare_reaction(projection: ReactionDisplayProjection) -> Any:
             Chem.SanitizeMol(molecule)
         except Exception:
             molecule.UpdatePropertyCache(strict=False)
+        return molecule
+
+    reaction = rdChemReactions.ChemicalReaction()
+    for component in projection.reactants:
+        reaction.AddReactantTemplate(prepare_component(component))
+    for component in projection.products:
+        reaction.AddProductTemplate(prepare_component(component))
     return reaction
 
 

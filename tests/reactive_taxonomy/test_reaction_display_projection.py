@@ -171,3 +171,76 @@ def test_indexed_r_groups_are_invariant_to_reactant_order() -> None:
     assert first.render_reaction_smiles == (
         "O=C(O)[*:1].N[*:2]>>O=C(N[*:2])[*:1]"
     )
+
+
+def test_multisite_projection_records_shortest_hidden_connector() -> None:
+    projection = _projection(
+        "Cc1c([N+](=O)[O-])cnc2c1c("
+        "C1=CCN(C(=O)OC(C)(C)C)C(C)(C)C1)cn2C"
+        ">>Cc1c(N)cnc2c1c("
+        "C1CCN(C(=O)OC(C)(C)C)C(C)(C)C1)cn2C"
+    )
+
+    assert len(projection.reactants) == 1
+    assert len(projection.products) == 1
+    assert len(projection.connectors) == 2
+    assert {
+        (value.side, value.connector_id, value.port_display_labels)
+        for value in projection.connectors
+    } == {
+        ("reactant", "S1", ("R³", "R⁴")),
+        ("product", "S1", ("R³", "R⁴")),
+    }
+    assert all(
+        value.shortest_path_bond_count == 3
+        and len(value.shortest_path_atom_indices) == 4
+        for value in projection.connectors
+    )
+    assert "HIDDEN_CONNECTOR_ABSTRACTED_IN_DISPLAY" in projection.warnings
+
+
+def test_terminal_omissions_do_not_create_hidden_connectors() -> None:
+    projection = _projection("C=CC1=CC=CC=C1>>CCc1ccccc1")
+    assert projection.connectors == ()
+
+
+def test_r_label_uses_correspondence_when_stereo_smiles_text_changes() -> None:
+    scaffold = (
+        "CC1=C(c2ccc(OC3CCCCO3)cc2)C(c2ccc(I)cc2)"
+        "Oc2ccc(OC3CCCCO3)cc21"
+    )
+    alcohol = "C[C@@H]1CCN([C@@H](C)CO)C1"
+    product = (
+        "CC1=C(c2ccc(OC3CCCCO3)cc2)"
+        "C(c2ccc(OC[C@H](C)N3CC[C@@H](C)C3)cc2)"
+        "Oc2ccc(OC3CCCCO3)cc21"
+    )
+    first = _projection(f"{scaffold}.{alcohol}>>{product}")
+    reordered = _projection(f"{alcohol}.{scaffold}>>{product}")
+
+    assert first.render_reaction_smiles == (
+        "O[*:1].Ic1ccccc1>>c1ccc(O[*:1])cc1"
+    )
+    assert reordered.render_reaction_smiles == first.render_reaction_smiles
+    labeled = [
+        value for value in first.substituents if value.display_label is not None
+    ]
+    assert {value.display_label for value in labeled} == {"R"}
+    assert len({value.atom_map_numbers for value in labeled}) == 1
+    assert labeled[0].atom_map_numbers
+
+
+def test_aromatic_valence_completion_retains_exocyclic_carbonyl() -> None:
+    projection = _projection(
+        "CCOC(=O)c1ccc("
+        "C#Cc2cnc3nc(NC(=O)C(C)(C)C)[nH]c(=O)c3c2)s1"
+        ">>CCOC(=O)c1ccc("
+        "CCC2CNc3nc(NC(=O)C(C)(C)C)[nH]c(=O)c3C2)s1"
+    )
+
+    assert projection.minimum_reaction_smiles == (
+        "*C#Cc1cnc2nc[nH]c(=O)c2c1"
+        ">>*CCC1CNc2nc[nH]c(=O)c2C1"
+    )
+    assert "c(=O)" in projection.reactants[0].display_smiles
+    assert "c(=O)" in projection.products[0].display_smiles
