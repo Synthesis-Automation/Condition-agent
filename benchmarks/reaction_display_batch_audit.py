@@ -18,9 +18,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from reactive_taxonomy import (  # noqa: E402
+    analyze_reaction_with_external_mapping,
     build_reaction_display_projection,
     featurize_reaction,
     reaction_render_context_from_analysis,
+    RxnMapperProvider,
 )
 from visualization import build_reaction_display_graphic  # noqa: E402
 
@@ -40,6 +42,7 @@ FAILURE_COLUMNS = (
     "failure_reason",
     "analysis_valid",
     "computed_evidence_status",
+    "external_mapping_status",
     "computed_warnings",
 )
 
@@ -55,6 +58,7 @@ class _AuditOutcome:
     failure_reason: str
     analysis_valid: bool | None
     evidence_status: str
+    external_mapping_status: str
     warnings: tuple[str, ...]
     definition_id: str
 
@@ -66,6 +70,7 @@ def _failure(
     exception: Exception | None = None,
     analysis_valid: bool | None = None,
     evidence_status: str = "",
+    external_mapping_status: str = "",
     warnings: tuple[str, ...] = (),
 ) -> _AuditOutcome:
     return _AuditOutcome(
@@ -76,12 +81,17 @@ def _failure(
         failure_reason=reason,
         analysis_valid=analysis_valid,
         evidence_status=evidence_status,
+        external_mapping_status=external_mapping_status,
         warnings=warnings,
         definition_id="",
     )
 
 
-def _audit_reaction(reaction_smiles: str) -> _AuditOutcome:
+def _audit_reaction(
+    reaction_smiles: str,
+    *,
+    mapping_provider: RxnMapperProvider | None,
+) -> _AuditOutcome:
     if not reaction_smiles.strip():
         return _failure(stage="input", reason="missing reaction SMILES")
     try:
@@ -101,12 +111,33 @@ def _audit_reaction(reaction_smiles: str) -> _AuditOutcome:
             analysis_valid=False,
             warnings=analysis_warnings,
         )
+    external_mapping_status = "not_requested"
     core = analysis.reaction_core
+    if core is None and mapping_provider is not None:
+        try:
+            assessment = analyze_reaction_with_external_mapping(
+                reaction_smiles,
+                mapping_provider,
+                base_analysis=analysis,
+            )
+        except Exception as exc:
+            return _failure(
+                stage="external_mapping",
+                reason=str(exc),
+                exception=exc,
+                analysis_valid=True,
+                warnings=analysis_warnings,
+            )
+        analysis = assessment.analysis
+        external_mapping_status = str(assessment.status)
+        analysis_warnings = tuple(str(value) for value in analysis.warnings)
+        core = analysis.reaction_core
     if core is None:
         return _failure(
             stage="reaction_core",
             reason="reaction core is unavailable",
             analysis_valid=True,
+            external_mapping_status=external_mapping_status,
             warnings=analysis_warnings,
         )
     evidence_status = str(core.evidence_status)
@@ -121,6 +152,7 @@ def _audit_reaction(reaction_smiles: str) -> _AuditOutcome:
             exception=exc,
             analysis_valid=True,
             evidence_status=evidence_status,
+            external_mapping_status=external_mapping_status,
             warnings=analysis_warnings + tuple(core.warnings),
         )
     try:
@@ -136,6 +168,7 @@ def _audit_reaction(reaction_smiles: str) -> _AuditOutcome:
             exception=exc,
             analysis_valid=True,
             evidence_status=evidence_status,
+            external_mapping_status=external_mapping_status,
             warnings=projection.warnings,
         )
     return _AuditOutcome(
@@ -146,6 +179,7 @@ def _audit_reaction(reaction_smiles: str) -> _AuditOutcome:
         failure_reason="",
         analysis_valid=True,
         evidence_status=evidence_status,
+        external_mapping_status=external_mapping_status,
         warnings=projection.warnings,
         definition_id=projection.definition_id,
     )
@@ -167,6 +201,7 @@ def build_batch_audit(
     *,
     source_path: Path,
     output_dir: Path,
+    use_rxnmapper: bool = True,
 ) -> Dict[str, Any]:
     """Render every CSV row and write structured failure and summary reports."""
     started = time.perf_counter()
@@ -188,6 +223,13 @@ def build_batch_audit(
         )
 
     cache: Dict[str, _AuditOutcome] = {}
+    mapping_provider = None
+    if use_rxnmapper:
+        if not RxnMapperProvider.is_available():
+            raise RuntimeError(
+                "RXNMapper is required unless use_rxnmapper is disabled"
+            )
+        mapping_provider = RxnMapperProvider()
     unsuccessful_rows = []
     successful_rows = 0
     definition_ids = set()
@@ -196,7 +238,10 @@ def build_batch_audit(
         reaction_smiles = str(row.get("canonical_reaction_smiles") or "").strip()
         outcome = cache.get(reaction_smiles)
         if outcome is None:
-            outcome = _audit_reaction(reaction_smiles)
+            outcome = _audit_reaction(
+                reaction_smiles,
+                mapping_provider=mapping_provider,
+            )
             cache[reaction_smiles] = outcome
         if outcome.success:
             if outcome.image_bytes is None:
@@ -232,6 +277,7 @@ def build_batch_audit(
                     "" if outcome.analysis_valid is None else outcome.analysis_valid
                 ),
                 "computed_evidence_status": outcome.evidence_status,
+                "external_mapping_status": outcome.external_mapping_status,
                 "computed_warnings": "; ".join(sorted(set(outcome.warnings))),
             }
         )
@@ -258,6 +304,7 @@ def build_batch_audit(
         "unique_unsuccessful_reactions": len(cache) - unique_successes,
         "failure_by_stage": dict(sorted(failure_by_stage.items())),
         "projection_definition_ids": sorted(definition_ids),
+        "rxnmapper_enabled": use_rxnmapper,
         "elapsed_seconds": round(time.perf_counter() - started, 3),
     }
     (output_dir / "batch_summary.json").write_text(
@@ -271,10 +318,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--no-rxnmapper",
+        action="store_true",
+        help="Disable the app-equivalent RXNMapper fallback.",
+    )
     args = parser.parse_args(argv)
     summary = build_batch_audit(
         source_path=args.source,
         output_dir=args.output_dir,
+        use_rxnmapper=not args.no_rxnmapper,
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
