@@ -66,11 +66,12 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         definition = dict(json.load(handle))
     expected = {
         "schema_version": "1.0",
-        "definition_id": "reaction_display_projection.v1.0",
+        "definition_id": "reaction_display_projection.v1.1",
         "aromatic_system_policy": "retain_aromatic_bond_component",
         "aromatic_carbon_boundary_policy": "remove_and_hydrogen_cap",
         "aromatic_heteroatom_boundary_policy": "retain_R_attachment",
         "nonaromatic_boundary_policy": "retain_R_attachment",
+        "multiple_bonded_heteroatom_policy": "retain_explicit",
         "placeholder_smiles": "*",
         "placeholder_label": "R",
     }
@@ -155,6 +156,30 @@ def _copy_atom(atom: Any) -> Any:
     return copied
 
 
+def _multiple_bonded_heteroatoms(
+    molecule: Any,
+    active_atom_indices: set[int],
+) -> set[int]:
+    """Return functional heteroatoms that must remain chemically explicit.
+
+    An unchanged carbonyl oxygen, for example, can sit just outside the edit
+    core even though it defines the acyl handle. Replacing that oxygen by ``R``
+    changes the represented functional group rather than merely abstracting a
+    remote framework.
+    """
+    retained = set()
+    for atom_index in active_atom_indices:
+        atom = molecule.GetAtomWithIdx(atom_index)
+        for bond in atom.GetBonds():
+            if float(bond.GetBondTypeAsDouble()) < 2.0:
+                continue
+            neighbor_index = int(bond.GetOtherAtomIdx(atom_index))
+            neighbor = molecule.GetAtomWithIdx(neighbor_index)
+            if neighbor.GetAtomicNum() not in {0, 1, 6}:
+                retained.add(neighbor_index)
+    return retained
+
+
 def _display_component(
     molecule: Any,
     *,
@@ -164,7 +189,11 @@ def _display_component(
     aromatic_seed_indices: set[int],
     explicit_remote_atom_indices: set[int],
 ) -> ReactionDisplayComponent:
-    retained = set(active_atom_indices).union(explicit_remote_atom_indices)
+    retained = (
+        set(active_atom_indices)
+        .union(explicit_remote_atom_indices)
+        .union(_multiple_bonded_heteroatoms(molecule, active_atom_indices))
+    )
     aromatic_systems: set[tuple[int, ...]] = set()
     aromatic_policy_atom_indices: set[int] = set()
     for atom_index in sorted(aromatic_seed_indices):

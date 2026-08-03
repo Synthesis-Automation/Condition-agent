@@ -276,14 +276,18 @@ click rows selected from `raw_dataset/examples/sample_reactions.csv`. Source
 reaction labels select the review rows only and are not passed to chemistry,
 mapping, minimization, or rendering.
 
-The versioned `reaction_display_projection.v1.0` policy retains the complete
+The versioned `reaction_display_projection.v1.1` policy retains the complete
 aromatic-bond-connected system containing an inherited active aromatic atom.
 Unchanged substituents attached through aromatic carbon are removed and the
 aromatic valence is hydrogen-capped. For non-aromatic reaction systems,
 omitted frameworks are represented by `R`; the serialized minimum reaction
 SMILES uses `*` as the graph-level placeholder. Departing or appearing
 fragments remain explicit, as do small unresolved heteroatoms needed to avoid
-hiding reactive handles such as `B(OH)2`.
+hiding reactive handles such as `B(OH)2`. A non-carbon atom multiply bonded
+directly to an active atom also remains explicit. This prevents functional
+handles such as `C=O`, `S=O`, `P=O`, `C=N`, and nitriles from being replaced
+by `R`; for example, an amidation acid is rendered as `R-C(=O)OH`, not
+`R-C(=R)OH`.
 
 Newly formed aromatic rings do not inherit the aromatic-substituent removal
 policy. Thus a click product retains its five-membered triazole core while its
@@ -304,6 +308,13 @@ SVG, PNG, and structured review artifacts are written beneath
 not reaction identities or retrieval inputs. The click example requires an
 external atom-mapping proposal and retains the corresponding expert-review
 warning.
+
+The featurizer GUI's **Minimized reaction** tab consumes this display
+projection and renderer. Its note exposes the minimum reaction SMILES, `R`
+count, removed aromatic-substituent count, evidence status, confidence, and
+intramolecular annotation. The complete reaction graph remains available in
+the sibling tab, and missing-core behavior remains explicit rather than
+inventing a display projection.
 
 ### 2.6 External RXNMapper Fischer POC
 

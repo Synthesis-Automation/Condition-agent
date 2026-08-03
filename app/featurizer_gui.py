@@ -17,6 +17,7 @@ from reactive_taxonomy import (  # noqa: E402
     ExternalMappingAssessment,
     RxnMapperProvider,
     analyze_reaction_with_external_mapping,
+    build_reaction_display_projection,
     build_reaction_review_summary,
     analyze_molecule,
     featurize_reaction,
@@ -26,7 +27,7 @@ from reactive_taxonomy import (  # noqa: E402
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
 from visualization import (  # noqa: E402
     available_render_presets,
-    build_reaction_core_graphic,
+    build_reaction_display_graphic,
     render_molecule_image_bytes,
     render_reaction_image_bytes,
 )
@@ -537,10 +538,12 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.graph_tabs.setCurrentIndex(0)
             return
         try:
-            graphic = build_reaction_core_graphic(
-                reaction_render_context_from_analysis(analysis),
+            projection = build_reaction_display_projection(
+                reaction_render_context_from_analysis(analysis)
+            )
+            graphic = build_reaction_display_graphic(
+                projection,
                 size=REACTION_IMAGE_SIZE,
-                image_format="svg",
                 render_preset=render_preset,
             )
         except (RuntimeError, ValueError) as exc:
@@ -560,19 +563,25 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             )
             self.graph_tabs.setCurrentIndex(0)
             return
-        legend = "; ".join(
-            (
-                f"{placeholder.label}"
-                f"{f' ({placeholder.attachment_port_count} ports)' if placeholder.attachment_port_count > 1 else ''}"
-                f" = {placeholder.fragment_smiles}"
-            )
-            for placeholder in graphic.placeholders
-        ) or "no remote placeholders"
-        note = (
-            f"{graphic.evidence_status} evidence; "
-            f"confidence {graphic.confidence:.3f}; {legend}"
+        removed_substituent_count = sum(
+            component.removed_substituent_count
+            for component in projection.reactants + projection.products
         )
-        if graphic.evidence_status == "external":
+        r_group_count = sum(
+            component.r_group_count
+            for component in projection.reactants + projection.products
+        )
+        note = (
+            f"Display-only minimum: {projection.minimum_reaction_smiles}; "
+            f"{projection.evidence_status} evidence; "
+            f"confidence {projection.confidence:.3f}; "
+            f"R groups: {r_group_count}; "
+            f"removed unchanged aromatic substituents: "
+            f"{removed_substituent_count}"
+        )
+        if projection.annotation:
+            note += f"; {projection.annotation}"
+        if projection.evidence_status == "external":
             note += "; external mapping requires expert review"
         self.core_graphic_note.setText(note)
         self.core_image_label.setToolTip(note)

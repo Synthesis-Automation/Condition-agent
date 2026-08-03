@@ -154,8 +154,32 @@ def test_window_displays_mapped_reaction_minimization() -> None:
         assert core_pixmap is not None
         assert not core_pixmap.isNull()
         assert window.graph_tabs.currentIndex() == 1
-        assert "Ar = Fc1ccccc1" in window.core_graphic_note.text()
-        assert "Alk = C" in window.core_graphic_note.text()
+        assert "Display-only minimum:" in window.core_graphic_note.text()
+        assert "R groups:" in window.core_graphic_note.text()
+        assert "removed unchanged aromatic substituents:" in (
+            window.core_graphic_note.text()
+        )
+    finally:
+        window.close()
+        application.processEvents()
+
+
+def test_window_uses_r_group_display_minimization() -> None:
+    application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    window = ReactiveTaxonomyWindow()
+    try:
+        window.use_rxnmapper_check.setChecked(False)
+        window.input_edit.setText("C=CC1=CC=CC=C1>>CCc1ccccc1")
+        window.analyze()
+
+        assert window.graph_tabs.currentIndex() == 1
+        core_pixmap = window.core_image_label.pixmap()
+        assert core_pixmap is not None
+        assert not core_pixmap.isNull()
+        assert "Display-only minimum: *C=C>>*CC" in (
+            window.core_graphic_note.text()
+        )
+        assert "R groups: 2" in window.core_graphic_note.text()
     finally:
         window.close()
         application.processEvents()

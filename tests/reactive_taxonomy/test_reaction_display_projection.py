@@ -42,6 +42,24 @@ def test_nonaromatic_hydrogenation_replaces_remote_aryl_with_r() -> None:
     assert projection.products[0].r_group_count == 1
 
 
+def test_amide_formation_retains_carboxylic_acid_carbonyl_oxygen() -> None:
+    projection = _projection(
+        "O=C(O)c1ccccc1.Nc1ccccc1"
+        ">>O=C(Nc1ccccc1)c1ccccc1"
+    )
+    assert projection.minimum_reaction_smiles == (
+        "*C(=O)O.*N>>*NC(*)=O"
+    )
+    assert "C(=*)" not in projection.minimum_reaction_smiles
+
+
+def test_aliphatic_amide_formation_keeps_r_c_o_oh_handle() -> None:
+    projection = _projection("CC(=O)O.NCc1ccccc1>>CC(=O)NCc1ccccc1")
+    assert projection.minimum_reaction_smiles == (
+        "*C(=O)O.*N>>*NC(*)=O"
+    )
+
+
 def test_click_reaction_keeps_new_ring_and_uses_two_r_groups() -> None:
     projection = _projection(
         "[CH:5]#[C:6][CH2:7][CH2:8][O:9][CH3:10]."
