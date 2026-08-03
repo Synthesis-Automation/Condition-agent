@@ -226,6 +226,30 @@ def test_global_correspondence_is_reactant_order_invariant() -> None:
     assert forward.reaction_label == reversed_order.reaction_label
 
 
+def test_global_correspondence_collapses_equivalent_substituent_permutations() -> None:
+    reaction = (
+        "Brc1ccccn1."
+        "CN(C(=O)OC(C)(C)C)[C@@H]1C[C@@H]("
+        "Oc2nc(Nc3cnn(C)c3)nc3c2ccn3COCC[Si](C)(C)C)C1"
+        ">>"
+        "CN(C(=O)OC(C)(C)C)[C@@H]1C[C@@H]("
+        "Oc2nc(N(c3cnn(C)c3)c3ccccn3)nc3c2ccn3COCC[Si](C)(C)C)C1"
+    )
+
+    result = featurize_reaction(reaction)
+
+    assert result.valid
+    assert result.evidence_quality == "global_atom_correspondence"
+    assert result.reaction_signature is not None
+    assert result.reaction_core is not None
+    assert result.reaction_signature.formed_bond_types == ("C-N:SINGLE",)
+    assert result.reaction_signature.broken_bond_types == ("Br-C:SINGLE",)
+    assert result.reaction_signature.hydrogen_changes == (
+        "N-H:SINGLE>NONE",
+    )
+    assert "GLOBAL_CORRESPONDENCE_COMPONENT_MATCH_LIMIT" not in result.warnings
+
+
 def test_largest_single_cut_fragment_avoids_dominated_symmetry_limit() -> None:
     product = "O=C(c1ccccc1)c1ncc(-c2ccccc2)c2ccccc12"
     forward = featurize_reaction(

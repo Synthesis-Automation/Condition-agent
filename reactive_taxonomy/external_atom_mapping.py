@@ -199,6 +199,11 @@ def _canonical_without_maps(smiles: str) -> Optional[str]:
     for atom in copy.GetAtoms():
         atom.SetAtomMapNum(0)
     try:
+        # Atom mapping changes atom order, which can reverse the textual @/@@
+        # tag while preserving the same stereochemical structure.  Reassign
+        # stereo after removing maps so identity comparison uses normalized
+        # molecular stereochemistry rather than serialization-local tags.
+        Chem.AssignStereochemistry(copy, cleanIt=True, force=True)
         return Chem.MolToSmiles(copy, canonical=True, isomericSmiles=True)
     except Exception:
         return None

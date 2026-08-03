@@ -12,7 +12,64 @@ from .reaction_models import ReactionComponent
 
 
 AtomPair = Tuple[int, int, int, int]
-REACTION_CORRESPONDENCE_VERSION = "2.4"
+REACTION_CORRESPONDENCE_VERSION = "2.5"
+
+
+def _symmetry_distinct_matches(
+    molecule: Any,
+    query: Any,
+    *,
+    max_matches: int,
+) -> tuple[Tuple[Tuple[int, ...], ...], bool]:
+    """Return atom-distinct matches after collapsing molecular automorphisms.
+
+    ``uniquify=True`` is too aggressive for reaction correspondence because it
+    can collapse alternative orientations that place an edit at chemically
+    different atoms.  Conversely, raw RDKit matches enumerate every
+    permutation of equivalent groups such as tert-butyl and trimethylsilyl
+    methyls.  Canonical symmetry-class sequences retain the former while
+    collapsing the latter before the chemistry search limit is applied.
+
+    The second return value reports bounded-search overflow.  We continue to
+    abstain instead of silently accepting a truncated correspondence set.
+    """
+    from rdkit import Chem
+
+    raw_match_limit = max(4_096, max_matches * 128)
+    raw_matches = molecule.GetSubstructMatches(
+        query,
+        uniquify=False,
+        maxMatches=raw_match_limit + 1,
+    )
+    if len(raw_matches) > raw_match_limit:
+        return (), True
+    symmetry_classes = tuple(
+        int(value)
+        for value in Chem.CanonicalRankAtoms(
+            molecule,
+            breakTies=False,
+            includeChirality=True,
+        )
+    )
+    representatives: Dict[
+        Tuple[Tuple[int, ...], Tuple[int, ...]], Tuple[int, ...]
+    ] = {}
+    for raw_match in raw_matches:
+        match = tuple(int(atom_index) for atom_index in raw_match)
+        # The atom set distinguishes separate copies/sites in the target.  The
+        # symmetry-class sequence additionally retains inequivalent query
+        # orientations over the same atom set (for example the two possible
+        # ends of an elimination scaffold).
+        signature = (
+            tuple(sorted(match)),
+            tuple(symmetry_classes[atom_index] for atom_index in match),
+        )
+        previous = representatives.get(signature)
+        if previous is None or match < previous:
+            representatives[signature] = match
+    if len(representatives) > max_matches:
+        return (), True
+    return tuple(sorted(representatives.values())), False
 
 
 @dataclass(frozen=True)
@@ -103,13 +160,17 @@ def _component_correspondence_candidates(
     query = compile_smarts(result.smartsString, validate=False)
     if query is None:
         return (), ("GLOBAL_CORRESPONDENCE_QUERY_FAILED",)
-    reactant_matches = reactant_mol.GetSubstructMatches(
-        query, uniquify=False, maxMatches=max_matches + 1
+    reactant_matches, reactant_limit_reached = _symmetry_distinct_matches(
+        reactant_mol,
+        query,
+        max_matches=max_matches,
     )
-    product_matches = product_mol.GetSubstructMatches(
-        query, uniquify=False, maxMatches=max_matches + 1
+    product_matches, product_limit_reached = _symmetry_distinct_matches(
+        product_mol,
+        query,
+        max_matches=max_matches,
     )
-    if len(reactant_matches) > max_matches or len(product_matches) > max_matches:
+    if reactant_limit_reached or product_limit_reached:
         return (), ("GLOBAL_CORRESPONDENCE_COMPONENT_MATCH_LIMIT",)
     candidates = set()
     for reactant_match in reactant_matches:

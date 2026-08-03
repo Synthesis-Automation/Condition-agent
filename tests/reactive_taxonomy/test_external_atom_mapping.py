@@ -69,6 +69,16 @@ REPEATED_SUZUKI_MAPPING = (
     "[c:8](-[c:9]3[cH:10][cH:11][cH:12][cH:13][cH:14]3)"
     "[cH:15][cH:16]2)[cH:17][cH:18]1"
 )
+REORDERED_STEREO_REACTION = (
+    "Brc1ccccn1.N[C@@H]1C[C@@H](OC)C1"
+    ">>c1cccc(N[C@@H]2C[C@@H](OC)C2)n1"
+)
+REORDERED_STEREO_MAPPING = (
+    "[Br:14][c:7]1[cH:8][cH:9][cH:10][cH:11][n:12]1."
+    "[CH3:1][O:2][C@H:3]1[CH2:4][C@H:5]([NH2:6])[CH2:13]1"
+    ">>[CH3:1][O:2][C@H:3]1[CH2:4][C@H:5]("
+    "[NH:6][c:7]2[cH:8][cH:9][cH:10][cH:11][n:12]2)[CH2:13]1"
+)
 
 
 class _ResolvedFixtureProvider:
@@ -187,6 +197,40 @@ def test_external_mapping_rejects_changed_chemistry() -> None:
     assert result.normalization is None
     assert result.error == "MAPPER_CHANGED_REACTION_STRUCTURE"
     assert "EXTERNAL_MAPPER_CHANGED_REACTION_STRUCTURE" in result.warnings
+
+
+def test_external_mapping_normalizes_stereo_after_atom_reordering() -> None:
+    result = validate_external_atom_mapping(
+        REORDERED_STEREO_REACTION,
+        REORDERED_STEREO_MAPPING,
+        provider_metadata=METADATA,
+        mapper_confidence=0.8,
+    )
+
+    assert result.valid
+    assert result.structure_preserved
+    assert result.normalization is not None
+    assert {
+        (edit.edit_type, edit.atom_1.element, edit.atom_2.element)
+        for edit in result.normalization.edits
+        if edit.atom_2 is not None
+    } == {
+        ("broken", "C", "Br"),
+        ("formed", "N", "C"),
+    }
+
+
+def test_external_mapping_still_rejects_a_real_stereo_change() -> None:
+    result = validate_external_atom_mapping(
+        "F[C@H](Cl)Br>>F[C@H](Cl)I",
+        "[F:1][C@@H:2]([Cl:3])[Br:4]>>[F:1][C@@H:2]([Cl:3])[I:4]",
+        provider_metadata=METADATA,
+        mapper_confidence=0.8,
+    )
+
+    assert not result.valid
+    assert not result.structure_preserved
+    assert result.error == "MAPPER_CHANGED_REACTION_STRUCTURE"
 
 
 class _FakeMapper:
