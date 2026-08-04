@@ -47,9 +47,52 @@ may be preserved for audit but cannot become structural condition precedents.
 | Path | Public entry point | Current status | Intended use |
 | --- | --- | --- | --- |
 | Generic structure-backed retrieval | `recommend_generic_conditions()` | Functional pilot; coverage and calibration depend on converted structure-rich records | Type-agnostic precedent retrieval and canonical recipe aggregation |
+| Exploratory reaction discovery | `ReactionDiscoveryExplorer.discover()` | Functional MVP over the validated SQLite precedent index | Multi-tier structural analogue search with observed-condition evidence |
 
 Supporting audit, conversion, indexing, and evaluation commands prepare data for
 this path; they do not recommend conditions by themselves.
+
+## Reaction discovery mode
+
+The desktop application includes **Reaction discovery** as an option in the
+existing recommender window. It deliberately uses a separate result contract
+and backend method from condition recommendation:
+
+```python
+from condition_recommender import ReactionDiscoveryExplorer
+
+explorer = ReactionDiscoveryExplorer.from_path(
+    "datasets/literature/generic_index.sqlite"
+)
+result = explorer.discover(
+    "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+    top_k=20,
+    view="diverse_strategies",
+)
+```
+
+Discovery unions exact-signature, bond-edit, reaction-core,
+local-environment, and anonymous edit-graph candidates instead of stopping at
+the first sufficiently supported recommendation tier. Ranking is declared in
+`definitions/discovery_retrieval.v1.json`. Bond-edit similarity has the largest
+weight, followed by reaction-center transitions and local environment; partner
+category, unchanged spectator groups, reaction topology, and reactive scaffold
+provide additional evidence. Missing factors remain `null`, and the available
+weights are explicitly renormalized in each `DiscoveryScoreTrace`.
+
+Each hit is an individual reaction observation with its yield, evidence tier,
+reference, structural matches and mismatches, and observed recipe. Low-yield
+and unreported outcomes are included by default because they can identify
+failure boundaries. They can be hidden with `include_low_yield=False` or
+`include_unreported_outcomes=False`. For an ambiguous query, edit hypotheses
+are searched and labeled separately rather than collapsed into a false
+consensus.
+
+Discovery conditions are evidence for expert ideation, **not recommended
+conditions**. The MVP searches the same admitted SQLite precedent corpus as the
+recommender; a future broader discovery-only corpus may add structurally
+verified failed or incomplete records without granting them recommendation
+authority. A complete `reactants>>product` query is currently required.
 
 ## Which path should I use?
 

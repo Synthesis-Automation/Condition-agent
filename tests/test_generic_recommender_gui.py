@@ -7,6 +7,11 @@ from condition_recommender.models import (
     GenericRecommendationResult,
     RecommendationScoreTrace,
 )
+from condition_recommender.discovery_models import (
+    DiscoveryScoreTrace,
+    ReactionDiscoveryHit,
+    ReactionDiscoveryResult,
+)
 
 
 def _aromatic_profile(
@@ -183,11 +188,10 @@ def test_window_uses_literature_recommendation_data_by_default(
     assert not window.unrestricted_fallback_check.isChecked()
     assert window.use_rxnmapper_check.isChecked()
     assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
-    assert (
-        window.unrestricted_fallback_check.objectName()
-        == "unrestrictedFallback"
-    )
+    assert window.unrestricted_fallback_check.objectName() == "unrestrictedFallback"
     assert window.reaction_edit.metaObject().className() == "QLineEdit"
+    assert window.mode_combo.parentWidget() == window.reaction_row_label
+    assert window.reaction_row_label.layout().indexOf(window.mode_combo) == 0
     assert window.summary_box.height() == 168
     assert window.data_row_layout.indexOf(window.data_label) == 0
     assert window.data_row_layout.indexOf(window.data_path_edit) == 1
@@ -203,6 +207,72 @@ def test_window_uses_literature_recommendation_data_by_default(
     assert not any(
         label.text() == "Reaction Condition Recommender"
         for label in window.findChildren(gui.QtWidgets.QLabel)
+    )
+
+
+def _discovery_result() -> ReactionDiscoveryResult:
+    trace = DiscoveryScoreTrace(
+        components={
+            "edit_similarity": 1.0,
+            "reaction_center": 0.8,
+            "local_environment": 0.7,
+            "partner_category": 0.5,
+            "spectator_groups": None,
+            "reaction_topology": 1.0,
+            "reactive_scaffold": 0.0,
+        },
+        contributions={"edit_similarity": 0.4},
+        configured_weights={
+            "edit_similarity": 0.35,
+            "reaction_center": 0.20,
+            "local_environment": 0.15,
+            "partner_category": 0.10,
+            "spectator_groups": 0.08,
+            "reaction_topology": 0.07,
+            "reactive_scaffold": 0.05,
+        },
+        effective_weights={"edit_similarity": 0.4},
+        matches=("retrieval:bond_edit_signature",),
+        mismatches=("reactive_scaffold=0.000",),
+        definition_id="discovery_retrieval.v1",
+        definition_version="1.0",
+    )
+    hit = ReactionDiscoveryHit(
+        rank=1,
+        reaction_id="discovery-1",
+        observation_id="observation-1",
+        canonical_reaction_id="canonical-1",
+        reaction_smiles="BrC.B(O)O>>CC",
+        reaction_label={"text": "Related coupling"},
+        relation_class="direct_edit_analogue",
+        relation_tiers=("bond_edit_signature",),
+        discovery_score=0.81,
+        yield_pct=12.0,
+        outcome_status="usable",
+        evidence_tier="trusted",
+        chemistry_status="verified",
+        source_dataset="literature",
+        reference_id="REF1:discovery",
+        resolved_recipe={
+            "catalysts": [{"canonical_name": "Discovery catalyst"}],
+            "temperature_c": 60.0,
+        },
+        recipe_id="RCR1:discovery",
+        recipe_core_id="RCORE1:discovery",
+        hypothesis_id=None,
+        score_trace=trace,
+        insights=("Observed conditions from literature",),
+        cautions=("Low observed yield (12.0%) may reveal a failure boundary",),
+    )
+    return ReactionDiscoveryResult(
+        query_reaction_smiles="IC.B(O)O>>CC",
+        valid=True,
+        reaction_label={"text": "Query coupling", "status": "structural_equation"},
+        transformation_class="c_c_transfer_coupling",
+        candidate_count=4,
+        relation_counts={"direct_edit_analogue": 4},
+        hits=(hit,),
+        warnings=("DISCOVERY_CONDITIONS_ARE_OBSERVED_NOT_RECOMMENDED",),
     )
 
 
@@ -235,9 +305,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
         gui,
         "_get_cached_recommender",
         lambda path, *, use_rxnmapper, include_review: (
-            calls.append(
-                ("index_options", use_rxnmapper, include_review)
-            )
+            calls.append(("index_options", use_rxnmapper, include_review))
             or FakeRecommender()
         ),
     )
@@ -253,9 +321,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
     finished = []
     worker.progress.connect(progress.append)
     worker.finished.connect(
-        lambda success, result, error: finished.append(
-            (success, result, error)
-        )
+        lambda success, result, error: finished.append((success, result, error))
     )
 
     worker.run()
@@ -265,6 +331,51 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
         ("A.B>>P", 3, 2, True, None),
     ]
     assert len(progress) == 2
+    assert finished == [(True, expected, "")]
+
+
+def test_discovery_worker_uses_separate_explorer_contract(monkeypatch) -> None:
+    expected = _discovery_result()
+    calls = []
+
+    class FakeExplorer:
+        def discover(self, reaction, **options):
+            calls.append((reaction, options))
+            return expected
+
+    monkeypatch.setattr(
+        gui,
+        "_get_cached_explorer",
+        lambda path, *, use_rxnmapper, include_review: (
+            calls.append((path, use_rxnmapper, include_review)) or FakeExplorer()
+        ),
+    )
+    worker = gui.ReactionDiscoveryWorker(
+        "index.sqlite",
+        "A.B>>P",
+        top_k=8,
+        view="failure_informed",
+        include_low_yield=True,
+        include_unreported_outcomes=False,
+        use_rxnmapper=False,
+    )
+    finished = []
+    worker.finished.connect(
+        lambda success, result, error: finished.append((success, result, error))
+    )
+
+    worker.run()
+
+    assert calls[0] == ("index.sqlite", False, False)
+    assert calls[1] == (
+        "A.B>>P",
+        {
+            "top_k": 8,
+            "view": "failure_informed",
+            "include_low_yield": True,
+            "include_unreported_outcomes": False,
+        },
+    )
     assert finished == [(True, expected, "")]
 
 
@@ -289,10 +400,7 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     precedent_pixmap = window.selected_reaction_image_label.pixmap()
     assert precedent_pixmap is not None
     assert not precedent_pixmap.isNull()
-    assert (
-        window.selected_reaction_image_label.toolTip()
-        == "BrC.B(O)O>>CC"
-    )
+    assert window.selected_reaction_image_label.toolTip() == "BrC.B(O)O>>CC"
     assert window.results_table.rowCount() == 1
     assert "Palladium catalyst" in window.results_table.item(0, 8).text()
     details = window.details_box.toPlainText()
@@ -311,10 +419,28 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     assert "Observed recipe variants:" not in details
     assert "RCORE1:core" not in details
     assert "RCR1:variant" not in details
-    assert "Exact bond-edit and handle match" in (
-        details
-    )
+    assert "Exact bond-edit and handle match" in (details)
     assert window.status_label.text() == "Done — 1 recipe(s)"
+
+
+def test_window_switches_to_discovery_and_renders_evidence(qtbot) -> None:
+    window = gui.GenericRecommenderWindow()
+    qtbot.addWidget(window)
+
+    window.mode_combo.setCurrentIndex(window.mode_combo.findData("discovery"))
+    window._render_discovery_result(_discovery_result())
+
+    assert window.run_button.text() == "Discover Related Reactions"
+    assert window.results_heading.text() == "Related reaction precedents"
+    assert window.results_table.horizontalHeaderItem(8).text() == "Observed conditions"
+    assert window.results_table.rowCount() == 1
+    assert "Discovery catalyst" in window.results_table.item(0, 8).text()
+    assert "not condition recipes" in window.summary_box.toPlainText()
+    details = window.details_box.toPlainText()
+    assert "Observed conditions (precedent evidence, not a recommendation)" in details
+    assert "configured weight 0.350" in details
+    assert "failure boundary" in details
+    assert window.status_label.text() == "Done — 1 analogue(s)"
 
 
 def test_row_header_selection_moves_stale_current_cell(qtbot) -> None:
@@ -329,9 +455,7 @@ def test_row_header_selection_moves_stale_current_cell(qtbot) -> None:
         )
         for rank in range(1, 4)
     )
-    window._render_result(
-        replace(_result(), recommendations=recommendations)
-    )
+    window._render_result(replace(_result(), recommendations=recommendations))
     table = window.results_table
     table.setCurrentCell(
         0,
@@ -373,8 +497,7 @@ def test_window_requests_vector_reaction_drawing(qtbot, monkeypatch) -> None:
     def render(reaction_smiles, *, size, image_format):
         calls.append((reaction_smiles, size, image_format))
         return (
-            b'<svg xmlns="http://www.w3.org/2000/svg" '
-            b'width="560" height="142"></svg>'
+            b'<svg xmlns="http://www.w3.org/2000/svg" width="560" height="142"></svg>'
         )
 
     monkeypatch.setattr(gui, "render_reaction_image_bytes", render)
@@ -383,9 +506,7 @@ def test_window_requests_vector_reaction_drawing(qtbot, monkeypatch) -> None:
 
     window._render_reaction_graph("CCO>>CC=O")
 
-    assert calls == [
-        ("CCO>>CC=O", gui.QUERY_REACTION_IMAGE_SIZE, "svg")
-    ]
+    assert calls == [("CCO>>CC=O", gui.QUERY_REACTION_IMAGE_SIZE, "svg")]
     assert window.reaction_image_label._source_svg
 
 
