@@ -11,6 +11,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_FOLDER = PROJECT_ROOT / "datasets" / "literature"
+DEFAULT_SQLITE_INDEX_PATH = DEFAULT_DATA_FOLDER / "generic_index.sqlite"
 DEFAULT_INDEX_PATH = DEFAULT_DATA_FOLDER / "generic_index.json.gz"
 DEFAULT_MANIFEST_PATH = DEFAULT_DATA_FOLDER / "shard_manifest.json"
 
@@ -52,6 +53,8 @@ _RECIPE_ROLE_LABELS = (
 
 def default_recommendation_data_path() -> Path:
     """Return the fastest available default recommendation artifact."""
+    if DEFAULT_SQLITE_INDEX_PATH.is_file():
+        return DEFAULT_SQLITE_INDEX_PATH
     if DEFAULT_INDEX_PATH.is_file():
         return DEFAULT_INDEX_PATH
     return DEFAULT_MANIFEST_PATH
@@ -336,8 +339,8 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         )
         self.data_path_edit.setObjectName("recommendationDataPath")
         self.data_path_edit.setPlaceholderText(
-            "generic_index.json.gz or shard_manifest.json; review mode uses "
-            "the paired generic_review_index.json.gz"
+            "generic_index.sqlite, generic_index.json.gz, or shard_manifest.json; "
+            "review mode uses the paired review-core index"
         )
         self.data_summary = QtWidgets.QLabel()
         self.data_summary.setObjectName("dataSummary")
@@ -602,7 +605,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             "Choose recommendation index or manifest",
             self.data_path_edit.text() or str(DEFAULT_DATA_FOLDER),
             (
-                "Recommendation data (*.json.gz *.json);;"
+                "Recommendation data (*.sqlite *.json.gz *.json);;"
                 "All files (*)"
             ),
         )

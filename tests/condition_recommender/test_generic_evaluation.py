@@ -17,6 +17,7 @@ from condition_recommender.evaluation import (
 )
 from condition_recommender.core_evaluation import evaluate_reaction_core_index
 from condition_recommender.evaluation_features import reaction_scaffold_tokens
+from condition_recommender.edit_prototypes import anonymous_edit_prototype
 from condition_recommender.calibration import (
     calibrate_generic_ranking,
     load_generic_calibration_rules,
@@ -33,6 +34,12 @@ from condition_recommender.generic_indexing import (
     load_persisted_generic_index,
     save_generic_index,
     validate_generic_index_artifact,
+)
+from condition_recommender.sqlite_indexing import (
+    SQLiteLookupMapping,
+    SQLiteReactionRows,
+    load_sqlite_generic_index,
+    save_sqlite_generic_index,
 )
 from condition_recommender.support import (
     evidence_unit,
@@ -193,6 +200,43 @@ def test_compressed_persisted_index_round_trip(tmp_path: Path) -> None:
     assert report["row_count"] == 2
     assert load_persisted_generic_index(path) == index
     assert load_generic_index(path) == index
+    assert validate_generic_index_artifact(path)["valid"]
+
+
+def test_sqlite_index_round_trip_is_lazy_and_equivalent(tmp_path: Path) -> None:
+    index = build_generic_index([_record(1), _record(2)])
+    path = tmp_path / "generic_index.sqlite"
+
+    report = save_sqlite_generic_index(index, path)
+    loaded = load_sqlite_generic_index(path)
+
+    assert report["row_count"] == 2
+    assert isinstance(loaded.rows, SQLiteReactionRows)
+    assert isinstance(loaded.exact, SQLiteLookupMapping)
+    assert tuple(loaded.rows) == index.rows
+    for field in (
+        "exact",
+        "handles",
+        "transformations",
+        "bond_edits",
+        "environments",
+        "core_exact",
+        "core_typed",
+        "core_shapes",
+        "core_centers",
+        "environment_features",
+        "fallback_features",
+        "partial_transformations",
+        "families",
+    ):
+        assert dict(getattr(loaded, field)) == dict(getattr(index, field))
+    assert load_generic_index(path).select((1, 0)) == (
+        index.rows[1],
+        index.rows[0],
+    )
+    prototype = anonymous_edit_prototype(index.rows[0].signature)
+    assert prototype is not None
+    assert loaded.rows.edit_graph_candidate_positions(prototype) == (0, 1)
     assert validate_generic_index_artifact(path)["valid"]
 
 

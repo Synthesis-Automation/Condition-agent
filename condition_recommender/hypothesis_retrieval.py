@@ -120,7 +120,18 @@ def _candidate_positions(
     threshold: float,
 ) -> set[int]:
     positions = set()
-    for position, row in enumerate(index.rows):
+    candidate_positions = getattr(
+        index.rows,
+        "edit_graph_candidate_positions",
+        None,
+    )
+    candidates = (
+        candidate_positions(prototype)
+        if callable(candidate_positions)
+        else range(len(index.rows))
+    )
+    for position in candidates:
+        row = index.rows[position]
         if not row.signature:
             continue
         precedent = anonymous_edit_prototype(row.signature)

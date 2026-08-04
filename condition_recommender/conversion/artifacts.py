@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 
 from ..generic_indexing import build_generic_index, save_generic_index
+from ..sqlite_indexing import save_sqlite_generic_index
 from .concise_review import (
     ConciseReviewConversionCancelled,
     ConciseReviewProgress,
@@ -212,8 +213,10 @@ def build_recommendation_artifacts(
 
     index_report: Optional[Dict[str, Any]] = None
     review_index_report: Optional[Dict[str, Any]] = None
-    index_path = destination / "generic_index.json.gz"
-    review_index_path = destination / "generic_review_index.json.gz"
+    index_path = destination / "generic_index.sqlite"
+    review_index_path = destination / "generic_review_index.sqlite"
+    json_index_path = destination / "generic_index.json.gz"
+    json_review_index_path = destination / "generic_review_index.json.gz"
     if build_fast_index:
         if cancel_check is not None and cancel_check():
             raise RecommendationArtifactBuildCancelled(
@@ -249,15 +252,25 @@ def build_recommendation_artifacts(
             raise RecommendationArtifactBuildCancelled(
                 "Build cancelled before saving the fast-load index."
             )
-        index_report = save_generic_index(index, index_path)
+        json_index_report = save_generic_index(index, json_index_path)
+        index_report = save_sqlite_generic_index(
+            index,
+            index_path,
+            index_id=str(json_index_report["index_id"]),
+        )
         scanned_rows = 0
         review_index = build_generic_index(records(), include_review=True)
         if cancel_check is not None and cancel_check():
             raise RecommendationArtifactBuildCancelled(
                 "Build cancelled before saving the review-core index."
             )
-        review_index_report = save_generic_index(
-            review_index, review_index_path
+        json_review_index_report = save_generic_index(
+            review_index, json_review_index_path
+        )
+        review_index_report = save_sqlite_generic_index(
+            review_index,
+            review_index_path,
+            index_id=str(json_review_index_report["index_id"]),
         )
         notify(
             "index_completed",
@@ -275,9 +288,17 @@ def build_recommendation_artifacts(
     }
     if index_report is not None:
         artifacts["fast_index"] = _artifact_entry(index_path, destination)
+        artifacts["legacy_json_index"] = _artifact_entry(
+            json_index_path,
+            destination,
+        )
     if review_index_report is not None:
         artifacts["review_core_index"] = _artifact_entry(
             review_index_path, destination
+        )
+        artifacts["legacy_json_review_core_index"] = _artifact_entry(
+            json_review_index_path,
+            destination,
         )
     shard_paths = tuple((destination / "shards").glob("*.jsonl.gz"))
     shard_size_bytes = sum(path.stat().st_size for path in shard_paths)
@@ -288,7 +309,10 @@ def build_recommendation_artifacts(
             "RXNMapper uses one conversion worker to avoid loading a separate "
             "model in each process."
         )
-    if not build_fast_index and index_path.is_file():
+    if not build_fast_index and any(
+        path.is_file()
+        for path in (index_path, review_index_path, json_index_path, json_review_index_path)
+    ):
         warnings.append(
             "Older trusted or review-core indexes may exist but were not rebuilt; "
             "do not use them unless they match the current canonical records."
@@ -328,7 +352,7 @@ def build_recommendation_artifacts(
             "requested_workers": workers,
             "build_fast_index": build_fast_index,
             "use_rxnmapper": use_rxnmapper,
-            "compression": "gzip",
+            "compression": "gzip canonical shards; row-compressed SQLite index",
         },
         "source_file_count": int(conversion_report["source_file_count"]),
         "record_count": total_rows,

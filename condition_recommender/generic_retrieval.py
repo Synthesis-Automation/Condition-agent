@@ -227,7 +227,18 @@ def _edit_graph_neighbor_positions(
     threshold = float(rules["edit_graph_neighbor_min_similarity"])
     limit = int(rules["edit_graph_neighbor_limit"])
     scored = []
-    for position, row in enumerate(index.rows):
+    candidate_positions = getattr(
+        index.rows,
+        "edit_graph_candidate_positions",
+        None,
+    )
+    positions = (
+        candidate_positions(query)
+        if callable(candidate_positions)
+        else range(len(index.rows))
+    )
+    for position in positions:
+        row = index.rows[position]
         if position in exclude or not row.signature:
             continue
         candidate = anonymous_edit_prototype(row.signature)

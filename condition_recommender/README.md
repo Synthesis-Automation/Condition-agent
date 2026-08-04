@@ -621,10 +621,12 @@ subfolders and creates:
   shows mapping disposition, provider, and confidence. Machine-only hash
   identifiers and internal grouping keys are omitted; they remain available in
   the canonical shards. The CSV is not used as recommendation input.
-- `generic_index.json.gz`: the compressed trusted-precedent index used by
-  default.
-- `generic_review_index.json.gz`: the paired expert-use index containing the
-  trusted rows plus qualified review-core precedents.
+- `generic_index.sqlite`: the trusted-precedent runtime index used by default.
+  Rows and lookup values are materialized lazily for fast application startup.
+- `generic_review_index.sqlite`: the paired expert-use runtime index containing
+  the trusted rows plus qualified review-core precedents.
+- `generic_index.json.gz` and `generic_review_index.json.gz`: temporary parity
+  artifacts retained while SQLite recommendation behavior is validated.
 - `recommendation_artifacts_report.json`: row counts, output paths, settings,
   reuse counts, and file sizes.
 
@@ -655,16 +657,16 @@ completed shards.
 ```powershell
 python -m condition_recommender.generic_index_cli `
   results/generic_conversion/records.jsonl `
-  results/generic_conversion/generic_index.json
+  results/generic_conversion/generic_index.sqlite
 
 python -m condition_recommender.generic_index_cli `
   results/generic_conversion/records.jsonl `
-  results/generic_conversion/generic_review_index.json.gz `
+  results/generic_conversion/generic_review_index.sqlite `
   --include-review-core
 
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records results/generic_conversion/generic_index.json
+  --records results/generic_conversion/generic_index.sqlite
 ```
 
 Add `--use-rxnmapper` for an unmapped query that ordinary featurization cannot
@@ -675,7 +677,7 @@ expert-review cautions:
 ```powershell
 python -m condition_recommender.generic_recommend_cli `
   "O=C1CCCCC1.Cl.NNc1ccc(F)cc1>>Fc1ccc2[nH]c3c(c2c1)CCCC3" `
-  --records results/generic_conversion/generic_index.json `
+  --records results/generic_conversion/generic_index.sqlite `
   --use-rxnmapper
 ```
 
@@ -684,12 +686,12 @@ For output made by the desktop app, use the fast index directly:
 ```powershell
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records datasets/literature/generic_index.json.gz
+  --records datasets/literature/generic_index.sqlite
 
-# Expert mode resolves the paired generic_review_index.json.gz automatically.
+# Expert mode resolves the paired generic_review_index.sqlite automatically.
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records datasets/literature/generic_index.json.gz `
+  --records datasets/literature/generic_index.sqlite `
   --unrestricted
 ```
 
@@ -709,8 +711,9 @@ Launch the simpler Qt6 interface:
 python -m app.reaction_recommender_gui
 ```
 
-It automatically selects `datasets/literature/generic_index.json.gz` when the
-fast index exists, with `shard_manifest.json` as a fallback. Paste a complete
+It automatically selects `datasets/literature/generic_index.sqlite` when the
+lazy runtime index exists, then the legacy JSON index or `shard_manifest.json`
+as fallbacks. Paste a complete
 `reactants>>product` reaction SMILES and choose how many recipes to return.
 `Use RXNMapper` is checked by default; it is invoked only when supplied mapping
 and ordinary internal analysis do not already resolve the query. Clear the

@@ -10,7 +10,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field as dataclass_field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
+from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
 from reactive_taxonomy import (
     REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
@@ -88,7 +88,7 @@ class GenericIndexedReaction:
 class GenericReactionIndex:
     """Immutable precedent collection with deterministic signature lookup maps."""
 
-    rows: Tuple[GenericIndexedReaction, ...]
+    rows: Sequence[GenericIndexedReaction]
     exact: Mapping[str, Tuple[int, ...]]
     handles: Mapping[str, Tuple[int, ...]]
     transformations: Mapping[str, Tuple[int, ...]]
@@ -114,6 +114,9 @@ class GenericReactionIndex:
     core_eligibility_definition_version: str
 
     def select(self, positions: Iterable[int]) -> Tuple[GenericIndexedReaction, ...]:
+        bulk_select = getattr(self.rows, "select", None)
+        if callable(bulk_select):
+            return tuple(bulk_select(positions))
         return tuple(self.rows[position] for position in positions)
 
 
@@ -545,57 +548,120 @@ def _valid_yield(value: Any) -> Optional[float]:
     return outcome if 0.0 <= outcome <= 100.0 else None
 
 
-def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
-    rows = [
-        {
-            "reaction_id": row.reaction_id,
-            "observation_id": row.observation_id,
-            "canonical_reaction_id": row.canonical_reaction_id,
-            "reaction_smiles": row.reaction_smiles,
-            "yield_pct": row.yield_pct,
-            "source_dataset": row.source_dataset,
-            "reference_id": row.reference_id,
-            "publication_year": row.publication_year,
-            "reference_condition_series_id": row.reference_condition_series_id,
-            "scaffold_key": row.scaffold_key,
-            "scaffold_tokens": row.scaffold_tokens,
-            "signature": row.signature,
-            "reaction_core": row.reaction_core,
-            "recipe_id": row.recipe_id,
-            "recipe_core_id": row.recipe_core_id,
-            "resolved_recipe": row.resolved_recipe,
-            "condition_uncertain": row.condition_uncertain,
-            "chemistry_status": row.chemistry_status,
-            "condition_status": row.condition_status,
-            "condition_stage_status": row.condition_stage_status,
-            "outcome_status": row.outcome_status,
-            "record_schema_version": row.record_schema_version,
-            "converter_definition_version": row.converter_definition_version,
-            "precedent_tier": row.precedent_tier.value,
-            "core_eligibility_definition_version": (
-                row.core_eligibility_definition_version
-            ),
-            "reaction_label": row.reaction_label,
-            "fallback_descriptor": row.fallback_descriptor,
-            "fragment_source_support": row.fragment_source_support,
-        }
-        for row in index.rows
-    ]
-    maps = {
-        "exact": dict(index.exact),
-        "handles": dict(index.handles),
-        "transformations": dict(index.transformations),
-        "bond_edits": dict(index.bond_edits),
-        "environments": dict(index.environments),
-        "core_exact": dict(index.core_exact),
-        "core_typed": dict(index.core_typed),
-        "core_shapes": dict(index.core_shapes),
-        "core_centers": dict(index.core_centers),
-        "environment_features": dict(index.environment_features),
-        "fallback_features": dict(index.fallback_features),
-        "partial_transformations": dict(index.partial_transformations),
-        "families": dict(index.families),
+def _indexed_reaction_payload(row: GenericIndexedReaction) -> Dict[str, Any]:
+    """Serialize one retrieval row without storage-format assumptions."""
+    return {
+        "reaction_id": row.reaction_id,
+        "observation_id": row.observation_id,
+        "canonical_reaction_id": row.canonical_reaction_id,
+        "reaction_smiles": row.reaction_smiles,
+        "yield_pct": row.yield_pct,
+        "source_dataset": row.source_dataset,
+        "reference_id": row.reference_id,
+        "publication_year": row.publication_year,
+        "reference_condition_series_id": row.reference_condition_series_id,
+        "scaffold_key": row.scaffold_key,
+        "scaffold_tokens": row.scaffold_tokens,
+        "signature": row.signature,
+        "reaction_core": row.reaction_core,
+        "recipe_id": row.recipe_id,
+        "recipe_core_id": row.recipe_core_id,
+        "resolved_recipe": row.resolved_recipe,
+        "condition_uncertain": row.condition_uncertain,
+        "chemistry_status": row.chemistry_status,
+        "condition_status": row.condition_status,
+        "condition_stage_status": row.condition_stage_status,
+        "outcome_status": row.outcome_status,
+        "record_schema_version": row.record_schema_version,
+        "converter_definition_version": row.converter_definition_version,
+        "precedent_tier": row.precedent_tier.value,
+        "core_eligibility_definition_version": (
+            row.core_eligibility_definition_version
+        ),
+        "reaction_label": row.reaction_label,
+        "fallback_descriptor": row.fallback_descriptor,
+        "fragment_source_support": row.fragment_source_support,
     }
+
+
+def _indexed_reaction_from_payload(
+    row: Mapping[str, Any],
+) -> GenericIndexedReaction:
+    """Deserialize one retrieval row shared by JSON and SQLite storage."""
+    return GenericIndexedReaction(
+        reaction_id=str(row["reaction_id"]),
+        observation_id=str(row["observation_id"]),
+        canonical_reaction_id=str(row["canonical_reaction_id"]),
+        reaction_smiles=str(row["reaction_smiles"]),
+        yield_pct=(
+            float(row["yield_pct"]) if row.get("yield_pct") is not None else None
+        ),
+        source_dataset=str(row["source_dataset"]),
+        reference_id=str(row.get("reference_id") or ""),
+        publication_year=(
+            int(row["publication_year"])
+            if row.get("publication_year") is not None
+            else None
+        ),
+        reference_condition_series_id=str(
+            row.get("reference_condition_series_id") or ""
+        ),
+        scaffold_key=str(row.get("scaffold_key") or ""),
+        scaffold_tokens=tuple(
+            str(value) for value in row.get("scaffold_tokens") or ()
+        ),
+        signature=dict(row["signature"]),
+        reaction_core=dict(row.get("reaction_core") or {}),
+        recipe_id=str(row["recipe_id"]),
+        recipe_core_id=str(row.get("recipe_core_id") or row["recipe_id"]),
+        resolved_recipe=dict(row["resolved_recipe"]),
+        condition_uncertain=bool(row["condition_uncertain"]),
+        chemistry_status=str(row.get("chemistry_status") or ""),
+        condition_status=str(row.get("condition_status") or ""),
+        condition_stage_status=str(
+            row.get("condition_stage_status") or "single_stage"
+        ),
+        outcome_status=str(row.get("outcome_status") or ""),
+        record_schema_version=str(row["record_schema_version"]),
+        converter_definition_version=str(row["converter_definition_version"]),
+        precedent_tier=PrecedentTier(str(row["precedent_tier"])),
+        core_eligibility_definition_version=str(
+            row["core_eligibility_definition_version"]
+        ),
+        reaction_label=dict(row.get("reaction_label") or {}),
+        fallback_descriptor=dict(row.get("fallback_descriptor") or {}),
+        fragment_source_support=tuple(
+            dict(value)
+            for value in row.get("fragment_source_support") or ()
+            if isinstance(value, Mapping)
+        ),
+    )
+
+
+def _index_maps(
+    index: GenericReactionIndex,
+) -> Dict[str, Mapping[str, Tuple[int, ...]]]:
+    """Return all deterministic lookup maps by their persisted names."""
+    return {
+        "exact": index.exact,
+        "handles": index.handles,
+        "transformations": index.transformations,
+        "bond_edits": index.bond_edits,
+        "environments": index.environments,
+        "core_exact": index.core_exact,
+        "core_typed": index.core_typed,
+        "core_shapes": index.core_shapes,
+        "core_centers": index.core_centers,
+        "environment_features": index.environment_features,
+        "fallback_features": index.fallback_features,
+        "partial_transformations": index.partial_transformations,
+        "families": index.families,
+    }
+
+
+def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
+    rows = [_indexed_reaction_payload(row) for row in index.rows]
+    maps = {name: dict(mapping) for name, mapping in _index_maps(index).items()}
     identity = json.dumps(
         {
             "rows": rows,
@@ -719,17 +785,8 @@ def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[st
     }
 
 
-def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
-    """Load and validate a persisted generic index without rebuilding maps."""
-    source = Path(path)
-    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
-    arguments = (
-        {"mode": "rt", "encoding": "utf-8"}
-        if source.suffix.casefold() == ".gz"
-        else {"mode": "r", "encoding": "utf-8"}
-    )
-    with opener(source, **arguments) as handle:
-        payload = json.load(handle)
+def _validate_index_metadata(payload: Mapping[str, Any]) -> PrecedentIndexScope:
+    """Validate the chemistry and schema contract of a persisted index."""
     if payload.get("artifact_type") != "generic_reaction_index":
         raise ValueError("Not a generic reaction index artifact")
     if payload.get("schema_version") != GENERIC_INDEX_SCHEMA_VERSION:
@@ -788,56 +845,23 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
     )
     if converter_definition_versions != (GENERIC_CONVERTER_DEFINITION_VERSION,):
         raise ValueError("Incompatible generic converter version; rebuild the index")
+    return precedent_scope
+
+
+def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
+    """Load and validate a persisted generic index without rebuilding maps."""
+    source = Path(path)
+    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
+    arguments = (
+        {"mode": "rt", "encoding": "utf-8"}
+        if source.suffix.casefold() == ".gz"
+        else {"mode": "r", "encoding": "utf-8"}
+    )
+    with opener(source, **arguments) as handle:
+        payload = json.load(handle)
+    precedent_scope = _validate_index_metadata(payload)
     rows = tuple(
-        GenericIndexedReaction(
-            reaction_id=str(row["reaction_id"]),
-            observation_id=str(row["observation_id"]),
-            canonical_reaction_id=str(row["canonical_reaction_id"]),
-            reaction_smiles=str(row["reaction_smiles"]),
-            yield_pct=(
-                float(row["yield_pct"]) if row.get("yield_pct") is not None else None
-            ),
-            source_dataset=str(row["source_dataset"]),
-            reference_id=str(row.get("reference_id") or ""),
-            publication_year=(
-                int(row["publication_year"])
-                if row.get("publication_year") is not None
-                else None
-            ),
-            reference_condition_series_id=str(
-                row.get("reference_condition_series_id") or ""
-            ),
-            scaffold_key=str(row.get("scaffold_key") or ""),
-            scaffold_tokens=tuple(
-                str(value) for value in row.get("scaffold_tokens") or ()
-            ),
-            signature=dict(row["signature"]),
-            reaction_core=dict(row.get("reaction_core") or {}),
-            recipe_id=str(row["recipe_id"]),
-            recipe_core_id=str(row.get("recipe_core_id") or row["recipe_id"]),
-            resolved_recipe=dict(row["resolved_recipe"]),
-            condition_uncertain=bool(row["condition_uncertain"]),
-            chemistry_status=str(row.get("chemistry_status") or ""),
-            condition_status=str(row.get("condition_status") or ""),
-            condition_stage_status=str(
-                row.get("condition_stage_status") or "single_stage"
-            ),
-            outcome_status=str(row.get("outcome_status") or ""),
-            record_schema_version=str(row["record_schema_version"]),
-            converter_definition_version=str(row["converter_definition_version"]),
-            precedent_tier=PrecedentTier(str(row["precedent_tier"])),
-            core_eligibility_definition_version=str(
-                row["core_eligibility_definition_version"]
-            ),
-            reaction_label=dict(row.get("reaction_label") or {}),
-            fallback_descriptor=dict(row.get("fallback_descriptor") or {}),
-            fragment_source_support=tuple(
-                dict(value)
-                for value in row.get("fragment_source_support") or ()
-                if isinstance(value, Mapping)
-            ),
-        )
-        for row in payload.get("rows") or ()
+        _indexed_reaction_from_payload(row) for row in payload.get("rows") or ()
     )
     maps = payload.get("maps") or {}
     index = GenericReactionIndex(
@@ -931,6 +955,10 @@ def load_generic_index(
 ) -> GenericReactionIndex:
     """Load canonical JSONL output from the generic conversion engine."""
     source = Path(path)
+    if source.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}:
+        from .sqlite_indexing import load_sqlite_generic_index
+
+        return load_sqlite_generic_index(source)
     if source.name.casefold().endswith(".json.gz"):
         return load_persisted_generic_index(source)
     if source.suffix.casefold() == ".json":
@@ -979,6 +1007,10 @@ def load_generic_index(
 def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
     """Validate persisted map coverage, row identity, and recipe contracts."""
     source = Path(path)
+    if source.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}:
+        from .sqlite_indexing import validate_sqlite_generic_index
+
+        return validate_sqlite_generic_index(source)
     index = load_persisted_generic_index(source)
     issues = []
     row_count = len(index.rows)

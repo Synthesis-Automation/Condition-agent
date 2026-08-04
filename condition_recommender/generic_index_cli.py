@@ -6,6 +6,7 @@ import argparse
 import json
 
 from .generic_indexing import load_generic_index, save_generic_index
+from .sqlite_indexing import save_sqlite_generic_index
 
 
 def main() -> None:
@@ -13,7 +14,10 @@ def main() -> None:
         description="Build a versioned generic reaction index from records.jsonl"
     )
     parser.add_argument("records_path", help="Canonical generic records.jsonl")
-    parser.add_argument("output_path", help="Destination generic_index.json")
+    parser.add_argument(
+        "output_path",
+        help="Destination generic_index.sqlite or legacy JSON index",
+    )
     parser.add_argument(
         "--include-review-core",
         action="store_true",
@@ -27,7 +31,11 @@ def main() -> None:
         args.records_path,
         include_review=args.include_review_core,
     )
-    report = save_generic_index(index, args.output_path)
+    report = (
+        save_sqlite_generic_index(index, args.output_path)
+        if str(args.output_path).casefold().endswith((".sqlite", ".sqlite3", ".db"))
+        else save_generic_index(index, args.output_path)
+    )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 
 

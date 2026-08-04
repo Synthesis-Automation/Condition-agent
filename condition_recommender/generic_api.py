@@ -222,12 +222,17 @@ class GenericConditionRecommender:
     ) -> "GenericConditionRecommender":
         source = Path(path)
         index_source = source
-        if include_review and source.name.casefold() == "generic_index.json.gz":
-            index_source = source.with_name("generic_review_index.json.gz")
+        paired_review_names = {
+            "generic_index.json.gz": "generic_review_index.json.gz",
+            "generic_index.sqlite": "generic_review_index.sqlite",
+        }
+        paired_review_name = paired_review_names.get(source.name.casefold())
+        if include_review and paired_review_name:
+            index_source = source.with_name(paired_review_name)
             if not index_source.is_file():
                 raise FileNotFoundError(
                     "Review-core index is unavailable. Rebuild recommendation "
-                    "artifacts to create generic_review_index.json.gz."
+                    f"artifacts to create {paired_review_name}."
                 )
         index = (
             load_generic_index(index_source, include_review=True)

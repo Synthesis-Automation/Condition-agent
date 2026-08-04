@@ -71,6 +71,8 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     assert (output / "shard_manifest.json").is_file()
     assert (output / "generic_index.json.gz").is_file()
     assert (output / "generic_review_index.json.gz").is_file()
+    assert (output / "generic_index.sqlite").is_file()
+    assert (output / "generic_review_index.sqlite").is_file()
     assert (output / "recommendation_artifacts_report.json").is_file()
     assert len(load_generic_index(output / "generic_index.json.gz").rows) == 2
     assert (
@@ -82,16 +84,19 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
         == 2
     )
     trusted_recommender = GenericConditionRecommender.from_path(
-        output / "generic_index.json.gz"
+        output / "generic_index.sqlite"
     )
     review_recommender = GenericConditionRecommender.from_path(
-        output / "generic_index.json.gz",
+        output / "generic_index.sqlite",
         include_review=True,
     )
     assert not trusted_recommender.includes_review_precedents
     assert review_recommender.includes_review_precedents
     assert review_recommender.index.precedent_scope.value == (
         "trusted_and_review_core"
+    )
+    assert report["artifacts"]["fast_index"]["path"].endswith(
+        "generic_index.sqlite"
     )
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 2
     with (output / "reaction_review.csv").open(
