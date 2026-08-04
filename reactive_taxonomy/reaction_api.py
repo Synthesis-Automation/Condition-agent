@@ -91,12 +91,6 @@ def featurize_reaction(
         mapped_bond_changes=mapped_changes,
         warnings=warnings,
     )
-    parsed = interpret_parsed_molecules(parsed, label_style=label_style)
-    spectators = derive_observed_spectator_groups(
-        parsed.reactants,
-        observation.edits,
-        observation.evidence_quality,
-    )
     reaction_topology = observation.topology
     reaction_core = observation.core
     reaction_completeness = observation.completeness
@@ -112,6 +106,15 @@ def featurize_reaction(
             and reaction_completeness.status != "incomplete"
         )
         else None
+    )
+
+    # Optional molecular annotations start only after the observation-only
+    # signature has been finalized.
+    parsed = interpret_parsed_molecules(parsed, label_style=label_style)
+    spectators = derive_observed_spectator_groups(
+        parsed.reactants,
+        observation.edits,
+        observation.evidence_quality,
     )
     partial_product_transformation = (
         infer_partial_product_transformation(

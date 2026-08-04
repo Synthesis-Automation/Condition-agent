@@ -91,6 +91,53 @@ def test_signature_and_core_do_not_depend_on_optional_annotations(monkeypatch) -
     assert interpreted.reaction_label.text == generic.reaction_label.text
 
 
+def test_signature_is_finalized_before_optional_molecular_interpretation(
+    monkeypatch,
+) -> None:
+    """Keep graph identity construction ahead of optional annotations."""
+    calls = []
+    original_observation = reaction_api_module.build_reaction_observation
+    original_signature = reaction_api_module.build_observation_signature
+    original_interpretation = reaction_api_module.interpret_parsed_molecules
+
+    def record_observation(*args, **kwargs):
+        calls.append("observation")
+        return original_observation(*args, **kwargs)
+
+    def record_signature(*args, **kwargs):
+        calls.append("signature")
+        return original_signature(*args, **kwargs)
+
+    def record_interpretation(*args, **kwargs):
+        calls.append("molecular_interpretation")
+        return original_interpretation(*args, **kwargs)
+
+    monkeypatch.setattr(
+        reaction_api_module,
+        "build_reaction_observation",
+        record_observation,
+    )
+    monkeypatch.setattr(
+        reaction_api_module,
+        "build_observation_signature",
+        record_signature,
+    )
+    monkeypatch.setattr(
+        reaction_api_module,
+        "interpret_parsed_molecules",
+        record_interpretation,
+    )
+
+    result = featurize_reaction(MAPPED_SUZUKI)
+
+    assert result.reaction_signature is not None
+    assert calls[:3] == [
+        "observation",
+        "signature",
+        "molecular_interpretation",
+    ]
+
+
 def test_molecular_reactivity_hypotheses_cannot_change_observation(monkeypatch) -> None:
     reaction = UNMAPPED_SUZUKI
     baseline = featurize_reaction(reaction)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Literal, Sequence
+from typing import Any, Literal, Sequence
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -18,10 +18,8 @@ from reactive_taxonomy import (  # noqa: E402
     RxnMapperProvider,
     analyze_reaction_with_external_mapping,
     build_reaction_display_projection,
-    build_reaction_review_summary,
     analyze_molecule,
     featurize_reaction,
-    format_reaction_review_summary,
     reaction_render_context_from_analysis,
 )
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
@@ -84,6 +82,490 @@ def featurize_text(
             assessment,
         )
     return kind, analyze_molecule(value), None
+
+
+def _readable(value: object) -> str:
+    return str(value or "").replace("_", " ").strip().lower()
+
+
+def _evidence_text(value: object) -> str:
+    labels = {
+        "validated_atom_mapping": "validated atom mapping",
+        "validated_mapping": "validated atom mapping",
+        "global_atom_correspondence": "whole-reaction atom correspondence",
+        "fragmented_scaffold_correspondence": "fragment-aware atom correspondence",
+        "scaffold_correspondence": "scaffold atom correspondence",
+        "ambiguous_correspondence_core_consensus": (
+            "consensus across atom-correspondence alternatives"
+        ),
+    }
+    raw = str(value or "")
+    return labels.get(raw, _readable(raw))
+
+
+def _annotation_text(value: object) -> str:
+    labels = {
+        "sp2_c_n_substitution_like": "sp² C–N substitution",
+        "sp2_c_o_substitution_like": "sp² C–O substitution",
+        "sp2_c_s_substitution_like": "sp² C–S substitution",
+        "organoboron_c_c_coupling_like": "organoboron C–C coupling",
+        "alkene_hydrogenation_like": "alkene hydrogenation",
+        "generic_graph_transformation": "graph-defined transformation",
+        "generic_multi_event_graph_transformation": (
+            "multi-event graph transformation"
+        ),
+        "suzuki_miyaura": "Suzuki–Miyaura",
+        "buchwald_hartwig_c_n": "Buchwald–Hartwig C–N coupling",
+        "snar_amination": "SNAr amination",
+        "ullmann_c_n": "Ullmann C–N coupling",
+    }
+    raw = str(value or "")
+    return labels.get(raw, _readable(raw))
+
+
+def _quality_note(value: object) -> str:
+    labels = {
+        "not_all_edits_graph_checked": (
+            "some bond changes could not be independently checked"
+        ),
+        "partial_active_atom_mapping": (
+            "atom provenance is incomplete at the reaction center"
+        ),
+        "remote_continuity_unresolved": "R-group continuity is not fully resolved",
+        "active_core_size_exceeds_review_limit": "reaction core is unusually large",
+        "event_count_exceeds_review_limit": "reaction contains many connected events",
+        "primary_center_has_no_state_change": (
+            "the proposed primary center has no recorded state change"
+        ),
+    }
+    raw = str(value or "")
+    return labels.get(raw, _readable(raw))
+
+
+def _warning_text(value: object) -> str:
+    labels = {
+        "INFERRED_GLOBAL_ATOM_CORRESPONDENCE": "atom correspondence was inferred",
+        "CORE_SHARED_BY_ALL_EDIT_HYPOTHESES": (
+            "all mapping alternatives support the same reaction core"
+        ),
+        "REACTION_COMPLETENESS_UNRESOLVED": (
+            "individual product-atom origins are not fully resolved"
+        ),
+    }
+    raw = str(value or "")
+    return labels.get(raw, _readable(raw))
+
+
+def _mapping_status_text(value: object) -> str:
+    labels = {
+        "not_requested_invalid_reaction": "not run; reaction is invalid",
+        "not_requested_supplied_mapping": "not needed; supplied mapping used",
+        "not_requested_resolved_internal_evidence": (
+            "not needed; internal correspondence resolved"
+        ),
+        "external_mapping_failed": "failed",
+        "external_mapping_internal_consensus": (
+            "supports the internal correspondence"
+        ),
+        "external_mapping_hypothesis_conflict": (
+            "conflicts with an internal mapping alternative"
+        ),
+        "external_mapping_signature_conflict": (
+            "conflicts with the internal reaction signature"
+        ),
+        "external_mapping_ambiguous_hypothesis_match": (
+            "matches more than one internal mapping alternative"
+        ),
+        "external_mapping_only": "external mapping only; expert review required",
+        "external_mapping_signature_unavailable": (
+            "mapping produced, but no verified signature is available"
+        ),
+    }
+    raw = str(value or "")
+    return labels.get(raw, _readable(raw))
+
+
+def _bond_text(value: str) -> str:
+    return value.replace("-", "–")
+
+
+def _edit_text(token: str) -> str:
+    """Translate one normalized edit token into concise chemical language."""
+    try:
+        edit_type, atoms, transition = str(token).split(":", 2)
+        before, after = transition.split(">", 1)
+    except ValueError:
+        return _readable(token)
+    bond = _bond_text(atoms)
+    if edit_type == "formed":
+        return f"form {bond}"
+    if edit_type == "broken":
+        return f"break {bond}"
+    if edit_type == "hydrogen_change":
+        return f"remove {bond}" if after == "NONE" else f"add {bond}"
+    if edit_type == "order_changed":
+        return (
+            f"change {bond} bond from {_readable(before)} "
+            f"to {_readable(after)}"
+        )
+    return f"{_readable(edit_type)} at {bond}"
+
+
+def _attachment_text(profile: Any) -> str:
+    hybridization = {
+        "SP3": "sp³",
+        "SP2": "sp²",
+        "SP": "sp",
+    }.get(str(profile.attachment_hybridization).upper(), "")
+    atom = str(profile.attachment_element)
+    center = f"{hybridization} {atom}" if hybridization else atom
+    order = _readable(profile.attachment_bond_order)
+    return f"attached through {center} by a {order} bond"
+
+
+def _site_profile_text(profile: Any) -> str:
+    """Render the most decision-relevant site context in chemical language."""
+    context = profile.context
+    center = profile.reactive_center
+    kind = str(profile.context_kind)
+    values = []
+    if kind == "heteroatom":
+        substitution = _readable(context.substitution_class)
+        values.append(f"{substitution} {context.element}")
+        resonance = _readable(context.resonance_class)
+        if resonance:
+            values.append(resonance)
+        if center.lone_pair_availability:
+            values.append(
+                f"{_readable(center.lone_pair_availability)} "
+                "lone-pair availability"
+            )
+    elif kind == "aromatic":
+        values.append(f"{_readable(context.ring_family)} aromatic {center.element}")
+        values.append(f"{_readable(context.ortho_burden_class)} ortho crowding")
+    elif kind == "alkyl":
+        values.append(
+            f"{_readable(context.carbon_substitution)} sp³ carbon"
+        )
+        for name in ("benzylic", "allylic", "propargylic", "cyclic"):
+            if getattr(context, name, False):
+                values.append(name)
+    elif kind in {"alkenyl", "alkynyl"}:
+        values.append(_readable(kind))
+        values.append(_readable(context.conjugation_class))
+    elif kind in {"acyl", "sulfonyl", "phosphoryl"}:
+        values.append(_readable(context.center_class))
+    else:
+        values.append(f"{_readable(kind)} {center.element}")
+
+    access = _readable(profile.steric.accessibility_class)
+    values.append(f"{access} access")
+    electronic = profile.electronic
+    if electronic.activation_axis != "lone_pair_availability":
+        electronic_class = _readable(electronic.activation_class).replace(
+            "electron poor", "electron-poor"
+        ).replace("electron rich", "electron-rich")
+        values.append(electronic_class)
+    if any(
+        modifier.modifier_type == "coordination"
+        for modifier in profile.modifiers
+    ):
+        values.append("coordination risk")
+    return "; ".join(value for value in values if value)
+
+
+def _port_profile_text(profile: Any) -> str:
+    """Render one attachment-port profile without interpreting its R label."""
+    class_name = {
+        "ring_aliphatic": "saturated ring",
+        "generic_R": "organic substituent",
+    }.get(str(profile.base_class), _readable(profile.base_class))
+    values = []
+    if profile.carbon_substitution not in {
+        "not_carbon",
+        "not_applicable",
+        "unresolved",
+    }:
+        values.append(f"{profile.carbon_substitution} carbon attachment")
+    values.append(class_name)
+    values.extend(
+        name
+        for name, present in (
+            ("benzylic", profile.benzylic),
+            ("allylic", profile.allylic),
+            ("propargylic", profile.propargylic),
+        )
+        if present
+    )
+    if profile.ring_sizes:
+        values.append(
+            "/".join(str(size) for size in profile.ring_sizes)
+            + "-membered ring"
+        )
+    if profile.alpha_branch_count == 0 and profile.beta_branch_count == 0:
+        values.append("unbranched near the attachment")
+    else:
+        if profile.alpha_branch_count:
+            values.append(f"α branching={profile.alpha_branch_count}")
+        if profile.beta_branch_count:
+            values.append(f"β branching={profile.beta_branch_count}")
+    if profile.radius_1_heteroatoms:
+        values.append(
+            "/".join(profile.radius_1_heteroatoms) + " one bond away"
+        )
+    if profile.radius_2_heteroatoms:
+        values.append(
+            "/".join(profile.radius_2_heteroatoms) + " two bonds away"
+        )
+    if profile.aromatic_substituent_relations:
+        relations = sorted(
+            {
+                f"{_readable(item.positional_relation)} "
+                f"{item.substituent_fragment_smiles or item.substituent_element}"
+                for item in profile.aromatic_substituent_relations
+            }
+        )
+        values.append("ring substituents: " + ", ".join(relations))
+    values.append(_attachment_text(profile))
+    return "; ".join(values)
+
+
+def _r_group_analysis_lines(analysis: Any) -> list[str]:
+    """Return display-labeled R-port profiles from the canonical projection."""
+    try:
+        projection = build_reaction_display_projection(
+            reaction_render_context_from_analysis(analysis)
+        )
+    except (RuntimeError, ValueError) as exc:
+        return [f"R-group attachment profiles: unavailable ({exc})"]
+
+    candidates = tuple(
+        value
+        for value in projection.substituents
+        if value.boundary_action == "r_placeholder"
+        and value.placeholder_index is not None
+        and value.display_label
+    )
+    by_index = {}
+    for value in candidates:
+        index = int(value.placeholder_index)
+        current = by_index.get(index)
+        if current is None or (
+            value.side == "reactant" and current.side != "reactant"
+        ):
+            by_index[index] = value
+    ports = tuple(by_index[index] for index in sorted(by_index))
+    if not ports:
+        return ["R-group attachment profiles: none"]
+
+    lines = ["R-group attachment profiles:"]
+    continuity_labels = {
+            "retained": "retained",
+            "departing": "departing group",
+            "appearing": "product-only group",
+            "changed": "changed during reaction",
+            "unresolved": "continuity unresolved",
+    }
+    profile_groups = {}
+    for value in ports:
+        key = (
+            value.substituent_profile.profile_id,
+            str(value.continuity),
+        )
+        profile_groups.setdefault(key, []).append(value)
+    for (_, continuity), values in sorted(
+        profile_groups.items(),
+        key=lambda item: min(
+            int(value.placeholder_index or 0) for value in item[1]
+        ),
+    ):
+        ordered = sorted(
+            values,
+            key=lambda item: int(item.placeholder_index or 0),
+        )
+        labels = "/".join(str(value.display_label) for value in ordered)
+        profile = ordered[0].substituent_profile
+        continuity_text = continuity_labels.get(
+            continuity,
+            _readable(continuity),
+        )
+        lines.append(
+            f"  {labels} — {continuity_text}; "
+            f"{_port_profile_text(profile)}"
+        )
+
+    label_indices = {
+        str(value.display_label): int(value.placeholder_index)
+        for value in ports
+    }
+    shared: dict[tuple[int, tuple[int, ...], str], list[str]] = {}
+    for value in ports:
+        key = (
+            int(value.source_component_index),
+            tuple(value.atom_indices),
+            str(value.fragment_smiles),
+        )
+        shared.setdefault(key, []).append(str(value.display_label))
+    for _, labels in sorted(
+        shared.items(),
+        key=lambda item: min(label_indices[label] for label in item[1]),
+    ):
+        ordered_labels = sorted(
+            set(labels),
+            key=label_indices.__getitem__,
+        )
+        if len(ordered_labels) > 1:
+            label_text = " and ".join(ordered_labels)
+            lines.append(
+                f"  {label_text} are connected through the same omitted scaffold."
+            )
+    connectors = {}
+    for value in projection.connectors:
+        key = tuple(value.placeholder_indices)
+        current = connectors.get(key)
+        if current is None or (
+            value.side == "reactant" and current.side != "reactant"
+        ):
+            connectors[key] = value
+    if connectors:
+        lines.append("Hidden core connectors:")
+        for value in sorted(
+            connectors.values(),
+            key=lambda item: item.placeholder_indices,
+        ):
+            path = (
+                f"{value.shortest_path_bond_count} omitted bonds"
+                if value.shortest_path_bond_count is not None
+                else f"{value.hidden_atom_count} omitted atoms"
+            )
+            lines.append(
+                f"  {' and '.join(value.port_display_labels)} remain connected "
+                f"through {path}."
+            )
+    return lines
+
+
+def _active_site_profile_lines(analysis: Any) -> list[str]:
+    """Render annotations for reactant sites participating in core edits."""
+    core = getattr(analysis, "reaction_core", None)
+    if core is None:
+        return ["Active-site steric/electronic context: unavailable"]
+    roles = {}
+    for transition in core.atom_transitions:
+        state = transition.before_state
+        if state is not None:
+            roles[(state.component_index, state.atom_index)] = transition.role
+    values = []
+    for component in getattr(analysis, "reactants", ()):
+        molecule_analysis = getattr(component, "molecule_analysis", None)
+        if molecule_analysis is None:
+            continue
+        for environment in molecule_analysis.reactive_site_environments:
+            key = (component.component_index, environment.center_atom_index)
+            if key not in roles or environment.reactivity_profile is None:
+                continue
+            values.append(
+                (
+                    component.component_index,
+                    roles[key],
+                    _site_profile_text(environment.reactivity_profile),
+                )
+            )
+    if not values:
+        return ["Active-site steric/electronic context: unavailable"]
+    lines = ["Active-site steric/electronic context:"]
+    for component_index, role, profile in sorted(values):
+        role_label = {
+            "primary_center": "Primary center",
+            "participant": "Participating site",
+        }.get(str(role), _readable(role).capitalize())
+        lines.append(
+            f"  {role_label} in reactant {component_index + 1}: {profile}"
+        )
+    return lines
+
+
+def format_core_graph_analysis(analysis: Any) -> str:
+    """Render the canonical reaction core, R ports, and site annotations."""
+    reaction_label = getattr(analysis, "reaction_label", None)
+    lines = [
+        f"Reaction: {getattr(reaction_label, 'text', None) or '-'}",
+    ]
+    core = getattr(analysis, "reaction_core", None)
+    if core is None:
+        lines.append("Core: unavailable (verified or consensus edits required)")
+        return "\n".join(lines)
+    evidence_status = {
+        "verified": "Verified",
+        "inferred": "Inferred",
+        "hypothesis": "Consensus hypothesis",
+        "external": "External mapping; review required",
+    }.get(str(core.evidence_status), _readable(core.evidence_status).capitalize())
+    lines.append(
+        f"Evidence: {evidence_status} from {_evidence_text(core.evidence)} "
+        f"({core.confidence:.0%} confidence)"
+    )
+    quality = core.quality
+    cautions = tuple(quality.review_reasons) + tuple(quality.blocking_reasons)
+    if cautions:
+        lines.append(
+            "Review note: "
+            + "; ".join(_quality_note(value) for value in cautions)
+        )
+    lines.append("Bond changes:" if len(core.events) == 1 else "Reaction events:")
+    for index, event in enumerate(core.events, start=1):
+        changes = "; ".join(_edit_text(token) for token in event.edit_tokens)
+        prefix = f"{index}. " if len(core.events) > 1 else ""
+        lines.append(f"  {prefix}{changes}")
+    lines.extend(_r_group_analysis_lines(analysis))
+    lines.extend(_active_site_profile_lines(analysis))
+    return "\n".join(lines)
+
+
+def format_reaction_additional_analysis(analysis: Any) -> str:
+    """Render a compact current-contract summary without legacy duplicates."""
+    observation = getattr(analysis, "observation", None)
+    signature = getattr(analysis, "reaction_signature", None)
+    interpretation = getattr(analysis, "interpretation", None)
+    completeness = getattr(analysis, "reaction_completeness", None)
+    lines = [
+        f"Status: {'valid' if getattr(analysis, 'valid', False) else 'invalid'}",
+        "Observation evidence: "
+        f"{_evidence_text(getattr(observation, 'evidence_quality', None)) or '-'}",
+        f"Generic signature: {'available' if signature is not None else 'unavailable'}",
+        "Transformation: "
+        f"{_annotation_text(getattr(signature, 'transformation_class', None)) or 'unknown'}",
+        "Completeness: "
+        f"{_readable(getattr(completeness, 'status', None)) or 'unknown'}",
+    ]
+    primary_pattern = getattr(interpretation, "primary_pattern_id", None)
+    if primary_pattern:
+        lines.append(f"Primary pattern: {_annotation_text(primary_pattern)}")
+    compatible = tuple(
+        getattr(interpretation, "compatible_named_families", ()) or ()
+    )
+    if compatible:
+        lines.append(
+            "Compatible annotations: "
+            + ", ".join(_annotation_text(value) for value in compatible)
+        )
+    named_family = getattr(interpretation, "named_family", None)
+    if named_family:
+        lines.append(f"Resolved annotation: {_annotation_text(named_family)}")
+    warnings = tuple(
+        value
+        for value in (getattr(analysis, "warnings", ()) or ())
+        if value != "INFERRED_GLOBAL_ATOM_CORRESPONDENCE"
+    )
+    if warnings:
+        lines.append(
+            "Warnings: "
+            + ", ".join(_warning_text(value) for value in warnings)
+        )
+    error = getattr(analysis, "error", None)
+    if error:
+        lines.append(f"Error: {error}")
+    return "\n".join(lines)
 
 
 class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
@@ -192,24 +674,31 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         analysis_layout = QtWidgets.QVBoxLayout(analysis_column)
         analysis_layout.setContentsMargins(0, 0, 0, 0)
         analysis_layout.setSpacing(4)
-        priority_heading = QtWidgets.QLabel("Priority reaction review")
-        priority_heading.setObjectName("priorityReviewHeading")
-        analysis_layout.addWidget(priority_heading)
+        self.core_analysis_heading = QtWidgets.QLabel("Core graph analysis")
+        self.core_analysis_heading.setObjectName("coreGraphAnalysisHeading")
+        analysis_layout.addWidget(self.core_analysis_heading)
 
-        self.review_output = QtWidgets.QPlainTextEdit()
-        self.review_output.setObjectName("priorityReviewOutput")
-        self.review_output.setReadOnly(True)
-        self.review_output.setPlaceholderText(
-            "Reaction label, spectators, and local electronic/steric "
-            "analysis appear here."
+        self.core_analysis_output = QtWidgets.QPlainTextEdit()
+        self.core_analysis_output.setObjectName("coreGraphAnalysisOutput")
+        self.core_analysis_output.setReadOnly(True)
+        self.core_analysis_output.setPlaceholderText(
+            "Reaction-core events, R-group attachment profiles, and active-site "
+            "steric/electronic context appear here."
         )
-        self.review_output.setLineWrapMode(
+        self.core_analysis_output.setLineWrapMode(
             QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth
         )
-        self.review_output.setMaximumHeight(210)
-        analysis_layout.addWidget(self.review_output)
+        self.core_analysis_output.setMinimumHeight(240)
+        self.core_analysis_output.setMaximumHeight(340)
+        analysis_layout.addWidget(self.core_analysis_output)
 
-        analysis_layout.addWidget(QtWidgets.QLabel("Additional analysis"))
+        self.additional_analysis_heading = QtWidgets.QLabel(
+            "Additional analysis"
+        )
+        self.additional_analysis_heading.setObjectName(
+            "additionalAnalysisHeading"
+        )
+        analysis_layout.addWidget(self.additional_analysis_heading)
 
         self.output = QtWidgets.QPlainTextEdit()
         self.output.setObjectName("analysisOutput")
@@ -418,25 +907,23 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                         else "not run"
                     )
                     mapping_summary = (
-                        f"\nRXNMapper: {assessment.status}"
-                        f"\nMapper provider: "
-                        f"{assessment.provider_metadata.provider_id}"
-                        f"\nMapper confidence: {confidence}"
+                        f"\nRXNMapper: {_mapping_status_text(assessment.status)}"
                     )
-            self.output.setPlainText(
-                f"{heading}{mapping_summary}\n\n"
-                f"{format_concise_analysis(analysis)}"
-            )
+                    if result is not None:
+                        mapping_summary += f"\nMapping confidence: {confidence}"
             if kind == "reaction":
-                self.review_output.setPlainText(
-                    format_reaction_review_summary(
-                        build_reaction_review_summary(analysis)
-                    )
+                self.core_analysis_output.setPlainText(
+                    format_core_graph_analysis(analysis)
                 )
+                additional = format_reaction_additional_analysis(analysis)
             else:
-                self.review_output.setPlainText(
-                    "Reaction review applies to reaction SMILES."
+                self.core_analysis_output.setPlainText(
+                    "Core graph analysis applies to reaction SMILES."
                 )
+                additional = format_concise_analysis(analysis)
+            self.output.setPlainText(
+                f"{heading}{mapping_summary}\n\n{additional}"
+            )
             self._last_analysis = analysis
             self._last_kind = kind
             self._last_input_text = self.input_edit.text().strip()
@@ -462,7 +949,9 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self._last_kind = None
             self._last_input_text = ""
             self.output.setPlainText(f"Unable to analyze input.\n\n{exc}")
-            self.review_output.setPlainText("Priority reaction review unavailable.")
+            self.core_analysis_output.setPlainText(
+                "Core graph analysis unavailable."
+            )
             self.graph_heading.setText("Structure graph")
             self.structure_image_label.clear_image(
                 "Structure graph unavailable."
@@ -692,7 +1181,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
     def copy_result(self) -> None:
         """Copy the visible analysis to the system clipboard."""
         sections = (
-            self.review_output.toPlainText().strip(),
+            self.core_analysis_output.toPlainText().strip(),
             self.output.toPlainText().strip(),
         )
         QtWidgets.QApplication.clipboard().setText(

@@ -14,8 +14,10 @@ from app.featurizer_gui import (  # noqa: E402
     REACTION_EXAMPLE,
     ReactiveTaxonomyWindow,
     detect_input_kind,
+    format_core_graph_analysis,
 )
 import app.featurizer_gui as gui  # noqa: E402
+from reactive_taxonomy import featurize_reaction  # noqa: E402
 
 
 def test_detect_input_kind() -> None:
@@ -37,24 +39,44 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert window.force_core_mapping_check.objectName() == "forceCoreMapping"
         assert window.render_style_combo.objectName() == "renderStylePreset"
         assert window.render_style_combo.currentData() == "current"
+        assert window.core_analysis_heading.text() == "Core graph analysis"
+        assert (
+            window.core_analysis_heading.objectName()
+            == "coreGraphAnalysisHeading"
+        )
+        assert (
+            window.core_analysis_output.objectName()
+            == "coreGraphAnalysisOutput"
+        )
+        assert not hasattr(window, "review_output")
 
         window.input_edit.setText(REACTION_EXAMPLE)
         assert window.kind_label.text() == "Detected: reaction"
         window.analyze()
         reaction_output = window.output.toPlainText()
-        priority_review = window.review_output.toPlainText()
+        core_analysis = window.core_analysis_output.toPlainText()
         assert reaction_output.startswith("REACTION FEATURIZATION")
         assert (
-            "RXNMapper: not_requested_resolved_internal_evidence"
+            "RXNMapper: not needed; internal correspondence resolved"
             in reaction_output
         )
-        assert "Reaction: Ar–Br + Ar–B(OH)₂ → Ar–Ar" in reaction_output
-        assert "Evidence: global_atom_correspondence" in reaction_output
-        assert priority_review.startswith(
-            "Reaction label: Ar–Br + Ar–B(OH)₂ → Ar–Ar"
+        assert (
+            "Observation evidence: whole-reaction atom correspondence"
+            in reaction_output
         )
-        assert "Spectators: None detected" in priority_review
-        assert "Electronic / steric analysis: Unavailable" in priority_review
+        assert "Generic signature: available" in reaction_output
+        assert "Primary pattern: organoboron C–C coupling" in reaction_output
+        assert "RS3:" not in reaction_output
+        assert "Reaction minimization:" not in reaction_output
+        assert "Product connection:" not in reaction_output
+        assert core_analysis.startswith(
+            "Reaction: Ar–Br + Ar–B(OH)₂ → Ar–Ar"
+        )
+        assert "Evidence:" in core_analysis
+        assert "Bond changes:" in core_analysis
+        assert "R-group attachment profiles:" in core_analysis
+        assert "RSH2:" not in core_analysis
+        assert "RSE1:" not in core_analysis
         assert "reaction input · valid" in window.status_label.text()
         reaction_pixmap = window.structure_image_label.pixmap()
         assert reaction_pixmap is not None
@@ -82,8 +104,8 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         molecule_output = window.output.toPlainText()
         assert molecule_output.startswith("MOLECULE FEATURIZATION")
         assert "Reactive-site hypotheses:" in molecule_output
-        assert window.review_output.toPlainText() == (
-            "Reaction review applies to reaction SMILES."
+        assert window.core_analysis_output.toPlainText() == (
+            "Core graph analysis applies to reaction SMILES."
         )
         assert "Ar–Br — leaving_group, available" in molecule_output
         assert "molecule input · valid" in window.status_label.text()
@@ -129,13 +151,11 @@ def test_window_explains_ambiguous_reaction_evidence() -> None:
         output = window.output.toPlainText()
 
         assert "RXNMapper: disabled" in output
-        assert "Correspondence ambiguity: 2 distinct edit hypotheses" in output
-        assert output.count("REH1:") == 2
-        assert "4 correspondences; unverified" in output
-        assert "Atoms not in the main product: Cl × 1, N × 1, O × 1" in output
-        assert "Net bond inventory (unmapped, not verified edits):" in output
-        assert "Retrieval: not eligible" in output
-        assert "ambiguous edit hypotheses" in output
+        assert "Generic signature: unavailable" in output
+        assert "Completeness:" in output
+        assert "Warnings:" in output
+        assert "REH1:" not in output
+        assert "Net bond inventory" not in output
     finally:
         window.close()
         application.processEvents()
@@ -155,13 +175,14 @@ def test_window_displays_mapped_reaction_minimization() -> None:
         window.input_edit.setText(reaction)
         window.analyze()
         output = window.output.toPlainText()
+        core_analysis = window.core_analysis_output.toPlainText()
 
-        assert "Reaction minimization:" in output
-        assert "Reaction: R–CH=O + Alk–OH" in output
-        assert "Core evidence: verified (validated_atom_mapping" in output
-        assert "Core shape (retrieval): RSH2:" in output
-        assert "Center transition (diagnostic only): RCS2:" in output
-        assert "retained aryl [Fc1ccccc1] (1 port)" in output
+        assert "Reaction minimization:" not in output
+        assert "Reaction: R–CH=O + Alk–OH" in core_analysis
+        assert "Evidence: Verified from validated atom mapping" in core_analysis
+        assert "RSH2:" not in core_analysis
+        assert "Bond changes:" in core_analysis
+        assert "R-group attachment profiles:" in core_analysis
         core_pixmap = window.core_image_label.pixmap()
         assert core_pixmap is not None
         assert not core_pixmap.isNull()
@@ -190,6 +211,9 @@ def test_window_uses_r_group_display_minimization() -> None:
             window.core_graphic_note.text()
         )
         assert "R groups: 2" in window.core_graphic_note.text()
+        assert "R-group attachment profiles:" in (
+            window.core_analysis_output.toPlainText()
+        )
     finally:
         window.close()
         application.processEvents()
@@ -257,6 +281,29 @@ def test_drawing_style_switch_rerenders_without_reanalysis(monkeypatch) -> None:
     finally:
         window.close()
         application.processEvents()
+
+
+def test_core_graph_analysis_exposes_shared_r_ports_and_site_context() -> None:
+    reaction = (
+        "O=C(O)c1cn(C2CC2)c2cc(N3CCNCC3)c(F)cc2c1=O."
+        "CC(C)c1nc(Cl)nc(Cl)c1Br>>"
+        "CC(C)c1nc(Cl)nc(N2CCN(c3cc4c(cc3F)c(=O)c(C(=O)O)"
+        "cn4C3CC3)CC2)c1Br"
+    )
+
+    text = format_core_graph_analysis(featurize_reaction(reaction))
+
+    assert "R¹/R² — retained; primary carbon attachment; saturated ring" in text
+    assert "R¹ and R² are connected through the same omitted scaffold." in text
+    assert "N two bonds away" in text
+    assert "break C–Cl; form C–N; remove N–H" in text
+    assert "Active-site steric/electronic context:" in text
+    assert "secondary N" in text
+    assert "hindered access" in text
+    assert "high lone-pair availability" in text
+    assert "RSH2:" not in text
+    assert "RSE1:" not in text
+    assert "REACTION_CORE" not in text
 
 
 def test_main_window_starts_maximized() -> None:

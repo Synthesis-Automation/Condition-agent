@@ -18,14 +18,16 @@ Normalize observed edits or retain explicit edit hypotheses
   ↓
 Build ReactionObservation
   ├─ topology and completeness
-  ├─ minimum ReactionCoreProjection
-  │    ├─ edit-provenanced reaction events
-  │    ├─ shortest-path relationships between multiple sites
-  │    └─ omitted fragments with port-specific R-group profiles
-  └─ generic ReactionSignature when evidence is sufficient
+  └─ minimum ReactionCoreProjection
+       ├─ edit-provenanced reaction events
+       ├─ shortest-path relationships between multiple sites
+       └─ omitted fragments with port-specific structural R-group profiles
+  ↓
+Build generic ReactionSignature from ReactionObservation when evidence is sufficient
   ↓
 Add optional annotations
   ├─ molecular motifs and reactive-site hypotheses
+  ├─ site-level steric/electronic reactivity profiles with branch evidence
   └─ generic transformation and synthesis-pattern matches that cite
      core event IDs, edit indices, and attachment-profile IDs
   ↓
@@ -38,8 +40,8 @@ Serialize for conversion and recommendation
 
 This is the execution order in
 [`featurize_reaction()`](../reactive_taxonomy/reaction_api.py). Optional molecular
-annotations are deliberately attached only after `ReactionObservation` has
-been built.
+annotations are deliberately attached only after `ReactionObservation` and its
+observation-only `ReactionSignature` have been built.
 
 ## Layer ownership
 
@@ -104,9 +106,13 @@ projects parsed components to `ReactionStructureComponent` and builds:
 - provider evidence and correspondence alternatives;
 - normalized edits and stereochemical changes;
 - generic topology and product completeness;
-- the minimum [`ReactionCoreProjection`](../reactive_taxonomy/reaction_core/builder.py);
-- a generic [`ReactionSignature`](../reactive_taxonomy/reaction_signatures.py)
-  when evidence is sufficient.
+- the minimum [`ReactionCoreProjection`](../reactive_taxonomy/reaction_core/builder.py).
+
+After that structure-only observation is complete,
+[`build_observation_signature()`](../reactive_taxonomy/reaction_signatures.py)
+builds a generic `ReactionSignature` when evidence is sufficient. Signature
+construction therefore finishes before molecular motifs, reactive-site
+hypotheses, or derived reactivity descriptors are added.
 
 For inferred correspondence, deterministic internal atom IDs allow the minimum
 core to be generated without mutating or pretending that the input was mapped.
@@ -132,18 +138,43 @@ levels:
 chemical classifications. The exact fragment SMILES and all atom/port
 provenance remain serialized beside the profile.
 
+### R-group feature placement
+
+R-group featurization is intentionally split across system layers:
+
+1. `ReactionCoreProjection` owns graph-invariant, port-specific structure:
+   exact omitted-fragment identity, attachment provenance, continuity, L0
+   chemical class, L1 substitution and activation context, L2 branching/ring/
+   heteroatom context, and the L3 local-environment key. A shared cyclic or
+   tethered omission remains one remote subgraph with all of its attachment
+   ports; display labels must not turn it into unrelated fragments.
+2. Molecular interpretation owns derived, context-sensitive reactivity:
+   reactive-center identity, attached-group classifications, branch-level
+   steric contributions, accessibility class and score, lone-pair or resonance
+   context, electronic activation class and score, modifiers, evidence, and
+   uncertainty. These profiles describe the reactive site and its graph
+   branches; they do not redefine R-label identity or signature identity.
+3. `condition_recommender` owns comparison and ranking. It may compare the
+   versioned port profiles and compatible reactivity descriptors, but it must
+   not derive new molecular chemistry from display labels or condition fields.
+
+This split keeps stable 2D graph facts in observation while preventing
+heuristic or future conformer-aware steric/electronic models from silently
+changing the canonical reaction identity.
+
 The signature hashes normalized chemistry and identity-bearing definition
 versions. It is invariant to irrelevant component order and serialization. A
 missing family never prevents a structurally supported generic signature.
 
 ## 4. Add optional annotations
 
-After the observation exists,
+After the observation and its generic signature exist,
 [`interpret_parsed_molecules()`](../reactive_taxonomy/reaction_parser.py) may add:
 
 - [`MolecularMotifMatch`](../reactive_taxonomy/models.py) records;
 - `ReactiveSiteHypothesis` records;
-- local reactivity profiles; and
+- local reactivity profiles with reactive-center, attached-group, steric,
+  electronic, modifier, evidence, and uncertainty fields; and
 - optional connectivity hypotheses for downstream reasoning.
 
 These are useful priors for compatibility, explanations, and recommendation,
