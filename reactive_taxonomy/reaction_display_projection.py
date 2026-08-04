@@ -14,6 +14,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
+from .chemistry.smarts_cache import compile_smarts
 from .chemistry.rdkit_utils import (
     parse_smiles,
     prepare_fragment_serialization_copy,
@@ -32,6 +33,10 @@ except ImportError:  # pragma: no cover
 _DEFINITION_PATH = (
     Path(__file__).with_name("definitions")
     / "reaction_display_projection.v1.json"
+)
+_INTERFACE_BLOCK_DEFINITION_PATH = (
+    Path(__file__).with_name("definitions")
+    / "reaction_interface_blocks.v1.json"
 )
 
 
@@ -140,7 +145,10 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         definition = dict(json.load(handle))
     expected = {
         "schema_version": "1.0",
-        "definition_id": "reaction_display_projection.v1.6",
+        "definition_id": "reaction_display_projection.v1.7",
+        "reaction_interface_block_definition_id": (
+            "reaction_interface_blocks.v1.0"
+        ),
         "aromatic_system_policy": "retain_aromatic_bond_component",
         "aromatic_valence_completion_policy": (
             "retain_exocyclic_multiple_bonds"
@@ -173,6 +181,92 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
     ):
         raise ValueError("intramolecular note template requires {ring_size}")
     return definition
+
+
+@lru_cache(maxsize=1)
+def load_reaction_interface_block_definitions() -> Tuple[Dict[str, Any], ...]:
+    """Load and validate chemist-facing reaction-interface blocks."""
+    with _INTERFACE_BLOCK_DEFINITION_PATH.open(
+        "r", encoding="utf-8"
+    ) as handle:
+        payload = dict(json.load(handle))
+    if payload.get("schema_version") != "1.0":
+        raise ValueError("unexpected reaction-interface block schema version")
+    if payload.get("definition_id") != "reaction_interface_blocks.v1.0":
+        raise ValueError("unexpected reaction-interface block definition ID")
+    if payload.get("trigger") != (
+        "retained_atom_intersection_or_boundary_attachment"
+    ):
+        raise ValueError("unexpected reaction-interface block trigger")
+    if payload.get("closure_policy") != "fixed_point_union":
+        raise ValueError("unexpected reaction-interface block closure policy")
+
+    definitions = []
+    seen_ids = set()
+    for raw_definition in payload.get("blocks") or []:
+        definition = dict(raw_definition)
+        block_id = str(definition.get("id") or "")
+        if not block_id or block_id in seen_ids:
+            raise ValueError(
+                "reaction-interface block IDs must be non-empty and unique"
+            )
+        seen_ids.add(block_id)
+        patterns = definition.get("patterns")
+        retained_maps = definition.get("retained_atom_maps")
+        boundary_maps = definition.get("boundary_atom_maps")
+        if not isinstance(patterns, list) or not patterns:
+            raise ValueError(
+                f"reaction-interface block {block_id} requires patterns"
+            )
+        if not isinstance(retained_maps, list) or not retained_maps:
+            raise ValueError(
+                f"reaction-interface block {block_id} requires retained maps"
+            )
+        if not isinstance(boundary_maps, list) or not boundary_maps:
+            raise ValueError(
+                f"reaction-interface block {block_id} requires boundary maps"
+            )
+        normalized_maps = tuple(int(value) for value in retained_maps)
+        if any(value <= 0 for value in normalized_maps) or len(
+            set(normalized_maps)
+        ) != len(normalized_maps):
+            raise ValueError(
+                f"reaction-interface block {block_id} has invalid retained maps"
+            )
+        normalized_boundary_maps = tuple(int(value) for value in boundary_maps)
+        if any(value <= 0 for value in normalized_boundary_maps) or not set(
+            normalized_boundary_maps
+        ).issubset(normalized_maps):
+            raise ValueError(
+                f"reaction-interface block {block_id} has invalid boundary maps"
+            )
+        for smarts in patterns:
+            query = compile_smarts(str(smarts), validate=True)
+            query_maps = {
+                int(atom.GetAtomMapNum())
+                for atom in query.GetAtoms()
+                if atom.GetAtomMapNum()
+            }
+            missing_maps = set(normalized_maps) - query_maps
+            if missing_maps:
+                raise ValueError(
+                    f"reaction-interface block {block_id} pattern lacks "
+                    f"retained maps {sorted(missing_maps)}"
+                )
+        definition["retained_atom_maps"] = normalized_maps
+        definition["boundary_atom_maps"] = normalized_boundary_maps
+        definitions.append(definition)
+    if not definitions:
+        raise ValueError("reaction-interface block definitions cannot be empty")
+    return tuple(
+        sorted(
+            definitions,
+            key=lambda item: (
+                -int(item.get("priority", 0)),
+                str(item["id"]),
+            ),
+        )
+    )
 
 
 def _require_rdkit() -> None:
@@ -303,6 +397,55 @@ class _ComponentDraft:
     connectors: list[_ConnectorDraft]
 
 
+def _retain_interface_blocks(
+    molecule: Any,
+    retained: set[int],
+) -> None:
+    """Complete defined blocks intersecting or bounding the interface."""
+    changed = True
+    while changed:
+        changed = False
+        for definition in load_reaction_interface_block_definitions():
+            retained_maps = set(definition["retained_atom_maps"])
+            boundary_maps = set(definition["boundary_atom_maps"])
+            for smarts in definition["patterns"]:
+                query = compile_smarts(str(smarts), validate=False)
+                if query is None:  # pragma: no cover - validated by the loader
+                    continue
+                positions = {
+                    int(atom.GetAtomMapNum()): int(atom.GetIdx())
+                    for atom in query.GetAtoms()
+                    if int(atom.GetAtomMapNum()) in retained_maps
+                }
+                for match in molecule.GetSubstructMatches(
+                    query, uniquify=True
+                ):
+                    block_atoms = {
+                        int(match[positions[map_number]])
+                        for map_number in retained_maps
+                    }
+                    boundary_atoms = {
+                        int(match[positions[map_number]])
+                        for map_number in boundary_maps
+                    }
+                    directly_bounds_retained = any(
+                        int(neighbor.GetIdx()) in retained
+                        for atom_index in boundary_atoms
+                        for neighbor in molecule.GetAtomWithIdx(
+                            atom_index
+                        ).GetNeighbors()
+                        if int(neighbor.GetIdx()) not in block_atoms
+                    )
+                    if not (
+                        block_atoms.intersection(retained)
+                        or directly_bounds_retained
+                    ):
+                        continue
+                    previous_size = len(retained)
+                    retained.update(block_atoms)
+                    changed = changed or len(retained) != previous_size
+
+
 def _reaction_interface_closure(
     molecule: Any,
     *,
@@ -384,6 +527,13 @@ def _reaction_interface_closure(
         for neighbor in atom.GetNeighbors():
             if neighbor.GetAtomicNum() not in {0, 1, 6}:
                 retained.add(int(neighbor.GetIdx()))
+
+    # Chemically cohesive units must not be split after a local heteroatom or
+    # one end of the unit enters the interface. In particular, organic azides
+    # remain N3 rather than being rendered as an attached N plus a hidden N2
+    # fragment. Iterate to a fixed point so overlapping blocks compose without
+    # relying on definition or atom order.
+    _retain_interface_blocks(molecule, retained)
     return retained, aromatic_systems, aromatic_policy_atoms
 
 
@@ -1365,5 +1515,6 @@ __all__ = [
     "ReactionDisplayProjection",
     "ReactionDisplaySubstituent",
     "build_reaction_display_projection",
+    "load_reaction_interface_block_definitions",
     "load_reaction_display_projection_definition",
 ]

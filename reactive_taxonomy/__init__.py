@@ -31,6 +31,7 @@ from .reaction_display_projection import (
     ReactionDisplayProjection,
     ReactionDisplaySubstituent,
     build_reaction_display_projection,
+    load_reaction_interface_block_definitions,
     load_reaction_display_projection_definition,
 )
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
@@ -329,6 +330,7 @@ __all__ = [
     "reaction_fallback_definition_versions",
     "load_molecular_motif_definitions",
     "load_handle_patterns",
+    "load_reaction_interface_block_definitions",
     "load_reaction_display_projection_definition",
     "load_molecular_feature_benchmark",
     "load_contextual_source_label_mappings",

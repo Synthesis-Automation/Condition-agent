@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reaction_interface_blocks.v1.0",
+  "trigger": "retained_atom_intersection_or_boundary_attachment",
+  "closure_policy": "fixed_point_union",
+  "blocks": [
+    {
+      "id": "acyl_heteroatom",
+      "chemist_label": "R-C(=O)-X",
+      "patterns": [
+        "[CX3:1](=[O:2])-[O,N,S,F,Cl,Br,I:3]"
+      ],
+      "retained_atom_maps": [1, 2, 3],
+      "boundary_atom_maps": [1],
+      "priority": 100
+    },
+    {
+      "id": "sulfonyl_heteroatom",
+      "chemist_label": "R-S(=O)2-X",
+      "patterns": [
+        "[S;X4:1](=[O:2])(=[O:3])-[O,N,S,F,Cl,Br,I:4]"
+      ],
+      "retained_atom_maps": [1, 2, 3, 4],
+      "boundary_atom_maps": [1],
+      "priority": 98
+    },
+    {
+      "id": "phosphoryl_heteroatoms",
+      "chemist_label": "R-P(=O)(X)-X",
+      "patterns": [
+        "[P;X4:1](=[O:2])([O,N,S,F,Cl,Br,I:3])-[O,N,S,F,Cl,Br,I:4]",
+        "[P+;X4:1]([O-:2])([O,N,S,F,Cl,Br,I:3])-[O,N,S,F,Cl,Br,I:4]"
+      ],
+      "retained_atom_maps": [1, 2, 3, 4],
+      "boundary_atom_maps": [1],
+      "priority": 96
+    },
+    {
+      "id": "azide",
+      "chemist_label": "R-N3",
+      "patterns": [
+        "[N:1]=[N+:2]=[N-:3]",
+        "[N-:1]-[N+:2]#[N:3]"
+      ],
+      "retained_atom_maps": [1, 2, 3],
+      "boundary_atom_maps": [1],
+      "priority": 94
+    },
+    {
+      "id": "thiocyanate",
+      "chemist_label": "R-S-C#N",
+      "patterns": [
+        "[S:1]-[C:2]#[N:3]"
+      ],
+      "retained_atom_maps": [1, 2, 3],
+      "boundary_atom_maps": [1],
+      "priority": 92
+    },
+    {
+      "id": "isothiocyanate",
+      "chemist_label": "R-N=C=S",
+      "patterns": [
+        "[N:1]=[C:2]=[S:3]"
+      ],
+      "retained_atom_maps": [1, 2, 3],
+      "boundary_atom_maps": [1],
+      "priority": 92
+    },
+    {
+      "id": "isocyanate",
+      "chemist_label": "R-N=C=O",
+      "patterns": [
+        "[N:1]=[C:2]=[O:3]"
+      ],
+      "retained_atom_maps": [1, 2, 3],
+      "boundary_atom_maps": [1],
+      "priority": 92
+    },
+    {
+      "id": "nitrile",
+      "chemist_label": "R-C#N",
+      "patterns": [
+        "[C+0:1]#[N+0:2]"
+      ],
+      "retained_atom_maps": [1, 2],
+      "boundary_atom_maps": [1],
+      "priority": 90
+    }
+  ]
+}

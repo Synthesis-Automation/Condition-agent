@@ -7,6 +7,9 @@ from reactive_taxonomy import (
     featurize_reaction,
     reaction_render_context_from_analysis,
 )
+from reactive_taxonomy.reaction_display_projection import (
+    load_reaction_interface_block_definitions,
+)
 
 
 def _projection(reaction_smiles: str):
@@ -99,6 +102,89 @@ def test_ordinary_ether_cleavage_does_not_gain_pi_system_context() -> None:
 
     assert projection.minimum_reaction_smiles == "*OC>>*O"
     assert projection.render_reaction_smiles == "CO[*:1]>>O[*:1]"
+
+
+def test_reaction_interface_block_registry_is_validated() -> None:
+    definitions = load_reaction_interface_block_definitions()
+
+    assert {definition["id"] for definition in definitions} == {
+        "acyl_heteroatom",
+        "azide",
+        "isocyanate",
+        "isothiocyanate",
+        "nitrile",
+        "phosphoryl_heteroatoms",
+        "sulfonyl_heteroatom",
+        "thiocyanate",
+    }
+    assert all(
+        definition["patterns"] and definition["retained_atom_maps"]
+        for definition in definitions
+    )
+
+
+@pytest.mark.parametrize(
+    ("reaction_smiles", "minimum_reaction_smiles"),
+    (
+        (
+            "CC(Br)N=[N+]=[N-].N>>CC(N)N=[N+]=[N-]",
+            "*C(Br)N=[N+]=[N-].N>>*C(N)N=[N+]=[N-]",
+        ),
+        (
+            "CC(Br)[N-][N+]#N.N>>CC(N)[N-][N+]#N",
+            "*C(Br)[N-][N+]#N.N>>*C(N)[N-][N+]#N",
+        ),
+        (
+            "CC(Br)SC#N.N>>CC(N)SC#N",
+            "*C(Br)SC#N.N>>*C(N)SC#N",
+        ),
+        (
+            "CC(Br)N=C=S.N>>CC(N)N=C=S",
+            "*C(Br)N=C=S.N>>*C(N)N=C=S",
+        ),
+        (
+            "CC(Br)N=C=O.N>>CC(N)N=C=O",
+            "*C(Br)N=C=O.N>>*C(N)N=C=O",
+        ),
+        (
+            "CC(Br)C#N.N>>CC(N)C#N",
+            "*C(Br)C#N.N>>*C(N)C#N",
+        ),
+        (
+            "CC(Br)S(=O)(=O)Cl.N>>CC(N)S(=O)(=O)Cl",
+            "*C(Br)S(=O)(=O)Cl.N>>*C(N)S(=O)(=O)Cl",
+        ),
+        (
+            "CC(Br)P(=O)(O)Cl.N>>CC(N)P(=O)(O)Cl",
+            "*C(Br)P(=O)(O)Cl.N>>*C(N)P(=O)(O)Cl",
+        ),
+    ),
+)
+def test_complete_interface_blocks_are_retained_at_core_boundary(
+    reaction_smiles: str,
+    minimum_reaction_smiles: str,
+) -> None:
+    projection = _projection(reaction_smiles)
+
+    assert projection.minimum_reaction_smiles == minimum_reaction_smiles
+
+
+def test_remote_nitrile_does_not_expand_through_hidden_carbon_chain() -> None:
+    projection = _projection("BrCCC#N.N>>NCCC#N")
+
+    assert projection.minimum_reaction_smiles == "*CBr.N>>*CN"
+
+
+def test_thiocyanate_and_isothiocyanate_remain_topologically_distinct() -> None:
+    thiocyanate = _projection("CC(Br)SC#N.N>>CC(N)SC#N")
+    isothiocyanate = _projection("CC(Br)N=C=S.N>>CC(N)N=C=S")
+
+    assert "SC#N" in thiocyanate.minimum_reaction_smiles
+    assert "N=C=S" in isothiocyanate.minimum_reaction_smiles
+    assert (
+        thiocyanate.minimum_reaction_smiles
+        != isothiocyanate.minimum_reaction_smiles
+    )
 
 
 def test_multisite_amide_formation_and_ester_hydrolysis_keep_both_acyls() -> None:
