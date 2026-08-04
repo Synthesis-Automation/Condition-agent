@@ -290,8 +290,8 @@ def build_recommendation_artifacts(
         )
     if not build_fast_index and index_path.is_file():
         warnings.append(
-            "An older generic_index.json.gz exists but was not rebuilt; do "
-            "not use it unless it matches the current canonical records."
+            "Older trusted or review-core indexes may exist but were not rebuilt; "
+            "do not use them unless they match the current canonical records."
         )
     core_eligibility_counts = dict(
         conversion_report.get("core_eligibility_counts") or {}

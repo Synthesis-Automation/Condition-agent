@@ -30,6 +30,14 @@ def main() -> None:
             "results remain expert-review required"
         ),
     )
+    parser.add_argument(
+        "--unrestricted",
+        action="store_true",
+        help=(
+            "Use the paired review-core index and relax fallback gates; expert "
+            "review is mandatory"
+        ),
+    )
     args = parser.parse_args()
     if args.use_rxnmapper and not RxnMapperProvider.is_available():
         parser.error(
@@ -42,6 +50,7 @@ def main() -> None:
         top_k=args.top_k,
         minimum_pool_size=args.minimum_pool_size,
         use_rxnmapper=args.use_rxnmapper,
+        unrestricted_fallback=args.unrestricted,
     )
     print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
 

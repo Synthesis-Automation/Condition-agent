@@ -49,7 +49,7 @@ reactive_taxonomy       condition_registry
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
 | Structural evidence | Implemented | Validated maps and bounded scaffold, global, and fragmented correspondence produce normalized edits or explicit alternatives; reaction patterns never generate edits |
 | Optional patterns | Implemented | Generic transformation and synthesis-pattern matches consume completed observations and cite normalized edits, core events, and R profiles; they may add display/family evidence only |
-| External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
+| External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, and persisted with model provenance; mapper-only or conflicting evidence is query-only, while full-coverage internal-consensus cores may enter only the explicit expert review-core index |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
 | Reaction signatures | Implemented | Deterministic graph-only RS3 L0–L4 signatures, events, ring-change observations, topology, and unknown-family support |
 | Reaction minimization | V3.1 integrated, calibration pending | Template-free minimum-core projection with edit-provenanced events, inter-event shortest paths, remote subgraphs, port-specific R profiles, stable existing identity keys, and review export |
@@ -57,7 +57,7 @@ reactive_taxonomy       condition_registry
 | Reactivity descriptors | Optional annotation | Typed context-aware molecular profiles are available above structural observation and do not affect core or signature identity |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
-| Generic index | Implemented | Version-checked persisted index with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys |
+| Generic index | Implemented | Separate version-checked trusted and trusted-plus-review-core indexes with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys |
 | Generic retrieval | Implemented pilot | Explicit verified-signature ladder, robust reaction-core shape tier, conservative unsigned-query core and all-hypothesis routes, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
 | Source-supported partial transformations | Implemented, review-qualified | Product-observed attachment replacement may retrieve only exact partial transformations whose precedent conditions have a curated source capability |
 | Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback for other unsigned queries; not represented as verified edit retrieval |
@@ -88,14 +88,15 @@ The current code declares:
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `9.1` |
-| Generic converter definition | `generic_conversion.v9.1` |
-| Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
-| Concise reaction review | `11.1` |
+| Recommendation record | `10.0` |
+| Generic converter definition | `generic_conversion.v10.0` |
+| Core eligibility policy | `core_eligibility.v1@1.0` |
+| Generic sharded converter definition | `generic_sharded_conversion.v5.0` |
+| Concise reaction review | `12.0` |
 | Shared chemist review summary | `3.0` |
-| Recommendation artifact workflow | `1.1` |
-| Generic persisted index | `5.0` |
-| Generic recommendation result | `2.4` |
+| Recommendation artifact workflow | `2.0` |
+| Generic persisted index | `6.0` |
+| Generic recommendation result | `3.0` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.8` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v2@1.0` |
@@ -744,9 +745,12 @@ eligible mapped core with passing or review-qualified controls
 This branch returns `recommendation_mode = reaction_core_review`,
 `retrieval_strategy = reaction_core_ladder`, and mandatory expert-review
 cautions. It never creates an RS3 signature for the query, upgrades its
-admission, or admits external-mapper records as precedents. A core-only failure
-continues to the existing structure fallback with both attempts preserved in
-the retrieval trace.
+admission, or makes external-mapper evidence trusted. In explicit unrestricted
+mode, a converted row whose full-coverage external map agrees with an internal
+hypothesis may be used as a `review_core` precedent; mapper-only, ambiguous, or
+conflicting rows remain query-only. A core-only failure continues to the
+existing structure fallback with both attempts preserved in the retrieval
+trace.
 
 The index stores exact, typed, shape, and center maps. Production retrieval
 uses the first three as a narrow-to-broad ladder; the center-transition map is
@@ -755,9 +759,10 @@ records map-number-independent equivalence, explicit H/charge/radical/isotope/
 aromaticity/hybridization/stereo changes, graph-edit consistency, mapping
 coverage, and pass/review/blocked quality. Presentation strings are generated
 after identity construction and never participate in retrieval keys. Indexed
-rows remain subject to the verified-record admission gate. Consequently,
-external mapping may expand query coverage but does not manufacture trusted
-training evidence.
+rows in the default index remain subject to the verified-record admission
+gate. The separate expert index admits only persisted, policy-qualified
+`review_core` rows. Consequently, external mapping may expand query and expert
+review coverage but does not manufacture trusted training evidence.
 
 ## 5. What is not complete
 

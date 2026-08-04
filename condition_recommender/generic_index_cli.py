@@ -14,8 +14,19 @@ def main() -> None:
     )
     parser.add_argument("records_path", help="Canonical generic records.jsonl")
     parser.add_argument("output_path", help="Destination generic_index.json")
+    parser.add_argument(
+        "--include-review-core",
+        action="store_true",
+        help=(
+            "Build an expert-use trusted-and-review-core index; use a distinct "
+            "output such as generic_review_index.json.gz"
+        ),
+    )
     args = parser.parse_args()
-    index = load_generic_index(args.records_path)
+    index = load_generic_index(
+        args.records_path,
+        include_review=args.include_review_core,
+    )
     report = save_generic_index(index, args.output_path)
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

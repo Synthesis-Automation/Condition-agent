@@ -220,6 +220,7 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
         "condition_stage_status",
         "outcome_status",
         "index_eligibility",
+        "precedent_tier",
         "evidence_quality",
     )
 
@@ -230,6 +231,10 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
         field: Counter(text(payload.get(field)) for payload in payloads)
         for field in fields
     }
+    values["precedent_tier"] = Counter(
+        text(payload.get("precedent_tier")) or "unavailable"
+        for payload in payloads
+    )
     core_eligibility_counts = Counter(
         text(payload.get("core_eligibility")) for payload in payloads
     )
@@ -904,6 +909,9 @@ def convert_datasets_sharded(
         ),
         "index_eligibility_counts": _merge_counts(
             complete_entries, "index_eligibility_counts"
+        ),
+        "precedent_tier_counts": _merge_counts(
+            complete_entries, "precedent_tier_counts"
         ),
         "core_eligibility_counts": _merge_counts(
             complete_entries, "core_eligibility_counts"

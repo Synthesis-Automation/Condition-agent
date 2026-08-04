@@ -85,6 +85,7 @@ def convert_datasets(
     condition_stage_counts = Counter()
     outcome_quality_counts = Counter()
     index_eligibility_counts = Counter()
+    precedent_tier_counts = Counter()
     core_eligibility_counts = Counter()
     reason_counts = Counter()
     evidence_counts = Counter()
@@ -144,6 +145,11 @@ def convert_datasets(
                 condition_stage_counts[record.condition_stage_status.value] += 1
                 outcome_quality_counts[record.outcome_status.value] += 1
                 index_eligibility_counts[record.index_eligibility.value] += 1
+                precedent_tier_counts[
+                    record.precedent_tier.value
+                    if record.precedent_tier is not None
+                    else "unavailable"
+                ] += 1
                 core_eligibility_counts[record.core_eligibility.value] += 1
                 reason_counts.update(record.admission_reasons)
                 evidence_counts[record.evidence_quality] += 1
@@ -233,6 +239,7 @@ def convert_datasets(
             status.value: index_eligibility_counts[status.value]
             for status in IndexEligibility
         },
+        "precedent_tier_counts": dict(sorted(precedent_tier_counts.items())),
         "core_eligibility_counts": dict(
             sorted(core_eligibility_counts.items())
         ),

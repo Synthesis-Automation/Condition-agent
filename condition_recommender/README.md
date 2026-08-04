@@ -281,9 +281,27 @@ The desktop recommender and Python API also expose an opt-in
 `unrestricted_fallback` expert mode. It bypasses fallback eligibility,
 similarity, independent-support, and condition-compatibility gates while
 retaining feature-index candidate generation and the finite candidate limit.
-The mode is disabled by default and reports distinct unrestricted-fallback
+It also loads the separate review-core precedent index. The mode is disabled
+by default and reports distinct unrestricted-fallback and review-core-index
 warnings and cautions; its output is exploratory and may be chemically
 incompatible with the query.
+
+Core use is assigned once during canonical conversion by the versioned
+`core_eligibility.v1` policy:
+
+- `trusted_core`: may support the default trusted index;
+- `review_core`: internally corroborated, full-product-coverage external
+  mapping may support only the expert review-core index;
+- `query_only`: usable to describe or retrieve for a query, never as a
+  condition precedent;
+- `blocked` or `unavailable`: excluded from core lookup maps.
+
+The canonical record separately persists `precedent_tier`. A trusted
+precedent may remain indexed through a verified signature even when an unsafe
+core view is removed. Review-only records enter the expert index only when
+both `precedent_tier=review_core` and `core_eligibility=review_core` are
+present. Index building does not reinterpret old records. Schema-9.1 records
+and schema-5.0 indexes must be regenerated.
 
 ## Expert rule-based recommendation
 
@@ -603,9 +621,10 @@ subfolders and creates:
   shows mapping disposition, provider, and confidence. Machine-only hash
   identifiers and internal grouping keys are omitted; they remain available in
   the canonical shards. The CSV is not used as recommendation input.
-- `generic_index.json.gz`: a compressed, ready-to-load recommendation index.
-  This is enabled by default because it makes repeated recommendations start
-  faster.
+- `generic_index.json.gz`: the compressed trusted-precedent index used by
+  default.
+- `generic_review_index.json.gz`: the paired expert-use index containing the
+  trusted rows plus qualified review-core precedents.
 - `recommendation_artifacts_report.json`: row counts, output paths, settings,
   reuse counts, and file sizes.
 
@@ -620,8 +639,10 @@ The default settings are intended for large datasets:
   small files.
 - `Use RXNMapper` is checked by default. It runs one conversion worker so one
   model copy is loaded; clear the checkbox to restore parallel workers.
-- Mapper-derived records remain review-only and do not enter the default fast
-  index. The mapper setting and model hash participate in shard reuse identity.
+- Mapper-only or conflicting records never become precedents. Full-coverage
+  external mappings that agree with an internal hypothesis may enter only the
+  expert review-core index. The mapper setting and model hash participate in
+  shard reuse identity.
 - Keep the fast index enabled for routine recommendation. Disable it only when
   conversion size matters more than startup speed.
 
@@ -635,6 +656,11 @@ completed shards.
 python -m condition_recommender.generic_index_cli `
   results/generic_conversion/records.jsonl `
   results/generic_conversion/generic_index.json
+
+python -m condition_recommender.generic_index_cli `
+  results/generic_conversion/records.jsonl `
+  results/generic_conversion/generic_review_index.json.gz `
+  --include-review-core
 
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
@@ -659,6 +685,12 @@ For output made by the desktop app, use the fast index directly:
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
   --records datasets/literature/generic_index.json.gz
+
+# Expert mode resolves the paired generic_review_index.json.gz automatically.
+python -m condition_recommender.generic_recommend_cli `
+  "<reaction_smiles>" `
+  --records datasets/literature/generic_index.json.gz `
+  --unrestricted
 ```
 
 If the fast index was not built, use the canonical manifest instead:

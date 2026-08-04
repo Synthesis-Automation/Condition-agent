@@ -266,7 +266,9 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "recommendation data and restart checkpoints) • "
             "reaction_review.csv (concise human review, including spectator "
             "and local steric/electronic context) • "
-            "generic_index.json.gz (optional fast lookup). A duplicate merged "
+            "generic_index.json.gz (trusted fast lookup) + "
+            "generic_review_index.json.gz (expert review-core lookup). "
+            "A duplicate merged "
             "records file is not stored."
         )
         outputs.setWordWrap(True)
@@ -562,6 +564,12 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 self._append_status(
                     "  Trusted recommendation precedents: "
                     f"{report['eligible_index_record_count']}"
+                )
+            if "review_core_index" in artifacts:
+                self._append_status(
+                    "  Review-core recommendation index: "
+                    f"{artifacts['review_core_index']['path']} "
+                    f"({_human_size(artifacts['review_core_index']['size_bytes'])})"
                 )
             self._append_status(
                 "  Qualified review-core precedents: "

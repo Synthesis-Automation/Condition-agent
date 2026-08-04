@@ -10,6 +10,7 @@ from condition_recommender.conversion.concise_review import (
     CONCISE_REACTION_REVIEW_FIELDS,
 )
 from condition_recommender.generic_indexing import load_generic_index
+from condition_recommender.generic_api import GenericConditionRecommender
 
 
 def _source_row(reaction_id: str) -> dict[str, str]:
@@ -79,6 +80,18 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
             ).rows
         )
         == 2
+    )
+    trusted_recommender = GenericConditionRecommender.from_path(
+        output / "generic_index.json.gz"
+    )
+    review_recommender = GenericConditionRecommender.from_path(
+        output / "generic_index.json.gz",
+        include_review=True,
+    )
+    assert not trusted_recommender.includes_review_precedents
+    assert review_recommender.includes_review_precedents
+    assert review_recommender.index.precedent_scope.value == (
+        "trusted_and_review_core"
     )
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 2
     with (output / "reaction_review.csv").open(

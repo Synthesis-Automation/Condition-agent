@@ -336,7 +336,8 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         )
         self.data_path_edit.setObjectName("recommendationDataPath")
         self.data_path_edit.setPlaceholderText(
-            "generic_index.json.gz or shard_manifest.json"
+            "generic_index.json.gz or shard_manifest.json; review mode uses "
+            "the paired generic_review_index.json.gz"
         )
         self.data_summary = QtWidgets.QLabel()
         self.data_summary.setObjectName("dataSummary")
