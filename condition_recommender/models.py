@@ -10,6 +10,8 @@ from typing import Any, Dict, Optional, Tuple
 RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.0"
 GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.0"
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
+CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.1"
 
 
 class AdmissionTier(str, Enum):
@@ -78,6 +80,26 @@ class PrecedentIndexScope(str, Enum):
 
     TRUSTED = "trusted"
     TRUSTED_AND_REVIEW_CORE = "trusted_and_review_core"
+
+
+@dataclass(frozen=True)
+class ChemistRankingPreferences:
+    """Versioned chemist-selected priorities for recipe reranking.
+
+    Chemistry admission, reaction compatibility, and hard condition conflicts
+    are intentionally outside this contract and cannot be disabled by weights.
+    An empty ``weights`` mapping requests the named declarative preset.
+    """
+
+    profile_id: str = "default"
+    weights: Dict[str, float] = field(default_factory=dict)
+    definition_id: str = "chemist_ranking_profiles.v1"
+    definition_version: str = "1.0"
+    customized: bool = False
+    schema_version: str = CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
 
 
 @dataclass(frozen=True)
@@ -230,6 +252,10 @@ class GenericConditionRecommendation:
     precedent_reference_ids: Tuple[str, ...]
     explanation: Tuple[str, ...]
     score_trace: "RecommendationScoreTrace"
+    default_rank: Optional[int] = None
+    default_score: Optional[float] = None
+    rank_change: int = 0
+    factor_evidence: Dict[str, Any] = field(default_factory=dict)
     precedent_reaction_smiles: Tuple[str, ...] = ()
     precedent_reaction_contexts: Tuple[Dict[str, Any], ...] = ()
     compatibility_evidence: Tuple[str, ...] = ()
@@ -267,6 +293,7 @@ class RecommendationScoreTrace:
     pool_yield_prior_pct: Optional[float]
     definition_versions: Dict[str, str]
     ranking_profile: str = "default"
+    default_ranking_contributions: Dict[str, float] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -288,6 +315,7 @@ class GenericRecommendationResult:
     transformation_class: Optional[str] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
     reaction_partners: Tuple[Dict[str, Any], ...] = ()
+    ranking_preferences: Dict[str, Any] = field(default_factory=dict)
     retrieval_definition_version: str = ""
     retrieval_strategy: str = "hybrid"
     retrieval_level: Optional[str] = None
@@ -300,7 +328,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "3.0"
+    schema_version: str = GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

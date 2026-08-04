@@ -39,7 +39,12 @@ from .hypothesis_retrieval import (
     load_edit_hypothesis_retrieval_rules,
     retrieve_hypothesis_consensus_pool_with_trace,
 )
-from .models import GenericRecommendationResult, PrecedentIndexScope
+from .models import (
+    ChemistRankingPreferences,
+    GenericRecommendationResult,
+    PrecedentIndexScope,
+)
+from .ranking_preferences import resolve_ranking_preferences
 from .recipe_ranking import rank_condition_recipes
 
 
@@ -63,8 +68,10 @@ def recommend_indexed_signature(
     minimum_pool_size: int | None = None,
     retrieval_strategy: RetrievalStrategy = "hybrid",
     ranking_weights: Mapping[str, float] | None = None,
+    ranking_preferences: ChemistRankingPreferences | None = None,
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
+    resolved_preferences = resolve_ranking_preferences(ranking_preferences)
     query_context = {
         "reaction_label": dict(reaction_label or {}),
         "spectator_groups": tuple(
@@ -77,6 +84,7 @@ def recommend_indexed_signature(
             for partner in (signature.get("partners") or ())
             if isinstance(partner, Mapping)
         ),
+        "ranking_preferences": resolved_preferences.to_dict(),
     }
     retrieval_definition_version = str(load_generic_retrieval_rules()["schema_version"])
     if top_k < 1:
@@ -168,6 +176,7 @@ def recommend_indexed_signature(
             else "default"
         ),
         ranking_weights=ranking_weights,
+        ranking_preferences=resolved_preferences,
         query_reaction_core=reaction_core,
     )
     if any(
@@ -264,8 +273,10 @@ class GenericConditionRecommender:
         top_k: int = 5,
         minimum_pool_size: int | None = None,
         unrestricted_fallback: bool = False,
+        ranking_preferences: ChemistRankingPreferences | None = None,
     ) -> GenericRecommendationResult:
         """Featurize a query and recommend without reloading the index."""
+        resolved_preferences = resolve_ranking_preferences(ranking_preferences)
         result = _recommend_with_index(
             reaction_smiles,
             self.index,
@@ -273,6 +284,11 @@ class GenericConditionRecommender:
             minimum_pool_size=minimum_pool_size,
             unrestricted_fallback=unrestricted_fallback,
             mapping_provider=self.mapping_provider,
+            ranking_preferences=resolved_preferences,
+        )
+        result = replace(
+            result,
+            ranking_preferences=resolved_preferences.to_dict(),
         )
         if self.includes_review_precedents:
             result = replace(
@@ -297,6 +313,7 @@ def _recommend_with_index(
     minimum_pool_size: int | None,
     unrestricted_fallback: bool,
     mapping_provider: AtomMappingProvider | None = None,
+    ranking_preferences: ChemistRankingPreferences | None = None,
 ) -> GenericRecommendationResult:
     if top_k < 1:
         return GenericRecommendationResult(
@@ -330,6 +347,7 @@ def _recommend_with_index(
             index,
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
+            ranking_preferences=ranking_preferences,
         )
         if mapped_core_result.valid:
             return _attach_external_mapping_assessment(
@@ -344,6 +362,7 @@ def _recommend_with_index(
                 index,
                 top_k=top_k,
                 minimum_pool_size=minimum_pool_size,
+                ranking_preferences=ranking_preferences,
             )
             if (
                 hypothesis_result.valid
@@ -363,6 +382,7 @@ def _recommend_with_index(
                 index,
                 top_k=top_k,
                 minimum_pool_size=minimum_pool_size,
+                ranking_preferences=ranking_preferences,
             )
             if core_attempt.valid:
                 return _attach_external_mapping_assessment(
@@ -375,6 +395,7 @@ def _recommend_with_index(
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
             unrestricted=unrestricted_fallback,
+            ranking_preferences=ranking_preferences,
         )
         if core_attempt is not None:
             result = replace(
@@ -407,6 +428,7 @@ def _recommend_with_index(
             reaction_label=_reaction_label_payload(analysis),
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
+            ranking_preferences=ranking_preferences,
         )
         result = replace(
             result,
@@ -423,6 +445,7 @@ def _recommend_core_with_index(
     *,
     top_k: int,
     minimum_pool_size: int | None,
+    ranking_preferences: ChemistRankingPreferences | None = None,
 ) -> GenericRecommendationResult:
     """Recommend from a review-qualified core against verified precedents."""
     core_model = analysis.reaction_core
@@ -472,6 +495,9 @@ def _recommend_core_with_index(
     query = {
         "reaction_core": core,
         "fallback_descriptor": fallback,
+        "spectator_groups": tuple(
+            asdict(group) for group in analysis.spectator_groups
+        ),
     }
 
     def core_similarity(
@@ -489,6 +515,8 @@ def _recommend_core_with_index(
         retrieval_level=retrieval.level,
         top_k=top_k,
         similarity_assessor=core_similarity,
+        query_reaction_core=core,
+        ranking_preferences=ranking_preferences,
     )
     cautions = (
         "Query retrieval used minimized reaction-core evidence, not a verified "
@@ -612,6 +640,7 @@ def _recommend_hypotheses_with_index(
     *,
     top_k: int,
     minimum_pool_size: int | None,
+    ranking_preferences: ChemistRankingPreferences | None = None,
 ) -> GenericRecommendationResult:
     """Recommend only from precedents robust across every retained edit hypothesis."""
     reaction_smiles = str(analysis.input_reaction_smiles)
@@ -674,12 +703,24 @@ def _recommend_hypotheses_with_index(
                 else "NO_ROBUST_EDIT_HYPOTHESIS_PRECEDENT"
             ),
         )
+    query_mapping = {
+        **query.to_mapping(),
+        "spectator_groups": tuple(
+            asdict(group) for group in analysis.spectator_groups
+        ),
+    }
     recommendations = rank_condition_recipes(
-        query.to_mapping(),
+        query_mapping,
         retrieval.pool,
         retrieval_level=retrieval.level,
         top_k=top_k,
         similarity_assessor=assess_hypothesis_consensus_similarity,
+        query_reaction_core=(
+            asdict(analysis.reaction_core)
+            if analysis.reaction_core is not None
+            else None
+        ),
+        ranking_preferences=ranking_preferences,
     )
     hypothesis_cautions = (
         "Query atom correspondence is ambiguous; no hypothesis is presented "
@@ -739,6 +780,7 @@ def _recommend_fallback_with_index(
     top_k: int,
     minimum_pool_size: int | None,
     unrestricted: bool = False,
+    ranking_preferences: ChemistRankingPreferences | None = None,
 ) -> GenericRecommendationResult:
     """Recommend through the gated or explicit unrestricted fallback route."""
     reaction_smiles = str(analysis.input_reaction_smiles)
@@ -830,8 +872,14 @@ def _recommend_fallback_with_index(
                 else "NO_SAFE_FALLBACK_PRECEDENT"
             ),
         )
+    ranking_query = {
+        **descriptor,
+        "spectator_groups": tuple(
+            asdict(group) for group in analysis.spectator_groups
+        ),
+    }
     recommendations = rank_condition_recipes(
-        descriptor,
+        ranking_query,
         retrieval.pool,
         retrieval_level=retrieval.level,
         top_k=top_k,
@@ -841,6 +889,12 @@ def _recommend_fallback_with_index(
                 row.fallback_descriptor,
             )
         ),
+        query_reaction_core=(
+            asdict(analysis.reaction_core)
+            if analysis.reaction_core is not None
+            else None
+        ),
+        ranking_preferences=ranking_preferences,
     )
     fallback_cautions = (
         "Query atom correspondence and bond edits are not verified; the "
@@ -945,6 +999,7 @@ def recommend_generic_conditions(
     unrestricted_fallback: bool = False,
     use_rxnmapper: bool = False,
     mapping_provider: AtomMappingProvider | None = None,
+    ranking_preferences: ChemistRankingPreferences | None = None,
 ) -> GenericRecommendationResult:
     """Featurize a reaction and recommend canonical resolved recipes."""
     if use_rxnmapper and mapping_provider is None:
@@ -959,6 +1014,7 @@ def recommend_generic_conditions(
         top_k=top_k,
         minimum_pool_size=minimum_pool_size,
         unrestricted_fallback=unrestricted_fallback,
+        ranking_preferences=ranking_preferences,
     )
 
 

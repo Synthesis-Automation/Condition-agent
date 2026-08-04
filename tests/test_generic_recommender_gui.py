@@ -198,7 +198,7 @@ def test_window_uses_literature_recommendation_data_by_default(
         window.selected_reaction_image_label.objectName()
         == "selectedPrecedentReactionGraph"
     )
-    assert window.results_table.columnCount() == 9
+    assert window.results_table.columnCount() == 10
     assert not window.export_button.isEnabled()
     assert not any(
         label.text() == "Reaction Condition Recommender"
@@ -218,6 +218,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
             top_k,
             minimum_pool_size,
             unrestricted_fallback,
+            ranking_preferences,
         ):
             calls.append(
                 (
@@ -225,6 +226,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
                     top_k,
                     minimum_pool_size,
                     unrestricted_fallback,
+                    ranking_preferences,
                 )
             )
             return expected
@@ -260,7 +262,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
 
     assert calls == [
         ("index_options", True, True),
-        ("A.B>>P", 3, 2, True),
+        ("A.B>>P", 3, 2, True, None),
     ]
     assert len(progress) == 2
     assert finished == [(True, expected, "")]
@@ -292,7 +294,7 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
         == "BrC.B(O)O>>CC"
     )
     assert window.results_table.rowCount() == 1
-    assert "Palladium catalyst" in window.results_table.item(0, 7).text()
+    assert "Palladium catalyst" in window.results_table.item(0, 8).text()
     details = window.details_box.toPlainText()
     assert "Potassium carbonate" in details
     assert "Reaction label: Precedent Ar–Br coupling" in details

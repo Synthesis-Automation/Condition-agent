@@ -36,42 +36,31 @@ through normal chemistry and condition-registry conversion. Label-only records
 are retained and condition-normalized but remain structurally ineligible for
 the generic precedent index.
 
-`condition_recommender` contains several condition-recommendation approaches at
-different stages of maturity. They share reaction observations from
-`reactive_taxonomy` and canonical condition identities and recipes from
-`condition_registry`, but they are not interchangeable.
-
-There is currently no automatic fallback from one recommendation path to
-another. Callers must choose the path explicitly and preserve its provenance,
-warnings, and uncertainty.
+`condition_recommender` exposes one canonical structure-backed recommendation
+path. It consumes reaction observations from `reactive_taxonomy` and canonical
+condition identities and recipes from `condition_registry`. Former expert-rule
+and weak-label recommenders have been removed; label-only source observations
+may be preserved for audit but cannot become structural condition precedents.
 
 ## Recommendation paths and status
 
 | Path | Public entry point | Current status | Intended use |
 | --- | --- | --- | --- |
-| Expert structural rules | `recommend_rule_conditions()` | Phase I C-N engine and definitions implemented; one production rule and multiple review-only drafts | Auditable starter protocols selected from explicit molecular facts |
 | Generic structure-backed retrieval | `recommend_generic_conditions()` | Functional pilot; coverage and calibration depend on converted structure-rich records | Type-agnostic precedent retrieval and canonical recipe aggregation |
-| Weak-label retrieval | `recommend_conditions_from_labels()` | Functional transitional path with important data limitations | Datasets that contain reaction labels but not precedent structures |
 
 Supporting audit, conversion, indexing, and evaluation commands prepare data for
-these paths; they do not recommend conditions by themselves.
-
-If you only want to try the new generic system, read **New generic system:
-quick start** and **Evaluate recommendations**. The expert-rule and weak-label
-sections describe separate paths and can be skipped.
+this path; they do not recommend conditions by themselves.
 
 ## Which path should I use?
 
-- Use expert rules when the reaction is inside a reviewed rule scope and an
-  explicit starter protocol is desired.
 - Use generic structure-backed retrieval when a compatible converted record set
   or persisted generic index is available.
-- Use weak-label retrieval only when structure-rich precedents are unavailable,
-  and retain its uncertainty warnings.
-- Abstain when the selected path cannot support the query. Do not silently call
-  a weaker path and present the result as equivalent evidence.
+- Abstain when structural evidence, compatible precedents, or independent
+  support is insufficient. Review-qualified core, edit-hypothesis, external-map,
+  partial-transformation, and structure-fallback modes remain inside the generic
+  API and explicitly preserve their evidence level and cautions.
 
-## New generic system: quick start
+## Generic system: quick start
 
 Run commands from the repository root with Python 3.10 or newer and RDKit
 available. The generic system is composed of three standalone packages:
@@ -103,10 +92,10 @@ python -m condition_recommender.sharded_conversion_cli `
 
 python -m condition_recommender.generic_index_cli `
   results/quickstart/conversion/records.jsonl.gz `
-  results/quickstart/generic_index.json
+  results/quickstart/generic_index.sqlite
 
 python -m condition_recommender.generic_index_integrity_cli `
-  results/quickstart/generic_index.json `
+  results/quickstart/generic_index.sqlite `
   --output-path results/quickstart/index_integrity.json
 ```
 
@@ -122,21 +111,43 @@ The CLI accepts reaction SMILES and returns JSON:
 ```powershell
 python -m condition_recommender.generic_recommend_cli `
   "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1" `
-  --records results/quickstart/generic_index.json `
+  --records results/quickstart/generic_index.sqlite `
   --top-k 5
 ```
+
+Chemists can choose a transparent ranking preset without changing chemistry
+admission or compatibility gates. For example:
+
+```powershell
+python -m condition_recommender.generic_recommend_cli `
+  "Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1" `
+  --records results/quickstart/generic_index.sqlite `
+  --ranking-profile reactant_category `
+  --ranking-weight functional_group_tolerance=0.30
+```
+
+Available presets are `default`, `reactant_category`,
+`functional_group_tolerance`, `evidence`, `yield`, and
+`procedure_completeness`. Repeated `--ranking-weight COMPONENT=VALUE`
+arguments override the chosen preset; weights are validated and normalized.
 
 For repeated recommendations, load the validated index once:
 
 ```python
-from condition_recommender import GenericConditionRecommender
+from condition_recommender import (
+    ChemistRankingPreferences,
+    GenericConditionRecommender,
+)
 
 recommender = GenericConditionRecommender.from_path(
-    "results/quickstart/generic_index.json"
+    "results/quickstart/generic_index.sqlite"
 )
 result = recommender.recommend(
     "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
     top_k=5,
+    ranking_preferences=ChemistRankingPreferences(
+        profile_id="functional_group_tolerance"
+    ),
 )
 
 if not result.valid:
@@ -163,10 +174,40 @@ Applications should inspect:
 - independent `reference_support` and `precedent_reference_ids`, not only raw
   observation counts;
 - `compatibility_evidence`, `cautions`, `explanation`, and `score_trace`;
+- `ranking_preferences`, `default_rank`, `rank_change`, and `factor_evidence`
+  to audit how a chemist-selected priority changed the ordering;
 - `expected_yield_pct`, which is `None` when no usable outcome evidence exists.
 
 An empty recommendation list or typed error is a valid abstention. It must not
 be replaced by a reaction-name guess.
+
+### Transparent chemist-controlled ranking
+
+Preferences rerank only recipes that have already passed structure-based
+admission, the retrieval support threshold, reaction compatibility, and hard
+condition-conflict filtering. A weight cannot admit a rejected precedent,
+disable a chemical incompatibility, or force a named family.
+
+The nine visible factors are:
+
+- reaction similarity;
+- reacting-partner category similarity, including graph-derived distinctions
+  such as secondary aliphatic amine versus primary aryl amine;
+- functional-group tolerance, based only on directly observed unchanged
+  spectator-group matches and weighted by distance from the reaction center;
+- similarity-weighted observed yield;
+- independent evidence support;
+- distinct reaction breadth;
+- dataset diversity;
+- post-filter recipe compatibility; and
+- condition identity/stage certainty.
+
+Missing functional-group evidence means unknown tolerance, not demonstrated
+failure or success. Unavailable factors receive zero applied weight and the
+remaining priorities are renormalized. Each recommendation retains its default
+rank and score alongside the custom rank, effective weights, contributions,
+category labels, matched/missing spectator groups, cautions, and precedent IDs.
+The Qt application exposes the same presets and an editable priority dialog.
 
 ### Canonical reaction layers
 
@@ -303,7 +344,14 @@ both `precedent_tier=review_core` and `core_eligibility=review_core` are
 present. Index building does not reinterpret old records. Schema-9.1 records
 and schema-5.0 indexes must be regenerated.
 
-## Expert rule-based recommendation
+## Removed expert rule-based recommendation (historical)
+
+> Historical design record only. The expert-rule modules, definitions, CLIs,
+> and public APIs described in this section have been removed. None of the
+> following examples is executable or part of the current recommendation
+> contract. The material is retained temporarily to support migration review
+> and should move to an archived design document once useful rationale has been
+> reconciled.
 
 ### Design
 
@@ -1048,7 +1096,13 @@ metrics are separate required gates.
 - Production release remains gated by independent chemist review and the
   untouched-test report.
 
-## Weak-label recommendation
+## Removed weak-label recommendation (historical)
+
+> Historical design record only. The weak-label recommender and CLI described
+> in this section have been removed. Label-only observations may still be
+> ingested and condition-normalized for audit, but they are structurally
+> ineligible as recommendation precedents and none of the following commands is
+> part of the current public workflow.
 
 The weak-label path uses a cleaned flat CSV whose precedent rows contain source
 reaction labels and reactive-site labels rather than reaction structures.
@@ -1157,7 +1211,7 @@ applied. The definition loader validates query tags against
 matching compatibility vocabulary is stale.
 
 Compatibility evidence does not repair an unsupported transformation or make a
-draft recipe production-ready.
+review-qualified recipe production-ready.
 
 ## Input contract
 
@@ -1172,11 +1226,12 @@ typed error or abstention rather than an unrelated recommendation.
 
 ## Development status
 
-The package is moving toward one canonical structure-backed recommendation
-workflow. Until parity and evaluation gates are complete:
+The package exposes one canonical structure-backed recommendation workflow.
+Verified-signature retrieval, review-qualified query routes, source-supported
+partial transformations, and unsigned structure fallback are evidence modes of
+that workflow rather than separate recommenders. Application code must preserve
+their `recommendation_mode`, retrieval trace, warnings, and provenance.
 
-- expert C-N rules remain a separate explicit path;
-- generic retrieval remains the preferred cross-family direction;
-- weak-label retrieval remains transitional;
-- application code must not merge results from these paths without preserving
-  their evidence level and provenance.
+Production release remains gated by full-corpus reproducibility, leakage-safe
+evaluation, independent chemist review, and removal or archival of the
+historical documentation above.

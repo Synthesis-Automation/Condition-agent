@@ -98,6 +98,12 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     assert report["artifacts"]["fast_index"]["path"].endswith(
         "generic_index.sqlite"
     )
+    legacy_recommender = GenericConditionRecommender.from_path(
+        output / "generic_index.json.gz"
+    )
+    assert trusted_recommender.recommend(rows[0]["reaction_smiles"]) == (
+        legacy_recommender.recommend(rows[0]["reaction_smiles"])
+    )
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 2
     with (output / "reaction_review.csv").open(
         encoding="utf-8-sig",

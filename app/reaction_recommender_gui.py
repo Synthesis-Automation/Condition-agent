@@ -19,8 +19,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from condition_recommender import (  # noqa: E402
+    ChemistRankingPreferences,
     GenericConditionRecommender,
     GenericRecommendationResult,
+    available_ranking_profiles,
+    resolve_ranking_preferences,
 )
 from reactive_taxonomy import (  # noqa: E402
     RxnMapperProvider,
@@ -49,6 +52,18 @@ _RECIPE_ROLE_LABELS = (
     ("solvents", "Solvent"),
     ("other_components", "Other"),
 )
+
+_RANKING_COMPONENT_LABELS = {
+    "similarity": "Structural similarity",
+    "partner_category": "Reactant category",
+    "functional_group_tolerance": "Functional-group tolerance",
+    "yield": "Expected yield",
+    "independent_support": "Independent support",
+    "reaction_breadth": "Reaction breadth",
+    "dataset_diversity": "Dataset diversity",
+    "compatibility": "Condition compatibility",
+    "condition_certainty": "Procedure completeness",
+}
 
 
 def default_recommendation_data_path() -> Path:
@@ -205,6 +220,12 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
             f"Retrieval: {_display_name(result.retrieval_level)}"
         ),
     ]
+    preferences = result.ranking_preferences or {}
+    lines.append(
+        "Ranking profile: "
+        f"{_display_name(preferences.get('profile_id'))}"
+        + (" (customized)" if preferences.get("customized") else "")
+    )
     if result.query_edit_hypothesis_ids:
         lines.append(
             "Ambiguous edit alternatives (all must agree): "
@@ -267,6 +288,61 @@ def _friendly_error(error: Any) -> str:
 ReactionImageLabel = StructureImageLabel
 
 
+class RankingPreferencesDialog(QtWidgets.QDialog):
+    """Edit transparent ranking priorities without changing chemistry gates."""
+
+    def __init__(
+        self,
+        weights: Mapping[str, float],
+        *,
+        parent: Optional[QtWidgets.QWidget] = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("Customize ranking priorities")
+        self.setModal(True)
+        self.spins: Dict[str, QtWidgets.QDoubleSpinBox] = {}
+        layout = QtWidgets.QVBoxLayout(self)
+        note = QtWidgets.QLabel(
+            "Priorities are normalized automatically. Structural validity, "
+            "precedent admission, and hard compatibility gates remain locked."
+        )
+        note.setWordWrap(True)
+        layout.addWidget(note)
+        form = QtWidgets.QFormLayout()
+        for component, label in _RANKING_COMPONENT_LABELS.items():
+            spin = QtWidgets.QDoubleSpinBox()
+            spin.setObjectName(f"rankingWeight_{component}")
+            spin.setRange(0.0, 100.0)
+            spin.setDecimals(1)
+            spin.setSingleStep(1.0)
+            spin.setValue(100.0 * float(weights.get(component, 0.0)))
+            spin.setSuffix(" %")
+            form.addRow(f"{label}:", spin)
+            self.spins[component] = spin
+        layout.addLayout(form)
+        buttons = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok
+            | QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.accepted.connect(self._accept_if_valid)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    @property
+    def weights(self) -> Dict[str, float]:
+        return {name: spin.value() for name, spin in self.spins.items()}
+
+    def _accept_if_valid(self) -> None:
+        if sum(self.weights.values()) <= 0.0:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Ranking priorities required",
+                "At least one ranking priority must be greater than zero.",
+            )
+            return
+        self.accept()
+
+
 class GenericRecommendationWorker(QtCore.QObject):
     """Load the index and recommend outside the Qt event loop."""
 
@@ -282,6 +358,7 @@ class GenericRecommendationWorker(QtCore.QObject):
         minimum_pool_size: Optional[int],
         unrestricted_fallback: bool = False,
         use_rxnmapper: bool = True,
+        ranking_preferences: ChemistRankingPreferences | None = None,
     ) -> None:
         super().__init__()
         self.data_path = data_path
@@ -290,6 +367,7 @@ class GenericRecommendationWorker(QtCore.QObject):
         self.minimum_pool_size = minimum_pool_size
         self.unrestricted_fallback = unrestricted_fallback
         self.use_rxnmapper = use_rxnmapper
+        self.ranking_preferences = ranking_preferences
 
     @QtCore.pyqtSlot()
     def run(self) -> None:
@@ -311,6 +389,7 @@ class GenericRecommendationWorker(QtCore.QObject):
                 top_k=self.top_k,
                 minimum_pool_size=self.minimum_pool_size,
                 unrestricted_fallback=self.unrestricted_fallback,
+                ranking_preferences=self.ranking_preferences,
             )
         except Exception as exc:
             self.finished.emit(
@@ -378,6 +457,29 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             "fallbacks, bypass eligibility, similarity, independent-support, "
             "and condition-compatibility gates. Expert review is required."
         )
+        self.ranking_profile_combo = QtWidgets.QComboBox()
+        self.ranking_profile_combo.setObjectName("rankingProfile")
+        self.ranking_profiles = {
+            value["profile_id"]: value for value in available_ranking_profiles()
+        }
+        for value in self.ranking_profiles.values():
+            self.ranking_profile_combo.addItem(
+                value["label"], value["profile_id"]
+            )
+        self.ranking_profile_combo.setCurrentIndex(
+            max(0, self.ranking_profile_combo.findData("default"))
+        )
+        self.ranking_profile_combo.setToolTip(
+            self.ranking_profiles["default"]["description"]
+        )
+        self.customize_ranking_button = QtWidgets.QPushButton(
+            "Customize priorities…"
+        )
+        self.customize_ranking_button.setObjectName("customizeRanking")
+        self.ranking_profile_status = QtWidgets.QLabel("Preset weights")
+        self.ranking_profile_status.setObjectName("rankingProfileStatus")
+        self.ranking_profile_status.setStyleSheet("color: #52606d;")
+        self.custom_ranking_weights: Optional[Dict[str, float]] = None
         self.use_rxnmapper_check = QtWidgets.QCheckBox(
             "Use RXNMapper for unresolved or ambiguous queries"
         )
@@ -420,10 +522,11 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
 
         self.results_table = QtWidgets.QTableWidget()
         self.results_table.setObjectName("recommendationTable")
-        self.results_table.setColumnCount(9)
+        self.results_table.setColumnCount(10)
         self.results_table.setHorizontalHeaderLabels(
             [
                 "Rank",
+                "Default rank",
                 "Score",
                 "Similarity",
                 "Compatibility",
@@ -447,7 +550,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.results_table.setSortingEnabled(True)
         header = self.results_table.horizontalHeader()
         header.setSectionResizeMode(
-            7,
+            8,
             QtWidgets.QHeaderView.ResizeMode.Stretch,
         )
 
@@ -505,6 +608,12 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         options.addWidget(self.use_rxnmapper_check)
         options.addStretch()
         form.addRow("Options:", options)
+        ranking_options = QtWidgets.QHBoxLayout()
+        ranking_options.addWidget(self.ranking_profile_combo)
+        ranking_options.addWidget(self.customize_ranking_button)
+        ranking_options.addWidget(self.ranking_profile_status)
+        ranking_options.addStretch()
+        form.addRow("Ranking priorities:", ranking_options)
         layout.addLayout(form)
 
         buttons = QtWidgets.QHBoxLayout()
@@ -594,6 +703,12 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.example_button.clicked.connect(self.load_example)
         self.clear_button.clicked.connect(self.clear_results)
         self.export_button.clicked.connect(self.export_json)
+        self.ranking_profile_combo.currentIndexChanged.connect(
+            self._ranking_profile_changed
+        )
+        self.customize_ranking_button.clicked.connect(
+            self.customize_ranking_priorities
+        )
         self.results_table.itemSelectionChanged.connect(
             self._show_selected_details
         )
@@ -612,6 +727,43 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         if path:
             self.data_path_edit.setText(path)
             self._update_data_summary()
+
+    @QtCore.pyqtSlot(int)
+    def _ranking_profile_changed(self, _index: int) -> None:
+        profile_id = str(self.ranking_profile_combo.currentData() or "default")
+        profile = self.ranking_profiles.get(profile_id, {})
+        self.ranking_profile_combo.setToolTip(
+            str(profile.get("description") or "")
+        )
+        self.custom_ranking_weights = None
+        self.ranking_profile_status.setText("Preset weights")
+
+    @QtCore.pyqtSlot()
+    def customize_ranking_priorities(self) -> None:
+        profile_id = str(self.ranking_profile_combo.currentData() or "default")
+        base = resolve_ranking_preferences(
+            ChemistRankingPreferences(profile_id=profile_id)
+        )
+        dialog = RankingPreferencesDialog(
+            self.custom_ranking_weights or base.weights,
+            parent=self,
+        )
+        if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+            return
+        self.custom_ranking_weights = dialog.weights
+        self.ranking_profile_status.setText("Custom normalized weights")
+
+    def _ranking_preferences(self) -> ChemistRankingPreferences:
+        profile_id = str(self.ranking_profile_combo.currentData() or "default")
+        return ChemistRankingPreferences(
+            profile_id=(
+                f"{profile_id}:custom"
+                if self.custom_ranking_weights
+                else profile_id
+            ),
+            weights=dict(self.custom_ranking_weights or {}),
+            customized=bool(self.custom_ranking_weights),
+        )
 
     @QtCore.pyqtSlot()
     def _update_data_summary(self) -> None:
@@ -727,6 +879,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 self.unrestricted_fallback_check.isChecked()
             ),
             use_rxnmapper=self.use_rxnmapper_check.isChecked(),
+            ranking_preferences=self._ranking_preferences(),
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
@@ -774,6 +927,11 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         for row, recommendation in enumerate(recommendations):
             values = (
                 str(recommendation.rank),
+                (
+                    str(recommendation.default_rank)
+                    if recommendation.default_rank is not None
+                    else "—"
+                ),
                 f"{recommendation.score:.3f}",
                 f"{recommendation.similarity_score:.3f}",
                 f"{recommendation.compatibility_score:.3f}",
@@ -798,7 +956,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.results_table.setSortingEnabled(True)
         self.results_table.resizeColumnsToContents()
         self.results_table.horizontalHeader().setSectionResizeMode(
-            7,
+            8,
             QtWidgets.QHeaderView.ResizeMode.Stretch,
         )
         self.status_label.setText(
@@ -915,6 +1073,12 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         partner_summaries = _partner_analysis_summaries(reaction_partners)
         lines = [
             f"Rank {recommendation.rank}",
+            (
+                f"Default rank {recommendation.default_rank}; "
+                f"rank change {recommendation.rank_change:+d}"
+                if recommendation.default_rank is not None
+                else "Default rank unavailable"
+            ),
             "",
             "Displayed precedent context",
             (
@@ -962,6 +1126,11 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                     f"{recommendation.compatibility_score:.3f}"
                 ),
                 (
+                    f"Default score: {recommendation.default_score:.3f}"
+                    if recommendation.default_score is not None
+                    else "Default score: unavailable"
+                ),
+                (
                     f"Support: {recommendation.support} reaction(s), "
                     f"{recommendation.reference_support} reference(s), "
                     f"{recommendation.dataset_support} dataset(s)"
@@ -973,6 +1142,51 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 f"Evidence-weighted expected yield: "
                 f"{recommendation.expected_yield_pct:.1f}%"
             )
+        trace = recommendation.score_trace
+        lines.extend(("", f"Ranking profile: {trace.ranking_profile}", "Score factors"))
+        for component, weight in trace.applied_ranking_weights.items():
+            value = trace.ranking_components.get(component)
+            contribution = trace.ranking_contributions.get(component, 0.0)
+            value_text = "unavailable" if value is None else f"{value:.3f}"
+            lines.append(
+                f"• {_RANKING_COMPONENT_LABELS.get(component, _display_name(component))}: "
+                f"value {value_text}; weight {weight:.3f}; "
+                f"contribution {contribution:.3f}"
+            )
+        partner_evidence = recommendation.factor_evidence.get(
+            "partner_category", {}
+        )
+        query_categories = tuple(partner_evidence.get("query_categories") or ())
+        if query_categories:
+            lines.extend(("", "Reactant-category evidence"))
+            lines.append("• Query: " + ", ".join(query_categories))
+            for assessment in partner_evidence.get("precedent_assessments") or ():
+                precedent_categories = tuple(
+                    assessment.get("precedent_categories") or ()
+                )
+                lines.append(
+                    "• Precedent "
+                    f"{assessment.get('evidence_id')}: "
+                    + (", ".join(precedent_categories) or "unavailable")
+                    + (
+                        f" (score {assessment.get('score'):.3f})"
+                        if assessment.get("score") is not None
+                        else ""
+                    )
+                )
+        tolerance = recommendation.factor_evidence.get(
+            "functional_group_tolerance", {}
+        )
+        tolerance_groups = tuple(tolerance.get("groups") or ())
+        if tolerance_groups:
+            lines.extend(("", "Functional-group tolerance evidence"))
+            for group in tolerance_groups:
+                lines.append(
+                    f"• {group.get('chemist_label') or group.get('group_id')}: "
+                    f"{_display_name(group.get('status'))}; "
+                    f"{group.get('matched_independent_count', 0)} independent "
+                    "precedent(s)"
+                )
         if recommendation.explanation:
             lines.extend(("", "Why this recipe"))
             lines.extend(f"• {value}" for value in recommendation.explanation)

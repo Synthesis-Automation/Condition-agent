@@ -437,7 +437,7 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
         "compatibility": "1.1",
         "retrieval": "1.8",
         "similarity": "1.0",
-        "ranking": "1.0",
+        "ranking": "1.1",
         "evidence_support": "1.0",
     }
     assert (output / "evaluation_report.json").is_file()

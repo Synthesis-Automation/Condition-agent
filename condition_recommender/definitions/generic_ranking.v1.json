@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "generic_ranking.v1",
   "calibration_status": "calibrated_sample_v1",
   "maximum_independent_neighbors": 50,
@@ -13,6 +13,8 @@
   "missing_yield_policy": "renormalize_available_components",
   "weights": {
     "similarity": 0.45,
+    "partner_category": 0.00,
+    "functional_group_tolerance": 0.00,
     "yield": 0.15,
     "independent_support": 0.15,
     "reaction_breadth": 0.08,
@@ -23,6 +25,8 @@
   "evaluation_baseline_weights": {
     "transformation_prior": {
       "similarity": 0.00,
+      "partner_category": 0.00,
+      "functional_group_tolerance": 0.00,
       "yield": 0.10,
       "independent_support": 0.35,
       "reaction_breadth": 0.20,
@@ -32,6 +36,8 @@
     },
     "legacy_pilot": {
       "similarity": 0.65,
+      "partner_category": 0.00,
+      "functional_group_tolerance": 0.00,
       "yield": 0.20,
       "independent_support": 0.10,
       "reaction_breadth": 0.00,

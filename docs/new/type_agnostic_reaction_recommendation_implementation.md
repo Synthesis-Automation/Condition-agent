@@ -1,7 +1,7 @@
 # Type-Agnostic Reaction Recommendation: Implementation Status and Roadmap
 
 **Status:** Consolidated implementation reference  
-**Reviewed against code, definitions, tests, and local artifacts:** 2026-08-03
+**Reviewed against code, definitions, tests, and local artifacts:** 2026-08-04
 **Companion design:** 
 [`reaction_condition_recommendation_design_for_chemists.md`](reaction_condition_recommendation_design_for_chemists.md)
 
@@ -57,7 +57,7 @@ reactive_taxonomy       condition_registry
 | Reactivity descriptors | Optional annotation | Typed context-aware molecular profiles are available above structural observation and do not affect core or signature identity |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
-| Generic index | Implemented | Separate version-checked trusted and trusted-plus-review-core indexes with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys |
+| Generic index | Implemented | Separate version-checked trusted and trusted-plus-review-core indexes with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys; SQLite is the default lazy runtime format and compressed JSON remains a parity artifact |
 | Generic retrieval | Implemented pilot | Explicit verified-signature ladder, robust reaction-core shape tier, conservative unsigned-query core and all-hypothesis routes, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
 | Source-supported partial transformations | Implemented, review-qualified | Product-observed attachment replacement may retrieve only exact partial transformations whose precedent conditions have a curated source capability |
 | Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback for other unsigned queries; not represented as verified edit retrieval |
@@ -97,9 +97,12 @@ The current code declares:
 | Shared chemist review summary | `3.0` |
 | Recommendation artifact workflow | `2.0` |
 | Generic persisted index | `6.0` |
-| Generic recommendation result | `3.0` |
-| Reaction correspondence definitions | `2.3` |
+| SQLite index storage | `1.0` |
+| Generic recommendation result | `3.1` |
+| Reaction correspondence definitions | `2.5` |
 | Generic retrieval definition | `1.8` |
+| Generic ranking definition | `1.1` |
+| Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v3@1.0` |
 | Evidence-support policy | `evidence_support.v1@1.0` |
 | Generic held-out evaluation | `generic_leakage_safe.v1.5` |
@@ -115,27 +118,36 @@ silently mixing chemistry identities.
 ### 2.3 Current local literature artifact
 
 The checked local artifact under `datasets/literature/` was rebuilt on
-2026-08-03 from the two intermediate Hofmann-rearrangement and
-Julia–Kocienski observation files with RXNMapper review evidence enabled. It
-is a bounded 600-row development artifact, not a full source corpus.
+2026-08-04 in full mode from 120 selected intermediate source-observation
+files. RXNMapper was disabled for this run. It is the current broad local
+development corpus, but its size and integrity do not establish recommendation
+accuracy or prove that every intended production source has been included.
 
 | Measurement | Count |
 | --- | ---: |
-| Source files / converted rows | 2 / 600 |
-| Trusted precedents | 175 |
-| Additional review-core precedents | 28 |
-| Expert-index precedents | 203 |
-| Query-eligible cores | 577 |
-| Trusted / review / query-only / blocked / unavailable cores | 174 / 28 / 375 / 21 / 2 |
+| Source files / converted rows | 120 / 59,360 |
+| Signature-bearing observations | 42,324 |
+| Trusted indexed precedents | 38,883 |
+| Additional review-core precedents | 0 |
+| Expert-index precedents | 38,883 |
+| Query-eligible cores | 42,358 |
+| Trusted-core / query-only / blocked / unavailable cores | 38,050 / 4,308 / 117 / 16,885 |
+| Verified / review / rejected admission rows | 25,768 / 15,171 / 18,421 |
 
-The sharded conversion and both index integrity reports record zero failures,
-zero duplicate observations, and current schema-10.0 records/schema-6.0
-indexes. The default app path resolves the 175-row trusted index; expert mode
-resolves the paired 203-row index. The previous 209-row count was not retained:
-34 rows had been promoted because structured condition data bypassed chemistry
-eligibility. Admission policy v4 removes that violation.
+The 147-shard conversion report records zero failed shards and zero duplicate
+observations. The default SQLite index validates as schema 6.0 with storage
+schema 1.0 and 38,883 rows. The application selects
+`generic_index.sqlite` by default and expert mode resolves the paired
+`generic_review_index.sqlite`; this run has no additional review-core
+precedents because external mapping was disabled. Compressed JSON indexes are
+retained temporarily for runtime-parity validation and fallback loading.
 
-The 577 query-core count is deliberately not a precedent count. Query-only
+The checked `recommendation_artifacts_report.json` was generated before the
+SQLite runtime artifacts were added and still identifies the compressed JSON
+files as the fast indexes. Regenerate that report with the current artifact
+workflow before treating the directory as a release candidate.
+
+The 42,358 query-core count is deliberately not a precedent count. Query-only
 cores can describe a new query and seek compatible admitted precedents, but
 they do not make their own source rows safe condition precedents. These are
 coverage and integrity measurements, not recommendation-accuracy claims.
@@ -690,6 +702,48 @@ retrieval definitions. Recipes are aggregated by `RCORE1`, while `RCR1`
 variants, independent references, reference-local series, reaction breadth,
 dataset breadth, usable yields, missingness, and uncertainty remain visible.
 
+Chemists may now rerank the compatible recipe pool using a versioned named
+profile or custom non-negative priorities. This preference layer cannot alter
+parsing, admission, the retrieval ladder, minimum independent support, reaction
+compatibility, or hard condition-conflict exclusions. It changes only the
+ordering of recipes that have already passed those gates.
+
+The default profile preserves the preceding seven-factor behavior. Two new
+explicit factors have zero default weight and become active when requested:
+
+- `partner_category` compares compositional reacting-center categories derived
+  from the minimized reaction core, including element, hydrogen/substitution
+  state, and retained aliphatic, aryl, or acyl attachments. For example,
+  `secondary aliphatic amine` is distinct from `primary aryl amine`. These are
+  graph-derived descriptions, not named-reaction routing labels.
+- `functional_group_tolerance` compares unchanged query
+  `spectator_groups` with directly observed unchanged groups in each precedent.
+  Matches nearer the reaction center receive more weight through the declared
+  graph-distance decay. Absence of a group in a precedent is reported as
+  `unknown_not_tolerant`; it is never converted into positive tolerance
+  evidence.
+
+The complete rank is the normalized weighted sum of available factors:
+
+| Factor | What raises it |
+| --- | --- |
+| `similarity` | Closer edits, handles, topology, partners, and local environment |
+| `partner_category` | Closer reacting-center category and retained attachment classes |
+| `functional_group_tolerance` | Direct precedents containing the same unchanged query spectator groups, especially near the center |
+| `yield` | Higher similarity-weighted usable precedent outcomes |
+| `independent_support` | More independent publications or canonical reactions |
+| `reaction_breadth` | More distinct canonical precedent reactions |
+| `dataset_diversity` | Evidence reproduced across more source datasets |
+| `compatibility` | Fewer soft recipe-compatibility cautions after hard filtering |
+| `condition_certainty` | Resolved identities and unambiguous stage assignment |
+
+If a requested factor is unavailable, its applied weight is zero and the
+remaining available weights are renormalized. Every returned recipe reports
+the selected preference definition and effective weights, factor values and
+contributions, partner-category and spectator-tolerance evidence, its default
+score/rank, and `rank_change`. This makes a custom ordering reversible and
+directly comparable with the system default.
+
 The fallback descriptor and retrieval policy are separate from RS3 retrieval.
 They must return `recommendation_mode`, fallback evidence, stricter thresholds,
 and cautions. A structure-neighbor fallback must never be described as a
@@ -770,6 +824,46 @@ gate. The separate expert index admits only persisted, policy-qualified
 `review_core` rows. Consequently, external mapping may expand query and expert
 review coverage but does not manufacture trusted training evidence.
 
+### 4.1 Recommendation result contract and current example
+
+A recommendation accepts a complete product-specified reaction SMILES. It
+recommends conditions for that requested graph transformation; it does not
+predict the product or infer a reaction solely from a source name. Each result
+reports:
+
+- query validity, structural reaction label, optional named family,
+  transformation class, signature/core/fallback identities, and warnings;
+- recommendation mode, retrieval strategy and selected level, every attempted
+  tier, candidate counts, independent-support counts, compatibility exclusions,
+  and any typed abstention reason;
+- ranked canonical `RCORE1` recipe cores and the observed `RCR1` operating
+  variants, including resolved catalysts, ligands, bases, solvents, additives,
+  other contextual roles, stages, temperature, time, concentration, atmosphere,
+  quantities, identity confidence, and provenance when reported;
+- total score, reaction similarity, recipe compatibility, usable-outcome-based
+  expected yield, support by observation/reaction/series/reference/dataset, and
+  the full score trace with definition versions; and
+- precedent reaction and reference IDs, precedent reaction context, matching
+  evidence, explanation text, cautions, and uncertainty.
+
+Missing operating data remain `null`; the recommender does not invent
+quantities, temperature, time, concentration, atmosphere, or yield. An expected
+yield is an aggregate of usable precedent outcomes, not a guaranteed result.
+An empty recommendation list or typed error is a valid abstention.
+
+As a current end-to-end smoke example, the query
+`Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1` against the checked trusted
+SQLite index gives the structural label `Ar-Br + Ar-B(OH)2 -> Ar-Ar`, retains
+`named_family=None`, and selects `exact_signature` retrieval. The selected pool
+contains 75 compatible candidates representing 73 independent support units.
+The top recipe core contains tetrakis(triphenylphosphine)palladium, potassium
+carbonate, and toluene/ethanol/water. It scores 0.784026, has an aggregated
+expected yield of 80.96%, and is supported by five independent references.
+Its temperature, time, quantities, and concentration are unreported, and the
+result cautions that precedent edits use deterministic inferred atom
+correspondence. This is an auditable condition suggestion, not yet a complete
+laboratory procedure or production-accuracy claim.
+
 ## 5. What is not complete
 
 ### 5.1 Production validation
@@ -782,8 +876,9 @@ production validation is not complete:
   chemist-review packet and signed adjudication summary;
 - the untouched-test gate has not been demonstrated against the current
   contracts and definitions;
-- the checked literature artifact is based on a per-dataset bounded sample,
-  not the full source corpus;
+- the checked literature artifact is a broad full-mode local conversion, but
+  the intended production source inventory has not been frozen or proven
+  complete;
 - no broad production-accuracy claim is justified.
 
 ### 5.2 Chemistry and data coverage
@@ -898,6 +993,12 @@ regression; the review and numerical evidence support release.
 
 ### Gate 5: Convert and validate the full source corpus
 
+The current 59,360-row, 120-source full-mode local conversion satisfies the
+mechanical shard and duplicate checks for the selected inputs. Gate 5 remains
+open: source-corpus completeness has not been frozen, the current run did not
+use external mapping, its artifact report predates the SQLite runtime build,
+and the performance and human release gates have not passed.
+
 1. Freeze contract and definition versions.
 2. Convert the full source corpus in restartable deterministic shards.
 3. Preserve source checksums and all artifact provenance.
@@ -911,16 +1012,22 @@ plus human release gates pass.
 
 ### Gate 6: Consolidate public paths
 
-After parity and release evidence:
+The package-level consolidation is complete: the generic structure-backed
+workflow is canonical, and the former expert-rule and weak-label recommenders
+have been removed. Remaining work is documentation and legacy-application
+containment:
 
-1. make the generic structure-backed workflow the canonical application path;
-2. retain expert rules only as explicitly identified reviewed protocols or
-   integrate them as provenance-preserving overlays;
-3. retire weak-label or legacy paths when their remaining use cases have a
-   validated replacement;
-4. remove migrated duplicate logic rather than maintaining parallel behavior;
-5. update application and package READMEs to point to these two consolidated
-   documents.
+1. move any still-useful historical expert-rule and weak-label rationale out of
+   the active package README or archive it explicitly;
+2. remove migrated duplicate logic rather than maintaining parallel behavior;
+3. remove or isolate legacy `chemtools` application paths after their
+   user-facing replacement is demonstrated; and
+4. keep application and package READMEs pointed to the two consolidated
+   documents and the current generic API.
+
+**Pass condition:** every public application path invokes the generic workflow,
+and no active documentation advertises a removed recommender or executable
+command.
 
 ## 7. Chemistry expansion after the release gates
 
@@ -981,7 +1088,7 @@ python -m condition_recommender.conversion_integrity_cli `
   datasets/literature/shard_manifest.json
 
 python -m condition_recommender.generic_index_integrity_cli `
-  datasets/literature/generic_index.json.gz
+  datasets/literature/generic_index.sqlite
 ```
 
 For a new release candidate, generate and adjudicate the chemist packet using

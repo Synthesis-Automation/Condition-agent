@@ -13,6 +13,7 @@ from .generic_api import (
 )
 from .models import (
     AdmissionTier,
+    ChemistRankingPreferences,
     ChemistryStatus,
     ConditionIdentity,
     ConditionStageStatus,
@@ -30,9 +31,15 @@ from .models import (
     RecommendationScoreTrace,
     RetrievalLevelTrace,
 )
+from .ranking_preferences import (
+    available_ranking_profiles,
+    load_chemist_ranking_profiles,
+    resolve_ranking_preferences,
+)
 
 __all__ = [
     "AdmissionTier",
+    "ChemistRankingPreferences",
     "ChemistryStatus",
     "ConditionStatus",
     "ConditionStageStatus",
@@ -52,9 +59,12 @@ __all__ = [
     "RecommendationRecord",
     "RecommendationScoreTrace",
     "RetrievalLevelTrace",
+    "available_ranking_profiles",
     "evaluate_reaction_core_index",
     "recommend_generic_conditions",
     "recommend_indexed_signature",
+    "load_chemist_ranking_profiles",
+    "resolve_ranking_preferences",
     "assess_recipe_compatibility",
     "assess_core_eligibility",
 ]

@@ -12,6 +12,7 @@ from reactive_taxonomy import (
 )
 
 from condition_recommender import (
+    ChemistRankingPreferences,
     GenericConditionRecommender,
     recommend_generic_conditions,
 )
@@ -41,6 +42,7 @@ from condition_recommender.recipe_ranking import (
     load_generic_ranking_rules,
     validate_generic_ranking_rules,
 )
+from condition_recommender.ranking_preferences import RANKING_COMPONENTS
 from condition_recommender.similarity import (
     assess_signature_similarity,
     load_generic_similarity_rules,
@@ -942,6 +944,113 @@ def test_condition_uncertainty_is_an_explicit_ranking_component() -> None:
     )
 
 
+def test_chemist_reactant_category_priority_reranks_with_audit_trace() -> None:
+    query_reaction = "Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1"
+    aryl_amine_reaction = (
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+    )
+    query_analysis = featurize_reaction(query_reaction)
+    aryl_analysis = featurize_reaction(aryl_amine_reaction)
+    assert query_analysis.reaction_signature is not None
+    assert query_analysis.reaction_core is not None
+    assert aryl_analysis.reaction_signature is not None
+    assert aryl_analysis.reaction_core is not None
+
+    def precedent(
+        index: int,
+        analysis,
+        *,
+        recipe_core_id: str,
+        yield_pct: float,
+    ) -> dict:
+        record = _record(index, asdict(analysis.reaction_signature))
+        recipe_id = recipe_core_id.replace("RCORE", "RCR")
+        record.update(
+            {
+                "reaction_smiles": (
+                    query_reaction
+                    if analysis is query_analysis
+                    else aryl_amine_reaction
+                ),
+                "reaction_core": asdict(analysis.reaction_core),
+                "yield_pct": yield_pct,
+                "resolved_recipe_id": recipe_id,
+                "resolved_recipe_core_id": recipe_core_id,
+                "resolved_recipe": {
+                    "recipe_id": recipe_id,
+                    "recipe_core_id": recipe_core_id,
+                },
+            }
+        )
+        return record
+
+    records = [
+        precedent(
+            0,
+            query_analysis,
+            recipe_core_id="RCORE:aliphatic",
+            yield_pct=10.0,
+        ),
+        *[
+            precedent(
+                index,
+                aryl_analysis,
+                recipe_core_id="RCORE:aryl",
+                yield_pct=99.0,
+            )
+            for index in range(1, 4)
+        ],
+    ]
+    result = recommend_indexed_signature(
+        asdict(query_analysis.reaction_signature),
+        build_generic_index(records),
+        reaction_core=asdict(query_analysis.reaction_core),
+        minimum_pool_size=2,
+        ranking_preferences=ChemistRankingPreferences(
+            profile_id="reactant_category"
+        ),
+    )
+
+    assert result.valid
+    assert result.retrieval_level == "transformation_signature"
+    assert result.ranking_preferences["profile_id"] == "reactant_category"
+    recommendation = result.recommendations[0]
+    assert recommendation.recipe_core_id == "RCORE:aliphatic"
+    assert recommendation.default_rank == 2
+    assert recommendation.rank_change == 1
+    assert (
+        recommendation.score_trace.ranking_components["partner_category"]
+        == 1.0
+    )
+    evidence = recommendation.factor_evidence["partner_category"]
+    assert "secondary aliphatic amine" in evidence["query_categories"]
+    assert recommendation.score_trace.default_ranking_contributions
+
+
+def test_unavailable_exclusive_custom_factor_has_zero_contribution() -> None:
+    weights = {name: 0.0 for name in RANKING_COMPONENTS}
+    weights["functional_group_tolerance"] = 1.0
+    result = recommend_indexed_signature(
+        _signature("query"),
+        build_generic_index([_record(0, _signature("precedent"))]),
+        minimum_pool_size=1,
+        ranking_preferences=ChemistRankingPreferences(
+            profile_id="tolerance-only",
+            weights=weights,
+            customized=True,
+        ),
+    )
+
+    assert result.valid
+    recommendation = result.recommendations[0]
+    assert recommendation.score == 0.0
+    assert not any(recommendation.score_trace.applied_ranking_weights.values())
+    assert any(
+        "No unchanged query functional groups" in caution
+        for caution in recommendation.cautions
+    )
+
+
 def test_unassigned_multistage_ingredient_set_is_ranked_with_caution() -> None:
     record = _record(0, _signature("unassigned-stage"))
     record["condition_stage_status"] = "unassigned_multistage"
@@ -1116,7 +1225,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.compatible_candidate_count >= 1
     assert result.compatible_candidate_count <= result.candidate_count
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "3.0"
+    assert result.schema_version == "3.1"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

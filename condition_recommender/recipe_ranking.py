@@ -12,7 +12,20 @@ from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Tuple
 
 from .compatibility import CompatibilityAssessment
 from .generic_indexing import GenericIndexedReaction
-from .models import GenericConditionRecommendation, RecommendationScoreTrace
+from .models import (
+    ChemistRankingPreferences,
+    GenericConditionRecommendation,
+    RecommendationScoreTrace,
+)
+from .preference_scoring import (
+    aggregate_partner_category_evidence,
+    assess_functional_group_tolerance,
+)
+from .ranking_preferences import (
+    RANKING_COMPONENTS,
+    normalize_ranking_weights,
+    resolve_ranking_preferences,
+)
 from .similarity import (
     SimilarityAssessment,
     assess_signature_similarity,
@@ -26,16 +39,8 @@ from .support import (
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_ranking.v1.json"
 _DEFINITION_ID = "generic_ranking.v1"
-_SCHEMA_VERSION = "1.0"
-_RANKING_COMPONENTS = (
-    "similarity",
-    "yield",
-    "independent_support",
-    "reaction_breadth",
-    "dataset_diversity",
-    "compatibility",
-    "condition_certainty",
-)
+_SCHEMA_VERSION = "1.1"
+_RANKING_COMPONENTS = RANKING_COMPONENTS
 
 
 @dataclass(frozen=True)
@@ -134,14 +139,9 @@ def _normalize_component_weights(
     *,
     label: str,
 ) -> Dict[str, float]:
-    if not isinstance(weights, Mapping) or set(weights) != set(_RANKING_COMPONENTS):
-        raise ValueError(f"{label} weights do not match component vocabulary")
-    normalized = {str(key): float(value) for key, value in weights.items()}
-    if any(value < 0.0 for value in normalized.values()):
-        raise ValueError(f"{label} weights must be non-negative")
-    if abs(sum(normalized.values()) - 1.0) > 1e-9:
-        raise ValueError(f"{label} weights must sum to one")
-    return normalized
+    if not isinstance(weights, Mapping):
+        raise ValueError(f"{label} weights must be an object")
+    return normalize_ranking_weights(weights, label=label)
 
 
 def validate_generic_ranking_rules(rules: Mapping[str, Any]) -> None:
@@ -237,6 +237,9 @@ def _weighted_score(
 ) -> tuple[float, Dict[str, float], Dict[str, float]]:
     available = {name: value for name, value in components.items() if value is not None}
     denominator = sum(float(base_weights[name]) for name in available)
+    if denominator <= 0.0:
+        empty = {name: 0.0 for name in _RANKING_COMPONENTS}
+        return 0.0, empty, empty
     applied = {
         name: (float(base_weights[name]) / denominator if name in available else 0.0)
         for name in _RANKING_COMPONENTS
@@ -330,6 +333,7 @@ def rank_condition_recipes(
     top_k: int,
     ranking_profile: str = "default",
     ranking_weights: Optional[Mapping[str, float]] = None,
+    ranking_preferences: ChemistRankingPreferences | None = None,
     similarity_assessor: Optional[
         Callable[
             [Mapping[str, Any], GenericIndexedReaction],
@@ -340,13 +344,14 @@ def rank_condition_recipes(
 ) -> Tuple[GenericConditionRecommendation, ...]:
     """Aggregate recipe cores and rank them with a complete score trace."""
     rules = load_generic_ranking_rules()
+    resolved_preferences = resolve_ranking_preferences(ranking_preferences)
     if ranking_weights is not None:
         ranking_weights = _normalize_component_weights(
             ranking_weights,
             label=f"generic ranking override {ranking_profile}",
         )
-    elif ranking_profile == "default":
-        ranking_weights = rules["weights"]
+    elif ranking_preferences is not None or ranking_profile == "default":
+        ranking_weights = resolved_preferences.weights
     else:
         profiles = rules.get("evaluation_baseline_weights") or {}
         if ranking_profile not in profiles:
@@ -418,8 +423,26 @@ def rank_condition_recipes(
             for member in independent
         )
         support = summarize_evidence_support(member.row for member in members)
+        partner_category_score, partner_category_evidence = (
+            aggregate_partner_category_evidence(
+                query_reaction_core,
+                (
+                    (evidence_unit(member.row), member.row.reaction_core)
+                    for member in independent
+                ),
+            )
+        )
+        tolerance_score, tolerance_evidence = assess_functional_group_tolerance(
+            query,
+            (
+                (evidence_unit(member.row), member.row.signature)
+                for member in independent
+            ),
+        )
         components: Dict[str, Optional[float]] = {
             "similarity": similarity_score,
+            "partner_category": partner_category_score,
+            "functional_group_tolerance": tolerance_score,
             "yield": expected_yield / 100.0 if expected_yield is not None else None,
             "independent_support": _saturated_log(
                 len(independent),
@@ -440,6 +463,10 @@ def rank_condition_recipes(
             components,
             ranking_weights,
         )
+        default_score, _, default_contributions = _weighted_score(
+            components,
+            rules["weights"],
+        )
         similarity_components, similarity_contributions = _mean_similarity_trace(
             independent
         )
@@ -447,6 +474,7 @@ def rank_condition_recipes(
         ranking_rows.append(
             (
                 score,
+                default_score,
                 expected_yield,
                 recipe_core_id,
                 members,
@@ -462,14 +490,30 @@ def rank_condition_recipes(
                 ranking_contributions,
                 similarity_components,
                 similarity_contributions,
+                default_contributions,
+                {
+                    "partner_category": partner_category_evidence,
+                    "functional_group_tolerance": tolerance_evidence,
+                },
             )
         )
 
+    default_order = sorted(
+        ranking_rows,
+        key=lambda item: (
+            -item[1],
+            -(item[2] if item[2] is not None else -1.0),
+            item[3],
+        ),
+    )
+    default_ranks = {
+        item[3]: rank for rank, item in enumerate(default_order, start=1)
+    }
     ranking_rows.sort(
         key=lambda item: (
             -item[0],
-            -(item[1] if item[1] is not None else -1.0),
-            item[2],
+            -(item[2] if item[2] is not None else -1.0),
+            item[3],
         )
     )
     recommendations = []
@@ -477,6 +521,7 @@ def rank_condition_recipes(
     for rank, item in enumerate(ranking_rows[:top_k], start=1):
         (
             score,
+            default_score,
             expected_yield,
             recipe_core_id,
             members,
@@ -492,6 +537,8 @@ def rank_condition_recipes(
             ranking_contributions,
             similarity_components,
             similarity_contributions,
+            default_ranking_contributions,
+            factor_evidence,
         ) = item
         best = members[0]
         cautions = []
@@ -518,6 +565,35 @@ def rank_condition_recipes(
         if expected_yield is None:
             cautions.append(
                 "No usable yield evidence; ranking excludes the outcome component"
+            )
+        if (
+            ranking_weights.get("partner_category", 0.0) > 0.0
+            and components["partner_category"] is None
+        ):
+            cautions.append(
+                "Reactant-category evidence is unavailable; its weight was "
+                "renormalized over available factors"
+            )
+        if (
+            ranking_weights.get("functional_group_tolerance", 0.0) > 0.0
+            and components["functional_group_tolerance"] is None
+        ):
+            cautions.append(
+                "No unchanged query functional groups were available for "
+                "direct tolerance scoring"
+            )
+        unknown_tolerance = tuple(
+            str(group.get("chemist_label") or group.get("group_id") or "")
+            for group in (
+                factor_evidence.get("functional_group_tolerance", {}).get("groups")
+                or ()
+            )
+            if group.get("status") == "unknown_not_tolerant"
+        )
+        if unknown_tolerance:
+            cautions.append(
+                "No direct tolerance precedent for unchanged group(s): "
+                + ", ".join(unknown_tolerance)
             )
         if retrieval_level.endswith("limited_support"):
             cautions.append("Retrieval pool is below the configured support threshold")
@@ -633,8 +709,16 @@ def rank_condition_recipes(
                 best.compatibility.definition_id: (
                     best.compatibility.definition_version
                 ),
+                resolved_preferences.definition_id: (
+                    resolved_preferences.definition_version
+                ),
             },
-            ranking_profile=ranking_profile,
+            ranking_profile=(
+                resolved_preferences.profile_id
+                if ranking_preferences is not None or ranking_profile == "default"
+                else ranking_profile
+            ),
+            default_ranking_contributions=default_ranking_contributions,
         )
         recommendations.append(
             GenericConditionRecommendation(
@@ -684,6 +768,10 @@ def rank_condition_recipes(
                     precedent_scope=reaction_scope(best.row.signature),
                 ),
                 score_trace=score_trace,
+                default_rank=default_ranks[recipe_core_id],
+                default_score=round(default_score, 6),
+                rank_change=default_ranks[recipe_core_id] - rank,
+                factor_evidence=factor_evidence,
                 compatibility_evidence=compatibility_evidence,
                 cautions=tuple(cautions),
             )

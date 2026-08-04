@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "chemist_ranking_profiles.v1",
+  "default_profile_id": "default",
+  "profiles": {
+    "default": {
+      "label": "Balanced (current default)",
+      "description": "Preserves the calibrated generic ranking behavior.",
+      "weights": {
+        "similarity": 0.45,
+        "partner_category": 0.00,
+        "functional_group_tolerance": 0.00,
+        "yield": 0.15,
+        "independent_support": 0.15,
+        "reaction_breadth": 0.08,
+        "dataset_diversity": 0.05,
+        "compatibility": 0.08,
+        "condition_certainty": 0.04
+      }
+    },
+    "reactant_category": {
+      "label": "Closest reactant category",
+      "description": "Prioritizes matching reacting-center element, substitution, hydrogen state, and attached aliphatic/aryl classes.",
+      "weights": {
+        "similarity": 0.32,
+        "partner_category": 0.22,
+        "functional_group_tolerance": 0.08,
+        "yield": 0.10,
+        "independent_support": 0.12,
+        "reaction_breadth": 0.06,
+        "dataset_diversity": 0.03,
+        "compatibility": 0.05,
+        "condition_certainty": 0.02
+      }
+    },
+    "functional_group_tolerance": {
+      "label": "Functional-group tolerance",
+      "description": "Prioritizes direct precedent evidence for unchanged query functional groups.",
+      "weights": {
+        "similarity": 0.30,
+        "partner_category": 0.08,
+        "functional_group_tolerance": 0.25,
+        "yield": 0.08,
+        "independent_support": 0.12,
+        "reaction_breadth": 0.05,
+        "dataset_diversity": 0.03,
+        "compatibility": 0.07,
+        "condition_certainty": 0.02
+      }
+    },
+    "evidence": {
+      "label": "Evidence and reproducibility",
+      "description": "Prioritizes independent support, reaction breadth, and dataset diversity.",
+      "weights": {
+        "similarity": 0.30,
+        "partner_category": 0.05,
+        "functional_group_tolerance": 0.10,
+        "yield": 0.10,
+        "independent_support": 0.22,
+        "reaction_breadth": 0.10,
+        "dataset_diversity": 0.08,
+        "compatibility": 0.03,
+        "condition_certainty": 0.02
+      }
+    },
+    "yield": {
+      "label": "Expected yield",
+      "description": "Prioritizes similarity-weighted precedent outcomes while retaining chemistry and compatibility gates.",
+      "weights": {
+        "similarity": 0.30,
+        "partner_category": 0.05,
+        "functional_group_tolerance": 0.05,
+        "yield": 0.30,
+        "independent_support": 0.12,
+        "reaction_breadth": 0.05,
+        "dataset_diversity": 0.03,
+        "compatibility": 0.07,
+        "condition_certainty": 0.03
+      }
+    },
+    "procedure_completeness": {
+      "label": "Procedure completeness",
+      "description": "Prioritizes resolved condition identities and assigned operating stages.",
+      "weights": {
+        "similarity": 0.30,
+        "partner_category": 0.05,
+        "functional_group_tolerance": 0.10,
+        "yield": 0.10,
+        "independent_support": 0.12,
+        "reaction_breadth": 0.05,
+        "dataset_diversity": 0.03,
+        "compatibility": 0.08,
+        "condition_certainty": 0.17
+      }
+    }
+  },
+  "functional_group_tolerance": {
+    "distance_decay": 0.25,
+    "missing_evidence_status": "unknown_not_tolerant"
+  }
+}

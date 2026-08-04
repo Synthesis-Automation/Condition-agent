@@ -15,6 +15,8 @@ from .recipe_ranking import load_generic_ranking_rules
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_calibration.v1.json"
 _COMPONENTS = {
     "similarity",
+    "partner_category",
+    "functional_group_tolerance",
     "yield",
     "independent_support",
     "reaction_breadth",
@@ -37,7 +39,7 @@ def _validated_weights(weights: Any) -> Dict[str, float]:
 
 def validate_generic_calibration_rules(rules: Mapping[str, Any]) -> None:
     """Validate deterministic calibration candidates and promotion gates."""
-    if str(rules.get("schema_version") or "") != "1.0":
+    if str(rules.get("schema_version") or "") != "1.1":
         raise ValueError("unsupported generic calibration schema")
     if str(rules.get("definition_id") or "") != "generic_calibration.v1":
         raise ValueError("unexpected generic calibration definition ID")
