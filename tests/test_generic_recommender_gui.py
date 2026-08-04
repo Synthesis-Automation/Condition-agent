@@ -317,6 +317,40 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     assert window.status_label.text() == "Done — 1 recipe(s)"
 
 
+def test_row_header_selection_moves_stale_current_cell(qtbot) -> None:
+    window = gui.GenericRecommenderWindow()
+    qtbot.addWidget(window)
+    recommendations = tuple(
+        replace(
+            _recommendation(),
+            rank=rank,
+            recipe_id=f"RCR1:variant-{rank}",
+            recipe_core_id=f"RCORE1:core-{rank}",
+        )
+        for rank in range(1, 4)
+    )
+    window._render_result(
+        replace(_result(), recommendations=recommendations)
+    )
+    table = window.results_table
+    table.setCurrentCell(
+        0,
+        5,
+        gui.QtCore.QItemSelectionModel.SelectionFlag.NoUpdate,
+    )
+
+    selection_model = table.selectionModel()
+    selection_model.select(
+        table.model().index(2, 0),
+        gui.QtCore.QItemSelectionModel.SelectionFlag.ClearAndSelect
+        | gui.QtCore.QItemSelectionModel.SelectionFlag.Rows,
+    )
+
+    assert table.currentRow() == 2
+    assert table.currentColumn() == 0
+    assert {index.row() for index in table.selectedIndexes()} == {2}
+
+
 def test_query_summary_discloses_external_mapping_provenance() -> None:
     result = replace(
         _result(),

@@ -710,7 +710,32 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             self.customize_ranking_priorities
         )
         self.results_table.itemSelectionChanged.connect(
+            self._synchronize_results_current_cell
+        )
+        self.results_table.itemSelectionChanged.connect(
             self._show_selected_details
+        )
+
+    @QtCore.pyqtSlot()
+    def _synchronize_results_current_cell(self) -> None:
+        """Keep the current-cell highlight inside the selected recipe row.
+
+        Selecting a row through its vertical header changes the selection but
+        some Qt styles retain and paint the previous current cell. Moving the
+        current index without changing selection prevents that stale blue cell.
+        """
+        selection_model = self.results_table.selectionModel()
+        selected_rows = selection_model.selectedRows()
+        if len(selected_rows) != 1:
+            return
+        selected_row = selected_rows[0].row()
+        current = self.results_table.currentIndex()
+        if current.isValid() and current.row() == selected_row:
+            return
+        self.results_table.setCurrentCell(
+            selected_row,
+            0,
+            QtCore.QItemSelectionModel.SelectionFlag.NoUpdate,
         )
 
     @QtCore.pyqtSlot()
