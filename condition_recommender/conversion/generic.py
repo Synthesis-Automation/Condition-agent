@@ -19,8 +19,9 @@ from reactive_taxonomy import (
 )
 
 from ..condition_normalization import normalize_cas_list
+from ..core_eligibility import assess_core_eligibility
 from ..fragment_source_support import assess_fragment_source_support
-from ..models import ConditionIdentity, RecommendationRecord
+from ..models import ConditionIdentity, PrecedentTier, RecommendationRecord
 from .admission import decide_admission
 from .identities import canonical_reaction_identity, observation_id, raw_recipe_id
 from .input_schema import RawReactionRecord
@@ -249,6 +250,33 @@ def convert_record(
         resolved_recipe=resolved_recipe,
         fragment_source_support=fragment_source_support,
     )
+    signature_fields = signature_record_fields(analysis)
+    completeness_payload = (
+        asdict(analysis.reaction_completeness)
+        if analysis.reaction_completeness
+        else None
+    )
+    partial_payload = (
+        asdict(analysis.partial_product_transformation)
+        if analysis.partial_product_transformation
+        else None
+    )
+    external_mapping_payload = (
+        assessment.to_provenance_dict() if assessment is not None else None
+    )
+    core_eligibility = assess_core_eligibility(
+        {
+            "reaction_core": signature_fields.get("reaction_core"),
+            "warnings": analysis.warnings,
+            "index_eligibility": decision.index_eligibility,
+            "chemistry_status": decision.chemistry_status,
+            "condition_status": decision.condition_status,
+            "condition_stage_status": decision.condition_stage_status,
+            "reaction_completeness": completeness_payload,
+            "partial_product_transformation": partial_payload,
+            "external_atom_mapping": external_mapping_payload,
+        }
+    )
     condition_series_id = reference_condition_series_id(
         reference_id=reference_identity.reference_id,
         recipe_core_id=resolved_recipe.recipe_core_id,
@@ -323,6 +351,21 @@ def convert_record(
         condition_stage_status=decision.condition_stage_status,
         outcome_status=decision.outcome_status,
         index_eligibility=decision.index_eligibility,
+        precedent_tier=(
+            PrecedentTier.TRUSTED
+            if decision.index_eligibility.value == "eligible"
+            else (
+                PrecedentTier.REVIEW_CORE
+                if decision.index_eligibility.value == "review_only"
+                and core_eligibility.tier.value == "review_core"
+                else None
+            )
+        ),
+        core_eligibility=core_eligibility.tier,
+        core_eligibility_reasons=core_eligibility.reasons,
+        core_eligibility_definition_version=(
+            core_eligibility.definition_version
+        ),
         family_environment=asdict(analysis.family_environment)
         if analysis.family_environment
         else None,
@@ -330,16 +373,8 @@ def convert_record(
         if analysis.product_connection
         else None,
         spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
-        partial_product_transformation=(
-            asdict(analysis.partial_product_transformation)
-            if analysis.partial_product_transformation
-            else None
-        ),
-        reaction_completeness=(
-            asdict(analysis.reaction_completeness)
-            if analysis.reaction_completeness
-            else None
-        ),
+        partial_product_transformation=partial_payload,
+        reaction_completeness=completeness_payload,
         reaction_observation=(
             asdict(analysis.observation) if analysis.observation is not None else None
         ),
@@ -351,10 +386,8 @@ def convert_record(
         fragment_source_support=tuple(
             support.to_dict() for support in fragment_source_support
         ),
-        **signature_record_fields(analysis),
-        external_atom_mapping=(
-            assessment.to_provenance_dict() if assessment is not None else None
-        ),
+        **signature_fields,
+        external_atom_mapping=external_mapping_payload,
         source_dataset=record.source_dataset,
         source_path=record.source_path,
         source_declared_family=record.source_declared_family,

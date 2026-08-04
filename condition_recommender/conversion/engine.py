@@ -44,6 +44,14 @@ def _markdown(report: Dict[str, Any]) -> str:
             f"- Review: {report['tier_counts']['review']}",
             f"- Rejected: {report['tier_counts']['rejected']}",
             f"- Index eligible: {report['index_eligibility_counts']['eligible']}",
+            (
+                "- Qualified review cores: "
+                f"{report['core_eligibility_counts'].get('review_core', 0)}"
+            ),
+            (
+                "- Query-only cores: "
+                f"{report['core_eligibility_counts'].get('query_only', 0)}"
+            ),
             f"- Signature coverage: {report['signature_count']}/{report['row_count']}",
             (
                 "- External atom mapping: "
@@ -77,6 +85,7 @@ def convert_datasets(
     condition_stage_counts = Counter()
     outcome_quality_counts = Counter()
     index_eligibility_counts = Counter()
+    core_eligibility_counts = Counter()
     reason_counts = Counter()
     evidence_counts = Counter()
     completeness_counts = Counter()
@@ -135,6 +144,7 @@ def convert_datasets(
                 condition_stage_counts[record.condition_stage_status.value] += 1
                 outcome_quality_counts[record.outcome_status.value] += 1
                 index_eligibility_counts[record.index_eligibility.value] += 1
+                core_eligibility_counts[record.core_eligibility.value] += 1
                 reason_counts.update(record.admission_reasons)
                 evidence_counts[record.evidence_quality] += 1
                 if record.external_atom_mapping is not None:
@@ -223,6 +233,9 @@ def convert_datasets(
             status.value: index_eligibility_counts[status.value]
             for status in IndexEligibility
         },
+        "core_eligibility_counts": dict(
+            sorted(core_eligibility_counts.items())
+        ),
         "reason_counts": dict(sorted(reason_counts.items())),
         "evidence_quality_counts": dict(sorted(evidence_counts.items())),
         "external_atom_mapping": {

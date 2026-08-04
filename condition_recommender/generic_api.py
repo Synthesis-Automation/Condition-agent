@@ -39,7 +39,7 @@ from .hypothesis_retrieval import (
     load_edit_hypothesis_retrieval_rules,
     retrieve_hypothesis_consensus_pool_with_trace,
 )
-from .models import GenericRecommendationResult
+from .models import GenericRecommendationResult, PrecedentIndexScope
 from .recipe_ranking import rank_condition_recipes
 
 
@@ -210,6 +210,7 @@ class GenericConditionRecommender:
     index: GenericReactionIndex
     source_path: str = ""
     mapping_provider: AtomMappingProvider | None = None
+    includes_review_precedents: bool = False
 
     @classmethod
     def from_path(
@@ -217,12 +218,38 @@ class GenericConditionRecommender:
         path: str | Path,
         *,
         mapping_provider: AtomMappingProvider | None = None,
+        include_review: bool = False,
     ) -> "GenericConditionRecommender":
         source = Path(path)
+        index_source = source
+        if include_review and source.name.casefold() == "generic_index.json.gz":
+            index_source = source.with_name("generic_review_index.json.gz")
+            if not index_source.is_file():
+                raise FileNotFoundError(
+                    "Review-core index is unavailable. Rebuild recommendation "
+                    "artifacts to create generic_review_index.json.gz."
+                )
+        index = (
+            load_generic_index(index_source, include_review=True)
+            if include_review
+            else load_generic_index(index_source)
+        )
+        expected_scope = (
+            PrecedentIndexScope.TRUSTED_AND_REVIEW_CORE
+            if include_review
+            else PrecedentIndexScope.TRUSTED
+        )
+        if index.precedent_scope != expected_scope:
+            raise ValueError(
+                f"Index scope is {index.precedent_scope.value!r}, expected "
+                f"{expected_scope.value!r}; select the matching mode or rebuild "
+                "recommendation artifacts."
+            )
         return cls(
-            index=load_generic_index(source),
+            index=index,
             source_path=str(source),
             mapping_provider=mapping_provider,
+            includes_review_precedents=include_review,
         )
 
     def recommend(
@@ -234,7 +261,7 @@ class GenericConditionRecommender:
         unrestricted_fallback: bool = False,
     ) -> GenericRecommendationResult:
         """Featurize a query and recommend without reloading the index."""
-        return _recommend_with_index(
+        result = _recommend_with_index(
             reaction_smiles,
             self.index,
             top_k=top_k,
@@ -242,6 +269,19 @@ class GenericConditionRecommender:
             unrestricted_fallback=unrestricted_fallback,
             mapping_provider=self.mapping_provider,
         )
+        if self.includes_review_precedents:
+            result = replace(
+                result,
+                warnings=tuple(
+                    dict.fromkeys(
+                        (
+                            *result.warnings,
+                            "UNRESTRICTED_CORE_REVIEW_INDEX_ENABLED",
+                        )
+                    )
+                ),
+            )
+        return result
 
 
 def _recommend_with_index(
@@ -886,6 +926,7 @@ def recommend_generic_conditions(
     recommender = GenericConditionRecommender.from_path(
         records_path,
         mapping_provider=mapping_provider,
+        include_review=unrestricted_fallback,
     )
     return recommender.recommend(
         reaction_smiles,

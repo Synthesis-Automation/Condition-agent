@@ -112,8 +112,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "9.1"
-    assert record.converter_definition_version == "generic_conversion.v9.1"
+    assert record.schema_version == "10.0"
+    assert record.converter_definition_version == "generic_conversion.v10.0"
     assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
@@ -641,7 +641,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "11.1"
+    assert report["schema_version"] == "12.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(

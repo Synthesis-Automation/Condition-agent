@@ -560,9 +560,17 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             )
             if report["eligible_index_record_count"] is not None:
                 self._append_status(
-                    "  Recommendation-eligible precedents: "
+                    "  Trusted recommendation precedents: "
                     f"{report['eligible_index_record_count']}"
                 )
+            self._append_status(
+                "  Qualified review-core precedents: "
+                f"{report.get('review_core_precedent_count', 0)}"
+            )
+            self._append_status(
+                "  Query-core eligible reactions: "
+                f"{report.get('query_core_eligible_count', 0)}"
+            )
             for warning in report.get("warnings") or ():
                 self._append_status(f"Warning: {warning}")
         else:

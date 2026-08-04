@@ -495,6 +495,14 @@ def rank_condition_recipes(
         ) = item
         best = members[0]
         cautions = []
+        if any(
+            member.row.precedent_tier.value == "review_core"
+            for member in members
+        ):
+            cautions.append(
+                "Recipe support includes core-qualified review precedents; "
+                "expert review is required"
+            )
         if condition_certainty < 1.0:
             cautions.append(
                 "Condition identity, contextual role, or stage assignment is uncertain"

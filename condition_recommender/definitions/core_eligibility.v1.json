@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "core_eligibility.v1",
+  "allowed_query_evidence_statuses": ["verified", "inferred", "external"],
+  "indexable_condition_statuses": ["resolved_complete", "unresolved_retained"],
+  "indexable_stage_statuses": ["single_stage", "structured_multistage"],
+  "review_mapping_statuses": ["external_mapping_internal_consensus"],
+  "blocking_warnings": [
+    "REACTION_CORE_NO_OP_PRIMARY_CENTER",
+    "REACTION_CORE_QUALITY_BLOCKED",
+    "EXTERNAL_MAPPING_HYPOTHESIS_CONFLICT",
+    "EXTERNAL_MAPPING_SIGNATURE_CONFLICT",
+    "EXTERNAL_MAPPING_AMBIGUOUS_HYPOTHESIS_MATCH"
+  ],
+  "mapper_supported_unresolved_requirements": {
+    "mapping_status": "external_mapping_internal_consensus",
+    "minimum_product_mapping_coverage": 1.0,
+    "require_no_product_element_excess": true,
+    "require_no_suspected_missing_reactant": true,
+    "require_no_suspected_multiplicity_problem": true
+  },
+  "review_core_requires_expert_review": true
+}

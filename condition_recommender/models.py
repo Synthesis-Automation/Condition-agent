@@ -7,8 +7,9 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "9.1"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v9.1"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.0"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.0"
+CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 
 
 class AdmissionTier(str, Enum):
@@ -53,6 +54,30 @@ class IndexEligibility(str, Enum):
     ELIGIBLE = "eligible"
     REVIEW_ONLY = "review_only"
     INELIGIBLE = "ineligible"
+
+
+class CoreEligibility(str, Enum):
+    """Trust tier for using a reaction core in recommendation."""
+
+    TRUSTED_CORE = "trusted_core"
+    REVIEW_CORE = "review_core"
+    QUERY_ONLY = "query_only"
+    BLOCKED = "blocked"
+    UNAVAILABLE = "unavailable"
+
+
+class PrecedentTier(str, Enum):
+    """Authority granted to one indexed condition precedent."""
+
+    TRUSTED = "trusted"
+    REVIEW_CORE = "review_core"
+
+
+class PrecedentIndexScope(str, Enum):
+    """Precedent tiers contained by one persisted retrieval index."""
+
+    TRUSTED = "trusted"
+    TRUSTED_AND_REVIEW_CORE = "trusted_and_review_core"
 
 
 @dataclass(frozen=True)
@@ -138,6 +163,10 @@ class RecommendationRecord:
     condition_stage_status: ConditionStageStatus = ConditionStageStatus.UNCLASSIFIED
     outcome_status: OutcomeStatus = OutcomeStatus.UNCLASSIFIED
     index_eligibility: IndexEligibility = IndexEligibility.UNCLASSIFIED
+    precedent_tier: Optional[PrecedentTier] = None
+    core_eligibility: CoreEligibility = CoreEligibility.UNAVAILABLE
+    core_eligibility_reasons: Tuple[str, ...] = ()
+    core_eligibility_definition_version: str = CORE_ELIGIBILITY_DEFINITION_VERSION
     family_environment: Optional[Dict[str, Any]] = None
     product_connection: Optional[Dict[str, Any]] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()

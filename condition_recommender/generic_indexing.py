@@ -23,15 +23,19 @@ from reactive_taxonomy import (
 )
 
 from .models import (
+    CORE_ELIGIBILITY_DEFINITION_VERSION,
     GENERIC_CONVERTER_DEFINITION_VERSION,
     RECOMMENDATION_RECORD_SCHEMA_VERSION,
+    CoreEligibility,
+    PrecedentIndexScope,
+    PrecedentTier,
 )
 from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "5.0"
+GENERIC_INDEX_SCHEMA_VERSION = "6.0"
 
 
 @dataclass(frozen=True)
@@ -61,6 +65,8 @@ class GenericIndexedReaction:
     outcome_status: str
     record_schema_version: str
     converter_definition_version: str
+    precedent_tier: PrecedentTier
+    core_eligibility_definition_version: str
     reaction_label: Dict[str, Any] = dataclass_field(default_factory=dict)
     fallback_descriptor: Dict[str, Any] = dataclass_field(default_factory=dict)
     fragment_source_support: Tuple[Dict[str, Any], ...] = ()
@@ -104,6 +110,8 @@ class GenericReactionIndex:
     fallback_definition_versions: Tuple[Tuple[str, str], ...]
     record_schema_versions: Tuple[str, ...]
     converter_definition_versions: Tuple[str, ...]
+    precedent_scope: PrecedentIndexScope
+    core_eligibility_definition_version: str
 
     def select(self, positions: Iterable[int]) -> Tuple[GenericIndexedReaction, ...]:
         return tuple(self.rows[position] for position in positions)
@@ -241,6 +249,15 @@ def _validate_index_rows(
         raise ValueError(
             "Incompatible generic converter version; regenerate converted records"
         )
+    core_eligibility_versions = {
+        row.core_eligibility_definition_version for row in values
+    }
+    if core_eligibility_versions and core_eligibility_versions != {
+        CORE_ELIGIBILITY_DEFINITION_VERSION
+    }:
+        raise ValueError(
+            "Incompatible core eligibility definition; regenerate converted records"
+        )
     return (
         REACTION_SIGNATURE_SCHEMA_VERSION,
         current_definitions,
@@ -253,6 +270,8 @@ def _validate_index_rows(
 
 def build_generic_index_from_rows(
     rows: Iterable[GenericIndexedReaction],
+    *,
+    precedent_scope: PrecedentIndexScope = PrecedentIndexScope.TRUSTED,
 ) -> GenericReactionIndex:
     """Build deterministic lookup maps from already validated index rows."""
     ordered = sorted(
@@ -272,6 +291,12 @@ def build_generic_index_from_rows(
         record_schemas,
         converter_versions,
     ) = _validate_index_rows(ordered)
+    row_tiers = {row.precedent_tier for row in ordered}
+    if precedent_scope == PrecedentIndexScope.TRUSTED:
+        if row_tiers - {PrecedentTier.TRUSTED}:
+            raise ValueError("Trusted index cannot contain review-core precedents")
+    elif row_tiers - {PrecedentTier.TRUSTED, PrecedentTier.REVIEW_CORE}:
+        raise ValueError("Unsupported precedent tier")
     maps: Dict[str, Dict[str, list[int]]] = {
         name: defaultdict(list) for name in _KEY_FIELDS
     }
@@ -336,36 +361,11 @@ def build_generic_index_from_rows(
         ),
         record_schema_versions=record_schemas,
         converter_definition_versions=converter_versions,
+        precedent_scope=precedent_scope,
+        core_eligibility_definition_version=(
+            CORE_ELIGIBILITY_DEFINITION_VERSION
+        ),
     )
-
-
-def _external_mapping_blocks_precedent(
-    record: Mapping[str, Any],
-    *,
-    status: str,
-    source_supported_partial: bool,
-) -> bool:
-    """Return whether external mapping supplied or contradicted chemistry.
-
-    A resolved shadow pass may add only a minimized reaction core while the
-    signature and admission evidence remain internal. That provenance must not
-    disqualify an otherwise eligible precedent. Mapper-derived or conflicting
-    chemistry remains excluded from the trusted index.
-    """
-    if not status or status.startswith("not_requested_"):
-        return False
-    if (
-        status == "external_mapping_signature_unavailable"
-        and source_supported_partial
-    ):
-        return False
-    evidence_quality = str(record.get("evidence_quality") or "")
-    core_only_shadow = (
-        status == "external_mapping_internal_consensus"
-        and evidence_quality != "external_atom_mapping"
-        and not evidence_quality.startswith("external_mapping")
-    )
-    return not core_only_shadow
 
 
 def build_generic_index(
@@ -376,34 +376,43 @@ def build_generic_index(
     """Build lookup maps, admitting only records with signatures and recipes."""
     rows = []
     for record in records:
-        external_mapping = record.get("external_atom_mapping")
-        external_mapping_status = (
-            str(external_mapping.get("status") or "")
-            if isinstance(external_mapping, Mapping)
-            else ""
-        )
         fragment_source_support = tuple(
             dict(value)
             for value in record.get("fragment_source_support") or ()
             if isinstance(value, Mapping)
         )
-        source_supported_partial = bool(
-            fragment_source_support
-            and all(
-                str(value.get("status") or "") == "supported"
-                for value in fragment_source_support
-            )
-        )
-        if not include_review and _external_mapping_blocks_precedent(
-            record,
-            status=external_mapping_status,
-            source_supported_partial=source_supported_partial,
-        ):
-            continue
         eligibility = _enum_value(record.get("index_eligibility"))
-        if eligibility != "eligible" and not (
-            include_review and eligibility == "review_only"
+        core_eligibility = _enum_value(record.get("core_eligibility"))
+        core_eligibility_definition_version = str(
+            record.get("core_eligibility_definition_version") or ""
+        )
+        if (
+            core_eligibility_definition_version
+            != CORE_ELIGIBILITY_DEFINITION_VERSION
         ):
+            raise ValueError(
+                "Converted record lacks current core eligibility definition; "
+                "regenerate converted records"
+            )
+        persisted_precedent_tier = _enum_value(record.get("precedent_tier"))
+        if core_eligibility not in {value.value for value in CoreEligibility}:
+            raise ValueError(
+                "Converted record lacks current core eligibility; regenerate "
+                "converted records"
+            )
+        if (
+            eligibility == "eligible"
+            and persisted_precedent_tier == PrecedentTier.TRUSTED.value
+        ):
+            precedent_tier = PrecedentTier.TRUSTED
+        elif (
+            include_review
+            and eligibility == "review_only"
+            and core_eligibility == CoreEligibility.REVIEW_CORE.value
+            and persisted_precedent_tier == PrecedentTier.REVIEW_CORE.value
+        ):
+            precedent_tier = PrecedentTier.REVIEW_CORE
+        else:
             continue
         signature = record.get("reaction_signature")
         reaction_core = record.get("reaction_core")
@@ -461,9 +470,20 @@ def build_generic_index(
                     signature if isinstance(signature, Mapping) else {},
                 ),
                 signature=(dict(signature) if isinstance(signature, Mapping) else {}),
+                # A blocked core must never enter core lookup maps. A separately
+                # verified signature may remain a trusted precedent through its
+                # signature keys, so only the unsafe core view is removed.
                 reaction_core=(
                     dict(reaction_core)
                     if isinstance(reaction_core, Mapping)
+                    and (
+                        core_eligibility == CoreEligibility.TRUSTED_CORE.value
+                        or (
+                            precedent_tier == PrecedentTier.REVIEW_CORE
+                            and core_eligibility
+                            == CoreEligibility.REVIEW_CORE.value
+                        )
+                    )
                     else {}
                 ),
                 recipe_id=recipe_id,
@@ -484,6 +504,10 @@ def build_generic_index(
                 converter_definition_version=str(
                     record.get("converter_definition_version") or ""
                 ),
+                precedent_tier=precedent_tier,
+                core_eligibility_definition_version=(
+                    core_eligibility_definition_version
+                ),
                 reaction_label=(
                     dict(record.get("reaction_label") or {})
                     if isinstance(record.get("reaction_label"), Mapping)
@@ -497,7 +521,14 @@ def build_generic_index(
                 fragment_source_support=fragment_source_support,
             )
         )
-    return build_generic_index_from_rows(rows)
+    return build_generic_index_from_rows(
+        rows,
+        precedent_scope=(
+            PrecedentIndexScope.TRUSTED_AND_REVIEW_CORE
+            if include_review
+            else PrecedentIndexScope.TRUSTED
+        ),
+    )
 
 
 def _enum_value(value: Any) -> str:
@@ -540,6 +571,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "outcome_status": row.outcome_status,
             "record_schema_version": row.record_schema_version,
             "converter_definition_version": row.converter_definition_version,
+            "precedent_tier": row.precedent_tier.value,
+            "core_eligibility_definition_version": (
+                row.core_eligibility_definition_version
+            ),
             "reaction_label": row.reaction_label,
             "fallback_descriptor": row.fallback_descriptor,
             "fragment_source_support": row.fragment_source_support,
@@ -579,6 +614,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "fallback_definition_versions": dict(index.fallback_definition_versions),
             "record_schema_versions": index.record_schema_versions,
             "converter_definition_versions": index.converter_definition_versions,
+            "precedent_scope": index.precedent_scope.value,
+            "core_eligibility_definition_version": (
+                index.core_eligibility_definition_version
+            ),
         },
         ensure_ascii=True,
         sort_keys=True,
@@ -597,6 +636,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "fallback_definition_versions": dict(index.fallback_definition_versions),
         "record_schema_versions": index.record_schema_versions,
         "converter_definition_versions": index.converter_definition_versions,
+        "precedent_scope": index.precedent_scope.value,
+        "core_eligibility_definition_version": (
+            index.core_eligibility_definition_version
+        ),
         "index_id": "GRI1:" + hashlib.sha256(identity.encode("utf-8")).hexdigest(),
         "row_count": len(rows),
         "rows": rows,
@@ -666,6 +709,10 @@ def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[st
         "fallback_definition_versions": payload["fallback_definition_versions"],
         "record_schema_versions": payload["record_schema_versions"],
         "converter_definition_versions": payload["converter_definition_versions"],
+        "precedent_scope": payload["precedent_scope"],
+        "core_eligibility_definition_version": payload[
+            "core_eligibility_definition_version"
+        ],
         "index_id": payload["index_id"],
         "row_count": payload["row_count"],
         "path": str(destination),
@@ -686,7 +733,22 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
     if payload.get("artifact_type") != "generic_reaction_index":
         raise ValueError("Not a generic reaction index artifact")
     if payload.get("schema_version") != GENERIC_INDEX_SCHEMA_VERSION:
-        raise ValueError("Unsupported generic reaction index schema; rebuild the index")
+        raise ValueError(
+            "Unsupported generic reaction index schema; rebuild recommendation "
+            "artifacts and rebuild the index to create clean trusted and "
+            "review-core indexes"
+        )
+    try:
+        precedent_scope = PrecedentIndexScope(str(payload["precedent_scope"]))
+    except (KeyError, ValueError) as exc:
+        raise ValueError("Invalid precedent index scope; rebuild the index") from exc
+    if (
+        payload.get("core_eligibility_definition_version")
+        != CORE_ELIGIBILITY_DEFINITION_VERSION
+    ):
+        raise ValueError(
+            "Incompatible core eligibility definition; rebuild the index"
+        )
     if (
         payload.get("reaction_signature_schema_version")
         != REACTION_SIGNATURE_SCHEMA_VERSION
@@ -763,6 +825,10 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             outcome_status=str(row.get("outcome_status") or ""),
             record_schema_version=str(row["record_schema_version"]),
             converter_definition_version=str(row["converter_definition_version"]),
+            precedent_tier=PrecedentTier(str(row["precedent_tier"])),
+            core_eligibility_definition_version=str(
+                row["core_eligibility_definition_version"]
+            ),
             reaction_label=dict(row.get("reaction_label") or {}),
             fallback_descriptor=dict(row.get("fallback_descriptor") or {}),
             fragment_source_support=tuple(
@@ -845,6 +911,10 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         ),
         record_schema_versions=tuple(payload["record_schema_versions"]),
         converter_definition_versions=tuple(payload["converter_definition_versions"]),
+        precedent_scope=precedent_scope,
+        core_eligibility_definition_version=(
+            CORE_ELIGIBILITY_DEFINITION_VERSION
+        ),
     )
     expected = _index_payload(index)
     if expected["index_id"] != payload.get("index_id"):

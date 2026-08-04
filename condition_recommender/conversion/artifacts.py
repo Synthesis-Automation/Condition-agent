@@ -21,7 +21,7 @@ from .sharded import (
 )
 from .input_schema import ConversionDatasetInput
 
-RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "1.1"
+RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "2.0"
 
 
 @dataclass(frozen=True)
@@ -211,7 +211,9 @@ def build_recommendation_artifacts(
         ) from exc
 
     index_report: Optional[Dict[str, Any]] = None
+    review_index_report: Optional[Dict[str, Any]] = None
     index_path = destination / "generic_index.json.gz"
+    review_index_path = destination / "generic_review_index.json.gz"
     if build_fast_index:
         if cancel_check is not None and cancel_check():
             raise RecommendationArtifactBuildCancelled(
@@ -248,11 +250,21 @@ def build_recommendation_artifacts(
                 "Build cancelled before saving the fast-load index."
             )
         index_report = save_generic_index(index, index_path)
+        scanned_rows = 0
+        review_index = build_generic_index(records(), include_review=True)
+        if cancel_check is not None and cancel_check():
+            raise RecommendationArtifactBuildCancelled(
+                "Build cancelled before saving the review-core index."
+            )
+        review_index_report = save_generic_index(
+            review_index, review_index_path
+        )
         notify(
             "index_completed",
             (
                 "Fast-load index complete: "
-                f"{index_report['row_count']} eligible precedent(s)."
+                f"{index_report['row_count']} trusted precedent(s), "
+                f"{review_index_report['row_count']} unrestricted precedent(s)."
             ),
             row_count=int(index_report["row_count"]),
         )
@@ -263,6 +275,10 @@ def build_recommendation_artifacts(
     }
     if index_report is not None:
         artifacts["fast_index"] = _artifact_entry(index_path, destination)
+    if review_index_report is not None:
+        artifacts["review_core_index"] = _artifact_entry(
+            review_index_path, destination
+        )
     shard_paths = tuple((destination / "shards").glob("*.jsonl.gz"))
     shard_size_bytes = sum(path.stat().st_size for path in shard_paths)
     all_files = tuple(path for path in destination.rglob("*") if path.is_file())
@@ -277,6 +293,27 @@ def build_recommendation_artifacts(
             "An older generic_index.json.gz exists but was not rebuilt; do "
             "not use it unless it matches the current canonical records."
         )
+    core_eligibility_counts = dict(
+        conversion_report.get("core_eligibility_counts") or {}
+    )
+    trusted_precedent_count = (
+        int(index_report["row_count"]) if index_report is not None else None
+    )
+    unrestricted_precedent_count = (
+        int(review_index_report["row_count"])
+        if review_index_report is not None
+        else None
+    )
+    review_core_count = (
+        unrestricted_precedent_count - trusted_precedent_count
+        if unrestricted_precedent_count is not None
+        and trusted_precedent_count is not None
+        else None
+    )
+    query_core_count = sum(
+        int(core_eligibility_counts.get(tier) or 0)
+        for tier in ("trusted_core", "review_core", "query_only")
+    )
     report: Dict[str, Any] = {
         "schema_version": RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION,
         "artifact_type": "recommendation_artifact_build",
@@ -296,8 +333,13 @@ def build_recommendation_artifacts(
         "source_file_count": int(conversion_report["source_file_count"]),
         "record_count": total_rows,
         "eligible_index_record_count": (
-            int(index_report["row_count"]) if index_report is not None else None
+            trusted_precedent_count
         ),
+        "trusted_precedent_count": trusted_precedent_count,
+        "review_core_precedent_count": review_core_count,
+        "unrestricted_precedent_count": unrestricted_precedent_count,
+        "query_core_eligible_count": query_core_count,
+        "core_eligibility_counts": core_eligibility_counts,
         "shard_count": int(conversion_report["shard_count"]),
         "reused_shard_count": int(conversion_report["reused_shard_count"]),
         "artifacts": artifacts,

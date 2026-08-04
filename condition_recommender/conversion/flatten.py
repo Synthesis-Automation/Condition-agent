@@ -34,6 +34,10 @@ GENERIC_REVIEW_FIELDS = (
     "condition_stage_status",
     "outcome_status",
     "index_eligibility",
+    "precedent_tier",
+    "core_eligibility_tier",
+    "core_eligibility_definition_version",
+    "core_eligibility_reasons",
     "reaction_smiles",
     "reaction_label",
     "canonical_reaction_smiles",
@@ -151,6 +155,14 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "condition_stage_status": record.condition_stage_status.value,
         "outcome_status": record.outcome_status.value,
         "index_eligibility": record.index_eligibility.value,
+        "precedent_tier": (
+            record.precedent_tier.value if record.precedent_tier else ""
+        ),
+        "core_eligibility_tier": record.core_eligibility.value,
+        "core_eligibility_definition_version": (
+            record.core_eligibility_definition_version
+        ),
+        "core_eligibility_reasons": _joined(record.core_eligibility_reasons),
         "reaction_smiles": record.reaction_smiles,
         "reaction_label": review_reaction_label_text(record.reaction_label),
         "canonical_reaction_smiles": record.canonical_reaction_smiles or "",

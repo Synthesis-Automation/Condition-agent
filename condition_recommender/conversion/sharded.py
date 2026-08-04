@@ -47,7 +47,7 @@ from .input_schema import (
 )
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v4.0"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v5.0"
 
 
 @dataclass(frozen=True)
@@ -230,12 +230,18 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
         field: Counter(text(payload.get(field)) for payload in payloads)
         for field in fields
     }
+    core_eligibility_counts = Counter(
+        text(payload.get("core_eligibility")) for payload in payloads
+    )
     return {
         f"{field}_counts": dict(sorted(counts.items()))
         for field, counts in values.items()
     } | {
         "signature_count": sum(
             int(payload.get("reaction_signature") is not None) for payload in payloads
+        ),
+        "core_eligibility_counts": dict(
+            sorted(core_eligibility_counts.items())
         ),
         "admission_reason_counts": dict(
             sorted(
@@ -898,6 +904,9 @@ def convert_datasets_sharded(
         ),
         "index_eligibility_counts": _merge_counts(
             complete_entries, "index_eligibility_counts"
+        ),
+        "core_eligibility_counts": _merge_counts(
+            complete_entries, "core_eligibility_counts"
         ),
         "admission_reason_counts": _merge_counts(
             complete_entries, "admission_reason_counts"

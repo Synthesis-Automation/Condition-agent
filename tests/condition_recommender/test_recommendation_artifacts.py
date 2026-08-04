@@ -60,13 +60,26 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
 
     assert report["record_count"] == 2
     assert report["eligible_index_record_count"] == 2
+    assert report["trusted_precedent_count"] == 2
+    assert report["review_core_precedent_count"] == 0
+    assert report["unrestricted_precedent_count"] == 2
+    assert report["query_core_eligible_count"] == 2
     assert report["shard_count"] == 2
     assert report["storage"]["shard_file_count"] == 2
     assert not (output / "records.jsonl.gz").exists()
     assert (output / "shard_manifest.json").is_file()
     assert (output / "generic_index.json.gz").is_file()
+    assert (output / "generic_review_index.json.gz").is_file()
     assert (output / "recommendation_artifacts_report.json").is_file()
     assert len(load_generic_index(output / "generic_index.json.gz").rows) == 2
+    assert (
+        len(
+            load_generic_index(
+                output / "generic_review_index.json.gz"
+            ).rows
+        )
+        == 2
+    )
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 2
     with (output / "reaction_review.csv").open(
         encoding="utf-8-sig",

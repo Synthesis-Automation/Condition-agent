@@ -232,8 +232,10 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
     monkeypatch.setattr(
         gui,
         "_get_cached_recommender",
-        lambda path, *, use_rxnmapper: (
-            calls.append(("use_rxnmapper", use_rxnmapper))
+        lambda path, *, use_rxnmapper, include_review: (
+            calls.append(
+                ("index_options", use_rxnmapper, include_review)
+            )
             or FakeRecommender()
         ),
     )
@@ -257,7 +259,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
     worker.run()
 
     assert calls == [
-        ("use_rxnmapper", True),
+        ("index_options", True, True),
         ("A.B>>P", 3, 2, True),
     ]
     assert len(progress) == 2

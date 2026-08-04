@@ -25,6 +25,7 @@ from condition_recommender.conversion.generic import (
 import condition_recommender.conversion.sharded as sharded_module
 from condition_recommender.conversion.sharded import convert_datasets_sharded
 from condition_recommender.conversion.input_schema import adapt_row
+from condition_recommender.core_eligibility import assess_core_eligibility
 from condition_recommender.generic_indexing import build_generic_index
 from condition_recommender.models import (
     AdmissionTier,
@@ -392,10 +393,38 @@ def test_converter_persists_mapper_provenance_but_excludes_precedent() -> None:
     )
     assert review["external_mapping_provider"] == "fixture_mapper"
     assert review["external_mapping_confidence"] == "0.65"
+    assert review["core_eligibility_tier"] == "review_core"
+    assert assess_core_eligibility(record.to_dict()).tier == "review_core"
     assert not build_generic_index([record.to_dict()]).rows
+    review_index = build_generic_index(
+        [record.to_dict()],
+        include_review=True,
+    )
+    assert len(review_index.rows) == 1
+    assert review_index.rows[0].chemistry_status == "review"
     incorrectly_promoted = record.to_dict()
     incorrectly_promoted["index_eligibility"] = "eligible"
     assert not build_generic_index([incorrectly_promoted]).rows
+
+    mapper_only = record.to_dict()
+    mapper_only["external_atom_mapping"]["status"] = "external_mapping_only"
+    assert assess_core_eligibility(mapper_only).tier == "query_only"
+    mapper_only["core_eligibility"] = "query_only"
+    mapper_only["precedent_tier"] = None
+    assert not build_generic_index(
+        [mapper_only],
+        include_review=True,
+    ).rows
+
+    blocked = record.to_dict()
+    blocked["reaction_core"]["quality"]["status"] = "blocked"
+    assert assess_core_eligibility(blocked).tier == "blocked"
+    blocked["core_eligibility"] = "blocked"
+    blocked["precedent_tier"] = None
+    assert not build_generic_index(
+        [blocked],
+        include_review=True,
+    ).rows
 
 
 def test_converter_cache_maps_duplicate_reactions_once() -> None:
@@ -501,6 +530,7 @@ def test_sharded_converter_carries_mapping_into_manifest_and_records(
         "external_mapping_internal_consensus": 1
     }
     assert report["index_eligibility_counts"] == {"review_only": 1}
+    assert report["core_eligibility_counts"] == {"review_core": 1}
     manifest = json.loads(
         (tmp_path / "sharded" / "shard_manifest.json").read_text(
             encoding="utf-8"
@@ -514,6 +544,15 @@ def test_sharded_converter_carries_mapping_into_manifest_and_records(
         "model_sha256": "abc",
     }
     assert report["integrity"]["valid"]
+    manifest_path = tmp_path / "sharded" / "shard_manifest.json"
+    trusted = GenericConditionRecommender.from_path(manifest_path)
+    review = GenericConditionRecommender.from_path(
+        manifest_path,
+        include_review=True,
+    )
+    assert trusted.index.rows == ()
+    assert len(review.index.rows) == 1
+    assert review.includes_review_precedents
 
 
 def test_recommender_uses_mapper_supported_query_with_review_cautions() -> None:
@@ -526,6 +565,7 @@ def test_recommender_uses_mapper_supported_query_with_review_cautions() -> None:
             "reaction_id": "verified-precedent",
             "observation_id": "verified-observation",
             "index_eligibility": "eligible",
+            "precedent_tier": "trusted",
             "chemistry_status": "verified",
             "admission_tier": "verified",
             "external_atom_mapping": None,

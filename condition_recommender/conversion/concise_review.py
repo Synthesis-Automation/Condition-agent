@@ -21,7 +21,7 @@ from .pattern_serialization import (
 )
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "11.1"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "12.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_label",
@@ -70,6 +70,10 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "condition_status",
     "condition_stage_status",
     "index_eligibility",
+    "precedent_tier",
+    "core_eligibility_tier",
+    "core_eligibility_definition_version",
+    "core_eligibility_reasons",
     "admission_reasons",
     "warnings",
     "spectators",
@@ -451,6 +455,14 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "condition_status": _enum_text(record.get("condition_status")),
         "condition_stage_status": _enum_text(record.get("condition_stage_status")),
         "index_eligibility": _enum_text(record.get("index_eligibility")),
+        "precedent_tier": _enum_text(record.get("precedent_tier")),
+        "core_eligibility_tier": _enum_text(record.get("core_eligibility")),
+        "core_eligibility_definition_version": str(
+            record.get("core_eligibility_definition_version") or ""
+        ),
+        "core_eligibility_reasons": "; ".join(
+            str(value) for value in record.get("core_eligibility_reasons") or ()
+        ),
         "admission_reasons": "; ".join(
             str(value) for value in record.get("admission_reasons") or ()
         ),

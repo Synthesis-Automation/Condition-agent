@@ -29,7 +29,7 @@ from visualization import render_reaction_image_bytes  # noqa: E402
 from visualization.qt_widgets import StructureImageLabel  # noqa: E402
 
 _RECOMMENDER_CACHE: Dict[
-    Tuple[str, int, int, bool],
+    Tuple[str, int, int, bool, bool],
     GenericConditionRecommender,
 ] = {}
 
@@ -57,30 +57,42 @@ def default_recommendation_data_path() -> Path:
     return DEFAULT_MANIFEST_PATH
 
 
-def _cache_key(path: Path, use_rxnmapper: bool) -> Tuple[str, int, int, bool]:
+def _cache_key(
+    path: Path,
+    use_rxnmapper: bool,
+    include_review: bool,
+) -> Tuple[str, int, int, bool, bool]:
     resolved = path.resolve()
     stat = resolved.stat()
-    return str(resolved), stat.st_size, stat.st_mtime_ns, use_rxnmapper
+    return (
+        str(resolved),
+        stat.st_size,
+        stat.st_mtime_ns,
+        use_rxnmapper,
+        include_review,
+    )
 
 
 def _get_cached_recommender(
     path: str | Path,
     *,
     use_rxnmapper: bool = True,
+    include_review: bool = False,
 ) -> GenericConditionRecommender:
     """Load a validated index once and invalidate it when the file changes."""
     source = Path(path)
-    key = _cache_key(source, use_rxnmapper)
+    key = _cache_key(source, use_rxnmapper, include_review)
     recommender = _RECOMMENDER_CACHE.get(key)
     if recommender is not None:
         return recommender
     resolved = key[0]
     for old_key in tuple(_RECOMMENDER_CACHE):
-        if old_key[0] == resolved:
+        if old_key[0] == resolved and old_key[1:3] != key[1:3]:
             _RECOMMENDER_CACHE.pop(old_key, None)
     recommender = GenericConditionRecommender.from_path(
         source,
         mapping_provider=RxnMapperProvider() if use_rxnmapper else None,
+        include_review=include_review,
     )
     _RECOMMENDER_CACHE[key] = recommender
     return recommender
@@ -284,6 +296,7 @@ class GenericRecommendationWorker(QtCore.QObject):
             recommender = _get_cached_recommender(
                 self.data_path,
                 use_rxnmapper=self.use_rxnmapper,
+                include_review=self.unrestricted_fallback,
             )
             self.progress.emit(
                 "Analyzing reaction with RXNMapper and ranking conditions…"
@@ -350,16 +363,16 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             "may force a broader chemistry fallback."
         )
         self.unrestricted_fallback_check = QtWidgets.QCheckBox(
-            "Unrestricted fallback matching (expert use)"
+            "Review-core and unrestricted fallback mode (expert use)"
         )
         self.unrestricted_fallback_check.setObjectName(
             "unrestrictedFallback"
         )
         self.unrestricted_fallback_check.setChecked(False)
         self.unrestricted_fallback_check.setToolTip(
-            "For unresolved reactions, bypass fallback eligibility, "
-            "similarity, independent-support, and condition-compatibility "
-            "gates. Results can be chemically incompatible."
+            "Also load qualified review-core precedents. For unresolved "
+            "fallbacks, bypass eligibility, similarity, independent-support, "
+            "and condition-compatibility gates. Expert review is required."
         )
         self.use_rxnmapper_check = QtWidgets.QCheckBox(
             "Use RXNMapper for unresolved or ambiguous queries"
@@ -609,15 +622,24 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             except (OSError, json.JSONDecodeError):
                 report = {}
             total = report.get("record_count")
-            eligible = report.get("eligible_index_record_count")
+            trusted = report.get(
+                "trusted_precedent_count",
+                report.get("eligible_index_record_count"),
+            )
+            review_core = report.get("review_core_precedent_count")
+            query_core = report.get("query_core_eligible_count")
             if total is not None:
-                eligible_text = (
-                    f"; {eligible} recommendation-eligible"
-                    if eligible is not None
-                    else ""
-                )
+                details = []
+                if trusted is not None:
+                    details.append(f"{trusted} trusted precedents")
+                if review_core is not None:
+                    details.append(f"{review_core} review-core precedents")
+                if query_core is not None:
+                    details.append(f"{query_core} query-core eligible")
                 self.data_summary.setText(
-                    f"{total} converted reactions{eligible_text}."
+                    f"{total} converted reactions"
+                    + (f"; {'; '.join(details)}" if details else "")
+                    + "."
                 )
                 return
         self.data_summary.setText(
