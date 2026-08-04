@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 
-from ..generic_indexing import build_generic_index, save_generic_index
+from ..generic_indexing import build_generic_index
 from ..sqlite_indexing import save_sqlite_generic_index
 from .concise_review import (
     ConciseReviewConversionCancelled,
@@ -22,7 +22,7 @@ from .sharded import (
 )
 from .input_schema import ConversionDatasetInput
 
-RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "2.0"
+RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "2.1"
 
 
 @dataclass(frozen=True)
@@ -213,11 +213,19 @@ def build_recommendation_artifacts(
 
     index_report: Optional[Dict[str, Any]] = None
     review_index_report: Optional[Dict[str, Any]] = None
+    review_index_reuses_trusted = False
     index_path = destination / "generic_index.sqlite"
     review_index_path = destination / "generic_review_index.sqlite"
-    json_index_path = destination / "generic_index.json.gz"
-    json_review_index_path = destination / "generic_review_index.json.gz"
+    retired_json_index_paths = (
+        destination / "generic_index.json.gz",
+        destination / "generic_review_index.json.gz",
+    )
+    for retired_path in retired_json_index_paths:
+        if retired_path.is_file():
+            retired_path.unlink()
     if build_fast_index:
+        if review_index_path.is_file():
+            review_index_path.unlink()
         if cancel_check is not None and cancel_check():
             raise RecommendationArtifactBuildCancelled(
                 "Build cancelled before index creation; canonical data and "
@@ -252,26 +260,27 @@ def build_recommendation_artifacts(
             raise RecommendationArtifactBuildCancelled(
                 "Build cancelled before saving the fast-load index."
             )
-        json_index_report = save_generic_index(index, json_index_path)
-        index_report = save_sqlite_generic_index(
-            index,
-            index_path,
-            index_id=str(json_index_report["index_id"]),
-        )
+        index_report = save_sqlite_generic_index(index, index_path)
         scanned_rows = 0
         review_index = build_generic_index(records(), include_review=True)
         if cancel_check is not None and cancel_check():
             raise RecommendationArtifactBuildCancelled(
                 "Build cancelled before saving the review-core index."
             )
-        json_review_index_report = save_generic_index(
-            review_index, json_review_index_path
-        )
-        review_index_report = save_sqlite_generic_index(
-            review_index,
-            review_index_path,
-            index_id=str(json_review_index_report["index_id"]),
-        )
+        review_index_reuses_trusted = tuple(review_index.rows) == tuple(index.rows)
+        if review_index_reuses_trusted:
+            if review_index_path.is_file():
+                review_index_path.unlink()
+            review_index_report = {
+                **index_report,
+                "requested_precedent_scope": review_index.precedent_scope.value,
+                "reuses_trusted_index": True,
+            }
+        else:
+            review_index_report = save_sqlite_generic_index(
+                review_index,
+                review_index_path,
+            )
         notify(
             "index_completed",
             (
@@ -288,18 +297,14 @@ def build_recommendation_artifacts(
     }
     if index_report is not None:
         artifacts["fast_index"] = _artifact_entry(index_path, destination)
-        artifacts["legacy_json_index"] = _artifact_entry(
-            json_index_path,
-            destination,
-        )
     if review_index_report is not None:
-        artifacts["review_core_index"] = _artifact_entry(
-            review_index_path, destination
+        review_artifact_path = (
+            index_path if review_index_reuses_trusted else review_index_path
         )
-        artifacts["legacy_json_review_core_index"] = _artifact_entry(
-            json_review_index_path,
-            destination,
-        )
+        artifacts["review_core_index"] = {
+            **_artifact_entry(review_artifact_path, destination),
+            "reuses_trusted_index": review_index_reuses_trusted,
+        }
     shard_paths = tuple((destination / "shards").glob("*.jsonl.gz"))
     shard_size_bytes = sum(path.stat().st_size for path in shard_paths)
     all_files = tuple(path for path in destination.rglob("*") if path.is_file())
@@ -311,7 +316,7 @@ def build_recommendation_artifacts(
         )
     if not build_fast_index and any(
         path.is_file()
-        for path in (index_path, review_index_path, json_index_path, json_review_index_path)
+        for path in (index_path, review_index_path)
     ):
         warnings.append(
             "Older trusted or review-core indexes may exist but were not rebuilt; "
@@ -361,6 +366,7 @@ def build_recommendation_artifacts(
         ),
         "trusted_precedent_count": trusted_precedent_count,
         "review_core_precedent_count": review_core_count,
+        "review_index_reuses_trusted": review_index_reuses_trusted,
         "unrestricted_precedent_count": unrestricted_precedent_count,
         "query_core_eligible_count": query_core_count,
         "core_eligibility_counts": core_eligibility_counts,

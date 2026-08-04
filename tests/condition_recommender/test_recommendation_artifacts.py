@@ -48,6 +48,9 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
         writer.writeheader()
         writer.writerows(rows)
     output = tmp_path / "recommendation_data"
+    output.mkdir()
+    (output / "generic_index.json.gz").write_bytes(b"retired")
+    (output / "generic_review_index.json.gz").write_bytes(b"retired")
     progress = []
 
     report = build_recommendation_artifacts(
@@ -60,6 +63,7 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     )
 
     assert report["record_count"] == 2
+    assert report["schema_version"] == "2.1"
     assert report["eligible_index_record_count"] == 2
     assert report["trusted_precedent_count"] == 2
     assert report["review_core_precedent_count"] == 0
@@ -69,19 +73,14 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     assert report["storage"]["shard_file_count"] == 2
     assert not (output / "records.jsonl.gz").exists()
     assert (output / "shard_manifest.json").is_file()
-    assert (output / "generic_index.json.gz").is_file()
-    assert (output / "generic_review_index.json.gz").is_file()
+    assert not (output / "generic_index.json.gz").exists()
+    assert not (output / "generic_review_index.json.gz").exists()
     assert (output / "generic_index.sqlite").is_file()
-    assert (output / "generic_review_index.sqlite").is_file()
+    assert not (output / "generic_review_index.sqlite").exists()
     assert (output / "recommendation_artifacts_report.json").is_file()
-    assert len(load_generic_index(output / "generic_index.json.gz").rows) == 2
-    assert (
-        len(
-            load_generic_index(
-                output / "generic_review_index.json.gz"
-            ).rows
-        )
-        == 2
+    assert report["review_index_reuses_trusted"]
+    assert not any(
+        name.startswith("legacy_json") for name in report["artifacts"]
     )
     trusted_recommender = GenericConditionRecommender.from_path(
         output / "generic_index.sqlite"
@@ -92,17 +91,18 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     )
     assert not trusted_recommender.includes_review_precedents
     assert review_recommender.includes_review_precedents
-    assert review_recommender.index.precedent_scope.value == (
-        "trusted_and_review_core"
-    )
+    assert review_recommender.review_index_reuses_trusted
+    assert review_recommender.index.precedent_scope.value == "trusted"
+    review_result = review_recommender.recommend(rows[0]["reaction_smiles"])
+    assert "UNRESTRICTED_MODE_REUSES_TRUSTED_INDEX" in review_result.warnings
     assert report["artifacts"]["fast_index"]["path"].endswith(
         "generic_index.sqlite"
     )
-    legacy_recommender = GenericConditionRecommender.from_path(
-        output / "generic_index.json.gz"
+    manifest_recommender = GenericConditionRecommender.from_path(
+        output / "shard_manifest.json"
     )
     assert trusted_recommender.recommend(rows[0]["reaction_smiles"]) == (
-        legacy_recommender.recommend(rows[0]["reaction_smiles"])
+        manifest_recommender.recommend(rows[0]["reaction_smiles"])
     )
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 2
     with (output / "reaction_review.csv").open(

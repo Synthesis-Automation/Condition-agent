@@ -575,11 +575,11 @@ python -m condition_recommender.sharded_conversion_cli `
 
 python -m condition_recommender.generic_index_cli `
   results/generic_conversion/v2/development/records.jsonl.gz `
-  results/generic_conversion/v2/development/generic_index.json
+  results/generic_conversion/v2/development/generic_index.sqlite
 
 python -m condition_recommender.generic_index_cli `
   results/generic_conversion/v2/validation/records.jsonl.gz `
-  results/generic_conversion/v2/validation/generic_index.json
+  results/generic_conversion/v2/validation/generic_index.sqlite
 ```
 
 Rerunning a sharded conversion with unchanged sources and definitions reuses
@@ -672,9 +672,9 @@ subfolders and creates:
 - `generic_index.sqlite`: the trusted-precedent runtime index used by default.
   Rows and lookup values are materialized lazily for fast application startup.
 - `generic_review_index.sqlite`: the paired expert-use runtime index containing
-  the trusted rows plus qualified review-core precedents.
-- `generic_index.json.gz` and `generic_review_index.json.gz`: temporary parity
-  artifacts retained while SQLite recommendation behavior is validated.
+  the trusted rows plus qualified review-core precedents. It is omitted when no
+  additional review-core rows exist; expert mode then reuses the trusted index
+  as declared by the artifact report.
 - `recommendation_artifacts_report.json`: row counts, output paths, settings,
   reuse counts, and file sizes.
 
@@ -760,8 +760,8 @@ python -m app.reaction_recommender_gui
 ```
 
 It automatically selects `datasets/literature/generic_index.sqlite` when the
-lazy runtime index exists, then the legacy JSON index or `shard_manifest.json`
-as fallbacks. Paste a complete
+lazy runtime index exists, then `shard_manifest.json` as the rebuild fallback.
+Persisted JSON runtime indexes are no longer accepted. Paste a complete
 `reactants>>product` reaction SMILES and choose how many recipes to return.
 `Use RXNMapper` is checked by default; it is invoked only when supplied mapping
 and ordinary internal analysis do not already resolve the query. Clear the
@@ -839,7 +839,7 @@ For an application or batch process, load the validated index once:
 from condition_recommender import GenericConditionRecommender
 
 recommender = GenericConditionRecommender.from_path(
-    "results/generic_conversion/generic_index.json"
+    "results/generic_conversion/generic_index.sqlite"
 )
 first = recommender.recommend("<reaction_smiles>")
 second = recommender.recommend("<another_reaction_smiles>")
@@ -869,7 +869,7 @@ Run the basic test:
 
 ```powershell
 python -m condition_recommender.evaluation_cli `
-  results/generic_conversion/v2/development/generic_index.json `
+  results/generic_conversion/v2/development/generic_index.sqlite `
   results/generic_evaluation/v2/development/basic `
   --test-fraction 0.2 --seed 17 --top-k 5
 ```
@@ -898,7 +898,7 @@ Calibrate the reaction-core path separately:
 
 ```powershell
 python -m condition_recommender.core_evaluation_cli `
-  results/generic_conversion/v2/development/generic_index.json `
+  results/generic_conversion/v2/development/generic_index.sqlite `
   results/reaction_core_evaluation/v1/development `
   --test-fraction 0.2 --seed 17 --top-k 5
 ```
@@ -927,17 +927,17 @@ source datasets, and newer publication years:
 
 ```powershell
 python -m condition_recommender.evaluation_cli `
-  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_conversion/v2/validation/generic_index.sqlite `
   results/generic_evaluation/v2/validation/scaffold `
   --split-mode scaffold_disjoint --seed 71
 
 python -m condition_recommender.evaluation_cli `
-  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_conversion/v2/validation/generic_index.sqlite `
   results/generic_evaluation/v2/validation/source `
   --split-mode source_disjoint --seed 71
 
 python -m condition_recommender.evaluation_cli `
-  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_conversion/v2/validation/generic_index.sqlite `
   results/generic_evaluation/v2/validation/time `
   --split-mode forward_time
 ```
@@ -946,7 +946,7 @@ Compare the available retrieval approaches on the same hidden reactions:
 
 ```powershell
 python -m condition_recommender.baseline_cli `
-  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_conversion/v2/validation/generic_index.sqlite `
   results/generic_evaluation/v2/validation/baselines `
   --seed 71
 ```
@@ -956,8 +956,8 @@ to decide whether those settings are safe to promote:
 
 ```powershell
 python -m condition_recommender.calibration_cli `
-  results/generic_conversion/v2/development/generic_index.json `
-  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_conversion/v2/development/generic_index.sqlite `
+  results/generic_conversion/v2/validation/generic_index.sqlite `
   results/generic_evaluation/v2/calibration
 ```
 
@@ -998,10 +998,10 @@ python -m condition_recommender.conversion_integrity_cli `
 
 python -m condition_recommender.generic_index_cli `
   results/generic_conversion/v2/full/records.jsonl.gz `
-  results/generic_conversion/v2/full/generic_index.json
+  results/generic_conversion/v2/full/generic_index.sqlite
 
 python -m condition_recommender.generic_index_integrity_cli `
-  results/generic_conversion/v2/full/generic_index.json
+  results/generic_conversion/v2/full/generic_index.sqlite
 ```
 
 Canonical shards and catalogs are deterministic compressed nested JSONL. The
@@ -1063,7 +1063,7 @@ python -m condition_recommender.conversion_integrity_cli `
   results/generic_conversion/v2/development/shard_manifest.json
 
 python -m condition_recommender.generic_index_integrity_cli `
-  results/generic_conversion/v2/development/generic_index.json `
+  results/generic_conversion/v2/development/generic_index.sqlite `
   --output-path results/generic_conversion/v2/development/index_integrity.json
 ```
 

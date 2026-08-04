@@ -57,7 +57,7 @@ reactive_taxonomy       condition_registry
 | Reactivity descriptors | Optional annotation | Typed context-aware molecular profiles are available above structural observation and do not affect core or signature identity |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
-| Generic index | Implemented | Separate version-checked trusted and trusted-plus-review-core indexes with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys; SQLite is the default lazy runtime format and compressed JSON remains a parity artifact |
+| Generic index | Implemented | SQLite-only runtime indexes with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys; canonical JSONL shards remain the rebuild and audit source |
 | Generic retrieval | Implemented pilot | Explicit verified-signature ladder, robust reaction-core shape tier, conservative unsigned-query core and all-hypothesis routes, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
 | Source-supported partial transformations | Implemented, review-qualified | Product-observed attachment replacement may retrieve only exact partial transformations whose precedent conditions have a curated source capability |
 | Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback for other unsigned queries; not represented as verified edit retrieval |
@@ -95,7 +95,7 @@ The current code declares:
 | Generic sharded converter definition | `generic_sharded_conversion.v5.0` |
 | Concise reaction review | `12.0` |
 | Shared chemist review summary | `3.0` |
-| Recommendation artifact workflow | `2.0` |
+| Recommendation artifact workflow | `2.1` |
 | Generic persisted index | `6.0` |
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `3.1` |
@@ -137,15 +137,11 @@ accuracy or prove that every intended production source has been included.
 The 147-shard conversion report records zero failed shards and zero duplicate
 observations. The default SQLite index validates as schema 6.0 with storage
 schema 1.0 and 38,883 rows. The application selects
-`generic_index.sqlite` by default and expert mode resolves the paired
-`generic_review_index.sqlite`; this run has no additional review-core
-precedents because external mapping was disabled. Compressed JSON indexes are
-retained temporarily for runtime-parity validation and fallback loading.
-
-The checked `recommendation_artifacts_report.json` was generated before the
-SQLite runtime artifacts were added and still identifies the compressed JSON
-files as the fast indexes. Regenerate that report with the current artifact
-workflow before treating the directory as a release candidate.
+`generic_index.sqlite` by default. This run has no additional review-core
+precedents because external mapping was disabled, so expert mode safely reuses
+the trusted SQLite index as recorded in the artifact report. Persisted JSON
+runtime indexes have been retired; the manifest and compressed JSONL shards
+remain the complete canonical rebuild and audit artifacts.
 
 The 42,358 query-core count is deliberately not a precedent count. Query-only
 cores can describe a new query and seek compatible admitted precedents, but
@@ -444,11 +440,11 @@ python -m condition_recommender.generic_conversion_cli `
 
 python -m condition_recommender.generic_index_cli `
   results/fischer_indole_rxnmapper_conversion/records.jsonl `
-  results/fischer_indole_rxnmapper_conversion/generic_index.json
+  results/fischer_indole_rxnmapper_conversion/generic_index.sqlite
 
 python -m condition_recommender.generic_recommend_cli `
   "O=C1CCCCC1.Cl.NNc1ccc(F)cc1>>Fc1ccc2[nH]c3c(c2c1)CCCC3" `
-  --records results/fischer_indole_rxnmapper_conversion/generic_index.json `
+  --records results/fischer_indole_rxnmapper_conversion/generic_index.sqlite `
   --use-rxnmapper
 ```
 
@@ -996,8 +992,8 @@ regression; the review and numerical evidence support release.
 The current 59,360-row, 120-source full-mode local conversion satisfies the
 mechanical shard and duplicate checks for the selected inputs. Gate 5 remains
 open: source-corpus completeness has not been frozen, the current run did not
-use external mapping, its artifact report predates the SQLite runtime build,
-and the performance and human release gates have not passed.
+use external mapping, and the performance and human release gates have not
+passed.
 
 1. Freeze contract and definition versions.
 2. Convert the full source corpus in restartable deterministic shards.

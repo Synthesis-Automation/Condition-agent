@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, Dict, Mapping
@@ -220,6 +221,7 @@ class GenericConditionRecommender:
     source_path: str = ""
     mapping_provider: AtomMappingProvider | None = None
     includes_review_precedents: bool = False
+    review_index_reuses_trusted: bool = False
 
     @classmethod
     def from_path(
@@ -232,17 +234,48 @@ class GenericConditionRecommender:
         source = Path(path)
         index_source = source
         paired_review_names = {
-            "generic_index.json.gz": "generic_review_index.json.gz",
             "generic_index.sqlite": "generic_review_index.sqlite",
         }
         paired_review_name = paired_review_names.get(source.name.casefold())
+        review_index_reuses_trusted = False
+        review_reuse_row_count: int | None = None
         if include_review and paired_review_name:
             index_source = source.with_name(paired_review_name)
             if not index_source.is_file():
-                raise FileNotFoundError(
-                    "Review-core index is unavailable. Rebuild recommendation "
-                    f"artifacts to create {paired_review_name}."
+                report_path = source.parent / "recommendation_artifacts_report.json"
+                report = {}
+                if report_path.is_file():
+                    try:
+                        report = json.loads(report_path.read_text(encoding="utf-8"))
+                    except (OSError, json.JSONDecodeError):
+                        report = {}
+                trusted_count = report.get("trusted_precedent_count")
+                unrestricted_count = report.get("unrestricted_precedent_count")
+                counts_match = (
+                    trusted_count is not None
+                    and unrestricted_count is not None
+                    and int(trusted_count) == int(unrestricted_count)
                 )
+                review_index_reuses_trusted = bool(
+                    report.get("review_index_reuses_trusted")
+                    and int(report.get("review_core_precedent_count") or 0) == 0
+                    and counts_match
+                    and str(
+                        ((report.get("artifacts") or {}).get("fast_index") or {}).get(
+                            "path"
+                        )
+                        or ""
+                    ).replace("\\", "/").endswith(source.name)
+                )
+                if review_index_reuses_trusted:
+                    index_source = source
+                    review_reuse_row_count = int(trusted_count)
+                else:
+                    raise FileNotFoundError(
+                        "Review-core index is unavailable. Rebuild recommendation "
+                        f"artifacts to create {paired_review_name} or record safe "
+                        "trusted-index reuse."
+                    )
         index = (
             load_generic_index(index_source, include_review=True)
             if include_review
@@ -250,7 +283,7 @@ class GenericConditionRecommender:
         )
         expected_scope = (
             PrecedentIndexScope.TRUSTED_AND_REVIEW_CORE
-            if include_review
+            if include_review and not review_index_reuses_trusted
             else PrecedentIndexScope.TRUSTED
         )
         if index.precedent_scope != expected_scope:
@@ -259,11 +292,20 @@ class GenericConditionRecommender:
                 f"{expected_scope.value!r}; select the matching mode or rebuild "
                 "recommendation artifacts."
             )
+        if (
+            review_reuse_row_count is not None
+            and len(index.rows) != review_reuse_row_count
+        ):
+            raise ValueError(
+                "Trusted-index review reuse row count does not match the "
+                "artifact report; rebuild recommendation artifacts"
+            )
         return cls(
             index=index,
             source_path=str(source),
             mapping_provider=mapping_provider,
             includes_review_precedents=include_review,
+            review_index_reuses_trusted=review_index_reuses_trusted,
         )
 
     def recommend(
@@ -291,13 +333,18 @@ class GenericConditionRecommender:
             ranking_preferences=resolved_preferences.to_dict(),
         )
         if self.includes_review_precedents:
+            review_warning = (
+                "UNRESTRICTED_MODE_REUSES_TRUSTED_INDEX"
+                if self.review_index_reuses_trusted
+                else "UNRESTRICTED_CORE_REVIEW_INDEX_ENABLED"
+            )
             result = replace(
                 result,
                 warnings=tuple(
                     dict.fromkeys(
                         (
                             *result.warnings,
-                            "UNRESTRICTED_CORE_REVIEW_INDEX_ENABLED",
+                            review_warning,
                         )
                     )
                 ),

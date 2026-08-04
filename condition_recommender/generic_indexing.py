@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import json
-import hashlib
 import gzip
-import io
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass, field as dataclass_field
 from enum import Enum
 from pathlib import Path
@@ -659,132 +657,6 @@ def _index_maps(
     }
 
 
-def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
-    rows = [_indexed_reaction_payload(row) for row in index.rows]
-    maps = {name: dict(mapping) for name, mapping in _index_maps(index).items()}
-    identity = json.dumps(
-        {
-            "rows": rows,
-            "maps": maps,
-            "reaction_signature_schema_version": (
-                index.reaction_signature_schema_version
-            ),
-            "reaction_core_schema_version": index.reaction_core_schema_version,
-            "reaction_core_algorithm_version": (
-                index.reaction_core_algorithm_version
-            ),
-            "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
-            "fallback_descriptor_schema_version": (
-                index.fallback_descriptor_schema_version
-            ),
-            "fallback_definition_versions": dict(index.fallback_definition_versions),
-            "record_schema_versions": index.record_schema_versions,
-            "converter_definition_versions": index.converter_definition_versions,
-            "precedent_scope": index.precedent_scope.value,
-            "core_eligibility_definition_version": (
-                index.core_eligibility_definition_version
-            ),
-        },
-        ensure_ascii=True,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return {
-        "schema_version": GENERIC_INDEX_SCHEMA_VERSION,
-        "artifact_type": "generic_reaction_index",
-        "reaction_signature_schema_version": (index.reaction_signature_schema_version),
-        "reaction_core_schema_version": index.reaction_core_schema_version,
-        "reaction_core_algorithm_version": index.reaction_core_algorithm_version,
-        "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
-        "fallback_descriptor_schema_version": (
-            index.fallback_descriptor_schema_version
-        ),
-        "fallback_definition_versions": dict(index.fallback_definition_versions),
-        "record_schema_versions": index.record_schema_versions,
-        "converter_definition_versions": index.converter_definition_versions,
-        "precedent_scope": index.precedent_scope.value,
-        "core_eligibility_definition_version": (
-            index.core_eligibility_definition_version
-        ),
-        "index_id": "GRI1:" + hashlib.sha256(identity.encode("utf-8")).hexdigest(),
-        "row_count": len(rows),
-        "rows": rows,
-        "maps": maps,
-    }
-
-
-def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[str, Any]:
-    """Write a deterministic, versioned generic index artifact."""
-    payload = _index_payload(index)
-    destination = Path(path)
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    temporary = destination.with_suffix(destination.suffix + ".tmp")
-    completed = False
-    try:
-        if destination.suffix.casefold() == ".gz":
-            with temporary.open("wb") as raw:
-                with gzip.GzipFile(
-                    filename="",
-                    mode="wb",
-                    fileobj=raw,
-                    compresslevel=6,
-                    mtime=0,
-                ) as compressed:
-                    with io.TextIOWrapper(
-                        compressed,
-                        encoding="utf-8",
-                    ) as handle:
-                        json.dump(
-                            payload,
-                            handle,
-                            ensure_ascii=False,
-                            sort_keys=True,
-                            separators=(",", ":"),
-                        )
-                        handle.write("\n")
-        else:
-            with temporary.open("w", encoding="utf-8") as handle:
-                json.dump(
-                    payload,
-                    handle,
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    separators=(",", ":"),
-                )
-                handle.write("\n")
-        temporary.replace(destination)
-        completed = True
-    finally:
-        if not completed and temporary.is_file():
-            temporary.unlink()
-    return {
-        "schema_version": payload["schema_version"],
-        "reaction_signature_schema_version": payload[
-            "reaction_signature_schema_version"
-        ],
-        "reaction_core_schema_version": payload[
-            "reaction_core_schema_version"
-        ],
-        "reaction_core_algorithm_version": payload[
-            "reaction_core_algorithm_version"
-        ],
-        "taxonomy_definition_versions": payload["taxonomy_definition_versions"],
-        "fallback_descriptor_schema_version": payload[
-            "fallback_descriptor_schema_version"
-        ],
-        "fallback_definition_versions": payload["fallback_definition_versions"],
-        "record_schema_versions": payload["record_schema_versions"],
-        "converter_definition_versions": payload["converter_definition_versions"],
-        "precedent_scope": payload["precedent_scope"],
-        "core_eligibility_definition_version": payload[
-            "core_eligibility_definition_version"
-        ],
-        "index_id": payload["index_id"],
-        "row_count": payload["row_count"],
-        "path": str(destination),
-    }
-
-
 def _validate_index_metadata(payload: Mapping[str, Any]) -> PrecedentIndexScope:
     """Validate the chemistry and schema contract of a persisted index."""
     if payload.get("artifact_type") != "generic_reaction_index":
@@ -848,106 +720,6 @@ def _validate_index_metadata(payload: Mapping[str, Any]) -> PrecedentIndexScope:
     return precedent_scope
 
 
-def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
-    """Load and validate a persisted generic index without rebuilding maps."""
-    source = Path(path)
-    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
-    arguments = (
-        {"mode": "rt", "encoding": "utf-8"}
-        if source.suffix.casefold() == ".gz"
-        else {"mode": "r", "encoding": "utf-8"}
-    )
-    with opener(source, **arguments) as handle:
-        payload = json.load(handle)
-    precedent_scope = _validate_index_metadata(payload)
-    rows = tuple(
-        _indexed_reaction_from_payload(row) for row in payload.get("rows") or ()
-    )
-    maps = payload.get("maps") or {}
-    index = GenericReactionIndex(
-        rows=rows,
-        exact={key: tuple(value) for key, value in (maps.get("exact") or {}).items()},
-        handles={
-            key: tuple(value) for key, value in (maps.get("handles") or {}).items()
-        },
-        transformations={
-            key: tuple(value)
-            for key, value in (maps.get("transformations") or {}).items()
-        },
-        bond_edits={
-            key: tuple(value) for key, value in (maps.get("bond_edits") or {}).items()
-        },
-        environments={
-            key: tuple(value) for key, value in (maps.get("environments") or {}).items()
-        },
-        core_exact={
-            key: tuple(value)
-            for key, value in (maps.get("core_exact") or {}).items()
-        },
-        core_typed={
-            key: tuple(value)
-            for key, value in (maps.get("core_typed") or {}).items()
-        },
-        core_shapes={
-            key: tuple(value)
-            for key, value in (maps.get("core_shapes") or {}).items()
-        },
-        core_centers={
-            key: tuple(value)
-            for key, value in (maps.get("core_centers") or {}).items()
-        },
-        environment_features={
-            key: tuple(value)
-            for key, value in (maps.get("environment_features") or {}).items()
-        },
-        fallback_features={
-            key: tuple(value)
-            for key, value in (maps.get("fallback_features") or {}).items()
-        },
-        partial_transformations={
-            key: tuple(value)
-            for key, value in (maps.get("partial_transformations") or {}).items()
-        },
-        families={
-            key: tuple(value) for key, value in (maps.get("families") or {}).items()
-        },
-        reaction_signature_schema_version=str(
-            payload["reaction_signature_schema_version"]
-        ),
-        reaction_core_schema_version=str(payload["reaction_core_schema_version"]),
-        reaction_core_algorithm_version=str(
-            payload["reaction_core_algorithm_version"]
-        ),
-        taxonomy_definition_versions=tuple(
-            sorted(
-                (str(key), str(value))
-                for key, value in payload["taxonomy_definition_versions"].items()
-            )
-        ),
-        fallback_descriptor_schema_version=str(
-            payload["fallback_descriptor_schema_version"]
-        ),
-        fallback_definition_versions=tuple(
-            sorted(
-                (str(key), str(value))
-                for key, value in payload["fallback_definition_versions"].items()
-            )
-        ),
-        record_schema_versions=tuple(payload["record_schema_versions"]),
-        converter_definition_versions=tuple(payload["converter_definition_versions"]),
-        precedent_scope=precedent_scope,
-        core_eligibility_definition_version=(
-            CORE_ELIGIBILITY_DEFINITION_VERSION
-        ),
-    )
-    expected = _index_payload(index)
-    if expected["index_id"] != payload.get("index_id"):
-        raise ValueError("Generic reaction index integrity check failed")
-    if int(payload.get("row_count", -1)) != len(rows):
-        raise ValueError("Generic reaction index row count mismatch")
-    return index
-
-
 def load_generic_index(
     path: str | Path,
     *,
@@ -960,7 +732,10 @@ def load_generic_index(
 
         return load_sqlite_generic_index(source)
     if source.name.casefold().endswith(".json.gz"):
-        return load_persisted_generic_index(source)
+        raise ValueError(
+            "Persisted JSON recommendation indexes are retired; rebuild or "
+            "select the corresponding SQLite index"
+        )
     if source.suffix.casefold() == ".json":
         if source.name == "shard_manifest.json":
             from .conversion.sharded import (
@@ -978,7 +753,10 @@ def load_generic_index(
                 for record in iter_gzip_jsonl(source.parent / entry["output_path"])
             )
             return build_generic_index(records, include_review=include_review)
-        return load_persisted_generic_index(source)
+        raise ValueError(
+            "Only shard_manifest.json is accepted as canonical JSON input; "
+            "persisted runtime indexes must use SQLite"
+        )
     opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
     open_arguments = (
         {"mode": "rt", "encoding": "utf-8"}
@@ -1005,149 +783,16 @@ def load_generic_index(
 
 
 def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
-    """Validate persisted map coverage, row identity, and recipe contracts."""
+    """Validate the supported SQLite runtime-index artifact."""
     source = Path(path)
-    if source.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}:
-        from .sqlite_indexing import validate_sqlite_generic_index
+    if source.suffix.casefold() not in {".sqlite", ".sqlite3", ".db"}:
+        raise ValueError(
+            "Runtime index integrity validation supports SQLite only; canonical "
+            "JSONL is validated through the conversion manifest"
+        )
+    from .sqlite_indexing import validate_sqlite_generic_index
 
-        return validate_sqlite_generic_index(source)
-    index = load_persisted_generic_index(source)
-    issues = []
-    row_count = len(index.rows)
-    observation_ids = [row.observation_id for row in index.rows]
-    duplicate_observation_count = len(observation_ids) - len(set(observation_ids))
-    if duplicate_observation_count:
-        issues.append("duplicate_observation_ids")
-    mapping_equivalence_counts = Counter(
-        str(row.reaction_core.get("mapping_equivalence_key") or "")
-        for row in index.rows
-        if str(row.reaction_core.get("mapping_equivalence_key") or "").startswith(
-            "RME1:"
-        )
-    )
-    maps = {
-        "exact": (index.exact, "exact_signature_key"),
-        "handles": (index.handles, "handle_signature_key"),
-        "transformations": (
-            index.transformations,
-            "transformation_signature_key",
-        ),
-        "bond_edits": (index.bond_edits, "bond_edit_signature_key"),
-        "environments": (index.environments, "environment_signature_key"),
-    }
-    for name, (mapping, field) in maps.items():
-        for positions in mapping.values():
-            if any(position < 0 or position >= row_count for position in positions):
-                issues.append(f"out_of_range_position:{name}")
-        for position, row in enumerate(index.rows):
-            key = str(row.signature.get(field) or "")
-            if key and position not in mapping.get(key, ()):
-                issues.append(f"missing_reverse_mapping:{name}")
-    core_maps = {
-        "core_exact": (index.core_exact, "exact_core_key"),
-        "core_typed": (index.core_typed, "typed_core_key"),
-        "core_shapes": (index.core_shapes, "shape_core_key"),
-        "core_centers": (index.core_centers, "center_transition_key"),
-    }
-    for name, (mapping, field) in core_maps.items():
-        for positions in mapping.values():
-            if any(position < 0 or position >= row_count for position in positions):
-                issues.append(f"out_of_range_position:{name}")
-        for position, row in enumerate(index.rows):
-            key = str(row.reaction_core.get(field) or "")
-            if key and position not in mapping.get(key, ()):
-                issues.append(f"missing_reverse_mapping:{name}")
-    for position, row in enumerate(index.rows):
-        for token in set(environment_tokens(row.signature)):
-            if position not in index.environment_features.get(token, ()):
-                issues.append("missing_environment_feature_mapping")
-        for token in fallback_index_tokens(row.fallback_descriptor):
-            if position not in index.fallback_features.get(token, ()):
-                issues.append("missing_fallback_feature_mapping")
-        partial_key = str(
-            row.fallback_descriptor.get("partial_transformation_key") or ""
-        )
-        if partial_key and position not in index.partial_transformations.get(
-            partial_key, ()
-        ):
-            issues.append("missing_partial_transformation_mapping")
-        if row.named_family and position not in index.families.get(
-            row.named_family, ()
-        ):
-            issues.append("missing_family_mapping")
-        if row.resolved_recipe.get("recipe_id") != row.recipe_id:
-            issues.append("recipe_identity_mismatch")
-        if (
-            row.resolved_recipe.get("recipe_core_id") or row.recipe_core_id
-        ) != row.recipe_core_id:
-            issues.append("recipe_core_identity_mismatch")
-    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
-    arguments = (
-        {"mode": "rt", "encoding": "utf-8"}
-        if source.suffix.casefold() == ".gz"
-        else {"mode": "r", "encoding": "utf-8"}
-    )
-    with opener(source, **arguments) as handle:
-        payload = json.load(handle)
-    report = {
-        "schema_version": "1.1",
-        "artifact_type": "generic_index_integrity",
-        "path": str(source),
-        "valid": not issues,
-        "issues": sorted(set(issues)),
-        "index_id": payload["index_id"],
-        "index_schema_version": payload["schema_version"],
-        "row_count": row_count,
-        "file_size_bytes": source.stat().st_size,
-        "duplicate_observation_count": duplicate_observation_count,
-        "mapping_equivalence": {
-            "row_count": sum(mapping_equivalence_counts.values()),
-            "group_count": len(mapping_equivalence_counts),
-            "multirow_group_count": sum(
-                count > 1 for count in mapping_equivalence_counts.values()
-            ),
-            "largest_group_size": max(
-                mapping_equivalence_counts.values(), default=0
-            ),
-        },
-        "key_counts": {
-            "exact": len(index.exact),
-            "handles": len(index.handles),
-            "partial_transformations": len(index.partial_transformations),
-            "transformations": len(index.transformations),
-            "bond_edits": len(index.bond_edits),
-            "environments": len(index.environments),
-            "core_exact": len(index.core_exact),
-            "core_typed": len(index.core_typed),
-            "core_shapes": len(index.core_shapes),
-            "core_centers": len(index.core_centers),
-            "environment_features": len(index.environment_features),
-            "fallback_features": len(index.fallback_features),
-            "families": len(index.families),
-        },
-        "transformation_class_counts": dict(
-            sorted(Counter(row.transformation_class for row in index.rows).items())
-        ),
-        "named_family_counts": dict(
-            sorted(Counter(row.named_family or "unnamed" for row in index.rows).items())
-        ),
-        "reaction_scope_counts": dict(
-            sorted(
-                Counter(
-                    str(
-                        (row.signature.get("topology") or {}).get("reaction_scope")
-                        or "unknown"
-                    )
-                    for row in index.rows
-                ).items()
-            )
-        ),
-        "unique_reference_count": len(
-            {row.reference_id for row in index.rows if row.reference_id}
-        ),
-        "unique_recipe_core_count": len({row.recipe_core_id for row in index.rows}),
-    }
-    return report
+    return validate_sqlite_generic_index(source)
 
 
 __all__ = [
@@ -1156,7 +801,5 @@ __all__ = [
     "build_generic_index",
     "build_generic_index_from_rows",
     "load_generic_index",
-    "load_persisted_generic_index",
-    "save_generic_index",
     "validate_generic_index_artifact",
 ]

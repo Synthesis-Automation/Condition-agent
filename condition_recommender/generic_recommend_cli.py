@@ -52,7 +52,7 @@ def main() -> None:
     parser.add_argument(
         "--records",
         default="results/generic_conversion/records.jsonl",
-        help="Canonical records or a persisted SQLite/JSON generic index",
+        help="Canonical records/manifest or a persisted SQLite runtime index",
     )
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--minimum-pool-size", type=int)

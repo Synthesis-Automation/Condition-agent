@@ -22,8 +22,8 @@ from condition_recommender.generic_api import recommend_indexed_signature
 from condition_recommender.generic_indexing import (
     build_generic_index,
     load_generic_index,
-    save_generic_index,
 )
+from condition_recommender.sqlite_indexing import save_sqlite_generic_index
 from condition_recommender.core_retrieval import (
     retrieve_core_pool_with_trace,
 )
@@ -1109,8 +1109,8 @@ def test_preloaded_recommender_loads_the_index_once(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
-    path = tmp_path / "index.json"
-    save_generic_index(
+    path = tmp_path / "index.sqlite"
+    save_sqlite_generic_index(
         build_generic_index([_record(1, _signature("one"))]),
         path,
     )
@@ -1136,9 +1136,9 @@ def test_reaction_core_index_round_trip_preserves_lookup_maps(
 ) -> None:
     record = _record(1, _signature("one"))
     record["reaction_core"] = _core("one")
-    path = tmp_path / "index.json"
+    path = tmp_path / "index.sqlite"
 
-    save_generic_index(build_generic_index([record]), path)
+    save_sqlite_generic_index(build_generic_index([record]), path)
     restored = load_generic_index(path)
 
     assert restored.rows[0].reaction_core["core_id"] == "RCP2:one"

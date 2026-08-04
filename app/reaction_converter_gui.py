@@ -266,9 +266,9 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "recommendation data and restart checkpoints) • "
             "reaction_review.csv (concise human review, including spectator "
             "and local steric/electronic context) • "
-            "generic_index.sqlite (trusted lazy lookup) + "
-            "generic_review_index.sqlite (expert review-core lookup), with "
-            "temporary JSON parity indexes. "
+            "generic_index.sqlite (trusted lazy lookup) and, only when it adds "
+            "qualified precedents, generic_review_index.sqlite (expert "
+            "review-core lookup). "
             "A duplicate merged "
             "records file is not stored."
         )

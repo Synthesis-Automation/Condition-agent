@@ -242,7 +242,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
         ),
     )
     worker = gui.GenericRecommendationWorker(
-        "index.json.gz",
+        "index.sqlite",
         "A.B>>P",
         top_k=3,
         minimum_pool_size=2,

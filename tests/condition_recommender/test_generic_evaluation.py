@@ -1,5 +1,6 @@
 import csv
 import json
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -31,8 +32,6 @@ from condition_recommender.chemist_review_adjudication import (
 from condition_recommender.generic_indexing import (
     build_generic_index,
     load_generic_index,
-    load_persisted_generic_index,
-    save_generic_index,
     validate_generic_index_artifact,
 )
 from condition_recommender.sqlite_indexing import (
@@ -162,45 +161,31 @@ def _core(token: str = "shared") -> dict:
     }
 
 
-def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
+def test_sqlite_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     index = build_generic_index([_record(1), _record(2)])
-    first_path = tmp_path / "first.json"
-    second_path = tmp_path / "second.json"
-    first = save_generic_index(index, first_path)
-    second = save_generic_index(index, second_path)
-    loaded = load_persisted_generic_index(first_path)
+    first_path = tmp_path / "first.sqlite"
+    second_path = tmp_path / "second.sqlite"
+    first = save_sqlite_generic_index(index, first_path)
+    second = save_sqlite_generic_index(index, second_path)
+    loaded = load_sqlite_generic_index(first_path)
     assert first["index_id"] == second["index_id"]
     assert first_path.read_bytes() == second_path.read_bytes()
-    assert loaded == index
-    assert load_generic_index(first_path) == index
-    payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "6.0"
-    assert payload["reaction_signature_schema_version"] == "3.4"
-    assert payload["record_schema_versions"] == ["10.0"]
-    assert payload["precedent_scope"] == "trusted"
-    assert payload["reaction_core_schema_version"] == "3.1"
-    assert payload["reaction_core_algorithm_version"] == (
-        "reaction_core_projection.v11"
-    )
-    assert payload["maps"]["environment_features"]
+    assert tuple(loaded.rows) == index.rows
+    assert tuple(load_generic_index(first_path).rows) == index.rows
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]
     assert integrity["row_count"] == 2
-    assert integrity["schema_version"] == "1.1"
-    assert integrity["mapping_equivalence"]["row_count"] == 0
+    assert integrity["schema_version"] == "1.0"
 
 
-def test_compressed_persisted_index_round_trip(tmp_path: Path) -> None:
-    index = build_generic_index([_record(1), _record(2)])
+def test_loader_rejects_retired_json_runtime_index(tmp_path: Path) -> None:
     path = tmp_path / "generic_index.json.gz"
+    path.write_text("{}", encoding="utf-8")
 
-    report = save_generic_index(index, path)
-
-    assert path.read_bytes().startswith(b"\x1f\x8b")
-    assert report["row_count"] == 2
-    assert load_persisted_generic_index(path) == index
-    assert load_generic_index(path) == index
-    assert validate_generic_index_artifact(path)["valid"]
+    with pytest.raises(ValueError, match="JSON recommendation indexes are retired"):
+        load_generic_index(path)
+    with pytest.raises(ValueError, match="supports SQLite only"):
+        validate_generic_index_artifact(path)
 
 
 def test_sqlite_index_round_trip_is_lazy_and_equivalent(tmp_path: Path) -> None:
@@ -275,8 +260,8 @@ def test_reaction_core_calibration_report_and_blind_review(
         record = _record(index)
         record["reaction_core"] = _core(str(index))
         records.append(record)
-    index_path = tmp_path / "index.json"
-    save_generic_index(build_generic_index(records), index_path)
+    index_path = tmp_path / "index.sqlite"
+    save_sqlite_generic_index(build_generic_index(records), index_path)
     output = tmp_path / "core_calibration"
 
     report = evaluate_reaction_core_index(
@@ -354,23 +339,36 @@ def test_index_rejects_stale_converted_records() -> None:
 
 
 def test_loader_rejects_stale_index_schema(tmp_path: Path) -> None:
-    path = tmp_path / "index.json"
-    save_generic_index(build_generic_index([_record(1)]), path)
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    payload["schema_version"] = "1.0"
-    path.write_text(json.dumps(payload), encoding="utf-8")
+    path = tmp_path / "index.sqlite"
+    save_sqlite_generic_index(build_generic_index([_record(1)]), path)
+    with sqlite3.connect(path) as connection:
+        payload = json.loads(
+            connection.execute(
+                "SELECT payload FROM metadata WHERE singleton = 1"
+            ).fetchone()[0]
+        )
+        payload["schema_version"] = "1.0"
+        connection.execute(
+            "UPDATE metadata SET payload = ? WHERE singleton = 1",
+            (json.dumps(payload, sort_keys=True),),
+        )
     with pytest.raises(ValueError, match="rebuild the index"):
-        load_persisted_generic_index(path)
+        load_sqlite_generic_index(path)
 
 
-def test_persisted_index_detects_tampering(tmp_path: Path) -> None:
-    path = tmp_path / "index.json"
-    save_generic_index(build_generic_index([_record(1)]), path)
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    payload["rows"][0]["yield_pct"] = 99.0
-    path.write_text(json.dumps(payload), encoding="utf-8")
-    with pytest.raises(ValueError, match="integrity"):
-        load_persisted_generic_index(path)
+def test_sqlite_index_detects_tampering(tmp_path: Path) -> None:
+    path = tmp_path / "index.sqlite"
+    save_sqlite_generic_index(build_generic_index([_record(1)]), path)
+    with sqlite3.connect(path) as connection:
+        connection.execute(
+            "UPDATE precedents SET payload = ? WHERE position = 0",
+            (b"not-a-compressed-record",),
+        )
+
+    integrity = validate_generic_index_artifact(path)
+
+    assert not integrity["valid"]
+    assert "precedent_payload_invalid" in integrity["issues"]
 
 
 def test_grouped_split_keeps_duplicate_reactions_together() -> None:
@@ -411,9 +409,9 @@ def test_grouped_split_keeps_publication_references_together() -> None:
 
 
 def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
-    index_path = tmp_path / "index.json"
+    index_path = tmp_path / "index.sqlite"
     output = tmp_path / "evaluation"
-    save_generic_index(
+    save_sqlite_generic_index(
         build_generic_index([_record(index) for index in range(10)]),
         index_path,
     )
@@ -536,9 +534,9 @@ def test_grouped_split_validates_inputs() -> None:
 def test_baseline_comparison_uses_one_split_and_writes_report(
     tmp_path: Path,
 ) -> None:
-    index_path = tmp_path / "index.json"
+    index_path = tmp_path / "index.sqlite"
     output = tmp_path / "baselines"
-    save_generic_index(
+    save_sqlite_generic_index(
         build_generic_index([_record(index) for index in range(10)]),
         index_path,
     )
@@ -574,12 +572,12 @@ def test_baseline_comparison_uses_one_split_and_writes_report(
 def test_calibration_selects_on_development_and_gates_on_validation(
     tmp_path: Path,
 ) -> None:
-    development_path = tmp_path / "development.json"
-    validation_path = tmp_path / "validation.json"
+    development_path = tmp_path / "development.sqlite"
+    validation_path = tmp_path / "validation.sqlite"
     output = tmp_path / "calibration"
     records = [_record(index) for index in range(30)]
-    save_generic_index(build_generic_index(records), development_path)
-    save_generic_index(build_generic_index(records), validation_path)
+    save_sqlite_generic_index(build_generic_index(records), development_path)
+    save_sqlite_generic_index(build_generic_index(records), validation_path)
 
     report = calibrate_generic_ranking(
         development_path,
@@ -605,14 +603,14 @@ def test_calibration_definition_rejects_stale_schema() -> None:
 def test_chemist_review_packet_randomizes_candidates_and_separates_key(
     tmp_path: Path,
 ) -> None:
-    index_path = tmp_path / "index.json"
+    index_path = tmp_path / "index.sqlite"
     records = [_record(index) for index in range(12)]
     for record in records[8:]:
         record["reaction_signature"] = {
             **record["reaction_signature"],
             "bond_edit_signature_key": "L3:alternate",
         }
-    save_generic_index(build_generic_index(records), index_path)
+    save_sqlite_generic_index(build_generic_index(records), index_path)
     output = tmp_path / "review"
 
     report = generate_chemist_review_packet(
@@ -640,14 +638,14 @@ def test_chemist_review_packet_randomizes_candidates_and_separates_key(
 def test_completed_chemist_review_is_unblinded_with_bound_provenance(
     tmp_path: Path,
 ) -> None:
-    index_path = tmp_path / "index.json"
+    index_path = tmp_path / "index.sqlite"
     records = [_record(index) for index in range(12)]
     for record in records[8:]:
         record["reaction_signature"] = {
             **record["reaction_signature"],
             "bond_edit_signature_key": "L3:alternate",
         }
-    save_generic_index(build_generic_index(records), index_path)
+    save_sqlite_generic_index(build_generic_index(records), index_path)
     review_dir = tmp_path / "review"
     generate_chemist_review_packet(
         index_path,
