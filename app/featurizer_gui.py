@@ -330,6 +330,79 @@ def _port_profile_text(profile: Any) -> str:
     return "; ".join(values)
 
 
+def _r_group_functional_context_lines(
+    analysis: Any,
+    ports: Sequence[Any],
+) -> list[str]:
+    """Render motif overlays already associated with remote core subgraphs."""
+    interpretation = getattr(analysis, "interpretation", None)
+    contexts = tuple(
+        getattr(interpretation, "r_group_functional_contexts", ()) or ()
+    )
+    lines = []
+    for context in contexts:
+        matching_ports = tuple(
+            value
+            for value in ports
+            if value.source_component_index == context.component_index
+            and tuple(value.atom_indices) == tuple(context.remote_atom_indices)
+        )
+        if not matching_ports:
+            continue
+        matching_ports = tuple(
+            sorted(
+                matching_ports,
+                key=lambda value: int(value.placeholder_index or 0),
+            )
+        )
+        labels = tuple(str(value.display_label) for value in matching_ports)
+        label_text = "/".join(labels)
+        label_by_attachment = {
+            int(value.attachment_atom_index): str(value.display_label)
+            for value in matching_ports
+        }
+        lines.append(
+            f"Unchanged functional groups on the {label_text} scaffold:"
+        )
+        for group in context.functional_groups:
+            port_values = tuple(
+                (
+                    label_by_attachment[distance.attachment_atom_index],
+                    distance.bond_distance,
+                )
+                for distance in group.port_distances
+                if distance.attachment_atom_index in label_by_attachment
+            )
+            distance_notes = []
+            if port_values:
+                unique_distances = {distance for _, distance in port_values}
+                if len(port_values) > 1 and len(unique_distances) == 1:
+                    distance_notes.append(
+                        f"{next(iter(unique_distances))} bonds from each R attachment"
+                    )
+                elif len(port_values) == 1:
+                    label, distance = port_values[0]
+                    distance_notes.append(
+                        f"{distance} bonds from the {label} attachment"
+                    )
+                else:
+                    distance_notes.append(
+                        ", ".join(
+                            f"{label}: {distance} bonds"
+                            for label, distance in port_values
+                        )
+                    )
+            if group.distance_to_reactive_site is not None:
+                distance_notes.append(
+                    f"{group.distance_to_reactive_site} bonds from the reaction center"
+                )
+            suffix = (
+                f" ({'; '.join(distance_notes)})" if distance_notes else ""
+            )
+            lines.append(f"  {_annotation_text(group.motif_id)}{suffix}")
+    return lines
+
+
 def _r_group_analysis_lines(analysis: Any) -> list[str]:
     """Return display-labeled R-port profiles from the canonical projection."""
     try:
@@ -419,6 +492,7 @@ def _r_group_analysis_lines(analysis: Any) -> list[str]:
             lines.append(
                 f"  {label_text} are connected through the same omitted scaffold."
             )
+    lines.extend(_r_group_functional_context_lines(analysis, ports))
     connectors = {}
     for value in projection.connectors:
         key = tuple(value.placeholder_indices)

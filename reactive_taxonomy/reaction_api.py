@@ -18,6 +18,7 @@ from .reaction_observation import build_reaction_observation
 from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_rendering import render_reaction
 from .reaction_render_context import build_reaction_render_context
+from .reaction_r_group_context import build_r_group_functional_contexts
 from .reaction_parser import interpret_parsed_molecules, parse_reaction_smiles
 from .reaction_stoichiometry import infer_reactant_multiplicity
 from .partial_product_correspondence import (
@@ -116,6 +117,11 @@ def featurize_reaction(
         observation.edits,
         observation.evidence_quality,
     )
+    r_group_functional_contexts = build_r_group_functional_contexts(
+        reactants=parsed.reactants,
+        core=reaction_core,
+        spectator_groups=spectators,
+    )
     partial_product_transformation = (
         infer_partial_product_transformation(
             reactants=parsed.reactants,
@@ -136,6 +142,7 @@ def featurize_reaction(
     interpretation = replace(
         interpret_reaction(observation, label_style=label_style),
         spectator_groups=spectators,
+        r_group_functional_contexts=r_group_functional_contexts,
     )
     edit_hypotheses = observation.edit_hypotheses
     evidence_candidates = observation.evidence_candidates

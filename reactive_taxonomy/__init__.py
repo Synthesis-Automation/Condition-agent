@@ -103,6 +103,7 @@ from .reaction_models import (
     REACTION_CORE_EVENT_RELATION_SCHEMA_VERSION,
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     REACTION_RING_CHANGE_SCHEMA_VERSION,
+    REACTION_R_GROUP_FUNCTIONAL_CONTEXT_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
     REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION,
     REACTION_TOPOLOGY_SCHEMA_VERSION,
@@ -136,6 +137,9 @@ from .reaction_models import (
     ReactionPartnerEnvironment,
     ReactionObservation,
     ReactionRingChange,
+    ReactionRGroupFunctionalContext,
+    ReactionRGroupFunctionalGroup,
+    ReactionRGroupPortDistance,
     ReactionSignature,
     ReactionSpectatorGroup,
     ReactionStereoChange,
@@ -148,6 +152,7 @@ from .reaction_review import (
     build_reaction_review_summary,
     format_reaction_review_summary,
 )
+from .reaction_r_group_context import build_r_group_functional_contexts
 from .labels import available_styles
 from .models import (
     MolecularAtomObservation,
@@ -239,6 +244,7 @@ __all__ = [
     "REACTION_CORE_EVENT_RELATION_SCHEMA_VERSION",
     "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
     "REACTION_RING_CHANGE_SCHEMA_VERSION",
+    "REACTION_R_GROUP_FUNCTIONAL_CONTEXT_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
     "REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION",
     "REACTION_TOPOLOGY_SCHEMA_VERSION",
@@ -274,6 +280,9 @@ __all__ = [
     "ReactionPartnerEnvironment",
     "ReactionObservation",
     "ReactionRingChange",
+    "ReactionRGroupFunctionalContext",
+    "ReactionRGroupFunctionalGroup",
+    "ReactionRGroupPortDistance",
     "ReactionSignature",
     "ReactionReviewSummary",
     "ReactionRenderContext",
@@ -306,6 +315,7 @@ __all__ = [
     "build_reaction_display_projection",
     "build_observation_signature",
     "build_reaction_review_summary",
+    "build_r_group_functional_contexts",
     "build_reaction_render_context",
     "detect_molecular_motifs",
     "detect_reactive_site_hypotheses",

@@ -15,6 +15,7 @@ REACTION_CORE_PROJECTION_SCHEMA_VERSION = "3.1"
 REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION = "1.0"
 REACTION_CORE_EVENT_RELATION_SCHEMA_VERSION = "1.0"
 REACTION_PATTERN_MATCH_SCHEMA_VERSION = "4.1"
+REACTION_R_GROUP_FUNCTIONAL_CONTEXT_SCHEMA_VERSION = "1.0"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v11"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
 REACTION_TOPOLOGY_SCHEMA_VERSION = "2.0"
@@ -463,6 +464,85 @@ class ReactionSpectatorGroup:
     graph_distance: Optional[int]
     tags: Tuple[str, ...] = ()
     unchanged_evidence: str = "selected_event_exclusion"
+
+
+@dataclass(frozen=True)
+class ReactionRGroupPortDistance:
+    """Graph distance from one unchanged motif to one R-group attachment."""
+
+    attachment_atom_index: int
+    substituent_profile_id: str
+    bond_distance: int
+
+    def __post_init__(self) -> None:
+        if self.attachment_atom_index < 0 or self.bond_distance < 0:
+            raise ValueError("R-group port indices and distances must be non-negative")
+        if not self.substituent_profile_id.startswith("RSP1:"):
+            raise ValueError("R-group port distance requires an RSP1 profile ID")
+
+
+@dataclass(frozen=True)
+class ReactionRGroupFunctionalGroup:
+    """One unchanged functional group contained by a remote core subgraph."""
+
+    motif_id: str
+    chemist_label: str
+    atom_indices: Tuple[int, ...]
+    tags: Tuple[str, ...]
+    nearest_reactive_site_id: Optional[str]
+    distance_to_reactive_site: Optional[int]
+    port_distances: Tuple[ReactionRGroupPortDistance, ...]
+    unchanged_evidence: str
+
+    def __post_init__(self) -> None:
+        if not self.motif_id or not self.atom_indices:
+            raise ValueError("R-group functional group requires motif provenance")
+        if tuple(sorted(set(self.atom_indices))) != self.atom_indices:
+            raise ValueError("R-group functional-group atoms must be unique and sorted")
+        if tuple(sorted(set(self.tags))) != self.tags:
+            raise ValueError("R-group functional-group tags must be unique and sorted")
+        if (
+            self.distance_to_reactive_site is not None
+            and self.distance_to_reactive_site < 0
+        ):
+            raise ValueError("reactive-site distance must be non-negative")
+        if not self.port_distances:
+            raise ValueError("R-group functional group requires a port distance")
+
+
+@dataclass(frozen=True)
+class ReactionRGroupFunctionalContext:
+    """Optional motif overlay for one graph-provenanced remote subgraph."""
+
+    context_id: str
+    remote_subgraph_id: str
+    side: Literal["reactant"]
+    component_index: int
+    remote_class: ReactionCoreRemoteClass
+    continuity: Literal[
+        "retained", "departing", "appearing", "changed", "unresolved"
+    ]
+    remote_atom_indices: Tuple[int, ...]
+    attachment_profile_ids: Tuple[str, ...]
+    functional_groups: Tuple[ReactionRGroupFunctionalGroup, ...]
+    evidence: str = "spectator_motif_contained_in_remote_subgraph"
+    schema_version: str = REACTION_R_GROUP_FUNCTIONAL_CONTEXT_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.context_id.startswith("RGFC1:"):
+            raise ValueError("R-group functional-context IDs require RGFC1")
+        if not self.remote_subgraph_id.startswith("RCR2:"):
+            raise ValueError("R-group context requires a remote-subgraph ID")
+        if self.component_index < 0 or not self.remote_atom_indices:
+            raise ValueError("R-group context requires remote atom provenance")
+        if tuple(sorted(set(self.remote_atom_indices))) != self.remote_atom_indices:
+            raise ValueError("R-group context atoms must be unique and sorted")
+        if tuple(sorted(set(self.attachment_profile_ids))) != (
+            self.attachment_profile_ids
+        ):
+            raise ValueError("R-group profile IDs must be unique and sorted")
+        if not self.attachment_profile_ids or not self.functional_groups:
+            raise ValueError("R-group context requires ports and functional groups")
 
 
 @dataclass(frozen=True)
@@ -1174,9 +1254,12 @@ class ReactionInterpretation:
     family_environment: Optional[ReactionFamilyEnvironment] = None
     product_connection: Optional[ProductConnection] = None
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
+    r_group_functional_contexts: Tuple[
+        ReactionRGroupFunctionalContext, ...
+    ] = ()
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "7.0"
+    schema_version: str = "7.1"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (
@@ -1247,6 +1330,7 @@ __all__ = [
     "REACTION_CORE_PROJECTION_SCHEMA_VERSION",
     "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
     "REACTION_RING_CHANGE_SCHEMA_VERSION",
+    "REACTION_R_GROUP_FUNCTIONAL_CONTEXT_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
     "REACTION_TOPOLOGY_SCHEMA_VERSION",
     "ReactionAnalysis",
@@ -1275,6 +1359,9 @@ __all__ = [
     "ReactionPatternMatch",
     "ReactionPartnerEnvironment",
     "ReactionRingChange",
+    "ReactionRGroupFunctionalContext",
+    "ReactionRGroupFunctionalGroup",
+    "ReactionRGroupPortDistance",
     "ReactionSignature",
     "ReactionSiteReference",
     "ReactionSpectatorGroup",

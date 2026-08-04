@@ -75,13 +75,14 @@ The current code declares:
 | --- | --- |
 | Reaction analysis | `10.0` |
 | Reaction observation | `3.0` |
-| Reaction interpretation | `7.0` |
+| Reaction interpretation | `7.1` |
 | Rendered reaction label | `1.1` |
 | Reaction signature / ID namespace | `3.4` / `RS3` |
 | Reaction ring change | `1.0` |
 | Reaction topology | `2.0` |
 | Reaction core projection / algorithm | `3.1` / `reaction_core_projection.v11` |
 | Reaction substituent profile | `1.0` / `substituent_profile.v1` |
+| R-group functional context | `1.0` / `RGFC1` |
 | Reaction-pattern match | `4.1` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |

@@ -28,6 +28,7 @@ Build generic ReactionSignature from ReactionObservation when evidence is suffic
 Add optional annotations
   ├─ molecular motifs and reactive-site hypotheses
   ├─ site-level steric/electronic reactivity profiles with branch evidence
+  ├─ unchanged functional groups associated with containing R subgraphs
   └─ generic transformation and synthesis-pattern matches that cite
      core event IDs, edit indices, and attachment-profile IDs
   ↓
@@ -152,8 +153,11 @@ R-group featurization is intentionally split across system layers:
    reactive-center identity, attached-group classifications, branch-level
    steric contributions, accessibility class and score, lone-pair or resonance
    context, electronic activation class and score, modifiers, evidence, and
-   uncertainty. These profiles describe the reactive site and its graph
-   branches; they do not redefine R-label identity or signature identity.
+   uncertainty. It also associates unchanged functional-group motifs with the
+   remote subgraph that contains all of their atoms, retaining distance to each
+   attachment port and to the nearest reaction center. These profiles describe
+   the reactive site and its graph branches; they do not redefine R-label
+   identity or signature identity.
 3. `condition_recommender` owns comparison and ranking. It may compare the
    versioned port profiles and compatible reactivity descriptors, but it must
    not derive new molecular chemistry from display labels or condition fields.
@@ -161,6 +165,14 @@ R-group featurization is intentionally split across system layers:
 This split keeps stable 2D graph facts in observation while preventing
 heuristic or future conformer-aware steric/electronic models from silently
 changing the canonical reaction identity.
+
+A `ReactionRGroupFunctionalContext` is emitted only when every atom of an
+unchanged spectator motif belongs to one reactant-side remote subgraph. It
+records the remote-subgraph ID, attachment-profile IDs, motif atom provenance,
+tags, distance to the nearest reaction center, and graph distance to every
+attachment port. A motif intersecting an edited atom is consumed rather than
+reported as R-group context. Shared scaffolds are represented once even when
+they have several displayed ports such as `R1` and `R2`.
 
 The signature hashes normalized chemistry and identity-bearing definition
 versions. It is invariant to irrelevant component order and serialization. A

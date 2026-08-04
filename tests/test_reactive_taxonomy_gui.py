@@ -297,6 +297,10 @@ def test_core_graph_analysis_exposes_shared_r_ports_and_site_context() -> None:
     assert "R¹ and R² are connected through the same omitted scaffold." in text
     assert "N two bonds away" in text
     assert "break C–Cl; form C–N; remove N–H" in text
+    assert "Unchanged functional groups on the R¹/R² scaffold:" in text
+    assert "tertiary amine (2 bonds from each R attachment" in text
+    assert "aryl halide (4 bonds from each R attachment" in text
+    assert "carboxylic acid (9 bonds from each R attachment" in text
     assert "Active-site steric/electronic context:" in text
     assert "secondary N" in text
     assert "hindered access" in text
