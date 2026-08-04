@@ -34,12 +34,12 @@ class AdmissionDecision:
     condition_stage_status: ConditionStageStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v3.0"
+    policy_version: str = "generic_admission.v4.0"
 
 
 @lru_cache(maxsize=1)
 def load_admission_policy() -> dict[str, Any]:
-    path = Path(__file__).parents[1] / "definitions" / "generic_admission.v3.json"
+    path = Path(__file__).parents[1] / "definitions" / "generic_admission.v4.json"
     with path.open("r", encoding="utf-8") as handle:
         return dict(json.load(handle))
 
@@ -254,7 +254,11 @@ def decide_admission(
                 )
             )
         )
-    ) or len(record.condition_component_inputs)
+    )
+    if not policy.get("condition_data_must_not_override_chemistry"):
+        raise ValueError(
+            "Admission policy must preserve chemistry-first index eligibility"
+        )
     if (
         chemistry_status == ChemistryStatus.REJECTED
         or condition_status == ConditionStatus.UNUSABLE

@@ -132,6 +132,11 @@ def assess_core_eligibility(
         if isinstance(external_mapping, Mapping)
         else ""
     )
+    mapping_product_coverage = (
+        float(external_mapping.get("product_mapping_coverage") or 0.0)
+        if isinstance(external_mapping, Mapping)
+        else 0.0
+    )
 
     external_mapping_used = bool(
         mapping_status and not mapping_status.startswith("not_requested_")
@@ -149,7 +154,10 @@ def assess_core_eligibility(
         completeness_status == "unresolved"
         and mapping_status == unresolved_policy.get("mapping_status")
         and isinstance(completeness, Mapping)
-        and float(completeness.get("product_mapping_coverage") or 0.0)
+        and max(
+            float(completeness.get("product_mapping_coverage") or 0.0),
+            mapping_product_coverage,
+        )
         >= float(unresolved_policy.get("minimum_product_mapping_coverage") or 1.0)
         and (
             not unresolved_policy.get("require_no_product_element_excess")

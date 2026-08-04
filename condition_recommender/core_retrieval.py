@@ -21,13 +21,13 @@ from .support import summarize_evidence_support
 
 _RULES_PATH = (
     Path(__file__).with_name("definitions")
-    / "reaction_core_retrieval.v2.json"
+    / "reaction_core_retrieval.v3.json"
 )
 
 
 @dataclass(frozen=True)
 class CoreRetrievalResult:
-    """Compatibility-filtered verified precedents for one core-only query."""
+    """Compatibility-filtered tier-qualified precedents for a core query."""
 
     level: str
     pool: Tuple[Tuple[GenericIndexedReaction, CompatibilityAssessment], ...]
@@ -45,7 +45,7 @@ def load_reaction_core_retrieval_rules() -> dict[str, Any]:
         rules = dict(json.load(handle))
     if str(rules.get("schema_version") or "") != "1.0":
         raise ValueError("unsupported reaction-core retrieval schema")
-    if str(rules.get("definition_id") or "") != "reaction_core_retrieval.v2":
+    if str(rules.get("definition_id") or "") != "reaction_core_retrieval.v3":
         raise ValueError("unexpected reaction-core retrieval definition ID")
     ladder = tuple(rules.get("retrieval_ladder") or ())
     expected = (
@@ -61,8 +61,13 @@ def load_reaction_core_retrieval_rules() -> dict[str, Any]:
         raise ValueError("reaction-core retrieval minimum support must be positive")
     if not tuple(rules.get("allowed_query_evidence_statuses") or ()):
         raise ValueError("reaction-core retrieval requires allowed evidence")
-    if rules.get("verified_precedents_only") is not True:
-        raise ValueError("reaction-core retrieval must use verified precedents")
+    if tuple(rules.get("allowed_precedent_tiers") or ()) != (
+        "trusted",
+        "review_core",
+    ):
+        raise ValueError("reaction-core retrieval precedent tiers are invalid")
+    if rules.get("review_core_requires_expert_mode") is not True:
+        raise ValueError("review-core retrieval must require expert mode")
     return rules
 
 
@@ -107,14 +112,20 @@ def _level_positions(
     key_field: str,
     index_map: str,
 ) -> set[int]:
+    rules = load_reaction_core_retrieval_rules()
+    allowed_tiers = set(rules["allowed_precedent_tiers"])
     key = str(core.get(key_field) or "")
     event_count = int(core.get("event_count") or 0)
     mapping = getattr(index, index_map)
     return {
         position
         for position in mapping.get(key, ())
-        if index.rows[position].signature
+        if index.rows[position].precedent_tier.value in allowed_tiers
         and index.rows[position].reaction_core
+        and (
+            index.rows[position].signature
+            or index.rows[position].fallback_descriptor
+        )
         and int(index.rows[position].reaction_core.get("event_count") or 0)
         == event_count
     }

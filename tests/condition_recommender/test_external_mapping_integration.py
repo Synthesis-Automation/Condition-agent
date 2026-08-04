@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, replace
 
+from condition_registry import ConditionComponentInput
 from reactive_taxonomy import (
     AtomMappingProviderMetadata,
     ExternalAtomMappingResult,
@@ -374,7 +375,9 @@ def test_converter_persists_mapper_provenance_but_excludes_precedent() -> None:
     provider = _FixtureProvider()
     record = convert_record(_raw_record(), mapping_provider=provider)
 
-    assert record.reaction_signature is not None
+    assert record.reaction_signature is None
+    assert record.fallback_descriptor is not None
+    assert record.reaction_core is not None
     assert record.external_atom_mapping is not None
     assert (
         record.external_atom_mapping["status"]
@@ -386,7 +389,7 @@ def test_converter_persists_mapper_provenance_but_excludes_precedent() -> None:
     assert record.chemistry_status == ChemistryStatus.REVIEW
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
-    assert "external_mapping_review_required" in record.admission_reasons
+    assert "missing_verified_reaction_signature" in record.admission_reasons
     review = concise_reaction_review_row(record.to_dict())
     assert review["external_mapping_status"] == (
         "external_mapping_internal_consensus"
@@ -405,6 +408,25 @@ def test_converter_persists_mapper_provenance_but_excludes_precedent() -> None:
     incorrectly_promoted = record.to_dict()
     incorrectly_promoted["index_eligibility"] = "eligible"
     assert not build_generic_index([incorrectly_promoted]).rows
+
+    structured_conditions = replace(
+        _raw_record(),
+        condition_component_inputs=(
+            ConditionComponentInput(
+                raw_identifier="7647-01-0",
+                source_field="reagents",
+                identifier_type="cas",
+                source_role_hint="reagent",
+            ),
+        ),
+    )
+    structured_record = convert_record(
+        structured_conditions,
+        mapping_provider=_FixtureProvider(),
+    )
+    assert structured_record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    assert structured_record.precedent_tier is not None
+    assert structured_record.precedent_tier.value == "review_core"
 
     mapper_only = record.to_dict()
     mapper_only["external_atom_mapping"]["status"] = "external_mapping_only"
@@ -465,7 +487,7 @@ def test_conversion_engine_reports_external_mapping_dispositions(tmp_path) -> No
     )
 
     assert report["schema_version"] == "2.1"
-    assert report["signature_count"] == 1
+    assert report["signature_count"] == 0
     assert report["index_eligibility_counts"]["review_only"] == 1
     assert report["external_atom_mapping"] == {
         "enabled": True,
@@ -560,23 +582,13 @@ def test_recommender_uses_mapper_supported_query_with_review_cautions() -> None:
         _raw_record(),
         mapping_provider=_FixtureProvider(),
     ).to_dict()
-    converted.update(
-        {
-            "reaction_id": "verified-precedent",
-            "observation_id": "verified-observation",
-            "index_eligibility": "eligible",
-            "precedent_tier": "trusted",
-            "chemistry_status": "verified",
-            "admission_tier": "verified",
-            "external_atom_mapping": None,
-        }
-    )
-    index = build_generic_index([converted])
+    index = build_generic_index([converted], include_review=True)
     provider = _FixtureProvider()
 
     result = GenericConditionRecommender(
         index=index,
         mapping_provider=provider,
+        includes_review_precedents=True,
     ).recommend(FISCHER_REACTION, minimum_pool_size=1)
 
     assert result.valid

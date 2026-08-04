@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "definition_id": "reaction_core_retrieval.v2",
+  "definition_id": "reaction_core_retrieval.v3",
   "calibration_status": "poc_review_only_not_calibrated",
   "minimum_pool_size": 2,
   "retrieval_ladder": [
@@ -9,9 +9,10 @@
     {"level": "reaction_core_context", "key_field": "shape_core_key", "index_map": "core_shapes"}
   ],
   "allowed_query_evidence_statuses": ["verified", "inferred", "external"],
+  "allowed_precedent_tiers": ["trusted", "review_core"],
+  "review_core_requires_expert_mode": true,
   "blocking_query_warnings": [
     "REACTION_CORE_NO_OP_PRIMARY_CENTER",
     "REACTION_CORE_QUALITY_BLOCKED"
-  ],
-  "verified_precedents_only": true
+  ]
 }

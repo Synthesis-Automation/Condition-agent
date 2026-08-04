@@ -768,7 +768,7 @@ Generic configuration is split by responsibility:
   requirements;
 - `definitions/fallback_retrieval.v1.json` controls the isolated unresolved-query
   structure fallback and its stricter support gates;
-- `definitions/reaction_core_retrieval.v2.json` controls unsigned reaction-core
+- `definitions/reaction_core_retrieval.v3.json` controls unsigned reaction-core
   evidence status, blocking warnings, and independent support.
 
 Ranking and retrieval parameters are selected on development splits and

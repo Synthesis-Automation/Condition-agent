@@ -1,6 +1,6 @@
 {
-  "schema_version": "2.0",
-  "policy_id": "generic_admission.v3.0",
+  "schema_version": "3.0",
+  "policy_id": "generic_admission.v4.0",
   "valid_yield_range": [0.0, 100.0],
   "verified_evidence": [
     "validated_atom_mapping",
@@ -27,5 +27,6 @@
   "indexable_unassigned_multistage_condition_statuses": [
     "resolved_complete"
   ],
-  "review_warnings": ["MULTIPLE_PRODUCTS"]
+  "review_warnings": ["MULTIPLE_PRODUCTS"],
+  "condition_data_must_not_override_chemistry": true
 }

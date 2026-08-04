@@ -314,6 +314,23 @@ def _recommend_with_index(
             False,
             error=analysis.error or "INVALID_REACTION",
         )
+    if (
+        assessment is not None
+        and assessment.status
+        in {"external_mapping_internal_consensus", "external_mapping_only"}
+        and analysis.reaction_core is not None
+    ):
+        mapped_core_result = _recommend_core_with_index(
+            analysis,
+            index,
+            top_k=top_k,
+            minimum_pool_size=minimum_pool_size,
+        )
+        if mapped_core_result.valid:
+            return _attach_external_mapping_assessment(
+                mapped_core_result,
+                assessment,
+            )
     if analysis.reaction_signature is None:
         core_attempt = None
         if analysis.edit_hypotheses:
@@ -422,6 +439,9 @@ def _recommend_core_with_index(
         minimum_pool_size=minimum_pool_size,
     )
     rules = load_reaction_core_retrieval_rules()
+    retrieval_definition_version = (
+        f"{rules['definition_id']}@{rules['schema_version']}"
+    )
     if not retrieval.pool:
         return GenericRecommendationResult(
             query_reaction_smiles=str(analysis.input_reaction_smiles),
@@ -430,7 +450,7 @@ def _recommend_core_with_index(
             recommendation_mode="reaction_core_review",
             reaction_label=_reaction_label_payload(analysis),
             transformation_class=analysis.transformation_class,
-            retrieval_definition_version=str(rules["schema_version"]),
+            retrieval_definition_version=retrieval_definition_version,
             retrieval_strategy="reaction_core_ladder",
             retrieval_level=retrieval.level,
             candidate_count=retrieval.candidate_count,
@@ -468,7 +488,8 @@ def _recommend_core_with_index(
     cautions = (
         "Query retrieval used minimized reaction-core evidence, not a verified "
         "query reaction signature",
-        "Only independently admitted verified precedents supplied conditions",
+        "Only independently admitted trusted or explicit review-core "
+        "precedents supplied conditions",
         "The center-transition key alone was not used for retrieval",
         "Reaction-core recommendations require expert review",
     )
@@ -503,7 +524,7 @@ def _recommend_core_with_index(
         spectator_groups=tuple(
             asdict(group) for group in analysis.spectator_groups
         ),
-        retrieval_definition_version=str(rules["schema_version"]),
+        retrieval_definition_version=retrieval_definition_version,
         retrieval_strategy="reaction_core_ladder",
         retrieval_level=retrieval.level,
         candidate_count=retrieval.candidate_count,

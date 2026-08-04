@@ -148,7 +148,10 @@ def convert_record(
                 ),
             )
         )
-        analysis = assessment.analysis
+        # External mapping is supplemental evidence. Canonical signatures,
+        # fallback descriptors, and admission remain grounded in the internal
+        # observation; a mapper-derived core is attached separately below.
+        analysis = base_analysis
     elif cache is None:
         analysis = featurize_reaction(record.reaction_smiles)
     else:
@@ -251,6 +254,14 @@ def convert_record(
         fragment_source_support=fragment_source_support,
     )
     signature_fields = signature_record_fields(analysis)
+    if (
+        assessment is not None
+        and analysis.reaction_core is None
+        and assessment.analysis.reaction_core is not None
+    ):
+        signature_fields["reaction_core"] = asdict(
+            assessment.analysis.reaction_core
+        )
     completeness_payload = (
         asdict(analysis.reaction_completeness)
         if analysis.reaction_completeness

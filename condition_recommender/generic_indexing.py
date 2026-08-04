@@ -479,7 +479,7 @@ def build_generic_index(
                     and (
                         core_eligibility == CoreEligibility.TRUSTED_CORE.value
                         or (
-                            precedent_tier == PrecedentTier.REVIEW_CORE
+                            include_review
                             and core_eligibility
                             == CoreEligibility.REVIEW_CORE.value
                         )

@@ -99,11 +99,11 @@ The current code declares:
 | Generic recommendation result | `3.0` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.8` |
-| Reaction-core retrieval policy | `reaction_core_retrieval.v2@1.0` |
+| Reaction-core retrieval policy | `reaction_core_retrieval.v3@1.0` |
 | Evidence-support policy | `evidence_support.v1@1.0` |
 | Generic held-out evaluation | `generic_leakage_safe.v1.5` |
 | Reaction-core calibration | `reaction_core_calibration.v1` |
-| Generic admission policy | `generic_admission.v3.0` |
+| Generic admission policy | `generic_admission.v4.0` |
 | Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
 | Fallback retrieval definition | `3.0` |
 
@@ -113,26 +113,31 @@ silently mixing chemistry identities.
 
 ### 2.3 Current local literature artifact
 
-The checked local artifact under `datasets/literature/` was most recently built
-from the bounded `examples/small_300` collection, not the full source corpus.
-Its pre-source-support report records:
+The checked local artifact under `datasets/literature/` was rebuilt on
+2026-08-03 from the two intermediate Hofmann-rearrangement and
+Julia–Kocienski observation files with RXNMapper review evidence enabled. It
+is a bounded 600-row development artifact, not a full source corpus.
 
 | Measurement | Count |
 | --- | ---: |
-| Source files / converted rows | 19 / 5,510 |
-| Generic-index rows | 2,603 |
+| Source files / converted rows | 2 / 600 |
+| Trusted precedents | 175 |
+| Additional review-core precedents | 28 |
+| Expert-index precedents | 203 |
+| Query-eligible cores | 577 |
+| Trusted / review / query-only / blocked / unavailable cores | 174 / 28 / 375 / 21 / 2 |
 
-The sharded conversion report records zero failed shards and zero duplicate
-observations. The artifact predates the current reaction-core, reaction-ring,
-converter, record, and index contracts; current code therefore rejects it until
-it is regenerated. This is deliberate because chemistry observations and index
-maps change artifact identity and retrieval coverage.
+The sharded conversion and both index integrity reports record zero failures,
+zero duplicate observations, and current schema-10.0 records/schema-6.0
+indexes. The default app path resolves the 175-row trusted index; expert mode
+resolves the paired 203-row index. The previous 209-row count was not retained:
+34 rows had been promoted because structured condition data bypassed chemistry
+eligibility. Admission policy v4 removes that violation.
 
-These counts demonstrate that the type-agnostic path works on a broad bounded
-sample and that unnamed reactions are retained. They are coverage and integrity
-measurements, not recommendation-accuracy claims. Because the source is capped
-per dataset, this artifact must not be described as a full-corpus production
-index.
+The 577 query-core count is deliberately not a precedent count. Query-only
+cores can describe a new query and seek compatible admitted precedents, but
+they do not make their own source rows safe condition precedents. These are
+coverage and integrity measurements, not recommendation-accuracy claims.
 
 ### 2.4 Interpretation-independent Fischer POC
 
@@ -729,7 +734,7 @@ mapper-derived converted rows do not enter that index by default.
 An unsigned query may also have a usable reaction core but no RS3 signature.
 After edit-hypothesis consensus and before ordinary structure fallback, the
 query-only core branch applies
-`condition_recommender/definitions/reaction_core_retrieval.v2.json`:
+`condition_recommender/definitions/reaction_core_retrieval.v3.json`:
 
 ```text
 eligible mapped core with passing or review-qualified controls
