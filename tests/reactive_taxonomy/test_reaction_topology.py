@@ -24,6 +24,28 @@ def test_ring_closure_is_an_optional_pattern() -> None:
     }
 
 
+def test_rearrangement_does_not_invent_ring_from_broken_tether() -> None:
+    result = featurize_reaction(
+        "NC(=O)CC1(CC(=O)O)CCCCC1>>NCC1(CC(=O)O)CCCCC1"
+    )
+
+    assert result.reaction_topology is not None
+    assert result.reaction_topology.reaction_scope == "intramolecular"
+    assert result.reaction_topology.ring_count_delta == 0
+    assert result.reaction_topology.ring_changes == ()
+    assert result.reaction_topology.formed_ring_sizes == ()
+    assert result.interpretation is not None
+    assert "net_ring_closure" not in {
+        match.pattern_id for match in result.interpretation.pattern_matches
+    }
+    assert result.reaction_signature is not None
+    assert all(
+        event.topology.formed_ring_sizes == ()
+        and event.topology.ring_changes == ()
+        for event in result.reaction_signature.events
+    )
+
+
 def test_topology_serializes_inside_observation_and_signature() -> None:
     result = featurize_reaction("NCCCCBr>>C1CCCN1")
     assert result.observation is not None

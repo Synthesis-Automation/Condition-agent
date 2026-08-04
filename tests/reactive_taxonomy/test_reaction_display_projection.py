@@ -307,3 +307,16 @@ def test_fragment_projection_ignores_stereobonds_outside_omitted_fragment() -> N
     assert projection.minimum_reaction_smiles == (
         "*CC(*)=O.*N(*)C(=O)OC(C)(C)C>>*C=C(*)N(*)*"
     )
+
+
+def test_hofmann_rearrangement_has_no_false_three_membered_ring_note() -> None:
+    projection = _projection(
+        "NC(=O)CC1(CC(=O)O)CCCCC1>>NCC1(CC(=O)O)CCCCC1"
+    )
+
+    assert projection.minimum_reaction_smiles == "*CC(N)=O>>*CN"
+    assert projection.formed_ring_sizes == ()
+    assert projection.annotation is None
+    assert "INTRAMOLECULAR_TETHER_ABSTRACTED_IN_DISPLAY" not in (
+        projection.warnings
+    )

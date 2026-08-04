@@ -9,6 +9,7 @@ from typing import Any, Optional, Sequence, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_archetypes import reconcile_edit_archetype
+from .reaction_edits import EditNormalizationResult
 from .reaction_models import (
     ReactionAtomReference,
     ReactionComponent,
@@ -18,6 +19,7 @@ from .reaction_models import (
     ReactionPartner,
     ReactionTopology,
 )
+from .reaction_topology import build_reaction_ring_changes
 
 
 def _canonical_json(value: Any) -> str:
@@ -141,6 +143,14 @@ def _event_topology(
     confidence: float,
 ) -> ReactionTopology:
     components = {component.component_index: component for component in reactants}
+    ring_changes = build_reaction_ring_changes(
+        reactants=reactants,
+        edit_result=EditNormalizationResult(
+            edits=tuple(edits),
+            evidence=evidence,
+            confidence=confidence,
+        ),
+    )
     participating = {
         atom.component_index
         for edit in edits
@@ -149,7 +159,6 @@ def _event_topology(
     }
     formed_scopes = []
     tether_distances = []
-    formed_ring_sizes = []
     from rdkit import Chem
 
     for edit in edits:
@@ -181,7 +190,6 @@ def _event_topology(
         if path:
             distance = len(path) - 1
             tether_distances.append(distance)
-            formed_ring_sizes.append(distance + 1)
 
     scopes = set(formed_scopes)
     if scopes == {"intramolecular"}:
@@ -199,10 +207,13 @@ def _event_topology(
         participating_component_indices=tuple(sorted(participating)),
         formed_bond_scopes=tuple(sorted(formed_scopes)),
         reactant_tether_distances=tuple(sorted(tether_distances)),
-        formed_ring_sizes=tuple(sorted(formed_ring_sizes)),
+        formed_ring_sizes=tuple(
+            sorted({change.ring_size for change in ring_changes})
+        ),
         ring_count_delta=None,
         evidence=evidence,
         confidence=confidence,
+        ring_changes=ring_changes,
     )
 
 

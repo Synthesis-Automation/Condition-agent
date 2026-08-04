@@ -140,7 +140,7 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         definition = dict(json.load(handle))
     expected = {
         "schema_version": "1.0",
-        "definition_id": "reaction_display_projection.v1.5",
+        "definition_id": "reaction_display_projection.v1.6",
         "aromatic_system_policy": "retain_aromatic_bond_component",
         "aromatic_valence_completion_policy": (
             "retain_exocyclic_multiple_bonds"
@@ -159,6 +159,9 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         "hidden_connector_policy": "collapse_shared_omitted_component",
         "hidden_connector_bond_type": "zero_order_dashed",
         "hidden_connector_label_template": "S{index}",
+        "intramolecular_annotation_policy": (
+            "formed_cycle_or_hidden_connector"
+        ),
     }
     for key, value in expected.items():
         if definition.get(key) != value:
@@ -1217,6 +1220,8 @@ def _finalize_components(
 def _intramolecular_annotation(
     topology: Any,
     definition: Mapping[str, Any],
+    *,
+    has_hidden_connector: bool,
 ) -> str | None:
     if topology is None or str(topology.reaction_scope) != "intramolecular":
         return None
@@ -1228,7 +1233,9 @@ def _intramolecular_annotation(
     if ring_sizes:
         sizes = ", ".join(str(value) for value in ring_sizes)
         return f"Intramolecular; forms rings of size {sizes}"
-    return str(definition["intramolecular_note_without_size"])
+    if has_hidden_connector:
+        return str(definition["intramolecular_note_without_size"])
+    return None
 
 
 def _formed_ring_sizes(topology: Any) -> Tuple[int, ...]:
@@ -1318,7 +1325,11 @@ def build_reaction_display_projection(
         )
     )
     topology = analysis.reaction_topology
-    annotation = _intramolecular_annotation(topology, definition)
+    annotation = _intramolecular_annotation(
+        topology,
+        definition,
+        has_hidden_connector=bool(connectors),
+    )
     warnings = list(core.warnings)
     warnings.append("DISPLAY_PROJECTION_NOT_REACTION_IDENTITY")
     if connectors:

@@ -245,7 +245,6 @@ def build_reaction_topology(
     }
     formed_scopes = []
     tether_distances = []
-    formed_ring_sizes = []
     ring_changes = build_reaction_ring_changes(
         reactants=reactants,
         edit_result=edit_result,
@@ -286,7 +285,6 @@ def build_reaction_topology(
         if path:
             distance = len(path) - 1
             tether_distances.append(distance)
-            formed_ring_sizes.append(distance + 1)
 
     scope_set = set(formed_scopes)
     if scope_set == {"intramolecular"}:
@@ -312,12 +310,12 @@ def build_reaction_topology(
         participating_component_indices=tuple(sorted(participating)),
         formed_bond_scopes=tuple(sorted(formed_scopes)),
         reactant_tether_distances=tuple(sorted(tether_distances)),
+        # A short path in the unedited reactant is not sufficient evidence of
+        # ring formation: rearrangements can break that path while forming the
+        # new bond. Only cycles present after applying the complete edit set
+        # are reported as formed rings.
         formed_ring_sizes=tuple(
-            sorted(
-                set(formed_ring_sizes).union(
-                    change.ring_size for change in ring_changes
-                )
-            )
+            sorted({change.ring_size for change in ring_changes})
         ),
         ring_count_delta=ring_count_delta,
         evidence=edit_result.evidence,
