@@ -19,12 +19,14 @@ from .loader import (
     IDENTIFIERS_PATH,
     SUBSTANCES_PATH,
     load_taxonomy,
+    row_to_identifier,
 )
 from .models import (
     CONDITION_IDENTIFIER_TYPES,
     CONDITION_NAME_IDENTIFIER_TYPES,
     RoleAssignment,
     Substance,
+    SubstanceIdentifier,
 )
 from .normalization import (
     identifier_normalization_profile,
@@ -145,6 +147,28 @@ class CompoundAdditionResult:
     molecular_weight: Optional[float]
     alias_count: int
     additions_path: str
+    identifiers_path: str
+
+
+@dataclass(frozen=True)
+class SubstanceAliasAdditionRequest:
+    """One evidence-bearing alias to add to an existing substance."""
+
+    substance_id: str
+    identifier_type: str
+    value: str
+    source: str
+    language: Optional[str] = None
+    is_preferred: bool = False
+    allow_ambiguous: bool = False
+
+
+@dataclass(frozen=True)
+class SubstanceAliasAdditionResult:
+    """Summary of one atomic batch alias curation operation."""
+
+    added: Tuple[SubstanceIdentifier, ...]
+    skipped_existing: Tuple[SubstanceIdentifier, ...]
     identifiers_path: str
 
 
@@ -749,6 +773,188 @@ def update_compound(
         )
 
 
+def add_substance_aliases(
+    requests: Iterable[SubstanceAliasAdditionRequest],
+    *,
+    substances_path: str | Path = SUBSTANCES_PATH,
+    additions_path: str | Path = ADDITIONS_PATH,
+    identifiers_path: str | Path = IDENTIFIERS_PATH,
+) -> SubstanceAliasAdditionResult:
+    """Validate and atomically add aliases to existing stable identities."""
+    requests = tuple(requests)
+    substances_path = Path(substances_path)
+    additions_path = Path(additions_path)
+    identifiers_path = Path(identifiers_path)
+    with _CURATION_LOCK:
+        registry = ConditionRegistry(
+            substances_path=substances_path,
+            additions_path=additions_path,
+            identifiers_path=identifiers_path,
+        )
+        errors: list[str] = []
+        prepared: list[tuple[SubstanceAliasAdditionRequest, str, str]] = []
+        skipped: list[SubstanceIdentifier] = []
+        seen: set[tuple[str, str, str]] = set()
+        for request in requests:
+            substance_id = str(request.substance_id or "").strip()
+            identifier_type = str(request.identifier_type or "").strip()
+            value = str(request.value or "").strip()
+            source = str(request.source or "").strip()
+            target = registry.resolve_id(substance_id)
+            if target.status != "resolved" or target.substance is None:
+                errors.append(f"ALIAS_TARGET_NOT_FOUND:{substance_id}")
+                continue
+            if identifier_type not in CONDITION_IDENTIFIER_TYPES:
+                errors.append(f"UNKNOWN_IDENTIFIER_TYPE:{identifier_type}")
+                continue
+            if identifier_type in {"canonical_name", "cas"}:
+                errors.append(f"RESERVED_ALIAS_TYPE:{identifier_type}")
+                continue
+            if not value:
+                errors.append("EMPTY_ALIAS_VALUE")
+                continue
+            if not source:
+                errors.append(f"MISSING_ALIAS_SOURCE:{value}")
+                continue
+            normalized = normalize_identifier(value, identifier_type)
+            if normalized is None:
+                errors.append(f"INVALID_ALIAS_VALUE:{identifier_type}:{value}")
+                continue
+            namespace = (
+                "name"
+                if identifier_type in CONDITION_NAME_IDENTIFIER_TYPES
+                else identifier_type
+            )
+            key = (substance_id, namespace, normalized)
+            if key in seen:
+                continue
+            seen.add(key)
+            existing = (
+                registry.resolve(name=value)
+                if identifier_type in CONDITION_NAME_IDENTIFIER_TYPES
+                else registry.resolve_identifier(
+                    value,
+                    identifier_type=identifier_type,
+                )
+            )
+            if (
+                existing.status == "resolved"
+                and existing.substance is not None
+                and existing.substance.substance_id == substance_id
+                and existing.matched_identifier is not None
+            ):
+                skipped.append(existing.matched_identifier)
+                continue
+            if existing.status != "unresolved" and not request.allow_ambiguous:
+                errors.append(
+                    f"ALIAS_ALREADY_REGISTERED:{identifier_type}:{value}"
+                )
+                continue
+            prepared.append((request, substance_id, normalized))
+        if errors:
+            raise CompoundAdditionError(errors)
+
+        identifier_rows = _read_csv(identifiers_path, IDENTIFIER_FIELDNAMES)
+        identifier_rows = list(
+            _declare_existing_shared_aliases(
+                identifier_rows,
+                (
+                    CompoundAliasInput(
+                        identifier_type=request.identifier_type,
+                        value=request.value,
+                        language=request.language,
+                        is_preferred=request.is_preferred,
+                        allow_ambiguous=request.allow_ambiguous,
+                    )
+                    for request, _substance_id, _normalized in prepared
+                ),
+            )
+        )
+        added_rows = []
+        existing_ids = {
+            str(row.get("identifier_id") or "").strip()
+            for row in identifier_rows
+        }
+        for request, substance_id, normalized in prepared:
+            digest = hashlib.sha256(
+                f"{substance_id}|{request.identifier_type}|{normalized}".encode(
+                    "utf-8"
+                )
+            ).hexdigest()[:16]
+            identifier_id = f"sid:alias:{digest}"
+            if identifier_id in existing_ids:
+                raise CompoundAdditionError(
+                    (f"DUPLICATE_IDENTIFIER_ID:{identifier_id}",)
+                )
+            existing_ids.add(identifier_id)
+            added_rows.append(
+                {
+                    "identifier_id": identifier_id,
+                    "substance_id": substance_id,
+                    "identifier_type": request.identifier_type,
+                    "value": request.value,
+                    "language": str(request.language or "").strip(),
+                    "is_preferred": str(bool(request.is_preferred)).lower(),
+                    "source": str(request.source).strip(),
+                    "confidence": "1.0",
+                    "status": "active",
+                    "normalization_profile": (
+                        identifier_normalization_profile(request.identifier_type)
+                        or ""
+                    ),
+                    "allow_ambiguous": str(
+                        bool(request.allow_ambiguous)
+                    ).lower(),
+                }
+            )
+        original = identifiers_path.read_bytes()
+        try:
+            _write_csv_atomic(
+                identifiers_path,
+                IDENTIFIER_FIELDNAMES,
+                (*identifier_rows, *added_rows),
+            )
+            verified_registry = ConditionRegistry(
+                substances_path=substances_path,
+                additions_path=additions_path,
+                identifiers_path=identifiers_path,
+            )
+            for request, substance_id, _normalized in prepared:
+                result = verified_registry.resolve_identifier(
+                    request.value,
+                    identifier_type=request.identifier_type,
+                )
+                if not (
+                    (
+                        result.status == "resolved"
+                        and result.substance is not None
+                        and result.substance.substance_id == substance_id
+                    )
+                    or (
+                        request.allow_ambiguous
+                        and result.status == "ambiguous"
+                        and substance_id in result.candidates
+                    )
+                ):
+                    raise RuntimeError(
+                        "New alias could not be verified after write: "
+                        f"{request.value}"
+                    )
+        except Exception:
+            _restore_bytes(identifiers_path, original)
+            raise
+        _clear_default_registry_caches(
+            substances_path=substances_path,
+            additions_path=additions_path,
+            identifiers_path=identifiers_path,
+        )
+        return SubstanceAliasAdditionResult(
+            added=tuple(row_to_identifier(row) for row in added_rows),
+            skipped_existing=tuple(skipped),
+            identifiers_path=str(identifiers_path),
+        )
+
+
 __all__ = [
     "ADDITION_FIELDNAMES",
     "IDENTIFIER_FIELDNAMES",
@@ -757,6 +963,9 @@ __all__ = [
     "CompoundAdditionRequest",
     "CompoundAdditionResult",
     "CompoundAliasInput",
+    "SubstanceAliasAdditionRequest",
+    "SubstanceAliasAdditionResult",
+    "add_substance_aliases",
     "add_compound",
     "update_compound",
 ]

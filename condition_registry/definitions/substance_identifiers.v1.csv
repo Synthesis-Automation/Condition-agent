@@ -3,3 +3,45 @@ sid:7647-01-0:hydrogen-chloride,cas:7647-01-0,systematic_name,Hydrogen chloride,
 sid:584-08-7:dipotassium-carbonate,cas:584-08-7,systematic_name,Dipotassium carbonate,en,false,condition_registry_curated,1.0,active,chemical_name_v1,false
 sid:1094520-55-4:036f89626cb96511,cas:1094520-55-4,systematic_name,tetrakis(2-methylpropan-2-ol);tetrabutylazanium;fluoride,en,false,pubchem:cid:25112410,1.0,active,chemical_name_v1,false
 sid:1094520-55-4:40d5f1f7cea2c4b0,cas:1094520-55-4,common_name,tetrakis(2-methyl-2-propanol) tetrabutylammonium ion fluoride,en,false,pubchem:cid:25112410,1.0,active,chemical_name_v1,false
+sid:alias:3b5f14aedc9117a3,cas:78-92-2,legacy_name,2-BuOH,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:42fff6bdbd6247a8,cas:148-24-3,legacy_name,8-Quinolol,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:7c4889d7dc0c32b5,cas:1160861-59-5,legacy_name,Ad-BrettPhos,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:818e65a2b758da91,cas:828-51-3,legacy_name,AdCOOH,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:6d78963adf2cd340,cas:7775-41-9,legacy_name,AgF,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:3c5a180b70075aee,cas:321921-71-5,legacy_name,CataCXiumA,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:c29934bf14d80071,cas:672937-60-9,legacy_name,cataCXiumPCy,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:7ef5953e561db2ae,cas:1067883-58-2,legacy_name,CMPhos,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:a9edec2915bb3013,cas:7789-19-7,legacy_name,CuF2,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:c786de2303c33793,cas:108-77-0,legacy_name,CyanuricChloride,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:c44f8a50d06cfdb9,cas:2524-64-3,legacy_name,Diphenylchlorophosphate,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:3aa1948ce716bfa0,cas:72287-26-4,legacy_name,dppfPdCl2,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:b73e34cb80e94243,cas:72914-19-3,legacy_name,dtbpy,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:da9185f580dc4bee,cas:611-10-9,legacy_name,ethyl 2-oxocyclopentane carboxylate,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:bc81546148acb191,cas:1702311-34-9,legacy_name,JosiphosSL-J009-1 Pd G3,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:6b8592383bb623a9,cas:16731-55-8,legacy_name,K2S2O5,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:5b745fa2b847e038,cas:4111-54-0,legacy_name,LDA,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:7c6650de98785846,cas:1907-33-1,legacy_name,LiOtBu,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:54a3e33a8350d740,cas:1660-93-1,legacy_name,Me4phen,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:afa6402d5b704750,registry-row:22427,legacy_name,"N,N-Dimethylglycine hydrochloride",,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:8da8aee38e5faa9b,cas:1070-89-9,legacy_name,NaHMDS,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:4931a0e62a771cbd,cas:14593-46-5,legacy_name,NaOtPent,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:190dd3798a41eddc,cas:123-86-4,legacy_name,nBuOAc,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:1f3c86979a6493d9,cas:121-44-8,legacy_name,NEt3,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:c43dd7dd0a524618,cas:373-02-4,legacy_name,Ni(OAc)2,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:526954d69da6f256,cas:28923-39-9,legacy_name,NiBr2-glyme,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:fe6eed952bfe3e7c,cas:109-02-4,legacy_name,NMM,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:98d5019f71fb1421,cas:3551-78-8,legacy_name,NN-Dibenzyloxamide,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:8547c38792cce149,cas:615-35-0,legacy_name,NN-Dimethyloxamide,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:b15ce5e11263238f,cas:3849-21-6,legacy_name,OxymaPure,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:258ff72220d6b196,cas:2622-14-2,legacy_name,P(Cy)3,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:da74898260a3d5cf,cas:6163-58-2,legacy_name,P(oTol)3,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:35dcba2319bc2f2a,cas:13716-12-6,legacy_name,P(tBu)3,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:ba640410f1859a11,cas:52522-40-4,legacy_name,Pd2dba3.CHCl3,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:666122e4b46e3440,cas:240417-00-9,legacy_name,Ph-DavePhos,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:9ac3f9e9e487ae44,registry-row:25327,legacy_name,Sodium octanoate,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:511e698bbba52a63,cas:75-85-4,legacy_name,tAmOH,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:86f9eb0fa7109614,cas:1112-67-0,legacy_name,TBAC,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:91b139a59505ee57,cas:1634-04-4,legacy_name,TBME,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:ff344008fb595ad1,cas:80-70-6,legacy_name,TMG,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:42f3113bf5cb538f,cas:67579-81-1,legacy_name,trans-NN-Dimethylcyclohexane-12-diamine,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:alias:4b2a52946ac649ea,cas:545-06-2,legacy_name,TrichloroACN,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false

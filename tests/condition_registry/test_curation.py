@@ -9,6 +9,8 @@ from condition_registry import (
     CompoundAliasInput,
     ConditionRegistry,
     RoleAssignment,
+    SubstanceAliasAdditionRequest,
+    add_substance_aliases,
     add_compound,
     update_compound,
     validate_registry,
@@ -394,3 +396,65 @@ def test_update_compound_rolls_back_all_definitions_on_failure(
         additions.read_bytes(),
         identifiers.read_bytes(),
     ) == before
+
+
+def test_add_substance_aliases_writes_and_verifies_atomic_batch(
+    tmp_path,
+) -> None:
+    substances, additions, identifiers = _definition_paths(tmp_path)
+
+    result = add_substance_aliases(
+        (
+            SubstanceAliasAdditionRequest(
+                substance_id="cas:7732-18-5",
+                identifier_type="legacy_name",
+                value="Aqua",
+                language="en",
+                source="weak-label:test",
+            ),
+        ),
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+
+    assert tuple(item.value for item in result.added) == ("Aqua",)
+    registry = ConditionRegistry(
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+    resolved = registry.resolve(name="Aqua")
+    assert resolved.status == "resolved"
+    assert resolved.substance is not None
+    assert resolved.substance.substance_id == "cas:7732-18-5"
+
+
+def test_add_substance_aliases_rejects_conflict_without_writing(
+    tmp_path,
+) -> None:
+    substances, additions, identifiers = _definition_paths(tmp_path)
+    add_compound(
+        _request(aliases=()),
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+    before = identifiers.read_bytes()
+
+    with pytest.raises(CompoundAdditionError, match="ALIAS_ALREADY_REGISTERED"):
+        add_substance_aliases(
+            (
+                SubstanceAliasAdditionRequest(
+                    substance_id="cas:64-17-5",
+                    identifier_type="legacy_name",
+                    value="Water",
+                    source="weak-label:test",
+                ),
+            ),
+            substances_path=substances,
+            additions_path=additions,
+            identifiers_path=identifiers,
+        )
+
+    assert identifiers.read_bytes() == before
