@@ -45,3 +45,560 @@ sid:alias:91b139a59505ee57,cas:1634-04-4,legacy_name,TBME,,false,weak_label_v2.1
 sid:alias:ff344008fb595ad1,cas:80-70-6,legacy_name,TMG,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
 sid:alias:42f3113bf5cb538f,cas:67579-81-1,legacy_name,trans-NN-Dimethylcyclohexane-12-diamine,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
 sid:alias:4b2a52946ac649ea,cas:545-06-2,legacy_name,TrichloroACN,,false,weak_label_v2.1:condition_name_reconciliation,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:ca8fdcbea56288a3,cas:1034901-50-2,common_name,"Dichloro(4,4′-di-tert-butyl-2,2′-bipyridine)nickel(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:1b7568e812280425,cas:1034901-50-2,legacy_name,"(4,4-dtbbpy)NiCl2",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:c326918b1761716d,cas:1034901-50-2,systematic_name,4-tert-butyl-2-(4-tert-butyl-2-pyridinyl)pyridine;dichloronickel,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:34a1d0c656e86349,cas:1034901-50-2,common_name,4-tert-butyl-2-(4-tert-butylpyridin-2-yl)pyridine;dichloronickel,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:bf58e53a1cebfe61,cas:1034901-50-2,common_name,MFCD31807325,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:e696e5042d398393,cas:1034901-50-2,common_name,SCHEMBL23538063,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:0f4685d58f975f67,cas:1034901-50-2,common_name,D81190,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:7ffc4d99c45dee0b,cas:1034901-50-2,common_name,"[4,4'-bis(1,1-dimethylethyl)-2,2'-bipyridyl]nickel(II) dichloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1034901-50-2:98613a0e6fbc7974,cas:1034901-50-2,common_name,"[4,4 inverted exclamation marka-Bis(1,1-dimethylethyl)-2,2 inverted exclamation marka-bipyridine] nickel (II) dichloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:156589138,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:210a66c4be85baed,cas:1157867-61-2,common_name,IPent imidazolinium chloride (NHC precursor),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:d4925a1e63adc4ee,cas:1157867-61-2,legacy_name,IPENT Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:78409d241916c23c,cas:1157867-61-2,systematic_name,"1,3-bis[2,6-di(pentan-3-yl)phenyl]imidazol-1-ium chloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:e9430e8cad1a3b2d,cas:1157867-61-2,common_name,MFCD27978383,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:e69d17fdf1b4d5f0,cas:1157867-61-2,common_name,C35H53ClN2,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:e8e272f765f84201,cas:1157867-61-2,common_name,"1,3-Bis[2,6-bis(1-ethylpropyl)phenyl]imidazolium chloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:ee7d5df0ae694726,cas:1157867-61-2,common_name,Pent.HCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:a891f684e4eb0a0e,cas:1157867-61-2,common_name,SCHEMBL17329311,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:94ebd6ee8812c288,cas:1157867-61-2,common_name,"1,3-Bis[2,6-di(3-pentyl)phenyl]-1H-imidazol-3-ium Chloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:ea493230f64a1e6c,cas:1157867-61-2,common_name,AS-85280,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:e64707b74665b190,cas:1157867-61-2,common_name,SY113480,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:1664fa2fda446141,cas:1157867-61-2,common_name,CS-0105689,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:1b329f7711476f9c,cas:1157867-61-2,common_name,F11584,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:1157867-61-2:ae0362eb3798f80b,cas:1157867-61-2,common_name,EN300-7481966,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:92132781,1.0,active,chemical_name_v1,false
+sid:123640-38-0:0e9a1825a019ae06,cas:123640-38-0,legacy_name,"2,6-di(1H-pyrazol-1-yl)pyridine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:84ea5e88dd97f6ae,cas:123640-38-0,systematic_name,"2,6-di(pyrazol-1-yl)pyridine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:ebe4602d2135ec88,cas:123640-38-0,common_name,RefChem:445255,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:34f6fcb26028dd03,cas:123640-38-0,common_name,808-081-1,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:3b0739bdc4b59b72,cas:123640-38-0,common_name,MFCD28336856,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:24166457f4249143,cas:123640-38-0,common_name,"2,6-bis(pyrazol-1-yl)pyridine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:beed8edffc390800,cas:123640-38-0,common_name,SCHEMBL199306,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:8ac31b94b4441306,cas:123640-38-0,common_name,"2,6-bis(n-pyrazolyl)pyridine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:fe5060695610c856,cas:123640-38-0,common_name,AKOS026671325,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:60ae2a682c335ac7,cas:123640-38-0,common_name,BS-15042,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:f593e0dfed2ce422,cas:123640-38-0,common_name,FD138227,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:123640-38-0:0d158e4dfa840e66,cas:123640-38-0,common_name,SY056479,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11816656,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:93e8208b4e8c784d,cas:1239478-87-5,systematic_name,"bis(1-adamantyl)-[2-(1,3,5-triphenylpyrazol-4-yl)pyrazol-3-yl]phosphane",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:370bd4af896f167e,cas:1239478-87-5,common_name,MFCD22200502,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:d5085ec8559f0b7c,cas:1239478-87-5,common_name,"1,4'-Bi-1H-pyrazole, 5-[bis(tricyclo[3.3.1.13,7]dec-1-yl)phosphino]-1',3',5'-triphenyl-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:5bcb23466f8d8415,cas:1239478-87-5,common_name,"5-(di(adamantan-1-yl)phosphino)-1',3',5'-triphenyl-1'H-1,4'-bipyrazole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:ea1339055367ce07,cas:1239478-87-5,common_name,"5-[Bis(tricyclo[3.3.1.13,7]dec-1-yl)phosphino]-1',3',5'-triphenyl-1,4'-bi-1H-pyrazole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:512cd9a64437d4d1,cas:1239478-87-5,common_name,"5-[Di(1-adamantyl)phosphino]-1',3',5'-triphenyl-1'H-[1,4']bipyrazole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:ca4397a224bf69d7,cas:1239478-87-5,common_name,SCHEMBL16805457,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:659a3f4d214da32b,cas:1239478-87-5,common_name,SCHEMBL20272132,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:f7f06b32ed18fe87,cas:1239478-87-5,common_name,C44H47N4P,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:1b66e25a74a820ad,cas:1239478-87-5,common_name,"5-[Di(1-adamantyl)phosphino](1,3,5-triphenyl-1H-pyrazol-4-yl)-1H-pyrazole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:4330ac302e5230a4,cas:1239478-87-5,common_name,AKOS037647612,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:8c5f15cdbed0576e,cas:1239478-87-5,common_name,AS-74239,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1239478-87-5:1cea8d0dd047ec46,cas:1239478-87-5,common_name,SY355323,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:46939809,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:97424cd02fd1df89,cas:1242759-01-8,common_name,PPh2-Andole-Phos ligand,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:ea2ac0fdcb3d24cf,cas:1242759-01-8,legacy_name,PPh2-Andole-Phos,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:2e08e14fecb93dec,cas:1242759-01-8,systematic_name,[2-(2-methoxyphenyl)-1-methylindol-3-yl]-diphenylphosphane,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:3fa7065b9d3a25a2,cas:1242759-01-8,common_name,MFCD22666029,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:71ba2e2f9d79a3f2,cas:1242759-01-8,common_name,3-(Diphenylphosphaneyl)-2-(2-methoxyphenyl)-1-methyl-1H-indole,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:ab4dc43f6346159a,cas:1242759-01-8,common_name,PPh?-Andole-Phos,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:d2de238685da240f,cas:1242759-01-8,common_name,CS-0108376,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:18c5ed19643e7b30,cas:1242759-01-8,common_name,H62003,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:bcc6764d8254641e,cas:1242759-01-8,common_name,F571272,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1242759-01-8:e7b83a2ddf3a039c,cas:1242759-01-8,common_name,"2-(2-Methoxyphenyl)-1-methyl-3-diphenylphosphino)-1H-indole, 98% PPh2-Andole-Phos",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:56949992,1.0,active,chemical_name_v1,false
+sid:1314-80-3:b01b9009e911e17e,cas:1314-80-3,common_name,Phosphorus pentasulfide,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:64d6c0c3ed3b1dbe,cas:1314-80-3,legacy_name,P4S10,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:238c4656393369cd,cas:1314-80-3,systematic_name,"1,3,5,7-tetrakis(sulfanylidene)-2,4,6,8,9,10-hexathia-1lambda5,3lambda5,5lambda5,7lambda5-tetraphosphatricyclo[3.3.1.13,7]decane",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:c490847bba355023,cas:1314-80-3,common_name,Sulfur phosphide,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:a6832b99c89acf7e,cas:1314-80-3,common_name,Tetraphosphorus decasulfide,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:117fc69b1a24efec,cas:1314-80-3,common_name,Phosphoric sulfide,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:01b56b683bdde6e9,cas:1314-80-3,common_name,Diphosphorus pentasulfide,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:38c2c857674db479,cas:1314-80-3,common_name,Phosphorus persulfide,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:a877cb3e88b9eb74,cas:1314-80-3,common_name,Thiophosphoric anhydride,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:6057bfa549d5d28d,cas:1314-80-3,common_name,Diphosphorus pentasulphide,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:be2da464b68ceb80,cas:1314-80-3,common_name,Phosphorus pentasulfide (P4S10),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:0805b27a5af678ea,cas:1314-80-3,common_name,Sirnik fosforecny,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:251b33d5b9156e8c,cas:1314-80-3,common_name,RCRA waste number U189,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:e5612b81a9c296e4,cas:1314-80-3,common_name,HJ1X20J1DX,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1314-80-3:8be423ecc1573ac4,cas:1314-80-3,common_name,Pentasulfure de phosphore,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:14817,1.0,active,chemical_name_v1,false
+sid:1385042-42-1:569e092d08579b17,cas:1385042-42-1,common_name,P(o-tolyl)3 palladium crotyl chloride precatalyst,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:177896871,1.0,active,chemical_name_v1,false
+sid:1385042-42-1:3150a00ae9fce2cf,cas:1385042-42-1,systematic_name,but-2-ene;chloropalladium(1+);tris(2-methylphenyl)phosphanium,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:177896871,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:cfa3751425011c5b,cas:1394382-56-9,common_name,"Pyridine-2,6-bis(carboximidamide) dihydrochloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:d833da4dcc4d79bb,cas:1394382-56-9,legacy_name,Weix 2-pyridyldicarboxamidine bis-HCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:9360f90942e5a694,cas:1394382-56-9,common_name,RefChem:870723,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:f5c872f5b5ee9659,cas:1394382-56-9,common_name,848-235-5,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:8c172f17a7a19f12,cas:1394382-56-9,common_name,"pyridine-2,6-dicarboxamidine;dihydrochloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:9894ba5941d34767,cas:1394382-56-9,common_name,MFCD31718854,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:64d2d1f9b3ff5357,cas:1394382-56-9,common_name,"2,6-Pyridinedicarboximidamide dihydrochloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:0b4cff4db444623c,cas:1394382-56-9,common_name,SCHEMBL8451784,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:3475ef6dfa67b2a2,cas:1394382-56-9,common_name,"Pyridine-2,6-dicarboxamidine diHCl",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:1139ba1758f1851d,cas:1394382-56-9,common_name,AT11798,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:fff9178949a14109,cas:1394382-56-9,common_name,AS-79003,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1394382-56-9:f9d511d456e899ce,cas:1394382-56-9,common_name,FP175726,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23373305,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:74a8d2777a59678f,cas:1651823-59-4,common_name,cataCXium A Pd G3,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:19832d456297f449,cas:1651823-59-4,systematic_name,bis(1-adamantyl)-butylphosphane;methanesulfonic acid;palladium;2-phenylaniline,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:481fdc188c969922,cas:1651823-59-4,common_name,RefChem:568979,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:496ea8f03f87c3f3,cas:1651823-59-4,common_name,815-115-9,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:52a93e21dc553930,cas:1651823-59-4,common_name,"cataCXium(R) A Pd G3, 95%",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:2f0cc2aac39cda4c,cas:1651823-59-4,common_name,SY073434,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:139c1bafe2c0a971,cas:1651823-59-4,common_name,P19059,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:1651823-59-4:1ffc5d57e5ad6de2,cas:1651823-59-4,common_name,EN300-7352854,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064761,1.0,active,chemical_name_v1,false
+sid:165535-45-5:e2996c1999da7e44,cas:165535-45-5,common_name,Phosphazene base P2-Et,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:091ad4bb133836b9,cas:165535-45-5,legacy_name,P2Et,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:c32f67e46af692b6,cas:165535-45-5,systematic_name,N-[dimethylamino-ethylimino-[[tris(dimethylamino)-lambda5-phosphanylidene]amino]-lambda5-phosphanyl]-N-methylmethanamine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:15488389d868bbb0,cas:165535-45-5,common_name,RefChem:446554,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:e9863c26615609e5,cas:165535-45-5,common_name,635-462-8,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:2264d0d70c841bc9,cas:165535-45-5,common_name,P2Et Phosphazene,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:3f4762a33fc7b066,cas:165535-45-5,common_name,MFCD00145113,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:04782e3ff27f51bb,cas:165535-45-5,common_name,"N',N',N'',N''-hexamethylphosphorimidic triamide-N,N,N',N',N'',N''-hexamethylphosphorimidic triamide",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:bf08d50d54bd9b18,cas:165535-45-5,common_name,"Phosphorimidic triamide, N'''-[P,P-bis(dimethylamino)-N-ethylphosphinimyl]-N,N,N',N',N'',N''-hexamethyl-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:c81e8c5902b77bc9,cas:165535-45-5,common_name,Phosphazene ligand P2-Et,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:76be9269797e4901,cas:165535-45-5,common_name,SCHEMBL1356930,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:9b080d6669aea351,cas:165535-45-5,common_name,C12H35N7P2,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:2189e791044e1b17,cas:165535-45-5,common_name,QGA53545,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:165535-45-5:356dbc35ef03ca3b,cas:165535-45-5,common_name,AKOS015913632,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:3393106,1.0,active,chemical_name_v1,false
+sid:17217-57-1:67809a318a1f9a9c,cas:17217-57-1,common_name,"4,4′-Dimethoxy-2,2′-bipyridine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:e66e8dee8db9f86b,cas:17217-57-1,systematic_name,4-methoxy-2-(4-methoxy-2-pyridinyl)pyridine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:42d057e276dd7710,cas:17217-57-1,common_name,RefChem:506660,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:18beccc76dcabe27,cas:17217-57-1,common_name,628-568-0,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:7cebc0b5b1b8d22d,cas:17217-57-1,common_name,4-methoxy-2-(4-methoxypyridin-2-yl)pyridine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:556759ba1881b528,cas:17217-57-1,common_name,MFCD00233880,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:1cfa9b19a0c71645,cas:17217-57-1,common_name,4-methoxy-2-(4-methoxy-2-pyridyl)pyridine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:357cbd28384c22b4,cas:17217-57-1,common_name,CHEMBL2205808,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:16bf8ca5a7bdb0f0,cas:17217-57-1,common_name,MeO-bpy,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:e77a28b1471585c3,cas:17217-57-1,common_name,"2,2'-Bipyridine, 4,4'-dimethoxy-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:bcea98cc1d907d6c,cas:17217-57-1,common_name,SCHEMBL182529,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:761c5c571e919009,cas:17217-57-1,common_name,SCHEMBL29395249,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:17217-57-1:f1e5a117c8143ac5,cas:17217-57-1,common_name,"4,4'-dimethoxy-2,2'-bipyridin",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2733927,1.0,active,chemical_name_v1,false
+sid:173035-10-4:5debaeae62d8ce42,cas:173035-10-4,common_name,"1,3-Bis(2,4,6-trimethylphenyl)imidazolinium chloride (SIMes·HCl)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:15750c2b3269a757,cas:173035-10-4,systematic_name,"1,3-bis(2,4,6-trimethylphenyl)-4,5-dihydroimidazol-1-ium chloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:61b99e5b7a51000a,cas:173035-10-4,common_name,RefChem:413924,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:0c2b71bdd45ec2e8,cas:173035-10-4,common_name,627-865-2,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:c9fa944f7be98694,cas:173035-10-4,common_name,"1,3-dimesityl-4,5-dihydro-1H-imidazol-3-ium chloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:2d686fbf8247c3c8,cas:173035-10-4,common_name,MFCD09039279,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:ff211fb7bc1d4405,cas:173035-10-4,common_name,C21H27ClN2,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:f00357558c01a290,cas:173035-10-4,common_name,"1,3-Bis(2,4,6-trimethylphenyl)-4,5-dihydroimidazolium chloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:3321c89c22c566bf,cas:173035-10-4,common_name,SIMes.HCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:384328c7211e547d,cas:173035-10-4,common_name,SCHEMBL442699,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:d9f9db76b0bc4cad,cas:173035-10-4,common_name,SCHEMBL12504936,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:626eba887f878237,cas:173035-10-4,common_name,AKOS025213338,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:173035-10-4:bff6ea1f9b5064c7,cas:173035-10-4,common_name,AS-10095,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:2734917,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:b8445c1b7c21c5ba,cas:1779569-04-8,common_name,IPr Pd(tBuInd)Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:31d313131912e8cf,cas:1779569-04-8,systematic_name,"1,3-bis[2,6-di(propan-2-yl)phenyl]-2H-imidazol-2-ide;1-tert-butyl-1,2-dihydroinden-2-ide;chloropalladium(1+)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:91cdfaf92a4b0c46,cas:1779569-04-8,common_name,"(1,3-Bis(2,6-diisopropylphenyl)-2,3-dihydro-1H-imidazol-2-yl)(1-(tert-butyl)-1H-inden-2-yl)chloropalladate(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:3fe0c10fa4f22b99,cas:1779569-04-8,common_name,[(IPr)Pd(1-tBu-Ind)Cl],en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:3a073e06af316db3,cas:1779569-04-8,common_name,MFCD29037171,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:295f1017c16a6d1a,cas:1779569-04-8,common_name,CS-0506304,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:545087f7f0d133ea,cas:1779569-04-8,common_name,"(3-1-t-Butyl-indenyl)[1,3-bis(2,6-diisopropylphenyl)imidazol-2-ylidene]chloropalladium(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1779569-04-8:d2ad33c06cb4338d,cas:1779569-04-8,common_name,"Chloro(1-tert-butylindenyl)[1,3-bis(2,6-di-i-propylphenyl)imidazol-2-yl]palladium(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:139036022,1.0,active,chemical_name_v1,false
+sid:1798782-33-8:99f98e00a105331f,cas:1798782-33-8,legacy_name,BippyPhos Pd(allyl)OTf,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:178188631,1.0,active,chemical_name_v1,false
+sid:1798782-33-8:dfc73f309c5b55c7,cas:1798782-33-8,systematic_name,"ditert-butyl-[2-(1,3,5-triphenylpyrazol-4-yl)pyrazol-3-yl]phosphane;palladium(2+);prop-1-ene;trifluoromethanesulfonate",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:178188631,1.0,active,chemical_name_v1,false
+sid:1846556-43-1:e0abbbd83f6fc181,cas:1846556-43-1,common_name,[Pd(allyl)(JohnPhos)] triflate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:177808366,1.0,active,chemical_name_v1,false
+sid:1846556-43-1:bec78bac28741717,cas:1846556-43-1,systematic_name,ditert-butyl-(2-phenylphenyl)phosphane;palladium;prop-1-ene;trifluoromethanesulfonic acid,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:177808366,1.0,active,chemical_name_v1,false
+sid:1846556-43-1:81e5daf1a62b5797,cas:1846556-43-1,common_name,SY404672,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:177808366,1.0,active,chemical_name_v1,false
+sid:210169-57-6:d6f1789fe3cbe23a,cas:210169-57-6,common_name,(S)-DM-SEGPHOS,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:3d1b7f8e981bfb57,cas:210169-57-6,systematic_name,"[4-[5-bis(3,5-dimethylphenyl)phosphanyl-1,3-benzodioxol-4-yl]-1,3-benzodioxol-5-yl]-bis(3,5-dimethylphenyl)phosphane",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:1363838765c95b81,cas:210169-57-6,common_name,"4,4'-Bi-1,3-benzodioxole-5,5'-diylbis(bis(3,5-dimethylphenyl)phosphine)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:8f7423bde05ddfa7,cas:210169-57-6,common_name,RefChem:407700,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:15300ee47dd736e5,cas:210169-57-6,common_name,811-356-9,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:5e7c39e59b6328c7,cas:210169-57-6,common_name,813-047-4,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:b4f8d6b5d329809e,cas:210169-57-6,common_name,(R)-DM-SEGPHOS,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:203a0f59b3701e44,cas:210169-57-6,common_name,"(R)-5,5'-Bis[di(3,5-xylyl)phosphino]-4,4'-bi-1,3-benzodioxole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:f522334b43d856bb,cas:210169-57-6,common_name,MFCD09753008,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:210169-57-6:df3ac76b77c28052,cas:210169-57-6,common_name,"5,5'-bis(bis(3,5-dimethylphenyl)phosphanyl)-4,4'-bibenzo[d][1,3]dioxole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11297101,1.0,active,chemical_name_v1,false
+sid:2102544-35-2:3d5421afb46b1aba,cas:2102544-35-2,systematic_name,"bis[3,5-bis(trifluoromethyl)phenyl]-[3,6-dimethoxy-2-[2,4,6-tri(propan-2-yl)phenyl]phenyl]phosphane;methanesulfonic acid;palladium;2-phenylaniline",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064817,1.0,active,chemical_name_v1,false
+sid:2102544-35-2:ea95475a8a66fac9,cas:2102544-35-2,common_name,MFCD22572672,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064817,1.0,active,chemical_name_v1,false
+sid:2102544-35-2:c6a92477381b30d6,cas:2102544-35-2,common_name,"JackiePhos Pd G3, 95%",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064817,1.0,active,chemical_name_v1,false
+sid:2102544-35-2:053aa5ebf3e7ab69,cas:2102544-35-2,common_name,"JackiePhos Palladacycle, 98%",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064817,1.0,active,chemical_name_v1,false
+sid:2102544-35-2:73b17439885ceb7d,cas:2102544-35-2,common_name,E81044,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:117064817,1.0,active,chemical_name_v1,false
+sid:3002-77-5:0d7334bd1e907a6d,cas:3002-77-5,legacy_name,2-mphen,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:aa85c2f67294e6f6,cas:3002-77-5,common_name,RefChem:262835,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:3ca2e965818f3bb5,cas:3002-77-5,common_name,DTXCID10357618,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:e9c2f4e17ad31f36,cas:3002-77-5,common_name,MFCD06643855,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:4b1bd5a5d15d6b06,cas:3002-77-5,common_name,"1,10-Phenanthroline, 2-methyl-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:a09cc443edd9d936,cas:3002-77-5,common_name,"Methyl-1,10-phenanthroline",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:5bb15a2cb6fe82e9,cas:3002-77-5,common_name,MLS001001117,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:45209649d767417e,cas:3002-77-5,common_name,SCHEMBL3193864,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:bc20faa860c79711,cas:3002-77-5,common_name,CHEMBL1728912,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:6ba12af2653c92af,cas:3002-77-5,common_name,SCHEMBL10012944,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:359f616914ccf96a,cas:3002-77-5,common_name,SCHEMBL29400608,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:fd958930458f658c,cas:3002-77-5,common_name,"2-methylpyridino[3,2-h]quinoline",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3002-77-5:ea2b4a56ed2671b3,cas:3002-77-5,common_name,AKOS000282830,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4913356,1.0,active,chemical_name_v1,false
+sid:3059853-80-1:8a570f57b0f3b58c,cas:3059853-80-1,common_name,FPhos ligand,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:175668732,1.0,active,chemical_name_v1,false
+sid:3059853-80-1:b9f5cbf083bb016d,cas:3059853-80-1,systematic_name,"[2-[3,5-bis(trifluoromethyl)phenyl]-3,6-dimethoxyphenyl]-dicyclopentylphosphane",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:175668732,1.0,active,chemical_name_v1,false
+sid:3059853-80-1:26c3b08e4fdc4ca5,cas:3059853-80-1,common_name,"Dicyclopentyl[3,6-dimethoxy-3',5'-bis(trifluoromethyl)-[1,1'-biphenyl]-2-yl]phosphine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:175668732,1.0,active,chemical_name_v1,false
+sid:3059853-80-1:e9a533dec79dc880,cas:3059853-80-1,common_name,SY470580,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:175668732,1.0,active,chemical_name_v1,false
+sid:3059853-80-1:4f7d52db06991021,cas:3059853-80-1,common_name,H53325,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:175668732,1.0,active,chemical_name_v1,false
+sid:307494-95-7:c14c4f0d2d62bbe1,cas:307494-95-7,common_name,Tricyclohexylphosphine palladium crotyl chloride precatalyst,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:171397231,1.0,active,chemical_name_v1,false
+sid:307494-95-7:9fcb95ef2c238c42,cas:307494-95-7,legacy_name,P(Cy)3 Pd(crotyl)Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:171397231,1.0,active,chemical_name_v1,false
+sid:307494-95-7:4d076f84d35c06e6,cas:307494-95-7,systematic_name,(Z)-but-2-ene;chloropalladium(1+);tricyclohexylphosphane,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:171397231,1.0,active,chemical_name_v1,false
+sid:307494-95-7:7f96c062ea1382ce,cas:307494-95-7,common_name,MFCD34790817,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:171397231,1.0,active,chemical_name_v1,false
+sid:307494-95-7:61645ea0d7720cb9,cas:307494-95-7,common_name,G79599,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:171397231,1.0,active,chemical_name_v1,false
+sid:32503-27-8:baa2f7b441a5b489,cas:32503-27-8,legacy_name,TBAHS,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:1440d9c779b19df7,cas:32503-27-8,systematic_name,hydrogen sulfate;tetrabutylazanium,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:6562b71ee99fabd8,cas:32503-27-8,common_name,Tetrabutylammonium hydrogen sulphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:ced054136502f062,cas:32503-27-8,common_name,"1-Butanaminium, N,N,N-tributyl-, sulfate (1:1)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:2c102309517b2ddc,cas:32503-27-8,common_name,RefChem:896764,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:9f9272c32aa8f7a9,cas:32503-27-8,common_name,251-068-5,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:a3a5d31614460d0b,cas:32503-27-8,common_name,tetra-n-Butylammonium hydrogen sulfate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:5d9dc1a6c99fdf37,cas:32503-27-8,common_name,Tetrabutylammonium bisulfate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:9e82c2826283ec30,cas:32503-27-8,common_name,Tetrabutylammonium sulfate (1:1),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:902dfa31f5a859c8,cas:32503-27-8,common_name,tetrabutylazanium hydrogen sulfate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:32503-27-8:36efb75980983a83,cas:32503-27-8,common_name,tetrabutylammonium hydrosulfate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:94433,1.0,active,chemical_name_v1,false
+sid:33636-93-0:863aa3bb588868c9,cas:33636-93-0,systematic_name,copper;hexakis(triphenylphosphane),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:3b70784c1f420a59,cas:33636-93-0,common_name,Stryker's reagent [MI],en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:36c2ce584b9b5533,cas:33636-93-0,common_name,(Triphenylphosphine)copper hydride hexamer,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:19cda51319f8905e,cas:33636-93-0,common_name,Triphenylphosphine cuprous hydride,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:a3b612c7a22969ea,cas:33636-93-0,common_name,8X3R32M7XU,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:11cbf389d848ccd6,cas:33636-93-0,common_name,Triphenylphosphine copper(I) hydride hexamer,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:710339eb3b5d061f,cas:33636-93-0,common_name,"Copper, hexa-mu3-hydrohexakis(triphenylphosphine)hexa-, octahedro",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:7e4a026fca1d9275,cas:33636-93-0,common_name,Osborn complex,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:28f926f678592550,cas:33636-93-0,common_name,RefChem:889316,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:bef0535fc06629d6,cas:33636-93-0,common_name,DTXCID10425942,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:b79f887b5d2d6f36,cas:33636-93-0,common_name,hexakis(triphenylphosphane) hexakis(lambda1-copper),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:33636-93-0:29ef0658748efa5b,cas:33636-93-0,common_name,hexameric copper hydride ligated with triphenylphosphine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11982471,1.0,active,chemical_name_v1,false
+sid:3470-98-2:31cea373d6421d79,cas:3470-98-2,common_name,N-Butyl-2-pyrrolidone,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:18984,1.0,active,chemical_name_v1,false
+sid:3470-98-2:29dc15a1d08392f2,cas:3470-98-2,legacy_name,NBP,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:18984,1.0,active,chemical_name_v1,false
+sid:3470-98-2:68a986dfa89f6aa7,cas:3470-98-2,systematic_name,1-butylpyrrolidin-2-one,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:18984,1.0,active,chemical_name_v1,false
+sid:39207-65-3:b533221581bdf4e7,cas:39207-65-3,common_name,2-Isobutyrylcyclohexanone,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:a7d684d80d98ae54,cas:39207-65-3,common_name,RefChem:454237,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:5bf8d475676d6bb2,cas:39207-65-3,common_name,628-199-5,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:cf102a7c7573f5f4,cas:39207-65-3,common_name,2-(2-Methyl-1-oxopropyl)cyclohexanone,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:3c3b9b378c693e43,cas:39207-65-3,common_name,MFCD00466185,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:0db81336f1a375d3,cas:39207-65-3,common_name,2-Isobutyrylcyclohexan-1-one,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:28de3268bd784f1d,cas:39207-65-3,common_name,2-(2-methylpropanoyl)cyclohexanone,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:64c1fb28834151a8,cas:39207-65-3,common_name,SC11822,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:65ff7799e71d6dad,cas:39207-65-3,common_name,"Cyclohexanone, 2-(2-methyl-1-oxopropyl)-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:348d74d6634479fb,cas:39207-65-3,common_name,2-(2-METHYL-1-OXOPROPYL)CYCLOHEXANONE;2-(2-METHYLPROPANOYL)CYCLOHEXAN-1-ONE;2-ISOBUTYRYLCYCLOHEXANONE,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:39207-65-3:0cb6fd136e85c75e,cas:39207-65-3,common_name,2-(2-Methyl-1-oxopropyl)cyclohexanone; 2-(2-Methylpropanoyl)cyclohexan-1-one; 2-(2-Methylpropanoyl)cyclohexanone,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11469301,1.0,active,chemical_name_v1,false
+sid:40759-64-6:bc395f49efacfecc,cas:40759-64-6,common_name,Nickel(COD)(DQ) complex,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:6565a23878742af1,cas:40759-64-6,systematic_name,"(1Z,5Z)-cycloocta-1,5-diene;nickel;2,3,5,6-tetramethylcyclohexa-2,5-diene-1,4-dione",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:a2888dcdbf35646d,cas:40759-64-6,common_name,RefChem:853805,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:522b4e3d0b2f07e9,cas:40759-64-6,common_name,886-943-6,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:906cfb001e5d9e95,cas:40759-64-6,common_name,"(1,5-Cyclooctadiene)(duroquinone) nickel",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:897ce6650ce4ed63,cas:40759-64-6,common_name,MFCD32851669,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:a1be454fdaad3177,cas:40759-64-6,common_name,MFCD34576019,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:a8820572620796f3,cas:40759-64-6,common_name,SY379608,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:c67f27af9f1f6a8d,cas:40759-64-6,common_name,EN300-27164644,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:096771255bbee1fe,cas:40759-64-6,common_name,F552680,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:40759-64-6:11639db50e3474a5,cas:40759-64-6,common_name,"(1Z,5Z)-cycloocta-1,5-diene tetramethylcyclohexa-2,5-diene-1,4-dione nickel",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:88698930,1.0,active,chemical_name_v1,false
+sid:53716-82-8:24ee8c44ccab7681,cas:53716-82-8,common_name,Dihydrolevoglucosenone (Cyrene),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:757612df9d32d5e7,cas:53716-82-8,legacy_name,Cyrene,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:9f7150d273b69b00,cas:53716-82-8,common_name,EC 807-130-4,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:e59eac443428df54,cas:53716-82-8,common_name,RefChem:68445,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:e980e9c3dba54a7b,cas:53716-82-8,common_name,DTXCID80401152,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:7a3c397014640a25,cas:53716-82-8,common_name,807-130-4,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:394000d1189f2f01,cas:53716-82-8,common_name,Dihydrolevoglucosenone,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:f0131d8ff1409c93,cas:53716-82-8,common_name,MFCD23105760,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:ba05cd74baab8a67,cas:53716-82-8,common_name,"(1S,5R)-6,8-Dioxabicyclo[3.2.1]octan-4-one; (5R)-6,8-Dioxabicyclo[3.2.1]octan-4-one;Cyrene; Dihydrolevoglucosenone;",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:2e650e9701d7a349,cas:53716-82-8,common_name,SCHEMBL7150975,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:82a2f6c7884c7993,cas:53716-82-8,common_name,CHEMBL4758795,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:53716-82-8:3d7651ac6617738a,cas:53716-82-8,common_name,AT22559,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10975499,1.0,active,chemical_name_v1,false
+sid:563-63-3:cab9ec3a8ab25569,cas:563-63-3,legacy_name,AgOAc,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:93fd727e7fe4e754,cas:563-63-3,common_name,Silver(I) acetate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:5e54c79bbfca06f8,cas:563-63-3,common_name,Silver(1+) acetate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:3dd10ab75c0ac1d6,cas:563-63-3,common_name,Silver monoacetate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:87e0f39d0deeeac8,cas:563-63-3,common_name,"ACETIC ACID, SILVER(1+) SALT",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:a2e076a7961b7ebe,cas:563-63-3,common_name,19PPS85F9H,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:0986f964072b7d6e,cas:563-63-3,common_name,RefChem:183021,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:a9eee5ac9150a1e8,cas:563-63-3,common_name,DTXCID6012041,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:4641d791fd626da0,cas:563-63-3,common_name,209-254-9,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:41fb3b97fc456aaa,cas:563-63-3,common_name,argentio acetate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:ebe075098014d4a7,cas:563-63-3,common_name,"Acetic acid, silver(1+) salt (1:1)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:563-63-3:3113033da3922cc4,cas:563-63-3,common_name,Acetic acid silver salt,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11246,1.0,active,chemical_name_v1,false
+sid:566940-03-2:42dfb5d504cb6c22,cas:566940-03-2,common_name,(R)-DTBM-SEGPHOS,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:4da011b9d7576390,cas:566940-03-2,systematic_name,"[4-[5-bis(3,5-ditert-butyl-4-methoxyphenyl)phosphanyl-1,3-benzodioxol-4-yl]-1,3-benzodioxol-5-yl]-bis(3,5-ditert-butyl-4-methoxyphenyl)phosphane",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:77d3686da4140c2f,cas:566940-03-2,common_name,RefChem:506516,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:80a99360a4b2597c,cas:566940-03-2,common_name,811-694-7,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:94ef835f75cbb6d0,cas:566940-03-2,common_name,811-888-1,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:54fd93cf1a5a5d43,cas:566940-03-2,common_name,(S)-DTBM-SEGPHOS,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:6d39a34202cf212f,cas:566940-03-2,common_name,MFCD09753003,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:1253ccfa8d435337,cas:566940-03-2,common_name,"(R)-5,5'-Bis[di(3,5-di-tert-butyl-4-methoxyphenyl)phosphino]-4,4'-bi-1,3-benzodioxole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:08b7d5864bfcadf8,cas:566940-03-2,common_name,"5,5'-Bis[di(3,5-di-tert-butyl-4-methoxyphenyl)phosphino]-4,4'-bi-1,3-benzodioxole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:566940-03-2:9c013963767a8078,cas:566940-03-2,common_name,"(S)-(+)-5,5'-Bis[di(3,5-di-tert-butyl-4-methoxyphenyl)phosphino]-4,4'-bi-1,3-benzodioxole",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11194192,1.0,active,chemical_name_v1,false
+sid:5807-14-7:e478a7a2285a343d,cas:5807-14-7,common_name,"1,5,7-Triazabicyclo[4.4.0]dec-5-ene",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:ba559409d074d06a,cas:5807-14-7,legacy_name,TBD,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:f16462c0a9be4333,cas:5807-14-7,systematic_name,"3,4,6,7,8,9-hexahydro-2H-pyrimido[1,2-a]pyrimidine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:0345ab8304edc06c,cas:5807-14-7,common_name,KAF7GN82TM,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:14740538b1518343,cas:5807-14-7,common_name,TBD compound,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:eb2aff2631dedbd0,cas:5807-14-7,common_name,RefChem:933318,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:1eac1eb173ce50a8,cas:5807-14-7,common_name,"1,3,4,6,7,8-Hexahydro-2H-pyrimido[1,2-a]pyrimidine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:270acc8af9730d61,cas:5807-14-7,common_name,Hhpp,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:a3d2d693d0559766,cas:5807-14-7,common_name,"2,3,4,6,7,8-Hexahydro-1H-pyrimido[1,2-a]pyrimidine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:b583b27c0fe19f66,cas:5807-14-7,common_name,MFCD00043003,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:ef24150bdeb5f825,cas:5807-14-7,common_name,"2H-Pyrimido[1,2-a]pyrimidine, 1,3,4,6,7,8-hexahydro-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:5807-14-7:0cc443262dd83fc0,cas:5807-14-7,common_name,"1H,2H,3H,4H,6H,7H,8H-[1,3]diazino[1,2-a]pyrimidine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:79873,1.0,active,chemical_name_v1,false
+sid:63517-33-9:26cae38617a11a76,cas:63517-33-9,systematic_name,difluoro(morpholin-4-yl)sulfanium tetrafluoroborate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:76ed8118d30df84f,cas:63517-33-9,common_name,RefChem:902380,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:71f2309168c3cf69,cas:63517-33-9,common_name,687-129-1,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:1028bbbefae00c0b,cas:63517-33-9,common_name,Difluoro(morpholino)sulfonium tetrafluoroborate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:aefd6faf76632a65,cas:63517-33-9,common_name,XtalFluor-M&reg;,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:88980db0af8adcd6,cas:63517-33-9,common_name,Morpholinodifluorosulfinium tetrafluoroborate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:16666da742a62d80,cas:63517-33-9,common_name,MFCD15144878,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:5a2de5ee5e61108f,cas:63517-33-9,common_name,Difluoro-4-morpholinylsulfonium tetrafluoroborate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:8cb026794061006a,cas:63517-33-9,common_name,Morpho-DAST difluorosulfinium salt,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:d0d201844eab333f,cas:63517-33-9,common_name,XTALFLUOR-M(R),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:63517-33-9:637dc1b84813b132,cas:63517-33-9,common_name,C4H8BF6NOS,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:54772265,1.0,active,chemical_name_v1,false
+sid:745038-86-2:f946ec31c14c1c78,cas:745038-86-2,legacy_name,iPrMgCl.LiCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11275082,1.0,active,chemical_name_v1,false
+sid:745038-86-2:c1c8f110588846af,cas:745038-86-2,systematic_name,lithium;magnesium;propane;dichloride,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:11275082,1.0,active,chemical_name_v1,false
+sid:7560-83-0:c5347bd2a700ba47,cas:7560-83-0,legacy_name,N-Methyldicyclohexylamin,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:47584204395762b1,cas:7560-83-0,systematic_name,N-cyclohexyl-N-methylcyclohexanamine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:121d08b9e76d63ec,cas:7560-83-0,common_name,"N,N-Dicyclohexylmethylamine",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:b26de64a56c62259,cas:7560-83-0,common_name,"Cyclohexanamine, N-cyclohexyl-N-methyl-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:c8e000fb0ff5f392,cas:7560-83-0,common_name,"Dicyclohexylamine, N-methyl-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:e6ae75da137dec2a,cas:7560-83-0,common_name,methyldicyclohexylamine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:5e03a816c00689d5,cas:7560-83-0,common_name,HSDB 4370,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:600c6263f49cc8b6,cas:7560-83-0,common_name,N-Cyclohexyl-N-methylcyclohexylamine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:02bd49c4bdf91964,cas:7560-83-0,common_name,EINECS 231-453-4,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:ebf13334362816f2,cas:7560-83-0,common_name,RI95G6J8FF,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:f5e1ae338cdcc5b0,cas:7560-83-0,common_name,BRN 2074991,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:e92e60b40d1c8abb,cas:7560-83-0,common_name,DTXCID4024727,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:7560-83-0:854495b323dab4f1,cas:7560-83-0,common_name,"METHYLDICYCLOHEXYLAMINE, N-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24210,1.0,active,chemical_name_v1,false
+sid:76189-55-4:015c6d6d411127bf,cas:76189-55-4,common_name,(R)-BINAP,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:330f0e3a3419fc1e,cas:76189-55-4,systematic_name,[1-(2-diphenylphosphanylnaphthalen-1-yl)naphthalen-2-yl]-diphenylphosphane,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:77c94bef034bf329,cas:76189-55-4,common_name,"2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:b6b591a1b319100f,cas:76189-55-4,common_name,rac-BINAP,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:85b8ca78dc4f7663,cas:76189-55-4,common_name,"(1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:142dee6c5334fb59,cas:76189-55-4,common_name,"RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:4f27fa66de0e8f06,cas:76189-55-4,common_name,970O8508MB,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:7e3862a4d36f4aa1,cas:76189-55-4,common_name,"Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:94f005340f1f3ed8,cas:76189-55-4,common_name,RefChem:1079872,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:70be59daad3c2a42,cas:76189-55-4,common_name,DTXCID701020048,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:70cea65ea480504c,cas:76189-55-4,common_name,"(R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:52aab0397d49a39f,cas:76189-55-4,common_name,BINAP,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:76189-55-4:24d1660357388649,cas:76189-55-4,common_name,"2,2'-Bis(diphenylphosphino)-1,1'-binaphthalene",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:634876,1.0,active,chemical_name_v1,false
+sid:7758-11-4:9744293dcf48005c,cas:7758-11-4,common_name,Dipotassium hydrogen phosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:f2f9d03f96b370a4,cas:7758-11-4,legacy_name,K2HPO4,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:972bd2be39fe0555,cas:7758-11-4,common_name,DIPOTASSIUM PHOSPHATE,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:de1243abef320526,cas:7758-11-4,common_name,Dibasic potassium phosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:8c40337c1cb2e732,cas:7758-11-4,common_name,"Phosphoric acid, dipotassium salt",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:080c523a855af623,cas:7758-11-4,common_name,Potassium dibasic phosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:8969df60c7e33784,cas:7758-11-4,common_name,Dipotassium monophosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:4f429c137bd12c86,cas:7758-11-4,common_name,Potassium monophosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:6c7788a54b221683,cas:7758-11-4,common_name,Dipotassium orthophosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:5471f95de347778a,cas:7758-11-4,common_name,Dipotassium monohydrogen phosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:7758-11-4:b5e986b5f98acf3b,cas:7758-11-4,common_name,Hydrogen dipotassium phosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:24450,1.0,active,chemical_name_v1,false
+sid:81675-81-2:5947f3b15f968254,cas:81675-81-2,legacy_name,P1-tBu,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:205e50c7e55f8db9,cas:81675-81-2,systematic_name,N-[tert-butylimino-bis(dimethylamino)-lambda5-phosphanyl]-N-methylmethanamine,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:9527bd4baf3ea94b,cas:81675-81-2,common_name,RefChem:369987,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:b6596bcf2c300a6f,cas:81675-81-2,common_name,DTXCID40351523,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:a49f65e34d4479d3,cas:81675-81-2,common_name,tert-Butylimino-tris(dimethylamino)phosphorane,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:e44a72afbed0642a,cas:81675-81-2,common_name,"N'''-tert-butyl-N,N,N',N',N'',N''-hexamethylphosphorimidic triamide",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:1088f54edc8fa26a,cas:81675-81-2,common_name,Phos- Phasen,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:bc5622e593b4bbf3,cas:81675-81-2,common_name,SCHEMBL246865,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:c19fd1a6805ea004,cas:81675-81-2,common_name,GEO-04829,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:a8188ed2c8df2966,cas:81675-81-2,common_name,MFCD00145111,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:6bfdb44cb453edff,cas:81675-81-2,common_name,[(tert-butylimino)bis(dimethylamino)-,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:5736096c004c5ed3,cas:81675-81-2,common_name,"Phosphazene base P1-t-Bu, >=97.0% (GC)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:81675-81-2:7779d6b1802ac4ed,cas:81675-81-2,common_name,H55510,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4195269,1.0,active,chemical_name_v1,false
+sid:82737-61-9:88f9537fea0f698a,cas:82737-61-9,common_name,Davy's reagent,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:fe33dc1fa6d49648,cas:82737-61-9,systematic_name,"2,4-bis(methylsulfanyl)-2,4-bis(sulfanylidene)-1,3,2lambda5,4lambda5-dithiadiphosphetane",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:82231ca4fbe951d6,cas:82737-61-9,common_name,RefChem:412272,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:f12e0e2bae7a9d24,cas:82737-61-9,common_name,Davy Reagent methyl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:3d37d3ce92694062,cas:82737-61-9,common_name,"2,4-Bis(methylthio)-1,3,2,4-dithiadiphosphetane 2,4-disulfide",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:a00ed45d529189fa,cas:82737-61-9,common_name,C2H6P2S6,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:0431f49febd520be,cas:82737-61-9,common_name,SCHEMBL1165089,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:d7fcbb390488005e,cas:82737-61-9,common_name,"Davy Reagent methyl, technical grade",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:c088fb0ddbb55237,cas:82737-61-9,common_name,MFCD00043127,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:1eb7e789c5f7a1ee,cas:82737-61-9,common_name,AKOS015903997,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:1da639b0d4d3b74b,cas:82737-61-9,common_name,DB-346462,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:2d566c929ab851dc,cas:82737-61-9,common_name,ST51038491,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:82737-61-9:187fc76426510204,cas:82737-61-9,common_name,"2,4-bis(methylthio)-1,3,2,4-dithiadiphosphetan-2,4-disulfide",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:4520958,1.0,active,chemical_name_v1,false
+sid:898838-07-8:1180ea1a7b8ee9b6,cas:898838-07-8,common_name,"2,2,6,6-Tetramethylpiperidylmagnesium chloride–lithium chloride complex",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:eb832465b5eae0ee,cas:898838-07-8,legacy_name,TMPMgCl.LiCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:48a12f923af95979,cas:898838-07-8,systematic_name,"lithium;magnesium;2,2,6,6-tetramethylpiperidin-1-ide;dichloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:942dc088cb80ae8c,cas:898838-07-8,common_name,RefChem:1088514,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:14a0f5b1b8790d83,cas:898838-07-8,common_name,DTXCID40586393,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:bb8b27fbc4b6f873,cas:898838-07-8,common_name,MFCD12546030,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:d3ed881b19fb330c,cas:898838-07-8,common_name,"2,2,6,6-Tetramethylpiperidinylmagnesium chloride lithium chloride complex solution 1.0 M in THF",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:2ec7d0f7d3fb55e0,cas:898838-07-8,common_name,"2,2,6,6-tetramethylpiperidinylmagnesium chloride lithium chloride",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:f2e1e467eadc55bd,cas:898838-07-8,common_name,SCHEMBL29413178,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:898838-07-8:9cb6406bad186a64,cas:898838-07-8,common_name,G92334,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:23690313,1.0,active,chemical_name_v1,false
+sid:92149-07-0:29a5152bf4e9f61d,cas:92149-07-0,legacy_name,"4,7-(MeO)2-Phen",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:056690a0c6203ad6,cas:92149-07-0,common_name,RefChem:96733,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:05aca18869ebe08e,cas:92149-07-0,common_name,DTXCID30391059,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:e05ac1a63b3d8308,cas:92149-07-0,common_name,626-185-3,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:9d48e18b34a68b32,cas:92149-07-0,common_name,MFCD00233883,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:9a468d9cd461ff58,cas:92149-07-0,common_name,"1,10-Phenanthroline, 4,7-dimethoxy-",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:0ba125e8bbee53d6,cas:92149-07-0,common_name,p-MeO-Phen,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:afb3b78c9a869834,cas:92149-07-0,common_name,"4,7-DIMETHOXY-1,10-PHENANTHROLINE, 97%",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:5253932abc2e8644,cas:92149-07-0,common_name,SCHEMBL185654,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:2f11b564680ffcbd,cas:92149-07-0,common_name,"4,7-dimethoxyl-1,10-phenanthroline",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:1664e92e789d2811,cas:92149-07-0,common_name,AKOS015919916,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:92149-07-0:b464664721b6595b,cas:92149-07-0,common_name,CS-W007747,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,1.0,active,chemical_name_v1,false
+sid:947402-60-0:1122a5ee966a9f34,cas:947402-60-0,common_name,N-(Dicyclohexylphosphino)-2-(2′-methoxyphenyl)indole,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:0082e03e0104e9e9,cas:947402-60-0,systematic_name,dicyclohexyl-[2-(2-methoxyphenyl)indol-1-yl]phosphane,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:843ac3db90469a09,cas:947402-60-0,common_name,RefChem:226483,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:f41aa15c26809186,cas:947402-60-0,common_name,DTXCID30538548,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:480a9702be8e1b3b,cas:947402-60-0,common_name,1-(Dicyclohexylphosphino)-2-(2-methoxyphenyl)-1H-indole,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:981cb4b7327e3138,cas:947402-60-0,common_name,MFCD15144752,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:9cf852d9c838837e,cas:947402-60-0,common_name,N-(Dicyclohexylphosphino)-2-(2'-methoxyphenyl)-1H-indole,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:fa2b788e79095c97,cas:947402-60-0,common_name,NPCy o-Andole-Phos,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:7efd16104a9c9013,cas:947402-60-0,common_name,C27H34NOP,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:bb1ca3337a3e7df4,cas:947402-60-0,common_name,SCHEMBL10295989,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:c7b1a3510a6534bf,cas:947402-60-0,common_name,N-(Dicyclohexylphosphino)-2-(2 inverted exclamation marka-methoxyphenyl)indole,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:30797e7dc70d7d91,cas:947402-60-0,common_name,SY078504,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:947402-60-0:6e5315351d120601,cas:947402-60-0,common_name,CS-0086414,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,1.0,active,chemical_name_v1,false
+sid:94790-35-9:dc723f0f2eb3d246,cas:94790-35-9,common_name,"N,N,N′,N′-Tetramethylchloroformamidinium hexafluorophosphate",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:f27f3ff294f39c59,cas:94790-35-9,legacy_name,TCFH,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:eaccaeba33b47a8b,cas:94790-35-9,systematic_name,[chloro(dimethylamino)methylidene]-dimethylazanium hexafluorophosphate,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:f188877de7b56cd2,cas:94790-35-9,common_name,RefChem:575766,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:7508d9996c12b693,cas:94790-35-9,common_name,DTXCID70401843,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:7a632e45924b6775,cas:94790-35-9,common_name,627-919-5,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:8277fc3c6fcf3a97,cas:94790-35-9,common_name,680-115-6,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:015c48f1cdf0f244,cas:94790-35-9,common_name,N-(Chloro(dimethylamino)methylene)-N-methylmethanaminium hexafluorophosphate(V),en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:9c94a549e43afc09,cas:94790-35-9,common_name,MFCD01862891,en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:94790-35-9:be3f86ca6bcd1101,cas:94790-35-9,common_name,"Methanaminium, N-[chloro(dimethylamino)methylene]-N-methyl-, hexafluorophosphate(1-) (1:1)",en,false,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,1.0,active,chemical_name_v1,false
+sid:alias:525ee494fe75359f,cas:100-51-6,legacy_name,BnOH,en,false,weak_label_v2.1:user_possible_cas_reconciliation:100-51-6,1.0,active,chemical_name_v1,false
+sid:alias:ee76bd5e7e011c04,cas:10465-81-3,legacy_name,ADDP,en,false,weak_label_v2.1:user_possible_cas_reconciliation:10465-81-3,1.0,active,chemical_name_v1,false
+sid:alias:4f4a480cd363827d,cas:107-31-3,legacy_name,MeO2CH,en,false,weak_label_v2.1:user_possible_cas_reconciliation:107-31-3,1.0,active,chemical_name_v1,false
+sid:alias:4f75fd95a2d61317,cas:108-75-8,common_name,"2,4,6-Trimethylpyridine (2,4,6-collidine)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:108-75-8,1.0,active,chemical_name_v1,false
+sid:alias:942027c4d0d354f0,cas:108-75-8,legacy_name,collidine,en,false,weak_label_v2.1:user_possible_cas_reconciliation:108-75-8,1.0,active,chemical_name_v1,false
+sid:alias:169a9e068e34464e,cas:109-60-4,common_name,n-Propyl acetate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:109-60-4,1.0,active,chemical_name_v1,false
+sid:alias:320e4c97aac1146b,cas:109-60-4,legacy_name,nPrOAc,en,false,weak_label_v2.1:user_possible_cas_reconciliation:109-60-4,1.0,active,chemical_name_v1,false
+sid:alias:3862516524fe64fb,cas:109-63-7,common_name,Boron trifluoride diethyl etherate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:109-63-7,1.0,active,chemical_name_v1,false
+sid:alias:2f70098af711f954,cas:109-63-7,legacy_name,BF3.OEt2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:109-63-7,1.0,active,chemical_name_v1,false
+sid:alias:b2513c16a600df6a,cas:110-19-0,common_name,Isobutyl acetate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:110-19-0,1.0,active,chemical_name_v1,false
+sid:alias:ee1c4e21a7897b6c,cas:110-19-0,legacy_name,AcOiBu,en,false,weak_label_v2.1:user_possible_cas_reconciliation:110-19-0,1.0,active,chemical_name_v1,false
+sid:alias:02397dd13029da46,cas:1121-22-8,common_name,"trans-1,2-Diaminocyclohexane",en,false,weak_label_v2.1:user_possible_cas_reconciliation:1121-22-8,1.0,active,chemical_name_v1,false
+sid:alias:c482057569dd4673,cas:114234-09-2,common_name,Davy's p-tolyl reagent,en,false,weak_label_v2.1:user_possible_cas_reconciliation:114234-09-2,1.0,active,chemical_name_v1,false
+sid:alias:70bd452126be3c94,cas:114234-09-2,legacy_name,Davy's Reagent p-tolyl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:114234-09-2,1.0,active,chemical_name_v1,false
+sid:alias:5ddd5d91f15c5a26,cas:114615-82-6,legacy_name,TPAP,en,false,weak_label_v2.1:user_possible_cas_reconciliation:114615-82-6,1.0,active,chemical_name_v1,false
+sid:alias:bb0822b3d6b10c9f,cas:12012-95-2,legacy_name,Pd(allyl)Cl)2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:12012-95-2,1.0,active,chemical_name_v1,false
+sid:alias:a60ae84f55e70336,cas:12131-44-1,common_name,Palladium(II) cinnamyl chloride dimer,en,false,weak_label_v2.1:user_possible_cas_reconciliation:12131-44-1,1.0,active,chemical_name_v1,false
+sid:alias:fe91055f76f5aead,cas:12131-44-1,legacy_name,Pd(Cinnamyl)Cl)2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:12131-44-1,1.0,active,chemical_name_v1,false
+sid:alias:ebc08358fa79b6c1,cas:12148-71-9,common_name,"Bis(1,5-cyclooctadiene)di-μ-methoxydiiridium(I)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:12148-71-9,1.0,active,chemical_name_v1,false
+sid:alias:bacb3c2f077b95f5,cas:12148-71-9,legacy_name,[Ir(cod)OMe]2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:12148-71-9,1.0,active,chemical_name_v1,false
+sid:alias:2ffe7ca69a3c72ce,cas:1252598-33-6,common_name,QPhos palladium crotyl chloride precatalyst,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1252598-33-6,1.0,active,chemical_name_v1,false
+sid:alias:3d6c10f88fce08ab,cas:1252598-33-6,legacy_name,QPhos Pd(crotyl)Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1252598-33-6,1.0,active,chemical_name_v1,false
+sid:alias:db9e6faf996e310b,cas:1310-65-2,common_name,"Lithium hydroxide, anhydrous",en,false,weak_label_v2.1:user_possible_cas_reconciliation:1310-65-2,1.0,active,chemical_name_v1,false
+sid:alias:46cebbaad2c0b80b,cas:1310-65-2,legacy_name,LiOH anh,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1310-65-2,1.0,active,chemical_name_v1,false
+sid:alias:16bbd277b5acd44f,cas:1310-66-3,legacy_name,LiOH.H2O,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1310-66-3,1.0,active,chemical_name_v1,false
+sid:alias:bd45c29ff2443790,cas:1314-13-2,common_name,Zinc oxide,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1314-13-2,1.0,active,chemical_name_v1,false
+sid:alias:8c21bbbac15f51a5,cas:1314-13-2,legacy_name,ZnO,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1314-13-2,1.0,active,chemical_name_v1,false
+sid:alias:6cfe961bbd56f4b2,cas:1334497-00-5,common_name,Tri-tert-butylphosphine palladium crotyl chloride precatalyst,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1334497-00-5,1.0,active,chemical_name_v1,false
+sid:alias:3788e60f7d7248c5,cas:1334497-00-5,legacy_name,P(tBu)3 Pd(crotyl)Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1334497-00-5,1.0,active,chemical_name_v1,false
+sid:alias:ba19ba9fa56a35fb,cas:13462-90-3,legacy_name,NiI2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:13462-90-3,1.0,active,chemical_name_v1,false
+sid:alias:d203e77f7f444453,cas:135540-11-3,common_name,PyCIU coupling reagent,en,false,weak_label_v2.1:user_possible_cas_reconciliation:135540-11-3,1.0,active,chemical_name_v1,false
+sid:alias:c8da3911ae15fbac,cas:135540-11-3,legacy_name,PyCIU,en,false,weak_label_v2.1:user_possible_cas_reconciliation:135540-11-3,1.0,active,chemical_name_v1,false
+sid:alias:8a0516f27e819bc9,cas:1375325-71-5,common_name,P(tBu)3 Pd G2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1375325-71-5,1.0,active,chemical_name_v1,false
+sid:alias:4dfccce268ff580b,cas:139-02-6,common_name,Sodium phenoxide,en,false,weak_label_v2.1:user_possible_cas_reconciliation:139-02-6,1.0,active,chemical_name_v1,false
+sid:alias:5d1f484b1ce5a6c0,cas:13965-03-2,common_name,Bis(triphenylphosphine)palladium(II) dichloride,en,false,weak_label_v2.1:user_possible_cas_reconciliation:13965-03-2,1.0,active,chemical_name_v1,false
+sid:alias:eba1716c985c667d,cas:13965-03-2,legacy_name,PPh3)2PdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:13965-03-2,1.0,active,chemical_name_v1,false
+sid:alias:dc4c8deb775edfc3,cas:13991-08-7,legacy_name,dppbenz,en,false,weak_label_v2.1:user_possible_cas_reconciliation:13991-08-7,1.0,active,chemical_name_v1,false
+sid:alias:631f5acc031ea8c5,cas:141-43-5,common_name,Ethanolamine,en,false,weak_label_v2.1:user_possible_cas_reconciliation:141-43-5,1.0,active,chemical_name_v1,false
+sid:alias:0600a96c100f9d52,cas:142-82-5,legacy_name,heptane,en,false,weak_label_v2.1:user_possible_cas_reconciliation:142-82-5,1.0,active,chemical_name_v1,false
+sid:alias:b4d9c5c71356aa1a,cas:14243-64-2,common_name,Chloro(triphenylphosphine)gold(I),en,false,weak_label_v2.1:user_possible_cas_reconciliation:14243-64-2,1.0,active,chemical_name_v1,false
+sid:alias:e50cb64ad4281473,cas:14243-64-2,legacy_name,Ph3P AuCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:14243-64-2,1.0,active,chemical_name_v1,false
+sid:alias:73282025da8ee915,cas:14283-07-9,legacy_name,LiBF4,en,false,weak_label_v2.1:user_possible_cas_reconciliation:14283-07-9,1.0,active,chemical_name_v1,false
+sid:alias:37452e802a86a1a6,cas:14338-32-0,common_name,2-Chloro-1-methylpyridinium iodide (Mukaiyama reagent),en,false,weak_label_v2.1:user_possible_cas_reconciliation:14338-32-0,1.0,active,chemical_name_v1,false
+sid:alias:79ea403e5f1eed54,cas:14338-32-0,legacy_name,MukayamaReagent,en,false,weak_label_v2.1:user_possible_cas_reconciliation:14338-32-0,1.0,active,chemical_name_v1,false
+sid:alias:5183a16cd9bc8e97,cas:1445086-12-3,common_name,PCy3 Pd G3,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1445086-12-3,1.0,active,chemical_name_v1,false
+sid:alias:7d7b9cb041df6a8b,cas:1445086-28-1,common_name,dppf Pd G3,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1445086-28-1,1.0,active,chemical_name_v1,false
+sid:alias:29725a668385ce80,cas:1447963-73-6,common_name,CPhos Pd G3,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1447963-73-6,1.0,active,chemical_name_v1,false
+sid:alias:7acac14c3518c313,cas:146960-90-9,common_name,"1,1′-Bis(dicyclohexylphosphino)ferrocene",en,false,weak_label_v2.1:user_possible_cas_reconciliation:146960-90-9,1.0,active,chemical_name_v1,false
+sid:alias:fe54b15e153b1376,cas:146960-90-9,legacy_name,dcypf,en,false,weak_label_v2.1:user_possible_cas_reconciliation:146960-90-9,1.0,active,chemical_name_v1,false
+sid:alias:9569e7595345da74,cas:1507403-85-1,common_name,Me4-tBuXPhos Pd G3,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1507403-85-1,1.0,active,chemical_name_v1,false
+sid:alias:68f282c72a099196,cas:1536473-72-9,common_name,tBuBrettPhos Pd G3,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1536473-72-9,1.0,active,chemical_name_v1,false
+sid:alias:f1f61bfbad249c60,cas:15418-29-8,common_name,Tetrakis(acetonitrile)copper(I) tetrafluoroborate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:15418-29-8,1.0,active,chemical_name_v1,false
+sid:alias:b5cdecee0af010f4,cas:15418-29-8,legacy_name,Cu(MeCN)4BF4,en,false,weak_label_v2.1:user_possible_cas_reconciliation:15418-29-8,1.0,active,chemical_name_v1,false
+sid:alias:76dc7c01b2ad8ddb,cas:1599466-81-5,common_name,XPhos Pd G4,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1599466-81-5,1.0,active,chemical_name_v1,false
+sid:alias:14a043da5e91cb44,cas:1599466-83-7,common_name,BrettPhos Pd G4,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1599466-83-7,1.0,active,chemical_name_v1,false
+sid:alias:43ddc6f38b9af9a6,cas:1599466-87-1,common_name,SPhos Pd G4,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1599466-87-1,1.0,active,chemical_name_v1,false
+sid:alias:64343657e44be7ab,cas:1602922-03-1,common_name,N-XantPhos Pd G3,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1602922-03-1,1.0,active,chemical_name_v1,false
+sid:alias:33e4d4f6f072a910,cas:1655-07-8,common_name,Ethyl 2-oxocyclohexane-1-carboxylate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1655-07-8,1.0,active,chemical_name_v1,false
+sid:alias:f886c96a094e9da5,cas:1655-07-8,legacy_name,Etyhl cyclohexanone-2-carboxylate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1655-07-8,1.0,active,chemical_name_v1,false
+sid:alias:e1fa028de27c76f1,cas:1662-01-7,legacy_name,bphen,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1662-01-7,1.0,active,chemical_name_v1,false
+sid:alias:fdd3cae30b74d462,cas:166445-62-1,common_name,Di-μ-iodobis(tri-tert-butylphosphino)dipalladium(I),en,false,weak_label_v2.1:user_possible_cas_reconciliation:166445-62-1,1.0,active,chemical_name_v1,false
+sid:alias:6dce1ef4d587e1b1,cas:166445-62-1,legacy_name,di-IodobisP(tBu)3 Pd2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:166445-62-1,1.0,active,chemical_name_v1,false
+sid:alias:68b03e12f94896f2,cas:16654-89-0,common_name,"Sodium 2,6-di-tert-butyl-4-methylphenoxide (sodium BHT)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:16654-89-0,1.0,active,chemical_name_v1,false
+sid:alias:397de0df1a546882,cas:16654-89-0,legacy_name,NaBHT,en,false,weak_label_v2.1:user_possible_cas_reconciliation:16654-89-0,1.0,active,chemical_name_v1,false
+sid:alias:b0aad87b9212a99d,cas:17084-13-8,legacy_name,KPF6,en,false,weak_label_v2.1:user_possible_cas_reconciliation:17084-13-8,1.0,active,chemical_name_v1,false
+sid:alias:a1db1545beacf282,cas:1779569-06-0,common_name,XPhos Pd(tBuInd)Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1779569-06-0,1.0,active,chemical_name_v1,false
+sid:alias:73ef874a1f95baeb,cas:1779569-07-1,common_name,SPhos Pd(tBuInd)Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1779569-07-1,1.0,active,chemical_name_v1,false
+sid:alias:d5e371479e53fb48,cas:1798782-02-1,common_name,XPhos palladium crotyl chloride precatalyst,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1798782-02-1,1.0,active,chemical_name_v1,false
+sid:alias:d71b5bb36814af96,cas:1798782-02-1,legacy_name,XPhos Pd(crotyl)Cl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1798782-02-1,1.0,active,chemical_name_v1,false
+sid:alias:22da917da3838035,cas:1972-28-7,common_name,Diethyl azodicarboxylate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1972-28-7,1.0,active,chemical_name_v1,false
+sid:alias:da00600335749a09,cas:1972-28-7,legacy_name,DEAD,en,false,weak_label_v2.1:user_possible_cas_reconciliation:1972-28-7,1.0,active,chemical_name_v1,false
+sid:alias:f857cc0c197058b0,cas:2004-14-0,common_name,Lithium trimethylsilanolate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:2004-14-0,1.0,active,chemical_name_v1,false
+sid:alias:6929f0bf314a9fae,cas:2004-14-0,legacy_name,LiOTMS,en,false,weak_label_v2.1:user_possible_cas_reconciliation:2004-14-0,1.0,active,chemical_name_v1,false
+sid:alias:1a5b5a60150fc9a5,cas:205319-06-8,common_name,Dichloro(DPEPhos)palladium(II),en,false,weak_label_v2.1:user_possible_cas_reconciliation:205319-06-8,1.0,active,chemical_name_v1,false
+sid:alias:dff55644785c0224,cas:205319-06-8,legacy_name,DPEPhosPdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:205319-06-8,1.0,active,chemical_name_v1,false
+sid:alias:a524d76626bc449b,cas:205319-10-4,common_name,Dichloro(XantPhos)palladium(II),en,false,weak_label_v2.1:user_possible_cas_reconciliation:205319-10-4,1.0,active,chemical_name_v1,false
+sid:alias:71934b7920c296ff,cas:205319-10-4,legacy_name,XantPhosPdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:205319-10-4,1.0,active,chemical_name_v1,false
+sid:alias:181b1cd87bd918ee,cas:21715-90-2,common_name,"N-Hydroxy-5-norbornene-2,3-dicarboximide",en,false,weak_label_v2.1:user_possible_cas_reconciliation:21715-90-2,1.0,active,chemical_name_v1,false
+sid:alias:1258b31a486321e2,cas:21715-90-2,legacy_name,HONB,en,false,weak_label_v2.1:user_possible_cas_reconciliation:21715-90-2,1.0,active,chemical_name_v1,false
+sid:alias:3684fc9a88073c31,cas:24424-99-5,legacy_name,Boc2O,en,false,weak_label_v2.1:user_possible_cas_reconciliation:24424-99-5,1.0,active,chemical_name_v1,false
+sid:alias:56bfb132c170e584,cas:27607-77-8,legacy_name,TMSOTf,en,false,weak_label_v2.1:user_possible_cas_reconciliation:27607-77-8,1.0,active,chemical_name_v1,false
+sid:alias:4e81090bb7dbb45d,cas:29046-78-4,common_name,Nickel(II) chloride ethylene glycol dimethyl ether complex,en,false,weak_label_v2.1:user_possible_cas_reconciliation:29046-78-4,1.0,active,chemical_name_v1,false
+sid:alias:6f88ad4aba4c113d,cas:29046-78-4,legacy_name,NiCl2-glyme,en,false,weak_label_v2.1:user_possible_cas_reconciliation:29046-78-4,1.0,active,chemical_name_v1,false
+sid:alias:0ca5abffdd2834e7,cas:2923-28-6,legacy_name,AgOTf,en,false,weak_label_v2.1:user_possible_cas_reconciliation:2923-28-6,1.0,active,chemical_name_v1,false
+sid:alias:97cc76c875761ca3,cas:29964-62-3,common_name,"Dichloro[1,4-bis(diphenylphosphino)butane]palladium(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:29964-62-3,1.0,active,chemical_name_v1,false
+sid:alias:d594d94ea98222c3,cas:29964-62-3,legacy_name,dppbPdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:29964-62-3,1.0,active,chemical_name_v1,false
+sid:alias:6958475b4a27a7b9,cas:3385-94-2,legacy_name,(TMS)2S,en,false,weak_label_v2.1:user_possible_cas_reconciliation:3385-94-2,1.0,active,chemical_name_v1,false
+sid:alias:53b06b9bd9ce8645,cas:34409-44-4,common_name,Bis(di-tert-butylphenylphosphine)palladium(II) dichloride,en,false,weak_label_v2.1:user_possible_cas_reconciliation:34409-44-4,1.0,active,chemical_name_v1,false
+sid:alias:63fee77ac93afa70,cas:34409-44-4,legacy_name,P(tBu)2Ph)2PdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:34409-44-4,1.0,active,chemical_name_v1,false
+sid:alias:22ae1311bdb12573,cas:35103-79-8,common_name,Cesium hydroxide monohydrate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:35103-79-8,1.0,active,chemical_name_v1,false
+sid:alias:6a234dd4cde7bf1b,cas:35103-79-8,legacy_name,CsOH.H2O,en,false,weak_label_v2.1:user_possible_cas_reconciliation:35103-79-8,1.0,active,chemical_name_v1,false
+sid:alias:3138ba9b6b569c47,cas:358-23-6,legacy_name,Tf2O,en,false,weak_label_v2.1:user_possible_cas_reconciliation:358-23-6,1.0,active,chemical_name_v1,false
+sid:alias:118069bac0ee3cdf,cas:3945-69-5,legacy_name,DMTMM,en,false,weak_label_v2.1:user_possible_cas_reconciliation:3945-69-5,1.0,active,chemical_name_v1,false
+sid:alias:6f6ebb76cf80bc72,cas:407-25-0,legacy_name,Triflouroacetic anhydride,en,false,weak_label_v2.1:user_possible_cas_reconciliation:407-25-0,1.0,active,chemical_name_v1,false
+sid:alias:5995804caccc7ff2,cas:41233-93-6,common_name,Potassium tert-amylate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:41233-93-6,1.0,active,chemical_name_v1,false
+sid:alias:2bbbba1c059352d7,cas:41233-93-6,legacy_name,KOtPent,en,false,weak_label_v2.1:user_possible_cas_reconciliation:41233-93-6,1.0,active,chemical_name_v1,false
+sid:alias:92d776789e592e61,cas:42196-31-6,legacy_name,Pd(OTFA)2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:42196-31-6,1.0,active,chemical_name_v1,false
+sid:alias:2b542cc597696b03,cas:4637-24-5,common_name,"N,N-Dimethylformamide dimethyl acetal",en,false,weak_label_v2.1:user_possible_cas_reconciliation:4637-24-5,1.0,active,chemical_name_v1,false
+sid:alias:0fe73ae331caafca,cas:4637-24-5,legacy_name,DMF dimethylacetal,en,false,weak_label_v2.1:user_possible_cas_reconciliation:4637-24-5,1.0,active,chemical_name_v1,false
+sid:alias:90e79f620c9f4b35,cas:484-11-7,common_name,"2,9-Dimethyl-1,10-phenanthroline (neocuproine)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:484-11-7,1.0,active,chemical_name_v1,false
+sid:alias:1bb4e4ae2e9c9173,cas:484-11-7,legacy_name,Me2phen,en,false,weak_label_v2.1:user_possible_cas_reconciliation:484-11-7,1.0,active,chemical_name_v1,false
+sid:alias:aa432d5b2bda50de,cas:51-35-4,legacy_name,trans-Hyp,en,false,weak_label_v2.1:user_possible_cas_reconciliation:51-35-4,1.0,active,chemical_name_v1,false
+sid:alias:4c1f1e77416e2a74,cas:524-38-9,legacy_name,N-Hydroxyphtalimide,en,false,weak_label_v2.1:user_possible_cas_reconciliation:524-38-9,1.0,active,chemical_name_v1,false
+sid:alias:cbf4dc186a6c5f0c,cas:52462-29-0,common_name,Dichloro(p-cymene)ruthenium(II) dimer,en,false,weak_label_v2.1:user_possible_cas_reconciliation:52462-29-0,1.0,active,chemical_name_v1,false
+sid:alias:fa39be84bc8ea1f7,cas:52462-29-0,legacy_name,(Ru(p-cymene)Cl2)2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:52462-29-0,1.0,active,chemical_name_v1,false
+sid:alias:fec27f2115e4863a,cas:540-63-6,legacy_name,Ethanedithiol,en,false,weak_label_v2.1:user_possible_cas_reconciliation:540-63-6,1.0,active,chemical_name_v1,false
+sid:alias:b9b9d3cf3a676dd0,cas:543-27-1,legacy_name,IBCF,en,false,weak_label_v2.1:user_possible_cas_reconciliation:543-27-1,1.0,active,chemical_name_v1,false
+sid:alias:92bd8bd0ace308c0,cas:544-97-8,legacy_name,Me2Zn,en,false,weak_label_v2.1:user_possible_cas_reconciliation:544-97-8,1.0,active,chemical_name_v1,false
+sid:alias:d8278183a377cc0f,cas:557-20-0,legacy_name,Et2Zn,en,false,weak_label_v2.1:user_possible_cas_reconciliation:557-20-0,1.0,active,chemical_name_v1,false
+sid:alias:b661bdd486cb3467,cas:59831-02-6,common_name,"Dichloro[1,3-bis(diphenylphosphino)propane]palladium(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:59831-02-6,1.0,active,chemical_name_v1,false
+sid:alias:51c249cfb8257633,cas:59831-02-6,legacy_name,dpppPdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:59831-02-6,1.0,active,chemical_name_v1,false
+sid:alias:6e02a001113ef856,cas:616-38-6,legacy_name,DMC,en,false,weak_label_v2.1:user_possible_cas_reconciliation:616-38-6,1.0,active,chemical_name_v1,false
+sid:alias:7916ec75f5ee5785,cas:64-18-6,legacy_name,HCOOH,en,false,weak_label_v2.1:user_possible_cas_reconciliation:64-18-6,1.0,active,chemical_name_v1,false
+sid:alias:8498f198afbc5fe2,cas:6485-79-6,legacy_name,TIPSH,en,false,weak_label_v2.1:user_possible_cas_reconciliation:6485-79-6,1.0,active,chemical_name_v1,false
+sid:alias:c1358cef24c156ad,cas:696-63-9,common_name,4-Methoxythiophenol,en,false,weak_label_v2.1:user_possible_cas_reconciliation:696-63-9,1.0,active,chemical_name_v1,false
+sid:alias:9bb6710985288070,cas:696-63-9,legacy_name,4-OMe-thiophenol,en,false,weak_label_v2.1:user_possible_cas_reconciliation:696-63-9,1.0,active,chemical_name_v1,false
+sid:alias:e87697844f130832,cas:71-23-8,legacy_name,PrOH,en,false,weak_label_v2.1:user_possible_cas_reconciliation:71-23-8,1.0,active,chemical_name_v1,false
+sid:alias:1b9cfd352fa3a55f,cas:71-36-3,legacy_name,BuOH,en,false,weak_label_v2.1:user_possible_cas_reconciliation:71-36-3,1.0,active,chemical_name_v1,false
+sid:alias:497cb27048ff8c95,cas:7188-38-7,common_name,tert-Butyl isocyanide,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7188-38-7,1.0,active,chemical_name_v1,false
+sid:alias:0757020d7dfcef90,cas:7188-38-7,legacy_name,tBu isocyanide,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7188-38-7,1.0,active,chemical_name_v1,false
+sid:alias:a0da247d94eb376c,cas:7226-23-5,legacy_name,DMPU,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7226-23-5,1.0,active,chemical_name_v1,false
+sid:alias:890842575e66be16,cas:73602-61-6,legacy_name,Et3N.3HF,en,false,weak_label_v2.1:user_possible_cas_reconciliation:73602-61-6,1.0,active,chemical_name_v1,false
+sid:alias:87d6f2c5130a83e7,cas:74124-79-1,legacy_name,DSC,en,false,weak_label_v2.1:user_possible_cas_reconciliation:74124-79-1,1.0,active,chemical_name_v1,false
+sid:alias:1ab8e1c9484cc267,cas:742103-27-1,common_name,cBRIDP ligand,en,false,weak_label_v2.1:user_possible_cas_reconciliation:742103-27-1,1.0,active,chemical_name_v1,false
+sid:alias:d0a54ceaef254f34,cas:742103-27-1,legacy_name,cBridP,en,false,weak_label_v2.1:user_possible_cas_reconciliation:742103-27-1,1.0,active,chemical_name_v1,false
+sid:alias:f0ef50736622788b,cas:7601-54-9,common_name,"Trisodium phosphate, anhydrous",en,false,weak_label_v2.1:user_possible_cas_reconciliation:7601-54-9,1.0,active,chemical_name_v1,false
+sid:alias:bc189db168fa0294,cas:7601-54-9,legacy_name,Na3PO4,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7601-54-9,1.0,active,chemical_name_v1,false
+sid:alias:e87e5338f095bc24,cas:768-66-1,legacy_name,TMP,en,false,weak_label_v2.1:user_possible_cas_reconciliation:768-66-1,1.0,active,chemical_name_v1,false
+sid:alias:a8daf3d4eaca955d,cas:7693-46-1,common_name,4-Nitrophenyl chloroformate,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7693-46-1,1.0,active,chemical_name_v1,false
+sid:alias:0e7f35e39a869e30,cas:7699-45-8,common_name,Zinc bromide,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7699-45-8,1.0,active,chemical_name_v1,false
+sid:alias:88068fbb29478ebb,cas:7699-45-8,legacy_name,ZnBr2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7699-45-8,1.0,active,chemical_name_v1,false
+sid:alias:2db0fad743784f19,cas:77-86-1,common_name,Tris(hydroxymethyl)aminomethane,en,false,weak_label_v2.1:user_possible_cas_reconciliation:77-86-1,1.0,active,chemical_name_v1,false
+sid:alias:51d42e91681bf73c,cas:7758-98-7,common_name,"Copper(II) sulfate, anhydrous",en,false,weak_label_v2.1:user_possible_cas_reconciliation:7758-98-7,1.0,active,chemical_name_v1,false
+sid:alias:c90a76bcab6143cb,cas:7758-98-7,legacy_name,CuSO4 anhydrous,en,false,weak_label_v2.1:user_possible_cas_reconciliation:7758-98-7,1.0,active,chemical_name_v1,false
+sid:alias:42ac3a6a6505cfac,cas:79-20-9,legacy_name,MeOAc,en,false,weak_label_v2.1:user_possible_cas_reconciliation:79-20-9,1.0,active,chemical_name_v1,false
+sid:alias:1fb0d873defe28b6,cas:79-37-8,common_name,Oxalyl chloride,en,false,weak_label_v2.1:user_possible_cas_reconciliation:79-37-8,1.0,active,chemical_name_v1,false
+sid:alias:226f6ef49ac0b69a,cas:824-94-2,common_name,4-Methoxybenzyl chloride,en,false,weak_label_v2.1:user_possible_cas_reconciliation:824-94-2,1.0,active,chemical_name_v1,false
+sid:alias:5f5f930a0b18c4f6,cas:824-94-2,legacy_name,PMBCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:824-94-2,1.0,active,chemical_name_v1,false
+sid:alias:89237dbfa0033d73,cas:852445-83-1,common_name,IPrAuCl,en,false,weak_label_v2.1:user_possible_cas_reconciliation:852445-83-1,1.0,active,chemical_name_v1,false
+sid:alias:e5615566248248b9,cas:887919-35-9,common_name,Bis(AmPhos)palladium(II) dichloride,en,false,weak_label_v2.1:user_possible_cas_reconciliation:887919-35-9,1.0,active,chemical_name_v1,false
+sid:alias:702656ce27fadc23,cas:887919-35-9,legacy_name,AmPhos2PdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:887919-35-9,1.0,active,chemical_name_v1,false
+sid:alias:48f4ebfd4d65b9b9,cas:917511-90-1,common_name,"Dichloro[1,1′-bis(dicyclohexylphosphino)ferrocene]palladium(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:917511-90-1,1.0,active,chemical_name_v1,false
+sid:alias:7eacd9c2bee1a3fd,cas:917511-90-1,legacy_name,dcypfPdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:917511-90-1,1.0,active,chemical_name_v1,false
+sid:alias:c850606a50ab7e39,cas:932710-63-9,common_name,AmPhos,en,false,weak_label_v2.1:user_possible_cas_reconciliation:932710-63-9,1.0,active,chemical_name_v1,false
+sid:alias:1c4297a0803a5a53,cas:95408-45-0,common_name,"Dichloro[1,1′-bis(di-tert-butylphosphino)ferrocene]palladium(II)",en,false,weak_label_v2.1:user_possible_cas_reconciliation:95408-45-0,1.0,active,chemical_name_v1,false
+sid:alias:8ef384137c905c8d,cas:95408-45-0,legacy_name,dtbpfPdCl2,en,false,weak_label_v2.1:user_possible_cas_reconciliation:95408-45-0,1.0,active,chemical_name_v1,false
+sid:alias:933ae5f7c4287a39,cas:99646-28-3,common_name,(R)-Tol-BINAP,en,false,weak_label_v2.1:user_possible_cas_reconciliation:99646-28-3,1.0,active,chemical_name_v1,false
+sid:alias:1b585618ea8b7b27,cas:998-40-3,legacy_name,PBu3,en,false,weak_label_v2.1:user_possible_cas_reconciliation:998-40-3,1.0,active,chemical_name_v1,false
+sid:alias:bea586d6b8ddba5e,cas:17217-57-1,legacy_name,44′-Dimethoxy-22′-bipyridyl,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:17217-57-1,1.0,active,chemical_name_v1,false
+sid:alias:982ce913d2efd77c,cas:1651823-59-4,legacy_name,cataCXiumA Pd G3,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:1651823-59-4,1.0,active,chemical_name_v1,false
+sid:alias:69162e80c6d50a24,cas:852445-83-1,legacy_name,iPr AuCl,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:852445-83-1,1.0,active,chemical_name_v1,false
+sid:alias:d5fe537f3ac062aa,cas:1507403-85-1,legacy_name,Me4tBuXPhos Pd G3,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:1507403-85-1,1.0,active,chemical_name_v1,false
+sid:alias:d154b96267c0dbfd,cas:7560-83-0,common_name,N-Methyldicyclohexylamine,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:7560-83-0,1.0,active,chemical_name_v1,false
+sid:alias:446b845cee1cb93d,cas:1445086-12-3,legacy_name,P(Cy3) Pd G3,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:1445086-12-3,1.0,active,chemical_name_v1,false
+sid:alias:9ca721adc254ba2c,cas:1385042-42-1,legacy_name,P(oTol)3 Pd(crotyl)Cl,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:1385042-42-1,1.0,active,chemical_name_v1,false
+sid:alias:d9f1d804857884fa,cas:33636-93-0,legacy_name,Strykers reagent,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:33636-93-0,1.0,active,chemical_name_v1,false
