@@ -1,4 +1,4 @@
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 
 import pytest
@@ -17,6 +17,7 @@ from condition_recommender import (
     recommend_generic_conditions,
 )
 import condition_recommender.generic_api as generic_api_module
+import condition_recommender.generic_retrieval as generic_retrieval_module
 from condition_recommender.conversion.engine import convert_datasets
 from condition_recommender.generic_api import recommend_indexed_signature
 from condition_recommender.generic_indexing import (
@@ -365,6 +366,88 @@ def test_retrieval_uses_context_core_after_exact_edit_tiers() -> None:
 
     assert level == "reaction_core_context"
     assert len(pool) == 2
+
+
+def test_exact_retrieval_does_not_compute_broader_fallbacks(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    signature = _signature("query")
+    index = build_generic_index(
+        [_record(1, signature), _record(2, signature)]
+    )
+
+    def unexpected_fallback(*args: object, **kwargs: object) -> set[int]:
+        raise AssertionError("broader fallback was computed before it was needed")
+
+    monkeypatch.setattr(
+        generic_retrieval_module,
+        "_environment_neighbor_positions",
+        unexpected_fallback,
+    )
+    monkeypatch.setattr(
+        generic_retrieval_module,
+        "_core_level_positions",
+        unexpected_fallback,
+    )
+    monkeypatch.setattr(
+        generic_retrieval_module,
+        "_edit_graph_neighbor_positions",
+        unexpected_fallback,
+    )
+
+    result = retrieve_compatible_generic_pool_with_trace(signature, index)
+
+    assert result.level == "exact_signature"
+    assert len(result.pool) == 2
+    assert tuple(trace.level for trace in result.trace) == ("exact_signature",)
+
+
+def test_approximate_tiers_bulk_load_candidate_rows() -> None:
+    records = [_record(1, _signature("one")), _record(2, _signature("two"))]
+    records[0]["reaction_core"] = _core("one")
+    records[1]["reaction_core"] = _core("two")
+    index = build_generic_index(records)
+
+    class BulkOnlyRows:
+        def __init__(self, rows: object) -> None:
+            self.rows = rows
+            self.select_calls = 0
+
+        def __len__(self) -> int:
+            return len(self.rows)  # type: ignore[arg-type]
+
+        def __getitem__(self, position: int) -> object:
+            raise AssertionError(f"candidate row {position} was loaded individually")
+
+        def select(self, positions: object) -> tuple[object, ...]:
+            self.select_calls += 1
+            return tuple(
+                self.rows[position]  # type: ignore[index]
+                for position in positions  # type: ignore[union-attr]
+            )
+
+        def edit_graph_candidate_positions(self, prototype: object) -> tuple[int, ...]:
+            return tuple(range(len(self)))
+
+    bulk_rows = BulkOnlyRows(index.rows)
+    bulk_index = replace(index, rows=bulk_rows)  # type: ignore[arg-type]
+
+    edit_positions = generic_retrieval_module._edit_graph_neighbor_positions(
+        _signature("query", bond="different-bond"),
+        bulk_index,
+        exclude=set(),
+    )
+    assert edit_positions == {0, 1}
+    assert bulk_rows.select_calls == 1
+
+    core_positions = generic_retrieval_module._core_level_positions(
+        _core("one"),
+        bulk_index,
+        level="reaction_core_exact",
+        query_eligible=True,
+    )
+    assert core_positions == {0}
+    assert bulk_rows.select_calls == 2
 
 
 def test_core_ladder_prefers_exact_then_local_before_context() -> None:

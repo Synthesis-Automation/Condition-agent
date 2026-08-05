@@ -6,7 +6,7 @@ import json
 from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Literal, Mapping, Tuple
+from typing import Any, Dict, Iterator, Literal, Mapping, Tuple
 
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
 from .core_retrieval import reaction_core_query_eligible
@@ -117,49 +117,10 @@ def _candidate_levels(
     *,
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
-) -> list[tuple[str, set[int]]]:
+) -> Iterator[tuple[str, set[int]]]:
+    """Yield retrieval tiers in order without computing later fallbacks early."""
     compatible = _compatible_edit_positions(signature, index)
-    edit_graph_neighbors = _edit_graph_neighbor_positions(
-        signature,
-        index,
-        exclude=compatible,
-    )
-    core_positions = _core_level_positions(reaction_core, index)
-    if not compatible and not edit_graph_neighbors and not any(core_positions.values()):
-        return []
     rules = load_generic_retrieval_rules()
-    family = str(signature.get("named_family") or "")
-    family_confidence = float(signature.get("family_confidence") or 0.0)
-    threshold = float(rules["high_confidence_family_threshold"])
-    family_positions = (
-        _positions(index.families, family) & compatible
-        if family and family_confidence >= threshold
-        else set()
-    )
-    candidates = {
-        "exact_signature": (
-            _positions(index.exact, signature.get("exact_signature_key"))
-            & compatible
-        ),
-        "handle_signature": (
-            _positions(index.handles, signature.get("handle_signature_key"))
-            & compatible
-        ),
-        "named_family": family_positions,
-        "transformation_signature": (
-            _positions(
-                index.transformations,
-                signature.get("transformation_signature_key"),
-            )
-            & compatible
-        ),
-        "environment_neighbors": _environment_neighbor_positions(
-            signature, index, compatible
-        ),
-        "bond_edit_signature": compatible,
-        **core_positions,
-        "edit_graph_neighbors": edit_graph_neighbors,
-    }
     ladder = (
         rules["retrieval_ladder"]
         if strategy == "hybrid"
@@ -167,24 +128,75 @@ def _candidate_levels(
     )
     if not ladder:
         raise ValueError(f"Unsupported generic retrieval strategy: {strategy}")
-    return [(level, candidates[level]) for level in ladder]
+    core_eligible = bool(
+        reaction_core
+        and reaction_core_query_eligible(reaction_core, index)[0]
+    )
+    for raw_level in ladder:
+        level = str(raw_level)
+        if level == "exact_signature":
+            positions = _positions(
+                index.exact, signature.get("exact_signature_key")
+            ) & compatible
+        elif level == "handle_signature":
+            positions = _positions(
+                index.handles, signature.get("handle_signature_key")
+            ) & compatible
+        elif level == "named_family":
+            family = str(signature.get("named_family") or "")
+            family_confidence = float(
+                signature.get("family_confidence") or 0.0
+            )
+            positions = (
+                _positions(index.families, family) & compatible
+                if family
+                and family_confidence
+                >= float(rules["high_confidence_family_threshold"])
+                else set()
+            )
+        elif level == "transformation_signature":
+            positions = _positions(
+                index.transformations,
+                signature.get("transformation_signature_key"),
+            ) & compatible
+        elif level == "environment_neighbors":
+            positions = _environment_neighbor_positions(
+                signature, index, compatible
+            )
+        elif level == "bond_edit_signature":
+            positions = compatible
+        elif level.startswith("reaction_core_"):
+            positions = _core_level_positions(
+                reaction_core,
+                index,
+                level=level,
+                query_eligible=core_eligible,
+            )
+        elif level == "edit_graph_neighbors":
+            positions = _edit_graph_neighbor_positions(
+                signature,
+                index,
+                exclude=compatible,
+            )
+        else:  # pragma: no cover - validated definitions prevent this branch.
+            raise ValueError(f"Unsupported generic retrieval level: {level}")
+        yield level, positions
 
 
 def _core_level_positions(
     reaction_core: Mapping[str, Any] | None,
     index: GenericReactionIndex,
-) -> dict[str, set[int]]:
-    """Return verified precedents for exact, local, and contextual cores."""
-    empty = {
-        "reaction_core_exact": set(),
-        "reaction_core_local": set(),
-        "reaction_core_context": set(),
-    }
-    if not reaction_core:
-        return empty
-    eligible, _ = reaction_core_query_eligible(reaction_core, index)
-    if not eligible:
-        return empty
+    *,
+    level: str,
+    query_eligible: bool | None = None,
+) -> set[int]:
+    """Return one bulk-loaded, event-compatible reaction-core tier."""
+    if not reaction_core or not (
+        reaction_core_query_eligible(reaction_core, index)[0]
+        if query_eligible is None
+        else query_eligible
+    ):
+        return set()
     event_count = int(reaction_core.get("event_count") or 0)
     definitions = {
         "reaction_core_exact": (
@@ -200,16 +212,17 @@ def _core_level_positions(
             str(reaction_core.get("shape_core_key") or ""),
         ),
     }
+    if level not in definitions:
+        raise ValueError(f"Unsupported reaction-core retrieval level: {level}")
+    mapping, key = definitions[level]
+    positions = tuple(mapping.get(key, ()))
+    rows = index.select(positions)
     return {
-        level: {
-            position
-            for position in mapping.get(key, ())
-            if index.rows[position].signature
-            and index.rows[position].reaction_core
-            and int(index.rows[position].reaction_core.get("event_count") or 0)
-            == event_count
-        }
-        for level, (mapping, key) in definitions.items()
+        position
+        for position, row in zip(positions, rows)
+        if row.signature
+        and row.reaction_core
+        and int(row.reaction_core.get("event_count") or 0) == event_count
     }
 
 
@@ -232,14 +245,17 @@ def _edit_graph_neighbor_positions(
         "edit_graph_candidate_positions",
         None,
     )
-    positions = (
+    positions = tuple(
         candidate_positions(query)
         if callable(candidate_positions)
         else range(len(index.rows))
     )
-    for position in positions:
-        row = index.rows[position]
-        if position in exclude or not row.signature:
+    included_positions = tuple(
+        position for position in positions if position not in exclude
+    )
+    rows = index.select(included_positions)
+    for position, row in zip(included_positions, rows):
+        if not row.signature:
             continue
         candidate = anonymous_edit_prototype(row.signature)
         if candidate is None:
@@ -274,23 +290,28 @@ def _environment_neighbor_positions(
     token_positions = set()
     for token in query_tokens:
         token_positions.update(index.environment_features.get(token, ()))
+    positions = tuple(sorted(compatible & token_positions))
+    rows = index.select(positions)
     scored = []
-    for position in compatible & token_positions:
+    for position, row in zip(positions, rows):
         score = environment_profile_similarity(
             signature,
-            index.rows[position].signature,
+            row.signature,
         )
         if score >= threshold:
-            scored.append((score, position))
+            scored.append(
+                (
+                    score,
+                    row.canonical_reaction_id,
+                    row.reaction_id,
+                    row.observation_id,
+                    position,
+                )
+            )
     scored.sort(
-        key=lambda item: (
-            -item[0],
-            index.rows[item[1]].canonical_reaction_id,
-            index.rows[item[1]].reaction_id,
-            index.rows[item[1]].observation_id,
-        )
+        key=lambda item: (-item[0],) + item[1:]
     )
-    return {position for _, position in scored[:limit]}
+    return {item[-1] for item in scored[:limit]}
 
 
 def _minimum_support(minimum_pool_size: int | None) -> int:
@@ -303,6 +324,20 @@ def _minimum_support(minimum_pool_size: int | None) -> int:
     if minimum < 1:
         raise ValueError("minimum_pool_size must be positive")
     return minimum
+
+
+def _no_compatible_bond_edit_trace(minimum: int) -> RetrievalLevelTrace:
+    """Return the stable trace used when every chemistry tier is empty."""
+    return RetrievalLevelTrace(
+        level="bond_edit_gate",
+        candidate_count=0,
+        independent_candidate_count=0,
+        compatible_candidate_count=0,
+        independent_compatible_candidate_count=0,
+        excluded_candidate_count=0,
+        minimum_independent_support=minimum,
+        status="no_compatible_bond_edit",
+    )
 
 
 def retrieve_generic_pool_with_trace(
@@ -325,20 +360,14 @@ def retrieve_generic_pool_with_trace(
         reaction_core=reaction_core,
         strategy=strategy,
     )
-    if not levels:
-        trace = RetrievalLevelTrace(
-            level="bond_edit_gate",
-            candidate_count=0,
-            independent_candidate_count=0,
-            compatible_candidate_count=0,
-            independent_compatible_candidate_count=0,
-            excluded_candidate_count=0,
-            minimum_independent_support=minimum,
-            status="no_compatible_bond_edit",
-        )
-        return "no_compatible_bond_edit", (), (trace,)
-    fallback: tuple[str, set[int], int] | None = None
+    fallback: tuple[
+        str,
+        Tuple[GenericIndexedReaction, ...],
+        int,
+        int,
+    ] | None = None
     traces = []
+    saw_candidates = False
     for level, positions in levels:
         if not positions:
             traces.append(
@@ -354,6 +383,7 @@ def retrieve_generic_pool_with_trace(
                 )
             )
             continue
+        saw_candidates = True
         rows = index.select(sorted(positions))
         support = summarize_evidence_support(rows)
         trace = RetrievalLevelTrace(
@@ -371,24 +401,30 @@ def retrieve_generic_pool_with_trace(
             support.independent_count,
             len(rows),
         ) > (
-            summarize_evidence_support(
-                index.select(sorted(fallback[1]))
-            ).independent_count,
+            fallback[3],
             len(fallback[1]),
         ):
-            fallback = (level, positions, len(traces) - 1)
+            fallback = (
+                level,
+                rows,
+                len(traces) - 1,
+                support.independent_count,
+            )
         if support.independent_count >= minimum:
             traces[-1] = replace(trace, status="selected")
             return level, rows, tuple(traces)
     if fallback is None:
+        if not saw_candidates:
+            trace = _no_compatible_bond_edit_trace(minimum)
+            return "no_compatible_bond_edit", (), (trace,)
         return "no_compatible_precedent", (), tuple(traces)
-    level, positions, trace_index = fallback
+    level, rows, trace_index, _ = fallback
     traces[trace_index] = replace(
         traces[trace_index], status="selected_limited_support"
     )
     return (
         f"{level}_limited_support",
-        index.select(sorted(positions)),
+        rows,
         tuple(traces),
     )
 
@@ -441,22 +477,9 @@ def retrieve_compatible_generic_pool_with_trace(
         reaction_core=reaction_core,
         strategy=strategy,
     )
-    if not levels:
-        trace = RetrievalLevelTrace(
-            level="bond_edit_gate",
-            candidate_count=0,
-            independent_candidate_count=0,
-            compatible_candidate_count=0,
-            independent_compatible_candidate_count=0,
-            excluded_candidate_count=0,
-            minimum_independent_support=minimum,
-            status="no_compatible_bond_edit",
-        )
-        return CompatibleRetrievalResult(
-            "no_compatible_bond_edit", (), 0, 0, 0, 0, (trace,)
-        )
     fallback = None
     traces = []
+    saw_candidates = False
     for level, positions in levels:
         if not positions:
             traces.append(
@@ -472,6 +495,7 @@ def retrieve_compatible_generic_pool_with_trace(
                 )
             )
             continue
+        saw_candidates = True
         rows = index.select(sorted(positions))
         accepted, excluded = filter_compatible_precedents(signature, rows)
         raw_support = summarize_evidence_support(rows)
@@ -528,6 +552,11 @@ def retrieve_compatible_generic_pool_with_trace(
                 trace=tuple(traces),
             )
     if fallback is None:
+        if not saw_candidates:
+            trace = _no_compatible_bond_edit_trace(minimum)
+            return CompatibleRetrievalResult(
+                "no_compatible_bond_edit", (), 0, 0, 0, 0, (trace,)
+            )
         bond_rows = index.select(sorted(_compatible_edit_positions(signature, index)))
         _, excluded = filter_compatible_precedents(signature, bond_rows)
         support = summarize_evidence_support(bond_rows)

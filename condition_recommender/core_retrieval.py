@@ -117,17 +117,18 @@ def _level_positions(
     key = str(core.get(key_field) or "")
     event_count = int(core.get("event_count") or 0)
     mapping = getattr(index, index_map)
+    positions = tuple(mapping.get(key, ()))
+    rows = index.select(positions)
     return {
         position
-        for position in mapping.get(key, ())
-        if index.rows[position].precedent_tier.value in allowed_tiers
-        and index.rows[position].reaction_core
+        for position, row in zip(positions, rows)
+        if row.precedent_tier.value in allowed_tiers
+        and row.reaction_core
         and (
-            index.rows[position].signature
-            or index.rows[position].fallback_descriptor
+            row.signature
+            or row.fallback_descriptor
         )
-        and int(index.rows[position].reaction_core.get("event_count") or 0)
-        == event_count
+        and int(row.reaction_core.get("event_count") or 0) == event_count
     }
 
 
