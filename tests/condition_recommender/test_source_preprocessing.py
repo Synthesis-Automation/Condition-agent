@@ -32,17 +32,29 @@ def _read_records(path: str | Path) -> list[dict]:
 def _literature_row() -> dict[str, str]:
     return {
         "reaction_id": "lit-1",
+        "duplicate_reaction_ids": "lit-1, lit-1-copy",
+        "source_files": "example.rdf",
         "reaction_type": "Suzuki source label",
         "yield_pct": "81.5",
         "temperature_c": "80",
         "time_h": "2",
+        "reactant_smiles": "Brc1ccccc1.OB(O)c1ccccc1",
+        "product_smiles": "c1ccc(-c2ccccc2)cc1",
         "reaction_smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        "title": "Example coupling",
+        "authors": "A. Chemist; B. Chemist",
+        "citation": "Example Journal (2024), 1, 1-2",
         "reference": "Example Journal (2024), 1, 1-2",
         "reactant_cas": "",
         "product_cas": "",
         "reagent_cas": "584-08-7",
         "catalyst_cas": "14221-01-3",
         "solvent_cas": "108-88-3",
+        "reactant_amd": "",
+        "product_amd": "",
+        "reagent_amd": "base grade",
+        "catalyst_amd": "supported",
+        "solvent_amd": "",
         "experimental_procedure": "Stirred at 80 C for 2 h.",
         "stages": "1",
         "steps": "1",
@@ -53,7 +65,32 @@ def _literature_row() -> dict[str, str]:
         "product_yield_5": "",
         "product_yield_6": "",
         "product_yield_7": "",
+        "product_yields_json": json.dumps({"1": 81.5}),
+        "reactants_json": json.dumps(
+            [
+                {"index": 1, "cas_rn": "", "smiles": "Brc1ccccc1"},
+                {"index": 2, "cas_rn": "", "smiles": "OB(O)c1ccccc1"},
+            ]
+        ),
+        "products_json": json.dumps(
+            [
+                {
+                    "index": 1,
+                    "cas_rn": "",
+                    "yield_pct": "81.5",
+                    "smiles": "c1ccc(-c2ccccc2)cc1",
+                }
+            ]
+        ),
+        "reagents_json": json.dumps(
+            [{"index": 1, "cas_rn": "584-08-7", "amd": "base grade"}]
+        ),
+        "catalysts_json": json.dumps(
+            [{"index": 1, "cas_rn": "14221-01-3", "amd": "supported"}]
+        ),
+        "solvents_json": json.dumps([{"index": 1, "cas_rn": "108-88-3"}]),
         "notes": "source note",
+        "structure_warnings": "",
     }
 
 
@@ -134,13 +171,17 @@ def test_literature_preprocessing_is_source_faithful(tmp_path: Path) -> None:
     report = preprocess_file(source, output)
     record = _read_records(report["output_path"])[0]
 
-    assert report["adapter_id"] == "literature_csv.v1"
+    assert report["adapter_id"] == "literature_csv.v2"
+    assert report["adapter_version"] == "2.0"
     assert report["input_row_count"] == report["output_row_count"] == 1
     assert record["schema_version"] == INTERMEDIATE_OBSERVATION_SCHEMA_VERSION
     assert record["observation_kind"] == "structure_backed"
     assert record["reaction"]["supplied_mapping_status"] == "not_supplied"
     assert record["reaction"]["source_reaction_type"] == "Suzuki source label"
+    assert record["reaction"]["source_labels"]["title"] == "Example coupling"
+    assert len(record["reaction"]["source_labels"]["reactants"]) == 2
     assert record["source"]["reference"].startswith("Example Journal")
+    assert record["source"]["source_groups"]["source_files"] == "example.rdf"
     assert {
         item["source_role_hint"] for item in record["conditions"]["components"]
     } == {
@@ -149,7 +190,43 @@ def test_literature_preprocessing_is_source_faithful(tmp_path: Path) -> None:
         "solvent",
     }
     assert record["conditions"]["stages"][0]["temperature_c"] == 80.0
+    catalyst = next(
+        item
+        for item in record["conditions"]["components"]
+        if item["source_role_hint"] == "catalyst"
+    )
+    assert catalyst["source_slot"] == "catalysts_json"
+    assert catalyst["provenance"]["additional_material_description"] == [
+        "supported"
+    ]
+    assert record["outcomes"][1]["source_field"] == "product_yields_json[1]"
+    assert record["outcomes"][1]["metadata"]["product_smiles"].startswith("c1ccc")
     assert record["raw_fields"]["notes"] == "source note"
+
+
+def test_literature_preprocessing_flags_structured_scalar_conflicts(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "literature.csv"
+    output = tmp_path / "intermediate"
+    row = _literature_row()
+    row["reagent_cas"] = "497-19-8"
+    _write_csv(source, [row])
+
+    report = preprocess_file(source, output)
+    record = _read_records(report["output_path"])[0]
+
+    assert record["ingestion_status"] == "review"
+    assert (
+        "CONFLICTING_STRUCTURED_FIELD:reagents_json:reagent_cas"
+        in record["warnings"]
+    )
+    reagent = next(
+        item
+        for item in record["conditions"]["components"]
+        if item["source_role_hint"] == "reagent"
+    )
+    assert reagent["identifiers"][0]["value"] == "584-08-7"
 
 
 def test_hitea_preprocessing_groups_identifiers_and_preserves_outcome_basis(
