@@ -681,6 +681,13 @@ def parse_txt(path: str) -> Dict[str, Dict[str, Any]]:
 # --------------------------- Parsing the RXN/RDF ----------------------------
 
 def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
+    """Parse a SciFinder RDF export without discarding unrecognized data fields.
+
+    Common chemistry fields are normalized into the historical keys consumed by
+    :func:`assemble_rows`.  Every ``$DTYPE``/``$DATUM`` pair is also retained in
+    ``raw_fields`` so new SciFinder fields remain available even before an
+    explicit normalized mapping is added.
+    """
     reactions: Dict[str, Dict[str, Any]] = {}
     pending_key = None
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -710,17 +717,50 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
             'authors': None,
             'citation': None,
             'notes': [],
+            'raw_fields': {},
         })
+
+    def _merge_pending_record(pending_rid: str, rid: str) -> None:
+        """Move fields seen before CAS_Reaction_Number onto the true record."""
+        if pending_rid == rid or pending_rid not in reactions:
+            return
+        pending = reactions.pop(pending_rid)
+        target = _ensure(rid)
+        list_fields = (
+            'rct_cas', 'pro_cas', 'rgt_cas', 'cat_cas', 'sol_cas',
+            'rct_amd', 'pro_amd', 'rgt_amd', 'cat_amd', 'sol_amd',
+            'exp_proc', 'notes', 'rct_mol', 'pro_mol',
+        )
+        for field in list_fields:
+            for value in pending.get(field, []) or []:
+                if value not in target[field]:
+                    target[field].append(value)
+        for field in ('stages', 'steps', 'yield_pct', 'title', 'authors', 'citation'):
+            if target.get(field) in (None, '') and pending.get(field) not in (None, ''):
+                target[field] = pending[field]
+        target['pro_yields'].update(pending.get('pro_yields') or {})
+        for key, values in (pending.get('raw_fields') or {}).items():
+            raw_values = target['raw_fields'].setdefault(key, [])
+            for value in values:
+                if value not in raw_values:
+                    raw_values.append(value)
 
     current_rid: str | None = None
     # queue pending RXN mol blocks (reactants/products) until we see the CAS Reaction Number
     pending_rxn_sets: List[Dict[str, Any]] = []
+    pending_record_number = 0
     i = 0
     while i < len(lines):
         line = lines[i]
         # Capture RXN header + MOL blocks (V2000/V3000). Format:
         # $RXN ... [counts line with two ints] then $MOL blocks for reactants then products.
         if line.strip().startswith('$RXN'):
+            # SciFinder may emit RCT/PRO identifiers before the CAS reaction
+            # number. Use a temporary record so they cannot leak into the
+            # preceding reaction.
+            pending_record_number += 1
+            current_rid = f"__pending_rdf_record_{pending_record_number}__"
+            _ensure(current_rid)
             i += 1
             # find counts line like "  2  1"
             rct_count = 0
@@ -791,8 +831,11 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
 
                 # Route datum into the appropriate bucket
                 if 'CAS_Reaction_Number' in key:
+                    pending_rid = current_rid
                     current_rid = datum
                     _ensure(current_rid)
+                    if pending_rid and pending_rid.startswith('__pending_rdf_record_'):
+                        _merge_pending_record(pending_rid, current_rid)
                     # attach earliest pending RXN set if present
                     if pending_rxn_sets:
                         rxnset = pending_rxn_sets.pop(0)
@@ -803,47 +846,62 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
                             rct_n = max(0, min(len(blocks), len(blocks) - 1))
                         _ensure(current_rid)['rct_mol'].extend(blocks[:rct_n])
                         _ensure(current_rid)['pro_mol'].extend(blocks[rct_n:])
+                    _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                 elif ':RCT(' in key and key.endswith('CAS_RN'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['rct_cas'].append(datum)
                 elif ':PRO(' in key and key.endswith('CAS_RN'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['pro_cas'].append(datum)
                 elif ':RGT(' in key and key.endswith('CAS_RN'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['rgt_cas'].append(datum)
                 elif ':CAT(' in key and key.endswith('CAS_RN'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['cat_cas'].append(datum)
                 elif ':SOL(' in key and key.endswith('CAS_RN'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['sol_cas'].append(datum)
                 elif ':RCT(' in key and key.endswith(':AMD'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['rct_amd'].append(datum)
                 elif ':PRO(' in key and key.endswith(':AMD'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['pro_amd'].append(datum)
                 elif ':RGT(' in key and key.endswith(':AMD'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['rgt_amd'].append(datum)
                 elif ':CAT(' in key and key.endswith(':AMD'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['cat_amd'].append(datum)
                 elif ':SOL(' in key and key.endswith(':AMD'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['sol_amd'].append(datum)
                 elif ':RCT(' in key and (key.endswith(':CTAB') or key.endswith(':MOL')):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['rct_mol'].append(datum)
                 elif ':PRO(' in key and (key.endswith(':CTAB') or key.endswith(':MOL')):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['pro_mol'].append(datum)
                 elif ':PRO(' in key and key.endswith(':YIELD'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         try:
-                            yield_val = int(float(datum))
-                        except Exception:
+                            parsed_yield = float(datum)
+                            yield_val = int(parsed_yield) if parsed_yield.is_integer() else parsed_yield
+                        except (TypeError, ValueError):
                             yield_val = None
                         try:
                             pro_idx = int(re.search(r':PRO\((\d+)\):YIELD$', key).group(1))  # type: ignore[union-attr]
@@ -856,25 +914,35 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
                             rec['yield_pct'] = yield_val
                 elif key.endswith(':EXP_PROC'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['exp_proc'].append(datum)
                 elif key.endswith(':STAGES'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['stages'] = datum
                 elif key.endswith(':STEPS'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['steps'] = datum
                 elif key.endswith(':REFERENCE(1):TITLE'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['title'] = datum
                 elif key.endswith(':REFERENCE(1):AUTHOR'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['authors'] = datum
                 elif key.endswith(':REFERENCE(1):CITATION'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['citation'] = datum
                 elif key.endswith(':NOTES'):
                     if current_rid:
+                        _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                         _ensure(current_rid)['notes'].append(datum)
+                elif current_rid:
+                    # Preserve fields introduced by other SciFinder versions.
+                    _ensure(current_rid)['raw_fields'].setdefault(key, []).append(datum)
                 # do not increment i here; we already moved to next line or stop
                 continue
             else:
@@ -882,6 +950,11 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
                 continue
         else:
             i += 1
+
+    # Discard malformed records that never supplied a reaction identifier.
+    for rid in list(reactions):
+        if rid.startswith('__pending_rdf_record_'):
+            reactions.pop(rid)
 
     # Deduplicate lists
     for rid, rec in reactions.items():
@@ -900,6 +973,8 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
                     seen.add(mb)
                     uniq.append(mb)
             rec[k] = uniq
+        for key, values in rec.get('raw_fields', {}).items():
+            rec['raw_fields'][key] = list(dict.fromkeys(values))
     return reactions
 
 

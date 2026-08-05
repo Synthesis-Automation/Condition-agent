@@ -5,7 +5,7 @@ Simple Qt6 GUI wrapper for processing RDF files only.
 Lets the user pick a folder containing RDF files and processes all RDF files in the folder.
 Works with PySide6 (preferred) or PyQt6 if installed.
 
-MAXSUM smiles: 160
+Long reactions are retained; no chemistry is discarded based on SMILES length.
 """
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ import sys
 import traceback
 import re
 import csv
+import copy
 from typing import List, Optional, Dict, Any, Set, Tuple
 from pathlib import Path
 
@@ -39,7 +40,7 @@ else:  # pragma: no cover
 
 # Import processing functions from the existing modules
 try:
-    from process_reactions import parse_rdf, assemble_rows
+    from process_reactions import parse_rdf, assemble_rows, _molblock_to_smiles
 except Exception as e:
     print(f"Error: Cannot import processing helpers: {e}")
     sys.exit(1)
@@ -881,103 +882,116 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             pass
 
     def generate_csv_export(self, rows, output_path: str, source_folder: str, rdf_map: Optional[Dict[str, Dict[str, Any]]] = None):
-        """Generate CSV export using CAS-only lists for components."""
+        """Write every parsed reaction and its chemistry/provenance fields."""
         fieldnames = [
-            "reaction_id",
-            "reaction_type",
-            "yield_pct",
-            "temperature_c",
-            "time_h",
-            "reaction_smiles",
-            "reference",
-            "reactant_cas",
-            "product_cas",
-            "reagent_cas",
-            "catalyst_cas",
-            "solvent_cas",
-            "reactant_amd",
-            "product_amd",
-            "reagent_amd",
-            "catalyst_amd",
-            "solvent_amd",
-            "experimental_procedure",
-            "stages",
-            "steps",
-            "product_yield_1",
-            "product_yield_2",
-            "product_yield_3",
-            "product_yield_4",
-            "product_yield_5",
-            "product_yield_6",
-            "product_yield_7",
-            "notes",
+            "reaction_id", "duplicate_reaction_ids", "source_files", "reaction_type",
+            "yield_pct", "temperature_c", "time_h", "reactant_smiles",
+            "product_smiles", "reaction_smiles", "title", "authors", "citation",
+            "reference", "reactant_cas", "product_cas", "reagent_cas",
+            "catalyst_cas", "solvent_cas", "reactant_amd", "product_amd",
+            "reagent_amd", "catalyst_amd", "solvent_amd",
+            "experimental_procedure", "stages", "steps", "product_yield_1",
+            "product_yield_2", "product_yield_3", "product_yield_4",
+            "product_yield_5", "product_yield_6", "product_yield_7",
+            "product_yields_json",
+            "reactants_json", "products_json", "reagents_json", "catalysts_json",
+            "solvents_json", "notes", "structure_warnings",
         ]
 
-        def _format_notes(val: Any) -> str:
-            if not val:
+        def _format_notes(value: Any) -> str:
+            if not value:
                 return ""
-            if isinstance(val, list):
-                parts = [str(v).strip() for v in val if str(v).strip()]
-                return " | ".join(parts)
-            return str(val).strip()
+            if isinstance(value, list):
+                return " | ".join(str(item).strip() for item in value if str(item).strip())
+            return str(value).strip()
 
-        def _extract_citation(row: Dict[str, Any], raw_data: Dict[str, Any]) -> str:
-            citation = ""
-            if isinstance(raw_data, dict):
-                txt_block = raw_data.get("txt") or {}
-                rdf_block = raw_data.get("rdf") or {}
-                citation = (txt_block.get("citation") or rdf_block.get("citation") or "").strip()
-            if citation:
-                return citation
-            ref_str = (row.get("Reference") or "").strip()
-            if not ref_str:
-                return ""
-            parts = [p.strip() for p in ref_str.split("|") if p.strip()]
-            for part in parts:
-                if "(" in part and ")" in part and not part.startswith("10."):
-                    return part
-            return ""
+        def _component_records(
+            rdf_data: Dict[str, Any],
+            role: str,
+            mol_field: Optional[str] = None,
+        ) -> List[Dict[str, Any]]:
+            components: Dict[int, Dict[str, Any]] = {}
+            pattern = re.compile(rf":{role}\((\d+)\):(CAS_RN|AMD|YIELD|CTAB|MOL)$")
+            for key, values in (rdf_data.get("raw_fields") or {}).items():
+                match = pattern.search(key)
+                if not match:
+                    continue
+                index = int(match.group(1))
+                field = match.group(2).lower()
+                component = components.setdefault(index, {"index": index})
+                normalized = list(values or [])
+                if field in {"cas_rn", "amd"}:
+                    component[field] = normalized[0] if len(normalized) == 1 else normalized
+                elif field == "yield":
+                    component["yield_pct"] = normalized[0] if len(normalized) == 1 else normalized
+
+            if mol_field:
+                for index, mol_block in enumerate(rdf_data.get(mol_field) or [], 1):
+                    component = components.setdefault(index, {"index": index})
+                    smiles = _molblock_to_smiles(mol_block)
+                    if smiles:
+                        component["smiles"] = smiles
+                    else:
+                        component["unparsed_mol_block"] = mol_block
+            return [components[index] for index in sorted(components)]
 
         try:
-            with open(output_path, "w", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=fieldnames)
+            written = 0
+            with open(output_path, "w", newline="", encoding="utf-8") as output_file:
+                writer = csv.DictWriter(output_file, fieldnames=fieldnames)
                 writer.writeheader()
                 for idx, row in enumerate(rows, 1):
-                    rid = row.get("ReactionID", "")
-                    rtype = row.get("ReactionType", "")
-                    y = row.get("Yield_%", "")
-                    temp_c = row.get("Temperature_C", "")
-                    time_h = row.get("Time_h", "")
-                    r_smi = row.get("ReactantSMILES", "")
-                    p_smi = row.get("ProductSMILES", "")
-                    rxn_smi = f"{r_smi}>>{p_smi}" if r_smi or p_smi else ""
+                    reaction_id = row.get("ReactionID", "")
+                    rdf_data = (
+                        rdf_map.get(reaction_id, {})
+                        if rdf_map and reaction_id in rdf_map
+                        else {}
+                    )
+                    reactant_smiles = row.get("ReactantSMILES", "")
+                    product_smiles = row.get("ProductSMILES", "")
+                    reaction_smiles = (
+                        f"{reactant_smiles}>>{product_smiles}"
+                        if reactant_smiles or product_smiles else ""
+                    )
+                    warnings: List[str] = []
+                    if rdf_data.get("rct_mol") and not reactant_smiles:
+                        warnings.append("reactant_mol_to_smiles_failed")
+                    if rdf_data.get("pro_mol") and not product_smiles:
+                        warnings.append("product_mol_to_smiles_failed")
+                    if RDKIT_AVAILABLE and reactant_smiles and not _is_valid_smiles(reactant_smiles):
+                        warnings.append("reactant_smiles_validation_failed")
+                    if RDKIT_AVAILABLE and product_smiles and not _is_valid_smiles(product_smiles):
+                        warnings.append("product_smiles_validation_failed")
 
-                    raw_data_str = row.get("RawData", "{}")
-                    raw_data: Dict[str, Any] = {}
-                    try:
-                        raw_data = _json.loads(raw_data_str) if raw_data_str else {}
-                    except Exception:
-                        raw_data = {}
-                    if rdf_map and rid in rdf_map:
-                        rdf_data = rdf_map.get(rid, {})
-                    else:
-                        rdf_data = raw_data.get("rdf", {}) if isinstance(raw_data, dict) else {}
-                    pro_yields = rdf_data.get("pro_yields", {}) if isinstance(rdf_data, dict) else {}
-                    def _yield_at(idx: int) -> Any:
-                        if isinstance(pro_yields, dict):
-                            return pro_yields.get(idx) or pro_yields.get(str(idx)) or ""
-                        if isinstance(pro_yields, list) and len(pro_yields) >= idx:
-                            return pro_yields[idx - 1] or ""
+                    product_yields = rdf_data.get("pro_yields", {})
+
+                    def _yield_at(index: int) -> Any:
+                        if isinstance(product_yields, dict):
+                            value = product_yields.get(index)
+                            if value is None:
+                                value = product_yields.get(str(index))
+                            return "" if value is None else value
+                        if isinstance(product_yields, list) and len(product_yields) >= index:
+                            return product_yields[index - 1]
                         return ""
 
                     entry = {
-                        "reaction_id": rid,
-                        "reaction_type": rtype,
-                        "yield_pct": y,
-                        "temperature_c": temp_c,
-                        "time_h": time_h,
-                        "reaction_smiles": rxn_smi,
-                        "reference": _extract_citation(row, raw_data),
+                        "reaction_id": reaction_id,
+                        "duplicate_reaction_ids": self._format_cas_list(
+                            rdf_data.get("duplicate_reaction_ids", [reaction_id])
+                        ),
+                        "source_files": self._format_cas_list(rdf_data.get("source_files", [])),
+                        "reaction_type": row.get("ReactionType", ""),
+                        "yield_pct": row.get("Yield_%", ""),
+                        "temperature_c": row.get("Temperature_C", ""),
+                        "time_h": row.get("Time_h", ""),
+                        "reactant_smiles": reactant_smiles,
+                        "product_smiles": product_smiles,
+                        "reaction_smiles": reaction_smiles,
+                        "title": rdf_data.get("title", "") or "",
+                        "authors": rdf_data.get("authors", "") or "",
+                        "citation": rdf_data.get("citation", "") or "",
+                        "reference": row.get("Reference", ""),
                         "reactant_cas": self._format_cas_list(rdf_data.get("rct_cas", [])),
                         "product_cas": self._format_cas_list(rdf_data.get("pro_cas", [])),
                         "reagent_cas": self._format_cas_list(rdf_data.get("rgt_cas", [])),
@@ -998,21 +1012,24 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         "product_yield_5": _yield_at(5),
                         "product_yield_6": _yield_at(6),
                         "product_yield_7": _yield_at(7),
+                        "product_yields_json": _json.dumps(
+                            product_yields, ensure_ascii=False, sort_keys=True
+                        ),
+                        "reactants_json": _json.dumps(_component_records(rdf_data, "RCT", "rct_mol"), ensure_ascii=False),
+                        "products_json": _json.dumps(_component_records(rdf_data, "PRO", "pro_mol"), ensure_ascii=False),
+                        "reagents_json": _json.dumps(_component_records(rdf_data, "RGT"), ensure_ascii=False),
+                        "catalysts_json": _json.dumps(_component_records(rdf_data, "CAT"), ensure_ascii=False),
+                        "solvents_json": _json.dumps(_component_records(rdf_data, "SOL"), ensure_ascii=False),
                         "notes": _format_notes(rdf_data.get("notes", "")),
+                        "structure_warnings": " | ".join(warnings),
                     }
-                    # Skip records with reaction SMILES longer than 160 characters
-                    if len(rxn_smi) > 160:
-                        continue
-                    # Skip chemically invalid SMILES
-                    if RDKIT_AVAILABLE and rxn_smi:
-                        if not _is_valid_smiles(r_smi) and not _is_valid_smiles(p_smi):
-                            continue
                     writer.writerow(entry)
+                    written += 1
                     if idx % 100 == 0:
                         print(f"  Processed {idx}/{len(rows)} reactions for CSV...")
-            print(f"  Successfully wrote {len(rows)} reactions to {output_path}")
-        except Exception as e:
-            print(f"Error writing CSV: {e}")
+            print(f"  Successfully wrote {written} reactions to {output_path}")
+        except Exception as error:
+            print(f"Error writing CSV: {error}")
 
 # Detect RDKit availability
 try:
@@ -1034,15 +1051,84 @@ def _is_valid_smiles(smiles: str) -> bool:
         return False
 
 
+RDF_LIST_FIELDS = (
+    "rct_cas", "pro_cas", "rgt_cas", "cat_cas", "sol_cas",
+    "rct_amd", "pro_amd", "rgt_amd", "cat_amd", "sol_amd",
+    "exp_proc", "notes", "rct_mol", "pro_mol", "source_files",
+    "reaction_types", "duplicate_reaction_ids",
+)
+
+
+def merge_rdf_records(primary: Dict[str, Any], duplicate: Dict[str, Any]) -> Dict[str, Any]:
+    """Merge duplicate RDF records while preserving every distinct value.
+
+    The first non-empty scalar remains the compatibility value. Conflicting
+    scalar and per-product yield values are retained in explicit multi-value
+    provenance fields instead of being silently overwritten.
+    """
+    merged = copy.deepcopy(primary)
+    for field in RDF_LIST_FIELDS:
+        values = list(merged.get(field) or [])
+        for value in duplicate.get(field) or []:
+            if value not in values:
+                values.append(value)
+        merged[field] = values
+
+    merged_raw = merged.setdefault("raw_fields", {})
+    for key, values in (duplicate.get("raw_fields") or {}).items():
+        target = merged_raw.setdefault(key, [])
+        for value in values or []:
+            if value not in target:
+                target.append(value)
+
+    merged_yields = merged.setdefault("pro_yields", {})
+    yield_values = merged.setdefault("product_yield_values", {})
+    for index, value in (duplicate.get("pro_yields") or {}).items():
+        if index not in merged_yields:
+            merged_yields[index] = value
+        elif merged_yields[index] != value:
+            values = yield_values.setdefault(str(index), [merged_yields[index]])
+            if value not in values:
+                values.append(value)
+
+    ignored = set(RDF_LIST_FIELDS) | {
+        "raw_fields", "pro_yields", "product_yield_values", "field_values",
+    }
+    field_values = merged.setdefault("field_values", {})
+    for field, value in duplicate.items():
+        if field in ignored or value in (None, "", [], {}):
+            continue
+        current = merged.get(field)
+        if current in (None, "", [], {}):
+            merged[field] = copy.deepcopy(value)
+        elif current != value:
+            values = field_values.setdefault(field, [current])
+            if value not in values:
+                values.append(copy.deepcopy(value))
+
+    if not field_values:
+        merged.pop("field_values", None)
+    if not yield_values:
+        merged.pop("product_yield_values", None)
+    return merged
+
+
 class RDFWorker(QtCore.QObject):
     finished = Signal(bool, str) if Signal else None  # type: ignore[misc]
     progress = Signal(str) if Signal else None  # type: ignore[misc]
 
-    def __init__(self, folder_path: str, output_md_path: str, output_csv_path: str):
+    def __init__(
+        self,
+        folder_path: str,
+        output_md_path: str,
+        output_csv_path: str,
+        combine_all: bool = False,
+    ):
         super().__init__()
         self.folder_path = folder_path
         self.output_md_path = output_md_path
         self.output_csv_path = output_csv_path
+        self.combine_all = combine_all
         self.rdf_files = []
 
     def _emit(self, msg: str):
@@ -1169,8 +1255,7 @@ class RDFWorker(QtCore.QObject):
                     f"Successful: {successful}\n"
                     f"Failed: {failed}\n\n"
                     f"Output files saved to:\n"
-                    f"  - data-processor/reaction_dataset/<ReactionType>.csv\n"
-                    f"  - {self.folder_path}/<ReactionType>/<ReactionType>.md"
+                    f"  - data-processor/reaction_dataset/<ReactionType>.csv"
                 )
             else:
                 self.finished.emit(
@@ -1233,6 +1318,12 @@ class RDFWorker(QtCore.QObject):
             # Set reaction type for all rows
             for row in rows:
                 row['ReactionType'] = reaction_type
+
+            rows, duplicate_count = self._deduplicate_rows(rows, combined_rdf_map)
+            if duplicate_count:
+                self._emit(
+                    f"      Removed {duplicate_count} exact duplicate reaction records"
+                )
             
             # Calculate output paths for this reaction type
             self._emit(f"[5/5] Generating output files...")
@@ -1245,15 +1336,11 @@ class RDFWorker(QtCore.QObject):
             safe_name = _re.sub(r'[^A-Za-z0-9_-]+', '', _re.sub(r'\s+', '_', reaction_type))
             
             output_csv = os.path.join(dataset_dir, f"{safe_name}.csv")
-            output_md = os.path.join(folder_path, f"{safe_name}.md")
             
             # Generate outputs
             generator = ReactionMarkdownGenerator()
             
             source_name = f"RDF_{reaction_type}"
-            
-            self._emit(f"      Generating Markdown report...")
-            generator.generate_markdown_report(rows, output_md, source_name)
             
             self._emit(f"      Generating CSV export...")
             generator.generate_csv_export(rows, output_csv, source_name, rdf_map=combined_rdf_map)
@@ -1261,14 +1348,11 @@ class RDFWorker(QtCore.QObject):
             # Show file sizes for verification
             try:
                 csv_size = os.path.getsize(output_csv) / 1024  # KB
-                md_size = os.path.getsize(output_md) / 1024  # KB
                 self._emit(f"\n      ✓ Successfully saved {len(rows)} reactions:")
                 self._emit(f"        CSV:  {output_csv} ({csv_size:.1f} KB)")
-                self._emit(f"        MD:    {output_md} ({md_size:.1f} KB)")
             except Exception:
                 self._emit(f"\n      ✓ Saved {len(rows)} reactions")
                 self._emit(f"        CSV: {output_csv}")
-                self._emit(f"        MD: {output_md}")
             
             return True
             
@@ -1447,9 +1531,8 @@ class RDFWorker(QtCore.QObject):
         return result
 
     def _process_rdf_files(self) -> Dict[str, Dict[str, Any]]:
-        """Process all RDF files and combine them into a single RDF map"""
+        """Process RDF files, losslessly merging records with the same ID."""
         combined_rdf_map: Dict[str, Dict[str, Any]] = {}
-        seen_ids: set[str] = set()
         total_files = len(self.rdf_files)
         
         for i, rdf_file in enumerate(self.rdf_files, 1):
@@ -1463,23 +1546,29 @@ class RDFWorker(QtCore.QObject):
             try:
                 # Parse individual RDF file
                 rdf_map = parse_rdf(rdf_file)
-                # Merge reactions without prefixing filename to the ID; keep first occurrence only
+                relative_source = os.path.relpath(rdf_file, self.folder_path)
+                reaction_type = self._reaction_type_for_source(rdf_file)
                 added = 0
-                skipped = 0
+                merged_count = 0
                 for rid, data in rdf_map.items():
-                    data['source_file'] = filename
-                    if rid in seen_ids or rid in combined_rdf_map:
-                        skipped += 1
-                        continue
-                    seen_ids.add(rid)
-                    combined_rdf_map[rid] = data
-                    added += 1
+                    data['source_file'] = relative_source
+                    data['source_files'] = [relative_source]
+                    data['reaction_types'] = [reaction_type]
+                    data['duplicate_reaction_ids'] = [rid]
+                    if rid in combined_rdf_map:
+                        combined_rdf_map[rid] = merge_rdf_records(
+                            combined_rdf_map[rid], data,
+                        )
+                        merged_count += 1
+                    else:
+                        combined_rdf_map[rid] = data
+                        added += 1
                 
                 # Only show details if reactions were found or errors occurred
                 if len(rdf_map) > 0:
                     msg_tail = f" ({added} new"
-                    if skipped:
-                        msg_tail += f", {skipped} dups"
+                    if merged_count:
+                        msg_tail += f", {merged_count} merged duplicates"
                     msg_tail += ")"
                     if total_files <= 20:  # Show details for small batches
                         self._emit(f"           {len(rdf_map)} reactions{msg_tail}")
@@ -1490,14 +1579,124 @@ class RDFWorker(QtCore.QObject):
         self._emit(f"      Total: {len(combined_rdf_map)} unique reactions from {total_files} files")
         return combined_rdf_map
 
+    def _reaction_type_for_source(self, rdf_file: str) -> str:
+        """Return a stable category label for one source RDF file."""
+        parts = Path(os.path.normpath(rdf_file)).parts
+        lowered = [part.lower() for part in parts]
+        if "original_dataset" in lowered:
+            index = lowered.index("original_dataset")
+            if index + 1 < len(parts):
+                return parts[index + 1]
+        relative = Path(os.path.relpath(rdf_file, self.folder_path))
+        if self.combine_all and len(relative.parts) > 1:
+            return relative.parts[0]
+        return os.path.basename(os.path.normpath(self.folder_path)) or "Other"
+
+    @staticmethod
+    def _normalized_smiles(smiles: str) -> str:
+        """Canonicalize a whole reaction side, including component ordering."""
+        if not smiles:
+            return ""
+        if RDKIT_AVAILABLE:
+            try:
+                molecule = Chem.MolFromSmiles(smiles)
+                if molecule is not None:
+                    return Chem.MolToSmiles(molecule, isomericSmiles=True)
+            except Exception:
+                pass
+        return "".join(smiles.split())
+
+    def _deduplication_key(
+        self,
+        row: Dict[str, Any],
+        rdf_data: Dict[str, Any],
+    ) -> str:
+        """Build an order-invariant key for an exact chemistry precedent."""
+        reactant_smiles = self._normalized_smiles(row.get("ReactantSMILES", ""))
+        product_smiles = self._normalized_smiles(row.get("ProductSMILES", ""))
+        has_structure = bool(reactant_smiles or product_smiles)
+        has_identified_sides = bool(
+            rdf_data.get("rct_cas") and rdf_data.get("pro_cas")
+        )
+        if not has_structure and not has_identified_sides:
+            # Do not collapse poorly specified records merely because their
+            # condition fields are empty or similar.
+            return f"reaction-id:{row.get('ReactionID', '')}"
+
+        def normalized_list(field: str) -> List[str]:
+            return sorted(
+                {" ".join(str(value).split()) for value in rdf_data.get(field, []) if value},
+                key=str.casefold,
+            )
+
+        payload = {
+            "reactants": reactant_smiles,
+            "products": product_smiles,
+            "rct_cas": normalized_list("rct_cas"),
+            "pro_cas": normalized_list("pro_cas"),
+            "rgt_cas": normalized_list("rgt_cas"),
+            "cat_cas": normalized_list("cat_cas"),
+            "sol_cas": normalized_list("sol_cas"),
+            "rct_amd": normalized_list("rct_amd"),
+            "pro_amd": normalized_list("pro_amd"),
+            "rgt_amd": normalized_list("rgt_amd"),
+            "cat_amd": normalized_list("cat_amd"),
+            "sol_amd": normalized_list("sol_amd"),
+            "product_yields": sorted(
+                (str(index), value)
+                for index, value in (rdf_data.get("pro_yields") or {}).items()
+            ),
+            "temperature_c": row.get("Temperature_C", ""),
+            "time_h": row.get("Time_h", ""),
+            "experimental_procedure": normalized_list("exp_proc"),
+            "stages": " ".join(str(rdf_data.get("stages") or "").split()),
+            "steps": " ".join(str(rdf_data.get("steps") or "").split()),
+            "notes": normalized_list("notes"),
+            "title": " ".join(str(rdf_data.get("title") or "").split()),
+            "authors": " ".join(str(rdf_data.get("authors") or "").split()),
+            "citation": " ".join(str(rdf_data.get("citation") or "").split()),
+        }
+        return _json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+    def _deduplicate_rows(
+        self,
+        rows: List[Dict[str, Any]],
+        rdf_map: Dict[str, Dict[str, Any]],
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Remove exact duplicate precedents and merge their provenance."""
+        unique_rows: List[Dict[str, Any]] = []
+        primary_by_key: Dict[str, Dict[str, Any]] = {}
+        duplicate_ids: List[str] = []
+
+        for row in rows:
+            reaction_id = str(row.get("ReactionID") or "")
+            rdf_data = rdf_map.get(reaction_id, {})
+            key = self._deduplication_key(row, rdf_data)
+            primary_row = primary_by_key.get(key)
+            if primary_row is None:
+                primary_by_key[key] = row
+                unique_rows.append(row)
+                continue
+
+            primary_id = str(primary_row.get("ReactionID") or "")
+            rdf_map[primary_id] = merge_rdf_records(
+                rdf_map.get(primary_id, {}), rdf_data,
+            )
+            reaction_types = rdf_map[primary_id].get("reaction_types") or []
+            primary_row["ReactionType"] = " | ".join(
+                sorted(set(reaction_types), key=str.casefold)
+            )
+            duplicate_ids.append(reaction_id)
+
+        for reaction_id in duplicate_ids:
+            rdf_map.pop(reaction_id, None)
+        return unique_rows, len(duplicate_ids)
+
     def _generate_outputs(self, rows: List[Dict[str, Any]], rdf_map: Optional[Dict[str, Dict[str, Any]]] = None) -> None:
-        """Generate CSV and Markdown output using ReactionMarkdownGenerator."""
+        """Generate the CSV output without creating a Markdown report."""
         generator = ReactionMarkdownGenerator()
         source_name = f"RDF_Folder_{os.path.basename(self.folder_path)}"
 
-        if self.output_md_path:
-            self._emit("Generating Markdown report...")
-            generator.generate_markdown_report(rows, self.output_md_path, source_name)
         self._emit("Generating CSV export...")
         generator.generate_csv_export(rows, self.output_csv_path, source_name, rdf_map=rdf_map)
         
@@ -1510,7 +1709,7 @@ class RDFWorker(QtCore.QObject):
             # Check if we should batch-process multiple subfolders
             subfolders = self._get_reaction_type_subfolders()
             
-            if len(subfolders) > 1:
+            if len(subfolders) > 1 and not self.combine_all:
                 self._emit(f"Detected {len(subfolders)} reaction type subfolders. Processing each separately...")
                 self._batch_process_subfolders(subfolders)
                 return
@@ -1578,17 +1777,22 @@ class RDFWorker(QtCore.QObject):
                         overridden += 1
                 self._emit(f"Applied temp/time overrides from temp_time.md for {overridden} reactions.")
 
-            # Override ReactionType using the parent folder name (e.g., ...\Suzuki\2023-2025 -> 'Suzuki')
-            try:
-                norm_folder = os.path.normpath(self.folder_path)
-                parent_dir = os.path.basename(os.path.dirname(norm_folder))
-                if parent_dir:
-                    for r in rows:
-                        r['ReactionType'] = parent_dir
-                self._emit(f"Reaction type set to folder category: {parent_dir}")
-            except Exception:
-                # Non-fatal; keep existing reaction types if path parsing fails
-                pass
+            # Folder-derived types are annotations; preserve all categories when
+            # an exact duplicate appeared in more than one source folder.
+            for row in rows:
+                rdf_data = combined_rdf_map.get(str(row.get('ReactionID') or ''), {})
+                reaction_types = rdf_data.get('reaction_types') or []
+                if reaction_types:
+                    row['ReactionType'] = " | ".join(
+                        sorted(set(reaction_types), key=str.casefold)
+                    )
+
+            rows, duplicate_count = self._deduplicate_rows(rows, combined_rdf_map)
+            if duplicate_count:
+                self._emit(
+                    f"Removed {duplicate_count} exact duplicate reaction records "
+                    "after merging their IDs and source provenance."
+                )
             
             # Count rows with SMILES for diagnostics
             smi_rows = sum(1 for r in rows if (r.get('ReactantSMILES') or r.get('ProductSMILES')))
@@ -1629,6 +1833,10 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         # Input controls
         self.folder_edit = QtWidgets.QLineEdit()
         self.btn_folder = QtWidgets.QPushButton("Browse Folder...")
+        self.combine_checkbox = QtWidgets.QCheckBox(
+            "Combine all subfolders into one deduplicated CSV"
+        )
+        self.combine_checkbox.setChecked(False)
         
         # File list display
         self.file_list = QtWidgets.QListWidget()
@@ -1681,12 +1889,13 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         folder_hint.setStyleSheet("font-style: italic; color: #666; font-size: 9px;")
         form.addRow("RDF Folder:", folder_box)
         form.addRow("", folder_hint)
+        form.addRow("Output mode:", self.combine_checkbox)
         
         # Add note about file locations
         note_label = QtWidgets.QLabel(
-            "Note: All RDF files in folder and subfolders will be combined\n"
-            "      CSV ->data-processor/reaction_dataset/{category}.csv\n"
-            "      Markdown -> <selected-folder>/<selected-folder>.md"
+            "Note: RDF files are scanned recursively. Enable combined mode to create\n"
+            "      one cross-category file with exact duplicates merged.\n"
+            "      CSV -> data-processor/reaction_dataset/{category}.csv"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
         form.addRow("", note_label)
@@ -1785,6 +1994,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             return
         
         # Disable UI during processing
+        combine_all = self.combine_checkbox.isChecked()
         self.setEnabled(False)
         self.log.clear()
         self.log_msg("Starting RDF processing...")
@@ -1819,24 +2029,23 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             os.makedirs(dataset_dir, exist_ok=True)
             
             final_name = _safe(category_name) or "dataset"
+            if combine_all:
+                final_name += "_combined_deduplicated"
             output_csv = os.path.join(dataset_dir, final_name + ".csv")
 
-            md_name = _safe(os.path.basename(norm_folder)) or "dataset"
-            output_md = os.path.join(folder_path, md_name + ".md")
         except Exception:
             # Fallback: use default paths
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             dataset_dir = os.path.join(repo_root, "data-processor", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             output_csv = os.path.join(dataset_dir, "dataset.csv")
-
-            output_md = os.path.join(self.folder_edit.text().strip() or os.getcwd(), "dataset.md")
         
         # Create worker and thread
         self.worker = RDFWorker(
             folder_path=self.folder_edit.text().strip(),
-            output_md_path=output_md,
+            output_md_path="",
             output_csv_path=output_csv,
+            combine_all=combine_all,
         )
         
         self.thread = QtCore.QThread(self)
