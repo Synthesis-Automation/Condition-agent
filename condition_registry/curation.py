@@ -72,6 +72,27 @@ IDENTIFIER_FIELDNAMES = (
     "allow_ambiguous",
 )
 
+SUBSTANCE_FIELDNAMES = (
+    "name",
+    "abbreviation",
+    "cas",
+    "smiles",
+    "formula",
+    "type",
+    "density",
+    "mw",
+    "bp",
+    "mp",
+    "volatile",
+    "viscose",
+    "role_1",
+    "family_1",
+    "tag_1",
+    "role_2",
+    "family_2",
+    "tag_2",
+)
+
 _CURATION_LOCK = threading.Lock()
 
 
@@ -156,6 +177,7 @@ def _prepare_request(
     request: CompoundAdditionRequest,
     *,
     registry: ConditionRegistry,
+    editing_substance_id: Optional[str] = None,
 ) -> _PreparedAddition:
     errors: list[str] = []
     canonical_name = str(request.canonical_name or "").strip()
@@ -168,11 +190,25 @@ def _prepare_request(
     if cas is None:
         errors.append("INVALID_CAS")
         cas = str(request.cas or "").strip()
-    elif registry.resolve(cas=cas).status != "unresolved":
-        errors.append(f"CAS_ALREADY_REGISTERED:{cas}")
+    else:
+        cas_result = registry.resolve(cas=cas)
+        if editing_substance_id is None:
+            if cas_result.status != "unresolved":
+                errors.append(f"CAS_ALREADY_REGISTERED:{cas}")
+        elif (
+            cas_result.status != "resolved"
+            or cas_result.substance is None
+            or cas_result.substance.substance_id != editing_substance_id
+        ):
+            errors.append(f"CAS_CHANGE_NOT_ALLOWED:{cas}")
     if canonical_name:
         name_result = registry.resolve(name=canonical_name)
-        if name_result.status != "unresolved":
+        if name_result.status != "unresolved" and not (
+            editing_substance_id is not None
+            and name_result.status == "resolved"
+            and name_result.substance is not None
+            and name_result.substance.substance_id == editing_substance_id
+        ):
             errors.append(f"NAME_ALREADY_REGISTERED:{canonical_name}")
 
     canonical_smiles = None
@@ -240,7 +276,12 @@ def _prepare_request(
         if normalized_abbreviation:
             seen_aliases.add(("name", normalized_abbreviation))
         existing = registry.resolve(name=abbreviation)
-        if existing.status != "unresolved":
+        if existing.status != "unresolved" and not (
+            editing_substance_id is not None
+            and existing.status == "resolved"
+            and existing.substance is not None
+            and existing.substance.substance_id == editing_substance_id
+        ):
             errors.append(f"ABBREVIATION_ALREADY_REGISTERED:{abbreviation}")
     for alias in request.aliases:
         alias_type = str(alias.identifier_type or "").strip()
@@ -269,8 +310,25 @@ def _prepare_request(
             if alias_type in CONDITION_NAME_IDENTIFIER_TYPES
             else registry.resolve_identifier(value, identifier_type=alias_type)
         )
-        if existing.status != "unresolved" and not alias.allow_ambiguous:
-            errors.append(f"ALIAS_ALREADY_REGISTERED:{alias_type}:{value}")
+        if existing.status != "unresolved":
+            owned_by_edit_target = (
+                editing_substance_id is not None
+                and existing.status == "resolved"
+                and existing.substance is not None
+                and existing.substance.substance_id == editing_substance_id
+            )
+            shared_by_edit_target = (
+                editing_substance_id is not None
+                and existing.status == "ambiguous"
+                and editing_substance_id in existing.candidates
+                and alias.allow_ambiguous
+            )
+            if (
+                not owned_by_edit_target
+                and not shared_by_edit_target
+                and not alias.allow_ambiguous
+            ):
+                errors.append(f"ALIAS_ALREADY_REGISTERED:{alias_type}:{value}")
         aliases.append(
             CompoundAliasInput(
                 identifier_type=alias_type,
@@ -284,7 +342,7 @@ def _prepare_request(
         raise CompoundAdditionError(errors)
     return _PreparedAddition(
         request=request,
-        substance_id=f"cas:{cas}",
+        substance_id=editing_substance_id or f"cas:{cas}",
         cas=cas,
         canonical_name=canonical_name,
         canonical_smiles=canonical_smiles,
@@ -444,6 +502,24 @@ def _restore_bytes(path: Path, content: bytes) -> None:
             Path(temporary_name).unlink()
 
 
+def _clear_default_registry_caches(
+    *,
+    substances_path: Path,
+    additions_path: Path,
+    identifiers_path: Path,
+) -> None:
+    if (
+        substances_path.resolve() == SUBSTANCES_PATH.resolve()
+        and additions_path.resolve() == ADDITIONS_PATH.resolve()
+        and identifiers_path.resolve() == IDENTIFIERS_PATH.resolve()
+    ):
+        from .api import get_registry
+        from .vocabulary import condition_registry_definition_versions
+
+        get_registry.cache_clear()
+        condition_registry_definition_versions.cache_clear()
+
+
 def add_compound(
     request: CompoundAdditionRequest,
     *,
@@ -501,16 +577,167 @@ def add_compound(
             _restore_bytes(additions_path, original_additions)
             _restore_bytes(identifiers_path, original_identifiers)
             raise
-        if (
-            substances_path.resolve() == SUBSTANCES_PATH.resolve()
-            and additions_path.resolve() == ADDITIONS_PATH.resolve()
-            and identifiers_path.resolve() == IDENTIFIERS_PATH.resolve()
-        ):
-            from .api import get_registry
-            from .vocabulary import condition_registry_definition_versions
+        _clear_default_registry_caches(
+            substances_path=substances_path,
+            additions_path=additions_path,
+            identifiers_path=identifiers_path,
+        )
+        return CompoundAdditionResult(
+            substance=verified.substance,
+            canonical_smiles=prepared.canonical_smiles,
+            formula=prepared.formula,
+            molecular_weight=prepared.molecular_weight,
+            alias_count=len(prepared.aliases),
+            additions_path=str(additions_path),
+            identifiers_path=str(identifiers_path),
+        )
 
-            get_registry.cache_clear()
-            condition_registry_definition_versions.cache_clear()
+
+def _legacy_row_substance_id(
+    row: Mapping[str, str],
+    row_number: int,
+) -> str:
+    cas = normalize_cas(str(row.get("cas") or "").strip())
+    return f"cas:{cas}" if cas else f"registry-row:{row_number}"
+
+
+def update_compound(
+    substance_id: str,
+    request: CompoundAdditionRequest,
+    *,
+    substances_path: str | Path = SUBSTANCES_PATH,
+    additions_path: str | Path = ADDITIONS_PATH,
+    identifiers_path: str | Path = IDENTIFIERS_PATH,
+) -> CompoundAdditionResult:
+    """Validate and atomically replace one registry compound definition.
+
+    Legacy substance rows are migrated to the provenance-bearing additions
+    definition when first edited. Existing addition rows are updated in place.
+    The stable substance ID and CAS number cannot be changed by this operation.
+    """
+    substance_id = str(substance_id or "").strip()
+    substances_path = Path(substances_path)
+    additions_path = Path(additions_path)
+    identifiers_path = Path(identifiers_path)
+    with _CURATION_LOCK:
+        registry = ConditionRegistry(
+            substances_path=substances_path,
+            additions_path=additions_path,
+            identifiers_path=identifiers_path,
+        )
+        target = registry.resolve_id(substance_id)
+        if target.status != "resolved" or target.substance is None:
+            raise CompoundAdditionError((f"EDIT_TARGET_NOT_FOUND:{substance_id}",))
+        prepared = _prepare_request(
+            request,
+            registry=registry,
+            editing_substance_id=substance_id,
+        )
+        substance_rows = _read_csv(substances_path, SUBSTANCE_FIELDNAMES)
+        addition_rows = _read_csv(additions_path, ADDITION_FIELDNAMES)
+        all_identifier_rows = _read_csv(
+            identifiers_path,
+            IDENTIFIER_FIELDNAMES,
+        )
+        addition_matches = [
+            index
+            for index, row in enumerate(addition_rows)
+            if str(row.get("substance_id") or "").strip() == substance_id
+        ]
+        legacy_matches = [
+            index
+            for index, row in enumerate(substance_rows)
+            if _legacy_row_substance_id(row, index + 2) == substance_id
+        ]
+        if len(addition_matches) + len(legacy_matches) != 1:
+            raise CompoundAdditionError(
+                (f"EDIT_TARGET_DEFINITION_AMBIGUOUS:{substance_id}",)
+            )
+
+        replacement = _addition_row(prepared)
+        if addition_matches:
+            index = addition_matches[0]
+            replacement["volatile"] = str(
+                addition_rows[index].get("volatile") or ""
+            )
+            replacement["viscose"] = str(
+                addition_rows[index].get("viscose") or ""
+            )
+            addition_rows[index] = replacement
+        else:
+            index = legacy_matches[0]
+            legacy_row = substance_rows.pop(index)
+            replacement["volatile"] = str(legacy_row.get("volatile") or "")
+            replacement["viscose"] = str(legacy_row.get("viscose") or "")
+            addition_rows.append(replacement)
+
+        retained_identifier_rows = tuple(
+            row
+            for row in all_identifier_rows
+            if str(row.get("substance_id") or "").strip() != substance_id
+        )
+        retained_identifier_rows = _declare_existing_shared_aliases(
+            retained_identifier_rows,
+            prepared.aliases,
+        )
+        updated_identifier_rows = (
+            *retained_identifier_rows,
+            *_identifier_rows(prepared),
+        )
+        originals = {
+            substances_path: substances_path.read_bytes(),
+            additions_path: additions_path.read_bytes(),
+            identifiers_path: identifiers_path.read_bytes(),
+        }
+        try:
+            _write_csv_atomic(
+                substances_path,
+                SUBSTANCE_FIELDNAMES,
+                substance_rows,
+            )
+            _write_csv_atomic(
+                additions_path,
+                ADDITION_FIELDNAMES,
+                addition_rows,
+            )
+            _write_csv_atomic(
+                identifiers_path,
+                IDENTIFIER_FIELDNAMES,
+                updated_identifier_rows,
+            )
+            verified_registry = ConditionRegistry(
+                substances_path=substances_path,
+                additions_path=additions_path,
+                identifiers_path=identifiers_path,
+            )
+            verified = verified_registry.resolve_id(substance_id)
+            if verified.status != "resolved" or verified.substance is None:
+                raise RuntimeError("Updated compound could not be resolved after write")
+            if (
+                verified.substance.canonical_name != prepared.canonical_name
+                or verified.substance.cas != prepared.cas
+                or verified.substance.smiles != prepared.canonical_smiles
+            ):
+                raise RuntimeError("Updated compound did not match the curated request")
+            for alias in prepared.aliases:
+                alias_result = verified_registry.resolve_identifier(
+                    alias.value,
+                    identifier_type=alias.identifier_type,
+                )
+                if alias_result.status not in {"resolved", "ambiguous"}:
+                    raise RuntimeError(
+                        "Updated alias could not be resolved after write: "
+                        f"{alias.value}"
+                    )
+        except Exception:
+            for path, content in originals.items():
+                _restore_bytes(path, content)
+            raise
+        _clear_default_registry_caches(
+            substances_path=substances_path,
+            additions_path=additions_path,
+            identifiers_path=identifiers_path,
+        )
         return CompoundAdditionResult(
             substance=verified.substance,
             canonical_smiles=prepared.canonical_smiles,
@@ -525,9 +752,11 @@ def add_compound(
 __all__ = [
     "ADDITION_FIELDNAMES",
     "IDENTIFIER_FIELDNAMES",
+    "SUBSTANCE_FIELDNAMES",
     "CompoundAdditionError",
     "CompoundAdditionRequest",
     "CompoundAdditionResult",
     "CompoundAliasInput",
     "add_compound",
+    "update_compound",
 ]

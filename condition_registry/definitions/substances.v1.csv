@@ -1,4 +1,4 @@
-name,abbreviation,cas,smiles,formula,type,density,mw,bp,mp,volatile,viscose,role_1,family_1,tag_1,role_2,family_2,tag_2
+﻿name,abbreviation,cas,smiles,formula,type,density,mw,bp,mp,volatile,viscose,role_1,family_1,tag_1,role_2,family_2,tag_2
 Amberlite IRN-78 ion-exchange resin,"OH-form""",,11128-95-3,,,liquid,,,,,0,0,other_reagent,,,,
 Amberlyst A26,OH-form,,,39339-85-0,,C6H4CH2N(CH3)3F,liquid,,,,,0,0,organic_compound,,,
 Boron tribromide,BBr3,10294-33-4,BrB(Br)Br,BBr3,liquid,2.782,250.523,91.3,-46,0,0,acid,boron_lewis_acids,strong Lewis acid,,,

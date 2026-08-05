@@ -10,6 +10,7 @@ from condition_registry import (
     ConditionRegistry,
     RoleAssignment,
     add_compound,
+    update_compound,
     validate_registry,
 )
 from condition_registry import curation
@@ -249,3 +250,147 @@ def test_add_compound_can_explicitly_share_an_existing_curated_alias(
     )
     assert report["issue_rows"] == 0
     assert report["identifier_issue_rows"] == 0
+
+
+def test_update_compound_replaces_addition_and_its_aliases(tmp_path) -> None:
+    substances, additions, identifiers = _definition_paths(tmp_path)
+    created = add_compound(
+        _request(),
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+    updated_request = _request(
+        density=0.79,
+        aliases=(
+            CompoundAliasInput("common_name", "Alcohol", "en"),
+        ),
+        curator_notes="Reviewed and updated.",
+        source="chemist:update",
+    )
+
+    updated = update_compound(
+        created.substance.substance_id,
+        updated_request,
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+
+    assert updated.substance.substance_id == "cas:64-17-5"
+    assert updated.substance.properties["density"] == "0.79"
+    assert updated.substance.properties["source"] == "chemist:update"
+    assert updated.substance.aliases == ("EtOH", "Alcohol")
+    registry = ConditionRegistry(
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+    assert registry.resolve(name="Spirit of wine").status == "unresolved"
+    assert registry.resolve(name="Alcohol").substance == updated.substance
+
+
+def test_update_compound_migrates_legacy_row_to_curated_additions(
+    tmp_path,
+) -> None:
+    substances, additions, identifiers = _definition_paths(tmp_path)
+    request = CompoundAdditionRequest(
+        canonical_name="Water",
+        cas="7732-18-5",
+        source="chemist:legacy-review",
+        smiles="O",
+        abbreviation="H2O",
+        substance_kind="liquid",
+        density=0.997,
+        roles=(RoleAssignment("solvent", "water"),),
+        aliases=(CompoundAliasInput("systematic_name", "Oxidane", "en"),),
+        curator_notes="Migrated through the edit workflow.",
+    )
+
+    result = update_compound(
+        "cas:7732-18-5",
+        request,
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+
+    with substances.open(encoding="utf-8-sig", newline="") as handle:
+        assert list(csv.DictReader(handle)) == []
+    with additions.open(encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    assert rows[0]["substance_id"] == "cas:7732-18-5"
+    assert rows[0]["source"] == "chemist:legacy-review"
+    assert result.substance.canonical_name == "Water"
+    assert result.substance.aliases == ("H2O", "Oxidane")
+    report = validate_registry(
+        substances_path=substances,
+        additions_path=additions,
+        identifiers_path=identifiers,
+    )
+    assert report["issue_rows"] == 0
+    assert report["identifier_issue_rows"] == 0
+
+
+def test_update_compound_rejects_cas_change_without_writing(tmp_path) -> None:
+    substances, additions, identifiers = _definition_paths(tmp_path)
+    before = (substances.read_bytes(), additions.read_bytes(), identifiers.read_bytes())
+
+    with pytest.raises(CompoundAdditionError, match="CAS_CHANGE_NOT_ALLOWED"):
+        update_compound(
+            "cas:7732-18-5",
+            CompoundAdditionRequest(
+                canonical_name="Water",
+                cas="64-17-5",
+                source="chemist:test",
+                smiles="O",
+            ),
+            substances_path=substances,
+            additions_path=additions,
+            identifiers_path=identifiers,
+        )
+
+    assert (
+        substances.read_bytes(),
+        additions.read_bytes(),
+        identifiers.read_bytes(),
+    ) == before
+
+
+def test_update_compound_rolls_back_all_definitions_on_failure(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    substances, additions, identifiers = _definition_paths(tmp_path)
+    before = (substances.read_bytes(), additions.read_bytes(), identifiers.read_bytes())
+    real_write = curation._write_csv_atomic
+    calls = 0
+
+    def fail_identifier_write(path, fieldnames, rows):
+        nonlocal calls
+        calls += 1
+        if calls == 3:
+            raise OSError("simulated update failure")
+        real_write(path, fieldnames, rows)
+
+    monkeypatch.setattr(curation, "_write_csv_atomic", fail_identifier_write)
+
+    with pytest.raises(OSError, match="simulated update failure"):
+        update_compound(
+            "cas:7732-18-5",
+            CompoundAdditionRequest(
+                canonical_name="Water",
+                cas="7732-18-5",
+                source="chemist:test",
+                smiles="O",
+            ),
+            substances_path=substances,
+            additions_path=additions,
+            identifiers_path=identifiers,
+        )
+
+    assert (
+        substances.read_bytes(),
+        additions.read_bytes(),
+        identifiers.read_bytes(),
+    ) == before

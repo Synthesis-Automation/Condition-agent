@@ -71,14 +71,37 @@ values are checked against the structure. Duplicate CAS numbers, names,
 abbreviations, aliases, invalid role/family pairs, and malformed structures are
 rejected before anything is written.
 
+Select **Check CAS** to resolve the number against the local registry. If the
+compound already exists, its identity, physical properties, roles, aliases,
+and available provenance are loaded into the form and the save action changes
+to **Validate and Save Changes**. The CAS field is locked while editing because
+it determines the stable substance identity. Saving an older legacy record
+migrates that record into the provenance-bearing additions definition; an
+existing curated addition is updated in place.
+
+Enter a valid CAS number and select **Auto-fill from Web** to query PubChem in
+the background, with the NCI/CADD Chemical Identifier Resolver as a fallback.
+When available, the form fills the preferred and systematic names,
+abbreviation, SMILES, formula, molecular weight, InChIKey, PubChem CID,
+physical state, density, boiling point, melting point, synonyms, and source
+provenance. Existing condition roles and families are deliberately not inferred
+from web names; the curator must review those chemistry annotations. PubChem
+experimental physical values are visibly marked for review before saving.
+
 Successful additions are written atomically to
 `substance_additions.v1.csv`, with supplemental aliases written to
 `substance_identifiers.v1.csv`. Both definitions are restored if either write
-or post-write resolution verification fails. The same workflow is available
-programmatically:
+or post-write resolution verification fails. Updates atomically coordinate the
+legacy, additions, and identifier definitions and restore all three if an edit
+cannot be written and resolved successfully. The same workflow is available
+programmatically with `add_compound()` and `update_compound()`:
 
 ```python
-from condition_registry import CompoundAdditionRequest, add_compound
+from condition_registry import (
+    CompoundAdditionRequest,
+    add_compound,
+    update_compound,
+)
 
 result = add_compound(
     CompoundAdditionRequest(
@@ -89,6 +112,16 @@ result = add_compound(
     )
 )
 assert result.substance.substance_id == "cas:64-17-5"
+
+updated = update_compound(
+    result.substance.substance_id,
+    CompoundAdditionRequest(
+        canonical_name="Ethanol",
+        cas="64-17-5",
+        smiles="CCO",
+        source="curator:reviewed",
+    ),
+)
 ```
 
 ## Expert recipe templates

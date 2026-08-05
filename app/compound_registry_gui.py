@@ -17,12 +17,19 @@ from condition_registry import (  # noqa: E402
     CompoundAdditionRequest,
     CompoundAliasInput,
     RoleAssignment,
+    Substance,
     add_compound,
     resolve_substance,
+    update_compound,
 )
 from condition_registry.loader import load_taxonomy  # noqa: E402
 from condition_registry.models import (  # noqa: E402
     CONDITION_NAME_IDENTIFIER_TYPES,
+)
+from cas_tools import (  # noqa: E402
+    CompoundLookupResult,
+    is_valid_cas_number,
+    lookup_compound_by_cas,
 )
 
 ALIAS_TYPES = tuple(
@@ -30,6 +37,25 @@ ALIAS_TYPES = tuple(
     for value in CONDITION_NAME_IDENTIFIER_TYPES
     if value not in {"canonical_name", "abbreviation"}
 ) + ("inchi_key", "database_id")
+
+
+class CompoundLookupWorker(QtCore.QObject):
+    """Resolve web metadata without blocking the Qt event loop."""
+
+    finished = QtCore.pyqtSignal(object, str)
+
+    def __init__(self, cas: str) -> None:
+        super().__init__()
+        self.cas = cas
+
+    @QtCore.pyqtSlot()
+    def run(self) -> None:
+        try:
+            result = lookup_compound_by_cas(self.cas)
+        except Exception as error:
+            self.finished.emit(None, f"{type(error).__name__}: {error}")
+        else:
+            self.finished.emit(result, "")
 
 
 class CompoundRegistryWindow(QtWidgets.QWidget):
@@ -40,14 +66,26 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         self.setFont(QtGui.QFont("Segoe UI", 9))
         self.setWindowTitle("Condition Registry — Add Compound")
         self.resize(940, 820)
+        self.setWindowState(
+            self.windowState() | QtCore.Qt.WindowState.WindowMaximized
+        )
         self._taxonomy = load_taxonomy()
         self._families_by_role = self._build_family_map()
+        self.lookup_thread: Optional[QtCore.QThread] = None
+        self.lookup_worker: Optional[CompoundLookupWorker] = None
+        self.last_lookup_result: Optional[CompoundLookupResult] = None
+        self.editing_substance_id: Optional[str] = None
 
         self.cas_edit = QtWidgets.QLineEdit()
         self.cas_edit.setObjectName("casNumber")
         self.cas_edit.setPlaceholderText("e.g. 64-17-5")
         self.cas_check_button = QtWidgets.QPushButton("Check CAS")
         self.cas_check_button.setObjectName("checkCasButton")
+        self.lookup_button = QtWidgets.QPushButton("Auto-fill from Web")
+        self.lookup_button.setObjectName("autoFillCompoundButton")
+        self.lookup_button.setToolTip(
+            "Look up identity and physical fields using PubChem with an NCI fallback"
+        )
         self.cas_status = QtWidgets.QLabel("Not checked")
         self.cas_status.setObjectName("casStatus")
 
@@ -103,10 +141,16 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         self.secondary_tag_edit.setObjectName("secondaryRoleTag")
         self.secondary_tag_edit.setPlaceholderText("Optional chemistry note")
 
-        self.alias_table = QtWidgets.QTableWidget(0, 4)
+        self.alias_table = QtWidgets.QTableWidget(0, 5)
         self.alias_table.setObjectName("aliasTable")
         self.alias_table.setHorizontalHeaderLabels(
-            ("Identifier type", "Alias / identifier", "Language", "Shared")
+            (
+                "Identifier type",
+                "Alias / identifier",
+                "Language",
+                "Preferred",
+                "Shared",
+            )
         )
         self.alias_table.horizontalHeader().setSectionResizeMode(
             0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
@@ -119,6 +163,9 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         )
         self.alias_table.horizontalHeader().setSectionResizeMode(
             3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
+        )
+        self.alias_table.horizontalHeader().setSectionResizeMode(
+            4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
         )
         self.alias_table.verticalHeader().setVisible(False)
         self.alias_table.setAlternatingRowColors(True)
@@ -236,10 +283,12 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         content_layout.setSpacing(12)
 
         identity_group = QtWidgets.QGroupBox("Identity")
+        identity_group.setObjectName("identityGroup")
         identity_form = QtWidgets.QFormLayout(identity_group)
         cas_row = QtWidgets.QHBoxLayout()
         cas_row.addWidget(self.cas_edit, stretch=1)
         cas_row.addWidget(self.cas_check_button)
+        cas_row.addWidget(self.lookup_button)
         cas_row.addWidget(self.cas_status)
         identity_form.addRow("CAS number *", cas_row)
         identity_form.addRow("Canonical name *", self.name_edit)
@@ -251,9 +300,8 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         identity_form.addRow("Density", self.density_edit)
         identity_form.addRow("Boiling point", self.boiling_point_edit)
         identity_form.addRow("Melting point", self.melting_point_edit)
-        content_layout.addWidget(identity_group)
-
         roles_group = QtWidgets.QGroupBox("Condition-role capabilities")
+        roles_group.setObjectName("conditionRoleCapabilitiesGroup")
         roles_form = QtWidgets.QFormLayout(roles_group)
         primary = QtWidgets.QHBoxLayout()
         primary.addWidget(self.primary_role_combo)
@@ -271,9 +319,16 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         )
         role_note.setWordWrap(True)
         roles_form.addRow("", role_note)
-        content_layout.addWidget(roles_group)
+
+        top_columns = QtWidgets.QHBoxLayout()
+        top_columns.setObjectName("identityAndRolesColumns")
+        top_columns.setSpacing(12)
+        top_columns.addWidget(identity_group, stretch=1)
+        top_columns.addWidget(roles_group, stretch=1)
+        content_layout.addLayout(top_columns)
 
         alias_group = QtWidgets.QGroupBox("Additional aliases and identifiers")
+        alias_group.setObjectName("additionalAliasesGroup")
         alias_layout = QtWidgets.QVBoxLayout(alias_group)
         alias_layout.addWidget(self.alias_table)
         alias_buttons = QtWidgets.QHBoxLayout()
@@ -293,13 +348,19 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         )
         alias_help.setWordWrap(True)
         alias_layout.addWidget(alias_help)
-        content_layout.addWidget(alias_group)
 
         provenance_group = QtWidgets.QGroupBox("Provenance")
+        provenance_group.setObjectName("provenanceGroup")
         provenance_form = QtWidgets.QFormLayout(provenance_group)
         provenance_form.addRow("Source *", self.source_edit)
         provenance_form.addRow("Curator notes", self.notes_edit)
-        content_layout.addWidget(provenance_group)
+
+        lower_columns = QtWidgets.QHBoxLayout()
+        lower_columns.setObjectName("aliasesAndProvenanceColumns")
+        lower_columns.setSpacing(12)
+        lower_columns.addWidget(alias_group, stretch=1)
+        lower_columns.addWidget(provenance_group, stretch=1)
+        content_layout.addLayout(lower_columns)
         scroll.setWidget(content)
         root.addWidget(scroll, stretch=1)
 
@@ -313,6 +374,7 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
 
     def _connect_signals(self) -> None:
         self.cas_check_button.clicked.connect(self.check_cas)
+        self.lookup_button.clicked.connect(self.start_web_lookup)
         self.cas_edit.editingFinished.connect(self.check_cas)
         self.primary_role_combo.currentIndexChanged.connect(
             lambda: self._refresh_family_combo(
@@ -349,6 +411,7 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         identifier_type: str = "common_name",
         value: str = "",
         language: str = "en",
+        is_preferred: bool = False,
         allow_ambiguous: bool = False,
     ) -> None:
         row = self.alias_table.rowCount()
@@ -363,13 +426,17 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         value_edit.setPlaceholderText("Alias or external identifier")
         language_edit = QtWidgets.QLineEdit(language)
         language_edit.setMaximumWidth(80)
+        preferred_check = QtWidgets.QCheckBox()
+        preferred_check.setChecked(is_preferred)
+        preferred_check.setToolTip("Mark this as the preferred identifier of its type")
         shared_check = QtWidgets.QCheckBox()
         shared_check.setChecked(allow_ambiguous)
         shared_check.setToolTip("Allow this identifier to resolve ambiguously")
         self.alias_table.setCellWidget(row, 0, type_combo)
         self.alias_table.setCellWidget(row, 1, value_edit)
         self.alias_table.setCellWidget(row, 2, language_edit)
-        self.alias_table.setCellWidget(row, 3, shared_check)
+        self.alias_table.setCellWidget(row, 3, preferred_check)
+        self.alias_table.setCellWidget(row, 4, shared_check)
 
     @QtCore.pyqtSlot()
     def remove_selected_alias_rows(self) -> None:
@@ -386,7 +453,8 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
             type_combo = self.alias_table.cellWidget(row, 0)
             value_edit = self.alias_table.cellWidget(row, 1)
             language_edit = self.alias_table.cellWidget(row, 2)
-            shared_check = self.alias_table.cellWidget(row, 3)
+            preferred_check = self.alias_table.cellWidget(row, 3)
+            shared_check = self.alias_table.cellWidget(row, 4)
             if not isinstance(type_combo, QtWidgets.QComboBox):
                 continue
             if not isinstance(value_edit, QtWidgets.QLineEdit):
@@ -404,6 +472,11 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
                     identifier_type=str(type_combo.currentData()),
                     value=value,
                     language=language or None,
+                    is_preferred=(
+                        preferred_check.isChecked()
+                        if isinstance(preferred_check, QtWidgets.QCheckBox)
+                        else False
+                    ),
                     allow_ambiguous=(
                         shared_check.isChecked()
                         if isinstance(shared_check, QtWidgets.QCheckBox)
@@ -489,39 +562,317 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
             return
         result = resolve_substance(cas=cas)
         if result.status == "unresolved":
+            self.editing_substance_id = None
+            self.cas_edit.setReadOnly(False)
+            self.save_button.setText("Validate and Add Compound")
             self.cas_status.setText("Available")
             self.cas_status.setStyleSheet("color: #107c10; font-weight: 600;")
         elif result.status == "resolved" and result.substance is not None:
-            self.cas_status.setText(f"Exists: {result.substance.canonical_name}")
-            self.cas_status.setStyleSheet("color: #a4262c; font-weight: 600;")
+            self.load_existing_substance(result.substance)
         else:
             self.cas_status.setText("Invalid or ambiguous")
             self.cas_status.setStyleSheet("color: #a4262c; font-weight: 600;")
+
+    def _load_role_assignment(
+        self,
+        role_combo: QtWidgets.QComboBox,
+        family_combo: QtWidgets.QComboBox,
+        tag_edit: QtWidgets.QLineEdit,
+        assignment: Optional[RoleAssignment],
+    ) -> None:
+        if assignment is None:
+            role_combo.setCurrentIndex(-1)
+            self._refresh_family_combo(role_combo, family_combo)
+            tag_edit.clear()
+            return
+        self._set_role(role_combo, assignment.role_id)
+        self._refresh_family_combo(role_combo, family_combo)
+        family_index = family_combo.findData(assignment.family_id or "")
+        if family_index >= 0:
+            family_combo.setCurrentIndex(family_index)
+        tag_edit.setText(assignment.tag or "")
+
+    def load_existing_substance(self, substance: Substance) -> None:
+        """Load one resolved registry substance into the editable form."""
+        self.editing_substance_id = substance.substance_id
+        self.last_lookup_result = None
+        self.cas_edit.setText(substance.cas or "")
+        self.cas_edit.setReadOnly(True)
+        self.name_edit.setText(substance.canonical_name)
+        abbreviations = sorted(
+            (
+                identifier
+                for identifier in substance.identifiers
+                if identifier.status == "active"
+                and identifier.identifier_type == "abbreviation"
+            ),
+            key=lambda identifier: (not identifier.is_preferred, identifier.value),
+        )
+        self.abbreviation_edit.setText(
+            abbreviations[0].value if abbreviations else ""
+        )
+        self.smiles_edit.setText(substance.smiles or "")
+        properties = substance.properties
+        self.formula_edit.setText(str(properties.get("formula") or ""))
+        self.molecular_weight_edit.setText(str(properties.get("mw") or ""))
+        self.kind_combo.setCurrentText(str(properties.get("type") or ""))
+        self.density_edit.setText(str(properties.get("density") or ""))
+        self.boiling_point_edit.setText(str(properties.get("bp") or ""))
+        self.melting_point_edit.setText(str(properties.get("mp") or ""))
+
+        roles = (*substance.roles, None, None)[:2]
+        self._load_role_assignment(
+            self.primary_role_combo,
+            self.primary_family_combo,
+            self.primary_tag_edit,
+            roles[0],
+        )
+        self._load_role_assignment(
+            self.secondary_role_combo,
+            self.secondary_family_combo,
+            self.secondary_tag_edit,
+            roles[1],
+        )
+
+        self.alias_table.setRowCount(0)
+        for identifier in substance.identifiers:
+            if (
+                identifier.status != "active"
+                or identifier.identifier_type not in ALIAS_TYPES
+            ):
+                continue
+            self.add_alias_row(
+                identifier.identifier_type,
+                identifier.value,
+                identifier.language or "",
+                identifier.is_preferred,
+                identifier.allow_ambiguous,
+            )
+        if self.alias_table.rowCount() == 0:
+            self.add_alias_row()
+
+        self.source_edit.setText(str(properties.get("source") or ""))
+        self.notes_edit.setPlainText(str(properties.get("curator_notes") or ""))
+        self.save_button.setText("Validate and Save Changes")
+        self.cas_status.setText("Loaded for editing")
+        self.cas_status.setStyleSheet("color: #005a9e; font-weight: 600;")
+        source_note = (
+            "Review the loaded fields and save changes."
+            if self.source_edit.text().strip()
+            else "Enter a provenance source before saving this legacy record."
+        )
+        self.status_box.setPlainText(
+            f"Loaded {substance.canonical_name} ({substance.substance_id}).\n"
+            f"{source_note}\n"
+            "The CAS number is locked to preserve the stable substance identity."
+        )
+
+    @QtCore.pyqtSlot()
+    def start_web_lookup(self) -> None:
+        """Start a background web lookup for the current CAS number."""
+        cas = self.cas_edit.text().strip()
+        if not is_valid_cas_number(cas):
+            self.cas_status.setText("Invalid CAS")
+            self.cas_status.setStyleSheet("color: #a4262c; font-weight: 600;")
+            self.status_box.setPlainText(
+                "Auto-fill was not started because the CAS checksum is invalid."
+            )
+            return
+        if self.lookup_thread is not None and self.lookup_thread.isRunning():
+            return
+        self.lookup_button.setEnabled(False)
+        self.save_button.setEnabled(False)
+        self.cas_status.setText("Looking up…")
+        self.cas_status.setStyleSheet("color: #005a9e; font-weight: 600;")
+        self.status_box.setPlainText(
+            f"Looking up {cas} using PubChem; NCI/CADD will be used as a fallback."
+        )
+        thread = QtCore.QThread(self)
+        worker = CompoundLookupWorker(cas)
+        worker.moveToThread(thread)
+        thread.started.connect(worker.run)
+        worker.finished.connect(self._web_lookup_finished)
+        worker.finished.connect(thread.quit)
+        worker.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(self._clear_lookup_thread)
+        self.lookup_thread = thread
+        self.lookup_worker = worker
+        thread.start()
+
+    @QtCore.pyqtSlot(object, str)
+    def _web_lookup_finished(
+        self,
+        result: Optional[CompoundLookupResult],
+        error: str,
+    ) -> None:
+        self.lookup_button.setEnabled(True)
+        self.save_button.setEnabled(True)
+        if error:
+            self.cas_status.setText("Lookup failed")
+            self.cas_status.setStyleSheet("color: #a4262c; font-weight: 600;")
+            self.status_box.setPlainText(f"Web lookup failed: {error}")
+            return
+        if result is None:
+            self.cas_status.setText("Lookup failed")
+            self.status_box.setPlainText("Web lookup returned no result object.")
+            return
+        if self.cas_edit.text().strip() != result.cas:
+            self.status_box.setPlainText(
+                f"Ignored lookup result for {result.cas} because the CAS field changed."
+            )
+            self.cas_status.setText("CAS changed")
+            return
+        self.last_lookup_result = result
+        if not result.found:
+            self.cas_status.setText("No web record")
+            self.cas_status.setStyleSheet("color: #a4262c; font-weight: 600;")
+            details = [f"No compound metadata was found for {result.cas}."]
+            details.extend(f"Warning: {warning}" for warning in result.warnings)
+            self.status_box.setPlainText("\n".join(details))
+            return
+        self.apply_lookup_result(result)
+
+    @QtCore.pyqtSlot()
+    def _clear_lookup_thread(self) -> None:
+        self.lookup_thread = None
+        self.lookup_worker = None
+
+    def _set_optional_text(
+        self,
+        edit: QtWidgets.QLineEdit,
+        value: Optional[str | float],
+    ) -> None:
+        if value is None:
+            return
+        edit.setText(str(value))
+
+    def _existing_alias_keys(self) -> set[tuple[str, str]]:
+        return {
+            (alias.identifier_type, alias.value.casefold())
+            for alias in self.alias_inputs()
+        }
+
+    def apply_lookup_result(self, result: CompoundLookupResult) -> None:
+        """Populate supported fields and retain lookup provenance for review."""
+        self._set_optional_text(self.name_edit, result.canonical_name)
+        self._set_optional_text(self.abbreviation_edit, result.abbreviation)
+        self._set_optional_text(self.smiles_edit, result.smiles)
+        self._set_optional_text(self.formula_edit, result.formula)
+        self._set_optional_text(
+            self.molecular_weight_edit, result.molecular_weight
+        )
+        self._set_optional_text(self.density_edit, result.density)
+        self._set_optional_text(
+            self.boiling_point_edit, result.boiling_point_c
+        )
+        self._set_optional_text(
+            self.melting_point_edit, result.melting_point_c
+        )
+        if result.substance_kind:
+            self.kind_combo.setCurrentText(result.substance_kind)
+        if result.source_ids:
+            self.source_edit.setText(";".join(result.source_ids))
+
+        existing = self._existing_alias_keys()
+        canonical_key = (result.canonical_name or "").casefold()
+        abbreviation_key = (result.abbreviation or "").casefold()
+
+        def add_if_new(identifier_type: str, value: Optional[str]) -> None:
+            if not value:
+                return
+            key = (identifier_type, value.casefold())
+            if key in existing:
+                return
+            if value.casefold() in {canonical_key, abbreviation_key}:
+                return
+            self.add_alias_row(identifier_type, value, "en")
+            existing.add(key)
+
+        add_if_new("systematic_name", result.iupac_name)
+        for synonym in result.synonyms:
+            add_if_new("common_name", synonym)
+        add_if_new("inchi_key", result.inchi_key)
+        if result.pubchem_cid is not None:
+            add_if_new("database_id", f"pubchem:cid:{result.pubchem_cid}")
+        empty_rows = []
+        for row in range(self.alias_table.rowCount()):
+            value_edit = self.alias_table.cellWidget(row, 1)
+            if isinstance(value_edit, QtWidgets.QLineEdit) and not value_edit.text().strip():
+                empty_rows.append(row)
+        for row in reversed(empty_rows):
+            self.alias_table.removeRow(row)
+
+        notes = self.notes_edit.toPlainText().strip()
+        lookup_notes = ["Web auto-fill sources:", *result.source_urls]
+        lookup_notes.extend(f"Lookup warning: {item}" for item in result.warnings)
+        lookup_notes.append(
+            "Condition roles and families were not inferred; review them manually."
+        )
+        self.notes_edit.setPlainText(
+            "\n".join(part for part in (notes, "\n".join(lookup_notes)) if part)
+        )
+        self.cas_status.setText("Web data loaded")
+        self.cas_status.setStyleSheet("color: #107c10; font-weight: 600;")
+        filled = [
+            label
+            for label, value in (
+                ("name", result.canonical_name),
+                ("SMILES", result.smiles),
+                ("formula", result.formula),
+                ("molecular weight", result.molecular_weight),
+                ("density", result.density),
+                ("boiling point", result.boiling_point_c),
+                ("melting point", result.melting_point_c),
+                ("physical state", result.substance_kind),
+            )
+            if value is not None
+        ]
+        status_lines = [
+            f"Auto-filled {result.cas} ({result.status}).",
+            f"Fields: {', '.join(filled) or 'aliases only'}.",
+            f"Aliases/identifiers offered: {len(self.alias_inputs())}.",
+            "Roles and families require curator review.",
+        ]
+        status_lines.extend(f"Warning: {item}" for item in result.warnings)
+        self.status_box.setPlainText("\n".join(status_lines))
 
     @QtCore.pyqtSlot()
     def save_compound(self) -> None:
         self.save_button.setEnabled(False)
         self.status_box.clear()
+        editing_substance_id = self.editing_substance_id
         try:
             request = self.compound_request()
-            result = add_compound(request)
+            result = (
+                update_compound(editing_substance_id, request)
+                if editing_substance_id is not None
+                else add_compound(request)
+            )
         except CompoundAdditionError as error:
-            self.status_box.appendPlainText("Compound was not added:")
+            action = "saved" if editing_substance_id is not None else "added"
+            self.status_box.appendPlainText(f"Compound was not {action}:")
             for item in error.errors:
                 self.status_box.appendPlainText(f"  • {item}")
             self.cas_status.setText("Validation failed")
             self.cas_status.setStyleSheet("color: #a4262c; font-weight: 600;")
         except Exception as error:
+            action = "saved" if editing_substance_id is not None else "added"
             self.status_box.appendPlainText(
-                f"Compound was not added: {type(error).__name__}: {error}"
+                f"Compound was not {action}: {type(error).__name__}: {error}"
             )
             self.cas_status.setText("Write failed")
             self.cas_status.setStyleSheet("color: #a4262c; font-weight: 600;")
         else:
-            self.cas_status.setText("Added")
+            was_updated = editing_substance_id is not None
+            action = "Updated" if was_updated else "Added"
+            self.editing_substance_id = (
+                result.substance.substance_id if was_updated else None
+            )
+            self.cas_status.setText(action)
             self.cas_status.setStyleSheet("color: #107c10; font-weight: 600;")
             self.status_box.appendPlainText(
-                f"Added {result.substance.canonical_name} as "
+                f"{action} {result.substance.canonical_name} as "
                 f"{result.substance.substance_id}."
             )
             self.status_box.appendPlainText(
@@ -567,14 +918,27 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         self.notes_edit.clear()
         self.cas_status.setText("Not checked")
         self.cas_status.setStyleSheet("")
+        self.cas_edit.setReadOnly(False)
+        self.save_button.setText("Validate and Add Compound")
         self.status_box.clear()
+        self.last_lookup_result = None
+        self.editing_substance_id = None
+
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        if self.lookup_thread is not None and self.lookup_thread.isRunning():
+            self.status_box.setPlainText(
+                "A web lookup is still running. Close the window after it finishes."
+            )
+            event.ignore()
+            return
+        event.accept()
 
 
 def main() -> None:
     """Launch the condition-registry compound curator."""
     application = QtWidgets.QApplication(sys.argv)
     window = CompoundRegistryWindow()
-    window.show()
+    window.showMaximized()
     raise SystemExit(application.exec())
 
 
@@ -582,4 +946,9 @@ if __name__ == "__main__":
     main()
 
 
-__all__ = ["ALIAS_TYPES", "CompoundRegistryWindow", "main"]
+__all__ = [
+    "ALIAS_TYPES",
+    "CompoundLookupWorker",
+    "CompoundRegistryWindow",
+    "main",
+]

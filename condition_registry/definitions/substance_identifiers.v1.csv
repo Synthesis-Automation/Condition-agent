@@ -1,3 +1,5 @@
-identifier_id,substance_id,identifier_type,value,language,is_preferred,source,confidence,status,normalization_profile,allow_ambiguous
+﻿identifier_id,substance_id,identifier_type,value,language,is_preferred,source,confidence,status,normalization_profile,allow_ambiguous
 sid:7647-01-0:hydrogen-chloride,cas:7647-01-0,systematic_name,Hydrogen chloride,en,true,condition_registry_curated,1.0,active,chemical_name_v1,false
 sid:584-08-7:dipotassium-carbonate,cas:584-08-7,systematic_name,Dipotassium carbonate,en,false,condition_registry_curated,1.0,active,chemical_name_v1,false
+sid:1094520-55-4:036f89626cb96511,cas:1094520-55-4,systematic_name,tetrakis(2-methylpropan-2-ol);tetrabutylazanium;fluoride,en,false,pubchem:cid:25112410,1.0,active,chemical_name_v1,false
+sid:1094520-55-4:40d5f1f7cea2c4b0,cas:1094520-55-4,common_name,tetrakis(2-methyl-2-propanol) tetrabutylammonium ion fluoride,en,false,pubchem:cid:25112410,1.0,active,chemical_name_v1,false

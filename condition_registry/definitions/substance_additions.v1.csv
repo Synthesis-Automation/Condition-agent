@@ -1,1 +1,2 @@
-substance_id,name,abbreviation,cas,smiles,formula,type,density,mw,bp,mp,volatile,viscose,role_1,family_1,tag_1,role_2,family_2,tag_2,status,source,curator_notes
+﻿substance_id,name,abbreviation,cas,smiles,formula,type,density,mw,bp,mp,volatile,viscose,role_1,family_1,tag_1,role_2,family_2,tag_2,status,source,curator_notes
+cas:1094520-55-4,tetrabutylammonium fluoride - 2-methylpropan-2-ol,TBAF(t-BuOH)4,1094520-55-4,CC(C)(C)O.CC(C)(C)O.CC(C)(C)O.CC(C)(C)O.CCCC[N+](CCCC)(CCCC)CCCC.[F-],C32H76FNO4,,,557.9,,,,,base,fluoride,,other_reagent,misc_general,,active,pubchem:cid:25112410,

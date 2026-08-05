@@ -14,6 +14,7 @@ from .curation import (
     CompoundAdditionResult,
     CompoundAliasInput,
     add_compound,
+    update_compound,
 )
 from .models import (
     CONDITION_RECIPE_COMPONENT_BUCKETS,
@@ -88,6 +89,7 @@ __all__ = [
     "build_resolved_recipe_from_inputs",
     "condition_registry_definition_versions",
     "add_compound",
+    "update_compound",
     "get_registry",
     "get_recipe_template",
     "load_recipe_template_set",
