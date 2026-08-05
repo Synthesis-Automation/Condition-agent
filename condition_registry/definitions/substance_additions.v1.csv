@@ -41,3 +41,13 @@ cas:898838-07-8,"Lithium magnesium chloride 2,2,6,6-tetramethylpiperidin-1-ide (
 cas:92149-07-0,"4,7-Dimethoxy-1,10-phenanthroline",,92149-07-0,COc1ccnc2c1ccc1c(OC)ccnc12,C14H12N2O2,,,240.262,,,,,,,,,,,active,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10462298,Imported from curator-updated weak-label unresolved-compounds CSV. Observed source roles (contextual only): ligand. CAS evidence: supplier/registry name match. Intrinsic registry roles were intentionally not inferred from dataset columns.
 cas:947402-60-0,1-(Dicyclohexylphosphanyl)-2-(2-methoxyphenyl)-1H-indole,,947402-60-0,COc1ccccc1-c1cc2ccccc2n1P(C1CCCCC1)C1CCCCC1,C27H34NOP,,,419.549,,,,,,,,,,,active,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:16747908,Imported from curator-updated weak-label unresolved-compounds CSV. Observed source roles (contextual only): ligand. CAS evidence: supplier/registry name match. Intrinsic registry roles were intentionally not inferred from dataset columns.
 cas:94790-35-9,"Chloro-N,N,N',N'-tetramethylformamidinium Hexafluorophosphate",,94790-35-9,CN(C)C(Cl)=[N+](C)C.F[P-](F)(F)(F)(F)F,C5H12ClF6N2P,,,280.58,,,,,,,,,,,active,weak_label_v2.1:user_possible_cas_reconciliation+pubchem:cid:10989639,Imported from curator-updated weak-label unresolved-compounds CSV. Observed source roles (contextual only): coupling_reagent. CAS evidence: current supplier catalog match. Intrinsic registry roles were intentionally not inferred from dataset columns.
+cas:7440-05-3,Palladium,PALLADIUM,7440-05-3,[Pd],Pd,solid,12.02,106.42,2963,1554.9,,,metal_catalyst,pure_metal,,,,,active,pubchem:cid:23938,"Web auto-fill sources:
+https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/7440-05-3/property/Title,IUPACName,MolecularFormula,MolecularWeight,SMILES,ConnectivitySMILES,InChIKey/JSON
+https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/7440-05-3/synonyms/JSON
+https://pubchem.ncbi.nlm.nih.gov/compound/23938
+https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23938/JSON?heading=Density
+https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23938/JSON?heading=Boiling%20Point
+https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23938/JSON?heading=Melting%20Point
+https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23938/JSON?heading=Physical%20Description
+Lookup warning: PUBCHEM_EXPERIMENTAL_FIELDS_REQUIRE_REVIEW
+Condition roles and families were not inferred; review them manually."

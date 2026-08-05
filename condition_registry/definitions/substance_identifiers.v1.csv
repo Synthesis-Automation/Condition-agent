@@ -602,3 +602,8 @@ sid:alias:d154b96267c0dbfd,cas:7560-83-0,common_name,N-Methyldicyclohexylamine,e
 sid:alias:446b845cee1cb93d,cas:1445086-12-3,legacy_name,P(Cy3) Pd G3,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:1445086-12-3,1.0,active,chemical_name_v1,false
 sid:alias:9ca721adc254ba2c,cas:1385042-42-1,legacy_name,P(oTol)3 Pd(crotyl)Cl,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:1385042-42-1,1.0,active,chemical_name_v1,false
 sid:alias:d9f1d804857884fa,cas:33636-93-0,legacy_name,Strykers reagent,en,false,weak_label_v2.1:user_possible_cas_exact_spelling:33636-93-0,1.0,active,chemical_name_v1,false
+sid:7440-05-3:0e13d241a546d83f,cas:7440-05-3,common_name,PD,en,false,pubchem:cid:23938,1.0,active,chemical_name_v1,false
+sid:7440-05-3:3c0a10dfb9ebf875,cas:7440-05-3,common_name,"Palladium, elemental",en,false,pubchem:cid:23938,1.0,active,chemical_name_v1,false
+sid:7440-05-3:86cf8bd3d2fb0c6a,cas:7440-05-3,common_name,231-115-6,en,false,pubchem:cid:23938,1.0,active,chemical_name_v1,false
+sid:7440-05-3:4f89af029c011937,cas:7440-05-3,common_name,Palladium on carbon,en,false,pubchem:cid:23938,1.0,active,chemical_name_v1,false
+sid:7440-05-3:08055ad9802689d6,cas:7440-05-3,common_name,Palladium Black,en,false,pubchem:cid:23938,1.0,active,chemical_name_v1,false
