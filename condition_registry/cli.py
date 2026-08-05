@@ -6,9 +6,9 @@ import argparse
 import json
 from typing import Any, Sequence
 
-from .api import get_registry, resolve_substance
+from .api import get_registry, resolve_identifier, resolve_substance
 from .migration import run_migration_audit
-from .models import ResolutionResult
+from .models import CONDITION_IDENTIFIER_TYPES, ResolutionResult
 from .validation import validate_registry
 
 
@@ -46,6 +46,10 @@ def _resolution_summary(result: ResolutionResult) -> str:
         )
         lines.append(f"roles: {roles or 'none'}")
         lines.append(f"aliases: {', '.join(substance.aliases) or 'none'}")
+    if result.matched_identifier is not None:
+        identifier = result.matched_identifier
+        lines.append(f"identifier type: {identifier.identifier_type}")
+        lines.append(f"identifier source: {identifier.source or '-'}")
     if result.candidates:
         lines.append(f"candidates: {', '.join(result.candidates)}")
     if result.warnings:
@@ -61,6 +65,8 @@ def _validation_summary(report: dict[str, Any]) -> str:
         f"rows with issues: {report['issue_rows']}",
         f"duplicate CAS values: {report['duplicate_cas']}",
         f"duplicate normalized names: {report['duplicate_normalized_names']}",
+        f"identifier rows checked: {report['identifier_total_rows']}",
+        f"identifier rows with issues: {report['identifier_issue_rows']}",
     ]
     for issue, count in report["issue_counts"].items():
         lines.append(f"  {issue}: {count}")
@@ -122,6 +128,13 @@ def _build_parser() -> argparse.ArgumentParser:
     query = resolve_parser.add_mutually_exclusive_group(required=True)
     query.add_argument("--cas", help="CAS registry number")
     query.add_argument("--name", help="Canonical name or curated alias")
+    query.add_argument("--identifier", help="Typed substance identifier")
+    resolve_parser.add_argument(
+        "--identifier-type",
+        choices=("auto", "name", "substance_id", *CONDITION_IDENTIFIER_TYPES),
+        default="auto",
+        help="Type used with --identifier (default: auto)",
+    )
     _add_format_argument(resolve_parser)
 
     validate_parser = subparsers.add_parser(
@@ -146,7 +159,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
 
     if args.command == "resolve":
-        result = resolve_substance(cas=args.cas, name=args.name)
+        result = (
+            resolve_identifier(
+                args.identifier,
+                identifier_type=args.identifier_type,
+            )
+            if args.identifier is not None
+            else resolve_substance(cas=args.cas, name=args.name)
+        )
         print(
             _json_dump(result.to_dict())
             if args.format == "json"
@@ -157,7 +177,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "validate":
         report = validate_registry()
         print(_json_dump(report) if args.format == "json" else _validation_summary(report))
-        return 0 if report["issue_rows"] == 0 else 1
+        return 0 if not report["has_errors"] else 1
 
     if args.command == "self-test":
         return _run_self_test(output_format=args.format)

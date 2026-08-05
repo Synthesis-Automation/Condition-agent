@@ -173,6 +173,10 @@ def test_contextual_component_resolves_name_and_retains_role_hint() -> None:
     assert component.primary_role == "base"
     assert component.source_role_hint == "base"
     assert component.provenance["identifier_type"] == "name"
+    assert component.provenance["identity_identifier_type"] == "abbreviation"
+    assert component.provenance["identity_identifier_source"] == (
+        "substances.v1.csv:abbreviation"
+    )
 
 
 def test_source_role_hint_does_not_override_registry_chemistry() -> None:

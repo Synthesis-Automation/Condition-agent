@@ -6,10 +6,90 @@ conversion and recommendation. It does not import `chemtools`.
 Data ownership:
 
 - `definitions/substances.v1.csv`: migrated flat substance registry
+- `definitions/substance_additions.v1.csv`: explicit, provenance-bearing new
+  compounds created by the curation workflow
+- `definitions/substance_identifiers.v1.csv`: typed one-to-many aliases and
+  external identifiers with provenance
 - `definitions/pending_substances.csv`: unresolved additions awaiting curation
 - `definitions/roles_families.v1.json`: role and family taxonomy
 - `definitions/role_resolution.v1.json`: contextual role and recipe-bucket rules
 - `definitions/recipe_templates.v1.json`: typed expert recipe templates
+
+## Substance identifiers and aliases
+
+Each substance can have any number of typed identifiers. During the v1
+migration, the loader converts the canonical `name`, `cas`, and `abbreviation`
+columns in `substances.v1.csv` into identifier objects and merges additional
+rows from `substance_identifiers.v1.csv`. New aliases belong in the identifier
+file; do not add numbered alias columns or delimiter-separated aliases to the
+substance file.
+`Substance.aliases` remains as a computed compatibility view for current
+callers; typed `Substance.identifiers` is the source-of-truth contract.
+
+```csv
+identifier_id,substance_id,identifier_type,value,language,is_preferred,source,confidence,status,normalization_profile,allow_ambiguous
+sid:584-08-7:dipotassium-carbonate,cas:584-08-7,systematic_name,Dipotassium carbonate,en,false,condition_registry_curated,1.0,active,chemical_name_v1,false
+```
+
+Supported types are canonical, common, systematic, abbreviation, trade, and
+legacy names, plus CAS, InChIKey, and external database identifiers. Alias
+resolution remains exact and returns the matched identifier and provenance.
+When a normalized alias belongs to multiple substances, resolution returns all
+candidate substance IDs rather than choosing one. Such intentional collisions
+must set `allow_ambiguous=true` on the supplemental definition row.
+
+Typed resolution is available through the API and CLI:
+
+```python
+from condition_registry import resolve_identifier
+
+result = resolve_identifier(
+    "Dipotassium carbonate",
+    identifier_type="systematic_name",
+)
+assert result.matched_identifier is not None
+assert result.matched_identifier.source == "condition_registry_curated"
+```
+
+```powershell
+python -m condition_registry.cli resolve --identifier "Dipotassium carbonate" --identifier-type systematic_name
+```
+
+## Adding compounds
+
+Use the PyQt curator instead of editing definition CSV files directly:
+
+```powershell
+python app/compound_registry_gui.py
+```
+
+The form accepts a required CAS number, canonical name, and provenance source;
+optional structure, physical properties, two curated role capabilities, and
+any number of typed aliases can also be supplied. SMILES is canonicalized with
+RDKit, formula and molecular weight are derived when omitted, and supplied
+values are checked against the structure. Duplicate CAS numbers, names,
+abbreviations, aliases, invalid role/family pairs, and malformed structures are
+rejected before anything is written.
+
+Successful additions are written atomically to
+`substance_additions.v1.csv`, with supplemental aliases written to
+`substance_identifiers.v1.csv`. Both definitions are restored if either write
+or post-write resolution verification fails. The same workflow is available
+programmatically:
+
+```python
+from condition_registry import CompoundAdditionRequest, add_compound
+
+result = add_compound(
+    CompoundAdditionRequest(
+        canonical_name="Ethanol",
+        cas="64-17-5",
+        smiles="CCO",
+        source="doi:example",
+    )
+)
+assert result.substance.substance_id == "cas:64-17-5"
+```
 
 ## Expert recipe templates
 

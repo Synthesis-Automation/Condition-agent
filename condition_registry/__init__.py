@@ -3,12 +3,22 @@
 from .api import (
     get_registry,
     resolve_condition_components,
+    resolve_identifier,
     resolve_substance,
     resolve_substance_id,
 )
 from .contextual_roles import resolve_contextual_component
+from .curation import (
+    CompoundAdditionError,
+    CompoundAdditionRequest,
+    CompoundAdditionResult,
+    CompoundAliasInput,
+    add_compound,
+)
 from .models import (
     CONDITION_RECIPE_COMPONENT_BUCKETS,
+    CONDITION_IDENTIFIER_TYPES,
+    CONDITION_NAME_IDENTIFIER_TYPES,
     ConditionComponentInput,
     ConditionProcessStage,
     ContextualRoleAssignment,
@@ -17,12 +27,14 @@ from .models import (
     ResolvedConditionRecipe,
     RoleAssignment,
     Substance,
+    SubstanceIdentifier,
 )
 from .recipes import (
     build_resolved_recipe,
     build_resolved_recipe_from_components,
     build_resolved_recipe_from_inputs,
 )
+from .resolver import ConditionRegistry
 from .vocabulary import (
     ConditionDefinitionVocabulary,
     condition_registry_definition_versions,
@@ -47,8 +59,15 @@ from .validation import validate_registry
 
 __all__ = [
     "ContextualRoleAssignment",
+    "CONDITION_IDENTIFIER_TYPES",
+    "CONDITION_NAME_IDENTIFIER_TYPES",
     "CONDITION_RECIPE_COMPONENT_BUCKETS",
     "ConditionDefinitionVocabulary",
+    "ConditionRegistry",
+    "CompoundAdditionError",
+    "CompoundAdditionRequest",
+    "CompoundAdditionResult",
+    "CompoundAliasInput",
     "ConditionComponentInput",
     "ConditionProcessStage",
     "ConditionRecipeTemplate",
@@ -63,16 +82,19 @@ __all__ = [
     "RecipeTemplateSlot",
     "RecipeTemplateVariant",
     "Substance",
+    "SubstanceIdentifier",
     "build_resolved_recipe",
     "build_resolved_recipe_from_components",
     "build_resolved_recipe_from_inputs",
     "condition_registry_definition_versions",
+    "add_compound",
     "get_registry",
     "get_recipe_template",
     "load_recipe_template_set",
     "materialize_recipe_variant",
     "load_condition_vocabulary",
     "resolve_condition_components",
+    "resolve_identifier",
     "resolve_contextual_component",
     "resolve_substance",
     "resolve_substance_id",

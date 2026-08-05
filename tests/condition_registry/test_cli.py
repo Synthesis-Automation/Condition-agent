@@ -12,6 +12,21 @@ def test_resolve_by_cas_and_alias(capsys) -> None:
     assert main(["resolve", "--name", "HCl"]) == 0
     assert "substance: Hydrochloric Acid" in capsys.readouterr().out
 
+    assert main([
+        "resolve",
+        "--identifier",
+        "Dipotassium carbonate",
+        "--identifier-type",
+        "systematic_name",
+        "--format",
+        "json",
+    ]) == 0
+    identifier_result = json.loads(capsys.readouterr().out)
+    assert identifier_result["matched_identifier"]["identifier_type"] == (
+        "systematic_name"
+    )
+    assert identifier_result["substance"]["substance_id"] == "cas:584-08-7"
+
 
 def test_resolve_returns_failure_for_invalid_or_unknown_query(capsys) -> None:
     assert main(["resolve", "--cas", "7732-18-4"]) == 1

@@ -8,9 +8,13 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Tuple
 
-from .api import resolve_substance, resolve_substance_id
+from .api import resolve_identifier, resolve_substance, resolve_substance_id
 from .loader import load_taxonomy
-from .models import ContextualRoleAssignment, ResolvedConditionComponent
+from .models import (
+    CONDITION_IDENTIFIER_TYPES,
+    ContextualRoleAssignment,
+    ResolvedConditionComponent,
+)
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "role_resolution.v1.json"
 
@@ -113,7 +117,13 @@ def resolve_contextual_component(
 ) -> ResolvedConditionComponent:
     """Resolve identity and rank possible roles using reaction context."""
     rules = load_role_resolution_rules()
-    if identifier_type not in {"auto", "cas", "name", "substance_id"}:
+    supported_identifier_types = {
+        "auto",
+        "name",
+        "substance_id",
+        *CONDITION_IDENTIFIER_TYPES,
+    }
+    if identifier_type not in supported_identifier_types:
         raise ValueError(f"Unsupported condition identifier type: {identifier_type}")
     resolved_identifier_type = identifier_type
     if resolved_identifier_type == "auto":
@@ -124,8 +134,13 @@ def resolve_contextual_component(
         result = resolve_substance(cas=identifier)
     elif resolved_identifier_type == "substance_id":
         result = resolve_substance_id(identifier)
-    else:
+    elif resolved_identifier_type == "name":
         result = resolve_substance(name=identifier)
+    else:
+        result = resolve_identifier(
+            identifier,
+            identifier_type=resolved_identifier_type,
+        )
     warnings = []
     if result.status == "resolved" and result.substance is not None:
         substance = result.substance
@@ -181,6 +196,21 @@ def resolve_contextual_component(
             provenance={
                 **dict(provenance or {}),
                 "identity_match_kind": result.match_kind,
+                "identity_identifier_id": (
+                    result.matched_identifier.identifier_id
+                    if result.matched_identifier is not None
+                    else None
+                ),
+                "identity_identifier_type": (
+                    result.matched_identifier.identifier_type
+                    if result.matched_identifier is not None
+                    else resolved_identifier_type
+                ),
+                "identity_identifier_source": (
+                    result.matched_identifier.source
+                    if result.matched_identifier is not None
+                    else None
+                ),
                 "identifier_type": resolved_identifier_type,
                 "transformation_class": transformation_class,
                 "named_family": named_family,

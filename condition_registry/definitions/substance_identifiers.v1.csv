@@ -1,0 +1,3 @@
+identifier_id,substance_id,identifier_type,value,language,is_preferred,source,confidence,status,normalization_profile,allow_ambiguous
+sid:7647-01-0:hydrogen-chloride,cas:7647-01-0,systematic_name,Hydrogen chloride,en,true,condition_registry_curated,1.0,active,chemical_name_v1,false
+sid:584-08-7:dipotassium-carbonate,cas:584-08-7,systematic_name,Dipotassium carbonate,en,false,condition_registry_curated,1.0,active,chemical_name_v1,false
