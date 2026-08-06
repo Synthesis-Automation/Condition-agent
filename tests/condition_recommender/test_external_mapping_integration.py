@@ -80,6 +80,10 @@ ACYL_FLUORIDE_RXNMAPPER_OUTPUT = (
     "[OH:10][C:2](=[O:1])[c:4]1[cH:5][cH:6][cH:7][cH:8][cH:9]1"
     ">>[O:1]=[C:2]([F:3])[c:4]1[cH:5][cH:6][cH:7][cH:8][cH:9]1"
 )
+INCOMPLETE_AZIDE_REACTION = (
+    "C=Cn1cc[n+](Cc2c(F)c(F)c(F)c(F)c2F)c1.[Br-]"
+    ">>C=Cn1cc[n+](Cc2c(F)c(F)c(N=[N+]=[N-])c(F)c2F)c1.[Br-]"
+)
 RESOLVED_SUZUKI_REACTION = (
     "CC(C)(C)c1ccc(OS(C)(=O)=O)cc1.OB(O)c1ccccc1"
     ">>CC(C)(C)c1ccc(-c2ccccc2)cc1"
@@ -603,4 +607,21 @@ def test_recommender_uses_mapper_supported_query_with_review_cautions() -> None:
     assert any(
         "external mapper" in caution
         for caution in result.recommendations[0].cautions
+    )
+
+
+def test_recommender_skips_mapper_for_missing_product_atom_source() -> None:
+    provider = _FixtureProvider()
+
+    result = GenericConditionRecommender(
+        index=build_generic_index([]),
+        mapping_provider=provider,
+    ).recommend(INCOMPLETE_AZIDE_REACTION)
+
+    assert provider.call_count == 0
+    assert not result.valid
+    assert result.error == "INDEX_HAS_NO_FALLBACK_DESCRIPTORS"
+    assert (
+        "EXTERNAL_MAPPING_SKIPPED:PARTIAL_PRODUCT_TRANSFORMATION_AVAILABLE"
+        in result.warnings
     )

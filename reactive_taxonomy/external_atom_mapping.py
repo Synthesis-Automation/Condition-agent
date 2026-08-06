@@ -12,7 +12,8 @@ import hashlib
 import importlib.util
 import itertools
 from dataclasses import dataclass, replace
-from importlib import metadata, resources
+from importlib import metadata
+from pathlib import Path
 from typing import (
     Any,
     Iterable,
@@ -1426,9 +1427,15 @@ class RxnMapperProvider:
         model_sha256 = None
         if provider_version != "unavailable":
             try:
-                model_path = resources.files("rxnmapper").joinpath(
-                    self._MODEL_RELATIVE_PATH
+                package_spec = importlib.util.find_spec("rxnmapper")
+                package_locations = (
+                    tuple(package_spec.submodule_search_locations or ())
+                    if package_spec is not None
+                    else ()
                 )
+                if not package_locations:
+                    raise ModuleNotFoundError("rxnmapper package path unavailable")
+                model_path = Path(package_locations[0]) / self._MODEL_RELATIVE_PATH
                 model_sha256 = _sha256_file(model_path)
             except (FileNotFoundError, ModuleNotFoundError, OSError):
                 model_sha256 = None

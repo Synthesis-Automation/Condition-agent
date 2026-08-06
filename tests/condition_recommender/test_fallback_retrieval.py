@@ -17,6 +17,10 @@ _CONDITION_SUPPLIED_IODINATION = "CCCCCCCCC(C)(F)CC>>CCCCCCCCC(C)(I)CC"
 _ACYL_FLUORIDE_QUERY = (
     "N#Cc1ccc(C(=O)O)cc1>>N#Cc1ccc(C(=O)F)cc1"
 )
+_COUNTERION_AZIDATION_QUERY = (
+    "C=Cn1cc[n+](Cc2c(F)c(F)c(F)c(F)c2F)c1.[Br-]"
+    ">>C=Cn1cc[n+](Cc2c(F)c(F)c(N=[N+]=[N-])c(F)c2F)c1.[Br-]"
+)
 
 
 def _precedent(index: int) -> dict:
@@ -83,6 +87,23 @@ def _acyl_fluoride_precedent(index: int, reaction_smiles: str) -> dict:
         },
         source_dataset="fallback-test",
         source_path="acyl-fluoride.csv",
+        source_row_number=index,
+    )
+    return convert_record(record).to_dict()
+
+
+def _azidation_precedent(index: int, reaction_smiles: str) -> dict:
+    record = adapt_row(
+        {
+            "reaction_id": f"azidation-{index}",
+            "reaction_smiles": reaction_smiles,
+            "yield_pct": str(90 - index),
+            "reagent_cas": "26628-22-8",
+            "solvent_cas": "67-64-1",
+            "reference": f"Independent azidation reference {index}",
+        },
+        source_dataset="azidation-test",
+        source_path="azidation.csv",
         source_row_number=index,
     )
     return convert_record(record).to_dict()
@@ -217,6 +238,37 @@ def test_exploratory_fluoride_partial_precedents_are_retrievable() -> None:
     assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:F" in result.warnings
     assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:F" in result.warnings
     assert len(result.recommendations) == 2
+
+
+def test_counterion_azidation_reaches_source_supported_recommendation() -> None:
+    records = [
+        _azidation_precedent(
+            1,
+            "COC(=O)c1c(F)c(F)c(F)c(F)c1F"
+            ">>COC(=O)c1c(F)c(F)c(N=[N+]=[N-])c(F)c1F",
+        ),
+        _azidation_precedent(
+            2,
+            "Fc1ccc(C#N)cc1>>[N-]=[N+]=Nc1ccc(C#N)cc1",
+        ),
+    ]
+
+    assert all(record["index_eligibility"] == "eligible" for record in records)
+    assert all(
+        record["fragment_source_support"][0]["status"] == "supported"
+        for record in records
+    )
+
+    result = GenericConditionRecommender(
+        build_generic_index(records)
+    ).recommend(_COUNTERION_AZIDATION_QUERY)
+
+    assert result.valid
+    assert result.retrieval_level == "source_supported_partial_transformation"
+    assert result.candidate_count == 2
+    assert len(result.recommendations) == 1
+    assert result.recommendations[0].reference_support == 2
+    assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:N,N,N" in result.warnings
 
 
 def test_partial_fluorination_without_capable_source_is_not_indexed() -> None:

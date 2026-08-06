@@ -2,7 +2,11 @@
 
 from dataclasses import asdict
 
-from condition_registry import build_resolved_recipe
+from condition_registry import (
+    ConditionComponentInput,
+    build_resolved_recipe,
+    build_resolved_recipe_from_inputs,
+)
 from reactive_taxonomy import featurize_reaction
 
 from condition_recommender.fragment_source_support import (
@@ -63,3 +67,26 @@ def test_multi_atom_cyanide_requirement_uses_same_general_contract() -> None:
     assert requirement["element_counts"] == {"C": 1, "N": 1}
     assert support[0].status == "supported"
     assert support[0].capability_ids == ("cyanide_fragment_source.v1",)
+
+
+def test_structured_reagent_field_supports_azide_requirement() -> None:
+    requirements = _requirements(
+        "Fc1ccccc1>>[N-]=[N+]=Nc1ccccc1"
+    )
+    recipe = build_resolved_recipe_from_inputs(
+        (
+            ConditionComponentInput(
+                raw_identifier="26628-22-8",
+                source_field="reagents_json",
+                identifier_type="cas",
+                source_role_hint="reagent",
+            ),
+        ),
+        transformation_class="attachment_replacement",
+    )
+
+    support = assess_fragment_source_support(requirements, recipe)
+
+    assert support[0].status == "supported"
+    assert support[0].component_substance_ids == ("cas:26628-22-8",)
+    assert support[0].capability_ids == ("azide_fragment_source.v1",)

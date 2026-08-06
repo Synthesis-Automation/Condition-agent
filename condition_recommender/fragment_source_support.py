@@ -21,7 +21,12 @@ _RULES_PATH = (
     Path(__file__).with_name("definitions")
     / "fragment_source_capabilities.v1.json"
 )
-_DEFINITION_VERSION = "fragment_source_capabilities.v1@1.0"
+_DEFINITION_VERSION = "fragment_source_capabilities.v1@1.1"
+
+_SOURCE_FIELD_EQUIVALENTS = {
+    "catalysts_json": "catalyst_cas",
+    "reagents_json": "reagent_cas",
+}
 
 
 def _mapping(value: Any) -> Mapping[str, Any]:
@@ -146,7 +151,10 @@ def _component_match(
     component: Any,
     capability: Mapping[str, Any],
 ) -> tuple[str, float] | None:
-    source_fields = set(str(component.source_field).split("|"))
+    source_fields = {
+        _SOURCE_FIELD_EQUIVALENTS.get(value, value)
+        for value in str(component.source_field).split("|")
+    }
     if not source_fields.intersection(
         str(value) for value in capability.get("allowed_source_fields") or ()
     ):

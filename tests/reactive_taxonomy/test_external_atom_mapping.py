@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import builtins
 from dataclasses import replace
 
 from reactive_taxonomy import (
@@ -409,6 +410,21 @@ class _FakeMapper:
             }
             for _ in reactions
         ]
+
+
+def test_rxnmapper_provider_construction_does_not_import_mapper(monkeypatch) -> None:
+    original_import = builtins.__import__
+
+    def guarded_import(name, *args, **kwargs):
+        if name == "rxnmapper" or name.startswith("rxnmapper."):
+            raise AssertionError("provider construction imported RXNMapper")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
+
+    provider = RxnMapperProvider(mapper=_FakeMapper())
+
+    assert provider.metadata.provider_id == "rxnmapper"
 
 
 def test_rxnmapper_provider_batches_and_retains_model_provenance() -> None:

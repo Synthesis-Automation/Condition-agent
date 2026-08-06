@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import hashlib
-from collections import Counter
-from dataclasses import dataclass
+from collections import Counter, defaultdict
+from dataclasses import dataclass, replace
 from typing import Iterable, Optional, Tuple
 
 from .chemistry.rdkit_utils import (
@@ -45,6 +45,41 @@ def _component(
             if component.component_index == component_index
         ),
         None,
+    )
+
+
+def _exclude_unchanged_components(
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+) -> tuple[Tuple[ReactionComponent, ...], Tuple[ReactionComponent, ...], int]:
+    """Remove exact side-preserved components from correspondence inputs."""
+    reactants_by_identity: dict[str, list[ReactionComponent]] = defaultdict(list)
+    for component in reactants:
+        reactants_by_identity[component.canonical_smiles].append(component)
+    for values in reactants_by_identity.values():
+        values.sort(key=lambda component: component.component_index)
+
+    excluded_reactant_indices = set()
+    excluded_product_indices = set()
+    for product in sorted(products, key=lambda component: component.component_index):
+        matches = reactants_by_identity.get(product.canonical_smiles, [])
+        if not matches:
+            continue
+        reactant = matches.pop(0)
+        excluded_reactant_indices.add(reactant.component_index)
+        excluded_product_indices.add(product.component_index)
+    return (
+        tuple(
+            component
+            for component in reactants
+            if component.component_index not in excluded_reactant_indices
+        ),
+        tuple(
+            component
+            for component in products
+            if component.component_index not in excluded_product_indices
+        ),
+        len(excluded_product_indices),
     )
 
 
@@ -530,8 +565,11 @@ def infer_partial_product_transformation(
         or not completeness.product_element_excess
     ):
         return None
+    effective_reactants, effective_products, excluded_count = (
+        _exclude_unchanged_components(reactants, products)
+    )
     correspondence = infer_partial_scaffold_correspondence_candidates(
-        reactants, products
+        effective_reactants, effective_products
     )
     if not correspondence.valid:
         return None
@@ -540,7 +578,10 @@ def infer_partial_product_transformation(
         for mapping in correspondence.candidates
         if (
             observation := _observation_from_mapping(
-                mapping, reactants, agents, products
+                mapping,
+                effective_reactants,
+                agents,
+                effective_products,
             )
         )
         is not None
@@ -548,13 +589,28 @@ def infer_partial_product_transformation(
     identities = {_identity(observation) for observation in observations}
     if len(identities) != 1:
         return None
-    return min(
+    selected = min(
         observations,
         key=lambda observation: (
             observation.reactant_center.component_index,
             observation.reactant_center.atom_index,
             observation.removed_attachment.atom_index,
             observation.added_attachment.atom_index,
+        ),
+    )
+    if not excluded_count:
+        return selected
+    return replace(
+        selected,
+        warnings=tuple(
+            sorted(
+                set(selected.warnings).union(
+                    {
+                        "UNCHANGED_PRODUCT_COMPONENTS_EXCLUDED_FROM_"
+                        "PARTIAL_CORRESPONDENCE"
+                    }
+                )
+            )
         ),
     )
 

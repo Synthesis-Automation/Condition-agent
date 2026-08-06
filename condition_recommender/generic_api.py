@@ -367,15 +367,54 @@ def _recommend_with_index(
             reaction_smiles, False, error="TOP_K_MUST_BE_POSITIVE"
         )
     base_analysis = featurize_reaction(reaction_smiles)
+    mapping_skip_warning = None
+    fallback_descriptor = base_analysis.fallback_descriptor
+    if (
+        mapping_provider is not None
+        and fallback_descriptor is not None
+        and base_analysis.partial_product_transformation is not None
+        and fallback_descriptor.retrieval_eligible
+    ):
+        mapping_skip_warning = (
+            "EXTERNAL_MAPPING_SKIPPED:PARTIAL_PRODUCT_TRANSFORMATION_AVAILABLE"
+        )
+    elif (
+        mapping_provider is not None
+        and fallback_descriptor is not None
+        and "incomplete_product_atom_provenance"
+        in fallback_descriptor.ineligibility_reasons
+    ):
+        # Atom correspondence cannot supply elements that are absent from the
+        # input. Avoid starting an external mapping model for a query that the
+        # chemistry gates must reject regardless of the proposed mapping.
+        mapping_skip_warning = (
+            "EXTERNAL_MAPPING_SKIPPED:INCOMPLETE_PRODUCT_ATOM_PROVENANCE"
+        )
     assessment = (
         analyze_reaction_with_external_mapping(
             reaction_smiles,
             mapping_provider,
             base_analysis=base_analysis,
         )
-        if mapping_provider is not None and base_analysis.valid
+        if (
+            mapping_provider is not None
+            and base_analysis.valid
+            and mapping_skip_warning is None
+        )
         else None
     )
+
+    def finalize(result: GenericRecommendationResult) -> GenericRecommendationResult:
+        attached = _attach_external_mapping_assessment(result, assessment)
+        if mapping_skip_warning is None:
+            return attached
+        return replace(
+            attached,
+            warnings=tuple(
+                dict.fromkeys((*attached.warnings, mapping_skip_warning))
+            ),
+        )
+
     analysis = assessment.analysis if assessment is not None else base_analysis
     if not analysis.valid:
         return GenericRecommendationResult(
@@ -397,9 +436,8 @@ def _recommend_with_index(
             ranking_preferences=ranking_preferences,
         )
         if mapped_core_result.valid:
-            return _attach_external_mapping_assessment(
+            return finalize(
                 mapped_core_result,
-                assessment,
             )
     if analysis.reaction_signature is None:
         core_attempt = None
@@ -416,9 +454,8 @@ def _recommend_with_index(
                 or hypothesis_result.error
                 != "QUERY_EDIT_HYPOTHESES_NOT_RETRIEVABLE"
             ):
-                return _attach_external_mapping_assessment(
+                return finalize(
                     hypothesis_result,
-                    assessment,
                 )
         if (
             analysis.reaction_core is not None
@@ -432,9 +469,8 @@ def _recommend_with_index(
                 ranking_preferences=ranking_preferences,
             )
             if core_attempt.valid:
-                return _attach_external_mapping_assessment(
+                return finalize(
                     core_attempt,
-                    assessment,
                 )
         result = _recommend_fallback_with_index(
             analysis,
@@ -483,7 +519,7 @@ def _recommend_with_index(
                 asdict(group) for group in analysis.spectator_groups
             ),
         )
-    return _attach_external_mapping_assessment(result, assessment)
+    return finalize(result)
 
 
 def _recommend_core_with_index(

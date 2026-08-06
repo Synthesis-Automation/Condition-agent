@@ -125,6 +125,26 @@ def test_missing_azide_source_retains_multi_atom_origin_gap() -> None:
     assert len(observation.installed_fragment.attachments) == 1
 
 
+def test_unchanged_counterion_does_not_hide_partial_azidation() -> None:
+    result = featurize_reaction(
+        "C=Cn1cc[n+](Cc2c(F)c(F)c(F)c(F)c2F)c1.[Br-]"
+        ">>C=Cn1cc[n+](Cc2c(F)c(F)c(N=[N+]=[N-])c(F)c2F)c1.[Br-]"
+    )
+
+    observation = result.partial_product_transformation
+    assert observation is not None
+    assert observation.removed_fragment_smiles == "F"
+    assert observation.installed_fragment.rooted_fragment_smiles == (
+        "*N=[N+]=[N-]"
+    )
+    assert (
+        "UNCHANGED_PRODUCT_COMPONENTS_EXCLUDED_FROM_PARTIAL_CORRESPONDENCE"
+        in observation.warnings
+    )
+    assert result.fallback_descriptor is not None
+    assert result.fallback_descriptor.retrieval_eligible
+
+
 def test_product_fragment_key_is_serialization_invariant() -> None:
     left_first = featurize_reaction(
         "Brc1ccccc1>>[N-]=[N+]=Nc1ccccc1"
