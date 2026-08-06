@@ -12,7 +12,23 @@ from .reaction_models import ReactionComponent
 
 
 AtomPair = Tuple[int, int, int, int]
-REACTION_CORRESPONDENCE_VERSION = "2.5"
+REACTION_CORRESPONDENCE_VERSION = "2.6"
+
+
+def _has_unsupported_mcs_bond(molecule: Any) -> bool:
+    """Return whether RDKit MCS is unsafe for this coordination graph."""
+    from rdkit.Chem.rdchem import BondType
+
+    unsupported_bond_types = {
+        BondType.DATIVE,
+        BondType.DATIVEL,
+        BondType.DATIVEONE,
+        BondType.DATIVER,
+    }
+    return any(
+        bond.GetBondType() in unsupported_bond_types
+        for bond in molecule.GetBonds()
+    )
 
 
 def _symmetry_distinct_matches(
@@ -137,6 +153,11 @@ def _component_correspondence_candidates(
         if len(candidates) > max_matches:
             return (), ("GLOBAL_CORRESPONDENCE_COMPONENT_MATCH_LIMIT",)
         return candidates, ()
+
+    if _has_unsupported_mcs_bond(reactant_mol) or _has_unsupported_mcs_bond(
+        product_mol
+    ):
+        return (), ("GLOBAL_CORRESPONDENCE_UNSUPPORTED_DATIVE_BOND",)
 
     from rdkit.Chem import rdFMCS
 
@@ -994,6 +1015,16 @@ def infer_scaffold_correspondence_candidates(
     if reactant_mol is None or product_mol is None:
         return ScaffoldCorrespondenceCandidates(
             (), ("SCAFFOLD_CORRESPONDENCE_PARSE_FAILED",), False
+        )
+
+    if any(
+        _has_unsupported_mcs_bond(molecule)
+        for molecule in (reactant_mol, product_mol)
+    ):
+        return ScaffoldCorrespondenceCandidates(
+            (),
+            ("SCAFFOLD_CORRESPONDENCE_UNSUPPORTED_DATIVE_BOND",),
+            False,
         )
 
     from rdkit.Chem import rdFMCS

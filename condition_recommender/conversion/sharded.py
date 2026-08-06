@@ -48,7 +48,7 @@ from .input_schema import (
 )
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v5.1"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v5.2"
 
 
 @dataclass(frozen=True)
@@ -809,8 +809,20 @@ def convert_datasets_sharded(
                         accept(future.result())
             if stop:
                 break
-        if pending:
-            done, _ = wait(pending)
+        while pending:
+            done, pending = wait(
+                pending,
+                timeout=5.0,
+                return_when=FIRST_COMPLETED,
+            )
+            if not done:
+                notify(
+                    "shard_waiting",
+                    f"Still processing {len(pending)} active shard(s)…",
+                    shard_count=len(entries),
+                    row_count=accepted_row_count,
+                )
+                continue
             for future in done:
                 accept(future.result())
     finally:

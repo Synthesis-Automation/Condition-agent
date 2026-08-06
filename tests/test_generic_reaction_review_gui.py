@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from PyQt6 import QtWidgets
+
 from app import reaction_converter_gui as gui
 from condition_recommender.conversion.artifacts import (
     RecommendationArtifactProgress,
@@ -35,6 +37,14 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     assert window.build_index_check.isChecked()
     assert window.use_rxnmapper_check.isChecked()
     assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
+    options_layout = window.options_widget.layout()
+    assert isinstance(options_layout, QtWidgets.QHBoxLayout)
+    assert options_layout.indexOf(window.use_rxnmapper_check) >= 0
+    assert options_layout.indexOf(window.build_index_check) >= 0
+    assert not any(
+        label.text().startswith("Outputs: shard_manifest.json")
+        for label in window.findChildren(QtWidgets.QLabel)
+    )
     assert window.worker_count_spin.value() == 1
     assert not window.worker_count_spin.isEnabled()
     window.use_rxnmapper_check.setChecked(False)

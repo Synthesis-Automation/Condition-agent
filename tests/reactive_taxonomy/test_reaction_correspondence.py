@@ -1,6 +1,47 @@
 """Regression tests for conservative unmapped scaffold correspondence."""
 
-from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy import analyze_molecule, featurize_reaction
+from reactive_taxonomy.reaction_correspondence import (
+    infer_global_correspondence_candidates,
+    infer_scaffold_correspondence_candidates,
+)
+from reactive_taxonomy.reaction_models import ReactionComponent
+
+
+def _component(
+    side: str,
+    component_index: int,
+    smiles: str,
+) -> ReactionComponent:
+    return ReactionComponent(
+        side=side,
+        component_index=component_index,
+        input_smiles=smiles,
+        canonical_smiles=smiles,
+        atom_mapped=False,
+        molecule_analysis=analyze_molecule(smiles),
+    )
+
+
+def test_dative_coordination_graph_abstains_from_mcs_correspondence() -> None:
+    reactants = (
+        _component("reactant", 0, "N->[Ru]"),
+        _component("reactant", 1, "C"),
+    )
+    products = (_component("product", 0, "CN->[Ru]"),)
+
+    global_result = infer_global_correspondence_candidates(reactants, products)
+    scaffold_result = infer_scaffold_correspondence_candidates(
+        reactants,
+        products,
+    )
+
+    assert "GLOBAL_CORRESPONDENCE_UNSUPPORTED_DATIVE_BOND" in (
+        global_result.warnings
+    )
+    assert "SCAFFOLD_CORRESPONDENCE_UNSUPPORTED_DATIVE_BOND" in (
+        scaffold_result.warnings
+    )
 
 
 def test_unmapped_alkene_hydrogenation_receives_inferred_label() -> None:

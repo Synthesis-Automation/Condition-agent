@@ -157,6 +157,15 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.use_rxnmapper_check.toggled.connect(self._sync_rxnmapper_worker_setting)
         self._sync_rxnmapper_worker_setting(True)
 
+        self.options_widget = QtWidgets.QWidget()
+        self.options_widget.setObjectName("conversionOptions")
+        options_layout = QtWidgets.QHBoxLayout(self.options_widget)
+        options_layout.setContentsMargins(0, 0, 0, 0)
+        options_layout.addWidget(self.use_rxnmapper_check)
+        options_layout.addSpacing(16)
+        options_layout.addWidget(self.build_index_check)
+        options_layout.addStretch()
+
         self.start_button = QtWidgets.QPushButton("Generate Recommendation Data")
         self.start_button.setObjectName("generateButton")
         self.start_button.setDefault(True)
@@ -257,27 +266,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         settings_row.addWidget(self.worker_count_spin)
         settings_row.addStretch()
         form.addRow("Performance:", settings_row)
-        form.addRow("", self.use_rxnmapper_check)
-        form.addRow("", self.build_index_check)
+        form.addRow("Options:", self.options_widget)
         layout.addLayout(form)
-
-        outputs = QtWidgets.QLabel(
-            "Outputs: shard_manifest.json + compressed shards (canonical "
-            "recommendation data and restart checkpoints) • "
-            "reaction_review.csv (concise human review, including spectator "
-            "and local steric/electronic context) • "
-            "generic_index.sqlite (trusted lazy lookup) and, only when it adds "
-            "qualified precedents, generic_review_index.sqlite (expert "
-            "review-core lookup). "
-            "A duplicate merged "
-            "records file is not stored."
-        )
-        outputs.setWordWrap(True)
-        outputs.setStyleSheet(
-            "background: #eef4fa; border: 1px solid #ccd9e5; "
-            "color: #23313f; padding: 8px; border-radius: 4px;"
-        )
-        layout.addWidget(outputs)
 
         button_row = QtWidgets.QHBoxLayout()
         button_row.addWidget(self.start_button)

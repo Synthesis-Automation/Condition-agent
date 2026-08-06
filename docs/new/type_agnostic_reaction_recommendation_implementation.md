@@ -100,7 +100,7 @@ The current code declares:
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `3.3` |
 | Reaction discovery result / definition | `1.0` / `discovery_retrieval.v1@1.0` |
-| Reaction correspondence definitions | `2.5` |
+| Reaction correspondence definitions | `2.6` |
 | Generic retrieval definition | `1.8` |
 | Generic ranking definition | `1.1` |
 | Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1` |
