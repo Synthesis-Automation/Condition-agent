@@ -35,6 +35,7 @@ from reactive_taxonomy import (
 from rdkit import RDLogger
 
 from ..models import (
+    FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION,
     GENERIC_CONVERTER_DEFINITION_VERSION,
     RECOMMENDATION_RECORD_SCHEMA_VERSION,
 )
@@ -47,7 +48,7 @@ from .input_schema import (
 )
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v5.0"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v5.1"
 
 
 @dataclass(frozen=True)
@@ -87,6 +88,9 @@ def _definition_contract(
         "reaction_label_definition_versions": reaction_label_definition_versions(),
         "condition_registry_definition_versions": (
             condition_registry_definition_versions()
+        ),
+        "fragment_source_capability_definition_version": (
+            FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
         ),
         "sharded_conversion_definition_version": (
             SHARDED_CONVERSION_DEFINITION_VERSION

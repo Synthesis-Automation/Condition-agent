@@ -273,6 +273,48 @@ def validate_completion_selections(
             raise ValueError("completion substance is not valid for requirement")
 
 
+def build_completed_reaction_smiles(
+    reaction_smiles: str,
+    selections: tuple[ReactionCompletionSelection, ...],
+) -> tuple[str | None, tuple[str, ...]]:
+    """Build a hypothetical agent-completed query from exact source choices."""
+    source_smiles = []
+    warnings = []
+    for selection in selections:
+        if selection.selection_kind != "registered_substance":
+            continue
+        resolved = resolve_substance_id(str(selection.substance_id or ""))
+        smiles = (
+            str(resolved.substance.smiles or "").strip()
+            if resolved.status == "resolved" and resolved.substance is not None
+            else ""
+        )
+        if not smiles:
+            warnings.append(
+                "CONFIRMED_SOURCE_HAS_NO_REGISTERED_STRUCTURE:"
+                f"{selection.substance_id}"
+            )
+            continue
+        source_smiles.append(smiles)
+    if not source_smiles:
+        return None, tuple(warnings)
+
+    if ">>" in reaction_smiles:
+        reactants, products = reaction_smiles.split(">>", 1)
+        existing_agents = ""
+    else:
+        parts = reaction_smiles.split(">")
+        if len(parts) != 3:
+            raise ValueError("INVALID_REACTION_FORMAT")
+        reactants, existing_agents, products = parts
+    agents = ".".join(
+        value
+        for value in (existing_agents.strip(), *dict.fromkeys(source_smiles))
+        if value
+    )
+    return f"{reactants}>{agents}>{products}", tuple(warnings)
+
+
 def completion_payload(value: ReactionCompletionProposal) -> dict[str, Any]:
     """Serialize a completion proposal for recommendation results."""
     return asdict(value)
@@ -280,6 +322,7 @@ def completion_payload(value: ReactionCompletionProposal) -> dict[str, Any]:
 
 __all__ = [
     "build_completion_selection",
+    "build_completed_reaction_smiles",
     "build_reaction_completion_proposal",
     "completion_payload",
     "propose_reaction_completion",

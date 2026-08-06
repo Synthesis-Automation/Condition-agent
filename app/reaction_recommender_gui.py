@@ -28,6 +28,7 @@ from condition_recommender import (  # noqa: E402
     ReactionCompletionSelection,
     available_ranking_profiles,
     build_completion_selection,
+    build_completed_reaction_smiles,
     propose_reaction_completion,
     resolve_ranking_preferences,
 )
@@ -257,6 +258,11 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
             if isinstance(value, Mapping)
         )
         lines.append(f"Source completion: {selections}")
+    if result.effective_query_reaction_smiles:
+        lines.append(
+            "Completed query used: "
+            f"{result.effective_query_reaction_smiles}"
+        )
     lines.append(
         "Ranking profile: "
         f"{_display_name(preferences.get('profile_id'))}"
@@ -359,6 +365,11 @@ def _friendly_error(error: Any) -> str:
         ),
         "INCOMPATIBLE_REACTION_TAXONOMY_DEFINITIONS": (
             "The saved index uses older chemistry definitions. Rebuild it."
+        ),
+        "RECOMMENDATION_INDEX_REBUILD_REQUIRED_FOR_COMPLETION": (
+            "The confirmed source was applied and recommendation completed, "
+            "but this index predates fragment-source precedents. Rebuild the "
+            "recommendation artifacts and run the query again."
         ),
     }
     return messages.get(code, code.replace("_", " ").title())
@@ -545,9 +556,18 @@ class GenericRecommendationWorker(QtCore.QObject):
                 include_review=self.unrestricted_fallback,
             )
             self.progress.emit(
-                "Analyzing reaction with RXNMapper and ranking conditions…"
-                if self.use_rxnmapper
-                else "Analyzing reaction and ranking conditions…"
+                (
+                    "Analyzing completed reaction with RXNMapper and "
+                    "ranking conditions…"
+                    if self.use_rxnmapper
+                    else "Analyzing completed reaction and ranking conditions…"
+                )
+                if self.completion_selections
+                else (
+                    "Analyzing reaction with RXNMapper and ranking conditions…"
+                    if self.use_rxnmapper
+                    else "Analyzing reaction and ranking conditions…"
+                )
             )
             result = recommender.recommend(
                 self.reaction_smiles,
@@ -650,6 +670,13 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             "Enter reaction SMILES with product, for example: "
             "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
         )
+        self.completed_query_label = QtWidgets.QLabel("Completed query:")
+        self.completed_query_label.setObjectName("completedQueryLabel")
+        self.completed_query_edit = QtWidgets.QLineEdit()
+        self.completed_query_edit.setObjectName("completedReactionSmiles")
+        self.completed_query_edit.setReadOnly(True)
+        self.completed_query_label.setVisible(False)
+        self.completed_query_edit.setVisible(False)
 
         self.mode_combo = QtWidgets.QComboBox()
         self.mode_combo.setObjectName("analysisMode")
@@ -842,6 +869,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         reaction_row_label_layout.addWidget(self.mode_combo)
         reaction_row_label_layout.addWidget(QtWidgets.QLabel("Reaction SMILES:"))
         form.addRow(self.reaction_row_label, self.reaction_edit)
+        form.addRow(self.completed_query_label, self.completed_query_edit)
         options = QtWidgets.QHBoxLayout()
         options.addWidget(QtWidgets.QLabel("Top results"))
         options.addWidget(self.top_k_spin)
@@ -1144,6 +1172,9 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.results_table.setSortingEnabled(True)
         self.last_result = None
         self.export_button.setEnabled(False)
+        self.completed_query_edit.clear()
+        self.completed_query_label.setVisible(False)
+        self.completed_query_edit.setVisible(False)
         self.status_label.setText("Ready")
 
     @QtCore.pyqtSlot()
@@ -1187,6 +1218,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             return
 
         completion_selections: Tuple[ReactionCompletionSelection, ...] = ()
+        completed_query: Optional[str] = None
         if self.mode_combo.currentData() == "recommendation":
             try:
                 completion_proposal = propose_reaction_completion(reaction_smiles)
@@ -1208,8 +1240,16 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 ):
                     return
                 completion_selections = completion_dialog.selections
+                completed_query, _ = build_completed_reaction_smiles(
+                    reaction_smiles,
+                    completion_selections,
+                )
 
         self.clear_results()
+        if completed_query:
+            self.completed_query_edit.setText(completed_query)
+            self.completed_query_label.setVisible(True)
+            self.completed_query_edit.setVisible(True)
         self._render_reaction_graph(reaction_smiles)
         self.run_button.setEnabled(False)
         self.status_label.setText("Starting…")
@@ -1323,9 +1363,23 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             self.results_table.selectRow(0)
 
     def _render_result(self, result: GenericRecommendationResult) -> None:
-        self._render_reaction_graph(result.query_reaction_smiles)
+        if result.effective_query_reaction_smiles:
+            self.completed_query_edit.setText(
+                result.effective_query_reaction_smiles
+            )
+            self.completed_query_label.setVisible(True)
+            self.completed_query_edit.setVisible(True)
+        self._render_reaction_graph(
+            result.effective_query_reaction_smiles
+            or result.query_reaction_smiles
+        )
         if not result.valid:
-            self.status_label.setText("No recommendation")
+            self.status_label.setText(
+                "Completed — index rebuild required"
+                if result.error
+                == "RECOMMENDATION_INDEX_REBUILD_REQUIRED_FOR_COMPLETION"
+                else "No recommendation"
+            )
             summary = format_query_summary(result)
             self.summary_box.setPlainText(
                 f"{summary}\nRecommendation: {_friendly_error(result.error)}"

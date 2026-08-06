@@ -14,15 +14,16 @@ from condition_registry import (
     resolve_substance_id,
 )
 
-from .models import FragmentSourceSupport
+from .models import (
+    FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION,
+    FragmentSourceSupport,
+)
 
 
 _RULES_PATH = (
     Path(__file__).with_name("definitions")
     / "fragment_source_capabilities.v1.json"
 )
-_DEFINITION_VERSION = "fragment_source_capabilities.v1@1.2"
-
 _SOURCE_FIELD_EQUIVALENTS = {
     "catalysts_json": "catalyst_cas",
     "reagents_json": "reagent_cas",
@@ -255,7 +256,7 @@ def assess_fragment_source_support(
                     (confidence for _, _, _, confidence in matches),
                     default=0.0,
                 ),
-                definition_version=_DEFINITION_VERSION,
+                definition_version=FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION,
             )
         )
     return tuple(results)
@@ -292,6 +293,7 @@ def fragment_source_support_is_complete(
 
 __all__ = [
     "assess_fragment_source_support",
+    "FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION",
     "fragment_source_support_is_complete",
     "load_fragment_source_capabilities",
     "matching_fragment_source_capabilities",

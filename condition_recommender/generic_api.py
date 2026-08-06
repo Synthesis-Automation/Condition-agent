@@ -42,16 +42,39 @@ from .hypothesis_retrieval import (
 )
 from .models import (
     ChemistRankingPreferences,
+    FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION,
     GenericRecommendationResult,
     PrecedentIndexScope,
     ReactionCompletionSelection,
 )
 from .reaction_completion import (
+    build_completed_reaction_smiles,
     build_reaction_completion_proposal,
     validate_completion_selections,
 )
 from .ranking_preferences import resolve_ranking_preferences
 from .recipe_ranking import rank_condition_recipes
+
+
+def _fragment_source_artifact_is_current(source: Path) -> bool | None:
+    manifest_path = (
+        source
+        if source.name.casefold() == "shard_manifest.json"
+        else source.parent / "shard_manifest.json"
+    )
+    if not manifest_path.is_file():
+        return None
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    definition_contract = manifest.get("definition_contract") or {}
+    return str(
+        definition_contract.get(
+            "fragment_source_capability_definition_version"
+        )
+        or ""
+    ) == FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
 
 
 def _reaction_label_payload(analysis: Any) -> Dict[str, Any]:
@@ -227,6 +250,7 @@ class GenericConditionRecommender:
     mapping_provider: AtomMappingProvider | None = None
     includes_review_precedents: bool = False
     review_index_reuses_trusted: bool = False
+    fragment_source_artifact_current: bool | None = None
 
     @classmethod
     def from_path(
@@ -311,6 +335,9 @@ class GenericConditionRecommender:
             mapping_provider=mapping_provider,
             includes_review_precedents=include_review,
             review_index_reuses_trusted=review_index_reuses_trusted,
+            fragment_source_artifact_current=(
+                _fragment_source_artifact_is_current(source)
+            ),
         )
 
     def recommend(
@@ -339,6 +366,32 @@ class GenericConditionRecommender:
             result,
             ranking_preferences=resolved_preferences.to_dict(),
         )
+        if (
+            completion_selections
+            and self.fragment_source_artifact_current is False
+        ):
+            result = replace(
+                result,
+                error=(
+                    "RECOMMENDATION_INDEX_REBUILD_REQUIRED_FOR_COMPLETION"
+                    if not result.valid
+                    and result.error
+                    in {
+                        "NO_SAFE_FALLBACK_PRECEDENT",
+                        "INDEX_HAS_NO_FALLBACK_DESCRIPTORS",
+                    }
+                    else result.error
+                ),
+                warnings=tuple(
+                    dict.fromkeys(
+                        (
+                            *result.warnings,
+                            "RECOMMENDATION_ARTIFACT_PREDATES_"
+                            "FRAGMENT_SOURCE_COMPLETION",
+                        )
+                    )
+                ),
+            )
         if self.includes_review_precedents:
             review_warning = (
                 "UNRESTRICTED_MODE_REUSES_TRUSTED_INDEX"
@@ -385,12 +438,24 @@ def _recommend_with_index(
             completion_proposal,
             completion_selections,
         )
+    effective_reaction_smiles, completion_build_warnings = (
+        build_completed_reaction_smiles(
+            reaction_smiles,
+            completion_selections,
+        )
+    )
+    analysis_reaction_smiles = effective_reaction_smiles or reaction_smiles
+    query_analysis = (
+        featurize_reaction(analysis_reaction_smiles)
+        if effective_reaction_smiles is not None
+        else base_analysis
+    )
     mapping_skip_warning = None
-    fallback_descriptor = base_analysis.fallback_descriptor
+    fallback_descriptor = query_analysis.fallback_descriptor
     if (
         mapping_provider is not None
         and fallback_descriptor is not None
-        and base_analysis.partial_product_transformation is not None
+        and query_analysis.partial_product_transformation is not None
         and fallback_descriptor.retrieval_eligible
     ):
         mapping_skip_warning = (
@@ -410,13 +475,13 @@ def _recommend_with_index(
         )
     assessment = (
         analyze_reaction_with_external_mapping(
-            reaction_smiles,
+            analysis_reaction_smiles,
             mapping_provider,
-            base_analysis=base_analysis,
+            base_analysis=query_analysis,
         )
         if (
             mapping_provider is not None
-            and base_analysis.valid
+            and query_analysis.valid
             and mapping_skip_warning is None
         )
         else None
@@ -425,6 +490,7 @@ def _recommend_with_index(
     def finalize(result: GenericRecommendationResult) -> GenericRecommendationResult:
         attached = _attach_external_mapping_assessment(result, assessment)
         warnings = list(attached.warnings)
+        warnings.extend(completion_build_warnings)
         if mapping_skip_warning is not None:
             warnings.append(mapping_skip_warning)
         if completion_proposal is not None and completion_proposal.requirements:
@@ -451,6 +517,8 @@ def _recommend_with_index(
                 warnings.append("QUERY_SOURCE_LEFT_UNRESOLVED")
         if completion_selections:
             warnings.append("REACTION_COMPLETION_SELECTION_RECORDED")
+            if effective_reaction_smiles is not None:
+                warnings.append("REACTION_COMPLETION_SHADOW_QUERY_USED")
             selection_cautions.extend(
                 (
                     "A missing condition source was confirmed or edited by the "
@@ -471,6 +539,8 @@ def _recommend_with_index(
         )
         return replace(
             attached,
+            query_reaction_smiles=reaction_smiles,
+            effective_query_reaction_smiles=effective_reaction_smiles,
             completion_proposal=(
                 completion_proposal.to_dict()
                 if completion_proposal is not None
@@ -484,7 +554,7 @@ def _recommend_with_index(
             warnings=tuple(dict.fromkeys(warnings)),
         )
 
-    analysis = assessment.analysis if assessment is not None else base_analysis
+    analysis = assessment.analysis if assessment is not None else query_analysis
     if not analysis.valid:
         return GenericRecommendationResult(
             reaction_smiles,

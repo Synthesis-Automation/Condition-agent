@@ -4,6 +4,7 @@ import pytest
 
 from condition_recommender import (
     build_completion_selection,
+    build_completed_reaction_smiles,
     propose_reaction_completion,
 )
 
@@ -50,6 +51,32 @@ def test_edited_known_identifier_resolves_without_rewriting_query() -> None:
     assert selection.provenance == "user_edited"
     assert selection.substance_id == "cas:26628-22-8"
     assert selection.raw_identifier == "26628-22-8"
+    assert proposal.query_reaction_smiles == _COUNTERION_AZIDATION_QUERY
+
+
+def test_confirmed_sodium_azide_builds_separate_completed_query() -> None:
+    proposal = propose_reaction_completion(_COUNTERION_AZIDATION_QUERY)
+    requirement = proposal.requirements[0]
+    sodium_azide = next(
+        value
+        for value in requirement.options
+        if value.substance_id == "cas:26628-22-8"
+    )
+    selection = build_completion_selection(
+        proposal,
+        requirement.requirement_id,
+        option_id=sodium_azide.option_id,
+    )
+
+    completed, warnings = build_completed_reaction_smiles(
+        _COUNTERION_AZIDATION_QUERY,
+        (selection,),
+    )
+
+    assert completed is not None
+    assert ">[Na+].[N-]=[N+]=[N-]>" in completed
+    assert completed != _COUNTERION_AZIDATION_QUERY
+    assert warnings == ()
     assert proposal.query_reaction_smiles == _COUNTERION_AZIDATION_QUERY
 
 

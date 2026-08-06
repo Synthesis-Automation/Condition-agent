@@ -11,8 +11,11 @@ RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.0"
 GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.0"
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
-GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.2"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.3"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
+FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
+    "fragment_source_capabilities.v1@1.2"
+)
 
 
 class AdmissionTier(str, Enum):
@@ -158,7 +161,7 @@ class FragmentSourceSupport:
     capability_ids: Tuple[str, ...] = ()
     evidence: Tuple[str, ...] = ()
     confidence: float = 0.0
-    definition_version: str = "fragment_source_capabilities.v1@1.2"
+    definition_version: str = FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
     schema_version: str = "1.0"
 
     def to_dict(self) -> Dict[str, Any]:
@@ -210,7 +213,7 @@ class ReactionCompletionProposal:
     requirements: Tuple[ReactionCompletionRequirement, ...] = ()
     warnings: Tuple[str, ...] = ()
     provenance: Literal["system_proposed"] = "system_proposed"
-    definition_version: str = "fragment_source_capabilities.v1@1.2"
+    definition_version: str = FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
     schema_version: str = REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION
 
     def to_dict(self) -> Dict[str, Any]:
@@ -396,6 +399,7 @@ class GenericRecommendationResult:
 
     query_reaction_smiles: str
     valid: bool
+    effective_query_reaction_smiles: Optional[str] = None
     query_signature_id: Optional[str] = None
     query_reaction_core_id: Optional[str] = None
     query_fallback_descriptor_id: Optional[str] = None

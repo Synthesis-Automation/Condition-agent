@@ -1018,8 +1018,8 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
 
     monkeypatch.setattr(
         sharded_module,
-        "reaction_label_definition_versions",
-        lambda: {"chemist_notation.v1.json": "changed"},
+        "FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION",
+        "fragment_source_capabilities.v1@changed",
     )
     invalidated = convert_datasets_sharded(
         dataset,
@@ -1030,6 +1030,9 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     assert invalidated["reused_shard_count"] == 0
 
     manifest = json.loads((output / "shard_manifest.json").read_text())
+    assert manifest["definition_contract"][
+        "fragment_source_capability_definition_version"
+    ] == "fragment_source_capabilities.v1@changed"
     first_shard = output / manifest["shards"][0]["output_path"]
     first_shard.write_bytes(first_shard.read_bytes() + b"tamper")
     integrity = validate_sharded_conversion(

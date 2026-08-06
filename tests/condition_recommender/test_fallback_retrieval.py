@@ -318,6 +318,8 @@ def test_confirmed_azide_substance_filters_source_supported_precedents() -> None
     assert result.candidate_count == 1
     assert result.completion_proposal is not None
     assert result.completion_selections[0]["substance_id"] == "cas:26628-22-8"
+    assert result.effective_query_reaction_smiles is not None
+    assert ">[Na+].[N-]=[N+]=[N-]>" in result.effective_query_reaction_smiles
     assert "QUERY_SOURCE_SUBSTANCE_USER_CONFIRMED:cas:26628-22-8" in (
         result.warnings
     )
@@ -329,6 +331,43 @@ def test_confirmed_azide_substance_filters_source_supported_precedents() -> None
     assert any(
         "not observed in the submitted reaction" in caution
         for caution in result.recommendations[0].cautions
+    )
+
+
+def test_stale_index_reports_rebuild_after_completion_selection() -> None:
+    from condition_recommender import (
+        build_completion_selection,
+        propose_reaction_completion,
+    )
+
+    proposal = propose_reaction_completion(_COUNTERION_AZIDATION_QUERY)
+    requirement = proposal.requirements[0]
+    sodium_azide = next(
+        value
+        for value in requirement.options
+        if value.substance_id == "cas:26628-22-8"
+    )
+    selection = build_completion_selection(
+        proposal,
+        requirement.requirement_id,
+        option_id=sodium_azide.option_id,
+    )
+    recommender = GenericConditionRecommender(
+        build_generic_index([]),
+        fragment_source_artifact_current=False,
+    )
+
+    result = recommender.recommend(
+        _COUNTERION_AZIDATION_QUERY,
+        completion_selections=(selection,),
+    )
+
+    assert not result.valid
+    assert result.error == (
+        "RECOMMENDATION_INDEX_REBUILD_REQUIRED_FOR_COMPLETION"
+    )
+    assert "RECOMMENDATION_ARTIFACT_PREDATES_FRAGMENT_SOURCE_COMPLETION" in (
+        result.warnings
     )
 
 

@@ -48,6 +48,7 @@ from .ranking_preferences import (
 )
 from .reaction_completion import (
     build_completion_selection,
+    build_completed_reaction_smiles,
     propose_reaction_completion,
 )
 
@@ -89,6 +90,7 @@ __all__ = [
     "load_discovery_rules",
     "resolve_ranking_preferences",
     "build_completion_selection",
+    "build_completed_reaction_smiles",
     "propose_reaction_completion",
     "assess_recipe_compatibility",
     "assess_core_eligibility",

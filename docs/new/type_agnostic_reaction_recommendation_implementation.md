@@ -98,7 +98,7 @@ The current code declares:
 | Recommendation artifact workflow | `2.1` |
 | Generic persisted index | `6.0` |
 | SQLite index storage | `1.0` |
-| Generic recommendation result | `3.2` |
+| Generic recommendation result | `3.3` |
 | Reaction discovery result / definition | `1.0` / `discovery_retrieval.v1@1.0` |
 | Reaction correspondence definitions | `2.5` |
 | Generic retrieval definition | `1.8` |

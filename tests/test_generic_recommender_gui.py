@@ -190,6 +190,7 @@ def test_window_uses_literature_recommendation_data_by_default(
     assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
     assert window.unrestricted_fallback_check.objectName() == "unrestrictedFallback"
     assert window.reaction_edit.metaObject().className() == "QLineEdit"
+    assert not window.completed_query_edit.isVisible()
     assert window.mode_combo.parentWidget() == window.reaction_row_label
     assert window.reaction_row_label.layout().indexOf(window.mode_combo) == 0
     assert window.summary_box.height() == 168
@@ -534,12 +535,33 @@ def test_query_summary_discloses_completion_provenance() -> None:
                 "provenance": "user_confirmed",
             },
         ),
+        effective_query_reaction_smiles="A>[Na+].[N-]=[N+]=[N-]>P",
     )
 
     summary = gui.format_query_summary(result)
 
     assert "Missing source requirement: *N=[N+]=[N-]" in summary
     assert "Source completion: NaN3 [User Confirmed]" in summary
+    assert "Completed query used: A>[Na+].[N-]=[N+]=[N-]>P" in summary
+
+
+def test_stale_completion_result_reports_rebuild_status(qtbot) -> None:
+    window = gui.GenericRecommenderWindow()
+    qtbot.addWidget(window)
+    result = replace(
+        _result(),
+        valid=False,
+        effective_query_reaction_smiles="A>[Na+].[N-]=[N+]=[N-]>P",
+        recommendations=(),
+        error="RECOMMENDATION_INDEX_REBUILD_REQUIRED_FOR_COMPLETION",
+    )
+
+    window._render_result(result)
+
+    assert window.status_label.text() == "Completed — index rebuild required"
+    assert "confirmed source was applied" in window.summary_box.toPlainText()
+    assert window.completed_query_edit.text() == "A>[Na+].[N-]=[N+]=[N-]>P"
+    assert not window.completed_query_edit.isHidden()
 
 
 def test_window_requests_vector_reaction_drawing(qtbot, monkeypatch) -> None:
