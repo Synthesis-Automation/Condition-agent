@@ -26,6 +26,10 @@ from .models import (
     OutcomeStatus,
     PrecedentIndexScope,
     PrecedentTier,
+    ReactionCompletionOption,
+    ReactionCompletionProposal,
+    ReactionCompletionRequirement,
+    ReactionCompletionSelection,
     ReferenceIdentity,
     RecommendationRecord,
     RecommendationScoreTrace,
@@ -41,6 +45,10 @@ from .ranking_preferences import (
     available_ranking_profiles,
     load_chemist_ranking_profiles,
     resolve_ranking_preferences,
+)
+from .reaction_completion import (
+    build_completion_selection,
+    propose_reaction_completion,
 )
 
 __all__ = [
@@ -65,6 +73,10 @@ __all__ = [
     "OutcomeStatus",
     "PrecedentIndexScope",
     "PrecedentTier",
+    "ReactionCompletionOption",
+    "ReactionCompletionProposal",
+    "ReactionCompletionRequirement",
+    "ReactionCompletionSelection",
     "ReferenceIdentity",
     "RecommendationRecord",
     "RecommendationScoreTrace",
@@ -76,6 +88,8 @@ __all__ = [
     "load_chemist_ranking_profiles",
     "load_discovery_rules",
     "resolve_ranking_preferences",
+    "build_completion_selection",
+    "propose_reaction_completion",
     "assess_recipe_compatibility",
     "assess_core_eligibility",
 ]

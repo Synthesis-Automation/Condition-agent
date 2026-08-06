@@ -4,14 +4,15 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Literal, Optional, Tuple
 
 
 RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.0"
 GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.0"
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
-GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.1"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.2"
+REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 
 
 class AdmissionTier(str, Enum):
@@ -157,8 +158,101 @@ class FragmentSourceSupport:
     capability_ids: Tuple[str, ...] = ()
     evidence: Tuple[str, ...] = ()
     confidence: float = 0.0
-    definition_version: str = "fragment_source_capabilities.v1@1.0"
+    definition_version: str = "fragment_source_capabilities.v1@1.2"
     schema_version: str = "1.0"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ReactionCompletionOption:
+    """One curated way to satisfy a product-fragment source requirement."""
+
+    option_id: str
+    option_kind: Literal[
+        "compatible_source_class",
+        "registered_substance",
+        "unresolved",
+    ]
+    display_name: str
+    capability_id: Optional[str] = None
+    substance_id: Optional[str] = None
+    canonical_name: Optional[str] = None
+    schema_version: str = REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION
+
+
+@dataclass(frozen=True)
+class ReactionCompletionRequirement:
+    """A structural source gap and the curated choices that may satisfy it."""
+
+    requirement_id: str
+    fragment_key: str
+    canonical_fragment_smiles: str
+    rooted_fragment_smiles: str
+    element_counts: Dict[str, int]
+    attachment_element: str
+    options: Tuple[ReactionCompletionOption, ...]
+    schema_version: str = REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION
+
+
+@dataclass(frozen=True)
+class ReactionCompletionProposal:
+    """System-proposed condition-source completion for an incomplete query."""
+
+    query_reaction_smiles: str
+    proposal_id: str
+    status: Literal[
+        "not_required",
+        "confirmation_recommended",
+        "no_curated_source_options",
+    ]
+    requirements: Tuple[ReactionCompletionRequirement, ...] = ()
+    warnings: Tuple[str, ...] = ()
+    provenance: Literal["system_proposed"] = "system_proposed"
+    definition_version: str = "fragment_source_capabilities.v1@1.2"
+    schema_version: str = REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ReactionCompletionSelection:
+    """A user decision about one system-proposed source requirement."""
+
+    proposal_id: str
+    requirement_id: str
+    selection_kind: Literal[
+        "compatible_source_class",
+        "registered_substance",
+        "custom_identifier",
+        "unresolved",
+    ]
+    provenance: Literal["user_confirmed", "user_edited"]
+    display_name: str
+    capability_id: Optional[str] = None
+    substance_id: Optional[str] = None
+    raw_identifier: Optional[str] = None
+    resolved: bool = False
+    schema_version: str = REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.proposal_id or not self.requirement_id:
+            raise ValueError("completion selection requires proposal and requirement IDs")
+        if (
+            self.selection_kind == "compatible_source_class"
+            and not self.capability_id
+        ):
+            raise ValueError("compatible source selection requires a capability ID")
+        if self.selection_kind == "registered_substance" and (
+            not self.capability_id or not self.substance_id or not self.resolved
+        ):
+            raise ValueError(
+                "registered source selection requires resolved capability and substance IDs"
+            )
+        if self.selection_kind == "custom_identifier" and not self.raw_identifier:
+            raise ValueError("custom source selection requires a raw identifier")
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -315,6 +409,8 @@ class GenericRecommendationResult:
     transformation_class: Optional[str] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
     reaction_partners: Tuple[Dict[str, Any], ...] = ()
+    completion_proposal: Optional[Dict[str, Any]] = None
+    completion_selections: Tuple[Dict[str, Any], ...] = ()
     ranking_preferences: Dict[str, Any] = field(default_factory=dict)
     retrieval_definition_version: str = ""
     retrieval_strategy: str = "hybrid"

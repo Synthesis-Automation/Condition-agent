@@ -21,7 +21,7 @@ _RULES_PATH = (
     Path(__file__).with_name("definitions")
     / "fragment_source_capabilities.v1.json"
 )
-_DEFINITION_VERSION = "fragment_source_capabilities.v1@1.1"
+_DEFINITION_VERSION = "fragment_source_capabilities.v1@1.2"
 
 _SOURCE_FIELD_EQUIVALENTS = {
     "catalysts_json": "catalyst_cas",
@@ -65,6 +65,10 @@ def load_fragment_source_capabilities() -> dict[str, Any]:
         if not capability_id or capability_id in seen:
             raise ValueError("fragment-source capability IDs must be unique")
         seen.add(capability_id)
+        if not str(capability.get("display_name") or "").strip():
+            raise ValueError(
+                f"fragment-source capability {capability_id} needs a display name"
+            )
         match = capability.get("match")
         if not isinstance(match, Mapping) or not match:
             raise ValueError(
@@ -257,6 +261,18 @@ def assess_fragment_source_support(
     return tuple(results)
 
 
+def matching_fragment_source_capabilities(
+    requirement: Any,
+) -> Tuple[dict[str, Any], ...]:
+    """Return deterministic curated capabilities matching one source gap."""
+    requirement_mapping = _mapping(requirement)
+    return tuple(
+        dict(capability)
+        for capability in load_fragment_source_capabilities()["capabilities"]
+        if _requirement_matches(requirement_mapping, capability["match"])
+    )
+
+
 def fragment_source_support_is_complete(
     requirements: Iterable[Any],
     supports: Iterable[FragmentSourceSupport | Mapping[str, Any]],
@@ -278,4 +294,5 @@ __all__ = [
     "assess_fragment_source_support",
     "fragment_source_support_is_complete",
     "load_fragment_source_capabilities",
+    "matching_fragment_source_capabilities",
 ]

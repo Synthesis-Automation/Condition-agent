@@ -92,13 +92,18 @@ def _acyl_fluoride_precedent(index: int, reaction_smiles: str) -> dict:
     return convert_record(record).to_dict()
 
 
-def _azidation_precedent(index: int, reaction_smiles: str) -> dict:
+def _azidation_precedent(
+    index: int,
+    reaction_smiles: str,
+    *,
+    reagent_cas: str = "26628-22-8",
+) -> dict:
     record = adapt_row(
         {
             "reaction_id": f"azidation-{index}",
             "reaction_smiles": reaction_smiles,
             "yield_pct": str(90 - index),
-            "reagent_cas": "26628-22-8",
+            "reagent_cas": reagent_cas,
             "solvent_cas": "67-64-1",
             "reference": f"Independent azidation reference {index}",
         },
@@ -269,6 +274,62 @@ def test_counterion_azidation_reaches_source_supported_recommendation() -> None:
     assert len(result.recommendations) == 1
     assert result.recommendations[0].reference_support == 2
     assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:N,N,N" in result.warnings
+
+
+def test_confirmed_azide_substance_filters_source_supported_precedents() -> None:
+    from condition_recommender import (
+        build_completion_selection,
+        propose_reaction_completion,
+    )
+
+    records = [
+        _azidation_precedent(
+            1,
+            "COC(=O)c1c(F)c(F)c(F)c(F)c1F"
+            ">>COC(=O)c1c(F)c(F)c(N=[N+]=[N-])c(F)c1F",
+        ),
+        _azidation_precedent(
+            2,
+            "Fc1ccc(C#N)cc1>>[N-]=[N+]=Nc1ccc(C#N)cc1",
+            reagent_cas="4648-54-8",
+        ),
+    ]
+    proposal = propose_reaction_completion(_COUNTERION_AZIDATION_QUERY)
+    requirement = proposal.requirements[0]
+    sodium_azide = next(
+        value
+        for value in requirement.options
+        if value.substance_id == "cas:26628-22-8"
+    )
+    selection = build_completion_selection(
+        proposal,
+        requirement.requirement_id,
+        option_id=sodium_azide.option_id,
+    )
+
+    result = GenericConditionRecommender(
+        build_generic_index(records)
+    ).recommend(
+        _COUNTERION_AZIDATION_QUERY,
+        completion_selections=(selection,),
+    )
+
+    assert result.valid
+    assert result.candidate_count == 1
+    assert result.completion_proposal is not None
+    assert result.completion_selections[0]["substance_id"] == "cas:26628-22-8"
+    assert "QUERY_SOURCE_SUBSTANCE_USER_CONFIRMED:cas:26628-22-8" in (
+        result.warnings
+    )
+    assert result.query_reaction_smiles == _COUNTERION_AZIDATION_QUERY
+    assert all(
+        "sodium" not in caution.lower() or "observed" not in caution.lower()
+        for caution in result.recommendations[0].cautions
+    )
+    assert any(
+        "not observed in the submitted reaction" in caution
+        for caution in result.recommendations[0].cautions
+    )
 
 
 def test_partial_fluorination_without_capable_source_is_not_indexed() -> None:

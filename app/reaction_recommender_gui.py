@@ -24,7 +24,11 @@ from condition_recommender import (  # noqa: E402
     ReactionDiscoveryExplorer,
     ReactionDiscoveryHit,
     ReactionDiscoveryResult,
+    ReactionCompletionProposal,
+    ReactionCompletionSelection,
     available_ranking_profiles,
+    build_completion_selection,
+    propose_reaction_completion,
     resolve_ranking_preferences,
 )
 from reactive_taxonomy import (  # noqa: E402
@@ -236,6 +240,23 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
         ),
     ]
     preferences = result.ranking_preferences or {}
+    proposal = result.completion_proposal or {}
+    requirements = tuple(proposal.get("requirements") or ())
+    if requirements:
+        fragments = ", ".join(
+            str(value.get("rooted_fragment_smiles") or value.get("fragment_key") or "")
+            for value in requirements
+            if isinstance(value, Mapping)
+        )
+        lines.append(f"Missing source requirement: {fragments}")
+    if result.completion_selections:
+        selections = ", ".join(
+            f"{value.get('display_name') or 'Unresolved'} "
+            f"[{_display_name(value.get('provenance'))}]"
+            for value in result.completion_selections
+            if isinstance(value, Mapping)
+        )
+        lines.append(f"Source completion: {selections}")
     lines.append(
         "Ranking profile: "
         f"{_display_name(preferences.get('profile_id'))}"
@@ -401,6 +422,90 @@ class RankingPreferencesDialog(QtWidgets.QDialog):
         self.accept()
 
 
+class CompletionSourceDialog(QtWidgets.QDialog):
+    """Collect explicit user decisions for proposed missing condition sources."""
+
+    def __init__(
+        self,
+        proposal: ReactionCompletionProposal,
+        parent: Optional[QtWidgets.QWidget] = None,
+    ) -> None:
+        super().__init__(parent)
+        self.proposal = proposal
+        self.setWindowTitle("Confirm missing reaction source")
+        self.setModal(True)
+        self.source_combos: Dict[str, QtWidgets.QComboBox] = {}
+
+        layout = QtWidgets.QVBoxLayout(self)
+        note = QtWidgets.QLabel(
+            "The product contains atoms not present in the submitted reactants. "
+            "Confirm a condition source for recommendation filtering. The "
+            "reaction SMILES will remain unchanged."
+        )
+        note.setWordWrap(True)
+        layout.addWidget(note)
+        form = QtWidgets.QFormLayout()
+        for requirement in proposal.requirements:
+            combo = QtWidgets.QComboBox()
+            combo.setObjectName(
+                f"completionSource_{requirement.requirement_id}"
+            )
+            combo.setEditable(True)
+            combo.setInsertPolicy(QtWidgets.QComboBox.InsertPolicy.NoInsert)
+            for option in requirement.options:
+                combo.addItem(option.display_name, option.option_id)
+            combo.setToolTip(
+                "Choose a curated source class or substance, type another "
+                "identifier, or leave the source unresolved."
+            )
+            form.addRow(
+                f"Installed fragment {requirement.rooted_fragment_smiles}:",
+                combo,
+            )
+            self.source_combos[requirement.requirement_id] = combo
+        layout.addLayout(form)
+        buttons = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok
+            | QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText(
+            "Use selection"
+        )
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    @property
+    def selections(self) -> Tuple[ReactionCompletionSelection, ...]:
+        selections = []
+        for requirement in self.proposal.requirements:
+            combo = self.source_combos[requirement.requirement_id]
+            current_text = combo.currentText().strip()
+            current_index = combo.currentIndex()
+            selected_text = (
+                combo.itemText(current_index).strip()
+                if current_index >= 0
+                else ""
+            )
+            if current_index >= 0 and current_text == selected_text:
+                selections.append(
+                    build_completion_selection(
+                        self.proposal,
+                        requirement.requirement_id,
+                        option_id=str(combo.currentData()),
+                    )
+                )
+            else:
+                selections.append(
+                    build_completion_selection(
+                        self.proposal,
+                        requirement.requirement_id,
+                        custom_identifier=current_text,
+                    )
+                )
+        return tuple(selections)
+
+
 class GenericRecommendationWorker(QtCore.QObject):
     """Load the index and recommend outside the Qt event loop."""
 
@@ -417,6 +522,7 @@ class GenericRecommendationWorker(QtCore.QObject):
         unrestricted_fallback: bool = False,
         use_rxnmapper: bool = True,
         ranking_preferences: ChemistRankingPreferences | None = None,
+        completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
     ) -> None:
         super().__init__()
         self.data_path = data_path
@@ -426,6 +532,7 @@ class GenericRecommendationWorker(QtCore.QObject):
         self.unrestricted_fallback = unrestricted_fallback
         self.use_rxnmapper = use_rxnmapper
         self.ranking_preferences = ranking_preferences
+        self.completion_selections = completion_selections
 
     @QtCore.pyqtSlot()
     def run(self) -> None:
@@ -448,6 +555,7 @@ class GenericRecommendationWorker(QtCore.QObject):
                 minimum_pool_size=self.minimum_pool_size,
                 unrestricted_fallback=self.unrestricted_fallback,
                 ranking_preferences=self.ranking_preferences,
+                completion_selections=self.completion_selections,
             )
         except Exception as exc:
             self.finished.emit(
@@ -1078,6 +1186,29 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             )
             return
 
+        completion_selections: Tuple[ReactionCompletionSelection, ...] = ()
+        if self.mode_combo.currentData() == "recommendation":
+            try:
+                completion_proposal = propose_reaction_completion(reaction_smiles)
+            except ValueError as exc:
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Reaction could not be analyzed",
+                    str(exc),
+                )
+                return
+            if completion_proposal.requirements:
+                completion_dialog = CompletionSourceDialog(
+                    completion_proposal,
+                    parent=self,
+                )
+                if (
+                    completion_dialog.exec()
+                    != QtWidgets.QDialog.DialogCode.Accepted
+                ):
+                    return
+                completion_selections = completion_dialog.selections
+
         self.clear_results()
         self._render_reaction_graph(reaction_smiles)
         self.run_button.setEnabled(False)
@@ -1107,6 +1238,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 unrestricted_fallback=(self.unrestricted_fallback_check.isChecked()),
                 use_rxnmapper=self.use_rxnmapper_check.isChecked(),
                 ranking_preferences=self._ranking_preferences(),
+                completion_selections=completion_selections,
             )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)

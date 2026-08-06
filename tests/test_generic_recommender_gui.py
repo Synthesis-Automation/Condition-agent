@@ -289,6 +289,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
             minimum_pool_size,
             unrestricted_fallback,
             ranking_preferences,
+            completion_selections,
         ):
             calls.append(
                 (
@@ -297,6 +298,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
                     minimum_pool_size,
                     unrestricted_fallback,
                     ranking_preferences,
+                    completion_selections,
                 )
             )
             return expected
@@ -328,7 +330,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
 
     assert calls == [
         ("index_options", True, True),
-        ("A.B>>P", 3, 2, True, None),
+        ("A.B>>P", 3, 2, True, None, ()),
     ]
     assert len(progress) == 2
     assert finished == [(True, expected, "")]
@@ -489,6 +491,55 @@ def test_query_summary_discloses_external_mapping_provenance() -> None:
     assert "External Mapping Internal Consensus" in summary
     assert "provider rxnmapper" in summary
     assert "confidence 0.656" in summary
+
+
+def test_completion_dialog_records_confirmed_and_edited_sources(qtbot) -> None:
+    reaction = (
+        "C=Cn1cc[n+](Cc2c(F)c(F)c(F)c(F)c2F)c1.[Br-]"
+        ">>C=Cn1cc[n+](Cc2c(F)c(F)c(N=[N+]=[N-])c(F)c2F)c1.[Br-]"
+    )
+    proposal = gui.propose_reaction_completion(reaction)
+    dialog = gui.CompletionSourceDialog(proposal)
+    qtbot.addWidget(dialog)
+    requirement = proposal.requirements[0]
+    combo = dialog.source_combos[requirement.requirement_id]
+
+    sodium_index = next(
+        index
+        for index, option in enumerate(requirement.options)
+        if option.substance_id == "cas:26628-22-8"
+    )
+    combo.setCurrentIndex(sodium_index)
+    confirmed = dialog.selections[0]
+    assert confirmed.provenance == "user_confirmed"
+    assert confirmed.substance_id == "cas:26628-22-8"
+
+    combo.setEditText("26628-22-8")
+    edited = dialog.selections[0]
+    assert edited.provenance == "user_edited"
+    assert edited.substance_id == "cas:26628-22-8"
+
+
+def test_query_summary_discloses_completion_provenance() -> None:
+    result = replace(
+        _result(),
+        completion_proposal={
+            "requirements": (
+                {"rooted_fragment_smiles": "*N=[N+]=[N-]"},
+            )
+        },
+        completion_selections=(
+            {
+                "display_name": "NaN3",
+                "provenance": "user_confirmed",
+            },
+        ),
+    )
+
+    summary = gui.format_query_summary(result)
+
+    assert "Missing source requirement: *N=[N+]=[N-]" in summary
+    assert "Source completion: NaN3 [User Confirmed]" in summary
 
 
 def test_window_requests_vector_reaction_drawing(qtbot, monkeypatch) -> None:

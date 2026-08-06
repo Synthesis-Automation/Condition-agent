@@ -26,6 +26,8 @@ def retrieve_fallback_pool_with_trace(
     *,
     minimum_pool_size: int | None = None,
     unrestricted: bool = False,
+    required_source_capability_ids: Mapping[str, str] | None = None,
+    required_source_substance_ids: Mapping[str, str] | None = None,
 ) -> CompatibleRetrievalResult:
     """Retrieve precedents without asserting query bond edits.
 
@@ -80,17 +82,44 @@ def retrieve_fallback_pool_with_trace(
         for value in descriptor.get("source_requirements") or ()
         if isinstance(value, Mapping)
     }
+    capability_constraints = dict(required_source_capability_ids or {})
+    substance_constraints = dict(required_source_substance_ids or {})
+
+    def supports_selected_sources(row: Any) -> bool:
+        supports = {
+            str(value.get("requirement_id") or ""): value
+            for value in row.fragment_source_support
+            if str(value.get("status") or "") == "supported"
+        }
+        if required_source_ids and not unrestricted and not (
+            required_source_ids <= set(supports)
+        ):
+            return False
+        for requirement_id, capability_id in capability_constraints.items():
+            support = supports.get(requirement_id, {})
+            if capability_id not in {
+                str(value) for value in support.get("capability_ids") or ()
+            }:
+                return False
+        for requirement_id, substance_id in substance_constraints.items():
+            support = supports.get(requirement_id, {})
+            if substance_id not in {
+                str(value)
+                for value in support.get("component_substance_ids") or ()
+            }:
+                return False
+        return True
+
     source_excluded_count = 0
-    if required_source_ids and not unrestricted:
+    if (
+        (required_source_ids and not unrestricted)
+        or capability_constraints
+        or substance_constraints
+    ):
         source_supported_rows = tuple(
             row
             for row in raw_rows
-            if required_source_ids
-            <= {
-                str(value.get("requirement_id") or "")
-                for value in row.fragment_source_support
-                if str(value.get("status") or "") == "supported"
-            }
+            if supports_selected_sources(row)
         )
         source_excluded_count = len(raw_rows) - len(source_supported_rows)
     else:

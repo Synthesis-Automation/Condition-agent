@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
-from typing import Any, Dict, Mapping
+from typing import Any, Dict, Mapping, Tuple
 
 from reactive_taxonomy import (
     AtomMappingProvider,
@@ -44,6 +44,11 @@ from .models import (
     ChemistRankingPreferences,
     GenericRecommendationResult,
     PrecedentIndexScope,
+    ReactionCompletionSelection,
+)
+from .reaction_completion import (
+    build_reaction_completion_proposal,
+    validate_completion_selections,
 )
 from .ranking_preferences import resolve_ranking_preferences
 from .recipe_ranking import rank_condition_recipes
@@ -316,6 +321,7 @@ class GenericConditionRecommender:
         minimum_pool_size: int | None = None,
         unrestricted_fallback: bool = False,
         ranking_preferences: ChemistRankingPreferences | None = None,
+        completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
     ) -> GenericRecommendationResult:
         """Featurize a query and recommend without reloading the index."""
         resolved_preferences = resolve_ranking_preferences(ranking_preferences)
@@ -327,6 +333,7 @@ class GenericConditionRecommender:
             unrestricted_fallback=unrestricted_fallback,
             mapping_provider=self.mapping_provider,
             ranking_preferences=resolved_preferences,
+            completion_selections=completion_selections,
         )
         result = replace(
             result,
@@ -361,12 +368,23 @@ def _recommend_with_index(
     unrestricted_fallback: bool,
     mapping_provider: AtomMappingProvider | None = None,
     ranking_preferences: ChemistRankingPreferences | None = None,
+    completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
 ) -> GenericRecommendationResult:
     if top_k < 1:
         return GenericRecommendationResult(
             reaction_smiles, False, error="TOP_K_MUST_BE_POSITIVE"
         )
     base_analysis = featurize_reaction(reaction_smiles)
+    completion_proposal = (
+        build_reaction_completion_proposal(base_analysis)
+        if base_analysis.valid
+        else None
+    )
+    if completion_proposal is not None:
+        validate_completion_selections(
+            completion_proposal,
+            completion_selections,
+        )
     mapping_skip_warning = None
     fallback_descriptor = base_analysis.fallback_descriptor
     if (
@@ -406,13 +424,64 @@ def _recommend_with_index(
 
     def finalize(result: GenericRecommendationResult) -> GenericRecommendationResult:
         attached = _attach_external_mapping_assessment(result, assessment)
-        if mapping_skip_warning is None:
-            return attached
+        warnings = list(attached.warnings)
+        if mapping_skip_warning is not None:
+            warnings.append(mapping_skip_warning)
+        if completion_proposal is not None and completion_proposal.requirements:
+            warnings.append("QUERY_PRODUCT_SOURCE_COMPONENT_MISSING")
+            if not completion_selections:
+                warnings.append(
+                    "SYSTEM_PROPOSED_SOURCES_REQUIRE_USER_CONFIRMATION"
+                )
+        selection_cautions = []
+        for selection in completion_selections:
+            if selection.selection_kind == "compatible_source_class":
+                warnings.append(
+                    "QUERY_SOURCE_CLASS_USER_CONFIRMED:"
+                    f"{selection.capability_id}"
+                )
+            elif selection.selection_kind == "registered_substance":
+                warnings.append(
+                    "QUERY_SOURCE_SUBSTANCE_USER_CONFIRMED:"
+                    f"{selection.substance_id}"
+                )
+            elif selection.selection_kind == "custom_identifier":
+                warnings.append("QUERY_SOURCE_EDIT_UNRESOLVED")
+            else:
+                warnings.append("QUERY_SOURCE_LEFT_UNRESOLVED")
+        if completion_selections:
+            warnings.append("REACTION_COMPLETION_SELECTION_RECORDED")
+            selection_cautions.extend(
+                (
+                    "A missing condition source was confirmed or edited by the "
+                    "user; it was not observed in the submitted reaction",
+                    "The submitted reaction SMILES was retained unchanged",
+                )
+            )
+        recommendations = tuple(
+            replace(
+                recommendation,
+                cautions=tuple(
+                    dict.fromkeys(
+                        (*selection_cautions, *recommendation.cautions)
+                    )
+                ),
+            )
+            for recommendation in attached.recommendations
+        )
         return replace(
             attached,
-            warnings=tuple(
-                dict.fromkeys((*attached.warnings, mapping_skip_warning))
+            completion_proposal=(
+                completion_proposal.to_dict()
+                if completion_proposal is not None
+                and completion_proposal.requirements
+                else None
             ),
+            completion_selections=tuple(
+                selection.to_dict() for selection in completion_selections
+            ),
+            recommendations=recommendations,
+            warnings=tuple(dict.fromkeys(warnings)),
         )
 
     analysis = assessment.analysis if assessment is not None else base_analysis
@@ -479,6 +548,7 @@ def _recommend_with_index(
             minimum_pool_size=minimum_pool_size,
             unrestricted=unrestricted_fallback,
             ranking_preferences=ranking_preferences,
+            completion_selections=completion_selections,
         )
         if core_attempt is not None:
             result = replace(
@@ -864,6 +934,7 @@ def _recommend_fallback_with_index(
     minimum_pool_size: int | None,
     unrestricted: bool = False,
     ranking_preferences: ChemistRankingPreferences | None = None,
+    completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
 ) -> GenericRecommendationResult:
     """Recommend through the gated or explicit unrestricted fallback route."""
     reaction_smiles = str(analysis.input_reaction_smiles)
@@ -932,6 +1003,19 @@ def _recommend_fallback_with_index(
         index,
         minimum_pool_size=minimum_pool_size,
         unrestricted=unrestricted,
+        required_source_capability_ids={
+            selection.requirement_id: str(selection.capability_id)
+            for selection in completion_selections
+            if selection.selection_kind
+            in {"compatible_source_class", "registered_substance"}
+            and selection.capability_id
+        },
+        required_source_substance_ids={
+            selection.requirement_id: str(selection.substance_id)
+            for selection in completion_selections
+            if selection.selection_kind == "registered_substance"
+            and selection.substance_id
+        },
     )
     if not retrieval.pool:
         return GenericRecommendationResult(
@@ -1083,6 +1167,7 @@ def recommend_generic_conditions(
     use_rxnmapper: bool = False,
     mapping_provider: AtomMappingProvider | None = None,
     ranking_preferences: ChemistRankingPreferences | None = None,
+    completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
 ) -> GenericRecommendationResult:
     """Featurize a reaction and recommend canonical resolved recipes."""
     if use_rxnmapper and mapping_provider is None:
@@ -1098,6 +1183,7 @@ def recommend_generic_conditions(
         minimum_pool_size=minimum_pool_size,
         unrestricted_fallback=unrestricted_fallback,
         ranking_preferences=ranking_preferences,
+        completion_selections=completion_selections,
     )
 
 

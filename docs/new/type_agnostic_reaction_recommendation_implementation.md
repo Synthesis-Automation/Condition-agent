@@ -98,7 +98,7 @@ The current code declares:
 | Recommendation artifact workflow | `2.1` |
 | Generic persisted index | `6.0` |
 | SQLite index storage | `1.0` |
-| Generic recommendation result | `3.1` |
+| Generic recommendation result | `3.2` |
 | Reaction discovery result / definition | `1.0` / `discovery_retrieval.v1@1.0` |
 | Reaction correspondence definitions | `2.5` |
 | Generic retrieval definition | `1.8` |
@@ -109,7 +109,7 @@ The current code declares:
 | Generic held-out evaluation | `generic_leakage_safe.v1.5` |
 | Reaction-core calibration | `reaction_core_calibration.v1` |
 | Generic admission policy | `generic_admission.v4.0` |
-| Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
+| Fragment-source capabilities | `fragment_source_capabilities.v1@1.2` |
 | Fallback retrieval definition | `3.0` |
 
 Do not copy this table into executable code. The constants and definition files

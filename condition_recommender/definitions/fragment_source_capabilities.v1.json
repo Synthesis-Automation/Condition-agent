@@ -4,6 +4,7 @@
   "capabilities": [
     {
       "capability_id": "single_atom_fluorine_source.v1",
+      "display_name": "fluorine source",
       "match": {
         "element_counts": {"F": 1},
         "maximum_atom_count": 1
@@ -27,6 +28,7 @@
     },
     {
       "capability_id": "single_atom_chlorine_source.v1",
+      "display_name": "chlorine source",
       "match": {
         "element_counts": {"Cl": 1},
         "maximum_atom_count": 1
@@ -43,6 +45,7 @@
     },
     {
       "capability_id": "single_atom_bromine_source.v1",
+      "display_name": "bromine source",
       "match": {
         "element_counts": {"Br": 1},
         "maximum_atom_count": 1
@@ -59,6 +62,7 @@
     },
     {
       "capability_id": "single_atom_iodine_source.v1",
+      "display_name": "iodine source",
       "match": {
         "element_counts": {"I": 1},
         "maximum_atom_count": 1
@@ -73,6 +77,7 @@
     },
     {
       "capability_id": "cyanide_fragment_source.v1",
+      "display_name": "cyanide source",
       "match": {
         "rooted_fragment_smiles_any": ["*C#N"],
         "maximum_atom_count": 2
@@ -88,6 +93,7 @@
     },
     {
       "capability_id": "azide_fragment_source.v1",
+      "display_name": "azide source",
       "match": {
         "rooted_fragment_smiles_any": ["*N=[N+]=[N-]"],
         "maximum_atom_count": 3
