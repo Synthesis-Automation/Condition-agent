@@ -375,7 +375,22 @@ def build_generic_index(
     include_review: bool = False,
 ) -> GenericReactionIndex:
     """Build lookup maps, admitting only records with signatures and recipes."""
-    rows = []
+    return build_generic_index_from_rows(
+        _iter_generic_index_rows(records, include_review=include_review),
+        precedent_scope=(
+            PrecedentIndexScope.TRUSTED_AND_REVIEW_CORE
+            if include_review
+            else PrecedentIndexScope.TRUSTED
+        ),
+    )
+
+
+def _iter_generic_index_rows(
+    records: Iterable[Mapping[str, Any]],
+    *,
+    include_review: bool = False,
+) -> Iterable[GenericIndexedReaction]:
+    """Yield admitted retrieval rows without retaining the input corpus."""
     for record in records:
         fragment_source_support = tuple(
             dict(value)
@@ -439,97 +454,86 @@ def build_generic_index(
         embedded_core_id = str(recipe.get("recipe_core_id") or recipe_core_id)
         if embedded_core_id != recipe_core_id:
             continue
-        rows.append(
-            GenericIndexedReaction(
-                reaction_id=str(record.get("reaction_id") or ""),
-                observation_id=str(record.get("observation_id") or ""),
-                canonical_reaction_id=str(
-                    record.get("canonical_reaction_id")
-                    or record.get("reaction_id")
-                    or record.get("observation_id")
-                    or ""
-                ),
-                reaction_smiles=str(record.get("reaction_smiles") or ""),
-                yield_pct=yield_pct,
-                source_dataset=str(record.get("source_dataset") or ""),
-                reference_id=str(record.get("reference_id") or ""),
-                publication_year=(
-                    int((record.get("reference_identity") or {})["publication_year"])
-                    if (record.get("reference_identity") or {}).get("publication_year")
-                    is not None
-                    else None
-                ),
-                reference_condition_series_id=str(
-                    record.get("reference_condition_series_id") or ""
-                ),
-                scaffold_key=reaction_scaffold_key(
-                    str(record.get("reaction_smiles") or ""),
-                    signature if isinstance(signature, Mapping) else {},
-                ),
-                scaffold_tokens=reaction_scaffold_tokens(
-                    str(record.get("reaction_smiles") or ""),
-                    signature if isinstance(signature, Mapping) else {},
-                ),
-                signature=(dict(signature) if isinstance(signature, Mapping) else {}),
-                # A blocked core must never enter core lookup maps. A separately
-                # verified signature may remain a trusted precedent through its
-                # signature keys, so only the unsafe core view is removed.
-                reaction_core=(
-                    dict(reaction_core)
-                    if isinstance(reaction_core, Mapping)
-                    and (
-                        core_eligibility == CoreEligibility.TRUSTED_CORE.value
-                        or (
-                            include_review
-                            and core_eligibility
-                            == CoreEligibility.REVIEW_CORE.value
-                        )
+        yield GenericIndexedReaction(
+            reaction_id=str(record.get("reaction_id") or ""),
+            observation_id=str(record.get("observation_id") or ""),
+            canonical_reaction_id=str(
+                record.get("canonical_reaction_id")
+                or record.get("reaction_id")
+                or record.get("observation_id")
+                or ""
+            ),
+            reaction_smiles=str(record.get("reaction_smiles") or ""),
+            yield_pct=yield_pct,
+            source_dataset=str(record.get("source_dataset") or ""),
+            reference_id=str(record.get("reference_id") or ""),
+            publication_year=(
+                int((record.get("reference_identity") or {})["publication_year"])
+                if (record.get("reference_identity") or {}).get("publication_year")
+                is not None
+                else None
+            ),
+            reference_condition_series_id=str(
+                record.get("reference_condition_series_id") or ""
+            ),
+            scaffold_key=reaction_scaffold_key(
+                str(record.get("reaction_smiles") or ""),
+                signature if isinstance(signature, Mapping) else {},
+            ),
+            scaffold_tokens=reaction_scaffold_tokens(
+                str(record.get("reaction_smiles") or ""),
+                signature if isinstance(signature, Mapping) else {},
+            ),
+            signature=(dict(signature) if isinstance(signature, Mapping) else {}),
+            # A blocked core must never enter core lookup maps. A separately
+            # verified signature may remain a trusted precedent through its
+            # signature keys, so only the unsafe core view is removed.
+            reaction_core=(
+                dict(reaction_core)
+                if isinstance(reaction_core, Mapping)
+                and (
+                    core_eligibility == CoreEligibility.TRUSTED_CORE.value
+                    or (
+                        include_review
+                        and core_eligibility == CoreEligibility.REVIEW_CORE.value
                     )
-                    else {}
-                ),
-                recipe_id=recipe_id,
-                recipe_core_id=recipe_core_id,
-                resolved_recipe=dict(recipe),
-                condition_uncertain=bool(
-                    (record.get("condition_resolution") or {}).get("has_uncertainty")
                 )
-                or _enum_value(record.get("condition_stage_status"))
-                == "unassigned_multistage",
-                chemistry_status=_enum_value(record.get("chemistry_status")),
-                condition_status=_enum_value(record.get("condition_status")),
-                condition_stage_status=(
-                    _enum_value(record.get("condition_stage_status")) or "single_stage"
-                ),
-                outcome_status=_enum_value(record.get("outcome_status")),
-                record_schema_version=str(record.get("schema_version") or ""),
-                converter_definition_version=str(
-                    record.get("converter_definition_version") or ""
-                ),
-                precedent_tier=precedent_tier,
-                core_eligibility_definition_version=(
-                    core_eligibility_definition_version
-                ),
-                reaction_label=(
-                    dict(record.get("reaction_label") or {})
-                    if isinstance(record.get("reaction_label"), Mapping)
-                    else {}
-                ),
-                fallback_descriptor=(
-                    dict(fallback_descriptor or {})
-                    if isinstance(fallback_descriptor, Mapping)
-                    else {}
-                ),
-                fragment_source_support=fragment_source_support,
+                else {}
+            ),
+            recipe_id=recipe_id,
+            recipe_core_id=recipe_core_id,
+            resolved_recipe=dict(recipe),
+            condition_uncertain=bool(
+                (record.get("condition_resolution") or {}).get("has_uncertainty")
             )
+            or _enum_value(record.get("condition_stage_status"))
+            == "unassigned_multistage",
+            chemistry_status=_enum_value(record.get("chemistry_status")),
+            condition_status=_enum_value(record.get("condition_status")),
+            condition_stage_status=(
+                _enum_value(record.get("condition_stage_status")) or "single_stage"
+            ),
+            outcome_status=_enum_value(record.get("outcome_status")),
+            record_schema_version=str(record.get("schema_version") or ""),
+            converter_definition_version=str(
+                record.get("converter_definition_version") or ""
+            ),
+            precedent_tier=precedent_tier,
+            core_eligibility_definition_version=(
+                core_eligibility_definition_version
+            ),
+            reaction_label=(
+                dict(record.get("reaction_label") or {})
+                if isinstance(record.get("reaction_label"), Mapping)
+                else {}
+            ),
+            fallback_descriptor=(
+                dict(fallback_descriptor or {})
+                if isinstance(fallback_descriptor, Mapping)
+                else {}
+            ),
+            fragment_source_support=fragment_source_support,
         )
-    return build_generic_index_from_rows(
-        rows,
-        precedent_scope=(
-            PrecedentIndexScope.TRUSTED_AND_REVIEW_CORE
-            if include_review
-            else PrecedentIndexScope.TRUSTED
-        ),
-    )
 
 
 def _enum_value(value: Any) -> str:

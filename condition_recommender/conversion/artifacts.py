@@ -7,8 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 
-from ..generic_indexing import build_generic_index
-from ..sqlite_indexing import save_sqlite_generic_index
+from ..sqlite_indexing import (
+    SQLiteIndexBuildCancelled,
+    build_sqlite_generic_index,
+)
 from .concise_review import (
     ConciseReviewConversionCancelled,
     ConciseReviewProgress,
@@ -255,32 +257,57 @@ def build_recommendation_artifacts(
                     )
                 yield record
 
-        index = build_generic_index(records())
-        if cancel_check is not None and cancel_check():
-            raise RecommendationArtifactBuildCancelled(
-                "Build cancelled before saving the fast-load index."
+        def on_index_progress(phase: str, count: int) -> None:
+            if phase == "staged":
+                message = f"Staged {count} eligible precedent(s) on disk."
+            elif phase == "rows":
+                message = f"Wrote {count} sorted precedent row(s) to the index."
+            else:
+                message = f"Aggregated {count} index lookup key(s)."
+            notify("index_rows", message, row_count=count)
+
+        try:
+            index_report = build_sqlite_generic_index(
+                records(),
+                index_path,
+                progress_callback=on_index_progress,
+                cancel_check=cancel_check,
             )
-        index_report = save_sqlite_generic_index(index, index_path)
-        scanned_rows = 0
-        review_index = build_generic_index(records(), include_review=True)
-        if cancel_check is not None and cancel_check():
-            raise RecommendationArtifactBuildCancelled(
-                "Build cancelled before saving the review-core index."
+            review_core_candidates = int(
+                (conversion_report.get("precedent_tier_counts") or {}).get(
+                    "review_core", 0
+                )
             )
-        review_index_reuses_trusted = tuple(review_index.rows) == tuple(index.rows)
-        if review_index_reuses_trusted:
-            if review_index_path.is_file():
-                review_index_path.unlink()
-            review_index_report = {
-                **index_report,
-                "requested_precedent_scope": review_index.precedent_scope.value,
-                "reuses_trusted_index": True,
-            }
-        else:
-            review_index_report = save_sqlite_generic_index(
-                review_index,
-                review_index_path,
-            )
+            if review_core_candidates == 0:
+                review_index_reuses_trusted = True
+                review_index_report = {
+                    **index_report,
+                    "requested_precedent_scope": "trusted_and_review_core",
+                    "reuses_trusted_index": True,
+                }
+            else:
+                scanned_rows = 0
+                review_index_report = build_sqlite_generic_index(
+                    records(),
+                    review_index_path,
+                    include_review=True,
+                    progress_callback=on_index_progress,
+                    cancel_check=cancel_check,
+                )
+                review_index_reuses_trusted = (
+                    int(review_index_report["row_count"])
+                    == int(index_report["row_count"])
+                )
+                if review_index_reuses_trusted:
+                    if review_index_path.is_file():
+                        review_index_path.unlink()
+                    review_index_report = {
+                        **index_report,
+                        "requested_precedent_scope": "trusted_and_review_core",
+                        "reuses_trusted_index": True,
+                    }
+        except SQLiteIndexBuildCancelled as exc:
+            raise RecommendationArtifactBuildCancelled(str(exc)) from exc
         notify(
             "index_completed",
             (

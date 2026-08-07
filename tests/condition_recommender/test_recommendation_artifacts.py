@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from condition_recommender.conversion import artifacts as artifact_module
 from condition_recommender.conversion.artifacts import (
     build_recommendation_artifacts,
 )
@@ -38,6 +39,7 @@ def _source_row(reaction_id: str) -> dict[str, str]:
 
 def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     tmp_path: Path,
+    monkeypatch,
 ) -> None:
     source = tmp_path / "source"
     source.mkdir()
@@ -52,6 +54,18 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     (output / "generic_index.json.gz").write_bytes(b"retired")
     (output / "generic_review_index.json.gz").write_bytes(b"retired")
     progress = []
+    index_builds = []
+    real_index_builder = artifact_module.build_sqlite_generic_index
+
+    def counting_index_builder(*args, **kwargs):
+        index_builds.append(bool(kwargs.get("include_review")))
+        return real_index_builder(*args, **kwargs)
+
+    monkeypatch.setattr(
+        artifact_module,
+        "build_sqlite_generic_index",
+        counting_index_builder,
+    )
 
     report = build_recommendation_artifacts(
         source,
@@ -79,6 +93,7 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     assert not (output / "generic_review_index.sqlite").exists()
     assert (output / "recommendation_artifacts_report.json").is_file()
     assert report["review_index_reuses_trusted"]
+    assert index_builds == [False]
     assert not any(
         name.startswith("legacy_json") for name in report["artifacts"]
     )

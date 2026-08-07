@@ -37,6 +37,7 @@ from condition_recommender.generic_indexing import (
 from condition_recommender.sqlite_indexing import (
     SQLiteLookupMapping,
     SQLiteReactionRows,
+    build_sqlite_generic_index,
     load_sqlite_generic_index,
     save_sqlite_generic_index,
 )
@@ -176,6 +177,40 @@ def test_sqlite_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert integrity["valid"]
     assert integrity["row_count"] == 2
     assert integrity["schema_version"] == "1.0"
+
+
+def test_streamed_sqlite_index_matches_in_memory_builder(tmp_path: Path) -> None:
+    records = [_record(2), _record(1)]
+    expected_index = build_generic_index(records)
+    expected_path = tmp_path / "expected.sqlite"
+    streamed_path = tmp_path / "streamed.sqlite"
+    expected_report = save_sqlite_generic_index(expected_index, expected_path)
+
+    streamed_report = build_sqlite_generic_index(records, streamed_path)
+    streamed_index = load_sqlite_generic_index(streamed_path)
+
+    assert streamed_report["index_id"] == expected_report["index_id"]
+    assert tuple(streamed_index.rows) == expected_index.rows
+    for field in (
+        "exact",
+        "handles",
+        "transformations",
+        "bond_edits",
+        "environments",
+        "core_exact",
+        "core_typed",
+        "core_shapes",
+        "core_centers",
+        "environment_features",
+        "fallback_features",
+        "partial_transformations",
+        "families",
+    ):
+        assert dict(getattr(streamed_index, field)) == dict(
+            getattr(expected_index, field)
+        )
+    assert not streamed_path.with_suffix(".sqlite.stage").exists()
+    assert not streamed_path.with_suffix(".sqlite.tmp").exists()
 
 
 def test_loader_rejects_retired_json_runtime_index(tmp_path: Path) -> None:

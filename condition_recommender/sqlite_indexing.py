@@ -8,25 +8,36 @@ import sqlite3
 import zlib
 from collections import defaultdict
 from collections.abc import Iterator, Mapping, Sequence
+from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Tuple, overload
+from typing import Any, Callable, Dict, Iterable, Tuple, overload
 
 from .edit_prototypes import AnonymousEditPrototype, anonymous_edit_prototype
+from .fallback_similarity import fallback_index_tokens
 from .generic_indexing import (
     GENERIC_INDEX_SCHEMA_VERSION,
     GenericIndexedReaction,
     GenericReactionIndex,
+    _iter_generic_index_rows,
     _index_maps,
     _indexed_reaction_from_payload,
     _indexed_reaction_payload,
+    _validate_index_rows,
     _validate_index_metadata,
+    build_generic_index_from_rows,
 )
+from .models import PrecedentIndexScope, PrecedentTier
+from .signature_features import environment_tokens
 
 
 SQLITE_INDEX_STORAGE_SCHEMA_VERSION = "1.0"
 _ROW_ENCODING = "json+zlib.v1"
 _POSITIONS_ENCODING = "json+zlib.v1"
+
+
+class SQLiteIndexBuildCancelled(RuntimeError):
+    """Raised after safely abandoning an incomplete streamed SQLite index."""
 
 
 def _canonical_json_bytes(value: Any) -> bytes:
@@ -235,6 +246,376 @@ def _metadata_payload(
         "row_count": len(index.rows),
         "lookup_counts": dict(sorted(lookup_counts.items())),
         "auxiliary_lookup_counts": dict(sorted(auxiliary_lookup_counts.items())),
+    }
+
+
+def build_sqlite_generic_index(
+    records: Iterable[Mapping[str, Any]],
+    path: str | Path,
+    *,
+    include_review: bool = False,
+    progress_callback: Callable[[str, int], None] | None = None,
+    cancel_check: Callable[[], bool] | None = None,
+) -> Dict[str, Any]:
+    """Build a deterministic SQLite index with bounded Python memory.
+
+    Admitted rows and lookup memberships are staged in a temporary SQLite
+    database. Sorting and aggregation therefore spill to disk instead of
+    retaining the full corpus, row payloads, and lookup maps in Python.
+    """
+    destination = Path(path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_suffix(destination.suffix + ".tmp")
+    staging = destination.with_suffix(destination.suffix + ".stage")
+    for transient in (temporary, staging):
+        if transient.is_file():
+            transient.unlink()
+
+    scope = (
+        PrecedentIndexScope.TRUSTED_AND_REVIEW_CORE
+        if include_review
+        else PrecedentIndexScope.TRUSTED
+    )
+    stage_connection: sqlite3.Connection | None = None
+    final_connection: sqlite3.Connection | None = None
+    completed = False
+    try:
+        stage_connection = sqlite3.connect(staging)
+        stage_connection.executescript(
+            """
+            PRAGMA journal_mode = OFF;
+            PRAGMA synchronous = OFF;
+            PRAGMA temp_store = FILE;
+            PRAGMA cache_size = -32768;
+            PRAGMA page_size = 32768;
+            CREATE TABLE staged_rows (
+                ordinal INTEGER PRIMARY KEY,
+                canonical_reaction_id TEXT NOT NULL,
+                reaction_id TEXT NOT NULL,
+                observation_id TEXT NOT NULL,
+                recipe_id TEXT NOT NULL,
+                payload BLOB NOT NULL
+            );
+            CREATE TABLE lookup_entries (
+                lookup_kind TEXT NOT NULL,
+                lookup_key TEXT NOT NULL,
+                position INTEGER NOT NULL,
+                PRIMARY KEY (lookup_kind, lookup_key, position)
+            ) WITHOUT ROWID;
+            """
+        )
+        stage_batch = []
+        eligible_count = 0
+        for row in _iter_generic_index_rows(records, include_review=include_review):
+            if cancel_check is not None and cancel_check():
+                raise SQLiteIndexBuildCancelled(
+                    "Index build cancelled while scanning canonical records"
+                )
+            _validate_index_rows((row,))
+            if scope == PrecedentIndexScope.TRUSTED:
+                if row.precedent_tier != PrecedentTier.TRUSTED:
+                    raise ValueError(
+                        "Trusted index cannot contain review-core precedents"
+                    )
+            elif row.precedent_tier not in {
+                PrecedentTier.TRUSTED,
+                PrecedentTier.REVIEW_CORE,
+            }:
+                raise ValueError("Unsupported precedent tier")
+            canonical = _canonical_json_bytes(_indexed_reaction_payload(row))
+            stage_batch.append(
+                (
+                    eligible_count,
+                    row.canonical_reaction_id,
+                    row.reaction_id,
+                    row.observation_id,
+                    row.recipe_id,
+                    zlib.compress(canonical, level=6),
+                )
+            )
+            eligible_count += 1
+            if len(stage_batch) >= 100:
+                stage_connection.executemany(
+                    "INSERT INTO staged_rows VALUES (?, ?, ?, ?, ?, ?)",
+                    stage_batch,
+                )
+                stage_batch.clear()
+            if eligible_count % 1_000 == 0 and progress_callback is not None:
+                progress_callback("staged", eligible_count)
+        if stage_batch:
+            stage_connection.executemany(
+                "INSERT INTO staged_rows VALUES (?, ?, ?, ?, ?, ?)",
+                stage_batch,
+            )
+        stage_connection.commit()
+
+        final_connection = sqlite3.connect(temporary)
+        final_connection.executescript(
+            """
+            PRAGMA journal_mode = OFF;
+            PRAGMA synchronous = OFF;
+            PRAGMA temp_store = FILE;
+            PRAGMA cache_size = -32768;
+            PRAGMA page_size = 32768;
+            CREATE TABLE metadata (
+                singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE precedents (
+                position INTEGER PRIMARY KEY,
+                payload BLOB NOT NULL
+            );
+            CREATE TABLE lookups (
+                lookup_kind TEXT NOT NULL,
+                lookup_key TEXT NOT NULL,
+                positions BLOB NOT NULL,
+                PRIMARY KEY (lookup_kind, lookup_key)
+            ) WITHOUT ROWID;
+            """
+        )
+        digest = hashlib.sha256()
+        row_batch = []
+        lookup_batch = []
+        sorted_rows = stage_connection.execute(
+            "SELECT payload FROM staged_rows ORDER BY "
+            "canonical_reaction_id, reaction_id, observation_id, recipe_id, ordinal"
+        )
+        for position, (compressed_payload,) in enumerate(sorted_rows):
+            if cancel_check is not None and cancel_check():
+                raise SQLiteIndexBuildCancelled(
+                    "Index build cancelled while writing precedent rows"
+                )
+            payload = _decompress_json(compressed_payload)
+            row = _indexed_reaction_from_payload(payload)
+            canonical = _canonical_json_bytes(payload)
+            digest.update(b"row\0")
+            digest.update(str(position).encode("ascii"))
+            digest.update(b"\0")
+            digest.update(canonical)
+            row_batch.append((position, compressed_payload))
+
+            signature_fields = {
+                "exact": "exact_signature_key",
+                "handles": "handle_signature_key",
+                "transformations": "transformation_signature_key",
+                "bond_edits": "bond_edit_signature_key",
+                "environments": "environment_signature_key",
+            }
+            for kind, field in signature_fields.items():
+                key = str(row.signature.get(field) or "")
+                if key:
+                    lookup_batch.append((kind, key, position))
+            core_fields = {
+                "core_exact": "exact_core_key",
+                "core_typed": "typed_core_key",
+                "core_shapes": "shape_core_key",
+                "core_centers": "center_transition_key",
+            }
+            for kind, field in core_fields.items():
+                key = str(row.reaction_core.get(field) or "")
+                if key:
+                    lookup_batch.append((kind, key, position))
+            if row.named_family:
+                lookup_batch.append(("families", row.named_family, position))
+            for token in set(environment_tokens(row.signature)):
+                lookup_batch.append(("environment_features", token, position))
+            for token in fallback_index_tokens(row.fallback_descriptor):
+                lookup_batch.append(("fallback_features", token, position))
+            partial_key = str(
+                row.fallback_descriptor.get("partial_transformation_key") or ""
+            )
+            if partial_key:
+                lookup_batch.append(
+                    ("partial_transformations", partial_key, position)
+                )
+            prototype = anonymous_edit_prototype(row.signature)
+            if prototype is not None:
+                ring_sign = (prototype.ring_count_delta > 0) - (
+                    prototype.ring_count_delta < 0
+                )
+                for pair in sorted(set(prototype.formed_element_pairs)):
+                    lookup_batch.append(
+                        ("edit_graph_features", f"{ring_sign}:{pair}", position)
+                    )
+
+            if len(row_batch) >= 100:
+                final_connection.executemany(
+                    "INSERT INTO precedents(position, payload) VALUES (?, ?)",
+                    row_batch,
+                )
+                row_batch.clear()
+            if len(lookup_batch) >= 5_000:
+                stage_connection.executemany(
+                    "INSERT OR IGNORE INTO lookup_entries VALUES (?, ?, ?)",
+                    lookup_batch,
+                )
+                lookup_batch.clear()
+            if (position + 1) % 1_000 == 0 and progress_callback is not None:
+                progress_callback("rows", position + 1)
+        if row_batch:
+            final_connection.executemany(
+                "INSERT INTO precedents(position, payload) VALUES (?, ?)",
+                row_batch,
+            )
+        if lookup_batch:
+            stage_connection.executemany(
+                "INSERT OR IGNORE INTO lookup_entries VALUES (?, ?, ?)",
+                lookup_batch,
+            )
+        stage_connection.commit()
+
+        lookup_names = (
+            "exact",
+            "handles",
+            "transformations",
+            "bond_edits",
+            "environments",
+            "core_exact",
+            "core_typed",
+            "core_shapes",
+            "core_centers",
+            "environment_features",
+            "fallback_features",
+            "partial_transformations",
+            "families",
+        )
+        lookup_counts = {name: 0 for name in lookup_names}
+        edit_graph_key_order: Dict[str, int] = {}
+        current_kind = ""
+        current_key = ""
+        positions: list[int] = []
+        written_lookup_count = 0
+        final_lookup_batch = []
+
+        def write_lookup() -> None:
+            nonlocal written_lookup_count
+            if not current_kind:
+                return
+            canonical_positions = _canonical_json_bytes(tuple(positions))
+            final_lookup_batch.append(
+                (
+                    current_kind,
+                    current_key,
+                    zlib.compress(canonical_positions, level=6),
+                )
+            )
+            if len(final_lookup_batch) >= 2_000:
+                final_connection.executemany(
+                    "INSERT INTO lookups"
+                    "(lookup_kind, lookup_key, positions) VALUES (?, ?, ?)",
+                    final_lookup_batch,
+                )
+                final_lookup_batch.clear()
+            if current_kind == "edit_graph_features":
+                edit_graph_key_order[current_key] = positions[0]
+            else:
+                lookup_counts[current_kind] += 1
+            written_lookup_count += 1
+            if (
+                written_lookup_count % 1_000 == 0
+                and progress_callback is not None
+            ):
+                progress_callback("lookups", written_lookup_count)
+
+        for kind, key, position in stage_connection.execute(
+            "SELECT lookup_kind, lookup_key, position FROM lookup_entries "
+            "ORDER BY lookup_kind, lookup_key, position"
+        ):
+            if cancel_check is not None and cancel_check():
+                raise SQLiteIndexBuildCancelled(
+                    "Index build cancelled while aggregating lookup keys"
+                )
+            if (kind, key) != (current_kind, current_key):
+                write_lookup()
+                current_kind = str(kind)
+                current_key = str(key)
+                positions = []
+            positions.append(int(position))
+        write_lookup()
+        if final_lookup_batch:
+            final_connection.executemany(
+                "INSERT INTO lookups"
+                "(lookup_kind, lookup_key, positions) VALUES (?, ?, ?)",
+                final_lookup_batch,
+            )
+
+        for kind in sorted((*lookup_names, "edit_graph_features")):
+            lookup_rows = final_connection.execute(
+                "SELECT lookup_key, positions FROM lookups "
+                "WHERE lookup_kind = ? ORDER BY lookup_key",
+                (kind,),
+            )
+            if kind == "edit_graph_features":
+                ordered_lookup_rows = sorted(
+                    lookup_rows,
+                    key=lambda item: (
+                        edit_graph_key_order[str(item[0])],
+                        str(item[0]),
+                    ),
+                )
+            else:
+                ordered_lookup_rows = lookup_rows
+            for key, compressed_positions in ordered_lookup_rows:
+                canonical_positions = zlib.decompress(compressed_positions)
+                digest.update(b"lookup\0")
+                digest.update(kind.encode("utf-8"))
+                digest.update(b"\0")
+                digest.update(str(key).encode("utf-8"))
+                digest.update(b"\0")
+                digest.update(canonical_positions)
+
+        template_index = build_generic_index_from_rows(
+            (),
+            precedent_scope=scope,
+        )
+        metadata_index = replace(template_index, rows=range(eligible_count))
+        metadata_identity = _metadata_payload(
+            metadata_index,
+            lookup_counts=lookup_counts,
+            auxiliary_lookup_counts={
+                "edit_graph_features": len(edit_graph_key_order),
+            },
+            index_id="",
+        )
+        digest.update(b"metadata\0")
+        digest.update(_canonical_json_bytes(metadata_identity))
+        metadata = _metadata_payload(
+            metadata_index,
+            lookup_counts=lookup_counts,
+            auxiliary_lookup_counts={
+                "edit_graph_features": len(edit_graph_key_order),
+            },
+            index_id="GRIS1:" + digest.hexdigest(),
+        )
+        final_connection.execute(
+            "INSERT INTO metadata(singleton, payload) VALUES (1, ?)",
+            (_canonical_json_bytes(metadata).decode("utf-8"),),
+        )
+        final_connection.commit()
+        final_connection.close()
+        final_connection = None
+        stage_connection.close()
+        stage_connection = None
+        temporary.replace(destination)
+        completed = True
+    finally:
+        if final_connection is not None:
+            final_connection.close()
+        if stage_connection is not None:
+            stage_connection.close()
+        if staging.is_file():
+            staging.unlink()
+        if not completed and temporary.is_file():
+            temporary.unlink()
+
+    return {
+        "schema_version": metadata["schema_version"],
+        "storage_schema_version": metadata["storage_schema_version"],
+        "precedent_scope": metadata["precedent_scope"],
+        "index_id": metadata["index_id"],
+        "row_count": metadata["row_count"],
+        "lookup_counts": metadata["lookup_counts"],
+        "path": str(destination),
     }
 
 
@@ -556,8 +937,10 @@ def validate_sqlite_generic_index(path: str | Path) -> Dict[str, Any]:
 
 __all__ = [
     "SQLITE_INDEX_STORAGE_SCHEMA_VERSION",
+    "SQLiteIndexBuildCancelled",
     "SQLiteLookupMapping",
     "SQLiteReactionRows",
+    "build_sqlite_generic_index",
     "load_sqlite_generic_index",
     "save_sqlite_generic_index",
     "validate_sqlite_generic_index",
