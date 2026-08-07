@@ -15,6 +15,7 @@ from typing import Any, Callable, Dict, Iterable, Tuple, overload
 
 from .edit_prototypes import AnonymousEditPrototype, anonymous_edit_prototype
 from .fallback_similarity import fallback_index_tokens
+from .reaction_facets import reaction_facet_keys
 from .generic_indexing import (
     GENERIC_INDEX_SCHEMA_VERSION,
     GenericIndexedReaction,
@@ -415,6 +416,21 @@ def build_sqlite_generic_index(
                 key = str(row.reaction_core.get(field) or "")
                 if key:
                     lookup_batch.append((kind, key, position))
+            facet_keys = reaction_facet_keys(
+                row.signature,
+                row.reaction_core,
+                row.fallback_descriptor,
+            )
+            exact_facet = facet_keys.get("reaction_facet_exact")
+            if exact_facet:
+                lookup_batch.append(("facet_exact", exact_facet, position))
+            attachment_facet = facet_keys.get(
+                "reaction_facet_attachment_relaxed"
+            )
+            if attachment_facet:
+                lookup_batch.append(
+                    ("facet_attachments", attachment_facet, position)
+                )
             if row.named_family:
                 lookup_batch.append(("families", row.named_family, position))
             for token in set(environment_tokens(row.signature)):
@@ -470,6 +486,8 @@ def build_sqlite_generic_index(
             "transformations",
             "bond_edits",
             "environments",
+            "facet_exact",
+            "facet_attachments",
             "core_exact",
             "core_typed",
             "core_shapes",
@@ -797,6 +815,8 @@ def load_sqlite_generic_index(path: str | Path) -> GenericReactionIndex:
         "transformations",
         "bond_edits",
         "environments",
+        "facet_exact",
+        "facet_attachments",
         "core_exact",
         "core_typed",
         "core_shapes",
@@ -821,6 +841,8 @@ def load_sqlite_generic_index(path: str | Path) -> GenericReactionIndex:
         transformations=maps["transformations"],
         bond_edits=maps["bond_edits"],
         environments=maps["environments"],
+        facet_exact=maps["facet_exact"],
+        facet_attachments=maps["facet_attachments"],
         core_exact=maps["core_exact"],
         core_typed=maps["core_typed"],
         core_shapes=maps["core_shapes"],

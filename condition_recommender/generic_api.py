@@ -27,6 +27,7 @@ from .generic_retrieval import (
     RetrievalStrategy,
     load_generic_retrieval_rules,
     retrieve_compatible_generic_pool_with_trace,
+    retrieve_progressive_compatible_pools_with_trace,
 )
 from .fallback_retrieval import retrieve_fallback_pool_with_trace
 from .fallback_similarity import (
@@ -54,6 +55,7 @@ from .reaction_completion import (
 )
 from .ranking_preferences import resolve_ranking_preferences
 from .recipe_ranking import rank_condition_recipes
+from .reaction_facets import load_reaction_facet_rules
 
 
 def _fragment_source_artifact_is_current(source: Path) -> bool | None:
@@ -144,6 +146,7 @@ def recommend_indexed_signature(
     index: GenericReactionIndex,
     *,
     reaction_core: Mapping[str, Any] | None = None,
+    fallback_descriptor: Mapping[str, Any] | None = None,
     query_reaction_smiles: str = "",
     reaction_label: Mapping[str, Any] | None = None,
     top_k: int = 5,
@@ -198,15 +201,48 @@ def recommend_indexed_signature(
             False,
             error="INCOMPATIBLE_REACTION_TAXONOMY_DEFINITIONS",
         )
-    retrieval = retrieve_compatible_generic_pool_with_trace(
-        signature,
-        index,
-        minimum_pool_size=minimum_pool_size,
-        reaction_core=reaction_core,
-        strategy=retrieval_strategy,
+    progressive = (
+        retrieve_progressive_compatible_pools_with_trace(
+            signature,
+            index,
+            reaction_core=reaction_core,
+            fallback_descriptor=fallback_descriptor,
+            target_recipe_count=top_k,
+            minimum_pool_size=minimum_pool_size,
+        )
+        if retrieval_strategy == "hybrid"
+        else None
     )
+    retrieval = (
+        progressive
+        if progressive is not None and progressive.tiers
+        else retrieve_compatible_generic_pool_with_trace(
+            signature,
+            index,
+            minimum_pool_size=minimum_pool_size,
+            reaction_core=reaction_core,
+            strategy=retrieval_strategy,
+        )
+    )
+    if progressive is not None and not progressive.tiers:
+        progressive = None
+    if progressive is not None:
+        facet_rules = load_reaction_facet_rules()
+        retrieval_definition_version = (
+            f"{facet_rules['definition_id']}@{facet_rules['schema_version']};"
+            f"generic_retrieval.v1@{retrieval_definition_version}"
+        )
     level = retrieval.level
-    compatible_pool = retrieval.pool
+    progressive_tiers = progressive.tiers if progressive is not None else ()
+    compatible_pool = (
+        tuple(
+            assessed
+            for _, tier_pool in progressive_tiers
+            for assessed in tier_pool
+        )
+        if progressive is not None
+        else retrieval.pool
+    )
     if not compatible_pool:
         compatibility_failure = level == "no_compatible_condition_precedent"
         return GenericRecommendationResult(
@@ -235,32 +271,96 @@ def recommend_indexed_signature(
             else "NO_CHEMICALLY_COMPATIBLE_PRECEDENT",
         )
     warnings = []
-    if level.endswith("limited_support"):
+    if level.endswith("limited_support") or any(
+        trace.status == "selected_limited_support"
+        for trace in retrieval.trace
+    ):
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
-    if level not in {"exact_signature", "handle_signature", "named_family"}:
+    progressive_levels = tuple(value[0] for value in progressive_tiers)
+    if (
+        level not in {
+            "exact_signature",
+            "handle_signature",
+            "named_family",
+            "reaction_facet_exact",
+        }
+        or "reaction_facet_attachment_relaxed" in progressive_levels
+    ):
         warnings.append("TYPE_AGNOSTIC_FALLBACK_USED")
+    if "reaction_facet_attachment_relaxed" in progressive_levels:
+        warnings.append("REACTION_FACET_RELAXATION_USED")
     if level.startswith("reaction_core_"):
         warnings.append("REACTION_CORE_RETRIEVAL_USED")
     if retrieval.excluded_candidate_count:
         warnings.append(
             f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"
         )
-    recommendations = rank_condition_recipes(
-        signature,
-        compatible_pool,
-        retrieval_level=level,
-        top_k=top_k,
-        ranking_profile=(
-            "calibration_candidate"
-            if ranking_weights is not None
-            else retrieval_strategy
-            if retrieval_strategy in {"transformation_prior", "legacy_pilot"}
-            else "default"
-        ),
-        ranking_weights=ranking_weights,
-        ranking_preferences=resolved_preferences,
-        query_reaction_core=reaction_core,
+    ranking_profile = (
+        "calibration_candidate"
+        if ranking_weights is not None
+        else retrieval_strategy
+        if retrieval_strategy in {"transformation_prior", "legacy_pilot"}
+        else "default"
     )
+    if progressive_tiers:
+        accumulated = []
+        seen_recipe_cores = set()
+        for tier_level, tier_pool in progressive_tiers:
+            ranked = rank_condition_recipes(
+                signature,
+                tier_pool,
+                retrieval_level=tier_level,
+                top_k=top_k + len(seen_recipe_cores),
+                ranking_profile=ranking_profile,
+                ranking_weights=ranking_weights,
+                ranking_preferences=resolved_preferences,
+                query_reaction_core=reaction_core,
+            )
+            for recommendation in ranked:
+                if recommendation.recipe_core_id in seen_recipe_cores:
+                    continue
+                seen_recipe_cores.add(recommendation.recipe_core_id)
+                explanation = recommendation.explanation
+                cautions = recommendation.cautions
+                if tier_level == "reaction_facet_exact":
+                    explanation = (
+                        *explanation,
+                        "Exact graph-derived reaction-class facets matched",
+                    )
+                elif tier_level == "reaction_facet_attachment_relaxed":
+                    explanation = (
+                        *explanation,
+                        "Retained attachment classes were relaxed through the "
+                        "versioned structural hierarchy",
+                    )
+                    cautions = (
+                        "A retained reactant attachment class differs from the query",
+                        *cautions,
+                    )
+                accumulated.append(
+                    replace(
+                        recommendation,
+                        rank=len(accumulated) + 1,
+                        explanation=tuple(dict.fromkeys(explanation)),
+                        cautions=tuple(dict.fromkeys(cautions)),
+                    )
+                )
+                if len(accumulated) >= top_k:
+                    break
+            if len(accumulated) >= top_k:
+                break
+        recommendations = tuple(accumulated)
+    else:
+        recommendations = rank_condition_recipes(
+            signature,
+            compatible_pool,
+            retrieval_level=level,
+            top_k=top_k,
+            ranking_profile=ranking_profile,
+            ranking_weights=ranking_weights,
+            ranking_preferences=resolved_preferences,
+            query_reaction_core=reaction_core,
+        )
     if any(
         caution.startswith("Reaction-scope mismatch:")
         for recommendation in recommendations
@@ -283,7 +383,11 @@ def recommend_indexed_signature(
         retrieval_level=level,
         candidate_count=retrieval.candidate_count,
         independent_candidate_count=retrieval.independent_candidate_count,
-        compatible_candidate_count=len(compatible_pool),
+        compatible_candidate_count=(
+            retrieval.compatible_candidate_count
+            if progressive is not None
+            else len(compatible_pool)
+        ),
         independent_compatible_candidate_count=(
             retrieval.independent_compatible_candidate_count
         ),
@@ -674,6 +778,11 @@ def _recommend_with_index(
             reaction_core=(
                 asdict(analysis.reaction_core)
                 if analysis.reaction_core is not None
+                else None
+            ),
+            fallback_descriptor=(
+                asdict(analysis.fallback_descriptor)
+                if analysis.fallback_descriptor is not None
                 else None
             ),
             query_reaction_smiles=reaction_smiles,

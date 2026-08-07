@@ -31,9 +31,10 @@ from .models import (
 from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
+from .reaction_facets import reaction_facet_keys
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "6.0"
+GENERIC_INDEX_SCHEMA_VERSION = "6.1"
 
 
 @dataclass(frozen=True)
@@ -92,6 +93,8 @@ class GenericReactionIndex:
     transformations: Mapping[str, Tuple[int, ...]]
     bond_edits: Mapping[str, Tuple[int, ...]]
     environments: Mapping[str, Tuple[int, ...]]
+    facet_exact: Mapping[str, Tuple[int, ...]]
+    facet_attachments: Mapping[str, Tuple[int, ...]]
     core_exact: Mapping[str, Tuple[int, ...]]
     core_typed: Mapping[str, Tuple[int, ...]]
     core_shapes: Mapping[str, Tuple[int, ...]]
@@ -309,6 +312,10 @@ def build_generic_index_from_rows(
     environment_features: Dict[str, list[int]] = defaultdict(list)
     fallback_features: Dict[str, list[int]] = defaultdict(list)
     partial_transformations: Dict[str, list[int]] = defaultdict(list)
+    facet_maps: Dict[str, Dict[str, list[int]]] = {
+        "exact": defaultdict(list),
+        "attachments": defaultdict(list),
+    }
     for position, row in enumerate(ordered):
         for name, field in _KEY_FIELDS.items():
             key = str(row.signature.get(field) or "")
@@ -330,6 +337,19 @@ def build_generic_index_from_rows(
             environment_features[token].append(position)
         for token in fallback_index_tokens(row.fallback_descriptor):
             fallback_features[token].append(position)
+        facet_keys = reaction_facet_keys(
+            row.signature,
+            row.reaction_core,
+            row.fallback_descriptor,
+        )
+        exact_facet = facet_keys.get("reaction_facet_exact")
+        if exact_facet:
+            facet_maps["exact"][exact_facet].append(position)
+        attachment_facet = facet_keys.get(
+            "reaction_facet_attachment_relaxed"
+        )
+        if attachment_facet:
+            facet_maps["attachments"][attachment_facet].append(position)
         partial_key = str(
             row.fallback_descriptor.get("partial_transformation_key") or ""
         )
@@ -342,6 +362,8 @@ def build_generic_index_from_rows(
         transformations=_freeze(maps["transformations"]),
         bond_edits=_freeze(maps["bond_edits"]),
         environments=_freeze(maps["environments"]),
+        facet_exact=_freeze(facet_maps["exact"]),
+        facet_attachments=_freeze(facet_maps["attachments"]),
         core_exact=_freeze(core_maps["exact"]),
         core_typed=_freeze(core_maps["typed"]),
         core_shapes=_freeze(core_maps["shapes"]),
@@ -650,6 +672,8 @@ def _index_maps(
         "transformations": index.transformations,
         "bond_edits": index.bond_edits,
         "environments": index.environments,
+        "facet_exact": index.facet_exact,
+        "facet_attachments": index.facet_attachments,
         "core_exact": index.core_exact,
         "core_typed": index.core_typed,
         "core_shapes": index.core_shapes,

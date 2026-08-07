@@ -3,10 +3,44 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
+from pathlib import Path
+from typing import Any, Dict, Iterable
 
 from .generic_indexing import load_generic_index
-from .sqlite_indexing import save_sqlite_generic_index
+from .sqlite_indexing import (
+    build_sqlite_generic_index,
+    save_sqlite_generic_index,
+)
+
+
+def _iter_records(path: Path) -> Iterable[Dict[str, Any]]:
+    """Stream canonical JSONL records without materializing the corpus."""
+    if path.name == "shard_manifest.json":
+        from .conversion.sharded import iter_gzip_jsonl, validate_sharded_conversion
+
+        integrity = validate_sharded_conversion(path, verify_rows=False)
+        if not integrity["valid"]:
+            raise ValueError("Sharded conversion integrity check failed")
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        for entry in manifest.get("shards") or ():
+            yield from iter_gzip_jsonl(path.parent / entry["output_path"])
+        return
+    opener = gzip.open if path.suffix.casefold() == ".gz" else Path.open
+    arguments = (
+        {"mode": "rt", "encoding": "utf-8"}
+        if path.suffix.casefold() == ".gz"
+        else {"mode": "r", "encoding": "utf-8"}
+    )
+    with opener(path, **arguments) as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            value = json.loads(line)
+            if not isinstance(value, dict):
+                raise ValueError(f"JSONL line {line_number} is not an object")
+            yield value
 
 
 def main() -> None:
@@ -34,11 +68,19 @@ def main() -> None:
             "output_path must be a SQLite index; persisted JSON runtime indexes "
             "have been retired"
         )
-    index = load_generic_index(
-        args.records_path,
-        include_review=args.include_review_core,
-    )
-    report = save_sqlite_generic_index(index, args.output_path)
+    source = Path(args.records_path)
+    if source.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}:
+        index = load_generic_index(
+            source,
+            include_review=args.include_review_core,
+        )
+        report = save_sqlite_generic_index(index, args.output_path)
+    else:
+        report = build_sqlite_generic_index(
+            _iter_records(source),
+            args.output_path,
+            include_review=args.include_review_core,
+        )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 
 

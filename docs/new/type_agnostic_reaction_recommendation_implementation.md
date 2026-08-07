@@ -96,12 +96,13 @@ The current code declares:
 | Concise reaction review | `12.0` |
 | Shared chemist review summary | `3.0` |
 | Recommendation artifact workflow | `2.1` |
-| Generic persisted index | `6.0` |
+| Generic persisted index | `6.1` |
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `3.3` |
 | Reaction discovery result / definition | `1.0` / `discovery_retrieval.v1@1.0` |
 | Reaction correspondence definitions | `2.6` |
 | Generic retrieval definition | `1.8` |
+| Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.0` |
 | Generic ranking definition | `1.1` |
 | Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v3@1.0` |
@@ -136,7 +137,7 @@ accuracy or prove that every intended production source has been included.
 | Verified / review / rejected admission rows | 25,768 / 15,171 / 18,421 |
 
 The 147-shard conversion report records zero failed shards and zero duplicate
-observations. The default SQLite index validates as schema 6.0 with storage
+observations. The default SQLite index validates as schema 6.1 with storage
 schema 1.0 and 38,883 rows. The application selects
 `generic_index.sqlite` by default. This run has no additional review-core
 precedents because external mapping was disabled, so expert mode safely reuses
@@ -702,6 +703,25 @@ added to the trusted recommendation scope. Product-specified reaction SMILES is
 required in the current MVP.
 
 ## 4. Current retrieval and ranking behavior
+
+Verified queries with a trustworthy reaction core first use the generic
+reaction-facet ladder in
+`condition_recommender/definitions/reaction_facet_retrieval.v1.json`:
+
+```text
+exact edit graph + active-atom states + retained attachment classes
+  -> same edit graph and atom states with attachment parent classes
+  -> existing verified-signature ladder when more distinct recipes are needed
+```
+
+Facet identity is generated from normalized graph edits, atom-state
+transitions, topology, retained remote-subgraph profiles, and unambiguous
+active X-H site signatures. It does not use the rendered reaction label or a
+named reaction family. Exact and relaxed tiers are ranked separately and
+appended in tier order, deduplicated by `RCORE1`, until `top_k` distinct recipe
+cores are available or the existing chemistry-gated ladder is exhausted. A
+well-supported broad recipe therefore cannot displace a closer structural
+class merely through support or yield.
 
 The verified-signature ladder in
 `condition_recommender/definitions/generic_retrieval.v1.json` is:

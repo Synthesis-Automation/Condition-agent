@@ -20,6 +20,7 @@ from .signature_features import (
     environment_profile_similarity,
     environment_tokens,
 )
+from .reaction_facets import load_reaction_facet_rules, reaction_facet_keys
 from .similarity import generic_signature_similarity, reaction_scope
 from .support import summarize_evidence_support
 
@@ -461,6 +462,173 @@ class CompatibleRetrievalResult:
     trace: Tuple[RetrievalLevelTrace, ...]
 
 
+@dataclass(frozen=True)
+class ProgressiveCompatibleRetrievalResult:
+    """Ordered chemistry tiers collected until enough recipe cores exist."""
+
+    tiers: tuple[
+        tuple[
+            str,
+            tuple[tuple[GenericIndexedReaction, CompatibilityAssessment], ...],
+        ],
+        ...,
+    ]
+    candidate_count: int
+    independent_candidate_count: int
+    compatible_candidate_count: int
+    independent_compatible_candidate_count: int
+    excluded_candidate_count: int
+    trace: Tuple[RetrievalLevelTrace, ...]
+
+    @property
+    def level(self) -> str:
+        if not self.tiers:
+            return "no_compatible_condition_precedent"
+        if len(self.tiers) == 1:
+            return self.tiers[0][0]
+        return "progressive_reaction_facets"
+
+
+def retrieve_progressive_compatible_pools_with_trace(
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    *,
+    reaction_core: Mapping[str, Any] | None,
+    fallback_descriptor: Mapping[str, Any] | None = None,
+    target_recipe_count: int,
+    minimum_pool_size: int | None = None,
+) -> ProgressiveCompatibleRetrievalResult | None:
+    """Collect ordered facet tiers without allowing broad rows to displace exact ones.
+
+    ``None`` means a trustworthy graph-facet projection was unavailable and the
+    historical retrieval policy should be used unchanged.
+    """
+    if target_recipe_count < 1:
+        raise ValueError("target_recipe_count must be positive")
+    keys = reaction_facet_keys(
+        signature,
+        reaction_core,
+        fallback_descriptor,
+    )
+    rules = load_reaction_facet_rules()
+    if not keys or any(level not in keys for level in rules["retrieval_ladder"]):
+        return None
+    minimum = _minimum_support(minimum_pool_size)
+    lookup_maps = {
+        "reaction_facet_exact": index.facet_exact,
+        "reaction_facet_attachment_relaxed": index.facet_attachments,
+    }
+    seen_positions: set[int] = set()
+    seen_recipe_cores: set[str] = set()
+    raw_rows_by_position: dict[int, GenericIndexedReaction] = {}
+    accepted_rows_by_position: dict[int, GenericIndexedReaction] = {}
+    tiers = []
+    traces = []
+    excluded_total = 0
+
+    def process_level(level: str, raw_positions: set[int]) -> bool:
+        nonlocal excluded_total
+        positions = raw_positions - seen_positions
+        seen_positions.update(positions)
+        if not positions:
+            traces.append(
+                RetrievalLevelTrace(
+                    level=level,
+                    candidate_count=0,
+                    independent_candidate_count=0,
+                    compatible_candidate_count=0,
+                    independent_compatible_candidate_count=0,
+                    excluded_candidate_count=0,
+                    minimum_independent_support=minimum,
+                    status="empty",
+                )
+            )
+            return False
+        ordered_positions = tuple(sorted(positions))
+        rows = index.select(ordered_positions)
+        raw_rows_by_position.update(zip(ordered_positions, rows))
+        accepted, excluded = filter_compatible_precedents(signature, rows)
+        accepted_ids = {id(row) for row, _ in accepted}
+        accepted_positions = {
+            position
+            for position, row in zip(ordered_positions, rows)
+            if id(row) in accepted_ids
+        }
+        accepted_rows_by_position.update(
+            (position, row)
+            for position, row in zip(ordered_positions, rows)
+            if position in accepted_positions
+        )
+        excluded_total += len(excluded)
+        raw_support = summarize_evidence_support(rows)
+        accepted_rows = tuple(row for row, _ in accepted)
+        accepted_support = summarize_evidence_support(accepted_rows)
+        new_recipe_cores = {
+            row.recipe_core_id for row in accepted_rows
+        } - seen_recipe_cores
+        if accepted and new_recipe_cores:
+            tiers.append((level, accepted))
+            seen_recipe_cores.update(new_recipe_cores)
+            status = (
+                "selected_target_reached"
+                if len(seen_recipe_cores) >= target_recipe_count
+                else "selected_progressive"
+                if accepted_support.independent_count >= minimum
+                else "selected_limited_support"
+            )
+        elif accepted:
+            status = "no_new_recipe_core"
+        else:
+            status = "no_compatible_recipe"
+        traces.append(
+            RetrievalLevelTrace(
+                level=level,
+                candidate_count=len(rows),
+                independent_candidate_count=raw_support.independent_count,
+                compatible_candidate_count=len(accepted),
+                independent_compatible_candidate_count=(
+                    accepted_support.independent_count
+                ),
+                excluded_candidate_count=len(excluded),
+                minimum_independent_support=minimum,
+                status=status,
+            )
+        )
+        return len(seen_recipe_cores) >= target_recipe_count
+
+    target_reached = False
+    for level in rules["retrieval_ladder"]:
+        target_reached = process_level(
+            level,
+            _positions(lookup_maps[level], keys[level]),
+        )
+        if target_reached:
+            break
+    if not target_reached:
+        for level, positions in _candidate_levels(
+            signature,
+            index,
+            reaction_core=reaction_core,
+            strategy="hybrid",
+        ):
+            target_reached = process_level(level, positions)
+            if target_reached:
+                break
+    raw_rows = tuple(raw_rows_by_position.values())
+    compatible_rows = tuple(accepted_rows_by_position.values())
+    raw_support = summarize_evidence_support(raw_rows)
+    compatible_support = summarize_evidence_support(compatible_rows)
+    return ProgressiveCompatibleRetrievalResult(
+        tiers=tuple(tiers),
+        candidate_count=len(raw_rows),
+        independent_candidate_count=raw_support.independent_count,
+        compatible_candidate_count=len(compatible_rows),
+        independent_compatible_candidate_count=compatible_support.independent_count,
+        excluded_candidate_count=excluded_total,
+        trace=tuple(traces),
+    )
+
+
 def retrieve_compatible_generic_pool_with_trace(
     signature: Mapping[str, Any],
     index: GenericReactionIndex,
@@ -624,11 +792,13 @@ def retrieve_compatible_generic_pool(
 __all__ = [
     "generic_signature_similarity",
     "CompatibleRetrievalResult",
+    "ProgressiveCompatibleRetrievalResult",
     "RetrievalStrategy",
     "load_generic_retrieval_rules",
     "reaction_scope",
     "retrieve_compatible_generic_pool",
     "retrieve_compatible_generic_pool_with_trace",
+    "retrieve_progressive_compatible_pools_with_trace",
     "retrieve_generic_pool",
     "retrieve_generic_pool_with_trace",
 ]

@@ -116,6 +116,15 @@ reactive_taxonomy + condition_registry -> condition_recommender
 `condition_registry` resolves condition identities and canonical recipes, and
 `condition_recommender` retrieves compatible precedents and ranks recipes.
 
+For verified queries with a trustworthy reaction core, the recommender first
+compares generic graph-derived reaction facets: normalized edits, active-atom
+states, reaction topology, retained attachment classes, and unambiguous active
+X-H site classes. It fills the requested `top_k` progressively with distinct
+canonical recipe cores: exact structural-class recipes first, then recipes
+whose retained attachment classes match through the versioned parent
+hierarchy, and only then the broader signature/edit ladder. Each recommendation
+retains its actual retrieval tier and relaxation caution.
+
 ### 1. Create a small local index
 
 First create reference-safe samples, then convert only one 100-row shard for a

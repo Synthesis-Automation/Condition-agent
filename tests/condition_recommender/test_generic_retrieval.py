@@ -1096,12 +1096,12 @@ def test_chemist_reactant_category_priority_reranks_with_audit_trace() -> None:
     )
 
     assert result.valid
-    assert result.retrieval_level == "transformation_signature"
+    assert result.retrieval_level == "progressive_reaction_facets"
     assert result.ranking_preferences["profile_id"] == "reactant_category"
     recommendation = result.recommendations[0]
     assert recommendation.recipe_core_id == "RCORE:aliphatic"
-    assert recommendation.default_rank == 2
-    assert recommendation.rank_change == 1
+    assert recommendation.retrieval_level == "reaction_facet_exact"
+    assert result.recommendations[1].retrieval_level == "transformation_signature"
     assert (
         recommendation.score_trace.ranking_components["partner_category"]
         == 1.0
@@ -1342,13 +1342,13 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
         minimum_pool_size=1,
     )
     assert result.valid
-    assert result.retrieval_level == "exact_signature"
+    assert result.retrieval_level == "reaction_facet_exact"
     assert result.candidate_count >= 1
     assert result.compatible_candidate_count >= 1
     assert result.compatible_candidate_count <= result.candidate_count
     assert result.excluded_candidate_count == 0
     assert result.schema_version == "3.3"
-    assert result.retrieval_trace[-1].status == "selected"
+    assert result.retrieval_trace[-1].status == "selected_target_reached"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")
     assert result.recommendations[0].resolved_recipe["recipe_id"].startswith("RCR1:")

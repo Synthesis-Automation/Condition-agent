@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reaction_facet_retrieval.v1",
+  "calibration_status": "chemist_prior_not_statistically_calibrated",
+  "state_fields": [
+    "element",
+    "formal_charge",
+    "aromatic",
+    "hybridization",
+    "total_hydrogens",
+    "heavy_atom_degree",
+    "radical_electrons"
+  ],
+  "topology_fields": [
+    "reaction_scope",
+    "formed_bond_scopes",
+    "formed_ring_sizes",
+    "ring_count_delta"
+  ],
+  "attachment_parents": {
+    "aryl": "aromatic",
+    "heteroaryl": "aromatic",
+    "alkyl": "saturated_carbon",
+    "ring_aliphatic": "saturated_carbon",
+    "alkenyl": "unsaturated_carbon",
+    "alkynyl": "unsaturated_carbon",
+    "acyl": "acyl",
+    "heteroatom": "heteroatom",
+    "generic_R": "generic_R"
+  },
+  "active_site_signature_prefixes": [
+    "signature:XH|"
+  ],
+  "retrieval_ladder": [
+    "reaction_facet_exact",
+    "reaction_facet_attachment_relaxed"
+  ]
+}

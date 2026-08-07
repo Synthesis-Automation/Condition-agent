@@ -34,6 +34,7 @@ from condition_recommender.generic_indexing import (
     load_generic_index,
     validate_generic_index_artifact,
 )
+from condition_recommender.generic_index_cli import _iter_records
 from condition_recommender.sqlite_indexing import (
     SQLiteLookupMapping,
     SQLiteReactionRows,
@@ -211,6 +212,19 @@ def test_streamed_sqlite_index_matches_in_memory_builder(tmp_path: Path) -> None
         )
     assert not streamed_path.with_suffix(".sqlite.stage").exists()
     assert not streamed_path.with_suffix(".sqlite.tmp").exists()
+
+
+def test_generic_index_cli_streams_jsonl_records(tmp_path: Path) -> None:
+    source = tmp_path / "records.jsonl"
+    source.write_text(
+        '{"reaction_id":"one"}\n{"reaction_id":"two"}\n',
+        encoding="utf-8",
+    )
+
+    assert list(_iter_records(source)) == [
+        {"reaction_id": "one"},
+        {"reaction_id": "two"},
+    ]
 
 
 def test_loader_rejects_retired_json_runtime_index(tmp_path: Path) -> None:
