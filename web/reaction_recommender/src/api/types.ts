@@ -1,0 +1,232 @@
+export type JsonObject = Record<string, unknown>
+
+export interface ApiEnvelope<T> {
+  api_schema_version: string
+  data: T
+}
+
+export interface Capabilities {
+  service: string
+  index_name: string
+  index_available: boolean
+  loaded_runtime_variants: number
+  rxnmapper_available: boolean
+  recommendation: boolean
+  discovery: boolean
+  reaction_rendering: boolean
+  local_only: boolean
+}
+
+export interface RankingProfile {
+  profile_id: string
+  label: string
+  description: string
+  weights: Record<string, number>
+}
+
+export interface CompletionOption {
+  option_id: string
+  option_kind: string
+  display_name: string
+  capability_id?: string | null
+  substance_id?: string | null
+}
+
+export interface CompletionRequirement {
+  requirement_id: string
+  fragment_key: string
+  canonical_fragment_smiles: string
+  attachment_element: string
+  options: CompletionOption[]
+}
+
+export interface CompletionProposal {
+  query_reaction_smiles: string
+  proposal_id: string
+  status: string
+  requirements: CompletionRequirement[]
+  warnings: string[]
+}
+
+export interface PrepareReactionResult {
+  valid: boolean
+  input_reaction_smiles: string
+  completion_proposal: CompletionProposal
+  warnings: string[]
+}
+
+export interface CompletionChoice {
+  requirement_id: string
+  option_id?: string
+  custom_identifier?: string
+}
+
+export interface RecipeComponent {
+  canonical_name?: string
+  display_name?: string
+  name?: string
+  raw_identifier?: string
+  substance_id?: string
+  [key: string]: unknown
+}
+
+export interface ResolvedRecipe {
+  recipe_id?: string
+  recipe_core_id?: string
+  catalysts?: RecipeComponent[]
+  ligands?: RecipeComponent[]
+  bases?: RecipeComponent[]
+  condensation_agents?: RecipeComponent[]
+  oxidants?: RecipeComponent[]
+  reductants?: RecipeComponent[]
+  acids?: RecipeComponent[]
+  additives?: RecipeComponent[]
+  solvents?: RecipeComponent[]
+  other_components?: RecipeComponent[]
+  temperature_c?: number | null
+  time_h?: number | null
+  concentration_m?: number | null
+  pressure_bar?: number | null
+  atmosphere?: string | null
+  [key: string]: unknown
+}
+
+export interface ScoreTrace {
+  ranking_profile: string
+  ranking_components: Record<string, number | null>
+  ranking_contributions: Record<string, number>
+  applied_ranking_weights: Record<string, number>
+  independent_evidence_count: number
+  observed_outcome_count: number
+  definition_versions: Record<string, string>
+}
+
+export interface Recommendation {
+  rank: number
+  default_rank?: number | null
+  rank_change: number
+  recipe_id: string
+  recipe_core_id: string
+  score: number
+  default_score?: number | null
+  similarity_score: number
+  compatibility_score: number
+  expected_yield_pct?: number | null
+  support: number
+  reference_support: number
+  dataset_support: number
+  retrieval_level: string
+  resolved_recipe: ResolvedRecipe
+  explanation: string[]
+  compatibility_evidence: string[]
+  cautions: string[]
+  precedent_reaction_smiles: string[]
+  precedent_reaction_ids: string[]
+  precedent_reference_ids: string[]
+  score_trace: ScoreTrace
+  factor_evidence: JsonObject
+}
+
+export interface RetrievalTrace {
+  level: string
+  candidate_count: number
+  independent_candidate_count: number
+  compatible_candidate_count: number
+  independent_compatible_candidate_count: number
+  excluded_candidate_count: number
+  status: string
+}
+
+export interface RecommendationResult {
+  query_reaction_smiles: string
+  effective_query_reaction_smiles?: string | null
+  valid: boolean
+  error?: string | null
+  schema_version: string
+  query_signature_id?: string | null
+  query_reaction_core_id?: string | null
+  named_family?: string | null
+  transformation_class?: string | null
+  reaction_label?: { text?: string; concise?: string; detailed?: string } | null
+  recommendation_mode: string
+  retrieval_level?: string | null
+  candidate_count: number
+  independent_candidate_count: number
+  compatible_candidate_count: number
+  warnings: string[]
+  retrieval_trace: RetrievalTrace[]
+  recommendations: Recommendation[]
+  ranking_preferences: JsonObject
+}
+
+export interface DiscoveryScoreTrace {
+  components: Record<string, number | null>
+  contributions: Record<string, number>
+  configured_weights: Record<string, number>
+  effective_weights: Record<string, number>
+  matches: string[]
+  mismatches: string[]
+}
+
+export interface DiscoveryHit {
+  rank: number
+  reaction_id: string
+  observation_id: string
+  reaction_smiles: string
+  relation_class: string
+  relation_tiers: string[]
+  discovery_score: number
+  yield_pct?: number | null
+  outcome_status: string
+  evidence_tier: string
+  chemistry_status: string
+  source_dataset: string
+  reference_id: string
+  resolved_recipe: ResolvedRecipe
+  recipe_id: string
+  recipe_core_id: string
+  hypothesis_id?: string | null
+  score_trace: DiscoveryScoreTrace
+  insights: string[]
+  cautions: string[]
+}
+
+export interface DiscoveryResult {
+  query_reaction_smiles: string
+  valid: boolean
+  error?: string | null
+  schema_version: string
+  query_signature_id?: string | null
+  query_reaction_core_id?: string | null
+  named_family?: string | null
+  transformation_class?: string | null
+  discovery_view: string
+  candidate_count: number
+  relation_counts: Record<string, number>
+  warnings: string[]
+  hits: DiscoveryHit[]
+}
+
+export interface RecommendationRequest {
+  reaction_smiles: string
+  top_k: number
+  minimum_pool_size: number | null
+  unrestricted_fallback: boolean
+  use_rxnmapper: boolean
+  ranking_preferences: {
+    profile_id: string
+    weights: Record<string, number>
+  }
+  completion_choices: CompletionChoice[]
+}
+
+export interface DiscoveryRequest {
+  reaction_smiles: string
+  top_k: number
+  view: string
+  include_low_yield: boolean
+  include_unreported_outcomes: boolean
+  use_rxnmapper: boolean
+  include_review: boolean
+}
+
