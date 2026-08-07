@@ -12,7 +12,7 @@ Suzuki,Potassium aryltrifluoroborate,Brc1ccc(OC)cc1.[K+].[B-](F)(F)(F)c2ccccc2>>
 Suzuki,2-pyridyl MIDA slow-release,Clc1ccncc1.O=C(CN(C(CN(C(O2)=O)CC(O)=O)=O)CC(O)=O)OB2c3cccnc3>>c4(c5cccnc5)ccncc4
 Suzuki,Dichloropyridine,Brc1ccc(Cl)nc1.c2ccc(B(O)O)cc2>>c1ccc(-c2ccc(Cl)nc2)cc1
 Suzuki,Mixed halide pyridine,Brc1cc(Cl)nc(Cl)c1.c2ccc(B(O)O)nc2>>c1ccc(-c2cc(Cl)nc(Cl)c2)nc1
-Suzuki,Trifluoromethyl aryl chloride + pyrimidine boronate,FC(F)(F)c1ccc(Cl)cc1.Nc1ccnc(B(O)O)n1>>FC(F)(F)c1ccc(-c2cc(N)ncn2)cc1
+Suzuki, aryl chloride + pyrimidine boronate,FC(F)(F)c1ccc(Cl)cc1.Nc1ccnc(B(O)O)n1>>FC(F)(F)c1ccc(-c2cc(N)ncn2)cc1
 Suzuki,Chloropyridyl boronic acid with aryl bromide,Clc1cncc(B(O)O)c1.Brc2ccc(F)cc2>>Fc1ccc(-c2cc(Cl)cnc2)cc1
 Suzuki,Bis-coupling to biphenyl,Brc1ccc(Br)cc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1
 Suzuki,Meta-dibromobenzene,Brc1cccc(Br)c1.c1ccc(B(O)O)cc1>>c1ccc(-c2cccc(-c3ccccc3)c2)cc1
@@ -143,7 +143,7 @@ Buchwald-Hartwig amination,4-iodoanisole + carbazole,Ic1ccc(OC)cc1.c1ccc2c(c1)c1
 Buchwald-Hartwig amination,"Ph-Br + 1,2,4-triazole N-phenyltriazole",Brc1ccccc1.c1nc[nH]n1>>c1ccccc1n1ncnc1
 Buchwald-Hartwig amination,"4-bromobenzonitrile + 1,2,4-triazole",Brc1ccc(C#N)cc1.c1nc[nH]n1>>N#Cc1ccc(n2ncnc2)cc1
 Buchwald-Hartwig amination,"2-bromotoluene + indole, ortho-substituted",Brc1ccccc1C.c1ccc2[nH]ccc2c1>>Cc1ccccc1n1ccc2ccccc21
-Buchwald-Hartwig amination,"2,6-dimethylbromobenzene + indole, sterically hindered",Brc1c(C)cccc1C.c1ccc2[nH]ccc2c1>>Cc1cccc(C)c1n1ccc2ccccc21
+Buchwald-Hartwig amination,"2,6-dimethylbromobenzene + indole, hindered",Brc1c(C)cccc1C.c1ccc2[nH]ccc2c1>>Cc1cccc(C)c1n1ccc2ccccc21
 Buchwald-Hartwig amination,"2-bromoanisole + pyrrole, ortho-substituted",Brc1ccccc1OC.c1cc[nH]c1>>COc1ccccc1n1cccc1
 Buchwald-Hartwig amination,"1,4-dibromobenzene + indole, bis-coupling",Brc1ccc(Br)cc1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)cc1n1ccc2ccccc21
 Buchwald-Hartwig amination,"1,3-dibromobenzene + pyrrole, bis-coupling",Brc1cccc(Br)c1.c1cc[nH]c1>>c1cccc(n2cccc2)c1n1cccc1
@@ -167,7 +167,7 @@ Buchwald-Hartwig amination,Ph-Br + pivalamide,Brc1ccccc1.NC(=O)C(C)(C)C>>CC(C)(C
 Buchwald-Hartwig amination,4-chlorobenzotrifluoride + isobutyramide,Clc1ccc(C(F)(F)F)cc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccc(C(F)(F)F)cc1
 Buchwald-Hartwig amination,Ph-Br + hydrocinnamamide,Brc1ccccc1.NC(=O)CCc1ccccc1>>O=C(CCc1ccccc1)Nc1ccccc1
 Buchwald-Hartwig amination,4-bromoanisole + hydrocinnamamide,Brc1ccc(OC)cc1.NC(=O)CCc1ccccc1>>COc1ccc(NC(=O)CCc2ccccc2)cc1
-Buchwald-Hartwig amination,Ph-Br + 2-pyrrolidinone N-phenyl-2-pyrrolidinone,Brc1ccccc1.C1CCNC1=O>>O=C1CCCN1c1ccccc1
+Buchwald-Hartwig amination,Ph-Br + 2-pyrrolidinone-2-pyrrolidinone,Brc1ccccc1.C1CCNC1=O>>O=C1CCCN1c1ccccc1
 Buchwald-Hartwig amination,4-bromotoluene + 2-pyrrolidinone,Brc1ccc(C)cc1.C1CCNC1=O>>Cc1ccc(N2CCCC2=O)cc1
 Buchwald-Hartwig amination,4-chloropyridine + 2-pyrrolidinone,Clc1ccncc1.C1CCNC1=O>>O=C1CCCN1c1ccncc1
 Buchwald-Hartwig amination,"Ph-Br + acetamide, alternative",Brc1ccccc1.NC(C)=O>>CC(=O)Nc1ccccc1
@@ -177,7 +177,7 @@ Buchwald-Hartwig amination,Ph-Br + thiophene-3-carboxamide,Brc1ccccc1.NC(=O)c1cc
 Buchwald-Hartwig amination,4-bromoanisole + thiophene-3-carboxamide,Brc1ccc(OC)cc1.NC(=O)c1cccs1>>COc1ccc(NC(=O)c2cccs2)cc1
 Buchwald-Hartwig amination,Ph-Br + furan-3-carboxamide,Brc1ccccc1.NC(=O)c1ccco1>>O=C(Nc1ccccc1)c1ccco1
 Buchwald-Hartwig amination,"2-bromotoluene + acetamide, ortho-substituted",Brc1ccccc1C.NC(=O)C>>CC(=O)Nc1ccccc1C
-Buchwald-Hartwig amination,"2,6-dimethylbromobenzene + benzamide, sterically hindered",Brc1c(C)cccc1C.NC(=O)c1ccccc1>>Cc1cccc(C)c1NC(=O)c1ccccc1
+Buchwald-Hartwig amination,"2,6-dimethylbromobenzene + benzamide, hindered",Brc1c(C)cccc1C.NC(=O)c1ccccc1>>Cc1cccc(C)c1NC(=O)c1ccccc1
 Buchwald-Hartwig amination,"2-iodonaphthalene + acetamide, fused ring",Ic1ccc2ccccc2c1.NC(=O)C>>CC(=O)Nc1ccc2ccccc2c1
 Buchwald-Hartwig amination,"1,4-dibromobenzene + acetamide, bis-coupling",Brc1ccc(Br)cc1.NC(=O)C>>CC(=O)Nc1ccc(NC(C)=O)cc1
 Buchwald-Hartwig amination,Ph-Br + methanesulfonamide,Brc1ccccc1.NS(=O)(=O)C>>CS(=O)(=O)Nc1ccccc1
@@ -386,17 +386,17 @@ Amide: 4-Nitrobenzoic acid + tert-butylamine,,O=C(O)c1ccc([N+](=O)[O-])cc1.NC(C)
 Amide: 3-Chlorobenzoic acid + 4-picolylamine,,O=C(O)c1cccc(Cl)c1.NCc1ccncc1>>O=C(NCc1ccncc1)c1cccc(Cl)c1
 Amide: 2-Naphthoic acid + 4-aminopiperidine,,O=C(O)c1ccc2ccccc2c1.NC1CCNCC1>>O=C(N1CCC(N)CC1)c1ccc2ccccc2c1
 Amide: Isonicotinic acid + aniline,,O=C(O)c1ccncc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccncc1
-Amide: Pyrimidine-2-carboxylic acid + 4-fluorobenzylamine,,O=C(O)c1cnccn1.NCc1ccc(F)cc1>>O=C(NCc1ccc(F)cc1)c1cnccn1
+Amide: Pyrimidine-2-acid + 4-fluorobenzylamine,,O=C(O)c1cnccn1.NCc1ccc(F)cc1>>O=C(NCc1ccc(F)cc1)c1cnccn1
 Amide: Thiophene-3-carboxylic acid + morpholine,,O=C(c1sccc1)O.NC2CCOCC2>>O=C(NC3CCOCC3)c4sccc4
-Amide: Pyrrole-3-carboxylic acid + 2-phenoxyethylamine,,O=C(O)c1cc[nH]c1.NCCOc1ccccc1>>O=C(NCCOc1ccccc1)c1cc[nH]c1
-"Amide: Pyrrole-2-carboxylic acid + 4,4-dimethylcyclohexylamine",,O=C(O)c1ccc[nH]1.NC1CCC(C)(C)CC1>>O=C(NC1CCC(C)(C)CC1)c1ccc[nH]1
+Amide: Pyrrole-3-acid + 2-phenoxyethylamine,,O=C(O)c1cc[nH]c1.NCCOc1ccccc1>>O=C(NCCOc1ccccc1)c1cc[nH]c1
+"Amide: Pyrrole-2 acid + 4,4-dimethylcyclohexylamine",,O=C(O)c1ccc[nH]1.NC1CCC(C)(C)CC1>>O=C(NC1CCC(C)(C)CC1)c1ccc[nH]1
 Amide: Octanoic acid + p-anisidine,,CCCCCCCC(=O)O.Nc1ccc(OC)cc1>>CCCCCCCC(=O)Nc1ccc(OC)cc1
 Amide: Isovaleric acid + 4-chlorobenzylamine,,CC(C)CC(=O)O.NCc1ccc(Cl)cc1>>CC(C)CC(=O)NCc1ccc(Cl)cc1
 Amide: 2-Methylbutyric acid + N-methylpiperazine,,CCC(C)C(=O)O.NC1CCN(C)CC1>>CCC(C)C(=O)N1CCN(C)CC1
 Amide: Cyclohexanecarboxylic acid + tryptamine,,O=C(O)C1CCCCC1.NCCc1ccc[nH]1>>O=C(NCCc1ccc[nH]1)C1CCCCC1
 Amide: Leucine + benzylamine,,CC(C)CC(N)C(=O)O.NCc1ccccc1>>CC(C)CC(N)C(=O)NCc1ccccc1
 Amide: Phenylalanine + cyclohexylamine,,N[C@@H](Cc1ccccc1)C(=O)O.NC1CCCCC1>>N[C@@H](Cc1ccccc1)C(=O)N1CCCCC1
-"Amide: Benzoic acid + N,N-dimethylaniline tertiary amide",,O=C(O)c1ccccc1.CN(C)c1ccccc1>>CN(C)c1ccccc1.O=C(N(C)c1ccccc1)c1ccccc1
+"Amide: Benzoic acid + tertiary amide",,O=C(O)c1ccccc1.CN(C)c1ccccc1>>CN(C)c1ccccc1.O=C(N(C)c1ccccc1)c1ccccc1
 Amide: Acetic acid + pyrrolidine,,CC(=O)O.N1CCCC1>>CC(=O)N1CCCC1
 Amide: 4-Bromobenzoic acid + morpholine,,O=C(O)c1ccc(Br)cc1.N1CCOCC1>>O=C(N1CCOCC1)c1ccc(Br)cc1
 Amide: EDC/HOBt coupling,,O=C(O)c1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccccc1
