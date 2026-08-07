@@ -77,6 +77,59 @@ def _fragment_source_artifact_is_current(source: Path) -> bool | None:
     ) == FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
 
 
+def _trusted_review_reuse_row_count(source: Path) -> int | None:
+    """Return a verified trusted-row count when no review index is needed."""
+    conversion_path = source.parent / "conversion_report.json"
+    if conversion_path.is_file():
+        try:
+            conversion = json.loads(conversion_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            conversion = {}
+        integrity = conversion.get("integrity") or {}
+        tiers = conversion.get("precedent_tier_counts") or {}
+        trusted_count = tiers.get("trusted")
+        verified_rows = integrity.get("verified_row_count")
+        output_rows = conversion.get("output_row_count")
+        conversion_supports_reuse = (
+            bool(integrity.get("valid"))
+            and int(conversion.get("failed_shard_count") or 0) == 0
+            and trusted_count is not None
+            and int(tiers.get("review_core") or 0) == 0
+            and verified_rows is not None
+            and output_rows is not None
+            and int(verified_rows) == int(output_rows)
+        )
+        if conversion_supports_reuse:
+            return int(trusted_count)
+
+    report_path = source.parent / "recommendation_artifacts_report.json"
+    if not report_path.is_file():
+        return None
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    trusted_count = report.get("trusted_precedent_count")
+    unrestricted_count = report.get("unrestricted_precedent_count")
+    counts_match = (
+        trusted_count is not None
+        and unrestricted_count is not None
+        and int(trusted_count) == int(unrestricted_count)
+    )
+    fast_index_path = str(
+        ((report.get("artifacts") or {}).get("fast_index") or {}).get("path")
+        or ""
+    ).replace("\\", "/")
+    if (
+        report.get("review_index_reuses_trusted")
+        and int(report.get("review_core_precedent_count") or 0) == 0
+        and counts_match
+        and fast_index_path.endswith(source.name)
+    ):
+        return int(trusted_count)
+    return None
+
+
 def _reaction_label_payload(analysis: Any) -> Dict[str, Any]:
     """Serialize the one canonical rendered reaction label."""
     return (
@@ -271,34 +324,10 @@ class GenericConditionRecommender:
         if include_review and paired_review_name:
             index_source = source.with_name(paired_review_name)
             if not index_source.is_file():
-                report_path = source.parent / "recommendation_artifacts_report.json"
-                report = {}
-                if report_path.is_file():
-                    try:
-                        report = json.loads(report_path.read_text(encoding="utf-8"))
-                    except (OSError, json.JSONDecodeError):
-                        report = {}
-                trusted_count = report.get("trusted_precedent_count")
-                unrestricted_count = report.get("unrestricted_precedent_count")
-                counts_match = (
-                    trusted_count is not None
-                    and unrestricted_count is not None
-                    and int(trusted_count) == int(unrestricted_count)
-                )
-                review_index_reuses_trusted = bool(
-                    report.get("review_index_reuses_trusted")
-                    and int(report.get("review_core_precedent_count") or 0) == 0
-                    and counts_match
-                    and str(
-                        ((report.get("artifacts") or {}).get("fast_index") or {}).get(
-                            "path"
-                        )
-                        or ""
-                    ).replace("\\", "/").endswith(source.name)
-                )
-                if review_index_reuses_trusted:
+                review_reuse_row_count = _trusted_review_reuse_row_count(source)
+                review_index_reuses_trusted = review_reuse_row_count is not None
+                if review_reuse_row_count is not None:
                     index_source = source
-                    review_reuse_row_count = int(trusted_count)
                 else:
                     raise FileNotFoundError(
                         "Review-core index is unavailable. Rebuild recommendation "

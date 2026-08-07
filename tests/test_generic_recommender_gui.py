@@ -1,5 +1,7 @@
 from dataclasses import replace
+import json
 from pathlib import Path
+from types import SimpleNamespace
 
 from app import reaction_recommender_gui as gui
 from condition_recommender.models import (
@@ -209,6 +211,54 @@ def test_window_uses_literature_recommendation_data_by_default(
         label.text() == "Reaction Condition Recommender"
         for label in window.findChildren(gui.QtWidgets.QLabel)
     )
+
+
+def test_data_summary_prefers_selected_index_and_current_conversion_report(
+    qtbot,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    index_path = tmp_path / "generic_index.sqlite"
+    index_path.write_bytes(b"sqlite placeholder")
+    (tmp_path / "recommendation_artifacts_report.json").write_text(
+        json.dumps(
+            {
+                "record_count": 20_389,
+                "trusted_precedent_count": 11_288,
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "conversion_report.json").write_text(
+        json.dumps(
+            {
+                "output_row_count": 298_274,
+                "precedent_tier_counts": {"trusted": 213_765},
+                "core_eligibility_counts": {
+                    "trusted_core": 210_816,
+                    "query_only": 12_026,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        gui,
+        "load_generic_index",
+        lambda _path: SimpleNamespace(
+            rows=range(213_765),
+            precedent_scope=SimpleNamespace(value="trusted"),
+        ),
+    )
+    window = gui.GenericRecommenderWindow()
+    qtbot.addWidget(window)
+
+    window.data_path_edit.setText(str(index_path))
+    window._update_data_summary()
+
+    assert "298,274 converted reactions" in window.data_summary.text()
+    assert "213,765 indexed trusted precedents" in window.data_summary.text()
+    assert "20,389" not in window.data_summary.text()
 
 
 def _discovery_result() -> ReactionDiscoveryResult:

@@ -1,4 +1,5 @@
 from dataclasses import asdict, replace
+import json
 from pathlib import Path
 
 import pytest
@@ -1212,6 +1213,44 @@ def test_preloaded_recommender_loads_the_index_once(
     recommender.recommend(reaction, minimum_pool_size=1)
 
     assert calls == [str(path)]
+
+
+def test_review_mode_uses_current_conversion_report_when_artifact_report_is_stale(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "generic_index.sqlite"
+    save_sqlite_generic_index(
+        build_generic_index([_record(1, _signature("one"))]),
+        path,
+    )
+    (tmp_path / "recommendation_artifacts_report.json").write_text(
+        json.dumps(
+            {
+                "trusted_precedent_count": 20_000,
+                "unrestricted_precedent_count": 20_000,
+                "review_core_precedent_count": 0,
+                "review_index_reuses_trusted": True,
+                "artifacts": {"fast_index": {"path": str(path)}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "conversion_report.json").write_text(
+        json.dumps(
+            {
+                "output_row_count": 1,
+                "failed_shard_count": 0,
+                "precedent_tier_counts": {"trusted": 1},
+                "integrity": {"valid": True, "verified_row_count": 1},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    recommender = GenericConditionRecommender.from_path(path, include_review=True)
+
+    assert len(recommender.index.rows) == 1
+    assert recommender.review_index_reuses_trusted
 
 
 def test_reaction_core_index_round_trip_preserves_lookup_maps(

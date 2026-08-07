@@ -32,6 +32,7 @@ from condition_recommender import (  # noqa: E402
     propose_reaction_completion,
     resolve_ranking_preferences,
 )
+from condition_recommender.generic_indexing import load_generic_index  # noqa: E402
 from reactive_taxonomy import (  # noqa: E402
     RxnMapperProvider,
     render_reactivity_profile,
@@ -1126,33 +1127,84 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         if not path.is_file():
             self.data_summary.setText("Data file not found.")
             return
-        report_path = path.parent / "recommendation_artifacts_report.json"
-        if report_path.is_file():
+
+        index_count: Optional[int] = None
+        index_scope = ""
+        if path.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}:
             try:
-                report = json.loads(report_path.read_text(encoding="utf-8"))
+                selected_index = load_generic_index(path)
+            except (OSError, ValueError):
+                selected_index = None
+            if selected_index is not None:
+                index_count = len(selected_index.rows)
+                index_scope = selected_index.precedent_scope.value
+
+        report = {}
+        conversion_report_path = path.parent / "conversion_report.json"
+        if conversion_report_path.is_file():
+            try:
+                report = json.loads(
+                    conversion_report_path.read_text(encoding="utf-8")
+                )
             except (OSError, json.JSONDecodeError):
                 report = {}
-            total = report.get("record_count")
-            trusted = report.get(
-                "trusted_precedent_count",
-                report.get("eligible_index_record_count"),
+        if not report:
+            artifact_report_path = (
+                path.parent / "recommendation_artifacts_report.json"
             )
-            review_core = report.get("review_core_precedent_count")
-            query_core = report.get("query_core_eligible_count")
-            if total is not None:
-                details = []
-                if trusted is not None:
-                    details.append(f"{trusted} trusted precedents")
-                if review_core is not None:
-                    details.append(f"{review_core} review-core precedents")
-                if query_core is not None:
-                    details.append(f"{query_core} query-core eligible")
-                self.data_summary.setText(
-                    f"{total} converted reactions"
-                    + (f"; {'; '.join(details)}" if details else "")
-                    + "."
-                )
-                return
+            if artifact_report_path.is_file():
+                try:
+                    report = json.loads(
+                        artifact_report_path.read_text(encoding="utf-8")
+                    )
+                except (OSError, json.JSONDecodeError):
+                    report = {}
+
+        total = report.get("output_row_count", report.get("record_count"))
+        tiers = report.get("precedent_tier_counts") or {}
+        core_counts = report.get("core_eligibility_counts") or {}
+        trusted = (
+            index_count
+            if index_count is not None and index_scope == "trusted"
+            else tiers.get(
+                "trusted",
+                report.get(
+                    "trusted_precedent_count",
+                    report.get("eligible_index_record_count"),
+                ),
+            )
+        )
+        review_core = tiers.get(
+            "review_core",
+            report.get("review_core_precedent_count"),
+        )
+        query_core = (
+            sum(
+                int(core_counts.get(tier) or 0)
+                for tier in ("trusted_core", "review_core", "query_only")
+            )
+            if core_counts
+            else report.get("query_core_eligible_count")
+        )
+        if total is not None or index_count is not None:
+            details = []
+            if trusted is not None:
+                details.append(f"{int(trusted):,} indexed trusted precedents")
+            elif index_count is not None:
+                details.append(f"{index_count:,} indexed precedents")
+            if review_core is not None:
+                details.append(f"{int(review_core):,} review-core precedents")
+            if query_core is not None:
+                details.append(f"{int(query_core):,} query-core eligible")
+            prefix = (
+                f"{int(total):,} converted reactions"
+                if total is not None
+                else path.name
+            )
+            self.data_summary.setText(
+                prefix + (f"; {'; '.join(details)}" if details else "") + "."
+            )
+            return
         self.data_summary.setText(
             f"Using {path.name} ({path.stat().st_size / 1024:.1f} KB)."
         )
