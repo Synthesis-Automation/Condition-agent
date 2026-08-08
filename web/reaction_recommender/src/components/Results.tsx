@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type {
   DiscoveryHit,
   DiscoveryResult,
+  ExperimentalDetail,
   RecipeComponent,
   Recommendation,
   RecommendationResult,
@@ -178,6 +179,26 @@ function ReferenceRecords({ records }: { records: ReferenceRecord[] }) {
   )
 }
 
+function ExperimentalDetails({ details }: { details: ExperimentalDetail[] }) {
+  if (!details.length) return null
+  return (
+    <details className="trace-panel experimental-panel">
+      <summary>
+        Experimental details{details.length > 1 ? ` (${details.length} precedents)` : ''}
+      </summary>
+      <div className="experimental-detail-list">
+        {details.map((detail, index) => (
+          <article key={detail.observation_id || detail.reaction_id || index}>
+            {details.length > 1 && <h5>Precedent {index + 1}</h5>}
+            <p>{detail.procedure_text}</p>
+            {detail.notes && <small>Notes: {detail.notes}</small>}
+          </article>
+        ))}
+      </div>
+    </details>
+  )
+}
+
 function protocolFilename(rank: number, recipeId: string): string {
   const recipeToken = recipeId.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '').slice(0, 48)
   return `condition_protocol_rank_${rank}_${recipeToken || 'recipe'}.json`
@@ -240,6 +261,7 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
           <ReferenceRecords records={item.precedent_references ?? []} />
         </section>
       </div>
+      <ExperimentalDetails details={item.precedent_experimental_details ?? []} />
       {protocol && <ProtocolPanel protocol={protocol} rank={item.rank} />}
       <MessageList title="Why this recipe" values={item.explanation} />
       <MessageList title="Compatibility evidence" values={item.compatibility_evidence} />
@@ -323,6 +345,7 @@ function DiscoveryDetails({ hit }: { hit: DiscoveryHit }) {
       <div className="detail-title-row"><div><span className="eyebrow">SELECTED PRECEDENT</span><h3>Rank {hit.rank} · {displayName(hit.relation_class)}</h3><p>Source: {displayName(hit.source_dataset)}</p></div><div className="score-orbit"><strong>{hit.discovery_score.toFixed(3)}</strong><span>score</span></div></div>
       <ReactionImage smiles={hit.reaction_smiles} label="Selected precedent reaction" compact />
       <div className="detail-columns"><section><h4>Observed conditions</h4><Conditions recipe={hit.resolved_recipe} /></section><section><h4>Provenance</h4><dl className="detail-list"><div><dt>Dataset</dt><dd>{displayName(hit.source_dataset)}</dd></div><div><dt>Evidence tier</dt><dd>{displayName(hit.evidence_tier)}</dd></div><div><dt>Chemistry</dt><dd>{displayName(hit.chemistry_status)}</dd></div><div><dt>Outcome</dt><dd>{displayName(hit.outcome_status)}</dd></div><div><dt>Observed yield</dt><dd>{hit.yield_pct == null ? 'Unreported' : `${hit.yield_pct.toFixed(1)}%`}</dd></div></dl><ReferenceRecords records={hit.reference_record ? [hit.reference_record] : []} /></section></div>
+      <ExperimentalDetails details={hit.experimental_detail ? [hit.experimental_detail] : []} />
       <MessageList title="Why it is related" values={hit.score_trace.matches} />
       <MessageList title="Structural differences" values={hit.score_trace.mismatches} tone="caution" />
       <MessageList title="Insights" values={hit.insights} />

@@ -30,6 +30,12 @@ from .contracts import (
     FeatureAnalysisRequest,
     RecommendationRequest,
 )
+from .experimental_details import (
+    EXPERIMENTAL_DETAIL_CATALOG_FILENAME,
+    attach_discovery_experimental_details,
+    attach_recommendation_experimental_details,
+    load_experimental_detail_catalog,
+)
 from .features import analyze_features, detect_input_kind
 from .references import (
     REFERENCE_CATALOG_FILENAME,
@@ -84,6 +90,8 @@ class LocalRecommendationRuntime:
         self._feature_mapping_provider: RxnMapperProvider | None = None
         self._reference_catalog_key: tuple[str, int, int] | None = None
         self._reference_catalog: Dict[str, Dict[str, Any]] = {}
+        self._experimental_detail_catalog_key: tuple[str, int, int] | None = None
+        self._experimental_detail_catalog: Dict[str, Dict[str, Any]] = {}
 
     def _get_reference_catalog(self) -> Dict[str, Dict[str, Any]]:
         """Load and cache the reference artifact paired with the active index."""
@@ -98,6 +106,24 @@ class LocalRecommendationRuntime:
                 self._reference_catalog = load_reference_catalog(self.index_path)
                 self._reference_catalog_key = key
             return self._reference_catalog
+
+    def _get_experimental_detail_catalog(self) -> Dict[str, Dict[str, Any]]:
+        """Load and cache observed procedures paired with the active index."""
+
+        catalog_path = (
+            self.index_path.parent / EXPERIMENTAL_DETAIL_CATALOG_FILENAME
+        )
+        if not catalog_path.is_file():
+            return {}
+        stat = catalog_path.stat()
+        key = (str(catalog_path.resolve()), stat.st_size, stat.st_mtime_ns)
+        with self._lock:
+            if self._experimental_detail_catalog_key != key:
+                self._experimental_detail_catalog = (
+                    load_experimental_detail_catalog(self.index_path)
+                )
+                self._experimental_detail_catalog_key = key
+            return self._experimental_detail_catalog
 
     def _cache_key(
         self, *, use_rxnmapper: bool, include_review: bool
@@ -234,9 +260,13 @@ class LocalRecommendationRuntime:
             ranking_preferences=preferences,
             completion_selections=selections,
         )
-        return attach_recommendation_references(
+        payload = attach_recommendation_references(
             result.to_dict(),
             self._get_reference_catalog(),
+        )
+        return attach_recommendation_experimental_details(
+            payload,
+            self._get_experimental_detail_catalog(),
         )
 
     def discover(self, request: DiscoveryRequest) -> Dict[str, Any]:
@@ -258,9 +288,13 @@ class LocalRecommendationRuntime:
             include_low_yield=request.include_low_yield,
             include_unreported_outcomes=request.include_unreported_outcomes,
         )
-        return attach_discovery_references(
+        payload = attach_discovery_references(
             result.to_dict(),
             self._get_reference_catalog(),
+        )
+        return attach_discovery_experimental_details(
+            payload,
+            self._get_experimental_detail_catalog(),
         )
 
     def analyze_features(

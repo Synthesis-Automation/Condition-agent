@@ -149,6 +149,17 @@ export interface ReferenceRecord {
   resolution_status?: string | null
 }
 
+export interface ExperimentalDetail {
+  observation_id?: string
+  reaction_id?: string
+  source_dataset?: string
+  reference_id?: string
+  procedure_text: string
+  notes?: string | null
+  stages?: unknown
+  steps?: unknown
+}
+
 export interface ScoreTrace {
   ranking_profile: string
   ranking_components: Record<string, number | null>
@@ -183,6 +194,7 @@ export interface Recommendation {
   precedent_reaction_ids: string[]
   precedent_reference_ids: string[]
   precedent_references?: ReferenceRecord[]
+  precedent_experimental_details?: ExperimentalDetail[]
   score_trace: ScoreTrace
   factor_evidence: JsonObject
 }
@@ -243,6 +255,7 @@ export interface DiscoveryHit {
   source_dataset: string
   reference_id: string
   reference_record?: ReferenceRecord | null
+  experimental_detail?: ExperimentalDetail | null
   resolved_recipe: ResolvedRecipe
   recipe_id: string
   recipe_core_id: string

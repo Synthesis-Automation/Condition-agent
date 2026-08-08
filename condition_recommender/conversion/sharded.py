@@ -440,6 +440,7 @@ def _write_catalogs(
     recipes: Dict[str, Mapping[str, Any]] = {}
     references: Dict[str, Mapping[str, Any]] = {}
     series: Dict[str, Dict[str, Any]] = {}
+    experimental_details: Dict[str, Dict[str, Any]] = {}
     for entry in manifest["shards"]:
         for record in iter_gzip_jsonl(destination / entry["output_path"]):
             recipe_id = str(record.get("resolved_recipe_id") or "")
@@ -467,11 +468,33 @@ def _write_catalogs(
                 if reaction_id:
                     item["canonical_reaction_ids"].add(reaction_id)
                 item["observation_count"] += 1
+            source = record.get("source") or {}
+            procedure = str(source.get("experimental_procedure") or "").strip()
+            observation_id = str(record.get("observation_id") or "")
+            source_reaction_id = str(record.get("reaction_id") or "")
+            if procedure and (observation_id or source_reaction_id):
+                key = observation_id or source_reaction_id
+                experimental_details.setdefault(
+                    key,
+                    {
+                        "observation_id": observation_id,
+                        "reaction_id": source_reaction_id,
+                        "source_dataset": str(record.get("source_dataset") or ""),
+                        "reference_id": reference_id,
+                        "procedure_text": procedure,
+                        "notes": str(source.get("notes") or "").strip(),
+                        "stages": source.get("stages"),
+                        "steps": source.get("steps"),
+                    },
+                )
     paths = {
         "recipe_catalog": Path("recipe_catalog.jsonl.gz"),
         "reference_catalog": Path("reference_catalog.jsonl.gz"),
         "reference_condition_series_catalog": Path(
             "reference_condition_series.jsonl.gz"
+        ),
+        "experimental_detail_catalog": Path(
+            "experimental_detail_catalog.jsonl.gz"
         ),
     }
     _write_gzip_jsonl(
@@ -492,6 +515,10 @@ def _write_catalogs(
             }
             for key in sorted(series)
         ),
+    )
+    _write_gzip_jsonl(
+        destination / paths["experimental_detail_catalog"],
+        (experimental_details[key] for key in sorted(experimental_details)),
     )
     return {
         name: {

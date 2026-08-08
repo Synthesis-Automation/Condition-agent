@@ -1,4 +1,5 @@
 import csv
+import gzip
 import json
 from pathlib import Path
 
@@ -992,6 +993,7 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
         )
         for index in range(4)
     ]
+    rows[0]["experimental_procedure"] = "Observed procedure from the source."
     with dataset.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
@@ -1023,6 +1025,16 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     }
     assert first["named_family_counts"] == {"suzuki_miyaura": 4}
     assert first["integrity"]["valid"]
+    with gzip.open(
+        output / "experimental_detail_catalog.jsonl.gz",
+        "rt",
+        encoding="utf-8",
+    ) as handle:
+        experimental_details = [json.loads(line) for line in handle]
+    assert len(experimental_details) == 1
+    assert experimental_details[0]["procedure_text"] == (
+        "Observed procedure from the source."
+    )
     assert second["reused_shard_count"] == 2
     assert (output / "recipe_catalog.jsonl.gz").read_bytes() == first_catalog
     assert len(load_generic_index(output / "records.jsonl.gz").rows) == 4
