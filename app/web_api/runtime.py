@@ -31,6 +31,12 @@ from .contracts import (
     RecommendationRequest,
 )
 from .features import analyze_features, detect_input_kind
+from .references import (
+    REFERENCE_CATALOG_FILENAME,
+    attach_discovery_references,
+    attach_recommendation_references,
+    load_reference_catalog,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -76,6 +82,22 @@ class LocalRecommendationRuntime:
         ] = {}
         self._lock = RLock()
         self._feature_mapping_provider: RxnMapperProvider | None = None
+        self._reference_catalog_key: tuple[str, int, int] | None = None
+        self._reference_catalog: Dict[str, Dict[str, Any]] = {}
+
+    def _get_reference_catalog(self) -> Dict[str, Dict[str, Any]]:
+        """Load and cache the reference artifact paired with the active index."""
+
+        catalog_path = self.index_path.parent / REFERENCE_CATALOG_FILENAME
+        if not catalog_path.is_file():
+            return {}
+        stat = catalog_path.stat()
+        key = (str(catalog_path.resolve()), stat.st_size, stat.st_mtime_ns)
+        with self._lock:
+            if self._reference_catalog_key != key:
+                self._reference_catalog = load_reference_catalog(self.index_path)
+                self._reference_catalog_key = key
+            return self._reference_catalog
 
     def _cache_key(
         self, *, use_rxnmapper: bool, include_review: bool
@@ -212,7 +234,10 @@ class LocalRecommendationRuntime:
             ranking_preferences=preferences,
             completion_selections=selections,
         )
-        return result.to_dict()
+        return attach_recommendation_references(
+            result.to_dict(),
+            self._get_reference_catalog(),
+        )
 
     def discover(self, request: DiscoveryRequest) -> Dict[str, Any]:
         """Execute exploratory precedent discovery over the shared index."""
@@ -233,7 +258,10 @@ class LocalRecommendationRuntime:
             include_low_yield=request.include_low_yield,
             include_unreported_outcomes=request.include_unreported_outcomes,
         )
-        return result.to_dict()
+        return attach_discovery_references(
+            result.to_dict(),
+            self._get_reference_catalog(),
+        )
 
     def analyze_features(
         self,

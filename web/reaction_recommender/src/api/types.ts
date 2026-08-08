@@ -139,6 +139,16 @@ export interface ResolvedRecipe {
   [key: string]: unknown
 }
 
+export interface ReferenceRecord {
+  reference_id: string
+  raw_reference?: string | null
+  normalized_citation?: string | null
+  doi?: string | null
+  patent_number?: string | null
+  publication_year?: number | null
+  resolution_status?: string | null
+}
+
 export interface ScoreTrace {
   ranking_profile: string
   ranking_components: Record<string, number | null>
@@ -172,6 +182,7 @@ export interface Recommendation {
   precedent_reaction_smiles: string[]
   precedent_reaction_ids: string[]
   precedent_reference_ids: string[]
+  precedent_references?: ReferenceRecord[]
   score_trace: ScoreTrace
   factor_evidence: JsonObject
 }
@@ -231,6 +242,7 @@ export interface DiscoveryHit {
   chemistry_status: string
   source_dataset: string
   reference_id: string
+  reference_record?: ReferenceRecord | null
   resolved_recipe: ResolvedRecipe
   recipe_id: string
   recipe_core_id: string

@@ -5,6 +5,7 @@ import type {
   RecipeComponent,
   Recommendation,
   RecommendationResult,
+  ReferenceRecord,
   ResolvedRecipe,
   SynthesisProtocolDraft,
 } from '../api/types'
@@ -68,6 +69,17 @@ export function recipeSummary(recipe: ResolvedRecipe): string {
   return parts.join(' · ') || 'Resolved recipe details unavailable'
 }
 
+export function compactRecipeSummary(recipe: ResolvedRecipe): string {
+  const parts: string[] = []
+  for (const [field] of ROLE_FIELDS) {
+    const values = recipe[field]
+    if (Array.isArray(values)) parts.push(...values.map(componentName))
+  }
+  if (recipe.temperature_c != null) parts.push(`${recipe.temperature_c} °C`)
+  if (recipe.time_h != null) parts.push(`${recipe.time_h} h`)
+  return parts.join(' · ') || 'Conditions unavailable'
+}
+
 function Conditions({ recipe }: { recipe: ResolvedRecipe }) {
   const rows: Array<[string, string]> = []
   for (const [field, label] of ROLE_FIELDS) {
@@ -101,6 +113,67 @@ function MessageList({ title, values, tone = '' }: { title: string; values: stri
     <div className={`message-group ${tone}`}>
       <h4>{title}</h4>
       <ul>{values.map((value, index) => <li key={`${value}-${index}`}>{value}</li>)}</ul>
+    </div>
+  )
+}
+
+function CitationText({ record }: { record: ReferenceRecord }) {
+  const rawCitation = record.raw_reference || record.normalized_citation || ''
+  const sections = rawCitation.split('|').map((value) => value.trim()).filter(Boolean)
+  const title = sections.length >= 3 ? sections[0] : ''
+  const authors = sections.length >= 3 ? sections[1] : ''
+  const publication = sections.length >= 3 ? sections.slice(2).join(' | ') : rawCitation
+  const publicationMatch = publication.match(/^(.*)\s+\(((?:18|19|20|21)\d{2})\)(.*)$/)
+  const terminalPeriod = (value: string) => /[.!?]$/.test(value) ? value : `${value}.`
+
+  if (!rawCitation) {
+    return (
+      <span className="reference-citation">
+        {record.doi || record.patent_number || 'Reference details unavailable'}
+        {record.publication_year && <> <strong>{record.publication_year}</strong>.</>}
+      </span>
+    )
+  }
+
+  return (
+    <span className="reference-citation">
+      {authors && <>{terminalPeriod(authors)} </>}
+      {title && <>{terminalPeriod(title)} </>}
+      {publicationMatch ? (
+        <>
+          <em>{publicationMatch[1].trim()}</em>{' '}
+          <strong>{publicationMatch[2]}</strong>{publicationMatch[3]}.
+        </>
+      ) : (
+        <>
+          {publication}
+          {record.publication_year && <> <strong>{record.publication_year}</strong></>}
+          {!/[.!?]$/.test(publication) && '.'}
+        </>
+      )}
+    </span>
+  )
+}
+
+function ReferenceRecords({ records }: { records: ReferenceRecord[] }) {
+  if (!records.length) return null
+  return (
+    <div className="reference-records">
+      <h5>Dataset references</h5>
+      <ul>
+        {records.map((record) => {
+          const metadata = [
+            record.doi ? `DOI ${record.doi}` : '',
+            record.patent_number ? `Patent ${record.patent_number}` : '',
+          ].filter(Boolean)
+          return (
+            <li key={record.reference_id}>
+              <CitationText record={record} />
+              {metadata.length > 0 && <small>{metadata.join(' · ')}</small>}
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
 }
@@ -161,8 +234,10 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
             <div><dt>Compatibility</dt><dd>{item.compatibility_score.toFixed(3)}</dd></div>
             <div><dt>Reaction support</dt><dd>{item.support}</dd></div>
             <div><dt>Reference support</dt><dd>{item.reference_support}</dd></div>
+            <div><dt>Dataset support</dt><dd>{item.dataset_support}</dd></div>
             <div><dt>Expected yield</dt><dd>{item.expected_yield_pct == null ? 'Unreported' : `${item.expected_yield_pct.toFixed(1)}%`}</dd></div>
           </dl>
+          <ReferenceRecords records={item.precedent_references ?? []} />
         </section>
       </div>
       {protocol && <ProtocolPanel protocol={protocol} rank={item.rank} />}
@@ -223,13 +298,13 @@ export function RecommendationResults({ result }: { result: RecommendationResult
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Similarity</th><th>Compatibility</th><th>Yield</th><th>Support</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Score</th><th>Similarity</th><th>Yield</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.recommendations.map((item, index) => (
                   <tr key={item.recipe_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
                     <td><strong>{item.rank}</strong>{item.rank_change !== 0 && <span className="rank-change">{item.rank_change > 0 ? '+' : ''}{item.rank_change}</span>}</td>
-                    <td>{item.score.toFixed(3)}</td><td>{item.similarity_score.toFixed(3)}</td><td>{item.compatibility_score.toFixed(3)}</td>
-                    <td>{item.expected_yield_pct == null ? '—' : `${item.expected_yield_pct.toFixed(1)}%`}</td><td>{item.support}</td><td>{recipeSummary(item.resolved_recipe)}</td>
+                    <td>{item.score.toFixed(3)}</td><td>{item.similarity_score.toFixed(3)}</td>
+                    <td>{item.expected_yield_pct == null ? '—' : `${item.expected_yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(item.resolved_recipe)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -247,7 +322,7 @@ function DiscoveryDetails({ hit }: { hit: DiscoveryHit }) {
     <article className="result-detail">
       <div className="detail-title-row"><div><span className="eyebrow">SELECTED PRECEDENT</span><h3>Rank {hit.rank} · {displayName(hit.relation_class)}</h3><p>Source: {displayName(hit.source_dataset)}</p></div><div className="score-orbit"><strong>{hit.discovery_score.toFixed(3)}</strong><span>score</span></div></div>
       <ReactionImage smiles={hit.reaction_smiles} label="Selected precedent reaction" compact />
-      <div className="detail-columns"><section><h4>Observed conditions</h4><Conditions recipe={hit.resolved_recipe} /></section><section><h4>Provenance</h4><dl className="detail-list"><div><dt>Evidence tier</dt><dd>{displayName(hit.evidence_tier)}</dd></div><div><dt>Chemistry</dt><dd>{displayName(hit.chemistry_status)}</dd></div><div><dt>Outcome</dt><dd>{displayName(hit.outcome_status)}</dd></div><div><dt>Observed yield</dt><dd>{hit.yield_pct == null ? 'Unreported' : `${hit.yield_pct.toFixed(1)}%`}</dd></div></dl></section></div>
+      <div className="detail-columns"><section><h4>Observed conditions</h4><Conditions recipe={hit.resolved_recipe} /></section><section><h4>Provenance</h4><dl className="detail-list"><div><dt>Dataset</dt><dd>{displayName(hit.source_dataset)}</dd></div><div><dt>Evidence tier</dt><dd>{displayName(hit.evidence_tier)}</dd></div><div><dt>Chemistry</dt><dd>{displayName(hit.chemistry_status)}</dd></div><div><dt>Outcome</dt><dd>{displayName(hit.outcome_status)}</dd></div><div><dt>Observed yield</dt><dd>{hit.yield_pct == null ? 'Unreported' : `${hit.yield_pct.toFixed(1)}%`}</dd></div></dl><ReferenceRecords records={hit.reference_record ? [hit.reference_record] : []} /></section></div>
       <MessageList title="Why it is related" values={hit.score_trace.matches} />
       <MessageList title="Structural differences" values={hit.score_trace.mismatches} tone="caution" />
       <MessageList title="Insights" values={hit.insights} />
@@ -274,8 +349,8 @@ export function DiscoveryResults({ result }: { result: DiscoveryResult }) {
       <ReactionImage smiles={result.query_reaction_smiles} label="Discovery query reaction" compact />
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No discovery result')}</div>}
       <MessageList title="Discovery warnings" values={result.warnings} tone="caution" />
-      {result.hits.length > 0 && <div className="results-layout"><div className="table-scroll"><table><thead><tr><th>Rank</th><th>Score</th><th>Relationship</th><th>Yield</th><th>Evidence</th><th>Observed conditions</th></tr></thead><tbody>
-        {result.hits.map((hit, index) => <tr key={hit.observation_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}><td><strong>{hit.rank}</strong></td><td>{hit.discovery_score.toFixed(3)}</td><td>{displayName(hit.relation_class)}</td><td>{hit.yield_pct == null ? '—' : `${hit.yield_pct.toFixed(1)}%`}</td><td>{displayName(hit.evidence_tier)}</td><td>{recipeSummary(hit.resolved_recipe)}</td></tr>)}
+      {result.hits.length > 0 && <div className="results-layout"><div className="table-scroll"><table><thead><tr><th>Rank</th><th>Score</th><th>Relationship</th><th>Yield</th><th>Conditions</th></tr></thead><tbody>
+        {result.hits.map((hit, index) => <tr key={hit.observation_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}><td><strong>{hit.rank}</strong></td><td>{hit.discovery_score.toFixed(3)}</td><td>{displayName(hit.relation_class)}</td><td>{hit.yield_pct == null ? '—' : `${hit.yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(hit.resolved_recipe)}</td></tr>)}
       </tbody></table></div>{active && <DiscoveryDetails hit={active} />}</div>}
     </section>
   )
