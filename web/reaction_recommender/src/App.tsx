@@ -200,10 +200,10 @@ function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div><span className="eyebrow">LOCAL · STRUCTURE-FIRST</span><h1>Reaction Condition Recommender</h1><p>Draw a transformation, retrieve compatible precedent chemistry, and inspect every ranking decision.</p></div>
+        <div><h1>Reaction Condition Recommender</h1><p>Find compatible conditions from structurally related precedents.</p></div>
         <div className="service-status">
           <span className={`status-dot ${capabilities?.index_available ? '' : 'offline'}`} />
-          <div><strong>{capabilities?.index_available ? 'Index ready' : capabilities ? 'Index unavailable' : 'Connecting…'}</strong><span>{capabilities?.index_name ?? 'Local recommendation service'}</span></div>
+          <strong>{capabilities?.index_available ? 'Index ready' : capabilities ? 'Index unavailable' : 'Connecting…'}</strong>
         </div>
       </header>
 
@@ -216,13 +216,13 @@ function App() {
 
       <section className="control-card" aria-labelledby="analysis-title">
         <div className="section-heading">
-          <div><span className="step-number">2</span><div><h2 id="analysis-title">Choose the analysis</h2><p>The molecular graph remains the source of truth in every mode.</p></div></div>
+          <div><span className="step-number">2</span><h2 id="analysis-title">Analysis</h2></div>
           {result && <button className="button quiet" type="button" onClick={exportResult}>Export full result</button>}
         </div>
         <div className="mode-switch" role="tablist" aria-label="Analysis mode">
-          <button type="button" className={mode === 'recommendation' ? 'active' : ''} onClick={() => { setMode('recommendation'); setResult(null) }}><strong>Condition recommendation</strong><span>Rank compatible recipes</span></button>
-          <button type="button" className={mode === 'discovery' ? 'active' : ''} onClick={() => { setMode('discovery'); setResult(null) }}><strong>Reaction discovery</strong><span>Explore structural precedents</span></button>
-          <button type="button" className={mode === 'features' ? 'active' : ''} onClick={() => { setMode('features'); setResult(null) }}><strong>Feature analysis</strong><span>Inspect molecular graph evidence</span></button>
+          <button type="button" className={mode === 'recommendation' ? 'active' : ''} onClick={() => { setMode('recommendation'); setResult(null) }}><strong>Condition recommendation</strong></button>
+          <button type="button" className={mode === 'discovery' ? 'active' : ''} onClick={() => { setMode('discovery'); setResult(null) }}><strong>Reaction discovery</strong></button>
+          <button type="button" className={mode === 'features' ? 'active' : ''} onClick={() => { setMode('features'); setResult(null) }}><strong>Feature analysis</strong></button>
         </div>
 
         <div className={`option-grid ${mode === 'features' ? 'feature-options' : ''}`}>

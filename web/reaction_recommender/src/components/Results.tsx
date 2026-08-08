@@ -124,7 +124,7 @@ function downloadProtocol(protocol: SynthesisProtocolDraft, rank: number) {
 
 function ProtocolPanel({ protocol, rank }: { protocol: SynthesisProtocolDraft; rank: number }) {
   return (
-    <details className="trace-panel protocol-panel" open>
+    <details className="trace-panel protocol-panel">
       <summary>
         <span>Condition protocol JSON</span>
         <span className="readiness-badge">{displayName(protocol.execution_readiness)}</span>
@@ -146,7 +146,7 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
       <div className="detail-title-row">
         <div>
           <span className="eyebrow">SELECTED RECIPE</span>
-          <h3>Rank {item.rank} · {item.recipe_id}</h3>
+          <h3>Rank {item.rank}</h3>
           <p>{recipeSummary(item.resolved_recipe)}</p>
         </div>
         <div className="score-orbit"><strong>{item.score.toFixed(3)}</strong><span>score</span></div>
@@ -245,7 +245,7 @@ export function RecommendationResults({ result }: { result: RecommendationResult
 function DiscoveryDetails({ hit }: { hit: DiscoveryHit }) {
   return (
     <article className="result-detail">
-      <div className="detail-title-row"><div><span className="eyebrow">SELECTED PRECEDENT</span><h3>Rank {hit.rank} · {displayName(hit.relation_class)}</h3><p>{hit.reference_id || hit.source_dataset}</p></div><div className="score-orbit"><strong>{hit.discovery_score.toFixed(3)}</strong><span>score</span></div></div>
+      <div className="detail-title-row"><div><span className="eyebrow">SELECTED PRECEDENT</span><h3>Rank {hit.rank} · {displayName(hit.relation_class)}</h3><p>Source: {displayName(hit.source_dataset)}</p></div><div className="score-orbit"><strong>{hit.discovery_score.toFixed(3)}</strong><span>score</span></div></div>
       <ReactionImage smiles={hit.reaction_smiles} label="Selected precedent reaction" compact />
       <div className="detail-columns"><section><h4>Observed conditions</h4><Conditions recipe={hit.resolved_recipe} /></section><section><h4>Provenance</h4><dl className="detail-list"><div><dt>Evidence tier</dt><dd>{displayName(hit.evidence_tier)}</dd></div><div><dt>Chemistry</dt><dd>{displayName(hit.chemistry_status)}</dd></div><div><dt>Outcome</dt><dd>{displayName(hit.outcome_status)}</dd></div><div><dt>Observed yield</dt><dd>{hit.yield_pct == null ? 'Unreported' : `${hit.yield_pct.toFixed(1)}%`}</dd></div></dl></section></div>
       <MessageList title="Why it is related" values={hit.score_trace.matches} />

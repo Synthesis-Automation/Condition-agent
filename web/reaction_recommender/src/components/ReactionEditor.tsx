@@ -222,8 +222,8 @@ export function ReactionEditor({
             </h2>
             <p>
               {allowMolecule
-                ? 'Enter molecular or reaction SMILES; the input type is detected automatically.'
-                : 'Enter reaction SMILES directly, or use the drawing editor.'}
+                ? 'Enter or draw a molecule or complete reaction SMILES.'
+                : <>Enter or draw complete <code>reactants&gt;&gt;products</code> SMILES.</>}
             </p>
           </div>
         </div>
@@ -254,11 +254,6 @@ export function ReactionEditor({
             spellCheck={false}
           />
         </label>
-        <small>
-          {allowMolecule
-            ? <>Use molecular SMILES or the complete <code>reactants&gt;&gt;products</code> form. A drawing writes its generated SMILES here automatically.</>
-            : <>Use the complete <code>reactants&gt;&gt;products</code> form. A drawing writes its generated SMILES here automatically.</>}
-        </small>
       </div>
 
       {canPreview ? (
