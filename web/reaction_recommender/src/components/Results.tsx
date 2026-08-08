@@ -313,7 +313,6 @@ export function RecommendationResults({ result }: { result: RecommendationResult
           </div>
         </div>
       </div>
-      <ReactionImage smiles={result.effective_query_reaction_smiles ?? result.query_reaction_smiles} label="Analyzed query reaction" compact />
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No recommendation')}</div>}
       <MessageList title="Query warnings" values={result.warnings} tone="caution" />
       {result.recommendations.length > 0 && (

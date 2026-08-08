@@ -43,18 +43,20 @@ function InlineSvg({ source, label }: { source: string; label: string }) {
   )
 }
 
-function FeatureWarnings({ values }: { values: string[] }) {
-  if (!values.length) return null
+function InlineNotes({ label, values }: { label: string; values: string[] }) {
+  const notes = [...new Set(values.filter(Boolean))]
+  if (!notes.length) return null
   return (
-    <div className="message-group caution feature-warning">
-      <h4>Review notes</h4>
-      <ul>{values.map((value) => <li key={value}>{displayName(value)}</li>)}</ul>
+    <div className="feature-inline-notes">
+      <strong>{label}</strong>
+      <ul>{notes.map((value) => <li key={value}>{displayName(value)}</li>)}</ul>
     </div>
   )
 }
 
 export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
   const mapping = result.mapping ?? null
+  const isReaction = result.input_kind === 'reaction'
   const mappingRows = useMemo(
     () => mapping
       ? Object.fromEntries(
@@ -66,37 +68,49 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
       : null,
     [mapping],
   )
+  const overviewValues = useMemo(
+    () => isReaction
+      ? Object.fromEntries(
+          Object.entries(result.overview).filter(([name]) => (
+            !['signature_id', 'compatible_named_families'].includes(name)
+          )),
+        )
+      : result.overview,
+    [isReaction, result.overview],
+  )
 
   return (
-    <section className="results-card feature-results">
+    <section className={`results-card feature-results ${isReaction ? 'reaction-features' : 'molecule-features'}`}>
       <div className="results-summary">
         <div>
           <span className="eyebrow">FEATURE ANALYSIS</span>
-          <h2>{result.input_kind === 'reaction' ? 'Reaction features' : 'Molecular features'}</h2>
+          <h2>{isReaction ? 'Reaction features' : 'Molecular features'}</h2>
         </div>
         <div className="metric-strip">
-          <div><strong>{displayName(result.input_kind)}</strong><span>detected input</span></div>
-          <div><strong>{result.valid ? 'Valid' : 'Invalid'}</strong><span>graph status</span></div>
-          <div><strong>{result.schema_version}</strong><span>schema</span></div>
+          <div><strong>{result.valid ? 'Valid' : 'Invalid'}</strong><span>graph</span></div>
+          <div><strong>{isReaction ? result.reaction_core?.event_count ?? 0 : result.motifs.length}</strong><span>{isReaction ? 'core events' : 'motifs'}</span></div>
+          <div><strong>{result.reactive_sites.length}</strong><span>reactive sites</span></div>
         </div>
       </div>
 
-      <div className="feature-structure-panel">
-        <h3>Full structure</h3>
-        <ReactionImage
-          smiles={result.input_smiles}
-          label={`Analyzed ${result.input_kind}`}
-          kind={result.input_kind}
-        />
-      </div>
+      {!isReaction && (
+        <div className="feature-structure-panel">
+          <h3>Structure</h3>
+          <ReactionImage
+            smiles={result.input_smiles}
+            label="Analyzed molecule"
+            kind="molecule"
+          />
+        </div>
+      )}
 
       {!result.valid && <div className="alert error">{result.error ?? 'The structure is invalid.'}</div>}
-      <FeatureWarnings values={result.warnings} />
 
       <div className="feature-layout">
         <section className="feature-panel">
           <h3>Chemistry overview</h3>
-          <Overview values={result.overview} />
+          <Overview values={overviewValues} />
+          <InlineNotes label="Analysis notes" values={result.warnings} />
         </section>
 
         {mappingRows && Object.keys(mappingRows).length > 0 && (
@@ -107,7 +121,7 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
         )}
 
         {result.reaction_core && (
-          <section className="feature-panel feature-panel-wide">
+          <section className="feature-panel feature-panel-wide feature-core-panel">
             <div className="feature-panel-heading">
               <div><h3>Reaction core</h3><p>{displayName(result.reaction_core.evidence_status)} evidence · {(result.reaction_core.confidence * 100).toFixed(0)}% confidence</p></div>
               <span className={`quality-badge ${result.reaction_core.quality.status}`}>{displayName(result.reaction_core.quality.status)}</span>
@@ -122,7 +136,7 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
                 </div>
               ))}
             </div>
-            <FeatureWarnings values={[
+            <InlineNotes label="Core review" values={[
               ...result.reaction_core.quality.review_reasons,
               ...result.reaction_core.quality.blocking_reasons,
             ]} />
@@ -131,7 +145,7 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
 
         {result.partners.length > 0 && (
           <section className="feature-panel">
-            <h3>Reaction partners</h3>
+            <h3>Reaction partners <span className="feature-count">{result.partners.length}</span></h3>
             <div className="feature-card-list">
               {result.partners.map((partner, index) => (
                 <article key={`${partner.component_index}-${partner.role}-${index}`}>
@@ -146,7 +160,7 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
 
         {result.motifs.length > 0 && (
           <section className="feature-panel">
-            <h3>Functional motifs</h3>
+            <h3>Functional motifs <span className="feature-count">{result.motifs.length}</span></h3>
             <div className="feature-card-list">
               {result.motifs.map((motif, index) => (
                 <article key={`${motif.side ?? ''}-${motif.component_index}-${motif.motif_id}-${index}`}>
@@ -161,7 +175,7 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
 
         {result.reactive_sites.length > 0 && (
           <section className="feature-panel feature-panel-wide">
-            <h3>Reactive-site hypotheses</h3>
+            <h3>Reactive-site hypotheses <span className="feature-count">{result.reactive_sites.length}</span></h3>
             <div className="feature-card-list site-list">
               {result.reactive_sites.map((site, index) => (
                 <article key={`${site.side ?? ''}-${site.component_index}-${site.hypothesis_id}-${index}`}>

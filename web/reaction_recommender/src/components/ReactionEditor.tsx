@@ -263,7 +263,6 @@ export function ReactionEditor({
             label={`Current ${detectedKind} drawing`}
             kind={detectedKind}
           />
-          <p className="reaction-smiles-caption">{normalizedValue}</p>
         </div>
       ) : normalizedValue ? (
         <button className="reaction-paper-empty incomplete" type="button" onClick={() => setOpen(true)}>

@@ -72,6 +72,11 @@ function App() {
     [profiles, profileId],
   )
 
+  const changeMode = (nextMode: Mode) => {
+    setMode(nextMode)
+    setResult(null)
+  }
+
   const runRecommendation = async (completionChoices: CompletionChoice[] = []) => {
     setBusy(true)
     setError('')
@@ -207,32 +212,34 @@ function App() {
         </div>
       </header>
 
-      <ReactionEditor
-        value={reactionSmiles}
-        onChange={setReactionSmiles}
-        onError={setError}
-        allowMolecule={mode === 'features'}
-      />
+      <div className="analysis-workbench">
+        <ReactionEditor
+          value={reactionSmiles}
+          onChange={setReactionSmiles}
+          onError={setError}
+          allowMolecule={mode === 'features'}
+        />
 
-      <section className="control-card" aria-labelledby="analysis-title">
+        <section className="control-card" aria-labelledby="analysis-title">
         <div className="section-heading">
           <div><span className="step-number">2</span><h2 id="analysis-title">Analysis</h2></div>
-          {result && <button className="button quiet" type="button" onClick={exportResult}>Export full result</button>}
+          {result && <button className="button quiet" type="button" onClick={exportResult}>Export JSON</button>}
         </div>
-        <div className="mode-switch" role="tablist" aria-label="Analysis mode">
-          <button type="button" className={mode === 'recommendation' ? 'active' : ''} onClick={() => { setMode('recommendation'); setResult(null) }}><strong>Condition recommendation</strong></button>
-          <button type="button" className={mode === 'discovery' ? 'active' : ''} onClick={() => { setMode('discovery'); setResult(null) }}><strong>Reaction discovery</strong></button>
-          <button type="button" className={mode === 'features' ? 'active' : ''} onClick={() => { setMode('features'); setResult(null) }}><strong>Feature analysis</strong></button>
-        </div>
+        <fieldset className="mode-switch">
+          <legend className="sr-only">Analysis mode</legend>
+          <label className={mode === 'recommendation' ? 'active' : ''}><input type="radio" name="analysis-mode" value="recommendation" checked={mode === 'recommendation'} onChange={() => changeMode('recommendation')} /><strong>Condition recommendation</strong></label>
+          <label className={mode === 'discovery' ? 'active' : ''}><input type="radio" name="analysis-mode" value="discovery" checked={mode === 'discovery'} onChange={() => changeMode('discovery')} /><strong>Reaction discovery</strong></label>
+          <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Feature analysis</strong></label>
+        </fieldset>
 
         <div className={`option-grid ${mode === 'features' ? 'feature-options' : ''}`}>
           {mode !== 'features' && <label><span>Top results</span><input type="number" min="1" max="50" value={topK} onChange={(event) => setTopK(Math.min(50, Math.max(1, Number(event.target.value))))} /></label>}
           {mode === 'recommendation' ? (
-            <label className="wide-option"><span>Ranking profile</span><div className="joined-control"><select value={profileId} onChange={(event) => { setProfileId(event.target.value); setCustomWeights(null) }}>{profiles.map((profile) => <option key={profile.profile_id} value={profile.profile_id}>{profile.label}</option>)}</select><button type="button" className="button quiet" onClick={() => setRankingOpen(true)} disabled={!selectedProfile}>Customize</button></div><small>{selectedProfile?.description}</small></label>
+            <label className="wide-option"><span>Ranking profile</span><div className="joined-control"><select value={profileId} onChange={(event) => { setProfileId(event.target.value); setCustomWeights(null) }}>{profiles.map((profile) => <option key={profile.profile_id} value={profile.profile_id}>{profile.label}</option>)}</select><button type="button" className="button quiet" onClick={() => setRankingOpen(true)} disabled={!selectedProfile}>Customize</button></div></label>
           ) : mode === 'discovery' ? (
             <label className="wide-option"><span>Discovery view</span><select value={discoveryView} onChange={(event) => setDiscoveryView(event.target.value)}><option value="closest_chemistry">Closest chemistry</option><option value="diverse_strategies">Diverse strategies</option><option value="successful_precedents">Successful precedents</option><option value="failure_informed">Failure-informed</option></select></label>
           ) : (
-            <div className="feature-mode-note"><strong>Automatic input detection</strong><span>Molecules return motifs and reactive sites. Reactions also return bond edits, partners, mapping evidence, and a minimized reaction core.</span></div>
+            <div className="feature-mode-note"><strong>Automatic input detection</strong><span>Molecules show motifs and sites; reactions also include edits and mapping.</span></div>
           )}
           <div className="run-control"><button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !capabilities?.index_available) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : 'Analyze features'}</button><span>{status}</span></div>
         </div>
@@ -249,7 +256,8 @@ function App() {
           )}
         </div></details>
         {error && <div className="alert error" role="alert">{error}</div>}
-      </section>
+        </section>
+      </div>
 
       {recommendationResult && <RecommendationResults result={recommendationResult} />}
       {discoveryResult && <DiscoveryResults result={discoveryResult} />}
