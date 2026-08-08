@@ -28,7 +28,11 @@ from .generic_indexing import (
     _validate_index_metadata,
     build_generic_index_from_rows,
 )
-from .models import PrecedentIndexScope, PrecedentTier
+from .models import (
+    FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION,
+    PrecedentIndexScope,
+    PrecedentTier,
+)
 from .signature_features import environment_tokens
 
 
@@ -242,6 +246,9 @@ def _metadata_payload(
         "precedent_scope": index.precedent_scope.value,
         "core_eligibility_definition_version": (
             index.core_eligibility_definition_version
+        ),
+        "fragment_source_capability_definition_version": (
+            FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
         ),
         "index_id": index_id,
         "row_count": len(index.rows),

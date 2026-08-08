@@ -21,6 +21,9 @@ _COUNTERION_AZIDATION_QUERY = (
     "C=Cn1cc[n+](Cc2c(F)c(F)c(F)c(F)c2F)c1.[Br-]"
     ">>C=Cn1cc[n+](Cc2c(F)c(F)c(N=[N+]=[N-])c(F)c2F)c1.[Br-]"
 )
+_INDAZOLE_CYANATION_QUERY = (
+    "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43"
+)
 
 
 def _precedent(index: int) -> dict:
@@ -319,7 +322,12 @@ def test_confirmed_azide_substance_filters_source_supported_precedents() -> None
     assert result.completion_proposal is not None
     assert result.completion_selections[0]["substance_id"] == "cas:26628-22-8"
     assert result.effective_query_reaction_smiles is not None
-    assert ">[Na+].[N-]=[N+]=[N-]>" in result.effective_query_reaction_smiles
+    completed_reactants, completed_products = (
+        result.effective_query_reaction_smiles.split(">>")
+    )
+    assert "[Na+]" in completed_reactants
+    assert "[N-]=[N+]=[N-]" in completed_reactants
+    assert completed_products.startswith("C=Cn1cc[n+]")
     assert "QUERY_SOURCE_SUBSTANCE_USER_CONFIRMED:cas:26628-22-8" in (
         result.warnings
     )
@@ -332,6 +340,70 @@ def test_confirmed_azide_substance_filters_source_supported_precedents() -> None
         "not observed in the submitted reaction" in caution
         for caution in result.recommendations[0].cautions
     )
+
+
+def test_ferrocyanide_completion_recovers_exact_indazole_precedent() -> None:
+    from condition_recommender import (
+        build_completion_selection,
+        propose_reaction_completion,
+    )
+
+    precedent = convert_record(
+        adapt_row(
+            {
+                "reaction_id": "preparation_of_1h_indazole_3_carbonitrile",
+                "reaction_smiles": _INDAZOLE_CYANATION_QUERY,
+                "yield_pct": "96",
+                "reagent_cas": "14459-95-1, 7732-18-5",
+                "catalyst_cas": "12012-95-2, 161265-03-8",
+                "solvent_cas": "127-19-5",
+                "reference": "10.15227/orgsyn.097.0314",
+            },
+            source_dataset="literature_reaction_dataset",
+            source_path="org_syn_1_preprocessor.csv",
+            source_row_number=5,
+        )
+    ).to_dict()
+    assert precedent["chemistry_status"] == "review"
+    assert precedent["index_eligibility"] == "eligible"
+    assert precedent["outcome_status"] == "usable"
+    assert precedent["fragment_source_support"][0]["status"] == "supported"
+
+    proposal = propose_reaction_completion(_INDAZOLE_CYANATION_QUERY)
+    requirement = proposal.requirements[0]
+    ferrocyanide = next(
+        value
+        for value in requirement.options
+        if value.substance_id == "cas:14459-95-1"
+    )
+    selection = build_completion_selection(
+        proposal,
+        requirement.requirement_id,
+        option_id=ferrocyanide.option_id,
+    )
+
+    result = GenericConditionRecommender(
+        build_generic_index([precedent])
+    ).recommend(
+        _INDAZOLE_CYANATION_QUERY,
+        completion_selections=(selection,),
+    )
+
+    assert result.valid
+    assert result.retrieval_level.startswith(
+        "source_supported_partial_transformation"
+    )
+    assert result.candidate_count == 1
+    assert result.recommendations[0].precedent_reaction_ids == (
+        "preparation_of_1h_indazole_3_carbonitrile",
+    )
+    assert result.effective_query_reaction_smiles is not None
+    completed_reactants, completed_product = (
+        result.effective_query_reaction_smiles.split(">>")
+    )
+    assert "[C-]#N" in completed_reactants
+    assert "[Fe+2]" in completed_reactants
+    assert completed_product == "N#CC3=NNC4=CC=CC=C43"
 
 
 def test_stale_index_reports_rebuild_after_completion_selection() -> None:
@@ -369,6 +441,20 @@ def test_stale_index_reports_rebuild_after_completion_selection() -> None:
     assert "RECOMMENDATION_ARTIFACT_PREDATES_FRAGMENT_SOURCE_COMPLETION" in (
         result.warnings
     )
+
+
+def test_sqlite_index_records_current_completion_definition(tmp_path) -> None:
+    from condition_recommender.sqlite_indexing import build_sqlite_generic_index
+
+    index_path = tmp_path / "generic_index.sqlite"
+    build_sqlite_generic_index(
+        (_azidation_precedent(1, _COUNTERION_AZIDATION_QUERY),),
+        index_path,
+    )
+
+    recommender = GenericConditionRecommender.from_path(index_path)
+
+    assert recommender.fragment_source_artifact_current is True
 
 
 def test_partial_fluorination_without_capable_source_is_not_indexed() -> None:

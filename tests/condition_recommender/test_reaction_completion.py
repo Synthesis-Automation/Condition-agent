@@ -74,10 +74,42 @@ def test_confirmed_sodium_azide_builds_separate_completed_query() -> None:
     )
 
     assert completed is not None
-    assert ">[Na+].[N-]=[N+]=[N-]>" in completed
+    reactants, products = completed.split(">>")
+    assert "[Na+]" in reactants
+    assert "[N-]=[N+]=[N-]" in reactants
+    assert products.startswith("C=Cn1cc[n+]")
     assert completed != _COUNTERION_AZIDATION_QUERY
     assert warnings == ()
     assert proposal.query_reaction_smiles == _COUNTERION_AZIDATION_QUERY
+
+
+def test_completed_three_part_query_preserves_agents_and_adds_reactant() -> None:
+    proposal = propose_reaction_completion(_COUNTERION_AZIDATION_QUERY)
+    requirement = proposal.requirements[0]
+    sodium_azide = next(
+        value
+        for value in requirement.options
+        if value.substance_id == "cas:26628-22-8"
+    )
+    selection = build_completion_selection(
+        proposal,
+        requirement.requirement_id,
+        option_id=sodium_azide.option_id,
+    )
+    reactants, products = _COUNTERION_AZIDATION_QUERY.split(">>")
+
+    completed, warnings = build_completed_reaction_smiles(
+        f"{reactants}>O>{products}",
+        (selection,),
+    )
+
+    assert completed is not None
+    completed_reactants, agents, completed_products = completed.split(">")
+    assert "[Na+]" in completed_reactants
+    assert "[N-]=[N+]=[N-]" in completed_reactants
+    assert agents == "O"
+    assert completed_products == products
+    assert warnings == ()
 
 
 def test_unknown_edited_source_remains_explicitly_unresolved() -> None:

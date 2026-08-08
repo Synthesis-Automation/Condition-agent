@@ -66,6 +66,19 @@ def test_multi_atom_cyanide_requirement_uses_same_general_contract() -> None:
     assert support[0].capability_ids == ("cyanide_fragment_source.v1",)
 
 
+def test_potassium_ferrocyanide_supports_cyanide_requirement() -> None:
+    requirements = _requirements("Brc1ccccc1>>N#Cc1ccccc1")
+    recipe = build_resolved_recipe(
+        {"reagent_cas": ("14459-95-1",)},
+    )
+
+    support = assess_fragment_source_support(requirements, recipe)
+
+    assert support[0].status == "supported"
+    assert support[0].component_substance_ids == ("cas:14459-95-1",)
+    assert support[0].capability_ids == ("cyanide_fragment_source.v1",)
+
+
 def test_structured_reagent_field_supports_azide_requirement() -> None:
     requirements = _requirements(
         "Fc1ccccc1>>[N-]=[N+]=Nc1ccccc1"

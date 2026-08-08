@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, Dict, Mapping, Tuple
@@ -59,6 +60,24 @@ from .reaction_facets import load_reaction_facet_rules
 
 
 def _fragment_source_artifact_is_current(source: Path) -> bool | None:
+    if source.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}:
+        try:
+            uri = f"{source.resolve().as_uri()}?mode=ro"
+            with sqlite3.connect(uri, uri=True, timeout=30.0) as connection:
+                result = connection.execute(
+                    "SELECT payload FROM metadata WHERE singleton = 1"
+                ).fetchone()
+            metadata = json.loads(result[0]) if result is not None else {}
+        except (OSError, sqlite3.DatabaseError, json.JSONDecodeError):
+            metadata = {}
+        stored_version = str(
+            metadata.get("fragment_source_capability_definition_version") or ""
+        )
+        if stored_version:
+            return (
+                stored_version
+                == FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
+            )
     manifest_path = (
         source
         if source.name.casefold() == "shard_manifest.json"
@@ -696,6 +715,29 @@ def _recommend_with_index(
             False,
             error=analysis.error or "INVALID_REACTION",
         )
+    if (
+        completion_selections
+        and effective_reaction_smiles is not None
+        and base_analysis.valid
+        and base_analysis.partial_product_transformation is not None
+        and base_analysis.fallback_descriptor is not None
+    ):
+        # Retain the source-faithful partial observation so an exact precedent
+        # supported by the confirmed source is not hidden by the hypothetical
+        # reactant-completed query. If no exact/source-compatible partial
+        # precedent exists, continue with the completed structural analysis and
+        # its generic verified-signature fallback ladder.
+        partial_completion_result = _recommend_fallback_with_index(
+            base_analysis,
+            index,
+            top_k=top_k,
+            minimum_pool_size=minimum_pool_size,
+            unrestricted=unrestricted_fallback,
+            ranking_preferences=ranking_preferences,
+            completion_selections=completion_selections,
+        )
+        if partial_completion_result.valid:
+            return finalize(partial_completion_result)
     if (
         assessment is not None
         and assessment.status

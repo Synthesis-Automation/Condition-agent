@@ -277,7 +277,7 @@ def build_completed_reaction_smiles(
     reaction_smiles: str,
     selections: tuple[ReactionCompletionSelection, ...],
 ) -> tuple[str | None, tuple[str, ...]]:
-    """Build a hypothetical agent-completed query from exact source choices."""
+    """Build a hypothetical reactant-completed query from exact source choices."""
     source_smiles = []
     warnings = []
     for selection in selections:
@@ -301,18 +301,25 @@ def build_completed_reaction_smiles(
 
     if ">>" in reaction_smiles:
         reactants, products = reaction_smiles.split(">>", 1)
-        existing_agents = ""
+        existing_agents = None
     else:
         parts = reaction_smiles.split(">")
         if len(parts) != 3:
             raise ValueError("INVALID_REACTION_FORMAT")
         reactants, existing_agents, products = parts
-    agents = ".".join(
-        value
-        for value in (existing_agents.strip(), *dict.fromkeys(source_smiles))
-        if value
+    reactant_components = tuple(
+        component
+        for value in (reactants, *source_smiles)
+        for component in value.strip().split(".")
+        if component
     )
-    return f"{reactants}>{agents}>{products}", tuple(warnings)
+    completed_reactants = ".".join(dict.fromkeys(reactant_components))
+    if existing_agents is None:
+        return f"{completed_reactants}>>{products}", tuple(warnings)
+    return (
+        f"{completed_reactants}>{existing_agents.strip()}>{products}",
+        tuple(warnings),
+    )
 
 
 def completion_payload(value: ReactionCompletionProposal) -> dict[str, Any]:
