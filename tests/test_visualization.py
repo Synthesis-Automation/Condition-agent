@@ -182,7 +182,42 @@ def test_render_presets_are_versioned_and_include_drawing_styles() -> None:
     assert available_render_presets() == (
         ("current", "Current"),
         ("short_bond", "Short bond"),
+        ("web_consistent", "Web consistent"),
         ("acs_1996_compact", "ACS 1996"),
+    )
+
+
+def test_web_reaction_preset_preserves_ring_scale_across_complexity() -> None:
+    simple = render_reaction_image_bytes(
+        "c1ccccc1>>c1ccccc1",
+        size=(980, 180),
+        image_format="svg",
+        render_preset="web_consistent",
+    )
+    coupling = render_reaction_image_bytes(
+        "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        size=(980, 180),
+        image_format="svg",
+        render_preset="web_consistent",
+    )
+
+    def longest_bond(drawing: bytes) -> float:
+        coordinates = re.findall(
+            rb"d='M ([0-9.]+),([0-9.]+) L ([0-9.]+),([0-9.]+)",
+            drawing,
+        )
+        return max(
+            math.dist(
+                (float(values[0]), float(values[1])),
+                (float(values[2]), float(values[3])),
+            )
+            for values in coordinates
+        )
+
+    assert longest_bond(simple) == pytest.approx(30.0, abs=1.1)
+    assert longest_bond(coupling) == pytest.approx(
+        longest_bond(simple),
+        abs=1.1,
     )
 
 

@@ -38,6 +38,24 @@
         "max_font_size": 36
       }
     },
+    "web_consistent": {
+      "label": "Web consistent",
+      "mode": "custom",
+      "target_bond_length_pixels": 30.0,
+      "draw_molecules_same_scale": false,
+      "standard": {
+        "padding": 0.06,
+        "bond_line_width": 1.8,
+        "min_font_size": 13,
+        "max_font_size": 20
+      },
+      "reaction_core": {
+        "padding": 0.06,
+        "bond_line_width": 2.0,
+        "min_font_size": 14,
+        "max_font_size": 22
+      }
+    },
     "acs_1996_compact": {
       "label": "ACS 1996",
       "mode": "acs_1996",

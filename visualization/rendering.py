@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 import json
 from pathlib import Path
+import re
 from typing import Any, Dict, Mapping, Tuple, Union
 
 from reactive_taxonomy.chemistry.rdkit_utils import (
@@ -131,6 +132,11 @@ def load_render_style_definitions() -> Dict[str, Any]:
         ):
             raise ValueError(
                 f"render-style preset {preset_id!r} has invalid bond length"
+            )
+        same_scale = preset.get("draw_molecules_same_scale", True)
+        if not isinstance(same_scale, bool):
+            raise ValueError(
+                f"render-style preset {preset_id!r} has invalid scale policy"
             )
         bond_length_scale = preset.get("bond_length_scale", 1.0)
         if (
@@ -293,6 +299,10 @@ def apply_render_preset(
     target_bond_length = preset.get("target_bond_length_pixels")
     if target_bond_length is not None and hasattr(options, "fixedBondLength"):
         options.fixedBondLength = float(target_bond_length) / mean_bond_length
+    if hasattr(options, "drawMolsSameScale"):
+        options.drawMolsSameScale = bool(
+            preset.get("draw_molecules_same_scale", True)
+        )
     if hasattr(options, "explicitMethyl"):
         options.explicitMethyl = False
     if hasattr(options, "addStereoAnnotation"):
@@ -327,6 +337,159 @@ def _drawing_bytes(drawing: RenderedImage) -> bytes:
     if isinstance(drawing, str):
         return drawing.encode("utf-8")
     return bytes(drawing)
+
+
+def _flexible_molecule_svg(
+    molecule: Any,
+    *,
+    render_preset: str,
+) -> Tuple[float, float, str]:
+    """Render one molecule at its preset bond scale on a minimal SVG canvas."""
+
+    drawer = rdMolDraw2D.MolDraw2DSVG(-1, -1)
+    apply_render_preset(
+        drawer.drawOptions(),
+        render_preset,
+        molecules=(molecule,),
+    )
+    drawer.DrawMolecule(molecule)
+    drawer.FinishDrawing()
+    drawing = str(drawer.GetDrawingText())
+    root_start = drawing.find("<svg")
+    root_end = drawing.find(">", root_start)
+    closing = drawing.rfind("</svg>")
+    if root_start < 0 or root_end < 0 or closing < 0:
+        raise RuntimeError("RDKit returned an invalid SVG drawing.")
+    root = drawing[root_start : root_end + 1]
+    dimensions = re.search(
+        r"width='([0-9.]+)px'\s+height='([0-9.]+)px'",
+        root,
+    )
+    if dimensions is None:
+        raise RuntimeError("RDKit SVG drawing has no pixel dimensions.")
+    width, height = (float(value) for value in dimensions.groups())
+    return width, height, drawing[root_end + 1 : closing]
+
+
+def _consistent_reaction_svg(
+    reaction: Any,
+    *,
+    height: int,
+    render_preset: str,
+) -> bytes:
+    """Compose independently scaled RDKit molecule SVGs into one reaction."""
+
+    reactants = tuple(reaction.GetReactants())
+    agents = tuple(reaction.GetAgents())
+    products = tuple(reaction.GetProducts())
+    rendered_reactants = tuple(
+        _flexible_molecule_svg(value, render_preset=render_preset)
+        for value in reactants
+    )
+    rendered_agents = tuple(
+        _flexible_molecule_svg(value, render_preset=render_preset)
+        for value in agents
+    )
+    rendered_products = tuple(
+        _flexible_molecule_svg(value, render_preset=render_preset)
+        for value in products
+    )
+
+    outer_padding = 14.0
+    component_gap = 10.0
+    plus_width = 24.0
+    arrow_padding = 15.0
+
+    def row_width(values: Tuple[Tuple[float, float, str], ...]) -> float:
+        if not values:
+            return 0.0
+        component_width = sum(value[0] for value in values)
+        return component_width + (len(values) - 1) * (
+            component_gap + plus_width
+        )
+
+    reactant_width = row_width(rendered_reactants)
+    product_width = row_width(rendered_products)
+    agent_width = row_width(rendered_agents)
+    arrow_width = max(86.0, agent_width + 2.0 * arrow_padding)
+    natural_width = (
+        2.0 * outer_padding
+        + reactant_width
+        + arrow_width
+        + product_width
+    )
+    canvas_height = float(max(height, 100))
+    arrow_y = canvas_height * (0.64 if rendered_agents else 0.5)
+
+    groups = [
+        f"<rect width='{natural_width:.1f}' height='{canvas_height:.1f}' "
+        "fill='#FFFFFF'/>",
+    ]
+
+    def append_row(
+        values: Tuple[Tuple[float, float, str], ...],
+        *,
+        start_x: float,
+        center_y: float,
+    ) -> None:
+        x_position = start_x
+        for index, (mol_width, mol_height, content) in enumerate(values):
+            y_position = center_y - mol_height / 2.0
+            groups.append(
+                f"<g transform='translate({x_position:.1f} {y_position:.1f})'>"
+                f"{content}</g>"
+            )
+            x_position += mol_width
+            if index < len(values) - 1:
+                x_position += component_gap
+                groups.append(
+                    f"<text x='{x_position + plus_width / 2.0:.1f}' "
+                    f"y='{center_y + 6.0:.1f}' text-anchor='middle' "
+                    "font-family='sans-serif' font-size='20' fill='#1F1F1F'>"
+                    "+</text>"
+                )
+                x_position += plus_width
+
+    reactant_x = outer_padding
+    append_row(
+        rendered_reactants,
+        start_x=reactant_x,
+        center_y=arrow_y,
+    )
+    arrow_x = reactant_x + reactant_width
+    line_start = arrow_x + arrow_padding
+    line_end = arrow_x + arrow_width - arrow_padding
+    groups.append(
+        f"<line x1='{line_start:.1f}' y1='{arrow_y:.1f}' "
+        f"x2='{line_end:.1f}' y2='{arrow_y:.1f}' "
+        "stroke='#1F1F1F' stroke-width='2'/>",
+    )
+    groups.append(
+        f"<path d='M {line_end - 9.0:.1f},{arrow_y - 6.0:.1f} "
+        f"L {line_end:.1f},{arrow_y:.1f} "
+        f"L {line_end - 9.0:.1f},{arrow_y + 6.0:.1f}' "
+        "fill='none' stroke='#1F1F1F' stroke-width='2'/>",
+    )
+    if rendered_agents:
+        append_row(
+            rendered_agents,
+            start_x=arrow_x + (arrow_width - agent_width) / 2.0,
+            center_y=max(24.0, arrow_y * 0.37),
+        )
+    append_row(
+        rendered_products,
+        start_x=arrow_x + arrow_width,
+        center_y=arrow_y,
+    )
+
+    drawing = (
+        "<svg xmlns='http://www.w3.org/2000/svg' "
+        f"width='{natural_width:.1f}px' height='{canvas_height:.1f}px' "
+        f"viewBox='0 0 {natural_width:.1f} {canvas_height:.1f}'>"
+        + "".join(groups)
+        + "</svg>"
+    )
+    return drawing.encode("utf-8")
 
 
 def render_molecule_image_bytes(
@@ -385,6 +548,18 @@ def render_reaction_image_bytes(
         style.validated_preset(),
         molecules=molecules,
     )
+    preset = load_render_style_definitions()["presets"][
+        style.validated_preset()
+    ]
+    if (
+        style.normalized_format() == "svg"
+        and not preset.get("draw_molecules_same_scale", True)
+    ):
+        return _consistent_reaction_svg(
+            reaction,
+            height=height,
+            render_preset=style.validated_preset(),
+        )
     panel_count = max(
         reaction.GetNumReactantTemplates()
         + reaction.GetNumAgentTemplates()

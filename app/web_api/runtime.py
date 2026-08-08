@@ -230,6 +230,7 @@ class LocalRecommendationRuntime:
             reaction_smiles.strip(),
             size=(width, height),
             image_format="svg",
+            render_preset="web_consistent",
         )
 
 
