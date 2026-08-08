@@ -5,15 +5,17 @@ import type {
   CompletionChoice,
   CompletionProposal,
   DiscoveryResult,
+  FeatureAnalysisResult,
   RankingProfile,
   RecommendationResult,
 } from './api/types'
 import { CompletionDialog } from './components/CompletionDialog'
+import { FeatureResults } from './components/FeatureResults'
 import { RankingDialog } from './components/RankingDialog'
 import { ReactionEditor } from './components/ReactionEditor'
 import { DiscoveryResults, RecommendationResults } from './components/Results'
 
-type Mode = 'recommendation' | 'discovery'
+type Mode = 'recommendation' | 'discovery' | 'features'
 
 const ERROR_MESSAGES: Record<string, string> = {
   INVALID_REACTION: 'The reaction could not be parsed. Check both sides and the reaction arrow.',
@@ -40,7 +42,7 @@ function App() {
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState('Ready')
   const [error, setError] = useState('')
-  const [result, setResult] = useState<RecommendationResult | DiscoveryResult | null>(null)
+  const [result, setResult] = useState<RecommendationResult | DiscoveryResult | FeatureAnalysisResult | null>(null)
   const [topK, setTopK] = useState(5)
   const [minimumPoolSize, setMinimumPoolSize] = useState<number | null>(null)
   const [unrestrictedFallback, setUnrestrictedFallback] = useState(false)
@@ -48,6 +50,7 @@ function App() {
   const [discoveryView, setDiscoveryView] = useState('closest_chemistry')
   const [includeLowYield, setIncludeLowYield] = useState(true)
   const [includeUnreported, setIncludeUnreported] = useState(true)
+  const [forceResolvedMapping, setForceResolvedMapping] = useState(false)
 
   useEffect(() => {
     Promise.all([api.capabilities(), api.rankingProfiles()])
@@ -141,13 +144,38 @@ function App() {
     }
   }
 
+  const runFeatureAnalysis = async () => {
+    setBusy(true)
+    setError('')
+    setStatus('Reading the molecular graph and identifying reactive features…')
+    try {
+      const next = await api.analyzeFeatures({
+        input_smiles: reactionSmiles.trim(),
+        use_rxnmapper: useRxnmapper,
+        force_resolved_mapping: forceResolvedMapping,
+      })
+      setResult(next)
+      setStatus(`Done — ${next.input_kind} features analyzed`)
+    } catch (nextError) {
+      setError(friendlyError(nextError))
+      setStatus('Feature analysis failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const run = () => {
     if (!reactionSmiles.trim()) {
-      setError('Draw or paste a reaction before running the analysis.')
+      setError(mode === 'features' ? 'Enter or draw a molecule or reaction before analyzing features.' : 'Draw or paste a reaction before running the analysis.')
+      return
+    }
+    if (mode !== 'features' && !reactionSmiles.includes('>')) {
+      setError('Condition recommendation and discovery require reaction SMILES.')
       return
     }
     if (mode === 'recommendation') void startRecommendation()
-    else void runDiscovery()
+    else if (mode === 'discovery') void runDiscovery()
+    else void runFeatureAnalysis()
   }
 
   const exportResult = () => {
@@ -156,13 +184,18 @@ function App() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = mode === 'recommendation' ? 'generic_recommendation.json' : 'reaction_discovery.json'
+    link.download = mode === 'recommendation'
+      ? 'generic_recommendation.json'
+      : mode === 'discovery'
+        ? 'reaction_discovery.json'
+        : 'structure_features.json'
     link.click()
     URL.revokeObjectURL(url)
   }
 
   const recommendationResult = result && 'recommendations' in result ? result : null
   const discoveryResult = result && 'hits' in result ? result : null
+  const featureResult = result && 'input_kind' in result ? result : null
 
   return (
     <main className="app-shell">
@@ -174,42 +207,55 @@ function App() {
         </div>
       </header>
 
-      <ReactionEditor value={reactionSmiles} onChange={setReactionSmiles} onError={setError} />
+      <ReactionEditor
+        value={reactionSmiles}
+        onChange={setReactionSmiles}
+        onError={setError}
+        allowMolecule={mode === 'features'}
+      />
 
       <section className="control-card" aria-labelledby="analysis-title">
         <div className="section-heading">
-          <div><span className="step-number">2</span><div><h2 id="analysis-title">Choose the analysis</h2><p>Hard chemistry filters remain active in every mode.</p></div></div>
+          <div><span className="step-number">2</span><div><h2 id="analysis-title">Choose the analysis</h2><p>The molecular graph remains the source of truth in every mode.</p></div></div>
           {result && <button className="button quiet" type="button" onClick={exportResult}>Export JSON</button>}
         </div>
         <div className="mode-switch" role="tablist" aria-label="Analysis mode">
           <button type="button" className={mode === 'recommendation' ? 'active' : ''} onClick={() => { setMode('recommendation'); setResult(null) }}><strong>Condition recommendation</strong><span>Rank compatible recipes</span></button>
           <button type="button" className={mode === 'discovery' ? 'active' : ''} onClick={() => { setMode('discovery'); setResult(null) }}><strong>Reaction discovery</strong><span>Explore structural precedents</span></button>
+          <button type="button" className={mode === 'features' ? 'active' : ''} onClick={() => { setMode('features'); setResult(null) }}><strong>Feature analysis</strong><span>Inspect molecular graph evidence</span></button>
         </div>
 
-        <div className="option-grid">
-          <label><span>Top results</span><input type="number" min="1" max="50" value={topK} onChange={(event) => setTopK(Math.min(50, Math.max(1, Number(event.target.value))))} /></label>
+        <div className={`option-grid ${mode === 'features' ? 'feature-options' : ''}`}>
+          {mode !== 'features' && <label><span>Top results</span><input type="number" min="1" max="50" value={topK} onChange={(event) => setTopK(Math.min(50, Math.max(1, Number(event.target.value))))} /></label>}
           {mode === 'recommendation' ? (
             <label className="wide-option"><span>Ranking profile</span><div className="joined-control"><select value={profileId} onChange={(event) => { setProfileId(event.target.value); setCustomWeights(null) }}>{profiles.map((profile) => <option key={profile.profile_id} value={profile.profile_id}>{profile.label}</option>)}</select><button type="button" className="button quiet" onClick={() => setRankingOpen(true)} disabled={!selectedProfile}>Customize</button></div><small>{selectedProfile?.description}</small></label>
-          ) : (
+          ) : mode === 'discovery' ? (
             <label className="wide-option"><span>Discovery view</span><select value={discoveryView} onChange={(event) => setDiscoveryView(event.target.value)}><option value="closest_chemistry">Closest chemistry</option><option value="diverse_strategies">Diverse strategies</option><option value="successful_precedents">Successful precedents</option><option value="failure_informed">Failure-informed</option></select></label>
+          ) : (
+            <div className="feature-mode-note"><strong>Automatic input detection</strong><span>Molecules return motifs and reactive sites. Reactions also return bond edits, partners, mapping evidence, and a minimized reaction core.</span></div>
           )}
-          <div className="run-control"><button className="button primary run-button" type="button" onClick={run} disabled={busy || !capabilities?.index_available}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : 'Discover precedents'}</button><span>{status}</span></div>
+          <div className="run-control"><button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !capabilities?.index_available) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : 'Analyze features'}</button><span>{status}</span></div>
         </div>
 
         {mode === 'discovery' && <div className="inline-checks"><label><input type="checkbox" checked={includeLowYield} onChange={(event) => setIncludeLowYield(event.target.checked)} /> Include low-yield precedents</label><label><input type="checkbox" checked={includeUnreported} onChange={(event) => setIncludeUnreported(event.target.checked)} /> Include unreported outcomes</label></div>}
 
         <details className="advanced-options"><summary>Advanced options</summary><div>
           {mode === 'recommendation' && <label><span>Minimum precedent pool</span><input type="number" min="1" max="100" placeholder="Definition default" value={minimumPoolSize ?? ''} onChange={(event) => setMinimumPoolSize(event.target.value ? Number(event.target.value) : null)} /></label>}
-          <label className="check-option"><input type="checkbox" checked={useRxnmapper} disabled={!capabilities?.rxnmapper_available} onChange={(event) => setUseRxnmapper(event.target.checked)} /><span>Use RXNMapper for unresolved or ambiguous queries</span></label>
-          <label className="check-option"><input type="checkbox" checked={unrestrictedFallback} onChange={(event) => setUnrestrictedFallback(event.target.checked)} /><span>Review-core and unrestricted fallback (expert review required)</span></label>
+          <label className="check-option"><input type="checkbox" checked={useRxnmapper} disabled={!capabilities?.rxnmapper_available || (mode === 'features' && !reactionSmiles.includes('>'))} onChange={(event) => { setUseRxnmapper(event.target.checked); if (!event.target.checked) setForceResolvedMapping(false) }} /><span>Use RXNMapper for unresolved or ambiguous reactions</span></label>
+          {mode === 'features' ? (
+            <label className="check-option"><input type="checkbox" checked={forceResolvedMapping} disabled={!useRxnmapper || !reactionSmiles.includes('>')} onChange={(event) => setForceResolvedMapping(event.target.checked)} /><span>Map resolved reactions too, for additional atom-mapping evidence</span></label>
+          ) : (
+            <label className="check-option"><input type="checkbox" checked={unrestrictedFallback} onChange={(event) => setUnrestrictedFallback(event.target.checked)} /><span>Review-core and unrestricted fallback (expert review required)</span></label>
+          )}
         </div></details>
         {error && <div className="alert error" role="alert">{error}</div>}
       </section>
 
       {recommendationResult && <RecommendationResults result={recommendationResult} />}
       {discoveryResult && <DiscoveryResults result={discoveryResult} />}
+      {featureResult && <FeatureResults result={featureResult} />}
 
-      {!result && <section className="empty-state"><span>3</span><div><h2>Inspect ranked evidence</h2><p>Recommendations, discovery hits, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.</p></div></section>}
+      {!result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : 'Recommendations, discovery hits, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
 
       <footer>All chemistry and data remain on this machine. Molecular structure is the source of truth.</footer>
 
@@ -220,4 +266,3 @@ function App() {
 }
 
 export default App
-

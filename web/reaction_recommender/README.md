@@ -51,9 +51,13 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
 - Retrieve and rank chemically compatible canonical condition recipes.
 - Apply declarative ranking profiles or transparent custom weights.
 - Browse structural precedents through the four discovery views.
+- Analyze a molecule or reaction with the same deterministic featurization used
+  by the Qt tool, including motifs, reactive sites, reaction-core evidence,
+  partner roles, mapping provenance, and the canonical nested analysis.
 - Inspect score traces, structural matches and mismatches, cautions, conditions,
   yields, fallback levels, and precedent provenance.
-- Export the complete versioned recommendation or discovery result as JSON.
+- Export the complete versioned recommendation, discovery, or feature result as
+  JSON.
 
 The UI intentionally exposes no arbitrary file paths or upload endpoints. Local
 dataset identity and access remain server configuration concerns.

@@ -14,6 +14,7 @@ class FakeRuntime:
         return {
             "index_available": True,
             "rxnmapper_available": False,
+            "featurization": True,
             "local_only": True,
         }
 
@@ -62,10 +63,37 @@ class FakeRuntime:
             "schema_version": "test",
         }
 
+    def analyze_features(self, request: Any) -> Dict[str, Any]:
+        input_kind = "reaction" if ">" in request.input_smiles else "molecule"
+        return {
+            "input_kind": input_kind,
+            "input_smiles": request.input_smiles,
+            "valid": True,
+            "overview": {"atom_count": 6},
+            "motifs": [],
+            "reactive_sites": [],
+            "reaction_core": None,
+            "partners": [],
+            "mapping": None,
+            "core_graphic_svg": None,
+            "core_projection": None,
+            "warnings": [],
+            "error": None,
+            "analysis": {"schema_version": "test"},
+        }
+
     def render_reaction(
         self, reaction_smiles: str, *, width: int, height: int
     ) -> bytes:
         assert reaction_smiles
+        assert width == 760
+        assert height == 220
+        return b"<svg xmlns='http://www.w3.org/2000/svg'></svg>"
+
+    def render_molecule(
+        self, molecule_smiles: str, *, width: int, height: int
+    ) -> bytes:
+        assert molecule_smiles
         assert width == 760
         assert height == 220
         return b"<svg xmlns='http://www.w3.org/2000/svg'></svg>"
@@ -141,6 +169,25 @@ def test_discovery_and_svg_rendering_contracts() -> None:
     assert drawing.content.startswith(b"<svg")
 
 
+def test_feature_analysis_and_molecule_rendering_contracts() -> None:
+    web = client()
+    feature_result = web.post(
+        "/api/v1/features/analyze",
+        json={"input_smiles": "Brc1ccccc1", "use_rxnmapper": False},
+    )
+    drawing = web.post(
+        "/api/v1/render/molecule",
+        json={"molecule_smiles": "Brc1ccccc1"},
+    )
+
+    assert feature_result.status_code == 200
+    assert feature_result.json()["data"]["input_kind"] == "molecule"
+    assert feature_result.json()["data"]["overview"]["atom_count"] == 6
+    assert drawing.status_code == 200
+    assert drawing.headers["content-type"].startswith("image/svg+xml")
+    assert drawing.content.startswith(b"<svg")
+
+
 def test_request_contract_rejects_unknown_fields() -> None:
     response = client().post(
         "/api/v1/recommendations",
@@ -151,4 +198,3 @@ def test_request_contract_rejects_unknown_fields() -> None:
     )
 
     assert response.status_code == 422
-

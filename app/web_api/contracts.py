@@ -84,11 +84,33 @@ class DiscoveryRequest(StrictRequest):
     include_review: bool = False
 
 
+class FeatureAnalysisRequest(StrictRequest):
+    """One auto-detected molecule or reaction featurization request."""
+
+    input_smiles: str = Field(min_length=1, max_length=20_000)
+    use_rxnmapper: bool = True
+    force_resolved_mapping: bool = False
+
+    @model_validator(mode="after")
+    def force_requires_mapping(self) -> "FeatureAnalysisRequest":
+        if self.force_resolved_mapping and not self.use_rxnmapper:
+            raise ValueError("forced resolved mapping requires RXNMapper")
+        return self
+
+
 class RenderReactionRequest(StrictRequest):
     """Server-side RDKit rendering request."""
 
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
     width: int = Field(default=760, ge=240, le=2400)
+    height: int = Field(default=220, ge=100, le=1200)
+
+
+class RenderMoleculeRequest(StrictRequest):
+    """Server-side molecule rendering request."""
+
+    molecule_smiles: str = Field(min_length=1, max_length=20_000)
+    width: int = Field(default=760, ge=160, le=2400)
     height: int = Field(default=220, ge=100, le=1200)
 
 
@@ -113,10 +135,11 @@ __all__ = [
     "ApiEnvelope",
     "CompletionChoiceRequest",
     "DiscoveryRequest",
+    "FeatureAnalysisRequest",
     "PrepareReactionRequest",
     "RankingPreferencesRequest",
     "RecommendationRequest",
+    "RenderMoleculeRequest",
     "RenderReactionRequest",
     "envelope",
 ]
-

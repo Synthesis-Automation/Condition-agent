@@ -5,9 +5,15 @@ interface ReactionImageProps {
   smiles: string
   label: string
   compact?: boolean
+  kind?: 'molecule' | 'reaction'
 }
 
-export function ReactionImage({ smiles, label, compact = false }: ReactionImageProps) {
+export function ReactionImage({
+  smiles,
+  label,
+  compact = false,
+  kind = 'reaction',
+}: ReactionImageProps) {
   const [source, setSource] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
 
@@ -17,8 +23,8 @@ export function ReactionImage({ smiles, label, compact = false }: ReactionImageP
     setFailed(false)
     setSource(null)
     if (!smiles) return () => undefined
-    api
-      .renderReaction(smiles, compact ? 660 : 980, compact ? 180 : 240)
+    const render = kind === 'molecule' ? api.renderMolecule : api.renderReaction
+    render(smiles, compact ? 660 : 980, compact ? 180 : 240)
       .then((blob) => {
         if (!active) return
         objectUrl = URL.createObjectURL(blob)
@@ -31,7 +37,7 @@ export function ReactionImage({ smiles, label, compact = false }: ReactionImageP
       active = false
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
-  }, [smiles, compact])
+  }, [smiles, compact, kind])
 
   if (!smiles) return null
   return (
@@ -40,4 +46,3 @@ export function ReactionImage({ smiles, label, compact = false }: ReactionImageP
     </div>
   )
 }
-

@@ -11,6 +11,7 @@ interface ReactionEditorProps {
   value: string
   onChange: (value: string) => void
   onError: (message: string) => void
+  allowMolecule?: boolean
 }
 
 function formatError(smiles: string): string | null {
@@ -21,11 +22,25 @@ function formatError(smiles: string): string | null {
   return null
 }
 
+function inputFormatError(
+  smiles: string,
+  allowMolecule: boolean,
+): string | null {
+  if (allowMolecule && !smiles.includes('>')) return null
+  return formatError(smiles)
+}
+
 interface DrawingDialogProps extends ReactionEditorProps {
   onClose: () => void
 }
 
-function DrawingDialog({ value, onChange, onError, onClose }: DrawingDialogProps) {
+function DrawingDialog({
+  value,
+  onChange,
+  onError,
+  allowMolecule = false,
+  onClose,
+}: DrawingDialogProps) {
   const provider = useMemo(() => new StandaloneStructServiceProvider(), [])
   const [ketcher, setKetcher] = useState<Ketcher | null>(null)
   const [draftSmiles, setDraftSmiles] = useState(value)
@@ -71,7 +86,7 @@ function DrawingDialog({ value, onChange, onError, onClose }: DrawingDialogProps
     if (!ketcher) return
     try {
       const smiles = (await ketcher.getSmiles()).trim()
-      const error = formatError(smiles)
+      const error = inputFormatError(smiles, allowMolecule)
       if (error) {
         onError(error)
         setStatus(error)
@@ -96,8 +111,14 @@ function DrawingDialog({ value, onChange, onError, onClose }: DrawingDialogProps
         <div className="modal-heading drawing-heading">
           <div>
             <span className="eyebrow">REACTION DRAWING</span>
-            <h2 id="drawing-title">Draw the transformation</h2>
-            <p>Place reactants and products on opposite sides of a reaction arrow.</p>
+            <h2 id="drawing-title">
+              {allowMolecule ? 'Draw a molecule or reaction' : 'Draw the transformation'}
+            </h2>
+            <p>
+              {allowMolecule
+                ? 'Draw one molecule, or place reactants and products around a reaction arrow.'
+                : 'Place reactants and products on opposite sides of a reaction arrow.'}
+            </p>
           </div>
           <div className="button-row">
             <button
@@ -122,7 +143,10 @@ function DrawingDialog({ value, onChange, onError, onClose }: DrawingDialogProps
             structServiceProvider={provider}
             onInit={(instance) => {
               setKetcher(instance)
-              if (value.trim() && formatError(value.trim()) === null) {
+              if (
+                value.trim()
+                && inputFormatError(value.trim(), allowMolecule) === null
+              ) {
                 void instance
                   .setMolecule(value.trim())
                   .then(() => setStatus('Existing reaction loaded.'))
@@ -171,11 +195,21 @@ function DrawingDialog({ value, onChange, onError, onClose }: DrawingDialogProps
   )
 }
 
-export function ReactionEditor({ value, onChange, onError }: ReactionEditorProps) {
+export function ReactionEditor({
+  value,
+  onChange,
+  onError,
+  allowMolecule = false,
+}: ReactionEditorProps) {
   const [open, setOpen] = useState(false)
   const normalizedValue = value.trim()
-  const inputError = normalizedValue ? formatError(normalizedValue) : null
+  const inputError = normalizedValue
+    ? inputFormatError(normalizedValue, allowMolecule)
+    : null
   const canPreview = Boolean(normalizedValue && inputError === null)
+  const detectedKind = normalizedValue && !normalizedValue.includes('>')
+    ? 'molecule'
+    : 'reaction'
 
   return (
     <section className="editor-card reaction-paper" aria-labelledby="editor-title">
@@ -183,8 +217,14 @@ export function ReactionEditor({ value, onChange, onError }: ReactionEditorProps
         <div>
           <span className="step-number">1</span>
           <div>
-            <h2 id="editor-title">Define the reaction</h2>
-            <p>Enter reaction SMILES directly, or use the drawing editor.</p>
+            <h2 id="editor-title">
+              {allowMolecule ? 'Define the structure' : 'Define the reaction'}
+            </h2>
+            <p>
+              {allowMolecule
+                ? 'Enter molecular or reaction SMILES; the input type is detected automatically.'
+                : 'Enter reaction SMILES directly, or use the drawing editor.'}
+            </p>
           </div>
         </div>
         <div className="button-row">
@@ -201,7 +241,7 @@ export function ReactionEditor({ value, onChange, onError }: ReactionEditorProps
 
       <div className="reaction-main-input">
         <label htmlFor="main-reaction-smiles">
-          <span>Reaction SMILES</span>
+          <span>{allowMolecule ? 'Molecule or reaction SMILES' : 'Reaction SMILES'}</span>
           <input
             id="main-reaction-smiles"
             type="text"
@@ -210,18 +250,24 @@ export function ReactionEditor({ value, onChange, onError }: ReactionEditorProps
               onChange(event.target.value)
               onError('')
             }}
-            placeholder="reactants>>products"
+            placeholder={allowMolecule ? 'CCO or reactants>>products' : 'reactants>>products'}
             spellCheck={false}
           />
         </label>
         <small>
-          Use the complete <code>reactants&gt;&gt;products</code> form. A drawing writes its generated SMILES here automatically.
+          {allowMolecule
+            ? <>Use molecular SMILES or the complete <code>reactants&gt;&gt;products</code> form. A drawing writes its generated SMILES here automatically.</>
+            : <>Use the complete <code>reactants&gt;&gt;products</code> form. A drawing writes its generated SMILES here automatically.</>}
         </small>
       </div>
 
       {canPreview ? (
         <div className="reaction-paper-preview">
-          <ReactionImage smiles={normalizedValue} label="Current reaction drawing" />
+          <ReactionImage
+            smiles={normalizedValue}
+            label={`Current ${detectedKind} drawing`}
+            kind={detectedKind}
+          />
           <p className="reaction-smiles-caption">{normalizedValue}</p>
         </div>
       ) : normalizedValue ? (
@@ -243,6 +289,7 @@ export function ReactionEditor({ value, onChange, onError }: ReactionEditorProps
           value={value}
           onChange={onChange}
           onError={onError}
+          allowMolecule={allowMolecule}
           onClose={() => setOpen(false)}
         />
       )}

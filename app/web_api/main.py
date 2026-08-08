@@ -13,8 +13,10 @@ from fastapi.staticfiles import StaticFiles
 from .contracts import (
     API_SCHEMA_VERSION,
     DiscoveryRequest,
+    FeatureAnalysisRequest,
     PrepareReactionRequest,
     RecommendationRequest,
+    RenderMoleculeRequest,
     RenderReactionRequest,
     envelope,
 )
@@ -110,6 +112,21 @@ def create_app(
             raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
         return envelope(data)
 
+    @app.post("/api/v1/features/analyze")
+    def analyze_features(
+        payload: FeatureAnalysisRequest,
+        request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).analyze_features(payload)
+        except (ValueError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(
+                status_code=status,
+                detail=error_payload(exc),
+            ) from exc
+        return envelope(data)
+
     @app.post("/api/v1/render/reaction")
     def render_reaction(
         payload: RenderReactionRequest,
@@ -123,6 +140,28 @@ def create_app(
             )
         except (ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
+        return Response(
+            content=drawing,
+            media_type="image/svg+xml",
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @app.post("/api/v1/render/molecule")
+    def render_molecule(
+        payload: RenderMoleculeRequest,
+        request: Request,
+    ) -> Response:
+        try:
+            drawing = active_runtime(request).render_molecule(
+                payload.molecule_smiles,
+                width=payload.width,
+                height=payload.height,
+            )
+        except (ValueError, RuntimeError) as exc:
+            raise HTTPException(
+                status_code=422,
+                detail=error_payload(exc),
+            ) from exc
         return Response(
             content=drawing,
             media_type="image/svg+xml",
@@ -150,4 +189,3 @@ app = create_app()
 
 
 __all__ = ["app", "create_app"]
-

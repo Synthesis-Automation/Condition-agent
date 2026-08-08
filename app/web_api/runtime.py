@@ -20,9 +20,17 @@ from condition_recommender.reaction_completion import (
     validate_completion_selections,
 )
 from reactive_taxonomy import RxnMapperProvider
-from visualization import render_reaction_image_bytes
+from visualization import (
+    render_molecule_image_bytes,
+    render_reaction_image_bytes,
+)
 
-from .contracts import DiscoveryRequest, RecommendationRequest
+from .contracts import (
+    DiscoveryRequest,
+    FeatureAnalysisRequest,
+    RecommendationRequest,
+)
+from .features import analyze_features, detect_input_kind
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -44,8 +52,16 @@ class WebRuntime(Protocol):
 
     def discover(self, request: DiscoveryRequest) -> Dict[str, Any]: ...
 
+    def analyze_features(
+        self, request: FeatureAnalysisRequest
+    ) -> Dict[str, Any]: ...
+
     def render_reaction(
         self, reaction_smiles: str, *, width: int, height: int
+    ) -> bytes: ...
+
+    def render_molecule(
+        self, molecule_smiles: str, *, width: int, height: int
     ) -> bytes: ...
 
 
@@ -59,6 +75,7 @@ class LocalRecommendationRuntime:
             tuple[str, int, int, bool, bool], GenericConditionRecommender
         ] = {}
         self._lock = RLock()
+        self._feature_mapping_provider: RxnMapperProvider | None = None
 
     def _cache_key(
         self, *, use_rxnmapper: bool, include_review: bool
@@ -114,6 +131,7 @@ class LocalRecommendationRuntime:
             "rxnmapper_available": RxnMapperProvider.is_available(),
             "recommendation": True,
             "discovery": True,
+            "featurization": True,
             "reaction_rendering": True,
             "local_only": True,
         }
@@ -217,6 +235,27 @@ class LocalRecommendationRuntime:
         )
         return result.to_dict()
 
+    def analyze_features(
+        self,
+        request: FeatureAnalysisRequest,
+    ) -> Dict[str, Any]:
+        """Auto-detect and featurize one molecule or reaction."""
+
+        value = request.input_smiles.strip()
+        mapping_provider = None
+        if detect_input_kind(value) == "reaction" and request.use_rxnmapper:
+            if not RxnMapperProvider.is_available():
+                raise RuntimeError("RXNMAPPER_UNAVAILABLE")
+            with self._lock:
+                if self._feature_mapping_provider is None:
+                    self._feature_mapping_provider = RxnMapperProvider()
+                mapping_provider = self._feature_mapping_provider
+        return analyze_features(
+            value,
+            mapping_provider=mapping_provider,
+            force_resolved_mapping=request.force_resolved_mapping,
+        )
+
     def render_reaction(
         self,
         reaction_smiles: str,
@@ -228,6 +267,22 @@ class LocalRecommendationRuntime:
 
         return render_reaction_image_bytes(
             reaction_smiles.strip(),
+            size=(width, height),
+            image_format="svg",
+            render_preset="web_consistent",
+        )
+
+    def render_molecule(
+        self,
+        molecule_smiles: str,
+        *,
+        width: int,
+        height: int,
+    ) -> bytes:
+        """Render a molecule with the same web drawing preset."""
+
+        return render_molecule_image_bytes(
+            molecule_smiles.strip(),
             size=(width, height),
             image_format="svg",
             render_preset="web_consistent",

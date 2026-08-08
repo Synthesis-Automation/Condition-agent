@@ -3,6 +3,8 @@ import type {
   Capabilities,
   DiscoveryRequest,
   DiscoveryResult,
+  FeatureAnalysisRequest,
+  FeatureAnalysisResult,
   PrepareReactionResult,
   RankingProfile,
   RecommendationRequest,
@@ -71,6 +73,12 @@ export const api = {
       body: JSON.stringify(request),
     }),
 
+  analyzeFeatures: (request: FeatureAnalysisRequest) =>
+    jsonRequest<FeatureAnalysisResult>('/features/analyze', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
   renderReaction: async (
     reactionSmiles: string,
     width = 760,
@@ -90,5 +98,24 @@ export const api = {
     }
     return response.blob()
   },
-}
 
+  renderMolecule: async (
+    moleculeSmiles: string,
+    width = 760,
+    height = 220,
+  ) => {
+    const response = await fetch(`${API_ROOT}/render/molecule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        molecule_smiles: moleculeSmiles,
+        width,
+        height,
+      }),
+    })
+    if (!response.ok) {
+      throw new ApiError('Molecule rendering failed.', 'RENDER_FAILED', response.status)
+    }
+    return response.blob()
+  },
+}

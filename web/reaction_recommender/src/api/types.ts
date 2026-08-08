@@ -13,6 +13,7 @@ export interface Capabilities {
   rxnmapper_available: boolean
   recommendation: boolean
   discovery: boolean
+  featurization: boolean
   reaction_rendering: boolean
   local_only: boolean
 }
@@ -230,3 +231,81 @@ export interface DiscoveryRequest {
   include_review: boolean
 }
 
+export interface FeatureMotif {
+  motif_id: string
+  label: string
+  component_index: number
+  side?: string
+  atom_indices: number[]
+  tags: string[]
+  confidence: number
+}
+
+export interface FeatureReactiveSite {
+  hypothesis_id: string
+  label: string
+  site_type: string
+  availability: string
+  component_index: number
+  side?: string
+  atom_indices: number[]
+  context_kind?: string | null
+}
+
+export interface ReactionCoreEvent {
+  event_id: string
+  edit_tokens: string[]
+  reactant_component_indices: number[]
+  product_component_indices: number[]
+}
+
+export interface ReactionCoreSummary {
+  core_id: string
+  evidence: string
+  evidence_status: string
+  confidence: number
+  active_atom_count: number
+  event_count: number
+  events: ReactionCoreEvent[]
+  quality: {
+    status: string
+    review_reasons: string[]
+    blocking_reasons: string[]
+    checked_edit_fraction: number
+    active_atom_mapping_coverage: number
+  }
+  warnings: string[]
+}
+
+export interface FeaturePartner {
+  role?: string | null
+  component_index: number
+  label: string
+  role_confidence: number
+  anchor_contexts: string[]
+}
+
+export interface FeatureAnalysisResult {
+  input_kind: 'molecule' | 'reaction'
+  input_smiles: string
+  valid: boolean
+  schema_version: string
+  overview: Record<string, unknown>
+  motifs: FeatureMotif[]
+  reactive_sites: FeatureReactiveSite[]
+  reaction_core?: ReactionCoreSummary | null
+  partners: FeaturePartner[]
+  mapping?: Record<string, unknown> | null
+  core_graphic_svg?: string | null
+  core_graphic_error?: string | null
+  core_projection?: Record<string, unknown> | null
+  warnings: string[]
+  error?: string | null
+  analysis: JsonObject
+}
+
+export interface FeatureAnalysisRequest {
+  input_smiles: string
+  use_rxnmapper: boolean
+  force_resolved_mapping: boolean
+}
