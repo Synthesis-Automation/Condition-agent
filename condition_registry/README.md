@@ -10,10 +10,9 @@ and does not import `chemtools` or `condition_recommender`.
 - `definitions/roles.v2.json`: the small allowed-role vocabulary
 - `definitions/role_resolution.v2.json`: contextual role and recipe-bucket rules
 - `definitions/recipe_templates.v1.json`: expert recipe templates
-- `definitions/pending_substances.csv`: unresolved identities awaiting curation
 
-The v1 substance, addition, and identifier CSV files are retained only as
-migration inputs. Runtime resolution does not read them.
+`definitions/substances.v1.csv` remains only because legacy application paths
+outside this package still read it. The clean registry runtime does not.
 
 ## Minimal substance format
 

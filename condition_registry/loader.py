@@ -14,12 +14,6 @@ from .normalization import identifier_normalization_profile, normalize_cas
 DEFINITIONS_DIR = Path(__file__).with_name("definitions")
 SUBSTANCES_PATH = DEFINITIONS_DIR / "substances.v2.jsonl"
 ROLES_PATH = DEFINITIONS_DIR / "roles.v2.json"
-PENDING_PATH = DEFINITIONS_DIR / "pending_substances.csv"
-
-# Read-only migration inputs. Runtime resolution does not consume these files.
-LEGACY_SUBSTANCES_PATH = DEFINITIONS_DIR / "substances.v1.csv"
-LEGACY_ADDITIONS_PATH = DEFINITIONS_DIR / "substance_additions.v1.csv"
-LEGACY_IDENTIFIERS_PATH = DEFINITIONS_DIR / "substance_identifiers.v1.csv"
 
 _SUBSTANCE_FIELDS = {"id", "name", "cas", "smiles", "aliases", "roles"}
 _ALIAS_FIELDS = {"type", "value", "language", "shared"}
@@ -205,10 +199,6 @@ def load_substances(
 
 __all__ = [
     "DEFINITIONS_DIR",
-    "LEGACY_ADDITIONS_PATH",
-    "LEGACY_IDENTIFIERS_PATH",
-    "LEGACY_SUBSTANCES_PATH",
-    "PENDING_PATH",
     "ROLES_PATH",
     "SUBSTANCES_PATH",
     "iter_substance_records",
