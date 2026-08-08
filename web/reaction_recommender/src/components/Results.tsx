@@ -6,6 +6,7 @@ import type {
   Recommendation,
   RecommendationResult,
   ResolvedRecipe,
+  SynthesisProtocolDraft,
 } from '../api/types'
 import { ReactionImage } from './ReactionImage'
 
@@ -104,8 +105,42 @@ function MessageList({ title, values, tone = '' }: { title: string; values: stri
   )
 }
 
+function protocolFilename(rank: number, recipeId: string): string {
+  const recipeToken = recipeId.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '').slice(0, 48)
+  return `condition_protocol_rank_${rank}_${recipeToken || 'recipe'}.json`
+}
+
+function downloadProtocol(protocol: SynthesisProtocolDraft, rank: number) {
+  const blob = new Blob([JSON.stringify(protocol, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = protocolFilename(rank, protocol.recipe_id)
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function ProtocolPanel({ protocol, rank }: { protocol: SynthesisProtocolDraft; rank: number }) {
+  return (
+    <details className="trace-panel protocol-panel" open>
+      <summary>
+        <span>Condition protocol JSON</span>
+        <span className="readiness-badge">{displayName(protocol.execution_readiness)}</span>
+      </summary>
+      <div className="protocol-toolbar">
+        <span>{protocol.materials.length} materials · {protocol.missing_required_fields.length} missing fields</span>
+        <button className="button secondary" type="button" onClick={() => downloadProtocol(protocol, rank)}>Download condition JSON</button>
+      </div>
+      <pre>{JSON.stringify(protocol, null, 2)}</pre>
+    </details>
+  )
+}
+
 function RecommendationDetails({ item }: { item: Recommendation }) {
   const precedent = item.precedent_reaction_smiles[0] ?? ''
+  const protocol = item.synthesis_protocol
   return (
     <article className="result-detail">
       <div className="detail-title-row">
@@ -130,6 +165,7 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
           </dl>
         </section>
       </div>
+      {protocol && <ProtocolPanel protocol={protocol} rank={item.rank} />}
       <MessageList title="Why this recipe" values={item.explanation} />
       <MessageList title="Compatibility evidence" values={item.compatibility_evidence} />
       <MessageList title="Cautions" values={item.cautions} tone="caution" />
@@ -164,14 +200,20 @@ export function RecommendationResults({ result }: { result: RecommendationResult
   const [selected, setSelected] = useState(0)
   useEffect(() => setSelected(0), [result])
   const active = result.recommendations[selected]
+  const activeProtocol = active?.synthesis_protocol
   return (
     <section className="results-card">
       <div className="results-summary">
         <div><span className="eyebrow">RECOMMENDATION RESULT</span><h2>{result.recommendations.length} ranked recipe{result.recommendations.length === 1 ? '' : 's'}</h2></div>
-        <div className="metric-strip">
-          <div><strong>{result.candidate_count}</strong><span>candidates</span></div>
-          <div><strong>{result.compatible_candidate_count}</strong><span>compatible</span></div>
-          <div><strong>{displayName(result.retrieval_level ?? 'none')}</strong><span>fallback level</span></div>
+        <div className="results-summary-actions">
+          {activeProtocol && active && (
+            <button className="button secondary" type="button" onClick={() => downloadProtocol(activeProtocol, active.rank)}>Download condition JSON</button>
+          )}
+          <div className="metric-strip">
+            <div><strong>{result.candidate_count}</strong><span>candidates</span></div>
+            <div><strong>{result.compatible_candidate_count}</strong><span>compatible</span></div>
+            <div><strong>{displayName(result.retrieval_level ?? 'none')}</strong><span>fallback level</span></div>
+          </div>
         </div>
       </div>
       <ReactionImage smiles={result.effective_query_reaction_smiles ?? result.query_reaction_smiles} label="Analyzed query reaction" compact />
@@ -238,4 +280,3 @@ export function DiscoveryResults({ result }: { result: DiscoveryResult }) {
     </section>
   )
 }
-

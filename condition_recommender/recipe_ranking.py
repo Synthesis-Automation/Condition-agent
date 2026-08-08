@@ -21,6 +21,7 @@ from .preference_scoring import (
     aggregate_partner_category_evidence,
     assess_functional_group_tolerance,
 )
+from .protocols import protocol_draft_for_reaction
 from .ranking_preferences import (
     RANKING_COMPONENTS,
     normalize_ranking_weights,
@@ -341,6 +342,7 @@ def rank_condition_recipes(
         ]
     ] = None,
     query_reaction_core: Mapping[str, Any] | None = None,
+    query_reaction_smiles: str = "",
 ) -> Tuple[GenericConditionRecommendation, ...]:
     """Aggregate recipe cores and rank them with a complete score trace."""
     rules = load_generic_ranking_rules()
@@ -727,6 +729,10 @@ def rank_condition_recipes(
                 recipe_core_id=recipe_core_id,
                 recipe_variant_ids=recipe_variants,
                 resolved_recipe=best.row.resolved_recipe,
+                synthesis_protocol=protocol_draft_for_reaction(
+                    best.row.resolved_recipe,
+                    query_reaction_smiles,
+                ).to_dict(),
                 score=round(score, 6),
                 similarity_score=round(similarity_score, 6),
                 compatibility_score=round(compatibility_score, 6),

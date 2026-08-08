@@ -217,7 +217,7 @@ function App() {
       <section className="control-card" aria-labelledby="analysis-title">
         <div className="section-heading">
           <div><span className="step-number">2</span><div><h2 id="analysis-title">Choose the analysis</h2><p>The molecular graph remains the source of truth in every mode.</p></div></div>
-          {result && <button className="button quiet" type="button" onClick={exportResult}>Export JSON</button>}
+          {result && <button className="button quiet" type="button" onClick={exportResult}>Export full result</button>}
         </div>
         <div className="mode-switch" role="tablist" aria-label="Analysis mode">
           <button type="button" className={mode === 'recommendation' ? 'active' : ''} onClick={() => { setMode('recommendation'); setResult(null) }}><strong>Condition recommendation</strong><span>Rank compatible recipes</span></button>

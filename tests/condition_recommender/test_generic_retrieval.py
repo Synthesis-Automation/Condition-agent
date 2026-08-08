@@ -155,8 +155,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "10.0",
-        "converter_definition_version": "generic_conversion.v10.0",
+        "schema_version": "10.1",
+        "converter_definition_version": "generic_conversion.v10.1",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "precedent_tier": "trusted" if tier == "verified" else None,
@@ -251,6 +251,17 @@ def test_generic_index_admits_only_usable_verified_records() -> None:
     )
     assert len(index.rows) == 1
     assert index.exact["exact-a"] == (0,)
+
+
+def test_additive_protocol_output_accepts_v10_index_rows() -> None:
+    record = _record(1, _signature("compatible-v10"))
+    record["schema_version"] = "10.0"
+    record["converter_definition_version"] = "generic_conversion.v10.0"
+
+    index = build_generic_index([record])
+
+    assert len(index.rows) == 1
+    assert index.record_schema_versions == ("10.0",)
 
 
 def test_retrieval_uses_exact_signature_when_supported() -> None:
@@ -1333,6 +1344,10 @@ def test_ambiguous_query_abstains_without_independent_consensus_support() -> Non
 
 
 def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
+    query_reaction = (
+        "c1ccc2[nH]cnc2c1.COc1ccc(B(O)O)cc1>>"
+        "COc1ccc(-n2cnc3ccccc32)cc1"
+    )
     output = tmp_path / "generic_conversion_chan_lam_pilot"
     convert_datasets(
         "raw_dataset/literature_reaction_dataset/ChanLam_Narylation.csv",
@@ -1341,7 +1356,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     )
     path = output / "records.jsonl"
     result = recommend_generic_conditions(
-        "c1ccc2[nH]cnc2c1.COc1ccc(B(O)O)cc1>>COc1ccc(-n2cnc3ccccc32)cc1",
+        query_reaction,
         records_path=path,
         top_k=3,
         minimum_pool_size=1,
@@ -1352,10 +1367,20 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.compatible_candidate_count >= 1
     assert result.compatible_candidate_count <= result.candidate_count
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "3.3"
+    assert result.schema_version == "3.4"
     assert result.retrieval_trace[-1].status == "selected_target_reached"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR2:")
     assert result.recommendations[0].resolved_recipe["recipe_id"].startswith("RCR2:")
     assert result.recommendations[0].precedent_reaction_smiles
+    protocol = result.recommendations[0].synthesis_protocol
+    assert protocol["reaction_smiles"] == query_reaction
+    assert sum(
+        material["category"] == "reaction_input"
+        for material in protocol["materials"]
+    ) == 2
+    assert any(
+        material["category"] == "condition" and material["cas"]
+        for material in protocol["materials"]
+    )
     assert 0.0 <= result.recommendations[0].compatibility_score <= 1.0

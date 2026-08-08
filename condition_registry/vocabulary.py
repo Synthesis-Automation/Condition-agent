@@ -16,6 +16,7 @@ _ACTIVE_DEFINITION_NAMES = {
     "role_resolution.v2.json",
     "roles.v2.json",
     "substances.v2.jsonl",
+    "synthesis_protocol.v1.schema.json",
 }
 
 

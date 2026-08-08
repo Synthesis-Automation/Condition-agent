@@ -63,12 +63,59 @@ export interface CompletionChoice {
 }
 
 export interface RecipeComponent {
+  cas?: string | null
   canonical_name?: string
   display_name?: string
   name?: string
   raw_identifier?: string
   substance_id?: string
   [key: string]: unknown
+}
+
+export interface ProtocolMaterial {
+  material_id: string
+  category: 'reaction_input' | 'condition' | 'reaction_output'
+  identity_status: string
+  substance_id?: string | null
+  canonical_name?: string | null
+  cas?: string | null
+  smiles?: string | null
+  role?: string | null
+  role_status: string
+  amount?: number | null
+  amount_unit?: string | null
+  source_field?: string | null
+  warnings: string[]
+}
+
+export interface ProtocolOperatingConditions {
+  temperature_c?: number | null
+  time_h?: number | null
+  concentration_m?: number | null
+  atmosphere?: string | null
+}
+
+export interface ProtocolOperation {
+  operation_id: string
+  operation_type: 'maintain_conditions'
+  stage_index: number
+  temperature_c?: number | null
+  time_h?: number | null
+  atmosphere?: string | null
+}
+
+export interface SynthesisProtocolDraft {
+  protocol_id: string
+  recipe_id: string
+  recipe_core_id: string
+  reaction_smiles?: string | null
+  materials: ProtocolMaterial[]
+  operating_conditions: ProtocolOperatingConditions
+  operations: ProtocolOperation[]
+  execution_readiness: 'review_required'
+  missing_required_fields: string[]
+  warnings: string[]
+  schema_version: string
 }
 
 export interface ResolvedRecipe {
@@ -118,6 +165,7 @@ export interface Recommendation {
   dataset_support: number
   retrieval_level: string
   resolved_recipe: ResolvedRecipe
+  synthesis_protocol?: SynthesisProtocolDraft
   explanation: string[]
   compatibility_evidence: string[]
   cautions: string[]

@@ -7,11 +7,15 @@ from enum import Enum
 from typing import Any, Dict, Literal, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.0"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.0"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.1"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.1"
+COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS = frozenset({"10.0", "10.1"})
+COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
+    {"generic_conversion.v10.0", "generic_conversion.v10.1"}
+)
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
-GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.3"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.4"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
     "fragment_source_capabilities.v1@1.2"
@@ -317,6 +321,7 @@ class RecommendationRecord:
     condition_resolution: Dict[str, Any] = field(default_factory=dict)
     resolved_recipe_id: str = ""
     resolved_recipe: Optional[Dict[str, Any]] = None
+    synthesis_protocol: Optional[Dict[str, Any]] = None
     reference_condition_series_id: str = ""
     converter_definition_version: str = GENERIC_CONVERTER_DEFINITION_VERSION
     source: Dict[str, Any] = field(default_factory=dict)
@@ -349,6 +354,7 @@ class GenericConditionRecommendation:
     precedent_reference_ids: Tuple[str, ...]
     explanation: Tuple[str, ...]
     score_trace: "RecommendationScoreTrace"
+    synthesis_protocol: Dict[str, Any] = field(default_factory=dict)
     default_rank: Optional[int] = None
     default_score: Optional[float] = None
     rank_change: int = 0

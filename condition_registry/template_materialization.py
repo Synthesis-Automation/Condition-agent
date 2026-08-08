@@ -105,6 +105,7 @@ def materialize_recipe_variant(
                 role_status="assigned",
                 primary_role=slot.role_id,
                 primary_role_confidence=1.0,
+                cas=substance.cas,
                 amount=selection.amount,
                 amount_unit=selection.amount_unit,
                 provenance={

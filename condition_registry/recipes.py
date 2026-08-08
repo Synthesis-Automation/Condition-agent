@@ -131,6 +131,7 @@ def _merge_duplicate_components(
                 role_status=role_status,
                 primary_role=primary_role,
                 primary_role_confidence=primary_confidence,
+                cas=primary.cas,
                 amount=primary.amount,
                 amount_unit=primary.amount_unit,
                 source_role_hint=primary.source_role_hint,

@@ -10,6 +10,7 @@ and does not import `chemtools` or `condition_recommender`.
 - `definitions/roles.v2.json`: the small allowed-role vocabulary
 - `definitions/role_resolution.v2.json`: contextual role and recipe-bucket rules
 - `definitions/recipe_templates.v1.json`: expert recipe templates
+- `definitions/synthesis_protocol.v1.schema.json`: canonical protocol JSON schema
 
 `definitions/substances.v1.csv` remains only because legacy application paths
 outside this package still read it. The clean registry runtime does not.
@@ -99,6 +100,45 @@ Resolved recipe IDs use the v2 condition contract: `RCR2` includes quantities,
 process stages, and operating conditions; `RCORE2` identifies the role-aware
 substance set without those variant details. Unresolved identities and roles
 remain explicit in serialized recipe components.
+
+Every resolved component includes `cas` when the registry has a CAS number.
+The recommender serializes a `synthesis_protocol` beside each converted or
+recommended recipe. Its materials contain stable registry IDs, canonical names,
+CAS numbers, roles, and quantities; its operating conditions use explicit field
+units (`temperature_c`, `time_h`, and `concentration_m`). Observed process stages
+become `maintain_conditions` operations.
+
+```json
+{
+  "protocol_id": "CP1:<sha256>",
+  "recipe_id": "RCR2:<sha256>",
+  "materials": [
+    {
+      "material_id": "condition_001",
+      "category": "condition",
+      "substance_id": "cas:584-08-7",
+      "canonical_name": "Potassium carbonate",
+      "cas": "584-08-7",
+      "role": "base",
+      "amount": 2.0,
+      "amount_unit": "equiv"
+    }
+  ],
+  "operating_conditions": {
+    "temperature_c": 80.0,
+    "time_h": 12.0,
+    "concentration_m": null,
+    "atmosphere": "nitrogen"
+  },
+  "execution_readiness": "review_required"
+}
+```
+
+Dataset conditions normally lack ordered additions, vessel configuration,
+mixing, quench, and workup. These gaps are listed in
+`missing_required_fields`; the registry does not infer them or label such a
+draft executable. A future procedure parser or reviewed template can populate
+those fields before export to a hardware-specific execution format.
 
 Run the migration audit without changing definitions:
 

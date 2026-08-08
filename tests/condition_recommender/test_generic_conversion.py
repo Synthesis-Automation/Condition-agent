@@ -112,8 +112,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "10.0"
-    assert record.converter_definition_version == "generic_conversion.v10.0"
+    assert record.schema_version == "10.1"
+    assert record.converter_definition_version == "generic_conversion.v10.1"
     assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
@@ -129,6 +129,18 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
     assert record.resolved_recipe_core_id.startswith("RCORE2:")
     assert record.reference_condition_series_id.startswith("RCS1:")
+    assert record.synthesis_protocol is not None
+    protocol_conditions = tuple(
+        material
+        for material in record.synthesis_protocol["materials"]
+        if material["category"] == "condition"
+    )
+    assert {material["cas"] for material in protocol_conditions} == {
+        "14221-01-3",
+        "584-08-7",
+        "108-88-3",
+    }
+    assert record.synthesis_protocol["execution_readiness"] == "review_required"
     payload = record.to_dict()
     assert payload["reaction_label"]["text"]
     assert payload["reaction_label"]["basis"]

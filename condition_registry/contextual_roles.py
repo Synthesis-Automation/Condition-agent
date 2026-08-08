@@ -228,6 +228,7 @@ def resolve_contextual_component(
             role_status=role_status,
             primary_role=primary_role,
             primary_role_confidence=primary_confidence,
+            cas=substance.cas,
             amount=amount,
             amount_unit=amount_unit,
             source_role_hint=source_role_hint,

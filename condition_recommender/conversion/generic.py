@@ -24,6 +24,7 @@ from ..condition_normalization import normalize_cas_list
 from ..core_eligibility import assess_core_eligibility
 from ..fragment_source_support import assess_fragment_source_support
 from ..models import ConditionIdentity, PrecedentTier, RecommendationRecord
+from ..protocols import protocol_draft_for_reaction
 from .admission import decide_admission
 from .identities import canonical_reaction_identity, observation_id, raw_recipe_id
 from .input_schema import RawReactionRecord
@@ -309,6 +310,10 @@ def convert_record(
         temperature_c=record.temperature_c,
         time_h=record.time_h,
     )
+    synthesis_protocol = protocol_draft_for_reaction(
+        resolved_recipe,
+        record.reaction_smiles,
+    )
     source = {
         "source_dataset": record.source_dataset,
         "source_path": record.source_path,
@@ -424,6 +429,7 @@ def convert_record(
         condition_resolution=_condition_resolution(resolved_recipe),
         resolved_recipe_id=resolved_recipe.recipe_id,
         resolved_recipe=resolved_recipe.to_dict(),
+        synthesis_protocol=synthesis_protocol.to_dict(),
         reference_condition_series_id=condition_series_id,
         source=source,
     )

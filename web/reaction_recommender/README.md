@@ -58,6 +58,9 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
   yields, fallback levels, and precedent provenance.
 - Export the complete versioned recommendation, discovery, or feature result as
   JSON.
+- Preview and download the selected recommendation's versioned synthesis
+  protocol JSON, including registry substance IDs, CAS numbers, quantities,
+  operating conditions, observed operations, and execution-readiness gaps.
 
 The UI intentionally exposes no arbitrary file paths or upload endpoints. Local
 dataset identity and access remain server configuration concerns.

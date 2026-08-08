@@ -17,8 +17,8 @@ def _record(index: int, *, yield_pct: float | None) -> dict:
     recipe_id = f"RCR1:discovery-{index}"
     recipe_core_id = f"RCORE1:discovery-{index}"
     return {
-        "schema_version": "10.0",
-        "converter_definition_version": "generic_conversion.v10.0",
+        "schema_version": "10.1",
+        "converter_definition_version": "generic_conversion.v10.1",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "precedent_tier": "trusted",

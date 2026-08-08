@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://condition-agent.local/schemas/synthesis_protocol.v1.schema.json",
+  "title": "Synthesis Protocol Draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_id",
+    "recipe_id",
+    "recipe_core_id",
+    "reaction_smiles",
+    "materials",
+    "operating_conditions",
+    "operations",
+    "execution_readiness",
+    "missing_required_fields",
+    "warnings",
+    "schema_version"
+  ],
+  "properties": {
+    "protocol_id": {"type": "string", "pattern": "^CP1:[0-9a-f]{64}$"},
+    "recipe_id": {"type": "string"},
+    "recipe_core_id": {"type": "string"},
+    "reaction_smiles": {"type": ["string", "null"]},
+    "materials": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/material"}
+    },
+    "operating_conditions": {"$ref": "#/$defs/operating_conditions"},
+    "operations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/operation"}
+    },
+    "execution_readiness": {"const": "review_required"},
+    "missing_required_fields": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "warnings": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "schema_version": {"const": "1.0"}
+  },
+  "$defs": {
+    "nullable_number": {"type": ["number", "null"]},
+    "nullable_string": {"type": ["string", "null"]},
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "material_id",
+        "category",
+        "identity_status",
+        "substance_id",
+        "canonical_name",
+        "cas",
+        "smiles",
+        "role",
+        "role_status",
+        "amount",
+        "amount_unit",
+        "source_field",
+        "warnings"
+      ],
+      "properties": {
+        "material_id": {"type": "string"},
+        "category": {
+          "enum": ["reaction_input", "condition", "reaction_output"]
+        },
+        "identity_status": {"type": "string"},
+        "substance_id": {"$ref": "#/$defs/nullable_string"},
+        "canonical_name": {"$ref": "#/$defs/nullable_string"},
+        "cas": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[0-9]{2,7}-[0-9]{2}-[0-9]$"}
+          ]
+        },
+        "smiles": {"$ref": "#/$defs/nullable_string"},
+        "role": {"$ref": "#/$defs/nullable_string"},
+        "role_status": {"type": "string"},
+        "amount": {"$ref": "#/$defs/nullable_number"},
+        "amount_unit": {"$ref": "#/$defs/nullable_string"},
+        "source_field": {"$ref": "#/$defs/nullable_string"},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "operating_conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["temperature_c", "time_h", "concentration_m", "atmosphere"],
+      "properties": {
+        "temperature_c": {"$ref": "#/$defs/nullable_number"},
+        "time_h": {"$ref": "#/$defs/nullable_number"},
+        "concentration_m": {"$ref": "#/$defs/nullable_number"},
+        "atmosphere": {"$ref": "#/$defs/nullable_string"}
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation_id",
+        "operation_type",
+        "stage_index",
+        "temperature_c",
+        "time_h",
+        "atmosphere"
+      ],
+      "properties": {
+        "operation_id": {"type": "string"},
+        "operation_type": {"const": "maintain_conditions"},
+        "stage_index": {"type": "integer", "minimum": 1},
+        "temperature_c": {"$ref": "#/$defs/nullable_number"},
+        "time_h": {"$ref": "#/$defs/nullable_number"},
+        "atmosphere": {"$ref": "#/$defs/nullable_string"}
+      }
+    }
+  }
+}

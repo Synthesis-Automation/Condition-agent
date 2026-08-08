@@ -142,6 +142,7 @@ input::placeholder, textarea::placeholder { color: #94a198; }
 .alert.error { color: #843e2c; background: #faebe6; border: 1px solid #efd1c7; }
 
 .results-summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 19px; border-bottom: 1px solid #dbe4de; background: #f8faf8; }
+.results-summary-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .metric-strip { display: flex; align-items: stretch; gap: 1px; overflow: hidden; border: 1px solid #d3ddd7; border-radius: 10px; background: #d3ddd7; }
 .metric-strip > div { display: flex; min-width: 94px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px 12px; background: #fff; }
 .metric-strip strong { color: #224c38; font-size: .9rem; }
@@ -181,6 +182,10 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .message-group.caution h4, .message-group.caution li::marker { color: #8a612d; }
 .trace-panel { margin-top: 11px; border: 1px solid #dce5df; border-radius: 9px; background: #fff; }
 .trace-panel summary { padding: 11px 12px; color: #3b5c4c; }
+.protocol-panel summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 11px; }
+.readiness-badge { padding: 4px 7px; border-radius: 6px; color: #805728; background: #f8eddc; font-size: .61rem; font-weight: 800; }
+.protocol-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px 10px; color: #6c7d73; font-size: .67rem; }
+.protocol-panel pre { max-height: 360px; overflow: auto; margin: 0; padding: 12px; border-top: 1px solid #e0e7e2; color: #3c5548; background: #f8faf8; font-family: Consolas, monospace; font-size: .63rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
 .factor-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; padding: 0 12px 12px; }
 .factor-grid > div { display: flex; flex-direction: column; gap: 2px; padding: 9px; border-radius: 7px; background: #f3f7f4; }
 .factor-grid strong { color: #345646; font-size: .68rem; }
@@ -263,7 +268,8 @@ footer { padding: 4px 4px 0; color: #77877e; font-size: .7rem; text-align: cente
 
 @media (max-width: 720px) {
   .app-shell { padding: 18px 14px 12px; }
-  .topbar, .results-summary { flex-direction: column; }
+  .topbar, .results-summary { align-items: stretch; flex-direction: column; }
+  .results-summary-actions { align-items: stretch; flex-direction: column; }
   .service-status { width: 100%; }
   .editor-frame { height: 520px; min-height: 430px; }
   .smiles-workbench, .option-grid, .advanced-options > div { grid-template-columns: 1fr; }

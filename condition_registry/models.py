@@ -227,12 +227,13 @@ class ResolvedConditionComponent:
     role_status: Literal["assigned", "unassigned", "ambiguous", "conflicting"]
     primary_role: Optional[str]
     primary_role_confidence: Optional[float]
+    cas: Optional[str] = None
     amount: Optional[float] = None
     amount_unit: Optional[str] = None
     source_role_hint: Optional[str] = None
     warnings: Tuple[str, ...] = ()
     provenance: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "2.0"
+    schema_version: str = "2.1"
 
     def __post_init__(self) -> None:
         if self.role_status == "assigned":
@@ -271,7 +272,7 @@ class ResolvedConditionRecipe:
     declared_absences: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
     definition_versions: Dict[str, str] = field(default_factory=dict)
-    schema_version: str = "2.0"
+    schema_version: str = "2.1"
 
     @property
     def components(self) -> Tuple[ResolvedConditionComponent, ...]:

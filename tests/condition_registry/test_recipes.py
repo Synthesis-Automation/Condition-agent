@@ -44,6 +44,7 @@ def test_resolved_recipe_groups_components_by_contextual_role() -> None:
     assert recipe.catalysts[0].primary_role == "metal_catalyst"
     assert recipe.bases[0].primary_role == "base"
     assert recipe.solvents[0].primary_role == "solvent"
+    assert recipe.solvents[0].cas == "7732-18-5"
     assert len(recipe.components) == 3
     assert recipe.warnings == ()
 
@@ -79,6 +80,7 @@ def test_unresolved_identity_is_retained_in_other_components() -> None:
     assert component.identity_status == "unresolved"
     assert component.role_status == "unassigned"
     assert component.primary_role is None
+    assert component.cas is None
     assert "CONDITION_IDENTITY_UNCERTAINTY" in recipe.warnings
 
 

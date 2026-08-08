@@ -47,8 +47,8 @@ def _record(index: int, reaction_smiles: str, recipe_core: str) -> dict:
     analysis = _analysis(reaction_smiles)
     recipe_id = recipe_core.replace("RCORE1", "RCR1")
     return {
-        "schema_version": "10.0",
-        "converter_definition_version": "generic_conversion.v10.0",
+        "schema_version": "10.1",
+        "converter_definition_version": "generic_conversion.v10.1",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "precedent_tier": "trusted",

@@ -21,6 +21,8 @@ from reactive_taxonomy import (
 )
 
 from .models import (
+    COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS,
+    COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS,
     CORE_ELIGIBILITY_DEFINITION_VERSION,
     GENERIC_CONVERTER_DEFINITION_VERSION,
     RECOMMENDATION_RECORD_SCHEMA_VERSION,
@@ -238,8 +240,8 @@ def _validate_index_rows(
             "Incompatible fallback descriptor definitions; regenerate converted records"
         )
     record_schemas = tuple(sorted({row.record_schema_version for row in values}))
-    if record_schemas and record_schemas != (
-        RECOMMENDATION_RECORD_SCHEMA_VERSION,
+    if record_schemas and not set(record_schemas).issubset(
+        COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS
     ):
         raise ValueError(
             "Incompatible recommendation record schema; regenerate converted records"
@@ -247,8 +249,8 @@ def _validate_index_rows(
     converter_versions = tuple(
         sorted({row.converter_definition_version for row in values})
     )
-    if converter_versions and converter_versions != (
-        GENERIC_CONVERTER_DEFINITION_VERSION,
+    if converter_versions and not set(converter_versions).issubset(
+        COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS
     ):
         raise ValueError(
             "Incompatible generic converter version; regenerate converted records"
@@ -738,12 +740,16 @@ def _validate_index_metadata(payload: Mapping[str, Any]) -> PrecedentIndexScope:
             "Incompatible fallback descriptor definitions; rebuild the index"
         )
     record_schema_versions = tuple(payload.get("record_schema_versions") or ())
-    if record_schema_versions != (RECOMMENDATION_RECORD_SCHEMA_VERSION,):
+    if not record_schema_versions or not set(record_schema_versions).issubset(
+        COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS
+    ):
         raise ValueError("Incompatible recommendation record schema; rebuild the index")
     converter_definition_versions = tuple(
         payload.get("converter_definition_versions") or ()
     )
-    if converter_definition_versions != (GENERIC_CONVERTER_DEFINITION_VERSION,):
+    if not converter_definition_versions or not set(
+        converter_definition_versions
+    ).issubset(COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS):
         raise ValueError("Incompatible generic converter version; rebuild the index")
     return precedent_scope
 

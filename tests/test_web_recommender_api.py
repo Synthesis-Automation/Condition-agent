@@ -50,6 +50,17 @@ class FakeRuntime:
                     "rank": 1,
                     "recipe_id": "recipe:1",
                     "score": 0.9,
+                    "synthesis_protocol": {
+                        "protocol_id": "CP1:test",
+                        "materials": [
+                            {
+                                "category": "condition",
+                                "canonical_name": "Potassium carbonate",
+                                "cas": "584-08-7",
+                            }
+                        ],
+                        "execution_readiness": "review_required",
+                    },
                 }
             ],
             "schema_version": "test",
@@ -145,6 +156,10 @@ def test_recommendation_contract_forwards_validated_options() -> None:
     assert payload["api_schema_version"] == "1.0"
     assert payload["data"]["query_reaction_smiles"] == "CCBr.N>>CCN"
     assert payload["data"]["recommendations"][0]["recipe_id"] == "recipe:1"
+    assert (
+        payload["data"]["recommendations"][0]["synthesis_protocol"]["materials"][0]["cas"]
+        == "584-08-7"
+    )
 
 
 def test_discovery_and_svg_rendering_contracts() -> None:

@@ -315,6 +315,7 @@ def recommend_indexed_signature(
                 ranking_weights=ranking_weights,
                 ranking_preferences=resolved_preferences,
                 query_reaction_core=reaction_core,
+                query_reaction_smiles=query_reaction_smiles,
             )
             for recommendation in ranked:
                 if recommendation.recipe_core_id in seen_recipe_cores:
@@ -360,6 +361,7 @@ def recommend_indexed_signature(
             ranking_weights=ranking_weights,
             ranking_preferences=resolved_preferences,
             query_reaction_core=reaction_core,
+            query_reaction_smiles=query_reaction_smiles,
         )
     if any(
         caution.startswith("Reaction-scope mismatch:")
@@ -878,6 +880,7 @@ def _recommend_core_with_index(
         similarity_assessor=core_similarity,
         query_reaction_core=core,
         ranking_preferences=ranking_preferences,
+        query_reaction_smiles=str(analysis.input_reaction_smiles),
     )
     cautions = (
         "Query retrieval used minimized reaction-core evidence, not a verified "
@@ -1082,6 +1085,7 @@ def _recommend_hypotheses_with_index(
             else None
         ),
         ranking_preferences=ranking_preferences,
+        query_reaction_smiles=reaction_smiles,
     )
     hypothesis_cautions = (
         "Query atom correspondence is ambiguous; no hypothesis is presented "
@@ -1270,6 +1274,7 @@ def _recommend_fallback_with_index(
             else None
         ),
         ranking_preferences=ranking_preferences,
+        query_reaction_smiles=reaction_smiles,
     )
     fallback_cautions = (
         "Query atom correspondence and bond edits are not verified; the "
