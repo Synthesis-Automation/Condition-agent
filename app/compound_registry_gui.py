@@ -16,13 +16,13 @@ from condition_registry import (  # noqa: E402
     CompoundAdditionError,
     CompoundAdditionRequest,
     CompoundAliasInput,
-    RoleAssignment,
+    RoleCapability,
     Substance,
     add_compound,
     resolve_substance,
     update_compound,
 )
-from condition_registry.loader import load_taxonomy  # noqa: E402
+from condition_registry.loader import load_role_definitions  # noqa: E402
 from condition_registry.models import (  # noqa: E402
     CONDITION_NAME_IDENTIFIER_TYPES,
 )
@@ -69,8 +69,7 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         self.setWindowState(
             self.windowState() | QtCore.Qt.WindowState.WindowMaximized
         )
-        self._taxonomy = load_taxonomy()
-        self._families_by_role = self._build_family_map()
+        self._role_definitions = load_role_definitions()
         self.lookup_thread: Optional[QtCore.QThread] = None
         self.lookup_worker: Optional[CompoundLookupWorker] = None
         self.last_lookup_result: Optional[CompoundLookupResult] = None
@@ -128,15 +127,11 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
             "meltingPoint", "Optional °C", positive=False
         )
 
-        self.primary_role_combo = self._role_combo("primaryRole", optional=False)
-        self.primary_family_combo = QtWidgets.QComboBox()
-        self.primary_family_combo.setObjectName("primaryFamily")
+        self.primary_role_combo = self._role_combo("primaryRole", optional=True)
         self.primary_tag_edit = QtWidgets.QLineEdit()
         self.primary_tag_edit.setObjectName("primaryRoleTag")
         self.primary_tag_edit.setPlaceholderText("Optional chemistry note")
         self.secondary_role_combo = self._role_combo("secondaryRole", optional=True)
-        self.secondary_family_combo = QtWidgets.QComboBox()
-        self.secondary_family_combo.setObjectName("secondaryFamily")
         self.secondary_tag_edit = QtWidgets.QLineEdit()
         self.secondary_tag_edit.setObjectName("secondaryRoleTag")
         self.secondary_tag_edit.setPlaceholderText("Optional chemistry note")
@@ -171,11 +166,6 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         self.alias_table.setAlternatingRowColors(True)
         self.alias_table.setMinimumHeight(150)
 
-        self.source_edit = QtWidgets.QLineEdit()
-        self.source_edit.setObjectName("provenanceSource")
-        self.source_edit.setPlaceholderText(
-            "Required: DOI, database record, vendor catalogue, or curator reference"
-        )
         self.notes_edit = QtWidgets.QPlainTextEdit()
         self.notes_edit.setObjectName("curatorNotes")
         self.notes_edit.setPlaceholderText("Optional curation rationale or cautions")
@@ -203,13 +193,6 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
 
         self._build_layout()
         self._connect_signals()
-        self._set_role(self.primary_role_combo, "other_reagent")
-        self._refresh_family_combo(
-            self.primary_role_combo, self.primary_family_combo
-        )
-        self._refresh_family_combo(
-            self.secondary_role_combo, self.secondary_family_combo
-        )
         self.add_alias_row()
 
     @staticmethod
@@ -226,26 +209,13 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         edit.setValidator(QtGui.QDoubleValidator(minimum, 1_000_000.0, 8))
         return edit
 
-    def _build_family_map(self) -> dict[str, tuple[tuple[str, str], ...]]:
-        values: dict[str, list[tuple[str, str]]] = {}
-        for family in self._taxonomy.get("families", ()):
-            role_id = str(family["role_id"])
-            family_id = str(family["id"])
-            description = str(family.get("description") or "").strip()
-            label = family_id if not description else f"{family_id} — {description}"
-            values.setdefault(role_id, []).append((label, family_id))
-        return {
-            role_id: tuple(sorted(families, key=lambda item: item[1]))
-            for role_id, families in values.items()
-        }
-
     def _role_combo(self, object_name: str, *, optional: bool) -> QtWidgets.QComboBox:
         combo = QtWidgets.QComboBox()
         combo.setObjectName(object_name)
         if optional:
-            combo.addItem("No secondary role", "")
+            combo.addItem("Unassigned", "")
         roles = sorted(
-            self._taxonomy.get("roles", ()),
+            self._role_definitions.get("roles", ()),
             key=lambda item: (int(item.get("priority", 100)), str(item["id"])),
         )
         for role in roles:
@@ -305,12 +275,10 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         roles_form = QtWidgets.QFormLayout(roles_group)
         primary = QtWidgets.QHBoxLayout()
         primary.addWidget(self.primary_role_combo)
-        primary.addWidget(self.primary_family_combo, stretch=1)
         primary.addWidget(self.primary_tag_edit, stretch=1)
         roles_form.addRow("Primary role", primary)
         secondary = QtWidgets.QHBoxLayout()
         secondary.addWidget(self.secondary_role_combo)
-        secondary.addWidget(self.secondary_family_combo, stretch=1)
         secondary.addWidget(self.secondary_tag_edit, stretch=1)
         roles_form.addRow("Secondary role", secondary)
         role_note = QtWidgets.QLabel(
@@ -349,17 +317,16 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         alias_help.setWordWrap(True)
         alias_layout.addWidget(alias_help)
 
-        provenance_group = QtWidgets.QGroupBox("Provenance")
-        provenance_group.setObjectName("provenanceGroup")
-        provenance_form = QtWidgets.QFormLayout(provenance_group)
-        provenance_form.addRow("Source *", self.source_edit)
-        provenance_form.addRow("Curator notes", self.notes_edit)
+        notes_group = QtWidgets.QGroupBox("Curation notes")
+        notes_group.setObjectName("curationNotesGroup")
+        notes_layout = QtWidgets.QVBoxLayout(notes_group)
+        notes_layout.addWidget(self.notes_edit)
 
         lower_columns = QtWidgets.QHBoxLayout()
-        lower_columns.setObjectName("aliasesAndProvenanceColumns")
+        lower_columns.setObjectName("aliasesAndNotesColumns")
         lower_columns.setSpacing(12)
         lower_columns.addWidget(alias_group, stretch=1)
-        lower_columns.addWidget(provenance_group, stretch=1)
+        lower_columns.addWidget(notes_group, stretch=1)
         content_layout.addLayout(lower_columns)
         scroll.setWidget(content)
         root.addWidget(scroll, stretch=1)
@@ -376,34 +343,8 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         self.cas_check_button.clicked.connect(self.check_cas)
         self.lookup_button.clicked.connect(self.start_web_lookup)
         self.cas_edit.editingFinished.connect(self.check_cas)
-        self.primary_role_combo.currentIndexChanged.connect(
-            lambda: self._refresh_family_combo(
-                self.primary_role_combo, self.primary_family_combo
-            )
-        )
-        self.secondary_role_combo.currentIndexChanged.connect(
-            lambda: self._refresh_family_combo(
-                self.secondary_role_combo, self.secondary_family_combo
-            )
-        )
         self.save_button.clicked.connect(self.save_compound)
         self.clear_button.clicked.connect(self.clear_form)
-
-    def _refresh_family_combo(
-        self,
-        role_combo: QtWidgets.QComboBox,
-        family_combo: QtWidgets.QComboBox,
-    ) -> None:
-        current = family_combo.currentData()
-        role_id = str(role_combo.currentData() or "")
-        family_combo.clear()
-        family_combo.addItem("No family annotation", "")
-        for label, family_id in self._families_by_role.get(role_id, ()):
-            family_combo.addItem(label, family_id)
-        index = family_combo.findData(current)
-        if index >= 0:
-            family_combo.setCurrentIndex(index)
-        family_combo.setEnabled(bool(role_id))
 
     @QtCore.pyqtSlot()
     def add_alias_row(
@@ -499,15 +440,13 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
     @staticmethod
     def _role_assignment(
         role_combo: QtWidgets.QComboBox,
-        family_combo: QtWidgets.QComboBox,
         tag_edit: QtWidgets.QLineEdit,
-    ) -> Optional[RoleAssignment]:
+    ) -> Optional[RoleCapability]:
         role_id = str(role_combo.currentData() or "")
         if not role_id:
             return None
-        return RoleAssignment(
+        return RoleCapability(
             role_id=role_id,
-            family_id=str(family_combo.currentData() or "") or None,
             tag=tag_edit.text().strip() or None,
             evidence="curator_gui",
         )
@@ -519,12 +458,10 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
             for assignment in (
                 self._role_assignment(
                     self.primary_role_combo,
-                    self.primary_family_combo,
                     self.primary_tag_edit,
                 ),
                 self._role_assignment(
                     self.secondary_role_combo,
-                    self.secondary_family_combo,
                     self.secondary_tag_edit,
                 ),
             )
@@ -533,7 +470,6 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         return CompoundAdditionRequest(
             canonical_name=self.name_edit.text().strip(),
             cas=self.cas_edit.text().strip(),
-            source=self.source_edit.text().strip(),
             smiles=self.smiles_edit.text().strip() or None,
             abbreviation=self.abbreviation_edit.text().strip() or None,
             formula=self.formula_edit.text().strip() or None,
@@ -576,20 +512,14 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
     def _load_role_assignment(
         self,
         role_combo: QtWidgets.QComboBox,
-        family_combo: QtWidgets.QComboBox,
         tag_edit: QtWidgets.QLineEdit,
-        assignment: Optional[RoleAssignment],
+        assignment: Optional[RoleCapability],
     ) -> None:
         if assignment is None:
             role_combo.setCurrentIndex(-1)
-            self._refresh_family_combo(role_combo, family_combo)
             tag_edit.clear()
             return
         self._set_role(role_combo, assignment.role_id)
-        self._refresh_family_combo(role_combo, family_combo)
-        family_index = family_combo.findData(assignment.family_id or "")
-        if family_index >= 0:
-            family_combo.setCurrentIndex(family_index)
         tag_edit.setText(assignment.tag or "")
 
     def load_existing_substance(self, substance: Substance) -> None:
@@ -614,22 +544,20 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         self.smiles_edit.setText(substance.smiles or "")
         properties = substance.properties
         self.formula_edit.setText(str(properties.get("formula") or ""))
-        self.molecular_weight_edit.setText(str(properties.get("mw") or ""))
-        self.kind_combo.setCurrentText(str(properties.get("type") or ""))
+        self.molecular_weight_edit.setText(str(properties.get("molecular_weight") or ""))
+        self.kind_combo.setCurrentText(str(properties.get("substance_kind") or ""))
         self.density_edit.setText(str(properties.get("density") or ""))
-        self.boiling_point_edit.setText(str(properties.get("bp") or ""))
-        self.melting_point_edit.setText(str(properties.get("mp") or ""))
+        self.boiling_point_edit.setText(str(properties.get("boiling_point_c") or ""))
+        self.melting_point_edit.setText(str(properties.get("melting_point_c") or ""))
 
         roles = (*substance.roles, None, None)[:2]
         self._load_role_assignment(
             self.primary_role_combo,
-            self.primary_family_combo,
             self.primary_tag_edit,
             roles[0],
         )
         self._load_role_assignment(
             self.secondary_role_combo,
-            self.secondary_family_combo,
             self.secondary_tag_edit,
             roles[1],
         )
@@ -651,19 +579,15 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         if self.alias_table.rowCount() == 0:
             self.add_alias_row()
 
-        self.source_edit.setText(str(properties.get("source") or ""))
-        self.notes_edit.setPlainText(str(properties.get("curator_notes") or ""))
+        self.notes_edit.setPlainText(
+            str(substance.provenance.get("curator_notes") or "")
+        )
         self.save_button.setText("Validate and Save Changes")
         self.cas_status.setText("Loaded for editing")
         self.cas_status.setStyleSheet("color: #005a9e; font-weight: 600;")
-        source_note = (
-            "Review the loaded fields and save changes."
-            if self.source_edit.text().strip()
-            else "Enter a provenance source before saving this legacy record."
-        )
         self.status_box.setPlainText(
             f"Loaded {substance.canonical_name} ({substance.substance_id}).\n"
-            f"{source_note}\n"
+            "Review the loaded fields and save changes.\n"
             "The CAS number is locked to preserve the stable substance identity."
         )
 
@@ -771,9 +695,6 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         )
         if result.substance_kind:
             self.kind_combo.setCurrentText(result.substance_kind)
-        if result.source_ids:
-            self.source_edit.setText(";".join(result.source_ids))
-
         existing = self._existing_alias_keys()
         canonical_key = (result.canonical_name or "").casefold()
         abbreviation_key = (result.abbreviation or "").casefold()
@@ -807,7 +728,7 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
         lookup_notes = ["Web auto-fill sources:", *result.source_urls]
         lookup_notes.extend(f"Lookup warning: {item}" for item in result.warnings)
         lookup_notes.append(
-            "Condition roles and families were not inferred; review them manually."
+            "Condition role capabilities were not inferred; review them manually."
         )
         self.notes_edit.setPlainText(
             "\n".join(part for part in (notes, "\n".join(lookup_notes)) if part)
@@ -832,7 +753,7 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
             f"Auto-filled {result.cas} ({result.status}).",
             f"Fields: {', '.join(filled) or 'aliases only'}.",
             f"Aliases/identifiers offered: {len(self.alias_inputs())}.",
-            "Roles and families require curator review.",
+            "Role capabilities require curator review.",
         ]
         status_lines.extend(f"Warning: {item}" for item in result.warnings)
         self.status_box.setPlainText("\n".join(status_lines))
@@ -907,11 +828,10 @@ class CompoundRegistryWindow(QtWidgets.QWidget):
             self.melting_point_edit,
             self.primary_tag_edit,
             self.secondary_tag_edit,
-            self.source_edit,
         ):
             edit.clear()
         self.kind_combo.setCurrentIndex(0)
-        self._set_role(self.primary_role_combo, "other_reagent")
+        self.primary_role_combo.setCurrentIndex(0)
         self.secondary_role_combo.setCurrentIndex(0)
         self.alias_table.setRowCount(0)
         self.add_alias_row()

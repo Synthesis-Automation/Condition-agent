@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Tuple
 
-from .loader import load_taxonomy
+from .loader import load_role_definitions
 from .resolver import ConditionRegistry
 from .template_models import (
     ConditionRecipeTemplate,
@@ -168,8 +168,11 @@ def validate_recipe_template_payload(payload: Mapping[str, Any]) -> Tuple[str, .
         return tuple(sorted((*errors, "templates_must_be_array")))
 
     registry = ConditionRegistry()
-    taxonomy = load_taxonomy()
-    roles = {str(value.get("id") or "") for value in taxonomy.get("roles") or ()}
+    definitions = load_role_definitions()
+    roles = {
+        str(value.get("id") or "")
+        for value in definitions.get("roles") or ()
+    }
     template_ids = []
     for template_index, template in enumerate(templates):
         prefix = f"templates[{template_index}]"

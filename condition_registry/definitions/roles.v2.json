@@ -1,0 +1,17 @@
+{
+  "schema_version": "roles.v2",
+  "definition_id": "condition_roles.v2",
+  "roles": [
+    {"id": "ligand", "priority": 0},
+    {"id": "metal_catalyst", "priority": 1},
+    {"id": "base", "priority": 2},
+    {"id": "acid", "priority": 3},
+    {"id": "condensation_agent", "priority": 4},
+    {"id": "oxidant", "priority": 5},
+    {"id": "reductant", "priority": 6},
+    {"id": "additive", "priority": 7},
+    {"id": "solvent", "priority": 8},
+    {"id": "organo_catalyst", "priority": 9},
+    {"id": "enzyme", "priority": 10}
+  ]
+}

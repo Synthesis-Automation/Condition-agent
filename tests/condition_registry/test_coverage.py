@@ -18,16 +18,16 @@ def test_dataset_coverage_routes_identity_and_role_categories(tmp_path) -> None:
     assert report["source_rows"] == 1
     assert report["unique_identifier_source_pairs"] == 6
     assert report["category_counts"] == {
-        "resolved": 1,
-        "multiple_roles": 1,
-        "generic_only": 1,
+        "resolved": 2,
+        "multiple_roles": 0,
+        "unassigned_role": 1,
         "role_conflict": 1,
         "missing_substance": 1,
         "invalid_identifier": 1,
     }
     assert json.loads((tmp_path / "out" / "coverage_report.json").read_text()) == report
     for filename in (
-        "resolved.csv", "ambiguous_roles.csv", "generic_only.csv",
+        "resolved.csv", "ambiguous_roles.csv", "unassigned_roles.csv",
         "role_conflicts.csv", "missing_substances.csv", "invalid_identifiers.csv",
     ):
         assert (tmp_path / "out" / filename).exists()

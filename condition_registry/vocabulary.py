@@ -1,4 +1,4 @@
-"""Immutable public vocabulary for condition roles and families."""
+"""Immutable public vocabulary for condition roles."""
 
 from __future__ import annotations
 
@@ -8,9 +8,15 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, FrozenSet
 
-from .loader import load_taxonomy
+from .loader import load_role_definitions
 
 _DEFINITION_DIR = Path(__file__).with_name("definitions")
+_ACTIVE_DEFINITION_NAMES = {
+    "recipe_templates.v1.json",
+    "role_resolution.v2.json",
+    "roles.v2.json",
+    "substances.v2.jsonl",
+}
 
 
 @dataclass(frozen=True)
@@ -18,20 +24,16 @@ class ConditionDefinitionVocabulary:
     """Validated identifiers available to downstream declarative rules."""
 
     role_ids: FrozenSet[str]
-    family_ids: FrozenSet[str]
     schema_version: str
 
 
 @lru_cache(maxsize=1)
 def load_condition_vocabulary() -> ConditionDefinitionVocabulary:
-    """Return immutable role and family identifiers owned by the registry."""
-    taxonomy = load_taxonomy()
+    """Return immutable role identifiers owned by the registry."""
+    definitions = load_role_definitions()
     return ConditionDefinitionVocabulary(
-        role_ids=frozenset(str(item["id"]) for item in taxonomy["roles"]),
-        family_ids=frozenset(str(item["id"]) for item in taxonomy["families"]),
-        schema_version=str(
-            taxonomy.get("schema_version") or "roles_families.v1"
-        ),
+        role_ids=frozenset(str(item["id"]) for item in definitions["roles"]),
+        schema_version=str(definitions["schema_version"]),
     )
 
 
@@ -40,7 +42,7 @@ def condition_registry_definition_versions() -> Dict[str, str]:
     """Return content-addressed versions for identity and role definitions."""
     versions = {}
     for path in sorted(_DEFINITION_DIR.glob("*"), key=lambda item: item.name):
-        if not path.is_file() or path.name == "pending_substances.csv":
+        if not path.is_file() or path.name not in _ACTIVE_DEFINITION_NAMES:
             continue
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         versions[path.name] = f"sha256:{digest}"

@@ -108,7 +108,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.canonical_reaction_id.startswith("CRX1:")
     assert record.observation_id.startswith("OBS1:")
     assert record.raw_recipe_id.startswith("RAWCOND1:")
-    assert record.resolved_recipe_id.startswith("RCR1:")
+    assert record.resolved_recipe_id.startswith("RCR2:")
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
@@ -127,7 +127,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.condition_status == ConditionStatus.RESOLVED_COMPLETE
     assert record.outcome_status == OutcomeStatus.USABLE
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
-    assert record.resolved_recipe_core_id.startswith("RCORE1:")
+    assert record.resolved_recipe_core_id.startswith("RCORE2:")
     assert record.reference_condition_series_id.startswith("RCS1:")
     payload = record.to_dict()
     assert payload["reaction_label"]["text"]
@@ -240,7 +240,7 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
     assert record.reaction_label["status"] == "structural_equation"
     assert record.reaction_label["basis"] == "local_context"
     assert record.reaction_signature["order_changes"] == ("C-C:DOUBLE>SINGLE",)
-    assert record.resolved_recipe_id.startswith("RCR1:")
+    assert record.resolved_recipe_id.startswith("RCR2:")
 
 
 def test_exact_multi_event_signature_is_verified() -> None:
@@ -588,7 +588,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     assert len(records) == 4
     assert records[1]["named_family"] is None
     assert records[1]["reaction_signature"]["order_changes"] == ["C-C:DOUBLE>SINGLE"]
-    assert records[1]["resolved_recipe_id"].startswith("RCR1:")
+    assert records[1]["resolved_recipe_id"].startswith("RCR2:")
     with (output / "verified.csv").open(encoding="utf-8-sig", newline="") as handle:
         verified = list(csv.DictReader(handle))
     assert len(verified) == 2

@@ -6,25 +6,25 @@ from condition_registry import (
     resolve_contextual_component,
 )
 from condition_registry.contextual_roles import load_role_resolution_rules
-from condition_registry.loader import load_taxonomy
+from condition_registry.loader import load_role_definitions
 
 
-def test_multi_role_substance_uses_source_and_transformation_context() -> None:
+def test_multi_role_substance_uses_source_and_reaction_role_context() -> None:
     reagent = resolve_contextual_component(
         "121-44-8",
         source_field="reagent_cas",
-        transformation_class="c_c_transfer_coupling",
+        preferred_roles=("metal_catalyst", "ligand", "base"),
     )
     solvent = resolve_contextual_component(
         "121-44-8",
         source_field="solvent_cas",
-        transformation_class="c_c_transfer_coupling",
+        preferred_roles=("metal_catalyst", "ligand", "base"),
     )
 
     assert reagent.primary_role == "base"
     assert solvent.primary_role == "solvent"
     assert {role.role_id for role in reagent.roles} == {"base", "solvent"}
-    assert "MULTIPLE_POSSIBLE_ROLES" in reagent.warnings
+    assert reagent.role_status == "assigned"
 
 
 def test_resolved_recipe_groups_components_by_contextual_role() -> None:
@@ -34,14 +34,13 @@ def test_resolved_recipe_groups_components_by_contextual_role() -> None:
             "reagent_cas": ("584-08-7",),
             "solvent_cas": ("7732-18-5",),
         },
-        transformation_class="c_c_transfer_coupling",
-        named_family="suzuki_miyaura",
+        preferred_roles=("metal_catalyst", "ligand", "base"),
         temperature_c=80.0,
         time_h=12.0,
     )
 
-    assert recipe.recipe_id.startswith("RCR1:")
-    assert recipe.recipe_core_id.startswith("RCORE1:")
+    assert recipe.recipe_id.startswith("RCR2:")
+    assert recipe.recipe_core_id.startswith("RCORE2:")
     assert recipe.catalysts[0].primary_role == "metal_catalyst"
     assert recipe.bases[0].primary_role == "base"
     assert recipe.solvents[0].primary_role == "solvent"
@@ -55,14 +54,14 @@ def test_recipe_identity_is_input_order_invariant() -> None:
             "reagent_cas": ("584-08-7", "121-44-8"),
             "solvent_cas": ("7732-18-5",),
         },
-        transformation_class="c_c_transfer_coupling",
+        preferred_roles=("metal_catalyst", "ligand", "base"),
     )
     reordered = build_resolved_recipe(
         {
             "solvent_cas": ("7732-18-5",),
             "reagent_cas": ("121-44-8", "584-08-7"),
         },
-        transformation_class="c_c_transfer_coupling",
+        preferred_roles=("metal_catalyst", "ligand", "base"),
     )
 
     assert first.recipe_id == reordered.recipe_id
@@ -71,14 +70,15 @@ def test_recipe_identity_is_input_order_invariant() -> None:
 def test_unresolved_identity_is_retained_in_other_components() -> None:
     recipe = build_resolved_recipe(
         {"catalyst_cas": ("7440-06-4",)},
-        transformation_class="c_c_transfer_coupling",
+        preferred_roles=("metal_catalyst", "ligand", "base"),
     )
 
     assert len(recipe.other_components) == 1
     component = recipe.other_components[0]
     assert component.raw_identifier == "7440-06-4"
     assert component.identity_status == "unresolved"
-    assert component.primary_role == "other_reagent"
+    assert component.role_status == "unassigned"
+    assert component.primary_role is None
     assert "CONDITION_IDENTITY_UNCERTAINTY" in recipe.warnings
 
 
@@ -140,12 +140,11 @@ def test_duplicate_identity_across_source_fields_is_not_double_counted() -> None
 
 
 def test_role_resolution_definition_references_known_roles_and_buckets() -> None:
-    taxonomy_roles = {item["id"] for item in load_taxonomy()["roles"]}
+    taxonomy_roles = {item["id"] for item in load_role_definitions()["roles"]}
     rules = load_role_resolution_rules()
 
     assert set(rules["role_buckets"]) <= taxonomy_roles
-    assert set(rules["source_fallback_roles"].values()) <= taxonomy_roles
-    assert set(rules["source_role_hint_fallbacks"].values()) <= taxonomy_roles
+    assert set(rules["source_role_fallbacks"].values()) <= taxonomy_roles
     assert set(rules["role_buckets"].values()) == {
         "catalysts",
         "ligands",
@@ -156,7 +155,6 @@ def test_role_resolution_definition_references_known_roles_and_buckets() -> None
         "reductants",
         "additives",
         "solvents",
-        "other_components",
     }
 
 
@@ -174,9 +172,7 @@ def test_contextual_component_resolves_name_and_retains_role_hint() -> None:
     assert component.source_role_hint == "base"
     assert component.provenance["identifier_type"] == "name"
     assert component.provenance["identity_identifier_type"] == "abbreviation"
-    assert component.provenance["identity_identifier_source"] == (
-        "substances.v1.csv:abbreviation"
-    )
+    assert "identity_identifier_source" not in component.provenance
 
 
 def test_source_role_hint_does_not_override_registry_chemistry() -> None:
@@ -187,8 +183,9 @@ def test_source_role_hint_does_not_override_registry_chemistry() -> None:
         source_role_hint="base",
     )
 
-    assert component.primary_role == "solvent"
-    assert "SOURCE_FIELD_ROLE_MISMATCH" in component.warnings
+    assert component.role_status == "conflicting"
+    assert component.primary_role is None
+    assert "SOURCE_ROLE_CONFLICT" in component.warnings
 
 
 def test_unresolved_name_uses_explicit_hint_fallback_with_uncertainty() -> None:
@@ -202,7 +199,7 @@ def test_unresolved_name_uses_explicit_hint_fallback_with_uncertainty() -> None:
     assert component.identity_status == "unresolved"
     assert component.primary_role == "ligand"
     assert component.primary_role_confidence < 0.7
-    assert component.roles[0].evidence[0] == "source_role_hint_fallback"
+    assert component.roles[0].evidence[0] == "source_role_hint"
 
 
 def test_recipe_identity_includes_stages_and_declared_absences() -> None:

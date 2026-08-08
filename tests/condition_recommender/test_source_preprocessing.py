@@ -336,7 +336,7 @@ def test_generic_converter_consumes_structure_backed_intermediate_file(
     assert raw_record.primary_outcome_type == "reported_yield_pct"
     assert len(raw_record.condition_component_inputs) == 3
     assert converted.reaction_signature is not None
-    assert converted.resolved_recipe_id.startswith("RCR1:")
+    assert converted.resolved_recipe_id.startswith("RCR2:")
     assert converted.source["input_schema_version"] == (
         INTERMEDIATE_OBSERVATION_SCHEMA_VERSION
     )

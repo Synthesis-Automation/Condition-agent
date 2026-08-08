@@ -13,12 +13,11 @@ from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 from .api import resolve_substance
 
 _SPLIT_RE = re.compile(r"[,;|]")
-_GENERIC_ROLES = {"organic_compound", "inorganic_compound", "other_reagent"}
 _EXPECTED_ROLES = {
     "catalyst_cas": {"metal_catalyst", "ligand", "organo_catalyst", "enzyme", "additive"},
     "solvent_cas": {"solvent"},
     # Reagent columns are deliberately broad; reaction context resolves these later.
-    "reagent_cas": {"base", "acid", "condensation_agent", "oxidant", "reductant", "additive", "other_reagent", "organic_compound", "inorganic_compound", "ligand", "metal_catalyst", "solvent"},
+    "reagent_cas": {"base", "acid", "condensation_agent", "oxidant", "reductant", "additive", "ligand", "metal_catalyst", "solvent"},
 }
 
 DEFAULT_DATASETS = {
@@ -54,7 +53,6 @@ def _classify(identifier: str, source_field: str) -> Dict[str, Any]:
         "substance_id": "",
         "canonical_name": "",
         "role_ids": "",
-        "family_ids": "",
         "coverage_category": "",
         "coverage_flags": "",
     }
@@ -66,18 +64,15 @@ def _classify(identifier: str, source_field: str) -> Dict[str, Any]:
         return base
     substance = result.substance
     roles = {role.role_id for role in substance.roles if role.role_id}
-    families = {role.family_id for role in substance.roles if role.family_id}
     base.update({
         "substance_id": substance.substance_id,
         "canonical_name": substance.canonical_name,
         "role_ids": "|".join(sorted(roles)),
-        "family_ids": "|".join(sorted(families)),
     })
-    specific_roles = roles - _GENERIC_ROLES
     expected = _EXPECTED_ROLES[source_field]
     flags = []
-    if not specific_roles:
-        category = "generic_only"
+    if not roles:
+        category = "unassigned_role"
     elif not roles.intersection(expected):
         category = "role_conflict"
     elif len(roles) > 1:
@@ -86,8 +81,6 @@ def _classify(identifier: str, source_field: str) -> Dict[str, Any]:
         category = "resolved"
     if len(roles) > 1:
         flags.append("MULTIPLE_POSSIBLE_ROLES")
-    if roles.intersection(_GENERIC_ROLES) and specific_roles:
-        flags.append("GENERIC_AND_SPECIFIC_ROLES")
     base["coverage_category"] = category
     base["coverage_flags"] = "|".join(flags)
     return base
@@ -101,7 +94,7 @@ def analyze_coverage(
     output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
     observed: Dict[Tuple[str, str], _ObservedIdentity] = {}
     source_rows = 0
-    for family_id, raw_path in datasets.items():
+    for dataset_id, raw_path in datasets.items():
         path = Path(raw_path)
         with path.open("r", encoding="utf-8-sig", newline="") as handle:
             rows = list(csv.DictReader(handle))
@@ -112,7 +105,7 @@ def analyze_coverage(
                 for identifier in _identifiers(row.get(source_field)):
                     key = (identifier, source_field)
                     entry = observed.setdefault(key, _ObservedIdentity(identifier, source_field))
-                    entry.occurrences += 1; entry.datasets.add(family_id); entry.dataset_occurrences[family_id] += 1
+                    entry.occurrences += 1; entry.datasets.add(dataset_id); entry.dataset_occurrences[dataset_id] += 1
                     if reaction_id: entry.reaction_ids.add(reaction_id)
     records: List[Dict[str, Any]] = []
     for entry in observed.values():
@@ -131,7 +124,7 @@ def analyze_coverage(
     files = {
         "resolved": "resolved.csv",
         "multiple_roles": "ambiguous_roles.csv",
-        "generic_only": "generic_only.csv",
+        "unassigned_role": "unassigned_roles.csv",
         "role_conflict": "role_conflicts.csv",
         "missing_substance": "missing_substances.csv",
         "invalid_identifier": "invalid_identifiers.csv",

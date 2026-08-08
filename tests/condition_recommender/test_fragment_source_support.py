@@ -33,11 +33,9 @@ def test_single_atom_source_requires_curated_transfer_capability() -> None:
     requirements = _requirements("CC(C)O>>CC(C)F")
     capable = build_resolved_recipe(
         {"reagent_cas": ("429-41-4",)},
-        transformation_class="attachment_replacement",
     )
     merely_fluorinated = build_resolved_recipe(
         {"reagent_cas": ("920-66-1",)},
-        transformation_class="attachment_replacement",
     )
 
     supported = assess_fragment_source_support(requirements, capable)
@@ -57,7 +55,6 @@ def test_multi_atom_cyanide_requirement_uses_same_general_contract() -> None:
     requirements = _requirements("Brc1ccccc1>>N#Cc1ccccc1")
     recipe = build_resolved_recipe(
         {"reagent_cas": ("143-33-9",)},
-        transformation_class="attachment_replacement",
     )
 
     support = assess_fragment_source_support(requirements, recipe)
@@ -82,7 +79,6 @@ def test_structured_reagent_field_supports_azide_requirement() -> None:
                 source_role_hint="reagent",
             ),
         ),
-        transformation_class="attachment_replacement",
     )
 
     support = assess_fragment_source_support(requirements, recipe)

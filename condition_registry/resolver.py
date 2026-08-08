@@ -8,8 +8,6 @@ from pathlib import Path
 from typing import DefaultDict, Dict, Iterable, List, Optional, Tuple
 
 from .loader import (
-    ADDITIONS_PATH,
-    IDENTIFIERS_PATH,
     SUBSTANCES_PATH,
     load_substances,
 )
@@ -32,14 +30,10 @@ class ConditionRegistry:
         self,
         *,
         substances_path: str | Path = SUBSTANCES_PATH,
-        additions_path: str | Path = ADDITIONS_PATH,
-        identifiers_path: str | Path = IDENTIFIERS_PATH,
         substances: Optional[Iterable[Substance]] = None,
     ) -> None:
         loaded = tuple(substances) if substances is not None else load_substances(
             substances_path=substances_path,
-            additions_path=additions_path,
-            identifiers_path=identifiers_path,
         )
         self._by_id: Dict[str, Substance] = {}
         self._by_cas: DefaultDict[str, List[Substance]] = defaultdict(list)

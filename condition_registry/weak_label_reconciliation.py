@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
 from .curation import SubstanceAliasAdditionRequest, add_substance_aliases
-from .loader import ADDITIONS_PATH, IDENTIFIERS_PATH, SUBSTANCES_PATH, load_substances
+from .loader import SUBSTANCES_PATH, load_substances
 from .models import CONDITION_NAME_IDENTIFIER_TYPES, Substance
 from .normalization import normalize_chemical_name
 from .resolver import ConditionRegistry
@@ -28,7 +28,6 @@ WEAK_LABEL_ROLE_COLUMNS = {
     "Tertiary Solvent": "solvent",
 }
 MISSING_COMPONENT_LABELS = {"", "missing", "none", "nan", "n/a"}
-ALIAS_SOURCE = "weak_label_v2.1:condition_name_reconciliation"
 
 
 def _curated_alias_targets() -> Dict[str, Tuple[str, str]]:
@@ -335,21 +334,13 @@ def run_weak_label_reconciliation(
     *,
     apply_aliases: bool = False,
     substances_path: str | Path = SUBSTANCES_PATH,
-    additions_path: str | Path = ADDITIONS_PATH,
-    identifiers_path: str | Path = IDENTIFIERS_PATH,
 ) -> Mapping[str, int]:
     """Extract, reconcile, optionally apply aliases, and write review CSVs."""
     source_path = Path(source_path)
     output_dir = Path(output_dir)
     substances_path = Path(substances_path)
-    additions_path = Path(additions_path)
-    identifiers_path = Path(identifiers_path)
     reagents = extract_weak_label_reagents(source_path)
-    substances = load_substances(
-        substances_path=substances_path,
-        additions_path=additions_path,
-        identifiers_path=identifiers_path,
-    )
+    substances = load_substances(substances_path=substances_path)
     registry = ConditionRegistry(substances=substances)
     matches = reconcile_weak_label_reagents(
         reagents,
@@ -367,13 +358,10 @@ def run_weak_label_reconciliation(
                     substance_id=match.substance_id or "",
                     identifier_type="legacy_name",
                     value=match.reagent.preferred_name,
-                    source=ALIAS_SOURCE,
                 )
                 for match in alias_candidates
             ),
             substances_path=substances_path,
-            additions_path=additions_path,
-            identifiers_path=identifiers_path,
         )
         added_values = {
             (identifier.substance_id, identifier.value)
@@ -482,7 +470,6 @@ if __name__ == "__main__":
 
 
 __all__ = [
-    "ALIAS_SOURCE",
     "CURATED_ALIAS_TARGETS",
     "ExtractedWeakLabelReagent",
     "ReconciliationMatch",

@@ -4,7 +4,7 @@ from condition_registry import (
     CompoundAdditionError,
     CompoundAdditionResult,
     ResolutionResult,
-    RoleAssignment,
+    RoleCapability,
     Substance,
     SubstanceIdentifier,
 )
@@ -49,11 +49,9 @@ def test_compound_registry_window_exposes_curated_fields(qtbot) -> None:
     assert window.isMaximized()
     assert window.cas_edit.objectName() == "casNumber"
     assert window.name_edit.objectName() == "canonicalName"
-    assert window.source_edit.objectName() == "provenanceSource"
     assert window.lookup_button.objectName() == "autoFillCompoundButton"
     assert window.alias_table.rowCount() == 1
-    assert window.primary_role_combo.currentData() == "other_reagent"
-    assert window.primary_family_combo.findData("misc_general") >= 0
+    assert window.primary_role_combo.currentData() == ""
     assert window.status_box.isReadOnly()
 
 
@@ -75,34 +73,31 @@ def test_identity_and_role_capabilities_use_two_columns(qtbot) -> None:
     )
 
 
-def test_aliases_and_provenance_use_two_columns(qtbot) -> None:
+def test_aliases_and_notes_use_two_columns(qtbot) -> None:
     window = gui.CompoundRegistryWindow()
     qtbot.addWidget(window)
 
     columns = window.findChild(
         gui.QtWidgets.QHBoxLayout,
-        "aliasesAndProvenanceColumns",
+        "aliasesAndNotesColumns",
     )
 
     assert columns is not None
     assert columns.count() == 2
     assert columns.itemAt(0).widget().objectName() == "additionalAliasesGroup"
-    assert columns.itemAt(1).widget().objectName() == "provenanceGroup"
+    assert columns.itemAt(1).widget().objectName() == "curationNotesGroup"
 
 
-def test_compound_form_builds_typed_request_and_filters_families(qtbot) -> None:
+def test_compound_form_builds_typed_request_with_optional_roles(qtbot) -> None:
     window = gui.CompoundRegistryWindow()
     qtbot.addWidget(window)
     window.cas_edit.setText("64-17-5")
     window.name_edit.setText("Ethanol")
     window.abbreviation_edit.setText("EtOH")
     window.smiles_edit.setText("CCO")
-    window.source_edit.setText("chemist:test")
     window.density_edit.setText("0.789")
     role_index = window.primary_role_combo.findData("solvent")
     window.primary_role_combo.setCurrentIndex(role_index)
-    family_index = window.primary_family_combo.findData("alcohols_primary")
-    window.primary_family_combo.setCurrentIndex(family_index)
     _set_alias_value(window, 0, "Ethyl alcohol")
 
     request = window.compound_request()
@@ -111,7 +106,6 @@ def test_compound_form_builds_typed_request_and_filters_families(qtbot) -> None:
     assert request.canonical_name == "Ethanol"
     assert request.density == 0.789
     assert request.roles[0].role_id == "solvent"
-    assert request.roles[0].family_id == "alcohols_primary"
     assert request.aliases[0].identifier_type == "common_name"
     assert request.aliases[0].value == "Ethyl alcohol"
 
@@ -125,7 +119,6 @@ def test_save_compound_calls_registry_service_and_reports_result(
     window.cas_edit.setText("64-17-5")
     window.name_edit.setText("Ethanol")
     window.smiles_edit.setText("CCO")
-    window.source_edit.setText("chemist:test")
     _set_alias_value(window, 0, "Ethyl alcohol")
     captured = []
     substance = Substance(
@@ -143,8 +136,7 @@ def test_save_compound_calls_registry_service_and_reports_result(
             formula="C2H6O",
             molecular_weight=46.069,
             alias_count=1,
-            additions_path="additions.csv",
-            identifiers_path="identifiers.csv",
+            substances_path="substances.v2.jsonl",
         )
 
     monkeypatch.setattr(gui, "add_compound", fake_add)
@@ -152,7 +144,6 @@ def test_save_compound_calls_registry_service_and_reports_result(
     window.save_compound()
 
     assert len(captured) == 1
-    assert captured[0].source == "chemist:test"
     assert "Added Ethanol as cas:64-17-5" in window.status_box.toPlainText()
     assert window.cas_status.text() == "Added"
     assert window.save_button.isEnabled()
@@ -184,14 +175,12 @@ def test_check_cas_loads_existing_identity_for_editing(qtbot, monkeypatch) -> No
         canonical_name="Water",
         cas="7732-18-5",
         smiles="O",
-        roles=(RoleAssignment("solvent", "water", "aqueous medium"),),
+        roles=(RoleCapability("solvent", tag="aqueous medium"),),
         properties={
             "formula": "H2O",
-            "type": "liquid",
+            "substance_kind": "liquid",
             "density": "0.997",
-            "mw": "18.015",
-            "source": "chemist:existing",
-            "curator_notes": "Previously reviewed.",
+            "molecular_weight": "18.015",
         },
         identifiers=(
             SubstanceIdentifier(
@@ -207,10 +196,10 @@ def test_check_cas_loads_existing_identity_for_editing(qtbot, monkeypatch) -> No
                 value="Oxidane",
                 language="en",
                 is_preferred=True,
-                source="chemist:existing",
                 normalization_profile="chemical_name_v1",
             ),
         ),
+        provenance={"curator_notes": "Previously reviewed."},
     )
     monkeypatch.setattr(
         gui,
@@ -232,8 +221,6 @@ def test_check_cas_loads_existing_identity_for_editing(qtbot, monkeypatch) -> No
     assert window.formula_edit.text() == "H2O"
     assert window.density_edit.text() == "0.997"
     assert window.primary_role_combo.currentData() == "solvent"
-    assert window.primary_family_combo.currentData() == "water"
-    assert window.source_edit.text() == "chemist:existing"
     assert window.alias_inputs() == (
         gui.CompoundAliasInput(
             identifier_type="systematic_name",
@@ -253,7 +240,6 @@ def test_save_existing_compound_calls_update_service(qtbot, monkeypatch) -> None
         canonical_name="Water",
         cas="7732-18-5",
         smiles="O",
-        properties={"source": "chemist:existing"},
     )
     window.load_existing_substance(substance)
     captured = []
@@ -266,8 +252,7 @@ def test_save_existing_compound_calls_update_service(qtbot, monkeypatch) -> None
             formula="H2O",
             molecular_weight=18.015,
             alias_count=0,
-            additions_path="additions.csv",
-            identifiers_path="identifiers.csv",
+            substances_path="substances.v2.jsonl",
         )
 
     monkeypatch.setattr(gui, "update_compound", fake_update)
@@ -312,8 +297,7 @@ def test_apply_web_lookup_fills_supported_fields_and_preserves_role_review(
     assert window.boiling_point_edit.text() == "78.2"
     assert window.melting_point_edit.text() == "-114.1"
     assert window.kind_combo.currentText() == "liquid"
-    assert window.source_edit.text() == "pubchem:cid:702"
-    assert window.primary_role_combo.currentData() == "other_reagent"
+    assert window.primary_role_combo.currentData() == ""
     aliases = {(item.identifier_type, item.value) for item in window.alias_inputs()}
     assert aliases == {
         ("common_name", "ethyl alcohol"),
@@ -321,7 +305,7 @@ def test_apply_web_lookup_fills_supported_fields_and_preserves_role_review(
         ("inchi_key", "LFQSCWFLJHTTHZ-UHFFFAOYSA-N"),
         ("database_id", "pubchem:cid:702"),
     }
-    assert "Roles and families require curator review" in (
+    assert "Role capabilities require curator review" in (
         window.status_box.toPlainText()
     )
     assert "https://pubchem.ncbi.nlm.nih.gov/compound/702" in (

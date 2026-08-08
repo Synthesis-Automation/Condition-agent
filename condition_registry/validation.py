@@ -1,173 +1,90 @@
-"""Validation and audit of package-owned condition registry data."""
+"""Validation and audit of the unified condition-substance registry."""
 
 from __future__ import annotations
 
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, DefaultDict, Dict, Iterable, List, Mapping, Tuple
+from typing import Any, DefaultDict, Dict, List, Tuple
 
 from .loader import (
-    ADDITIONS_PATH,
-    IDENTIFIERS_PATH,
     SUBSTANCES_PATH,
-    iter_addition_rows,
-    iter_identifier_rows,
-    iter_substance_rows,
-    load_taxonomy,
-    row_to_identifier,
+    iter_substance_records,
+    load_role_definitions,
+    record_to_substance,
 )
 from .models import CONDITION_NAME_IDENTIFIER_TYPES
-from .normalization import (
-    identifier_normalization_profile,
-    normalize_cas,
-    normalize_identifier,
-    normalize_name,
-)
+from .normalization import normalize_identifier
 
 
-def _substance_id(row: Mapping[str, str], row_number: int) -> str:
-    explicit = str(row.get("substance_id") or "").strip()
-    if explicit:
-        return explicit
-    cas = normalize_cas(str(row.get("cas") or "").strip())
-    return f"cas:{cas}" if cas else f"registry-row:{row_number}"
-
-
-def _validate_substance_row(
-    row: Dict[str, str],
+def validate_registry(
     *,
-    row_number: int,
-    definition_name: str,
-    is_addition: bool,
-    roles: set[str],
-    families: Dict[str, str],
-    known_substance_ids: set[str],
-    cas_counts: Counter[str],
-    name_counts: Counter[str],
-    identifier_owners: DefaultDict[Tuple[str, str], set[str]],
-) -> Dict[str, Any] | None:
-    row_issues = []
-    name = str(row.get("name") or "").strip()
-    cas_raw = str(row.get("cas") or "").strip()
-    if not name:
-        row_issues.append("MISSING_NAME")
-    cas = normalize_cas(cas_raw) if cas_raw else None
-    if cas_raw and cas is None:
-        row_issues.append("INVALID_CAS")
-    smiles = str(row.get("smiles") or "").strip()
-    if not cas_raw and normalize_cas(smiles):
-        row_issues.append("CAS_IN_SMILES_COLUMN")
-    substance_id = _substance_id(row, row_number)
-    if is_addition:
-        explicit_id = str(row.get("substance_id") or "").strip()
-        status = str(row.get("status") or "").strip()
-        if not explicit_id:
-            row_issues.append("MISSING_SUBSTANCE_ID")
-        if not cas_raw:
-            row_issues.append("MISSING_CAS")
-        if cas and explicit_id != f"cas:{cas}":
-            row_issues.append("SUBSTANCE_ID_CAS_MISMATCH")
-        if not str(row.get("source") or "").strip():
-            row_issues.append("MISSING_SUBSTANCE_SOURCE")
-        if status not in {"active", "deprecated"}:
-            row_issues.append(f"INVALID_SUBSTANCE_STATUS:{status}")
-        if substance_id in known_substance_ids:
-            row_issues.append(f"DUPLICATE_SUBSTANCE_ID:{substance_id}")
-        if cas and cas_counts[cas]:
-            row_issues.append(f"DUPLICATE_CAS:{cas}")
-    for index in (1, 2):
-        role = str(row.get(f"role_{index}") or "").strip()
-        family = str(row.get(f"family_{index}") or "").strip()
-        if role and role not in roles:
-            row_issues.append(f"UNKNOWN_ROLE:{role}")
-        if family and family not in families:
-            row_issues.append(f"UNKNOWN_FAMILY:{family}")
-        if role and family and families.get(family) != role:
-            row_issues.append(f"ROLE_FAMILY_MISMATCH:{role}:{family}")
-    known_substance_ids.add(substance_id)
-    if cas:
-        cas_counts[cas] += 1
-        identifier_owners[("cas", cas)].add(substance_id)
-    normalized_name = normalize_name(name)
-    if normalized_name:
-        name_counts[normalized_name] += 1
-    canonical_key = normalize_identifier(name, "canonical_name")
-    if canonical_key:
-        identifier_owners[("name", canonical_key)].add(substance_id)
-    abbreviation = str(row.get("abbreviation") or "").strip().strip('"')
-    abbreviation_key = normalize_identifier(abbreviation, "abbreviation")
-    if abbreviation_key:
-        identifier_owners[("name", abbreviation_key)].add(substance_id)
-    if not row_issues:
-        return None
-    return {
-        "definition": definition_name,
-        "row_number": row_number,
-        "name": name,
-        "cas_raw": cas_raw,
-        "issues": row_issues,
+    substances_path: str | Path = SUBSTANCES_PATH,
+) -> Dict[str, Any]:
+    """Validate unified records, identifiers, and role capabilities."""
+    known_roles = {
+        str(item["id"]) for item in load_role_definitions().get("roles", ())
     }
-
-
-def _validate_identifiers(
-    identifier_rows: List[Dict[str, str]],
-    *,
-    known_substance_ids: set[str],
-    identifier_owners: DefaultDict[Tuple[str, str], set[str]],
-) -> List[Dict[str, Any]]:
+    issues: List[Dict[str, Any]] = []
     identifier_issues: List[Dict[str, Any]] = []
-    identifier_id_counts: Counter[str] = Counter(
-        str(row.get("identifier_id") or "").strip()
-        for row in identifier_rows
-    )
-    supplemental_owners: DefaultDict[Tuple[str, str], set[str]] = defaultdict(set)
-    supplemental_value_counts: Counter[Tuple[str, str, str]] = Counter()
-    for row in identifier_rows:
-        try:
-            candidate = row_to_identifier(row)
-        except (TypeError, ValueError):
-            continue
-        normalized = normalize_identifier(candidate.value, candidate.identifier_type)
-        if normalized is None:
-            continue
-        namespace = (
-            "name"
-            if candidate.identifier_type in CONDITION_NAME_IDENTIFIER_TYPES
-            else candidate.identifier_type
-        )
-        key = (namespace, normalized)
-        supplemental_owners[key].add(candidate.substance_id)
-        supplemental_value_counts[(namespace, normalized, candidate.substance_id)] += 1
-    for row_number, row in enumerate(identifier_rows, start=2):
+    substance_ids: set[str] = set()
+    identifier_ids: set[str] = set()
+    capability_ids: set[str] = set()
+    name_counts: Counter[str] = Counter()
+    cas_counts: Counter[str] = Counter()
+    identifier_owners: DefaultDict[Tuple[str, str], set[str]] = defaultdict(set)
+    alias_shared_flags: DefaultDict[Tuple[str, str], list[bool]] = defaultdict(list)
+    identifier_types: DefaultDict[Tuple[str, str], set[str]] = defaultdict(set)
+    total_rows = 0
+
+    try:
+        records = tuple(iter_substance_records(substances_path))
+    except (OSError, ValueError) as error:
+        return {
+            "schema_version": "2.0",
+            "total_rows": 0,
+            "accepted_rows": 0,
+            "issue_rows": 1,
+            "issues": [{"line_number": 0, "issues": [f"INVALID_JSONL:{error}"]}],
+            "identifier_total_rows": 0,
+            "identifier_accepted_rows": 0,
+            "identifier_issue_rows": 0,
+            "identifier_issues": [],
+            "duplicate_cas": 0,
+            "duplicate_normalized_names": 0,
+            "issue_counts": {"INVALID_JSONL": 1},
+            "has_errors": True,
+        }
+
+    for line_number, payload in records:
+        total_rows += 1
         row_issues = []
-        identifier_id = str(row.get("identifier_id") or "").strip()
-        substance_id = str(row.get("substance_id") or "").strip()
-        if identifier_id and identifier_id_counts[identifier_id] > 1:
-            row_issues.append(f"DUPLICATE_IDENTIFIER_ID:{identifier_id}")
-        if substance_id not in known_substance_ids:
-            row_issues.append(f"UNKNOWN_SUBSTANCE_ID:{substance_id}")
-        if not str(row.get("source") or "").strip():
-            row_issues.append("MISSING_IDENTIFIER_SOURCE")
         try:
-            identifier = row_to_identifier(row)
+            substance = record_to_substance(payload, line_number)
         except (TypeError, ValueError) as error:
-            row_issues.append(f"INVALID_IDENTIFIER:{error}")
-            identifier = None
-        if identifier is not None:
-            expected_profile = identifier_normalization_profile(
-                identifier.identifier_type
+            issues.append(
+                {
+                    "line_number": line_number,
+                    "substance_id": str(payload.get("id") or ""),
+                    "issues": [f"INVALID_RECORD:{error}"],
+                }
             )
-            if identifier.normalization_profile != expected_profile:
-                row_issues.append(
-                    "NORMALIZATION_PROFILE_MISMATCH:"
-                    f"{identifier.normalization_profile or ''}:"
-                    f"{expected_profile or ''}"
-                )
-            normalized = normalize_identifier(
-                identifier.value, identifier.identifier_type
-            )
+            continue
+        if substance.substance_id in substance_ids:
+            row_issues.append(f"DUPLICATE_SUBSTANCE_ID:{substance.substance_id}")
+        substance_ids.add(substance.substance_id)
+        if substance.cas:
+            cas_counts[substance.cas] += 1
+        canonical_key = normalize_identifier(substance.canonical_name, "canonical_name")
+        if canonical_key:
+            name_counts[canonical_key] += 1
+        for identifier in substance.identifiers:
+            current_issues = []
+            if identifier.identifier_id in identifier_ids:
+                current_issues.append(f"DUPLICATE_IDENTIFIER_ID:{identifier.identifier_id}")
+            identifier_ids.add(identifier.identifier_id)
+            normalized = normalize_identifier(identifier.value, identifier.identifier_type)
             if normalized is None:
-                row_issues.append(
+                current_issues.append(
                     f"INVALID_{identifier.identifier_type.upper()}_VALUE"
                 )
             else:
@@ -177,102 +94,72 @@ def _validate_identifiers(
                     else identifier.identifier_type
                 )
                 key = (namespace, normalized)
-                owners = identifier_owners[key] | supplemental_owners[key]
-                if len(owners) > 1 and not identifier.allow_ambiguous:
-                    row_issues.append("UNDECLARED_AMBIGUOUS_IDENTIFIER")
-                if identifier.substance_id in identifier_owners[key] or (
-                    supplemental_value_counts[
-                        (namespace, normalized, identifier.substance_id)
-                    ]
-                    > 1
-                ):
-                    row_issues.append("DUPLICATE_IDENTIFIER_VALUE")
+                identifier_owners[key].add(substance.substance_id)
+                if identifier.identifier_type != "canonical_name":
+                    alias_shared_flags[key].append(identifier.allow_ambiguous)
+                identifier_types[key].add(identifier.identifier_type)
+            if current_issues:
+                identifier_issues.append(
+                    {
+                        "line_number": line_number,
+                        "identifier_id": identifier.identifier_id,
+                        "substance_id": substance.substance_id,
+                        "issues": current_issues,
+                    }
+                )
+        for capability in substance.roles:
+            capability_id = capability.capability_id or ""
+            if capability_id in capability_ids:
+                row_issues.append(f"DUPLICATE_ROLE_CAPABILITY:{capability_id}")
+            capability_ids.add(capability_id)
+            if capability.role_id not in known_roles:
+                row_issues.append(f"UNKNOWN_ROLE:{capability.role_id}")
         if row_issues:
-            identifier_issues.append(
+            issues.append(
                 {
-                    "row_number": row_number,
-                    "identifier_id": identifier_id,
-                    "substance_id": substance_id,
-                    "value": str(row.get("value") or ""),
+                    "line_number": line_number,
+                    "substance_id": substance.substance_id,
                     "issues": row_issues,
                 }
             )
-    return identifier_issues
 
-
-def validate_registry(
-    *,
-    substances_path: str | Path = SUBSTANCES_PATH,
-    additions_path: str | Path = ADDITIONS_PATH,
-    identifiers_path: str | Path = IDENTIFIERS_PATH,
-) -> Dict[str, Any]:
-    """Validate substance rows and normalized one-to-many identifiers."""
-    taxonomy = load_taxonomy()
-    roles = {str(item.get("id")) for item in taxonomy.get("roles", [])}
-    families = {
-        str(item.get("id")): str(item.get("role_id"))
-        for item in taxonomy.get("families", [])
-    }
-    issues: List[Dict[str, Any]] = []
-    cas_counts: Counter[str] = Counter()
-    name_counts: Counter[str] = Counter()
-    known_substance_ids: set[str] = set()
-    identifier_owners: DefaultDict[Tuple[str, str], set[str]] = defaultdict(set)
-    accepted = 0
-    definitions: Iterable[
-        Tuple[str, Iterable[Dict[str, str]], bool]
-    ] = (
-        (Path(substances_path).name, iter_substance_rows(substances_path), False),
-        (Path(additions_path).name, iter_addition_rows(additions_path), True),
-    )
-    for definition_name, rows, is_addition in definitions:
-        for row_number, row in enumerate(rows, start=2):
-            issue = _validate_substance_row(
-                row,
-                row_number=row_number,
-                definition_name=definition_name,
-                is_addition=is_addition,
-                roles=roles,
-                families=families,
-                known_substance_ids=known_substance_ids,
-                cas_counts=cas_counts,
-                name_counts=name_counts,
-                identifier_owners=identifier_owners,
+    for key, owners in identifier_owners.items():
+        if len(owners) <= 1:
+            continue
+        if identifier_types[key] == {"canonical_name"}:
+            continue
+        if not all(alias_shared_flags[key]):
+            identifier_issues.append(
+                {
+                    "line_number": 0,
+                    "identifier_id": "",
+                    "substance_id": "|".join(sorted(owners)),
+                    "issues": ["UNDECLARED_AMBIGUOUS_IDENTIFIER"],
+                }
             )
-            if issue is None:
-                accepted += 1
-            else:
-                issues.append(issue)
-    identifier_rows = list(iter_identifier_rows(identifiers_path))
-    identifier_issues = _validate_identifiers(
-        identifier_rows,
-        known_substance_ids=known_substance_ids,
-        identifier_owners=identifier_owners,
-    )
-    substance_issue_counts = Counter(
-        issue for item in issues for issue in item["issues"]
-    )
-    identifier_issue_counts = Counter(
-        issue for item in identifier_issues for issue in item["issues"]
+    issue_counts = Counter(
+        issue.split(":", 1)[0]
+        for row in (*issues, *identifier_issues)
+        for issue in row["issues"]
     )
     return {
-        "schema_version": "1.2",
-        "total_rows": accepted + len(issues),
-        "accepted_rows": accepted,
+        "schema_version": "2.0",
+        "total_rows": total_rows,
+        "accepted_rows": total_rows - len(issues),
         "issue_rows": len(issues),
+        "issues": issues,
+        "identifier_total_rows": len(identifier_ids),
+        "identifier_accepted_rows": len(identifier_ids) - len(identifier_issues),
+        "identifier_issue_rows": len(identifier_issues),
+        "identifier_issues": identifier_issues,
+        "role_capability_rows": len(capability_ids),
         "duplicate_cas": sum(
             count - 1 for count in cas_counts.values() if count > 1
         ),
         "duplicate_normalized_names": sum(
             count - 1 for count in name_counts.values() if count > 1
         ),
-        "issue_counts": dict(sorted(substance_issue_counts.items())),
-        "issues": issues,
-        "identifier_total_rows": len(identifier_rows),
-        "identifier_accepted_rows": len(identifier_rows) - len(identifier_issues),
-        "identifier_issue_rows": len(identifier_issues),
-        "identifier_issue_counts": dict(sorted(identifier_issue_counts.items())),
-        "identifier_issues": identifier_issues,
+        "issue_counts": dict(sorted(issue_counts.items())),
         "has_errors": bool(issues or identifier_issues),
     }
 

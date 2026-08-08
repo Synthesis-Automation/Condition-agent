@@ -85,10 +85,7 @@ def load_fallback_retrieval_rules() -> dict[str, Any]:
             raise ValueError("invalid fallback condition source requirement")
         if not tuple(requirement.get("elements") or ()):
             raise ValueError("condition source requirement needs elements")
-        if not (
-            tuple(requirement.get("family_ids") or ())
-            or tuple(requirement.get("substance_ids") or ())
-        ):
+        if not tuple(requirement.get("substance_ids") or ()):
             raise ValueError("condition source requirement needs registry identities")
     return rules
 

@@ -623,7 +623,12 @@ def test_compatibility_exclusion_continues_to_relaxed_tier() -> None:
     unsafe["resolved_recipe"] = {
         "recipe_id": unsafe["resolved_recipe_id"],
         "oxidants": [
-            {"roles": [{"family_id": "peroxides_hydroperoxides", "role_id": "oxidant"}]}
+            {
+                "identity_status": "resolved",
+                "role_status": "assigned",
+                "primary_role": "oxidant",
+                "roles": [{"role_id": "oxidant"}],
+            }
         ],
     }
     safe_records = [
@@ -1350,7 +1355,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.schema_version == "3.3"
     assert result.retrieval_trace[-1].status == "selected_target_reached"
     assert result.recommendations
-    assert result.recommendations[0].recipe_id.startswith("RCR1:")
-    assert result.recommendations[0].resolved_recipe["recipe_id"].startswith("RCR1:")
+    assert result.recommendations[0].recipe_id.startswith("RCR2:")
+    assert result.recommendations[0].resolved_recipe["recipe_id"].startswith("RCR2:")
     assert result.recommendations[0].precedent_reaction_smiles
     assert 0.0 <= result.recommendations[0].compatibility_score <= 1.0

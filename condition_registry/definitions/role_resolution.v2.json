@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "definition_id": "role_resolution.v2",
+  "source_role_preferences": {
+    "catalyst_cas": ["metal_catalyst", "organo_catalyst", "enzyme", "ligand"],
+    "reagent_cas": ["base", "acid", "condensation_agent", "oxidant", "reductant", "additive", "ligand", "metal_catalyst", "solvent"],
+    "solvent_cas": ["solvent"]
+  },
+  "source_role_fallbacks": {},
+  "source_role_hint_preferences": {
+    "catalyst": ["metal_catalyst", "organo_catalyst", "enzyme"],
+    "ligand": ["ligand"],
+    "base": ["base"],
+    "acid": ["acid"],
+    "solvent": ["solvent"],
+    "additive": ["additive"],
+    "oxidant": ["oxidant"],
+    "reductant": ["reductant"],
+    "coupling_reagent": ["condensation_agent"]
+  },
+  "role_buckets": {
+    "metal_catalyst": "catalysts",
+    "organo_catalyst": "catalysts",
+    "enzyme": "catalysts",
+    "ligand": "ligands",
+    "base": "bases",
+    "acid": "acids",
+    "condensation_agent": "condensation_agents",
+    "oxidant": "oxidants",
+    "reductant": "reductants",
+    "additive": "additives",
+    "solvent": "solvents"
+  }
+}

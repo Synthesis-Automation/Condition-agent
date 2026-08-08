@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "definition_id": "compatibility.v1",
   "hard_conflicts": [
     {
@@ -23,7 +23,7 @@
     {
       "id": "moisture_sensitive_with_water",
       "query_tags_any": ["moisture_sensitive"],
-      "recipe_family_ids_any": ["water"],
+      "recipe_substance_ids_any": ["cas:7732-18-5"],
       "message": "An unchanged moisture-sensitive group conflicts with water in the recipe"
     },
     {
@@ -65,7 +65,7 @@
     {
       "id": "hydrolysis_sensitive_with_hot_water",
       "query_tags_any": ["hydrolysis_sensitive"],
-      "recipe_family_ids_any": ["water"],
+      "recipe_substance_ids_any": ["cas:7732-18-5"],
       "minimum_temperature_c": 60.0,
       "penalty_group": "hydrolysis",
       "penalty": 0.4,
@@ -74,7 +74,7 @@
     {
       "id": "hydrolysis_sensitive_with_water",
       "query_tags_any": ["hydrolysis_sensitive"],
-      "recipe_family_ids_any": ["water"],
+      "recipe_substance_ids_any": ["cas:7732-18-5"],
       "penalty_group": "hydrolysis",
       "penalty": 0.25,
       "message": "Water may compromise an unchanged hydrolysis-sensitive group"
@@ -90,10 +90,10 @@
     {
       "id": "palladium_poisoning_with_pd_catalyst",
       "query_tags_any": ["palladium_poisoning"],
-      "recipe_family_prefixes_any": ["pd_"],
+      "recipe_role_ids_any": ["metal_catalyst"],
       "penalty_group": "catalyst_coordination",
       "penalty": 0.25,
-      "message": "A spectator group may poison the palladium catalyst"
+      "message": "A spectator group may poison the metal catalyst"
     },
     {
       "id": "strong_metal_binding_with_catalyst",

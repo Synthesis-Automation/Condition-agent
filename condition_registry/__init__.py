@@ -29,7 +29,7 @@ from .models import (
     ResolutionResult,
     ResolvedConditionComponent,
     ResolvedConditionRecipe,
-    RoleAssignment,
+    RoleCapability,
     Substance,
     SubstanceIdentifier,
 )
@@ -81,7 +81,7 @@ __all__ = [
     "ResolutionResult",
     "ResolvedConditionComponent",
     "ResolvedConditionRecipe",
-    "RoleAssignment",
+    "RoleCapability",
     "RecipeTemplateOption",
     "RecipeTemplatePartnerAmount",
     "RecipeTemplateSelection",

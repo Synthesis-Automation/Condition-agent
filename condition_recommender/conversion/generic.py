@@ -11,6 +11,8 @@ from condition_registry import (
     build_resolved_recipe,
     build_resolved_recipe_from_inputs,
 )
+
+from ..condition_roles import preferred_roles_for_reaction
 from reactive_taxonomy import (
     AtomMappingProvider,
     ExternalMappingAssessment,
@@ -82,6 +84,7 @@ def _condition_resolution(recipe: ResolvedConditionRecipe) -> Dict[str, Any]:
                 "substance_id": component.substance_id,
                 "canonical_name": component.canonical_name,
                 "possible_roles": tuple(role.role_id for role in component.roles),
+                "role_status": component.role_status,
                 "primary_role": component.primary_role,
                 "primary_role_confidence": component.primary_role_confidence,
                 "warnings": component.warnings,
@@ -92,9 +95,13 @@ def _condition_resolution(recipe: ResolvedConditionRecipe) -> Dict[str, Any]:
         "status_counts": dict(sorted(statuses.items())),
         "components": tuple(components),
         "has_uncertainty": bool(recipe.warnings)
-        or any(component["status"] != "resolved" for component in components),
+        or any(
+            component["status"] != "resolved"
+            or component["role_status"] != "assigned"
+            for component in components
+        ),
         "recipe_warnings": recipe.warnings,
-        "schema_version": "1.1",
+        "schema_version": "2.0",
     }
 
 
@@ -209,11 +216,13 @@ def convert_record(
     )
 
     def build_recipe() -> ResolvedConditionRecipe:
+        preferred_roles = preferred_roles_for_reaction(
+            analysis.transformation_class
+        )
         if record.condition_component_inputs:
             return build_resolved_recipe_from_inputs(
                 record.condition_component_inputs,
-                transformation_class=analysis.transformation_class,
-                named_family=analysis.named_family,
+                preferred_roles=preferred_roles,
                 temperature_c=record.temperature_c,
                 time_h=record.time_h,
                 stages=record.condition_process_stages,
@@ -225,8 +234,7 @@ def convert_record(
                 "reagent_cas": record.reagent_cas,
                 "solvent_cas": record.solvent_cas,
             },
-            transformation_class=analysis.transformation_class,
-            named_family=analysis.named_family,
+            preferred_roles=preferred_roles,
             temperature_c=record.temperature_c,
             time_h=record.time_h,
         )

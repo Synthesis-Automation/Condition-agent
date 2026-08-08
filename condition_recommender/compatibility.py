@@ -18,8 +18,8 @@ _RULES_PATH = Path(__file__).with_name("definitions") / "compatibility.v1.json"
 _MATCH_KEYS = {
     "query_tags_any",
     "recipe_buckets_any",
-    "recipe_family_ids_any",
-    "recipe_family_prefixes_any",
+    "recipe_role_ids_any",
+    "recipe_substance_ids_any",
     "recipe_atmospheres_any",
     "minimum_temperature_c",
     "maximum_temperature_c",
@@ -36,7 +36,7 @@ class CompatibilityAssessment:
     penalty_ids: Tuple[str, ...] = ()
     evidence: Tuple[str, ...] = ()
     definition_id: str = "compatibility.v1"
-    definition_version: str = "1.1"
+    definition_version: str = "1.2"
 
 
 @lru_cache(maxsize=1)
@@ -51,7 +51,6 @@ def _validate_match_vocabulary(
     rule: Mapping[str, Any],
     *,
     query_tags: set[str],
-    family_ids: set[str],
 ) -> None:
     unknown_tags = set(rule.get("query_tags_any") or ()) - query_tags
     if unknown_tags:
@@ -65,29 +64,31 @@ def _validate_match_vocabulary(
         raise ValueError(
             f"unknown compatibility recipe buckets: {sorted(unknown_buckets)}"
         )
-    unknown_families = set(rule.get("recipe_family_ids_any") or ()) - family_ids
-    if unknown_families:
+    unknown_roles = set(rule.get("recipe_role_ids_any") or ()) - set(
+        load_condition_vocabulary().role_ids
+    )
+    if unknown_roles:
         raise ValueError(
-            f"unknown compatibility recipe families: {sorted(unknown_families)}"
+            f"unknown compatibility recipe roles: {sorted(unknown_roles)}"
         )
-    for prefix in rule.get("recipe_family_prefixes_any") or ():
-        if not any(family_id.startswith(str(prefix)) for family_id in family_ids):
+    for substance_id in rule.get("recipe_substance_ids_any") or ():
+        from condition_registry import resolve_substance_id
+
+        if resolve_substance_id(str(substance_id)).status != "resolved":
             raise ValueError(
-                f"compatibility family prefix matches no registry family: {prefix}"
+                f"unknown compatibility recipe substance: {substance_id}"
             )
 
 
 def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
     """Validate rule structure against taxonomy and registry vocabularies."""
-    if str(rules.get("schema_version") or "") != "1.1":
+    if str(rules.get("schema_version") or "") != "1.2":
         raise ValueError("unsupported compatibility definition schema")
-    vocabulary = load_condition_vocabulary()
     query_tags = {
         str(tag)
         for definition in load_molecular_motif_definitions()
         for tag in definition.get("tags") or ()
     }
-    family_ids = set(vocabulary.family_ids)
     seen = set()
     for section in ("hard_conflicts", "soft_penalties", "regime_requirements"):
         values = rules.get(section)
@@ -115,7 +116,6 @@ def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
                 _validate_match_vocabulary(
                     rule,
                     query_tags=query_tags,
-                    family_ids=family_ids,
                 )
                 minimum = rule.get("minimum_temperature_c")
                 maximum = rule.get("maximum_temperature_c")
@@ -208,9 +208,10 @@ def _query_family_evidence(
 
 def _recipe_facts(
     recipe: Mapping[str, Any]
-) -> tuple[set[str], set[str], bool, str, float | None]:
+) -> tuple[set[str], set[str], set[str], bool, str, float | None]:
     buckets = set()
-    family_ids = set()
+    substance_ids = set()
+    role_ids = set()
     has_unresolved = False
     for bucket in CONDITION_RECIPE_COMPONENT_BUCKETS:
         components = recipe.get(bucket) or ()
@@ -218,15 +219,17 @@ def _recipe_facts(
             buckets.add(bucket)
         for component in components:
             has_unresolved |= component.get("identity_status") != "resolved"
-            for role in component.get("roles") or ():
-                family_id = role.get("family_id")
-                if family_id:
-                    family_ids.add(str(family_id))
+            substance_id = component.get("substance_id")
+            if substance_id:
+                substance_ids.add(str(substance_id))
+            if component.get("role_status") == "assigned" and component.get("primary_role"):
+                role_ids.add(str(component["primary_role"]))
     temperature_value = recipe.get("temperature_c")
     temperature = float(temperature_value) if temperature_value is not None else None
     return (
         buckets,
-        family_ids,
+        substance_ids,
+        role_ids,
         has_unresolved,
         str(recipe.get("atmosphere") or ""),
         temperature,
@@ -238,7 +241,8 @@ def _matches(
     *,
     query_tags: set[str],
     recipe_buckets: set[str],
-    recipe_family_ids: set[str],
+    recipe_substance_ids: set[str],
+    recipe_role_ids: set[str],
     recipe_atmosphere: str,
     recipe_temperature_c: float | None,
 ) -> bool:
@@ -248,15 +252,11 @@ def _matches(
     required_buckets = set(rule.get("recipe_buckets_any") or ())
     if required_buckets and not required_buckets.intersection(recipe_buckets):
         return False
-    required_families = set(rule.get("recipe_family_ids_any") or ())
-    if required_families and not required_families.intersection(recipe_family_ids):
+    required_substances = set(rule.get("recipe_substance_ids_any") or ())
+    if required_substances and not required_substances.intersection(recipe_substance_ids):
         return False
-    prefixes = tuple(str(value) for value in rule.get("recipe_family_prefixes_any") or ())
-    if prefixes and not any(
-        family_id.startswith(prefix)
-        for family_id in recipe_family_ids
-        for prefix in prefixes
-    ):
+    required_roles = set(rule.get("recipe_role_ids_any") or ())
+    if required_roles and not required_roles.intersection(recipe_role_ids):
         return False
     atmosphere_tokens = tuple(
         str(value).casefold() for value in rule.get("recipe_atmospheres_any") or ()
@@ -296,9 +296,14 @@ def assess_recipe_compatibility(
     """Evaluate a resolved recipe using unchanged query-group evidence."""
     rules = load_compatibility_rules()
     tags = _query_tags(signature)
-    buckets, family_ids, has_unresolved, atmosphere, temperature = _recipe_facts(
-        recipe
-    )
+    (
+        buckets,
+        substance_ids,
+        role_ids,
+        has_unresolved,
+        atmosphere,
+        temperature,
+    ) = _recipe_facts(recipe)
     hard = []
     penalties = []
     evidence = []
@@ -307,7 +312,8 @@ def assess_recipe_compatibility(
             rule,
             query_tags=tags,
             recipe_buckets=buckets,
-            recipe_family_ids=family_ids,
+            recipe_substance_ids=substance_ids,
+            recipe_role_ids=role_ids,
             recipe_atmosphere=atmosphere,
             recipe_temperature_c=temperature,
         ):
@@ -353,7 +359,8 @@ def assess_recipe_compatibility(
             rule,
             query_tags=tags,
             recipe_buckets=buckets,
-            recipe_family_ids=family_ids,
+            recipe_substance_ids=substance_ids,
+            recipe_role_ids=role_ids,
             recipe_atmosphere=atmosphere,
             recipe_temperature_c=temperature,
         ):

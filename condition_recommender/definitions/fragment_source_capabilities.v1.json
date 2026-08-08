@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "fragment_source_capabilities.v1",
   "capabilities": [
     {
@@ -19,10 +19,6 @@
         "cas:164298-23-1",
         "cas:164298-25-3"
       ],
-      "family_ids": [
-        "acyl_halide_fluoride_generators",
-        "fluoride"
-      ],
       "raw_identifiers": [],
       "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
     },
@@ -39,7 +35,6 @@
         "cas:10026-13-8",
         "cas:10294-34-5"
       ],
-      "family_ids": [],
       "raw_identifiers": ["7719-09-7"],
       "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
     },
@@ -56,7 +51,6 @@
         "cas:7726-95-6",
         "cas:7550-35-8"
       ],
-      "family_ids": [],
       "raw_identifiers": [],
       "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
     },
@@ -71,7 +65,6 @@
         "cas:7553-56-2",
         "cas:7681-11-0"
       ],
-      "family_ids": ["iodide_promoters"],
       "raw_identifiers": [],
       "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
     },
@@ -87,7 +80,6 @@
         "cas:151-50-8",
         "cas:7677-24-9"
       ],
-      "family_ids": [],
       "raw_identifiers": [],
       "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
     },
@@ -102,7 +94,6 @@
         "cas:26628-22-8",
         "cas:4648-54-8"
       ],
-      "family_ids": [],
       "raw_identifiers": [],
       "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
     }

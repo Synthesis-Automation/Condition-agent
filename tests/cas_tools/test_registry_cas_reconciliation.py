@@ -1,4 +1,5 @@
 import csv
+import json
 from pathlib import Path
 
 from cas_tools.compound_lookup import CompoundLookupResult
@@ -7,14 +8,6 @@ from cas_tools.registry_cas_reconciliation import (
     reconcile_registry_from_cas_csv,
 )
 from condition_registry import ConditionRegistry
-from condition_registry import curation
-
-
-LEGACY_FIELDS = (
-    "name", "abbreviation", "cas", "smiles", "formula", "type", "density",
-    "mw", "bp", "mp", "volatile", "viscose", "role_1", "family_1", "tag_1",
-    "role_2", "family_2", "tag_2",
-)
 INPUT_FIELDS = (
     "name", "aliases", "roles", "mention_count", "source_columns",
     "reconciliation_status", "normalized_identity", "possible_cas_no",
@@ -30,19 +23,28 @@ def _write(path: Path, fields, rows=()):
         writer.writerows(rows)
 
 
+def _write_registry(path: Path, records=()):
+    path.write_text(
+        "".join(json.dumps(record) + "\n" for record in records),
+        encoding="utf-8",
+    )
+
+
 def test_reconciliation_adds_existing_alias_and_verified_new_compound(tmp_path):
-    substances = tmp_path / "substances.v1.csv"
-    additions = tmp_path / "substance_additions.v1.csv"
-    identifiers = tmp_path / "substance_identifiers.v1.csv"
+    substances = tmp_path / "substances.v2.jsonl"
     source = tmp_path / "possible.csv"
     output = tmp_path / "output"
-    _write(
+    _write_registry(
         substances,
-        LEGACY_FIELDS,
-        ({"name": "Water", "abbreviation": "H2O", "cas": "7732-18-5", "smiles": "O"},),
+        ({
+            "id": "cas:7732-18-5",
+            "name": "Water",
+            "cas": "7732-18-5",
+            "smiles": "O",
+            "aliases": [{"type": "abbreviation", "value": "H2O"}],
+            "roles": ["solvent"],
+        },),
     )
-    _write(additions, curation.ADDITION_FIELDNAMES)
-    _write(identifiers, curation.IDENTIFIER_FIELDNAMES)
     common = {
         "roles": "solvent", "mention_count": "2", "source_columns": "Solvent",
         "reconciliation_status": "unresolved", "cas_match_status": "exact_name_match",
@@ -73,18 +75,12 @@ def test_reconciliation_adds_existing_alias_and_verified_new_compound(tmp_path):
         lookup=lookup,
         lookup_workers=1,
         substances_path=substances,
-        additions_path=additions,
-        identifiers_path=identifiers,
     )
 
     assert summary.aliases_added == 1
     assert summary.new_compounds_added == 1
     assert summary.review_rows == 1
-    registry = ConditionRegistry(
-        substances_path=substances,
-        additions_path=additions,
-        identifiers_path=identifiers,
-    )
+    registry = ConditionRegistry(substances_path=substances)
     assert registry.resolve(name="Aqua reagent").substance.substance_id == "cas:7732-18-5"
     assert registry.resolve(name="EtOH reagent").substance.substance_id == "cas:64-17-5"
     with Path(summary.audit_path).open(encoding="utf-8-sig", newline="") as handle:
@@ -97,13 +93,9 @@ def test_reconciliation_adds_existing_alias_and_verified_new_compound(tmp_path):
 
 
 def test_shared_cas_with_different_normalized_identities_is_held(tmp_path):
-    substances = tmp_path / "substances.v1.csv"
-    additions = tmp_path / "substance_additions.v1.csv"
-    identifiers = tmp_path / "substance_identifiers.v1.csv"
+    substances = tmp_path / "substances.v2.jsonl"
     source = tmp_path / "possible.csv"
-    _write(substances, LEGACY_FIELDS)
-    _write(additions, curation.ADDITION_FIELDNAMES)
-    _write(identifiers, curation.IDENTIFIER_FIELDNAMES)
+    _write_registry(substances)
     base = {
         "aliases": "", "roles": "additive", "mention_count": "1",
         "source_columns": "Additive", "reconciliation_status": "unresolved",
@@ -129,8 +121,6 @@ def test_shared_cas_with_different_normalized_identities_is_held(tmp_path):
         lookup=lambda _cas: result,
         lookup_workers=1,
         substances_path=substances,
-        additions_path=additions,
-        identifiers_path=identifiers,
     )
 
     assert summary.review_rows == 2

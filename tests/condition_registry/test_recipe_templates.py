@@ -103,7 +103,7 @@ def test_explicit_variant_materializes_one_canonical_recipe() -> None:
         include_draft=True,
     )
 
-    assert recipe.recipe_id.startswith("RCR1:")
+    assert recipe.recipe_id.startswith("RCR2:")
     assert len(recipe.components) == 3
     assert recipe.catalysts[0].substance_id == "cas:1536473-72-9"
     assert recipe.bases[0].substance_id == "cas:7778-53-2"

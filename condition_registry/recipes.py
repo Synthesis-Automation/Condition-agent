@@ -21,12 +21,11 @@ def _canonical_json(value: Any) -> str:
 
 
 def _component_token(component: ResolvedConditionComponent) -> Tuple[Any, ...]:
-    primary = component.roles[0] if component.roles else None
     identity = component.substance_id or f"raw:{component.raw_identifier.strip().lower()}"
     return (
         identity,
+        component.role_status,
         component.primary_role,
-        primary.family_id if primary else None,
         component.amount,
         component.amount_unit,
     )
@@ -36,12 +35,11 @@ def _component_core_token(
     component: ResolvedConditionComponent,
 ) -> Tuple[Any, ...]:
     """Identify a role-aware substance without variant-level quantities."""
-    primary = component.roles[0] if component.roles else None
     identity = component.substance_id or f"raw:{component.raw_identifier.strip().lower()}"
     return (
         identity,
+        component.role_status,
         component.primary_role,
-        primary.family_id if primary else None,
     )
 
 
@@ -66,24 +64,56 @@ def _merge_duplicate_components(
         primary = sorted(
             candidates,
             key=lambda item: (
-                -item.primary_role_confidence,
-                item.primary_role,
+                -(item.primary_role_confidence if item.primary_role_confidence is not None else -1.0),
+                item.primary_role or "",
                 item.source_field,
             ),
         )[0]
-        roles: Dict[Tuple[str, Optional[str]], ContextualRoleAssignment] = {}
+        roles: Dict[str, ContextualRoleAssignment] = {}
         for candidate in candidates:
             for role in candidate.roles:
-                key = (role.role_id, role.family_id)
-                existing = roles.get(key)
+                existing = roles.get(role.role_id)
                 if existing is None or role.confidence > existing.confidence:
-                    roles[key] = role
+                    roles[role.role_id] = role
         ranked_roles = tuple(
             sorted(
                 roles.values(),
-                key=lambda role: (-role.confidence, role.role_id, role.family_id or ""),
+                key=lambda role: (-role.confidence, role.role_id),
             )
         )
+        assigned_roles = {
+            candidate.primary_role
+            for candidate in candidates
+            if candidate.role_status == "assigned" and candidate.primary_role
+        }
+        if len(assigned_roles) == 1:
+            selected_role = next(iter(assigned_roles))
+            selected_assignment = next(
+                role for role in ranked_roles if role.role_id == selected_role
+            )
+            ranked_roles = (
+                selected_assignment,
+                *(role for role in ranked_roles if role.role_id != selected_role),
+            )
+            role_status = "assigned"
+            primary_role = selected_role
+            primary_confidence = selected_assignment.confidence
+        elif len(assigned_roles) > 1:
+            role_status = "conflicting"
+            primary_role = None
+            primary_confidence = None
+        elif any(candidate.role_status == "conflicting" for candidate in candidates):
+            role_status = "conflicting"
+            primary_role = None
+            primary_confidence = None
+        elif ranked_roles:
+            role_status = "ambiguous"
+            primary_role = None
+            primary_confidence = None
+        else:
+            role_status = "unassigned"
+            primary_role = None
+            primary_confidence = None
         source_fields = tuple(sorted({item.source_field for item in candidates}))
         warnings = {warning for item in candidates for warning in item.warnings}
         if len(candidates) > 1:
@@ -98,8 +128,9 @@ def _merge_duplicate_components(
                 substance_id=primary.substance_id,
                 canonical_name=primary.canonical_name,
                 roles=ranked_roles,
-                primary_role=primary.primary_role,
-                primary_role_confidence=primary.primary_role_confidence,
+                role_status=role_status,
+                primary_role=primary_role,
+                primary_role_confidence=primary_confidence,
                 amount=primary.amount,
                 amount_unit=primary.amount_unit,
                 source_role_hint=primary.source_role_hint,
@@ -129,9 +160,7 @@ def build_resolved_recipe_from_components(
     warnings = []
     for component in _merge_duplicate_components(components):
         bucket = str(
-            rules["role_buckets"].get(
-                component.primary_role, "other_components"
-            )
+            rules["role_buckets"].get(component.primary_role, "other_components")
         )
         buckets.setdefault(bucket, []).append(component)
         warnings.extend(component.warnings)
@@ -139,7 +168,7 @@ def build_resolved_recipe_from_components(
         name: _sorted_components(values) for name, values in buckets.items()
     }
     definition_versions = {
-        "role_resolution.v1.json": str(rules["schema_version"]),
+        "role_resolution.v2.json": str(rules["schema_version"]),
     }
     normalized_stages = tuple(sorted(stages, key=lambda item: item.stage_index))
     normalized_absences = tuple(
@@ -165,7 +194,7 @@ def build_resolved_recipe_from_components(
         ),
         "declared_absences": normalized_absences,
         "definition_versions": definition_versions,
-        "schema_version": "1.2",
+        "schema_version": "2.0",
     }
     core_identity_payload = {
         "buckets": {
@@ -173,12 +202,12 @@ def build_resolved_recipe_from_components(
             for name, values in sorted(sorted_buckets.items())
         },
         "definition_versions": definition_versions,
-        "schema_version": "1.0",
+        "schema_version": "2.0",
     }
-    recipe_core_id = "RCORE1:" + hashlib.sha256(
+    recipe_core_id = "RCORE2:" + hashlib.sha256(
         _canonical_json(core_identity_payload).encode("utf-8")
     ).hexdigest()
-    recipe_id = "RCR1:" + hashlib.sha256(
+    recipe_id = "RCR2:" + hashlib.sha256(
         _canonical_json(identity_payload).encode("utf-8")
     ).hexdigest()
     return ResolvedConditionRecipe(
@@ -208,8 +237,7 @@ def build_resolved_recipe_from_components(
 def build_resolved_recipe_from_inputs(
     inputs: Iterable[ConditionComponentInput],
     *,
-    transformation_class: Optional[str] = None,
-    named_family: Optional[str] = None,
+    preferred_roles: Iterable[str] = (),
     temperature_c: Optional[float] = None,
     time_h: Optional[float] = None,
     concentration_m: Optional[float] = None,
@@ -224,8 +252,7 @@ def build_resolved_recipe_from_inputs(
             source_field=item.source_field,
             identifier_type=item.identifier_type,
             source_role_hint=item.source_role_hint,
-            transformation_class=transformation_class,
-            named_family=named_family,
+            preferred_roles=preferred_roles,
             amount=item.amount,
             amount_unit=item.amount_unit,
             provenance=item.provenance,
@@ -247,8 +274,7 @@ def build_resolved_recipe_from_inputs(
 def build_resolved_recipe(
     source_components: Mapping[str, Iterable[str]],
     *,
-    transformation_class: Optional[str] = None,
-    named_family: Optional[str] = None,
+    preferred_roles: Iterable[str] = (),
     temperature_c: Optional[float] = None,
     time_h: Optional[float] = None,
     concentration_m: Optional[float] = None,
@@ -268,8 +294,7 @@ def build_resolved_recipe(
                 raw,
                 source_field=source_field,
                 identifier_type="cas",
-                transformation_class=transformation_class,
-                named_family=named_family,
+                preferred_roles=preferred_roles,
             )
             resolved_components.append(component)
     return build_resolved_recipe_from_components(

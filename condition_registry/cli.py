@@ -41,15 +41,12 @@ def _resolution_summary(result: ResolutionResult) -> str:
                 f"SMILES: {substance.smiles or '-'}",
             )
         )
-        roles = ", ".join(
-            f"{role.role_id}/{role.family_id or '-'}" for role in substance.roles
-        )
+        roles = ", ".join(role.role_id for role in substance.roles)
         lines.append(f"roles: {roles or 'none'}")
         lines.append(f"aliases: {', '.join(substance.aliases) or 'none'}")
     if result.matched_identifier is not None:
         identifier = result.matched_identifier
         lines.append(f"identifier type: {identifier.identifier_type}")
-        lines.append(f"identifier source: {identifier.source or '-'}")
     if result.candidates:
         lines.append(f"candidates: {', '.join(result.candidates)}")
     if result.warnings:
@@ -138,7 +135,7 @@ def _build_parser() -> argparse.ArgumentParser:
     _add_format_argument(resolve_parser)
 
     validate_parser = subparsers.add_parser(
-        "validate", help="Validate substance rows against the role/family taxonomy"
+        "validate", help="Validate unified substance and role definitions"
     )
     _add_format_argument(validate_parser)
 

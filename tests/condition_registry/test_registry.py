@@ -26,7 +26,6 @@ def _identifier(
         substance_id=substance_id,
         identifier_type=identifier_type,
         value=value,
-        source="test_curator",
         status=status,
     )
 
@@ -68,7 +67,7 @@ def test_registry_audit_reconciles_all_rows() -> None:
     report = validate_registry()
     assert report["total_rows"] == get_registry().size
     assert report["accepted_rows"] + report["issue_rows"] == report["total_rows"]
-    assert report["issue_rows"] > 0
+    assert report["issue_rows"] == 0
     assert report["identifier_total_rows"] >= 2
     assert report["identifier_issue_rows"] == 0
 
@@ -77,11 +76,11 @@ def test_condition_vocabulary_is_immutable_and_versioned() -> None:
     vocabulary = load_condition_vocabulary()
 
     assert "metal_catalyst" in vocabulary.role_ids
-    assert "pd_zero_sources" in vocabulary.family_ids
-    assert vocabulary.schema_version == "roles_families.v1"
+    assert not hasattr(vocabulary, "family_ids")
+    assert vocabulary.schema_version == "roles.v2"
 
 
-def test_substance_supports_unbounded_typed_aliases_with_provenance() -> None:
+def test_substance_supports_unbounded_typed_aliases() -> None:
     result = resolve_identifier(
         "Dipotassium carbonate",
         identifier_type="systematic_name",
@@ -94,7 +93,7 @@ def test_substance_supports_unbounded_typed_aliases_with_provenance() -> None:
         result.substance.aliases
     )
     assert result.matched_identifier is not None
-    assert result.matched_identifier.source == "condition_registry_curated"
+    assert result.matched_identifier.source is None
     assert result.matched_identifier.identifier_type == "systematic_name"
 
 
@@ -200,48 +199,43 @@ def test_formulation_words_are_not_erased_by_typed_name_resolution() -> None:
     assert registry.resolve(name="Example reagent anhydrous").substance == dry
 
 
-def test_identifier_validation_rejects_unknown_substance_and_missing_source(
-    tmp_path,
-) -> None:
-    identifiers_path = tmp_path / "identifiers.csv"
-    identifiers_path.write_text(
-        "identifier_id,substance_id,identifier_type,value,language,"
-        "is_preferred,source,confidence,status,normalization_profile,"
-        "allow_ambiguous\n"
-        "sid:unknown,sub:missing,common_name,Unknown alias,en,false,,1.0,"
-        "active,chemical_name_v1,false\n",
-        encoding="utf-8",
-    )
+def test_registry_validation_rejects_source_metadata(tmp_path) -> None:
+    path = tmp_path / "substances.v2.jsonl"
+    payload = {
+        "id": "sub:test",
+        "name": "Test",
+        "source": "obsolete metadata",
+    }
+    import json
+    path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
 
-    report = validate_registry(identifiers_path=identifiers_path)
+    report = validate_registry(substances_path=path)
 
-    assert report["identifier_issue_rows"] == 1
-    assert {
-        "UNKNOWN_SUBSTANCE_ID:sub:missing",
-        "MISSING_IDENTIFIER_SOURCE",
-    } <= set(report["identifier_issues"][0]["issues"])
+    assert report["issue_rows"] == 1
+    assert "Unsupported fields" in report["issues"][0]["issues"][0]
 
 
 def test_identifier_validation_requires_declared_shared_aliases(tmp_path) -> None:
-    identifiers_path = tmp_path / "identifiers.csv"
-    header = (
-        "identifier_id,substance_id,identifier_type,value,language,"
-        "is_preferred,source,confidence,status,normalization_profile,"
-        "allow_ambiguous\n"
-    )
-    identifiers_path.write_text(
-        header
-        + "sid:shared:one,cas:584-08-7,common_name,Shared curated alias,en,"
-        "false,test_curator,1.0,active,chemical_name_v1,false\n"
-        + "sid:shared:two,cas:7732-18-5,common_name,Shared curated alias,en,"
-        "false,test_curator,1.0,active,chemical_name_v1,false\n",
+    import json
+    path = tmp_path / "substances.v2.jsonl"
+    records = []
+    for index in (1, 2):
+        records.append({
+            "id": f"sub:{index}",
+            "name": f"Compound {index}",
+            "aliases": [{
+                "type": "common_name",
+                "value": "Shared curated alias",
+            }],
+        })
+    path.write_text(
+        "".join(json.dumps(record) + "\n" for record in records),
         encoding="utf-8",
     )
 
-    report = validate_registry(identifiers_path=identifiers_path)
+    report = validate_registry(substances_path=path)
 
-    assert report["identifier_issue_rows"] == 2
-    assert all(
+    assert any(
         "UNDECLARED_AMBIGUOUS_IDENTIFIER" in item["issues"]
         for item in report["identifier_issues"]
     )

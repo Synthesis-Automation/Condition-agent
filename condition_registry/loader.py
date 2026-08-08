@@ -1,232 +1,218 @@
-"""Read the package-owned substance and role/family definitions."""
+"""Load the unified condition-substance registry and role vocabulary."""
 
 from __future__ import annotations
 
-import csv
 import json
-from dataclasses import replace
+import hashlib
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Mapping, Tuple
+from typing import Any, Dict, Iterator, Mapping, Tuple
 
-from .models import RoleAssignment, Substance, SubstanceIdentifier
-from .normalization import normalize_cas
+from .models import RoleCapability, Substance, SubstanceIdentifier
+from .normalization import identifier_normalization_profile, normalize_cas
 
 DEFINITIONS_DIR = Path(__file__).with_name("definitions")
-SUBSTANCES_PATH = DEFINITIONS_DIR / "substances.v1.csv"
-ADDITIONS_PATH = DEFINITIONS_DIR / "substance_additions.v1.csv"
-IDENTIFIERS_PATH = DEFINITIONS_DIR / "substance_identifiers.v1.csv"
+SUBSTANCES_PATH = DEFINITIONS_DIR / "substances.v2.jsonl"
+ROLES_PATH = DEFINITIONS_DIR / "roles.v2.json"
 PENDING_PATH = DEFINITIONS_DIR / "pending_substances.csv"
-TAXONOMY_PATH = DEFINITIONS_DIR / "roles_families.v1.json"
+
+# Read-only migration inputs. Runtime resolution does not consume these files.
+LEGACY_SUBSTANCES_PATH = DEFINITIONS_DIR / "substances.v1.csv"
+LEGACY_ADDITIONS_PATH = DEFINITIONS_DIR / "substance_additions.v1.csv"
+LEGACY_IDENTIFIERS_PATH = DEFINITIONS_DIR / "substance_identifiers.v1.csv"
+
+_SUBSTANCE_FIELDS = {"id", "name", "cas", "smiles", "aliases", "roles"}
+_ALIAS_FIELDS = {"type", "value", "language", "shared"}
 
 
 @lru_cache(maxsize=1)
-def load_taxonomy() -> Dict[str, Any]:
-    with TAXONOMY_PATH.open("r", encoding="utf-8") as handle:
-        return dict(json.load(handle))
+def load_role_definitions() -> Dict[str, Any]:
+    """Load and validate the package-owned role vocabulary."""
+    with ROLES_PATH.open("r", encoding="utf-8") as handle:
+        definitions = dict(json.load(handle))
+    if str(definitions.get("schema_version") or "") != "roles.v2":
+        raise ValueError("Unsupported condition role schema")
+    roles = tuple(definitions.get("roles") or ())
+    role_ids = tuple(str(item.get("id") or "") for item in roles)
+    if not role_ids or any(not role_id for role_id in role_ids):
+        raise ValueError("Condition roles require non-empty IDs")
+    if len(role_ids) != len(set(role_ids)):
+        raise ValueError("Condition role IDs must be unique")
+    return definitions
 
 
-def iter_substance_rows(
+def iter_substance_records(
     path: str | Path = SUBSTANCES_PATH,
-) -> Iterator[Dict[str, str]]:
-    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        yield from csv.DictReader(handle)
+) -> Iterator[Tuple[int, Dict[str, Any]]]:
+    """Yield one parsed substance record per non-empty JSONL line."""
+    with Path(path).open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            payload = json.loads(line)
+            if not isinstance(payload, dict):
+                raise ValueError(f"Substance line {line_number} must be an object")
+            yield line_number, payload
 
 
-def iter_identifier_rows(
-    path: str | Path = IDENTIFIERS_PATH,
-) -> Iterator[Dict[str, str]]:
-    """Yield supplemental one-to-many identifier definition rows."""
-    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        yield from csv.DictReader(handle)
-
-
-def iter_addition_rows(
-    path: str | Path = ADDITIONS_PATH,
-) -> Iterator[Dict[str, str]]:
-    """Yield explicitly curated compound additions."""
-    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        yield from csv.DictReader(handle)
-
-
-def _role_assignments(row: Dict[str, str]) -> Tuple[RoleAssignment, ...]:
-    roles = []
-    for index in (1, 2):
-        role = str(row.get(f"role_{index}") or "").strip()
-        if role:
-            roles.append(RoleAssignment(
-                role_id=role,
-                family_id=str(row.get(f"family_{index}") or "").strip() or None,
-                tag=str(row.get(f"tag_{index}") or "").strip() or None,
-            ))
-    return tuple(roles)
-
-
-def _legacy_identifiers(
+def _alias_identifier(
+    payload: Mapping[str, Any],
     *,
     substance_id: str,
-    canonical_name: str,
-    cas: str | None,
-    abbreviation: str,
-    source_definition: str,
-) -> Tuple[SubstanceIdentifier, ...]:
+) -> SubstanceIdentifier:
+    identifier_type = str(payload.get("type") or "").strip()
+    value = str(payload.get("value") or "").strip()
+    digest = hashlib.sha256(
+        f"{substance_id}|{identifier_type}|{value}".encode("utf-8")
+    ).hexdigest()[:16]
+    return SubstanceIdentifier(
+        identifier_id=f"alias:{substance_id}:{digest}",
+        substance_id=substance_id,
+        identifier_type=identifier_type,
+        value=value,
+        language=str(payload.get("language") or "").strip() or None,
+        normalization_profile=identifier_normalization_profile(identifier_type),
+        allow_ambiguous=bool(payload.get("shared", False)),
+    )
+
+
+def _role_from_id(
+    role_id: str,
+    *,
+    substance_id: str,
+) -> RoleCapability:
+    return RoleCapability(
+        role_id=role_id,
+        capability_id=f"role:{substance_id}:{role_id}",
+        evidence="curated_registry",
+    )
+
+
+def record_to_substance(payload: Mapping[str, Any], line_number: int) -> Substance:
+    """Convert and locally validate one unified substance record."""
+    unknown_fields = set(payload) - _SUBSTANCE_FIELDS
+    if unknown_fields:
+        raise ValueError(
+            f"Unsupported fields on substance line {line_number}: "
+            + ", ".join(sorted(unknown_fields))
+        )
+    substance_id = str(payload.get("id") or "").strip()
+    canonical_name = str(payload.get("name") or "").strip()
+    if not substance_id or not canonical_name:
+        raise ValueError(f"Substance line {line_number} requires ID and name")
+    cas = str(payload.get("cas") or "").strip() or None
+    if cas is not None and normalize_cas(cas) is None:
+        raise ValueError(f"Invalid CAS on substance line {line_number}")
     identifiers = [
         SubstanceIdentifier(
-            identifier_id=f"legacy:{substance_id}:canonical_name",
+            identifier_id=f"identity:{substance_id}:name",
             substance_id=substance_id,
             identifier_type="canonical_name",
             value=canonical_name,
             is_preferred=True,
-            source=f"{source_definition}:name",
             normalization_profile="chemical_name_v1",
         )
     ]
     if cas:
         identifiers.append(
             SubstanceIdentifier(
-                identifier_id=f"legacy:{substance_id}:cas",
+                identifier_id=f"identity:{substance_id}:cas",
                 substance_id=substance_id,
                 identifier_type="cas",
                 value=cas,
                 is_preferred=True,
-                source=f"{source_definition}:cas",
                 normalization_profile="cas_v1",
             )
         )
-    if abbreviation:
+    alias_payloads = payload.get("aliases") or ()
+    if not isinstance(alias_payloads, (list, tuple)):
+        raise ValueError(f"Aliases on substance line {line_number} must be a list")
+    for alias in alias_payloads:
+        if not isinstance(alias, Mapping):
+            raise ValueError(f"Aliases on substance line {line_number} must be objects")
+        unknown_alias_fields = set(alias) - _ALIAS_FIELDS
+        if unknown_alias_fields:
+            raise ValueError(
+                f"Unsupported alias fields on substance line {line_number}: "
+                + ", ".join(sorted(unknown_alias_fields))
+            )
         identifiers.append(
-            SubstanceIdentifier(
-                identifier_id=f"legacy:{substance_id}:abbreviation",
+            _alias_identifier(
+                alias,
                 substance_id=substance_id,
-                identifier_type="abbreviation",
-                value=abbreviation,
-                source=f"{source_definition}:abbreviation",
-                normalization_profile="abbreviation_v1",
             )
         )
-    return tuple(identifiers)
-
-
-def row_to_identifier(row: Mapping[str, str]) -> SubstanceIdentifier:
-    """Convert one declarative supplemental identifier row."""
-    confidence_raw = str(row.get("confidence") or "1.0").strip()
-    return SubstanceIdentifier(
-        identifier_id=str(row.get("identifier_id") or "").strip(),
-        substance_id=str(row.get("substance_id") or "").strip(),
-        identifier_type=str(row.get("identifier_type") or "").strip(),
-        value=str(row.get("value") or "").strip(),
-        language=str(row.get("language") or "").strip() or None,
-        is_preferred=str(row.get("is_preferred") or "").strip().casefold()
-        in {"1", "true", "yes"},
-        source=str(row.get("source") or "").strip() or None,
-        confidence=float(confidence_raw),
-        status=str(row.get("status") or "active").strip(),
-        normalization_profile=(
-            str(row.get("normalization_profile") or "").strip() or None
-        ),
-        allow_ambiguous=str(row.get("allow_ambiguous") or "")
-        .strip()
-        .casefold()
-        in {"1", "true", "yes"},
-    )
-
-
-def row_to_substance(
-    row: Dict[str, str],
-    row_number: int,
-    *,
-    supplemental_identifiers: Iterable[SubstanceIdentifier] = (),
-    source_definition: str = "substances.v1.csv",
-) -> Substance:
-    name = str(row.get("name") or "").strip()
-    cas_raw = str(row.get("cas") or "").strip()
-    cas = normalize_cas(cas_raw)
-    abbreviation = str(row.get("abbreviation") or "").strip().strip('"')
-    explicit_identity = str(row.get("substance_id") or "").strip()
-    identity = explicit_identity or (
-        f"cas:{cas}" if cas else f"registry-row:{row_number}"
-    )
-    core = {"name", "abbreviation", "cas", "smiles", "role_1", "family_1", "tag_1", "role_2", "family_2", "tag_2"}
-    properties = {key: str(value).strip() for key, value in row.items() if key and key not in core and value and str(value).strip()}
+    role_ids = payload.get("roles") or ()
+    if not isinstance(role_ids, (list, tuple)) or any(
+        not isinstance(value, str) for value in role_ids
+    ):
+        raise ValueError(f"Roles on substance line {line_number} must be a string list")
     return Substance(
-        substance_id=identity,
-        canonical_name=name,
+        substance_id=substance_id,
+        canonical_name=canonical_name,
         cas=cas,
-        smiles=str(row.get("smiles") or "").strip() or None,
-        identifiers=(
-            *_legacy_identifiers(
-                substance_id=identity,
-                canonical_name=name,
-                cas=cas,
-                abbreviation=abbreviation,
-                source_definition=source_definition,
-            ),
-            *tuple(supplemental_identifiers),
+        smiles=str(payload.get("smiles") or "").strip() or None,
+        identifiers=tuple(identifiers),
+        roles=tuple(
+            _role_from_id(
+                str(value),
+                substance_id=substance_id,
+            )
+            for value in role_ids
         ),
-        roles=_role_assignments(row),
-        properties=properties,
+        properties={},
+        provenance={},
     )
 
 
 def load_substances(
     *,
     substances_path: str | Path = SUBSTANCES_PATH,
-    additions_path: str | Path = ADDITIONS_PATH,
-    identifiers_path: str | Path = IDENTIFIERS_PATH,
 ) -> Tuple[Substance, ...]:
-    """Load substances and merge arbitrary supplemental identifiers."""
-    legacy_substances = tuple(
-        row_to_substance(row, row_number)
-        for row_number, row in enumerate(
-            iter_substance_rows(substances_path), start=2
-        )
+    """Load active substances from the unified JSONL definition."""
+    substances = tuple(
+        record_to_substance(payload, line_number)
+        for line_number, payload in iter_substance_records(substances_path)
     )
-    added_substances = tuple(
-        row_to_substance(
-            row,
-            row_number,
-            source_definition=Path(additions_path).name,
-        )
-        for row_number, row in enumerate(
-            iter_addition_rows(additions_path), start=2
-        )
-        if str(row.get("status") or "active").strip() == "active"
-    )
-    substances = (*legacy_substances, *added_substances)
-    by_id = {substance.substance_id: substance for substance in substances}
-    additions: Dict[str, list[SubstanceIdentifier]] = {}
-    for row in iter_identifier_rows(identifiers_path):
-        identifier = row_to_identifier(row)
-        if identifier.substance_id not in by_id:
-            raise ValueError(
-                "Supplemental identifier references unknown substance: "
-                f"{identifier.identifier_id}:{identifier.substance_id}"
-            )
-        additions.setdefault(identifier.substance_id, []).append(identifier)
-    return tuple(
-        replace(
-            substance,
-            identifiers=(
-                *substance.identifiers,
-                *additions.get(substance.substance_id, ()),
-            ),
-        )
-        for substance in substances
-    )
+    known_roles = {
+        str(item["id"]) for item in load_role_definitions().get("roles", ())
+    }
+    seen_substances: set[str] = set()
+    seen_identifiers: set[str] = set()
+    seen_capabilities: set[str] = set()
+    for substance in substances:
+        if substance.substance_id in seen_substances:
+            raise ValueError(f"Duplicate substance ID: {substance.substance_id}")
+        seen_substances.add(substance.substance_id)
+        for identifier in substance.identifiers:
+            if identifier.identifier_id in seen_identifiers:
+                raise ValueError(
+                    f"Duplicate substance identifier ID: {identifier.identifier_id}"
+                )
+            seen_identifiers.add(identifier.identifier_id)
+        for capability in substance.roles:
+            if capability.role_id not in known_roles:
+                raise ValueError(
+                    f"Unknown role capability: {substance.substance_id}:"
+                    f"{capability.role_id}"
+                )
+            capability_id = capability.capability_id or ""
+            if not capability_id or capability_id in seen_capabilities:
+                raise ValueError(f"Invalid or duplicate role capability: {capability_id}")
+            seen_capabilities.add(capability_id)
+    return substances
 
 
 __all__ = [
-    "ADDITIONS_PATH",
     "DEFINITIONS_DIR",
-    "IDENTIFIERS_PATH",
+    "LEGACY_ADDITIONS_PATH",
+    "LEGACY_IDENTIFIERS_PATH",
+    "LEGACY_SUBSTANCES_PATH",
     "PENDING_PATH",
+    "ROLES_PATH",
     "SUBSTANCES_PATH",
-    "TAXONOMY_PATH",
-    "iter_addition_rows",
-    "iter_identifier_rows",
-    "iter_substance_rows",
+    "iter_substance_records",
+    "load_role_definitions",
     "load_substances",
-    "load_taxonomy",
-    "row_to_identifier",
-    "row_to_substance",
+    "record_to_substance",
 ]

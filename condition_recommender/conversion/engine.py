@@ -187,7 +187,7 @@ def convert_datasets(
                     for component in (record.resolved_recipe or {}).get(bucket, ()):
                         role_bucket_counts[bucket] += 1
                         confidence = float(
-                            component.get("primary_role_confidence", 0.0)
+                            component.get("primary_role_confidence") or 0.0
                         )
                         if confidence >= 0.9:
                             role_confidence_counts["high"] += 1

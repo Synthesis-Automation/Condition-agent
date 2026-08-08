@@ -73,11 +73,9 @@ def materialize_recipe_variant(
             raise ValueError(
                 f"Template role mismatch {selection.substance_id}:{slot.role_id}"
             )
-        primary_assignment = matching_roles[0]
         roles = [
             ContextualRoleAssignment(
                 role_id=slot.role_id,
-                family_id=primary_assignment.family_id,
                 confidence=1.0,
                 evidence=(
                     "recipe_template_declared_role",
@@ -88,7 +86,6 @@ def materialize_recipe_variant(
         roles.extend(
             ContextualRoleAssignment(
                 role_id=assignment.role_id,
-                family_id=assignment.family_id,
                 confidence=0.7,
                 evidence=("curated_registry_secondary_role",),
             )
@@ -105,6 +102,7 @@ def materialize_recipe_variant(
                 substance_id=substance.substance_id,
                 canonical_name=substance.canonical_name,
                 roles=tuple(roles),
+                role_status="assigned",
                 primary_role=slot.role_id,
                 primary_role_confidence=1.0,
                 amount=selection.amount,

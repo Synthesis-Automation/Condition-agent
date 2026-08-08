@@ -10,7 +10,6 @@ from typing import Any, Iterable, Mapping, Tuple
 
 from condition_registry import (
     ResolvedConditionRecipe,
-    load_condition_vocabulary,
     resolve_substance_id,
 )
 
@@ -43,7 +42,7 @@ def load_fragment_source_capabilities() -> dict[str, Any]:
     """Load and validate curated transferable-fragment capabilities."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.0":
+    if str(rules.get("schema_version") or "") != "1.1":
         raise ValueError("unsupported fragment-source capability schema")
     if str(rules.get("definition_id") or "") != (
         "fragment_source_capabilities.v1"
@@ -52,7 +51,6 @@ def load_fragment_source_capabilities() -> dict[str, Any]:
     capabilities = tuple(dict(value) for value in rules.get("capabilities") or ())
     if not capabilities:
         raise ValueError("fragment-source capabilities must not be empty")
-    family_ids = set(load_condition_vocabulary().family_ids)
     seen = set()
     allowed_match_fields = {
         "element_counts",
@@ -84,14 +82,6 @@ def load_fragment_source_capabilities() -> dict[str, Any]:
         if maximum < 1:
             raise ValueError(
                 f"fragment-source capability {capability_id} needs atom bound"
-            )
-        configured_families = {
-            str(value) for value in capability.get("family_ids") or ()
-        }
-        unknown_families = configured_families - family_ids
-        if unknown_families:
-            raise ValueError(
-                f"unknown fragment-source families: {sorted(unknown_families)}"
             )
         for substance_id in capability.get("substance_ids") or ():
             if resolve_substance_id(str(substance_id)).status != "resolved":
@@ -166,17 +156,10 @@ def _component_match(
         return None
     substance_id = str(component.substance_id or "")
     raw_identifier = str(component.raw_identifier or "")
-    family_ids = {
-        str(role.family_id) for role in component.roles if role.family_id
-    }
     if substance_id and substance_id in {
         str(value) for value in capability.get("substance_ids") or ()
     }:
         return "curated_substance_capability", 0.95
-    if family_ids.intersection(
-        str(value) for value in capability.get("family_ids") or ()
-    ):
-        return "curated_family_capability", 0.90
     if raw_identifier in {
         str(value) for value in capability.get("raw_identifiers") or ()
     }:

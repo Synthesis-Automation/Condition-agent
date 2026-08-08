@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Literal, Optional, Tuple
 
 
 CONDITION_IDENTIFIER_TYPES = (
@@ -76,12 +76,23 @@ class ConditionProcessStage:
 
 
 @dataclass(frozen=True)
-class RoleAssignment:
+class RoleCapability:
+    """Curated evidence that a substance can serve a condition role."""
+
     role_id: str
-    family_id: Optional[str]
+    capability_id: Optional[str] = None
     tag: Optional[str] = None
     confidence: float = 1.0
     evidence: str = "curated_registry"
+    source: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        if not self.role_id.strip():
+            raise ValueError("Role capability requires a role ID")
+        if self.capability_id is not None and not self.capability_id.strip():
+            raise ValueError("Role capability ID must not be empty")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("Role capability confidence must be between 0 and 1")
 
 
 @dataclass(frozen=True)
@@ -124,13 +135,19 @@ class Substance:
     cas: Optional[str]
     smiles: Optional[str]
     aliases: Tuple[str, ...] = ()
-    roles: Tuple[RoleAssignment, ...] = ()
+    roles: Tuple[RoleCapability, ...] = ()
     properties: Dict[str, Any] = None  # type: ignore[assignment]
     identifiers: Tuple[SubstanceIdentifier, ...] = ()
+    status: str = "active"
+    provenance: Dict[str, Any] = None  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
         if self.properties is None:
             object.__setattr__(self, "properties", {})
+        if self.provenance is None:
+            object.__setattr__(self, "provenance", {})
+        if self.status not in {"active", "deprecated"}:
+            raise ValueError(f"Unsupported substance status: {self.status}")
         identifiers = list(self.identifiers)
         identifier_values = {
             identifier.value for identifier in identifiers
@@ -185,9 +202,16 @@ class ContextualRoleAssignment:
     """One context-ranked role interpretation with explicit evidence."""
 
     role_id: str
-    family_id: Optional[str]
     confidence: float
     evidence: Tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not self.role_id.strip():
+            raise ValueError("Contextual role assignment requires a role ID")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("Contextual role confidence must be between 0 and 1")
+        if not self.evidence:
+            raise ValueError("Contextual role assignment requires evidence")
 
 
 @dataclass(frozen=True)
@@ -200,14 +224,24 @@ class ResolvedConditionComponent:
     substance_id: Optional[str]
     canonical_name: Optional[str]
     roles: Tuple[ContextualRoleAssignment, ...]
-    primary_role: str
-    primary_role_confidence: float
+    role_status: Literal["assigned", "unassigned", "ambiguous", "conflicting"]
+    primary_role: Optional[str]
+    primary_role_confidence: Optional[float]
     amount: Optional[float] = None
     amount_unit: Optional[str] = None
     source_role_hint: Optional[str] = None
     warnings: Tuple[str, ...] = ()
     provenance: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "1.0"
+    schema_version: str = "2.0"
+
+    def __post_init__(self) -> None:
+        if self.role_status == "assigned":
+            if self.primary_role is None or self.primary_role_confidence is None:
+                raise ValueError("Assigned component requires a primary role")
+            if not self.roles or self.roles[0].role_id != self.primary_role:
+                raise ValueError("Primary role must be the first contextual assignment")
+        elif self.primary_role is not None or self.primary_role_confidence is not None:
+            raise ValueError("Unresolved role status must not have a primary role")
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -237,7 +271,7 @@ class ResolvedConditionRecipe:
     declared_absences: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
     definition_versions: Dict[str, str] = field(default_factory=dict)
-    schema_version: str = "1.2"
+    schema_version: str = "2.0"
 
     @property
     def components(self) -> Tuple[ResolvedConditionComponent, ...]:

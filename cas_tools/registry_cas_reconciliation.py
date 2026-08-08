@@ -28,8 +28,6 @@ from condition_registry import (
     add_substance_aliases,
 )
 from condition_registry.loader import (
-    ADDITIONS_PATH,
-    IDENTIFIERS_PATH,
     SUBSTANCES_PATH,
 )
 from condition_registry.normalization import normalize_cas, normalize_chemical_name
@@ -71,7 +69,6 @@ METAL_NAME_PATTERNS = {
     "Co": re.compile(r"(?<![A-Za-z])Co(?![a-z])|cobalt", re.I),
     "Fe": re.compile(r"(?<![A-Za-z])Fe(?![a-z])|iron", re.I),
 }
-ALIAS_SOURCE = "weak_label_v2.1:user_possible_cas_reconciliation"
 AUDIT_FIELDNAMES = (
     "name",
     "aliases",
@@ -509,7 +506,6 @@ def _plan_group(
         lookup=lookup,
         registry=registry,
     )
-    source_ids = "+".join(lookup.source_ids) or "web_lookup"
     roles = sorted(
         {
             role.strip()
@@ -534,7 +530,6 @@ def _plan_group(
     request = CompoundAdditionRequest(
         canonical_name=canonical_name,
         cas=cas,
-        source=f"{ALIAS_SOURCE}+{source_ids}",
         smiles=lookup.smiles,
         substance_kind=lookup.substance_kind,
         aliases=aliases,
@@ -594,24 +589,17 @@ def _alias_requests(
                     substance_id=plan.registry_substance_id,
                     identifier_type=identifier_type,
                     value=value,
-                    source=f"{ALIAS_SOURCE}:{plan.cas}",
                     language="en",
                 )
             )
     return tuple(requests)
 
 
-def _copy_definitions(
-    directory: Path,
-    paths: Sequence[Path],
-) -> Tuple[Path, Path, Path]:
+def _copy_definition(directory: Path, path: Path) -> Path:
     directory.mkdir(parents=True, exist_ok=True)
-    copied = []
-    for path in paths:
-        target = directory / path.name
-        shutil.copy2(path, target)
-        copied.append(target)
-    return tuple(copied)  # type: ignore[return-value]
+    target = directory / path.name
+    shutil.copy2(path, target)
+    return target
 
 
 def _apply_requests(
@@ -619,8 +607,6 @@ def _apply_requests(
     aliases: Sequence[SubstanceAliasAdditionRequest],
     *,
     substances_path: Path,
-    additions_path: Path,
-    identifiers_path: Path,
 ) -> Tuple[int, int]:
     compound_count = 0
     alias_count = 0
@@ -628,16 +614,12 @@ def _apply_requests(
         add_compound(
             request,
             substances_path=substances_path,
-            additions_path=additions_path,
-            identifiers_path=identifiers_path,
         )
         compound_count += 1
     if aliases:
         result = add_substance_aliases(
             aliases,
             substances_path=substances_path,
-            additions_path=additions_path,
-            identifiers_path=identifiers_path,
         )
         alias_count = len(result.added)
     return compound_count, alias_count
@@ -692,15 +674,11 @@ def reconcile_registry_from_cas_csv(
     lookup: LookupFunction = lookup_compound_by_cas,
     lookup_workers: int = 4,
     substances_path: str | Path = SUBSTANCES_PATH,
-    additions_path: str | Path = ADDITIONS_PATH,
-    identifiers_path: str | Path = IDENTIFIERS_PATH,
 ) -> CasReconciliationSummary:
     """Plan, verify, optionally apply, and audit curator-supplied CAS mappings."""
     input_path = Path(input_path)
     output_dir = Path(output_dir)
     substances_path = Path(substances_path)
-    additions_path = Path(additions_path)
-    identifiers_path = Path(identifiers_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     rows = _parse_rows(input_path)
     grouped: Dict[str, list[_InputRow]] = {}
@@ -714,11 +692,7 @@ def reconcile_registry_from_cas_csv(
         lookup=lookup,
         workers=lookup_workers,
     )
-    registry = ConditionRegistry(
-        substances_path=substances_path,
-        additions_path=additions_path,
-        identifiers_path=identifiers_path,
-    )
+    registry = ConditionRegistry(substances_path=substances_path)
     plans = tuple(
         _plan_group(
             cas,
@@ -762,33 +736,27 @@ def reconcile_registry_from_cas_csv(
     compounds_added = 0
     aliases_added = 0
     if apply_changes and (addition_requests or alias_requests):
-        paths = (substances_path, additions_path, identifiers_path)
         with tempfile.TemporaryDirectory(prefix="condition-registry-cas-dry-run-") as temp:
-            dry_paths = _copy_definitions(Path(temp), paths)
+            dry_path = _copy_definition(Path(temp), substances_path)
             _apply_requests(
                 addition_requests,
                 alias_requests,
-                substances_path=dry_paths[0],
-                additions_path=dry_paths[1],
-                identifiers_path=dry_paths[2],
+                substances_path=dry_path,
             )
-        originals = {path: path.read_bytes() for path in paths}
+        original = substances_path.read_bytes()
         try:
             compounds_added, aliases_added = _apply_requests(
                 addition_requests,
                 alias_requests,
                 substances_path=substances_path,
-                additions_path=additions_path,
-                identifiers_path=identifiers_path,
             )
         except Exception:
-            for path, content in originals.items():
-                with tempfile.NamedTemporaryFile(
-                    mode="wb", dir=path.parent, delete=False
-                ) as handle:
-                    handle.write(content)
-                    temporary = handle.name
-                os.replace(temporary, path)
+            with tempfile.NamedTemporaryFile(
+                mode="wb", dir=substances_path.parent, delete=False
+            ) as handle:
+                handle.write(original)
+                temporary = handle.name
+            os.replace(temporary, substances_path)
             raise
 
     audit_path = output_dir / "weak_label_cas_registry_audit.csv"

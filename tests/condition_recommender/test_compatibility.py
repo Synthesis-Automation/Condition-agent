@@ -19,9 +19,13 @@ def _signature(*tags: str) -> dict:
     }
 
 
-def _component(family_id: str, role_id: str) -> dict:
+def _component(role_id: str, substance_id: str | None = None) -> dict:
     return {
-        "roles": [{"family_id": family_id, "role_id": role_id}]
+        "identity_status": "resolved",
+        "substance_id": substance_id,
+        "role_status": "assigned",
+        "primary_role": role_id,
+        "roles": [{"role_id": role_id}],
     }
 
 
@@ -32,7 +36,7 @@ def _recipe(**buckets: list[dict]) -> dict:
 def test_oxidation_sensitive_spectator_rejects_oxidant_recipe() -> None:
     assessment = assess_recipe_compatibility(
         _signature("oxidation_sensitive"),
-        _recipe(oxidants=[_component("peroxides_hydroperoxides", "oxidant")]),
+        _recipe(oxidants=[_component("oxidant")]),
     )
     assert not assessment.compatible
     assert assessment.score == 0.0
@@ -42,7 +46,7 @@ def test_oxidation_sensitive_spectator_rejects_oxidant_recipe() -> None:
 def test_moisture_sensitive_spectator_rejects_water_recipe() -> None:
     assessment = assess_recipe_compatibility(
         _signature("moisture_sensitive"),
-        _recipe(solvents=[_component("water", "solvent")]),
+        _recipe(solvents=[_component("solvent", "cas:7732-18-5")]),
     )
     assert not assessment.compatible
     assert assessment.hard_conflicts == ("moisture_sensitive_with_water",)
@@ -53,19 +57,19 @@ def test_overlapping_coordination_risks_use_only_strongest_penalty() -> None:
         _signature(
             "metal_binding", "strong_metal_binding", "palladium_poisoning"
         ),
-        _recipe(catalysts=[_component("pd_zero_sources", "metal_catalyst")]),
+        _recipe(catalysts=[_component("metal_catalyst")]),
     )
     assert assessment.compatible
     assert assessment.score == 0.75
     assert assessment.penalty_ids == ("palladium_poisoning_with_pd_catalyst",)
     assert assessment.evidence == (
-        "A spectator group may poison the palladium catalyst",
+        "A spectator group may poison the metal catalyst",
     )
 
 
 def test_hot_water_uses_stronger_hydrolysis_penalty() -> None:
     query = _signature("hydrolysis_sensitive")
-    water = [_component("water", "solvent")]
+    water = [_component("solvent", "cas:7732-18-5")]
     ambient = assess_recipe_compatibility(
         query, {"solvents": water, "temperature_c": 25.0}
     )
@@ -81,7 +85,7 @@ def test_hot_water_uses_stronger_hydrolysis_penalty() -> None:
 def test_acidic_conditions_penalize_hydrolysis_sensitive_spectators() -> None:
     assessment = assess_recipe_compatibility(
         _signature("hydrolysis_sensitive"),
-        _recipe(acids=[_component("mineral_acids", "acid")]),
+        _recipe(acids=[_component("acid")]),
     )
 
     assert assessment.compatible
@@ -98,7 +102,7 @@ def test_only_unchanged_spectator_tags_drive_compatibility() -> None:
     }
     assessment = assess_recipe_compatibility(
         signature,
-        _recipe(oxidants=[_component("peroxides_hydroperoxides", "oxidant")]),
+        _recipe(oxidants=[_component("oxidant")]),
     )
     assert assessment.compatible
     assert assessment.score == 1.0
@@ -108,7 +112,7 @@ def test_filter_retains_exclusion_evidence() -> None:
     safe = SimpleNamespace(resolved_recipe=_recipe(bases=[]))
     unsafe = SimpleNamespace(
         resolved_recipe=_recipe(
-            reductants=[_component("borohydrides", "reductant")]
+            reductants=[_component("reductant")]
         )
     )
     accepted, excluded = filter_compatible_precedents(
@@ -204,7 +208,8 @@ def test_multi_event_family_requirements_apply_to_every_event() -> None:
     (
         ("query_tags_any", ["invented_tag"], "query tags"),
         ("recipe_buckets_any", ["invented_bucket"], "recipe buckets"),
-        ("recipe_family_ids_any", ["invented_family"], "recipe families"),
+        ("recipe_role_ids_any", ["invented_role"], "recipe roles"),
+        ("recipe_substance_ids_any", ["sub:missing"], "recipe substance"),
     ),
 )
 def test_compatibility_definition_rejects_unknown_vocabulary(

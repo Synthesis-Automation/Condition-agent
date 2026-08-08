@@ -47,6 +47,9 @@ def test_self_test_text_and_json(capsys) -> None:
 
 
 def test_validate_reports_current_registry_state(capsys) -> None:
+    assert main(["validate"]) == 0
+    assert "duplicate CAS values: 0" in capsys.readouterr().out
+
     exit_code = main(["validate", "--format", "json"])
     report = json.loads(capsys.readouterr().out)
     assert exit_code == (1 if report["issue_rows"] else 0)
@@ -58,8 +61,8 @@ def test_audit_writes_outputs(tmp_path, capsys) -> None:
     report = json.loads(capsys.readouterr().out)
     assert report["total_rows"] > 0
     assert {path.name for path in tmp_path.iterdir()} == {
-        "accepted.csv",
+        "accepted.jsonl",
         "issues.csv",
         "migration_report.json",
-        "quarantine.csv",
+        "quarantine.jsonl",
     }

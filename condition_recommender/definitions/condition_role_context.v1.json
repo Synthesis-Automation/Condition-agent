@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "condition_role_context.v1",
+  "transformation_role_preferences": {
+    "c_c_transfer_coupling": ["metal_catalyst", "ligand", "base"],
+    "sp2_c_n_substitution": ["metal_catalyst", "ligand", "base"],
+    "sp2_c_o_substitution": ["metal_catalyst", "ligand", "base"],
+    "sp2_c_s_substitution": ["metal_catalyst", "ligand", "base"],
+    "amide_formation": ["condensation_agent", "base", "acid"],
+    "ester_formation": ["acid", "condensation_agent", "base"],
+    "thioester_formation": ["condensation_agent", "base"],
+    "sulfonamide_formation": ["base", "acid"],
+    "chan_lam_heteroatom_coupling": ["metal_catalyst", "base", "oxidant"]
+  }
+}

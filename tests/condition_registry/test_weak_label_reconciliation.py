@@ -1,8 +1,8 @@
 import csv
+import json
 from pathlib import Path
 
 from condition_registry import ConditionRegistry
-from condition_registry import curation
 from condition_registry import weak_label_reconciliation as reconciliation
 
 
@@ -29,29 +29,24 @@ def _write_csv(
         writer.writerows(rows)
 
 
-def _registry_paths(tmp_path: Path) -> tuple[Path, Path, Path]:
-    substances = tmp_path / "substances.csv"
-    additions = tmp_path / "additions.csv"
-    identifiers = tmp_path / "identifiers.csv"
-    _write_csv(
-        substances,
-        curation.SUBSTANCE_FIELDNAMES,
-        (
-            {
-                "name": "Triethylamine",
-                "cas": "121-44-8",
-                "role_1": "base",
-            },
-            {
-                "name": "dppf-PdCl2",
-                "cas": "72287-26-4",
-                "role_1": "metal_catalyst",
-            },
-        ),
+def _registry_path(tmp_path: Path) -> Path:
+    substances = tmp_path / "substances.v2.jsonl"
+    records = []
+    for cas, name, role in (
+        ("121-44-8", "Triethylamine", "base"),
+        ("72287-26-4", "dppf-PdCl2", "metal_catalyst"),
+    ):
+        records.append({
+            "id": f"cas:{cas}",
+            "name": name,
+            "cas": cas,
+            "roles": [role],
+        })
+    substances.write_text(
+        "".join(json.dumps(record) + "\n" for record in records),
+        encoding="utf-8",
     )
-    _write_csv(additions, curation.ADDITION_FIELDNAMES)
-    _write_csv(identifiers, curation.IDENTIFIER_FIELDNAMES)
-    return substances, additions, identifiers
+    return substances
 
 
 def test_split_component_value_preserves_systematic_name_commas() -> None:
@@ -92,7 +87,7 @@ def test_run_reconciliation_applies_compact_and_curated_aliases(
 ) -> None:
     source = tmp_path / "weak.csv"
     output = tmp_path / "output"
-    substances, additions, identifiers = _registry_paths(tmp_path)
+    substances = _registry_path(tmp_path)
     _write_csv(
         source,
         SOURCE_FIELDS,
@@ -110,19 +105,13 @@ def test_run_reconciliation_applies_compact_and_curated_aliases(
         output,
         apply_aliases=True,
         substances_path=substances,
-        additions_path=additions,
-        identifiers_path=identifiers,
     )
 
     assert summary["unique_reagents"] == 3
     assert summary["matched_reagents"] == 2
     assert summary["unresolved_reagents"] == 1
     assert summary["aliases_added"] == 2
-    registry = ConditionRegistry(
-        substances_path=substances,
-        additions_path=additions,
-        identifiers_path=identifiers,
-    )
+    registry = ConditionRegistry(substances_path=substances)
     assert registry.resolve(name="NEt3").substance.substance_id == "cas:121-44-8"
     assert (
         registry.resolve(name="dppfPdCl2").substance.substance_id
@@ -134,4 +123,3 @@ def test_run_reconciliation_applies_compact_and_curated_aliases(
     ) as handle:
         unresolved = list(csv.DictReader(handle))
     assert unresolved[0]["name"] == "Unknown reagent"
-
