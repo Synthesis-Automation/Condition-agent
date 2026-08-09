@@ -48,12 +48,13 @@ reaction SMILES.
 python -m retrosynthesis_poc disconnect `
   results/retrosynthesis_poc/cx_templates.json.gz `
   "CCNc1ccc2ccccc2c1" `
-  --concise
+  --concise --top-k 10
 ```
 
-With `--concise`, the command prints only the highest-ranked proposed reaction
-SMILES. Omit it for the full ranked JSON output. The `--bond` filter remains
-optional; for example, add `--bond C-N` to search only C-N disconnections.
+With `--concise`, the command prints only proposed reaction SMILES, one per line.
+Use `--top-k 5` to print the five highest-ranked proposals; omit `--concise` for
+the full ranked JSON output. The `--bond` filter remains optional; for example,
+add `--bond C-N` to search only C-N disconnections.
 
 Each result contains a proposed `precursors>>target` reaction, supporting
 template and precedent IDs, an interpretable score breakdown, and the outcome

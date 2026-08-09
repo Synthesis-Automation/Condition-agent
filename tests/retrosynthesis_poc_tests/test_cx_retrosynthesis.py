@@ -174,11 +174,11 @@ def test_directory_row_globs_select_requested_cohorts(tmp_path) -> None:
     assert rows == ({"row": "included"},)
 
 
-def test_disconnect_cli_concise_prints_only_top_reaction_smiles(
+def test_disconnect_cli_concise_prints_requested_reaction_smiles(
     tmp_path,
     capsys,
 ) -> None:
-    library, _ = build_library((_row("C-N"),))
+    library, _ = build_library((_row("C-N"), _row("C-O")))
     destination = tmp_path / "templates.json.gz"
     save_library(library, destination)
 
@@ -186,10 +186,15 @@ def test_disconnect_cli_concise_prints_only_top_reaction_smiles(
         [
             "disconnect",
             str(destination),
-            "CNc1ccccc1",
+            "COc1ccc(NC)cc1",
             "--concise",
+            "--top-k",
+            "2",
         ]
     )
 
     assert exit_code == 0
-    assert capsys.readouterr().out == "Brc1ccccc1.CN>>CNc1ccccc1\n"
+    lines = capsys.readouterr().out.splitlines()
+    assert len(lines) == 2
+    assert all(">>" in line for line in lines)
+    assert all(not line.startswith("[") for line in lines)

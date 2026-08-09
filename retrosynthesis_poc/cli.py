@@ -65,12 +65,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         library,
         allowed_bonds=arguments.bond or ("C-N", "C-O", "C-S"),
         max_templates_to_apply=arguments.max_templates,
-        top_k=1 if arguments.concise else arguments.top_k,
+        top_k=arguments.top_k,
         validate_forward=not arguments.skip_forward_validation,
     )
     if arguments.concise:
-        if candidates:
-            print(candidates[0].proposed_reaction_smiles)
+        for candidate in candidates:
+            print(candidate.proposed_reaction_smiles)
         return 0
     print(
         json.dumps(
