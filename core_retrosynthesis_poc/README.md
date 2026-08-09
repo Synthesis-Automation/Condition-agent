@@ -407,9 +407,14 @@ and elapsed time. Merge messages include partial libraries, rows, and template
 counts. For example:
 
 ```text
-[compile] 84/399 shards (21.1%), 69,412 rows, 41,506 accepted, 12 reused, 20.4 rows/s, elapsed 00:56:43
+[compile] 84/399 shards (21.1%), 69,412 completed rows, 41,506 accepted, 12 reused, completed-output average 20.4 rows/s, 6 active, 309 queued, elapsed 00:56:43
 [merge] 120/399 shards (30.1%), 98,630 rows, 42,118 templates, elapsed 03:48:10
 ```
+
+Rows from active workers are not counted until their entire shard is
+checkpointed, so `completed-output average` is a conservative, bursty measure,
+not live per-row throughput. A heartbeat with no newly completed shard reports
+the number of active and queued shards without showing a declining rate.
 
 Use `--progress-interval 60` to report once per minute, or
 `--quiet-progress` to suppress progress messages.

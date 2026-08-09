@@ -55,12 +55,24 @@ def _print_build_progress(event: Dict[str, Any]) -> None:
     if phase == "compile":
         accepted = int(event.get("accepted_observations") or 0)
         reused = int(event.get("reused_shards") or 0)
-        rate = rows / max(1.0, float(event.get("elapsed_seconds") or 0))
-        message = (
+        active = int(event.get("active_shards") or 0)
+        queued = int(event.get("queued_shards") or 0)
+        newly_completed = int(event.get("newly_completed_shards") or 0)
+        newly_reused = int(event.get("newly_reused_shards") or 0)
+        prefix = (
             f"[compile] {completed}/{total} shards ({percent:.1f}%), "
-            f"{rows:,} rows, {accepted:,} accepted, {reused} reused, "
-            f"{rate:.1f} rows/s, elapsed {elapsed}"
+            f"{rows:,} completed rows, {accepted:,} accepted, {reused} reused"
         )
+        if newly_completed > newly_reused or completed == total:
+            rate = rows / max(1.0, float(event.get("elapsed_seconds") or 0))
+            message = (
+                f"{prefix}, completed-output average {rate:.1f} rows/s, "
+                f"{active} active, {queued} queued, elapsed {elapsed}"
+            )
+        else:
+            message = (
+                f"{prefix}, {active} active, {queued} queued, elapsed {elapsed}"
+            )
     elif phase == "merge":
         templates = int(event.get("template_count") or 0)
         message = (

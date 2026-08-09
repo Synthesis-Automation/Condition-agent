@@ -594,7 +594,11 @@ def build_full_scale_operator_library(
     started = time.monotonic()
     completed_manifests: list[Dict[str, Any]] = []
 
-    def emit_compile_progress() -> None:
+    def emit_compile_progress(
+        *,
+        newly_completed_shards: int = 0,
+        newly_reused_shards: int = 0,
+    ) -> None:
         if progress_callback is None:
             return
         source_rows = sum(
@@ -616,6 +620,16 @@ def build_full_scale_operator_library(
                     int(bool(manifest.get("_reused")))
                     for manifest in completed_manifests
                 ),
+                "newly_completed_shards": newly_completed_shards,
+                "newly_reused_shards": newly_reused_shards,
+                "active_shards": min(
+                    workers,
+                    max(0, len(files) - len(completed_manifests)),
+                ),
+                "queued_shards": max(
+                    0,
+                    len(files) - len(completed_manifests) - workers,
+                ),
                 "workers": workers,
                 "elapsed_seconds": time.monotonic() - started,
             }
@@ -624,22 +638,30 @@ def build_full_scale_operator_library(
     emit_compile_progress()
     if workers == 1:
         last_progress = started
+        newly_completed = 0
+        newly_reused = 0
         for ordinal, path in enumerate(files, start=1):
-            completed_manifests.append(
-                compile_operator_shard(
-                    path,
-                    output_directory,
-                    config=settings,
-                    force=force,
-                )
+            manifest = compile_operator_shard(
+                path,
+                output_directory,
+                config=settings,
+                force=force,
             )
+            completed_manifests.append(manifest)
+            newly_completed += 1
+            newly_reused += int(bool(manifest.get("_reused")))
             now = time.monotonic()
             if (
                 now - last_progress >= progress_interval_seconds
                 or ordinal == len(files)
             ):
-                emit_compile_progress()
+                emit_compile_progress(
+                    newly_completed_shards=newly_completed,
+                    newly_reused_shards=newly_reused,
+                )
                 last_progress = now
+                newly_completed = 0
+                newly_reused = 0
     else:
         jobs = {
             path: (path, Path(output_directory), settings, force)
@@ -651,6 +673,8 @@ def build_full_scale_operator_library(
                 for path, job in jobs.items()
             }
             last_progress = time.monotonic()
+            newly_completed = 0
+            newly_reused = 0
             while pending:
                 done, not_done = wait(
                     pending,
@@ -658,8 +682,15 @@ def build_full_scale_operator_library(
                     return_when=FIRST_COMPLETED,
                 )
                 pending = set(not_done)
+                completed_batch = []
                 for future in done:
-                    completed_manifests.append(future.result())
+                    completed_batch.append(future.result())
+                completed_manifests.extend(completed_batch)
+                newly_completed += len(completed_batch)
+                newly_reused += sum(
+                    int(bool(manifest.get("_reused")))
+                    for manifest in completed_batch
+                )
                 now = time.monotonic()
                 if (
                     progress_callback is not None
@@ -668,8 +699,13 @@ def build_full_scale_operator_library(
                         or not pending
                     )
                 ):
-                    emit_compile_progress()
+                    emit_compile_progress(
+                        newly_completed_shards=newly_completed,
+                        newly_reused_shards=newly_reused,
+                    )
                     last_progress = now
+                    newly_completed = 0
+                    newly_reused = 0
     manifests = tuple(completed_manifests)
     return merge_operator_shards(
         manifests,
