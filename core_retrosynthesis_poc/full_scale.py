@@ -7,12 +7,13 @@ import hashlib
 import io
 import json
 import sqlite3
+import time
 from collections import Counter
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from dataclasses import asdict, dataclass, replace
 from itertools import islice
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Literal, Sequence
+from typing import Any, Callable, Dict, Iterable, Iterator, Literal, Sequence
 
 from retrosynthesis_poc.chemistry import digest
 from retrosynthesis_poc.library import iter_rows
@@ -30,6 +31,9 @@ from .generic_models import (
     GenericTemplateLibrary,
 )
 from .retrieval_index import build_generic_retrieval_index
+
+
+ProgressCallback = Callable[[Dict[str, Any]], None]
 
 
 @dataclass(frozen=True)
@@ -146,7 +150,10 @@ def compile_operator_shard(
         ledger_path,
         expected,
     ):
-        return json.loads(manifest_path.read_text(encoding="utf-8"))
+        return {
+            **json.loads(manifest_path.read_text(encoding="utf-8")),
+            "_reused": True,
+        }
 
     temporary_ledger = ledger_path.with_suffix(ledger_path.suffix + ".tmp")
     admission_counts: Counter[str] = Counter()
@@ -197,7 +204,7 @@ def compile_operator_shard(
         "ledger_path": str(ledger_path.resolve()),
     }
     _write_json(manifest_path, manifest)
-    return manifest
+    return {**manifest, "_reused": False}
 
 
 def _ledger_rows(path: Path) -> Iterator[Dict[str, Any]]:
@@ -320,6 +327,8 @@ def merge_operator_shards(
     output_directory: str | Path,
     *,
     config: FullScaleBuildConfig | None = None,
+    progress_callback: ProgressCallback | None = None,
+    progress_started_at: float | None = None,
 ) -> tuple[GenericTemplateLibrary, Dict[str, Any]]:
     """Merge shard artifacts with exact observation/reference deduplication."""
 
@@ -333,8 +342,24 @@ def merge_operator_shards(
     rejection_counts: Counter[str] = Counter()
     source_rows = 0
     duplicate_accepted = 0
+    merge_started = progress_started_at or time.monotonic()
+    ordered_manifests = sorted(
+        manifests,
+        key=lambda value: value["source_path"],
+    )
+    merge_progress_step = max(1, len(ordered_manifests) // 20)
+    if progress_callback is not None:
+        progress_callback(
+            {
+                "phase": "merge",
+                "completed_shards": 0,
+                "total_shards": len(ordered_manifests),
+                "source_rows": 0,
+                "elapsed_seconds": time.monotonic() - merge_started,
+            }
+        )
     try:
-        for manifest in sorted(manifests, key=lambda value: value["source_path"]):
+        for ordinal, manifest in enumerate(ordered_manifests, start=1):
             source_rows += int(manifest.get("source_rows") or 0)
             partial = load_generic_library(str(manifest["library_path"]))
             for template in partial.templates:
@@ -356,7 +381,32 @@ def merge_operator_shards(
                     rejection_counts[
                         str(record.get("reason") or "unknown_rejection")
                     ] += 1
+            if progress_callback is not None and (
+                ordinal % merge_progress_step == 0
+                or ordinal == len(ordered_manifests)
+            ):
+                progress_callback(
+                    {
+                        "phase": "merge",
+                        "completed_shards": ordinal,
+                        "total_shards": len(ordered_manifests),
+                        "source_rows": source_rows,
+                        "template_count": len(templates),
+                        "elapsed_seconds": time.monotonic() - merge_started,
+                    }
+                )
         connection.commit()
+        if progress_callback is not None:
+            progress_callback(
+                {
+                    "phase": "finalize",
+                    "completed_shards": len(ordered_manifests),
+                    "total_shards": len(ordered_manifests),
+                    "source_rows": source_rows,
+                    "template_count": len(templates),
+                    "elapsed_seconds": time.monotonic() - merge_started,
+                }
+            )
         template_counts = _support_counts(
             connection,
             "template_support",
@@ -503,6 +553,16 @@ def merge_operator_shards(
         "support_database_path": str(database_path.resolve()),
     }
     _write_json(output / "build_report.json", report)
+    if progress_callback is not None:
+        progress_callback(
+            {
+                "phase": "complete",
+                **report,
+                "completed_shards": len(ordered_manifests),
+                "total_shards": len(ordered_manifests),
+                "elapsed_seconds": time.monotonic() - merge_started,
+            }
+        )
     return library, report
 
 
@@ -514,6 +574,8 @@ def build_full_scale_operator_library(
     max_shards: int | None = None,
     workers: int = 1,
     force: bool = False,
+    progress_callback: ProgressCallback | None = None,
+    progress_interval_seconds: float = 30.0,
 ) -> tuple[GenericTemplateLibrary, Dict[str, Any]]:
     """Compile selected shards resumably and merge the resulting v3 library."""
 
@@ -527,26 +589,94 @@ def build_full_scale_operator_library(
         raise ValueError("source contains no JSONL gzip shards")
     if workers < 1:
         raise ValueError("workers must be positive")
+    if progress_interval_seconds <= 0:
+        raise ValueError("progress interval must be positive")
+    started = time.monotonic()
+    completed_manifests: list[Dict[str, Any]] = []
+
+    def emit_compile_progress() -> None:
+        if progress_callback is None:
+            return
+        source_rows = sum(
+            int(manifest.get("source_rows") or 0)
+            for manifest in completed_manifests
+        )
+        accepted = sum(
+            int(manifest.get("accepted_observations") or 0)
+            for manifest in completed_manifests
+        )
+        progress_callback(
+            {
+                "phase": "compile",
+                "completed_shards": len(completed_manifests),
+                "total_shards": len(files),
+                "source_rows": source_rows,
+                "accepted_observations": accepted,
+                "reused_shards": sum(
+                    int(bool(manifest.get("_reused")))
+                    for manifest in completed_manifests
+                ),
+                "workers": workers,
+                "elapsed_seconds": time.monotonic() - started,
+            }
+        )
+
+    emit_compile_progress()
     if workers == 1:
-        manifests = tuple(
-            compile_operator_shard(
-                path,
-                output_directory,
-                config=settings,
-                force=force,
+        last_progress = started
+        for ordinal, path in enumerate(files, start=1):
+            completed_manifests.append(
+                compile_operator_shard(
+                    path,
+                    output_directory,
+                    config=settings,
+                    force=force,
+                )
             )
-            for path in files
-        )
+            now = time.monotonic()
+            if (
+                now - last_progress >= progress_interval_seconds
+                or ordinal == len(files)
+            ):
+                emit_compile_progress()
+                last_progress = now
     else:
-        jobs = tuple(
-            (path, Path(output_directory), settings, force) for path in files
-        )
+        jobs = {
+            path: (path, Path(output_directory), settings, force)
+            for path in files
+        }
         with ProcessPoolExecutor(max_workers=workers) as executor:
-            manifests = tuple(executor.map(_compile_operator_shard_job, jobs))
+            pending = {
+                executor.submit(_compile_operator_shard_job, job): path
+                for path, job in jobs.items()
+            }
+            last_progress = time.monotonic()
+            while pending:
+                done, not_done = wait(
+                    pending,
+                    timeout=progress_interval_seconds,
+                    return_when=FIRST_COMPLETED,
+                )
+                pending = set(not_done)
+                for future in done:
+                    completed_manifests.append(future.result())
+                now = time.monotonic()
+                if (
+                    progress_callback is not None
+                    and (
+                        now - last_progress >= progress_interval_seconds
+                        or not pending
+                    )
+                ):
+                    emit_compile_progress()
+                    last_progress = now
+    manifests = tuple(completed_manifests)
     return merge_operator_shards(
         manifests,
         output_directory,
         config=settings,
+        progress_callback=progress_callback,
+        progress_started_at=started,
     )
 
 
@@ -567,4 +697,5 @@ __all__ = [
     "build_full_scale_operator_library",
     "compile_operator_shard",
     "merge_operator_shards",
+    "ProgressCallback",
 ]

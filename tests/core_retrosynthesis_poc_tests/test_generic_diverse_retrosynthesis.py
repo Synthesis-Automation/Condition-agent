@@ -321,10 +321,13 @@ def test_resumable_full_scale_merge_deduplicates_observations(tmp_path) -> None:
             handle.write(json.dumps(row) + "\n")
 
     config = FullScaleBuildConfig(levels=("L1", "L2"))
+    progress_events = []
     library, report = build_full_scale_operator_library(
         source,
         output,
         config=config,
+        progress_callback=progress_events.append,
+        progress_interval_seconds=0.01,
     )
     first_manifests = {
         path.name: path.stat().st_mtime_ns
@@ -346,6 +349,15 @@ def test_resumable_full_scale_merge_deduplicates_observations(tmp_path) -> None:
     }
     assert (output / "operator_library_v3.json.gz").is_file()
     assert (output / "support.sqlite3").is_file()
+    assert progress_events[0]["phase"] == "compile"
+    assert progress_events[0]["completed_shards"] == 0
+    assert {event["phase"] for event in progress_events} >= {
+        "compile",
+        "merge",
+        "finalize",
+        "complete",
+    }
+    assert progress_events[-1]["phase"] == "complete"
 
 
 def test_coverage_audit_attributes_operator_recovery(tmp_path) -> None:

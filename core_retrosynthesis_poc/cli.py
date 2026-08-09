@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import asdict
 from itertools import islice
 from typing import Any, Dict, Iterable, Iterator, Optional, Sequence
@@ -33,6 +34,53 @@ from .operator_benchmark import (
     run_operator_coverage_benchmark,
 )
 from .search import disconnect_target
+
+
+def _format_elapsed(seconds: object) -> str:
+    value = max(0, int(float(seconds or 0)))
+    hours, remainder = divmod(value, 3600)
+    minutes, remaining_seconds = divmod(remainder, 60)
+    return f"{hours:02d}:{minutes:02d}:{remaining_seconds:02d}"
+
+
+def _print_build_progress(event: Dict[str, Any]) -> None:
+    """Write compact full-build progress without contaminating JSON stdout."""
+
+    phase = str(event.get("phase") or "unknown")
+    elapsed = _format_elapsed(event.get("elapsed_seconds"))
+    completed = int(event.get("completed_shards") or 0)
+    total = int(event.get("total_shards") or event.get("source_shards") or 0)
+    percent = 100.0 * completed / total if total else 0.0
+    rows = int(event.get("source_rows") or 0)
+    if phase == "compile":
+        accepted = int(event.get("accepted_observations") or 0)
+        reused = int(event.get("reused_shards") or 0)
+        rate = rows / max(1.0, float(event.get("elapsed_seconds") or 0))
+        message = (
+            f"[compile] {completed}/{total} shards ({percent:.1f}%), "
+            f"{rows:,} rows, {accepted:,} accepted, {reused} reused, "
+            f"{rate:.1f} rows/s, elapsed {elapsed}"
+        )
+    elif phase == "merge":
+        templates = int(event.get("template_count") or 0)
+        message = (
+            f"[merge] {completed}/{total} shards ({percent:.1f}%), "
+            f"{rows:,} rows, {templates:,} templates, elapsed {elapsed}"
+        )
+    elif phase == "finalize":
+        templates = int(event.get("template_count") or 0)
+        message = (
+            f"[finalize] calculating support and index for "
+            f"{templates:,} templates, elapsed {elapsed}"
+        )
+    else:
+        accepted = int(event.get("accepted_observations") or 0)
+        templates = int(event.get("template_count") or 0)
+        message = (
+            f"[complete] {rows:,} rows, {accepted:,} accepted, "
+            f"{templates:,} templates, elapsed {elapsed}"
+        )
+    print(message, file=sys.stderr, flush=True)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -132,7 +180,7 @@ def _parser() -> argparse.ArgumentParser:
 
     full_build = commands.add_parser(
         "build-operators-full",
-        help="resumably compile and merge a full data-derived operator library",
+        help="compile and merge a resumable data-derived operator library",
     )
     full_build.add_argument("source")
     full_build.add_argument("output_directory")
@@ -140,6 +188,8 @@ def _parser() -> argparse.ArgumentParser:
     full_build.add_argument("--max-rows-per-shard", type=int)
     full_build.add_argument("--max-precedents-per-template", type=int, default=8)
     full_build.add_argument("--workers", type=int, default=1)
+    full_build.add_argument("--progress-interval", type=float, default=30.0)
+    full_build.add_argument("--quiet-progress", action="store_true")
     full_build.add_argument("--skip-l0", action="store_true")
     full_build.add_argument("--force", action="store_true")
 
@@ -342,6 +392,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             max_shards=arguments.max_shards,
             workers=arguments.workers,
             force=arguments.force,
+            progress_callback=(
+                None if arguments.quiet_progress else _print_build_progress
+            ),
+            progress_interval_seconds=arguments.progress_interval,
         )
         print(json.dumps(build_report, indent=2, sort_keys=True))
         return 0

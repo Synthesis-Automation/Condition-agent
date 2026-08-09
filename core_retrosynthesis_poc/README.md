@@ -397,8 +397,22 @@ unchanged shards. Use `--force` only to intentionally recompile them.
 python -m core_retrosynthesis_poc build-operators-full `
   datasets/literature/shards `
   results/operator_retrosynthesis_poc/full_scale_v3 `
-  --workers 4
+  --workers 6
 ```
+
+The command prints a progress heartbeat to stderr every 30 seconds while
+keeping the final JSON report on stdout. Compilation messages include completed
+shards, processed rows, accepted observations, reused checkpoints, throughput,
+and elapsed time. Merge messages include partial libraries, rows, and template
+counts. For example:
+
+```text
+[compile] 84/399 shards (21.1%), 69,412 rows, 41,506 accepted, 12 reused, 20.4 rows/s, elapsed 00:56:43
+[merge] 120/399 shards (30.1%), 98,630 rows, 42,118 templates, elapsed 03:48:10
+```
+
+Use `--progress-interval 60` to report once per minute, or
+`--quiet-progress` to suppress progress messages.
 
 Admission no longer requires an already serialized core and observation. The
 compiler recomputes mapping, observation, core, and completeness from the
