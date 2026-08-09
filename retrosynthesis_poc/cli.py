@@ -37,6 +37,11 @@ def _parser() -> argparse.ArgumentParser:
     disconnect.add_argument("--bond", action="append", choices=("C-N", "C-O", "C-S"))
     disconnect.add_argument("--max-templates", type=int, default=250)
     disconnect.add_argument("--top-k", type=int, default=20)
+    disconnect.add_argument(
+        "--concise",
+        action="store_true",
+        help="print only the top proposed reaction SMILES",
+    )
     disconnect.add_argument("--skip-forward-validation", action="store_true")
     return parser
 
@@ -60,9 +65,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         library,
         allowed_bonds=arguments.bond or ("C-N", "C-O", "C-S"),
         max_templates_to_apply=arguments.max_templates,
-        top_k=arguments.top_k,
+        top_k=1 if arguments.concise else arguments.top_k,
         validate_forward=not arguments.skip_forward_validation,
     )
+    if arguments.concise:
+        if candidates:
+            print(candidates[0].proposed_reaction_smiles)
+        return 0
     print(
         json.dumps(
             [candidate.to_dict() for candidate in candidates],

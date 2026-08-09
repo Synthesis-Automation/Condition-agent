@@ -16,6 +16,7 @@ from retrosynthesis_poc import (
     save_library,
 )
 from retrosynthesis_poc.extraction import extract_cx_template
+from retrosynthesis_poc.cli import main
 from retrosynthesis_poc.library import iter_rows
 
 
@@ -171,3 +172,24 @@ def test_directory_row_globs_select_requested_cohorts(tmp_path) -> None:
     rows = tuple(iter_rows(tmp_path, include=("C_N_Coupling*.jsonl",)))
 
     assert rows == ({"row": "included"},)
+
+
+def test_disconnect_cli_concise_prints_only_top_reaction_smiles(
+    tmp_path,
+    capsys,
+) -> None:
+    library, _ = build_library((_row("C-N"),))
+    destination = tmp_path / "templates.json.gz"
+    save_library(library, destination)
+
+    exit_code = main(
+        [
+            "disconnect",
+            str(destination),
+            "CNc1ccccc1",
+            "--concise",
+        ]
+    )
+
+    assert exit_code == 0
+    assert capsys.readouterr().out == "Brc1ccccc1.CN>>CNc1ccccc1\n"
