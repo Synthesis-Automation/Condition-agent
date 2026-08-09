@@ -19,11 +19,12 @@ from .models import (
 
 
 LIBRARY_DEFINITION = {
-    "definition_id": "cx_retrosynthesis_poc.v1",
+    "definition_id": "cx_retrosynthesis_poc.v2",
     "allowed_bonds": ["C-N", "C-O", "C-S"],
     "allowed_core_quality": ["pass", "review"],
     "allowed_core_evidence": ["verified", "inferred"],
-    "required_event_count": 1,
+    "required_heavy_atom_event_count": 1,
+    "attached_hydrogen_loss_events_allowed": True,
     "required_product_count": 1,
     "required_product_completeness": "verified",
     "source_round_trip_required": True,

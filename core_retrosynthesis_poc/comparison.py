@@ -345,7 +345,7 @@ def run_comparison(
         evaluated += 1
 
     report = {
-        "definition_id": "core_retrosynthesis_comparison.v1.1",
+        "definition_id": "core_retrosynthesis_comparison.v1.2",
         "split": {
             "source_rows": len(values),
             "eligible_rows": len(eligible_rows),

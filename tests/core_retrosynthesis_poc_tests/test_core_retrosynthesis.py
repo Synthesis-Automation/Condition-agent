@@ -76,6 +76,26 @@ def _c_n_chloride_row() -> dict:
     }
 
 
+def _hydrogen_coupled_pyrazole_row() -> dict:
+    reaction_smiles = (
+        "COc1ccccc1I.c1cn[nH]c1>>"
+        "COc1ccccc1-n1cccn1"
+    )
+    analysis = featurize_reaction(reaction_smiles)
+    assert analysis.reaction_core is not None
+    assert analysis.reaction_core.event_count == 2
+    value = analysis.to_dict()
+    return {
+        "reaction_id": "hydrogen-coupled-pyrazole",
+        "observation_id": "hydrogen-coupled-pyrazole",
+        "reference_id": "hydrogen-coupled-pyrazole",
+        "reaction_smiles": reaction_smiles,
+        "reaction_core": value["reaction_core"],
+        "reaction_observation": value["observation"],
+        "reaction_completeness": value["reaction_completeness"],
+    }
+
+
 @pytest.mark.parametrize("bond_kind", ("C-N", "C-O", "C-S"))
 def test_compiles_l1_l2_and_round_trips_source(bond_kind: str) -> None:
     result = compile_core_templates(_row(bond_kind))
@@ -89,6 +109,38 @@ def test_compiles_l1_l2_and_round_trips_source(bond_kind: str) -> None:
     assert all(template.template_id.startswith("CRT1:") for template in result.templates)
     assert all(template.operator_id.startswith("CRO1:") for template in result.templates)
     assert all(">>" in template.reaction_smarts for template in result.templates)
+
+
+@pytest.mark.parametrize("bond_kind", ("C-N", "C-O", "C-S"))
+def test_l1_encodes_valence_restoring_hydrogen_change(bond_kind: str) -> None:
+    template = compile_core_templates(
+        _row(bond_kind),
+        levels=("L1",),
+    ).templates[0]
+
+    assert "&H" in template.reaction_smarts
+    assert "H1" in template.precursor_smarts or "H2" in template.precursor_smarts
+
+
+def test_core_l1_generalizes_adjacent_pyrazole_hydrogen_restoration() -> None:
+    library, report = build_library(
+        (_hydrogen_coupled_pyrazole_row(),),
+        levels=("L1",),
+    )
+
+    candidates = disconnect_target(
+        "N#Cc1ccccc1-n1cccn1",
+        library,
+        allowed_bonds=("C-N",),
+        levels=("L1",),
+        top_k=5,
+        max_candidates_to_validate=5,
+    )
+
+    assert report.accepted_observation_count == 1
+    assert candidates
+    assert candidates[0].precursor_smiles == "N#Cc1ccccc1I.c1cn[nH]c1"
+    assert candidates[0].forward_validation_status == "verified_signature"
 
 
 def test_l1_core_is_map_and_partner_order_invariant() -> None:

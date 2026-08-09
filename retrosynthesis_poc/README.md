@@ -8,7 +8,8 @@ C-S bonds. It does not change `reactive_taxonomy`, `condition_registry`, or
 The POC accepts only observations with:
 
 - a pass- or review-quality, verified or inferred reaction core;
-- one reaction event and one reported product;
+- one heavy-atom reaction event and one reported product; directly connected
+  N-H, O-H, or S-H loss may be normalized into that event;
 - verified product completeness;
 - exactly one observed single C-N, C-O, or C-S bond formation;
 - no bond-order or stereochemical change; and
@@ -24,6 +25,12 @@ precedent. This does not promote or rewrite the source observation.
 Template extraction and stereochemistry-aware application use RDChiral. Core
 quality and edit selection come from the repository's structure-derived
 observation contracts. Source reaction names and named families are ignored.
+
+Hydrogen normalization does not alter the recorded reaction core. It is an
+executable-template interpretation that accepts a local X-H loss stored as a
+separate inferred event, including adjacent aromatic heteroatoms introduced by
+tautomer correspondence. Multiple heavy-atom events and nonlocal hydrogen
+changes remain blocked.
 
 ## Build a bounded development library
 

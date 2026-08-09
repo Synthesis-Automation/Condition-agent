@@ -19,6 +19,7 @@ from retrosynthesis_poc.chemistry import (
     split_reaction_smiles,
 )
 from retrosynthesis_poc.mapping import materialize_atom_mapping
+from retrosynthesis_poc.event_normalization import normalize_single_cx_event
 
 from .context import context_from_analysis
 from .models import (
@@ -105,6 +106,25 @@ def _direct_handle_signature(molecule: Any, center_maps: set[int]) -> str:
     return ";".join(sorted(tokens)) or "no_observed_precursor_handle"
 
 
+def _hydrogen_carrier_maps(
+    observation: Dict[str, Any],
+    edit_indices: Iterable[int],
+) -> set[int]:
+    edits = tuple(observation.get("edits") or ())
+    values = set()
+    for index in edit_indices:
+        if index < 0 or index >= len(edits):
+            continue
+        edit = edits[index]
+        if edit.get("edit_type") != "hydrogen_change":
+            continue
+        atom = edit.get("atom_1") or {}
+        map_number = int(atom.get("atom_map_number") or 0)
+        if map_number > 0:
+            values.add(map_number)
+    return values
+
+
 def _canonical_map_lookup(
     reactants: Any,
     product: Any,
@@ -166,11 +186,12 @@ def _selected_atoms(
     *,
     level: AbstractionLevel,
     reactant_side: bool,
+    active_maps: set[int],
 ) -> set[int]:
     centers = {
         int(atom.GetIdx())
         for atom in molecule.GetAtoms()
-        if int(atom.GetAtomMapNum()) in {1, 2}
+        if int(atom.GetAtomMapNum()) in active_maps
     }
     selected = set(centers)
     handle_frontier = []
@@ -195,22 +216,49 @@ def _selected_atoms(
     return selected
 
 
-def _fragment_smarts(molecule: Any, selected: set[int]) -> str:
+def _with_hydrogen_queries(molecule: Any, carrier_maps: set[int]) -> Any:
+    editable = Chem.RWMol(molecule)
+    for atom in molecule.GetAtoms():
+        map_number = int(atom.GetAtomMapNum())
+        if map_number not in carrier_maps:
+            continue
+        atomic_number = int(atom.GetAtomicNum())
+        hydrogen_count = int(atom.GetTotalNumHs(includeNeighbors=True))
+        query = Chem.AtomFromSmarts(
+            f"[#{atomic_number}H{hydrogen_count}:{map_number}]"
+        )
+        if query is None:
+            raise ValueError("hydrogen carrier query could not be compiled")
+        editable.ReplaceAtom(int(atom.GetIdx()), query, preserveProps=False)
+    return editable.GetMol()
+
+
+def _fragment_smarts(
+    molecule: Any,
+    selected: set[int],
+    *,
+    hydrogen_carrier_maps: set[int],
+) -> str:
+    query_molecule = _with_hydrogen_queries(molecule, hydrogen_carrier_maps)
     values = []
-    for component in Chem.GetMolFrags(molecule, asMols=False, sanitizeFrags=False):
+    for component in Chem.GetMolFrags(
+        query_molecule,
+        asMols=False,
+        sanitizeFrags=False,
+    ):
         atoms = sorted(selected.intersection(int(index) for index in component))
         if not atoms:
             continue
         atom_set = set(atoms)
         bonds = [
             int(bond.GetIdx())
-            for bond in molecule.GetBonds()
+            for bond in query_molecule.GetBonds()
             if int(bond.GetBeginAtomIdx()) in atom_set
             and int(bond.GetEndAtomIdx()) in atom_set
         ]
         values.append(
             Chem.MolFragmentToSmarts(
-                molecule,
+                query_molecule,
                 atoms,
                 bonds,
                 isomericSmarts=True,
@@ -247,14 +295,28 @@ def _compile_level(
     level: AbstractionLevel,
     reactants: Any,
     product: Any,
+    hydrogen_carrier_maps: set[int],
 ) -> tuple[str, str, str]:
+    active_maps = {1, 2}.union(hydrogen_carrier_maps)
     product_smarts = _fragment_smarts(
         product,
-        _selected_atoms(product, level=level, reactant_side=False),
+        _selected_atoms(
+            product,
+            level=level,
+            reactant_side=False,
+            active_maps=active_maps,
+        ),
+        hydrogen_carrier_maps=hydrogen_carrier_maps,
     )
     precursor_smarts = _fragment_smarts(
         reactants,
-        _selected_atoms(reactants, level=level, reactant_side=True),
+        _selected_atoms(
+            reactants,
+            level=level,
+            reactant_side=True,
+            active_maps=active_maps,
+        ),
+        hydrogen_carrier_maps=hydrogen_carrier_maps,
     )
     return product_smarts, precursor_smarts, f"{product_smarts}>>{precursor_smarts}"
 
@@ -277,7 +339,7 @@ def compile_core_templates(
         return CompilationResult((), "core_quality_blocked")
     if source_core.get("evidence_status") not in ALLOWED_CORE_EVIDENCE:
         return CompilationResult((), "core_evidence_not_allowed")
-    if int(source_core.get("event_count") or 0) != 1:
+    if normalize_single_cx_event(source_core, source_observation) is None:
         return CompilationResult((), "not_single_event")
     completeness = source_observation.get("completeness") or row.get(
         "reaction_completeness"
@@ -305,7 +367,14 @@ def compile_core_templates(
         return CompilationResult((), "materialized_mapping_not_verified")
     if mapped_core.center_transition_key != source_core.get("center_transition_key"):
         return CompilationResult((), "materialized_mapping_core_conflict")
-    mapped_observation = mapped_analysis.to_dict().get("observation") or {}
+    mapped_value = mapped_analysis.to_dict()
+    mapped_observation = mapped_value.get("observation") or {}
+    normalized_event = normalize_single_cx_event(
+        mapped_value.get("reaction_core") or {},
+        mapped_observation,
+    )
+    if normalized_event is None:
+        return CompilationResult((), "materialized_event_not_single")
     formed_center = _formed_center(mapped_observation)
     if formed_center is None:
         return CompilationResult((), "not_single_cx_bond_formation")
@@ -323,6 +392,15 @@ def compile_core_templates(
         return CompilationResult((), "participant_canonicalization_failed")
     handle_signature = _direct_handle_signature(reactants, set(center_maps))
     map_lookup = _canonical_map_lookup(reactants, product, center_maps)
+    original_hydrogen_maps = _hydrogen_carrier_maps(
+        mapped_observation,
+        normalized_event.hydrogen_edit_indices,
+    )
+    hydrogen_carrier_maps = {
+        map_lookup[map_number]
+        for map_number in original_hydrogen_maps
+        if map_number in map_lookup
+    }
     _apply_map_lookup(reactants, map_lookup)
     _apply_map_lookup(product, map_lookup)
     reference_id = _reference_id(row)
@@ -356,6 +434,7 @@ def compile_core_templates(
             level=level,
             reactants=reactants,
             product=product,
+            hydrogen_carrier_maps=hydrogen_carrier_maps,
         )
         if compile_smarts(product_smarts, validate=False) is None:
             continue

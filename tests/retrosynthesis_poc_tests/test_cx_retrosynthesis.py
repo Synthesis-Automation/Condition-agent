@@ -56,6 +56,26 @@ def _row(bond_kind: str, *, ordinal: int = 1) -> dict:
     }
 
 
+def _hydrogen_coupled_pyrazole_row() -> dict:
+    reaction_smiles = (
+        "COc1ccccc1I.c1cn[nH]c1>>"
+        "COc1ccccc1-n1cccn1"
+    )
+    analysis = featurize_reaction(reaction_smiles)
+    assert analysis.reaction_core is not None
+    assert analysis.reaction_core.event_count == 2
+    value = analysis.to_dict()
+    return {
+        "reaction_id": "hydrogen-coupled-pyrazole",
+        "observation_id": "hydrogen-coupled-pyrazole",
+        "reference_id": "hydrogen-coupled-pyrazole",
+        "reaction_smiles": reaction_smiles,
+        "reaction_core": value["reaction_core"],
+        "reaction_observation": value["observation"],
+        "reaction_completeness": value["reaction_completeness"],
+    }
+
+
 @pytest.mark.parametrize("bond_kind", ("C-N", "C-O", "C-S"))
 def test_extracts_and_round_trips_each_supported_cx_bond(bond_kind: str) -> None:
     result = extract_cx_template(_row(bond_kind))
@@ -115,6 +135,45 @@ def test_rejects_unsigned_or_multi_event_observations() -> None:
     row["reaction_core"] = {
         **row["reaction_core"],
         "event_count": 2,
+    }
+
+    result = extract_cx_template(row)
+
+    assert result.template is None
+    assert result.rejection_reason == "not_single_event"
+
+
+def test_accepts_local_hydrogen_satellite_and_generalizes_pyrazole() -> None:
+    row = _hydrogen_coupled_pyrazole_row()
+
+    library, report = build_library((row,))
+    candidates = disconnect_target(
+        "N#Cc1ccccc1-n1cccn1",
+        library,
+        allowed_bonds=("C-N",),
+        top_k=5,
+    )
+
+    assert report.accepted_observation_count == 1
+    assert candidates
+    assert candidates[0].precursor_smiles == "N#Cc1ccccc1I.c1cn[nH]c1"
+
+
+def test_rejects_nonlocal_hydrogen_satellite() -> None:
+    row = _hydrogen_coupled_pyrazole_row()
+    relations = row["reaction_core"]["event_relations"]
+    row["reaction_core"] = {
+        **row["reaction_core"],
+        "event_relations": [
+            {
+                **relation,
+                "shortest_paths": [
+                    {**path, "bond_count": 2}
+                    for path in relation["shortest_paths"]
+                ],
+            }
+            for relation in relations
+        ],
     }
 
     result = extract_cx_template(row)

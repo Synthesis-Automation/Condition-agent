@@ -22,9 +22,13 @@ profiles, unchanged spectator groups, steric accessibility, and electronic
 activation are retained as separate precedent context. Context can be used for
 ranking or disabled to isolate candidate-generation performance.
 
-Only single-event, single-product C-N, C-O, and C-S bond formations are enabled
-in this first experiment. Every admitted SMARTS must reproduce its recorded
-contributing precursors when applied to its source product.
+Only single-heavy-atom-event, single-product C-N, C-O, and C-S bond formations
+are enabled in this first experiment. A directly connected N-H, O-H, or S-H
+loss may be normalized into that event. The compiler writes explicit mapped
+hydrogen-count queries into the SMARTS so reverse application restores a
+valence-correct X-H precursor, including adjacent aromatic tautomer carriers.
+Every admitted SMARTS must reproduce its recorded contributing precursors when
+applied to its source product.
 
 ## Build a balanced library
 
@@ -120,11 +124,11 @@ unresolved proposals before ranking.
 
 | Method | Top-1 exact | Top-5 exact | Top-10 exact | Valid | Candidates/target |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| RDChiral baseline | 0.372 | 0.744 | 0.884 | 1.000 | 7.34 |
-| Core L1 + context | 0.291 | 0.674 | 0.907 | 1.000 | 8.64 |
-| Core L2 + context | 0.337 | 0.709 | 0.802 | 1.000 | 5.73 |
-| Core L1/L2 + context | 0.337 | 0.733 | 0.860 | 1.000 | 6.97 |
-| Baseline-first L1 ensemble | **0.372** | **0.756** | **0.930** | **1.000** | 8.85 |
+| RDChiral baseline | 0.372 | 0.744 | 0.884 | 1.000 | 7.35 |
+| Core L1 + context | 0.291 | 0.721 | 0.942 | 1.000 | 8.56 |
+| Core L2 + context | 0.337 | 0.709 | 0.802 | 1.000 | 5.74 |
+| Core L1/L2 + context | 0.337 | 0.756 | 0.884 | 1.000 | 6.66 |
+| Baseline-first L1 ensemble | **0.372** | **0.802** | **0.965** | **1.000** | 8.74 |
 
 Both extraction methods admitted the same 400 training observations after the
 core compiler was corrected to retain complete connected precursor-only handle
@@ -134,12 +138,18 @@ variants per operator because distinct precursor handles remain separate.
 
 The result does not support replacing the baseline. L1 is broader and has lower
 top-1 precision, but it recovers C-N disconnections absent from the baseline.
-The baseline-first ensemble preserved every baseline result and rescued four
-additional held-out C-N reactions at ranks 5, 8, 9, and 9. It introduced no
-top-10 losses. This is therefore the recommended POC workflow.
+The baseline-first ensemble preserved every baseline result and rescued seven
+additional held-out C-N reactions: five within the top five and two at rank six.
+It introduced no top-10 losses. This is therefore the recommended POC workflow.
+
+Hydrogen-event normalization also removed the zero-candidate failure for
+`N#Cc1ccccc1-n1cccn1`. All methods now propose the independently supported,
+valence-correct alternative `N#Cc1ccccc1Br.c1cn[nH]c1`. It is not an exact
+match to the recorded protected precursor, so it remains uncredited by the
+strict exact-precursor and full-transition-center metrics.
 
 The canonical local report is
-`results/core_retrosynthesis_comparison/balanced_500_final_filtered/comparison.json`.
+`results/core_retrosynthesis_comparison/balanced_500_hydrogen_normalized/comparison.json`.
 It includes aggregate and per-bond metrics plus every held-out target, expected
 precursor, candidate list, exact-precursor rank, and center rank for all method
 ablations. The complete offline comparison took about 16.5 minutes; normal

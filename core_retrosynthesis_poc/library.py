@@ -22,12 +22,14 @@ from .models import (
 
 
 LIBRARY_DEFINITION = {
-    "definition_id": "core_retrosynthesis_poc.v1",
+    "definition_id": "core_retrosynthesis_poc.v2",
     "allowed_bonds": ["C-N", "C-O", "C-S"],
     "abstraction_levels": ["L1", "L2"],
     "L1": "edit atoms plus connected precursor-only handle subgraphs",
     "L2": "L1 chemistry plus the first molecular shell",
     "source_round_trip_required": True,
+    "required_heavy_atom_event_count": 1,
+    "attached_hydrogen_loss_events_allowed": True,
     "context_embedded_in_smarts": False,
     "context_features": [
         "reaction_core_substituent_profiles",

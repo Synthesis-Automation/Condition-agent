@@ -18,6 +18,7 @@ from .chemistry import (
     digest,
     split_reaction_smiles,
 )
+from .event_normalization import normalize_single_cx_event
 from .models import CxBondKind, TemplatePrecedent
 from .mapping import materialize_atom_mapping
 
@@ -127,7 +128,7 @@ def extract_cx_template(row: Dict[str, Any]) -> ExtractionResult:
         return ExtractionResult(None, "core_quality_blocked")
     if core.get("evidence_status") not in ALLOWED_CORE_EVIDENCE:
         return ExtractionResult(None, "core_evidence_not_allowed")
-    if int(core.get("event_count") or 0) != 1:
+    if normalize_single_cx_event(core, observation) is None:
         return ExtractionResult(None, "not_single_event")
     completeness = observation.get("completeness") or row.get(
         "reaction_completeness"
