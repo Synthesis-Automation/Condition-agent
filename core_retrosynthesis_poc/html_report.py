@@ -27,6 +27,7 @@ METHOD_LABELS = {
     "core_context": "Core L1/L2 + context",
     "core_neutral": "Core L1/L2 neutral",
     "ensemble_baseline_l1_context": "Baseline-first L1 ensemble",
+    "ensemble_baseline_core_context": "Baseline-first generic-core ensemble",
 }
 
 
@@ -191,9 +192,14 @@ def _target_card(
     baseline_rank = ((target.get("methods") or {}).get("baseline") or {}).get(
         "exact_precursor_rank"
     )
-    ensemble_rank = (
-        (target.get("methods") or {}).get("ensemble_baseline_l1_context") or {}
-    ).get("exact_precursor_rank")
+    target_methods = target.get("methods") or {}
+    ensemble_method = next(
+        (method for method in methods if method.startswith("ensemble_")),
+        "ensemble_baseline_l1_context",
+    )
+    ensemble_rank = (target_methods.get(ensemble_method) or {}).get(
+        "exact_precursor_rank"
+    )
     recovery = (
         "rescue"
         if baseline_rank is None and ensemble_rank is not None
@@ -329,6 +335,15 @@ def render_comparison_html(
     if missing:
         raise ValueError(f"comparison does not contain methods: {', '.join(missing)}")
     targets = tuple(comparison.get("target_results") or ())[:max_targets]
+    bond_options = "".join(
+        f'<option value="{html.escape(value)}">{html.escape(value)}</option>'
+        for value in sorted(
+            {
+                str(target.get("bond_kind") or "unclassified")
+                for target in targets
+            }
+        )
+    )
     cards = "".join(
         _target_card(target, selected_methods, top_k, index)
         for index, target in enumerate(targets, start=1)
@@ -346,9 +361,9 @@ def render_comparison_html(
         f"<header><h1>{html.escape(title)}</h1><p>{html.escape(subtitle)}</p></header>"
         '<main><section class="summary-panel"><h2>Method summary</h2>'
         f"{_metrics_table(comparison, selected_methods)}</section>"
-        '<section class="toolbar"><label>Bond class<select id="bond-filter">'
-        '<option value="all">All bonds</option><option>C-N</option><option>C-O</option>'
-        '<option>C-S</option></select></label><label>Recovery<select id="recovery-filter">'
+        '<section class="toolbar"><label>Transformation<select id="bond-filter">'
+        f'<option value="all">All classes</option>{bond_options}</select></label>'
+        '<label>Recovery<select id="recovery-filter">'
         '<option value="all">All outcomes</option><option value="rescue">Core rescues</option>'
         '<option value="recovered">Recovered</option><option value="missed">Missed</option>'
         '</select></label><label>Search<input id="search-filter" '

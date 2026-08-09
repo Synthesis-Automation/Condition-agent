@@ -6,13 +6,16 @@ import argparse
 import json
 from dataclasses import asdict
 from itertools import islice
-from typing import Dict, Iterable, Iterator, Optional, Sequence, Any
+from typing import Any, Dict, Iterable, Iterator, Optional, Sequence
 
 from retrosynthesis_poc.library import iter_rows
 from retrosynthesis_poc.library import load_library as load_baseline_library
 
 from .comparison import run_comparison
+from .diverse_benchmark import load_diverse_rows, run_diverse_benchmark
 from .ensemble import disconnect_ensemble
+from .generic_library import load_generic_library
+from .generic_search import disconnect_generic_target
 from .html_report import DEFAULT_METHODS, write_comparison_html
 from .library import build_library, load_library, save_library
 from .search import disconnect_target
@@ -74,6 +77,31 @@ def _parser() -> argparse.ArgumentParser:
     compare.add_argument("--top-k", type=int, default=10)
     compare.add_argument("--max-test-targets", type=int)
     compare.add_argument("--max-candidates-to-validate", type=int, default=20)
+
+    diverse = commands.add_parser(
+        "compare-diverse",
+        help="evaluate generic operators across diverse edit archetypes",
+    )
+    diverse.add_argument("source")
+    diverse.add_argument("output_directory")
+    diverse.add_argument("--max-rows-per-cohort", type=int, default=200)
+    diverse.add_argument("--test-fraction", type=float, default=0.2)
+    diverse.add_argument("--max-targets-per-transformation", type=int, default=10)
+    diverse.add_argument("--top-k", type=int, default=10)
+    diverse.add_argument("--max-candidates-to-validate", type=int, default=30)
+
+    generic = commands.add_parser(
+        "disconnect-generic",
+        help="apply a structurally diverse generic template library",
+    )
+    generic.add_argument("library")
+    generic.add_argument("target")
+    generic.add_argument("--transformation", action="append")
+    generic.add_argument("--level", action="append", choices=("RDCHIRAL", "L1", "L2"))
+    generic.add_argument("--top-k", type=int, default=20)
+    generic.add_argument("--max-candidates-to-validate", type=int, default=50)
+    generic.add_argument("--concise", action="store_true")
+    generic.add_argument("--no-context", action="store_true")
 
     report = commands.add_parser(
         "render-report",
@@ -146,6 +174,47 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             max_candidates_to_validate=arguments.max_candidates_to_validate,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+
+    if arguments.command == "compare-diverse":
+        rows = load_diverse_rows(
+            arguments.source,
+            max_rows_per_cohort=arguments.max_rows_per_cohort,
+        )
+        report = run_diverse_benchmark(
+            rows,
+            arguments.output_directory,
+            test_fraction=arguments.test_fraction,
+            max_targets_per_transformation=(
+                arguments.max_targets_per_transformation
+            ),
+            top_k=arguments.top_k,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+
+    if arguments.command == "disconnect-generic":
+        candidates = disconnect_generic_target(
+            arguments.target,
+            load_generic_library(arguments.library),
+            transformations=arguments.transformation or (),
+            levels=arguments.level or (),
+            top_k=arguments.top_k,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+            use_context=not arguments.no_context,
+        )
+        if arguments.concise:
+            for candidate in candidates:
+                print(candidate.proposed_reaction_smiles)
+            return 0
+        print(
+            json.dumps(
+                [candidate.to_dict() for candidate in candidates],
+                indent=2,
+                sort_keys=True,
+            )
+        )
         return 0
 
     if arguments.command == "render-report":
