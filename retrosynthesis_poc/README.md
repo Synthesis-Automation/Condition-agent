@@ -47,8 +47,8 @@ reaction SMILES.
 ```powershell
 python -m retrosynthesis_poc disconnect `
   results/retrosynthesis_poc/cx_templates.json.gz `
-  "CCNc1ccc2ccccc2c1" `
-  --concise --top-k 10
+  "CC(=O)c1ccccc1Nc1ccccc1" `
+  --concise --top-k 5
 ```
 
 With `--concise`, the command prints only proposed reaction SMILES, one per line.
