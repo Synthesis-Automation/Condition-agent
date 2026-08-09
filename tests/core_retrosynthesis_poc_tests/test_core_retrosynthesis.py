@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import json
 
 import pytest
 
@@ -16,9 +17,11 @@ from core_retrosynthesis_poc import (
     disconnect_target,
     disconnect_ensemble,
     load_library,
+    render_comparison_html,
     run_comparison,
     save_library,
     split_by_reference,
+    write_comparison_html,
 )
 from core_retrosynthesis_poc.cli import main
 
@@ -299,3 +302,95 @@ def test_connected_precursor_only_handle_round_trips() -> None:
     assert result.rejection_reason is None
     assert len(result.templates) == 1
     assert "[#53+]" in result.templates[0].precursor_smarts
+
+
+def _comparison_for_html() -> dict:
+    method_metrics = {
+        "targets": 1,
+        "top1_exact_precursor_recall": 1.0,
+        "top5_exact_precursor_recall": 1.0,
+        "top10_exact_precursor_recall": 1.0,
+        "valid_candidate_fraction": 1.0,
+        "mean_candidates_per_target": 1.0,
+    }
+    method_result = {
+        "candidate_count": 1,
+        "center_rank": 1,
+        "exact_precursor_rank": 1,
+        "precursor_smiles": ["Brc1ccccc1.CN"],
+    }
+    return {
+        "split": {
+            "source_rows": 10,
+            "held_out_support_groups": 1,
+        },
+        "metrics": {
+            method: dict(method_metrics)
+            for method in (
+                "baseline",
+                "core_l1_context",
+                "ensemble_baseline_l1_context",
+            )
+        },
+        "target_results": [
+            {
+                "reaction_id": "html-c-n-1",
+                "reference_group": "reference-1",
+                "bond_kind": "C-N",
+                "target_smiles": "CNc1ccccc1",
+                "expected_precursor_smiles": "Brc1ccccc1.CN",
+                "expected_center_transition_key": "RCS2:test",
+                "methods": {
+                    method: dict(method_result)
+                    for method in (
+                        "baseline",
+                        "core_l1_context",
+                        "ensemble_baseline_l1_context",
+                    )
+                },
+            }
+        ],
+    }
+
+
+def test_html_report_contains_inline_chemical_drawings() -> None:
+    document = render_comparison_html(_comparison_for_html(), top_k=1)
+
+    assert document.startswith("<!doctype html>")
+    assert document.count("<svg") >= 5
+    assert "CNc1ccccc1" in document
+    assert "RDChiral baseline" in document
+    assert "Baseline-first L1 ensemble" in document
+    assert 'data-bond="C-N"' in document
+    assert "exact precursor" in document
+    assert '<script src="' not in document
+    assert '<link rel="stylesheet"' not in document
+
+
+def test_write_html_report_and_cli(tmp_path, capsys) -> None:
+    comparison_path = tmp_path / "comparison.json"
+    comparison_path.write_text(
+        json.dumps(_comparison_for_html()),
+        encoding="utf-8",
+    )
+    output_path = tmp_path / "review.html"
+
+    summary = write_comparison_html(comparison_path, output_path, top_k=1)
+
+    assert summary["target_count"] == 1
+    assert summary["self_contained"] is True
+    assert output_path.is_file()
+
+    cli_output = tmp_path / "cli-review.html"
+    exit_code = main(
+        [
+            "render-report",
+            str(comparison_path),
+            str(cli_output),
+            "--top-k",
+            "1",
+        ]
+    )
+    assert exit_code == 0
+    assert cli_output.is_file()
+    assert '"target_count": 1' in capsys.readouterr().out
