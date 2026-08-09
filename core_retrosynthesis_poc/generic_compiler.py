@@ -52,6 +52,16 @@ class GenericCompilationResult:
     rejection_reason: Optional[str]
 
 
+@dataclass(frozen=True)
+class GenericReactionIdentity:
+    """Handle-independent and realization-level identities for one reaction."""
+
+    named_annotation: Optional[str]
+    disconnection_site_key: str
+    operator_signature: str
+    synthon_signature: str
+
+
 @lru_cache(maxsize=20_000)
 def _materialized_analysis(reaction_smiles: str) -> tuple[Any, Any] | None:
     """Cache deterministic atom mapping and featurization across compilers."""
@@ -269,6 +279,107 @@ def _product_disconnection_site_key(
     )
 
 
+def _generic_operator_signature(
+    observation: Dict[str, Any],
+    product: Any,
+) -> str:
+    """Describe mapped product edits without precursor-only handle atoms."""
+
+    product_maps = {
+        int(atom.GetAtomMapNum())
+        for atom in product.GetAtoms()
+        if int(atom.GetAtomMapNum()) > 0
+    }
+    tokens = []
+    for edit in observation.get("edits") or ():
+        edit_type = str(edit.get("edit_type") or "")
+        if edit_type not in {
+            "formed",
+            "broken",
+            "order_changed",
+            "hydrogen_change",
+        }:
+            continue
+        endpoints = []
+        valid = True
+        for field in ("atom_1", "atom_2"):
+            atom = edit.get(field)
+            if atom is None:
+                endpoints.append(("H", 0, False, "S"))
+                continue
+            map_number = int(atom.get("atom_map_number") or 0)
+            if map_number not in product_maps:
+                valid = False
+                break
+            endpoints.append(
+                (
+                    str(atom.get("element") or ""),
+                    int(atom.get("formal_charge") or 0),
+                    bool(atom.get("aromatic")),
+                    str(atom.get("hybridization") or ""),
+                )
+            )
+        if not valid or not endpoints:
+            continue
+        tokens.append(
+            (
+                edit_type,
+                tuple(sorted(endpoints)),
+                str(edit.get("old_order") or "NONE"),
+                str(edit.get("new_order") or "NONE"),
+            )
+        )
+    if not tokens:
+        return ""
+    return json.dumps(sorted(tokens), separators=(",", ":"))
+
+
+def _synthon_signature(
+    reactants: Any,
+    product: Any,
+    operator_signature: str,
+) -> str:
+    """Normalize precursor-only handles while retaining mapped skeletons."""
+
+    product_maps = {
+        int(atom.GetAtomMapNum())
+        for atom in product.GetAtoms()
+        if int(atom.GetAtomMapNum()) > 0
+    }
+    values = []
+    for fragment in Chem.GetMolFrags(reactants, asMols=True, sanitizeFrags=False):
+        retained = {
+            int(atom.GetIdx())
+            for atom in fragment.GetAtoms()
+            if int(atom.GetAtomMapNum()) in product_maps
+        }
+        if not retained:
+            continue
+        editable = Chem.RWMol(fragment)
+        for atom_index in sorted(
+            set(range(fragment.GetNumAtoms())).difference(retained),
+            reverse=True,
+        ):
+            editable.RemoveAtom(atom_index)
+        skeleton = editable.GetMol()
+        for atom in skeleton.GetAtoms():
+            atom.SetAtomMapNum(0)
+        try:
+            Chem.SanitizeMol(skeleton)
+            values.append(
+                Chem.MolToSmiles(
+                    skeleton,
+                    canonical=True,
+                    isomericSmiles=True,
+                )
+            )
+        except Exception:
+            return ""
+    if not values:
+        return ""
+    return digest("SYN1", operator_signature, ".".join(sorted(values)))
+
+
 def _active_maps(observation: Dict[str, Any]) -> tuple[set[int], set[int]]:
     active = set()
     hydrogen = set()
@@ -348,6 +459,36 @@ def _handle_signature(reactants: Any, active_maps: set[int]) -> str:
     return ";".join(sorted(values)) or "no_unmapped_handle"
 
 
+def _generalized_product_atoms(
+    molecule: Any,
+    active_maps: set[int],
+    hydrogen_maps: set[int],
+) -> Any:
+    """Generalize active product atoms for the broad L0 applicability query."""
+
+    editable = Chem.RWMol(molecule)
+    for atom in molecule.GetAtoms():
+        map_number = int(atom.GetAtomMapNum())
+        if map_number not in active_maps or map_number in hydrogen_maps:
+            continue
+        if atom.GetIsAromatic():
+            symbol = atom.GetSymbol().lower()
+            atom_query = symbol
+        else:
+            atom_query = f"#{int(atom.GetAtomicNum())}"
+        charge = int(atom.GetFormalCharge())
+        charge_query = "+" if charge == 1 else "-" if charge == -1 else ""
+        if abs(charge) > 1:
+            charge_query = f"{charge:+d}"
+        query = Chem.AtomFromSmarts(
+            f"[{atom_query}{charge_query}:{map_number}]"
+        )
+        if query is None:
+            raise ValueError("generic active-atom query could not be compiled")
+        editable.ReplaceAtom(int(atom.GetIdx()), query, preserveProps=False)
+    return editable.GetMol()
+
+
 def _without_stereo(smiles: str) -> str | None:
     molecule = Chem.MolFromSmiles(smiles)
     if molecule is None:
@@ -390,9 +531,18 @@ def compile_generic_templates(
     row: Dict[str, Any],
     *,
     engine: Literal["reaction_core", "rdchiral"] = "reaction_core",
-    levels: Iterable[Literal["L1", "L2"]] = ("L1", "L2"),
+    levels: Iterable[Literal["L0", "L1", "L2"]] = ("L1", "L2"),
+    admission_mode: Literal["supported", "data_driven"] = "supported",
 ) -> GenericCompilationResult:
-    """Compile source-round-tripped templates for supported edit archetypes."""
+    """Compile source-round-tripped templates from normalized graph edits."""
+
+    requested_levels = tuple(dict.fromkeys(levels))
+    if not requested_levels or any(
+        level not in {"L0", "L1", "L2"} for level in requested_levels
+    ):
+        raise ValueError("levels must contain L0, L1, and/or L2")
+    if admission_mode not in {"supported", "data_driven"}:
+        raise ValueError("unsupported generic admission mode")
 
     source_core = dict(row.get("reaction_core") or {})
     source_observation = _observation(row)
@@ -430,11 +580,22 @@ def compile_generic_templates(
     if reactants is None or product is None or expected is None or canonical_product is None:
         return GenericCompilationResult((), "participant_canonicalization_failed")
     transformation = _classify_transformation(observation, reactants, product)
-    if transformation not in SUPPORTED_TRANSFORMATIONS:
+    if (
+        admission_mode == "supported"
+        and transformation not in SUPPORTED_TRANSFORMATIONS
+    ):
         return GenericCompilationResult((), "unsupported_edit_archetype")
     active_maps, hydrogen_maps = _active_maps(observation)
     if not active_maps:
         return GenericCompilationResult((), "missing_mapped_active_atoms")
+    operator_signature = _generic_operator_signature(observation, product)
+    if not operator_signature:
+        return GenericCompilationResult((), "missing_generic_operator_signature")
+    synthon_signature = _synthon_signature(
+        reactants,
+        product,
+        operator_signature,
+    )
     context = context_from_analysis(analysis, materialized.reaction_smiles)
     precedent = GenericTemplatePrecedent(
         reaction_id=str(row.get("reaction_id") or ""),
@@ -445,6 +606,51 @@ def compile_generic_templates(
         context=context,
     )
     edit_tokens = tuple(analysis.reaction_core.edit_tokens)
+    lookup = _canonical_map_lookup(reactants, product, active_maps)
+    canonical_active = {lookup[value] for value in active_maps if value in lookup}
+    canonical_hydrogen = {
+        lookup[value] for value in hydrogen_maps if value in lookup
+    }
+    handle_signature = _handle_signature(reactants, active_maps)
+    _apply_map_lookup(reactants, lookup)
+    _apply_map_lookup(product, lookup)
+    try:
+        generalized_product = _generalized_product_atoms(
+            product,
+            canonical_active,
+            set(),
+        )
+        product_l0_smarts = _fragment_smarts(
+            generalized_product,
+            _selected_atoms(
+                generalized_product,
+                level="L1",
+                reactant_side=False,
+                active_maps=canonical_active,
+            ),
+            hydrogen_carrier_maps=set(),
+        )
+        precursor_l0_smarts = _fragment_smarts(
+            reactants,
+            _selected_atoms(
+                reactants,
+                level="L1",
+                reactant_side=True,
+                active_maps=canonical_active,
+            ),
+            hydrogen_carrier_maps=set(),
+        )
+    except (RuntimeError, ValueError):
+        return GenericCompilationResult((), "generic_l0_compilation_failed")
+    operator_id = digest("OP1", operator_signature)
+    realization_id = digest(
+        "REAL1",
+        operator_id,
+        handle_signature,
+        synthon_signature,
+        precursor_l0_smarts,
+    )
+    annotations = (transformation,) if transformation is not None else ()
     if engine == "rdchiral":
         try:
             with redirect_stdout(io.StringIO()):
@@ -463,13 +669,7 @@ def compile_generic_templates(
         policy = _round_trip_policy(reaction_smarts, product_smiles, expected)
         if policy is None:
             return GenericCompilationResult((), "source_round_trip_failed")
-        operator_id = digest(
-            "GRO1",
-            "rdchiral",
-            transformation,
-            analysis.reaction_core.typed_core_key,
-        )
-        template_id = digest("GRT1", operator_id, reaction_smarts)
+        template_id = digest("GRT2", realization_id, "RDCHIRAL", reaction_smarts)
         return GenericCompilationResult(
             (
                 GenericCoreTemplate(
@@ -487,62 +687,49 @@ def compile_generic_templates(
                     observation_support=1,
                     independent_reference_support=1,
                     precedents=(precedent,),
+                    realization_id=realization_id,
+                    operator_signature=operator_signature,
+                    synthon_signature=synthon_signature,
+                    named_annotations=annotations,
                 ),
             ),
             None,
         )
 
-    lookup = _canonical_map_lookup(reactants, product, active_maps)
-    canonical_active = {lookup[value] for value in active_maps if value in lookup}
-    canonical_hydrogen = {
-        lookup[value] for value in hydrogen_maps if value in lookup
-    }
-    handle_signature = _handle_signature(reactants, active_maps)
-    _apply_map_lookup(reactants, lookup)
-    _apply_map_lookup(product, lookup)
     templates = []
-    for level in tuple(dict.fromkeys(levels)):
+    for level in requested_levels:
         try:
-            product_smarts = _fragment_smarts(
-                product,
-                _selected_atoms(
+            if level == "L0":
+                product_smarts = product_l0_smarts
+                precursor_smarts = precursor_l0_smarts
+            else:
+                product_smarts = _fragment_smarts(
                     product,
-                    level=level,
-                    reactant_side=False,
-                    active_maps=canonical_active,
-                ),
-                hydrogen_carrier_maps=canonical_hydrogen,
-            )
-            precursor_smarts = _fragment_smarts(
-                reactants,
-                _selected_atoms(
+                    _selected_atoms(
+                        product,
+                        level=level,
+                        reactant_side=False,
+                        active_maps=canonical_active,
+                    ),
+                    hydrogen_carrier_maps=canonical_hydrogen,
+                )
+                precursor_smarts = _fragment_smarts(
                     reactants,
-                    level=level,
-                    reactant_side=True,
-                    active_maps=canonical_active,
-                ),
-                hydrogen_carrier_maps=canonical_hydrogen,
-            )
+                    _selected_atoms(
+                        reactants,
+                        level=level,
+                        reactant_side=True,
+                        active_maps=canonical_active,
+                    ),
+                    hydrogen_carrier_maps=canonical_hydrogen,
+                )
         except (RuntimeError, ValueError):
             continue
         reaction_smarts = f"{product_smarts}>>{precursor_smarts}"
         policy = _round_trip_policy(reaction_smarts, product_smiles, expected)
         if policy is None:
             continue
-        core_key = (
-            analysis.reaction_core.shape_core_key
-            if level == "L1"
-            else analysis.reaction_core.typed_core_key
-        )
-        operator_id = digest(
-            "GRO1",
-            "reaction_core",
-            transformation,
-            level,
-            core_key,
-            handle_signature,
-        )
-        template_id = digest("GRT1", operator_id, reaction_smarts)
+        template_id = digest("GRT2", realization_id, level, reaction_smarts)
         templates.append(
             GenericCoreTemplate(
                 template_id=template_id,
@@ -559,6 +746,10 @@ def compile_generic_templates(
                 observation_support=1,
                 independent_reference_support=1,
                 precedents=(precedent,),
+                realization_id=realization_id,
+                operator_signature=operator_signature,
+                synthon_signature=synthon_signature,
+                named_annotations=annotations,
             )
         )
     return GenericCompilationResult(
@@ -568,26 +759,45 @@ def compile_generic_templates(
 
 
 @lru_cache(maxsize=50_000)
-def classify_reaction_with_site(reaction_smiles: str) -> tuple[str | None, str]:
-    """Return graph-edit archetype and product-side disconnection-site key."""
+def analyze_generic_reaction(
+    reaction_smiles: str,
+) -> GenericReactionIdentity | None:
+    """Return data-derived identities for one structurally valid reaction."""
 
     prepared = _materialized_analysis(reaction_smiles)
     if prepared is None:
-        return None, ""
+        return None
     materialized, analysis = prepared
     split = split_reaction_smiles(materialized.reaction_smiles)
     if not analysis.valid or split is None:
-        return None, ""
+        return None
     reactant_smiles, product_smiles = split
     reactants = Chem.MolFromSmiles(reactant_smiles)
     product = Chem.MolFromSmiles(product_smiles)
     observation = analysis.to_dict().get("observation") or {}
     if reactants is None or product is None:
-        return None, ""
-    return (
-        _classify_transformation(observation, reactants, product),
-        _product_disconnection_site_key(observation, product),
+        return None
+    signature = _generic_operator_signature(observation, product)
+    if not signature:
+        return None
+    return GenericReactionIdentity(
+        named_annotation=_classify_transformation(observation, reactants, product),
+        disconnection_site_key=_product_disconnection_site_key(
+            observation,
+            product,
+        ),
+        operator_signature=signature,
+        synthon_signature=_synthon_signature(reactants, product, signature),
     )
+
+
+def classify_reaction_with_site(reaction_smiles: str) -> tuple[str | None, str]:
+    """Return optional named archetype and product disconnection-site key."""
+
+    identity = analyze_generic_reaction(reaction_smiles)
+    if identity is None:
+        return None, ""
+    return identity.named_annotation, identity.disconnection_site_key
 
 
 def classify_reaction_smiles(reaction_smiles: str) -> str | None:
@@ -598,7 +808,9 @@ def classify_reaction_smiles(reaction_smiles: str) -> str | None:
 
 __all__ = [
     "GenericCompilationResult",
+    "GenericReactionIdentity",
     "SUPPORTED_TRANSFORMATIONS",
+    "analyze_generic_reaction",
     "classify_reaction_smiles",
     "classify_reaction_with_site",
     "compile_generic_templates",

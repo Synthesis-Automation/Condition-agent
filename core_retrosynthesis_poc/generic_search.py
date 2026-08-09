@@ -15,7 +15,7 @@ from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
 from retrosynthesis_poc.chemistry import canonical_smiles, maximum_similarity
 
 from .context import context_similarity
-from .generic_compiler import classify_reaction_with_site
+from .generic_compiler import analyze_generic_reaction
 from .generic_models import (
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
@@ -146,8 +146,13 @@ def disconnect_generic_target(
         )
         if status in {"invalid", "unresolved"}:
             continue
-        classified, site_key = classify_reaction_with_site(proposed)
-        if classified != template.transformation_kind:
+        identity = analyze_generic_reaction(proposed)
+        if identity is None:
+            continue
+        if template.operator_signature:
+            if identity.operator_signature != template.operator_signature:
+                continue
+        elif identity.named_annotation != template.transformation_kind:
             continue
         context_score = max(
             (
@@ -178,7 +183,7 @@ def disconnect_generic_target(
             independent_reference_support=template.independent_reference_support,
             forward_validation_status=status,
             center_transition_key=center_key,
-            disconnection_site_key=site_key,
+            disconnection_site_key=identity.disconnection_site_key,
             precedent_reaction_ids=tuple(
                 sorted(
                     {
@@ -188,6 +193,10 @@ def disconnect_generic_target(
                     }
                 )
             ),
+            operator_id=template.operator_id,
+            realization_id=template.realization_id,
+            operator_signature=identity.operator_signature,
+            synthon_signature=identity.synthon_signature,
         )
         current = candidates.get(precursors)
         if current is None or candidate.score > current.score:
@@ -231,4 +240,47 @@ def rank_site_diverse(
     return tuple(values)
 
 
-__all__ = ["disconnect_generic_target", "rank_site_diverse"]
+def disconnect_operator_ladder(
+    target_smiles: str,
+    library: GenericTemplateLibrary,
+    *,
+    top_k: int = 20,
+    max_templates_to_apply: int = 500,
+    max_candidates_to_validate: int = 100,
+    use_context: bool = True,
+    include_l0: bool = True,
+) -> tuple[GenericDisconnectionCandidate, ...]:
+    """Fill candidates in specificity order without reordering earlier tiers."""
+
+    if top_k < 1:
+        raise ValueError("top-k must be positive")
+    selected = []
+    seen = set()
+    levels = ("L2", "L1", "L0") if include_l0 else ("L2", "L1")
+    for level in levels:
+        if len(selected) >= top_k:
+            break
+        candidates = disconnect_generic_target(
+            target_smiles,
+            library,
+            levels=(level,),
+            top_k=top_k,
+            max_templates_to_apply=max_templates_to_apply,
+            max_candidates_to_validate=max_candidates_to_validate,
+            use_context=use_context,
+        )
+        for candidate in candidates:
+            if candidate.precursor_smiles in seen:
+                continue
+            selected.append(candidate)
+            seen.add(candidate.precursor_smiles)
+            if len(selected) >= top_k:
+                break
+    return tuple(selected)
+
+
+__all__ = [
+    "disconnect_generic_target",
+    "disconnect_operator_ladder",
+    "rank_site_diverse",
+]

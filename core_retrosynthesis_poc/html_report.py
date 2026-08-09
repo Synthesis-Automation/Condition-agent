@@ -32,6 +32,10 @@ METHOD_LABELS = {
     "ensemble_baseline_core_site_diverse": (
         "Baseline-first site-diverse ensemble"
     ),
+    "supported_l1_l2": "Seven-archetype L1/L2",
+    "data_l2": "Data-derived L2",
+    "data_l2_l1": "Data-derived L2/L1",
+    "data_ladder": "Data-derived L2/L1/L0",
 }
 
 
@@ -102,10 +106,25 @@ def _metrics_table(data: dict[str, Any], methods: Sequence[str]) -> str:
         "top1_site_recall" in (metrics.get(method) or {})
         for method in methods
     )
+    has_operator_metrics = any(
+        "top1_operator_recall" in (metrics.get(method) or {})
+        for method in methods
+    )
     rows = []
     for method in methods:
         values = metrics.get(method) or {}
-        if has_site_metrics:
+        if has_operator_metrics:
+            recall_cells = (
+                f"<td>{_metric(values.get('top1_exact_precursor_recall'))}</td>"
+                f"<td>{_metric(values.get('top25_exact_precursor_recall'))}</td>"
+                f"<td>{_metric(values.get('top1_synthon_recall'))}</td>"
+                f"<td>{_metric(values.get('top25_synthon_recall'))}</td>"
+                f"<td>{_metric(values.get('top1_operator_recall'))}</td>"
+                f"<td>{_metric(values.get('top25_operator_recall'))}</td>"
+                f"<td>{_metric(values.get('top1_site_recall'))}</td>"
+                f"<td>{_metric(values.get('top25_site_recall'))}</td>"
+            )
+        elif has_site_metrics:
             recall_cells = (
                 f"<td>{_metric(values.get('top1_exact_precursor_recall'))}</td>"
                 f"<td>{_metric(values.get('top10_exact_precursor_recall'))}</td>"
@@ -129,6 +148,11 @@ def _metrics_table(data: dict[str, Any], methods: Sequence[str]) -> str:
             "</tr>"
         )
     recall_headers = (
+        "<th>Exact @1</th><th>Exact @25</th><th>Synthon @1</th>"
+        "<th>Synthon @25</th><th>Operator @1</th><th>Operator @25</th>"
+        "<th>Site @1</th><th>Site @25</th>"
+        if has_operator_metrics
+        else
         "<th>Exact @1</th><th>Exact @10</th><th>Site @1</th>"
         "<th>Site @5</th><th>Site @10</th>"
         if has_site_metrics
@@ -155,6 +179,8 @@ def _candidate_card(
     rank: int,
     exact_rank: int | None,
     site_rank: int | None,
+    operator_rank: int | None = None,
+    synthon_rank: int | None = None,
 ) -> str:
     reaction_smiles = f"{precursor_smiles}>>{target_smiles}"
     badges = [f'<span class="badge rank">#{rank}</span>']
@@ -162,6 +188,10 @@ def _candidate_card(
         badges.append('<span class="badge exact">exact precursor</span>')
     if site_rank == rank:
         badges.append('<span class="badge center">correct product site</span>')
+    if operator_rank == rank:
+        badges.append('<span class="badge operator">correct operator</span>')
+    if synthon_rank == rank:
+        badges.append('<span class="badge synthon">equivalent synthons</span>')
     return (
         '<article class="candidate">'
         f'<div class="candidate-badges">{"".join(badges)}</div>'
@@ -181,6 +211,8 @@ def _method_section(
     precursors = tuple(values.get("precursor_smiles") or ())[:top_k]
     exact_rank = values.get("exact_precursor_rank")
     site_rank = values.get("site_rank", values.get("center_rank"))
+    operator_rank = values.get("operator_rank")
+    synthon_rank = values.get("synthon_rank")
     candidates = "".join(
         _candidate_card(
             str(precursor),
@@ -188,6 +220,8 @@ def _method_section(
             rank,
             exact_rank,
             site_rank,
+            operator_rank,
+            synthon_rank,
         )
         for rank, precursor in enumerate(precursors, start=1)
     )
@@ -199,6 +233,8 @@ def _method_section(
         f"<h4>{html.escape(_method_label(method))}</h4>"
         f'{_rank_badge("exact", exact_rank, "exact-rank")}'
         f'{_rank_badge("site", site_rank, "center-rank")}'
+        f'{_rank_badge("operator", operator_rank, "operator-rank")}'
+        f'{_rank_badge("synthon", synthon_rank, "synthon-rank")}'
         "</div>"
         f'<div class="candidate-grid">{candidates}</div>'
         "</section>"
@@ -221,7 +257,7 @@ def _target_card(
     target_methods = target.get("methods") or {}
     ensemble_method = next(
         (method for method in methods if method.startswith("ensemble_")),
-        "ensemble_baseline_l1_context",
+        methods[-1] if methods else "baseline",
     )
     ensemble_rank = (target_methods.get(ensemble_method) or {}).get(
         "exact_precursor_rank"
@@ -312,6 +348,8 @@ code { display:block; white-space:normal; overflow-wrap:anywhere; color:#33414d;
 .badge.center { background:#dcecf7; color:#155477; }.badge.recovery.rescue {
   background:#fff0c7; color:var(--warn); }.badge.recovery.missed { background:#f9dddd;
   color:var(--bad); }.badge.bond { background:#e6e2fa; color:#4b3884; }
+.badge.operator { background:#e2edf9; color:#23537a; }
+.badge.synthon { background:#e5f2dd; color:#35651e; }
 .render-error,.empty { padding:30px; color:var(--bad); text-align:center; }
 .hidden { display:none; }
 @media (max-width:800px) { .query-panel { grid-template-columns:1fr; }

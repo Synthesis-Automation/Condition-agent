@@ -287,3 +287,81 @@ python -m core_retrosynthesis_poc render-report `
   --method ensemble_baseline_core_context --top-k 5 `
   --title "C-C coupling and conjugate-addition stress review"
 ```
+
+## Coverage-first data-derived graph operators
+
+The unrestricted operator path removes the seven-archetype admission gate.
+Named transformations remain optional annotations; operator admission and
+identity use only mapped graph edits, product topology, precursor handles,
+hydrogen events, local environments, and source round-trip evidence.
+
+The hierarchy separates:
+
+- `OP1`: handle-independent normalized graph edits;
+- `REAL1`: one executable precursor-handle realization of an operator;
+- `SYN1`: mapped precursor skeletons after precursor-only handles are removed;
+- `SITE1`: edited atoms and bonds on a particular target product.
+
+Every admitted realization must regenerate its recorded precursors. Every
+generated candidate is remapped, forward-featurized, and rejected unless its
+observed edit signature agrees with the source operator. L0 may be absent for
+an individual realization when a sufficiently general template cannot pass
+the source round-trip check.
+
+Run the all-shard census and held-out comparison with:
+
+```powershell
+python -m core_retrosynthesis_poc compare-operators `
+  datasets/literature/shards `
+  results/operator_retrosynthesis_poc/all_shards_400 `
+  --max-rows 400 --test-fraction 0.25 `
+  --max-targets 24 --max-targets-per-operator 5 `
+  --top-k 25 --max-templates 500 `
+  --max-candidates-to-validate 100
+```
+
+The completed census sampled every one of the 399 shards before taking a
+second row. Of 298 training rows, unrestricted compilation admitted 178
+(59.7%) into 58 operators and 177 realizations. The seven-archetype view
+admitted 78 rows (26.2%). One hundred admitted observations had no supported
+named annotation.
+
+The broad 54-target audit increased candidate coverage from 0.704 to 0.963 and
+correct-site @25 from 0.315 to 0.630. A balanced 24-target policy audit was then
+used to compare the specificity-preserving fallback:
+
+| Method | Coverage | Exact @25 | Synthon @25 | Operator @25 | Site @25 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Seven-archetype L1/L2 | 0.708 | 0.292 | 0.417 | 0.417 | 0.458 |
+| Data-derived L2 | 0.917 | 0.625 | 0.708 | 0.792 | 0.708 |
+| Data-derived L2 then L1 | **1.000** | **0.625** | **0.875** | **0.875** | **0.875** |
+| Data-derived L2/L1/L0 | **1.000** | **0.625** | **0.875** | **0.875** | **0.875** |
+
+For the 12 unannotated targets in that audit, site/operator/synthon @25 reached
+0.833 versus 0.167 site recall for the seven-archetype view. L0 produced no
+additional recovery in this sample, so it remains a final fill tier rather
+than competing with L2 or L1 candidates.
+
+Render the equivalence-aware review with:
+
+```powershell
+python -m core_retrosynthesis_poc render-report `
+  results/operator_retrosynthesis_poc/all_shards_400/specificity_comparison.json `
+  results/operator_retrosynthesis_poc/all_shards_400/review.html `
+  --method supported_l1_l2 --method data_l2 `
+  --method data_l2_l1 --method data_ladder --top-k 5 `
+  --title "Data-derived graph-operator coverage review"
+```
+
+Apply the compiled library to a new target with the measured fallback policy:
+
+```powershell
+python -m core_retrosynthesis_poc disconnect-operators `
+  results/operator_retrosynthesis_poc/all_shards_400/operator_library.json.gz `
+  "Cc1ccnc(-c2ccccc2)c1" --top-k 10 --concise
+```
+
+Exact precursor recovery remains intentionally separate from site, operator,
+and synthon recovery. A different source-supported handle realization is not
+called the recorded reaction, and condition compatibility is reported as not
+evaluated when the query supplies no conditions.

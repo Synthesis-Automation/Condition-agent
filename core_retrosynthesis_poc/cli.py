@@ -19,9 +19,16 @@ from .diverse_benchmark import (
 )
 from .ensemble import disconnect_ensemble
 from .generic_library import load_generic_library
-from .generic_search import disconnect_generic_target
+from .generic_search import (
+    disconnect_generic_target,
+    disconnect_operator_ladder,
+)
 from .html_report import DEFAULT_METHODS, write_comparison_html
 from .library import build_library, load_library, save_library
+from .operator_benchmark import (
+    load_operator_rows,
+    run_operator_coverage_benchmark,
+)
 from .search import disconnect_target
 
 
@@ -106,6 +113,20 @@ def _parser() -> argparse.ArgumentParser:
     stress.add_argument("--top-k", type=int, default=10)
     stress.add_argument("--max-candidates-to-validate", type=int, default=75)
 
+    operators = commands.add_parser(
+        "compare-operators",
+        help="mine unrestricted graph operators and benchmark coverage",
+    )
+    operators.add_argument("source")
+    operators.add_argument("output_directory")
+    operators.add_argument("--max-rows", type=int, default=1_000)
+    operators.add_argument("--test-fraction", type=float, default=0.25)
+    operators.add_argument("--max-targets", type=int, default=80)
+    operators.add_argument("--max-targets-per-operator", type=int, default=3)
+    operators.add_argument("--top-k", type=int, default=25)
+    operators.add_argument("--max-templates", type=int, default=500)
+    operators.add_argument("--max-candidates-to-validate", type=int, default=100)
+
     generic = commands.add_parser(
         "disconnect-generic",
         help="apply a structurally diverse generic template library",
@@ -113,12 +134,33 @@ def _parser() -> argparse.ArgumentParser:
     generic.add_argument("library")
     generic.add_argument("target")
     generic.add_argument("--transformation", action="append")
-    generic.add_argument("--level", action="append", choices=("RDCHIRAL", "L1", "L2"))
+    generic.add_argument(
+        "--level",
+        action="append",
+        choices=("RDCHIRAL", "L0", "L1", "L2"),
+    )
     generic.add_argument("--top-k", type=int, default=20)
     generic.add_argument("--max-candidates-to-validate", type=int, default=50)
     generic.add_argument("--concise", action="store_true")
     generic.add_argument("--no-context", action="store_true")
     generic.add_argument("--diversify-sites", action="store_true")
+
+    operator_search = commands.add_parser(
+        "disconnect-operators",
+        help="apply data-derived operators with L2-to-L1-to-L0 fallback",
+    )
+    operator_search.add_argument("library")
+    operator_search.add_argument("target")
+    operator_search.add_argument("--top-k", type=int, default=20)
+    operator_search.add_argument("--max-templates", type=int, default=500)
+    operator_search.add_argument(
+        "--max-candidates-to-validate",
+        type=int,
+        default=100,
+    )
+    operator_search.add_argument("--concise", action="store_true")
+    operator_search.add_argument("--no-context", action="store_true")
+    operator_search.add_argument("--skip-l0", action="store_true")
 
     report = commands.add_parser(
         "render-report",
@@ -230,6 +272,24 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
 
+    if arguments.command == "compare-operators":
+        rows = load_operator_rows(
+            arguments.source,
+            max_rows=arguments.max_rows,
+        )
+        report = run_operator_coverage_benchmark(
+            rows,
+            arguments.output_directory,
+            test_fraction=arguments.test_fraction,
+            max_targets=arguments.max_targets,
+            max_targets_per_operator=arguments.max_targets_per_operator,
+            top_k=arguments.top_k,
+            max_templates_to_apply=arguments.max_templates,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+
     if arguments.command == "disconnect-generic":
         candidates = disconnect_generic_target(
             arguments.target,
@@ -240,6 +300,29 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             max_candidates_to_validate=arguments.max_candidates_to_validate,
             use_context=not arguments.no_context,
             diversify_sites=arguments.diversify_sites,
+        )
+        if arguments.concise:
+            for candidate in candidates:
+                print(candidate.proposed_reaction_smiles)
+            return 0
+        print(
+            json.dumps(
+                [candidate.to_dict() for candidate in candidates],
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if arguments.command == "disconnect-operators":
+        candidates = disconnect_operator_ladder(
+            arguments.target,
+            load_generic_library(arguments.library),
+            top_k=arguments.top_k,
+            max_templates_to_apply=arguments.max_templates,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+            use_context=not arguments.no_context,
+            include_l0=not arguments.skip_l0,
         )
         if arguments.concise:
             for candidate in candidates:
