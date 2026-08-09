@@ -47,8 +47,8 @@ reaction SMILES.
 ```powershell
 python -m retrosynthesis_poc disconnect `
   results/retrosynthesis_poc/cx_templates.json.gz `
-  "COc1ccccc1" `
-  --bond C-O --top-k 10
+  "CCNc1ccc2ccccc2c1" `
+  --bond C-N --top-k 10
 ```
 
 Each result contains a proposed `precursors>>target` reaction, supporting
