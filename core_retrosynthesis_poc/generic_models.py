@@ -137,6 +137,7 @@ class GenericDisconnectionCandidate:
     independent_reference_support: int
     forward_validation_status: str
     center_transition_key: str
+    disconnection_site_key: str
     precedent_reaction_ids: Tuple[str, ...]
 
     def to_dict(self) -> Dict[str, Any]:

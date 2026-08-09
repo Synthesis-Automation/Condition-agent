@@ -12,7 +12,11 @@ from retrosynthesis_poc.library import iter_rows
 from retrosynthesis_poc.library import load_library as load_baseline_library
 
 from .comparison import run_comparison
-from .diverse_benchmark import load_diverse_rows, run_diverse_benchmark
+from .diverse_benchmark import (
+    load_diverse_rows,
+    load_stress_rows,
+    run_diverse_benchmark,
+)
 from .ensemble import disconnect_ensemble
 from .generic_library import load_generic_library
 from .generic_search import disconnect_generic_target
@@ -90,6 +94,18 @@ def _parser() -> argparse.ArgumentParser:
     diverse.add_argument("--top-k", type=int, default=10)
     diverse.add_argument("--max-candidates-to-validate", type=int, default=30)
 
+    stress = commands.add_parser(
+        "compare-stress",
+        help="stress-test C-C coupling and conjugate-addition site selection",
+    )
+    stress.add_argument("source")
+    stress.add_argument("output_directory")
+    stress.add_argument("--max-rows-per-cohort", type=int, default=1_000)
+    stress.add_argument("--test-fraction", type=float, default=0.25)
+    stress.add_argument("--max-targets-per-transformation", type=int, default=50)
+    stress.add_argument("--top-k", type=int, default=10)
+    stress.add_argument("--max-candidates-to-validate", type=int, default=75)
+
     generic = commands.add_parser(
         "disconnect-generic",
         help="apply a structurally diverse generic template library",
@@ -102,6 +118,7 @@ def _parser() -> argparse.ArgumentParser:
     generic.add_argument("--max-candidates-to-validate", type=int, default=50)
     generic.add_argument("--concise", action="store_true")
     generic.add_argument("--no-context", action="store_true")
+    generic.add_argument("--diversify-sites", action="store_true")
 
     report = commands.add_parser(
         "render-report",
@@ -194,6 +211,25 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
 
+    if arguments.command == "compare-stress":
+        rows = load_stress_rows(
+            arguments.source,
+            max_rows_per_cohort=arguments.max_rows_per_cohort,
+        )
+        report = run_diverse_benchmark(
+            rows,
+            arguments.output_directory,
+            test_fraction=arguments.test_fraction,
+            max_targets_per_transformation=(
+                arguments.max_targets_per_transformation
+            ),
+            top_k=arguments.top_k,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+            include_level_ablations=False,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+
     if arguments.command == "disconnect-generic":
         candidates = disconnect_generic_target(
             arguments.target,
@@ -203,6 +239,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             top_k=arguments.top_k,
             max_candidates_to_validate=arguments.max_candidates_to_validate,
             use_context=not arguments.no_context,
+            diversify_sites=arguments.diversify_sites,
         )
         if arguments.concise:
             for candidate in candidates:

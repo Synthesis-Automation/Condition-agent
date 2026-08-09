@@ -11,7 +11,11 @@ from core_retrosynthesis_poc import (
     compile_generic_templates,
     disconnect_generic_target,
 )
-from core_retrosynthesis_poc.generic_compiler import classify_reaction_smiles
+from core_retrosynthesis_poc.diverse_benchmark import run_diverse_benchmark
+from core_retrosynthesis_poc.generic_compiler import (
+    classify_reaction_smiles,
+    classify_reaction_with_site,
+)
 
 
 REACTIONS = {
@@ -114,3 +118,95 @@ def test_structural_classifier_does_not_use_family_names() -> None:
         "acyl_substitution"
     )
     assert classify_reaction_smiles("CCO>>CCO") is None
+
+
+def test_disconnection_site_ignores_suzuki_handle_form() -> None:
+    product = "Cc1ccc(-c2ccccc2)cc1"
+    boronic_acid = f"Brc1ccccc1.Cc1ccc(B(O)O)cc1>>{product}"
+    pinacol_chloride = (
+        "CC1(C)OB(c2ccc(C)cc2)OC1(C)C.Clc1ccccc1>>"
+        f"{product}"
+    )
+
+    acid_kind, acid_site = classify_reaction_with_site(boronic_acid)
+    pinacol_kind, pinacol_site = classify_reaction_with_site(pinacol_chloride)
+
+    assert acid_kind == pinacol_kind == "c_c_coupling"
+    assert acid_site.startswith("SITE1:")
+    assert acid_site == pinacol_site
+
+
+def test_disconnection_site_is_invariant_to_mapped_source_serialization() -> None:
+    template = compile_generic_templates(
+        _row("conjugate_addition"),
+        engine="reaction_core",
+        levels=("L1",),
+    ).templates[0]
+    precedent = template.precedents[0]
+
+    mapped = classify_reaction_with_site(precedent.mapped_reaction_smiles)
+    canonical = classify_reaction_with_site(
+        f"{precedent.precursor_smiles}>>{precedent.product_smiles}"
+    )
+
+    assert mapped == canonical
+
+
+def test_site_diverse_ranking_exposes_distinct_product_bonds() -> None:
+    library = build_generic_library((_row("c_c_coupling"),), engine="reaction_core")
+
+    candidates = disconnect_generic_target(
+        "Cc1ccc(-c2ccc(-c3ccc(F)cc3)cc2)cc1",
+        library,
+        transformations=("c_c_coupling",),
+        top_k=4,
+        max_candidates_to_validate=20,
+        diversify_sites=True,
+    )
+
+    unique_sites = {candidate.disconnection_site_key for candidate in candidates}
+    assert len(unique_sites) >= 2
+    assert len({candidate.disconnection_site_key for candidate in candidates[:2]}) == 2
+
+
+def test_diverse_benchmark_writes_leakage_safe_artifacts(tmp_path) -> None:
+    rows = tuple(
+        _row(kind, ordinal=ordinal)
+        for kind in ("carbonyl_reduction", "ring_formation")
+        for ordinal in range(1, 7)
+    )
+
+    report = run_diverse_benchmark(
+        rows,
+        tmp_path,
+        test_fraction=0.3,
+        max_targets_per_transformation=2,
+        top_k=3,
+        max_candidates_to_validate=5,
+    )
+
+    assert report["split"]["evaluated_targets"] >= 2
+    assert set(report["metrics"]) == {
+        "baseline",
+        "core_context",
+        "core_l1_context",
+        "core_l2_context",
+        "core_site_diverse",
+        "ensemble_baseline_core_context",
+        "ensemble_baseline_core_site_diverse",
+    }
+    assert report["metrics"]["core_context"]["valid_candidate_fraction"] == 1.0
+    assert report["metrics"]["core_context"]["top1_site_recall"] > 0.0
+    assert (
+        report["metrics"]["core_context"]["top10_site_recall"]
+        >= report["metrics"]["core_context"]["top1_site_recall"]
+    )
+    assert report["target_results"][0]["expected_disconnection_site_key"]
+    assert report["target_results"][0]["difficulty"] in {
+        "single_site",
+        "multi_site",
+    }
+    assert report["metrics_by_difficulty"]
+    assert (tmp_path / "baseline_templates.json.gz").is_file()
+    assert (tmp_path / "core_templates.json.gz").is_file()
+    assert (tmp_path / "comparison.json").is_file()

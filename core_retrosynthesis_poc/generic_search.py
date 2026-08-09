@@ -15,7 +15,7 @@ from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
 from retrosynthesis_poc.chemistry import canonical_smiles, maximum_similarity
 
 from .context import context_similarity
-from .generic_compiler import classify_reaction_smiles
+from .generic_compiler import classify_reaction_with_site
 from .generic_models import (
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
@@ -58,6 +58,7 @@ def disconnect_generic_target(
     max_templates_to_apply: int = 300,
     max_candidates_to_validate: int = 50,
     use_context: bool = True,
+    diversify_sites: bool = False,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
     """Generate candidates with archetype and forward-chemistry hard filters."""
 
@@ -145,7 +146,8 @@ def disconnect_generic_target(
         )
         if status in {"invalid", "unresolved"}:
             continue
-        if classify_reaction_smiles(proposed) != template.transformation_kind:
+        classified, site_key = classify_reaction_with_site(proposed)
+        if classified != template.transformation_kind:
             continue
         context_score = max(
             (
@@ -176,6 +178,7 @@ def disconnect_generic_target(
             independent_reference_support=template.independent_reference_support,
             forward_validation_status=status,
             center_transition_key=center_key,
+            disconnection_site_key=site_key,
             precedent_reaction_ids=tuple(
                 sorted(
                     {
@@ -189,7 +192,7 @@ def disconnect_generic_target(
         current = candidates.get(precursors)
         if current is None or candidate.score > current.score:
             candidates[precursors] = candidate
-    return tuple(
+    ranked = tuple(
         sorted(
             candidates.values(),
             key=lambda candidate: (
@@ -197,8 +200,35 @@ def disconnect_generic_target(
                 -candidate.independent_reference_support,
                 candidate.precursor_smiles,
             ),
-        )[:top_k]
+        )
     )
+    if diversify_sites:
+        ranked = rank_site_diverse(ranked)
+    return ranked[:top_k]
 
 
-__all__ = ["disconnect_generic_target"]
+def rank_site_diverse(
+    candidates: Iterable[GenericDisconnectionCandidate],
+) -> tuple[GenericDisconnectionCandidate, ...]:
+    """Interleave ranked precursor forms across distinct product edit sites."""
+
+    groups: dict[str, list[GenericDisconnectionCandidate]] = {}
+    order = []
+    for candidate in candidates:
+        key = candidate.disconnection_site_key or candidate.precursor_smiles
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(candidate)
+    values = []
+    depth = 0
+    while len(values) < sum(len(group) for group in groups.values()):
+        for key in order:
+            group = groups[key]
+            if depth < len(group):
+                values.append(group[depth])
+        depth += 1
+    return tuple(values)
+
+
+__all__ = ["disconnect_generic_target", "rank_site_diverse"]

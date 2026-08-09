@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import io
+import json
 from contextlib import redirect_stdout
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Dict, Iterable, Literal, Optional, Tuple
 
 from rdkit import Chem
@@ -48,6 +50,16 @@ class GenericCompilationResult:
 
     templates: Tuple[GenericCoreTemplate, ...]
     rejection_reason: Optional[str]
+
+
+@lru_cache(maxsize=20_000)
+def _materialized_analysis(reaction_smiles: str) -> tuple[Any, Any] | None:
+    """Cache deterministic atom mapping and featurization across compilers."""
+
+    materialized = materialize_atom_mapping(reaction_smiles)
+    if materialized is None:
+        return None
+    return materialized, featurize_reaction(materialized.reaction_smiles)
 
 
 def _observation(row: Dict[str, Any]) -> Dict[str, Any]:
@@ -190,6 +202,73 @@ def _classify_transformation(
     return None
 
 
+def _product_disconnection_site_key(
+    observation: Dict[str, Any],
+    product: Any,
+) -> str:
+    """Identify edited product bonds independently of precursor handle form."""
+
+    unnumbered = Chem.Mol(product)
+    for atom in unnumbered.GetAtoms():
+        atom.SetAtomMapNum(0)
+    ranks = tuple(
+        int(rank)
+        for rank in Chem.CanonicalRankAtoms(
+            unnumbered,
+            breakTies=False,
+            includeChirality=True,
+        )
+    )
+    rank_by_map = {
+        int(atom.GetAtomMapNum()): ranks[int(atom.GetIdx())]
+        for atom in product.GetAtoms()
+        if int(atom.GetAtomMapNum()) > 0
+    }
+    descriptors = []
+    for edit in observation.get("edits") or ():
+        edit_type = str(edit.get("edit_type") or "")
+        if edit_type not in {"formed", "order_changed"}:
+            continue
+        endpoints = []
+        for field in ("atom_1", "atom_2"):
+            atom = edit.get(field) or {}
+            map_number = int(atom.get("atom_map_number") or 0)
+            if map_number not in rank_by_map:
+                endpoints = []
+                break
+            endpoints.append(
+                (rank_by_map[map_number], str(atom.get("element") or ""))
+            )
+        if len(endpoints) != 2:
+            continue
+        descriptors.append(
+            {
+                "edit_type": edit_type,
+                "product_atoms": sorted(endpoints),
+                "product_order": str(edit.get("new_order") or ""),
+            }
+        )
+    if not descriptors:
+        return ""
+    descriptors.sort(
+        key=lambda descriptor: json.dumps(
+            descriptor,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+    )
+    canonical_product = Chem.MolToSmiles(
+        unnumbered,
+        canonical=True,
+        isomericSmiles=True,
+    )
+    return digest(
+        "SITE1",
+        canonical_product,
+        json.dumps(descriptors, sort_keys=True, separators=(",", ":")),
+    )
+
+
 def _active_maps(observation: Dict[str, Any]) -> tuple[set[int], set[int]]:
     active = set()
     hydrogen = set()
@@ -328,12 +407,10 @@ def compile_generic_templates(
         return GenericCompilationResult((), "product_completeness_not_verified")
     if len(source_observation.get("products") or ()) != 1:
         return GenericCompilationResult((), "not_single_product")
-    materialized = materialize_atom_mapping(
-        _source_reaction(row, source_observation)
-    )
-    if materialized is None:
+    prepared = _materialized_analysis(_source_reaction(row, source_observation))
+    if prepared is None:
         return GenericCompilationResult((), "atom_mapping_unavailable")
-    analysis = featurize_reaction(materialized.reaction_smiles)
+    materialized, analysis = prepared
     if (
         not analysis.valid
         or analysis.reaction_core is None
@@ -490,28 +567,39 @@ def compile_generic_templates(
     )
 
 
-def classify_reaction_smiles(reaction_smiles: str) -> str | None:
-    """Return the supported structural archetype for a proposed reaction."""
+@lru_cache(maxsize=50_000)
+def classify_reaction_with_site(reaction_smiles: str) -> tuple[str | None, str]:
+    """Return graph-edit archetype and product-side disconnection-site key."""
 
-    materialized = materialize_atom_mapping(reaction_smiles)
-    if materialized is None:
-        return None
-    analysis = featurize_reaction(materialized.reaction_smiles)
+    prepared = _materialized_analysis(reaction_smiles)
+    if prepared is None:
+        return None, ""
+    materialized, analysis = prepared
     split = split_reaction_smiles(materialized.reaction_smiles)
     if not analysis.valid or split is None:
-        return None
+        return None, ""
     reactant_smiles, product_smiles = split
     reactants = Chem.MolFromSmiles(reactant_smiles)
     product = Chem.MolFromSmiles(product_smiles)
     observation = analysis.to_dict().get("observation") or {}
     if reactants is None or product is None:
-        return None
-    return _classify_transformation(observation, reactants, product)
+        return None, ""
+    return (
+        _classify_transformation(observation, reactants, product),
+        _product_disconnection_site_key(observation, product),
+    )
+
+
+def classify_reaction_smiles(reaction_smiles: str) -> str | None:
+    """Return the supported structural archetype for a proposed reaction."""
+
+    return classify_reaction_with_site(reaction_smiles)[0]
 
 
 __all__ = [
     "GenericCompilationResult",
     "SUPPORTED_TRANSFORMATIONS",
     "classify_reaction_smiles",
+    "classify_reaction_with_site",
     "compile_generic_templates",
 ]

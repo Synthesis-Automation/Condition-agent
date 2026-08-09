@@ -172,3 +172,118 @@ recommended ensemble. Repeat `--method` to select other ablations, use
 `--max-targets` for a smaller report, or increase `--top-k` to render more
 proposals. The HTML has no external assets and can be opened directly in a
 browser.
+
+## Structurally diverse benchmark
+
+The generic extension routes by normalized graph edits rather than reaction
+names. Named dataset cohorts are used only to construct a balanced sample. The
+supported structural archetypes are acyl substitution, C-C coupling, carbonyl
+oxidation and reduction, conjugate addition, carbonyl condensation/reductive
+amination, and azide-alkyne ring formation.
+
+Every RDChiral or core-derived template must regenerate its source precursors.
+Generated proposals are remapped, featurized, and rejected unless their forward
+graph transformation is classified as the same archetype as the template.
+Stereochemistry-relaxed source round-trip is retained explicitly when a reverse
+edit creates a stereocenter absent from the product.
+
+Run the balanced comparison with round-robin sampling across all shards:
+
+```powershell
+python -m core_retrosynthesis_poc compare-diverse `
+  datasets/literature/shards `
+  results/diverse_retrosynthesis_poc/balanced_round_robin_100 `
+  --max-rows-per-cohort 100 `
+  --max-targets-per-transformation 5 `
+  --top-k 10 --max-candidates-to-validate 20
+```
+
+The completed POC used 700 source rows, 536 training rows, and 27 eligible
+held-out targets from 60 held-out reference groups. The small target count,
+especially one carbonyl-condensation and one ring-formation target, makes this
+an architecture and coverage test rather than a production accuracy estimate.
+
+| Method | Coverage | Top-1 exact | Top-10 exact | Top-10 center | Valid |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Generic RDChiral | 0.519 | 0.407 | 0.444 | 0.444 | 1.000 |
+| Generic core L1/L2 + context | **1.000** | **0.741** | 0.778 | 0.778 | 1.000 |
+| Baseline-first generic-core ensemble | **1.000** | **0.741** | **0.815** | **0.815** | 1.000 |
+
+Core exact top-10 recovery by archetype was 0.80 for acyl substitution, 0.40
+for C-C coupling, 1.00 for carbonyl condensation, 1.00 for oxidation, 1.00 for
+reduction, 0.60 for conjugate addition, and 1.00 for ring formation. C-C
+coupling and conjugate addition are the useful stress cases: they generate
+multiple structurally valid precursor alternatives and expose ranking and
+chemoselectivity limitations hidden by C-X tests.
+
+Render the visual review with:
+
+```powershell
+python -m core_retrosynthesis_poc render-report `
+  results/diverse_retrosynthesis_poc/balanced_round_robin_100/comparison.json `
+  results/diverse_retrosynthesis_poc/balanced_round_robin_100/review.html `
+  --method baseline --method core_context `
+  --method ensemble_baseline_core_context --top-k 5
+```
+
+Apply the generic core library directly with, for example:
+
+```powershell
+python -m core_retrosynthesis_poc disconnect-generic `
+  results/diverse_retrosynthesis_poc/balanced_round_robin_100/core_templates.json.gz `
+  "OCc1ccc(F)cc1" `
+  --transformation carbonyl_reduction --concise --top-k 5
+```
+
+## C-C coupling and conjugate-addition stress test
+
+The focused stress benchmark separates exact recorded precursor recovery from
+product-side disconnection-site recovery. The `SITE1` identity uses canonical
+product symmetry classes and the formed/order-changed bonds, so changing a
+Suzuki halide or boronate form does not turn the same product cut into a false
+center miss.
+
+Run the larger reference-group-held-out comparison with:
+
+```powershell
+python -m core_retrosynthesis_poc compare-stress `
+  datasets/literature/shards `
+  results/diverse_retrosynthesis_poc/stress_cc_michael_250 `
+  --max-rows-per-cohort 250 --test-fraction 0.30 `
+  --max-targets-per-transformation 30 `
+  --top-k 10 --max-candidates-to-validate 75
+```
+
+The completed run used 500 source rows, 355 training rows, 58 held-out
+reference groups, and 60 eligible targets split equally between Suzuki C-C
+coupling and conjugate addition. Forty-eight targets had more than one
+structurally valid candidate product site.
+
+| Method | Coverage | Exact @1 | Exact @10 | Site @1 | Site @5 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Generic RDChiral | 0.433 | 0.117 | 0.317 | 0.400 | 0.417 |
+| Generic core + context | **1.000** | 0.567 | 0.883 | 0.917 | **1.000** |
+| Baseline-first core ensemble | **1.000** | **0.600** | **0.933** | **0.950** | 0.983 |
+
+For C-C coupling alone, core exact @1 was 0.233 while site @1 was 0.833 and
+site @5 was 1.000. Much of the apparent exact failure is therefore ranking of
+halide/boronate form rather than selection of the wrong bond. For conjugate
+addition, core exact @1 was 0.900 and site @1 was 1.000.
+
+The experimental `--diversify-sites` search option interleaves precursor forms
+across product sites. It is retained as an ablation, but it is not the default:
+on this benchmark it did not improve site recall and reduced exact @10 from
+0.883 to 0.867. The ordinary core ranker already recovered every expected site
+by rank 5.
+
+Render the focused chemistry review with:
+
+```powershell
+python -m core_retrosynthesis_poc render-report `
+  results/diverse_retrosynthesis_poc/stress_cc_michael_250/comparison.json `
+  results/diverse_retrosynthesis_poc/stress_cc_michael_250/review.html `
+  --method baseline --method core_context `
+  --method core_site_diverse `
+  --method ensemble_baseline_core_context --top-k 5 `
+  --title "C-C coupling and conjugate-addition stress review"
+```

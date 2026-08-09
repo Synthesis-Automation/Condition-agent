@@ -25,9 +25,13 @@ METHOD_LABELS = {
     "core_l2_context": "Core L2 + context",
     "core_l2_neutral": "Core L2 neutral",
     "core_context": "Core L1/L2 + context",
+    "core_site_diverse": "Core + site-diverse ranking",
     "core_neutral": "Core L1/L2 neutral",
     "ensemble_baseline_l1_context": "Baseline-first L1 ensemble",
     "ensemble_baseline_core_context": "Baseline-first generic-core ensemble",
+    "ensemble_baseline_core_site_diverse": (
+        "Baseline-first site-diverse ensemble"
+    ),
 }
 
 
@@ -94,23 +98,45 @@ def _method_label(method: str) -> str:
 
 def _metrics_table(data: dict[str, Any], methods: Sequence[str]) -> str:
     metrics = data.get("metrics") or {}
+    has_site_metrics = any(
+        "top1_site_recall" in (metrics.get(method) or {})
+        for method in methods
+    )
     rows = []
     for method in methods:
         values = metrics.get(method) or {}
+        if has_site_metrics:
+            recall_cells = (
+                f"<td>{_metric(values.get('top1_exact_precursor_recall'))}</td>"
+                f"<td>{_metric(values.get('top10_exact_precursor_recall'))}</td>"
+                f"<td>{_metric(values.get('top1_site_recall'))}</td>"
+                f"<td>{_metric(values.get('top5_site_recall'))}</td>"
+                f"<td>{_metric(values.get('top10_site_recall'))}</td>"
+            )
+        else:
+            recall_cells = (
+                f"<td>{_metric(values.get('top1_exact_precursor_recall'))}</td>"
+                f"<td>{_metric(values.get('top5_exact_precursor_recall'))}</td>"
+                f"<td>{_metric(values.get('top10_exact_precursor_recall'))}</td>"
+            )
         rows.append(
             "<tr>"
             f"<th>{html.escape(_method_label(method))}</th>"
             f"<td>{_metric(values.get('target_coverage'))}</td>"
-            f"<td>{_metric(values.get('top1_exact_precursor_recall'))}</td>"
-            f"<td>{_metric(values.get('top5_exact_precursor_recall'))}</td>"
-            f"<td>{_metric(values.get('top10_exact_precursor_recall'))}</td>"
+            f"{recall_cells}"
             f"<td>{_metric(values.get('valid_candidate_fraction'))}</td>"
             f"<td>{_metric(values.get('mean_candidates_per_target'))}</td>"
             "</tr>"
         )
+    recall_headers = (
+        "<th>Exact @1</th><th>Exact @10</th><th>Site @1</th>"
+        "<th>Site @5</th><th>Site @10</th>"
+        if has_site_metrics
+        else "<th>Top 1</th><th>Top 5</th><th>Top 10</th>"
+    )
     return (
         '<table class="metrics"><thead><tr><th>Method</th><th>Coverage</th>'
-        "<th>Top 1</th><th>Top 5</th><th>Top 10</th><th>Valid</th>"
+        f"{recall_headers}<th>Valid</th>"
         f"<th>Candidates/target</th></tr></thead><tbody>{''.join(rows)}</tbody></table>"
     )
 
@@ -128,14 +154,14 @@ def _candidate_card(
     target_smiles: str,
     rank: int,
     exact_rank: int | None,
-    center_rank: int | None,
+    site_rank: int | None,
 ) -> str:
     reaction_smiles = f"{precursor_smiles}>>{target_smiles}"
     badges = [f'<span class="badge rank">#{rank}</span>']
     if exact_rank == rank:
         badges.append('<span class="badge exact">exact precursor</span>')
-    if center_rank == rank:
-        badges.append('<span class="badge center">correct center</span>')
+    if site_rank == rank:
+        badges.append('<span class="badge center">correct product site</span>')
     return (
         '<article class="candidate">'
         f'<div class="candidate-badges">{"".join(badges)}</div>'
@@ -154,14 +180,14 @@ def _method_section(
     values = (target.get("methods") or {}).get(method) or {}
     precursors = tuple(values.get("precursor_smiles") or ())[:top_k]
     exact_rank = values.get("exact_precursor_rank")
-    center_rank = values.get("center_rank")
+    site_rank = values.get("site_rank", values.get("center_rank"))
     candidates = "".join(
         _candidate_card(
             str(precursor),
             str(target.get("target_smiles") or ""),
             rank,
             exact_rank,
-            center_rank,
+            site_rank,
         )
         for rank, precursor in enumerate(precursors, start=1)
     )
@@ -172,7 +198,7 @@ def _method_section(
         '<div class="method-title">'
         f"<h4>{html.escape(_method_label(method))}</h4>"
         f'{_rank_badge("exact", exact_rank, "exact-rank")}'
-        f'{_rank_badge("center", center_rank, "center-rank")}'
+        f'{_rank_badge("site", site_rank, "center-rank")}'
         "</div>"
         f'<div class="candidate-grid">{candidates}</div>'
         "</section>"
