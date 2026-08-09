@@ -18,9 +18,12 @@ from .diverse_benchmark import (
     run_diverse_benchmark,
 )
 from .ensemble import disconnect_ensemble
+from .coverage_audit import audit_operator_library_coverage
+from .full_scale import FullScaleBuildConfig, build_full_scale_operator_library
 from .generic_library import load_generic_library
 from .generic_search import (
     disconnect_generic_target,
+    disconnect_generic_target_detailed,
     disconnect_operator_ladder,
 )
 from .html_report import DEFAULT_METHODS, write_comparison_html
@@ -127,6 +130,35 @@ def _parser() -> argparse.ArgumentParser:
     operators.add_argument("--max-templates", type=int, default=500)
     operators.add_argument("--max-candidates-to-validate", type=int, default=100)
 
+    full_build = commands.add_parser(
+        "build-operators-full",
+        help="resumably compile and merge a full data-derived operator library",
+    )
+    full_build.add_argument("source")
+    full_build.add_argument("output_directory")
+    full_build.add_argument("--max-shards", type=int)
+    full_build.add_argument("--max-rows-per-shard", type=int)
+    full_build.add_argument("--max-precedents-per-template", type=int, default=8)
+    full_build.add_argument("--workers", type=int, default=1)
+    full_build.add_argument("--skip-l0", action="store_true")
+    full_build.add_argument("--force", action="store_true")
+
+    coverage_audit = commands.add_parser(
+        "audit-operator-coverage",
+        help="attribute held-out coverage misses to exact pipeline stages",
+    )
+    coverage_audit.add_argument("library")
+    coverage_audit.add_argument("source")
+    coverage_audit.add_argument("output_directory")
+    coverage_audit.add_argument("--max-rows", type=int, default=1_000)
+    coverage_audit.add_argument("--top-k", type=int, default=25)
+    coverage_audit.add_argument("--max-templates", type=int, default=500)
+    coverage_audit.add_argument(
+        "--max-candidates-to-validate",
+        type=int,
+        default=100,
+    )
+
     generic = commands.add_parser(
         "disconnect-generic",
         help="apply a structurally diverse generic template library",
@@ -161,6 +193,11 @@ def _parser() -> argparse.ArgumentParser:
     operator_search.add_argument("--concise", action="store_true")
     operator_search.add_argument("--no-context", action="store_true")
     operator_search.add_argument("--skip-l0", action="store_true")
+    operator_search.add_argument(
+        "--diagnostics",
+        action="store_true",
+        help="include retrieval and validation stage counters",
+    )
 
     report = commands.add_parser(
         "render-report",
@@ -290,6 +327,40 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
 
+    if arguments.command == "build-operators-full":
+        levels = ("L1", "L2") if arguments.skip_l0 else ("L0", "L1", "L2")
+        _, build_report = build_full_scale_operator_library(
+            arguments.source,
+            arguments.output_directory,
+            config=FullScaleBuildConfig(
+                levels=levels,
+                max_precedents_per_template=(
+                    arguments.max_precedents_per_template
+                ),
+                max_rows_per_shard=arguments.max_rows_per_shard,
+            ),
+            max_shards=arguments.max_shards,
+            workers=arguments.workers,
+            force=arguments.force,
+        )
+        print(json.dumps(build_report, indent=2, sort_keys=True))
+        return 0
+
+    if arguments.command == "audit-operator-coverage":
+        rows = islice(iter_rows(arguments.source), arguments.max_rows)
+        audit_report = audit_operator_library_coverage(
+            rows,
+            load_generic_library(arguments.library),
+            arguments.output_directory,
+            top_k=arguments.top_k,
+            max_templates_to_apply=arguments.max_templates,
+            max_candidates_to_validate=(
+                arguments.max_candidates_to_validate
+            ),
+        )
+        print(json.dumps(audit_report, indent=2, sort_keys=True))
+        return 0
+
     if arguments.command == "disconnect-generic":
         candidates = disconnect_generic_target(
             arguments.target,
@@ -315,9 +386,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
 
     if arguments.command == "disconnect-operators":
+        loaded_library = load_generic_library(arguments.library)
         candidates = disconnect_operator_ladder(
             arguments.target,
-            load_generic_library(arguments.library),
+            loaded_library,
             top_k=arguments.top_k,
             max_templates_to_apply=arguments.max_templates,
             max_candidates_to_validate=arguments.max_candidates_to_validate,
@@ -328,9 +400,31 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             for candidate in candidates:
                 print(candidate.proposed_reaction_smiles)
             return 0
+        diagnostics = None
+        if arguments.diagnostics:
+            _, diagnostics = disconnect_generic_target_detailed(
+                arguments.target,
+                loaded_library,
+                levels=("L1", "L2"),
+                top_k=arguments.top_k,
+                max_templates_to_apply=arguments.max_templates,
+                max_candidates_to_validate=(
+                    arguments.max_candidates_to_validate
+                ),
+                use_context=not arguments.no_context,
+            )
         print(
             json.dumps(
-                [candidate.to_dict() for candidate in candidates],
+                {
+                    "candidates": [
+                        candidate.to_dict() for candidate in candidates
+                    ],
+                    "diagnostics": (
+                        diagnostics.to_dict() if diagnostics is not None else None
+                    ),
+                }
+                if arguments.diagnostics
+                else [candidate.to_dict() for candidate in candidates],
                 indent=2,
                 sort_keys=True,
             )

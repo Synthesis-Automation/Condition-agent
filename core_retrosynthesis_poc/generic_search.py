@@ -18,8 +18,10 @@ from .context import context_similarity
 from .generic_compiler import analyze_generic_reaction
 from .generic_models import (
     GenericDisconnectionCandidate,
+    GenericSearchDiagnostics,
     GenericTemplateLibrary,
 )
+from .retrieval_index import indexed_template_ids
 from .search import _forward_analysis
 
 
@@ -28,39 +30,58 @@ def _reaction(smarts: str) -> object:
     return rdchiralReaction(smarts)
 
 
-def _apply(smarts: str, target_smiles: str) -> tuple[str, ...]:
+def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
+    """Return canonical precursors and RDChiral-preserved mapped reactions."""
+
     try:
+        reactants = rdchiralReactants(target_smiles)
         with redirect_stdout(io.StringIO()):
-            outcomes = rdchiralRun(
+            outcomes, mapped_outcomes = rdchiralRun(
                 _reaction(smarts),
-                rdchiralReactants(target_smiles),
+                reactants,
+                combine_enantiomers=False,
+                return_mapped=True,
             )
     except Exception:
         return ()
+    mapped_target = Chem.MolToSmiles(
+        reactants.reactants,
+        canonical=True,
+        isomericSmiles=True,
+    )
+    values = {}
+    for outcome in outcomes:
+        canonical = canonical_smiles(str(outcome))
+        mapped = mapped_outcomes.get(outcome)
+        if canonical is None or mapped is None:
+            continue
+        mapped_precursors = str(mapped[0])
+        mapped_reaction = f"{mapped_precursors}>>{mapped_target}"
+        current = values.get(canonical)
+        if current is None or mapped_reaction < current:
+            values[canonical] = mapped_reaction
     return tuple(
-        sorted(
-            {
-                canonical
-                for outcome in outcomes
-                if (canonical := canonical_smiles(str(outcome))) is not None
-            }
-        )
+        sorted(values.items())
     )
 
 
-def disconnect_generic_target(
+def disconnect_generic_target_detailed(
     target_smiles: str,
     library: GenericTemplateLibrary,
     *,
     transformations: Iterable[str] = (),
+    operator_ids: Iterable[str] = (),
     levels: Iterable[str] = (),
     top_k: int = 20,
     max_templates_to_apply: int = 300,
     max_candidates_to_validate: int = 50,
     use_context: bool = True,
     diversify_sites: bool = False,
-) -> tuple[GenericDisconnectionCandidate, ...]:
-    """Generate candidates with archetype and forward-chemistry hard filters."""
+) -> tuple[
+    tuple[GenericDisconnectionCandidate, ...],
+    GenericSearchDiagnostics,
+]:
+    """Generate candidates and expose each retrieval/validation stage."""
 
     if min(top_k, max_templates_to_apply, max_candidates_to_validate) < 1:
         raise ValueError("search limits must be positive")
@@ -71,15 +92,27 @@ def disconnect_generic_target(
     if target is None:
         raise ValueError("target could not be parsed")
     allowed_transformations = set(transformations)
+    allowed_operators = set(operator_ids)
     allowed_levels = set(levels)
+    indexed_ids = (
+        indexed_template_ids(canonical_target, library.retrieval_index)
+        if library.retrieval_index is not None
+        else frozenset(template.template_id for template in library.templates)
+    )
     applicable = []
+    metadata_filtered_count = 0
     for template in library.templates:
+        if template.template_id not in indexed_ids:
+            continue
+        if allowed_operators and template.operator_id not in allowed_operators:
+            continue
         if allowed_transformations and (
             template.transformation_kind not in allowed_transformations
         ):
             continue
         if allowed_levels and template.abstraction_level not in allowed_levels:
             continue
+        metadata_filtered_count += 1
         pattern = compile_smarts(template.product_smarts, validate=False)
         if pattern is None or not target.HasSubstructMatch(pattern):
             continue
@@ -98,10 +131,14 @@ def disconnect_generic_target(
         )
     )
     seeds = []
-    for product_similarity, specificity, template in applicable[
+    templates_to_apply = applicable[
         :max_templates_to_apply
-    ]:
-        for precursors in _apply(template.reaction_smarts, canonical_target):
+    ]
+    for product_similarity, specificity, template in templates_to_apply:
+        for precursors, mapped_proposed in _apply(
+            template.reaction_smarts,
+            canonical_target,
+        ):
             precursor_similarity = maximum_similarity(
                 precursors,
                 (
@@ -127,10 +164,15 @@ def disconnect_generic_target(
                     product_similarity,
                     specificity,
                     template,
+                    mapped_proposed,
                 )
             )
     seeds.sort(key=lambda item: (-item[0], item[1], item[5].template_id))
     candidates: dict[str, GenericDisconnectionCandidate] = {}
+    invalid_forward_count = 0
+    unresolved_identity_count = 0
+    operator_mismatch_count = 0
+    validation_seeds = seeds[:max_candidates_to_validate]
     for (
         preliminary,
         precursors,
@@ -138,21 +180,26 @@ def disconnect_generic_target(
         product_similarity,
         specificity,
         template,
-    ) in seeds[:max_candidates_to_validate]:
+        mapped_proposed,
+    ) in validation_seeds:
         proposed = f"{precursors}>>{canonical_target}"
         status, _, query_context, center_key = _forward_analysis(
-            proposed,
+            mapped_proposed,
             enabled=True,
         )
         if status in {"invalid", "unresolved"}:
+            invalid_forward_count += 1
             continue
-        identity = analyze_generic_reaction(proposed)
+        identity = analyze_generic_reaction(mapped_proposed)
         if identity is None:
+            unresolved_identity_count += 1
             continue
         if template.operator_signature:
             if identity.operator_signature != template.operator_signature:
+                operator_mismatch_count += 1
                 continue
         elif identity.named_annotation != template.transformation_kind:
+            operator_mismatch_count += 1
             continue
         context_score = max(
             (
@@ -213,7 +260,50 @@ def disconnect_generic_target(
     )
     if diversify_sites:
         ranked = rank_site_diverse(ranked)
-    return ranked[:top_k]
+    selected = ranked[:top_k]
+    return selected, GenericSearchDiagnostics(
+        library_template_count=len(library.templates),
+        indexed_template_count=len(indexed_ids),
+        metadata_filtered_template_count=metadata_filtered_count,
+        product_query_match_count=len(applicable),
+        applied_template_count=len(templates_to_apply),
+        generated_precursor_count=len(seeds),
+        validation_attempt_count=len(validation_seeds),
+        valid_candidate_count=len(candidates),
+        invalid_forward_count=invalid_forward_count,
+        unresolved_identity_count=unresolved_identity_count,
+        operator_mismatch_count=operator_mismatch_count,
+    )
+
+
+def disconnect_generic_target(
+    target_smiles: str,
+    library: GenericTemplateLibrary,
+    *,
+    transformations: Iterable[str] = (),
+    operator_ids: Iterable[str] = (),
+    levels: Iterable[str] = (),
+    top_k: int = 20,
+    max_templates_to_apply: int = 300,
+    max_candidates_to_validate: int = 50,
+    use_context: bool = True,
+    diversify_sites: bool = False,
+) -> tuple[GenericDisconnectionCandidate, ...]:
+    """Generate structurally validated candidates using the product index."""
+
+    candidates, _ = disconnect_generic_target_detailed(
+        target_smiles,
+        library,
+        transformations=transformations,
+        operator_ids=operator_ids,
+        levels=levels,
+        top_k=top_k,
+        max_templates_to_apply=max_templates_to_apply,
+        max_candidates_to_validate=max_candidates_to_validate,
+        use_context=use_context,
+        diversify_sites=diversify_sites,
+    )
+    return candidates
 
 
 def rank_site_diverse(
@@ -281,6 +371,7 @@ def disconnect_operator_ladder(
 
 __all__ = [
     "disconnect_generic_target",
+    "disconnect_generic_target_detailed",
     "disconnect_operator_ladder",
     "rank_site_diverse",
 ]

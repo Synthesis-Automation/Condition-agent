@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+import gzip
+import json
+
 import pytest
 
 from reactive_taxonomy import featurize_reaction
 from core_retrosynthesis_poc import (
     GenericTemplateLibrary,
+    FullScaleBuildConfig,
+    audit_operator_library_coverage,
+    build_full_scale_operator_library,
     build_generic_library,
     compile_generic_templates,
     disconnect_generic_target,
+    disconnect_generic_target_detailed,
     disconnect_operator_ladder,
     render_comparison_html,
 )
@@ -179,6 +186,10 @@ def test_operator_consolidates_suzuki_handle_realizations() -> None:
     assert len({template.synthon_signature for template in library.templates}) == 1
     assert len({template.operator_id for template in library.templates}) == 1
     assert len({template.realization_id for template in library.templates}) == 2
+    assert len(library.completion_groups) == 2
+    assert all(
+        len(group.realization_ids) == 1 for group in library.completion_groups
+    )
 
     candidates = disconnect_operator_ladder(product, library, top_k=6)
     levels = [candidate.abstraction_level for candidate in candidates]
@@ -188,6 +199,175 @@ def test_operator_consolidates_suzuki_handle_realizations() -> None:
     assert [level_rank[level] for level in levels] == sorted(
         level_rank[level] for level in levels
     )
+
+
+def test_realization_identity_ignores_unrelated_substrate_scaffold() -> None:
+    rows = tuple(
+        _row_from_reaction(
+            reaction,
+            reaction_id=f"reduction-{ordinal}",
+            reference_id=f"reduction-reference-{ordinal}",
+        )
+        for ordinal, reaction in enumerate(
+            (
+                "O=Cc1ccccc1>>OCc1ccccc1",
+                "O=Cc1ccc(F)cc1>>OCc1ccc(F)cc1",
+            ),
+            start=1,
+        )
+    )
+
+    library = build_generic_library(
+        rows,
+        levels=("L0", "L1", "L2"),
+        admission_mode="data_driven",
+    )
+
+    assert len({template.realization_id for template in library.templates}) == 1
+    assert all(template.observation_support == 2 for template in library.templates)
+    assert len(library.completion_groups) == 1
+
+
+def test_missing_serialized_core_is_recomputed_only_when_verified() -> None:
+    row = _row("carbonyl_reduction")
+    row.pop("reaction_core")
+    row.pop("reaction_observation")
+
+    recovered = compile_generic_templates(
+        row,
+        admission_mode="data_driven",
+    )
+    rejected = compile_generic_templates(
+        {"reaction_id": "unmappable", "reaction_smiles": "not-a-reaction"},
+        admission_mode="data_driven",
+    )
+
+    assert recovered.templates
+    assert recovered.diagnostics is not None
+    assert recovered.diagnostics["recovered_stored_inputs"] is True
+    assert rejected.rejection_reason == "atom_mapping_unavailable"
+    assert rejected.rejection_stage == "mapping"
+
+
+def test_product_index_preserves_results_and_reports_pruning() -> None:
+    library = build_generic_library(
+        (_row("carbonyl_reduction"), _row("carbonyl_condensation")),
+        levels=("L1", "L2"),
+        admission_mode="data_driven",
+    )
+
+    indexed, diagnostics = disconnect_generic_target_detailed(
+        "OCc1ccc(F)cc1",
+        library,
+        top_k=5,
+    )
+    unindexed = disconnect_generic_target(
+        "OCc1ccc(F)cc1",
+        GenericTemplateLibrary.from_dict(
+            {**library.to_dict(), "retrieval_index": None}
+        ),
+        top_k=5,
+    )
+
+    assert [item.precursor_smiles for item in indexed] == [
+        item.precursor_smiles for item in unindexed
+    ]
+    assert diagnostics.indexed_template_count < len(library.templates)
+    assert diagnostics.valid_candidate_count >= len(indexed)
+
+
+def test_rdchiral_mapping_prevents_unchanged_halogen_swap() -> None:
+    mapped_source = (
+        "[CH3:1][CH2:2][O:3][C:4]([c:6]1[cH:10][nH:9][n:8][cH:7]1)=[O:5]."
+        "[CH3:11][n:12]1[n:16][cH:15][c:14]([C:17]([CH2:19]Br)=[O:18])"
+        "[cH:13]1>>[CH3:1][CH2:2][O:3][C:4]([c:6]1[cH:10][n:9]"
+        "([CH2:19][C:17]([c:14]2[cH:13][n:12]([CH3:11])[n:16][cH:15]2)"
+        "=[O:18])[n:8][cH:7]1)=[O:5]"
+    )
+    row = _row_from_reaction(
+        mapped_source,
+        reaction_id="mapped-n-alkylation",
+        reference_id="mapped-n-alkylation-reference",
+    )
+    library = build_generic_library(
+        (row,),
+        levels=("L1", "L2"),
+        admission_mode="data_driven",
+    )
+
+    candidates = disconnect_generic_target(
+        "Cn1ncc2cc(Br)cc(F)c21",
+        library,
+        levels=("L1",),
+        top_k=5,
+    )
+
+    assert candidates
+    assert candidates[0].precursor_smiles == "CBr.Fc1cc(Br)cc2cn[nH]c12"
+    assert candidates[0].operator_id == library.operators[0].operator_id
+
+
+def test_resumable_full_scale_merge_deduplicates_observations(tmp_path) -> None:
+    source = tmp_path / "source"
+    output = tmp_path / "output"
+    source.mkdir()
+    row = _row("carbonyl_reduction")
+    for ordinal in (1, 2):
+        with gzip.open(
+            source / f"part-{ordinal:05d}.jsonl.gz",
+            "wt",
+            encoding="utf-8",
+        ) as handle:
+            handle.write(json.dumps(row) + "\n")
+
+    config = FullScaleBuildConfig(levels=("L1", "L2"))
+    library, report = build_full_scale_operator_library(
+        source,
+        output,
+        config=config,
+    )
+    first_manifests = {
+        path.name: path.stat().st_mtime_ns
+        for path in (output / "shards").glob("*.manifest.json")
+    }
+    _, repeated_report = build_full_scale_operator_library(
+        source,
+        output,
+        config=config,
+    )
+
+    assert library.source_row_count == 2
+    assert library.accepted_observation_count == 1
+    assert report["duplicate_accepted_observations"] == 1
+    assert repeated_report["accepted_observations"] == 1
+    assert first_manifests == {
+        path.name: path.stat().st_mtime_ns
+        for path in (output / "shards").glob("*.manifest.json")
+    }
+    assert (output / "operator_library_v3.json.gz").is_file()
+    assert (output / "support.sqlite3").is_file()
+
+
+def test_coverage_audit_attributes_operator_recovery(tmp_path) -> None:
+    row = _row("carbonyl_reduction")
+    library = build_generic_library(
+        (row,),
+        levels=("L1", "L2"),
+        admission_mode="data_driven",
+    )
+
+    report = audit_operator_library_coverage(
+        (row,),
+        library,
+        tmp_path,
+        top_k=5,
+        max_candidates_to_validate=10,
+    )
+
+    assert report["stage_counts"] == {"operator_recovered": 1}
+    assert report["metrics"]["top5_operator_recall"] == 1.0
+    assert (tmp_path / "coverage_audit.json").is_file()
+    assert (tmp_path / "coverage_cases.jsonl.gz").is_file()
 
 
 def test_generic_identity_separates_operator_and_synthon() -> None:

@@ -365,3 +365,94 @@ Exact precursor recovery remains intentionally separate from site, operator,
 and synthon recovery. A different source-supported handle realization is not
 called the recorded reaction, and condition compatibility is reported as not
 evaluated when the query supplies no conditions.
+
+## Full-scale operator library v3
+
+The v3 builder is a resumable, shard-oriented path for datasets that are too
+large to collect in memory. Each source shard writes three deterministic
+artifacts under `OUTPUT/shards/`:
+
+- a partial executable operator library;
+- an admission JSONL ledger containing the exact rejection stage or accepted
+  template/operator/completion identities;
+- a manifest keyed by the source size, modification time, and build config.
+
+Unchanged shard artifacts are reused. The merge uses `support.sqlite3` to
+deduplicate observation and reference support exactly across shards, then
+writes `operator_library_v3.json.gz` and `build_report.json`.
+
+Run a progressive build first:
+
+```powershell
+python -m core_retrosynthesis_poc build-operators-full `
+  datasets/literature/shards `
+  results/operator_retrosynthesis_poc/full_scale_v3 `
+  --max-shards 50 --max-rows-per-shard 10 --workers 4
+```
+
+Remove both limits for the full corpus. Repeating the same command resumes
+unchanged shards. Use `--force` only to intentionally recompile them.
+
+```powershell
+python -m core_retrosynthesis_poc build-operators-full `
+  datasets/literature/shards `
+  results/operator_retrosynthesis_poc/full_scale_v3 `
+  --workers 4
+```
+
+Admission no longer requires an already serialized core and observation. The
+compiler recomputes mapping, observation, core, and completeness from the
+source reaction, but admission still requires a verified recomputed core,
+verified product completeness, and source round-trip. Missing serialized data
+is recovered only when those checks pass. Rejections are separated into source,
+mapping, observation, core, completeness, canonicalization, operator,
+template, and round-trip stages.
+
+Templates are organized at four data-derived levels:
+
+- graph operator;
+- handle-completion group (`operator + direct precursor-handle signature`);
+- executable realization identified by its normalized precursor-handle
+  subgraph;
+- L0/L1/L2 product-context SMARTS.
+
+Precedents are retained deterministically across distinct context bins instead
+of keeping the first observations encountered. A necessary-feature product
+index uses product-observable edited atom/bond tokens before SMARTS matching;
+it cannot exclude a chemically applicable template, and final candidates still
+pass mapped graph-edit validation.
+
+Audit a genuinely held-out shard or dataset with:
+
+```powershell
+python -m core_retrosynthesis_poc audit-operator-coverage `
+  results/operator_retrosynthesis_poc/full_scale_v3/operator_library_v3.json.gz `
+  path/to/heldout.jsonl.gz `
+  results/operator_retrosynthesis_poc/full_scale_v3/heldout_audit `
+  --max-rows 1000 --top-k 25
+```
+
+The audit attributes misses to source compilation, operator absence, product
+index retrieval, product SMARTS applicability, precursor generation,
+structural validation, or global ranking. It also writes exact, synthon,
+operator, and site recall plus per-target `coverage_cases.jsonl.gz`. Do not use
+a training shard as the audit source.
+
+The completed 399-shard, one-row-per-shard smoke build admitted 239 unique
+observations (59.9%) after removing five cross-shard duplicates. It produced 72
+operators, 105 handle-completion groups, 156 realizations, and 463 templates;
+an unchanged resumability rerun completed in under one second. A denser
+50-shard x 10-row progressive validation admitted 349/500 rows
+(69.8%) into 37 operators, 56 handle-completion groups, 116 realizations, and
+382 templates. Normalized local map identity reduced that library from the
+initial 321 realizations and 869 templates. The detailed rejections were 111 unavailable mappings, 31
+unverified recomputed cores, and 9 source round-trip failures. On 25 reactions
+from an unused shard, candidate/operator/site coverage was 1.0 and synthon
+recall was 0.92; exact precursor recall was zero because the library proposed a
+different source-supported alkylating handle. This small, single-shard audit is
+a pipeline regression, not a diverse accuracy estimate.
+
+Candidate validation now consumes the atom correspondence returned by
+RDChiral. This prevents unchanged duplicate atoms, such as an aryl bromine and
+a bromide leaving group in the same proposal, from being swapped by a second
+global remapping pass and incorrectly creating extra graph edits.

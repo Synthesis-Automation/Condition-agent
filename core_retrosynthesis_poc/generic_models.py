@@ -62,6 +62,31 @@ class GenericGraphOperator:
 
 
 @dataclass(frozen=True)
+class GenericHandleCompletionGroup:
+    """Data-derived precursor completions sharing an operator and handle class."""
+
+    completion_group_id: str
+    operator_id: str
+    completion_signature: str
+    synthon_signatures: Tuple[str, ...]
+    realization_ids: Tuple[str, ...]
+    template_ids: Tuple[str, ...]
+    handle_signatures: Tuple[str, ...]
+    observation_support: int
+    independent_reference_support: int
+
+
+@dataclass(frozen=True)
+class GenericRetrievalIndex:
+    """Serializable necessary-feature index for product-side template lookup."""
+
+    token_to_template_ids: Dict[str, Tuple[str, ...]]
+    template_required_tokens: Dict[str, Tuple[str, ...]]
+    fallback_template_ids: Tuple[str, ...] = ()
+    definition_id: str = "generic_product_retrieval_index.v1"
+
+
+@dataclass(frozen=True)
 class GenericTemplateLibrary:
     """Serializable generic template collection."""
 
@@ -71,7 +96,9 @@ class GenericTemplateLibrary:
     rejection_counts: Dict[str, int]
     definition: Dict[str, Any]
     operators: Tuple[GenericGraphOperator, ...] = ()
-    schema_version: str = "2.0"
+    completion_groups: Tuple[GenericHandleCompletionGroup, ...] = ()
+    retrieval_index: Optional[GenericRetrievalIndex] = None
+    schema_version: str = "3.0"
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible representation."""
@@ -82,7 +109,7 @@ class GenericTemplateLibrary:
     def from_dict(cls, value: Dict[str, Any]) -> "GenericTemplateLibrary":
         """Load a generic library and its nested contexts."""
 
-        if value.get("schema_version") not in {"1.0", "2.0"}:
+        if value.get("schema_version") not in {"1.0", "2.0", "3.0"}:
             raise ValueError("unsupported generic template library schema")
         templates = []
         for raw_template in value.get("templates") or ():
@@ -160,6 +187,64 @@ class GenericTemplateLibrary:
             )
             for raw in value.get("operators") or ()
         )
+        completion_groups = tuple(
+            GenericHandleCompletionGroup(
+                **{
+                    key: item
+                    for key, item in raw.items()
+                    if key
+                    not in {
+                        "realization_ids",
+                        "template_ids",
+                        "handle_signatures",
+                        "completion_signature",
+                        "synthon_signature",
+                        "synthon_signatures",
+                    }
+                },
+                completion_signature=str(
+                    raw.get("completion_signature")
+                    or ";".join(raw.get("handle_signatures") or ())
+                    or "legacy_completion"
+                ),
+                synthon_signatures=tuple(
+                    raw.get("synthon_signatures")
+                    or (
+                        (raw.get("synthon_signature"),)
+                        if raw.get("synthon_signature")
+                        else ()
+                    )
+                ),
+                realization_ids=tuple(raw.get("realization_ids") or ()),
+                template_ids=tuple(raw.get("template_ids") or ()),
+                handle_signatures=tuple(raw.get("handle_signatures") or ()),
+            )
+            for raw in value.get("completion_groups") or ()
+        )
+        raw_index = value.get("retrieval_index")
+        retrieval_index = None
+        if isinstance(raw_index, dict):
+            retrieval_index = GenericRetrievalIndex(
+                token_to_template_ids={
+                    str(token): tuple(template_ids or ())
+                    for token, template_ids in (
+                        raw_index.get("token_to_template_ids") or {}
+                    ).items()
+                },
+                template_required_tokens={
+                    str(template_id): tuple(tokens or ())
+                    for template_id, tokens in (
+                        raw_index.get("template_required_tokens") or {}
+                    ).items()
+                },
+                fallback_template_ids=tuple(
+                    raw_index.get("fallback_template_ids") or ()
+                ),
+                definition_id=str(
+                    raw_index.get("definition_id")
+                    or "generic_product_retrieval_index.v1"
+                ),
+            )
         return cls(
             templates=tuple(templates),
             source_row_count=int(value.get("source_row_count") or 0),
@@ -172,8 +257,32 @@ class GenericTemplateLibrary:
             },
             definition=dict(value.get("definition") or {}),
             operators=operators,
-            schema_version="2.0",
+            completion_groups=completion_groups,
+            retrieval_index=retrieval_index,
+            schema_version="3.0",
         )
+
+
+@dataclass(frozen=True)
+class GenericSearchDiagnostics:
+    """Counts for each retrieval, generation, and validation stage."""
+
+    library_template_count: int = 0
+    indexed_template_count: int = 0
+    metadata_filtered_template_count: int = 0
+    product_query_match_count: int = 0
+    applied_template_count: int = 0
+    generated_precursor_count: int = 0
+    validation_attempt_count: int = 0
+    valid_candidate_count: int = 0
+    invalid_forward_count: int = 0
+    unresolved_identity_count: int = 0
+    operator_mismatch_count: int = 0
+
+    def to_dict(self) -> Dict[str, int]:
+        """Return stage counters as a JSON-compatible mapping."""
+
+        return asdict(self)
 
 
 @dataclass(frozen=True)
@@ -210,6 +319,9 @@ __all__ = [
     "GenericCoreTemplate",
     "GenericDisconnectionCandidate",
     "GenericGraphOperator",
+    "GenericRetrievalIndex",
+    "GenericSearchDiagnostics",
+    "GenericHandleCompletionGroup",
     "GenericTemplateLibrary",
     "GenericTemplatePrecedent",
 ]

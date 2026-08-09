@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from contextlib import redirect_stdout
 from dataclasses import dataclass
 from functools import lru_cache
@@ -43,6 +44,8 @@ SUPPORTED_TRANSFORMATIONS = frozenset(
     }
 )
 
+_SMARTS_ATOM_MAP = re.compile(r":(\d+)\]")
+
 
 @dataclass(frozen=True)
 class GenericCompilationResult:
@@ -50,6 +53,8 @@ class GenericCompilationResult:
 
     templates: Tuple[GenericCoreTemplate, ...]
     rejection_reason: Optional[str]
+    rejection_stage: str = ""
+    diagnostics: Dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -83,6 +88,63 @@ def _source_reaction(row: Dict[str, Any], observation: Dict[str, Any]) -> str:
         or row.get("canonical_reaction_smiles")
         or ""
     )
+
+
+_REJECTION_STAGES = {
+    "missing_source_reaction": "source",
+    "atom_mapping_unavailable": "mapping",
+    "materialized_analysis_invalid": "observation",
+    "materialized_core_missing": "core",
+    "materialized_core_not_verified": "core",
+    "product_completeness_not_verified": "completeness",
+    "not_single_product": "completeness",
+    "invalid_reaction_smiles": "canonicalization",
+    "participant_canonicalization_failed": "canonicalization",
+    "unsupported_edit_archetype": "operator",
+    "missing_mapped_active_atoms": "operator",
+    "missing_generic_operator_signature": "operator",
+    "generic_l0_compilation_failed": "template",
+    "template_extraction_failed": "template",
+    "source_round_trip_failed": "round_trip",
+}
+
+
+def generic_rejection_stage(reason: str | None) -> str:
+    """Return the deterministic pipeline stage for one rejection reason."""
+
+    return _REJECTION_STAGES.get(str(reason or ""), "unknown")
+
+
+def _rejection(
+    reason: str,
+    diagnostics: Dict[str, Any],
+) -> GenericCompilationResult:
+    return GenericCompilationResult(
+        (),
+        reason,
+        generic_rejection_stage(reason),
+        diagnostics,
+    )
+
+
+def _normalize_reaction_atom_maps(reaction_smarts: str) -> str:
+    """Relabel local SMARTS maps by deterministic product-first occurrence."""
+
+    if reaction_smarts.count(">>") != 1:
+        return reaction_smarts
+    product_smarts, precursor_smarts = reaction_smarts.split(">>")
+    ordered = []
+    for side in (product_smarts, precursor_smarts):
+        for match in _SMARTS_ATOM_MAP.finditer(side):
+            value = match.group(1)
+            if value not in ordered:
+                ordered.append(value)
+    lookup = {value: index for index, value in enumerate(ordered, start=1)}
+
+    def replace_map(match: re.Match[str]) -> str:
+        return f":{lookup[match.group(1)]}]"
+
+    return _SMARTS_ATOM_MAP.sub(replace_map, reaction_smarts)
 
 
 def _reference_id(row: Dict[str, Any]) -> str:
@@ -546,51 +608,75 @@ def compile_generic_templates(
 
     source_core = dict(row.get("reaction_core") or {})
     source_observation = _observation(row)
-    if not source_core or not source_observation:
-        return GenericCompilationResult((), "missing_core_or_observation")
-    if (source_core.get("quality") or {}).get("status") not in {"pass", "review"}:
-        return GenericCompilationResult((), "core_quality_blocked")
-    completeness = source_observation.get("completeness") or row.get(
-        "reaction_completeness"
-    ) or {}
-    if completeness.get("status") != "verified":
-        return GenericCompilationResult((), "product_completeness_not_verified")
-    if len(source_observation.get("products") or ()) != 1:
-        return GenericCompilationResult((), "not_single_product")
-    prepared = _materialized_analysis(_source_reaction(row, source_observation))
+    source_reaction = _source_reaction(row, source_observation)
+    diagnostics: Dict[str, Any] = {
+        "stored_core_present": bool(source_core),
+        "stored_observation_present": bool(source_observation),
+        "stored_core_status": str(
+            (source_core.get("quality") or {}).get("status") or "missing"
+        ),
+        "stored_completeness_status": str(
+            (
+                source_observation.get("completeness")
+                or row.get("reaction_completeness")
+                or {}
+            ).get("status")
+            or "missing"
+        ),
+        "recomputed_evidence": True,
+    }
+    if not source_reaction:
+        return _rejection("missing_source_reaction", diagnostics)
+    prepared = _materialized_analysis(source_reaction)
     if prepared is None:
-        return GenericCompilationResult((), "atom_mapping_unavailable")
+        return _rejection("atom_mapping_unavailable", diagnostics)
     materialized, analysis = prepared
-    if (
-        not analysis.valid
-        or analysis.reaction_core is None
-        or analysis.reaction_core.quality.status != "pass"
-    ):
-        return GenericCompilationResult((), "materialized_mapping_not_verified")
+    diagnostics["mapping_evidence"] = str(materialized.evidence)
+    diagnostics["mapping_confidence"] = float(materialized.confidence)
+    if not analysis.valid:
+        return _rejection("materialized_analysis_invalid", diagnostics)
+    if analysis.reaction_core is None:
+        return _rejection("materialized_core_missing", diagnostics)
+    if analysis.reaction_core.quality.status != "pass":
+        diagnostics["recomputed_core_status"] = str(
+            analysis.reaction_core.quality.status
+        )
+        return _rejection("materialized_core_not_verified", diagnostics)
     value = analysis.to_dict()
     observation = value.get("observation") or {}
+    diagnostics["recomputed_core_status"] = "pass"
+    diagnostics["recomputed_completeness_status"] = str(
+        (observation.get("completeness") or {}).get("status") or "missing"
+    )
+    diagnostics["recovered_stored_inputs"] = bool(
+        not source_core or not source_observation
+    )
+    if diagnostics["recomputed_completeness_status"] != "verified":
+        return _rejection("product_completeness_not_verified", diagnostics)
+    if len(observation.get("products") or ()) != 1:
+        return _rejection("not_single_product", diagnostics)
     split = split_reaction_smiles(materialized.reaction_smiles)
     if split is None:
-        return GenericCompilationResult((), "invalid_reaction_smiles")
+        return _rejection("invalid_reaction_smiles", diagnostics)
     reactant_smiles, product_smiles = split
     reactants = Chem.MolFromSmiles(reactant_smiles)
     product = Chem.MolFromSmiles(product_smiles)
     expected = contributing_reactants(reactant_smiles, product_smiles)
     canonical_product = canonical_smiles(product_smiles)
     if reactants is None or product is None or expected is None or canonical_product is None:
-        return GenericCompilationResult((), "participant_canonicalization_failed")
+        return _rejection("participant_canonicalization_failed", diagnostics)
     transformation = _classify_transformation(observation, reactants, product)
     if (
         admission_mode == "supported"
         and transformation not in SUPPORTED_TRANSFORMATIONS
     ):
-        return GenericCompilationResult((), "unsupported_edit_archetype")
+        return _rejection("unsupported_edit_archetype", diagnostics)
     active_maps, hydrogen_maps = _active_maps(observation)
     if not active_maps:
-        return GenericCompilationResult((), "missing_mapped_active_atoms")
+        return _rejection("missing_mapped_active_atoms", diagnostics)
     operator_signature = _generic_operator_signature(observation, product)
     if not operator_signature:
-        return GenericCompilationResult((), "missing_generic_operator_signature")
+        return _rejection("missing_generic_operator_signature", diagnostics)
     synthon_signature = _synthon_signature(
         reactants,
         product,
@@ -641,13 +727,16 @@ def compile_generic_templates(
             hydrogen_carrier_maps=set(),
         )
     except (RuntimeError, ValueError):
-        return GenericCompilationResult((), "generic_l0_compilation_failed")
+        return _rejection("generic_l0_compilation_failed", diagnostics)
+    normalized_l0 = _normalize_reaction_atom_maps(
+        f"{product_l0_smarts}>>{precursor_l0_smarts}"
+    )
+    product_l0_smarts, precursor_l0_smarts = normalized_l0.split(">>")
     operator_id = digest("OP1", operator_signature)
     realization_id = digest(
-        "REAL1",
+        "REAL2",
         operator_id,
         handle_signature,
-        synthon_signature,
         precursor_l0_smarts,
     )
     annotations = (transformation,) if transformation is not None else ()
@@ -664,12 +753,17 @@ def compile_generic_templates(
         except Exception:
             raw = None
         if not raw or not raw.get("reaction_smarts"):
-            return GenericCompilationResult((), "template_extraction_failed")
-        reaction_smarts = str(raw["reaction_smarts"])
+            return _rejection("template_extraction_failed", diagnostics)
+        reaction_smarts = _normalize_reaction_atom_maps(
+            str(raw["reaction_smarts"])
+        )
+        normalized_product_smarts, normalized_precursor_smarts = (
+            reaction_smarts.split(">>")
+        )
         policy = _round_trip_policy(reaction_smarts, product_smiles, expected)
         if policy is None:
-            return GenericCompilationResult((), "source_round_trip_failed")
-        template_id = digest("GRT2", realization_id, "RDCHIRAL", reaction_smarts)
+            return _rejection("source_round_trip_failed", diagnostics)
+        template_id = digest("GRT3", realization_id, "RDCHIRAL", reaction_smarts)
         return GenericCompilationResult(
             (
                 GenericCoreTemplate(
@@ -679,8 +773,8 @@ def compile_generic_templates(
                     abstraction_level="RDCHIRAL",
                     compiler_engine="rdchiral",
                     reaction_smarts=reaction_smarts,
-                    product_smarts=str(raw["products"]),
-                    precursor_smarts=str(raw["reactants"]),
+                    product_smarts=normalized_product_smarts,
+                    precursor_smarts=normalized_precursor_smarts,
                     edit_tokens=edit_tokens,
                     handle_signature=_handle_signature(reactants, active_maps),
                     stereo_policy=policy,
@@ -694,6 +788,8 @@ def compile_generic_templates(
                 ),
             ),
             None,
+            "accepted",
+            diagnostics,
         )
 
     templates = []
@@ -725,11 +821,14 @@ def compile_generic_templates(
                 )
         except (RuntimeError, ValueError):
             continue
-        reaction_smarts = f"{product_smarts}>>{precursor_smarts}"
+        reaction_smarts = _normalize_reaction_atom_maps(
+            f"{product_smarts}>>{precursor_smarts}"
+        )
+        product_smarts, precursor_smarts = reaction_smarts.split(">>")
         policy = _round_trip_policy(reaction_smarts, product_smiles, expected)
         if policy is None:
             continue
-        template_id = digest("GRT2", realization_id, level, reaction_smarts)
+        template_id = digest("GRT3", realization_id, level, reaction_smarts)
         templates.append(
             GenericCoreTemplate(
                 template_id=template_id,
@@ -752,9 +851,13 @@ def compile_generic_templates(
                 named_annotations=annotations,
             )
         )
+    if not templates:
+        return _rejection("source_round_trip_failed", diagnostics)
     return GenericCompilationResult(
         tuple(templates),
-        None if templates else "source_round_trip_failed",
+        None,
+        "accepted",
+        diagnostics,
     )
 
 
@@ -814,4 +917,5 @@ __all__ = [
     "classify_reaction_smiles",
     "classify_reaction_with_site",
     "compile_generic_templates",
+    "generic_rejection_stage",
 ]
