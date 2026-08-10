@@ -10,14 +10,13 @@ from itertools import cycle
 from pathlib import Path
 from typing import Any, Dict, Sequence
 
-from retrosynthesis_poc.library import iter_rows
-
 from .comparison import split_by_reference
 from .ensemble import merge_baseline_first
 from .generic_compiler import analyze_generic_reaction, compile_generic_templates
 from .generic_library import build_generic_library, save_generic_library
 from .generic_models import GenericTemplateLibrary
 from .generic_search import disconnect_generic_target
+from .sources import iter_library_rows, source_shard_files
 
 
 def _precedent_identity(precedent: Any) -> str:
@@ -33,18 +32,13 @@ def load_operator_rows(
 
     if max_rows < 1:
         raise ValueError("max rows must be positive")
-    root = Path(source)
-    files = (
-        (root,)
-        if root.is_file()
-        else tuple(
-            sorted(
-                root.glob("*.jsonl.gz"),
-                key=lambda path: hashlib.sha256(path.name.encode()).digest(),
-            )
+    files = tuple(
+        sorted(
+            source_shard_files(source),
+            key=lambda path: hashlib.sha256(path.name.encode()).digest(),
         )
     )
-    iterators = {path: iter(iter_rows(path)) for path in files}
+    iterators = {path: iter(iter_library_rows(path)) for path in files}
     values = []
     for path in cycle(files):
         if not iterators or len(values) >= max_rows:

@@ -29,6 +29,11 @@ from core_retrosynthesis_poc.generic_compiler import (
 from core_retrosynthesis_poc.operator_benchmark import (
     run_operator_coverage_benchmark,
 )
+from core_retrosynthesis_poc.sources import (
+    iter_library_rows,
+    resolve_library_mode,
+    source_shard_files,
+)
 
 
 REACTIONS = {
@@ -358,6 +363,55 @@ def test_resumable_full_scale_merge_deduplicates_observations(tmp_path) -> None:
         "complete",
     }
     assert progress_events[-1]["phase"] == "complete"
+
+
+def test_mode_source_uses_combined_rows_and_manifest_shards(tmp_path) -> None:
+    root = tmp_path / "literature"
+    mode_dir = root / "compact"
+    batch_dir = mode_dir / "batches" / "batch-one"
+    shards_dir = batch_dir / "shards"
+    shards_dir.mkdir(parents=True)
+    first = {**_row("carbonyl_reduction"), "source_path": "NaBH4.csv"}
+    second = {**_row("c_c_coupling"), "source_path": "Suzuki.csv"}
+    combined_path = mode_dir / "combined_records.jsonl.gz"
+    with gzip.open(combined_path, "wt", encoding="utf-8") as handle:
+        handle.write(json.dumps(first) + "\n")
+        handle.write(json.dumps(second) + "\n")
+    shard_path = shards_dir / "part-00000.jsonl.gz"
+    with gzip.open(shard_path, "wt", encoding="utf-8") as handle:
+        handle.write(json.dumps(first) + "\n")
+    manifest_path = batch_dir / "shard_manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "source_files": [{"coverage_complete": True}],
+                "shards": [
+                    {
+                        "status": "complete",
+                        "output_path": "shards/part-00000.jsonl.gz",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (mode_dir / "combined_batch_manifest.json").write_text(
+        json.dumps({"batch_manifests": [{"path": str(manifest_path)}]}),
+        encoding="utf-8",
+    )
+
+    selected = resolve_library_mode(root, "compact")
+
+    assert selected == mode_dir
+    assert [row["source_path"] for row in iter_library_rows(selected)] == [
+        "NaBH4.csv",
+        "Suzuki.csv",
+    ]
+    assert [
+        row["source_path"]
+        for row in iter_library_rows(selected, include=("Suzuki*.csv",))
+    ] == ["Suzuki.csv"]
+    assert source_shard_files(selected) == (shard_path,)
 
 
 def test_coverage_audit_attributes_operator_recovery(tmp_path) -> None:

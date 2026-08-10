@@ -16,8 +16,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Iterator, Literal, Sequence
 
 from retrosynthesis_poc.chemistry import digest
-from retrosynthesis_poc.library import iter_rows
-
 from .generic_library import (
     build_generic_library,
     load_generic_library,
@@ -31,6 +29,7 @@ from .generic_models import (
     GenericTemplateLibrary,
 )
 from .retrieval_index import build_generic_retrieval_index
+from .sources import iter_library_rows, source_shard_files
 
 
 ProgressCallback = Callable[[Dict[str, Any]], None]
@@ -53,12 +52,9 @@ class FullScaleBuildConfig:
 
 
 def _source_files(source: str | Path) -> tuple[Path, ...]:
-    root = Path(source)
-    if root.is_file():
-        return (root,)
     return tuple(
         sorted(
-            root.glob("*.jsonl.gz"),
+            source_shard_files(source),
             key=lambda path: (
                 hashlib.sha256(path.name.encode()).hexdigest(),
                 path.name,
@@ -89,7 +85,7 @@ def _iter_shard_rows(
     source: Path,
     max_rows: int | None,
 ) -> Iterator[Dict[str, Any]]:
-    rows: Iterable[Dict[str, Any]] = iter_rows(source)
+    rows: Iterable[Dict[str, Any]] = iter_library_rows(source)
     if max_rows is not None:
         rows = islice(rows, max_rows)
     for ordinal, row in enumerate(rows, start=1):

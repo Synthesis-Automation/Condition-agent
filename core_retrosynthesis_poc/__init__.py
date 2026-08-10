@@ -51,6 +51,12 @@ from .operator_benchmark import (
     run_operator_coverage_benchmark,
 )
 from .search import disconnect_target
+from .sources import (
+    LIBRARY_MODES,
+    iter_library_rows,
+    resolve_library_mode,
+    source_shard_files,
+)
 
 __all__ = [
     "CenterReactivityContext",
@@ -71,6 +77,7 @@ __all__ = [
     "GenericSearchDiagnostics",
     "GenericHandleCompletionGroup",
     "GenericTemplateLibrary",
+    "LIBRARY_MODES",
     "TemplateContext",
     "analyze_generic_reaction",
     "audit_operator_library_coverage",
@@ -88,12 +95,15 @@ __all__ = [
     "load_library",
     "load_generic_library",
     "load_operator_rows",
+    "iter_library_rows",
     "merge_operator_shards",
     "run_comparison",
     "run_operator_coverage_benchmark",
     "render_comparison_html",
+    "resolve_library_mode",
     "save_library",
     "save_generic_library",
     "split_by_reference",
+    "source_shard_files",
     "write_comparison_html",
 ]

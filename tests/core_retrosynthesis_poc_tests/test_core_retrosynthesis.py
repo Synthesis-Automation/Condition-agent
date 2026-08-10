@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import gzip
 import json
 
 import pytest
@@ -279,6 +280,38 @@ def test_concise_cli_honors_top_k(tmp_path, capsys) -> None:
     lines = capsys.readouterr().out.splitlines()
     assert len(lines) == 2
     assert all(">>" in line for line in lines)
+
+
+def test_build_cli_selects_compact_recommendation_library(tmp_path, capsys) -> None:
+    library_root = tmp_path / "literature"
+    for mode, bond_kind in (("full", "C-N"), ("compact", "C-O")):
+        mode_dir = library_root / mode
+        mode_dir.mkdir(parents=True)
+        row = {**_row(bond_kind), "source_path": f"{bond_kind}.csv"}
+        with gzip.open(
+            mode_dir / "combined_records.jsonl.gz",
+            "wt",
+            encoding="utf-8",
+        ) as handle:
+            handle.write(json.dumps(row) + "\n")
+    destination = tmp_path / "compact-core.json.gz"
+
+    exit_code = main(
+        [
+            "build-library",
+            str(library_root),
+            str(destination),
+            "--library-mode",
+            "compact",
+            "--level",
+            "L1",
+        ]
+    )
+
+    assert exit_code == 0
+    capsys.readouterr()
+    library = load_library(destination)
+    assert {template.bond_kind for template in library.templates} == {"C-O"}
 
 
 def test_baseline_first_ensemble_preserves_order_and_adds_fallback(

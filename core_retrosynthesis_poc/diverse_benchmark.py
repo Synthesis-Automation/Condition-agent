@@ -9,8 +9,6 @@ from itertools import cycle
 from pathlib import Path
 from typing import Any, Dict, Sequence
 
-from retrosynthesis_poc.library import iter_rows
-
 from .comparison import split_by_reference
 from .ensemble import merge_baseline_first
 from .generic_compiler import (
@@ -22,6 +20,7 @@ from .generic_library import (
     save_generic_library,
 )
 from .generic_search import disconnect_generic_target, rank_site_diverse
+from .sources import iter_library_rows, source_shard_files
 
 
 DIVERSE_COHORTS = {
@@ -51,15 +50,20 @@ def load_cohort_rows(
     if max_rows_per_cohort < 1:
         raise ValueError("max rows per cohort must be positive")
     values = []
-    root = Path(source)
+    available_files = source_shard_files(source)
     for cohort, patterns in cohorts.items():
         files = tuple(
             sorted(
-                {path for pattern in patterns for path in root.glob(pattern)},
+                {
+                    path
+                    for pattern in patterns
+                    for path in available_files
+                    if path.match(pattern)
+                },
                 key=lambda path: path.as_posix(),
             )
         )
-        iterators = {path: iter(iter_rows(path)) for path in files}
+        iterators = {path: iter(iter_library_rows(path)) for path in files}
         selected_count = 0
         for path in cycle(files):
             if not iterators or selected_count >= max_rows_per_cohort:

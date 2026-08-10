@@ -7,9 +7,9 @@ import json
 import sys
 from dataclasses import asdict
 from itertools import islice
+from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Sequence
 
-from retrosynthesis_poc.library import iter_rows
 from retrosynthesis_poc.library import load_library as load_baseline_library
 
 from .comparison import run_comparison
@@ -34,6 +34,7 @@ from .operator_benchmark import (
     run_operator_coverage_benchmark,
 )
 from .search import disconnect_target
+from .sources import LIBRARY_MODES, iter_library_rows, resolve_library_mode
 
 
 def _format_elapsed(seconds: object) -> str:
@@ -95,6 +96,18 @@ def _print_build_progress(event: Dict[str, Any]) -> None:
     print(message, file=sys.stderr, flush=True)
 
 
+def _add_library_mode_argument(command: argparse.ArgumentParser) -> None:
+    command.add_argument(
+        "--library-mode",
+        choices=LIBRARY_MODES,
+        default="full",
+        help=(
+            "recommendation-library mode when SOURCE contains full/ and "
+            "compact/ directories (default: full)"
+        ),
+    )
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Reaction-core-derived one-step retrosynthesis POC"
@@ -109,6 +122,7 @@ def _parser() -> argparse.ArgumentParser:
     build.add_argument("--max-rows", type=int)
     build.add_argument("--max-rows-per-include", type=int)
     build.add_argument("--max-precedents-per-template", type=int, default=8)
+    _add_library_mode_argument(build)
 
     disconnect = commands.add_parser(
         "disconnect",
@@ -151,6 +165,7 @@ def _parser() -> argparse.ArgumentParser:
     compare.add_argument("--top-k", type=int, default=10)
     compare.add_argument("--max-test-targets", type=int)
     compare.add_argument("--max-candidates-to-validate", type=int, default=20)
+    _add_library_mode_argument(compare)
 
     diverse = commands.add_parser(
         "compare-diverse",
@@ -163,6 +178,7 @@ def _parser() -> argparse.ArgumentParser:
     diverse.add_argument("--max-targets-per-transformation", type=int, default=10)
     diverse.add_argument("--top-k", type=int, default=10)
     diverse.add_argument("--max-candidates-to-validate", type=int, default=30)
+    _add_library_mode_argument(diverse)
 
     stress = commands.add_parser(
         "compare-stress",
@@ -175,6 +191,7 @@ def _parser() -> argparse.ArgumentParser:
     stress.add_argument("--max-targets-per-transformation", type=int, default=50)
     stress.add_argument("--top-k", type=int, default=10)
     stress.add_argument("--max-candidates-to-validate", type=int, default=75)
+    _add_library_mode_argument(stress)
 
     operators = commands.add_parser(
         "compare-operators",
@@ -189,6 +206,7 @@ def _parser() -> argparse.ArgumentParser:
     operators.add_argument("--top-k", type=int, default=25)
     operators.add_argument("--max-templates", type=int, default=500)
     operators.add_argument("--max-candidates-to-validate", type=int, default=100)
+    _add_library_mode_argument(operators)
 
     full_build = commands.add_parser(
         "build-operators-full",
@@ -204,6 +222,7 @@ def _parser() -> argparse.ArgumentParser:
     full_build.add_argument("--quiet-progress", action="store_true")
     full_build.add_argument("--skip-l0", action="store_true")
     full_build.add_argument("--force", action="store_true")
+    _add_library_mode_argument(full_build)
 
     coverage_audit = commands.add_parser(
         "audit-operator-coverage",
@@ -220,6 +239,7 @@ def _parser() -> argparse.ArgumentParser:
         type=int,
         default=100,
     )
+    _add_library_mode_argument(coverage_audit)
 
     generic = commands.add_parser(
         "disconnect-generic",
@@ -275,7 +295,7 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _selected_rows(
-    source: str,
+    source: str | Path,
     includes: Sequence[str],
     *,
     max_rows: int | None,
@@ -287,13 +307,13 @@ def _selected_rows(
         def balanced() -> Iterator[Dict[str, Any]]:
             for pattern in includes:
                 yield from islice(
-                    iter_rows(source, include=(pattern,)),
+                    iter_library_rows(source, include=(pattern,)),
                     max_rows_per_include,
                 )
 
         values: Iterable[Dict[str, Any]] = balanced()
     else:
-        values = iter_rows(source, include=includes)
+        values = iter_library_rows(source, include=includes)
     return islice(values, max_rows) if max_rows is not None else values
 
 
@@ -301,9 +321,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     """Run library construction, disconnection, or paired evaluation."""
 
     arguments = _parser().parse_args(argv)
+    source = (
+        resolve_library_mode(arguments.source, arguments.library_mode)
+        if hasattr(arguments, "source")
+        else None
+    )
     if arguments.command == "build-library":
         rows = _selected_rows(
-            arguments.source,
+            source,
             arguments.include,
             max_rows=arguments.max_rows,
             max_rows_per_include=arguments.max_rows_per_include,
@@ -318,7 +343,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
     if arguments.command == "compare":
         rows = _selected_rows(
-            arguments.source,
+            source,
             arguments.include,
             max_rows=arguments.max_rows,
             max_rows_per_include=arguments.max_rows_per_include,
@@ -336,7 +361,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if arguments.command == "compare-diverse":
         rows = load_diverse_rows(
-            arguments.source,
+            source,
             max_rows_per_cohort=arguments.max_rows_per_cohort,
         )
         report = run_diverse_benchmark(
@@ -354,7 +379,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if arguments.command == "compare-stress":
         rows = load_stress_rows(
-            arguments.source,
+            source,
             max_rows_per_cohort=arguments.max_rows_per_cohort,
         )
         report = run_diverse_benchmark(
@@ -373,7 +398,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if arguments.command == "compare-operators":
         rows = load_operator_rows(
-            arguments.source,
+            source,
             max_rows=arguments.max_rows,
         )
         report = run_operator_coverage_benchmark(
@@ -392,7 +417,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if arguments.command == "build-operators-full":
         levels = ("L1", "L2") if arguments.skip_l0 else ("L0", "L1", "L2")
         _, build_report = build_full_scale_operator_library(
-            arguments.source,
+            source,
             arguments.output_directory,
             config=FullScaleBuildConfig(
                 levels=levels,
@@ -413,7 +438,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
 
     if arguments.command == "audit-operator-coverage":
-        rows = islice(iter_rows(arguments.source), arguments.max_rows)
+        rows = islice(iter_library_rows(source), arguments.max_rows)
         audit_report = audit_operator_library_coverage(
             rows,
             load_generic_library(arguments.library),

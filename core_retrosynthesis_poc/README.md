@@ -30,6 +30,29 @@ valence-correct X-H precursor, including adjacent aromatic tautomer carriers.
 Every admitted SMARTS must reproduce its recorded contributing precursors when
 applied to its source product.
 
+## Full and Compact input libraries
+
+Commands that consume converted reactions accept the recommendation-library
+root and a mode selector:
+
+```powershell
+--library-mode full     # complete converted corpus; the default
+--library-mode compact  # deterministic sampled corpus for development
+```
+
+For example, `datasets/literature --library-mode compact` resolves to
+`datasets/literature/compact`. Row-oriented commands read that mode's
+deduplicated `combined_records.jsonl.gz`. Shard-oriented benchmarks and the
+resumable full-scale builder read only the completed batch shards named by
+`combined_batch_manifest.json`; incomplete or saved-but-not-combined batches
+are excluded. An explicit JSONL file, legacy shard directory, or already
+selected `full/` or `compact/` directory remains valid and does not require a
+path migration.
+
+Use separate output directories for Full and Compact builds. Compact is the
+recommended iteration mode; use Full for final operator-library construction
+and release evaluation.
+
 ## Build a balanced library
 
 Use a separate limit for every included cohort so C-N rows do not consume a
@@ -37,8 +60,9 @@ global limit before C-O and C-S are read:
 
 ```powershell
 python -m core_retrosynthesis_poc build-library `
-  datasets/literature/shards `
-  results/core_retrosynthesis_poc/core_templates.json.gz `
+  datasets/literature `
+  results/core_retrosynthesis_poc/compact/core_templates.json.gz `
+  --library-mode compact `
   --include "C_N_Coupling*.jsonl.gz" `
   --include "C_O_Coupling*.jsonl.gz" `
   --include "C_S_Coupling*.jsonl.gz" `
@@ -87,8 +111,9 @@ core-neutral, and core-context ranking on held-out products:
 
 ```powershell
 python -m core_retrosynthesis_poc compare `
-  datasets/literature/shards `
-  results/core_retrosynthesis_comparison `
+  datasets/literature `
+  results/core_retrosynthesis_comparison/compact `
+  --library-mode compact `
   --include "C_N_Coupling*.jsonl.gz" `
   --include "C_O_Coupling*.jsonl.gz" `
   --include "C_S_Coupling*.jsonl.gz" `
@@ -191,8 +216,9 @@ Run the balanced comparison with round-robin sampling across all shards:
 
 ```powershell
 python -m core_retrosynthesis_poc compare-diverse `
-  datasets/literature/shards `
-  results/diverse_retrosynthesis_poc/balanced_round_robin_100 `
+  datasets/literature `
+  results/diverse_retrosynthesis_poc/compact/balanced_round_robin_100 `
+  --library-mode compact `
   --max-rows-per-cohort 100 `
   --max-targets-per-transformation 5 `
   --top-k 10 --max-candidates-to-validate 20
@@ -220,8 +246,8 @@ Render the visual review with:
 
 ```powershell
 python -m core_retrosynthesis_poc render-report `
-  results/diverse_retrosynthesis_poc/balanced_round_robin_100/comparison.json `
-  results/diverse_retrosynthesis_poc/balanced_round_robin_100/review.html `
+  results/diverse_retrosynthesis_poc/compact/balanced_round_robin_100/comparison.json `
+  results/diverse_retrosynthesis_poc/compact/balanced_round_robin_100/review.html `
   --method baseline --method core_context `
   --method ensemble_baseline_core_context --top-k 5
 ```
@@ -230,7 +256,7 @@ Apply the generic core library directly with, for example:
 
 ```powershell
 python -m core_retrosynthesis_poc disconnect-generic `
-  results/diverse_retrosynthesis_poc/balanced_round_robin_100/core_templates.json.gz `
+  results/diverse_retrosynthesis_poc/compact/balanced_round_robin_100/core_templates.json.gz `
   "OCc1ccc(F)cc1" `
   --transformation carbonyl_reduction --concise --top-k 5
 ```
@@ -247,8 +273,9 @@ Run the larger reference-group-held-out comparison with:
 
 ```powershell
 python -m core_retrosynthesis_poc compare-stress `
-  datasets/literature/shards `
-  results/diverse_retrosynthesis_poc/stress_cc_michael_250 `
+  datasets/literature `
+  results/diverse_retrosynthesis_poc/compact/stress_cc_michael_250 `
+  --library-mode compact `
   --max-rows-per-cohort 250 --test-fraction 0.30 `
   --max-targets-per-transformation 30 `
   --top-k 10 --max-candidates-to-validate 75
@@ -280,8 +307,8 @@ Render the focused chemistry review with:
 
 ```powershell
 python -m core_retrosynthesis_poc render-report `
-  results/diverse_retrosynthesis_poc/stress_cc_michael_250/comparison.json `
-  results/diverse_retrosynthesis_poc/stress_cc_michael_250/review.html `
+  results/diverse_retrosynthesis_poc/compact/stress_cc_michael_250/comparison.json `
+  results/diverse_retrosynthesis_poc/compact/stress_cc_michael_250/review.html `
   --method baseline --method core_context `
   --method core_site_diverse `
   --method ensemble_baseline_core_context --top-k 5 `
@@ -312,8 +339,9 @@ Run the all-shard census and held-out comparison with:
 
 ```powershell
 python -m core_retrosynthesis_poc compare-operators `
-  datasets/literature/shards `
-  results/operator_retrosynthesis_poc/all_shards_400 `
+  datasets/literature `
+  results/operator_retrosynthesis_poc/compact/all_shards_400 `
+  --library-mode compact `
   --max-rows 400 --test-fraction 0.25 `
   --max-targets 24 --max-targets-per-operator 5 `
   --top-k 25 --max-templates 500 `
@@ -346,8 +374,8 @@ Render the equivalence-aware review with:
 
 ```powershell
 python -m core_retrosynthesis_poc render-report `
-  results/operator_retrosynthesis_poc/all_shards_400/specificity_comparison.json `
-  results/operator_retrosynthesis_poc/all_shards_400/review.html `
+  results/operator_retrosynthesis_poc/compact/all_shards_400/specificity_comparison.json `
+  results/operator_retrosynthesis_poc/compact/all_shards_400/review.html `
   --method supported_l1_l2 --method data_l2 `
   --method data_l2_l1 --method data_ladder --top-k 5 `
   --title "Data-derived graph-operator coverage review"
@@ -357,7 +385,7 @@ Apply the compiled library to a new target with the measured fallback policy:
 
 ```powershell
 python -m core_retrosynthesis_poc disconnect-operators `
-  results/operator_retrosynthesis_poc/all_shards_400/operator_library.json.gz `
+  results/operator_retrosynthesis_poc/compact/all_shards_400/operator_library.json.gz `
   "Cc1ccnc(-c2ccccc2)c1" --top-k 10 --concise
 ```
 
@@ -381,22 +409,25 @@ Unchanged shard artifacts are reused. The merge uses `support.sqlite3` to
 deduplicate observation and reference support exactly across shards, then
 writes `operator_library_v3.json.gz` and `build_report.json`.
 
-Run a progressive build first:
+Run a progressive Compact build first:
 
 ```powershell
 python -m core_retrosynthesis_poc build-operators-full `
-  datasets/literature/shards `
-  results/operator_retrosynthesis_poc/full_scale_v3 `
+  datasets/literature `
+  results/operator_retrosynthesis_poc/full_scale_v3/compact `
+  --library-mode compact `
   --max-shards 50 --max-rows-per-shard 10 --workers 4
 ```
 
-Remove both limits for the full corpus. Repeating the same command resumes
-unchanged shards. Use `--force` only to intentionally recompile them.
+Then remove both limits and select Full for the complete corpus. Repeating the
+same command resumes unchanged shards. Use `--force` only to intentionally
+recompile them.
 
 ```powershell
 python -m core_retrosynthesis_poc build-operators-full `
-  datasets/literature/shards `
-  results/operator_retrosynthesis_poc/full_scale_v3 `
+  datasets/literature `
+  results/operator_retrosynthesis_poc/full_scale_v3/full `
+  --library-mode full `
   --workers 6
 ```
 
@@ -445,9 +476,9 @@ Audit a genuinely held-out shard or dataset with:
 
 ```powershell
 python -m core_retrosynthesis_poc audit-operator-coverage `
-  results/operator_retrosynthesis_poc/full_scale_v3/operator_library_v3.json.gz `
+  results/operator_retrosynthesis_poc/full_scale_v3/full/operator_library_v3.json.gz `
   path/to/heldout.jsonl.gz `
-  results/operator_retrosynthesis_poc/full_scale_v3/heldout_audit `
+  results/operator_retrosynthesis_poc/full_scale_v3/full/heldout_audit `
   --max-rows 1000 --top-k 25
 ```
 
