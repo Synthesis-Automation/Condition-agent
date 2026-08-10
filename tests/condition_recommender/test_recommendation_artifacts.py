@@ -14,9 +14,6 @@ from condition_recommender.conversion.artifacts import (
     resume_saved_conversion_batch,
     save_recommendation_batch,
 )
-from condition_recommender.conversion.concise_review import (
-    CONCISE_REACTION_REVIEW_FIELDS,
-)
 from condition_recommender.generic_indexing import load_generic_index
 from condition_recommender.generic_api import GenericConditionRecommender
 
@@ -60,7 +57,7 @@ def _source_row(reaction_id: str) -> dict[str, str]:
     }
 
 
-def test_artifact_workflow_builds_recommendation_data_and_review_csv(
+def test_artifact_workflow_builds_recommendation_data_without_review_csv(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
@@ -100,7 +97,7 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     )
 
     assert report["record_count"] == 2
-    assert report["schema_version"] == "2.1"
+    assert report["schema_version"] == "2.2"
     assert report["eligible_index_record_count"] == 2
     assert report["trusted_precedent_count"] == 2
     assert report["review_core_precedent_count"] == 0
@@ -136,6 +133,8 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     assert report["artifacts"]["fast_index"]["path"].endswith(
         "generic_index.sqlite"
     )
+    assert "review_csv" not in report["artifacts"]
+    assert not (output / "reaction_review.csv").exists()
     manifest_recommender = GenericConditionRecommender.from_path(
         output / "shard_manifest.json"
     )
@@ -143,25 +142,6 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
         manifest_recommender.recommend(rows[0]["reaction_smiles"])
     )
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 2
-    with (output / "reaction_review.csv").open(
-        encoding="utf-8-sig",
-        newline="",
-    ) as handle:
-        review_rows = list(csv.DictReader(handle))
-    assert len(review_rows) == 2
-    assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
-    assert tuple(review_rows[0])[:10] == (
-        "canonical_reaction_smiles",
-        "reaction_label",
-        "primary_reaction_pattern",
-        "primary_reaction_pattern_count",
-        "reaction_pattern_matches",
-        "co_occurring_reaction_patterns",
-        "identified_reaction_type",
-        "compatible_reaction_types",
-        "reaction_pattern_confidence",
-        "reaction_pattern_requires_condition_evidence",
-    )
     assert progress[0].phase == "canonical_discovered"
     assert progress[-1].phase == "completed"
 
@@ -268,6 +248,9 @@ def test_saved_batches_combine_into_one_active_recommender(tmp_path: Path) -> No
     assert report["input_record_count"] == 2
     assert report["record_count"] == 2
     assert report["duplicate_record_count"] == 0
+    assert report["schema_version"] == "1.1"
+    assert "review_csv" not in report["artifacts"]
+    assert not (library / "reaction_review.csv").exists()
     assert (library / "combined_records.jsonl.gz").is_file()
     assert (library / "combined_batch_manifest.json").is_file()
     assert (library / "generic_index.sqlite").is_file()

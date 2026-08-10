@@ -280,6 +280,9 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.conversion_mode_combo.setObjectName("conversionMode")
         self.conversion_mode_combo.addItem("Full", "full")
         self.conversion_mode_combo.addItem("Compact", "compact")
+        self.conversion_mode_combo.setCurrentIndex(
+            self.conversion_mode_combo.findData("compact")
+        )
         self.conversion_mode_combo.setToolTip(
             "Full converts every record. Compact keeps the first 200 records "
             "in each source file plus a deterministic random 15% sample of "
@@ -554,7 +557,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
     def refresh_batch_summary(self, _value: str | int = "") -> None:
         """Show how many independently saved batches can be combined."""
         output_text = self.output_edit.text().strip()
-        mode = str(self.conversion_mode_combo.currentData() or "full")
+        mode = str(self.conversion_mode_combo.currentData() or "compact")
         library_dir = (
             recommendation_library_mode_dir(output_text, mode)
             if output_text
@@ -629,7 +632,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 "clear the RXNMapper checkbox.",
             )
             return
-        mode = str(self.conversion_mode_combo.currentData() or "full")
+        mode = str(self.conversion_mode_combo.currentData() or "compact")
         output_root = Path(output_text)
         output = recommendation_library_mode_dir(output_root, mode)
         output_resolved = output.resolve()
@@ -714,7 +717,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 "Choose the recommendation library folder.",
             )
             return
-        mode = str(self.conversion_mode_combo.currentData() or "full")
+        mode = str(self.conversion_mode_combo.currentData() or "compact")
         library_dir = recommendation_library_mode_dir(output_text, mode)
         manifests = discover_saved_conversion_batches(library_dir)
         if not manifests:
@@ -804,10 +807,6 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             self.progress_bar.setFormat(
                 f"{progress.shard_count} shard(s) • {progress.row_count} reactions"
             )
-        elif progress.phase.startswith("review"):
-            self.progress_bar.setFormat(
-                f"Writing review CSV • {progress.row_count} reactions"
-            )
         elif progress.phase.startswith("index"):
             self.progress_bar.setFormat(
                 f"Building fast index • {progress.row_count} reactions"
@@ -871,11 +870,6 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                     "  Combined canonical records: "
                     f"{artifacts['canonical_records']['path']} "
                     f"({_human_size(artifacts['canonical_records']['size_bytes'])})"
-                )
-                self._append_status(
-                    "  Combined review CSV: "
-                    f"{artifacts['review_csv']['path']} "
-                    f"({_human_size(artifacts['review_csv']['size_bytes'])})"
                 )
                 self._append_status(
                     "  Active fast recommendation index: "

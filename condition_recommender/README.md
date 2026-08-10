@@ -750,12 +750,6 @@ Each mode-specific batch library creates:
   completed shards.
 - `combined_records.jsonl.gz`: the deduplicated canonical corpus represented by
   the active index.
-- `reaction_review.csv`: the combined compact file for quick human review, including
-  structural-evidence and admission diagnostics, spectators, and
-  reactive-partner steric/electronic context. When RXNMapper is enabled it also
-  shows mapping disposition, provider, and confidence. Machine-only hash
-  identifiers and internal grouping keys are omitted; they remain available in
-  the canonical shards. The CSV is not used as recommendation input.
 - `generic_index.sqlite`: the trusted-precedent runtime index used by default.
   Rows and lookup values are materialized lazily for fast application startup.
 - `generic_review_index.sqlite`: the paired expert-use runtime index containing
@@ -764,6 +758,10 @@ Each mode-specific batch library creates:
   the trusted index, keeping its expert-use scope unambiguous across batches.
 - `combined_batch_manifest.json` and `combined_recommendation_report.json`:
   included batches, checksums, duplicate counts, output paths, and index counts.
+
+The converter does not generate a review CSV. When a human-review export is
+needed, create it explicitly with the standalone concise-review CLI; it is not
+part of conversion or index construction.
 
 The checkbox beside the conversion settings refreshes the combined index
 automatically after a batch is saved. It is unchecked by default; enable it for

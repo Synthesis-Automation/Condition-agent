@@ -39,7 +39,7 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     assert window.combine_button.isEnabled()
     assert window.batch_name_edit.objectName() == "batchName"
     assert "saved batch" in window.batch_summary.text()
-    assert window.conversion_mode_combo.currentData() == "full"
+    assert window.conversion_mode_combo.currentData() == "compact"
     assert window.conversion_mode_combo.objectName() == "conversionMode"
     assert not window.use_rxnmapper_check.isChecked()
     assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
