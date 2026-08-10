@@ -7,6 +7,7 @@ from typing import Any, Dict
 from fastapi.testclient import TestClient
 
 from app.web_api.main import create_app
+from app.web_api.runtime import LocalRecommendationRuntime
 
 
 class FakeRuntime:
@@ -44,6 +45,7 @@ class FakeRuntime:
     def recommend(self, request: Any) -> Dict[str, Any]:
         return {
             "query_reaction_smiles": request.reaction_smiles,
+            "library_mode": request.library_mode,
             "valid": True,
             "recommendations": [
                 {
@@ -69,6 +71,7 @@ class FakeRuntime:
     def discover(self, request: Any) -> Dict[str, Any]:
         return {
             "query_reaction_smiles": request.reaction_smiles,
+            "library_mode": request.library_mode,
             "valid": True,
             "hits": [{"rank": 1, "reaction_id": "rxn:1"}],
             "schema_version": "test",
@@ -114,6 +117,21 @@ def client() -> TestClient:
     return TestClient(create_app(runtime=FakeRuntime(), frontend_dist="missing"))
 
 
+def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> None:
+    for mode in ("full", "compact"):
+        mode_dir = tmp_path / mode
+        mode_dir.mkdir()
+        (mode_dir / "generic_index.sqlite").touch()
+
+    capabilities = LocalRecommendationRuntime(
+        library_root=tmp_path
+    ).capabilities()
+
+    assert capabilities["default_library_mode"] == "full"
+    assert capabilities["library_modes"]["full"]["index_available"] is True
+    assert capabilities["library_modes"]["compact"]["index_available"] is True
+
+
 def test_health_and_capabilities_are_versioned() -> None:
     web = client()
     health = web.get("/api/v1/health")
@@ -142,6 +160,7 @@ def test_recommendation_contract_forwards_validated_options() -> None:
         "/api/v1/recommendations",
         json={
             "reaction_smiles": "CCBr.N>>CCN",
+            "library_mode": "compact",
             "top_k": 4,
             "use_rxnmapper": False,
             "ranking_preferences": {
@@ -155,6 +174,7 @@ def test_recommendation_contract_forwards_validated_options() -> None:
     payload = response.json()
     assert payload["api_schema_version"] == "1.0"
     assert payload["data"]["query_reaction_smiles"] == "CCBr.N>>CCN"
+    assert payload["data"]["library_mode"] == "compact"
     assert payload["data"]["recommendations"][0]["recipe_id"] == "recipe:1"
     assert (
         payload["data"]["recommendations"][0]["synthesis_protocol"]["materials"][0]["cas"]
@@ -168,6 +188,7 @@ def test_discovery_and_svg_rendering_contracts() -> None:
         "/api/v1/discovery",
         json={
             "reaction_smiles": "CCBr.N>>CCN",
+            "library_mode": "compact",
             "view": "closest_chemistry",
             "use_rxnmapper": False,
         },
@@ -178,6 +199,7 @@ def test_discovery_and_svg_rendering_contracts() -> None:
     )
 
     assert discovery.status_code == 200
+    assert discovery.json()["data"]["library_mode"] == "compact"
     assert discovery.json()["data"]["hits"][0]["reaction_id"] == "rxn:1"
     assert drawing.status_code == 200
     assert drawing.headers["content-type"].startswith("image/svg+xml")

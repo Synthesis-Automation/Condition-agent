@@ -74,8 +74,20 @@ _RANKING_COMPONENT_LABELS = {
 }
 
 
-def default_recommendation_data_path() -> Path:
-    """Return the fastest available default recommendation artifact."""
+def default_recommendation_data_path(mode: str = "full") -> Path:
+    """Return the fastest available artifact for one library mode."""
+    normalized = mode.strip().casefold()
+    if normalized not in {"full", "compact"}:
+        raise ValueError(f"Unsupported recommendation library mode: {mode}")
+    mode_folder = DEFAULT_DATA_FOLDER / normalized
+    mode_index = mode_folder / "generic_index.sqlite"
+    if mode_index.is_file():
+        return mode_index
+    mode_manifest = mode_folder / "shard_manifest.json"
+    if mode_manifest.is_file() or normalized == "compact":
+        return mode_manifest
+    # Preserve existing installations until their root-level full artifacts are
+    # rebuilt into the new full/ directory.
     if DEFAULT_SQLITE_INDEX_PATH.is_file():
         return DEFAULT_SQLITE_INDEX_PATH
     return DEFAULT_MANIFEST_PATH
@@ -654,7 +666,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         ] = None
 
         self.data_path_edit = QtWidgets.QLineEdit(
-            str(default_recommendation_data_path())
+            str(default_recommendation_data_path("full"))
         )
         self.data_path_edit.setObjectName("recommendationDataPath")
         self.data_path_edit.setPlaceholderText(
@@ -664,6 +676,14 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.data_summary = QtWidgets.QLabel()
         self.data_summary.setObjectName("dataSummary")
         self.data_summary.setStyleSheet("color: #52606d;")
+        self.library_mode_combo = QtWidgets.QComboBox()
+        self.library_mode_combo.setObjectName("recommendationLibraryMode")
+        self.library_mode_combo.addItem("Full", "full")
+        self.library_mode_combo.addItem("Compact", "compact")
+        self.library_mode_combo.setToolTip(
+            "Full uses the complete precedent library. Compact uses the "
+            "deterministically sampled library for faster testing."
+        )
 
         self.reaction_edit = QtWidgets.QLineEdit()
         self.reaction_edit.setObjectName("reactionSmiles")
@@ -855,6 +875,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.data_label = QtWidgets.QLabel("Recommendation data")
         self.data_label.setObjectName("recommendationDataLabel")
         self.data_row_layout.addWidget(self.data_label)
+        self.data_row_layout.addWidget(self.library_mode_combo)
         self.data_row_layout.addWidget(self.data_path_edit, stretch=1)
         browse = QtWidgets.QPushButton("Browse…")
         browse.clicked.connect(self.choose_data_path)
@@ -985,6 +1006,9 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
 
     def _bind_signals(self) -> None:
         self.data_path_edit.editingFinished.connect(self._update_data_summary)
+        self.library_mode_combo.currentIndexChanged.connect(
+            self._library_mode_changed
+        )
         self.run_button.clicked.connect(self.start_recommendation)
         self.example_button.clicked.connect(self.load_example)
         self.clear_button.clicked.connect(self.clear_results)
@@ -998,6 +1022,14 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             self._synchronize_results_current_cell
         )
         self.results_table.itemSelectionChanged.connect(self._show_selected_details)
+
+    @QtCore.pyqtSlot(int)
+    def _library_mode_changed(self, _index: int) -> None:
+        """Switch to the isolated index produced for the selected build mode."""
+        mode = str(self.library_mode_combo.currentData() or "full")
+        self.data_path_edit.setText(str(default_recommendation_data_path(mode)))
+        self._update_data_summary()
+        self.clear_results()
 
     @QtCore.pyqtSlot(int)
     def _mode_changed(self, _index: int) -> None:

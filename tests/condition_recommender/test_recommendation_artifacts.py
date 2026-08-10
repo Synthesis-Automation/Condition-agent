@@ -10,6 +10,7 @@ from condition_recommender.conversion.artifacts import (
     combine_saved_recommendation_batches,
     discover_saved_conversion_batches,
     incomplete_saved_conversion_batches,
+    recommendation_library_mode_dir,
     resume_saved_conversion_batch,
     save_recommendation_batch,
 )
@@ -18,6 +19,22 @@ from condition_recommender.conversion.concise_review import (
 )
 from condition_recommender.generic_indexing import load_generic_index
 from condition_recommender.generic_api import GenericConditionRecommender
+
+
+def test_recommendation_library_modes_use_isolated_directories(
+    tmp_path: Path,
+) -> None:
+    assert recommendation_library_mode_dir(tmp_path, "Full") == tmp_path / "full"
+    assert recommendation_library_mode_dir(tmp_path, "compact") == (
+        tmp_path / "compact"
+    )
+    (tmp_path / "generic_index.sqlite").touch()
+    assert recommendation_library_mode_dir(tmp_path, "full") == tmp_path
+    assert recommendation_library_mode_dir(tmp_path, "compact") == (
+        tmp_path / "compact"
+    )
+    with pytest.raises(ValueError, match="Unsupported recommendation library"):
+        recommendation_library_mode_dir(tmp_path, "preview")
 
 
 def _source_row(reaction_id: str) -> dict[str, str]:

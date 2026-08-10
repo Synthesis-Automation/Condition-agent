@@ -197,7 +197,9 @@ def test_window_uses_literature_recommendation_data_by_default(
     assert window.reaction_row_label.layout().indexOf(window.mode_combo) == 0
     assert window.summary_box.height() == 168
     assert window.data_row_layout.indexOf(window.data_label) == 0
-    assert window.data_row_layout.indexOf(window.data_path_edit) == 1
+    assert window.data_row_layout.indexOf(window.library_mode_combo) == 1
+    assert window.data_row_layout.indexOf(window.data_path_edit) == 2
+    assert window.library_mode_combo.currentData() == "full"
     assert window.query_summary_layout.count() == 2
     assert window.reaction_image_label.objectName() == "queryReactionGraph"
     assert window.selected_details_layout.count() == 2
@@ -211,6 +213,27 @@ def test_window_uses_literature_recommendation_data_by_default(
         label.text() == "Reaction Condition Recommender"
         for label in window.findChildren(gui.QtWidgets.QLabel)
     )
+
+
+def test_window_switches_between_isolated_full_and_compact_libraries(
+    qtbot,
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(gui, "DEFAULT_DATA_FOLDER", tmp_path)
+    monkeypatch.setattr(gui, "DEFAULT_SQLITE_INDEX_PATH", tmp_path / "generic_index.sqlite")
+    monkeypatch.setattr(gui, "DEFAULT_MANIFEST_PATH", tmp_path / "shard_manifest.json")
+    window = gui.GenericRecommenderWindow()
+    qtbot.addWidget(window)
+
+    window.library_mode_combo.setCurrentIndex(
+        window.library_mode_combo.findData("compact")
+    )
+
+    assert Path(window.data_path_edit.text()) == (
+        tmp_path / "compact" / "shard_manifest.json"
+    )
+    assert "not found" in window.data_summary.text().casefold()
 
 
 def test_data_summary_prefers_selected_index_and_current_conversion_report(

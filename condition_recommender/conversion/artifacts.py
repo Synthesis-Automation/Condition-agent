@@ -37,6 +37,36 @@ SAVED_BATCH_WORKFLOW_SCHEMA_VERSION = "1.0"
 SAVED_BATCHES_DIRNAME = "batches"
 COMBINED_RECORDS_FILENAME = "combined_records.jsonl.gz"
 COMBINED_BATCH_MANIFEST_FILENAME = "combined_batch_manifest.json"
+RECOMMENDATION_LIBRARY_MODES = ("full", "compact")
+
+
+def recommendation_library_mode_dir(
+    library_root: str | Path,
+    mode: str,
+) -> Path:
+    """Return the isolated artifact directory for a library build mode.
+
+    Existing root-level libraries predate the mode layout and remain the Full
+    location until explicitly migrated. This avoids requiring an expensive Full
+    rebuild merely to introduce a Compact development library.
+    """
+    normalized = mode.strip().casefold()
+    if normalized not in RECOMMENDATION_LIBRARY_MODES:
+        raise ValueError(f"Unsupported recommendation library mode: {mode}")
+    root = Path(library_root)
+    mode_dir = root / normalized
+    legacy_full_markers = (
+        root / "shard_manifest.json",
+        root / SAVED_BATCHES_DIRNAME,
+        root / "generic_index.sqlite",
+    )
+    if (
+        normalized == "full"
+        and not mode_dir.exists()
+        and any(path.exists() for path in legacy_full_markers)
+    ):
+        return root
+    return mode_dir
 
 
 @dataclass(frozen=True)
@@ -196,6 +226,7 @@ def resume_saved_conversion_batch(
         workers=workers,
         build_fast_index=False,
         use_rxnmapper=bool(mapping_contract.get("enabled")),
+        conversion_mode=str(manifest.get("mode") or "full"),
         progress_callback=progress_callback,
         cancel_check=cancel_check,
     )
@@ -209,6 +240,7 @@ def save_recommendation_batch(
     shard_size: int = 1_000,
     workers: int = 1,
     use_rxnmapper: bool = False,
+    conversion_mode: str = "full",
     checkpoint_interval: int = 1,
     progress_callback: Optional[
         Callable[[RecommendationArtifactProgress], None]
@@ -233,6 +265,7 @@ def save_recommendation_batch(
         workers=workers,
         build_fast_index=False,
         use_rxnmapper=use_rxnmapper,
+        conversion_mode=conversion_mode,
         checkpoint_interval=checkpoint_interval,
         progress_callback=progress_callback,
         cancel_check=cancel_check,
@@ -243,6 +276,7 @@ def save_recommendation_batch(
         "batch_name": resolved_name,
         "batch_dir": str(batch_dir.resolve()),
         "library_dir": str(root.resolve()),
+        "conversion_mode": conversion_mode,
     }
     _atomic_json(batch_dir / "saved_batch_report.json", batch_report)
     return batch_report
@@ -575,6 +609,7 @@ def build_recommendation_artifacts(
     workers: int = 1,
     build_fast_index: bool = True,
     use_rxnmapper: bool = False,
+    conversion_mode: str = "full",
     checkpoint_interval: int = 1,
     progress_callback: Optional[
         Callable[[RecommendationArtifactProgress], None]
@@ -634,7 +669,7 @@ def build_recommendation_artifacts(
             selected_paths,
             destination,
             shard_size=shard_size,
-            mode="full",
+            mode=conversion_mode,
             workers=effective_workers,
             checkpoint_interval=checkpoint_interval,
             merge_records=False,
@@ -859,6 +894,7 @@ def build_recommendation_artifacts(
     report: Dict[str, Any] = {
         "schema_version": RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION,
         "artifact_type": "recommendation_artifact_build",
+        "conversion_mode": conversion_mode,
         "source_path": (
             str(selected_paths[0].resolve()) if len(selected_paths) == 1 else None
         ),

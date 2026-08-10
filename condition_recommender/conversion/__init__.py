@@ -3,11 +3,13 @@
 from .artifacts import (
     RecommendationArtifactBuildCancelled,
     RecommendationArtifactProgress,
+    RECOMMENDATION_LIBRARY_MODES,
     build_recommendation_artifacts,
     combine_saved_recommendation_batches,
     discover_saved_conversion_batches,
     incomplete_saved_conversion_batches,
     resume_saved_conversion_batch,
+    recommendation_library_mode_dir,
     save_recommendation_batch,
 )
 from .concise_review import (
@@ -29,6 +31,8 @@ __all__ = [
     "save_recommendation_batch",
     "RecommendationArtifactBuildCancelled",
     "RecommendationArtifactProgress",
+    "RECOMMENDATION_LIBRARY_MODES",
+    "recommendation_library_mode_dir",
     "convert_datasets",
     "convert_dataset_folder_to_concise_review_csv",
     "convert_generic_record",

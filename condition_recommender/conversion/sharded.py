@@ -6,6 +6,8 @@ import gzip
 import hashlib
 import io
 import json
+import math
+import random
 import shutil
 from collections import Counter
 from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
@@ -49,6 +51,9 @@ from .input_schema import (
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
 SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v5.2"
+COMPACT_ALWAYS_KEEP_ROWS = 200
+COMPACT_REMAINDER_FRACTION = 0.15
+COMPACT_SAMPLING_DEFINITION_VERSION = "compact_random_sampling.v1"
 
 
 @dataclass(frozen=True)
@@ -180,6 +185,55 @@ def _chunks(
         yield values
 
 
+def compact_selected_row_indices(
+    total_row_count: int,
+    source_sha256: str,
+) -> frozenset[int]:
+    """Select stable zero-based source rows for a compact conversion.
+
+    The first 200 records are always retained. A content-seeded pseudo-random
+    sample containing 15% of the remaining records, rounded up, is retained as
+    well. Using the source checksum as the seed keeps resume and repeated builds
+    deterministic while changing the sample when the source content changes.
+    """
+    if total_row_count < 0:
+        raise ValueError("total_row_count must not be negative")
+    if total_row_count <= COMPACT_ALWAYS_KEEP_ROWS:
+        return frozenset(range(total_row_count))
+    remainder_count = total_row_count - COMPACT_ALWAYS_KEEP_ROWS
+    sampled_count = math.ceil(remainder_count * COMPACT_REMAINDER_FRACTION)
+    seed_material = (
+        f"{COMPACT_SAMPLING_DEFINITION_VERSION}:{source_sha256}"
+    ).encode("utf-8")
+    seed = int.from_bytes(hashlib.sha256(seed_material).digest(), "big")
+    selected_remainder = random.Random(seed).sample(
+        range(COMPACT_ALWAYS_KEEP_ROWS, total_row_count),
+        sampled_count,
+    )
+    return frozenset(range(COMPACT_ALWAYS_KEEP_ROWS)) | frozenset(
+        selected_remainder
+    )
+
+
+def _iter_mode_records(
+    path: Path,
+    *,
+    mode: str,
+    source_sha256: str,
+    total_row_count: int | None,
+) -> Iterator[RawReactionRecord]:
+    records = iter_conversion_records(path)
+    if mode.casefold() != "compact":
+        yield from records
+        return
+    if total_row_count is None:
+        raise ValueError("Compact conversion requires a source row count")
+    selected = compact_selected_row_indices(total_row_count, source_sha256)
+    for row_index, record in enumerate(records):
+        if row_index in selected:
+            yield record
+
+
 def _source_key(path: Path) -> str:
     digest = hashlib.sha256(str(path.resolve()).encode("utf-8")).hexdigest()[:10]
     safe_stem = "".join(
@@ -208,6 +262,7 @@ def _reusable(
         "input_position_end",
         "input_row_count",
         "definition_contract",
+        "sampling_definition_version",
         "output_path",
     )
     if any(previous.get(key) != expected.get(key) for key in keys):
@@ -384,6 +439,8 @@ def _manifest_payload(
     contract: Mapping[str, Any],
     paths: Sequence[Path],
     source_checksums: Mapping[str, str],
+    source_input_row_counts: Mapping[str, int],
+    source_selected_row_counts: Mapping[str, int],
     source_row_counts: Mapping[str, int],
     entries: Sequence[Mapping[str, Any]],
     coverage_complete: bool,
@@ -403,11 +460,28 @@ def _manifest_payload(
         "mode": mode,
         "shard_size": shard_size,
         "max_shards": max_shards,
+        "sampling": (
+            {
+                "definition_version": COMPACT_SAMPLING_DEFINITION_VERSION,
+                "always_keep_rows": COMPACT_ALWAYS_KEEP_ROWS,
+                "remainder_fraction": COMPACT_REMAINDER_FRACTION,
+                "selection": "content_seeded_pseudorandom_without_replacement",
+                "rounding": "ceiling",
+            }
+            if mode.casefold() == "compact"
+            else None
+        ),
         "definition_contract": contract,
         "source_files": [
             {
                 "path": str(path.resolve()),
                 "sha256": source_checksums[str(path.resolve())],
+                "input_row_count": source_input_row_counts.get(
+                    str(path.resolve())
+                ),
+                "selected_row_count": source_selected_row_counts.get(
+                    str(path.resolve())
+                ),
                 "covered_row_count": source_row_counts.get(str(path.resolve()), 0),
                 "coverage_complete": coverage_complete,
             }
@@ -623,8 +697,13 @@ def validate_sharded_conversion(
         if covered_source_rows[source_path] != int(source_entry["covered_row_count"]):
             issues.append(f"source_coverage_mismatch:{source_path}")
         if source_entry.get("coverage_complete"):
-            actual_rows = sum(1 for _ in iter_conversion_records(source_path))
-            if actual_rows != int(source_entry["covered_row_count"]):
+            selected_row_count = source_entry.get("selected_row_count")
+            expected_rows = (
+                int(selected_row_count)
+                if selected_row_count is not None
+                else sum(1 for _ in iter_conversion_records(source_path))
+            )
+            if expected_rows != int(source_entry["covered_row_count"]):
                 issues.append(f"incomplete_source_coverage:{source_path}")
     report = {
         "schema_version": "1.0",
@@ -720,6 +799,8 @@ def convert_datasets_sharded(
     entries = []
     source_row_counts = Counter()
     source_checksums = {}
+    source_input_row_counts = {}
+    source_selected_row_counts = {}
     for file_number, path in enumerate(paths, start=1):
         if cancel_check is not None and cancel_check():
             raise ShardedConversionCancelled(
@@ -729,7 +810,21 @@ def convert_datasets_sharded(
             "hashing",
             f"Checking source file {file_number}/{len(paths)}: {path.name}",
         )
-        source_checksums[str(path.resolve())] = _sha256(path)
+        source_path = str(path.resolve())
+        source_checksums[source_path] = _sha256(path)
+        if mode.casefold() == "compact":
+            notify(
+                "counting",
+                f"Counting source file {file_number}/{len(paths)}: {path.name}",
+            )
+            input_row_count = sum(1 for _ in iter_conversion_records(path))
+            source_input_row_counts[source_path] = input_row_count
+            source_selected_row_counts[source_path] = len(
+                compact_selected_row_indices(
+                    input_row_count,
+                    source_checksums[source_path],
+                )
+            )
     processed_shards = 0
     accepted_since_checkpoint = 0
     accepted_row_count = 0
@@ -747,6 +842,8 @@ def convert_datasets_sharded(
                 contract=contract,
                 paths=paths,
                 source_checksums=source_checksums,
+                source_input_row_counts=source_input_row_counts,
+                source_selected_row_counts=source_selected_row_counts,
                 source_row_counts=source_row_counts,
                 entries=entries,
                 coverage_complete=coverage_complete,
@@ -796,8 +893,14 @@ def convert_datasets_sharded(
                 shard_count=len(entries),
                 row_count=accepted_row_count,
             )
+            mode_records = _iter_mode_records(
+                path,
+                mode=mode,
+                source_sha256=source_sha256,
+                total_row_count=source_input_row_counts.get(source_path),
+            )
             for part_number, raw_records in enumerate(
-                _chunks(iter_conversion_records(path), shard_size)
+                _chunks(mode_records, shard_size)
             ):
                 if cancel_check is not None and cancel_check():
                     cancelled = True
@@ -821,6 +924,11 @@ def convert_datasets_sharded(
                     "source_row_number_end": raw_records[-1].source_row_number,
                     "input_row_count": len(raw_records),
                     "definition_contract": contract,
+                    "sampling_definition_version": (
+                        COMPACT_SAMPLING_DEFINITION_VERSION
+                        if mode.casefold() == "compact"
+                        else None
+                    ),
                     "output_path": str(output_path),
                     "mode": mode,
                 }
@@ -895,6 +1003,8 @@ def convert_datasets_sharded(
         contract=contract,
         paths=paths,
         source_checksums=source_checksums,
+        source_input_row_counts=source_input_row_counts,
+        source_selected_row_counts=source_selected_row_counts,
         source_row_counts=source_row_counts,
         entries=entries,
         coverage_complete=max_shards is None,

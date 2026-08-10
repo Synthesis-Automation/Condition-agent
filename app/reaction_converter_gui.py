@@ -21,6 +21,7 @@ from condition_recommender.conversion.artifacts import (  # noqa: E402
     combine_saved_recommendation_batches,
     discover_saved_conversion_batches,
     incomplete_saved_conversion_batches,
+    recommendation_library_mode_dir,
     resume_saved_conversion_batch,
     save_recommendation_batch,
 )
@@ -108,6 +109,7 @@ class SavedBatchWorker(QtCore.QObject):
         workers: int = 1,
         combine_after_save: bool = True,
         use_rxnmapper: bool = True,
+        conversion_mode: str = "full",
     ) -> None:
         super().__init__()
         self.source_inputs = tuple(source_inputs)
@@ -117,6 +119,7 @@ class SavedBatchWorker(QtCore.QObject):
         self.workers = workers
         self.combine_after_save = combine_after_save
         self.use_rxnmapper = use_rxnmapper
+        self.conversion_mode = conversion_mode
         self._cancel_requested = False
 
     def request_cancel(self) -> None:
@@ -134,6 +137,7 @@ class SavedBatchWorker(QtCore.QObject):
                 shard_size=self.shard_size,
                 workers=self.workers,
                 use_rxnmapper=self.use_rxnmapper,
+                conversion_mode=self.conversion_mode,
                 progress_callback=self.progress.emit,
                 cancel_check=lambda: self._cancel_requested,
             )
@@ -271,6 +275,19 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.source_summary.setWordWrap(True)
         self.batch_summary = QtWidgets.QLabel()
         self.batch_summary.setObjectName("savedBatchSummary")
+
+        self.conversion_mode_combo = QtWidgets.QComboBox()
+        self.conversion_mode_combo.setObjectName("conversionMode")
+        self.conversion_mode_combo.addItem("Full", "full")
+        self.conversion_mode_combo.addItem("Compact", "compact")
+        self.conversion_mode_combo.setToolTip(
+            "Full converts every record. Compact keeps the first 200 records "
+            "in each source file plus a deterministic random 15% sample of "
+            "the remainder. Each mode has its own saved batches and index."
+        )
+        self.conversion_mode_combo.currentIndexChanged.connect(
+            self.refresh_batch_summary
+        )
 
         self.shard_size_spin = QtWidgets.QSpinBox()
         self.shard_size_spin.setObjectName("shardSize")
@@ -420,6 +437,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         output_button.clicked.connect(self.choose_output_folder)
         output_row.addWidget(output_button)
         form.addRow("Output folder:", output_row)
+        form.addRow("Library mode:", self.conversion_mode_combo)
         form.addRow("Batch name:", self.batch_name_edit)
         form.addRow("Saved data:", self.batch_summary)
 
@@ -532,16 +550,26 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     @QtCore.pyqtSlot(str)
-    def refresh_batch_summary(self, _value: str = "") -> None:
+    @QtCore.pyqtSlot(int)
+    def refresh_batch_summary(self, _value: str | int = "") -> None:
         """Show how many independently saved batches can be combined."""
         output_text = self.output_edit.text().strip()
-        count = (
-            len(discover_saved_conversion_batches(output_text))
+        mode = str(self.conversion_mode_combo.currentData() or "full")
+        library_dir = (
+            recommendation_library_mode_dir(output_text, mode)
             if output_text
+            else None
+        )
+        count = (
+            len(discover_saved_conversion_batches(library_dir))
+            if library_dir is not None
             else 0
         )
         noun = "batch" if count == 1 else "batches"
-        self.batch_summary.setText(f"{count} saved {noun} available to combine.")
+        self.batch_summary.setText(
+            f"{count} saved {noun} available to combine in the "
+            f"{mode.title()} library ({library_dir})."
+        )
 
     def _append_status(self, message: str) -> None:
         if message:
@@ -601,7 +629,9 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 "clear the RXNMapper checkbox.",
             )
             return
-        output = Path(output_text)
+        mode = str(self.conversion_mode_combo.currentData() or "full")
+        output_root = Path(output_text)
+        output = recommendation_library_mode_dir(output_root, mode)
         output_resolved = output.resolve()
         invalid_folders = [
             Path(value)
@@ -625,7 +655,10 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             f"Selected inputs: {len(source_inputs)}; discovered files: "
             f"{len(discovered)}"
         )
-        self._append_status(f"Recommendation library: {output}")
+        self._append_status(f"Recommendation library root: {output_root}")
+        self._append_status(
+            f"Conversion mode: {mode.title()}; artifacts: {output}"
+        )
         if self.batch_name_edit.text().strip():
             self._append_status(
                 f"Saved batch name: {self.batch_name_edit.text().strip()}"
@@ -654,6 +687,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             workers=self.worker_count_spin.value(),
             combine_after_save=self.build_index_check.isChecked(),
             use_rxnmapper=self.use_rxnmapper_check.isChecked(),
+            conversion_mode=mode,
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
@@ -680,7 +714,9 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 "Choose the recommendation library folder.",
             )
             return
-        manifests = discover_saved_conversion_batches(output_text)
+        mode = str(self.conversion_mode_combo.currentData() or "full")
+        library_dir = recommendation_library_mode_dir(output_text, mode)
+        manifests = discover_saved_conversion_batches(library_dir)
         if not manifests:
             QtWidgets.QMessageBox.warning(
                 self,
@@ -688,7 +724,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 "Convert and save at least one batch before building the index.",
             )
             return
-        incomplete = incomplete_saved_conversion_batches(output_text)
+        incomplete = incomplete_saved_conversion_batches(library_dir)
         resume_incomplete = False
         if incomplete:
             listed = "\n".join(f"• {path.parent}" for path in incomplete[:5])
@@ -717,11 +753,13 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         if resume_incomplete:
             self._append_status(
                 f"Resuming {len(incomplete)} incomplete conversion(s), then "
-                f"combining {len(manifests)} saved batch(es) in {output_text}"
+                f"combining {len(manifests)} saved {mode} batch(es) in "
+                f"{library_dir}"
             )
         else:
             self._append_status(
-                f"Combining {len(manifests)} saved batch(es) in {output_text}"
+                f"Combining {len(manifests)} saved {mode} batch(es) in "
+                f"{library_dir}"
             )
         self.start_button.setEnabled(False)
         self.combine_button.setEnabled(False)
@@ -732,7 +770,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
 
         thread = QtCore.QThread(self)
         worker = CombineSavedBatchesWorker(
-            output_text,
+            str(library_dir),
             resume_incomplete=resume_incomplete,
             workers=self.worker_count_spin.value(),
         )

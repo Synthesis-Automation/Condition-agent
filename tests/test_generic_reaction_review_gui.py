@@ -39,6 +39,8 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     assert window.combine_button.isEnabled()
     assert window.batch_name_edit.objectName() == "batchName"
     assert "saved batch" in window.batch_summary.text()
+    assert window.conversion_mode_combo.currentData() == "full"
+    assert window.conversion_mode_combo.objectName() == "conversionMode"
     assert not window.use_rxnmapper_check.isChecked()
     assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
     options_layout = window.options_widget.layout()
@@ -119,7 +121,15 @@ def test_saved_batch_worker_can_save_then_combine(monkeypatch) -> None:
     calls = []
 
     def fake_save(source, output, **options):
-        calls.append(("save", source, output, options["batch_name"]))
+        calls.append(
+            (
+                "save",
+                source,
+                output,
+                options["batch_name"],
+                options["conversion_mode"],
+            )
+        )
         return {
             "record_count": 3,
             "batch_name": "batch-a",
@@ -138,6 +148,7 @@ def test_saved_batch_worker_can_save_then_combine(monkeypatch) -> None:
         batch_name="batch-a",
         combine_after_save=True,
         use_rxnmapper=False,
+        conversion_mode="compact",
     )
     results = []
     worker.finished.connect(
@@ -147,7 +158,13 @@ def test_saved_batch_worker_can_save_then_combine(monkeypatch) -> None:
     worker.run()
 
     assert calls == [
-        ("save", ("first.csv", "second.csv"), "output", "batch-a"),
+        (
+            "save",
+            ("first.csv", "second.csv"),
+            "output",
+            "batch-a",
+            "compact",
+        ),
         ("combine", "output"),
     ]
     assert results[0][0]

@@ -16,6 +16,7 @@ import { ReactionEditor } from './components/ReactionEditor'
 import { DiscoveryResults, RecommendationResults } from './components/Results'
 
 type Mode = 'recommendation' | 'discovery' | 'features'
+type LibraryMode = 'full' | 'compact'
 
 const ERROR_MESSAGES: Record<string, string> = {
   INVALID_REACTION: 'The reaction could not be parsed. Check both sides and the reaction arrow.',
@@ -33,6 +34,7 @@ function friendlyError(error: unknown): string {
 function App() {
   const [reactionSmiles, setReactionSmiles] = useState('')
   const [mode, setMode] = useState<Mode>('recommendation')
+  const [libraryMode, setLibraryMode] = useState<LibraryMode>('full')
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null)
   const [profiles, setProfiles] = useState<RankingProfile[]>([])
   const [profileId, setProfileId] = useState('default')
@@ -84,6 +86,7 @@ function App() {
     try {
       const next = await api.recommend({
         reaction_smiles: reactionSmiles.trim(),
+        library_mode: libraryMode,
         top_k: topK,
         minimum_pool_size: minimumPoolSize,
         unrestricted_fallback: unrestrictedFallback,
@@ -132,6 +135,7 @@ function App() {
     try {
       const next = await api.discover({
         reaction_smiles: reactionSmiles.trim(),
+        library_mode: libraryMode,
         top_k: topK,
         view: discoveryView,
         include_low_yield: includeLowYield,
@@ -201,14 +205,17 @@ function App() {
   const recommendationResult = result && 'recommendations' in result ? result : null
   const discoveryResult = result && 'hits' in result ? result : null
   const featureResult = result && 'input_kind' in result ? result : null
+  const selectedLibraryAvailable = capabilities?.library_modes?.[libraryMode]?.index_available
+    ?? capabilities?.index_available
+    ?? false
 
   return (
     <main className="app-shell">
       <header className="topbar">
         <div><h1>Reaction Condition Recommender</h1><p>Find compatible conditions from structurally related precedents.</p></div>
         <div className="service-status">
-          <span className={`status-dot ${capabilities?.index_available ? '' : 'offline'}`} />
-          <strong>{capabilities?.index_available ? 'Index ready' : capabilities ? 'Index unavailable' : 'Connecting…'}</strong>
+          <span className={`status-dot ${selectedLibraryAvailable ? '' : 'offline'}`} />
+          <strong>{capabilities ? `${libraryMode === 'full' ? 'Full' : 'Compact'} index ${selectedLibraryAvailable ? 'ready' : 'unavailable'}` : 'Connecting…'}</strong>
         </div>
       </header>
 
@@ -233,6 +240,7 @@ function App() {
         </fieldset>
 
         <div className={`option-grid ${mode === 'features' ? 'feature-options' : ''}`}>
+          {mode !== 'features' && <label><span>Data library</span><select value={libraryMode} onChange={(event) => { setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full</option><option value="compact">Compact</option></select></label>}
           {mode !== 'features' && <label><span>Top results</span><input type="number" min="1" max="50" value={topK} onChange={(event) => setTopK(Math.min(50, Math.max(1, Number(event.target.value))))} /></label>}
           {mode === 'recommendation' ? (
             <label className="wide-option"><span>Ranking profile</span><div className="joined-control"><select value={profileId} onChange={(event) => { setProfileId(event.target.value); setCustomWeights(null) }}>{profiles.map((profile) => <option key={profile.profile_id} value={profile.profile_id}>{profile.label}</option>)}</select><button type="button" className="button quiet" onClick={() => setRankingOpen(true)} disabled={!selectedProfile}>Customize</button></div></label>
@@ -241,7 +249,7 @@ function App() {
           ) : (
             <div className="feature-mode-note"><strong>Automatic input detection</strong><span>Molecules show motifs and sites; reactions also include edits and mapping.</span></div>
           )}
-          <div className="run-control"><button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !capabilities?.index_available) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : 'Analyze features'}</button><span>{status}</span></div>
+          <div className="run-control"><button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : 'Analyze features'}</button><span>{status}</span></div>
         </div>
 
         {mode === 'discovery' && <div className="inline-checks"><label><input type="checkbox" checked={includeLowYield} onChange={(event) => setIncludeLowYield(event.target.checked)} /> Include low-yield precedents</label><label><input type="checkbox" checked={includeUnreported} onChange={(event) => setIncludeUnreported(event.target.checked)} /> Include unreported outcomes</label></div>}

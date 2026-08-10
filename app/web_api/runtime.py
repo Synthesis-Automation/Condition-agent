@@ -46,9 +46,8 @@ from .references import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_INDEX_PATH = (
-    PROJECT_ROOT / "datasets" / "literature" / "generic_index.sqlite"
-)
+DEFAULT_LIBRARY_ROOT = PROJECT_ROOT / "datasets" / "literature"
+DEFAULT_INDEX_PATH = DEFAULT_LIBRARY_ROOT / "generic_index.sqlite"
 
 
 class WebRuntime(Protocol):
@@ -80,55 +79,97 @@ class WebRuntime(Protocol):
 class LocalRecommendationRuntime:
     """Load each immutable index/mapping configuration at most once."""
 
-    def __init__(self, index_path: str | Path | None = None) -> None:
+    def __init__(
+        self,
+        index_path: str | Path | None = None,
+        *,
+        library_root: str | Path | None = None,
+    ) -> None:
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
-        self.index_path = Path(configured) if configured else DEFAULT_INDEX_PATH
+        self._configured_index_path = Path(configured) if configured else None
+        configured_library = library_root or os.environ.get(
+            "CONDITION_RECOMMENDER_LIBRARY"
+        )
+        if configured_library is not None:
+            self.library_root = Path(configured_library)
+        elif self._configured_index_path is not None:
+            configured_parent = self._configured_index_path.parent
+            self.library_root = (
+                configured_parent.parent
+                if configured_parent.name.casefold() == "full"
+                else configured_parent
+            )
+        else:
+            self.library_root = DEFAULT_LIBRARY_ROOT
+        self.index_path = self._index_path("full")
         self._recommenders: Dict[
             tuple[str, int, int, bool, bool], GenericConditionRecommender
         ] = {}
         self._lock = RLock()
         self._feature_mapping_provider: RxnMapperProvider | None = None
-        self._reference_catalog_key: tuple[str, int, int] | None = None
-        self._reference_catalog: Dict[str, Dict[str, Any]] = {}
-        self._experimental_detail_catalog_key: tuple[str, int, int] | None = None
-        self._experimental_detail_catalog: Dict[str, Dict[str, Any]] = {}
+        self._reference_catalogs: Dict[
+            tuple[str, int, int], Dict[str, Dict[str, Any]]
+        ] = {}
+        self._experimental_detail_catalogs: Dict[
+            tuple[str, int, int], Dict[str, Dict[str, Any]]
+        ] = {}
 
-    def _get_reference_catalog(self) -> Dict[str, Dict[str, Any]]:
+    def _index_path(self, library_mode: str) -> Path:
+        """Resolve one isolated Full or Compact runtime index."""
+        mode = library_mode.strip().casefold()
+        if mode not in {"full", "compact"}:
+            raise ValueError(f"unsupported library mode: {library_mode}")
+        if self._configured_index_path is not None and mode == "full":
+            return self._configured_index_path
+        candidate = self.library_root / mode / "generic_index.sqlite"
+        if mode == "full" and not candidate.is_file():
+            legacy = self.library_root / "generic_index.sqlite"
+            if legacy.is_file() or self._configured_index_path is None:
+                return legacy
+        return candidate
+
+    def _get_reference_catalog(
+        self, index_path: Path
+    ) -> Dict[str, Dict[str, Any]]:
         """Load and cache the reference artifact paired with the active index."""
 
-        catalog_path = self.index_path.parent / REFERENCE_CATALOG_FILENAME
+        catalog_path = index_path.parent / REFERENCE_CATALOG_FILENAME
         if not catalog_path.is_file():
             return {}
         stat = catalog_path.stat()
         key = (str(catalog_path.resolve()), stat.st_size, stat.st_mtime_ns)
         with self._lock:
-            if self._reference_catalog_key != key:
-                self._reference_catalog = load_reference_catalog(self.index_path)
-                self._reference_catalog_key = key
-            return self._reference_catalog
+            if key not in self._reference_catalogs:
+                self._reference_catalogs[key] = load_reference_catalog(index_path)
+            return self._reference_catalogs[key]
 
-    def _get_experimental_detail_catalog(self) -> Dict[str, Dict[str, Any]]:
+    def _get_experimental_detail_catalog(
+        self, index_path: Path
+    ) -> Dict[str, Dict[str, Any]]:
         """Load and cache observed procedures paired with the active index."""
 
         catalog_path = (
-            self.index_path.parent / EXPERIMENTAL_DETAIL_CATALOG_FILENAME
+            index_path.parent / EXPERIMENTAL_DETAIL_CATALOG_FILENAME
         )
         if not catalog_path.is_file():
             return {}
         stat = catalog_path.stat()
         key = (str(catalog_path.resolve()), stat.st_size, stat.st_mtime_ns)
         with self._lock:
-            if self._experimental_detail_catalog_key != key:
-                self._experimental_detail_catalog = (
-                    load_experimental_detail_catalog(self.index_path)
+            if key not in self._experimental_detail_catalogs:
+                self._experimental_detail_catalogs[key] = (
+                    load_experimental_detail_catalog(index_path)
                 )
-                self._experimental_detail_catalog_key = key
-            return self._experimental_detail_catalog
+            return self._experimental_detail_catalogs[key]
 
     def _cache_key(
-        self, *, use_rxnmapper: bool, include_review: bool
+        self,
+        index_path: Path,
+        *,
+        use_rxnmapper: bool,
+        include_review: bool,
     ) -> tuple[str, int, int, bool, bool]:
-        resolved = self.index_path.resolve()
+        resolved = index_path.resolve()
         stat = resolved.stat()
         return (
             str(resolved),
@@ -139,15 +180,22 @@ class LocalRecommendationRuntime:
         )
 
     def _get_recommender(
-        self, *, use_rxnmapper: bool, include_review: bool
+        self,
+        *,
+        library_mode: str,
+        use_rxnmapper: bool,
+        include_review: bool,
     ) -> GenericConditionRecommender:
-        if not self.index_path.is_file():
+        index_path = self._index_path(library_mode)
+        if not index_path.is_file():
             raise FileNotFoundError(
-                f"recommendation index is unavailable: {self.index_path.name}"
+                "recommendation index is unavailable for "
+                f"{library_mode} mode: {index_path}"
             )
         if use_rxnmapper and not RxnMapperProvider.is_available():
             raise RuntimeError("RXNMAPPER_UNAVAILABLE")
         key = self._cache_key(
+            index_path,
             use_rxnmapper=use_rxnmapper,
             include_review=include_review,
         )
@@ -159,7 +207,7 @@ class LocalRecommendationRuntime:
                 if old_key[0] == key[0] and old_key[1:3] != key[1:3]:
                     self._recommenders.pop(old_key, None)
             recommender = GenericConditionRecommender.from_path(
-                self.index_path,
+                index_path,
                 mapping_provider=(
                     RxnMapperProvider() if use_rxnmapper else None
                 ),
@@ -171,10 +219,22 @@ class LocalRecommendationRuntime:
     def capabilities(self) -> Dict[str, Any]:
         """Report local feature availability without exposing absolute paths."""
 
+        mode_paths = {
+            mode: self._index_path(mode) for mode in ("full", "compact")
+        }
         return {
             "service": "reaction-condition-recommender",
-            "index_name": self.index_path.name,
-            "index_available": self.index_path.is_file(),
+            "index_name": mode_paths["full"].name,
+            "index_available": mode_paths["full"].is_file(),
+            "default_library_mode": "full",
+            "library_modes": {
+                mode: {
+                    "label": mode.title(),
+                    "index_name": path.name,
+                    "index_available": path.is_file(),
+                }
+                for mode, path in mode_paths.items()
+            },
             "loaded_runtime_variants": len(self._recommenders),
             "rxnmapper_available": RxnMapperProvider.is_available(),
             "recommendation": True,
@@ -249,6 +309,7 @@ class LocalRecommendationRuntime:
             customized=bool(ranking.weights),
         )
         recommender = self._get_recommender(
+            library_mode=request.library_mode,
             use_rxnmapper=request.use_rxnmapper,
             include_review=request.unrestricted_fallback,
         )
@@ -262,17 +323,18 @@ class LocalRecommendationRuntime:
         )
         payload = attach_recommendation_references(
             result.to_dict(),
-            self._get_reference_catalog(),
+            self._get_reference_catalog(recommender.source_path),
         )
         return attach_recommendation_experimental_details(
             payload,
-            self._get_experimental_detail_catalog(),
+            self._get_experimental_detail_catalog(recommender.source_path),
         )
 
     def discover(self, request: DiscoveryRequest) -> Dict[str, Any]:
         """Execute exploratory precedent discovery over the shared index."""
 
         recommender = self._get_recommender(
+            library_mode=request.library_mode,
             use_rxnmapper=request.use_rxnmapper,
             include_review=request.include_review,
         )
@@ -290,11 +352,11 @@ class LocalRecommendationRuntime:
         )
         payload = attach_discovery_references(
             result.to_dict(),
-            self._get_reference_catalog(),
+            self._get_reference_catalog(recommender.source_path),
         )
         return attach_discovery_experimental_details(
             payload,
-            self._get_experimental_detail_catalog(),
+            self._get_experimental_detail_catalog(recommender.source_path),
         )
 
     def analyze_features(

@@ -26,6 +26,7 @@ from condition_recommender.conversion.input_schema import (
 )
 from condition_recommender.conversion.sharded import (
     ShardedConversionCancelled,
+    compact_selected_row_indices,
     convert_datasets_sharded,
     validate_sharded_conversion,
 )
@@ -955,6 +956,64 @@ def test_conversion_input_discovery_accepts_files_and_folders_without_duplicates
     discovered = discover_conversion_datasets((first, folder, ignored))
 
     assert discovered == (first, second)
+
+
+def test_compact_sampling_keeps_first_200_and_random_fifteen_percent() -> None:
+    small = compact_selected_row_indices(200, "a" * 64)
+    first = compact_selected_row_indices(1_000, "b" * 64)
+    repeated = compact_selected_row_indices(1_000, "b" * 64)
+    changed = compact_selected_row_indices(1_000, "c" * 64)
+
+    assert small == frozenset(range(200))
+    assert len(first) == 320
+    assert frozenset(range(200)) <= first
+    assert first == repeated
+    assert first != changed
+
+
+def test_compact_sharded_conversion_records_sampling_provenance(
+    tmp_path: Path,
+) -> None:
+    dataset = tmp_path / "compact.csv"
+    rows = [
+        _csv_row(
+            f"reaction-{index}",
+            "CCBr.N>>CCN",
+            reaction_type="untrusted",
+        )
+        for index in range(205)
+    ]
+    with dataset.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+    report = convert_datasets_sharded(
+        dataset,
+        tmp_path / "output",
+        shard_size=100,
+        mode="compact",
+        workers=1,
+    )
+    manifest = json.loads(
+        (tmp_path / "output" / "shard_manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert report["output_row_count"] == 201
+    assert manifest["mode"] == "compact"
+    assert manifest["sampling"] == {
+        "always_keep_rows": 200,
+        "definition_version": "compact_random_sampling.v1",
+        "remainder_fraction": 0.15,
+        "rounding": "ceiling",
+        "selection": "content_seeded_pseudorandom_without_replacement",
+    }
+    assert manifest["source_files"][0]["input_row_count"] == 205
+    assert manifest["source_files"][0]["selected_row_count"] == 201
+    assert manifest["source_files"][0]["covered_row_count"] == 201
+    assert manifest["source_files"][0]["coverage_complete"] is True
 
 
 def test_recursive_concise_review_cancellation_removes_temporary_file(

@@ -720,11 +720,21 @@ python -m app.reaction_converter_gui
 ```
 
 Choose any mixture of source files and folders. The output defaults to
-`datasets/literature`, but it remains editable. **Convert & Save Batch** stores
-the selection as an independent, restartable folder under `batches/`. You can
-repeat this for later groups of files. **Combine Saved Batches / Build Index**
-then streams every saved batch, removes identical duplicate observations, and
-rebuilds the active recommender artifacts in the library root. If two saved
+`datasets/literature`, but it remains editable. Select **Full** to convert every
+record or **Compact** for a faster development library. Compact retains every
+record in files with at most 200 records; for larger files it retains the first
+200 plus a content-seeded random 15% sample of the remainder, rounded up. The
+seed makes reruns and resumes deterministic. Full and Compact artifacts are
+isolated under `full/` and `compact/`, respectively. If the selected output
+already contains a root-level pre-mode library, that location remains the Full
+library so its expensive completed batches do not need to be rebuilt; Compact
+still uses `compact/`.
+
+**Convert & Save Batch** stores the selection as an independent, restartable
+folder under the selected mode's `batches/`. You can repeat this for later
+groups of files. **Combine Saved Batches / Build Index** then streams every
+saved batch in the selected mode, removes identical duplicate observations, and
+rebuilds that mode's active recommender artifacts. If two saved
 records have the same observation ID but different content, combining stops
 instead of silently choosing one. Combining also refuses any cancelled or
 otherwise incomplete batch, so partial source coverage cannot replace a
@@ -732,7 +742,7 @@ previously complete recommender index. In the desktop converter, the combine
 button offers to resume those stored source selections first, reusing valid
 checkpointed shards, and proceeds to indexing only after coverage is complete.
 
-The batch library creates:
+Each mode-specific batch library creates:
 
 - `batches/<batch-name>/shard_manifest.json` and compressed shards: canonical
   data for each independently reusable batch. A blank batch name produces a
@@ -810,12 +820,12 @@ For output made by the desktop app, use the fast index directly:
 ```powershell
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records datasets/literature/generic_index.sqlite
+  --records datasets/literature/full/generic_index.sqlite
 
 # Expert mode resolves the paired generic_review_index.sqlite automatically.
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records datasets/literature/generic_index.sqlite `
+  --records datasets/literature/full/generic_index.sqlite `
   --unrestricted
 ```
 
@@ -824,7 +834,7 @@ If the fast index was not built, use the canonical manifest instead:
 ```powershell
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records datasets/literature/shard_manifest.json
+  --records datasets/literature/full/shard_manifest.json
 ```
 
 ### Desktop recommender
@@ -835,9 +845,11 @@ Launch the simpler Qt6 interface:
 python -m app.reaction_recommender_gui
 ```
 
-It automatically selects `datasets/literature/generic_index.sqlite` when the
-lazy runtime index exists, then `shard_manifest.json` as the rebuild fallback.
-Persisted JSON runtime indexes are no longer accepted. Paste a complete
+Use the **Full / Compact** selector to switch between
+`datasets/literature/full/` and `datasets/literature/compact/`. Existing
+root-level artifacts remain a temporary Full fallback until a new Full library
+is built. The app prefers `generic_index.sqlite`, then `shard_manifest.json` as
+the rebuild fallback. Persisted JSON runtime indexes are no longer accepted. Paste a complete
 `reactants>>product` reaction SMILES and choose how many recipes to return.
 `Use RXNMapper` is checked by default; it is invoked only when supplied mapping
 and ordinary internal analysis do not already resolve the query. Clear the

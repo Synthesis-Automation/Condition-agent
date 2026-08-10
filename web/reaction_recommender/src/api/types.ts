@@ -16,6 +16,12 @@ export interface Capabilities {
   featurization: boolean
   reaction_rendering: boolean
   local_only: boolean
+  default_library_mode?: 'full' | 'compact'
+  library_modes?: Record<string, {
+    label: string
+    index_name: string
+    index_available: boolean
+  }>
 }
 
 export interface RankingProfile {
@@ -283,6 +289,7 @@ export interface DiscoveryResult {
 
 export interface RecommendationRequest {
   reaction_smiles: string
+  library_mode: 'full' | 'compact'
   top_k: number
   minimum_pool_size: number | null
   unrestricted_fallback: boolean
@@ -296,6 +303,7 @@ export interface RecommendationRequest {
 
 export interface DiscoveryRequest {
   reaction_smiles: string
+  library_mode: 'full' | 'compact'
   top_k: number
   view: string
   include_low_yield: boolean
