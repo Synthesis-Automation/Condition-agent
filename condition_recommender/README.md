@@ -23,12 +23,23 @@ python -m condition_recommender.preprocess_cli `
   --output-dir datasets/intermediate
 ```
 
+For the cleaned USPTO dataset (automatic detection selects the USPTO adapter):
+
+```powershell
+python -m condition_recommender.preprocess_cli `
+  raw_dataset/USPTO/USPTO_condition_reactions_cleaned.csv `
+  --output-dir datasets/intermediate
+```
+
 Available adapters cover the literature CSV contract, the HiTEA approved CSV,
-and the original weak-label v2.1 CSV. Automatic selection requires one exact,
-unambiguous header match. Conditions are stored as source-faithful component
-claims, identifier evidence, quantities, and ordered process stages. This
-stage does not parse molecules, validate atom mapping, assign reaction
-families, resolve registry substances, or make admission decisions.
+the cleaned USPTO condition-reaction CSV, and the original weak-label v2.1 CSV.
+The USPTO adapter prefers `remapped_rxn` when it contains atom-map syntax and
+complete reaction sides, otherwise retaining `canonical_rxn` as a clearly
+flagged fallback. Automatic selection requires one exact, unambiguous header
+match. Conditions are stored as source-faithful component claims, identifier
+evidence, quantities, and ordered process stages. This stage does not parse
+molecules, validate atom mapping, assign reaction families, resolve registry
+substances, or make admission decisions.
 
 The generic conversion engine accepts either raw CSV files or the generated
 `*.observations.jsonl.gz` artifacts. Structure-backed observations continue

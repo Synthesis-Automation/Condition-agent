@@ -174,3 +174,6 @@ tmpclaude-*
 
 # Generated and local recommendation datasets
 /datasets/
+
+# Local USPTO source dataset (exceeds GitHub's 100 MB file limit)
+/raw_dataset/USPTO/USPTO_condition_reactions_cleaned.csv

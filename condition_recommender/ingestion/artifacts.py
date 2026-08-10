@@ -15,7 +15,7 @@ from .models import INTERMEDIATE_OBSERVATION_SCHEMA_VERSION
 from .registry import detect_adapter, get_adapter
 
 
-PREPROCESSOR_DEFINITION_VERSION = "source_preprocessor.v1.0"
+PREPROCESSOR_DEFINITION_VERSION = "source_preprocessor.v1.1"
 
 
 @dataclass(frozen=True)

@@ -5,7 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, Tuple
 
-from .adapters import HiTeaCsvAdapter, LiteratureCsvAdapter, WeakLabelCsvAdapter
+from .adapters import (
+    HiTeaCsvAdapter,
+    LiteratureCsvAdapter,
+    UsptoConditionCsvAdapter,
+    WeakLabelCsvAdapter,
+)
 from .adapters.base import SourceAdapter, read_headers
 
 
@@ -14,6 +19,7 @@ _ADAPTERS: Dict[str, SourceAdapter] = {
     for adapter in (
         LiteratureCsvAdapter(),
         HiTeaCsvAdapter(),
+        UsptoConditionCsvAdapter(),
         WeakLabelCsvAdapter(),
     )
 }

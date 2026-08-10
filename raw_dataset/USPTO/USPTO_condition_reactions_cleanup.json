@@ -1,0 +1,38 @@
+{
+  "accepted_rows": 343249,
+  "dropped_columns": [
+    "dataset",
+    "rxn_category",
+    "rxn_class_name"
+  ],
+  "duplicate_rows_removed": 7,
+  "minimum_mapping_confidence": 0.5,
+  "output_columns": [
+    "source",
+    "canonical_rxn",
+    "catalyst1",
+    "solvent1",
+    "solvent2",
+    "reagent1",
+    "reagent2",
+    "remapped_rxn",
+    "confidence"
+  ],
+  "output_path": "C:/Git-softwares/Condition-agent/raw_dataset/USPTO/USPTO_condition_reactions_cleaned.csv",
+  "rejection_reason_counts": {
+    "canonical_unparseable_reaction_structure": 21,
+    "duplicate_cleaned_row": 7,
+    "low_mapping_confidence": 246943,
+    "missing_active_condition": 140376,
+    "remapped_no_mapped_transformation": 9257,
+    "remapped_unparseable_reaction_structure": 21
+  },
+  "removed_rows": 337492,
+  "required_active_condition_columns": [
+    "catalyst1",
+    "reagent1",
+    "reagent2"
+  ],
+  "source_path": "C:/Git-softwares/Condition-agent/raw_dataset/USPTO/USPTO_condition_pred_category_maped_rxn.csv",
+  "source_rows": 680741
+}

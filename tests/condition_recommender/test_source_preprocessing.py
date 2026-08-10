@@ -163,6 +163,23 @@ def _weak_row(*, fg_a: str = "ArH", fg_b: str = "ArBr") -> dict[str, str]:
     }
 
 
+def _uspto_row() -> dict[str, str]:
+    return {
+        "source": "US20090239848A1",
+        "canonical_rxn": "CBr.CN>>CNC",
+        "catalyst1": "[Pd]",
+        "solvent1": "CO",
+        "solvent2": "",
+        "reagent1": "N",
+        "reagent2": "[Na+].[OH-]",
+        "remapped_rxn": (
+            "[CH3:1][Br:2].[NH2:3][CH3:4].[Pd]>>"
+            "[CH3:1][NH:3][CH3:4]"
+        ),
+        "confidence": "0.91",
+    }
+
+
 def test_literature_preprocessing_is_source_faithful(tmp_path: Path) -> None:
     source = tmp_path / "literature.csv"
     output = tmp_path / "intermediate"
@@ -256,6 +273,70 @@ def test_hitea_preprocessing_groups_identifiers_and_preserves_outcome_basis(
     assert group["amount"]["value"] == 0.0625
     assert record["outcomes"][0]["outcome_type"] == "uv_area_yield_pct"
     assert record["outcomes"][0]["metadata"]["wavelength_nm"] == 280.0
+
+
+def test_uspto_preprocessing_prefers_mapped_reaction_and_preserves_conditions(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "USPTO_condition_reactions_cleaned.csv"
+    output = tmp_path / "intermediate"
+    _write_csv(source, [_uspto_row()])
+
+    assert detect_adapter(source).adapter_id == "uspto_condition_csv.v1"
+    report = preprocess_file(source, output)
+    record = _read_records(report["output_path"])[0]
+
+    assert report["adapter_id"] == "uspto_condition_csv.v1"
+    assert record["ingestion_status"] == "accepted"
+    assert record["reaction"]["reaction_smiles"].startswith("[CH3:1][Br:2]")
+    assert record["reaction"]["supplied_mapping_status"] == "supplied_unvalidated"
+    assert (
+        record["reaction"]["source_labels"]["reaction_smiles_source_field"]
+        == "remapped_rxn"
+    )
+    assert record["reaction"]["source_labels"]["mapping_confidence"] == 0.91
+    assert record["source"]["reference"] == "US20090239848A1"
+    assert record["source"]["source_groups"]["patent_id"] == "US20090239848A1"
+    assert [
+        (item["source_slot"], item["source_role_hint"])
+        for item in record["conditions"]["components"]
+    ] == [
+        ("catalyst1", "catalyst"),
+        ("solvent1", "solvent"),
+        ("reagent1", "reagent"),
+        ("reagent2", "reagent"),
+    ]
+    assert all(
+        item["identifiers"][0]["identifier_type"] == "smiles"
+        for item in record["conditions"]["components"]
+    )
+
+    raw_record = next(iter_conversion_records(report["output_path"]))
+    converted = convert_record(raw_record)
+    assert converted.reaction_signature is not None
+    assert converted.evidence_quality == "validated_atom_mapping"
+
+
+def test_uspto_preprocessing_falls_back_when_remapped_reaction_is_unusable(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "uspto.csv"
+    output = tmp_path / "intermediate"
+    row = _uspto_row()
+    row["remapped_rxn"] = "CBr.CN>>CNC"
+    _write_csv(source, [row])
+
+    report = preprocess_file(source, output)
+    record = _read_records(report["output_path"])[0]
+
+    assert record["reaction"]["reaction_smiles"] == row["canonical_rxn"]
+    assert record["reaction"]["supplied_mapping_status"] == "not_supplied"
+    assert (
+        record["reaction"]["source_labels"]["reaction_smiles_source_field"]
+        == "canonical_rxn"
+    )
+    assert "REMAPPED_REACTION_HAS_NO_ATOM_MAPS" in record["warnings"]
+    assert "CANONICAL_REACTION_SMILES_FALLBACK" in record["warnings"]
 
 
 def test_weak_label_preprocessing_retains_formerly_filtered_rows(
