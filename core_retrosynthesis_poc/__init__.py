@@ -1,6 +1,11 @@
 """Reaction-core-derived one-step retrosynthesis proof of concept."""
 
 from .compiler import CompilationResult, compile_core_templates
+from .condition_ranking import (
+    ConditionRankedRetrosynthesisCandidate,
+    RetrosynthesisConditionEvidence,
+    rank_retrosynthesis_candidates_with_conditions,
+)
 from .comparison import run_comparison, split_by_reference
 from .ensemble import EnsembleCandidate, disconnect_ensemble
 from .coverage_audit import audit_operator_library_coverage
@@ -61,6 +66,7 @@ from .sources import (
 __all__ = [
     "CenterReactivityContext",
     "CompilationResult",
+    "ConditionRankedRetrosynthesisCandidate",
     "CoreDisconnectionCandidate",
     "CoreLibraryBuildReport",
     "CoreTemplate",
@@ -78,6 +84,7 @@ __all__ = [
     "GenericHandleCompletionGroup",
     "GenericTemplateLibrary",
     "LIBRARY_MODES",
+    "RetrosynthesisConditionEvidence",
     "TemplateContext",
     "analyze_generic_reaction",
     "audit_operator_library_coverage",
@@ -97,6 +104,7 @@ __all__ = [
     "load_operator_rows",
     "iter_library_rows",
     "merge_operator_shards",
+    "rank_retrosynthesis_candidates_with_conditions",
     "run_comparison",
     "run_operator_coverage_benchmark",
     "render_comparison_html",

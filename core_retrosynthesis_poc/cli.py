@@ -13,6 +13,7 @@ from typing import Any, Dict, Iterable, Iterator, Optional, Sequence
 from retrosynthesis_poc.library import load_library as load_baseline_library
 
 from .comparison import run_comparison
+from .condition_ranking import rank_retrosynthesis_candidates_with_conditions
 from .diverse_benchmark import (
     load_diverse_rows,
     load_stress_rows,
@@ -280,6 +281,30 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="include retrieval and validation stage counters",
     )
+    operator_search.add_argument(
+        "--condition-index",
+        help=(
+            "generic condition index used to enrich and rerank verified "
+            "retrosynthesis candidates"
+        ),
+    )
+    operator_search.add_argument("--condition-top-k", type=int, default=3)
+    operator_search.add_argument("--condition-minimum-pool-size", type=int)
+    operator_search.add_argument(
+        "--condition-unrestricted-fallback",
+        action="store_true",
+        help="allow review-core condition precedents when the index permits it",
+    )
+    operator_search.add_argument(
+        "--condition-use-rxnmapper",
+        action="store_true",
+        help="use the configured external mapper for condition queries",
+    )
+    operator_search.add_argument(
+        "--keep-retrosynthesis-order",
+        action="store_true",
+        help="attach condition evidence without condition-informed reranking",
+    )
 
     report = commands.add_parser(
         "render-report",
@@ -487,8 +512,41 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             use_context=not arguments.no_context,
             include_l0=not arguments.skip_l0,
         )
+        condition_ranked = None
+        if arguments.condition_index:
+            from condition_recommender import GenericConditionRecommender
+            from reactive_taxonomy import RxnMapperProvider
+
+            if (
+                arguments.condition_use_rxnmapper
+                and not RxnMapperProvider.is_available()
+            ):
+                raise RuntimeError("RXNMAPPER_UNAVAILABLE")
+            condition_recommender = GenericConditionRecommender.from_path(
+                arguments.condition_index,
+                mapping_provider=(
+                    RxnMapperProvider()
+                    if arguments.condition_use_rxnmapper
+                    else None
+                ),
+                include_review=arguments.condition_unrestricted_fallback,
+            )
+            condition_ranked = rank_retrosynthesis_candidates_with_conditions(
+                candidates,
+                condition_recommender,
+                condition_top_k=arguments.condition_top_k,
+                minimum_pool_size=arguments.condition_minimum_pool_size,
+                unrestricted_fallback=(
+                    arguments.condition_unrestricted_fallback
+                ),
+                rerank=not arguments.keep_retrosynthesis_order,
+            )
         if arguments.concise:
-            for candidate in candidates:
+            for candidate in (
+                (value.candidate for value in condition_ranked)
+                if condition_ranked is not None
+                else candidates
+            ):
                 print(candidate.proposed_reaction_smiles)
             return 0
         diagnostics = None
@@ -504,18 +562,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 ),
                 use_context=not arguments.no_context,
             )
+        serialized_candidates = (
+            [value.to_dict() for value in condition_ranked]
+            if condition_ranked is not None
+            else [candidate.to_dict() for candidate in candidates]
+        )
         print(
             json.dumps(
                 {
-                    "candidates": [
-                        candidate.to_dict() for candidate in candidates
-                    ],
+                    "candidates": serialized_candidates,
                     "diagnostics": (
                         diagnostics.to_dict() if diagnostics is not None else None
                     ),
                 }
                 if arguments.diagnostics
-                else [candidate.to_dict() for candidate in candidates],
+                else serialized_candidates,
                 indent=2,
                 sort_keys=True,
             )

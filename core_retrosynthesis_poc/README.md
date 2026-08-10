@@ -508,6 +508,50 @@ Finally run the focused deterministic regression suite:
 pytest -q tests/core_retrosynthesis_poc_tests
 ```
 
+## Rank verified disconnections with condition evidence
+
+Condition recommendation is an optional application-layer step after the
+operator ladder. Supply a condition index to recommend recipes for every
+candidate whose forward validation status is `verified_signature`:
+
+```powershell
+$operatorLibrary = "results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz"
+$conditionIndex = "datasets/literature/compact/generic_index.sqlite"
+
+python -m core_retrosynthesis_poc disconnect-operators `
+  $operatorLibrary `
+  "Cc1ccnc(-c2ccccc2)c1" `
+  --top-k 5 `
+  --condition-index $conditionIndex `
+  --condition-top-k 3
+```
+
+Each candidate retains `retrosynthesis_rank` and gains
+`condition_informed_rank` plus a `condition_evidence` object containing the
+recommended canonical recipes, retrieval level, compatible and independent
+support counts, precedent reference IDs, cautions, warnings, and errors.
+Condition support is labeled as:
+
+- `recommended_direct` for verified-signature condition evidence;
+- `recommended_fallback` when type-agnostic, core, or topology fallback was
+  required;
+- `insufficient_evidence` when no compatible condition precedent was found.
+
+Reranking is deterministic and lexicographic: direct evidence precedes fallback
+evidence, which precedes insufficient evidence. Independent compatible support,
+best-recipe reference support, and recipe score break ties before the original
+retrosynthesis rank. Use `--keep-retrosynthesis-order` to attach the same
+evidence without changing candidate order.
+
+Graph validation remains authoritative. Candidates without a verified forward
+signature are not sent to the condition recommender, and condition evidence
+cannot rescue them. Conversely, missing condition evidence does not invalidate
+a structurally verified disconnection; it records uncertainty caused by sparse
+precedent coverage. Use `--condition-use-rxnmapper` only when the external
+mapper is installed, and use `--condition-unrestricted-fallback` only when the
+condition artifacts explicitly permit review-core access or trusted-index
+reuse.
+
 The command prints a progress heartbeat to stderr every 30 seconds while
 keeping the final JSON report on stdout. Compilation messages include completed
 shards, processed rows, accepted observations, reused checkpoints, throughput,
