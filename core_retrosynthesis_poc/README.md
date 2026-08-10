@@ -431,6 +431,83 @@ python -m core_retrosynthesis_poc build-operators-full `
   --workers 6
 ```
 
+## Test a Compact operator build
+
+Set the generated library path once for the following PowerShell examples:
+
+```powershell
+$library = "results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz"
+$buildReport = "results/operator_retrosynthesis_poc/full_scale_v3/compact/build_report.json"
+```
+
+First confirm that both final artifacts exist and inspect the build census:
+
+```powershell
+Test-Path $library
+Get-Content $buildReport |
+  ConvertFrom-Json |
+  Select-Object source_shards, source_rows, accepted_observations, `
+    operator_count, completion_group_count, realization_count, template_count
+```
+
+For a quick functional smoke test, pass a product SMILES—not a reaction—to the
+specificity-preserving L2-to-L1-to-L0 operator ladder:
+
+```powershell
+python -m core_retrosynthesis_poc disconnect-operators `
+  $library `
+  "Cc1ccnc(-c2ccccc2)c1" `
+  --top-k 5 --concise
+```
+
+Every printed line is a proposed `precursors>>product` reaction. An empty result
+is valid for an unsupported target, so test several products representative of
+the chemistry present in the Compact batches. Remove `--concise` and request
+diagnostics when investigating retrieval or validation:
+
+```powershell
+python -m core_retrosynthesis_poc disconnect-operators `
+  $library `
+  "Cc1ccnc(-c2ccccc2)c1" `
+  --top-k 5 `
+  --max-templates 500 `
+  --max-candidates-to-validate 100 `
+  --diagnostics
+```
+
+The JSON output exposes product-index retrieval, SMARTS applicability,
+generated precursors, validation attempts, operator mismatches, and valid
+candidates. Retained candidates should have
+`forward_validation_status: "verified_signature"`. Use `--skip-l0` to test only
+the more specific L2/L1 tiers and `--no-context` as a ranking ablation.
+
+Next run a quantitative audit against a JSONL dataset excluded from every batch
+used to build the library. For example, if the Dess–Martin observations were
+not part of the Compact build:
+
+```powershell
+python -m core_retrosynthesis_poc audit-operator-coverage `
+  $library `
+  "datasets/intermediate/DessMartin_periodinane_DMP_Alcohols__aldehydesketones.csv.observations.jsonl.gz" `
+  "results/operator_retrosynthesis_poc/full_scale_v3/compact/heldout_audit" `
+  --max-rows 100 `
+  --top-k 25 `
+  --max-templates 500 `
+  --max-candidates-to-validate 100
+```
+
+The audit writes `coverage_audit.json` with aggregate exact, synthon, operator,
+and site recall, plus `coverage_cases.jsonl.gz` with each target's successful
+stage or precise failure stage. A file is genuinely held out only when its
+observation/reference identities do not occur in any training batch; merely
+choosing a different filename is not sufficient evidence of independence.
+
+Finally run the focused deterministic regression suite:
+
+```powershell
+pytest -q tests/core_retrosynthesis_poc_tests
+```
+
 The command prints a progress heartbeat to stderr every 30 seconds while
 keeping the final JSON report on stdout. Compilation messages include completed
 shards, processed rows, accepted observations, reused checkpoints, throughput,
