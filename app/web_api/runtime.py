@@ -129,27 +129,31 @@ class LocalRecommendationRuntime:
         return candidate
 
     def _get_reference_catalog(
-        self, index_path: Path
+        self, index_path: str | Path
     ) -> Dict[str, Dict[str, Any]]:
         """Load and cache the reference artifact paired with the active index."""
 
-        catalog_path = index_path.parent / REFERENCE_CATALOG_FILENAME
+        normalized_index_path = Path(index_path)
+        catalog_path = normalized_index_path.parent / REFERENCE_CATALOG_FILENAME
         if not catalog_path.is_file():
             return {}
         stat = catalog_path.stat()
         key = (str(catalog_path.resolve()), stat.st_size, stat.st_mtime_ns)
         with self._lock:
             if key not in self._reference_catalogs:
-                self._reference_catalogs[key] = load_reference_catalog(index_path)
+                self._reference_catalogs[key] = load_reference_catalog(
+                    normalized_index_path
+                )
             return self._reference_catalogs[key]
 
     def _get_experimental_detail_catalog(
-        self, index_path: Path
+        self, index_path: str | Path
     ) -> Dict[str, Dict[str, Any]]:
         """Load and cache observed procedures paired with the active index."""
 
+        normalized_index_path = Path(index_path)
         catalog_path = (
-            index_path.parent / EXPERIMENTAL_DETAIL_CATALOG_FILENAME
+            normalized_index_path.parent / EXPERIMENTAL_DETAIL_CATALOG_FILENAME
         )
         if not catalog_path.is_file():
             return {}
@@ -158,7 +162,7 @@ class LocalRecommendationRuntime:
         with self._lock:
             if key not in self._experimental_detail_catalogs:
                 self._experimental_detail_catalogs[key] = (
-                    load_experimental_detail_catalog(index_path)
+                    load_experimental_detail_catalog(normalized_index_path)
                 )
             return self._experimental_detail_catalogs[key]
 

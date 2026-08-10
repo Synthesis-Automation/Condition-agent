@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import gzip
+import json
 from typing import Any, Dict
 
 from fastapi.testclient import TestClient
@@ -130,6 +132,39 @@ def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> No
     assert capabilities["default_library_mode"] == "full"
     assert capabilities["library_modes"]["full"]["index_available"] is True
     assert capabilities["library_modes"]["compact"]["index_available"] is True
+
+
+def test_local_runtime_loads_paired_catalogs_from_string_index_path(
+    tmp_path,
+) -> None:
+    index_path = tmp_path / "generic_index.sqlite"
+    index_path.touch()
+    reference = {"reference_id": "REF1:paper", "raw_reference": "Example"}
+    detail = {
+        "observation_id": "observation:1",
+        "reaction_id": "reaction:1",
+        "procedure_text": "Stir for 1 h.",
+    }
+    with gzip.open(
+        tmp_path / "reference_catalog.jsonl.gz", "wt", encoding="utf-8"
+    ) as handle:
+        handle.write(json.dumps(reference) + "\n")
+    with gzip.open(
+        tmp_path / "experimental_detail_catalog.jsonl.gz",
+        "wt",
+        encoding="utf-8",
+    ) as handle:
+        handle.write(json.dumps(detail) + "\n")
+
+    runtime = LocalRecommendationRuntime(index_path=index_path)
+
+    assert runtime._get_reference_catalog(str(index_path)) == {
+        "REF1:paper": reference
+    }
+    assert runtime._get_experimental_detail_catalog(str(index_path)) == {
+        "observation:observation:1": detail,
+        "reaction:reaction:1": detail,
+    }
 
 
 def test_health_and_capabilities_are_versioned() -> None:

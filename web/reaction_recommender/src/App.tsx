@@ -240,7 +240,7 @@ function App() {
         </fieldset>
 
         <div className={`option-grid ${mode === 'features' ? 'feature-options' : ''}`}>
-          {mode !== 'features' && <label><span>Data library</span><select value={libraryMode} onChange={(event) => { setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full</option><option value="compact">Compact</option></select></label>}
+          {mode !== 'features' && <label className="library-option"><span>Precedent library</span><select aria-label="Precedent library" value={libraryMode} onChange={(event) => { setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full — complete</option><option value="compact">Compact — faster</option></select></label>}
           {mode !== 'features' && <label><span>Top results</span><input type="number" min="1" max="50" value={topK} onChange={(event) => setTopK(Math.min(50, Math.max(1, Number(event.target.value))))} /></label>}
           {mode === 'recommendation' ? (
             <label className="wide-option"><span>Ranking profile</span><div className="joined-control"><select value={profileId} onChange={(event) => { setProfileId(event.target.value); setCustomWeights(null) }}>{profiles.map((profile) => <option key={profile.profile_id} value={profile.profile_id}>{profile.label}</option>)}</select><button type="button" className="button quiet" onClick={() => setRankingOpen(true)} disabled={!selectedProfile}>Customize</button></div></label>
