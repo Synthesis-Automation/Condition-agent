@@ -4,6 +4,9 @@ from .artifacts import (
     RecommendationArtifactBuildCancelled,
     RecommendationArtifactProgress,
     build_recommendation_artifacts,
+    combine_saved_recommendation_batches,
+    discover_saved_conversion_batches,
+    save_recommendation_batch,
 )
 from .concise_review import (
     convert_dataset_folder_to_concise_review_csv,
@@ -17,6 +20,9 @@ from .sampling import build_reference_safe_samples
 
 __all__ = [
     "build_recommendation_artifacts",
+    "combine_saved_recommendation_batches",
+    "discover_saved_conversion_batches",
+    "save_recommendation_batch",
     "RecommendationArtifactBuildCancelled",
     "RecommendationArtifactProgress",
     "convert_datasets",

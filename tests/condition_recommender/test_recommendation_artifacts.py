@@ -6,6 +6,9 @@ import pytest
 from condition_recommender.conversion import artifacts as artifact_module
 from condition_recommender.conversion.artifacts import (
     build_recommendation_artifacts,
+    combine_saved_recommendation_batches,
+    discover_saved_conversion_batches,
+    save_recommendation_batch,
 )
 from condition_recommender.conversion.concise_review import (
     CONCISE_REACTION_REVIEW_FIELDS,
@@ -209,3 +212,74 @@ def test_artifact_workflow_rejects_output_inside_source(
 
     with pytest.raises(ValueError, match="outside the source"):
         build_recommendation_artifacts(source, source / "generated")
+
+
+def test_saved_batches_combine_into_one_active_recommender(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    first = source / "first.csv"
+    second = source / "second.csv"
+    for path, reaction_id in ((first, "one"), (second, "two")):
+        row = _source_row(reaction_id)
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(row))
+            writer.writeheader()
+            writer.writerow(row)
+    library = tmp_path / "library"
+
+    first_report = save_recommendation_batch(
+        first,
+        library,
+        batch_name="first-batch",
+        shard_size=1,
+    )
+    second_report = save_recommendation_batch(
+        second,
+        library,
+        batch_name="second-batch",
+        shard_size=1,
+    )
+    report = combine_saved_recommendation_batches(library)
+
+    assert first_report["batch_name"] == "first-batch"
+    assert second_report["batch_name"] == "second-batch"
+    assert len(discover_saved_conversion_batches(library)) == 2
+    assert report["batch_count"] == 2
+    assert report["input_record_count"] == 2
+    assert report["record_count"] == 2
+    assert report["duplicate_record_count"] == 0
+    assert (library / "combined_records.jsonl.gz").is_file()
+    assert (library / "combined_batch_manifest.json").is_file()
+    assert (library / "generic_index.sqlite").is_file()
+    assert (library / "reference_catalog.jsonl.gz").is_file()
+    recommender = GenericConditionRecommender.from_path(
+        library / "generic_index.sqlite"
+    )
+    assert len(recommender.index.rows) == 2
+    review_recommender = GenericConditionRecommender.from_path(
+        library / "generic_index.sqlite",
+        include_review=True,
+    )
+    assert review_recommender.includes_review_precedents
+    assert len(review_recommender.index.rows) == 2
+
+
+def test_combining_saved_batches_deduplicates_identical_observations(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source.csv"
+    row = _source_row("same")
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(row))
+        writer.writeheader()
+        writer.writerow(row)
+    library = tmp_path / "library"
+    save_recommendation_batch(source, library, batch_name="one", shard_size=1)
+    save_recommendation_batch(source, library, batch_name="two", shard_size=1)
+
+    report = combine_saved_recommendation_batches(library)
+
+    assert report["input_record_count"] == 2
+    assert report["record_count"] == 1
+    assert report["duplicate_record_count"] == 1
+    assert len(load_generic_index(library / "generic_index.sqlite").rows) == 1

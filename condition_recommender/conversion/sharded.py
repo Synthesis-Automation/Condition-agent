@@ -433,60 +433,66 @@ def _merge_counts(
     return dict(sorted(counts.items()))
 
 
-def _write_catalogs(
-    manifest: Mapping[str, Any],
-    destination: Path,
+def write_conversion_catalogs(
+    records: Iterable[Mapping[str, Any]],
+    destination: str | Path,
 ) -> Dict[str, Any]:
+    """Write the canonical recipe, reference, and procedure catalogs.
+
+    The input is deliberately a record iterable rather than a shard manifest so
+    saved conversion batches can be combined without re-running chemistry.
+    """
+    output_dir = Path(destination)
+    output_dir.mkdir(parents=True, exist_ok=True)
     recipes: Dict[str, Mapping[str, Any]] = {}
     references: Dict[str, Mapping[str, Any]] = {}
     series: Dict[str, Dict[str, Any]] = {}
     experimental_details: Dict[str, Dict[str, Any]] = {}
-    for entry in manifest["shards"]:
-        for record in iter_gzip_jsonl(destination / entry["output_path"]):
-            recipe_id = str(record.get("resolved_recipe_id") or "")
-            if recipe_id and isinstance(record.get("resolved_recipe"), Mapping):
-                recipes.setdefault(recipe_id, record["resolved_recipe"])
-            reference_id = str(record.get("reference_id") or "")
-            if reference_id and isinstance(record.get("reference_identity"), Mapping):
-                references.setdefault(reference_id, record["reference_identity"])
-            series_id = str(record.get("reference_condition_series_id") or "")
-            if series_id:
-                item = series.setdefault(
-                    series_id,
-                    {
-                        "reference_condition_series_id": series_id,
-                        "reference_id": reference_id,
-                        "recipe_core_ids": set(),
-                        "canonical_reaction_ids": set(),
-                        "observation_count": 0,
-                    },
-                )
-                recipe_core_id = str(record.get("resolved_recipe_core_id") or "")
-                reaction_id = str(record.get("canonical_reaction_id") or "")
-                if recipe_core_id:
-                    item["recipe_core_ids"].add(recipe_core_id)
-                if reaction_id:
-                    item["canonical_reaction_ids"].add(reaction_id)
-                item["observation_count"] += 1
-            source = record.get("source") or {}
-            procedure = str(source.get("experimental_procedure") or "").strip()
-            observation_id = str(record.get("observation_id") or "")
-            source_reaction_id = str(record.get("reaction_id") or "")
-            if procedure and (observation_id or source_reaction_id):
-                key = observation_id or source_reaction_id
-                experimental_details.setdefault(
-                    key,
-                    {
-                        "observation_id": observation_id,
-                        "reaction_id": source_reaction_id,
-                        "source_dataset": str(record.get("source_dataset") or ""),
-                        "reference_id": reference_id,
-                        "procedure_text": procedure,
-                        "notes": str(source.get("notes") or "").strip(),
-                        "stages": source.get("stages"),
-                        "steps": source.get("steps"),
-                    },
-                )
+    for record in records:
+        recipe_id = str(record.get("resolved_recipe_id") or "")
+        if recipe_id and isinstance(record.get("resolved_recipe"), Mapping):
+            recipes.setdefault(recipe_id, record["resolved_recipe"])
+        reference_id = str(record.get("reference_id") or "")
+        if reference_id and isinstance(record.get("reference_identity"), Mapping):
+            references.setdefault(reference_id, record["reference_identity"])
+        series_id = str(record.get("reference_condition_series_id") or "")
+        if series_id:
+            item = series.setdefault(
+                series_id,
+                {
+                    "reference_condition_series_id": series_id,
+                    "reference_id": reference_id,
+                    "recipe_core_ids": set(),
+                    "canonical_reaction_ids": set(),
+                    "observation_count": 0,
+                },
+            )
+            recipe_core_id = str(record.get("resolved_recipe_core_id") or "")
+            reaction_id = str(record.get("canonical_reaction_id") or "")
+            if recipe_core_id:
+                item["recipe_core_ids"].add(recipe_core_id)
+            if reaction_id:
+                item["canonical_reaction_ids"].add(reaction_id)
+            item["observation_count"] += 1
+        source = record.get("source") or {}
+        procedure = str(source.get("experimental_procedure") or "").strip()
+        observation_id = str(record.get("observation_id") or "")
+        source_reaction_id = str(record.get("reaction_id") or "")
+        if procedure and (observation_id or source_reaction_id):
+            key = observation_id or source_reaction_id
+            experimental_details.setdefault(
+                key,
+                {
+                    "observation_id": observation_id,
+                    "reaction_id": source_reaction_id,
+                    "source_dataset": str(record.get("source_dataset") or ""),
+                    "reference_id": reference_id,
+                    "procedure_text": procedure,
+                    "notes": str(source.get("notes") or "").strip(),
+                    "stages": source.get("stages"),
+                    "steps": source.get("steps"),
+                },
+            )
     paths = {
         "recipe_catalog": Path("recipe_catalog.jsonl.gz"),
         "reference_catalog": Path("reference_catalog.jsonl.gz"),
@@ -498,15 +504,15 @@ def _write_catalogs(
         ),
     }
     _write_gzip_jsonl(
-        destination / paths["recipe_catalog"],
+        output_dir / paths["recipe_catalog"],
         (recipes[key] for key in sorted(recipes)),
     )
     _write_gzip_jsonl(
-        destination / paths["reference_catalog"],
+        output_dir / paths["reference_catalog"],
         (references[key] for key in sorted(references)),
     )
     _write_gzip_jsonl(
-        destination / paths["reference_condition_series_catalog"],
+        output_dir / paths["reference_condition_series_catalog"],
         (
             {
                 **series[key],
@@ -517,17 +523,29 @@ def _write_catalogs(
         ),
     )
     _write_gzip_jsonl(
-        destination / paths["experimental_detail_catalog"],
+        output_dir / paths["experimental_detail_catalog"],
         (experimental_details[key] for key in sorted(experimental_details)),
     )
     return {
         name: {
             "path": str(path),
-            "sha256": _sha256(destination / path),
-            "row_count": sum(1 for _ in iter_gzip_jsonl(destination / path)),
+            "sha256": _sha256(output_dir / path),
+            "row_count": sum(1 for _ in iter_gzip_jsonl(output_dir / path)),
         }
         for name, path in paths.items()
     }
+
+
+def _write_catalogs(
+    manifest: Mapping[str, Any],
+    destination: Path,
+) -> Dict[str, Any]:
+    records = (
+        record
+        for entry in manifest["shards"]
+        for record in iter_gzip_jsonl(destination / entry["output_path"])
+    )
+    return write_conversion_catalogs(records, destination)
 
 
 def _merge_shards(manifest: Mapping[str, Any], destination: Path) -> Dict[str, Any]:
@@ -1012,5 +1030,6 @@ __all__ = [
     "ShardedConversionProgress",
     "convert_datasets_sharded",
     "iter_gzip_jsonl",
+    "write_conversion_catalogs",
     "validate_sharded_conversion",
 ]

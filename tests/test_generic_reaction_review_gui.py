@@ -34,8 +34,12 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     assert not window.cancel_button.isEnabled()
     assert Path(window.output_edit.text()) == gui.DEFAULT_OUTPUT_FOLDER
     assert window.shard_size_spin.value() == 1_000
-    assert window.build_index_check.isChecked()
-    assert window.use_rxnmapper_check.isChecked()
+    assert not window.build_index_check.isChecked()
+    assert window.combine_button.objectName() == "combineIndexButton"
+    assert window.combine_button.isEnabled()
+    assert window.batch_name_edit.objectName() == "batchName"
+    assert "saved batch" in window.batch_summary.text()
+    assert not window.use_rxnmapper_check.isChecked()
     assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
     options_layout = window.options_widget.layout()
     assert isinstance(options_layout, QtWidgets.QHBoxLayout)
@@ -45,9 +49,6 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
         label.text().startswith("Outputs: shard_manifest.json")
         for label in window.findChildren(QtWidgets.QLabel)
     )
-    assert window.worker_count_spin.value() == 1
-    assert not window.worker_count_spin.isEnabled()
-    window.use_rxnmapper_check.setChecked(False)
     assert window.worker_count_spin.isEnabled()
     window.use_rxnmapper_check.setChecked(True)
     assert window.worker_count_spin.value() == 1
@@ -112,3 +113,43 @@ def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
     assert results == [
         (True, {"record_count": 10, "output_dir": "output"}, "")
     ]
+
+
+def test_saved_batch_worker_can_save_then_combine(monkeypatch) -> None:
+    calls = []
+
+    def fake_save(source, output, **options):
+        calls.append(("save", source, output, options["batch_name"]))
+        return {
+            "record_count": 3,
+            "batch_name": "batch-a",
+            "batch_dir": "output/batches/batch-a",
+        }
+
+    def fake_combine(output, **options):
+        calls.append(("combine", output))
+        return {"record_count": 5, "output_dir": output}
+
+    monkeypatch.setattr(gui, "save_recommendation_batch", fake_save)
+    monkeypatch.setattr(gui, "combine_saved_recommendation_batches", fake_combine)
+    worker = gui.SavedBatchWorker(
+        ("first.csv", "second.csv"),
+        "output",
+        batch_name="batch-a",
+        combine_after_save=True,
+        use_rxnmapper=False,
+    )
+    results = []
+    worker.finished.connect(
+        lambda success, report, error: results.append((success, report, error))
+    )
+
+    worker.run()
+
+    assert calls == [
+        ("save", ("first.csv", "second.csv"), "output", "batch-a"),
+        ("combine", "output"),
+    ]
+    assert results[0][0]
+    assert results[0][1]["saved_batch"]["record_count"] == 3
+    assert results[0][1]["combined"]["record_count"] == 5

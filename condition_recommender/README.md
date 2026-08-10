@@ -719,14 +719,24 @@ review CSV:
 python -m app.reaction_converter_gui
 ```
 
-Choose the source dataset folder. The output defaults to
-`datasets/literature`, but it remains editable. The app finds CSV files in all
-subfolders and creates:
+Choose any mixture of source files and folders. The output defaults to
+`datasets/literature`, but it remains editable. **Convert & Save Batch** stores
+the selection as an independent, restartable folder under `batches/`. You can
+repeat this for later groups of files. **Combine Saved Batches / Build Index**
+then streams every saved batch, removes identical duplicate observations, and
+rebuilds the active recommender artifacts in the library root. If two saved
+records have the same observation ID but different content, combining stops
+instead of silently choosing one.
 
-- `shard_manifest.json` and `shards/*.jsonl.gz`: the complete canonical
-  recommendation data. Shards are compressed and completed shards are reused
-  after cancellation or restart.
-- `reaction_review.csv`: the compact file for quick human review, including
+The batch library creates:
+
+- `batches/<batch-name>/shard_manifest.json` and compressed shards: canonical
+  data for each independently reusable batch. A blank batch name produces a
+  stable name from the selected inputs, so cancellation or restart reuses
+  completed shards.
+- `combined_records.jsonl.gz`: the deduplicated canonical corpus represented by
+  the active index.
+- `reaction_review.csv`: the combined compact file for quick human review, including
   structural-evidence and admission diagnostics, spectators, and
   reactive-partner steric/electronic context. When RXNMapper is enabled it also
   shows mapping disposition, provider, and confidence. Machine-only hash
@@ -735,29 +745,28 @@ subfolders and creates:
 - `generic_index.sqlite`: the trusted-precedent runtime index used by default.
   Rows and lookup values are materialized lazily for fast application startup.
 - `generic_review_index.sqlite`: the paired expert-use runtime index containing
-  the trusted rows plus qualified review-core precedents. It is omitted when no
-  additional review-core rows exist; expert mode then reuses the trusted index
-  as declared by the artifact report.
-- `recommendation_artifacts_report.json`: row counts, output paths, settings,
-  reuse counts, and file sizes.
+  the trusted rows plus qualified review-core precedents. The combined workflow
+  writes this explicitly even when it currently contains the same reactions as
+  the trusted index, keeping its expert-use scope unambiguous across batches.
+- `combined_batch_manifest.json` and `combined_recommendation_report.json`:
+  included batches, checksums, duplicate counts, output paths, and index counts.
 
-The app does not keep an additional merged copy of all canonical records. This
-avoids duplicating the largest data on disk. If the fast index is disabled, the
-recommender can still use `shard_manifest.json`, but it must rebuild lookup maps
-when loading.
+The checkbox beside the conversion settings refreshes the combined index
+automatically after a batch is saved. It is unchecked by default; enable it for
+a one-step save-and-refresh, or use the combine button after saving all batches.
 
 The default settings are intended for large datasets:
 
 - `1,000` rows per shard gives useful restart points without creating too many
   small files.
-- `Use RXNMapper` is checked by default. It runs one conversion worker so one
-  model copy is loaded; clear the checkbox to restore parallel workers.
+- `Use RXNMapper` is unchecked by default, leaving parallel workers available.
+  Enabling it uses one conversion worker so only one model copy is loaded.
 - Mapper-only or conflicting records never become precedents. Full-coverage
   external mappings that agree with an internal hypothesis may enter only the
   expert review-core index. The mapper setting and model hash participate in
   shard reuse identity.
-- Keep the fast index enabled for routine recommendation. Disable it only when
-  conversion size matters more than startup speed.
+- Automatic combining is unchecked by default. Save all intended batches, then
+  combine once to avoid repeated index builds.
 
 Cancellation is safe: the active shard finishes, the manifest is checkpointed,
 and choosing the same source and output folders later resumes by reusing valid

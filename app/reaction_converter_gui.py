@@ -18,6 +18,9 @@ from condition_recommender.conversion.artifacts import (  # noqa: E402
     RecommendationArtifactBuildCancelled,
     RecommendationArtifactProgress,
     build_recommendation_artifacts,
+    combine_saved_recommendation_batches,
+    discover_saved_conversion_batches,
+    save_recommendation_batch,
 )
 from condition_recommender.conversion.input_schema import (  # noqa: E402
     discover_conversion_datasets,
@@ -87,6 +90,112 @@ class ReviewConversionWorker(QtCore.QObject):
             self.finished.emit(True, report, "")
 
 
+class SavedBatchWorker(QtCore.QObject):
+    """Save one conversion batch and optionally rebuild the combined index."""
+
+    progress = QtCore.pyqtSignal(object)
+    finished = QtCore.pyqtSignal(bool, object, str)
+
+    def __init__(
+        self,
+        source_inputs: Iterable[str],
+        library_folder: str,
+        *,
+        batch_name: str = "",
+        shard_size: int = 1_000,
+        workers: int = 1,
+        combine_after_save: bool = True,
+        use_rxnmapper: bool = True,
+    ) -> None:
+        super().__init__()
+        self.source_inputs = tuple(source_inputs)
+        self.library_folder = library_folder
+        self.batch_name = batch_name
+        self.shard_size = shard_size
+        self.workers = workers
+        self.combine_after_save = combine_after_save
+        self.use_rxnmapper = use_rxnmapper
+        self._cancel_requested = False
+
+    def request_cancel(self) -> None:
+        """Request a safe stop after the active conversion unit."""
+        self._cancel_requested = True
+
+    @QtCore.pyqtSlot()
+    def run(self) -> None:
+        """Save the selected batch and optionally refresh active artifacts."""
+        try:
+            batch_report = save_recommendation_batch(
+                self.source_inputs,
+                self.library_folder,
+                batch_name=self.batch_name,
+                shard_size=self.shard_size,
+                workers=self.workers,
+                use_rxnmapper=self.use_rxnmapper,
+                progress_callback=self.progress.emit,
+                cancel_check=lambda: self._cancel_requested,
+            )
+            combined_report = None
+            if self.combine_after_save:
+                combined_report = combine_saved_recommendation_batches(
+                    self.library_folder,
+                    progress_callback=self.progress.emit,
+                    cancel_check=lambda: self._cancel_requested,
+                )
+        except RecommendationArtifactBuildCancelled as exc:
+            self.finished.emit(False, {}, str(exc))
+        except Exception as exc:
+            self.finished.emit(False, {}, f"{type(exc).__name__}: {exc}")
+        else:
+            self.finished.emit(
+                True,
+                {
+                    "operation": "save_batch",
+                    "output_dir": self.library_folder,
+                    "record_count": batch_report["record_count"],
+                    "saved_batch": batch_report,
+                    "combined": combined_report,
+                },
+                "",
+            )
+
+
+class CombineSavedBatchesWorker(QtCore.QObject):
+    """Build active recommender artifacts from all saved conversion batches."""
+
+    progress = QtCore.pyqtSignal(object)
+    finished = QtCore.pyqtSignal(bool, object, str)
+
+    def __init__(self, library_folder: str) -> None:
+        super().__init__()
+        self.library_folder = library_folder
+        self._cancel_requested = False
+
+    def request_cancel(self) -> None:
+        """Request cancellation at the next safe checkpoint."""
+        self._cancel_requested = True
+
+    @QtCore.pyqtSlot()
+    def run(self) -> None:
+        """Combine saved batches and emit the resulting active index report."""
+        try:
+            report = combine_saved_recommendation_batches(
+                self.library_folder,
+                progress_callback=self.progress.emit,
+                cancel_check=lambda: self._cancel_requested,
+            )
+        except RecommendationArtifactBuildCancelled as exc:
+            self.finished.emit(False, {}, str(exc))
+        except Exception as exc:
+            self.finished.emit(False, {}, f"{type(exc).__name__}: {exc}")
+        else:
+            self.finished.emit(
+                True,
+                {**report, "operation": "combine_batches"},
+                "",
+            )
+
+
 class GenericReactionReviewWindow(QtWidgets.QWidget):
     """Desktop controller for canonical conversion and review export."""
 
@@ -96,7 +205,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.setWindowTitle("Reaction Recommendation Dataset Builder")
         self.resize(880, 680)
         self.thread: Optional[QtCore.QThread] = None
-        self.worker: Optional[ReviewConversionWorker] = None
+        self.worker: Optional[QtCore.QObject] = None
         self._automatic_output = str(DEFAULT_OUTPUT_FOLDER)
         self._completed_output: Optional[Path] = None
 
@@ -110,11 +219,19 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.output_edit = QtWidgets.QLineEdit()
         self.output_edit.setObjectName("outputFolder")
         self.output_edit.setPlaceholderText(
-            "Folder for canonical data, review CSV, and index"
+            "Library folder for saved batches and the combined index"
         )
         self.output_edit.setText(self._automatic_output)
+        self.output_edit.textChanged.connect(self.refresh_batch_summary)
+        self.batch_name_edit = QtWidgets.QLineEdit()
+        self.batch_name_edit.setObjectName("batchName")
+        self.batch_name_edit.setPlaceholderText(
+            "Optional; leave blank for a stable name based on the selected inputs"
+        )
         self.source_summary = QtWidgets.QLabel("No source files or folders selected.")
         self.source_summary.setWordWrap(True)
+        self.batch_summary = QtWidgets.QLabel()
+        self.batch_summary.setObjectName("savedBatchSummary")
 
         self.shard_size_spin = QtWidgets.QSpinBox()
         self.shard_size_spin.setObjectName("shardSize")
@@ -135,19 +252,20 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "more memory."
         )
         self.build_index_check = QtWidgets.QCheckBox(
-            "Build compressed fast-load recommendation index"
+            "Combine all saved batches and rebuild the index after saving"
         )
         self.build_index_check.setObjectName("buildFastIndex")
-        self.build_index_check.setChecked(True)
+        self.build_index_check.setChecked(False)
         self.build_index_check.setToolTip(
-            "Recommended for repeated use. It takes extra conversion time and "
-            "disk space, but avoids rebuilding lookup maps when recommending."
+            "When checked, the active recommender index is refreshed after this "
+            "batch is saved. You can also rebuild it later with the Combine / "
+            "Build Index button."
         )
         self.use_rxnmapper_check = QtWidgets.QCheckBox(
             "Use RXNMapper for unresolved, ambiguous, or missing-core reactions"
         )
         self.use_rxnmapper_check.setObjectName("useRxnMapper")
-        self.use_rxnmapper_check.setChecked(True)
+        self.use_rxnmapper_check.setChecked(False)
         self.use_rxnmapper_check.setToolTip(
             "Checked by default. RXNMapper proposals are reconciled with "
             "internal evidence; resolved reactions retain their internal "
@@ -155,7 +273,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "One worker is used to avoid loading multiple model copies."
         )
         self.use_rxnmapper_check.toggled.connect(self._sync_rxnmapper_worker_setting)
-        self._sync_rxnmapper_worker_setting(True)
+        self._sync_rxnmapper_worker_setting(False)
 
         self.options_widget = QtWidgets.QWidget()
         self.options_widget.setObjectName("conversionOptions")
@@ -166,7 +284,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         options_layout.addWidget(self.build_index_check)
         options_layout.addStretch()
 
-        self.start_button = QtWidgets.QPushButton("Generate Recommendation Data")
+        self.start_button = QtWidgets.QPushButton("Convert && Save Batch")
         self.start_button.setObjectName("generateButton")
         self.start_button.setDefault(True)
         self.start_button.setStyleSheet(
@@ -185,6 +303,10 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.cancel_button = QtWidgets.QPushButton("Cancel")
         self.cancel_button.setObjectName("cancelButton")
         self.cancel_button.setEnabled(False)
+        self.combine_button = QtWidgets.QPushButton(
+            "Combine Saved Batches / Build Index"
+        )
+        self.combine_button.setObjectName("combineIndexButton")
         self.open_button = QtWidgets.QPushButton("Open Output Folder")
         self.open_button.setObjectName("openOutputButton")
         self.open_button.setEnabled(False)
@@ -203,8 +325,10 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
 
         self._build_layout()
         self.start_button.clicked.connect(self.start_conversion)
+        self.combine_button.clicked.connect(self.start_combining)
         self.cancel_button.clicked.connect(self.cancel_conversion)
         self.open_button.clicked.connect(self.open_output_folder)
+        self.refresh_batch_summary()
 
     def _build_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -216,10 +340,10 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         layout.addWidget(title)
         description = QtWidgets.QLabel(
             "Convert selected raw CSV or preprocessed observation files, or "
-            "every supported file in selected folder trees, then produce "
-            "compressed recommendation data and a concise review CSV from the "
-            "same canonical records. Interrupted conversions can reuse "
-            "completed shards."
+            "every supported file in selected folder trees, into a reusable "
+            "saved batch. Repeat this for later files, then combine every saved "
+            "batch into the active recommender index. Interrupted conversions "
+            "can reuse completed shards."
         )
         description.setWordWrap(True)
         layout.addWidget(description)
@@ -257,6 +381,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         output_button.clicked.connect(self.choose_output_folder)
         output_row.addWidget(output_button)
         form.addRow("Output folder:", output_row)
+        form.addRow("Batch name:", self.batch_name_edit)
+        form.addRow("Saved data:", self.batch_summary)
 
         settings_row = QtWidgets.QHBoxLayout()
         settings_row.addWidget(QtWidgets.QLabel("Rows per shard"))
@@ -271,6 +397,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
 
         button_row = QtWidgets.QHBoxLayout()
         button_row.addWidget(self.start_button)
+        button_row.addWidget(self.combine_button)
         button_row.addWidget(self.cancel_button)
         button_row.addWidget(self.open_button)
         button_row.addStretch()
@@ -364,6 +491,19 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             f"{file_count} selected file(s) and {folder_count} folder(s)."
         )
 
+    @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot(str)
+    def refresh_batch_summary(self, _value: str = "") -> None:
+        """Show how many independently saved batches can be combined."""
+        output_text = self.output_edit.text().strip()
+        count = (
+            len(discover_saved_conversion_batches(output_text))
+            if output_text
+            else 0
+        )
+        noun = "batch" if count == 1 else "batches"
+        self.batch_summary.setText(f"{count} saved {noun} available to combine.")
+
     def _append_status(self, message: str) -> None:
         if message:
             self.status_box.appendPlainText(message)
@@ -446,29 +586,82 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             f"Selected inputs: {len(source_inputs)}; discovered files: "
             f"{len(discovered)}"
         )
-        self._append_status(f"Output folder: {output}")
+        self._append_status(f"Recommendation library: {output}")
+        if self.batch_name_edit.text().strip():
+            self._append_status(
+                f"Saved batch name: {self.batch_name_edit.text().strip()}"
+            )
         self._append_status(
             f"Settings: {self.shard_size_spin.value()} rows/shard, "
             f"{self.worker_count_spin.value()} worker(s), "
             f"RXNMapper "
             f"{'on' if self.use_rxnmapper_check.isChecked() else 'off'}, "
-            f"fast index {'on' if self.build_index_check.isChecked() else 'off'}"
+            "combine after save "
+            f"{'on' if self.build_index_check.isChecked() else 'off'}"
         )
         self.start_button.setEnabled(False)
+        self.combine_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.open_button.setEnabled(False)
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setFormat("Discovering files…")
 
         thread = QtCore.QThread(self)
-        worker = ReviewConversionWorker(
+        worker = SavedBatchWorker(
             source_inputs,
             str(output),
+            batch_name=self.batch_name_edit.text().strip(),
             shard_size=self.shard_size_spin.value(),
             workers=self.worker_count_spin.value(),
-            build_fast_index=self.build_index_check.isChecked(),
+            combine_after_save=self.build_index_check.isChecked(),
             use_rxnmapper=self.use_rxnmapper_check.isChecked(),
         )
+        worker.moveToThread(thread)
+        thread.started.connect(worker.run)
+        worker.progress.connect(self._on_progress)
+        worker.finished.connect(self._on_finished)
+        worker.finished.connect(thread.quit)
+        thread.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(self._clear_thread)
+        self.thread = thread
+        self.worker = worker
+        thread.start()
+
+    @QtCore.pyqtSlot()
+    def start_combining(self) -> None:
+        """Combine all saved batches into the active recommender index."""
+        if self.thread is not None:
+            return
+        output_text = self.output_edit.text().strip()
+        if not output_text:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Output required",
+                "Choose the recommendation library folder.",
+            )
+            return
+        manifests = discover_saved_conversion_batches(output_text)
+        if not manifests:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "No saved batches",
+                "Convert and save at least one batch before building the index.",
+            )
+            return
+        self.status_box.clear()
+        self._append_status(
+            f"Combining {len(manifests)} saved batch(es) in {output_text}"
+        )
+        self.start_button.setEnabled(False)
+        self.combine_button.setEnabled(False)
+        self.cancel_button.setEnabled(True)
+        self.open_button.setEnabled(False)
+        self.progress_bar.setRange(0, 0)
+        self.progress_bar.setFormat("Combining saved batches…")
+
+        thread = QtCore.QThread(self)
+        worker = CombineSavedBatchesWorker(output_text)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.progress.connect(self._on_progress)
@@ -507,6 +700,10 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             self.progress_bar.setFormat(
                 f"Building fast index • {progress.row_count} reactions"
             )
+        elif progress.phase.startswith("combine"):
+            self.progress_bar.setFormat(
+                f"Combining batches • {progress.row_count} reactions"
+            )
         else:
             self.progress_bar.setFormat(progress.message)
         self._append_status(progress.message)
@@ -519,59 +716,79 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         error: str,
     ) -> None:
         self.start_button.setEnabled(True)
+        self.combine_button.setEnabled(True)
         self.cancel_button.setEnabled(False)
         if success:
             self.progress_bar.setRange(0, 1)
             self.progress_bar.setValue(1)
-            self.progress_bar.setFormat(
-                f"Complete • {report['record_count']} reactions"
+            operation = str(report.get("operation") or "")
+            combined = report.get("combined")
+            active_report = (
+                combined
+                if isinstance(combined, dict)
+                else report if operation == "combine_batches" else None
             )
+            if operation == "save_batch":
+                batch = report["saved_batch"]
+                self.progress_bar.setFormat(
+                    f"Batch saved • {batch['record_count']} reactions"
+                )
+                self._append_status(
+                    f"Saved batch '{batch['batch_name']}': "
+                    f"{batch['record_count']} reaction(s) in {batch['batch_dir']}"
+                )
+                self._append_status(
+                    f"  Canonical manifest: "
+                    f"{batch['artifacts']['canonical_manifest']['path']}"
+                )
+                if active_report is None:
+                    self._append_status(
+                        "The batch is saved. Use Combine Saved Batches / Build "
+                        "Index when you are ready to refresh the recommender."
+                    )
+            else:
+                self.progress_bar.setFormat(
+                    f"Combined index ready • {report['record_count']} reactions"
+                )
             self._completed_output = Path(report["output_dir"])
             self.open_button.setEnabled(True)
-            artifacts = report["artifacts"]
-            self._append_status("Ready:")
-            self._append_status(
-                "  Canonical data manifest: "
-                f"{artifacts['canonical_manifest']['path']} "
-                f"({_human_size(artifacts['canonical_manifest']['size_bytes'])})"
-            )
-            self._append_status(
-                "  Review CSV: "
-                f"{artifacts['review_csv']['path']} "
-                f"({_human_size(artifacts['review_csv']['size_bytes'])})"
-            )
-            if "fast_index" in artifacts:
+            if active_report is not None:
+                artifacts = active_report["artifacts"]
+                self._append_status("Active recommender data is ready:")
                 self._append_status(
-                    "  Fast recommendation index: "
+                    "  Combined canonical records: "
+                    f"{artifacts['canonical_records']['path']} "
+                    f"({_human_size(artifacts['canonical_records']['size_bytes'])})"
+                )
+                self._append_status(
+                    "  Combined review CSV: "
+                    f"{artifacts['review_csv']['path']} "
+                    f"({_human_size(artifacts['review_csv']['size_bytes'])})"
+                )
+                self._append_status(
+                    "  Active fast recommendation index: "
                     f"{artifacts['fast_index']['path']} "
                     f"({_human_size(artifacts['fast_index']['size_bytes'])})"
                 )
-            self._append_status(
-                f"  Shards: {report['shard_count']} "
-                f"({_human_size(report['storage']['shard_size_bytes'])}); "
-                f"reused this run: {report['reused_shard_count']}"
-            )
-            if report["eligible_index_record_count"] is not None:
+                self._append_status(
+                    f"  Saved batches: {active_report['batch_count']}; "
+                    f"unique reactions: {active_report['record_count']}; "
+                    "duplicates skipped: "
+                    f"{active_report['duplicate_record_count']}"
+                )
                 self._append_status(
                     "  Trusted recommendation precedents: "
-                    f"{report['eligible_index_record_count']}"
+                    f"{active_report['eligible_index_record_count']}"
                 )
-            if "review_core_index" in artifacts:
+                for warning in active_report.get("warnings") or ():
+                    self._append_status(f"Warning: {warning}")
+            elif not operation:
+                # Preserve display support for direct, non-batch worker callers.
+                artifacts = report["artifacts"]
                 self._append_status(
-                    "  Review-core recommendation index: "
-                    f"{artifacts['review_core_index']['path']} "
-                    f"({_human_size(artifacts['review_core_index']['size_bytes'])})"
+                    f"Ready: {artifacts['canonical_manifest']['path']}"
                 )
-            self._append_status(
-                "  Qualified review-core precedents: "
-                f"{report.get('review_core_precedent_count', 0)}"
-            )
-            self._append_status(
-                "  Query-core eligible reactions: "
-                f"{report.get('query_core_eligible_count', 0)}"
-            )
-            for warning in report.get("warnings") or ():
-                self._append_status(f"Warning: {warning}")
+            self.refresh_batch_summary()
         else:
             self.progress_bar.setRange(0, 1)
             self.progress_bar.setValue(0)
@@ -617,8 +834,10 @@ if __name__ == "__main__":
 
 
 __all__ = [
+    "CombineSavedBatchesWorker",
     "DEFAULT_OUTPUT_FOLDER",
     "GenericReactionReviewWindow",
     "ReviewConversionWorker",
+    "SavedBatchWorker",
     "main",
 ]
