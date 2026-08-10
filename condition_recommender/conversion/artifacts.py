@@ -27,8 +27,8 @@ from .sharded import (
 )
 from .input_schema import ConversionDatasetInput
 
-RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "2.2"
-SAVED_BATCH_WORKFLOW_SCHEMA_VERSION = "1.1"
+RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "2.3"
+SAVED_BATCH_WORKFLOW_SCHEMA_VERSION = "1.2"
 SAVED_BATCHES_DIRNAME = "batches"
 COMBINED_RECORDS_FILENAME = "combined_records.jsonl.gz"
 COMBINED_BATCH_MANIFEST_FILENAME = "combined_batch_manifest.json"
@@ -496,18 +496,8 @@ def combine_saved_recommendation_batches(
             progress_callback=on_index_progress,
             cancel_check=cancel_check,
         )
-        # Keep an explicitly scoped unrestricted index even when the current
-        # batches contain no review-core rows. A library may still contain a
-        # root-level legacy report, so relying on report-based trusted-index
-        # reuse could associate the new combined index with stale counts.
-        review_index_report = build_sqlite_generic_index(
-            iter_canonical_records(records_path),
-            review_index_path,
-            include_review=True,
-            progress_callback=on_index_progress,
-            cancel_check=cancel_check,
-        )
-        review_index_reuses_trusted = False
+        if review_index_path.is_file():
+            review_index_path.unlink()
     except SQLiteIndexBuildCancelled as exc:
         raise RecommendationArtifactBuildCancelled(str(exc)) from exc
 
@@ -531,15 +521,13 @@ def combine_saved_recommendation_batches(
     }
     _atomic_json(combined_manifest_path, combined_manifest)
     trusted_count = int(index_report["row_count"])
-    unrestricted_count = int(review_index_report["row_count"])
-    review_core_count = unrestricted_count - trusted_count
+    review_core_count = int(
+        combined["precedent_tier_counts"].get("review_core") or 0
+    )
     core_counts = combined["core_eligibility_counts"]
     query_core_count = sum(
         int(core_counts.get(tier) or 0)
         for tier in ("trusted_core", "review_core", "query_only")
-    )
-    review_artifact_path = (
-        index_path if review_index_reuses_trusted else review_index_path
     )
     report: Dict[str, Any] = {
         "schema_version": SAVED_BATCH_WORKFLOW_SCHEMA_VERSION,
@@ -551,8 +539,9 @@ def combine_saved_recommendation_batches(
         "eligible_index_record_count": trusted_count,
         "trusted_precedent_count": trusted_count,
         "review_core_precedent_count": review_core_count,
-        "unrestricted_precedent_count": unrestricted_count,
-        "review_index_reuses_trusted": review_index_reuses_trusted,
+        "unrestricted_precedent_count": None,
+        "review_index_generated": False,
+        "review_index_reuses_trusted": False,
         "query_core_eligible_count": query_core_count,
         "artifacts": {
             "combined_manifest": _artifact_entry(
@@ -560,10 +549,6 @@ def combine_saved_recommendation_batches(
             ),
             "canonical_records": _artifact_entry(records_path, destination),
             "fast_index": _artifact_entry(index_path, destination),
-            "review_core_index": {
-                **_artifact_entry(review_artifact_path, destination),
-                "reuses_trusted_index": review_index_reuses_trusted,
-            },
         },
         "catalogs": catalogs,
         "warnings": [],
@@ -685,8 +670,6 @@ def build_recommendation_artifacts(
         )
 
     index_report: Optional[Dict[str, Any]] = None
-    review_index_report: Optional[Dict[str, Any]] = None
-    review_index_reuses_trusted = False
     index_path = destination / "generic_index.sqlite"
     review_index_path = destination / "generic_review_index.sqlite"
     retired_json_index_paths = (
@@ -697,8 +680,6 @@ def build_recommendation_artifacts(
         if retired_path.is_file():
             retired_path.unlink()
     if build_fast_index:
-        if review_index_path.is_file():
-            review_index_path.unlink()
         if cancel_check is not None and cancel_check():
             raise RecommendationArtifactBuildCancelled(
                 "Build cancelled before index creation; canonical data are "
@@ -744,47 +725,15 @@ def build_recommendation_artifacts(
                 progress_callback=on_index_progress,
                 cancel_check=cancel_check,
             )
-            review_core_candidates = int(
-                (conversion_report.get("precedent_tier_counts") or {}).get(
-                    "review_core", 0
-                )
-            )
-            if review_core_candidates == 0:
-                review_index_reuses_trusted = True
-                review_index_report = {
-                    **index_report,
-                    "requested_precedent_scope": "trusted_and_review_core",
-                    "reuses_trusted_index": True,
-                }
-            else:
-                scanned_rows = 0
-                review_index_report = build_sqlite_generic_index(
-                    records(),
-                    review_index_path,
-                    include_review=True,
-                    progress_callback=on_index_progress,
-                    cancel_check=cancel_check,
-                )
-                review_index_reuses_trusted = (
-                    int(review_index_report["row_count"])
-                    == int(index_report["row_count"])
-                )
-                if review_index_reuses_trusted:
-                    if review_index_path.is_file():
-                        review_index_path.unlink()
-                    review_index_report = {
-                        **index_report,
-                        "requested_precedent_scope": "trusted_and_review_core",
-                        "reuses_trusted_index": True,
-                    }
+            if review_index_path.is_file():
+                review_index_path.unlink()
         except SQLiteIndexBuildCancelled as exc:
             raise RecommendationArtifactBuildCancelled(str(exc)) from exc
         notify(
             "index_completed",
             (
                 "Fast-load index complete: "
-                f"{index_report['row_count']} trusted precedent(s), "
-                f"{review_index_report['row_count']} unrestricted precedent(s)."
+                f"{index_report['row_count']} trusted precedent(s)."
             ),
             row_count=int(index_report["row_count"]),
         )
@@ -794,14 +743,6 @@ def build_recommendation_artifacts(
     }
     if index_report is not None:
         artifacts["fast_index"] = _artifact_entry(index_path, destination)
-    if review_index_report is not None:
-        review_artifact_path = (
-            index_path if review_index_reuses_trusted else review_index_path
-        )
-        artifacts["review_core_index"] = {
-            **_artifact_entry(review_artifact_path, destination),
-            "reuses_trusted_index": review_index_reuses_trusted,
-        }
     shard_paths = tuple((destination / "shards").glob("*.jsonl.gz"))
     shard_size_bytes = sum(path.stat().st_size for path in shard_paths)
     all_files = tuple(path for path in destination.rglob("*") if path.is_file())
@@ -825,16 +766,10 @@ def build_recommendation_artifacts(
     trusted_precedent_count = (
         int(index_report["row_count"]) if index_report is not None else None
     )
-    unrestricted_precedent_count = (
-        int(review_index_report["row_count"])
-        if review_index_report is not None
-        else None
-    )
-    review_core_count = (
-        unrestricted_precedent_count - trusted_precedent_count
-        if unrestricted_precedent_count is not None
-        and trusted_precedent_count is not None
-        else None
+    review_core_count = int(
+        (conversion_report.get("precedent_tier_counts") or {}).get(
+            "review_core", 0
+        )
     )
     query_core_count = sum(
         int(core_eligibility_counts.get(tier) or 0)
@@ -864,8 +799,9 @@ def build_recommendation_artifacts(
         ),
         "trusted_precedent_count": trusted_precedent_count,
         "review_core_precedent_count": review_core_count,
-        "review_index_reuses_trusted": review_index_reuses_trusted,
-        "unrestricted_precedent_count": unrestricted_precedent_count,
+        "review_index_generated": False,
+        "review_index_reuses_trusted": False,
+        "unrestricted_precedent_count": None,
         "query_core_eligible_count": query_core_count,
         "core_eligibility_counts": core_eligibility_counts,
         "shard_count": int(conversion_report["shard_count"]),

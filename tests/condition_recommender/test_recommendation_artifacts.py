@@ -73,6 +73,7 @@ def test_artifact_workflow_builds_recommendation_data_without_review_csv(
     output.mkdir()
     (output / "generic_index.json.gz").write_bytes(b"retired")
     (output / "generic_review_index.json.gz").write_bytes(b"retired")
+    (output / "generic_review_index.sqlite").write_bytes(b"stale")
     progress = []
     index_builds = []
     real_index_builder = artifact_module.build_sqlite_generic_index
@@ -97,11 +98,11 @@ def test_artifact_workflow_builds_recommendation_data_without_review_csv(
     )
 
     assert report["record_count"] == 2
-    assert report["schema_version"] == "2.2"
+    assert report["schema_version"] == "2.3"
     assert report["eligible_index_record_count"] == 2
     assert report["trusted_precedent_count"] == 2
     assert report["review_core_precedent_count"] == 0
-    assert report["unrestricted_precedent_count"] == 2
+    assert report["unrestricted_precedent_count"] is None
     assert report["query_core_eligible_count"] == 2
     assert report["shard_count"] == 2
     assert report["storage"]["shard_file_count"] == 2
@@ -112,7 +113,8 @@ def test_artifact_workflow_builds_recommendation_data_without_review_csv(
     assert (output / "generic_index.sqlite").is_file()
     assert not (output / "generic_review_index.sqlite").exists()
     assert (output / "recommendation_artifacts_report.json").is_file()
-    assert report["review_index_reuses_trusted"]
+    assert not report["review_index_generated"]
+    assert not report["review_index_reuses_trusted"]
     assert index_builds == [False]
     assert not any(
         name.startswith("legacy_json") for name in report["artifacts"]
@@ -239,6 +241,7 @@ def test_saved_batches_combine_into_one_active_recommender(tmp_path: Path) -> No
         batch_name="second-batch",
         shard_size=1,
     )
+    (library / "generic_review_index.sqlite").write_bytes(b"stale")
     report = combine_saved_recommendation_batches(library)
 
     assert first_report["batch_name"] == "first-batch"
@@ -248,23 +251,26 @@ def test_saved_batches_combine_into_one_active_recommender(tmp_path: Path) -> No
     assert report["input_record_count"] == 2
     assert report["record_count"] == 2
     assert report["duplicate_record_count"] == 0
-    assert report["schema_version"] == "1.1"
+    assert report["schema_version"] == "1.2"
     assert "review_csv" not in report["artifacts"]
     assert not (library / "reaction_review.csv").exists()
     assert (library / "combined_records.jsonl.gz").is_file()
     assert (library / "combined_batch_manifest.json").is_file()
     assert (library / "generic_index.sqlite").is_file()
+    assert not (library / "generic_review_index.sqlite").exists()
     assert (library / "reference_catalog.jsonl.gz").is_file()
     recommender = GenericConditionRecommender.from_path(
         library / "generic_index.sqlite"
     )
     assert len(recommender.index.rows) == 2
-    review_recommender = GenericConditionRecommender.from_path(
-        library / "generic_index.sqlite",
-        include_review=True,
-    )
-    assert review_recommender.includes_review_precedents
-    assert len(review_recommender.index.rows) == 2
+    assert report["unrestricted_precedent_count"] is None
+    assert not report["review_index_generated"]
+    assert "review_core_index" not in report["artifacts"]
+    with pytest.raises(FileNotFoundError, match="Review-core index is unavailable"):
+        GenericConditionRecommender.from_path(
+            library / "generic_index.sqlite",
+            include_review=True,
+        )
 
 
 def test_combining_saved_batches_deduplicates_identical_observations(

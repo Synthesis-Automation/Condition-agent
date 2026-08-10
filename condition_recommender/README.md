@@ -752,12 +752,14 @@ Each mode-specific batch library creates:
   the active index.
 - `generic_index.sqlite`: the trusted-precedent runtime index used by default.
   Rows and lookup values are materialized lazily for fast application startup.
-- `generic_review_index.sqlite`: the paired expert-use runtime index containing
-  the trusted rows plus qualified review-core precedents. The combined workflow
-  writes this explicitly even when it currently contains the same reactions as
-  the trusted index, keeping its expert-use scope unambiguous across batches.
 - `combined_batch_manifest.json` and `combined_recommendation_report.json`:
   included batches, checksums, duplicate counts, output paths, and index counts.
+
+The converter intentionally does not build `generic_review_index.sqlite`, which
+avoids a second full canonical-corpus scan. Build that optional expert-use index
+separately with `condition_recommender.generic_index_cli --include-review-core`
+only when review-core retrieval is required. A successful converter index build
+removes an older paired review index so it cannot be mistaken for a current one.
 
 The converter does not generate a review CSV. When a human-review export is
 needed, create it explicitly with the standalone concise-review CLI; it is not
@@ -820,7 +822,7 @@ python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
   --records datasets/literature/full/generic_index.sqlite
 
-# Expert mode resolves the paired generic_review_index.sqlite automatically.
+# Expert mode requires a separately built paired generic_review_index.sqlite.
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
   --records datasets/literature/full/generic_index.sqlite `
