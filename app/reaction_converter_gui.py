@@ -20,6 +20,8 @@ from condition_recommender.conversion.artifacts import (  # noqa: E402
     build_recommendation_artifacts,
     combine_saved_recommendation_batches,
     discover_saved_conversion_batches,
+    incomplete_saved_conversion_batches,
+    resume_saved_conversion_batch,
     save_recommendation_batch,
 )
 from condition_recommender.conversion.input_schema import (  # noqa: E402
@@ -166,9 +168,17 @@ class CombineSavedBatchesWorker(QtCore.QObject):
     progress = QtCore.pyqtSignal(object)
     finished = QtCore.pyqtSignal(bool, object, str)
 
-    def __init__(self, library_folder: str) -> None:
+    def __init__(
+        self,
+        library_folder: str,
+        *,
+        resume_incomplete: bool = False,
+        workers: int = 1,
+    ) -> None:
         super().__init__()
         self.library_folder = library_folder
+        self.resume_incomplete = resume_incomplete
+        self.workers = workers
         self._cancel_requested = False
 
     def request_cancel(self) -> None:
@@ -179,6 +189,31 @@ class CombineSavedBatchesWorker(QtCore.QObject):
     def run(self) -> None:
         """Combine saved batches and emit the resulting active index report."""
         try:
+            resumed = []
+            if self.resume_incomplete:
+                for manifest_path in incomplete_saved_conversion_batches(
+                    self.library_folder
+                ):
+                    self.progress.emit(
+                        RecommendationArtifactProgress(
+                            phase="resume_started",
+                            source_file_count=0,
+                            shard_count=0,
+                            row_count=0,
+                            message=(
+                                "Resuming incomplete saved conversion: "
+                                f"{manifest_path.parent}"
+                            ),
+                        )
+                    )
+                    resumed.append(
+                        resume_saved_conversion_batch(
+                            manifest_path,
+                            workers=self.workers,
+                            progress_callback=self.progress.emit,
+                            cancel_check=lambda: self._cancel_requested,
+                        )
+                    )
             report = combine_saved_recommendation_batches(
                 self.library_folder,
                 progress_callback=self.progress.emit,
@@ -191,7 +226,11 @@ class CombineSavedBatchesWorker(QtCore.QObject):
         else:
             self.finished.emit(
                 True,
-                {**report, "operation": "combine_batches"},
+                {
+                    **report,
+                    "operation": "combine_batches",
+                    "resumed_batch_count": len(resumed),
+                },
                 "",
             )
 
@@ -649,10 +688,41 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 "Convert and save at least one batch before building the index.",
             )
             return
+        incomplete = incomplete_saved_conversion_batches(output_text)
+        resume_incomplete = False
+        if incomplete:
+            listed = "\n".join(f"• {path.parent}" for path in incomplete[:5])
+            if len(incomplete) > 5:
+                listed += f"\n• …and {len(incomplete) - 5} more"
+            choice = QtWidgets.QMessageBox.question(
+                self,
+                "Resume incomplete conversion?",
+                (
+                    f"{len(incomplete)} saved conversion(s) are incomplete:\n\n"
+                    f"{listed}\n\n"
+                    "Resume their checkpointed source files now and combine "
+                    "only after coverage is complete? Valid completed shards "
+                    "will be reused. This may take some time."
+                ),
+                (
+                    QtWidgets.QMessageBox.StandardButton.Yes
+                    | QtWidgets.QMessageBox.StandardButton.No
+                ),
+                QtWidgets.QMessageBox.StandardButton.Yes,
+            )
+            if choice != QtWidgets.QMessageBox.StandardButton.Yes:
+                return
+            resume_incomplete = True
         self.status_box.clear()
-        self._append_status(
-            f"Combining {len(manifests)} saved batch(es) in {output_text}"
-        )
+        if resume_incomplete:
+            self._append_status(
+                f"Resuming {len(incomplete)} incomplete conversion(s), then "
+                f"combining {len(manifests)} saved batch(es) in {output_text}"
+            )
+        else:
+            self._append_status(
+                f"Combining {len(manifests)} saved batch(es) in {output_text}"
+            )
         self.start_button.setEnabled(False)
         self.combine_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
@@ -661,7 +731,11 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.progress_bar.setFormat("Combining saved batches…")
 
         thread = QtCore.QThread(self)
-        worker = CombineSavedBatchesWorker(output_text)
+        worker = CombineSavedBatchesWorker(
+            output_text,
+            resume_incomplete=resume_incomplete,
+            workers=self.worker_count_spin.value(),
+        )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.progress.connect(self._on_progress)
@@ -776,6 +850,11 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                     "duplicates skipped: "
                     f"{active_report['duplicate_record_count']}"
                 )
+                if int(active_report.get("resumed_batch_count") or 0):
+                    self._append_status(
+                        "  Resumed incomplete conversions: "
+                        f"{active_report['resumed_batch_count']}"
+                    )
                 self._append_status(
                     "  Trusted recommendation precedents: "
                     f"{active_report['eligible_index_record_count']}"

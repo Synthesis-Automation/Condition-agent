@@ -140,6 +140,67 @@ def discover_saved_conversion_batches(
     return tuple(manifests)
 
 
+def incomplete_saved_conversion_batches(
+    library_dir: str | Path,
+) -> tuple[Path, ...]:
+    """Return saved manifests whose selected sources are not fully covered."""
+    incomplete = []
+    for manifest_path in discover_saved_conversion_batches(library_dir):
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            incomplete.append(manifest_path)
+            continue
+        source_files = tuple(manifest.get("source_files") or ())
+        if not source_files or any(
+            not source.get("coverage_complete") for source in source_files
+        ):
+            incomplete.append(manifest_path)
+    return tuple(incomplete)
+
+
+def resume_saved_conversion_batch(
+    manifest_path: str | Path,
+    *,
+    workers: int = 1,
+    progress_callback: Optional[
+        Callable[[RecommendationArtifactProgress], None]
+    ] = None,
+    cancel_check: Optional[Callable[[], bool]] = None,
+) -> Dict[str, Any]:
+    """Resume one checkpointed batch using its persisted source selection."""
+    source = Path(manifest_path)
+    manifest = json.loads(source.read_text(encoding="utf-8"))
+    if (
+        manifest.get("schema_version") != SHARD_MANIFEST_SCHEMA_VERSION
+        or manifest.get("artifact_type") != "generic_sharded_conversion"
+    ):
+        raise ValueError(f"Unsupported saved batch manifest: {source}")
+    dataset_paths = tuple(str(value) for value in manifest.get("dataset_paths") or ())
+    if not dataset_paths:
+        raise ValueError(f"Saved batch has no source selection to resume: {source}")
+    missing = tuple(value for value in dataset_paths if not Path(value).exists())
+    if missing:
+        raise ValueError(
+            f"Cannot resume {source}; {len(missing)} selected source path(s) "
+            "no longer exist"
+        )
+    mapping_contract = (
+        (manifest.get("definition_contract") or {}).get("external_atom_mapping")
+        or {}
+    )
+    return build_recommendation_artifacts(
+        dataset_paths,
+        source.parent,
+        shard_size=int(manifest.get("shard_size") or 1_000),
+        workers=workers,
+        build_fast_index=False,
+        use_rxnmapper=bool(mapping_contract.get("enabled")),
+        progress_callback=progress_callback,
+        cancel_check=cancel_check,
+    )
+
+
 def save_recommendation_batch(
     dataset_path: ConversionDatasetInput,
     library_dir: str | Path,
@@ -198,6 +259,18 @@ def _batch_records(
             or manifest.get("artifact_type") != "generic_sharded_conversion"
         ):
             raise ValueError(f"Unsupported saved batch manifest: {manifest_path}")
+        source_files = tuple(manifest.get("source_files") or ())
+        incomplete_sources = tuple(
+            str(source.get("path") or "")
+            for source in source_files
+            if not source.get("coverage_complete")
+        )
+        if not source_files or incomplete_sources:
+            raise ValueError(
+                "Saved batch conversion is incomplete and cannot be combined: "
+                f"{manifest_path} ({len(incomplete_sources)} incomplete "
+                "source file(s)). Resume and finish this batch first."
+            )
         contract = {
             key: value
             for key, value in (manifest.get("definition_contract") or {}).items()
@@ -849,5 +922,7 @@ __all__ = [
     "build_recommendation_artifacts",
     "combine_saved_recommendation_batches",
     "discover_saved_conversion_batches",
+    "incomplete_saved_conversion_batches",
+    "resume_saved_conversion_batch",
     "save_recommendation_batch",
 ]

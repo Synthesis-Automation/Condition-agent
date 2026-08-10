@@ -6,6 +6,8 @@ from .artifacts import (
     build_recommendation_artifacts,
     combine_saved_recommendation_batches,
     discover_saved_conversion_batches,
+    incomplete_saved_conversion_batches,
+    resume_saved_conversion_batch,
     save_recommendation_batch,
 )
 from .concise_review import (
@@ -22,6 +24,8 @@ __all__ = [
     "build_recommendation_artifacts",
     "combine_saved_recommendation_batches",
     "discover_saved_conversion_batches",
+    "incomplete_saved_conversion_batches",
+    "resume_saved_conversion_batch",
     "save_recommendation_batch",
     "RecommendationArtifactBuildCancelled",
     "RecommendationArtifactProgress",

@@ -153,3 +153,42 @@ def test_saved_batch_worker_can_save_then_combine(monkeypatch) -> None:
     assert results[0][0]
     assert results[0][1]["saved_batch"]["record_count"] == 3
     assert results[0][1]["combined"]["record_count"] == 5
+
+
+def test_combine_worker_resumes_incomplete_batches_first(
+    monkeypatch, tmp_path: Path
+) -> None:
+    manifest = tmp_path / "batches" / "partial" / "shard_manifest.json"
+    calls = []
+
+    monkeypatch.setattr(
+        gui,
+        "incomplete_saved_conversion_batches",
+        lambda output: (manifest,),
+    )
+
+    def fake_resume(path, **options):
+        calls.append(("resume", path, options["workers"]))
+        return {"record_count": 3}
+
+    def fake_combine(output, **options):
+        calls.append(("combine", output))
+        return {"record_count": 3, "output_dir": output}
+
+    monkeypatch.setattr(gui, "resume_saved_conversion_batch", fake_resume)
+    monkeypatch.setattr(gui, "combine_saved_recommendation_batches", fake_combine)
+    worker = gui.CombineSavedBatchesWorker(
+        "output",
+        resume_incomplete=True,
+        workers=4,
+    )
+    results = []
+    worker.finished.connect(
+        lambda success, report, error: results.append((success, report, error))
+    )
+
+    worker.run()
+
+    assert calls == [("resume", manifest, 4), ("combine", "output")]
+    assert results[0][0]
+    assert results[0][1]["resumed_batch_count"] == 1

@@ -726,7 +726,11 @@ repeat this for later groups of files. **Combine Saved Batches / Build Index**
 then streams every saved batch, removes identical duplicate observations, and
 rebuilds the active recommender artifacts in the library root. If two saved
 records have the same observation ID but different content, combining stops
-instead of silently choosing one.
+instead of silently choosing one. Combining also refuses any cancelled or
+otherwise incomplete batch, so partial source coverage cannot replace a
+previously complete recommender index. In the desktop converter, the combine
+button offers to resume those stored source selections first, reusing valid
+checkpointed shards, and proceeds to indexing only after coverage is complete.
 
 The batch library creates:
 

@@ -1,4 +1,5 @@
 import csv
+import json
 from pathlib import Path
 
 import pytest
@@ -8,6 +9,8 @@ from condition_recommender.conversion.artifacts import (
     build_recommendation_artifacts,
     combine_saved_recommendation_batches,
     discover_saved_conversion_batches,
+    incomplete_saved_conversion_batches,
+    resume_saved_conversion_batch,
     save_recommendation_batch,
 )
 from condition_recommender.conversion.concise_review import (
@@ -283,3 +286,42 @@ def test_combining_saved_batches_deduplicates_identical_observations(
     assert report["record_count"] == 1
     assert report["duplicate_record_count"] == 1
     assert len(load_generic_index(library / "generic_index.sqlite").rows) == 1
+
+
+def test_combining_rejects_an_incomplete_saved_batch(tmp_path: Path) -> None:
+    source = tmp_path / "source.csv"
+    row = _source_row("partial")
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(row))
+        writer.writeheader()
+        writer.writerow(row)
+    library = tmp_path / "library"
+    saved = save_recommendation_batch(
+        source,
+        library,
+        batch_name="partial",
+        shard_size=1,
+    )
+    combine_saved_recommendation_batches(library)
+    active_index = library / "generic_index.sqlite"
+    original_index = active_index.read_bytes()
+    manifest_path = Path(saved["batch_dir"]) / "shard_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["source_files"][0]["coverage_complete"] = False
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="conversion is incomplete"):
+        combine_saved_recommendation_batches(library)
+
+    assert active_index.read_bytes() == original_index
+    assert incomplete_saved_conversion_batches(library) == (manifest_path,)
+
+    resumed = resume_saved_conversion_batch(manifest_path)
+    rebuilt = combine_saved_recommendation_batches(library)
+
+    assert resumed["reused_shard_count"] == 1
+    assert incomplete_saved_conversion_batches(library) == ()
+    assert rebuilt["record_count"] == 1
