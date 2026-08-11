@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Callable, Dict, Iterable, Optional
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -28,6 +28,10 @@ from condition_recommender.conversion.artifacts import (  # noqa: E402
 from condition_recommender.conversion.input_schema import (  # noqa: E402
     discover_conversion_datasets,
 )
+from core_retrosynthesis_poc import (  # noqa: E402
+    FullScaleBuildConfig,
+    build_full_scale_operator_library,
+)
 from reactive_taxonomy import RxnMapperProvider  # noqa: E402
 
 
@@ -38,6 +42,90 @@ def _human_size(size_bytes: int) -> str:
             return f"{value:.0f} {unit}" if unit == "B" else f"{value:.1f} {unit}"
         value /= 1024.0
     return f"{size_bytes} B"
+
+
+DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER = Path(
+    os.environ.get(
+        "CORE_RETROSYNTHESIS_LIBRARY_ROOT",
+        str(
+            PROJECT_ROOT
+            / "results"
+            / "operator_retrosynthesis_poc"
+            / "full_scale_v3"
+        ),
+    )
+)
+
+
+def build_retrosynthesis_operator_artifacts(
+    source_library_folder: str | Path,
+    output_root: str | Path,
+    *,
+    library_mode: str,
+    workers: int = 1,
+    progress_callback: Optional[
+        Callable[[RecommendationArtifactProgress], None]
+    ] = None,
+    cancel_check: Optional[Callable[[], bool]] = None,
+) -> Dict[str, Any]:
+    """Build one resumable operator library from every combined record."""
+
+    mode = library_mode.strip().casefold()
+    if mode not in {"compact", "full"}:
+        raise ValueError(f"Unsupported retrosynthesis library mode: {library_mode}")
+    output = Path(output_root) / mode
+
+    def emit(update: Dict[str, Any]) -> None:
+        if cancel_check is not None and cancel_check():
+            raise RecommendationArtifactBuildCancelled(
+                "Retrosynthesis conversion cancelled. Completed operator "
+                "shards remain reusable."
+            )
+        if progress_callback is None:
+            return
+        phase = str(update.get("phase") or "compile")
+        completed = int(update.get("completed_shards") or 0)
+        total = int(update.get("total_shards") or 0)
+        rows = int(update.get("source_rows") or 0)
+        if phase == "compile":
+            message = (
+                f"Retrosynthesis {mode}: compiled {completed}/{total} "
+                f"shard(s), {rows} source reaction(s)."
+            )
+        elif phase == "merge":
+            message = (
+                f"Retrosynthesis {mode}: merging {completed}/{total} "
+                "operator shard(s)."
+            )
+        elif phase == "finalize":
+            message = f"Retrosynthesis {mode}: finalizing operator library."
+        else:
+            message = (
+                f"Retrosynthesis {mode} operator library ready: "
+                f"{update.get('operator_count', 0)} operator(s)."
+            )
+        progress_callback(
+            RecommendationArtifactProgress(
+                phase=f"retrosynthesis_{phase}",
+                source_file_count=total,
+                shard_count=completed,
+                row_count=rows,
+                message=message,
+            )
+        )
+
+    _, report = build_full_scale_operator_library(
+        source_library_folder,
+        output,
+        config=FullScaleBuildConfig(),
+        workers=workers,
+        progress_callback=emit,
+    )
+    return {
+        **report,
+        "library_mode": mode,
+        "output_dir": str(output.resolve()),
+    }
 
 
 class ReviewConversionWorker(QtCore.QObject):
@@ -110,6 +198,10 @@ class SavedBatchWorker(QtCore.QObject):
         combine_after_save: bool = True,
         use_rxnmapper: bool = True,
         conversion_mode: str = "full",
+        build_retrosynthesis: bool = False,
+        retrosynthesis_output_folder: str = str(
+            DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER
+        ),
     ) -> None:
         super().__init__()
         self.source_inputs = tuple(source_inputs)
@@ -120,6 +212,8 @@ class SavedBatchWorker(QtCore.QObject):
         self.combine_after_save = combine_after_save
         self.use_rxnmapper = use_rxnmapper
         self.conversion_mode = conversion_mode
+        self.build_retrosynthesis = build_retrosynthesis
+        self.retrosynthesis_output_folder = retrosynthesis_output_folder
         self._cancel_requested = False
 
     def request_cancel(self) -> None:
@@ -142,9 +236,19 @@ class SavedBatchWorker(QtCore.QObject):
                 cancel_check=lambda: self._cancel_requested,
             )
             combined_report = None
-            if self.combine_after_save:
+            if self.combine_after_save or self.build_retrosynthesis:
                 combined_report = combine_saved_recommendation_batches(
                     self.library_folder,
+                    progress_callback=self.progress.emit,
+                    cancel_check=lambda: self._cancel_requested,
+                )
+            retrosynthesis_report = None
+            if self.build_retrosynthesis:
+                retrosynthesis_report = build_retrosynthesis_operator_artifacts(
+                    self.library_folder,
+                    self.retrosynthesis_output_folder,
+                    library_mode=self.conversion_mode,
+                    workers=self.workers,
                     progress_callback=self.progress.emit,
                     cancel_check=lambda: self._cancel_requested,
                 )
@@ -161,6 +265,7 @@ class SavedBatchWorker(QtCore.QObject):
                     "record_count": batch_report["record_count"],
                     "saved_batch": batch_report,
                     "combined": combined_report,
+                    "retrosynthesis": retrosynthesis_report,
                 },
                 "",
             )
@@ -178,11 +283,19 @@ class CombineSavedBatchesWorker(QtCore.QObject):
         *,
         resume_incomplete: bool = False,
         workers: int = 1,
+        library_mode: str = "full",
+        build_retrosynthesis: bool = False,
+        retrosynthesis_output_folder: str = str(
+            DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER
+        ),
     ) -> None:
         super().__init__()
         self.library_folder = library_folder
         self.resume_incomplete = resume_incomplete
         self.workers = workers
+        self.library_mode = library_mode
+        self.build_retrosynthesis = build_retrosynthesis
+        self.retrosynthesis_output_folder = retrosynthesis_output_folder
         self._cancel_requested = False
 
     def request_cancel(self) -> None:
@@ -223,6 +336,16 @@ class CombineSavedBatchesWorker(QtCore.QObject):
                 progress_callback=self.progress.emit,
                 cancel_check=lambda: self._cancel_requested,
             )
+            retrosynthesis_report = None
+            if self.build_retrosynthesis:
+                retrosynthesis_report = build_retrosynthesis_operator_artifacts(
+                    self.library_folder,
+                    self.retrosynthesis_output_folder,
+                    library_mode=self.library_mode,
+                    workers=self.workers,
+                    progress_callback=self.progress.emit,
+                    cancel_check=lambda: self._cancel_requested,
+                )
         except RecommendationArtifactBuildCancelled as exc:
             self.finished.emit(False, {}, str(exc))
         except Exception as exc:
@@ -234,6 +357,7 @@ class CombineSavedBatchesWorker(QtCore.QObject):
                     **report,
                     "operation": "combine_batches",
                     "resumed_batch_count": len(resumed),
+                    "retrosynthesis": retrosynthesis_report,
                 },
                 "",
             )
@@ -320,6 +444,20 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "batch is saved. You can also rebuild it later with the Combine / "
             "Build Index button."
         )
+        self.build_retrosynthesis_check = QtWidgets.QCheckBox(
+            "Build retrosynthesis operators from all saved data"
+        )
+        self.build_retrosynthesis_check.setObjectName("buildRetrosynthesis")
+        self.build_retrosynthesis_check.setChecked(False)
+        self.build_retrosynthesis_check.setToolTip(
+            "Off by default. When enabled, all saved batches in the selected "
+            "Compact or Full library are combined before a resumable "
+            "retrosynthesis operator library is built."
+        )
+        self._combine_before_retrosynthesis = False
+        self.build_retrosynthesis_check.toggled.connect(
+            self._sync_retrosynthesis_setting
+        )
         self.use_rxnmapper_check = QtWidgets.QCheckBox(
             "Use RXNMapper for unresolved, ambiguous, or missing-core reactions"
         )
@@ -341,6 +479,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         options_layout.addWidget(self.use_rxnmapper_check)
         options_layout.addSpacing(16)
         options_layout.addWidget(self.build_index_check)
+        options_layout.addSpacing(16)
+        options_layout.addWidget(self.build_retrosynthesis_check)
         options_layout.addStretch()
 
         self.start_button = QtWidgets.QPushButton("Convert && Save Batch")
@@ -592,6 +732,21 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             self.worker_count_spin.setEnabled(True)
             self.worker_count_spin.setValue(self._parallel_worker_count)
 
+    @QtCore.pyqtSlot(bool)
+    def _sync_retrosynthesis_setting(self, enabled: bool) -> None:
+        """Require a current combined corpus before building operators."""
+        if enabled:
+            self._combine_before_retrosynthesis = (
+                self.build_index_check.isChecked()
+            )
+            self.build_index_check.setChecked(True)
+            self.build_index_check.setEnabled(False)
+        else:
+            self.build_index_check.setEnabled(True)
+            self.build_index_check.setChecked(
+                self._combine_before_retrosynthesis
+            )
+
     @QtCore.pyqtSlot()
     def start_conversion(self) -> None:
         if self.thread is not None:
@@ -662,6 +817,12 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self._append_status(
             f"Conversion mode: {mode.title()}; artifacts: {output}"
         )
+        if self.build_retrosynthesis_check.isChecked():
+            self._append_status(
+                "Retrosynthesis conversion: on; all available "
+                f"{mode} data -> "
+                f"{DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER / mode}"
+            )
         if self.batch_name_edit.text().strip():
             self._append_status(
                 f"Saved batch name: {self.batch_name_edit.text().strip()}"
@@ -691,6 +852,12 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             combine_after_save=self.build_index_check.isChecked(),
             use_rxnmapper=self.use_rxnmapper_check.isChecked(),
             conversion_mode=mode,
+            build_retrosynthesis=(
+                self.build_retrosynthesis_check.isChecked()
+            ),
+            retrosynthesis_output_folder=str(
+                DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER
+            ),
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
@@ -776,6 +943,13 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             str(library_dir),
             resume_incomplete=resume_incomplete,
             workers=self.worker_count_spin.value(),
+            library_mode=mode,
+            build_retrosynthesis=(
+                self.build_retrosynthesis_check.isChecked()
+            ),
+            retrosynthesis_output_folder=str(
+                DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER
+            ),
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
@@ -815,6 +989,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             self.progress_bar.setFormat(
                 f"Combining batches • {progress.row_count} reactions"
             )
+        elif progress.phase.startswith("retrosynthesis"):
+            self.progress_bar.setFormat(progress.message)
         else:
             self.progress_bar.setFormat(progress.message)
         self._append_status(progress.message)
@@ -893,6 +1069,18 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 )
                 for warning in active_report.get("warnings") or ():
                     self._append_status(f"Warning: {warning}")
+                retrosynthesis = report.get("retrosynthesis")
+                if isinstance(retrosynthesis, dict):
+                    self._append_status(
+                        "Retrosynthesis operator library is ready: "
+                        f"{retrosynthesis['library_path']}"
+                    )
+                    self._append_status(
+                        f"  Mode: {retrosynthesis['library_mode'].title()}; "
+                        f"source reactions: {retrosynthesis['source_rows']}; "
+                        f"operators: {retrosynthesis['operator_count']}; "
+                        f"templates: {retrosynthesis['template_count']}"
+                    )
             elif not operation:
                 # Preserve display support for direct, non-batch worker callers.
                 artifacts = report["artifacts"]
@@ -947,8 +1135,10 @@ if __name__ == "__main__":
 __all__ = [
     "CombineSavedBatchesWorker",
     "DEFAULT_OUTPUT_FOLDER",
+    "DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER",
     "GenericReactionReviewWindow",
     "ReviewConversionWorker",
     "SavedBatchWorker",
+    "build_retrosynthesis_operator_artifacts",
     "main",
 ]

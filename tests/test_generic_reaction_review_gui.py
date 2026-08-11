@@ -35,6 +35,8 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     assert Path(window.output_edit.text()) == gui.DEFAULT_OUTPUT_FOLDER
     assert window.shard_size_spin.value() == 1_000
     assert not window.build_index_check.isChecked()
+    assert not window.build_retrosynthesis_check.isChecked()
+    assert window.build_retrosynthesis_check.objectName() == "buildRetrosynthesis"
     assert window.combine_button.objectName() == "combineIndexButton"
     assert window.combine_button.isEnabled()
     assert window.batch_name_edit.objectName() == "batchName"
@@ -47,6 +49,7 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     assert isinstance(options_layout, QtWidgets.QHBoxLayout)
     assert options_layout.indexOf(window.use_rxnmapper_check) >= 0
     assert options_layout.indexOf(window.build_index_check) >= 0
+    assert options_layout.indexOf(window.build_retrosynthesis_check) >= 0
     assert not any(
         label.text().startswith("Outputs: shard_manifest.json")
         for label in window.findChildren(QtWidgets.QLabel)
@@ -55,6 +58,13 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     window.use_rxnmapper_check.setChecked(True)
     assert window.worker_count_spin.value() == 1
     assert not window.worker_count_spin.isEnabled()
+
+    window.build_retrosynthesis_check.setChecked(True)
+    assert window.build_index_check.isChecked()
+    assert not window.build_index_check.isEnabled()
+    window.build_retrosynthesis_check.setChecked(False)
+    assert not window.build_index_check.isChecked()
+    assert window.build_index_check.isEnabled()
 
 
 def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
@@ -172,6 +182,73 @@ def test_saved_batch_worker_can_save_then_combine(monkeypatch) -> None:
     assert results[0][1]["combined"]["record_count"] == 5
 
 
+def test_saved_batch_worker_builds_selected_retrosynthesis_mode_from_all_batches(
+    monkeypatch,
+) -> None:
+    calls = []
+
+    def fake_save(source, output, **options):
+        calls.append(("save", output))
+        return {
+            "record_count": 3,
+            "batch_name": "batch-a",
+            "batch_dir": "output/batches/batch-a",
+        }
+
+    def fake_combine(output, **options):
+        calls.append(("combine", output))
+        return {"record_count": 5, "output_dir": output}
+
+    def fake_retrosynthesis(source, output, **options):
+        calls.append(
+            (
+                "retrosynthesis",
+                source,
+                output,
+                options["library_mode"],
+                options["workers"],
+            )
+        )
+        return {"operator_count": 2, "library_mode": "compact"}
+
+    monkeypatch.setattr(gui, "save_recommendation_batch", fake_save)
+    monkeypatch.setattr(gui, "combine_saved_recommendation_batches", fake_combine)
+    monkeypatch.setattr(
+        gui,
+        "build_retrosynthesis_operator_artifacts",
+        fake_retrosynthesis,
+    )
+    worker = gui.SavedBatchWorker(
+        ("first.csv",),
+        "library/compact",
+        workers=3,
+        combine_after_save=False,
+        conversion_mode="compact",
+        build_retrosynthesis=True,
+        retrosynthesis_output_folder="operators",
+    )
+    results = []
+    worker.finished.connect(
+        lambda success, report, error: results.append((success, report, error))
+    )
+
+    worker.run()
+
+    assert calls == [
+        ("save", "library/compact"),
+        ("combine", "library/compact"),
+        (
+            "retrosynthesis",
+            "library/compact",
+            "operators",
+            "compact",
+            3,
+        ),
+    ]
+    assert results[0][0]
+    assert results[0][1]["retrosynthesis"]["operator_count"] == 2
+
+
 def test_combine_worker_resumes_incomplete_batches_first(
     monkeypatch, tmp_path: Path
 ) -> None:
@@ -209,3 +286,47 @@ def test_combine_worker_resumes_incomplete_batches_first(
     assert calls == [("resume", manifest, 4), ("combine", "output")]
     assert results[0][0]
     assert results[0][1]["resumed_batch_count"] == 1
+
+
+def test_retrosynthesis_builder_uses_unlimited_default_config(
+    monkeypatch, tmp_path: Path
+) -> None:
+    calls = []
+    updates = []
+
+    def fake_build(source, output, **options):
+        calls.append((Path(source), Path(output), options))
+        options["progress_callback"](
+            {
+                "phase": "complete",
+                "completed_shards": 2,
+                "total_shards": 2,
+                "source_rows": 12,
+                "operator_count": 4,
+            }
+        )
+        return object(), {
+            "source_rows": 12,
+            "operator_count": 4,
+            "template_count": 6,
+            "library_path": str(Path(output) / "operator_library_v3.json.gz"),
+        }
+
+    monkeypatch.setattr(gui, "build_full_scale_operator_library", fake_build)
+    report = gui.build_retrosynthesis_operator_artifacts(
+        tmp_path / "recommendations" / "full",
+        tmp_path / "operators",
+        library_mode="full",
+        workers=4,
+        progress_callback=updates.append,
+    )
+
+    source, output, options = calls[0]
+    assert source == tmp_path / "recommendations" / "full"
+    assert output == tmp_path / "operators" / "full"
+    assert options["workers"] == 4
+    assert options["config"].max_rows_per_shard is None
+    assert report["library_mode"] == "full"
+    assert report["output_dir"] == str(output.resolve())
+    assert updates[0].phase == "retrosynthesis_complete"
+    assert updates[0].row_count == 12
