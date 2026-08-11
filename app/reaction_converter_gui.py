@@ -32,6 +32,9 @@ from core_retrosynthesis_poc import (  # noqa: E402
     FullScaleBuildConfig,
     build_full_scale_operator_library,
 )
+from core_retrosynthesis_poc.sources import (  # noqa: E402
+    COMBINED_BATCH_MANIFEST_FILENAME,
+)
 from reactive_taxonomy import RxnMapperProvider  # noqa: E402
 
 
@@ -363,6 +366,61 @@ class CombineSavedBatchesWorker(QtCore.QObject):
             )
 
 
+class RetrosynthesisOnlyWorker(QtCore.QObject):
+    """Build operators from an existing combined recommendation corpus."""
+
+    progress = QtCore.pyqtSignal(object)
+    finished = QtCore.pyqtSignal(bool, object, str)
+
+    def __init__(
+        self,
+        library_folder: str,
+        *,
+        workers: int = 1,
+        library_mode: str = "full",
+        retrosynthesis_output_folder: str = str(
+            DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER
+        ),
+    ) -> None:
+        super().__init__()
+        self.library_folder = library_folder
+        self.workers = workers
+        self.library_mode = library_mode
+        self.retrosynthesis_output_folder = retrosynthesis_output_folder
+        self._cancel_requested = False
+
+    def request_cancel(self) -> None:
+        """Request cancellation at the next operator-build checkpoint."""
+        self._cancel_requested = True
+
+    @QtCore.pyqtSlot()
+    def run(self) -> None:
+        """Build only retrosynthesis artifacts and emit the result."""
+        try:
+            report = build_retrosynthesis_operator_artifacts(
+                self.library_folder,
+                self.retrosynthesis_output_folder,
+                library_mode=self.library_mode,
+                workers=self.workers,
+                progress_callback=self.progress.emit,
+                cancel_check=lambda: self._cancel_requested,
+            )
+        except RecommendationArtifactBuildCancelled as exc:
+            self.finished.emit(False, {}, str(exc))
+        except Exception as exc:
+            self.finished.emit(False, {}, f"{type(exc).__name__}: {exc}")
+        else:
+            self.finished.emit(
+                True,
+                {
+                    "operation": "retrosynthesis_only",
+                    "output_dir": report["output_dir"],
+                    "retrosynthesis": report,
+                },
+                "",
+            )
+
+
 class GenericReactionReviewWindow(QtWidgets.QWidget):
     """Desktop controller for canonical conversion and review export."""
 
@@ -506,6 +564,15 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "Combine Saved Batches / Build Index"
         )
         self.combine_button.setObjectName("combineIndexButton")
+        self.retrosynthesis_button = QtWidgets.QPushButton(
+            "Build Retrosynthesis Only"
+        )
+        self.retrosynthesis_button.setObjectName("retrosynthesisOnlyButton")
+        self.retrosynthesis_button.setToolTip(
+            "Build or resume the selected Compact or Full retrosynthesis "
+            "operator library from the existing combined corpus. This does "
+            "not reconvert data, combine batches, or rebuild the index."
+        )
         self.open_button = QtWidgets.QPushButton("Open Output Folder")
         self.open_button.setObjectName("openOutputButton")
         self.open_button.setEnabled(False)
@@ -525,6 +592,9 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self._build_layout()
         self.start_button.clicked.connect(self.start_conversion)
         self.combine_button.clicked.connect(self.start_combining)
+        self.retrosynthesis_button.clicked.connect(
+            self.start_retrosynthesis_only
+        )
         self.cancel_button.clicked.connect(self.cancel_conversion)
         self.open_button.clicked.connect(self.open_output_folder)
         self.refresh_batch_summary()
@@ -598,6 +668,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         button_row = QtWidgets.QHBoxLayout()
         button_row.addWidget(self.start_button)
         button_row.addWidget(self.combine_button)
+        button_row.addWidget(self.retrosynthesis_button)
         button_row.addWidget(self.cancel_button)
         button_row.addWidget(self.open_button)
         button_row.addStretch()
@@ -837,6 +908,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         )
         self.start_button.setEnabled(False)
         self.combine_button.setEnabled(False)
+        self.retrosynthesis_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.open_button.setEnabled(False)
         self.progress_bar.setRange(0, 0)
@@ -855,6 +927,74 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             build_retrosynthesis=(
                 self.build_retrosynthesis_check.isChecked()
             ),
+            retrosynthesis_output_folder=str(
+                DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER
+            ),
+        )
+        worker.moveToThread(thread)
+        thread.started.connect(worker.run)
+        worker.progress.connect(self._on_progress)
+        worker.finished.connect(self._on_finished)
+        worker.finished.connect(thread.quit)
+        thread.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(self._clear_thread)
+        self.thread = thread
+        self.worker = worker
+        thread.start()
+
+    @QtCore.pyqtSlot()
+    def start_retrosynthesis_only(self) -> None:
+        """Build operators without rebuilding recommendation artifacts."""
+        if self.thread is not None:
+            return
+        output_text = self.output_edit.text().strip()
+        if not output_text:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Output required",
+                "Choose the recommendation library folder.",
+            )
+            return
+        mode = str(self.conversion_mode_combo.currentData() or "compact")
+        library_dir = recommendation_library_mode_dir(output_text, mode)
+        combined_manifest = library_dir / COMBINED_BATCH_MANIFEST_FILENAME
+        if not combined_manifest.is_file():
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Combined library required",
+                "No combined recommendation corpus exists for the selected "
+                f"{mode.title()} mode. Combine saved batches once before "
+                "building retrosynthesis operators.",
+            )
+            return
+
+        retrosynthesis_output = DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER / mode
+        self.status_box.clear()
+        self._append_status(
+            f"Building retrosynthesis operators only from {library_dir}"
+        )
+        self._append_status(
+            "Recommendation conversion, batch combination, and index rebuild "
+            "will be skipped."
+        )
+        self._append_status(
+            f"Retrosynthesis output: {retrosynthesis_output}; "
+            f"workers: {self.worker_count_spin.value()}"
+        )
+        self.start_button.setEnabled(False)
+        self.combine_button.setEnabled(False)
+        self.retrosynthesis_button.setEnabled(False)
+        self.cancel_button.setEnabled(True)
+        self.open_button.setEnabled(False)
+        self.progress_bar.setRange(0, 0)
+        self.progress_bar.setFormat("Discovering operator source shards…")
+
+        thread = QtCore.QThread(self)
+        worker = RetrosynthesisOnlyWorker(
+            str(library_dir),
+            workers=self.worker_count_spin.value(),
+            library_mode=mode,
             retrosynthesis_output_folder=str(
                 DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER
             ),
@@ -933,6 +1073,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             )
         self.start_button.setEnabled(False)
         self.combine_button.setEnabled(False)
+        self.retrosynthesis_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.open_button.setEnabled(False)
         self.progress_bar.setRange(0, 0)
@@ -1004,6 +1145,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
     ) -> None:
         self.start_button.setEnabled(True)
         self.combine_button.setEnabled(True)
+        self.retrosynthesis_button.setEnabled(True)
         self.cancel_button.setEnabled(False)
         if success:
             self.progress_bar.setRange(0, 1)
@@ -1015,7 +1157,13 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 if isinstance(combined, dict)
                 else report if operation == "combine_batches" else None
             )
-            if operation == "save_batch":
+            if operation == "retrosynthesis_only":
+                retrosynthesis = report["retrosynthesis"]
+                self.progress_bar.setFormat(
+                    "Retrosynthesis ready • "
+                    f"{retrosynthesis['operator_count']} operators"
+                )
+            elif operation == "save_batch":
                 batch = report["saved_batch"]
                 self.progress_bar.setFormat(
                     f"Batch saved • {batch['record_count']} reactions"
@@ -1069,23 +1217,23 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 )
                 for warning in active_report.get("warnings") or ():
                     self._append_status(f"Warning: {warning}")
-                retrosynthesis = report.get("retrosynthesis")
-                if isinstance(retrosynthesis, dict):
-                    self._append_status(
-                        "Retrosynthesis operator library is ready: "
-                        f"{retrosynthesis['library_path']}"
-                    )
-                    self._append_status(
-                        f"  Mode: {retrosynthesis['library_mode'].title()}; "
-                        f"source reactions: {retrosynthesis['source_rows']}; "
-                        f"operators: {retrosynthesis['operator_count']}; "
-                        f"templates: {retrosynthesis['template_count']}"
-                    )
             elif not operation:
                 # Preserve display support for direct, non-batch worker callers.
                 artifacts = report["artifacts"]
                 self._append_status(
                     f"Ready: {artifacts['canonical_manifest']['path']}"
+                )
+            retrosynthesis = report.get("retrosynthesis")
+            if isinstance(retrosynthesis, dict):
+                self._append_status(
+                    "Retrosynthesis operator library is ready: "
+                    f"{retrosynthesis['library_path']}"
+                )
+                self._append_status(
+                    f"  Mode: {retrosynthesis['library_mode'].title()}; "
+                    f"source reactions: {retrosynthesis['source_rows']}; "
+                    f"operators: {retrosynthesis['operator_count']}; "
+                    f"templates: {retrosynthesis['template_count']}"
                 )
             self.refresh_batch_summary()
         else:
@@ -1137,6 +1285,7 @@ __all__ = [
     "DEFAULT_OUTPUT_FOLDER",
     "DEFAULT_RETROSYNTHESIS_OUTPUT_FOLDER",
     "GenericReactionReviewWindow",
+    "RetrosynthesisOnlyWorker",
     "ReviewConversionWorker",
     "SavedBatchWorker",
     "build_retrosynthesis_operator_artifacts",

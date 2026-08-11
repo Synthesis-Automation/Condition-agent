@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import gzip
 import json
+from pathlib import Path
 
 import pytest
 
@@ -412,6 +413,61 @@ def test_mode_source_uses_combined_rows_and_manifest_shards(tmp_path) -> None:
         for row in iter_library_rows(selected, include=("Suzuki*.csv",))
     ] == ["Suzuki.csv"]
     assert source_shard_files(selected) == (shard_path,)
+
+
+def test_source_shards_resolve_multi_source_saved_batch_manifests(
+    tmp_path: Path,
+) -> None:
+    mode_dir = tmp_path / "compact"
+    batch_dir = mode_dir / "batches" / "multi-source"
+    conversion_dir = mode_dir / "converted_sources" / "source-a"
+    shard_dir = conversion_dir / "shards"
+    shard_dir.mkdir(parents=True)
+    batch_dir.mkdir(parents=True)
+    shard_path = shard_dir / "part-00000.jsonl.gz"
+    with gzip.open(shard_path, "wt", encoding="utf-8") as handle:
+        handle.write(json.dumps(_row("carbonyl_reduction")) + "\n")
+    conversion_manifest = conversion_dir / "shard_manifest.json"
+    conversion_manifest.write_text(
+        json.dumps(
+            {
+                "artifact_type": "generic_sharded_conversion",
+                "source_files": [{"coverage_complete": True}],
+                "shards": [
+                    {
+                        "status": "complete",
+                        "output_path": "shards/part-00000.jsonl.gz",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    batch_manifest = batch_dir / "shard_manifest.json"
+    batch_manifest.write_text(
+        json.dumps(
+            {
+                "artifact_type": "saved_recommendation_batch_manifest",
+                "source_files": [{"coverage_complete": True}],
+                "source_manifests": [
+                    {
+                        "path": "relocated/missing/shard_manifest.json",
+                        "relative_path": (
+                            "../../converted_sources/source-a/"
+                            "shard_manifest.json"
+                        ),
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (mode_dir / "combined_batch_manifest.json").write_text(
+        json.dumps({"batch_manifests": [{"path": str(batch_manifest)}]}),
+        encoding="utf-8",
+    )
+
+    assert source_shard_files(mode_dir) == (shard_path,)
 
 
 def test_coverage_audit_attributes_operator_recovery(tmp_path) -> None:

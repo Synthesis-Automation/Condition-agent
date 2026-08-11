@@ -39,6 +39,10 @@ def test_review_window_accepts_folder_and_individual_file_inputs(
     assert window.build_retrosynthesis_check.objectName() == "buildRetrosynthesis"
     assert window.combine_button.objectName() == "combineIndexButton"
     assert window.combine_button.isEnabled()
+    assert window.retrosynthesis_button.objectName() == (
+        "retrosynthesisOnlyButton"
+    )
+    assert window.retrosynthesis_button.isEnabled()
     assert window.batch_name_edit.objectName() == "batchName"
     assert "saved batch" in window.batch_summary.text()
     assert window.conversion_mode_combo.currentData() == "compact"
@@ -247,6 +251,61 @@ def test_saved_batch_worker_builds_selected_retrosynthesis_mode_from_all_batches
     ]
     assert results[0][0]
     assert results[0][1]["retrosynthesis"]["operator_count"] == 2
+
+
+def test_retrosynthesis_only_worker_skips_combination_and_index(
+    monkeypatch,
+) -> None:
+    calls = []
+
+    def fail_combine(*args, **kwargs):
+        raise AssertionError("recommendation combination must be skipped")
+
+    def fake_retrosynthesis(source, output, **options):
+        calls.append(
+            (
+                source,
+                output,
+                options["library_mode"],
+                options["workers"],
+            )
+        )
+        return {
+            "output_dir": "operators/compact",
+            "library_path": "operators/compact/operator_library_v3.json.gz",
+            "library_mode": "compact",
+            "source_rows": 12,
+            "operator_count": 4,
+            "template_count": 6,
+        }
+
+    monkeypatch.setattr(
+        gui,
+        "combine_saved_recommendation_batches",
+        fail_combine,
+    )
+    monkeypatch.setattr(
+        gui,
+        "build_retrosynthesis_operator_artifacts",
+        fake_retrosynthesis,
+    )
+    worker = gui.RetrosynthesisOnlyWorker(
+        "library/compact",
+        workers=3,
+        library_mode="compact",
+        retrosynthesis_output_folder="operators",
+    )
+    results = []
+    worker.finished.connect(
+        lambda success, report, error: results.append((success, report, error))
+    )
+
+    worker.run()
+
+    assert calls == [("library/compact", "operators", "compact", 3)]
+    assert results[0][0]
+    assert results[0][1]["operation"] == "retrosynthesis_only"
+    assert results[0][1]["retrosynthesis"]["operator_count"] == 4
 
 
 def test_combine_worker_resumes_incomplete_batches_first(

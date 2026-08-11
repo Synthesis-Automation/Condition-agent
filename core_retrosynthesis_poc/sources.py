@@ -101,6 +101,56 @@ def _combined_batch_manifests(mode_root: Path) -> tuple[Path, ...]:
     )
 
 
+def _referenced_source_manifests(
+    batch_manifest_path: Path,
+    batch_manifest: Dict[str, Any],
+) -> tuple[Path, ...]:
+    """Resolve new multi-source saved batches to conversion manifests."""
+
+    references = tuple(batch_manifest.get("source_manifests") or ())
+    if not references:
+        return (batch_manifest_path,)
+    manifests = []
+    for reference in references:
+        if not isinstance(reference, dict):
+            raise ValueError(
+                f"invalid converted-source reference: {batch_manifest_path}"
+            )
+        configured = Path(str(reference.get("path") or ""))
+        relative = Path(str(reference.get("relative_path") or ""))
+        candidates = (configured, batch_manifest_path.parent / relative)
+        resolved = next((path for path in candidates if path.is_file()), None)
+        if resolved is None:
+            raise FileNotFoundError(
+                "converted-source manifest is unavailable: "
+                f"{configured or relative}"
+            )
+        manifests.append(resolved.resolve())
+    return tuple(manifests)
+
+
+def _manifest_shards(manifest_path: Path) -> tuple[Path, ...]:
+    """Validate one conversion manifest and return its completed shards."""
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source_files = tuple(manifest.get("source_files") or ())
+    if not source_files or any(
+        not item.get("coverage_complete") for item in source_files
+    ):
+        raise ValueError(f"saved batch is incomplete: {manifest_path}")
+    shards = []
+    for entry in manifest.get("shards") or ():
+        if entry.get("status") != "complete":
+            raise ValueError(
+                f"saved batch contains an incomplete shard: {manifest_path}"
+            )
+        shard = manifest_path.parent / str(entry.get("output_path") or "")
+        if not shard.is_file():
+            raise FileNotFoundError(shard)
+        shards.append(shard)
+    return tuple(shards)
+
+
 def source_shard_files(source: str | Path) -> tuple[Path, ...]:
     """Return canonical physical shards represented by the selected library.
 
@@ -115,25 +165,27 @@ def source_shard_files(source: str | Path) -> tuple[Path, ...]:
     if manifests:
         files: list[Path] = []
         seen: set[Path] = set()
-        for manifest_path in manifests:
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            source_files = tuple(manifest.get("source_files") or ())
+        for batch_manifest_path in manifests:
+            batch_manifest = json.loads(
+                batch_manifest_path.read_text(encoding="utf-8")
+            )
+            source_files = tuple(batch_manifest.get("source_files") or ())
             if not source_files or any(
                 not item.get("coverage_complete") for item in source_files
             ):
-                raise ValueError(f"saved batch is incomplete: {manifest_path}")
-            for entry in manifest.get("shards") or ():
-                if entry.get("status") != "complete":
-                    raise ValueError(
-                        f"saved batch contains an incomplete shard: {manifest_path}"
-                    )
-                shard = manifest_path.parent / str(entry.get("output_path") or "")
-                if not shard.is_file():
-                    raise FileNotFoundError(shard)
-                resolved = shard.resolve()
-                if resolved not in seen:
-                    seen.add(resolved)
-                    files.append(shard)
+                raise ValueError(
+                    f"saved batch is incomplete: {batch_manifest_path}"
+                )
+            conversion_manifests = _referenced_source_manifests(
+                batch_manifest_path,
+                batch_manifest,
+            )
+            for conversion_manifest in conversion_manifests:
+                for shard in _manifest_shards(conversion_manifest):
+                    resolved = shard.resolve()
+                    if resolved not in seen:
+                        seen.add(resolved)
+                        files.append(shard)
         return tuple(files)
     combined = root / COMBINED_RECORDS_FILENAME
     if combined.is_file():
