@@ -111,6 +111,14 @@ class RetrosynthesisRequest(StrictRequest):
     diversify: bool = True
 
 
+class RetrosynthesisConditionsRequest(StrictRequest):
+    """Progressive condition lookup for one retrosynthesis hit."""
+
+    reaction_smiles: str = Field(min_length=1, max_length=20_000)
+    library_mode: Literal["full", "compact"] = "compact"
+    top_k: int = Field(default=3, ge=1, le=5)
+
+
 class RenderReactionRequest(StrictRequest):
     """Server-side RDKit rendering request."""
 
@@ -153,6 +161,7 @@ __all__ = [
     "RankingPreferencesRequest",
     "RecommendationRequest",
     "RetrosynthesisRequest",
+    "RetrosynthesisConditionsRequest",
     "RenderMoleculeRequest",
     "RenderReactionRequest",
     "envelope",

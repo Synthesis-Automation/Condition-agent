@@ -156,6 +156,59 @@ def _condition_evidence(result: Any) -> RetrosynthesisConditionEvidence:
     )
 
 
+def _failed_condition_evidence(
+    reaction_smiles: str,
+    error: Exception,
+) -> RetrosynthesisConditionEvidence:
+    """Retain structural evidence when one condition query fails."""
+
+    return RetrosynthesisConditionEvidence(
+        status="insufficient_evidence",
+        query_reaction_smiles=reaction_smiles,
+        recommender_valid=False,
+        recommendation_mode="unavailable",
+        retrieval_level=None,
+        uses_type_agnostic_fallback=False,
+        candidate_count=0,
+        independent_candidate_count=0,
+        compatible_candidate_count=0,
+        independent_compatible_candidate_count=0,
+        excluded_candidate_count=0,
+        best_recipe_score=None,
+        best_recipe_compatibility_score=None,
+        best_recipe_reference_support=0,
+        recommendations=(),
+        warnings=("CONDITION_RECOMMENDATION_FAILED",),
+        error=type(error).__name__,
+    )
+
+
+def recommend_retrosynthesis_conditions(
+    reaction_smiles: str,
+    recommender: ConditionRecommenderProtocol,
+    *,
+    condition_top_k: int = 3,
+    minimum_pool_size: int | None = None,
+    unrestricted_fallback: bool = False,
+) -> RetrosynthesisConditionEvidence:
+    """Recommend conditions for one proposed, forward-validated reaction."""
+
+    if condition_top_k < 1:
+        raise ValueError("condition_top_k must be positive")
+    if minimum_pool_size is not None and minimum_pool_size < 1:
+        raise ValueError("minimum_pool_size must be positive")
+    try:
+        result = recommender.recommend(
+            reaction_smiles,
+            top_k=condition_top_k,
+            minimum_pool_size=minimum_pool_size,
+            unrestricted_fallback=unrestricted_fallback,
+        )
+    except Exception as exc:
+        return _failed_condition_evidence(reaction_smiles, exc)
+    return _condition_evidence(result)
+
+
 def _ranking_key(
     value: tuple[
         int,
@@ -213,9 +266,14 @@ def rank_retrosynthesis_candidates_with_conditions(
     )
     assessed = []
     for original_rank, candidate in verified_ranked:
-        result = recommender.recommend(
-            candidate.proposed_reaction_smiles,
-            top_k=condition_top_k,
+        condition_query = (
+            candidate.condition_query_reaction_smiles
+            or candidate.proposed_reaction_smiles
+        )
+        evidence = recommend_retrosynthesis_conditions(
+            condition_query,
+            recommender,
+            condition_top_k=condition_top_k,
             minimum_pool_size=minimum_pool_size,
             unrestricted_fallback=unrestricted_fallback,
         )
@@ -223,7 +281,7 @@ def rank_retrosynthesis_candidates_with_conditions(
             (
                 original_rank,
                 candidate,
-                _condition_evidence(result),
+                evidence,
                 bands[id(candidate)],
             )
         )
@@ -261,4 +319,5 @@ __all__ = [
     "ConditionSupportStatus",
     "RetrosynthesisConditionEvidence",
     "rank_retrosynthesis_candidates_with_conditions",
+    "recommend_retrosynthesis_conditions",
 ]

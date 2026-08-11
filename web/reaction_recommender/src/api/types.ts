@@ -407,11 +407,43 @@ export interface RetrosynthesisRequest {
   diversify: boolean
 }
 
+export interface RetrosynthesisConditionsRequest {
+  reaction_smiles: string
+  library_mode: 'full' | 'compact'
+  top_k: number
+}
+
+export interface RetrosynthesisConditionEvidence {
+  status: 'pending' | 'recommended_direct' | 'recommended_fallback' | 'insufficient_evidence'
+  query_reaction_smiles: string
+  recommender_valid: boolean
+  recommendation_mode: string
+  retrieval_level?: string | null
+  uses_type_agnostic_fallback: boolean
+  candidate_count: number
+  independent_candidate_count: number
+  compatible_candidate_count: number
+  independent_compatible_candidate_count: number
+  excluded_candidate_count: number
+  best_recipe_score?: number | null
+  best_recipe_compatibility_score?: number | null
+  best_recipe_reference_support: number
+  recommendations: Recommendation[]
+  warnings: string[]
+  error?: string | null
+}
+
+export interface RetrosynthesisSupportingPrecedent {
+  reaction_smiles: string
+  reference_record?: ReferenceRecord | null
+}
+
 export interface RetrosynthesisCandidate {
   rank: number
   target_smiles: string
   precursor_smiles: string
   proposed_reaction_smiles: string
+  condition_query_reaction_smiles?: string
   transformation_kind?: string | null
   abstraction_level: string
   compiler_engine: string
@@ -425,7 +457,8 @@ export interface RetrosynthesisCandidate {
   forward_validation_status: string
   center_transition_key: string
   disconnection_site_key: string
-  precedent_reaction_ids: string[]
+  supporting_precedents: RetrosynthesisSupportingPrecedent[]
+  condition_evidence: RetrosynthesisConditionEvidence
   operator_id: string
   realization_id: string
   operator_signature: string

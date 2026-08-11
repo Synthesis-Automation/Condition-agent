@@ -381,6 +381,7 @@ export function DiscoveryResults({ result }: { result: DiscoveryResult }) {
 }
 
 function RetrosynthesisDetails({ candidate }: { candidate: RetrosynthesisCandidate }) {
+  const conditionRecommendations = candidate.condition_evidence?.recommendations ?? []
   return (
     <article className="result-detail retrosynthesis-detail">
       <div className="detail-title-row">
@@ -415,10 +416,46 @@ function RetrosynthesisDetails({ candidate }: { candidate: RetrosynthesisCandida
           </dl>
         </section>
       </div>
-      {candidate.precedent_reaction_ids.length > 0 && (
-        <details className="trace-panel">
-          <summary>Supporting precedent reactions</summary>
-          <p className="mono-wrap">{candidate.precedent_reaction_ids.join(', ')}</p>
+      <details className="trace-panel retrosynthesis-conditions" open>
+        <summary>
+          Recommended conditions
+          {conditionRecommendations.length > 0 ? ` (${conditionRecommendations.length})` : ''}
+        </summary>
+        {conditionRecommendations.length > 0 ? (
+          <div className="retrosynthesis-condition-list">
+            {conditionRecommendations.map((recommendation) => (
+              <article key={recommendation.recipe_id}>
+                <div className="retrosynthesis-condition-heading">
+                  <div><strong>Recipe rank {recommendation.rank}</strong><span>{compactRecipeSummary(recommendation.resolved_recipe)}</span></div>
+                  <small>Score {recommendation.score.toFixed(3)}{recommendation.expected_yield_pct == null ? '' : ` · ${recommendation.expected_yield_pct.toFixed(1)}% expected yield`}</small>
+                </div>
+                <Conditions recipe={recommendation.resolved_recipe} />
+                <ReferenceRecords records={recommendation.precedent_references ?? []} />
+                <ExperimentalDetails details={recommendation.precedent_experimental_details ?? []} />
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="retrosynthesis-empty-evidence">
+            {candidate.condition_evidence?.status === 'pending'
+              ? 'Loading condition recommendations…'
+              : 'No compatible condition recipe was found for this proposed reaction.'}
+          </p>
+        )}
+        <MessageList title="Condition cautions" values={candidate.condition_evidence?.warnings ?? []} tone="caution" />
+      </details>
+      {candidate.supporting_precedents.length > 0 && (
+        <details className="trace-panel supporting-precedents">
+          <summary>Supporting precedent reactions ({candidate.supporting_precedents.length})</summary>
+          <div className="supporting-precedent-list">
+            {candidate.supporting_precedents.map((precedent, index) => (
+              <article key={`${precedent.reaction_smiles}:${index}`}>
+                <ReactionImage smiles={precedent.reaction_smiles} label={`Supporting precedent reaction ${index + 1}`} compact />
+                <ReferenceRecords records={precedent.reference_record ? [precedent.reference_record] : []} />
+                {!precedent.reference_record && <p className="retrosynthesis-empty-evidence">Publication details unavailable for this precedent.</p>}
+              </article>
+            ))}
+          </div>
         </details>
       )}
       <details className="trace-panel">
@@ -454,7 +491,7 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Level</th><th>Transformation</th><th>Precursors</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Score</th><th>Level</th><th>Transformation</th><th>Precursors</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.candidates.map((candidate, index) => (
                   <tr key={`${candidate.template_id}:${candidate.precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
@@ -463,6 +500,7 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
                     <td>{candidate.abstraction_level}</td>
                     <td>{displayName(candidate.transformation_kind ?? 'graph operator')}</td>
                     <td className="mono-value">{candidate.precursor_smiles}</td>
+                    <td>{candidate.condition_evidence?.recommendations?.[0] ? compactRecipeSummary(candidate.condition_evidence.recommendations[0].resolved_recipe) : 'No compatible conditions'}</td>
                   </tr>
                 ))}
               </tbody>

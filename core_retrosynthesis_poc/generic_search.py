@@ -251,6 +251,7 @@ def disconnect_generic_target_detailed(
             realization_id=template.realization_id,
             operator_signature=identity.operator_signature,
             synthon_signature=identity.synthon_signature,
+            condition_query_reaction_smiles=mapped_proposed,
         )
         current = candidates.get(precursors)
         if current is None or candidate.score > current.score:

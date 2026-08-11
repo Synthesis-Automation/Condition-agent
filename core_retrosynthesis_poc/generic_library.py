@@ -12,6 +12,11 @@ from typing import Any, Callable, Dict, Iterable, Literal
 
 from retrosynthesis_poc.chemistry import digest
 
+try:
+    import orjson
+except ImportError:  # pragma: no cover - compatibility outside the web runtime
+    orjson = None
+
 from .generic_compiler import compile_generic_templates
 from .generic_models import (
     GenericCoreTemplate,
@@ -356,8 +361,13 @@ def save_generic_library(
 def load_generic_library(source: str | Path) -> GenericTemplateLibrary:
     """Load a generic gzip JSON library."""
 
-    with gzip.open(Path(source), "rt", encoding="utf-8") as handle:
-        value = json.load(handle)
+    with gzip.open(Path(source), "rb") as handle:
+        payload = handle.read()
+    value = (
+        orjson.loads(payload)
+        if orjson is not None
+        else json.loads(payload.decode("utf-8"))
+    )
     if not isinstance(value, dict):
         raise ValueError("generic library must contain an object")
     return GenericTemplateLibrary.from_dict(value)

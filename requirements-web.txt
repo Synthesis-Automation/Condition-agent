@@ -1,3 +1,4 @@
 fastapi>=0.116,<1
 uvicorn>=0.35,<1
 rdchiral>=1.1.0
+orjson>=3.10,<4

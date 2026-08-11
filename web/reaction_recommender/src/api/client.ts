@@ -10,6 +10,8 @@ import type {
   RecommendationRequest,
   RecommendationResult,
   RetrosynthesisRequest,
+  RetrosynthesisConditionsRequest,
+  RetrosynthesisConditionEvidence,
   RetrosynthesisResult,
 } from './types'
 
@@ -83,6 +85,12 @@ export const api = {
 
   retrosynthesize: (request: RetrosynthesisRequest) =>
     jsonRequest<RetrosynthesisResult>('/retrosynthesis', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  retrosynthesisConditions: (request: RetrosynthesisConditionsRequest) =>
+    jsonRequest<RetrosynthesisConditionEvidence>('/retrosynthesis/conditions', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

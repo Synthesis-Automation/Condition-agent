@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import gzip
 import json
+from types import SimpleNamespace
 from typing import Any, Dict
 
 from fastapi.testclient import TestClient
 
 from app.web_api.main import create_app
+from app.web_api.contracts import (
+    RetrosynthesisConditionsRequest,
+    RetrosynthesisRequest,
+)
+import app.web_api.runtime as runtime_module
 from app.web_api.runtime import LocalRecommendationRuntime
 
 
@@ -121,6 +127,27 @@ class FakeRuntime:
             ],
         }
 
+    def retrosynthesis_conditions(self, request: Any) -> Dict[str, Any]:
+        return {
+            "status": "recommended_direct",
+            "query_reaction_smiles": request.reaction_smiles,
+            "recommender_valid": True,
+            "recommendation_mode": "verified_signature",
+            "retrieval_level": "L2",
+            "uses_type_agnostic_fallback": False,
+            "candidate_count": 1,
+            "independent_candidate_count": 1,
+            "compatible_candidate_count": 1,
+            "independent_compatible_candidate_count": 1,
+            "excluded_candidate_count": 0,
+            "best_recipe_score": 0.9,
+            "best_recipe_compatibility_score": 1.0,
+            "best_recipe_reference_support": 1,
+            "recommendations": [],
+            "warnings": [],
+            "error": None,
+        }
+
     def render_reaction(
         self, reaction_smiles: str, *, width: int, height: int
     ) -> bytes:
@@ -213,6 +240,144 @@ def test_local_runtime_loads_paired_catalogs_from_string_index_path(
         "observation:observation:1": detail,
         "reaction:reaction:1": detail,
     }
+
+
+def test_local_retrosynthesis_returns_hits_before_condition_lookup(
+    monkeypatch, tmp_path
+) -> None:
+    candidate = SimpleNamespace(
+        target_smiles="CCN",
+        template_id="template:1",
+        proposed_reaction_smiles="CCBr.N>>CCN",
+        to_dict=lambda: {
+            "target_smiles": "CCN",
+            "template_id": "template:1",
+            "precursor_smiles": "CCBr.N",
+            "proposed_reaction_smiles": "CCBr.N>>CCN",
+            "precedent_reaction_ids": ["internal-row-id"],
+        },
+    )
+    precedent = SimpleNamespace(
+        precursor_smiles="CCBr.N",
+        product_smiles="CCN",
+        reference_id="REF1:paper",
+    )
+    library = SimpleNamespace(
+        operators=(object(),),
+        templates=(
+            SimpleNamespace(
+                template_id="template:1",
+                precedents=(precedent,),
+            ),
+        ),
+    )
+    reference = {
+        "reference_id": "REF1:paper",
+        "raw_reference": (
+            "Example synthesis | A. Chemist | Journal of Examples (2025), 1, 1"
+        ),
+    }
+    runtime = LocalRecommendationRuntime(
+        library_root=tmp_path,
+        retrosynthesis_library_root=tmp_path,
+    )
+    monkeypatch.setattr(runtime, "_get_retrosynthesis_library", lambda mode: library)
+    monkeypatch.setattr(
+        runtime,
+        "_get_recommender",
+        lambda **options: (_ for _ in ()).throw(
+            AssertionError("condition lookup must not block retrosynthesis")
+        ),
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_get_reference_catalog",
+        lambda path: {"REF1:paper": reference},
+    )
+    search_options = {}
+
+    def fake_disconnect(*args, **kwargs):
+        search_options.update(kwargs)
+        return (candidate,)
+
+    monkeypatch.setattr(
+        runtime_module,
+        "disconnect_operator_ladder",
+        fake_disconnect,
+    )
+
+    payload = runtime.retrosynthesize(
+        RetrosynthesisRequest(target_smiles="CCN", library_mode="compact")
+    )
+
+    result = payload["candidates"][0]
+    assert payload["schema_version"] == "1.2"
+    assert search_options["max_templates_to_apply"] == 100
+    assert search_options["max_candidates_to_validate"] == 30
+    assert "precedent_reaction_ids" not in result
+    assert result["supporting_precedents"] == [
+        {
+            "reaction_smiles": "CCBr.N>>CCN",
+            "reference_record": reference,
+        }
+    ]
+    assert result["condition_evidence"]["status"] == "pending"
+    assert result["condition_evidence"]["recommendations"] == []
+
+
+def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
+    monkeypatch, tmp_path
+) -> None:
+    recommendation = {
+        "rank": 1,
+        "recipe_id": "recipe:1",
+        "score": 0.9,
+        "resolved_recipe": {"bases": []},
+        "precedent_reaction_ids": ["reaction:1"],
+        "precedent_reference_ids": ["REF1:paper"],
+    }
+    evidence = SimpleNamespace(
+        to_dict=lambda: {
+            "status": "recommended_direct",
+            "recommendations": [recommendation],
+            "warnings": [],
+        }
+    )
+    reference = {"reference_id": "REF1:paper", "raw_reference": "Example"}
+    experimental = {
+        "observation_id": "observation:1",
+        "reaction_id": "reaction:1",
+        "procedure_text": "Stir for one hour.",
+    }
+    recommender = SimpleNamespace(source_path=str(tmp_path / "generic_index.sqlite"))
+    runtime = LocalRecommendationRuntime(library_root=tmp_path)
+    monkeypatch.setattr(runtime, "_get_recommender", lambda **options: recommender)
+    monkeypatch.setattr(
+        runtime_module,
+        "recommend_retrosynthesis_conditions",
+        lambda *args, **kwargs: evidence,
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_get_reference_catalog",
+        lambda path: {"REF1:paper": reference},
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_get_experimental_detail_catalog",
+        lambda path: {"reaction:reaction:1": experimental},
+    )
+
+    payload = runtime.retrosynthesis_conditions(
+        RetrosynthesisConditionsRequest(
+            reaction_smiles="CCBr.N>>CCN",
+            library_mode="compact",
+        )
+    )
+
+    condition = payload["recommendations"][0]
+    assert condition["precedent_references"] == [reference]
+    assert condition["precedent_experimental_details"] == [experimental]
 
 
 def test_health_and_capabilities_are_versioned() -> None:
@@ -326,6 +491,22 @@ def test_retrosynthesis_contract_forwards_operator_options() -> None:
     assert payload["target_smiles"] == "CCN"
     assert payload["library_mode"] == "compact"
     assert payload["candidates"][0]["precursor_smiles"] == "CCBr.N"
+
+
+def test_retrosynthesis_conditions_contract_is_independent() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis/conditions",
+        json={
+            "reaction_smiles": "CCBr.N>>CCN",
+            "library_mode": "compact",
+            "top_k": 3,
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()["data"]
+    assert payload["status"] == "recommended_direct"
+    assert payload["query_reaction_smiles"] == "CCBr.N>>CCN"
 
 
 def test_retrosynthesis_contract_requires_one_target() -> None:

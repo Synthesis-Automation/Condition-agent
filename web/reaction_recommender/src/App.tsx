@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ApiError, api } from './api/client'
 import type {
   Capabilities,
@@ -58,6 +58,7 @@ function App() {
   const [includeL0, setIncludeL0] = useState(true)
   const [useRetrosynthesisContext, setUseRetrosynthesisContext] = useState(true)
   const [diversifyRetrosynthesis, setDiversifyRetrosynthesis] = useState(true)
+  const retrosynthesisRun = useRef(0)
 
   useEffect(() => {
     Promise.all([api.capabilities(), api.rankingProfiles()])
@@ -70,6 +71,8 @@ function App() {
   }, [])
 
   useEffect(() => {
+    retrosynthesisRun.current += 1
+    setBusy(false)
     setResult(null)
     setCompletionProposal(null)
   }, [reactionSmiles])
@@ -80,11 +83,72 @@ function App() {
   )
 
   const changeMode = (nextMode: Mode) => {
+    retrosynthesisRun.current += 1
+    setBusy(false)
     setMode(nextMode)
     setResult(null)
     setError('')
     if (nextMode === 'retrosynthesis' && capabilities) {
       setLibraryMode(capabilities.default_retrosynthesis_library_mode ?? 'compact')
+    }
+  }
+
+  const loadRetrosynthesisConditions = async (
+    baseResult: RetrosynthesisResult,
+    runId: number,
+    activeLibraryMode: LibraryMode,
+  ) => {
+    for (let index = 0; index < baseResult.candidates.length; index += 1) {
+      if (retrosynthesisRun.current !== runId) return
+      const candidate = baseResult.candidates[index]
+      setStatus(`Loading conditions for hit ${index + 1} of ${baseResult.candidates.length}…`)
+      try {
+        const conditionEvidence = await api.retrosynthesisConditions({
+          reaction_smiles: candidate.condition_query_reaction_smiles
+            || candidate.proposed_reaction_smiles,
+          library_mode: activeLibraryMode,
+          top_k: 3,
+        })
+        if (retrosynthesisRun.current !== runId) return
+        setResult((current) => {
+          if (!current || !('candidates' in current)) return current
+          return {
+            ...current,
+            candidates: current.candidates.map((value) =>
+              value.template_id === candidate.template_id
+              && value.proposed_reaction_smiles === candidate.proposed_reaction_smiles
+                ? { ...value, condition_evidence: conditionEvidence }
+                : value,
+            ),
+          }
+        })
+      } catch (conditionError) {
+        if (retrosynthesisRun.current !== runId) return
+        setResult((current) => {
+          if (!current || !('candidates' in current)) return current
+          return {
+            ...current,
+            candidates: current.candidates.map((value) =>
+              value.template_id === candidate.template_id
+              && value.proposed_reaction_smiles === candidate.proposed_reaction_smiles
+                ? {
+                    ...value,
+                    condition_evidence: {
+                      ...value.condition_evidence,
+                      status: 'insufficient_evidence' as const,
+                      recommendation_mode: 'unavailable',
+                      warnings: ['CONDITION_RECOMMENDATION_UNAVAILABLE'],
+                      error: friendlyError(conditionError),
+                    },
+                  }
+                : value,
+            ),
+          }
+        })
+      }
+    }
+    if (retrosynthesisRun.current === runId) {
+      setStatus(`Done — ${baseResult.candidates.length} disconnection(s), conditions loaded`)
     }
   }
 
@@ -183,25 +247,43 @@ function App() {
   }
 
   const runRetrosynthesis = async () => {
+    const runId = retrosynthesisRun.current + 1
+    retrosynthesisRun.current = runId
+    const activeLibraryMode = libraryMode
+    const startedAt = Date.now()
     setBusy(true)
     setError('')
-    setStatus('Applying graph operators and validating generated precursors…')
+    setStatus('Applying graph operators and validating generated precursors… 0s')
+    const timer = window.setInterval(() => {
+      if (retrosynthesisRun.current === runId) {
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000)
+        setStatus(`Applying graph operators and validating generated precursors… ${elapsed}s`)
+      }
+    }, 1000)
     try {
       const next = await api.retrosynthesize({
         target_smiles: reactionSmiles.trim(),
-        library_mode: libraryMode,
+        library_mode: activeLibraryMode,
         top_k: topK,
         include_l0: includeL0,
         use_context: useRetrosynthesisContext,
         diversify: diversifyRetrosynthesis,
       })
+      if (retrosynthesisRun.current !== runId) return
       setResult(next)
-      setStatus(next.valid ? `Done — ${next.candidates.length} disconnection(s)` : 'No validated disconnection')
+      if (next.valid) {
+        setStatus(`Found ${next.candidates.length} disconnection(s); loading conditions…`)
+        void loadRetrosynthesisConditions(next, runId, activeLibraryMode)
+      } else {
+        setStatus('No validated disconnection')
+      }
     } catch (nextError) {
+      if (retrosynthesisRun.current !== runId) return
       setError(friendlyError(nextError))
       setStatus('Retrosynthesis failed')
     } finally {
-      setBusy(false)
+      window.clearInterval(timer)
+      if (retrosynthesisRun.current === runId) setBusy(false)
     }
   }
 
@@ -285,7 +367,7 @@ function App() {
         </fieldset>
 
         <div className={`option-grid ${mode === 'features' ? 'feature-options' : ''}`}>
-          {mode !== 'features' && <label className="library-option"><span>{mode === 'retrosynthesis' ? 'Operator library' : 'Precedent library'}</span><select aria-label={mode === 'retrosynthesis' ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full — complete</option><option value="compact">Compact — faster</option></select></label>}
+          {mode !== 'features' && <label className="library-option"><span>{mode === 'retrosynthesis' ? 'Operator library' : 'Precedent library'}</span><select aria-label={mode === 'retrosynthesis' ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full — complete</option><option value="compact">Compact — faster</option></select></label>}
           {mode !== 'features' && <label><span>Top results</span><input type="number" min="1" max="50" value={topK} onChange={(event) => setTopK(Math.min(50, Math.max(1, Number(event.target.value))))} /></label>}
           {mode === 'recommendation' ? (
             <label className="wide-option"><span>Ranking profile</span><div className="joined-control"><select value={profileId} onChange={(event) => { setProfileId(event.target.value); setCustomWeights(null) }}>{profiles.map((profile) => <option key={profile.profile_id} value={profile.profile_id}>{profile.label}</option>)}</select><button type="button" className="button quiet" onClick={() => setRankingOpen(true)} disabled={!selectedProfile}>Customize</button></div></label>

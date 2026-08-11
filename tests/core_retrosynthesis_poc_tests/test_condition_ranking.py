@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -177,6 +178,45 @@ def test_condition_enrichment_can_preserve_retrosynthesis_order() -> None:
         "supported",
     ]
     assert [value.condition_informed_rank for value in ranked] == [1, 2]
+
+
+def test_condition_query_failure_preserves_structural_candidate() -> None:
+    candidate = _candidate("failed-condition-query")
+
+    class FailingRecommender:
+        def recommend(self, reaction_smiles: str, **kwargs: object) -> object:
+            raise RuntimeError("condition index failure")
+
+    ranked = rank_retrosynthesis_candidates_with_conditions(
+        (candidate,),
+        FailingRecommender(),
+    )
+
+    assert len(ranked) == 1
+    evidence = ranked[0].condition_evidence
+    assert evidence.status == "insufficient_evidence"
+    assert evidence.recommendations == ()
+    assert evidence.warnings == ("CONDITION_RECOMMENDATION_FAILED",)
+    assert evidence.error == "RuntimeError"
+
+
+def test_condition_enrichment_uses_validated_mapped_query() -> None:
+    candidate = replace(
+        _candidate("mapped-query"),
+        condition_query_reaction_smiles="[CH3:1]Br.[NH2:2]>>[CH3:1][NH:2]",
+    )
+    mapped_query = candidate.condition_query_reaction_smiles
+    recommender = _FakeRecommender(
+        {mapped_query: _result(mapped_query, valid=True)}
+    )
+
+    ranked = rank_retrosynthesis_candidates_with_conditions(
+        (candidate,),
+        recommender,
+    )
+
+    assert ranked[0].condition_evidence.query_reaction_smiles == mapped_query
+    assert recommender.calls[0][0] == mapped_query
 
 
 def test_condition_support_cannot_cross_structural_score_band() -> None:

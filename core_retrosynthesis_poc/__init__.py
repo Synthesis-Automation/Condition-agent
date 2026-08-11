@@ -5,6 +5,7 @@ from .condition_ranking import (
     ConditionRankedRetrosynthesisCandidate,
     RetrosynthesisConditionEvidence,
     rank_retrosynthesis_candidates_with_conditions,
+    recommend_retrosynthesis_conditions,
 )
 from .comparison import run_comparison, split_by_reference
 from .ensemble import EnsembleCandidate, disconnect_ensemble
@@ -112,6 +113,7 @@ __all__ = [
     "iter_library_rows",
     "merge_operator_shards",
     "rank_retrosynthesis_candidates_with_conditions",
+    "recommend_retrosynthesis_conditions",
     "rank_operator_site_diverse",
     "run_comparison",
     "run_operator_coverage_benchmark",

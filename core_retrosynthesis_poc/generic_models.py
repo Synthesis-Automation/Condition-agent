@@ -315,6 +315,7 @@ class GenericDisconnectionCandidate:
     diversity_group_key: Tuple[str, ...] = ()
     structural_score_band: int = 0
     ranking_policy_definition_id: str = ""
+    condition_query_reaction_smiles: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible candidate."""

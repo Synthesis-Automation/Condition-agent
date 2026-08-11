@@ -311,6 +311,9 @@ def test_rdchiral_mapping_prevents_unchanged_halogen_swap() -> None:
     assert candidates
     assert candidates[0].precursor_smiles == "CBr.Fc1cc(Br)cc2cn[nH]c12"
     assert candidates[0].operator_id == library.operators[0].operator_id
+    assert candidates[0].condition_query_reaction_smiles
+    assert ":" in candidates[0].condition_query_reaction_smiles
+    assert ">>" in candidates[0].condition_query_reaction_smiles
 
 
 def test_resumable_full_scale_merge_deduplicates_observations(tmp_path) -> None:

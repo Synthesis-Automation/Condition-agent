@@ -23,6 +23,7 @@ from core_retrosynthesis_poc import (
     GenericTemplateLibrary,
     disconnect_operator_ladder,
     load_generic_library,
+    recommend_retrosynthesis_conditions,
 )
 from reactive_taxonomy import RxnMapperProvider
 from visualization import (
@@ -34,6 +35,7 @@ from .contracts import (
     DiscoveryRequest,
     FeatureAnalysisRequest,
     RecommendationRequest,
+    RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
 )
 from .experimental_details import (
@@ -60,6 +62,51 @@ DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = (
     / "operator_retrosynthesis_poc"
     / "full_scale_v3"
 )
+WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET = 100
+WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET = 30
+
+
+def _unavailable_retrosynthesis_conditions(
+    reaction_smiles: str,
+    error: Exception | None = None,
+) -> Dict[str, Any]:
+    """Preserve a disconnection when condition evidence is unavailable."""
+
+    return {
+        "status": "insufficient_evidence",
+        "query_reaction_smiles": reaction_smiles,
+        "recommender_valid": False,
+        "recommendation_mode": "unavailable",
+        "retrieval_level": None,
+        "uses_type_agnostic_fallback": False,
+        "candidate_count": 0,
+        "independent_candidate_count": 0,
+        "compatible_candidate_count": 0,
+        "independent_compatible_candidate_count": 0,
+        "excluded_candidate_count": 0,
+        "best_recipe_score": None,
+        "best_recipe_compatibility_score": None,
+        "best_recipe_reference_support": 0,
+        "recommendations": [],
+        "warnings": ["CONDITION_RECOMMENDATION_UNAVAILABLE"],
+        "error": type(error).__name__ if error is not None else None,
+    }
+
+
+def _pending_retrosynthesis_conditions(
+    reaction_smiles: str,
+) -> Dict[str, Any]:
+    """Represent condition evidence that the browser will fetch progressively."""
+
+    value = _unavailable_retrosynthesis_conditions(reaction_smiles)
+    value.update(
+        {
+            "status": "pending",
+            "recommendation_mode": "pending",
+            "warnings": [],
+        }
+    )
+    return value
 
 
 class WebRuntime(Protocol):
@@ -81,6 +128,10 @@ class WebRuntime(Protocol):
 
     def retrosynthesize(
         self, request: RetrosynthesisRequest
+    ) -> Dict[str, Any]: ...
+
+    def retrosynthesis_conditions(
+        self, request: RetrosynthesisConditionsRequest
     ) -> Dict[str, Any]: ...
 
     def render_reaction(
@@ -473,9 +524,23 @@ class LocalRecommendationRuntime:
         self,
         request: RetrosynthesisRequest,
     ) -> Dict[str, Any]:
-        """Apply the validated specificity-preserving operator ladder."""
+        """Apply operators and return hits before slower condition lookup."""
 
         library = self._get_retrosynthesis_library(request.library_mode)
+        template_budget = min(
+            300,
+            max(
+                WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET,
+                request.top_k * 10,
+            ),
+        )
+        validation_budget = min(
+            100,
+            max(
+                WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET,
+                request.top_k * 2,
+            ),
+        )
         candidates = disconnect_operator_ladder(
             request.target_smiles.strip(),
             library,
@@ -483,11 +548,51 @@ class LocalRecommendationRuntime:
             use_context=request.use_context,
             include_l0=request.include_l0,
             diversify=request.diversify,
+            max_templates_to_apply=template_budget,
+            max_candidates_to_validate=validation_budget,
         )
-        serialized = [
-            {"rank": rank, **candidate.to_dict()}
-            for rank, candidate in enumerate(candidates, start=1)
-        ]
+        index_path = self._index_path(request.library_mode)
+        reference_catalog = self._get_reference_catalog(index_path)
+        templates = {
+            template.template_id: template for template in library.templates
+        }
+        serialized = []
+        for rank, candidate in enumerate(candidates, start=1):
+            value = {
+                "rank": rank,
+                **candidate.to_dict(),
+            }
+            condition_query = getattr(
+                candidate,
+                "condition_query_reaction_smiles",
+                "",
+            ) or candidate.proposed_reaction_smiles
+            value["condition_evidence"] = _pending_retrosynthesis_conditions(
+                condition_query
+            )
+            value.pop("precedent_reaction_ids", None)
+            template = templates.get(candidate.template_id)
+            supporting_precedents = []
+            seen_support = set()
+            for precedent in template.precedents if template is not None else ():
+                reaction_smiles = (
+                    f"{precedent.precursor_smiles}>>{precedent.product_smiles}"
+                )
+                support_key = (reaction_smiles, precedent.reference_id)
+                if support_key in seen_support:
+                    continue
+                seen_support.add(support_key)
+                reference = reference_catalog.get(precedent.reference_id)
+                supporting_precedents.append(
+                    {
+                        "reaction_smiles": reaction_smiles,
+                        "reference_record": (
+                            dict(reference) if reference is not None else None
+                        ),
+                    }
+                )
+            value["supporting_precedents"] = supporting_precedents
+            serialized.append(value)
         return {
             "target_smiles": (
                 candidates[0].target_smiles
@@ -497,16 +602,48 @@ class LocalRecommendationRuntime:
             "library_mode": request.library_mode,
             "valid": bool(candidates),
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
-            "schema_version": "1.0",
+            "schema_version": "1.2",
             "candidate_count": len(candidates),
             "library_operator_count": len(library.operators),
             "library_template_count": len(library.templates),
             "warnings": [
                 "Single-step proposals are generated from source-round-tripped "
-                "graph operators and still require chemist review."
+                "graph operators and still require chemist review.",
+                "Interactive search uses a bounded operator-validation budget; "
+                "condition evidence loads progressively for each hit.",
             ],
             "candidates": serialized,
         }
+
+    def retrosynthesis_conditions(
+        self,
+        request: RetrosynthesisConditionsRequest,
+    ) -> Dict[str, Any]:
+        """Load condition evidence independently of disconnection generation."""
+
+        recommender = self._get_recommender(
+            library_mode=request.library_mode,
+            use_rxnmapper=False,
+            include_review=False,
+        )
+        evidence = recommend_retrosynthesis_conditions(
+            request.reaction_smiles.strip(),
+            recommender,
+            condition_top_k=request.top_k,
+        ).to_dict()
+        recommendation_payload = {
+            "recommendations": list(evidence.get("recommendations") or ())
+        }
+        attach_recommendation_references(
+            recommendation_payload,
+            self._get_reference_catalog(recommender.source_path),
+        )
+        attach_recommendation_experimental_details(
+            recommendation_payload,
+            self._get_experimental_detail_catalog(recommender.source_path),
+        )
+        evidence["recommendations"] = recommendation_payload["recommendations"]
+        return evidence
 
     def render_reaction(
         self,
