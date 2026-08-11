@@ -380,7 +380,13 @@ export function DiscoveryResults({ result }: { result: DiscoveryResult }) {
   )
 }
 
-function RetrosynthesisDetails({ candidate }: { candidate: RetrosynthesisCandidate }) {
+function RetrosynthesisDetails({
+  candidate,
+  scopeWarnings,
+}: {
+  candidate: RetrosynthesisCandidate
+  scopeWarnings: string[]
+}) {
   const conditionRecommendations = candidate.condition_evidence?.recommendations ?? []
   return (
     <article className="result-detail retrosynthesis-detail">
@@ -467,6 +473,7 @@ function RetrosynthesisDetails({ candidate }: { candidate: RetrosynthesisCandida
           <div><strong>Score band</strong><span>{candidate.structural_score_band}</span></div>
         </div>
       </details>
+      <MessageList title="Scope and cautions" values={scopeWarnings} tone="caution" />
     </article>
   )
 }
@@ -486,12 +493,12 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
         </div>
       </div>
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No retrosynthesis candidates')}</div>}
-      <MessageList title="Scope and cautions" values={result.warnings} tone="caution" />
+      {result.candidates.length === 0 && <MessageList title="Scope and cautions" values={result.warnings} tone="caution" />}
       {result.candidates.length > 0 && (
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Level</th><th>Transformation</th><th>Precursors</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Score</th><th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.candidates.map((candidate, index) => (
                   <tr key={`${candidate.template_id}:${candidate.precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
@@ -499,14 +506,13 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
                     <td>{candidate.score.toFixed(3)}</td>
                     <td>{candidate.abstraction_level}</td>
                     <td>{displayName(candidate.transformation_kind ?? 'graph operator')}</td>
-                    <td className="mono-value">{candidate.precursor_smiles}</td>
                     <td>{candidate.condition_evidence?.recommendations?.[0] ? compactRecipeSummary(candidate.condition_evidence.recommendations[0].resolved_recipe) : 'No compatible conditions'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {active && <RetrosynthesisDetails candidate={active} />}
+          {active && <RetrosynthesisDetails candidate={active} scopeWarnings={result.warnings} />}
         </div>
       )}
     </section>

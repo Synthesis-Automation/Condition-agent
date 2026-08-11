@@ -227,7 +227,7 @@ export function ReactionEditor({
     <section className="editor-card reaction-paper" aria-labelledby="editor-title">
       <div className="section-heading reaction-paper-heading">
         <div>
-          <span className="step-number">1</span>
+          <span className="step-number">2</span>
           <div>
             <h2 id="editor-title">
               {moleculeOnly ? 'Define the target' : allowMolecule ? 'Define the structure' : 'Define the reaction'}
