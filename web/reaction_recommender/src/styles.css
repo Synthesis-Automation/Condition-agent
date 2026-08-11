@@ -201,6 +201,7 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .message-group.caution h4, .message-group.caution li::marker { color: #8a612d; }
 .trace-panel { margin-top: 11px; border: 1px solid #dce5df; border-radius: 9px; background: #fff; }
 .trace-panel summary { padding: 11px 12px; color: #3b5c4c; }
+.machine-code-panel .detail-list { padding: 0 12px 12px; }
 .protocol-panel summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 11px; }
 .readiness-badge { padding: 4px 7px; border-radius: 6px; color: #805728; background: #f8eddc; font-size: .61rem; font-weight: 800; }
 .protocol-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px 10px; color: #6c7d73; font-size: .67rem; }

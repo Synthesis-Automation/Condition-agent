@@ -412,15 +412,6 @@ function RetrosynthesisDetails({
             <div><dt>Forward validation</dt><dd>{displayName(candidate.forward_validation_status)}</dd></div>
           </dl>
         </section>
-        <section>
-          <h4>Operator identity</h4>
-          <dl className="detail-list">
-            <div><dt>Operator</dt><dd className="mono-value">{candidate.operator_id || 'Unavailable'}</dd></div>
-            <div><dt>Realization</dt><dd className="mono-value">{candidate.realization_id || 'Unavailable'}</dd></div>
-            <div><dt>Site</dt><dd className="mono-value">{candidate.disconnection_site_key || 'Unavailable'}</dd></div>
-            <div><dt>Synthon</dt><dd className="mono-value">{candidate.synthon_signature || 'Unavailable'}</dd></div>
-          </dl>
-        </section>
       </div>
       <details className="trace-panel retrosynthesis-conditions" open>
         <summary>
@@ -474,6 +465,15 @@ function RetrosynthesisDetails({
         </div>
       </details>
       <MessageList title="Scope and cautions" values={scopeWarnings} tone="caution" />
+      <details className="trace-panel machine-code-panel">
+        <summary>Operator identity</summary>
+        <dl className="detail-list">
+          <div><dt>Operator</dt><dd className="mono-value">{candidate.operator_id || 'Unavailable'}</dd></div>
+          <div><dt>Realization</dt><dd className="mono-value">{candidate.realization_id || 'Unavailable'}</dd></div>
+          <div><dt>Site</dt><dd className="mono-value">{candidate.disconnection_site_key || 'Unavailable'}</dd></div>
+          <div><dt>Synthon</dt><dd className="mono-value">{candidate.synthon_signature || 'Unavailable'}</dd></div>
+        </dl>
+      </details>
     </article>
   )
 }
