@@ -169,6 +169,7 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .score-orbit strong { font-size: .94rem; }
 .score-orbit span { color: #6e8376; font-size: .58rem; text-transform: uppercase; }
 .result-detail .reaction-image { margin: 15px 0; }
+.mono-value { font-family: Consolas, "SFMono-Regular", monospace; font-size: .67rem; overflow-wrap: anywhere; }
 .detail-columns { display: grid; grid-template-columns: 1fr; gap: 13px; }
 .detail-columns > section, .message-group { padding: 12px; border: 1px solid #dce5df; border-radius: 9px; background: #fff; }
 .detail-columns h4, .message-group h4 { margin-bottom: 8px; }

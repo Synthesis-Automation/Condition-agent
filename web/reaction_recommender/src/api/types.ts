@@ -15,12 +15,19 @@ export interface Capabilities {
   discovery: boolean
   featurization: boolean
   reaction_rendering: boolean
+  retrosynthesis?: boolean
   local_only: boolean
   default_library_mode?: 'full' | 'compact'
   library_modes?: Record<string, {
     label: string
     index_name: string
     index_available: boolean
+  }>
+  default_retrosynthesis_library_mode?: 'full' | 'compact'
+  retrosynthesis_library_modes?: Record<string, {
+    label: string
+    library_name: string
+    library_available: boolean
   }>
 }
 
@@ -389,4 +396,56 @@ export interface FeatureAnalysisRequest {
   input_smiles: string
   use_rxnmapper: boolean
   force_resolved_mapping: boolean
+}
+
+export interface RetrosynthesisRequest {
+  target_smiles: string
+  library_mode: 'full' | 'compact'
+  top_k: number
+  include_l0: boolean
+  use_context: boolean
+  diversify: boolean
+}
+
+export interface RetrosynthesisCandidate {
+  rank: number
+  target_smiles: string
+  precursor_smiles: string
+  proposed_reaction_smiles: string
+  transformation_kind?: string | null
+  abstraction_level: string
+  compiler_engine: string
+  template_id: string
+  score: number
+  context_similarity: number
+  product_similarity: number
+  precursor_similarity: number
+  template_specificity: number
+  independent_reference_support: number
+  forward_validation_status: string
+  center_transition_key: string
+  disconnection_site_key: string
+  precedent_reaction_ids: string[]
+  operator_id: string
+  realization_id: string
+  operator_signature: string
+  synthon_signature: string
+  pre_diversity_rank: number
+  diversity_rank: number
+  diversity_group_key: string[]
+  structural_score_band: number
+  ranking_policy_definition_id: string
+}
+
+export interface RetrosynthesisResult {
+  target_smiles: string
+  library_mode: 'full' | 'compact'
+  valid: boolean
+  error?: string | null
+  schema_version: string
+  candidate_count: number
+  library_operator_count: number
+  library_template_count: number
+  warnings: string[]
+  candidates: RetrosynthesisCandidate[]
 }

@@ -19,6 +19,11 @@ from condition_recommender import (
 from condition_recommender.reaction_completion import (
     validate_completion_selections,
 )
+from core_retrosynthesis_poc import (
+    GenericTemplateLibrary,
+    disconnect_operator_ladder,
+    load_generic_library,
+)
 from reactive_taxonomy import RxnMapperProvider
 from visualization import (
     render_molecule_image_bytes,
@@ -29,6 +34,7 @@ from .contracts import (
     DiscoveryRequest,
     FeatureAnalysisRequest,
     RecommendationRequest,
+    RetrosynthesisRequest,
 )
 from .experimental_details import (
     EXPERIMENTAL_DETAIL_CATALOG_FILENAME,
@@ -48,6 +54,12 @@ from .references import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LIBRARY_ROOT = PROJECT_ROOT / "datasets" / "literature"
 DEFAULT_INDEX_PATH = DEFAULT_LIBRARY_ROOT / "generic_index.sqlite"
+DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = (
+    PROJECT_ROOT
+    / "results"
+    / "operator_retrosynthesis_poc"
+    / "full_scale_v3"
+)
 
 
 class WebRuntime(Protocol):
@@ -67,6 +79,10 @@ class WebRuntime(Protocol):
         self, request: FeatureAnalysisRequest
     ) -> Dict[str, Any]: ...
 
+    def retrosynthesize(
+        self, request: RetrosynthesisRequest
+    ) -> Dict[str, Any]: ...
+
     def render_reaction(
         self, reaction_smiles: str, *, width: int, height: int
     ) -> bytes: ...
@@ -84,6 +100,7 @@ class LocalRecommendationRuntime:
         index_path: str | Path | None = None,
         *,
         library_root: str | Path | None = None,
+        retrosynthesis_library_root: str | Path | None = None,
     ) -> None:
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
         self._configured_index_path = Path(configured) if configured else None
@@ -102,6 +119,13 @@ class LocalRecommendationRuntime:
         else:
             self.library_root = DEFAULT_LIBRARY_ROOT
         self.index_path = self._index_path("full")
+        configured_retrosynthesis = (
+            retrosynthesis_library_root
+            or os.environ.get("CORE_RETROSYNTHESIS_LIBRARY_ROOT")
+        )
+        self.retrosynthesis_library_root = Path(
+            configured_retrosynthesis or DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT
+        )
         self._recommenders: Dict[
             tuple[str, int, int, bool, bool], GenericConditionRecommender
         ] = {}
@@ -112,6 +136,9 @@ class LocalRecommendationRuntime:
         ] = {}
         self._experimental_detail_catalogs: Dict[
             tuple[str, int, int], Dict[str, Dict[str, Any]]
+        ] = {}
+        self._retrosynthesis_libraries: Dict[
+            tuple[str, int, int], GenericTemplateLibrary
         ] = {}
 
     def _index_path(self, library_mode: str) -> Path:
@@ -127,6 +154,43 @@ class LocalRecommendationRuntime:
             if legacy.is_file() or self._configured_index_path is None:
                 return legacy
         return candidate
+
+    def _retrosynthesis_library_path(self, library_mode: str) -> Path:
+        """Resolve the immutable operator library for one web mode."""
+
+        mode = library_mode.strip().casefold()
+        if mode not in {"full", "compact"}:
+            raise ValueError(f"unsupported library mode: {library_mode}")
+        return (
+            self.retrosynthesis_library_root
+            / mode
+            / "operator_library_v3.json.gz"
+        )
+
+    def _get_retrosynthesis_library(
+        self,
+        library_mode: str,
+    ) -> GenericTemplateLibrary:
+        """Load and cache one versioned executable operator library."""
+
+        path = self._retrosynthesis_library_path(library_mode)
+        if not path.is_file():
+            raise FileNotFoundError(
+                "retrosynthesis operator library is unavailable for "
+                f"{library_mode} mode"
+            )
+        stat = path.stat()
+        key = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
+        with self._lock:
+            cached = self._retrosynthesis_libraries.get(key)
+            if cached is not None:
+                return cached
+            for old_key in tuple(self._retrosynthesis_libraries):
+                if old_key[0] == key[0] and old_key[1:] != key[1:]:
+                    self._retrosynthesis_libraries.pop(old_key, None)
+            library = load_generic_library(path)
+            self._retrosynthesis_libraries[key] = library
+            return library
 
     def _get_reference_catalog(
         self, index_path: str | Path
@@ -226,6 +290,13 @@ class LocalRecommendationRuntime:
         mode_paths = {
             mode: self._index_path(mode) for mode in ("full", "compact")
         }
+        retrosynthesis_paths = {
+            mode: self._retrosynthesis_library_path(mode)
+            for mode in ("full", "compact")
+        }
+        default_retrosynthesis_mode = (
+            "full" if retrosynthesis_paths["full"].is_file() else "compact"
+        )
         return {
             "service": "reaction-condition-recommender",
             "index_name": mode_paths["full"].name,
@@ -245,6 +316,20 @@ class LocalRecommendationRuntime:
             "discovery": True,
             "featurization": True,
             "reaction_rendering": True,
+            "retrosynthesis": any(
+                path.is_file() for path in retrosynthesis_paths.values()
+            ),
+            "default_retrosynthesis_library_mode": (
+                default_retrosynthesis_mode
+            ),
+            "retrosynthesis_library_modes": {
+                mode: {
+                    "label": mode.title(),
+                    "library_name": path.name,
+                    "library_available": path.is_file(),
+                }
+                for mode, path in retrosynthesis_paths.items()
+            },
             "local_only": True,
         }
 
@@ -383,6 +468,45 @@ class LocalRecommendationRuntime:
             mapping_provider=mapping_provider,
             force_resolved_mapping=request.force_resolved_mapping,
         )
+
+    def retrosynthesize(
+        self,
+        request: RetrosynthesisRequest,
+    ) -> Dict[str, Any]:
+        """Apply the validated specificity-preserving operator ladder."""
+
+        library = self._get_retrosynthesis_library(request.library_mode)
+        candidates = disconnect_operator_ladder(
+            request.target_smiles.strip(),
+            library,
+            top_k=request.top_k,
+            use_context=request.use_context,
+            include_l0=request.include_l0,
+            diversify=request.diversify,
+        )
+        serialized = [
+            {"rank": rank, **candidate.to_dict()}
+            for rank, candidate in enumerate(candidates, start=1)
+        ]
+        return {
+            "target_smiles": (
+                candidates[0].target_smiles
+                if candidates
+                else request.target_smiles.strip()
+            ),
+            "library_mode": request.library_mode,
+            "valid": bool(candidates),
+            "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
+            "schema_version": "1.0",
+            "candidate_count": len(candidates),
+            "library_operator_count": len(library.operators),
+            "library_template_count": len(library.templates),
+            "warnings": [
+                "Single-step proposals are generated from source-round-tripped "
+                "graph operators and still require chemist review."
+            ],
+            "candidates": serialized,
+        }
 
     def render_reaction(
         self,

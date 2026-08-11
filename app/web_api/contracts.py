@@ -100,6 +100,17 @@ class FeatureAnalysisRequest(StrictRequest):
         return self
 
 
+class RetrosynthesisRequest(StrictRequest):
+    """One structure-derived, single-step retrosynthesis request."""
+
+    target_smiles: str = Field(min_length=1, max_length=20_000)
+    library_mode: Literal["full", "compact"] = "compact"
+    top_k: int = Field(default=10, ge=1, le=50)
+    include_l0: bool = True
+    use_context: bool = True
+    diversify: bool = True
+
+
 class RenderReactionRequest(StrictRequest):
     """Server-side RDKit rendering request."""
 
@@ -141,6 +152,7 @@ __all__ = [
     "PrepareReactionRequest",
     "RankingPreferencesRequest",
     "RecommendationRequest",
+    "RetrosynthesisRequest",
     "RenderMoleculeRequest",
     "RenderReactionRequest",
     "envelope",

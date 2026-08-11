@@ -16,6 +16,7 @@ from .contracts import (
     FeatureAnalysisRequest,
     PrepareReactionRequest,
     RecommendationRequest,
+    RetrosynthesisRequest,
     RenderMoleculeRequest,
     RenderReactionRequest,
     envelope,
@@ -120,6 +121,21 @@ def create_app(
         try:
             data = active_runtime(request).analyze_features(payload)
         except (ValueError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(
+                status_code=status,
+                detail=error_payload(exc),
+            ) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/retrosynthesis")
+    def retrosynthesize(
+        payload: RetrosynthesisRequest,
+        request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).retrosynthesize(payload)
+        except (ValueError, FileNotFoundError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(
                 status_code=status,

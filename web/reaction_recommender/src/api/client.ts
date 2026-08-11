@@ -9,6 +9,8 @@ import type {
   RankingProfile,
   RecommendationRequest,
   RecommendationResult,
+  RetrosynthesisRequest,
+  RetrosynthesisResult,
 } from './types'
 
 const API_ROOT = '/api/v1'
@@ -75,6 +77,12 @@ export const api = {
 
   analyzeFeatures: (request: FeatureAnalysisRequest) =>
     jsonRequest<FeatureAnalysisResult>('/features/analyze', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  retrosynthesize: (request: RetrosynthesisRequest) =>
+    jsonRequest<RetrosynthesisResult>('/retrosynthesis', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

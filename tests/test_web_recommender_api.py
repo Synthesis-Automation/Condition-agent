@@ -98,6 +98,29 @@ class FakeRuntime:
             "analysis": {"schema_version": "test"},
         }
 
+    def retrosynthesize(self, request: Any) -> Dict[str, Any]:
+        return {
+            "target_smiles": request.target_smiles,
+            "library_mode": request.library_mode,
+            "valid": True,
+            "error": None,
+            "schema_version": "1.0",
+            "candidate_count": 1,
+            "library_operator_count": 12,
+            "library_template_count": 34,
+            "warnings": [],
+            "candidates": [
+                {
+                    "rank": 1,
+                    "precursor_smiles": "CCBr.N",
+                    "proposed_reaction_smiles": "CCBr.N>>CCN",
+                    "score": 0.91,
+                    "abstraction_level": "L2",
+                    "forward_validation_status": "verified_signature",
+                }
+            ],
+        }
+
     def render_reaction(
         self, reaction_smiles: str, *, width: int, height: int
     ) -> bytes:
@@ -132,6 +155,31 @@ def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> No
     assert capabilities["default_library_mode"] == "full"
     assert capabilities["library_modes"]["full"]["index_available"] is True
     assert capabilities["library_modes"]["compact"]["index_available"] is True
+
+
+def test_local_runtime_reports_retrosynthesis_library_modes(tmp_path) -> None:
+    compact = tmp_path / "compact"
+    compact.mkdir()
+    (compact / "operator_library_v3.json.gz").touch()
+
+    capabilities = LocalRecommendationRuntime(
+        retrosynthesis_library_root=tmp_path
+    ).capabilities()
+
+    assert capabilities["retrosynthesis"] is True
+    assert capabilities["default_retrosynthesis_library_mode"] == "compact"
+    assert (
+        capabilities["retrosynthesis_library_modes"]["compact"][
+            "library_available"
+        ]
+        is True
+    )
+    assert (
+        capabilities["retrosynthesis_library_modes"]["full"][
+            "library_available"
+        ]
+        is False
+    )
 
 
 def test_local_runtime_loads_paired_catalogs_from_string_index_path(
@@ -258,6 +306,35 @@ def test_feature_analysis_and_molecule_rendering_contracts() -> None:
     assert drawing.status_code == 200
     assert drawing.headers["content-type"].startswith("image/svg+xml")
     assert drawing.content.startswith(b"<svg")
+
+
+def test_retrosynthesis_contract_forwards_operator_options() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis",
+        json={
+            "target_smiles": "CCN",
+            "library_mode": "compact",
+            "top_k": 7,
+            "include_l0": False,
+            "use_context": True,
+            "diversify": True,
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()["data"]
+    assert payload["target_smiles"] == "CCN"
+    assert payload["library_mode"] == "compact"
+    assert payload["candidates"][0]["precursor_smiles"] == "CCBr.N"
+
+
+def test_retrosynthesis_contract_requires_one_target() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis",
+        json={"target_smiles": "", "library_mode": "compact"},
+    )
+
+    assert response.status_code == 422
 
 
 def test_request_contract_rejects_unknown_fields() -> None:

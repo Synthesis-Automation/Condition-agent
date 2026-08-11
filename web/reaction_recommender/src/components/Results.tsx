@@ -8,6 +8,8 @@ import type {
   RecommendationResult,
   ReferenceRecord,
   ResolvedRecipe,
+  RetrosynthesisCandidate,
+  RetrosynthesisResult,
   SynthesisProtocolDraft,
 } from '../api/types'
 import { ReactionImage } from './ReactionImage'
@@ -374,6 +376,101 @@ export function DiscoveryResults({ result }: { result: DiscoveryResult }) {
       {result.hits.length > 0 && <div className="results-layout"><div className="table-scroll"><table><thead><tr><th>Rank</th><th>Score</th><th>Relationship</th><th>Yield</th><th>Conditions</th></tr></thead><tbody>
         {result.hits.map((hit, index) => <tr key={hit.observation_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}><td><strong>{hit.rank}</strong></td><td>{hit.discovery_score.toFixed(3)}</td><td>{displayName(hit.relation_class)}</td><td>{hit.yield_pct == null ? '—' : `${hit.yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(hit.resolved_recipe)}</td></tr>)}
       </tbody></table></div>{active && <DiscoveryDetails hit={active} />}</div>}
+    </section>
+  )
+}
+
+function RetrosynthesisDetails({ candidate }: { candidate: RetrosynthesisCandidate }) {
+  return (
+    <article className="result-detail retrosynthesis-detail">
+      <div className="detail-title-row">
+        <div>
+          <span className="eyebrow">SELECTED DISCONNECTION</span>
+          <h3>Rank {candidate.rank} · {displayName(candidate.transformation_kind ?? 'graph operator')}</h3>
+          <p>{candidate.precursor_smiles}</p>
+        </div>
+        <div className="score-orbit"><strong>{candidate.score.toFixed(3)}</strong><span>score</span></div>
+      </div>
+      <ReactionImage smiles={candidate.proposed_reaction_smiles} label="Proposed single-step retrosynthesis" compact />
+      <div className="detail-columns">
+        <section>
+          <h4>Structural evidence</h4>
+          <dl className="detail-list">
+            <div><dt>Abstraction level</dt><dd>{candidate.abstraction_level}</dd></div>
+            <div><dt>Product similarity</dt><dd>{candidate.product_similarity.toFixed(3)}</dd></div>
+            <div><dt>Precursor similarity</dt><dd>{candidate.precursor_similarity.toFixed(3)}</dd></div>
+            <div><dt>Context similarity</dt><dd>{candidate.context_similarity.toFixed(3)}</dd></div>
+            <div><dt>Template specificity</dt><dd>{candidate.template_specificity.toFixed(3)}</dd></div>
+            <div><dt>Independent references</dt><dd>{candidate.independent_reference_support}</dd></div>
+            <div><dt>Forward validation</dt><dd>{displayName(candidate.forward_validation_status)}</dd></div>
+          </dl>
+        </section>
+        <section>
+          <h4>Operator identity</h4>
+          <dl className="detail-list">
+            <div><dt>Operator</dt><dd className="mono-value">{candidate.operator_id || 'Unavailable'}</dd></div>
+            <div><dt>Realization</dt><dd className="mono-value">{candidate.realization_id || 'Unavailable'}</dd></div>
+            <div><dt>Site</dt><dd className="mono-value">{candidate.disconnection_site_key || 'Unavailable'}</dd></div>
+            <div><dt>Synthon</dt><dd className="mono-value">{candidate.synthon_signature || 'Unavailable'}</dd></div>
+          </dl>
+        </section>
+      </div>
+      {candidate.precedent_reaction_ids.length > 0 && (
+        <details className="trace-panel">
+          <summary>Supporting precedent reactions</summary>
+          <p className="mono-wrap">{candidate.precedent_reaction_ids.join(', ')}</p>
+        </details>
+      )}
+      <details className="trace-panel">
+        <summary>Ranking trace</summary>
+        <div className="factor-grid">
+          <div><strong>Policy</strong><span>{candidate.ranking_policy_definition_id || 'Default structural ranking'}</span></div>
+          <div><strong>Structural rank</strong><span>{candidate.pre_diversity_rank || candidate.rank}</span></div>
+          <div><strong>Diversity rank</strong><span>{candidate.diversity_rank || candidate.rank}</span></div>
+          <div><strong>Score band</strong><span>{candidate.structural_score_band}</span></div>
+        </div>
+      </details>
+    </article>
+  )
+}
+
+export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult }) {
+  const [selected, setSelected] = useState(0)
+  useEffect(() => setSelected(0), [result])
+  const active = result.candidates[selected]
+  return (
+    <section className="results-card">
+      <div className="results-summary">
+        <div><span className="eyebrow">RETROSYNTHESIS RESULT</span><h2>{result.candidates.length} validated disconnection{result.candidates.length === 1 ? '' : 's'}</h2></div>
+        <div className="metric-strip">
+          <div><strong>{result.candidate_count}</strong><span>candidates</span></div>
+          <div><strong>{result.library_operator_count}</strong><span>operators</span></div>
+          <div><strong>{result.library_template_count}</strong><span>templates</span></div>
+        </div>
+      </div>
+      {!result.valid && <div className="alert error">{displayName(result.error ?? 'No retrosynthesis candidates')}</div>}
+      <MessageList title="Scope and cautions" values={result.warnings} tone="caution" />
+      {result.candidates.length > 0 && (
+        <div className="results-layout">
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>Rank</th><th>Score</th><th>Level</th><th>Transformation</th><th>Precursors</th></tr></thead>
+              <tbody>
+                {result.candidates.map((candidate, index) => (
+                  <tr key={`${candidate.template_id}:${candidate.precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
+                    <td><strong>{candidate.rank}</strong></td>
+                    <td>{candidate.score.toFixed(3)}</td>
+                    <td>{candidate.abstraction_level}</td>
+                    <td>{displayName(candidate.transformation_kind ?? 'graph operator')}</td>
+                    <td className="mono-value">{candidate.precursor_smiles}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {active && <RetrosynthesisDetails candidate={active} />}
+        </div>
+      )}
     </section>
   )
 }
