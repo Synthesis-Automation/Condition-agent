@@ -6,6 +6,7 @@ import gzip
 import hashlib
 import io
 import json
+import os
 import re
 import sqlite3
 from dataclasses import dataclass
@@ -19,17 +20,21 @@ from ..sqlite_indexing import (
 from .concise_review import iter_canonical_records
 from .sharded import (
     SHARD_MANIFEST_SCHEMA_VERSION,
+    SHARDED_CONVERSION_DEFINITION_VERSION,
     ShardedConversionCancelled,
     ShardedConversionProgress,
     convert_datasets_sharded,
     iter_gzip_jsonl,
+    validate_sharded_conversion,
     write_conversion_catalogs,
 )
-from .input_schema import ConversionDatasetInput
+from .input_schema import ConversionDatasetInput, discover_conversion_datasets
 
 RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "2.3"
-SAVED_BATCH_WORKFLOW_SCHEMA_VERSION = "1.2"
+SAVED_BATCH_WORKFLOW_SCHEMA_VERSION = "1.3"
 SAVED_BATCHES_DIRNAME = "batches"
+CONVERTED_SOURCES_DIRNAME = "converted_sources"
+SAVED_BATCH_MANIFEST_ARTIFACT_TYPE = "saved_recommendation_batch_manifest"
 COMBINED_RECORDS_FILENAME = "combined_records.jsonl.gz"
 COMBINED_BATCH_MANIFEST_FILENAME = "combined_batch_manifest.json"
 RECOMMENDATION_LIBRARY_MODES = ("full", "compact")
@@ -134,7 +139,19 @@ def _safe_batch_name(value: str) -> str:
 
 
 def _automatic_batch_name(dataset_path: ConversionDatasetInput) -> str:
-    selected = _selected_paths(dataset_path)
+    selected = tuple(
+        sorted(
+            discover_conversion_datasets(dataset_path),
+            key=lambda path: str(path.resolve()).casefold(),
+        )
+    )
+    if not selected:
+        selected = tuple(
+            sorted(
+                _selected_paths(dataset_path),
+                key=lambda path: str(path.resolve()).casefold(),
+            )
+        )
     identity = json.dumps(
         [str(path.resolve()).casefold() for path in selected],
         ensure_ascii=False,
@@ -143,6 +160,118 @@ def _automatic_batch_name(dataset_path: ConversionDatasetInput) -> str:
     digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:10]
     stem = _safe_batch_name(selected[0].stem)[:36] if selected else "inputs"
     return f"batch-{stem}-{digest}"
+
+
+def _source_artifact_location(
+    source: Path,
+    library_dir: Path,
+    *,
+    source_sha256: str,
+    shard_size: int,
+    conversion_mode: str,
+    use_rxnmapper: bool,
+) -> tuple[str, Path]:
+    """Return the immutable cache identity and folder for one source version."""
+    resolved = source.resolve()
+    path_digest = hashlib.sha256(
+        str(resolved).casefold().encode("utf-8")
+    ).hexdigest()[:10]
+    identity = {
+        "source_path": str(resolved).casefold(),
+        "source_sha256": source_sha256,
+        "shard_size": shard_size,
+        "conversion_mode": conversion_mode.casefold(),
+        "use_rxnmapper": use_rxnmapper,
+        "sharded_conversion_definition_version": (
+            SHARDED_CONVERSION_DEFINITION_VERSION
+        ),
+    }
+    conversion_digest = hashlib.sha256(
+        json.dumps(
+            identity,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()[:16]
+    try:
+        stem = _safe_batch_name(source.stem)[:36]
+    except ValueError:
+        stem = "source"
+    artifact_id = f"{stem}.{path_digest}/{conversion_digest}"
+    return artifact_id, library_dir / CONVERTED_SOURCES_DIRNAME / artifact_id
+
+
+def _relative_reference(path: Path, origin: Path) -> str:
+    return Path(os.path.relpath(path.resolve(), origin.resolve())).as_posix()
+
+
+def _resolve_manifest_reference(
+    batch_manifest_path: Path,
+    reference: Mapping[str, Any],
+) -> Path:
+    relative = str(reference.get("relative_path") or "").strip()
+    if relative:
+        return (batch_manifest_path.parent / relative).resolve()
+    stored = str(reference.get("path") or "").strip()
+    if not stored:
+        raise ValueError(
+            f"Saved batch has an empty source-manifest reference: "
+            f"{batch_manifest_path}"
+        )
+    return Path(stored).resolve()
+
+
+def _referenced_conversion_manifests(
+    manifest_path: Path,
+    manifest: Optional[Mapping[str, Any]] = None,
+) -> tuple[Path, ...]:
+    payload = (
+        dict(manifest)
+        if manifest is not None
+        else json.loads(manifest_path.read_text(encoding="utf-8"))
+    )
+    artifact_type = payload.get("artifact_type")
+    if artifact_type == "generic_sharded_conversion":
+        return (manifest_path,)
+    if artifact_type != SAVED_BATCH_MANIFEST_ARTIFACT_TYPE:
+        raise ValueError(f"Unsupported saved batch manifest: {manifest_path}")
+    if payload.get("schema_version") != SAVED_BATCH_WORKFLOW_SCHEMA_VERSION:
+        raise ValueError(f"Unsupported saved batch manifest schema: {manifest_path}")
+    references = tuple(payload.get("source_manifests") or ())
+    if not references:
+        raise ValueError(f"Saved batch has no converted-source references: {manifest_path}")
+    return tuple(
+        _resolve_manifest_reference(manifest_path, reference)
+        for reference in references
+    )
+
+
+def _conversion_manifest_complete(manifest_path: Path) -> bool:
+    if not manifest_path.is_file():
+        return False
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    source_files = tuple(manifest.get("source_files") or ())
+    if (
+        manifest.get("schema_version") != SHARD_MANIFEST_SCHEMA_VERSION
+        or manifest.get("artifact_type") != "generic_sharded_conversion"
+        or not source_files
+        or any(not source.get("coverage_complete") for source in source_files)
+        or any(
+            entry.get("status") != "complete"
+            for entry in manifest.get("shards") or ()
+        )
+    ):
+        return False
+    try:
+        return bool(
+            validate_sharded_conversion(manifest_path, verify_rows=False).get("valid")
+        )
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
 
 
 def discover_saved_conversion_batches(
@@ -181,6 +310,17 @@ def incomplete_saved_conversion_batches(
             not source.get("coverage_complete") for source in source_files
         ):
             incomplete.append(manifest_path)
+            continue
+        if manifest.get("artifact_type") == SAVED_BATCH_MANIFEST_ARTIFACT_TYPE:
+            try:
+                referenced = _referenced_conversion_manifests(
+                    manifest_path, manifest
+                )
+            except ValueError:
+                incomplete.append(manifest_path)
+                continue
+            if any(not _conversion_manifest_complete(path) for path in referenced):
+                incomplete.append(manifest_path)
     return tuple(incomplete)
 
 
@@ -196,9 +336,40 @@ def resume_saved_conversion_batch(
     """Resume one checkpointed batch using its persisted source selection."""
     source = Path(manifest_path)
     manifest = json.loads(source.read_text(encoding="utf-8"))
+    artifact_type = manifest.get("artifact_type")
+    if artifact_type == SAVED_BATCH_MANIFEST_ARTIFACT_TYPE:
+        if manifest.get("schema_version") != SAVED_BATCH_WORKFLOW_SCHEMA_VERSION:
+            raise ValueError(f"Unsupported saved batch manifest: {source}")
+        dataset_paths = tuple(
+            str(value) for value in manifest.get("dataset_paths") or ()
+        )
+        if not dataset_paths:
+            raise ValueError(
+                f"Saved batch has no source selection to resume: {source}"
+            )
+        missing = tuple(value for value in dataset_paths if not Path(value).exists())
+        if missing:
+            raise ValueError(
+                f"Cannot resume {source}; {len(missing)} selected source path(s) "
+                "no longer exist"
+            )
+        library_dir = Path(
+            str(manifest.get("library_dir") or source.parent.parent)
+        )
+        return save_recommendation_batch(
+            dataset_paths,
+            library_dir,
+            batch_name=str(manifest.get("batch_name") or source.parent.name),
+            shard_size=int(manifest.get("shard_size") or 1_000),
+            workers=workers,
+            use_rxnmapper=bool(manifest.get("use_rxnmapper")),
+            conversion_mode=str(manifest.get("mode") or "full"),
+            progress_callback=progress_callback,
+            cancel_check=cancel_check,
+        )
     if (
         manifest.get("schema_version") != SHARD_MANIFEST_SCHEMA_VERSION
-        or manifest.get("artifact_type") != "generic_sharded_conversion"
+        or artifact_type != "generic_sharded_conversion"
     ):
         raise ValueError(f"Unsupported saved batch manifest: {source}")
     dataset_paths = tuple(str(value) for value in manifest.get("dataset_paths") or ())
@@ -227,6 +398,92 @@ def resume_saved_conversion_batch(
     )
 
 
+def _source_reference(
+    *,
+    source: Path,
+    source_sha256: str,
+    artifact_id: str,
+    source_manifest: Path,
+    batch_dir: Path,
+) -> Dict[str, Any]:
+    return {
+        "source_path": str(source.resolve()),
+        "source_sha256": source_sha256,
+        "source_artifact_id": artifact_id,
+        "path": str(source_manifest.resolve()),
+        "relative_path": _relative_reference(source_manifest, batch_dir),
+    }
+
+
+def _saved_batch_manifest_payload(
+    *,
+    batch_name: str,
+    batch_dir: Path,
+    library_dir: Path,
+    dataset_path: ConversionDatasetInput,
+    source_references: Iterable[Mapping[str, Any]],
+    shard_size: int,
+    conversion_mode: str,
+    use_rxnmapper: bool,
+) -> Dict[str, Any]:
+    references = [dict(reference) for reference in source_references]
+    source_files = []
+    for reference in references:
+        manifest_path = _resolve_manifest_reference(
+            batch_dir / "shard_manifest.json", reference
+        )
+        if not manifest_path.is_file():
+            source_files.append(
+                {
+                    "path": reference["source_path"],
+                    "sha256": reference["source_sha256"],
+                    "covered_row_count": 0,
+                    "coverage_complete": False,
+                    "source_artifact_id": reference["source_artifact_id"],
+                }
+            )
+            continue
+        try:
+            source_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            source_files.append(
+                {
+                    "path": reference["source_path"],
+                    "sha256": reference["source_sha256"],
+                    "covered_row_count": 0,
+                    "coverage_complete": False,
+                    "source_artifact_id": reference["source_artifact_id"],
+                }
+            )
+            continue
+        for source_file in source_manifest.get("source_files") or ():
+            source_files.append(
+                {
+                    **source_file,
+                    "source_artifact_id": reference["source_artifact_id"],
+                }
+            )
+    selected = _selected_paths(dataset_path)
+    return {
+        "schema_version": SAVED_BATCH_WORKFLOW_SCHEMA_VERSION,
+        "artifact_type": SAVED_BATCH_MANIFEST_ARTIFACT_TYPE,
+        "batch_name": batch_name,
+        "batch_dir": str(batch_dir.resolve()),
+        "library_dir": str(library_dir.resolve()),
+        "dataset_path": (
+            str(selected[0].resolve()) if len(selected) == 1 else None
+        ),
+        "dataset_paths": [str(path.resolve()) for path in selected],
+        "mode": conversion_mode,
+        "shard_size": shard_size,
+        "use_rxnmapper": use_rxnmapper,
+        "source_files": source_files,
+        "source_manifests": references,
+        "coverage_complete": bool(source_files)
+        and all(source.get("coverage_complete") for source in source_files),
+    }
+
+
 def save_recommendation_batch(
     dataset_path: ConversionDatasetInput,
     library_dir: str | Path,
@@ -242,7 +499,7 @@ def save_recommendation_batch(
     ] = None,
     cancel_check: Optional[Callable[[], bool]] = None,
 ) -> Dict[str, Any]:
-    """Convert selected inputs into one independently reusable saved batch."""
+    """Convert sources once and save a lightweight batch of artifact references."""
     root = Path(library_dir)
     batches_dir = root / SAVED_BATCHES_DIRNAME
     resolved_name = (
@@ -253,18 +510,154 @@ def save_recommendation_batch(
     batch_dir = batches_dir / resolved_name
     _validate_paths(dataset_path, batch_dir)
     batches_dir.mkdir(parents=True, exist_ok=True)
-    report = build_recommendation_artifacts(
-        dataset_path,
-        batch_dir,
-        shard_size=shard_size,
-        workers=workers,
-        build_fast_index=False,
-        use_rxnmapper=use_rxnmapper,
-        conversion_mode=conversion_mode,
-        checkpoint_interval=checkpoint_interval,
-        progress_callback=progress_callback,
-        cancel_check=cancel_check,
+    batch_dir.mkdir(parents=True, exist_ok=True)
+    paths = discover_conversion_datasets(dataset_path)
+    if not paths:
+        raise ValueError("No supported conversion datasets were found")
+
+    source_references = []
+    source_work = []
+    for path in paths:
+        source_sha256 = _sha256(path)
+        artifact_id, artifact_dir = _source_artifact_location(
+            path,
+            root,
+            source_sha256=source_sha256,
+            shard_size=shard_size,
+            conversion_mode=conversion_mode,
+            use_rxnmapper=use_rxnmapper,
+        )
+        source_manifest = artifact_dir / "shard_manifest.json"
+        source_references.append(
+            _source_reference(
+                source=path,
+                source_sha256=source_sha256,
+                artifact_id=artifact_id,
+                source_manifest=source_manifest,
+                batch_dir=batch_dir,
+            )
+        )
+        source_work.append((path, artifact_dir, source_manifest))
+
+    batch_manifest_path = batch_dir / "shard_manifest.json"
+
+    def checkpoint_batch() -> Dict[str, Any]:
+        payload = _saved_batch_manifest_payload(
+            batch_name=resolved_name,
+            batch_dir=batch_dir,
+            library_dir=root,
+            dataset_path=dataset_path,
+            source_references=source_references,
+            shard_size=shard_size,
+            conversion_mode=conversion_mode,
+            use_rxnmapper=use_rxnmapper,
+        )
+        _atomic_json(batch_manifest_path, payload)
+        return payload
+
+    checkpoint_batch()
+    source_reports = []
+    source_reused = []
+    reused_source_file_count = 0
+    try:
+        for path, artifact_dir, source_manifest in source_work:
+            if _conversion_manifest_complete(source_manifest):
+                stored_report_path = artifact_dir / "recommendation_artifacts_report.json"
+                if stored_report_path.is_file():
+                    source_report = json.loads(
+                        stored_report_path.read_text(encoding="utf-8")
+                    )
+                    source_report = {
+                        **source_report,
+                        "reused_shard_count": int(source_report.get("shard_count") or 0),
+                    }
+                    reused_source_file_count += 1
+                    source_reports.append(source_report)
+                    source_reused.append(True)
+                    if progress_callback is not None:
+                        progress_callback(
+                            RecommendationArtifactProgress(
+                                phase="source_reused",
+                                source_file_count=len(paths),
+                                shard_count=int(
+                                    source_report.get("shard_count") or 0
+                                ),
+                                row_count=int(
+                                    source_report.get("record_count") or 0
+                                ),
+                                message=(
+                                    f"Reused converted source: {path.name}"
+                                ),
+                            )
+                        )
+                    checkpoint_batch()
+                    continue
+            source_report = build_recommendation_artifacts(
+                path,
+                artifact_dir,
+                shard_size=shard_size,
+                workers=workers,
+                build_fast_index=False,
+                use_rxnmapper=use_rxnmapper,
+                conversion_mode=conversion_mode,
+                checkpoint_interval=checkpoint_interval,
+                progress_callback=progress_callback,
+                cancel_check=cancel_check,
+            )
+            source_reports.append(source_report)
+            source_reused.append(False)
+            checkpoint_batch()
+    except RecommendationArtifactBuildCancelled:
+        checkpoint_batch()
+        raise
+
+    batch_manifest = checkpoint_batch()
+    record_count = sum(int(item.get("record_count") or 0) for item in source_reports)
+    shard_count = sum(int(item.get("shard_count") or 0) for item in source_reports)
+    reused_shard_count = sum(
+        int(item.get("reused_shard_count") or 0) for item in source_reports
     )
+    source_artifacts = [
+        {
+            **reference,
+            "record_count": int(report.get("record_count") or 0),
+            "shard_count": int(report.get("shard_count") or 0),
+            "reused": reused,
+        }
+        for reference, report, reused in zip(
+            source_references, source_reports, source_reused
+        )
+    ]
+    report = {
+        "schema_version": RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION,
+        "artifact_type": "recommendation_artifact_build",
+        "conversion_mode": conversion_mode,
+        "source_path": (
+            str(paths[0].resolve()) if len(paths) == 1 else None
+        ),
+        "source_paths": [str(path.resolve()) for path in paths],
+        "output_dir": str(batch_dir.resolve()),
+        "settings": {
+            "shard_size": shard_size,
+            "workers": 1 if use_rxnmapper else workers,
+            "requested_workers": workers,
+            "build_fast_index": False,
+            "use_rxnmapper": use_rxnmapper,
+            "compression": "shared gzip canonical shards",
+        },
+        "source_file_count": len(paths),
+        "record_count": record_count,
+        "shard_count": shard_count,
+        "reused_shard_count": reused_shard_count,
+        "reused_source_file_count": reused_source_file_count,
+        "new_source_file_count": len(paths) - reused_source_file_count,
+        "artifacts": {
+            "canonical_manifest": _artifact_entry(batch_manifest_path, batch_dir),
+            "converted_sources": source_artifacts,
+        },
+        "warnings": [],
+        "batch_manifest": batch_manifest,
+    }
     batch_report = {
         **report,
         "artifact_type": "saved_recommendation_batch",
@@ -281,14 +674,11 @@ def _batch_records(
     manifest_paths: Iterable[Path],
 ) -> Iterator[Dict[str, Any]]:
     expected_contract: Mapping[str, Any] | None = None
-    for manifest_path in manifest_paths:
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if (
-            manifest.get("schema_version") != SHARD_MANIFEST_SCHEMA_VERSION
-            or manifest.get("artifact_type") != "generic_sharded_conversion"
-        ):
-            raise ValueError(f"Unsupported saved batch manifest: {manifest_path}")
-        source_files = tuple(manifest.get("source_files") or ())
+    for batch_manifest_path in manifest_paths:
+        batch_manifest = json.loads(
+            batch_manifest_path.read_text(encoding="utf-8")
+        )
+        source_files = tuple(batch_manifest.get("source_files") or ())
         incomplete_sources = tuple(
             str(source.get("path") or "")
             for source in source_files
@@ -297,32 +687,54 @@ def _batch_records(
         if not source_files or incomplete_sources:
             raise ValueError(
                 "Saved batch conversion is incomplete and cannot be combined: "
-                f"{manifest_path} ({len(incomplete_sources)} incomplete "
+                f"{batch_manifest_path} ({len(incomplete_sources)} incomplete "
                 "source file(s)). Resume and finish this batch first."
             )
-        contract = {
-            key: value
-            for key, value in (manifest.get("definition_contract") or {}).items()
-            if key != "external_atom_mapping"
-        }
-        if expected_contract is None:
-            expected_contract = contract
-        elif contract != expected_contract:
-            raise ValueError(
-                "Saved batches use different chemistry definition contracts; "
-                "reconvert the older batch before combining"
-            )
-        for entry in manifest.get("shards") or ():
-            if entry.get("status") != "complete":
+        conversion_manifests = _referenced_conversion_manifests(
+            batch_manifest_path, batch_manifest
+        )
+        for manifest_path in conversion_manifests:
+            if not manifest_path.is_file():
                 raise ValueError(
-                    f"Saved batch contains an incomplete shard: {manifest_path}"
+                    "Saved batch references a missing converted source: "
+                    f"{manifest_path}"
                 )
-            shard_path = manifest_path.parent / str(entry.get("output_path") or "")
-            if not shard_path.is_file() or _sha256(shard_path) != entry.get(
-                "output_sha256"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if (
+                manifest.get("schema_version") != SHARD_MANIFEST_SCHEMA_VERSION
+                or manifest.get("artifact_type") != "generic_sharded_conversion"
             ):
-                raise ValueError(f"Saved batch shard checksum failed: {shard_path}")
-            yield from iter_gzip_jsonl(shard_path)
+                raise ValueError(
+                    f"Unsupported converted-source manifest: {manifest_path}"
+                )
+            contract = {
+                key: value
+                for key, value in (manifest.get("definition_contract") or {}).items()
+                if key != "external_atom_mapping"
+            }
+            if expected_contract is None:
+                expected_contract = contract
+            elif contract != expected_contract:
+                raise ValueError(
+                    "Saved batches use different chemistry definition contracts; "
+                    "reconvert the older batch before combining"
+                )
+            for entry in manifest.get("shards") or ():
+                if entry.get("status") != "complete":
+                    raise ValueError(
+                        "Saved batch contains an incomplete shard: "
+                        f"{manifest_path}"
+                    )
+                shard_path = manifest_path.parent / str(
+                    entry.get("output_path") or ""
+                )
+                if not shard_path.is_file() or _sha256(shard_path) != entry.get(
+                    "output_sha256"
+                ):
+                    raise ValueError(
+                        f"Saved batch shard checksum failed: {shard_path}"
+                    )
+                yield from iter_gzip_jsonl(shard_path)
 
 
 def _write_combined_records(
@@ -835,8 +1247,10 @@ def build_recommendation_artifacts(
 __all__ = [
     "COMBINED_BATCH_MANIFEST_FILENAME",
     "COMBINED_RECORDS_FILENAME",
+    "CONVERTED_SOURCES_DIRNAME",
     "RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION",
     "SAVED_BATCHES_DIRNAME",
+    "SAVED_BATCH_MANIFEST_ARTIFACT_TYPE",
     "SAVED_BATCH_WORKFLOW_SCHEMA_VERSION",
     "RecommendationArtifactBuildCancelled",
     "RecommendationArtifactProgress",

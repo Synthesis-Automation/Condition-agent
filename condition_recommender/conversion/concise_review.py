@@ -184,6 +184,21 @@ def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
     source = Path(path)
     if source.name.casefold() == "shard_manifest.json":
         payload = json.loads(source.read_text(encoding="utf-8"))
+        if payload.get("artifact_type") == "saved_recommendation_batch_manifest":
+            references = tuple(payload.get("source_manifests") or ())
+            if not references:
+                raise ValueError(
+                    f"Saved batch has no converted-source references: {source}"
+                )
+            for reference in references:
+                relative = str(reference.get("relative_path") or "").strip()
+                referenced = (
+                    (source.parent / relative).resolve()
+                    if relative
+                    else Path(str(reference.get("path") or "")).resolve()
+                )
+                yield from iter_canonical_records(referenced)
+            return
         if payload.get("artifact_type") != "generic_sharded_conversion":
             raise ValueError(f"Not a sharded conversion manifest: {source}")
         for entry in payload.get("shards") or ():

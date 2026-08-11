@@ -730,11 +730,14 @@ already contains a root-level pre-mode library, that location remains the Full
 library so its expensive completed batches do not need to be rebuilt; Compact
 still uses `compact/`.
 
-**Convert & Save Batch** stores the selection as an independent, restartable
-folder under the selected mode's `batches/`. You can repeat this for later
-groups of files. **Combine Saved Batches / Build Index** then streams every
-saved batch in the selected mode, removes identical duplicate observations, and
-rebuilds that mode's active recommender artifacts. If two saved
+**Convert & Save Batch** converts each distinct source version once under the
+selected mode's shared `converted_sources/` store. The lightweight batch under
+`batches/` records only the selected source-artifact references. Overlapping
+batches therefore reuse the same physical shards instead of converting and
+storing a source again. You can repeat this for later groups of files.
+**Combine Saved Batches / Build Index** then streams every saved batch in the
+selected mode, removes identical duplicate observations, and rebuilds that
+mode's active recommender artifacts. If two saved
 records have the same observation ID but different content, combining stops
 instead of silently choosing one. Combining also refuses any cancelled or
 otherwise incomplete batch, so partial source coverage cannot replace a
@@ -744,10 +747,13 @@ checkpointed shards, and proceeds to indexing only after coverage is complete.
 
 Each mode-specific batch library creates:
 
-- `batches/<batch-name>/shard_manifest.json` and compressed shards: canonical
-  data for each independently reusable batch. A blank batch name produces a
-  stable name from the selected inputs, so cancellation or restart reuses
-  completed shards.
+- `converted_sources/<source>/<version>/shard_manifest.json` and compressed
+  shards: canonical data shared by every batch that selects the same source
+  path, content checksum, conversion mode, settings, and definition version.
+- `batches/<batch-name>/shard_manifest.json`: a small manifest referencing the
+  converted sources selected for that batch. A blank batch name produces a
+  stable, order-independent name from the discovered files, so selecting the
+  same files in a different order reuses the same logical batch.
 - `combined_records.jsonl.gz`: the deduplicated canonical corpus represented by
   the active index.
 - `generic_index.sqlite`: the trusted-precedent runtime index used by default.

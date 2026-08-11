@@ -251,7 +251,7 @@ def test_saved_batches_combine_into_one_active_recommender(tmp_path: Path) -> No
     assert report["input_record_count"] == 2
     assert report["record_count"] == 2
     assert report["duplicate_record_count"] == 0
-    assert report["schema_version"] == "1.2"
+    assert report["schema_version"] == "1.3"
     assert "review_csv" not in report["artifacts"]
     assert not (library / "reaction_review.csv").exists()
     assert (library / "combined_records.jsonl.gz").is_file()
@@ -292,6 +292,128 @@ def test_combining_saved_batches_deduplicates_identical_observations(
     assert report["record_count"] == 1
     assert report["duplicate_record_count"] == 1
     assert len(load_generic_index(library / "generic_index.sqlite").rows) == 1
+
+
+def test_overlapping_batches_share_converted_source_artifacts(
+    tmp_path: Path,
+) -> None:
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    paths = {}
+    for name in ("a.csv", "b.csv", "c.csv"):
+        path = source_dir / name
+        row = _source_row(name)
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(row))
+            writer.writeheader()
+            writer.writerow(row)
+        paths[name] = path
+    library = tmp_path / "library"
+
+    first = save_recommendation_batch(
+        (paths["a.csv"], paths["b.csv"]),
+        library,
+        batch_name="ab",
+        shard_size=1,
+    )
+    second = save_recommendation_batch(
+        (paths["a.csv"], paths["c.csv"]),
+        library,
+        batch_name="ac",
+        shard_size=1,
+    )
+
+    source_manifests = tuple(
+        (library / "converted_sources").glob("*/*/shard_manifest.json")
+    )
+    assert len(source_manifests) == 3
+    assert not (Path(first["batch_dir"]) / "shards").exists()
+    assert not (Path(second["batch_dir"]) / "shards").exists()
+    assert second["reused_source_file_count"] == 1
+    first_manifest = json.loads(
+        (Path(first["batch_dir"]) / "shard_manifest.json").read_text()
+    )
+    second_manifest = json.loads(
+        (Path(second["batch_dir"]) / "shard_manifest.json").read_text()
+    )
+    first_a = next(
+        item
+        for item in first_manifest["source_manifests"]
+        if item["source_path"] == str(paths["a.csv"].resolve())
+    )
+    second_a = next(
+        item
+        for item in second_manifest["source_manifests"]
+        if item["source_path"] == str(paths["a.csv"].resolve())
+    )
+    assert first_a["path"] == second_a["path"]
+
+    combined = combine_saved_recommendation_batches(library)
+    assert combined["input_record_count"] == 4
+    assert combined["record_count"] == 3
+    assert combined["duplicate_record_count"] == 1
+
+
+def test_automatic_batch_identity_ignores_selection_order(
+    tmp_path: Path,
+) -> None:
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    paths = []
+    for name in ("a.csv", "b.csv"):
+        path = source_dir / name
+        row = _source_row(name)
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(row))
+            writer.writeheader()
+            writer.writerow(row)
+        paths.append(path)
+    library = tmp_path / "library"
+
+    first = save_recommendation_batch(paths, library, shard_size=1)
+    second = save_recommendation_batch(tuple(reversed(paths)), library, shard_size=1)
+
+    assert first["batch_name"] == second["batch_name"]
+    assert first["batch_dir"] == second["batch_dir"]
+    assert second["reused_source_file_count"] == 2
+    assert len(discover_saved_conversion_batches(library)) == 1
+    assert len(
+        load_generic_index(
+            Path(second["batch_dir"]) / "shard_manifest.json"
+        ).rows
+    ) == 2
+
+
+def test_changed_source_content_creates_a_new_source_artifact(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source.csv"
+    first_row = _source_row("first")
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(first_row))
+        writer.writeheader()
+        writer.writerow(first_row)
+    library = tmp_path / "library"
+
+    first = save_recommendation_batch(
+        source, library, batch_name="before", shard_size=1
+    )
+    second_row = _source_row("second")
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(second_row))
+        writer.writeheader()
+        writer.writerow(second_row)
+    second = save_recommendation_batch(
+        source, library, batch_name="after", shard_size=1
+    )
+
+    first_artifact = first["artifacts"]["converted_sources"][0]
+    second_artifact = second["artifacts"]["converted_sources"][0]
+    assert first_artifact["path"] != second_artifact["path"]
+    assert second["reused_source_file_count"] == 0
+    assert len(
+        tuple((library / "converted_sources").glob("*/*/shard_manifest.json"))
+    ) == 2
 
 
 def test_combining_rejects_an_incomplete_saved_batch(tmp_path: Path) -> None:

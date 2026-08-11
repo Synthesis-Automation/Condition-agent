@@ -772,6 +772,16 @@ def load_generic_index(
         )
     if source.suffix.casefold() == ".json":
         if source.name == "shard_manifest.json":
+            manifest = json.loads(source.read_text(encoding="utf-8"))
+            if manifest.get("artifact_type") == (
+                "saved_recommendation_batch_manifest"
+            ):
+                from .conversion.concise_review import iter_canonical_records
+
+                return build_generic_index(
+                    iter_canonical_records(source),
+                    include_review=include_review,
+                )
             from .conversion.sharded import (
                 iter_gzip_jsonl,
                 validate_sharded_conversion,
@@ -780,7 +790,6 @@ def load_generic_index(
             integrity = validate_sharded_conversion(source, verify_rows=False)
             if not integrity["valid"]:
                 raise ValueError("Sharded conversion integrity check failed")
-            manifest = json.loads(source.read_text(encoding="utf-8"))
             records = (
                 record
                 for entry in manifest.get("shards") or ()
