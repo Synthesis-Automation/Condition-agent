@@ -7,6 +7,15 @@ from .cas_number_extractor import (
     write_matches_to_csv,
     write_matches_to_markdown,
 )
+from .cas_smiles_extractor import (
+    CASSmilesPair,
+    CSVExtractionResult,
+    FolderExtractionResult,
+    discover_csv_files,
+    extract_cas_smiles_pairs_from_csv,
+    extract_cas_smiles_pairs_from_folder,
+    write_cas_smiles_pairs,
+)
 from .compound_lookup import (
     CompoundLookupClient,
     CompoundLookupResult,
@@ -19,10 +28,16 @@ from .registry_cas_reconciliation import (
 
 __all__ = [
     "CASMatch",
+    "CASSmilesPair",
+    "CSVExtractionResult",
     "CompoundLookupClient",
     "CompoundLookupResult",
     "CasReconciliationSummary",
+    "FolderExtractionResult",
     "discover_candidate_files",
+    "discover_csv_files",
+    "extract_cas_smiles_pairs_from_csv",
+    "extract_cas_smiles_pairs_from_folder",
     "extract_cas_matches_from_file",
     "find_cas_numbers_in_text",
     "is_valid_cas_number",
@@ -30,4 +45,5 @@ __all__ = [
     "reconcile_registry_from_cas_csv",
     "write_matches_to_csv",
     "write_matches_to_markdown",
+    "write_cas_smiles_pairs",
 ]

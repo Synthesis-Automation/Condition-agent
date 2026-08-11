@@ -2,6 +2,33 @@
 
 This standalone package provides CAS extraction and web-backed compound lookup.
 
+## Literature CAS/SMILES extractor
+
+Launch the small desktop UI from the repository root:
+
+```powershell
+python .\cas_tools\cas_smiles_extractor_gui.py
+```
+
+The input defaults to `raw_dataset/literature_reaction_dataset`. The extractor
+recursively reads every CSV, examines all JSON-valued columns (including
+`reactants_json`, `products_json`, `reagents_json`, `catalysts_json`, and
+`solvents_json`), and falls back to matching flat `*_cas`/`*_smiles` columns
+when no structured role column exists. It writes a deterministic, deduplicated
+CSV with exactly these columns:
+
+```text
+cas_no,compound_smiles,reaction_id,citation
+```
+
+The generated file contains exactly one row per CAS number. If a CAS number is
+associated with conflicting structures, the extractor selects the SMILES
+supported by the most distinct reaction records. Ties are resolved
+deterministically. One reaction ID and literature citation supporting the
+selected structure are retained in the output row.
+
+## Compound lookup
+
 ```python
 from cas_tools import lookup_compound_by_cas
 
