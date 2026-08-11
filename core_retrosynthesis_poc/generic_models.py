@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Dict, Literal, Optional, Tuple
 
 from .models import CenterReactivityContext, TemplateContext
+from .selectivity_poc import FunctionalGroupCompetitionWarning
 
 
 GenericLevel = Literal["RDCHIRAL", "L0", "L1", "L2"]
@@ -316,6 +317,7 @@ class GenericDisconnectionCandidate:
     structural_score_band: int = 0
     ranking_policy_definition_id: str = ""
     condition_query_reaction_smiles: str = ""
+    selectivity_warnings: Tuple[FunctionalGroupCompetitionWarning, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible candidate."""

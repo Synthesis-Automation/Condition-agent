@@ -438,6 +438,29 @@ export interface RetrosynthesisSupportingPrecedent {
   reference_record?: ReferenceRecord | null
 }
 
+export interface FunctionalGroupCompetitionOutcome {
+  candidate_id: string
+  component_index: number
+  atom_index: number
+  element: string
+  site_type: string
+  site_signature: string
+  availability: string
+  product_smiles: string
+}
+
+export interface FunctionalGroupCompetitionWarning {
+  code: string
+  message: string
+  selected_outcome: FunctionalGroupCompetitionOutcome
+  competing_outcomes: FunctionalGroupCompetitionOutcome[]
+  assessment_mode: string
+  ranking_impact: 'none'
+  conditions_evaluated: false
+  audit_id: string
+  schema_version: string
+}
+
 export interface RetrosynthesisCandidate {
   rank: number
   target_smiles: string
@@ -468,6 +491,7 @@ export interface RetrosynthesisCandidate {
   diversity_group_key: string[]
   structural_score_band: number
   ranking_policy_definition_id: string
+  selectivity_warnings?: FunctionalGroupCompetitionWarning[]
 }
 
 export interface RetrosynthesisResult {

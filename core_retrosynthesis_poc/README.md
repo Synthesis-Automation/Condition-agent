@@ -640,3 +640,64 @@ Candidate validation now consumes the atom correspondence returned by
 RDChiral. This prevents unchanged duplicate atoms, such as an aryl bromine and
 a bromide leaving group in the same proposal, from being swapped by a second
 global remapping pass and incorrectly creating extra graph edits.
+
+## Condition-aware selectivity POC
+
+`selectivity_poc.py` tests a dataset-driven alternative to hand-authored
+functional-group compatibility rules. For an observed single-connection
+replacement, it holds the partners and edit topology fixed, enumerates other
+connection endpoints on the selected partner component, applies each graph
+edit, and retains only products that pass RDKit sanitization. Named reaction
+families do not participate.
+
+Every observed reaction becomes a listwise choice set. The mapped endpoint is
+the selected outcome; other available endpoints are weak `not observed as
+major` alternatives rather than asserted failures. A small deterministic
+hashed softmax model learns endpoint and endpoint-by-condition preferences:
+
+```python
+from core_retrosynthesis_poc import (
+    ConditionalEditChoiceModel,
+    build_reaction_choice_set,
+)
+
+acidic_s_alkylation = build_reaction_choice_set(
+    "Cc1[nH]cnc1CCl.NCCS>>NCCSCc1c(C)[nH]cn1",
+    {"medium": "acidic", "salt_state": "hydrochloride"},
+    reference_id="example-s",
+    label_strength=1.0,
+)
+neutral_n_alkylation = build_reaction_choice_set(
+    "Cc1[nH]cnc1CCl.NCCS>>SCCNCc1c(C)[nH]cn1",
+    {"medium": "neutral", "salt_state": "free_base"},
+    reference_id="example-n",
+    label_strength=1.0,
+)
+
+model = ConditionalEditChoiceModel()
+model.fit((acidic_s_alkylation, neutral_n_alkylation))
+assessment = model.assess(acidic_s_alkylation)
+```
+
+Canonical converted dataset rows can be consumed without source-column logic
+using `build_reaction_choice_set_from_record(row)`. Its resolved-recipe
+projection retains canonical component identities, roles, temperature, time,
+concentration, atmosphere, and stages while excluding recipe IDs, source
+fields, warnings, and provenance that could leak document identity.
+
+The assessment reports the desired and best-competitor probabilities,
+probability margin, normalized entropy, exact-condition independent reference
+support, and every ranked counterfactual product. This is an architectural POC,
+not a calibrated production predictor. Its current graph scope is one broken
+and one formed heavy-atom bond sharing an electrophilic endpoint. It does not
+yet model no-reaction outcomes, stoichiometric overreaction, multiple events,
+or unexpected transformations outside the enumerated choice set.
+
+The structural enumerator is integrated into generic retrosynthesis as a
+review-only audit. A validated candidate receives a
+`POSSIBLE_FUNCTIONAL_GROUP_COMPETITION` warning when another endpoint on the
+same partner produces a distinct sanitized product. The warning serializes the
+selected endpoint and each alternative product into CLI/API output, and the web
+review displays those structures. It is explicitly condition-unaware and is
+not used by candidate admission, scoring, deduplication, or diversity ranking.
+Unsupported topologies fail open without changing the retrosynthesis result.

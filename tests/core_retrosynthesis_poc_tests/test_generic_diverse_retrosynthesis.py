@@ -30,6 +30,7 @@ from core_retrosynthesis_poc.generic_compiler import (
 from core_retrosynthesis_poc.operator_benchmark import (
     run_operator_coverage_benchmark,
 )
+from core_retrosynthesis_poc import generic_search as generic_search_module
 from core_retrosynthesis_poc.sources import (
     iter_library_rows,
     resolve_library_mode,
@@ -314,6 +315,52 @@ def test_rdchiral_mapping_prevents_unchanged_halogen_swap() -> None:
     assert candidates[0].condition_query_reaction_smiles
     assert ":" in candidates[0].condition_query_reaction_smiles
     assert ">>" in candidates[0].condition_query_reaction_smiles
+
+
+def test_competition_audit_warns_without_changing_ranking(monkeypatch) -> None:
+    reaction = "Cc1[nH]cnc1CCl.NCCS>>NCCSCc1c(C)[nH]cn1"
+    library = build_generic_library(
+        (
+            _row_from_reaction(
+                reaction,
+                reaction_id="cysteamine-s-alkylation",
+                reference_id="cysteamine-s-alkylation-reference",
+            ),
+        ),
+        levels=("L1", "L2"),
+        admission_mode="data_driven",
+    )
+
+    audited = disconnect_generic_target(
+        "NCCSCc1c(C)[nH]cn1",
+        library,
+        top_k=5,
+    )
+    monkeypatch.setattr(
+        generic_search_module,
+        "_selectivity_warnings",
+        lambda reaction_smiles: (),
+    )
+    unaudited = disconnect_generic_target(
+        "NCCSCc1c(C)[nH]cn1",
+        library,
+        top_k=5,
+    )
+
+    assert audited[0].precursor_smiles == "Cc1[nH]cnc1CCl.NCCS"
+    assert audited[0].selectivity_warnings
+    assert audited[0].selectivity_warnings[0].selected_outcome.element == "S"
+    assert {
+        outcome.element
+        for outcome in audited[0].selectivity_warnings[0].competing_outcomes
+    } == {"N"}
+    assert [
+        (candidate.precursor_smiles, candidate.score)
+        for candidate in audited
+    ] == [
+        (candidate.precursor_smiles, candidate.score)
+        for candidate in unaudited
+    ]
 
 
 def test_resumable_full_scale_merge_deduplicates_observations(tmp_path) -> None:

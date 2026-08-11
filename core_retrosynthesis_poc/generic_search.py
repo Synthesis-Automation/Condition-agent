@@ -30,6 +30,10 @@ from .ranking_policy import (
     structural_score_bands,
 )
 from .search import _forward_analysis
+from .selectivity_poc import (
+    FunctionalGroupCompetitionWarning,
+    detect_functional_group_competition,
+)
 
 
 @lru_cache(maxsize=20_000)
@@ -70,6 +74,20 @@ def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
     return tuple(
         sorted(values.items())
     )
+
+
+def _selectivity_warnings(
+    reaction_smiles: str,
+) -> tuple[FunctionalGroupCompetitionWarning, ...]:
+    """Run the optional audit without changing candidate admission or ranking."""
+
+    try:
+        warning = detect_functional_group_competition(reaction_smiles)
+    except Exception:
+        # This review-only pass must fail open if an unanticipated structure is
+        # outside the POC's supported graph-edit topology.
+        return ()
+    return (warning,) if warning is not None else ()
 
 
 def disconnect_generic_target_detailed(
@@ -252,6 +270,7 @@ def disconnect_generic_target_detailed(
             operator_signature=identity.operator_signature,
             synthon_signature=identity.synthon_signature,
             condition_query_reaction_smiles=mapped_proposed,
+            selectivity_warnings=_selectivity_warnings(mapped_proposed),
         )
         current = candidates.get(precursors)
         if current is None or candidate.score > current.score:

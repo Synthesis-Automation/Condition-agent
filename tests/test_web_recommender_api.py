@@ -255,6 +255,14 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
             "precursor_smiles": "CCBr.N",
             "proposed_reaction_smiles": "CCBr.N>>CCN",
             "precedent_reaction_ids": ["internal-row-id"],
+            "selectivity_warnings": [
+                {
+                    "code": "POSSIBLE_FUNCTIONAL_GROUP_COMPETITION",
+                    "message": "Review a competing endpoint.",
+                    "ranking_impact": "none",
+                    "competing_outcomes": [],
+                }
+            ],
         },
     )
     precedent = SimpleNamespace(
@@ -311,7 +319,7 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     )
 
     result = payload["candidates"][0]
-    assert payload["schema_version"] == "1.2"
+    assert payload["schema_version"] == "1.3"
     assert search_options["max_templates_to_apply"] == 100
     assert search_options["max_candidates_to_validate"] == 30
     assert "precedent_reaction_ids" not in result
@@ -323,6 +331,7 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     ]
     assert result["condition_evidence"]["status"] == "pending"
     assert result["condition_evidence"]["recommendations"] == []
+    assert result["selectivity_warnings"][0]["ranking_impact"] == "none"
 
 
 def test_local_retrosynthesis_condition_lookup_attaches_publication_records(

@@ -602,7 +602,7 @@ class LocalRecommendationRuntime:
             "library_mode": request.library_mode,
             "valid": bool(candidates),
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
-            "schema_version": "1.2",
+            "schema_version": "1.3",
             "candidate_count": len(candidates),
             "library_operator_count": len(library.operators),
             "library_template_count": len(library.templates),

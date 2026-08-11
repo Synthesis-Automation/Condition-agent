@@ -388,6 +388,10 @@ function RetrosynthesisDetails({
   scopeWarnings: string[]
 }) {
   const conditionRecommendations = candidate.condition_evidence?.recommendations ?? []
+  const combinedCautions = Array.from(new Set([
+    ...scopeWarnings,
+    ...(candidate.condition_evidence?.warnings ?? []),
+  ]))
   return (
     <article className="result-detail retrosynthesis-detail">
       <div className="detail-title-row">
@@ -399,6 +403,25 @@ function RetrosynthesisDetails({
         <div className="score-orbit"><strong>{candidate.score.toFixed(3)}</strong><span>score</span></div>
       </div>
       <ReactionImage smiles={candidate.proposed_reaction_smiles} label="Proposed single-step retrosynthesis" compact />
+      <MessageList
+        title="Functional-group competition"
+        values={(candidate.selectivity_warnings ?? []).map((warning) => warning.message)}
+        tone="caution"
+      />
+      {(candidate.selectivity_warnings ?? []).map((warning) => (
+        <details className="trace-panel" key={warning.code}>
+          <summary>Review competing structural outcomes ({warning.competing_outcomes.length})</summary>
+          <div className="supporting-precedent-list">
+            {warning.competing_outcomes.map((outcome) => (
+              <article key={outcome.candidate_id}>
+                <strong>{outcome.element} endpoint · atom {outcome.atom_index}</strong>
+                <ReactionImage smiles={outcome.product_smiles} label={`Possible competing ${outcome.element} outcome`} compact />
+                <small>{displayName(outcome.site_type)} · {displayName(outcome.availability)}</small>
+              </article>
+            ))}
+          </div>
+        </details>
+      ))}
       <div className="detail-columns">
         <section>
           <h4>Structural evidence</h4>
@@ -439,7 +462,6 @@ function RetrosynthesisDetails({
               : 'No compatible condition recipe was found for this proposed reaction.'}
           </p>
         )}
-        <MessageList title="Condition cautions" values={candidate.condition_evidence?.warnings ?? []} tone="caution" />
       </details>
       {candidate.supporting_precedents.length > 0 && (
         <details className="trace-panel supporting-precedents">
@@ -464,7 +486,6 @@ function RetrosynthesisDetails({
           <div><strong>Score band</strong><span>{candidate.structural_score_band}</span></div>
         </div>
       </details>
-      <MessageList title="Scope and cautions" values={scopeWarnings} tone="caution" />
       <details className="trace-panel machine-code-panel">
         <summary>Operator identity</summary>
         <dl className="detail-list">
@@ -474,6 +495,7 @@ function RetrosynthesisDetails({
           <div><dt>Synthon</dt><dd className="mono-value">{candidate.synthon_signature || 'Unavailable'}</dd></div>
         </dl>
       </details>
+      <MessageList title="Scope and condition cautions" values={combinedCautions} tone="caution" />
     </article>
   )
 }
