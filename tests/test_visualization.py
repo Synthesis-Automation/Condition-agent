@@ -325,6 +325,36 @@ def test_reaction_renderer_supports_vector_output() -> None:
     assert b"<svg" in drawing[:512]
 
 
+def test_molecule_renderer_hides_atom_mapping_numbers() -> None:
+    mapped = render_molecule_image_bytes(
+        "[CH3:7][OH:11]",
+        size=(240, 160),
+        image_format="svg",
+    )
+    unmapped = render_molecule_image_bytes(
+        "[CH3][OH]",
+        size=(240, 160),
+        image_format="svg",
+    )
+
+    assert mapped == unmapped
+
+
+def test_reaction_renderer_hides_atom_mapping_numbers() -> None:
+    mapped = render_reaction_image_bytes(
+        "[CH3:7][OH:11]>>[CH2:7]=[O:11]",
+        size=(480, 180),
+        image_format="svg",
+    )
+    unmapped = render_reaction_image_bytes(
+        "[CH3][OH]>>[CH2]=[O]",
+        size=(480, 180),
+        image_format="svg",
+    )
+
+    assert mapped == unmapped
+
+
 def test_reaction_renderer_supports_compact_acs_style() -> None:
     drawing = render_reaction_image_bytes(
         "CCO>>CC=O",

@@ -202,7 +202,10 @@ def _prepare_molecule(smiles: str, *, kekulize: bool) -> Any:
     molecule = parse_smiles(smiles)
     if molecule is None:
         raise ValueError(f"Invalid SMILES string: {smiles!r}")
-    molecule = _promote_hetero_hydrogens(Chem.Mol(molecule))
+    molecule = Chem.Mol(molecule)
+    for atom in molecule.GetAtoms():
+        atom.SetAtomMapNum(0)
+    molecule = _promote_hetero_hydrogens(molecule)
     return rdMolDraw2D.PrepareMolForDrawing(
         molecule,
         kekulize=kekulize,
@@ -305,6 +308,10 @@ def apply_render_preset(
         )
     if hasattr(options, "explicitMethyl"):
         options.explicitMethyl = False
+    if hasattr(options, "addAtomIndices"):
+        options.addAtomIndices = False
+    if hasattr(options, "includeAtomTags"):
+        options.includeAtomTags = False
     if hasattr(options, "addStereoAnnotation"):
         options.addStereoAnnotation = True
     if preset["mode"] != "acs_1996" and hasattr(

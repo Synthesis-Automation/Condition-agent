@@ -7,9 +7,10 @@ import json
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
-from rdkit import Chem
-from rdkit.Chem import Draw, rdChemReactions
-from rdkit.Chem.Draw import rdMolDraw2D
+from visualization import (
+    render_molecule_image_bytes,
+    render_reaction_image_bytes,
+)
 
 
 DEFAULT_METHODS = (
@@ -51,17 +52,14 @@ def _placeholder(message: str) -> str:
 def molecule_svg(smiles: str, *, width: int = 320, height: int = 220) -> str:
     """Render one molecule as an inline SVG or a visible error placeholder."""
 
-    molecule = Chem.MolFromSmiles(smiles)
-    if molecule is None:
-        return _placeholder("Molecule could not be rendered")
     try:
-        drawer = rdMolDraw2D.MolDraw2DSVG(width, height)
-        options = drawer.drawOptions()
-        options.addAtomIndices = False
-        rdMolDraw2D.PrepareAndDrawMolecule(drawer, molecule)
-        drawer.FinishDrawing()
-        return _inline_svg(drawer.GetDrawingText())
-    except Exception:
+        drawing = render_molecule_image_bytes(
+            smiles,
+            size=(width, height),
+            image_format="svg",
+        )
+        return _inline_svg(drawing.decode("utf-8"))
+    except (RuntimeError, ValueError, UnicodeDecodeError):
         return _placeholder("Molecule drawing failed")
 
 
@@ -73,19 +71,13 @@ def reaction_svg(
     """Render one reaction SMILES as an inline SVG or an error placeholder."""
 
     try:
-        reaction = rdChemReactions.ReactionFromSmarts(
+        drawing = render_reaction_image_bytes(
             reaction_smiles,
-            useSmiles=True,
+            size=(sub_image_size[0] * 3, sub_image_size[1]),
+            image_format="svg",
         )
-        if reaction is None:
-            return _placeholder("Reaction could not be rendered")
-        drawing = Draw.ReactionToImage(
-            reaction,
-            subImgSize=sub_image_size,
-            useSVG=True,
-        )
-        return _inline_svg(str(drawing))
-    except Exception:
+        return _inline_svg(drawing.decode("utf-8"))
+    except (RuntimeError, ValueError, UnicodeDecodeError):
         return _placeholder("Reaction drawing failed")
 
 

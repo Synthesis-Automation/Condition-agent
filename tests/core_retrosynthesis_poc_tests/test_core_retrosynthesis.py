@@ -25,6 +25,7 @@ from core_retrosynthesis_poc import (
     write_comparison_html,
 )
 from core_retrosynthesis_poc.cli import main
+from core_retrosynthesis_poc.html_report import molecule_svg, reaction_svg
 
 
 MAPPED_REACTIONS = {
@@ -44,6 +45,13 @@ MAPPED_REACTIONS = {
         "[c:1]1([S:8][CH3:9])[cH:3][cH:4][cH:5][cH:6][cH:7]1"
     ),
 }
+
+
+def test_html_rendering_hides_atom_mapping_numbers() -> None:
+    assert molecule_svg("[CH3:7][OH:11]") == molecule_svg("[CH3][OH]")
+    assert reaction_svg(
+        "[CH3:7][OH:11]>>[CH2:7]=[O:11]"
+    ) == reaction_svg("[CH3][OH]>>[CH2]=[O]")
 
 
 def _row(bond_kind: str, *, ordinal: int = 1) -> dict:
