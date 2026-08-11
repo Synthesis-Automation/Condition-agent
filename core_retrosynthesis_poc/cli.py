@@ -277,6 +277,11 @@ def _parser() -> argparse.ArgumentParser:
     operator_search.add_argument("--no-context", action="store_true")
     operator_search.add_argument("--skip-l0", action="store_true")
     operator_search.add_argument(
+        "--no-diversity",
+        action="store_true",
+        help="disable operator/site/synthon diversity for ranking ablation",
+    )
+    operator_search.add_argument(
         "--diagnostics",
         action="store_true",
         help="include retrieval and validation stage counters",
@@ -511,6 +516,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             max_candidates_to_validate=arguments.max_candidates_to_validate,
             use_context=not arguments.no_context,
             include_l0=not arguments.skip_l0,
+            diversify=not arguments.no_diversity,
         )
         condition_ranked = None
         if arguments.condition_index:

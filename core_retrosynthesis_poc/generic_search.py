@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import math
 from contextlib import redirect_stdout
+from dataclasses import replace
 from functools import lru_cache
 from typing import Iterable
 
@@ -22,6 +23,12 @@ from .generic_models import (
     GenericTemplateLibrary,
 )
 from .retrieval_index import indexed_template_ids
+from .ranking_policy import (
+    RetrosynthesisRankingPolicy,
+    diversity_group_key,
+    load_retrosynthesis_ranking_policy,
+    structural_score_bands,
+)
 from .search import _forward_analysis
 
 
@@ -330,6 +337,84 @@ def rank_site_diverse(
     return tuple(values)
 
 
+def rank_operator_site_diverse(
+    candidates: Iterable[GenericDisconnectionCandidate],
+    *,
+    policy: RetrosynthesisRankingPolicy | None = None,
+) -> tuple[GenericDisconnectionCandidate, ...]:
+    """Diversify candidates within structural quality and specificity bands."""
+
+    resolved = policy or load_retrosynthesis_ranking_policy()
+    structurally_ranked = tuple(
+        sorted(
+            candidates,
+            key=lambda candidate: (
+                (
+                    resolved.level_rank(candidate.abstraction_level)
+                    if resolved.preserve_abstraction_level_order
+                    else 0
+                ),
+                -candidate.score,
+                -candidate.independent_reference_support,
+                candidate.precursor_smiles,
+                candidate.template_id,
+            ),
+        )
+    )
+    bands = structural_score_bands(
+        structurally_ranked,
+        width=resolved.diversity_score_band_width,
+        separate_by_level=resolved.preserve_abstraction_level_order,
+    )
+    pre_ranks = {
+        id(candidate): rank
+        for rank, candidate in enumerate(structurally_ranked, start=1)
+    }
+    partitions: dict[
+        tuple[int, int],
+        dict[tuple[str, ...], list[GenericDisconnectionCandidate]],
+    ] = {}
+    for candidate in structurally_ranked:
+        partition_key = (
+            (
+                resolved.level_rank(candidate.abstraction_level)
+                if resolved.preserve_abstraction_level_order
+                else 0
+            ),
+            bands[id(candidate)],
+        )
+        groups = partitions.setdefault(partition_key, {})
+        groups.setdefault(
+            diversity_group_key(candidate, resolved),
+            [],
+        ).append(candidate)
+
+    diversified = []
+    for partition_key in sorted(partitions):
+        group_values = tuple(partitions[partition_key].values())
+        depth = 0
+        while True:
+            added = False
+            for group in group_values:
+                if depth < len(group):
+                    diversified.append(group[depth])
+                    added = True
+            if not added:
+                break
+            depth += 1
+    return tuple(
+        replace(
+            candidate,
+            pre_diversity_rank=pre_ranks[id(candidate)],
+            diversity_rank=rank,
+            diversity_group_key=diversity_group_key(candidate, resolved),
+            structural_score_band=bands[id(candidate)],
+            ranking_policy_definition_id=resolved.definition_id,
+        )
+        for rank, candidate in enumerate(diversified, start=1)
+    )
+
+
 def disconnect_operator_ladder(
     target_smiles: str,
     library: GenericTemplateLibrary,
@@ -339,13 +424,19 @@ def disconnect_operator_ladder(
     max_candidates_to_validate: int = 100,
     use_context: bool = True,
     include_l0: bool = True,
+    diversify: bool = True,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
-    """Fill candidates in specificity order without reordering earlier tiers."""
+    """Fill specificity tiers with general operator/site-diverse candidates."""
 
     if top_k < 1:
         raise ValueError("top-k must be positive")
     selected = []
     seen = set()
+    policy = load_retrosynthesis_ranking_policy()
+    candidate_pool_size = min(
+        max_candidates_to_validate,
+        max(top_k, top_k * policy.candidate_pool_multiplier),
+    )
     levels = ("L2", "L1", "L0") if include_l0 else ("L2", "L1")
     for level in levels:
         if len(selected) >= top_k:
@@ -354,11 +445,16 @@ def disconnect_operator_ladder(
             target_smiles,
             library,
             levels=(level,),
-            top_k=top_k,
+            top_k=candidate_pool_size,
             max_templates_to_apply=max_templates_to_apply,
             max_candidates_to_validate=max_candidates_to_validate,
             use_context=use_context,
         )
+        if diversify:
+            candidates = rank_operator_site_diverse(
+                candidates,
+                policy=policy,
+            )
         for candidate in candidates:
             if candidate.precursor_smiles in seen:
                 continue
@@ -373,5 +469,6 @@ __all__ = [
     "disconnect_generic_target",
     "disconnect_generic_target_detailed",
     "disconnect_operator_ladder",
+    "rank_operator_site_diverse",
     "rank_site_diverse",
 ]

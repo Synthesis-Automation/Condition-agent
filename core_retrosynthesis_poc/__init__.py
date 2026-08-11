@@ -39,6 +39,7 @@ from .generic_search import (
     disconnect_generic_target,
     disconnect_generic_target_detailed,
     disconnect_operator_ladder,
+    rank_operator_site_diverse,
 )
 from .html_report import render_comparison_html, write_comparison_html
 from .library import build_library, load_library, save_library
@@ -54,6 +55,10 @@ from .models import (
 from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
+)
+from .ranking_policy import (
+    RetrosynthesisRankingPolicy,
+    load_retrosynthesis_ranking_policy,
 )
 from .search import disconnect_target
 from .sources import (
@@ -85,6 +90,7 @@ __all__ = [
     "GenericTemplateLibrary",
     "LIBRARY_MODES",
     "RetrosynthesisConditionEvidence",
+    "RetrosynthesisRankingPolicy",
     "TemplateContext",
     "analyze_generic_reaction",
     "audit_operator_library_coverage",
@@ -102,9 +108,11 @@ __all__ = [
     "load_library",
     "load_generic_library",
     "load_operator_rows",
+    "load_retrosynthesis_ranking_policy",
     "iter_library_rows",
     "merge_operator_shards",
     "rank_retrosynthesis_candidates_with_conditions",
+    "rank_operator_site_diverse",
     "run_comparison",
     "run_operator_coverage_benchmark",
     "render_comparison_html",

@@ -12,6 +12,11 @@ from dataclasses import asdict, dataclass
 from typing import Any, Dict, Iterable, Literal, Protocol, Tuple
 
 from .generic_models import GenericDisconnectionCandidate
+from .ranking_policy import (
+    RetrosynthesisRankingPolicy,
+    load_retrosynthesis_ranking_policy,
+    structural_score_bands,
+)
 
 
 ConditionSupportStatus = Literal[
@@ -79,6 +84,9 @@ class ConditionRankedRetrosynthesisCandidate:
     candidate: GenericDisconnectionCandidate
     retrosynthesis_rank: int
     condition_informed_rank: int
+    structural_score_band: int
+    ranking_policy_definition_id: str
+    rerank_scope: str
     condition_evidence: RetrosynthesisConditionEvidence
 
     def to_dict(self) -> Dict[str, Any]:
@@ -88,6 +96,11 @@ class ConditionRankedRetrosynthesisCandidate:
             **self.candidate.to_dict(),
             "retrosynthesis_rank": self.retrosynthesis_rank,
             "condition_informed_rank": self.condition_informed_rank,
+            "condition_structural_score_band": self.structural_score_band,
+            "condition_ranking_policy_definition_id": (
+                self.ranking_policy_definition_id
+            ),
+            "condition_rerank_scope": self.rerank_scope,
             "condition_evidence": self.condition_evidence.to_dict(),
         }
 
@@ -148,16 +161,15 @@ def _ranking_key(
         int,
         GenericDisconnectionCandidate,
         RetrosynthesisConditionEvidence,
+        int,
     ],
-) -> tuple[int, int, int, float, int]:
-    original_rank, _, evidence = value
-    status_rank = {
-        "recommended_direct": 0,
-        "recommended_fallback": 1,
-        "insufficient_evidence": 2,
-    }[evidence.status]
+    policy: RetrosynthesisRankingPolicy,
+) -> tuple[int, int, int, int, int, float, int]:
+    original_rank, candidate, evidence, structural_band = value
     return (
-        status_rank,
+        policy.level_rank(candidate.abstraction_level),
+        structural_band,
+        policy.condition_status_rank(evidence.status),
         -evidence.independent_compatible_candidate_count,
         -evidence.best_recipe_reference_support,
         -(evidence.best_recipe_score or 0.0),
@@ -176,21 +188,31 @@ def rank_retrosynthesis_candidates_with_conditions(
 ) -> Tuple[ConditionRankedRetrosynthesisCandidate, ...]:
     """Enrich and optionally rerank structurally verified candidates.
 
-    Ranking is lexicographic and auditable: direct condition support precedes
-    fallback support, which precedes insufficient evidence.  Within a tier,
-    independent compatible support, best-recipe reference support, and the
-    recommender's recipe score are considered in that order.  The original
-    retrosynthesis rank is the deterministic final tie-breaker.
+    Condition evidence can reorder candidates only within the same abstraction
+    level and versioned structural-score band. Within that bounded scope,
+    direct support precedes fallback support, which precedes insufficient
+    evidence. Independent compatible support, best-recipe reference support,
+    recipe score, and the original rank provide deterministic tie-breaking.
     """
 
     if condition_top_k < 1:
         raise ValueError("condition_top_k must be positive")
     if minimum_pool_size is not None and minimum_pool_size < 1:
         raise ValueError("minimum_pool_size must be positive")
+    policy = load_retrosynthesis_ranking_policy()
+    verified_ranked = tuple(
+        (rank, candidate)
+        for rank, candidate in enumerate(candidates, start=1)
+        if candidate.forward_validation_status == "verified_signature"
+    )
+    verified = tuple(candidate for _, candidate in verified_ranked)
+    bands = structural_score_bands(
+        verified,
+        width=policy.condition_score_band_width,
+        separate_by_level=True,
+    )
     assessed = []
-    for original_rank, candidate in enumerate(candidates, start=1):
-        if candidate.forward_validation_status != "verified_signature":
-            continue
+    for original_rank, candidate in verified_ranked:
         result = recommender.recommend(
             candidate.proposed_reaction_smiles,
             top_k=condition_top_k,
@@ -198,20 +220,38 @@ def rank_retrosynthesis_candidates_with_conditions(
             unrestricted_fallback=unrestricted_fallback,
         )
         assessed.append(
-            (original_rank, candidate, _condition_evidence(result))
+            (
+                original_rank,
+                candidate,
+                _condition_evidence(result),
+                bands[id(candidate)],
+            )
         )
-    ordered = sorted(assessed, key=_ranking_key) if rerank else assessed
+    ordered = (
+        sorted(assessed, key=lambda value: _ranking_key(value, policy))
+        if rerank
+        else assessed
+    )
     return tuple(
         ConditionRankedRetrosynthesisCandidate(
             candidate=candidate,
             retrosynthesis_rank=original_rank,
             condition_informed_rank=condition_rank,
+            structural_score_band=structural_band,
+            ranking_policy_definition_id=policy.definition_id,
+            rerank_scope=(
+                "same_abstraction_level_and_structural_score_band"
+                if rerank
+                else "retrosynthesis_order_preserved"
+            ),
             condition_evidence=evidence,
         )
-        for condition_rank, (original_rank, candidate, evidence) in enumerate(
-            ordered,
-            start=1,
-        )
+        for condition_rank, (
+            original_rank,
+            candidate,
+            evidence,
+            structural_band,
+        ) in enumerate(ordered, start=1)
     )
 
 

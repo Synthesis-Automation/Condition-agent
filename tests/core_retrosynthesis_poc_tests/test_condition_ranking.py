@@ -17,16 +17,18 @@ def _candidate(
     name: str,
     *,
     validation: str = "verified_signature",
+    score: float = 0.5,
+    level: str = "L2",
 ) -> GenericDisconnectionCandidate:
     return GenericDisconnectionCandidate(
         target_smiles="CC",
         precursor_smiles=name,
         proposed_reaction_smiles=f"{name}>>CC",
         transformation_kind=None,
-        abstraction_level="L2",
+        abstraction_level=level,
         compiler_engine="test",
         template_id=f"template-{name}",
-        score=0.5,
+        score=score,
         context_similarity=0.5,
         product_similarity=0.5,
         precursor_similarity=0.5,
@@ -177,6 +179,103 @@ def test_condition_enrichment_can_preserve_retrosynthesis_order() -> None:
     assert [value.condition_informed_rank for value in ranked] == [1, 2]
 
 
+def test_condition_support_cannot_cross_structural_score_band() -> None:
+    stronger = _candidate("stronger", score=0.90)
+    weaker = _candidate("weaker", score=0.80)
+    recommender = _FakeRecommender(
+        {
+            stronger.proposed_reaction_smiles: _result(
+                stronger.proposed_reaction_smiles,
+                valid=False,
+            ),
+            weaker.proposed_reaction_smiles: _result(
+                weaker.proposed_reaction_smiles,
+                valid=True,
+                independent_support=20,
+                reference_support=10,
+                score=0.95,
+            ),
+        }
+    )
+
+    ranked = rank_retrosynthesis_candidates_with_conditions(
+        (stronger, weaker),
+        recommender,
+    )
+
+    assert [value.candidate.precursor_smiles for value in ranked] == [
+        "stronger",
+        "weaker",
+    ]
+    assert [value.structural_score_band for value in ranked] == [0, 2]
+
+
+def test_condition_support_reranks_within_structural_score_band() -> None:
+    stronger = _candidate("stronger", score=0.90)
+    supported = _candidate("supported", score=0.88)
+    recommender = _FakeRecommender(
+        {
+            stronger.proposed_reaction_smiles: _result(
+                stronger.proposed_reaction_smiles,
+                valid=False,
+            ),
+            supported.proposed_reaction_smiles: _result(
+                supported.proposed_reaction_smiles,
+                valid=True,
+                independent_support=3,
+                reference_support=2,
+                score=0.75,
+            ),
+        }
+    )
+
+    ranked = rank_retrosynthesis_candidates_with_conditions(
+        (stronger, supported),
+        recommender,
+    )
+
+    assert [value.candidate.precursor_smiles for value in ranked] == [
+        "supported",
+        "stronger",
+    ]
+    assert all(value.structural_score_band == 0 for value in ranked)
+    assert all(
+        value.rerank_scope
+        == "same_abstraction_level_and_structural_score_band"
+        for value in ranked
+    )
+
+
+def test_condition_support_cannot_cross_abstraction_level() -> None:
+    specific = _candidate("specific", score=0.70, level="L2")
+    broad = _candidate("broad", score=0.99, level="L1")
+    recommender = _FakeRecommender(
+        {
+            specific.proposed_reaction_smiles: _result(
+                specific.proposed_reaction_smiles,
+                valid=False,
+            ),
+            broad.proposed_reaction_smiles: _result(
+                broad.proposed_reaction_smiles,
+                valid=True,
+                independent_support=20,
+                reference_support=10,
+                score=0.95,
+            ),
+        }
+    )
+
+    ranked = rank_retrosynthesis_candidates_with_conditions(
+        (specific, broad),
+        recommender,
+    )
+
+    assert [value.candidate.precursor_smiles for value in ranked] == [
+        "specific",
+        "broad",
+    ]
+
+
 @pytest.mark.parametrize(
     ("condition_top_k", "minimum_pool_size"),
     ((0, None), (1, 0)),
@@ -207,6 +306,7 @@ def test_operator_cli_accepts_condition_ranking_options() -> None:
             "--condition-minimum-pool-size",
             "6",
             "--keep-retrosynthesis-order",
+            "--no-diversity",
         )
     )
 
@@ -214,3 +314,4 @@ def test_operator_cli_accepts_condition_ranking_options() -> None:
     assert arguments.condition_top_k == 4
     assert arguments.condition_minimum_pool_size == 6
     assert arguments.keep_retrosynthesis_order is True
+    assert arguments.no_diversity is True

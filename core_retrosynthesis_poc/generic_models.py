@@ -310,6 +310,11 @@ class GenericDisconnectionCandidate:
     realization_id: str = ""
     operator_signature: str = ""
     synthon_signature: str = ""
+    pre_diversity_rank: int = 0
+    diversity_rank: int = 0
+    diversity_group_key: Tuple[str, ...] = ()
+    structural_score_band: int = 0
+    ranking_policy_definition_id: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible candidate."""

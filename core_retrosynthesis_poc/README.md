@@ -451,7 +451,9 @@ Get-Content $buildReport |
 ```
 
 For a quick functional smoke test, pass a product SMILES—not a reaction—to the
-specificity-preserving L2-to-L1-to-L0 operator ladder:
+specificity-preserving L2-to-L1-to-L0 operator ladder. By default, each level
+retrieves a pool four times the requested result count and then diversifies it
+by graph operator, disconnection site, and synthon signature:
 
 ```powershell
 python -m core_retrosynthesis_poc disconnect-operators `
@@ -474,6 +476,13 @@ python -m core_retrosynthesis_poc disconnect-operators `
   --max-candidates-to-validate 100 `
   --diagnostics
 ```
+
+Diversification is conservative: it round-robins chemistry-distinct groups only
+within 0.05-wide structural-score bands and never moves an L1 or L0 proposal
+ahead of an available L2 proposal. Use `--no-diversity` only for an ablation or
+before/after comparison. The versioned defaults live in
+`definitions/retrosynthesis_ranking.v1.json`; output candidates record the
+policy ID, original structural rank, diversity rank, group key, and score band.
 
 The JSON output exposes product-index retrieval, SMARTS applicability,
 generated precursors, validation attempts, operator mismatches, and valid
@@ -537,10 +546,14 @@ Condition support is labeled as:
   required;
 - `insufficient_evidence` when no compatible condition precedent was found.
 
-Reranking is deterministic and lexicographic: direct evidence precedes fallback
-evidence, which precedes insufficient evidence. Independent compatible support,
-best-recipe reference support, and recipe score break ties before the original
-retrosynthesis rank. Use `--keep-retrosynthesis-order` to attach the same
+Reranking is deterministic and bounded. Condition evidence can reorder
+candidates only within the same abstraction level and 0.05-wide structural
+score band, so a well-supported recipe cannot promote a substantially weaker
+or less-specific disconnection. Inside that scope, direct evidence precedes
+fallback evidence, which precedes insufficient evidence. Independent compatible
+support, best-recipe reference support, and recipe score break ties before the
+original retrosynthesis rank. The output records the policy ID, structural score
+band, and reranking scope. Use `--keep-retrosynthesis-order` to attach the same
 evidence without changing candidate order.
 
 Graph validation remains authoritative. Candidates without a verified forward

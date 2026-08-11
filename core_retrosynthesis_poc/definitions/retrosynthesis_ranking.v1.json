@@ -1,0 +1,28 @@
+{
+  "definition_id": "retrosynthesis_ranking.v1",
+  "schema_version": "1.0",
+  "candidate_diversity": {
+    "candidate_pool_multiplier": 4,
+    "group_fields": [
+      "operator_id",
+      "disconnection_site_key",
+      "synthon_signature"
+    ],
+    "preserve_abstraction_level_order": true,
+    "structural_score_band_width": 0.05
+  },
+  "condition_reranking": {
+    "status_order": [
+      "recommended_direct",
+      "recommended_fallback",
+      "insufficient_evidence"
+    ],
+    "structural_score_band_width": 0.05
+  },
+  "abstraction_level_order": [
+    "L2",
+    "L1",
+    "L0",
+    "RDCHIRAL"
+  ]
+}
