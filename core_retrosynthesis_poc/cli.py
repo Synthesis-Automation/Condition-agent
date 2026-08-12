@@ -10,6 +10,7 @@ from itertools import islice
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Sequence
 
+from cas_tools import CanonicalMoleculeIndex
 from retrosynthesis_poc.library import load_library as load_baseline_library
 
 from .comparison import run_comparison
@@ -30,6 +31,7 @@ from .generic_search import (
 )
 from .html_report import DEFAULT_METHODS, write_comparison_html
 from .library import build_library, load_library, save_library
+from .multistep import plan_multistep_routes
 from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
@@ -311,6 +313,25 @@ def _parser() -> argparse.ArgumentParser:
         help="attach condition evidence without condition-informed reranking",
     )
 
+    route_search = commands.add_parser(
+        "plan-routes",
+        help="search deterministic two- or three-depth retrosynthesis routes",
+    )
+    route_search.add_argument("library")
+    route_search.add_argument("literature_index")
+    route_search.add_argument("target")
+    route_search.add_argument("--max-depth", type=int, choices=(2, 3), default=3)
+    route_search.add_argument("--molecular-weight-threshold", type=float, default=150.0)
+    route_search.add_argument("--top-k-routes", type=int, default=5)
+    route_search.add_argument("--per-step-top-k", type=int, default=5)
+    route_search.add_argument("--beam-width", type=int, default=20)
+    route_search.add_argument("--max-expansions", type=int, default=100)
+    route_search.add_argument("--max-templates", type=int, default=300)
+    route_search.add_argument("--max-candidates-to-validate", type=int, default=50)
+    route_search.add_argument("--no-context", action="store_true")
+    route_search.add_argument("--skip-l0", action="store_true")
+    route_search.add_argument("--no-diversity", action="store_true")
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -353,7 +374,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     arguments = _parser().parse_args(argv)
     source = (
         resolve_library_mode(arguments.source, arguments.library_mode)
-        if hasattr(arguments, "source")
+        if hasattr(arguments, "source") and hasattr(arguments, "library_mode")
         else None
     )
     if arguments.command == "build-library":
@@ -587,6 +608,32 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 sort_keys=True,
             )
         )
+        return 0
+
+    if arguments.command == "plan-routes":
+        loaded_library = load_generic_library(arguments.library)
+        with CanonicalMoleculeIndex(arguments.literature_index) as stock_index:
+            result = plan_multistep_routes(
+                arguments.target,
+                loaded_library,
+                stock_index,
+                max_depth=arguments.max_depth,
+                molecular_weight_threshold=(
+                    arguments.molecular_weight_threshold
+                ),
+                top_k_routes=arguments.top_k_routes,
+                per_step_top_k=arguments.per_step_top_k,
+                beam_width=arguments.beam_width,
+                max_expansions=arguments.max_expansions,
+                max_templates_to_apply=arguments.max_templates,
+                max_candidates_to_validate=(
+                    arguments.max_candidates_to_validate
+                ),
+                use_context=not arguments.no_context,
+                include_l0=not arguments.skip_l0,
+                diversify=not arguments.no_diversity,
+            )
+        print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
         return 0
 
     if arguments.command == "render-report":

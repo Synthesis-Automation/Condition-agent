@@ -14,6 +14,7 @@ from .contracts import (
     API_SCHEMA_VERSION,
     DiscoveryRequest,
     FeatureAnalysisRequest,
+    MultistepRetrosynthesisRequest,
     PrepareReactionRequest,
     RecommendationRequest,
     RetrosynthesisConditionsRequest,
@@ -151,6 +152,21 @@ def create_app(
     ) -> dict[str, Any]:
         try:
             data = active_runtime(request).retrosynthesis_conditions(payload)
+        except (ValueError, FileNotFoundError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(
+                status_code=status,
+                detail=error_payload(exc),
+            ) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/retrosynthesis/routes")
+    def multistep_retrosynthesize(
+        payload: MultistepRetrosynthesisRequest,
+        request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).multistep_retrosynthesize(payload)
         except (ValueError, FileNotFoundError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(

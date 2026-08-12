@@ -7,6 +7,7 @@ from pathlib import Path
 from threading import RLock
 from typing import Any, Dict, Protocol
 
+from cas_tools import CanonicalMoleculeIndex
 from condition_recommender import (
     ChemistRankingPreferences,
     GenericConditionRecommender,
@@ -23,6 +24,7 @@ from core_retrosynthesis_poc import (
     GenericTemplateLibrary,
     disconnect_operator_ladder,
     load_generic_library,
+    plan_multistep_routes,
     recommend_retrosynthesis_conditions,
 )
 from reactive_taxonomy import RxnMapperProvider
@@ -34,6 +36,7 @@ from visualization import (
 from .contracts import (
     DiscoveryRequest,
     FeatureAnalysisRequest,
+    MultistepRetrosynthesisRequest,
     RecommendationRequest,
     RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
@@ -61,6 +64,9 @@ DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = (
     / "results"
     / "operator_retrosynthesis_poc"
     / "full_scale_v3"
+)
+DEFAULT_LITERATURE_MOLECULE_INDEX = (
+    PROJECT_ROOT / "results" / "literature_molecule_index.sqlite"
 )
 WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET = 100
 WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET = 30
@@ -130,6 +136,10 @@ class WebRuntime(Protocol):
         self, request: RetrosynthesisRequest
     ) -> Dict[str, Any]: ...
 
+    def multistep_retrosynthesize(
+        self, request: MultistepRetrosynthesisRequest
+    ) -> Dict[str, Any]: ...
+
     def retrosynthesis_conditions(
         self, request: RetrosynthesisConditionsRequest
     ) -> Dict[str, Any]: ...
@@ -152,6 +162,7 @@ class LocalRecommendationRuntime:
         *,
         library_root: str | Path | None = None,
         retrosynthesis_library_root: str | Path | None = None,
+        literature_index_path: str | Path | None = None,
     ) -> None:
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
         self._configured_index_path = Path(configured) if configured else None
@@ -176,6 +187,13 @@ class LocalRecommendationRuntime:
         )
         self.retrosynthesis_library_root = Path(
             configured_retrosynthesis or DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT
+        )
+        configured_literature_index = (
+            literature_index_path
+            or os.environ.get("CORE_RETROSYNTHESIS_LITERATURE_INDEX")
+        )
+        self.literature_index_path = Path(
+            configured_literature_index or DEFAULT_LITERATURE_MOLECULE_INDEX
         )
         self._recommenders: Dict[
             tuple[str, int, int, bool, bool], GenericConditionRecommender
@@ -370,6 +388,14 @@ class LocalRecommendationRuntime:
             "retrosynthesis": any(
                 path.is_file() for path in retrosynthesis_paths.values()
             ),
+            "multistep_retrosynthesis": (
+                self.literature_index_path.is_file()
+                and any(path.is_file() for path in retrosynthesis_paths.values())
+            ),
+            "literature_molecule_index_available": (
+                self.literature_index_path.is_file()
+            ),
+            "literature_molecule_index_name": self.literature_index_path.name,
             "default_retrosynthesis_library_mode": (
                 default_retrosynthesis_mode
             ),
@@ -644,6 +670,52 @@ class LocalRecommendationRuntime:
         )
         evidence["recommendations"] = recommendation_payload["recommendations"]
         return evidence
+
+    def multistep_retrosynthesize(
+        self,
+        request: MultistepRetrosynthesisRequest,
+    ) -> Dict[str, Any]:
+        """Search short routes using explicit literature/MW terminal rules."""
+
+        library = self._get_retrosynthesis_library(request.library_mode)
+        with CanonicalMoleculeIndex(self.literature_index_path) as stock_index:
+            result = plan_multistep_routes(
+                request.target_smiles.strip(),
+                library,
+                stock_index,
+                max_depth=request.max_depth,
+                molecular_weight_threshold=(
+                    request.molecular_weight_threshold
+                ),
+                top_k_routes=request.top_k_routes,
+                per_step_top_k=5,
+                beam_width=max(20, request.top_k_routes * 4),
+                max_expansions=40,
+                max_templates_to_apply=(
+                    WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET
+                ),
+                max_candidates_to_validate=(
+                    WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET
+                ),
+                use_context=request.use_context,
+                include_l0=request.include_l0,
+                diversify=request.diversify,
+            )
+        payload = result.to_dict()
+        payload.update(
+            {
+                "library_mode": request.library_mode,
+                "valid": bool(result.routes),
+                "error": (
+                    None if result.routes else "NO_MULTISTEP_ROUTES"
+                ),
+                "route_count": len(result.routes),
+                "partial_route_count": len(result.partial_routes),
+                "library_operator_count": len(library.operators),
+                "library_template_count": len(library.templates),
+            }
+        )
+        return payload
 
     def render_reaction(
         self,

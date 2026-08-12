@@ -16,6 +16,9 @@ export interface Capabilities {
   featurization: boolean
   reaction_rendering: boolean
   retrosynthesis?: boolean
+  multistep_retrosynthesis?: boolean
+  literature_molecule_index_available?: boolean
+  literature_molecule_index_name?: string
   local_only: boolean
   default_library_mode?: 'full' | 'compact'
   library_modes?: Record<string, {
@@ -407,6 +410,17 @@ export interface RetrosynthesisRequest {
   diversify: boolean
 }
 
+export interface MultistepRetrosynthesisRequest {
+  target_smiles: string
+  library_mode: 'full' | 'compact'
+  top_k_routes: number
+  max_depth: 2 | 3
+  molecular_weight_threshold: number
+  include_l0: boolean
+  use_context: boolean
+  diversify: boolean
+}
+
 export interface RetrosynthesisConditionsRequest {
   reaction_smiles: string
   library_mode: 'full' | 'compact'
@@ -505,4 +519,89 @@ export interface RetrosynthesisResult {
   library_template_count: number
   warnings: string[]
   candidates: RetrosynthesisCandidate[]
+}
+
+export interface MoleculeIndexMatch {
+  canonical_smiles: string
+  inchi_key?: string | null
+  occurrence_count: number
+  source_records: Array<Record<string, string>>
+}
+
+export interface StartingMaterialAssessment {
+  smiles: string
+  canonical_smiles: string
+  depth: number
+  molecular_weight?: number | null
+  terminal: boolean
+  terminal_reasons: string[]
+  unresolved_reason?: string | null
+  literature_match?: MoleculeIndexMatch | null
+}
+
+export interface MultistepRouteCandidate {
+  proposed_reaction_smiles: string
+  precursor_smiles: string
+  transformation_kind?: string | null
+  abstraction_level: string
+  score: number
+  independent_reference_support: number
+  forward_validation_status: string
+  operator_id: string
+  realization_id: string
+  disconnection_site_key: string
+  synthon_signature: string
+}
+
+export interface MultistepRouteStep {
+  step_id: string
+  depth: number
+  product_smiles: string
+  precursor_smiles: string[]
+  step_cost: number
+  candidate: MultistepRouteCandidate
+}
+
+export interface MultistepRetrosynthesisRoute {
+  route_id: string
+  target_smiles: string
+  solved: boolean
+  route_cost: number
+  reaction_count: number
+  maximum_depth: number
+  steps: MultistepRouteStep[]
+  leaves: StartingMaterialAssessment[]
+  warnings: string[]
+}
+
+export interface MultistepSearchDiagnostics {
+  expanded_states: number
+  one_step_calls: number
+  one_step_cache_hits: number
+  generated_candidates: number
+  rejected_cycles: number
+  rejected_invalid_candidates: number
+  duplicate_states: number
+  frontier_states: number
+  solved_routes_found: number
+  partial_routes_found: number
+  stopped_by_expansion_limit: boolean
+}
+
+export interface MultistepRetrosynthesisResult {
+  target_smiles: string
+  library_mode: 'full' | 'compact'
+  valid: boolean
+  error?: string | null
+  schema_version: string
+  max_depth: 2 | 3
+  molecular_weight_threshold: number
+  route_count: number
+  partial_route_count: number
+  library_operator_count: number
+  library_template_count: number
+  routes: MultistepRetrosynthesisRoute[]
+  partial_routes: MultistepRetrosynthesisRoute[]
+  diagnostics: MultistepSearchDiagnostics
+  warnings: string[]
 }

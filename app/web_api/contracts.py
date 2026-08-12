@@ -111,6 +111,19 @@ class RetrosynthesisRequest(StrictRequest):
     diversify: bool = True
 
 
+class MultistepRetrosynthesisRequest(StrictRequest):
+    """One bounded, structure-derived multistep retrosynthesis request."""
+
+    target_smiles: str = Field(min_length=1, max_length=20_000)
+    library_mode: Literal["full", "compact"] = "compact"
+    top_k_routes: int = Field(default=5, ge=1, le=10)
+    max_depth: Literal[2, 3] = 3
+    molecular_weight_threshold: float = Field(default=150.0, gt=0, le=500)
+    include_l0: bool = True
+    use_context: bool = True
+    diversify: bool = True
+
+
 class RetrosynthesisConditionsRequest(StrictRequest):
     """Progressive condition lookup for one retrosynthesis hit."""
 
@@ -157,6 +170,7 @@ __all__ = [
     "CompletionChoiceRequest",
     "DiscoveryRequest",
     "FeatureAnalysisRequest",
+    "MultistepRetrosynthesisRequest",
     "PrepareReactionRequest",
     "RankingPreferencesRequest",
     "RecommendationRequest",

@@ -27,6 +27,36 @@ supported by the most distinct reaction records. Ties are resolved
 deterministically. One reaction ID and literature citation supporting the
 selected structure are retained in the output row.
 
+## Canonical molecule index
+
+`molecule_index.py` converts any CSV SMILES column into a reusable SQLite
+identity index. Atom maps and serialization differences are normalized to
+canonical isomeric SMILES; a full InChIKey provides a second strict lookup key.
+Invalid structures are excluded and counted. Selected source columns are
+retained as bounded match provenance.
+
+Build the literature index from the repository root:
+
+```powershell
+python -m cas_tools.molecule_index_cli `
+  cas_tools/literature_cas_smiles_pairs.csv `
+  results/literature_molecule_index.sqlite `
+  --provenance-column cas_no `
+  --provenance-column reaction_id `
+  --provenance-column citation
+```
+
+The builder writes through a temporary database and atomically replaces the
+requested output only after a successful build. Other CSV catalogs can select
+a different structure column with `--smiles-column`.
+
+```python
+from cas_tools import CanonicalMoleculeIndex
+
+with CanonicalMoleculeIndex("results/literature_molecule_index.sqlite") as index:
+    match = index.lookup("C(C)O")
+```
+
 ## Compound lookup
 
 ```python

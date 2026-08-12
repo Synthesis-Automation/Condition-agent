@@ -5,6 +5,8 @@ import type {
   DiscoveryResult,
   FeatureAnalysisRequest,
   FeatureAnalysisResult,
+  MultistepRetrosynthesisRequest,
+  MultistepRetrosynthesisResult,
   PrepareReactionResult,
   RankingProfile,
   RecommendationRequest,
@@ -85,6 +87,12 @@ export const api = {
 
   retrosynthesize: (request: RetrosynthesisRequest) =>
     jsonRequest<RetrosynthesisResult>('/retrosynthesis', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  multistepRetrosynthesize: (request: MultistepRetrosynthesisRequest) =>
+    jsonRequest<MultistepRetrosynthesisResult>('/retrosynthesis/routes', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

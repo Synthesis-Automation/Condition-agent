@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from app.web_api.main import create_app
 from app.web_api.contracts import (
+    MultistepRetrosynthesisRequest,
     RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
 )
@@ -148,6 +149,36 @@ class FakeRuntime:
             "error": None,
         }
 
+    def multistep_retrosynthesize(self, request: Any) -> Dict[str, Any]:
+        return {
+            "target_smiles": request.target_smiles,
+            "library_mode": request.library_mode,
+            "valid": True,
+            "error": None,
+            "schema_version": "1.0",
+            "max_depth": request.max_depth,
+            "molecular_weight_threshold": (
+                request.molecular_weight_threshold
+            ),
+            "route_count": 1,
+            "partial_route_count": 0,
+            "routes": [
+                {
+                    "route_id": "ROUTE1:test",
+                    "solved": True,
+                    "route_cost": 1.2,
+                    "reaction_count": 1,
+                    "maximum_depth": 1,
+                    "steps": [],
+                    "leaves": [],
+                    "warnings": [],
+                }
+            ],
+            "partial_routes": [],
+            "diagnostics": {"expanded_states": 1},
+            "warnings": [],
+        }
+
     def render_reaction(
         self, reaction_smiles: str, *, width: int, height: int
     ) -> bytes:
@@ -207,6 +238,102 @@ def test_local_runtime_reports_retrosynthesis_library_modes(tmp_path) -> None:
         ]
         is False
     )
+
+
+def test_local_runtime_reports_multistep_index_availability(tmp_path) -> None:
+    compact = tmp_path / "operators" / "compact"
+    compact.mkdir(parents=True)
+    (compact / "operator_library_v3.json.gz").touch()
+    literature_index = tmp_path / "literature.sqlite"
+    literature_index.touch()
+
+    capabilities = LocalRecommendationRuntime(
+        retrosynthesis_library_root=tmp_path / "operators",
+        literature_index_path=literature_index,
+    ).capabilities()
+
+    assert capabilities["multistep_retrosynthesis"] is True
+    assert capabilities["literature_molecule_index_available"] is True
+    assert capabilities["literature_molecule_index_name"] == "literature.sqlite"
+
+
+def test_local_runtime_runs_multistep_planner_with_web_limits(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    literature_index = tmp_path / "literature.sqlite"
+    literature_index.touch()
+    library = SimpleNamespace(operators=("operator",), templates=("template",))
+    runtime = LocalRecommendationRuntime(
+        literature_index_path=literature_index,
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_get_retrosynthesis_library",
+        lambda mode: library,
+    )
+
+    opened_paths = []
+
+    class FakeMoleculeIndex:
+        def __init__(self, path) -> None:
+            opened_paths.append(path)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback) -> None:
+            return None
+
+    captured = {}
+
+    def fake_plan(target_smiles, selected_library, stock_index, **options):
+        captured.update(
+            {
+                "target_smiles": target_smiles,
+                "library": selected_library,
+                "stock_index": stock_index,
+                **options,
+            }
+        )
+        return SimpleNamespace(
+            routes=("route",),
+            partial_routes=(),
+            to_dict=lambda: {
+                "target_smiles": target_smiles,
+                "routes": [],
+                "partial_routes": [],
+                "diagnostics": {},
+                "warnings": [],
+            },
+        )
+
+    monkeypatch.setattr(runtime_module, "CanonicalMoleculeIndex", FakeMoleculeIndex)
+    monkeypatch.setattr(runtime_module, "plan_multistep_routes", fake_plan)
+
+    payload = runtime.multistep_retrosynthesize(
+        MultistepRetrosynthesisRequest(
+            target_smiles=" Cc1ccccc1 ",
+            library_mode="compact",
+            top_k_routes=3,
+            max_depth=2,
+            molecular_weight_threshold=140.0,
+            include_l0=False,
+            use_context=True,
+            diversify=False,
+        )
+    )
+
+    assert opened_paths == [literature_index]
+    assert captured["target_smiles"] == "Cc1ccccc1"
+    assert captured["library"] is library
+    assert captured["max_depth"] == 2
+    assert captured["molecular_weight_threshold"] == 140.0
+    assert captured["top_k_routes"] == 3
+    assert captured["include_l0"] is False
+    assert captured["diversify"] is False
+    assert payload["valid"] is True
+    assert payload["route_count"] == 1
 
 
 def test_local_runtime_loads_paired_catalogs_from_string_index_path(
@@ -397,6 +524,40 @@ def test_health_and_capabilities_are_versioned() -> None:
     assert health.status_code == 200
     assert health.json()["api_schema_version"] == "1.0"
     assert capabilities.json()["data"]["index_available"] is True
+
+
+def test_multistep_retrosynthesis_contract_forwards_bounded_options() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis/routes",
+        json={
+            "target_smiles": "Cc1ccccc1",
+            "library_mode": "compact",
+            "top_k_routes": 3,
+            "max_depth": 2,
+            "molecular_weight_threshold": 140.0,
+            "include_l0": False,
+            "use_context": True,
+            "diversify": True,
+        },
+    )
+
+    assert response.status_code == 200
+    result = response.json()["data"]
+    assert result["route_count"] == 1
+    assert result["max_depth"] == 2
+    assert result["molecular_weight_threshold"] == 140.0
+
+
+def test_multistep_retrosynthesis_rejects_depth_above_three() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis/routes",
+        json={
+            "target_smiles": "Cc1ccccc1",
+            "max_depth": 4,
+        },
+    )
+
+    assert response.status_code == 422
 
 
 def test_prepare_reaction_returns_typed_error() -> None:

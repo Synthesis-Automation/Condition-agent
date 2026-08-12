@@ -701,3 +701,33 @@ selected endpoint and each alternative product into CLI/API output, and the web
 review displays those structures. It is explicitly condition-unaware and is
 not used by candidate admission, scoring, deduplication, or diversity ranking.
 Unsupported topologies fail open without changing the retrosynthesis result.
+
+## Bounded multistep route search
+
+The initial multistep planner recursively composes the existing validated
+L2-to-L1-to-L0 operator ladder without changing single-step chemistry. Search
+depth is restricted to two or three reactions along the longest branch. A
+route is solved only after at least one disconnection and when every leaf:
+
+- has RDKit molecular weight at or below the configured threshold (150 by
+  default); or
+- exactly matches the configured canonical literature-molecule index.
+
+Build the reusable SQLite index as documented in `cas_tools/README.md`, then
+run:
+
+```powershell
+python -m core_retrosynthesis_poc plan-routes `
+  results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
+  results/literature_molecule_index.sqlite `
+  "TARGET_SMILES" `
+  --max-depth 3 `
+  --top-k-routes 5
+```
+
+The target itself is never accepted as a zero-step literature or
+molecular-weight terminal. The deterministic best-first beam expands the
+largest unresolved leaf first, caches repeated molecule expansions, rejects
+ancestor cycles, and reports depth-, candidate-, and search-limited partial
+routes separately from solved routes. Literature presence is disclosed as a
+corpus observation rather than commercial-availability evidence.

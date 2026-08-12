@@ -3,6 +3,8 @@ import type {
   DiscoveryHit,
   DiscoveryResult,
   ExperimentalDetail,
+  MultistepRetrosynthesisResult,
+  MultistepRetrosynthesisRoute,
   RecipeComponent,
   Recommendation,
   RecommendationResult,
@@ -537,6 +539,113 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
           {active && <RetrosynthesisDetails candidate={active} scopeWarnings={result.warnings} />}
         </div>
       )}
+    </section>
+  )
+}
+
+function MultistepRouteDetails({
+  route,
+}: {
+  route: MultistepRetrosynthesisRoute
+}) {
+  return (
+    <article className="result-detail multistep-route-detail">
+      <div className="detail-title-row">
+        <div>
+          <span className="eyebrow">{route.solved ? 'SOLVED ROUTE' : 'PARTIAL ROUTE'}</span>
+          <h3>{route.reaction_count} reaction{route.reaction_count === 1 ? '' : 's'} · depth {route.maximum_depth}</h3>
+          <p>{route.solved ? 'Every leaf satisfies the configured terminal rule.' : 'At least one branch remains unresolved within the search limits.'}</p>
+        </div>
+        <div className="score-orbit"><strong>{route.route_cost.toFixed(3)}</strong><span>cost</span></div>
+      </div>
+
+      <section className="route-step-list" aria-label="Retrosynthetic route steps">
+        {route.steps.map((step, index) => (
+          <article className="route-step-card" key={step.step_id}>
+            <div className="route-step-heading">
+              <div><span>Step {index + 1} · depth {step.depth}</span><strong>{displayName(step.candidate.transformation_kind ?? 'graph operator')}</strong></div>
+              <small>{step.candidate.abstraction_level} · score {step.candidate.score.toFixed(3)}</small>
+            </div>
+            <ReactionImage smiles={step.candidate.proposed_reaction_smiles} label={`Route reaction ${index + 1}`} compact />
+            <dl className="detail-list">
+              <div><dt>Precursors</dt><dd>{step.precursor_smiles.join(' · ')}</dd></div>
+              <div><dt>Forward validation</dt><dd>{displayName(step.candidate.forward_validation_status)}</dd></div>
+              <div><dt>Independent support</dt><dd>{step.candidate.independent_reference_support}</dd></div>
+              <div><dt>Operator</dt><dd className="mono-value">{step.candidate.operator_id}</dd></div>
+            </dl>
+          </article>
+        ))}
+      </section>
+
+      <section className="route-leaf-section">
+        <h4>Starting-material leaves</h4>
+        <div className="route-leaf-grid">
+          {route.leaves.map((leaf, index) => (
+            <article className={leaf.terminal ? 'route-leaf terminal' : 'route-leaf unresolved'} key={`${leaf.canonical_smiles}:${leaf.depth}:${index}`}>
+              <div className="route-leaf-heading">
+                <strong>{leaf.canonical_smiles}</strong>
+                <span>{leaf.terminal ? 'Terminal' : 'Unresolved'}</span>
+              </div>
+              <small>MW {leaf.molecular_weight == null ? '—' : leaf.molecular_weight.toFixed(2)} · depth {leaf.depth}</small>
+              {leaf.terminal_reasons.length > 0 && <p>{leaf.terminal_reasons.map(displayName).join(' · ')}</p>}
+              {leaf.unresolved_reason && <p>{displayName(leaf.unresolved_reason)}</p>}
+              {(leaf.literature_match?.source_records ?? []).map((record, recordIndex) => (
+                <div className="route-leaf-source" key={`${record.reaction_id ?? 'source'}:${recordIndex}`}>
+                  {record.cas_no && <strong>CAS {record.cas_no}</strong>}
+                  {record.citation && <span>{record.citation}</span>}
+                  {record.reaction_id && <small>{record.reaction_id}</small>}
+                </div>
+              ))}
+            </article>
+          ))}
+        </div>
+      </section>
+      <MessageList title="Route cautions" values={route.warnings} tone="caution" />
+    </article>
+  )
+}
+
+export function MultistepRetrosynthesisResults({ result }: { result: MultistepRetrosynthesisResult }) {
+  const [selected, setSelected] = useState(0)
+  useEffect(() => setSelected(0), [result])
+  const availableRoutes = [...result.routes, ...result.partial_routes]
+  const active = availableRoutes[selected]
+  return (
+    <section className="results-card">
+      <div className="results-summary">
+        <div><span className="eyebrow">MULTI-STEP RETROSYNTHESIS</span><h2>{result.route_count} solved route{result.route_count === 1 ? '' : 's'}</h2></div>
+        <div className="metric-strip">
+          <div><strong>{result.route_count}</strong><span>solved</span></div>
+          <div><strong>{result.partial_route_count}</strong><span>partial</span></div>
+          <div><strong>{result.diagnostics.expanded_states}</strong><span>expanded</span></div>
+          <div><strong>{result.max_depth}</strong><span>max depth</span></div>
+        </div>
+      </div>
+      {!result.valid && <div className="alert error">{displayName(result.error ?? 'No solved multistep routes')}</div>}
+      {availableRoutes.length === 0 && <MessageList title="Scope and cautions" values={result.warnings} tone="caution" />}
+      {availableRoutes.length > 0 && (
+        <div className="results-layout multistep-results-layout">
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>Route</th><th>Status</th><th>Steps</th><th>Depth</th><th>Cost</th><th>Terminal leaves</th></tr></thead>
+              <tbody>
+                {availableRoutes.map((route, index) => (
+                  <tr key={route.route_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
+                    <td><strong>{index + 1}</strong></td>
+                    <td>{route.solved ? 'Solved' : 'Partial'}</td>
+                    <td>{route.reaction_count}</td>
+                    <td>{route.maximum_depth}</td>
+                    <td>{route.route_cost.toFixed(3)}</td>
+                    <td>{route.leaves.filter((leaf) => leaf.terminal).length}/{route.leaves.length}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {active && <MultistepRouteDetails route={active} />}
+        </div>
+      )}
+      <MessageList title="Search cautions" values={result.warnings} tone="caution" />
     </section>
   )
 }

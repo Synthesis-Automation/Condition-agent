@@ -25,6 +25,14 @@ from .registry_cas_reconciliation import (
     CasReconciliationSummary,
     reconcile_registry_from_cas_csv,
 )
+from .molecule_index import (
+    CanonicalMoleculeIndex,
+    MoleculeIdentity,
+    MoleculeIndexBuildReport,
+    MoleculeIndexMatch,
+    build_canonical_molecule_index,
+    molecule_identity,
+)
 
 __all__ = [
     "CASMatch",
@@ -32,8 +40,13 @@ __all__ = [
     "CSVExtractionResult",
     "CompoundLookupClient",
     "CompoundLookupResult",
+    "CanonicalMoleculeIndex",
     "CasReconciliationSummary",
     "FolderExtractionResult",
+    "MoleculeIdentity",
+    "MoleculeIndexBuildReport",
+    "MoleculeIndexMatch",
+    "build_canonical_molecule_index",
     "discover_candidate_files",
     "discover_csv_files",
     "extract_cas_smiles_pairs_from_csv",
@@ -42,6 +55,7 @@ __all__ = [
     "find_cas_numbers_in_text",
     "is_valid_cas_number",
     "lookup_compound_by_cas",
+    "molecule_identity",
     "reconcile_registry_from_cas_csv",
     "write_matches_to_csv",
     "write_matches_to_markdown",
