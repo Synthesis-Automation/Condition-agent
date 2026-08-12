@@ -33,6 +33,16 @@ from .molecule_index import (
     build_canonical_molecule_index,
     molecule_identity,
 )
+from .stock_portfolio import (
+    STOCK_PORTFOLIO_SCHEMA_VERSION,
+    STOCK_SOURCE_MANIFEST_VERSION,
+    StockPortfolio,
+    StockPortfolioBuildReport,
+    StockSourceDefinition,
+    build_stock_portfolio,
+    load_stock_source_manifest,
+    open_stock_lookup,
+)
 
 __all__ = [
     "CASMatch",
@@ -46,6 +56,12 @@ __all__ = [
     "MoleculeIdentity",
     "MoleculeIndexBuildReport",
     "MoleculeIndexMatch",
+    "STOCK_PORTFOLIO_SCHEMA_VERSION",
+    "STOCK_SOURCE_MANIFEST_VERSION",
+    "StockPortfolio",
+    "StockPortfolioBuildReport",
+    "StockSourceDefinition",
+    "build_stock_portfolio",
     "build_canonical_molecule_index",
     "discover_candidate_files",
     "discover_csv_files",
@@ -56,6 +72,8 @@ __all__ = [
     "is_valid_cas_number",
     "lookup_compound_by_cas",
     "molecule_identity",
+    "load_stock_source_manifest",
+    "open_stock_lookup",
     "reconcile_registry_from_cas_csv",
     "write_matches_to_csv",
     "write_matches_to_markdown",

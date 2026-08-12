@@ -249,6 +249,24 @@ def test_local_runtime_reports_multistep_index_availability(tmp_path) -> None:
     assert capabilities["literature_molecule_index_name"] == "literature.sqlite"
 
 
+def test_local_runtime_prefers_explicit_supplier_stock_portfolio(tmp_path) -> None:
+    compact = tmp_path / "operators" / "compact"
+    compact.mkdir(parents=True)
+    (compact / "operator_library_v3.json.gz").touch()
+    stock_portfolio = tmp_path / "stock.sqlite"
+    stock_portfolio.touch()
+
+    capabilities = LocalRecommendationRuntime(
+        retrosynthesis_library_root=tmp_path / "operators",
+        literature_index_path=tmp_path / "missing-literature.sqlite",
+        stock_portfolio_path=stock_portfolio,
+    ).capabilities()
+
+    assert capabilities["multistep_retrosynthesis"] is True
+    assert capabilities["stock_portfolio_available"] is True
+    assert capabilities["stock_portfolio_name"] == "stock.sqlite"
+
+
 def test_local_runtime_runs_multistep_planner_with_web_limits(
     monkeypatch,
     tmp_path,

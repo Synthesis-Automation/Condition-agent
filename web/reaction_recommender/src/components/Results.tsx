@@ -592,7 +592,11 @@ function MultistepRouteDetails({
               {leaf.terminal_reasons.length > 0 && <p>{leaf.terminal_reasons.map(displayName).join(' · ')}</p>}
               {leaf.unresolved_reason && <p>{displayName(leaf.unresolved_reason)}</p>}
               {(leaf.literature_match?.source_records ?? []).map((record, recordIndex) => (
-                <div className="route-leaf-source" key={`${record.reaction_id ?? 'source'}:${recordIndex}`}>
+                <div className="route-leaf-source" key={`${record.supplier_record_id ?? record.reaction_id ?? 'source'}:${recordIndex}`}>
+                  {record.supplier && <strong>{record.supplier}</strong>}
+                  {record.source_collection && <span>{record.source_collection}</span>}
+                  {record.snapshot_date && <small>Snapshot {record.snapshot_date}</small>}
+                  {record.supplier_record_id && <small>{record.supplier_record_id}</small>}
                   {record.cas_no && <strong>CAS {record.cas_no}</strong>}
                   {record.citation && <span>{record.citation}</span>}
                   {record.reaction_id && <small>{record.reaction_id}</small>}

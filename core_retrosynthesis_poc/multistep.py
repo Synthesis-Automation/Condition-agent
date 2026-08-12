@@ -28,8 +28,13 @@ from cas_tools.molecule_index import (
 
 
 MULTISTEP_SCHEMA_VERSION = "1.2"
-_TERMINAL_LITERATURE_ROLES = frozenset(
-    {"reactant", "starting_material", "startingmaterial", "substrate"}
+_TERMINAL_STOCK_ROLES = frozenset(
+    {
+        "reactant",
+        "starting_material",
+        "startingmaterial",
+        "substrate",
+    }
 )
 
 
@@ -251,11 +256,27 @@ def _catalog_role_status(
         for record in literature_match.source_records
     }
     roles.discard("")
-    if roles & _TERMINAL_LITERATURE_ROLES:
+    if roles & _TERMINAL_STOCK_ROLES:
         return "reactant_supported"
     if roles:
         return "nonreactant_only"
     return "untyped"
+
+
+def _has_strong_stock_evidence(
+    literature_match: MoleculeIndexMatch | None,
+) -> bool:
+    """Return whether retained provenance explicitly confirms usable stock."""
+
+    if literature_match is None:
+        return False
+    return any(
+        str(record.get("stock_evidence") or "").strip().casefold()
+        in {"physically_available", "supplier_in_stock"}
+        and str(record.get("terminal_eligible") or "").strip().casefold()
+        in {"1", "true", "yes"}
+        for record in literature_match.source_records
+    )
 
 
 def _assess_starting_material(
@@ -283,10 +304,13 @@ def _assess_starting_material(
         )
     literature_match = literature_index.lookup(identity)
     catalog_role_status = _catalog_role_status(literature_match)
+    strong_stock_evidence = _has_strong_stock_evidence(literature_match)
     reasons = []
     if identity.molecular_weight <= molecular_weight_threshold:
         reasons.append("molecular_weight_threshold")
-    if catalog_role_status == "reactant_supported":
+    if strong_stock_evidence:
+        reasons.append("supplier_stock_match")
+    elif catalog_role_status == "reactant_supported":
         reasons.append("literature_reactant_match")
     elif catalog_role_status == "untyped" and allow_untyped_literature_terminal:
         reasons.append("literature_untyped_match")
@@ -294,7 +318,9 @@ def _assess_starting_material(
     terminal_evidence = "none"
     if terminal:
         terminal_evidence = (
-            "role_supported_literature"
+            "supplier_stock_portfolio"
+            if "supplier_stock_match" in reasons
+            else "role_supported_literature"
             if "literature_reactant_match" in reasons
             else "untyped_literature"
             if "literature_untyped_match" in reasons

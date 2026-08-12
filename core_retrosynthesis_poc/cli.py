@@ -10,7 +10,7 @@ from itertools import islice
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Sequence
 
-from cas_tools import CanonicalMoleculeIndex
+from cas_tools import open_stock_lookup
 from retrosynthesis_poc.library import load_library as load_baseline_library
 
 from .comparison import run_comparison
@@ -318,7 +318,7 @@ def _parser() -> argparse.ArgumentParser:
         help="search deterministic two- or three-depth retrosynthesis routes",
     )
     route_search.add_argument("library")
-    route_search.add_argument("literature_index")
+    route_search.add_argument("stock_index")
     route_search.add_argument("target")
     route_search.add_argument("--max-depth", type=int, choices=(2, 3), default=3)
     route_search.add_argument("--molecular-weight-threshold", type=float, default=150.0)
@@ -620,7 +620,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if arguments.command == "plan-routes":
         loaded_library = load_generic_library(arguments.library)
-        with CanonicalMoleculeIndex(arguments.literature_index) as stock_index:
+        with open_stock_lookup(arguments.stock_index) as stock_index:
             result = plan_multistep_routes(
                 arguments.target,
                 loaded_library,

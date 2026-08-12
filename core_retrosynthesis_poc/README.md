@@ -711,8 +711,9 @@ route is solved only after at least one disconnection and when every leaf:
 
 - has RDKit molecular weight at or below the configured threshold (150 by
   default); or
-- exactly matches the configured canonical literature-molecule index with
-  reactant-like source-role provenance.
+- exactly matches the configured local stock portfolio with physical or
+  supplier-in-stock evidence; or, as a legacy fallback, matches the canonical
+  literature-molecule index with reactant-like source-role provenance.
 
 Build the reusable SQLite index as documented in `cas_tools/README.md`, then
 run:
@@ -720,7 +721,7 @@ run:
 ```powershell
 python -m core_retrosynthesis_poc plan-routes `
   results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
-  results/literature_molecule_index.sqlite `
+  results/stock_portfolio/stock_portfolio.sqlite `
   "TARGET_SMILES" `
   --max-depth 3 `
   --top-k-routes 5
@@ -732,7 +733,7 @@ the planner exposes an explicit compatibility switch for legacy untyped
 catalogs but does not enable it by default. Low-molecular-weight leaves remain
 labelled heuristic terminals and add a declarative route-cost penalty.
 
-The target itself is never accepted as a zero-step literature or
+The target itself is never accepted as a zero-step stock, literature, or
 molecular-weight terminal. The deterministic best-first beam expands the
 largest unresolved leaf first, caches repeated molecule expansions, reserves
 specificity-first L2 candidates and widens to L1/L0 only when a narrower tier

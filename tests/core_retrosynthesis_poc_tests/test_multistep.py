@@ -43,6 +43,25 @@ class _LiteratureIndex:
         )
 
 
+class _StockIndex(_LiteratureIndex):
+    def lookup(self, identity, *, provenance_limit: int = 5):
+        if identity.canonical_smiles not in self.known:
+            return None
+        return MoleculeIndexMatch(
+            canonical_smiles=identity.canonical_smiles,
+            inchi_key=identity.inchi_key,
+            occurrence_count=1,
+            source_records=(
+                {
+                    "supplier": "Mcule",
+                    "source_role": "starting_material",
+                    "stock_evidence": "supplier_in_stock",
+                    "terminal_eligible": "true",
+                },
+            ),
+        )
+
+
 def _candidate(product: str, precursors: str, score: float = 0.9):
     return GenericDisconnectionCandidate(
         target_smiles=product,
@@ -158,6 +177,26 @@ def test_high_weight_literature_match_is_terminal() -> None:
     assert matched.terminal_evidence == "role_supported_literature"
     assert matched.catalog_role_status == "reactant_supported"
     assert matched.literature_match is not None
+
+
+def test_supplier_stock_match_is_a_strong_terminal() -> None:
+    known = "CCCCCCCCCC"
+    result = plan_multistep_routes(
+        "CCCCCCCCCCCC",
+        object(),
+        _StockIndex((known,)),
+        max_depth=2,
+        molecular_weight_threshold=20.0,
+        expander=_expander(
+            {"CCCCCCCCCCCC": (_candidate("CCCCCCCCCCCC", f"C.{known}"),)}
+        ),
+    )
+
+    matched = next(
+        leaf for leaf in result.routes[0].leaves if leaf.canonical_smiles == known
+    )
+    assert matched.terminal_reasons == ("supplier_stock_match",)
+    assert matched.terminal_evidence == "supplier_stock_portfolio"
 
 
 def test_role_provenance_round_trips_through_canonical_index(tmp_path) -> None:

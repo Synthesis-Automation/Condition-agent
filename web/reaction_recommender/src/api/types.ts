@@ -19,6 +19,8 @@ export interface Capabilities {
   multistep_retrosynthesis?: boolean
   literature_molecule_index_available?: boolean
   literature_molecule_index_name?: string
+  stock_portfolio_available?: boolean
+  stock_portfolio_name?: string
   local_only: boolean
   default_library_mode?: 'full' | 'compact'
   library_modes?: Record<string, {
@@ -647,6 +649,10 @@ export interface MultistepRetrosynthesisResult {
   library_operator_count: number
   library_template_count: number
   search_elapsed_seconds: number
+  terminal_stock_source: {
+    type: 'supplier_stock_portfolio' | 'literature_molecule_index'
+    name: string
+  }
   search_budget: Record<string, number>
   route_postprocessing: {
     definition_id: string

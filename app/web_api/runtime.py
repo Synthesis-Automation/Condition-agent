@@ -8,7 +8,7 @@ from pathlib import Path
 from threading import RLock
 from typing import Any, Dict, Protocol
 
-from cas_tools import CanonicalMoleculeIndex
+from cas_tools import CanonicalMoleculeIndex, StockPortfolio
 from condition_recommender import (
     ChemistRankingPreferences,
     GenericConditionRecommender,
@@ -68,6 +68,9 @@ DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = (
 )
 DEFAULT_LITERATURE_MOLECULE_INDEX = (
     PROJECT_ROOT / "results" / "literature_molecule_index.sqlite"
+)
+DEFAULT_STOCK_PORTFOLIO = (
+    PROJECT_ROOT / "results" / "stock_portfolio" / "stock_portfolio.sqlite"
 )
 WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET = 100
 WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET = 30
@@ -166,6 +169,7 @@ class LocalRecommendationRuntime:
         library_root: str | Path | None = None,
         retrosynthesis_library_root: str | Path | None = None,
         literature_index_path: str | Path | None = None,
+        stock_portfolio_path: str | Path | None = None,
     ) -> None:
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
         self._configured_index_path = Path(configured) if configured else None
@@ -197,6 +201,17 @@ class LocalRecommendationRuntime:
         )
         self.literature_index_path = Path(
             configured_literature_index or DEFAULT_LITERATURE_MOLECULE_INDEX
+        )
+        configured_stock_portfolio = (
+            stock_portfolio_path or os.environ.get("RETROSYNTHESIS_STOCK_PORTFOLIO")
+        )
+        self.stock_portfolio_path = Path(
+            configured_stock_portfolio or DEFAULT_STOCK_PORTFOLIO
+        )
+        # An explicitly supplied legacy index is an intentional test/runtime
+        # override unless a stock portfolio was also explicitly configured.
+        self._prefer_stock_portfolio = bool(configured_stock_portfolio) or (
+            literature_index_path is None
         )
         self._recommenders: Dict[
             tuple[str, int, int, bool, bool], GenericConditionRecommender
@@ -392,13 +407,22 @@ class LocalRecommendationRuntime:
                 path.is_file() for path in retrosynthesis_paths.values()
             ),
             "multistep_retrosynthesis": (
-                self.literature_index_path.is_file()
+                (
+                    (
+                        self._prefer_stock_portfolio
+                        and self.stock_portfolio_path.is_file()
+                    )
+                    or self.literature_index_path.is_file()
+                )
                 and any(path.is_file() for path in retrosynthesis_paths.values())
             ),
-            "literature_molecule_index_available": (
-                self.literature_index_path.is_file()
-            ),
+            "literature_molecule_index_available": self.literature_index_path.is_file(),
             "literature_molecule_index_name": self.literature_index_path.name,
+            "stock_portfolio_available": (
+                self._prefer_stock_portfolio
+                and self.stock_portfolio_path.is_file()
+            ),
+            "stock_portfolio_name": self.stock_portfolio_path.name,
             "default_retrosynthesis_library_mode": (
                 default_retrosynthesis_mode
             ),
@@ -678,11 +702,32 @@ class LocalRecommendationRuntime:
         self,
         request: MultistepRetrosynthesisRequest,
     ) -> Dict[str, Any]:
-        """Search short routes using explicit literature/MW terminal rules."""
+        """Search short routes using explicit stock and MW terminal rules."""
 
         library = self._get_retrosynthesis_library(request.library_mode)
         started_at = time.perf_counter()
-        with CanonicalMoleculeIndex(self.literature_index_path) as stock_index:
+        stock_path = (
+            self.stock_portfolio_path
+            if (
+                self._prefer_stock_portfolio
+                and self.stock_portfolio_path.is_file()
+            )
+            else self.literature_index_path
+        )
+        stock_type = (
+            "supplier_stock_portfolio"
+            if (
+                self._prefer_stock_portfolio
+                and self.stock_portfolio_path.is_file()
+            )
+            else "literature_molecule_index"
+        )
+        stock_context = (
+            StockPortfolio(stock_path)
+            if stock_type == "supplier_stock_portfolio"
+            else CanonicalMoleculeIndex(stock_path)
+        )
+        with stock_context as stock_index:
             result = plan_multistep_routes(
                 request.target_smiles.strip(),
                 library,
@@ -717,6 +762,10 @@ class LocalRecommendationRuntime:
                 "library_operator_count": len(library.operators),
                 "library_template_count": len(library.templates),
                 "search_elapsed_seconds": elapsed_seconds,
+                "terminal_stock_source": {
+                    "type": stock_type,
+                    "name": stock_path.name,
+                },
                 "search_budget": {
                     "per_step_top_k": 5,
                     "beam_width": max(12, request.top_k_routes * 3),
@@ -777,6 +826,7 @@ def error_payload(exc: Exception) -> Dict[str, str]:
 
 __all__ = [
     "DEFAULT_INDEX_PATH",
+    "DEFAULT_STOCK_PORTFOLIO",
     "LocalRecommendationRuntime",
     "WebRuntime",
     "error_payload",

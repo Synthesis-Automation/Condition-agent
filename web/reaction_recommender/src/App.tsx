@@ -380,7 +380,9 @@ function App() {
   const isRetrosynthesisMode = mode === 'retrosynthesis' || mode === 'multistep_retrosynthesis'
   const selectedLibraryAvailable = isRetrosynthesisMode
     ? (capabilities?.retrosynthesis_library_modes?.[libraryMode]?.library_available ?? false)
-      && (mode !== 'multistep_retrosynthesis' || capabilities?.literature_molecule_index_available === true)
+      && (mode !== 'multistep_retrosynthesis'
+        || capabilities?.stock_portfolio_available === true
+        || capabilities?.literature_molecule_index_available === true)
     : capabilities?.library_modes?.[libraryMode]?.index_available
       ?? capabilities?.index_available
       ?? false
@@ -469,7 +471,7 @@ function App() {
       {multistepRetrosynthesisResult && <MultistepRetrosynthesisResults result={multistepRetrosynthesisResult} />}
       {featureResult && <FeatureResults result={featureResult} />}
 
-      {!result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, literature provenance, and unresolved stopping reasons.' : 'Recommendations, discovery hits, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
+      {!result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, supplier-stock provenance, and unresolved stopping reasons.' : 'Recommendations, discovery hits, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
 
       <footer>All chemistry and data remain on this machine. Molecular structure is the source of truth.</footer>
 

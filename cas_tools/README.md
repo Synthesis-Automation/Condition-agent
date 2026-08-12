@@ -61,6 +61,42 @@ with CanonicalMoleculeIndex("results/literature_molecule_index.sqlite") as index
     match = index.lookup("C(C)O")
 ```
 
+## Supplier stock portfolio
+
+`stock_portfolio.py` combines exact molecule identities while retaining each
+supplier offer, collection, evidence tier, region, snapshot date, source URL,
+terms URL, and supplier record ID. Only `physically_available` and
+`supplier_in_stock` sources can be configured as route terminals; comprehensive
+or make-on-demand catalogs remain review evidence.
+
+Download the current public Mcule in-stock snapshot and create its versioned
+source manifest:
+
+```powershell
+python -m cas_tools.stock_cli download-mcule `
+  results/stock_portfolio/sources
+```
+
+Compile all sources listed in that manifest into one atomic SQLite portfolio:
+
+```powershell
+python -m cas_tools.stock_cli build `
+  results/stock_portfolio/sources/stock_sources.v1.json `
+  results/stock_portfolio/stock_portfolio.sqlite `
+  --workers 12 `
+  --chunk-size 5000
+```
+
+The web runtime automatically prefers this portfolio and falls back to the
+legacy literature index only when it is absent. Override its location with
+`RETROSYNTHESIS_STOCK_PORTFOLIO`.
+
+Additional authorized supplier exports can be appended to the manifest using
+`smi`, `csv`, or `sdf` format. For example, an Enamine export requires explicit
+written authorization under Enamine's current terms before it may be processed
+by this computational system. The importer never signs in, scrapes, bypasses
+access controls, or calls a supplier API during route search.
+
 ## Compound lookup
 
 ```python
