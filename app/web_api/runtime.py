@@ -688,9 +688,9 @@ class LocalRecommendationRuntime:
                     request.molecular_weight_threshold
                 ),
                 top_k_routes=request.top_k_routes,
-                per_step_top_k=5,
-                beam_width=max(20, request.top_k_routes * 4),
-                max_expansions=40,
+                per_step_top_k=8,
+                beam_width=max(32, request.top_k_routes * 6),
+                max_expansions=max(60, request.top_k_routes * 12),
                 max_templates_to_apply=(
                     WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET
                 ),

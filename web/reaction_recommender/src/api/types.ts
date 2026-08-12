@@ -535,6 +535,8 @@ export interface StartingMaterialAssessment {
   molecular_weight?: number | null
   terminal: boolean
   terminal_reasons: string[]
+  terminal_evidence: string
+  catalog_role_status: string
   unresolved_reason?: string | null
   literature_match?: MoleculeIndexMatch | null
 }
@@ -559,6 +561,7 @@ export interface MultistepRouteStep {
   product_smiles: string
   precursor_smiles: string[]
   step_cost: number
+  step_cost_components: Record<string, number>
   candidate: MultistepRouteCandidate
 }
 
@@ -582,6 +585,7 @@ export interface MultistepSearchDiagnostics {
   rejected_cycles: number
   rejected_invalid_candidates: number
   duplicate_states: number
+  retained_alternative_paths: number
   frontier_states: number
   solved_routes_found: number
   partial_routes_found: number
@@ -596,6 +600,7 @@ export interface MultistepRetrosynthesisResult {
   schema_version: string
   max_depth: 2 | 3
   molecular_weight_threshold: number
+  ranking_policy_definition_id: string
   route_count: number
   partial_route_count: number
   library_operator_count: number

@@ -569,6 +569,7 @@ function MultistepRouteDetails({
             <ReactionImage smiles={step.candidate.proposed_reaction_smiles} label={`Route reaction ${index + 1}`} compact />
             <dl className="detail-list">
               <div><dt>Precursors</dt><dd>{step.precursor_smiles.join(' · ')}</dd></div>
+              <div><dt>Step cost</dt><dd>{step.step_cost.toFixed(3)} · {Object.entries(step.step_cost_components).filter(([, value]) => value > 0).map(([name, value]) => `${displayName(name)} ${value.toFixed(3)}`).join(' · ')}</dd></div>
               <div><dt>Forward validation</dt><dd>{displayName(step.candidate.forward_validation_status)}</dd></div>
               <div><dt>Independent support</dt><dd>{step.candidate.independent_reference_support}</dd></div>
               <div><dt>Operator</dt><dd className="mono-value">{step.candidate.operator_id}</dd></div>
@@ -587,6 +588,7 @@ function MultistepRouteDetails({
                 <span>{leaf.terminal ? 'Terminal' : 'Unresolved'}</span>
               </div>
               <small>MW {leaf.molecular_weight == null ? '—' : leaf.molecular_weight.toFixed(2)} · depth {leaf.depth}</small>
+              <p>{displayName(leaf.terminal_evidence)} · {displayName(leaf.catalog_role_status)}</p>
               {leaf.terminal_reasons.length > 0 && <p>{leaf.terminal_reasons.map(displayName).join(' · ')}</p>}
               {leaf.unresolved_reason && <p>{displayName(leaf.unresolved_reason)}</p>}
               {(leaf.literature_match?.source_records ?? []).map((record, recordIndex) => (

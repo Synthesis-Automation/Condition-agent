@@ -5,7 +5,6 @@ from __future__ import annotations
 import csv
 import json
 import re
-from collections import Counter
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -14,7 +13,13 @@ from typing import Any
 from .cas_number_extractor import find_cas_numbers_in_text
 
 
-OUTPUT_COLUMNS = ("cas_no", "compound_smiles", "reaction_id", "citation")
+OUTPUT_COLUMNS = (
+    "cas_no",
+    "compound_smiles",
+    "reaction_id",
+    "citation",
+    "source_role",
+)
 CAS_KEYS = ("casrn", "casno", "casnumber", "casregistrynumber", "casregistry", "cas")
 SMILES_KEYS = ("smiles", "canonicalsmiles", "isomericsmiles", "compoundsmiles")
 JSON_ROLE_COLUMNS = {
@@ -34,15 +39,17 @@ class CASSmilesPair:
     compound_smiles: str
     reaction_id: str = ""
     citation: str = ""
+    source_role: str = ""
 
     def to_row(self) -> dict[str, str]:
-        """Return the exact four-column output representation."""
+        """Return the role-aware output representation."""
 
         return {
             "cas_no": self.cas_no,
             "compound_smiles": self.compound_smiles,
             "reaction_id": self.reaction_id,
             "citation": self.citation,
+            "source_role": self.source_role,
         }
 
 
@@ -143,6 +150,7 @@ def extract_cas_smiles_pairs_from_csv(path: str | Path) -> CSVExtractionResult:
                         value,
                         reaction_id=reaction_id,
                         citation=citation,
+                        source_role=role or "",
                     )
                 )
                 pair_occurrences += len(extracted)
@@ -156,6 +164,7 @@ def extract_cas_smiles_pairs_from_csv(path: str | Path) -> CSVExtractionResult:
                     row.get(smiles_column),
                     reaction_id=reaction_id,
                     citation=citation,
+                    source_role=role,
                 )
                 if warning:
                     warnings.append(
@@ -213,9 +222,9 @@ def write_cas_smiles_pairs(
     """Write exactly one deterministic record per CAS number.
 
     If a CAS number has conflicting structures, the structure supported by the
-    most distinct reaction records is selected. Ties use lexical SMILES order,
-    followed by reaction ID and citation, so identical inputs always produce
-    identical output.
+    most distinct reaction records is selected. Ties use lexical SMILES order.
+    A reactant-role observation is preferred for retained provenance, followed
+    by reaction ID and citation.
     """
 
     output = Path(output_path)
@@ -237,15 +246,32 @@ def _select_one_record_per_cas(
 
     selected: list[CASSmilesPair] = []
     for records in records_by_cas.values():
-        smiles_counts = Counter(record.compound_smiles for record in records)
+        smiles_counts = {
+            smiles: len(
+                {
+                    (record.reaction_id, record.citation)
+                    for record in records
+                    if record.compound_smiles == smiles
+                }
+            )
+            for smiles in {record.compound_smiles for record in records}
+        }
         selected_smiles = min(
             smiles_counts,
             key=lambda smiles: (-smiles_counts[smiles], smiles),
         )
         selected.append(
             min(
-                (record for record in records if record.compound_smiles == selected_smiles),
-                key=lambda record: (record.reaction_id, record.citation),
+                (
+                    record
+                    for record in records
+                    if record.compound_smiles == selected_smiles
+                ),
+                key=lambda record: (
+                    _source_role_rank(record.source_role),
+                    record.reaction_id,
+                    record.citation,
+                ),
             )
         )
     return sorted(selected, key=_pair_sort_key)
@@ -256,23 +282,30 @@ def _pairs_from_json_value(
     *,
     reaction_id: str,
     citation: str,
+    source_role: str,
 ) -> Iterator[CASSmilesPair]:
     if isinstance(value, Mapping):
         normalized = {_normalized_key(str(key)): item for key, item in value.items()}
-        cas_value = next((normalized[key] for key in CAS_KEYS if key in normalized), None)
-        smiles_value = next((normalized[key] for key in SMILES_KEYS if key in normalized), None)
+        cas_value = next(
+            (normalized[key] for key in CAS_KEYS if key in normalized), None
+        )
+        smiles_value = next(
+            (normalized[key] for key in SMILES_KEYS if key in normalized), None
+        )
         if cas_value is not None and smiles_value is not None:
             yield from _associate_values(
                 cas_value,
                 smiles_value,
                 reaction_id=reaction_id,
                 citation=citation,
+                source_role=source_role,
             )
         for child in value.values():
             yield from _pairs_from_json_value(
                 child,
                 reaction_id=reaction_id,
                 citation=citation,
+                source_role=source_role,
             )
     elif isinstance(value, (list, tuple)):
         for child in value:
@@ -280,6 +313,7 @@ def _pairs_from_json_value(
                 child,
                 reaction_id=reaction_id,
                 citation=citation,
+                source_role=source_role,
             )
 
 
@@ -289,6 +323,7 @@ def _associate_values(
     *,
     reaction_id: str,
     citation: str,
+    source_role: str,
 ) -> Iterator[CASSmilesPair]:
     cas_numbers = _cas_numbers(cas_value)
     smiles_values = _smiles_values(smiles_value)
@@ -296,15 +331,33 @@ def _associate_values(
         return
     if len(cas_numbers) == 1:
         for smiles in smiles_values:
-            yield CASSmilesPair(cas_numbers[0], smiles, reaction_id, citation)
+            yield CASSmilesPair(
+                cas_numbers[0],
+                smiles,
+                reaction_id,
+                citation,
+                source_role,
+            )
         return
     if len(smiles_values) == 1:
         for cas_no in cas_numbers:
-            yield CASSmilesPair(cas_no, smiles_values[0], reaction_id, citation)
+            yield CASSmilesPair(
+                cas_no,
+                smiles_values[0],
+                reaction_id,
+                citation,
+                source_role,
+            )
         return
     if len(cas_numbers) == len(smiles_values):
         for cas_no, smiles in zip(cas_numbers, smiles_values):
-            yield CASSmilesPair(cas_no, smiles, reaction_id, citation)
+            yield CASSmilesPair(
+                cas_no,
+                smiles,
+                reaction_id,
+                citation,
+                source_role,
+            )
 
 
 def _pairs_from_flat_values(
@@ -313,20 +366,35 @@ def _pairs_from_flat_values(
     *,
     reaction_id: str,
     citation: str,
+    source_role: str,
 ) -> tuple[tuple[CASSmilesPair, ...], str | None]:
     cas_numbers = _cas_numbers(cas_value)
     smiles_text = str(smiles_value or "").strip()
     if not cas_numbers or not smiles_text:
         return (), None
     if len(cas_numbers) == 1:
-        return (CASSmilesPair(cas_numbers[0], smiles_text, reaction_id, citation),), None
+        return (
+            CASSmilesPair(
+                cas_numbers[0],
+                smiles_text,
+                reaction_id,
+                citation,
+                source_role,
+            ),
+        ), None
 
     smiles_values = [item.strip() for item in smiles_text.split(".") if item.strip()]
     if len(smiles_values) != len(cas_numbers):
         return (), "ambiguous multi-value fields were skipped."
     return (
         tuple(
-            CASSmilesPair(cas_no, smiles, reaction_id, citation)
+            CASSmilesPair(
+                cas_no,
+                smiles,
+                reaction_id,
+                citation,
+                source_role,
+            )
             for cas_no, smiles in zip(cas_numbers, smiles_values)
         ),
         None,
@@ -404,10 +472,28 @@ def _normalized_key(value: str) -> str:
     return re.sub(r"[^a-z0-9]", "", value.casefold())
 
 
-def _pair_sort_key(pair: CASSmilesPair) -> tuple[tuple[int, ...], str, str, str]:
+def _source_role_rank(source_role: str) -> tuple[int, str]:
+    normalized = str(source_role or "").strip().casefold()
+    order = {
+        "reactant": 0,
+        "starting_material": 1,
+        "substrate": 2,
+        "reagent": 3,
+        "catalyst": 4,
+        "solvent": 5,
+        "product": 6,
+        "": 7,
+    }
+    return order.get(normalized, 7), normalized
+
+
+def _pair_sort_key(
+    pair: CASSmilesPair,
+) -> tuple[tuple[int, ...], str, str, str, str]:
     return (
         tuple(int(part) for part in pair.cas_no.split("-")),
         pair.compound_smiles,
         pair.reaction_id,
         pair.citation,
+        pair.source_role,
     )

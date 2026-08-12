@@ -1,0 +1,21 @@
+{
+  "definition_id": "multistep_ranking.v1",
+  "schema_version": "1.0",
+  "search": {
+    "maximum_paths_per_state": 2,
+    "minimum_candidates_per_level": 1
+  },
+  "step_cost": {
+    "base": 1.0,
+    "candidate_score_deficit_weight": 1.0,
+    "abstraction_level_penalties": {
+      "L2": 0.0,
+      "L1": 0.05,
+      "L0": 0.15,
+      "RDCHIRAL": 0.0
+    },
+    "selectivity_warning_penalty": 0.25,
+    "heuristic_terminal_penalty": 0.2,
+    "candidate_rank_tiebreak": 0.000001
+  }
+}

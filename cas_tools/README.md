@@ -18,14 +18,17 @@ when no structured role column exists. It writes a deterministic, deduplicated
 CSV with exactly these columns:
 
 ```text
-cas_no,compound_smiles,reaction_id,citation
+cas_no,compound_smiles,reaction_id,citation,source_role
 ```
 
 The generated file contains exactly one row per CAS number. If a CAS number is
 associated with conflicting structures, the extractor selects the SMILES
 supported by the most distinct reaction records. Ties are resolved
-deterministically. One reaction ID and literature citation supporting the
-selected structure are retained in the output row.
+deterministically. One reaction ID, literature citation, and observed source
+role supporting the selected structure are retained. A reactant-role record is
+preferred when the selected structure appeared in multiple roles so terminal
+starting-material decisions do not silently rely on catalyst, solvent, reagent,
+or product observations.
 
 ## Canonical molecule index
 
@@ -43,7 +46,8 @@ python -m cas_tools.molecule_index_cli `
   results/literature_molecule_index.sqlite `
   --provenance-column cas_no `
   --provenance-column reaction_id `
-  --provenance-column citation
+  --provenance-column citation `
+  --provenance-column source_role
 ```
 
 The builder writes through a temporary database and atomically replaces the

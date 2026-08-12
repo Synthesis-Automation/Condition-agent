@@ -61,6 +61,10 @@ from .multistep import (
     StartingMaterialAssessment,
     plan_multistep_routes,
 )
+from .multistep_ranking import (
+    MultistepRankingPolicy,
+    load_multistep_ranking_policy,
+)
 from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
@@ -119,6 +123,7 @@ __all__ = [
     "LIBRARY_MODES",
     "MultistepRetrosynthesisResult",
     "MultistepRetrosynthesisRoute",
+    "MultistepRankingPolicy",
     "MultistepSearchDiagnostics",
     "RankedReactionOutcome",
     "ReactionChoiceSet",
@@ -151,6 +156,7 @@ __all__ = [
     "load_generic_library",
     "load_operator_rows",
     "load_retrosynthesis_ranking_policy",
+    "load_multistep_ranking_policy",
     "iter_library_rows",
     "merge_operator_shards",
     "plan_multistep_routes",

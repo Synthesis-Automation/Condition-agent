@@ -48,7 +48,9 @@ class CASSmilesExtractorWorker(QtCore.QObject):
                 excluded_paths=[self.output_csv_path],
             )
             if not files:
-                self.finished.emit(False, "No CSV files were found in the selected folder.")
+                self.finished.emit(
+                    False, "No CSV files were found in the selected folder."
+                )
                 return
 
             all_pairs: set[CASSmilesPair] = set()
@@ -72,7 +74,7 @@ class CASSmilesExtractorWorker(QtCore.QObject):
                     f"    {result.rows_read:,} rows; {len(result.pairs):,} unique pairs"
                 )
 
-            self.progress.emit("Writing deterministic four-column CSV...")
+            self.progress.emit("Writing deterministic role-aware CSV...")
             written = write_cas_smiles_pairs(all_pairs, self.output_csv_path)
             conflict_count = _count_conflicting_cas(all_pairs)
             summary = (
@@ -141,8 +143,9 @@ class CASSmilesExtractorWindow(QtWidgets.QWidget):
         note = QtWidgets.QLabel(
             "Scans CSV files recursively. CAS/SMILES associations are extracted from "
             "nested JSON objects and matching flat columns. The output contains only "
-            "cas_no, compound_smiles, reaction_id, and citation; distinct conflicts "
-            "are resolved to one deterministic row per CAS number."
+            "cas_no, compound_smiles, reaction_id, citation, and source_role; "
+            "distinct conflicts are resolved to one deterministic row per CAS "
+            "number, preferring reactant provenance when available."
         )
         note.setWordWrap(True)
         note.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
@@ -209,7 +212,9 @@ class CASSmilesExtractorWindow(QtWidgets.QWidget):
             self.run_button.setEnabled(False)
             return
 
-        self.candidate_files = discover_csv_files(folder, excluded_paths=[output] if output else [])
+        self.candidate_files = discover_csv_files(
+            folder, excluded_paths=[output] if output else []
+        )
         for path in self.candidate_files:
             self.file_list.addItem(os.path.relpath(path, folder))
         count = len(self.candidate_files)

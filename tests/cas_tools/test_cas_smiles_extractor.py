@@ -60,10 +60,10 @@ def test_extracts_pairs_recursively_from_all_json_columns(tmp_path: Path) -> Non
     result = extract_cas_smiles_pairs_from_csv(source)
 
     assert set(result.pairs) == {
-        CASSmilesPair("64-17-5", "CCO"),
-        CASSmilesPair("67-56-1", "CO"),
-        CASSmilesPair("123-39-7", "CO"),
-        CASSmilesPair("67-64-1", "CC(C)=O"),
+        CASSmilesPair("64-17-5", "CCO", source_role="reactant"),
+        CASSmilesPair("67-56-1", "CO", source_role="product"),
+        CASSmilesPair("123-39-7", "CO", source_role="product"),
+        CASSmilesPair("67-64-1", "CC(C)=O", source_role="reagent"),
         CASSmilesPair("71-43-2", "c1ccccc1"),
     }
     assert result.rows_read == 1
@@ -98,7 +98,9 @@ def test_preserves_conflicts_and_deduplicates_exact_pairs(tmp_path: Path) -> Non
     )
 
 
-def test_carries_reaction_id_and_citation_and_preserves_each_reaction(tmp_path: Path) -> None:
+def test_carries_reaction_id_and_citation_and_preserves_each_reaction(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "provenance.csv"
     _write_rows(
         source,
@@ -107,16 +109,12 @@ def test_carries_reaction_id_and_citation_and_preserves_each_reaction(tmp_path: 
             {
                 "reaction_id": "RXN-1",
                 "citation": "Journal A (2024), 1, 10-12",
-                "reactants_json": json.dumps(
-                    [{"cas_rn": "64-17-5", "smiles": "CCO"}]
-                ),
+                "reactants_json": json.dumps([{"cas_rn": "64-17-5", "smiles": "CCO"}]),
             },
             {
                 "reaction_id": "RXN-2",
                 "citation": "Journal B (2025), 2, 20-22",
-                "reactants_json": json.dumps(
-                    [{"cas_rn": "64-17-5", "smiles": "CCO"}]
-                ),
+                "reactants_json": json.dumps([{"cas_rn": "64-17-5", "smiles": "CCO"}]),
             },
         ],
     )
@@ -124,12 +122,18 @@ def test_carries_reaction_id_and_citation_and_preserves_each_reaction(tmp_path: 
     result = extract_cas_smiles_pairs_from_csv(source)
 
     assert result.pairs == (
-        CASSmilesPair("64-17-5", "CCO", "RXN-1", "Journal A (2024), 1, 10-12"),
-        CASSmilesPair("64-17-5", "CCO", "RXN-2", "Journal B (2025), 2, 20-22"),
+        CASSmilesPair(
+            "64-17-5", "CCO", "RXN-1", "Journal A (2024), 1, 10-12", "reactant"
+        ),
+        CASSmilesPair(
+            "64-17-5", "CCO", "RXN-2", "Journal B (2025), 2, 20-22", "reactant"
+        ),
     )
 
 
-def test_uses_matching_flat_columns_only_without_structured_role(tmp_path: Path) -> None:
+def test_uses_matching_flat_columns_only_without_structured_role(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "flat.csv"
     _write_rows(
         source,
@@ -146,9 +150,9 @@ def test_uses_matching_flat_columns_only_without_structured_role(tmp_path: Path)
     result = extract_cas_smiles_pairs_from_csv(source)
 
     assert set(result.pairs) == {
-        CASSmilesPair("64-17-5", "CCO"),
-        CASSmilesPair("67-56-1", "CO"),
-        CASSmilesPair("67-64-1", "CC(C)=O"),
+        CASSmilesPair("64-17-5", "CCO", source_role="compound"),
+        CASSmilesPair("67-56-1", "CO", source_role="compound"),
+        CASSmilesPair("67-64-1", "CC(C)=O", source_role="compound"),
     }
 
 
@@ -167,7 +171,9 @@ def test_malformed_json_warns_without_scanning_unrelated_text(tmp_path: Path) ->
     assert "invalid JSON" in result.warnings[0]
 
 
-def test_folder_discovery_excludes_output_and_writer_has_exact_columns(tmp_path: Path) -> None:
+def test_folder_discovery_excludes_output_and_writer_has_exact_columns(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "nested" / "source.csv"
     output = tmp_path / "pairs.csv"
     _write_rows(
@@ -186,8 +192,8 @@ def test_folder_discovery_excludes_output_and_writer_has_exact_columns(tmp_path:
     with output.open("r", encoding="utf-8", newline="") as handle:
         rows = list(csv.reader(handle))
     assert rows == [
-        ["cas_no", "compound_smiles", "reaction_id", "citation"],
-        ["64-17-5", "CCO", "", ""],
+        ["cas_no", "compound_smiles", "reaction_id", "citation", "source_role"],
+        ["64-17-5", "CCO", "", "", ""],
     ]
 
 
@@ -208,7 +214,24 @@ def test_writer_emits_one_row_per_cas_and_selects_best_supported_smiles(
     with output.open("r", encoding="utf-8", newline="") as handle:
         rows = list(csv.reader(handle))
     assert rows == [
-        ["cas_no", "compound_smiles", "reaction_id", "citation"],
-        ["64-17-5", "CCO", "RXN-1", "Citation A"],
-        ["67-56-1", "CO", "RXN-4", "Citation D"],
+        ["cas_no", "compound_smiles", "reaction_id", "citation", "source_role"],
+        ["64-17-5", "CCO", "RXN-1", "Citation A", ""],
+        ["67-56-1", "CO", "RXN-4", "Citation D", ""],
     ]
+
+
+def test_writer_prefers_reactant_provenance_for_selected_structure(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "role-aware.csv"
+    pairs = [
+        CASSmilesPair("64-17-5", "CCO", "RXN-1", source_role="solvent"),
+        CASSmilesPair("64-17-5", "CCO", "RXN-2", source_role="reactant"),
+    ]
+
+    write_cas_smiles_pairs(pairs, output)
+
+    with output.open("r", encoding="utf-8", newline="") as handle:
+        row = next(csv.DictReader(handle))
+    assert row["source_role"] == "reactant"
+    assert row["reaction_id"] == "RXN-2"

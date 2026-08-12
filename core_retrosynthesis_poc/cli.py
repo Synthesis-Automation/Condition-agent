@@ -331,6 +331,14 @@ def _parser() -> argparse.ArgumentParser:
     route_search.add_argument("--no-context", action="store_true")
     route_search.add_argument("--skip-l0", action="store_true")
     route_search.add_argument("--no-diversity", action="store_true")
+    route_search.add_argument(
+        "--allow-untyped-literature-terminals",
+        action="store_true",
+        help=(
+            "temporarily accept legacy catalog matches without source-role "
+            "provenance"
+        ),
+    )
 
     report = commands.add_parser(
         "render-report",
@@ -632,6 +640,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 use_context=not arguments.no_context,
                 include_l0=not arguments.skip_l0,
                 diversify=not arguments.no_diversity,
+                allow_untyped_literature_terminals=(
+                    arguments.allow_untyped_literature_terminals
+                ),
             )
         print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
         return 0

@@ -71,9 +71,7 @@ def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
         current = values.get(canonical)
         if current is None or mapped_reaction < current:
             values[canonical] = mapped_reaction
-    return tuple(
-        sorted(values.items())
-    )
+    return tuple(sorted(values.items()))
 
 
 def _selectivity_warnings(
@@ -156,9 +154,7 @@ def disconnect_generic_target_detailed(
         )
     )
     seeds = []
-    templates_to_apply = applicable[
-        :max_templates_to_apply
-    ]
+    templates_to_apply = applicable[:max_templates_to_apply]
     for product_similarity, specificity, template in templates_to_apply:
         for precursors, mapped_proposed in _apply(
             template.reaction_smarts,
@@ -166,10 +162,7 @@ def disconnect_generic_target_detailed(
         ):
             precursor_similarity = maximum_similarity(
                 precursors,
-                (
-                    precedent.precursor_smiles
-                    for precedent in template.precedents
-                ),
+                (precedent.precursor_smiles for precedent in template.precedents),
             )
             support = min(
                 1.0,
@@ -235,9 +228,7 @@ def disconnect_generic_target_detailed(
             default=0.0,
         )
         score = (
-            0.85 * preliminary + 0.15 * context_score
-            if use_context
-            else preliminary
+            0.85 * preliminary + 0.15 * context_score if use_context else preliminary
         )
         candidate = GenericDisconnectionCandidate(
             target_smiles=canonical_target,
@@ -445,11 +436,20 @@ def disconnect_operator_ladder(
     use_context: bool = True,
     include_l0: bool = True,
     diversify: bool = True,
+    minimum_candidates_per_level: int = 0,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
-    """Fill specificity tiers with general operator/site-diverse candidates."""
+    """Fill specificity tiers with general operator/site-diverse candidates.
+
+    ``minimum_candidates_per_level`` reserves bounded fallback coverage for
+    broader tiers. The default preserves the strict specificity-first one-step
+    behavior; multistep search uses a positive reserve so a full L2 tranche
+    cannot prevent downstream exploration of L1/L0 alternatives.
+    """
 
     if top_k < 1:
         raise ValueError("top-k must be positive")
+    if minimum_candidates_per_level < 0:
+        raise ValueError("minimum candidates per level cannot be negative")
     selected = []
     seen = set()
     policy = load_retrosynthesis_ranking_policy()
@@ -458,8 +458,12 @@ def disconnect_operator_ladder(
         max(top_k, top_k * policy.candidate_pool_multiplier),
     )
     levels = ("L2", "L1", "L0") if include_l0 else ("L2", "L1")
+    candidates_by_level: dict[
+        str,
+        tuple[GenericDisconnectionCandidate, ...],
+    ] = {}
     for level in levels:
-        if len(selected) >= top_k:
+        if len(selected) >= top_k and minimum_candidates_per_level == 0:
             break
         candidates = disconnect_generic_target(
             target_smiles,
@@ -475,6 +479,9 @@ def disconnect_operator_ladder(
                 candidates,
                 policy=policy,
             )
+        candidates_by_level[level] = candidates
+        if minimum_candidates_per_level > 0:
+            continue
         for candidate in candidates:
             if candidate.precursor_smiles in seen:
                 continue
@@ -482,6 +489,30 @@ def disconnect_operator_ladder(
             seen.add(candidate.precursor_smiles)
             if len(selected) >= top_k:
                 break
+
+    if minimum_candidates_per_level > 0:
+        for level in levels:
+            added = 0
+            for candidate in candidates_by_level[level]:
+                if candidate.precursor_smiles in seen:
+                    continue
+                selected.append(candidate)
+                seen.add(candidate.precursor_smiles)
+                added += 1
+                if added >= minimum_candidates_per_level or len(selected) >= top_k:
+                    break
+            if len(selected) >= top_k:
+                break
+        for level in levels:
+            if len(selected) >= top_k:
+                break
+            for candidate in candidates_by_level[level]:
+                if candidate.precursor_smiles in seen:
+                    continue
+                selected.append(candidate)
+                seen.add(candidate.precursor_smiles)
+                if len(selected) >= top_k:
+                    break
     return tuple(selected)
 
 

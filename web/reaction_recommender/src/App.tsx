@@ -445,10 +445,6 @@ function App() {
             {error && <div className="alert error" role="alert">{error}</div>}
           </div>
         </div>
-        <div className="run-control analysis-action-row">
-          <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze features'}</button>
-          <span role="status" aria-live="polite">{status}</span>
-        </div>
         </section>
 
         <ReactionEditor
@@ -458,6 +454,11 @@ function App() {
           allowMolecule={mode === 'features' || isRetrosynthesisMode}
           moleculeOnly={isRetrosynthesisMode}
         />
+
+        <div className="run-control analysis-action-row workbench-action-row">
+          <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze features'}</button>
+          <span role="status" aria-live="polite">{status}</span>
+        </div>
       </div>
 
       {recommendationResult && <RecommendationResults result={recommendationResult} />}

@@ -711,7 +711,8 @@ route is solved only after at least one disconnection and when every leaf:
 
 - has RDKit molecular weight at or below the configured threshold (150 by
   default); or
-- exactly matches the configured canonical literature-molecule index.
+- exactly matches the configured canonical literature-molecule index with
+  reactant-like source-role provenance.
 
 Build the reusable SQLite index as documented in `cas_tools/README.md`, then
 run:
@@ -725,9 +726,20 @@ python -m core_retrosynthesis_poc plan-routes `
   --top-k-routes 5
 ```
 
+Catalyst, solvent, reagent, product, and untyped legacy-index matches are not
+strong literature terminals. Rebuild the index with `source_role` provenance;
+the planner exposes an explicit compatibility switch for legacy untyped
+catalogs but does not enable it by default. Low-molecular-weight leaves remain
+labelled heuristic terminals and add a declarative route-cost penalty.
+
 The target itself is never accepted as a zero-step literature or
 molecular-weight terminal. The deterministic best-first beam expands the
-largest unresolved leaf first, caches repeated molecule expansions, rejects
-ancestor cycles, and reports depth-, candidate-, and search-limited partial
-routes separately from solved routes. Literature presence is disclosed as a
-corpus observation rather than commercial-availability evidence.
+largest unresolved leaf first, caches repeated molecule expansions, reserves
+bounded L2/L1/L0 candidate coverage, rejects ancestor cycles, and reports
+depth-, candidate-, and search-limited partial routes separately from solved
+routes. It searches the configured budget before selecting the lowest-cost
+top-k solutions and retains bounded alternative paths to the same molecular
+state. Step costs, fallback and selectivity penalties, heuristic-terminal
+penalties, and path breadth come from `multistep_ranking.v1.json`. Literature
+presence is disclosed as a corpus observation rather than
+commercial-availability evidence.

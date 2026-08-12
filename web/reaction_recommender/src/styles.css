@@ -129,6 +129,7 @@ input::placeholder, textarea::placeholder { color: #94a198; }
 .analysis-action-row { flex-direction: row; align-items: center; gap: 12px; margin-top: 13px; padding-top: 12px; border-top: 1px solid #e0e7e2; }
 .analysis-action-row .run-button { width: auto; min-width: 190px; flex: 0 0 auto; }
 .analysis-action-row > span { min-width: 0; overflow: visible; text-align: left; text-overflow: clip; white-space: normal; }
+.workbench-action-row { margin-top: 0; padding-top: 0; border-top: 0; }
 .option-grid.feature-options { grid-template-columns: minmax(0,1fr) minmax(245px,.55fr); align-items: stretch; }
 .feature-mode-note { display: flex; min-height: 58px; flex-direction: column; justify-content: center; gap: 4px; padding: 10px 12px; border: 1px solid #d5dfd9; border-radius: 9px; background: #f5f8f6; }
 .feature-mode-note strong { color: #315542; font-size: .77rem; }

@@ -157,9 +157,7 @@ class FakeRuntime:
             "error": None,
             "schema_version": "1.0",
             "max_depth": request.max_depth,
-            "molecular_weight_threshold": (
-                request.molecular_weight_threshold
-            ),
+            "molecular_weight_threshold": (request.molecular_weight_threshold),
             "route_count": 1,
             "partial_route_count": 0,
             "routes": [
@@ -206,9 +204,7 @@ def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> No
         mode_dir.mkdir()
         (mode_dir / "generic_index.sqlite").touch()
 
-    capabilities = LocalRecommendationRuntime(
-        library_root=tmp_path
-    ).capabilities()
+    capabilities = LocalRecommendationRuntime(library_root=tmp_path).capabilities()
 
     assert capabilities["default_library_mode"] == "full"
     assert capabilities["library_modes"]["full"]["index_available"] is True
@@ -227,15 +223,11 @@ def test_local_runtime_reports_retrosynthesis_library_modes(tmp_path) -> None:
     assert capabilities["retrosynthesis"] is True
     assert capabilities["default_retrosynthesis_library_mode"] == "compact"
     assert (
-        capabilities["retrosynthesis_library_modes"]["compact"][
-            "library_available"
-        ]
+        capabilities["retrosynthesis_library_modes"]["compact"]["library_available"]
         is True
     )
     assert (
-        capabilities["retrosynthesis_library_modes"]["full"][
-            "library_available"
-        ]
+        capabilities["retrosynthesis_library_modes"]["full"]["library_available"]
         is False
     )
 
@@ -330,6 +322,9 @@ def test_local_runtime_runs_multistep_planner_with_web_limits(
     assert captured["max_depth"] == 2
     assert captured["molecular_weight_threshold"] == 140.0
     assert captured["top_k_routes"] == 3
+    assert captured["per_step_top_k"] == 8
+    assert captured["beam_width"] == 32
+    assert captured["max_expansions"] == 60
     assert captured["include_l0"] is False
     assert captured["diversify"] is False
     assert payload["valid"] is True
@@ -360,9 +355,7 @@ def test_local_runtime_loads_paired_catalogs_from_string_index_path(
 
     runtime = LocalRecommendationRuntime(index_path=index_path)
 
-    assert runtime._get_reference_catalog(str(index_path)) == {
-        "REF1:paper": reference
-    }
+    assert runtime._get_reference_catalog(str(index_path)) == {"REF1:paper": reference}
     assert runtime._get_experimental_detail_catalog(str(index_path)) == {
         "observation:observation:1": detail,
         "reaction:reaction:1": detail,
@@ -595,7 +588,9 @@ def test_recommendation_contract_forwards_validated_options() -> None:
     assert payload["data"]["library_mode"] == "compact"
     assert payload["data"]["recommendations"][0]["recipe_id"] == "recipe:1"
     assert (
-        payload["data"]["recommendations"][0]["synthesis_protocol"]["materials"][0]["cas"]
+        payload["data"]["recommendations"][0]["synthesis_protocol"]["materials"][0][
+            "cas"
+        ]
         == "584-08-7"
     )
 
