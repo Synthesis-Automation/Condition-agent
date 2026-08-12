@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import heapq
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import Any, Callable, Optional, Protocol
 
 from retrosynthesis_poc.chemistry import digest
@@ -11,9 +11,15 @@ from retrosynthesis_poc.chemistry import digest
 from .generic_models import (
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
+    OperatorLadderDiagnostics,
 )
-from .generic_search import disconnect_operator_ladder
+from .generic_search import disconnect_operator_ladder_detailed
 from .multistep_ranking import load_multistep_ranking_policy
+from .route_tree import (
+    CanonicalRouteTree,
+    build_canonical_route_tree,
+    route_distance_matrix,
+)
 from cas_tools.molecule_index import (
     MoleculeIndexMatch,
     MoleculeIdentity,
@@ -21,7 +27,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.1"
+MULTISTEP_SCHEMA_VERSION = "1.2"
 _TERMINAL_LITERATURE_ROLES = frozenset(
     {"reactant", "starting_material", "startingmaterial", "substrate"}
 )
@@ -38,9 +44,17 @@ class LiteratureLookup(Protocol):
     ) -> Optional[MoleculeIndexMatch]: ...
 
 
+@dataclass(frozen=True)
+class OneStepExpansionBatch:
+    """Validated actions plus staged-expansion profiling."""
+
+    candidates: tuple[GenericDisconnectionCandidate, ...]
+    diagnostics: Optional[OperatorLadderDiagnostics] = None
+
+
 OneStepExpander = Callable[
     [str, int],
-    tuple[GenericDisconnectionCandidate, ...],
+    tuple[GenericDisconnectionCandidate, ...] | OneStepExpansionBatch,
 ]
 
 
@@ -58,6 +72,7 @@ class StartingMaterialAssessment:
     catalog_role_status: str
     unresolved_reason: Optional[str] = None
     literature_match: Optional[MoleculeIndexMatch] = None
+    route_node_id: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible assessment."""
@@ -76,6 +91,8 @@ class RetrosynthesisRouteStep:
     step_cost: float
     step_cost_components: tuple[tuple[str, float], ...]
     candidate: GenericDisconnectionCandidate
+    product_node_id: str = ""
+    precursor_node_ids: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible route step."""
@@ -88,6 +105,8 @@ class RetrosynthesisRouteStep:
             "step_cost": self.step_cost,
             "step_cost_components": dict(self.step_cost_components),
             "candidate": self.candidate.to_dict(),
+            "product_node_id": self.product_node_id,
+            "precursor_node_ids": list(self.precursor_node_ids),
         }
 
 
@@ -103,6 +122,7 @@ class MultistepRetrosynthesisRoute:
     maximum_depth: int
     steps: tuple[RetrosynthesisRouteStep, ...]
     leaves: tuple[StartingMaterialAssessment, ...]
+    route_tree: CanonicalRouteTree
     warnings: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
@@ -117,6 +137,7 @@ class MultistepRetrosynthesisRoute:
             "maximum_depth": self.maximum_depth,
             "steps": [step.to_dict() for step in self.steps],
             "leaves": [leaf.to_dict() for leaf in self.leaves],
+            "route_tree": self.route_tree.to_dict(),
             "warnings": list(self.warnings),
         }
 
@@ -137,6 +158,13 @@ class MultistepSearchDiagnostics:
     solved_routes_found: int
     partial_routes_found: int
     stopped_by_expansion_limit: bool
+    proposed_actions: int = 0
+    validation_attempts: int = 0
+    valid_actions: int = 0
+    first_solution_expansion: Optional[int] = None
+    beam_pruned_states: int = 0
+    dead_end_states: int = 0
+    expansion_level_calls: tuple[tuple[str, int], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -169,6 +197,16 @@ class MultistepRetrosynthesisResult:
             "molecular_weight_threshold": self.molecular_weight_threshold,
             "ranking_policy_definition_id": (self.ranking_policy_definition_id),
             "schema_version": self.schema_version,
+            "route_postprocessing": {
+                "definition_id": "route_distance_multiset_jaccard.v1",
+                "tree_ids": [route.route_tree.tree_id for route in self.routes],
+                "distance_matrix": [
+                    list(row)
+                    for row in route_distance_matrix(
+                        route.route_tree for route in self.routes
+                    )
+                ],
+            },
             "warnings": [
                 "Literature matches mean observed in the configured corpus, "
                 "not verified commercial availability.",
@@ -445,6 +483,38 @@ def _route_from_state(
         for leaf in state.leaves
     ):
         warnings.append("CATALOG_MATCH_NOT_REACTANT_SUPPORTED")
+    route_leaves = tuple(
+        sorted(
+            (leaf.assessment for leaf in state.leaves),
+            key=lambda value: (
+                value.canonical_smiles,
+                value.depth,
+                value.route_node_id,
+                value.unresolved_reason or "",
+            ),
+        )
+    )
+    root_node_id = next(
+        (
+            step.product_node_id
+            for step in state.steps
+            if step.depth == 1
+        ),
+        next(
+            (
+                leaf.route_node_id
+                for leaf in route_leaves
+                if leaf.depth == 0
+            ),
+            digest("RMOL1", target_smiles, "root"),
+        ),
+    )
+    route_tree = build_canonical_route_tree(
+        target_smiles,
+        root_node_id,
+        state.steps,
+        route_leaves,
+    )
     return MultistepRetrosynthesisRoute(
         route_id=route_id,
         target_smiles=target_smiles,
@@ -456,16 +526,8 @@ def _route_from_state(
             default=0,
         ),
         steps=state.steps,
-        leaves=tuple(
-            sorted(
-                (leaf.assessment for leaf in state.leaves),
-                key=lambda value: (
-                    value.canonical_smiles,
-                    value.depth,
-                    value.unresolved_reason or "",
-                ),
-            )
-        ),
+        leaves=route_leaves,
+        route_tree=route_tree,
         warnings=tuple(warnings),
     )
 
@@ -527,8 +589,8 @@ def plan_multistep_routes(
     def default_expander(
         product_smiles: str,
         top_k: int,
-    ) -> tuple[GenericDisconnectionCandidate, ...]:
-        return disconnect_operator_ladder(
+    ) -> OneStepExpansionBatch:
+        candidates, diagnostics = disconnect_operator_ladder_detailed(
             product_smiles,
             library,
             top_k=top_k,
@@ -538,17 +600,23 @@ def plan_multistep_routes(
             include_l0=include_l0,
             diversify=diversify,
             minimum_candidates_per_level=active_minimum_per_level,
+            lazy_validation=True,
         )
+        return OneStepExpansionBatch(candidates, diagnostics)
 
     active_expander = expander or default_expander
+    root_node_id = digest("RMOL1", target.canonical_smiles, "root")
     root = _Leaf(
-        assessment=_assess_starting_material(
+        assessment=replace(
+            _assess_starting_material(
             target.canonical_smiles,
             depth=0,
             literature_index=literature_index,
             molecular_weight_threshold=molecular_weight_threshold,
             allow_terminal=False,
             allow_untyped_literature_terminal=(allow_untyped_literature_terminals),
+            ),
+            route_node_id=root_node_id,
         ),
         ancestors=(),
     )
@@ -576,6 +644,13 @@ def plan_multistep_routes(
     rejected_invalid = 0
     duplicate_states = 0
     retained_alternative_paths = 0
+    proposed_actions = 0
+    validation_attempts = 0
+    valid_actions = 0
+    first_solution_expansion: int | None = None
+    beam_pruned_states = 0
+    dead_end_states = 0
+    expansion_level_calls: dict[str, int] = {}
 
     while queue and expanded_states < max_expansions:
         _, _, state = heapq.heappop(queue)
@@ -600,7 +675,32 @@ def plan_multistep_routes(
         product = leaf.assessment.canonical_smiles
         candidates = expansion_cache.get(product)
         if candidates is None:
-            candidates = active_expander(product, per_step_top_k)
+            expansion = active_expander(product, per_step_top_k)
+            if isinstance(expansion, OneStepExpansionBatch):
+                candidates = expansion.candidates
+                expansion_diagnostics = expansion.diagnostics
+                if expansion_diagnostics is not None:
+                    proposed_actions += expansion_diagnostics.proposed_action_count
+                    validation_attempts += (
+                        expansion_diagnostics.validation_attempt_count
+                    )
+                    valid_actions += expansion_diagnostics.valid_action_count
+                    for level in expansion_diagnostics.levels_attempted:
+                        expansion_level_calls[level] = (
+                            expansion_level_calls.get(level, 0) + 1
+                        )
+                else:
+                    proposed_actions += len(candidates)
+                    validation_attempts += len(candidates)
+                    valid_actions += len(candidates)
+            else:
+                candidates = expansion
+                proposed_actions += len(candidates)
+                validation_attempts += len(candidates)
+                valid_actions += sum(
+                    candidate.forward_validation_status == "verified_signature"
+                    for candidate in candidates
+                )
             expansion_cache[product] = candidates
             one_step_calls += 1
         else:
@@ -608,16 +708,20 @@ def plan_multistep_routes(
         expanded_states += 1
         generated_candidates += len(candidates)
         if not candidates:
+            dead_end_states += 1
             stopped = _Leaf(
-                assessment=_assess_starting_material(
-                    product,
-                    depth=leaf.assessment.depth,
-                    literature_index=literature_index,
-                    molecular_weight_threshold=molecular_weight_threshold,
-                    allow_untyped_literature_terminal=(
-                        allow_untyped_literature_terminals
+                assessment=replace(
+                    _assess_starting_material(
+                        product,
+                        depth=leaf.assessment.depth,
+                        literature_index=literature_index,
+                        molecular_weight_threshold=molecular_weight_threshold,
+                        allow_untyped_literature_terminal=(
+                            allow_untyped_literature_terminals
+                        ),
+                        unresolved_reason="no_candidates",
                     ),
-                    unresolved_reason="no_candidates",
+                    route_node_id=leaf.assessment.route_node_id,
                 ),
                 ancestors=leaf.ancestors,
             )
@@ -648,7 +752,26 @@ def plan_multistep_routes(
                 continue
             child_depth = leaf.assessment.depth + 1
             child_leaves = []
+            precursor_node_ids = []
+            precursor_occurrences: dict[str, int] = {}
+            step_id = digest(
+                "RSTEP1",
+                product,
+                candidate.proposed_reaction_smiles,
+                str(child_depth),
+                leaf.assessment.route_node_id,
+            )
             for precursor in precursor_values:
+                occurrence = precursor_occurrences.get(precursor, 0)
+                precursor_occurrences[precursor] = occurrence + 1
+                precursor_node_id = digest(
+                    "RMOL1",
+                    leaf.assessment.route_node_id,
+                    step_id,
+                    precursor,
+                    str(occurrence),
+                )
+                precursor_node_ids.append(precursor_node_id)
                 assessment = _assess_starting_material(
                     precursor,
                     depth=child_depth,
@@ -663,7 +786,10 @@ def plan_multistep_routes(
                 )
                 child_leaves.append(
                     _Leaf(
-                        assessment=assessment,
+                        assessment=replace(
+                            assessment,
+                            route_node_id=precursor_node_id,
+                        ),
                         ancestors=(*leaf.ancestors, product),
                     )
                 )
@@ -674,18 +800,15 @@ def plan_multistep_routes(
                 normalized_child_leaves,
             )
             step = RetrosynthesisRouteStep(
-                step_id=digest(
-                    "RSTEP1",
-                    product,
-                    candidate.proposed_reaction_smiles,
-                    str(child_depth),
-                ),
+                step_id=step_id,
                 depth=child_depth,
                 product_smiles=product,
                 precursor_smiles=precursor_values,
                 step_cost=step_cost,
                 step_cost_components=step_cost_components,
                 candidate=candidate,
+                product_node_id=leaf.assessment.route_node_id,
+                precursor_node_ids=tuple(precursor_node_ids),
             )
             next_leaves = list(state.leaves)
             next_leaves[leaf_index : leaf_index + 1] = child_leaves
@@ -715,6 +838,8 @@ def plan_multistep_routes(
                     max_depth=max_depth,
                 )
                 solved_states.setdefault(route.route_id, next_state)
+                if first_solution_expansion is None:
+                    first_solution_expansion = expanded_states
                 continue
             if not _expandable_leaves(next_state, max_depth):
                 partial_states[(signature, _route_history_signature(next_state))] = (
@@ -727,12 +852,14 @@ def plan_multistep_routes(
                 (_state_priority(next_state, max_depth), serial, next_state),
             )
         if len(queue) > beam_width:
+            queue_size_before_pruning = len(queue)
             queue = [
                 item
                 for item in queue
                 if _is_retained_state_path(item[2], best_paths_by_state)
             ]
             queue = heapq.nsmallest(beam_width, queue)
+            beam_pruned_states += max(0, queue_size_before_pruning - len(queue))
             heapq.heapify(queue)
 
     stopped_by_limit = bool(queue and expanded_states >= max_expansions)
@@ -751,15 +878,20 @@ def plan_multistep_routes(
                     assessment=(
                         leaf.assessment
                         if leaf.assessment.terminal
-                        else _assess_starting_material(
-                            leaf.assessment.canonical_smiles,
-                            depth=leaf.assessment.depth,
-                            literature_index=literature_index,
-                            molecular_weight_threshold=(molecular_weight_threshold),
-                            allow_untyped_literature_terminal=(
-                                allow_untyped_literature_terminals
+                        else replace(
+                            _assess_starting_material(
+                                leaf.assessment.canonical_smiles,
+                                depth=leaf.assessment.depth,
+                                literature_index=literature_index,
+                                molecular_weight_threshold=(
+                                    molecular_weight_threshold
+                                ),
+                                allow_untyped_literature_terminal=(
+                                    allow_untyped_literature_terminals
+                                ),
+                                unresolved_reason="search_limit",
                             ),
-                            unresolved_reason="search_limit",
+                            route_node_id=leaf.assessment.route_node_id,
                         )
                     ),
                     ancestors=leaf.ancestors,
@@ -823,6 +955,13 @@ def plan_multistep_routes(
         solved_routes_found=len(solved_states),
         partial_routes_found=len(partial_states),
         stopped_by_expansion_limit=stopped_by_limit,
+        proposed_actions=proposed_actions,
+        validation_attempts=validation_attempts,
+        valid_actions=valid_actions,
+        first_solution_expansion=first_solution_expansion,
+        beam_pruned_states=beam_pruned_states,
+        dead_end_states=dead_end_states,
+        expansion_level_calls=tuple(sorted(expansion_level_calls.items())),
     )
     return MultistepRetrosynthesisResult(
         target_smiles=target.canonical_smiles,
@@ -841,6 +980,7 @@ __all__ = [
     "MultistepRetrosynthesisResult",
     "MultistepRetrosynthesisRoute",
     "MultistepSearchDiagnostics",
+    "OneStepExpansionBatch",
     "RetrosynthesisRouteStep",
     "StartingMaterialAssessment",
     "plan_multistep_routes",

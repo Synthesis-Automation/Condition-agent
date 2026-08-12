@@ -283,6 +283,34 @@ def test_product_index_preserves_results_and_reports_pruning() -> None:
     assert diagnostics.valid_candidate_count >= len(indexed)
 
 
+def test_staged_validation_stops_after_enough_verified_actions() -> None:
+    library = build_generic_library(
+        (_row("carbonyl_reduction"), _row("carbonyl_condensation")),
+        levels=("L1", "L2"),
+        admission_mode="data_driven",
+    )
+
+    exhaustive, exhaustive_diagnostics = disconnect_generic_target_detailed(
+        "OCc1ccc(F)cc1",
+        library,
+        top_k=5,
+    )
+    staged, staged_diagnostics = disconnect_generic_target_detailed(
+        "OCc1ccc(F)cc1",
+        library,
+        top_k=5,
+        stop_after_valid_candidates=1,
+    )
+
+    assert staged
+    assert staged[0].forward_validation_status == "verified_signature"
+    assert staged[0].precursor_smiles == exhaustive[0].precursor_smiles
+    assert staged_diagnostics.valid_candidate_count == 1
+    assert staged_diagnostics.validation_attempt_count <= (
+        exhaustive_diagnostics.validation_attempt_count
+    )
+
+
 def test_rdchiral_mapping_prevents_unchanged_halogen_swap() -> None:
     mapped_source = (
         "[CH3:1][CH2:2][O:3][C:4]([c:6]1[cH:10][nH:9][n:8][cH:7]1)=[O:5]."

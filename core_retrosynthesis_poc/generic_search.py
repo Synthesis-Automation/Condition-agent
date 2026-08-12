@@ -21,6 +21,7 @@ from .generic_models import (
     GenericDisconnectionCandidate,
     GenericSearchDiagnostics,
     GenericTemplateLibrary,
+    OperatorLadderDiagnostics,
 )
 from .retrieval_index import indexed_template_ids
 from .ranking_policy import (
@@ -100,6 +101,7 @@ def disconnect_generic_target_detailed(
     max_candidates_to_validate: int = 50,
     use_context: bool = True,
     diversify_sites: bool = False,
+    stop_after_valid_candidates: int | None = None,
 ) -> tuple[
     tuple[GenericDisconnectionCandidate, ...],
     GenericSearchDiagnostics,
@@ -108,6 +110,8 @@ def disconnect_generic_target_detailed(
 
     if min(top_k, max_templates_to_apply, max_candidates_to_validate) < 1:
         raise ValueError("search limits must be positive")
+    if stop_after_valid_candidates is not None and stop_after_valid_candidates < 1:
+        raise ValueError("valid-candidate acceptance target must be positive")
     canonical_target = canonical_smiles(target_smiles)
     if canonical_target is None or "." in canonical_target:
         raise ValueError("target must be one valid molecule")
@@ -191,6 +195,7 @@ def disconnect_generic_target_detailed(
     unresolved_identity_count = 0
     operator_mismatch_count = 0
     validation_seeds = seeds[:max_candidates_to_validate]
+    validation_attempt_count = 0
     for (
         preliminary,
         precursors,
@@ -200,6 +205,7 @@ def disconnect_generic_target_detailed(
         template,
         mapped_proposed,
     ) in validation_seeds:
+        validation_attempt_count += 1
         proposed = f"{precursors}>>{canonical_target}"
         status, _, query_context, center_key = _forward_analysis(
             mapped_proposed,
@@ -266,6 +272,11 @@ def disconnect_generic_target_detailed(
         current = candidates.get(precursors)
         if current is None or candidate.score > current.score:
             candidates[precursors] = candidate
+        if (
+            stop_after_valid_candidates is not None
+            and len(candidates) >= stop_after_valid_candidates
+        ):
+            break
     ranked = tuple(
         sorted(
             candidates.values(),
@@ -286,7 +297,7 @@ def disconnect_generic_target_detailed(
         product_query_match_count=len(applicable),
         applied_template_count=len(templates_to_apply),
         generated_precursor_count=len(seeds),
-        validation_attempt_count=len(validation_seeds),
+        validation_attempt_count=validation_attempt_count,
         valid_candidate_count=len(candidates),
         invalid_forward_count=invalid_forward_count,
         unresolved_identity_count=unresolved_identity_count,
@@ -516,10 +527,114 @@ def disconnect_operator_ladder(
     return tuple(selected)
 
 
+def disconnect_operator_ladder_detailed(
+    target_smiles: str,
+    library: GenericTemplateLibrary,
+    *,
+    top_k: int = 20,
+    max_templates_to_apply: int = 500,
+    max_candidates_to_validate: int = 100,
+    use_context: bool = True,
+    include_l0: bool = True,
+    diversify: bool = True,
+    minimum_candidates_per_level: int = 0,
+    lazy_validation: bool = False,
+) -> tuple[
+    tuple[GenericDisconnectionCandidate, ...],
+    OperatorLadderDiagnostics,
+]:
+    """Run the specificity ladder with inspectable staged-validation counts.
+
+    Lazy validation changes only how many ranked proposals receive expensive
+    graph validation. Every returned action still passes the same mandatory
+    forward and operator-signature checks as exhaustive one-step search.
+    """
+
+    if top_k < 1:
+        raise ValueError("top-k must be positive")
+    if minimum_candidates_per_level < 0:
+        raise ValueError("minimum candidates per level cannot be negative")
+    selected: list[GenericDisconnectionCandidate] = []
+    seen: set[str] = set()
+    policy = load_retrosynthesis_ranking_policy()
+    candidate_pool_size = min(
+        max_candidates_to_validate,
+        max(top_k, top_k * policy.candidate_pool_multiplier),
+    )
+    levels = ("L2", "L1", "L0") if include_l0 else ("L2", "L1")
+    candidates_by_level: dict[
+        str,
+        tuple[GenericDisconnectionCandidate, ...],
+    ] = {}
+    diagnostics_by_level: list[tuple[str, GenericSearchDiagnostics]] = []
+    for level in levels:
+        if len(selected) >= top_k and minimum_candidates_per_level == 0:
+            break
+        candidates, diagnostics = disconnect_generic_target_detailed(
+            target_smiles,
+            library,
+            levels=(level,),
+            top_k=candidate_pool_size,
+            max_templates_to_apply=max_templates_to_apply,
+            max_candidates_to_validate=max_candidates_to_validate,
+            use_context=use_context,
+            # Diversification needs a small verified reservoir; stopping at
+            # the final top-k can erase distinct operator/site alternatives.
+            # The bounded pool still avoids exhausting large validation
+            # budgets (100 by default) once enough actions are available.
+            stop_after_valid_candidates=(
+                candidate_pool_size if lazy_validation else None
+            ),
+        )
+        diagnostics_by_level.append((level, diagnostics))
+        if diversify:
+            candidates = rank_operator_site_diverse(candidates, policy=policy)
+        candidates_by_level[level] = candidates
+        if minimum_candidates_per_level > 0:
+            continue
+        for candidate in candidates:
+            if candidate.precursor_smiles in seen:
+                continue
+            selected.append(candidate)
+            seen.add(candidate.precursor_smiles)
+            if len(selected) >= top_k:
+                break
+
+    if minimum_candidates_per_level > 0:
+        for level in levels:
+            added = 0
+            for candidate in candidates_by_level.get(level, ()):
+                if candidate.precursor_smiles in seen:
+                    continue
+                selected.append(candidate)
+                seen.add(candidate.precursor_smiles)
+                added += 1
+                if added >= minimum_candidates_per_level or len(selected) >= top_k:
+                    break
+            if len(selected) >= top_k:
+                break
+        for level in levels:
+            if len(selected) >= top_k:
+                break
+            for candidate in candidates_by_level.get(level, ()):
+                if candidate.precursor_smiles in seen:
+                    continue
+                selected.append(candidate)
+                seen.add(candidate.precursor_smiles)
+                if len(selected) >= top_k:
+                    break
+    diagnostics = OperatorLadderDiagnostics(
+        levels_attempted=tuple(level for level, _ in diagnostics_by_level),
+        level_diagnostics=tuple(diagnostics_by_level),
+    )
+    return tuple(selected), diagnostics
+
+
 __all__ = [
     "disconnect_generic_target",
     "disconnect_generic_target_detailed",
     "disconnect_operator_ladder",
+    "disconnect_operator_ladder_detailed",
     "rank_operator_site_diverse",
     "rank_site_diverse",
 ]

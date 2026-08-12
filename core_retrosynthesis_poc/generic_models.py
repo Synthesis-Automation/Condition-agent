@@ -287,6 +287,55 @@ class GenericSearchDiagnostics:
 
 
 @dataclass(frozen=True)
+class OperatorLadderDiagnostics:
+    """Aggregated counters for a specificity-ladder expansion."""
+
+    levels_attempted: Tuple[str, ...]
+    level_diagnostics: Tuple[Tuple[str, GenericSearchDiagnostics], ...]
+
+    @property
+    def proposed_action_count(self) -> int:
+        """Return the number of cheaply generated precursor actions."""
+
+        return sum(
+            diagnostics.generated_precursor_count
+            for _, diagnostics in self.level_diagnostics
+        )
+
+    @property
+    def validation_attempt_count(self) -> int:
+        """Return the number of actions subjected to hard graph validation."""
+
+        return sum(
+            diagnostics.validation_attempt_count
+            for _, diagnostics in self.level_diagnostics
+        )
+
+    @property
+    def valid_action_count(self) -> int:
+        """Return the number of unique validated actions before ladder merging."""
+
+        return sum(
+            diagnostics.valid_candidate_count
+            for _, diagnostics in self.level_diagnostics
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Return a JSON-compatible profiling record."""
+
+        return {
+            "levels_attempted": list(self.levels_attempted),
+            "level_diagnostics": {
+                level: diagnostics.to_dict()
+                for level, diagnostics in self.level_diagnostics
+            },
+            "proposed_action_count": self.proposed_action_count,
+            "validation_attempt_count": self.validation_attempt_count,
+            "valid_action_count": self.valid_action_count,
+        }
+
+
+@dataclass(frozen=True)
 class GenericDisconnectionCandidate:
     """One structurally validated generic retrosynthesis proposal."""
 
@@ -329,6 +378,7 @@ __all__ = [
     "GenericGraphOperator",
     "GenericRetrievalIndex",
     "GenericSearchDiagnostics",
+    "OperatorLadderDiagnostics",
     "GenericHandleCompletionGroup",
     "GenericTemplateLibrary",
     "GenericTemplatePrecedent",

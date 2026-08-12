@@ -744,3 +744,19 @@ state. Step costs, fallback and selectivity penalties, heuristic-terminal
 penalties, and path breadth come from `multistep_ranking.v1.json`. Literature
 presence is disclosed as a corpus observation rather than
 commercial-availability evidence.
+
+Multi-step expansion uses staged action validation: indexed templates and
+RDChiral precursor proposals are ranked cheaply, then hard forward-graph and
+operator-signature validation proceeds only until the planner's per-step
+action quota is filled. The exhaustive one-step API remains the default for
+interactive disconnection review. Search diagnostics distinguish proposed,
+validated, and accepted actions; record the first-solution expansion, dead
+ends, beam pruning, cache use, and abstraction levels attempted; and the web
+API adds elapsed time plus the configured search budget.
+
+Every route also serializes a `route_tree` alternating molecule occurrences
+and validated reaction nodes. Occurrence IDs prevent identical molecules on
+different branches from collapsing. `route_postprocessing` exposes stable tree
+IDs and a deterministic multiset-Jaccard distance matrix, providing a canonical
+contract for route clustering and diversity selection without changing the
+chemistry-first cost ranking in this release.

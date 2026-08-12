@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 from threading import RLock
 from typing import Any, Dict, Protocol
@@ -680,6 +681,7 @@ class LocalRecommendationRuntime:
         """Search short routes using explicit literature/MW terminal rules."""
 
         library = self._get_retrosynthesis_library(request.library_mode)
+        started_at = time.perf_counter()
         with CanonicalMoleculeIndex(self.literature_index_path) as stock_index:
             result = plan_multistep_routes(
                 request.target_smiles.strip(),
@@ -702,6 +704,7 @@ class LocalRecommendationRuntime:
                 diversify=request.diversify,
             )
         payload = result.to_dict()
+        elapsed_seconds = round(time.perf_counter() - started_at, 3)
         payload.update(
             {
                 "library_mode": request.library_mode,
@@ -713,6 +716,16 @@ class LocalRecommendationRuntime:
                 "partial_route_count": len(result.partial_routes),
                 "library_operator_count": len(library.operators),
                 "library_template_count": len(library.templates),
+                "search_elapsed_seconds": elapsed_seconds,
+                "search_budget": {
+                    "per_step_top_k": 5,
+                    "beam_width": max(12, request.top_k_routes * 3),
+                    "max_expansions": max(4, request.top_k_routes),
+                    "max_templates_to_apply": WEB_MULTISTEP_TEMPLATE_BUDGET,
+                    "max_candidates_to_validate": (
+                        WEB_MULTISTEP_VALIDATION_BUDGET
+                    ),
+                },
             }
         )
         return payload

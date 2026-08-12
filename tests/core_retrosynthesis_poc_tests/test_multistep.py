@@ -8,6 +8,7 @@ from dataclasses import replace
 from core_retrosynthesis_poc import (
     GenericDisconnectionCandidate,
     plan_multistep_routes,
+    route_tree_distance,
 )
 from cas_tools import (
     CanonicalMoleculeIndex,
@@ -101,6 +102,25 @@ def test_two_depth_route_requires_every_leaf_to_be_terminal() -> None:
         "CCO",
     }
     assert all(leaf.terminal for leaf in route.leaves)
+    assert route.route_tree.root.smiles == "CCCCCCCC"
+    assert route.route_tree.reaction_count == route.reaction_count
+    assert route.route_tree.root.reaction is not None
+    assert len(route.route_tree.root.reaction.children) == 2
+    expanded_child = next(
+        child
+        for child in route.route_tree.root.reaction.children
+        if child.smiles == "CCCCCC"
+    )
+    assert expanded_child.reaction is not None
+    assert route_tree_distance(route.route_tree, route.route_tree) == 0.0
+    assert result.diagnostics.proposed_actions == 2
+    assert result.diagnostics.validation_attempts == 2
+    assert result.diagnostics.valid_actions == 2
+    assert result.diagnostics.first_solution_expansion == 2
+
+    serialized = result.to_dict()
+    assert serialized["routes"][0]["route_tree"]["tree_id"]
+    assert serialized["route_postprocessing"]["distance_matrix"] == [[0.0]]
 
 
 def test_root_never_terminates_without_one_disconnection() -> None:
@@ -304,3 +324,9 @@ def test_search_retains_distinct_paths_to_the_same_leaf_state() -> None:
 
     assert len(result.routes) == 2
     assert result.diagnostics.retained_alternative_paths >= 1
+    assert route_tree_distance(
+        result.routes[0].route_tree,
+        result.routes[1].route_tree,
+    ) > 0.0
+    matrix = result.to_dict()["route_postprocessing"]["distance_matrix"]
+    assert matrix[0][1] == matrix[1][0]

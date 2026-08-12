@@ -529,6 +529,7 @@ export interface MoleculeIndexMatch {
 }
 
 export interface StartingMaterialAssessment {
+  route_node_id: string
   smiles: string
   canonical_smiles: string
   depth: number
@@ -563,6 +564,38 @@ export interface MultistepRouteStep {
   step_cost: number
   step_cost_components: Record<string, number>
   candidate: MultistepRouteCandidate
+  product_node_id: string
+  precursor_node_ids: string[]
+}
+
+export interface RouteTreeMoleculeNode {
+  molecule_node_id: string
+  smiles: string
+  depth: number
+  terminal: boolean
+  terminal_evidence: string
+  unresolved_reason?: string | null
+  reaction?: RouteTreeReactionNode | null
+}
+
+export interface RouteTreeReactionNode {
+  reaction_node_id: string
+  step_id: string
+  depth: number
+  proposed_reaction_smiles: string
+  operator_id: string
+  disconnection_site_key: string
+  children: RouteTreeMoleculeNode[]
+}
+
+export interface CanonicalRouteTree {
+  tree_id: string
+  target_smiles: string
+  root: RouteTreeMoleculeNode
+  reaction_count: number
+  maximum_depth: number
+  fingerprint_tokens: string[]
+  schema_version: string
 }
 
 export interface MultistepRetrosynthesisRoute {
@@ -574,6 +607,7 @@ export interface MultistepRetrosynthesisRoute {
   maximum_depth: number
   steps: MultistepRouteStep[]
   leaves: StartingMaterialAssessment[]
+  route_tree: CanonicalRouteTree
   warnings: string[]
 }
 
@@ -590,6 +624,13 @@ export interface MultistepSearchDiagnostics {
   solved_routes_found: number
   partial_routes_found: number
   stopped_by_expansion_limit: boolean
+  proposed_actions: number
+  validation_attempts: number
+  valid_actions: number
+  first_solution_expansion?: number | null
+  beam_pruned_states: number
+  dead_end_states: number
+  expansion_level_calls: Array<[string, number]>
 }
 
 export interface MultistepRetrosynthesisResult {
@@ -605,6 +646,13 @@ export interface MultistepRetrosynthesisResult {
   partial_route_count: number
   library_operator_count: number
   library_template_count: number
+  search_elapsed_seconds: number
+  search_budget: Record<string, number>
+  route_postprocessing: {
+    definition_id: string
+    tree_ids: string[]
+    distance_matrix: number[][]
+  }
   routes: MultistepRetrosynthesisRoute[]
   partial_routes: MultistepRetrosynthesisRoute[]
   diagnostics: MultistepSearchDiagnostics

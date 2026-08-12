@@ -35,11 +35,13 @@ from .generic_models import (
     GenericSearchDiagnostics,
     GenericHandleCompletionGroup,
     GenericTemplateLibrary,
+    OperatorLadderDiagnostics,
 )
 from .generic_search import (
     disconnect_generic_target,
     disconnect_generic_target_detailed,
     disconnect_operator_ladder,
+    disconnect_operator_ladder_detailed,
     rank_operator_site_diverse,
 )
 from .html_report import render_comparison_html, write_comparison_html
@@ -57,9 +59,18 @@ from .multistep import (
     MultistepRetrosynthesisResult,
     MultistepRetrosynthesisRoute,
     MultistepSearchDiagnostics,
+    OneStepExpansionBatch,
     RetrosynthesisRouteStep,
     StartingMaterialAssessment,
     plan_multistep_routes,
+)
+from .route_tree import (
+    CanonicalRouteTree,
+    RouteTreeMoleculeNode,
+    RouteTreeReactionNode,
+    build_canonical_route_tree,
+    route_distance_matrix,
+    route_tree_distance,
 )
 from .multistep_ranking import (
     MultistepRankingPolicy,
@@ -120,11 +131,16 @@ __all__ = [
     "GenericSearchDiagnostics",
     "GenericHandleCompletionGroup",
     "GenericTemplateLibrary",
+    "OperatorLadderDiagnostics",
     "LIBRARY_MODES",
     "MultistepRetrosynthesisResult",
     "MultistepRetrosynthesisRoute",
     "MultistepRankingPolicy",
     "MultistepSearchDiagnostics",
+    "OneStepExpansionBatch",
+    "CanonicalRouteTree",
+    "RouteTreeMoleculeNode",
+    "RouteTreeReactionNode",
     "RankedReactionOutcome",
     "ReactionChoiceSet",
     "ReactionOutcomeCandidate",
@@ -152,6 +168,7 @@ __all__ = [
     "disconnect_generic_target",
     "disconnect_generic_target_detailed",
     "disconnect_operator_ladder",
+    "disconnect_operator_ladder_detailed",
     "load_library",
     "load_generic_library",
     "load_operator_rows",
@@ -163,6 +180,9 @@ __all__ = [
     "rank_retrosynthesis_candidates_with_conditions",
     "recommend_retrosynthesis_conditions",
     "rank_operator_site_diverse",
+    "build_canonical_route_tree",
+    "route_distance_matrix",
+    "route_tree_distance",
     "run_comparison",
     "run_operator_coverage_benchmark",
     "render_comparison_html",

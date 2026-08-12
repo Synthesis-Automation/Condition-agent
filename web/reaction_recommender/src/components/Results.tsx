@@ -620,7 +620,8 @@ export function MultistepRetrosynthesisResults({ result }: { result: MultistepRe
           <div><strong>{result.route_count}</strong><span>solved</span></div>
           <div><strong>{result.partial_route_count}</strong><span>partial</span></div>
           <div><strong>{result.diagnostics.expanded_states}</strong><span>expanded</span></div>
-          <div><strong>{result.max_depth}</strong><span>max depth</span></div>
+          <div><strong>{result.diagnostics.validation_attempts}</strong><span>validated</span></div>
+          <div><strong>{result.search_elapsed_seconds.toFixed(1)}s</strong><span>search time</span></div>
         </div>
       </div>
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No solved multistep routes')}</div>}
