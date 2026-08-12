@@ -3,7 +3,7 @@
   "schema_version": "1.0",
   "search": {
     "maximum_paths_per_state": 2,
-    "minimum_candidates_per_level": 1
+    "minimum_candidates_per_level": 0
   },
   "step_cost": {
     "base": 1.0,

@@ -70,6 +70,8 @@ DEFAULT_LITERATURE_MOLECULE_INDEX = (
 )
 WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET = 100
 WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET = 30
+WEB_MULTISTEP_TEMPLATE_BUDGET = 40
+WEB_MULTISTEP_VALIDATION_BUDGET = 10
 
 
 def _unavailable_retrosynthesis_conditions(
@@ -688,14 +690,12 @@ class LocalRecommendationRuntime:
                     request.molecular_weight_threshold
                 ),
                 top_k_routes=request.top_k_routes,
-                per_step_top_k=8,
-                beam_width=max(32, request.top_k_routes * 6),
-                max_expansions=max(60, request.top_k_routes * 12),
-                max_templates_to_apply=(
-                    WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET
-                ),
+                per_step_top_k=5,
+                beam_width=max(12, request.top_k_routes * 3),
+                max_expansions=max(4, request.top_k_routes),
+                max_templates_to_apply=WEB_MULTISTEP_TEMPLATE_BUDGET,
                 max_candidates_to_validate=(
-                    WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET
+                    WEB_MULTISTEP_VALIDATION_BUDGET
                 ),
                 use_context=request.use_context,
                 include_l0=request.include_l0,

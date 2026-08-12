@@ -50,6 +50,12 @@ def _positive_integer(value: object, field: str) -> int:
     return value
 
 
+def _nonnegative_integer(value: object, field: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError(f"{field} must be a nonnegative integer")
+    return value
+
+
 @lru_cache(maxsize=1)
 def load_multistep_ranking_policy() -> MultistepRankingPolicy:
     """Load and validate the versioned multistep ranking definition."""
@@ -82,7 +88,7 @@ def load_multistep_ranking_policy() -> MultistepRankingPolicy:
             search.get("maximum_paths_per_state"),
             "maximum paths per state",
         ),
-        minimum_candidates_per_level=_positive_integer(
+        minimum_candidates_per_level=_nonnegative_integer(
             search.get("minimum_candidates_per_level"),
             "minimum candidates per level",
         ),

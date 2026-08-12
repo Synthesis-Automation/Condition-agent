@@ -322,9 +322,11 @@ def test_local_runtime_runs_multistep_planner_with_web_limits(
     assert captured["max_depth"] == 2
     assert captured["molecular_weight_threshold"] == 140.0
     assert captured["top_k_routes"] == 3
-    assert captured["per_step_top_k"] == 8
-    assert captured["beam_width"] == 32
-    assert captured["max_expansions"] == 60
+    assert captured["per_step_top_k"] == 5
+    assert captured["beam_width"] == 12
+    assert captured["max_expansions"] == 4
+    assert captured["max_templates_to_apply"] == 40
+    assert captured["max_candidates_to_validate"] == 10
     assert captured["include_l0"] is False
     assert captured["diversify"] is False
     assert payload["valid"] is True

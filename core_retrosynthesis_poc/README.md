@@ -735,7 +735,8 @@ labelled heuristic terminals and add a declarative route-cost penalty.
 The target itself is never accepted as a zero-step literature or
 molecular-weight terminal. The deterministic best-first beam expands the
 largest unresolved leaf first, caches repeated molecule expansions, reserves
-bounded L2/L1/L0 candidate coverage, rejects ancestor cycles, and reports
+specificity-first L2 candidates and widens to L1/L0 only when a narrower tier
+cannot fill the candidate quota, rejects ancestor cycles, and reports
 depth-, candidate-, and search-limited partial routes separately from solved
 routes. It searches the configured budget before selecting the lowest-cost
 top-k solutions and retains bounded alternative paths to the same molecular

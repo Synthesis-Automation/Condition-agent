@@ -447,17 +447,19 @@ function App() {
         </div>
         </section>
 
-        <ReactionEditor
-          value={reactionSmiles}
-          onChange={setReactionSmiles}
-          onError={setError}
-          allowMolecule={mode === 'features' || isRetrosynthesisMode}
-          moleculeOnly={isRetrosynthesisMode}
-        />
+        <div className="editor-action-layout">
+          <ReactionEditor
+            value={reactionSmiles}
+            onChange={setReactionSmiles}
+            onError={setError}
+            allowMolecule={mode === 'features' || isRetrosynthesisMode}
+            moleculeOnly={isRetrosynthesisMode}
+          />
 
-        <div className="run-control analysis-action-row workbench-action-row">
-          <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze features'}</button>
-          <span role="status" aria-live="polite">{status}</span>
+          <div className="run-control workbench-action-row" aria-label="Analysis action">
+            <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze features'}</button>
+            <span role="status" aria-live="polite">{status}</span>
+          </div>
         </div>
       </div>
 
