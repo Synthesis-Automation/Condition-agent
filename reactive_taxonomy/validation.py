@@ -40,6 +40,7 @@ def validate_taxonomy() -> List[str]:
         "taxonomy_manifest.v4",
         "rendering.v1",
         "reactivity_descriptor_rules.v1",
+        "reactive_pair_interactions.v1",
         "aromatic_systems.v1",
         "reactivity_rendering.v1",
         "signature_features.v3",
@@ -49,6 +50,15 @@ def validate_taxonomy() -> List[str]:
     if missing:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
         return errors
+    from .reactive_pair_interactions import (
+        validate_reactive_pair_interaction_definition,
+    )
+
+    errors.extend(
+        validate_reactive_pair_interaction_definition(
+            payload["reactive_pair_interactions.v1"]
+        )
+    )
     descriptor_profile_rules = payload["reactivity_descriptor_rules.v1"]
     if descriptor_profile_rules.get("profile_schema_version") != "1.0":
         errors.append("invalid_reactivity_profile_schema_version")

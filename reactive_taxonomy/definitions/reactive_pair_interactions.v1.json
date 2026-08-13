@@ -1,0 +1,204 @@
+{
+  "definition_id": "reactive_pair_interactions.v1",
+  "schema_version": "1.0",
+  "allowed_scopes": [
+    "same_component"
+  ],
+  "rules": [
+    {
+      "rule_id": "RPI001_ORGANOMETALLIC_PROTIC_SELF_QUENCH",
+      "interaction_class": "acid_base_self_quench",
+      "scope": "same_component",
+      "left_site": {
+        "site_type": "transfer_group",
+        "interaction_atom_field": "details.anchor_atom_index",
+        "constraints": [
+          {
+            "field": "details.handle_token",
+            "operator": "in",
+            "values": ["Li", "MgX"]
+          }
+        ]
+      },
+      "right_site": {
+        "site_type": "pronucleophile_XH",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "details.center_element",
+            "operator": "in",
+            "values": ["N", "O", "S"]
+          },
+          {
+            "field": "details.h_count",
+            "operator": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "intrinsic_severity": "critical",
+      "warning_strength": "strong",
+      "topology_evaluation": "graph_distance",
+      "message": "An organolithium or organomagnesium center and a free O-H, N-H, or S-H site occur in the same molecular component and are expected to self-quench."
+    },
+    {
+      "rule_id": "RPI002_ORGANOMETALLIC_CARBONYL_SELF_REACTION",
+      "interaction_class": "intramolecular_nucleophilic_addition",
+      "scope": "same_component",
+      "left_site": {
+        "site_type": "transfer_group",
+        "interaction_atom_field": "details.anchor_atom_index",
+        "constraints": [
+          {
+            "field": "details.handle_token",
+            "operator": "in",
+            "values": ["Li", "MgX"]
+          }
+        ]
+      },
+      "right_site": {
+        "site_type": "electrophilic_center",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "details.center_family",
+            "operator": "eq",
+            "value": "Carbonyl"
+          },
+          {
+            "field": "details.carbonyl_subtype",
+            "operator": "in",
+            "values": ["aldehyde", "ketone"]
+          }
+        ]
+      },
+      "intrinsic_severity": "critical",
+      "warning_strength": "strong",
+      "topology_evaluation": "potential_bond_closure",
+      "message": "An organolithium or organomagnesium center and an aldehyde or ketone occur in the same molecular component, enabling an intramolecular addition."
+    },
+    {
+      "rule_id": "RPI003_ACYL_HALIDE_FREE_AMINE",
+      "interaction_class": "competing_intramolecular_acylation",
+      "scope": "same_component",
+      "left_site": {
+        "site_type": "electrophilic_center",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "details.center_family",
+            "operator": "eq",
+            "value": "Acyl"
+          },
+          {
+            "field": "details.leaving_or_activatable_group",
+            "operator": "in",
+            "values": ["F", "Cl", "Br", "I"]
+          }
+        ]
+      },
+      "right_site": {
+        "site_type": "pronucleophile_XH",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "availability",
+            "operator": "eq",
+            "value": "free"
+          },
+          {
+            "field": "details.derived_family",
+            "operator": "in",
+            "values": ["primary_amine", "secondary_amine"]
+          }
+        ]
+      },
+      "intrinsic_severity": "high",
+      "warning_strength": "strong",
+      "topology_evaluation": "potential_bond_closure",
+      "message": "An acyl halide and a free primary or secondary amine occur in the same molecular component, enabling intramolecular acylation."
+    },
+    {
+      "rule_id": "RPI004_ACYL_HALIDE_FREE_THIOL",
+      "interaction_class": "competing_intramolecular_acylation",
+      "scope": "same_component",
+      "left_site": {
+        "site_type": "electrophilic_center",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "details.center_family",
+            "operator": "eq",
+            "value": "Acyl"
+          },
+          {
+            "field": "details.leaving_or_activatable_group",
+            "operator": "in",
+            "values": ["F", "Cl", "Br", "I"]
+          }
+        ]
+      },
+      "right_site": {
+        "site_type": "pronucleophile_XH",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "availability",
+            "operator": "eq",
+            "value": "free"
+          },
+          {
+            "field": "details.derived_family",
+            "operator": "eq",
+            "value": "thiol"
+          }
+        ]
+      },
+      "intrinsic_severity": "high",
+      "warning_strength": "strong",
+      "topology_evaluation": "potential_bond_closure",
+      "message": "An acyl halide and a free thiol occur in the same molecular component, enabling intramolecular acylation."
+    },
+    {
+      "rule_id": "RPI005_ACYL_HALIDE_FREE_HYDROXYL",
+      "interaction_class": "competing_intramolecular_acylation",
+      "scope": "same_component",
+      "left_site": {
+        "site_type": "electrophilic_center",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "details.center_family",
+            "operator": "eq",
+            "value": "Acyl"
+          },
+          {
+            "field": "details.leaving_or_activatable_group",
+            "operator": "in",
+            "values": ["F", "Cl", "Br", "I"]
+          }
+        ]
+      },
+      "right_site": {
+        "site_type": "pronucleophile_XH",
+        "interaction_atom_field": "details.center_atom_index",
+        "constraints": [
+          {
+            "field": "availability",
+            "operator": "eq",
+            "value": "free"
+          },
+          {
+            "field": "details.derived_family",
+            "operator": "in",
+            "values": ["alcohol", "phenol"]
+          }
+        ]
+      },
+      "intrinsic_severity": "high",
+      "warning_strength": "strong",
+      "topology_evaluation": "potential_bond_closure",
+      "message": "An acyl halide and a free alcohol or phenol occur in the same molecular component, enabling intramolecular acylation."
+    }
+  ]
+}

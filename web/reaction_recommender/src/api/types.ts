@@ -478,6 +478,34 @@ export interface FunctionalGroupCompetitionWarning {
   schema_version: string
 }
 
+export interface ReactivePairSiteReference {
+  hypothesis_id: string
+  component_index: number
+  atom_index: number
+  site_type: string
+  canonical_signature: string
+  chemist_label: string
+  availability: string
+}
+
+export interface ReactivePairInteractionAssessment {
+  assessment_id: string
+  rule_id: string
+  interaction_class: string
+  scope: 'same_component'
+  component_index: number
+  component_smiles: string
+  left_site: ReactivePairSiteReference
+  right_site: ReactivePairSiteReference
+  graph_distance?: number | null
+  potential_closure_ring_size?: number | null
+  intrinsic_severity: string
+  warning_strength: 'advisory' | 'strong'
+  message: string
+  definition_id: string
+  schema_version: string
+}
+
 export interface RetrosynthesisCandidate {
   rank: number
   target_smiles: string
@@ -509,6 +537,11 @@ export interface RetrosynthesisCandidate {
   structural_score_band: number
   ranking_policy_definition_id: string
   selectivity_warnings?: FunctionalGroupCompetitionWarning[]
+  precursor_compatibility_assessments?: ReactivePairInteractionAssessment[]
+  precursor_compatibility_disposition?: 'pass' | 'warn' | 'demote' | 'reject'
+  precursor_compatibility_warning_strength?: 'advisory' | 'strong' | null
+  precursor_compatibility_band_penalty?: number
+  precursor_compatibility_policy_definition_id?: string
   precursor_realism_score?: number | null
   precursor_realism_assessments?: PrecursorRealismAssessment[]
   precursor_realism_aggregation?: PrecursorRealismAggregation | null
@@ -516,6 +549,22 @@ export interface RetrosynthesisCandidate {
   precursor_realism_rank: number
   precursor_realism_band_penalty: number
   effective_structural_score_band: number
+  completion_group_id: string
+  completion_prior_probability?: number | null
+  completion_prior_backoff_level: string
+  completion_prior_independent_support: number
+  completion_prior_total_support: number
+  completion_prior_alternative_count: number
+  hierarchical_site_score: number
+  hierarchical_synthon_score: number
+  hierarchical_realization_score: number
+  hierarchical_partition_key: [string, number] | []
+  hierarchical_site_rank: number
+  hierarchical_synthon_rank: number
+  hierarchical_realization_rank: number
+  pre_hierarchical_rank: number
+  hierarchical_rank: number
+  hierarchical_ranking_definition_id: string
 }
 
 export interface PrecursorRealismAssessment {

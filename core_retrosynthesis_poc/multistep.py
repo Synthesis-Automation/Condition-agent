@@ -14,6 +14,7 @@ from .generic_models import (
     OperatorLadderDiagnostics,
 )
 from .generic_search import disconnect_operator_ladder_detailed
+from .hierarchical_ranking import build_completion_prior_index
 from .multistep_ranking import load_multistep_ranking_policy
 from .route_tree import (
     CanonicalRouteTree,
@@ -574,6 +575,7 @@ def plan_multistep_routes(
     use_context: bool = True,
     include_l0: bool = True,
     diversify: bool = True,
+    use_hierarchical_ranking: bool = True,
     allow_untyped_literature_terminals: bool = False,
     max_paths_per_state: int | None = None,
     minimum_candidates_per_level: int | None = None,
@@ -611,6 +613,11 @@ def plan_multistep_routes(
         raise ValueError("maximum paths per state must be positive")
     if active_minimum_per_level < 0:
         raise ValueError("minimum candidates per level cannot be negative")
+    completion_prior_index = (
+        build_completion_prior_index(library)
+        if diversify and use_hierarchical_ranking
+        else None
+    )
 
     def default_expander(
         product_smiles: str,
@@ -625,8 +632,10 @@ def plan_multistep_routes(
             use_context=use_context,
             include_l0=include_l0,
             diversify=diversify,
+            use_hierarchical_ranking=use_hierarchical_ranking,
             minimum_candidates_per_level=active_minimum_per_level,
             lazy_validation=True,
+            completion_prior_index=completion_prior_index,
         )
         return OneStepExpansionBatch(candidates, diagnostics)
 

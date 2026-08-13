@@ -281,7 +281,15 @@ def _parser() -> argparse.ArgumentParser:
     operator_search.add_argument(
         "--no-diversity",
         action="store_true",
-        help="disable operator/site/synthon diversity for ranking ablation",
+        help=(
+            "disable hierarchical SITE1/SYN1/REAL1 ranking and "
+            "operator/site/synthon diversity for an ablation"
+        ),
+    )
+    operator_search.add_argument(
+        "--no-hierarchical-ranking",
+        action="store_true",
+        help="retain legacy diversity ranking without SITE1/SYN1/REAL1 evidence",
     )
     operator_search.add_argument(
         "--diagnostics",
@@ -331,6 +339,7 @@ def _parser() -> argparse.ArgumentParser:
     route_search.add_argument("--no-context", action="store_true")
     route_search.add_argument("--skip-l0", action="store_true")
     route_search.add_argument("--no-diversity", action="store_true")
+    route_search.add_argument("--no-hierarchical-ranking", action="store_true")
     route_search.add_argument(
         "--allow-untyped-literature-terminals",
         action="store_true",
@@ -546,6 +555,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             use_context=not arguments.no_context,
             include_l0=not arguments.skip_l0,
             diversify=not arguments.no_diversity,
+            use_hierarchical_ranking=not arguments.no_hierarchical_ranking,
         )
         condition_ranked = None
         if arguments.condition_index:
@@ -640,6 +650,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 use_context=not arguments.no_context,
                 include_l0=not arguments.skip_l0,
                 diversify=not arguments.no_diversity,
+                use_hierarchical_ranking=not arguments.no_hierarchical_ranking,
                 allow_untyped_literature_terminals=(
                     arguments.allow_untyped_literature_terminals
                 ),

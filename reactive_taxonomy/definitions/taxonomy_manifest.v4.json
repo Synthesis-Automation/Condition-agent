@@ -15,6 +15,7 @@
     "chemist_notation.v1.json",
     "rendering.v1.json",
     "reactivity_rendering.v1.json",
+    "reactive_pair_interactions.v1.json",
     "synthesis_patterns.v2.json",
     "transformation_patterns.v2.json",
     "source_label_crosswalk.v1.json",

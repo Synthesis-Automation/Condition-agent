@@ -6,6 +6,9 @@ from dataclasses import asdict, dataclass
 from typing import Any, Dict, Literal, Optional, Tuple
 
 from cas_tools import PrecursorRealismAggregation, PrecursorRealismAssessment
+from reactive_taxonomy.reactive_pair_interactions import (
+    ReactivePairInteractionAssessment,
+)
 
 from .models import CenterReactivityContext, TemplateContext
 from .selectivity_poc import FunctionalGroupCompetitionWarning
@@ -369,6 +372,13 @@ class GenericDisconnectionCandidate:
     ranking_policy_definition_id: str = ""
     condition_query_reaction_smiles: str = ""
     selectivity_warnings: Tuple[FunctionalGroupCompetitionWarning, ...] = ()
+    precursor_compatibility_assessments: Tuple[
+        ReactivePairInteractionAssessment, ...
+    ] = ()
+    precursor_compatibility_disposition: str = "pass"
+    precursor_compatibility_warning_strength: Optional[str] = None
+    precursor_compatibility_band_penalty: int = 0
+    precursor_compatibility_policy_definition_id: str = ""
     precursor_realism_score: Optional[float] = None
     precursor_realism_assessments: Tuple[PrecursorRealismAssessment, ...] = ()
     precursor_realism_aggregation: Optional[PrecursorRealismAggregation] = None
@@ -376,6 +386,22 @@ class GenericDisconnectionCandidate:
     precursor_realism_rank: int = 0
     precursor_realism_band_penalty: int = 0
     effective_structural_score_band: int = 0
+    completion_group_id: str = ""
+    completion_prior_probability: Optional[float] = None
+    completion_prior_backoff_level: str = "unavailable"
+    completion_prior_independent_support: int = 0
+    completion_prior_total_support: int = 0
+    completion_prior_alternative_count: int = 0
+    hierarchical_site_score: float = 0.0
+    hierarchical_synthon_score: float = 0.0
+    hierarchical_realization_score: float = 0.0
+    hierarchical_partition_key: Tuple[str, int] = ()
+    hierarchical_site_rank: int = 0
+    hierarchical_synthon_rank: int = 0
+    hierarchical_realization_rank: int = 0
+    pre_hierarchical_rank: int = 0
+    hierarchical_rank: int = 0
+    hierarchical_ranking_definition_id: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible candidate."""

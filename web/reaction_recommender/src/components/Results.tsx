@@ -406,6 +406,27 @@ function RetrosynthesisDetails({
       </div>
       <ReactionImage smiles={candidate.proposed_reaction_smiles} label="Proposed single-step retrosynthesis" compact />
       <MessageList
+        title="Strong intramolecular compatibility warning"
+        values={(candidate.precursor_compatibility_assessments ?? []).map((assessment) => assessment.message)}
+        tone="caution"
+      />
+      {(candidate.precursor_compatibility_assessments ?? []).length > 0 && (
+        <details className="trace-panel" open>
+          <summary>Review incompatible sites in one molecular component</summary>
+          {(candidate.precursor_compatibility_assessments ?? []).map((assessment) => (
+            <dl className="detail-list" key={assessment.assessment_id}>
+              <div><dt>Rule</dt><dd className="mono-value">{assessment.rule_id}</dd></div>
+              <div><dt>Component</dt><dd className="mono-value">{assessment.component_smiles}</dd></div>
+              <div><dt>Reactive pair</dt><dd>{assessment.left_site.chemist_label} + {assessment.right_site.chemist_label}</dd></div>
+              <div><dt>Severity</dt><dd>{displayName(assessment.intrinsic_severity)} · {displayName(assessment.warning_strength)} warning</dd></div>
+              {assessment.graph_distance != null && <div><dt>Graph distance</dt><dd>{assessment.graph_distance} bonds</dd></div>}
+              {assessment.potential_closure_ring_size != null && <div><dt>Possible closure</dt><dd>{assessment.potential_closure_ring_size}-membered ring</dd></div>}
+              <div><dt>Scope</dt><dd>Same molecular component</dd></div>
+            </dl>
+          ))}
+        </details>
+      )}
+      <MessageList
         title="Functional-group competition"
         values={(candidate.selectivity_warnings ?? []).map((warning) => warning.message)}
         tone="caution"
@@ -487,11 +508,20 @@ function RetrosynthesisDetails({
           <div><strong>Structural rank</strong><span>{candidate.pre_diversity_rank || candidate.rank}</span></div>
           <div><strong>Diversity rank</strong><span>{candidate.diversity_rank || candidate.rank}</span></div>
           <div><strong>Score band</strong><span>{candidate.structural_score_band}</span></div>
+          {candidate.precursor_compatibility_policy_definition_id && <div><strong>Compatibility policy</strong><span>{candidate.precursor_compatibility_policy_definition_id}</span></div>}
+          {(candidate.precursor_compatibility_band_penalty ?? 0) > 0 && <div><strong>Compatibility action</strong><span>{displayName(candidate.precursor_compatibility_disposition ?? 'demote')} · band +{candidate.precursor_compatibility_band_penalty}</span></div>}
+          {candidate.hierarchical_ranking_definition_id && <div><strong>Hierarchical policy</strong><span>{candidate.hierarchical_ranking_definition_id}</span></div>}
+          {candidate.hierarchical_rank > 0 && <div><strong>Hierarchical rerank</strong><span>{candidate.pre_hierarchical_rank} → {candidate.hierarchical_rank}</span></div>}
+          {candidate.hierarchical_site_rank > 0 && <div><strong>SITE1 rank / score</strong><span>{candidate.hierarchical_site_rank} / {candidate.hierarchical_site_score.toFixed(3)}</span></div>}
+          {candidate.hierarchical_synthon_rank > 0 && <div><strong>SYN1 rank / score</strong><span>{candidate.hierarchical_synthon_rank} / {candidate.hierarchical_synthon_score.toFixed(3)}</span></div>}
+          {candidate.hierarchical_realization_rank > 0 && <div><strong>REAL1 rank / score</strong><span>{candidate.hierarchical_realization_rank} / {candidate.hierarchical_realization_score.toFixed(3)}</span></div>}
+          {candidate.completion_group_id && <div><strong>Completion group</strong><span>{candidate.completion_group_id}</span></div>}
+          {candidate.completion_group_id && <div><strong>Completion prior</strong><span>{candidate.completion_prior_probability == null ? 'Unavailable' : candidate.completion_prior_probability.toFixed(3)} ({displayName(candidate.completion_prior_backoff_level)}, {candidate.completion_prior_independent_support}/{candidate.completion_prior_total_support} support)</span></div>}
           {candidate.precursor_realism_score != null && <div><strong>Realism rerank</strong><span>{candidate.pre_realism_rank} → {candidate.precursor_realism_rank}</span></div>}
           {candidate.precursor_realism_aggregation && <div><strong>Weakest precursor</strong><span>{candidate.precursor_realism_aggregation.weakest_component_score.toFixed(3)}</span></div>}
           {candidate.precursor_realism_aggregation && <div><strong>Known substantial component bonus</strong><span>+{candidate.precursor_realism_aggregation.known_substantial_component_bonus.toFixed(3)}</span></div>}
           {candidate.precursor_realism_score != null && <div><strong>Realism band penalty</strong><span>+{candidate.precursor_realism_band_penalty}</span></div>}
-          {candidate.precursor_realism_score != null && <div><strong>Effective band</strong><span>{candidate.effective_structural_score_band}</span></div>}
+          {(candidate.precursor_realism_score != null || (candidate.precursor_compatibility_band_penalty ?? 0) > 0) && <div><strong>Effective band</strong><span>{candidate.effective_structural_score_band}</span></div>}
         </div>
         {(candidate.precursor_realism_assessments ?? []).map((assessment) => (
           <dl className="detail-list" key={assessment.canonical_smiles}>

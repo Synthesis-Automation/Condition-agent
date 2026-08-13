@@ -7,6 +7,15 @@ from .api import (
     observe_molecular_structure,
 )
 from .reaction_api import featurize_reaction, identify_reaction_patterns
+from .reactive_pair_interactions import (
+    REACTIVE_PAIR_INTERACTION_DEFINITION_ID,
+    REACTIVE_PAIR_INTERACTION_SCHEMA_VERSION,
+    ReactivePairInteractionAssessment,
+    ReactivePairSiteReference,
+    assess_reactive_pair_interactions,
+    load_reactive_pair_interaction_definition,
+    validate_reactive_pair_interaction_definition,
+)
 from .reaction_core import (
     build_reaction_core_projection,
     build_substituent_profile,
@@ -299,6 +308,8 @@ __all__ = [
     "ReactiveCenterProfile",
     "ReactivityModifier",
     "ReactiveLinkSite",
+    "ReactivePairInteractionAssessment",
+    "ReactivePairSiteReference",
     "ReactiveSiteHypothesis",
     "ReactiveSiteCandidate",
     "ReactiveSiteEnvironment",
@@ -322,6 +333,7 @@ __all__ = [
     "detect_reactive_site_hypotheses",
     "evaluate_molecular_features",
     "analyze_molecule",
+    "assess_reactive_pair_interactions",
     "interpret_molecular_reactivity",
     "observe_molecular_structure",
     "featurize_reaction",
@@ -329,6 +341,7 @@ __all__ = [
     "interpret_reaction",
     "reaction_fallback_definition_versions",
     "load_molecular_motif_definitions",
+    "load_reactive_pair_interaction_definition",
     "load_handle_patterns",
     "load_reaction_interface_block_definitions",
     "load_reaction_display_projection_definition",
@@ -349,8 +362,11 @@ __all__ = [
     "render_reactivity_profile_expanded",
     "resolve_source_label",
     "validate_source_label_mappings",
+    "validate_reactive_pair_interaction_definition",
     "validate_taxonomy",
     "validate_external_atom_mapping",
     "analyze_reaction_with_external_mapping",
     "normalized_edit_profile",
+    "REACTIVE_PAIR_INTERACTION_DEFINITION_ID",
+    "REACTIVE_PAIR_INTERACTION_SCHEMA_VERSION",
 ]

@@ -484,6 +484,35 @@ before/after comparison. The versioned defaults live in
 `definitions/retrosynthesis_ranking.v2.json`; output candidates record the
 policy ID, original structural rank, diversity rank, group key, and score band.
 
+The default ranking now adds a second conservative hierarchy after mandatory
+forward validation and structural band assignment. It first ranks distinct
+product disconnection sites (`SITE1`), then synthon skeletons (`SYN1`), and
+finally precursor-handle realizations (`REAL1`). Completion evidence is derived
+only from the operator library's independent-reference counts. A smoothed prior
+backs off from `operator + SYN1` to `operator` and then to the global completion
+distribution; unavailable evidence remains explicit and is not treated as a
+failure. Sites and synthons are round-robin interleaved inside the same
+abstraction-level and effective score-band partition, so the hierarchy cannot
+promote L1/L0 over L2 or cross a structural/realism band. Every candidate
+serializes its completion group, probability, backoff level, support
+denominator, stage scores/ranks, and
+`hierarchical_retrosynthesis_ranking.v1` definition ID. `--no-diversity`
+disables both this hierarchy and the earlier diversity pass for a controlled
+ablation. Use `--no-hierarchical-ranking` to retain the legacy diversity pass
+and isolate the hierarchy's contribution. The policy is declared in
+`definitions/hierarchical_ranking.v1.json`.
+
+Precursor compatibility is assessed before hierarchical ranking. Chemical
+pair knowledge is declared in
+`../reactive_taxonomy/definitions/reactive_pair_interactions.v1.json`; the
+generic evaluator matches existing typed reactive sites and calculates graph
+distance or possible closure size. Only pairs within one dot-separated
+molecular component are intrinsic precursor warnings. The planner actions are
+declared separately in `definitions/precursor_compatibility_policy.v1.json`.
+The initial policy emits a strong warning and a structural-band demotion for
+high or critical conflicts; the same groups on separate precursor components
+receive no intrinsic molecular penalty.
+
 The JSON output exposes product-index retrieval, SMARTS applicability,
 generated precursors, validation attempts, operator mismatches, and valid
 candidates. Retained candidates should have

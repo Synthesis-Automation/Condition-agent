@@ -45,6 +45,14 @@ from .generic_search import (
     rank_operator_site_diverse,
     rank_precursor_realism,
 )
+from .hierarchical_ranking import (
+    CompletionPriorEvidence,
+    CompletionPriorIndex,
+    HierarchicalRankingPolicy,
+    build_completion_prior_index,
+    load_hierarchical_ranking_policy,
+    rank_hierarchical_candidates,
+)
 from .html_report import render_comparison_html, write_comparison_html
 from .library import build_library, load_library, save_library
 from .models import (
@@ -81,6 +89,13 @@ from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
 )
+from .precursor_compatibility import (
+    PrecursorCompatibilityPolicy,
+    PrecursorCompatibilityResult,
+    assess_precursor_compatibility,
+    load_precursor_compatibility_policy,
+    validate_precursor_compatibility_policy,
+)
 from .ranking_policy import (
     RetrosynthesisRankingPolicy,
     load_retrosynthesis_ranking_policy,
@@ -114,6 +129,8 @@ __all__ = [
     "ChoiceModelTrainingReport",
     "ConditionalEditChoiceModel",
     "ConditionRankedRetrosynthesisCandidate",
+    "CompletionPriorEvidence",
+    "CompletionPriorIndex",
     "CoreDisconnectionCandidate",
     "CoreLibraryBuildReport",
     "CoreTemplate",
@@ -132,7 +149,10 @@ __all__ = [
     "GenericSearchDiagnostics",
     "GenericHandleCompletionGroup",
     "GenericTemplateLibrary",
+    "HierarchicalRankingPolicy",
     "OperatorLadderDiagnostics",
+    "PrecursorCompatibilityPolicy",
+    "PrecursorCompatibilityResult",
     "LIBRARY_MODES",
     "MultistepRetrosynthesisResult",
     "MultistepRetrosynthesisRoute",
@@ -156,8 +176,10 @@ __all__ = [
     "build_full_scale_operator_library",
     "build_library",
     "build_reaction_choice_set",
+    "assess_precursor_compatibility",
     "build_reaction_choice_set_from_record",
     "build_generic_library",
+    "build_completion_prior_index",
     "compile_generic_templates",
     "compile_core_templates",
     "compile_operator_shard",
@@ -172,7 +194,9 @@ __all__ = [
     "disconnect_operator_ladder_detailed",
     "load_library",
     "load_generic_library",
+    "load_hierarchical_ranking_policy",
     "load_operator_rows",
+    "load_precursor_compatibility_policy",
     "load_retrosynthesis_ranking_policy",
     "load_multistep_ranking_policy",
     "iter_library_rows",
@@ -181,6 +205,7 @@ __all__ = [
     "rank_retrosynthesis_candidates_with_conditions",
     "recommend_retrosynthesis_conditions",
     "rank_operator_site_diverse",
+    "rank_hierarchical_candidates",
     "rank_precursor_realism",
     "build_canonical_route_tree",
     "route_distance_matrix",
@@ -189,6 +214,7 @@ __all__ = [
     "run_operator_coverage_benchmark",
     "render_comparison_html",
     "resolve_library_mode",
+    "validate_precursor_compatibility_policy",
     "save_library",
     "save_generic_library",
     "split_by_reference",

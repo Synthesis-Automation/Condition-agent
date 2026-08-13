@@ -27,6 +27,12 @@ from .generic_models import (
     GenericTemplateLibrary,
     OperatorLadderDiagnostics,
 )
+from .hierarchical_ranking import (
+    CompletionPriorIndex,
+    build_completion_prior_index,
+    rank_hierarchical_candidates,
+)
+from .precursor_compatibility import assess_precursor_compatibility
 from .retrieval_index import indexed_template_ids
 from .ranking_policy import (
     RetrosynthesisRankingPolicy,
@@ -240,6 +246,7 @@ def disconnect_generic_target_detailed(
         score = (
             0.85 * preliminary + 0.15 * context_score if use_context else preliminary
         )
+        compatibility = assess_precursor_compatibility(precursors)
         candidate = GenericDisconnectionCandidate(
             target_smiles=canonical_target,
             precursor_smiles=precursors,
@@ -272,6 +279,15 @@ def disconnect_generic_target_detailed(
             synthon_signature=identity.synthon_signature,
             condition_query_reaction_smiles=mapped_proposed,
             selectivity_warnings=_selectivity_warnings(mapped_proposed),
+            precursor_compatibility_assessments=compatibility.assessments,
+            precursor_compatibility_disposition=compatibility.disposition,
+            precursor_compatibility_warning_strength=compatibility.warning_strength,
+            precursor_compatibility_band_penalty=(
+                compatibility.structural_band_penalty
+            ),
+            precursor_compatibility_policy_definition_id=(
+                compatibility.policy_definition_id
+            ),
         )
         current = candidates.get(precursors)
         if current is None or candidate.score > current.score:
@@ -410,8 +426,16 @@ def rank_operator_site_diverse(
         )
         for candidate in structurally_ranked
     }
+    compatibility_penalties = {
+        id(candidate): candidate.precursor_compatibility_band_penalty
+        for candidate in structurally_ranked
+    }
     effective_bands = {
-        id(candidate): bands[id(candidate)] + realism_penalties[id(candidate)]
+        id(candidate): (
+            bands[id(candidate)]
+            + realism_penalties[id(candidate)]
+            + compatibility_penalties[id(candidate)]
+        )
         for candidate in structurally_ranked
     }
     partitions: dict[
@@ -565,8 +589,16 @@ def rank_precursor_realism(
         )
         for candidate in chemistry_order
     }
+    compatibility_penalties = {
+        id(candidate): candidate.precursor_compatibility_band_penalty
+        for candidate in chemistry_order
+    }
     effective_bands = {
-        id(candidate): bands[id(candidate)] + realism_penalties[id(candidate)]
+        id(candidate): (
+            bands[id(candidate)]
+            + realism_penalties[id(candidate)]
+            + compatibility_penalties[id(candidate)]
+        )
         for candidate in chemistry_order
     }
     ranked = sorted(
@@ -606,10 +638,12 @@ def disconnect_operator_ladder(
     use_context: bool = True,
     include_l0: bool = True,
     diversify: bool = True,
+    use_hierarchical_ranking: bool = True,
     minimum_candidates_per_level: int = 0,
     precursor_realism_scorer: (
         Callable[[str], tuple[PrecursorRealismAssessment, ...]] | None
     ) = None,
+    completion_prior_index: CompletionPriorIndex | None = None,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
     """Fill specificity tiers with general operator/site-diverse candidates.
 
@@ -626,6 +660,9 @@ def disconnect_operator_ladder(
     selected = []
     seen = set()
     policy = load_retrosynthesis_ranking_policy()
+    hierarchical_prior_index = completion_prior_index
+    if diversify and use_hierarchical_ranking and hierarchical_prior_index is None:
+        hierarchical_prior_index = build_completion_prior_index(library)
     candidate_pool_size = min(
         max_candidates_to_validate,
         max(top_k, top_k * policy.candidate_pool_multiplier),
@@ -657,6 +694,13 @@ def disconnect_operator_ladder(
                 candidates,
                 policy=policy,
             )
+            if use_hierarchical_ranking:
+                candidates = rank_hierarchical_candidates(
+                    candidates,
+                    library,
+                    structural_policy=policy,
+                    prior_index=hierarchical_prior_index,
+                )
         elif precursor_realism_scorer is not None:
             candidates = rank_precursor_realism(candidates, policy=policy)
         candidates_by_level[level] = candidates
@@ -706,8 +750,10 @@ def disconnect_operator_ladder_detailed(
     use_context: bool = True,
     include_l0: bool = True,
     diversify: bool = True,
+    use_hierarchical_ranking: bool = True,
     minimum_candidates_per_level: int = 0,
     lazy_validation: bool = False,
+    completion_prior_index: CompletionPriorIndex | None = None,
 ) -> tuple[
     tuple[GenericDisconnectionCandidate, ...],
     OperatorLadderDiagnostics,
@@ -726,6 +772,9 @@ def disconnect_operator_ladder_detailed(
     selected: list[GenericDisconnectionCandidate] = []
     seen: set[str] = set()
     policy = load_retrosynthesis_ranking_policy()
+    hierarchical_prior_index = completion_prior_index
+    if diversify and use_hierarchical_ranking and hierarchical_prior_index is None:
+        hierarchical_prior_index = build_completion_prior_index(library)
     candidate_pool_size = min(
         max_candidates_to_validate,
         max(top_k, top_k * policy.candidate_pool_multiplier),
@@ -758,6 +807,13 @@ def disconnect_operator_ladder_detailed(
         diagnostics_by_level.append((level, diagnostics))
         if diversify:
             candidates = rank_operator_site_diverse(candidates, policy=policy)
+            if use_hierarchical_ranking:
+                candidates = rank_hierarchical_candidates(
+                    candidates,
+                    library,
+                    structural_policy=policy,
+                    prior_index=hierarchical_prior_index,
+                )
         candidates_by_level[level] = candidates
         if minimum_candidates_per_level > 0:
             continue
@@ -805,6 +861,7 @@ __all__ = [
     "disconnect_operator_ladder",
     "disconnect_operator_ladder_detailed",
     "rank_operator_site_diverse",
+    "rank_hierarchical_candidates",
     "rank_precursor_realism",
     "rank_site_diverse",
 ]
