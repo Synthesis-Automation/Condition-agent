@@ -1,6 +1,6 @@
 {
-  "definition_id": "retrosynthesis_ranking.v2",
-  "schema_version": "2.0",
+  "definition_id": "retrosynthesis_ranking.v3",
+  "schema_version": "3.0",
   "candidate_diversity": {
     "candidate_pool_multiplier": 4,
     "group_fields": [
@@ -10,6 +10,11 @@
     ],
     "preserve_abstraction_level_order": true,
     "structural_score_band_width": 0.05
+  },
+  "strategic_candidate_reserve": {
+    "reserved_candidates": 2,
+    "minimum_output_size": 5,
+    "maximum_structural_band_displacement": 2
   },
   "condition_reranking": {
     "status_order": [

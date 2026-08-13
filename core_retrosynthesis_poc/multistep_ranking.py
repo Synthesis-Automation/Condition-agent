@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 MULTISTEP_RANKING_POLICY_PATH = (
-    Path(__file__).with_name("definitions") / "multistep_ranking.v2.json"
+    Path(__file__).with_name("definitions") / "multistep_ranking.v3.json"
 )
 
 
@@ -29,6 +29,9 @@ class MultistepRankingPolicy:
     heuristic_terminal_penalty: float
     precursor_compatibility_band_penalty_weight: float
     precursor_realism_band_penalty_weight: float
+    strategic_progress_minimum_score: float
+    strategic_progress_deficit_penalty_weight: float
+    complexity_increasing_step_penalty: float
     candidate_rank_tiebreak: float
     condition_status_penalties: tuple[tuple[str, float], ...]
 
@@ -72,9 +75,9 @@ def load_multistep_ranking_policy() -> MultistepRankingPolicy:
     """Load and validate the versioned multistep ranking definition."""
 
     value = json.loads(MULTISTEP_RANKING_POLICY_PATH.read_text(encoding="utf-8"))
-    if value.get("definition_id") != "multistep_ranking.v2":
+    if value.get("definition_id") != "multistep_ranking.v3":
         raise ValueError("unexpected multistep ranking definition ID")
-    if value.get("schema_version") != "2.0":
+    if value.get("schema_version") != "3.0":
         raise ValueError("unsupported multistep ranking schema")
     search = value.get("search")
     costs = value.get("step_cost")
@@ -154,6 +157,18 @@ def load_multistep_ranking_policy() -> MultistepRankingPolicy:
         precursor_realism_band_penalty_weight=_nonnegative_float(
             costs.get("precursor_realism_band_penalty_weight"),
             "precursor-realism band-penalty weight",
+        ),
+        strategic_progress_minimum_score=_nonnegative_float(
+            costs.get("strategic_progress_minimum_score"),
+            "strategic-progress minimum score",
+        ),
+        strategic_progress_deficit_penalty_weight=_nonnegative_float(
+            costs.get("strategic_progress_deficit_penalty_weight"),
+            "strategic-progress deficit penalty weight",
+        ),
+        complexity_increasing_step_penalty=_nonnegative_float(
+            costs.get("complexity_increasing_step_penalty"),
+            "complexity-increasing step penalty",
         ),
         candidate_rank_tiebreak=_nonnegative_float(
             costs.get("candidate_rank_tiebreak"),

@@ -17,6 +17,10 @@ from cas_tools import (
     aggregate_precursor_realism_trace,
 )
 from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
+from reactive_taxonomy.strategic_complexity import (
+    RetrosyntheticComplexityReduction,
+    assess_retrosynthetic_complexity_reduction,
+)
 from retrosynthesis_poc.chemistry import canonical_smiles, maximum_similarity
 
 from .context import context_similarity
@@ -50,6 +54,20 @@ from .selectivity_poc import (
 @lru_cache(maxsize=20_000)
 def _reaction(smarts: str) -> object:
     return rdchiralReaction(smarts)
+
+
+@lru_cache(maxsize=50_000)
+def _strategic_complexity(
+    mapped_reaction_smiles: str,
+) -> RetrosyntheticComplexityReduction | None:
+    """Return a cached audit without weakening mandatory graph validation."""
+
+    try:
+        return assess_retrosynthetic_complexity_reduction(
+            mapped_reaction_smiles
+        )
+    except ValueError:
+        return None
 
 
 def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
@@ -247,6 +265,7 @@ def disconnect_generic_target_detailed(
             0.85 * preliminary + 0.15 * context_score if use_context else preliminary
         )
         compatibility = assess_precursor_compatibility(precursors)
+        strategic_complexity = _strategic_complexity(mapped_proposed)
         candidate = GenericDisconnectionCandidate(
             target_smiles=canonical_target,
             precursor_smiles=precursors,
@@ -287,6 +306,22 @@ def disconnect_generic_target_detailed(
             ),
             precursor_compatibility_policy_definition_id=(
                 compatibility.policy_definition_id
+            ),
+            strategic_complexity=strategic_complexity,
+            strategic_complexity_score=(
+                strategic_complexity.score
+                if strategic_complexity is not None
+                else 0.0
+            ),
+            strategic_class=(
+                strategic_complexity.strategic_class
+                if strategic_complexity is not None
+                else "unresolved"
+            ),
+            strategic_candidate=(
+                strategic_complexity.is_strategic
+                if strategic_complexity is not None
+                else False
             ),
         )
         current = candidates.get(precursors)
@@ -628,6 +663,73 @@ def rank_precursor_realism(
     )
 
 
+def _apply_strategic_candidate_reserve(
+    selected: Iterable[GenericDisconnectionCandidate],
+    candidates_by_level: dict[
+        str,
+        tuple[GenericDisconnectionCandidate, ...],
+    ],
+    *,
+    top_k: int,
+    policy: RetrosynthesisRankingPolicy,
+) -> tuple[GenericDisconnectionCandidate, ...]:
+    """Retain bounded scaffold-level alternatives when already generated."""
+
+    values = list(selected)
+    if top_k < policy.strategic_reserve_minimum_output_size or not values:
+        return tuple(values)
+    strategic_count = sum(candidate.strategic_candidate for candidate in values)
+    needed = max(0, policy.strategic_reserved_candidates - strategic_count)
+    if needed == 0:
+        return tuple(values)
+    selected_precursors = {candidate.precursor_smiles for candidate in values}
+    reserve_pool = sorted(
+        (
+            candidate
+            for level_candidates in candidates_by_level.values()
+            for candidate in level_candidates
+            if candidate.strategic_candidate
+            and candidate.precursor_smiles not in selected_precursors
+        ),
+        key=lambda candidate: (
+            policy.level_rank(candidate.abstraction_level),
+            candidate.effective_structural_score_band,
+            -candidate.strategic_complexity_score,
+            -candidate.score,
+            candidate.precursor_smiles,
+        ),
+    )
+    for strategic_candidate in reserve_pool:
+        replacement_index = next(
+            (
+                index
+                for index in range(len(values) - 1, -1, -1)
+                if not values[index].strategic_candidate
+                and values[index].abstraction_level
+                == strategic_candidate.abstraction_level
+                and strategic_candidate.effective_structural_score_band
+                <= (
+                    values[index].effective_structural_score_band
+                    + policy.strategic_maximum_band_displacement
+                )
+            ),
+            None,
+        )
+        if replacement_index is None:
+            continue
+        removed = values[replacement_index]
+        selected_precursors.discard(removed.precursor_smiles)
+        selected_precursors.add(strategic_candidate.precursor_smiles)
+        values[replacement_index] = replace(
+            strategic_candidate,
+            strategic_reserve_selected=True,
+        )
+        needed -= 1
+        if needed == 0:
+            break
+    return tuple(values)
+
+
 def disconnect_operator_ladder(
     target_smiles: str,
     library: GenericTemplateLibrary,
@@ -737,7 +839,14 @@ def disconnect_operator_ladder(
                 seen.add(candidate.precursor_smiles)
                 if len(selected) >= top_k:
                     break
-    return tuple(selected)
+    if not diversify:
+        return tuple(selected)
+    return _apply_strategic_candidate_reserve(
+        selected,
+        candidates_by_level,
+        top_k=top_k,
+        policy=policy,
+    )
 
 
 def disconnect_operator_ladder_detailed(
@@ -862,7 +971,17 @@ def disconnect_operator_ladder_detailed(
         levels_attempted=tuple(level for level, _ in diagnostics_by_level),
         level_diagnostics=tuple(diagnostics_by_level),
     )
-    return tuple(selected), diagnostics
+    if not diversify:
+        return tuple(selected), diagnostics
+    return (
+        _apply_strategic_candidate_reserve(
+            selected,
+            candidates_by_level,
+            top_k=top_k,
+            policy=policy,
+        ),
+        diagnostics,
+    )
 
 
 __all__ = [

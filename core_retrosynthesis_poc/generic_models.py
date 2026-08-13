@@ -9,6 +9,9 @@ from cas_tools import PrecursorRealismAggregation, PrecursorRealismAssessment
 from reactive_taxonomy.reactive_pair_interactions import (
     ReactivePairInteractionAssessment,
 )
+from reactive_taxonomy.strategic_complexity import (
+    RetrosyntheticComplexityReduction,
+)
 
 from .models import CenterReactivityContext, TemplateContext
 from .selectivity_poc import FunctionalGroupCompetitionWarning
@@ -379,6 +382,11 @@ class GenericDisconnectionCandidate:
     precursor_compatibility_warning_strength: Optional[str] = None
     precursor_compatibility_band_penalty: int = 0
     precursor_compatibility_policy_definition_id: str = ""
+    strategic_complexity: Optional[RetrosyntheticComplexityReduction] = None
+    strategic_complexity_score: float = 0.0
+    strategic_class: str = "unresolved"
+    strategic_candidate: bool = False
+    strategic_reserve_selected: bool = False
     precursor_realism_score: Optional[float] = None
     precursor_realism_assessments: Tuple[PrecursorRealismAssessment, ...] = ()
     precursor_realism_aggregation: Optional[PrecursorRealismAggregation] = None

@@ -481,8 +481,11 @@ Diversification is conservative: it round-robins chemistry-distinct groups only
 within 0.05-wide structural-score bands and never moves an L1 or L0 proposal
 ahead of an available L2 proposal. Use `--no-diversity` only for an ablation or
 before/after comparison. The versioned defaults live in
-`definitions/retrosynthesis_ranking.v2.json`; output candidates record the
+`definitions/retrosynthesis_ranking.v3.json`; output candidates record the
 policy ID, original structural rank, diversity rank, group key, and score band.
+The same policy reserves up to two already-generated strategic alternatives
+for outputs of at least five candidates, with a maximum two-band displacement.
+The reserve never generates chemistry or bypasses forward validation.
 
 The default ranking now adds a second conservative hierarchy after mandatory
 forward validation and structural band assignment. It first ranks distinct
@@ -496,11 +499,22 @@ abstraction-level and effective score-band partition, so the hierarchy cannot
 promote L1/L0 over L2 or cross a structural/realism band. Every candidate
 serializes its completion group, probability, backoff level, support
 denominator, stage scores/ranks, and
-`hierarchical_retrosynthesis_ranking.v1` definition ID. `--no-diversity`
+`hierarchical_retrosynthesis_ranking.v2` definition ID. SITE1 includes the
+deterministic strategic-complexity reduction score inside its existing
+abstraction-level and structural-score-band partition. `--no-diversity`
 disables both this hierarchy and the earlier diversity pass for a controlled
 ablation. Use `--no-hierarchical-ranking` to retain the legacy diversity pass
 and isolate the hierarchy's contribution. The policy is declared in
-`definitions/hierarchical_ranking.v1.json`.
+`definitions/hierarchical_ranking.v2.json`.
+
+Strategic complexity is derived from mapped product bonds and product-derived
+precursor atoms by
+`../reactive_taxonomy/definitions/strategic_complexity.v1.json`.
+The trace reports core fragmentation, ring-topology reduction, graph-complexity
+change, stereochemical simplification, convergency, and tactical penalties.
+Functional-group interconversions and protection changes remain valid but rank
+as tactical; missing scaffold-level proposals are reported separately as an
+operator-coverage warning.
 
 Precursor compatibility is assessed before hierarchical ranking. Chemical
 pair knowledge is declared in
@@ -772,7 +786,8 @@ routes. It searches the configured budget before selecting the lowest-cost
 top-k solutions and retains bounded alternative paths to the same molecular
 state. Step costs, fallback and selectivity penalties, heuristic-terminal
 penalties, precursor-compatibility and realism bands, condition-availability
-penalties, and path breadth come from `multistep_ranking.v2.json`. Literature
+penalties, strategic-progress deficits, and path breadth come from
+`multistep_ranking.v3.json`. Literature
 presence is disclosed as a corpus observation rather than
 commercial-availability evidence.
 

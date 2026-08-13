@@ -1,0 +1,40 @@
+{
+  "definition_id": "strategic_complexity.v1",
+  "schema_version": "1.0",
+  "molecule_complexity": {
+    "heavy_atom": 1.0,
+    "heavy_bond": 0.5,
+    "cycle_rank": 6.0,
+    "ring_system": 2.0,
+    "fused_ring_bond": 3.0,
+    "branching": 1.5,
+    "assigned_stereocenter": 4.0,
+    "atom_environment": 0.5
+  },
+  "retrosynthetic_reduction": {
+    "frontier_secondary_component_weight": 0.15,
+    "minimum_substantive_fragment_heavy_atoms": 3,
+    "component_weights": {
+      "core_fragmentation": 0.35,
+      "ring_topology": 0.25,
+      "graph_complexity": 0.15,
+      "stereochemical_simplification": 0.10,
+      "convergency": 0.15
+    },
+    "tactical_penalties": {
+      "scaffold_split": 0.0,
+      "ring_construction": 0.0,
+      "stereochemistry_installation": 0.0,
+      "peripheral_attachment": 0.05,
+      "functional_group_interconversion": 0.15,
+      "protection_state_change": 0.25,
+      "complexity_increasing": 0.35,
+      "no_progress": 0.25,
+      "unresolved": 0.0
+    },
+    "complexity_increase_fraction_threshold": 0.05,
+    "strategic_candidate_minimum_score": 0.25,
+    "complex_target_minimum_heavy_atoms": 12,
+    "complex_target_minimum_cycle_rank": 2
+  }
+}

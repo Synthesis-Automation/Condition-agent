@@ -508,6 +508,47 @@ export interface ReactivePairInteractionAssessment {
   schema_version: string
 }
 
+export interface MoleculeComplexityTrace {
+  canonical_smiles: string
+  heavy_atom_count: number
+  heavy_bond_count: number
+  cycle_rank: number
+  ring_system_count: number
+  largest_ring_system_atom_count: number
+  fused_ring_bond_count: number
+  branching_excess: number
+  assigned_stereocenter_count: number
+  atom_environment_count: number
+  raw_complexity: number
+  definition_id: string
+  schema_version: string
+}
+
+export interface RetrosyntheticComplexityReduction {
+  score: number
+  strategic_class: string
+  is_strategic: boolean
+  evidence: string
+  target: MoleculeComplexityTrace
+  precursors: MoleculeComplexityTrace[]
+  product_derived_component_heavy_atom_counts: number[]
+  largest_retained_core_fraction: number
+  core_fragmentation_score: number
+  ring_topology_reduction_score: number
+  graph_complexity_reduction_score: number
+  graph_complexity_reduction_fraction: number
+  stereochemical_simplification_score: number
+  convergency_score: number
+  tactical_penalty: number
+  formed_product_bond_count: number
+  formed_product_ring_bond_count: number
+  product_cycle_rank_reduction: number
+  extra_precursor_heavy_atom_count: number
+  warnings: string[]
+  definition_id: string
+  schema_version: string
+}
+
 export interface RetrosynthesisCandidate {
   rank: number
   target_smiles: string
@@ -544,6 +585,11 @@ export interface RetrosynthesisCandidate {
   precursor_compatibility_warning_strength?: 'advisory' | 'strong' | null
   precursor_compatibility_band_penalty?: number
   precursor_compatibility_policy_definition_id?: string
+  strategic_complexity?: RetrosyntheticComplexityReduction | null
+  strategic_complexity_score: number
+  strategic_class: string
+  strategic_candidate: boolean
+  strategic_reserve_selected: boolean
   precursor_realism_score?: number | null
   precursor_realism_assessments?: PrecursorRealismAssessment[]
   precursor_realism_aggregation?: PrecursorRealismAggregation | null
@@ -607,6 +653,8 @@ export interface RetrosynthesisResult {
   candidate_count: number
   library_operator_count: number
   library_template_count: number
+  strategic_complexity_definition_id: string
+  strategic_candidate_count: number
   precursor_realism_enabled: boolean
   precursor_realism_sources: {
     buyable: boolean
@@ -656,6 +704,11 @@ export interface MultistepRouteCandidate {
   precursor_compatibility_warning_strength?: 'advisory' | 'strong' | null
   precursor_compatibility_band_penalty?: number
   precursor_compatibility_policy_definition_id?: string
+  strategic_complexity?: RetrosyntheticComplexityReduction | null
+  strategic_complexity_score: number
+  strategic_class: string
+  strategic_candidate: boolean
+  strategic_reserve_selected: boolean
   precursor_realism_score?: number | null
   precursor_realism_assessments?: PrecursorRealismAssessment[]
   precursor_realism_aggregation?: PrecursorRealismAggregation | null
@@ -681,6 +734,12 @@ export interface MultistepRouteEvidenceSummary {
   strong_compatibility_warning_step_count: number
   realism_assessed_step_count: number
   weakest_precursor_realism_score?: number | null
+  strategic_complexity_assessed_step_count: number
+  strategic_step_count: number
+  tactical_step_count: number
+  complexity_increasing_step_count: number
+  mean_strategic_complexity_reduction_score?: number | null
+  target_to_frontier_complexity_reduction_fraction?: number | null
   condition_assessed_step_count: number
   condition_supported_step_count: number
   condition_direct_step_count: number
@@ -769,6 +828,7 @@ export interface MultistepRetrosynthesisResult {
   condition_availability_enabled: boolean
   precursor_realism_requested: boolean
   condition_availability_requested: boolean
+  strategic_complexity_definition_id: string
   precursor_realism_sources: {
     buyable: boolean
     compound_registry: boolean

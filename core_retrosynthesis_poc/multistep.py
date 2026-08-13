@@ -8,6 +8,7 @@ from functools import lru_cache
 from typing import Any, Callable, Optional, Protocol
 
 from cas_tools import PrecursorRealismAssessment
+from reactive_taxonomy import assess_molecule_complexity
 from retrosynthesis_poc.chemistry import digest
 
 from .condition_ranking import RetrosynthesisConditionEvidence
@@ -31,7 +32,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.3"
+MULTISTEP_SCHEMA_VERSION = "1.4"
 _TERMINAL_STOCK_ROLES = frozenset(
     {
         "reactant",
@@ -138,6 +139,12 @@ class MultistepRouteEvidenceSummary:
     strong_compatibility_warning_step_count: int
     realism_assessed_step_count: int
     weakest_precursor_realism_score: Optional[float]
+    strategic_complexity_assessed_step_count: int
+    strategic_step_count: int
+    tactical_step_count: int
+    complexity_increasing_step_count: int
+    mean_strategic_complexity_reduction_score: Optional[float]
+    target_to_frontier_complexity_reduction_fraction: Optional[float]
     condition_assessed_step_count: int
     condition_supported_step_count: int
     condition_direct_step_count: int
@@ -537,6 +544,24 @@ def _step_cost(
             policy.precursor_realism_band_penalty_weight
             * candidate.precursor_realism_band_penalty
         ),
+        "strategic_progress_deficit": (
+            (
+                policy.strategic_progress_deficit_penalty_weight
+                * max(
+                    0.0,
+                    policy.strategic_progress_minimum_score
+                    - candidate.strategic_complexity_score,
+                )
+                / max(policy.strategic_progress_minimum_score, 1e-12)
+            )
+            if candidate.strategic_complexity is not None
+            else 0.0
+        ),
+        "complexity_increasing_step": (
+            policy.complexity_increasing_step_penalty
+            if candidate.strategic_class == "complexity_increasing"
+            else 0.0
+        ),
         "candidate_rank_tiebreak": (policy.candidate_rank_tiebreak * candidate_rank),
     }
     normalized = tuple((name, round(value, 8)) for name, value in components.items())
@@ -545,6 +570,9 @@ def _step_cost(
 
 def _route_evidence_summary(
     steps: tuple[RetrosynthesisRouteStep, ...],
+    *,
+    target_smiles: str = "",
+    leaves: tuple[StartingMaterialAssessment, ...] = (),
 ) -> MultistepRouteEvidenceSummary:
     """Aggregate per-step evidence without hiding the underlying traces."""
 
@@ -572,6 +600,38 @@ def _route_evidence_summary(
         dict(step.step_cost_components).get("condition_availability", 0.0)
         for step in steps
     )
+    strategic_assessments = tuple(
+        step.candidate.strategic_complexity
+        for step in steps
+        if step.candidate.strategic_complexity is not None
+    )
+    frontier_reduction = None
+    if target_smiles and leaves:
+        try:
+            target_complexity = assess_molecule_complexity(
+                target_smiles
+            ).raw_complexity
+            leaf_complexities = sorted(
+                (
+                    assess_molecule_complexity(
+                        leaf.canonical_smiles
+                    ).raw_complexity
+                    for leaf in leaves
+                ),
+                reverse=True,
+            )
+            frontier_complexity = (
+                leaf_complexities[0] + 0.15 * sum(leaf_complexities[1:])
+                if leaf_complexities
+                else target_complexity
+            )
+            frontier_reduction = round(
+                (target_complexity - frontier_complexity)
+                / max(target_complexity, frontier_complexity, 1e-12),
+                8,
+            )
+        except ValueError:
+            frontier_reduction = None
     return MultistepRouteEvidenceSummary(
         compatibility_warning_step_count=sum(
             step.candidate.precursor_compatibility_disposition != "pass"
@@ -585,6 +645,27 @@ def _route_evidence_summary(
         weakest_precursor_realism_score=(
             round(min(realism_scores), 8) if realism_scores else None
         ),
+        strategic_complexity_assessed_step_count=len(strategic_assessments),
+        strategic_step_count=sum(
+            assessment.is_strategic for assessment in strategic_assessments
+        ),
+        tactical_step_count=sum(
+            not assessment.is_strategic for assessment in strategic_assessments
+        ),
+        complexity_increasing_step_count=sum(
+            assessment.strategic_class == "complexity_increasing"
+            for assessment in strategic_assessments
+        ),
+        mean_strategic_complexity_reduction_score=(
+            round(
+                sum(assessment.score for assessment in strategic_assessments)
+                / len(strategic_assessments),
+                8,
+            )
+            if strategic_assessments
+            else None
+        ),
+        target_to_frontier_complexity_reduction_fraction=frontier_reduction,
         condition_assessed_step_count=len(condition_evidence),
         condition_supported_step_count=direct + fallback,
         condition_direct_step_count=direct,
@@ -613,6 +694,17 @@ def _route_warnings(
         step.candidate.precursor_realism_band_penalty > 0 for step in steps
     ):
         warnings.append("LOW_PRECURSOR_REALISM")
+    assessed = tuple(
+        step.candidate.strategic_complexity
+        for step in steps
+        if step.candidate.strategic_complexity is not None
+    )
+    if assessed and not any(value.is_strategic for value in assessed):
+        warnings.append("NO_STRATEGIC_COMPLEXITY_REDUCTION")
+    if any(
+        value.strategic_class == "complexity_increasing" for value in assessed
+    ):
+        warnings.append("COMPLEXITY_INCREASING_RETRO_STEP")
     evidence = tuple(
         step.condition_evidence
         for step in steps
@@ -662,7 +754,11 @@ def _attach_route_condition_evidence(
         route,
         route_cost=round(route.route_cost + route_penalty, 8),
         steps=normalized_steps,
-        evidence_summary=_route_evidence_summary(normalized_steps),
+        evidence_summary=_route_evidence_summary(
+            normalized_steps,
+            target_smiles=route.target_smiles,
+            leaves=route.leaves,
+        ),
         warnings=_route_warnings(normalized_steps, route.warnings),
     )
 
@@ -740,7 +836,11 @@ def _route_from_state(
         steps=state.steps,
         leaves=route_leaves,
         route_tree=route_tree,
-        evidence_summary=_route_evidence_summary(state.steps),
+        evidence_summary=_route_evidence_summary(
+            state.steps,
+            target_smiles=target_smiles,
+            leaves=route_leaves,
+        ),
         warnings=_route_warnings(state.steps, tuple(warnings)),
     )
 

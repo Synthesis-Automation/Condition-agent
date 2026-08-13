@@ -405,6 +405,23 @@ function RetrosynthesisDetails({
         <div className="score-orbit"><strong>{candidate.score.toFixed(3)}</strong><span>score</span></div>
       </div>
       <ReactionImage smiles={candidate.proposed_reaction_smiles} label="Proposed single-step retrosynthesis" compact />
+      {candidate.strategic_complexity && (
+        <details className="trace-panel" open>
+          <summary>Strategic complexity reduction · {(100 * candidate.strategic_complexity_score).toFixed(1)}/100 · {displayName(candidate.strategic_class)}</summary>
+          <dl className="detail-list">
+            <div><dt>Strategic scaffold step</dt><dd>{candidate.strategic_candidate ? 'Yes' : 'No — tactical or insufficient simplification'}</dd></div>
+            <div><dt>Retained target core</dt><dd>{(100 * candidate.strategic_complexity.largest_retained_core_fraction).toFixed(1)}%</dd></div>
+            <div><dt>Product-derived fragments</dt><dd>{candidate.strategic_complexity.product_derived_component_heavy_atom_counts.join(' + ') || 'Mapping unavailable'} heavy atoms</dd></div>
+            <div><dt>Core fragmentation</dt><dd>{candidate.strategic_complexity.core_fragmentation_score.toFixed(3)}</dd></div>
+            <div><dt>Ring-topology reduction</dt><dd>{candidate.strategic_complexity.ring_topology_reduction_score.toFixed(3)}</dd></div>
+            <div><dt>Graph-complexity reduction</dt><dd>{candidate.strategic_complexity.graph_complexity_reduction_fraction.toFixed(3)}</dd></div>
+            <div><dt>Convergency</dt><dd>{candidate.strategic_complexity.convergency_score.toFixed(3)}</dd></div>
+            <div><dt>Tactical penalty</dt><dd>−{candidate.strategic_complexity.tactical_penalty.toFixed(3)}</dd></div>
+            <div><dt>Target graph</dt><dd>{candidate.strategic_complexity.target.heavy_atom_count} heavy atoms · cycle rank {candidate.strategic_complexity.target.cycle_rank} · raw complexity {candidate.strategic_complexity.target.raw_complexity.toFixed(2)}</dd></div>
+          </dl>
+          <MessageList title="Strategic audit cautions" values={candidate.strategic_complexity.warnings} tone="caution" />
+        </details>
+      )}
       <MessageList
         title="Strong intramolecular compatibility warning"
         values={(candidate.precursor_compatibility_assessments ?? []).map((assessment) => assessment.message)}
@@ -456,6 +473,7 @@ function RetrosynthesisDetails({
             <div><dt>Template specificity</dt><dd>{candidate.template_specificity.toFixed(3)}</dd></div>
             <div><dt>Independent references</dt><dd>{candidate.independent_reference_support}</dd></div>
             <div><dt>Forward validation</dt><dd>{displayName(candidate.forward_validation_status)}</dd></div>
+            <div><dt>Strategic reduction</dt><dd>{(100 * candidate.strategic_complexity_score).toFixed(1)}/100 · {displayName(candidate.strategic_class)}</dd></div>
             {candidate.precursor_realism_score != null && <div><dt>Precursor realism</dt><dd>{candidate.precursor_realism_score.toFixed(3)}</dd></div>}
           </dl>
         </section>
@@ -509,6 +527,8 @@ function RetrosynthesisDetails({
           <div><strong>Diversity rank</strong><span>{candidate.diversity_rank || candidate.rank}</span></div>
           <div><strong>Score band</strong><span>{candidate.structural_score_band}</span></div>
           {candidate.precursor_compatibility_policy_definition_id && <div><strong>Compatibility policy</strong><span>{candidate.precursor_compatibility_policy_definition_id}</span></div>}
+          {candidate.strategic_complexity && <div><strong>Strategic-complexity policy</strong><span>{candidate.strategic_complexity.definition_id}</span></div>}
+          {candidate.strategic_reserve_selected && <div><strong>Strategic reserve</strong><span>Retained as a bounded scaffold-level alternative</span></div>}
           {(candidate.precursor_compatibility_band_penalty ?? 0) > 0 && <div><strong>Compatibility action</strong><span>{displayName(candidate.precursor_compatibility_disposition ?? 'demote')} · band +{candidate.precursor_compatibility_band_penalty}</span></div>}
           {candidate.hierarchical_ranking_definition_id && <div><strong>Hierarchical policy</strong><span>{candidate.hierarchical_ranking_definition_id}</span></div>}
           {candidate.hierarchical_rank > 0 && <div><strong>Hierarchical rerank</strong><span>{candidate.pre_hierarchical_rank} → {candidate.hierarchical_rank}</span></div>}
@@ -563,6 +583,7 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
           <div><strong>{result.candidate_count}</strong><span>candidates</span></div>
           <div><strong>{result.library_operator_count}</strong><span>operators</span></div>
           <div><strong>{result.library_template_count}</strong><span>templates</span></div>
+          <div><strong>{result.strategic_candidate_count}</strong><span>strategic</span></div>
         </div>
       </div>
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No retrosynthesis candidates')}</div>}
@@ -571,12 +592,13 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th>{result.precursor_realism_enabled && <th>Realism</th>}<th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Score</th><th>Strategic</th>{result.precursor_realism_enabled && <th>Realism</th>}<th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.candidates.map((candidate, index) => (
                   <tr key={`${candidate.template_id}:${candidate.precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
                     <td><strong>{candidate.rank}</strong></td>
                     <td>{candidate.score.toFixed(3)}</td>
+                    <td>{(100 * candidate.strategic_complexity_score).toFixed(1)} · {displayName(candidate.strategic_class)}</td>
                     {result.precursor_realism_enabled && <td>{candidate.precursor_realism_score?.toFixed(3) ?? '—'}</td>}
                     <td>{candidate.abstraction_level}</td>
                     <td>{displayName(candidate.transformation_kind ?? 'graph operator')}</td>
@@ -609,6 +631,13 @@ function MultistepRouteDetails({
         <div className="score-orbit"><strong>{route.route_cost.toFixed(3)}</strong><span>cost</span></div>
       </div>
 
+      <dl className="detail-list">
+        <div><dt>Strategic steps</dt><dd>{route.evidence_summary.strategic_step_count}/{route.evidence_summary.strategic_complexity_assessed_step_count}</dd></div>
+        <div><dt>Tactical steps</dt><dd>{route.evidence_summary.tactical_step_count}</dd></div>
+        <div><dt>Mean strategic reduction</dt><dd>{route.evidence_summary.mean_strategic_complexity_reduction_score == null ? '—' : `${(100 * route.evidence_summary.mean_strategic_complexity_reduction_score).toFixed(1)}/100`}</dd></div>
+        <div><dt>Target → frontier reduction</dt><dd>{route.evidence_summary.target_to_frontier_complexity_reduction_fraction == null ? '—' : `${(100 * route.evidence_summary.target_to_frontier_complexity_reduction_fraction).toFixed(1)}%`}</dd></div>
+      </dl>
+
       <section className="route-step-list" aria-label="Retrosynthetic route steps">
         {route.steps.map((step, index) => (
           <article className="route-step-card" key={step.step_id}>
@@ -628,6 +657,7 @@ function MultistepRouteDetails({
               <div><dt>Forward validation</dt><dd>{displayName(step.candidate.forward_validation_status)}</dd></div>
               <div><dt>Independent support</dt><dd>{step.candidate.independent_reference_support}</dd></div>
               {step.candidate.precursor_realism_score != null && <div><dt>Precursor realism</dt><dd>{step.candidate.precursor_realism_score.toFixed(3)} · band +{step.candidate.precursor_realism_band_penalty}</dd></div>}
+              <div><dt>Strategic reduction</dt><dd>{(100 * step.candidate.strategic_complexity_score).toFixed(1)}/100 · {displayName(step.candidate.strategic_class)}</dd></div>
               {(step.candidate.precursor_compatibility_band_penalty ?? 0) > 0 && <div><dt>Compatibility audit</dt><dd>{displayName(step.candidate.precursor_compatibility_disposition ?? 'warn')} · band +{step.candidate.precursor_compatibility_band_penalty}</dd></div>}
               {step.condition_evidence && <div><dt>Condition availability</dt><dd>{displayName(step.condition_evidence.status)} · {step.condition_evidence.compatible_candidate_count} compatible precedents</dd></div>}
               <div><dt>Operator</dt><dd className="mono-value">{step.candidate.operator_id}</dd></div>
@@ -738,7 +768,7 @@ export function MultistepRetrosynthesisResults({ result }: { result: MultistepRe
         <div className="results-layout multistep-results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Route</th><th>Status</th><th>Steps</th><th>Depth</th><th>Cost</th><th>Realism</th><th>Conditions</th><th>Strong incompat.</th><th>Terminal leaves</th></tr></thead>
+              <thead><tr><th>Route</th><th>Status</th><th>Steps</th><th>Depth</th><th>Cost</th><th>Strategic steps</th><th>Frontier reduction</th><th>Realism</th><th>Conditions</th><th>Strong incompat.</th><th>Terminal leaves</th></tr></thead>
               <tbody>
                 {availableRoutes.map((route, index) => (
                   <tr key={route.route_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
@@ -747,6 +777,8 @@ export function MultistepRetrosynthesisResults({ result }: { result: MultistepRe
                     <td>{route.reaction_count}</td>
                     <td>{route.maximum_depth}</td>
                     <td>{route.route_cost.toFixed(3)}</td>
+                    <td>{route.evidence_summary.strategic_step_count}/{route.evidence_summary.strategic_complexity_assessed_step_count}</td>
+                    <td>{route.evidence_summary.target_to_frontier_complexity_reduction_fraction == null ? '—' : `${(100 * route.evidence_summary.target_to_frontier_complexity_reduction_fraction).toFixed(1)}%`}</td>
                     <td>{route.evidence_summary.weakest_precursor_realism_score == null ? '—' : route.evidence_summary.weakest_precursor_realism_score.toFixed(3)}</td>
                     <td>{route.evidence_summary.condition_assessed_step_count === 0 ? '—' : `${route.evidence_summary.condition_supported_step_count}/${route.evidence_summary.condition_assessed_step_count}`}</td>
                     <td>{route.evidence_summary.strong_compatibility_warning_step_count}</td>

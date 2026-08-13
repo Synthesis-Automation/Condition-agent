@@ -59,8 +59,8 @@ def _candidate(
 def test_ranking_policy_is_versioned_and_general() -> None:
     policy = load_retrosynthesis_ranking_policy()
 
-    assert policy.definition_id == "retrosynthesis_ranking.v2"
-    assert policy.schema_version == "2.0"
+    assert policy.definition_id == "retrosynthesis_ranking.v3"
+    assert policy.schema_version == "3.0"
     assert policy.diversity_group_fields == (
         "operator_id",
         "disconnection_site_key",
@@ -73,9 +73,11 @@ def test_ranking_policy_is_versioned_and_general() -> None:
     assert policy.precursor_realism_band_penalty(0.50) == 1
     assert policy.precursor_realism_band_penalty(0.25) == 2
     assert policy.precursor_realism_band_penalty(0.05) == 3
+    assert policy.strategic_reserved_candidates == 2
+    assert policy.strategic_maximum_band_displacement == 2
 
     multistep = load_multistep_ranking_policy()
-    assert multistep.definition_id == "multistep_ranking.v2"
+    assert multistep.definition_id == "multistep_ranking.v3"
     assert multistep.maximum_paths_per_state == 2
     assert multistep.minimum_candidates_per_level == 0
     assert multistep.abstraction_penalty("L0") == 0.15
@@ -101,7 +103,7 @@ def test_diversity_interleaves_groups_only_within_structural_band() -> None:
     assert [value.structural_score_band for value in ranked] == [0, 0, 0, 4]
     assert ranked[1].diversity_group_key == ("B", "site-b", "syn-b")
     assert all(
-        value.ranking_policy_definition_id == "retrosynthesis_ranking.v2"
+        value.ranking_policy_definition_id == "retrosynthesis_ranking.v3"
         for value in ranked
     )
     assert [value.precursor_smiles for value in reversed_input] == [
@@ -323,6 +325,51 @@ def test_operator_ladder_expands_pool_before_diverse_selection(
 
     assert requested_sizes == [8]
     assert [value.precursor_smiles for value in ranked] == ["a1", "b"]
+
+
+def test_operator_ladder_reserves_a_bounded_strategic_candidate(
+    monkeypatch,
+) -> None:
+    routine = tuple(
+        _candidate(
+            f"routine-{index}",
+            0.90 - index * 0.01,
+            operator=f"R{index}",
+            site=f"routine-site-{index}",
+            synthon=f"routine-synthon-{index}",
+        )
+        for index in range(5)
+    )
+    strategic = replace(
+        _candidate(
+            "strategic",
+            0.79,
+            operator="S",
+            site="strategic-site",
+            synthon="strategic-synthon",
+        ),
+        strategic_complexity_score=0.7,
+        strategic_class="scaffold_split",
+        strategic_candidate=True,
+    )
+    monkeypatch.setattr(
+        search_module,
+        "disconnect_generic_target",
+        lambda *args, **kwargs: (*routine, strategic),
+    )
+
+    ranked = disconnect_operator_ladder(
+        "CC",
+        object(),
+        top_k=5,
+        use_hierarchical_ranking=False,
+    )
+
+    assert len(ranked) == 5
+    retained = next(
+        candidate for candidate in ranked if candidate.precursor_smiles == "strategic"
+    )
+    assert retained.strategic_reserve_selected is True
 
 
 def test_operator_ladder_reserves_multistep_fallback_levels(monkeypatch) -> None:

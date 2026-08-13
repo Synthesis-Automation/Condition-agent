@@ -16,6 +16,7 @@ from cas_tools import (
     MoleculeIndexMatch,
     build_canonical_molecule_index,
 )
+from reactive_taxonomy import assess_retrosynthetic_complexity_reduction
 
 
 class _LiteratureIndex:
@@ -370,7 +371,7 @@ def test_search_does_not_stop_at_first_more_expensive_solved_route() -> None:
 
     assert result.routes[0].reaction_count == 2
     assert result.routes[0].route_cost < 2.55
-    assert result.ranking_policy_definition_id == "multistep_ranking.v2"
+    assert result.ranking_policy_definition_id == "multistep_ranking.v3"
 
 
 def test_search_retains_distinct_paths_to_the_same_leaf_state() -> None:
@@ -499,3 +500,35 @@ def test_condition_queries_are_cached_across_routes() -> None:
     assert len(result.routes) == 2
     assert len(calls) == 3
     assert calls.count("CCCCCCC>>CCCCCCCC") == 1
+
+
+def test_multistep_cost_penalizes_tactical_complexity_stagnation() -> None:
+    mapped_reaction = (
+        "[CH3:1][I:9].[OH:2][C:3]([CH3:4])=[O:5]>>"
+        "[CH3:1][O:2][C:3]([CH3:4])=[O:5]"
+    )
+    assessment = assess_retrosynthetic_complexity_reduction(mapped_reaction)
+    candidate = replace(
+        _candidate("CCCCCCCC", "C.C", score=1.0),
+        strategic_complexity=assessment,
+        strategic_complexity_score=assessment.score,
+        strategic_class=assessment.strategic_class,
+        strategic_candidate=assessment.is_strategic,
+    )
+
+    result = plan_multistep_routes(
+        "CCCCCCCC",
+        object(),
+        _LiteratureIndex(),
+        max_depth=2,
+        molecular_weight_threshold=50.0,
+        expander=_expander({"CCCCCCCC": (candidate,)}),
+    )
+
+    route = result.routes[0]
+    assert dict(route.steps[0].step_cost_components)[
+        "strategic_progress_deficit"
+    ] > 0.39
+    assert route.evidence_summary.strategic_step_count == 0
+    assert route.evidence_summary.tactical_step_count == 1
+    assert "NO_STRATEGIC_COMPLEXITY_REDUCTION" in route.warnings

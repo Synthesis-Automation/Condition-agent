@@ -36,7 +36,11 @@ from core_retrosynthesis_poc import (
     plan_multistep_routes,
     recommend_retrosynthesis_conditions,
 )
-from reactive_taxonomy import RxnMapperProvider
+from reactive_taxonomy import (
+    STRATEGIC_COMPLEXITY_DEFINITION_ID,
+    RxnMapperProvider,
+    complex_target_requires_strategic_candidate,
+)
 from visualization import (
     render_molecule_image_bytes,
     render_reaction_image_bytes,
@@ -688,7 +692,10 @@ class LocalRecommendationRuntime:
             ),
         )
         realism_scorer = None
-        close_realism_sources = lambda: None
+
+        def close_realism_sources() -> None:
+            return None
+
         if request.use_precursor_realism:
             realism_scorer, close_realism_sources = (
                 self._precursor_realism_scorer()
@@ -774,6 +781,22 @@ class LocalRecommendationRuntime:
                     "No literature molecule index was available; literature "
                     "evidence was treated as absent."
                 )
+        strategic_assessments = tuple(
+            getattr(candidate, "strategic_complexity", None)
+            for candidate in candidates
+            if getattr(candidate, "strategic_complexity", None) is not None
+        )
+        if (
+            strategic_assessments
+            and complex_target_requires_strategic_candidate(
+                strategic_assessments[0]
+            )
+            and not any(
+                assessment.is_strategic
+                for assessment in strategic_assessments
+            )
+        ):
+            warnings.append("NO_SCAFFOLD_SIMPLIFYING_CANDIDATE_GENERATED")
         return {
             "target_smiles": (
                 candidates[0].target_smiles
@@ -783,8 +806,15 @@ class LocalRecommendationRuntime:
             "library_mode": request.library_mode,
             "valid": bool(candidates),
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
-            "schema_version": "1.6",
+            "schema_version": "1.7",
             "precursor_realism_enabled": request.use_precursor_realism,
+            "strategic_complexity_definition_id": (
+                STRATEGIC_COMPLEXITY_DEFINITION_ID
+            ),
+            "strategic_candidate_count": sum(
+                bool(getattr(candidate, "strategic_candidate", False))
+                for candidate in candidates
+            ),
             "precursor_realism_sources": {
                 "buyable": bool(
                     self._prefer_stock_portfolio
@@ -860,7 +890,10 @@ class LocalRecommendationRuntime:
             else CanonicalMoleculeIndex(stock_path)
         )
         realism_scorer = None
-        close_realism_sources = lambda: None
+
+        def close_realism_sources() -> None:
+            return None
+
         if request.use_precursor_realism:
             realism_scorer, close_realism_sources = (
                 self._precursor_realism_scorer()
@@ -961,6 +994,9 @@ class LocalRecommendationRuntime:
                 "precursor_realism_requested": request.use_precursor_realism,
                 "condition_availability_requested": (
                     request.use_condition_availability
+                ),
+                "strategic_complexity_definition_id": (
+                    STRATEGIC_COMPLEXITY_DEFINITION_ID
                 ),
                 "precursor_realism_sources": {
                     "buyable": bool(

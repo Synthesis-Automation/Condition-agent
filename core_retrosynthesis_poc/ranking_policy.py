@@ -14,7 +14,7 @@ from .generic_models import GenericDisconnectionCandidate
 
 RANKING_POLICY_PATH = (
     Path(__file__).with_name("definitions")
-    / "retrosynthesis_ranking.v2.json"
+    / "retrosynthesis_ranking.v3.json"
 )
 _ALLOWED_GROUP_FIELDS = frozenset(
     {
@@ -45,6 +45,9 @@ class RetrosynthesisRankingPolicy:
     abstraction_level_order: Tuple[str, ...]
     condition_status_order: Tuple[str, ...]
     precursor_realism_band_penalties: Tuple[Tuple[float, int], ...]
+    strategic_reserved_candidates: int
+    strategic_reserve_minimum_output_size: int
+    strategic_maximum_band_displacement: int
 
     def level_rank(self, level: str) -> int:
         """Return the configured specificity rank for one abstraction level."""
@@ -87,16 +90,17 @@ def load_retrosynthesis_ranking_policy() -> RetrosynthesisRankingPolicy:
     """Load and validate the canonical general ranking policy."""
 
     value = json.loads(RANKING_POLICY_PATH.read_text(encoding="utf-8"))
-    if value.get("definition_id") != "retrosynthesis_ranking.v2":
+    if value.get("definition_id") != "retrosynthesis_ranking.v3":
         raise ValueError("unexpected retrosynthesis ranking definition ID")
-    if value.get("schema_version") != "2.0":
+    if value.get("schema_version") != "3.0":
         raise ValueError("unsupported retrosynthesis ranking schema")
     diversity = value.get("candidate_diversity")
     condition = value.get("condition_reranking")
     realism = value.get("precursor_realism_reranking")
+    strategic_reserve = value.get("strategic_candidate_reserve")
     if not all(
         isinstance(section, dict)
-        for section in (diversity, condition, realism)
+        for section in (diversity, condition, realism, strategic_reserve)
     ):
         raise ValueError(
             "ranking policy requires diversity, condition, and realism rules"
@@ -158,6 +162,17 @@ def load_retrosynthesis_ranking_policy() -> RetrosynthesisRankingPolicy:
         for (_, left_penalty), (_, right_penalty) in zip(penalties, penalties[1:])
     ):
         raise ValueError("lower realism must not receive a smaller band penalty")
+    strategic_integer_fields = (
+        ("reserved_candidates", 1),
+        ("minimum_output_size", 1),
+        ("maximum_structural_band_displacement", 0),
+    )
+    normalized_strategic_fields = {}
+    for field, minimum in strategic_integer_fields:
+        raw = strategic_reserve.get(field)
+        if isinstance(raw, bool) or not isinstance(raw, int) or raw < minimum:
+            raise ValueError(f"strategic reserve {field} must be at least {minimum}")
+        normalized_strategic_fields[field] = raw
     return RetrosynthesisRankingPolicy(
         definition_id=str(value["definition_id"]),
         schema_version=str(value["schema_version"]),
@@ -175,6 +190,15 @@ def load_retrosynthesis_ranking_policy() -> RetrosynthesisRankingPolicy:
         abstraction_level_order=level_order,
         condition_status_order=status_order,
         precursor_realism_band_penalties=tuple(penalties),
+        strategic_reserved_candidates=normalized_strategic_fields[
+            "reserved_candidates"
+        ],
+        strategic_reserve_minimum_output_size=normalized_strategic_fields[
+            "minimum_output_size"
+        ],
+        strategic_maximum_band_displacement=normalized_strategic_fields[
+            "maximum_structural_band_displacement"
+        ],
     )
 
 

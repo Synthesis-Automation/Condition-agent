@@ -126,14 +126,15 @@ def _candidate(
 def test_hierarchical_policy_is_versioned_and_conservative() -> None:
     policy = load_hierarchical_ranking_policy()
 
-    assert policy.definition_id == "hierarchical_retrosynthesis_ranking.v1"
-    assert policy.schema_version == "1.0"
+    assert policy.definition_id == "hierarchical_retrosynthesis_ranking.v2"
+    assert policy.schema_version == "2.0"
     assert policy.backoff_order == ("operator_synthon", "operator", "global")
     assert policy.minimum_context_independent_support == 2
     assert policy.laplace_alpha == 1.0
     assert policy.preserve_abstraction_level_order is True
     assert policy.preserve_structural_score_bands is True
     assert sum(policy.weights("realization").values()) == pytest.approx(1.0)
+    assert policy.weights("site")["strategic_complexity_reduction"] == 0.25
 
 
 def test_completion_prior_uses_explicit_smoothed_backoff() -> None:
@@ -258,7 +259,7 @@ def test_hierarchy_ranks_sites_then_synthons_and_realizations() -> None:
     assert [candidate.hierarchical_rank for candidate in ranked] == [1, 2, 3]
     assert all(
         candidate.hierarchical_ranking_definition_id
-        == "hierarchical_retrosynthesis_ranking.v1"
+        == "hierarchical_retrosynthesis_ranking.v2"
         for candidate in ranked
     )
 
@@ -305,6 +306,43 @@ def test_hierarchy_cannot_cross_score_band_or_abstraction_level() -> None:
         ("L2", 2),
         ("L1", 0),
     ]
+
+
+def test_strategic_complexity_contributes_only_to_site_ranking() -> None:
+    tactical = _candidate(
+        "tactical",
+        0.90,
+        site="site-tactical",
+        operator="op-a",
+        synthon="syn-a",
+        realization="real-minor",
+        template="template-minor",
+    )
+    strategic = replace(
+        _candidate(
+            "strategic",
+            0.87,
+            site="site-strategic",
+            operator="op-a",
+            synthon="syn-a",
+            realization="real-major",
+            template="template-major",
+        ),
+        strategic_complexity_score=0.8,
+        strategic_class="scaffold_split",
+        strategic_candidate=True,
+    )
+
+    ranked = rank_hierarchical_candidates(
+        rank_operator_site_diverse((tactical, strategic)),
+        _library(),
+    )
+
+    assert [candidate.precursor_smiles for candidate in ranked] == [
+        "strategic",
+        "tactical",
+    ]
+    assert ranked[0].hierarchical_site_score > ranked[1].hierarchical_site_score
 
 
 def test_missing_prior_is_retained_as_uncertainty() -> None:

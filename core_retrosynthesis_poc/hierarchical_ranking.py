@@ -28,7 +28,7 @@ from .ranking_policy import (
 
 
 HIERARCHICAL_RANKING_POLICY_PATH = (
-    Path(__file__).with_name("definitions") / "hierarchical_ranking.v1.json"
+    Path(__file__).with_name("definitions") / "hierarchical_ranking.v2.json"
 )
 _BACKOFF_ORDER = ("operator_synthon", "operator", "global")
 
@@ -194,9 +194,9 @@ def load_hierarchical_ranking_policy() -> HierarchicalRankingPolicy:
     """Load and validate the canonical hierarchical ranking definition."""
 
     value = json.loads(HIERARCHICAL_RANKING_POLICY_PATH.read_text(encoding="utf-8"))
-    if value.get("definition_id") != "hierarchical_retrosynthesis_ranking.v1":
+    if value.get("definition_id") != "hierarchical_retrosynthesis_ranking.v2":
         raise ValueError("unexpected hierarchical ranking definition ID")
-    if value.get("schema_version") != "1.0":
+    if value.get("schema_version") != "2.0":
         raise ValueError("unsupported hierarchical ranking schema")
     applicability = value.get("applicability")
     prior = value.get("completion_prior")
@@ -219,7 +219,13 @@ def load_hierarchical_ranking_policy() -> HierarchicalRankingPolicy:
         raise ValueError("completion-prior backoff order is unsupported")
     site = _validated_weights(
         scores.get("site"),
-        required=frozenset({"structural_score", "independent_support"}),
+        required=frozenset(
+            {
+                "structural_score",
+                "independent_support",
+                "strategic_complexity_reduction",
+            }
+        ),
         field="site",
     )
     synthon = _validated_weights(
@@ -469,6 +475,9 @@ def rank_hierarchical_candidates(
                             resolved.independent_support_saturation,
                         )
                         for value in group
+                    ),
+                    "strategic_complexity_reduction": max(
+                        value.strategic_complexity_score for value in group
                     ),
                 },
                 resolved.weights("site"),
