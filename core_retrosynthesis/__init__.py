@@ -1,0 +1,233 @@
+"""Chemistry-first, type-agnostic retrosynthesis."""
+
+from .compiler import CompilationResult, compile_core_templates
+from .condition_ranking import (
+    ConditionRankedRetrosynthesisCandidate,
+    RetrosynthesisConditionEvidence,
+    rank_retrosynthesis_candidates_with_conditions,
+    recommend_retrosynthesis_conditions,
+)
+from .comparison import run_comparison, split_by_reference
+from .ensemble import EnsembleCandidate, disconnect_ensemble
+from .coverage_audit import audit_operator_library_coverage
+from .full_scale import (
+    FullScaleBuildConfig,
+    build_full_scale_operator_library,
+    compile_operator_shard,
+    merge_operator_shards,
+)
+from .generic_compiler import (
+    GenericCompilationResult,
+    GenericReactionIdentity,
+    analyze_generic_reaction,
+    compile_generic_templates,
+)
+from .generic_library import (
+    build_generic_library,
+    load_generic_library,
+    save_generic_library,
+)
+from .generic_models import (
+    GenericCoreTemplate,
+    GenericDisconnectionCandidate,
+    GenericGraphOperator,
+    GenericRetrievalIndex,
+    GenericSearchDiagnostics,
+    GenericHandleCompletionGroup,
+    GenericTemplateLibrary,
+    OperatorLadderDiagnostics,
+    StrategyProposal,
+)
+from .generic_search import (
+    disconnect_generic_target,
+    disconnect_generic_target_detailed,
+    disconnect_operator_ladder,
+    disconnect_operator_ladder_detailed,
+    rank_operator_site_diverse,
+    rank_precursor_realism,
+)
+from .hierarchical_ranking import (
+    CompletionPriorEvidence,
+    CompletionPriorIndex,
+    HierarchicalRankingPolicy,
+    build_completion_prior_index,
+    load_hierarchical_ranking_policy,
+    rank_hierarchical_candidates,
+)
+from .html_report import render_comparison_html, write_comparison_html
+from .library import build_library, load_library, save_library
+from .models import (
+    CenterReactivityContext,
+    CoreDisconnectionCandidate,
+    CoreLibraryBuildReport,
+    CoreTemplate,
+    CoreTemplateLibrary,
+    CoreTemplatePrecedent,
+    TemplateContext,
+)
+from .multistep import (
+    MultistepRouteEvidenceSummary,
+    MultistepRetrosynthesisResult,
+    MultistepRetrosynthesisRoute,
+    MultistepSearchDiagnostics,
+    OneStepExpansionBatch,
+    RetrosynthesisRouteStep,
+    StartingMaterialAssessment,
+    plan_multistep_routes,
+)
+from .route_tree import (
+    CanonicalRouteTree,
+    RouteTreeMoleculeNode,
+    RouteTreeReactionNode,
+    build_canonical_route_tree,
+    route_distance_matrix,
+    route_tree_distance,
+)
+from .multistep_ranking import (
+    MultistepRankingPolicy,
+    load_multistep_ranking_policy,
+)
+from .operator_benchmark import (
+    load_operator_rows,
+    run_operator_coverage_benchmark,
+)
+from .precursor_compatibility import (
+    PrecursorCompatibilityPolicy,
+    PrecursorCompatibilityResult,
+    assess_precursor_compatibility,
+    load_precursor_compatibility_policy,
+    validate_precursor_compatibility_policy,
+)
+from .ranking_policy import (
+    RetrosynthesisRankingPolicy,
+    load_retrosynthesis_ranking_policy,
+)
+from .search import disconnect_target
+from .selectivity_poc import (
+    ChoiceModelTrainingReport,
+    ConditionalEditChoiceModel,
+    FunctionalGroupCompetitionOutcome,
+    FunctionalGroupCompetitionWarning,
+    RankedReactionOutcome,
+    ReactionChoiceSet,
+    ReactionOutcomeCandidate,
+    SelectivityAssessment,
+    build_reaction_choice_set,
+    build_reaction_choice_set_from_record,
+    condition_tokens_from_mapping,
+    condition_tokens_from_recipe,
+    detect_functional_group_competition,
+)
+from .strategy_identity import STRATEGY_ID_NAMESPACE, build_strategy_id
+from .strategy_search import disconnect_strategies, group_strategy_candidates
+from .sources import (
+    LIBRARY_MODES,
+    iter_library_rows,
+    resolve_library_mode,
+    source_shard_files,
+)
+
+__all__ = [
+    "CenterReactivityContext",
+    "CompilationResult",
+    "ChoiceModelTrainingReport",
+    "ConditionalEditChoiceModel",
+    "ConditionRankedRetrosynthesisCandidate",
+    "CompletionPriorEvidence",
+    "CompletionPriorIndex",
+    "CoreDisconnectionCandidate",
+    "CoreLibraryBuildReport",
+    "CoreTemplate",
+    "CoreTemplateLibrary",
+    "CoreTemplatePrecedent",
+    "EnsembleCandidate",
+    "FullScaleBuildConfig",
+    "FunctionalGroupCompetitionOutcome",
+    "FunctionalGroupCompetitionWarning",
+    "GenericCompilationResult",
+    "GenericCoreTemplate",
+    "GenericDisconnectionCandidate",
+    "GenericGraphOperator",
+    "GenericRetrievalIndex",
+    "GenericReactionIdentity",
+    "GenericSearchDiagnostics",
+    "GenericHandleCompletionGroup",
+    "GenericTemplateLibrary",
+    "HierarchicalRankingPolicy",
+    "OperatorLadderDiagnostics",
+    "PrecursorCompatibilityPolicy",
+    "PrecursorCompatibilityResult",
+    "LIBRARY_MODES",
+    "MultistepRetrosynthesisResult",
+    "MultistepRetrosynthesisRoute",
+    "MultistepRouteEvidenceSummary",
+    "MultistepRankingPolicy",
+    "MultistepSearchDiagnostics",
+    "OneStepExpansionBatch",
+    "CanonicalRouteTree",
+    "RouteTreeMoleculeNode",
+    "RouteTreeReactionNode",
+    "RankedReactionOutcome",
+    "ReactionChoiceSet",
+    "ReactionOutcomeCandidate",
+    "RetrosynthesisConditionEvidence",
+    "RetrosynthesisRouteStep",
+    "RetrosynthesisRankingPolicy",
+    "SelectivityAssessment",
+    "StartingMaterialAssessment",
+    "STRATEGY_ID_NAMESPACE",
+    "StrategyProposal",
+    "TemplateContext",
+    "analyze_generic_reaction",
+    "audit_operator_library_coverage",
+    "build_full_scale_operator_library",
+    "build_library",
+    "build_reaction_choice_set",
+    "assess_precursor_compatibility",
+    "build_reaction_choice_set_from_record",
+    "build_generic_library",
+    "build_completion_prior_index",
+    "compile_generic_templates",
+    "compile_core_templates",
+    "compile_operator_shard",
+    "condition_tokens_from_mapping",
+    "condition_tokens_from_recipe",
+    "disconnect_target",
+    "detect_functional_group_competition",
+    "disconnect_ensemble",
+    "disconnect_generic_target",
+    "disconnect_generic_target_detailed",
+    "disconnect_operator_ladder",
+    "disconnect_operator_ladder_detailed",
+    "disconnect_strategies",
+    "load_library",
+    "load_generic_library",
+    "load_hierarchical_ranking_policy",
+    "load_operator_rows",
+    "load_precursor_compatibility_policy",
+    "load_retrosynthesis_ranking_policy",
+    "load_multistep_ranking_policy",
+    "iter_library_rows",
+    "merge_operator_shards",
+    "plan_multistep_routes",
+    "rank_retrosynthesis_candidates_with_conditions",
+    "recommend_retrosynthesis_conditions",
+    "rank_operator_site_diverse",
+    "rank_hierarchical_candidates",
+    "rank_precursor_realism",
+    "group_strategy_candidates",
+    "build_strategy_id",
+    "build_canonical_route_tree",
+    "route_distance_matrix",
+    "route_tree_distance",
+    "run_comparison",
+    "run_operator_coverage_benchmark",
+    "render_comparison_html",
+    "resolve_library_mode",
+    "validate_precursor_compatibility_policy",
+    "save_library",
+    "save_generic_library",
+    "split_by_reference",
+    "source_shard_files",
+    "write_comparison_html",
+]

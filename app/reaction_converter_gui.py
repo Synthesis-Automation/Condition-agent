@@ -28,11 +28,11 @@ from condition_recommender.conversion.artifacts import (  # noqa: E402
 from condition_recommender.conversion.input_schema import (  # noqa: E402
     discover_conversion_datasets,
 )
-from core_retrosynthesis_poc import (  # noqa: E402
+from core_retrosynthesis import (  # noqa: E402
     FullScaleBuildConfig,
     build_full_scale_operator_library,
 )
-from core_retrosynthesis_poc.sources import (  # noqa: E402
+from core_retrosynthesis.sources import (  # noqa: E402
     COMBINED_BATCH_MANIFEST_FILENAME,
 )
 from reactive_taxonomy import RxnMapperProvider  # noqa: E402

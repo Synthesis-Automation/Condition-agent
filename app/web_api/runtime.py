@@ -29,7 +29,7 @@ from condition_recommender import (
 from condition_recommender.reaction_completion import (
     validate_completion_selections,
 )
-from core_retrosynthesis_poc import (
+from core_retrosynthesis import (
     GenericTemplateLibrary,
     disconnect_operator_ladder,
     load_generic_library,

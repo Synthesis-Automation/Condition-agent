@@ -1,1 +1,0 @@
-"""Standalone retrosynthesis POC tests."""
