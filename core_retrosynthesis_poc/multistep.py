@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import heapq
 from dataclasses import asdict, dataclass, replace
+from functools import lru_cache
 from typing import Any, Callable, Optional, Protocol
 
+from cas_tools import PrecursorRealismAssessment
 from retrosynthesis_poc.chemistry import digest
 
+from .condition_ranking import RetrosynthesisConditionEvidence
 from .generic_models import (
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
@@ -28,7 +31,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.2"
+MULTISTEP_SCHEMA_VERSION = "1.3"
 _TERMINAL_STOCK_ROLES = frozenset(
     {
         "reactant",
@@ -61,6 +64,11 @@ class OneStepExpansionBatch:
 OneStepExpander = Callable[
     [str, int],
     tuple[GenericDisconnectionCandidate, ...] | OneStepExpansionBatch,
+]
+ConditionEvidenceEvaluator = Callable[[str], RetrosynthesisConditionEvidence]
+PrecursorRealismScorer = Callable[
+    [str],
+    tuple[PrecursorRealismAssessment, ...],
 ]
 
 
@@ -99,6 +107,7 @@ class RetrosynthesisRouteStep:
     candidate: GenericDisconnectionCandidate
     product_node_id: str = ""
     precursor_node_ids: tuple[str, ...] = ()
+    condition_evidence: Optional[RetrosynthesisConditionEvidence] = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible route step."""
@@ -113,7 +122,34 @@ class RetrosynthesisRouteStep:
             "candidate": self.candidate.to_dict(),
             "product_node_id": self.product_node_id,
             "precursor_node_ids": list(self.precursor_node_ids),
+            "condition_evidence": (
+                self.condition_evidence.to_dict()
+                if self.condition_evidence is not None
+                else None
+            ),
         }
+
+
+@dataclass(frozen=True)
+class MultistepRouteEvidenceSummary:
+    """Route-level audit of step realism, compatibility, and conditions."""
+
+    compatibility_warning_step_count: int
+    strong_compatibility_warning_step_count: int
+    realism_assessed_step_count: int
+    weakest_precursor_realism_score: Optional[float]
+    condition_assessed_step_count: int
+    condition_supported_step_count: int
+    condition_direct_step_count: int
+    condition_fallback_step_count: int
+    condition_insufficient_step_count: int
+    condition_coverage_fraction: Optional[float]
+    condition_cost_penalty: float
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible route evidence summary."""
+
+        return asdict(self)
 
 
 @dataclass(frozen=True)
@@ -129,6 +165,7 @@ class MultistepRetrosynthesisRoute:
     steps: tuple[RetrosynthesisRouteStep, ...]
     leaves: tuple[StartingMaterialAssessment, ...]
     route_tree: CanonicalRouteTree
+    evidence_summary: MultistepRouteEvidenceSummary
     warnings: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
@@ -144,6 +181,7 @@ class MultistepRetrosynthesisRoute:
             "steps": [step.to_dict() for step in self.steps],
             "leaves": [leaf.to_dict() for leaf in self.leaves],
             "route_tree": self.route_tree.to_dict(),
+            "evidence_summary": self.evidence_summary.to_dict(),
             "warnings": list(self.warnings),
         }
 
@@ -189,11 +227,32 @@ class MultistepRetrosynthesisResult:
     max_depth: int
     molecular_weight_threshold: float
     ranking_policy_definition_id: str
+    precursor_realism_enabled: bool = False
+    condition_availability_enabled: bool = False
     schema_version: str = MULTISTEP_SCHEMA_VERSION
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible result."""
 
+        warnings = [
+            "Literature matches mean observed in the configured corpus, "
+            "not verified commercial availability.",
+            "Molecular-weight terminals are a search heuristic and still "
+            "require chemist review.",
+            "Literature matches are terminal only when retained provenance "
+            "identifies a reactant-like source role; rebuild legacy indexes "
+            "with source_role provenance.",
+        ]
+        if self.precursor_realism_enabled:
+            warnings.append(
+                "Precursor realism is a versioned evidence heuristic, not a "
+                "probability or a hard feasibility filter."
+            )
+        if self.condition_availability_enabled:
+            warnings.append(
+                "Condition availability reports precedent support for each "
+                "retained reaction; it does not guarantee route execution."
+            )
         return {
             "target_smiles": self.target_smiles,
             "routes": [route.to_dict() for route in self.routes],
@@ -202,6 +261,8 @@ class MultistepRetrosynthesisResult:
             "max_depth": self.max_depth,
             "molecular_weight_threshold": self.molecular_weight_threshold,
             "ranking_policy_definition_id": (self.ranking_policy_definition_id),
+            "precursor_realism_enabled": self.precursor_realism_enabled,
+            "condition_availability_enabled": self.condition_availability_enabled,
             "schema_version": self.schema_version,
             "route_postprocessing": {
                 "definition_id": "route_distance_multiset_jaccard.v1",
@@ -213,15 +274,7 @@ class MultistepRetrosynthesisResult:
                     )
                 ],
             },
-            "warnings": [
-                "Literature matches mean observed in the configured corpus, "
-                "not verified commercial availability.",
-                "Molecular-weight terminals are a search heuristic and still "
-                "require chemist review.",
-                "Literature matches are terminal only when retained provenance "
-                "identifies a reactant-like source role; rebuild legacy indexes "
-                "with source_role provenance.",
-            ],
+            "warnings": warnings,
         }
 
 
@@ -476,10 +529,142 @@ def _step_cost(
                 for leaf in child_leaves
             )
         ),
+        "precursor_compatibility": (
+            policy.precursor_compatibility_band_penalty_weight
+            * candidate.precursor_compatibility_band_penalty
+        ),
+        "precursor_realism": (
+            policy.precursor_realism_band_penalty_weight
+            * candidate.precursor_realism_band_penalty
+        ),
         "candidate_rank_tiebreak": (policy.candidate_rank_tiebreak * candidate_rank),
     }
     normalized = tuple((name, round(value, 8)) for name, value in components.items())
     return round(sum(value for _, value in normalized), 8), normalized
+
+
+def _route_evidence_summary(
+    steps: tuple[RetrosynthesisRouteStep, ...],
+) -> MultistepRouteEvidenceSummary:
+    """Aggregate per-step evidence without hiding the underlying traces."""
+
+    realism_scores = tuple(
+        float(step.candidate.precursor_realism_score)
+        for step in steps
+        if step.candidate.precursor_realism_score is not None
+    )
+    condition_evidence = tuple(
+        step.condition_evidence
+        for step in steps
+        if step.condition_evidence is not None
+    )
+    direct = sum(
+        evidence.status == "recommended_direct" for evidence in condition_evidence
+    )
+    fallback = sum(
+        evidence.status == "recommended_fallback" for evidence in condition_evidence
+    )
+    insufficient = sum(
+        evidence.status == "insufficient_evidence"
+        for evidence in condition_evidence
+    )
+    condition_penalty = sum(
+        dict(step.step_cost_components).get("condition_availability", 0.0)
+        for step in steps
+    )
+    return MultistepRouteEvidenceSummary(
+        compatibility_warning_step_count=sum(
+            step.candidate.precursor_compatibility_disposition != "pass"
+            for step in steps
+        ),
+        strong_compatibility_warning_step_count=sum(
+            step.candidate.precursor_compatibility_warning_strength == "strong"
+            for step in steps
+        ),
+        realism_assessed_step_count=len(realism_scores),
+        weakest_precursor_realism_score=(
+            round(min(realism_scores), 8) if realism_scores else None
+        ),
+        condition_assessed_step_count=len(condition_evidence),
+        condition_supported_step_count=direct + fallback,
+        condition_direct_step_count=direct,
+        condition_fallback_step_count=fallback,
+        condition_insufficient_step_count=insufficient,
+        condition_coverage_fraction=(
+            round((direct + fallback) / len(condition_evidence), 8)
+            if condition_evidence
+            else None
+        ),
+        condition_cost_penalty=round(condition_penalty, 8),
+    )
+
+
+def _route_warnings(
+    steps: tuple[RetrosynthesisRouteStep, ...],
+    existing: tuple[str, ...],
+) -> tuple[str, ...]:
+    warnings = list(existing)
+    if any(
+        step.candidate.precursor_compatibility_warning_strength == "strong"
+        for step in steps
+    ):
+        warnings.append("STRONG_INTRAMOLECULAR_COMPATIBILITY_WARNING")
+    if any(
+        step.candidate.precursor_realism_band_penalty > 0 for step in steps
+    ):
+        warnings.append("LOW_PRECURSOR_REALISM")
+    evidence = tuple(
+        step.condition_evidence
+        for step in steps
+        if step.condition_evidence is not None
+    )
+    if any(value.status == "recommended_fallback" for value in evidence):
+        warnings.append("CONDITION_FALLBACK_USED")
+    if any(value.status == "insufficient_evidence" for value in evidence):
+        warnings.append("CONDITION_EVIDENCE_INCOMPLETE")
+    return tuple(dict.fromkeys(warnings))
+
+
+def _attach_route_condition_evidence(
+    route: MultistepRetrosynthesisRoute,
+    evaluator: ConditionEvidenceEvaluator,
+    cache: dict[str, RetrosynthesisConditionEvidence],
+) -> MultistepRetrosynthesisRoute:
+    """Attach cached condition evidence and its declarative route penalty."""
+
+    policy = load_multistep_ranking_policy()
+    steps = []
+    route_penalty = 0.0
+    for step in route.steps:
+        query = (
+            step.candidate.condition_query_reaction_smiles
+            or step.candidate.proposed_reaction_smiles
+        )
+        evidence = cache.get(query)
+        if evidence is None:
+            evidence = evaluator(query)
+            cache[query] = evidence
+        penalty = round(policy.condition_status_penalty(evidence.status), 8)
+        route_penalty += penalty
+        components = tuple(
+            (*step.step_cost_components, ("condition_availability", penalty))
+        )
+        steps.append(
+            replace(
+                step,
+                step_cost=round(step.step_cost + penalty, 8),
+                step_cost_components=components,
+                condition_evidence=evidence,
+            )
+        )
+    normalized_steps = tuple(steps)
+    return replace(
+        route,
+        route_cost=round(route.route_cost + route_penalty, 8),
+        steps=normalized_steps,
+        evidence_summary=_route_evidence_summary(normalized_steps),
+        warnings=_route_warnings(normalized_steps, route.warnings),
+    )
 
 
 def _route_from_state(
@@ -555,7 +740,8 @@ def _route_from_state(
         steps=state.steps,
         leaves=route_leaves,
         route_tree=route_tree,
-        warnings=tuple(warnings),
+        evidence_summary=_route_evidence_summary(state.steps),
+        warnings=_route_warnings(state.steps, tuple(warnings)),
     )
 
 
@@ -579,6 +765,8 @@ def plan_multistep_routes(
     allow_untyped_literature_terminals: bool = False,
     max_paths_per_state: int | None = None,
     minimum_candidates_per_level: int | None = None,
+    precursor_realism_scorer: PrecursorRealismScorer | None = None,
+    condition_evidence_evaluator: ConditionEvidenceEvaluator | None = None,
     expander: OneStepExpander | None = None,
 ) -> MultistepRetrosynthesisResult:
     """Find short routes whose leaves pass the explicit terminal predicate."""
@@ -618,6 +806,17 @@ def plan_multistep_routes(
         if diversify and use_hierarchical_ranking
         else None
     )
+    active_realism_scorer: PrecursorRealismScorer | None = None
+    if precursor_realism_scorer is not None:
+        uncached_realism_scorer = precursor_realism_scorer
+
+        @lru_cache(maxsize=20_000)
+        def cached_realism_scorer(
+            precursor_smiles: str,
+        ) -> tuple[PrecursorRealismAssessment, ...]:
+            return uncached_realism_scorer(precursor_smiles)
+
+        active_realism_scorer = cached_realism_scorer
 
     def default_expander(
         product_smiles: str,
@@ -635,6 +834,7 @@ def plan_multistep_routes(
             use_hierarchical_ranking=use_hierarchical_ranking,
             minimum_candidates_per_level=active_minimum_per_level,
             lazy_validation=True,
+            precursor_realism_scorer=active_realism_scorer,
             completion_prior_index=completion_prior_index,
         )
         return OneStepExpansionBatch(candidates, diagnostics)
@@ -942,16 +1142,43 @@ def plan_multistep_routes(
                 limited,
             )
 
+    solved_route_values = tuple(
+        _route_from_state(
+            target.canonical_smiles,
+            state,
+            max_depth=max_depth,
+        )
+        for state in solved_states.values()
+    )
+    partial_route_values = tuple(
+        _route_from_state(
+            target.canonical_smiles,
+            state,
+            max_depth=max_depth,
+        )
+        for state in partial_states.values()
+    )
+    if condition_evidence_evaluator is not None:
+        condition_cache: dict[str, RetrosynthesisConditionEvidence] = {}
+        solved_route_values = tuple(
+            _attach_route_condition_evidence(
+                route,
+                condition_evidence_evaluator,
+                condition_cache,
+            )
+            for route in solved_route_values
+        )
+        partial_route_values = tuple(
+            _attach_route_condition_evidence(
+                route,
+                condition_evidence_evaluator,
+                condition_cache,
+            )
+            for route in partial_route_values
+        )
     solved_routes = tuple(
         sorted(
-            (
-                _route_from_state(
-                    target.canonical_smiles,
-                    state,
-                    max_depth=max_depth,
-                )
-                for state in solved_states.values()
-            ),
+            solved_route_values,
             key=lambda route: (
                 route.route_cost,
                 route.reaction_count,
@@ -961,14 +1188,7 @@ def plan_multistep_routes(
     )
     partial_routes = tuple(
         sorted(
-            (
-                _route_from_state(
-                    target.canonical_smiles,
-                    state,
-                    max_depth=max_depth,
-                )
-                for state in partial_states.values()
-            ),
+            partial_route_values,
             key=lambda route: (
                 sum(not leaf.terminal for leaf in route.leaves),
                 route.route_cost,
@@ -1006,12 +1226,15 @@ def plan_multistep_routes(
         max_depth=max_depth,
         molecular_weight_threshold=molecular_weight_threshold,
         ranking_policy_definition_id=ranking_policy.definition_id,
+        precursor_realism_enabled=precursor_realism_scorer is not None,
+        condition_availability_enabled=condition_evidence_evaluator is not None,
     )
 
 
 __all__ = [
     "MULTISTEP_SCHEMA_VERSION",
     "LiteratureLookup",
+    "MultistepRouteEvidenceSummary",
     "MultistepRetrosynthesisResult",
     "MultistepRetrosynthesisRoute",
     "MultistepSearchDiagnostics",

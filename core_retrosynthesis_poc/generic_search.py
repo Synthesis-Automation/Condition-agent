@@ -753,6 +753,9 @@ def disconnect_operator_ladder_detailed(
     use_hierarchical_ranking: bool = True,
     minimum_candidates_per_level: int = 0,
     lazy_validation: bool = False,
+    precursor_realism_scorer: (
+        Callable[[str], tuple[PrecursorRealismAssessment, ...]] | None
+    ) = None,
     completion_prior_index: CompletionPriorIndex | None = None,
 ) -> tuple[
     tuple[GenericDisconnectionCandidate, ...],
@@ -805,6 +808,11 @@ def disconnect_operator_ladder_detailed(
             ),
         )
         diagnostics_by_level.append((level, diagnostics))
+        if precursor_realism_scorer is not None:
+            candidates = _attach_precursor_realism(
+                candidates,
+                precursor_realism_scorer,
+            )
         if diversify:
             candidates = rank_operator_site_diverse(candidates, policy=policy)
             if use_hierarchical_ranking:
@@ -814,6 +822,8 @@ def disconnect_operator_ladder_detailed(
                     structural_policy=policy,
                     prior_index=hierarchical_prior_index,
                 )
+        elif precursor_realism_scorer is not None:
+            candidates = rank_precursor_realism(candidates, policy=policy)
         candidates_by_level[level] = candidates
         if minimum_candidates_per_level > 0:
             continue

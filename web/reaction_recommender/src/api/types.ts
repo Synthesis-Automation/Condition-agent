@@ -422,6 +422,8 @@ export interface MultistepRetrosynthesisRequest {
   include_l0: boolean
   use_context: boolean
   diversify: boolean
+  use_precursor_realism: boolean
+  use_condition_availability: boolean
 }
 
 export interface RetrosynthesisConditionsRequest {
@@ -648,6 +650,17 @@ export interface MultistepRouteCandidate {
   realization_id: string
   disconnection_site_key: string
   synthon_signature: string
+  condition_query_reaction_smiles?: string
+  precursor_compatibility_assessments?: ReactivePairInteractionAssessment[]
+  precursor_compatibility_disposition?: 'pass' | 'warn' | 'demote' | 'reject'
+  precursor_compatibility_warning_strength?: 'advisory' | 'strong' | null
+  precursor_compatibility_band_penalty?: number
+  precursor_compatibility_policy_definition_id?: string
+  precursor_realism_score?: number | null
+  precursor_realism_assessments?: PrecursorRealismAssessment[]
+  precursor_realism_aggregation?: PrecursorRealismAggregation | null
+  precursor_realism_band_penalty: number
+  effective_structural_score_band: number
 }
 
 export interface MultistepRouteStep {
@@ -660,6 +673,21 @@ export interface MultistepRouteStep {
   candidate: MultistepRouteCandidate
   product_node_id: string
   precursor_node_ids: string[]
+  condition_evidence?: RetrosynthesisConditionEvidence | null
+}
+
+export interface MultistepRouteEvidenceSummary {
+  compatibility_warning_step_count: number
+  strong_compatibility_warning_step_count: number
+  realism_assessed_step_count: number
+  weakest_precursor_realism_score?: number | null
+  condition_assessed_step_count: number
+  condition_supported_step_count: number
+  condition_direct_step_count: number
+  condition_fallback_step_count: number
+  condition_insufficient_step_count: number
+  condition_coverage_fraction?: number | null
+  condition_cost_penalty: number
 }
 
 export interface RouteTreeMoleculeNode {
@@ -702,6 +730,7 @@ export interface MultistepRetrosynthesisRoute {
   steps: MultistepRouteStep[]
   leaves: StartingMaterialAssessment[]
   route_tree: CanonicalRouteTree
+  evidence_summary: MultistepRouteEvidenceSummary
   warnings: string[]
 }
 
@@ -736,6 +765,15 @@ export interface MultistepRetrosynthesisResult {
   max_depth: 2 | 3
   molecular_weight_threshold: number
   ranking_policy_definition_id: string
+  precursor_realism_enabled: boolean
+  condition_availability_enabled: boolean
+  precursor_realism_requested: boolean
+  condition_availability_requested: boolean
+  precursor_realism_sources: {
+    buyable: boolean
+    compound_registry: boolean
+    literature: boolean
+  }
   route_count: number
   partial_route_count: number
   library_operator_count: number

@@ -1,6 +1,6 @@
 {
-  "definition_id": "multistep_ranking.v1",
-  "schema_version": "1.0",
+  "definition_id": "multistep_ranking.v2",
+  "schema_version": "2.0",
   "search": {
     "maximum_paths_per_state": 2,
     "minimum_candidates_per_level": 0
@@ -16,6 +16,15 @@
     },
     "selectivity_warning_penalty": 0.25,
     "heuristic_terminal_penalty": 0.2,
+    "precursor_compatibility_band_penalty_weight": 0.5,
+    "precursor_realism_band_penalty_weight": 0.2,
     "candidate_rank_tiebreak": 0.000001
+  },
+  "condition_postprocessing": {
+    "status_penalties": {
+      "recommended_direct": 0.0,
+      "recommended_fallback": 0.15,
+      "insufficient_evidence": 0.75
+    }
   }
 }

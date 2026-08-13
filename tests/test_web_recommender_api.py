@@ -433,6 +433,8 @@ def test_local_runtime_runs_multistep_planner_with_web_limits(
     assert captured["max_candidates_to_validate"] == 10
     assert captured["include_l0"] is False
     assert captured["diversify"] is False
+    assert captured["precursor_realism_scorer"] is None
+    assert captured["condition_evidence_evaluator"] is None
     assert payload["valid"] is True
     assert payload["route_count"] == 1
 

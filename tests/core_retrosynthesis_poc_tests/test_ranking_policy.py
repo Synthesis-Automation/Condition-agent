@@ -6,9 +6,13 @@ from dataclasses import replace
 
 from cas_tools import PrecursorEvidence, assess_precursor_realism
 import core_retrosynthesis_poc.generic_search as search_module
-from core_retrosynthesis_poc.generic_models import GenericDisconnectionCandidate
+from core_retrosynthesis_poc.generic_models import (
+    GenericDisconnectionCandidate,
+    GenericSearchDiagnostics,
+)
 from core_retrosynthesis_poc.generic_search import (
     disconnect_operator_ladder,
+    disconnect_operator_ladder_detailed,
     rank_operator_site_diverse,
     rank_precursor_realism,
 )
@@ -71,7 +75,7 @@ def test_ranking_policy_is_versioned_and_general() -> None:
     assert policy.precursor_realism_band_penalty(0.05) == 3
 
     multistep = load_multistep_ranking_policy()
-    assert multistep.definition_id == "multistep_ranking.v1"
+    assert multistep.definition_id == "multistep_ranking.v2"
     assert multistep.maximum_paths_per_state == 2
     assert multistep.minimum_candidates_per_level == 0
     assert multistep.abstraction_penalty("L0") == 0.15
@@ -269,6 +273,36 @@ def test_realism_option_attaches_component_score_before_diversity(monkeypatch) -
         ranked[0].precursor_realism_aggregation.known_substantial_component_bonus
         == 0.0
     )
+
+
+def test_detailed_operator_ladder_applies_the_same_realism_ranking(
+    monkeypatch,
+) -> None:
+    unlikely = _candidate("CO", 0.90, operator="A", site="a", synthon="a")
+    realistic = _candidate("CCO", 0.87, operator="B", site="b", synthon="b")
+    monkeypatch.setattr(
+        search_module,
+        "disconnect_generic_target_detailed",
+        lambda *args, **kwargs: (
+            (unlikely, realistic),
+            GenericSearchDiagnostics(valid_candidate_count=2),
+        ),
+    )
+
+    def scorer(smiles):
+        evidence = PrecursorEvidence(smiles == "CCO", False, False)
+        return (assess_precursor_realism(smiles, evidence),)
+
+    ranked, diagnostics = disconnect_operator_ladder_detailed(
+        "CC",
+        object(),
+        top_k=2,
+        precursor_realism_scorer=scorer,
+    )
+
+    assert [candidate.precursor_smiles for candidate in ranked] == ["CCO", "CO"]
+    assert ranked[0].precursor_realism_score == 0.95
+    assert diagnostics.valid_action_count == 2
 
 
 def test_operator_ladder_expands_pool_before_diverse_selection(

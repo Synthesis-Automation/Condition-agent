@@ -771,7 +771,8 @@ depth-, candidate-, and search-limited partial routes separately from solved
 routes. It searches the configured budget before selecting the lowest-cost
 top-k solutions and retains bounded alternative paths to the same molecular
 state. Step costs, fallback and selectivity penalties, heuristic-terminal
-penalties, and path breadth come from `multistep_ranking.v1.json`. Literature
+penalties, precursor-compatibility and realism bands, condition-availability
+penalties, and path breadth come from `multistep_ranking.v2.json`. Literature
 presence is disclosed as a corpus observation rather than
 commercial-availability evidence.
 

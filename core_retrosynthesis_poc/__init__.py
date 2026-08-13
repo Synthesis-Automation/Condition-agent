@@ -65,6 +65,7 @@ from .models import (
     TemplateContext,
 )
 from .multistep import (
+    MultistepRouteEvidenceSummary,
     MultistepRetrosynthesisResult,
     MultistepRetrosynthesisRoute,
     MultistepSearchDiagnostics,
@@ -156,6 +157,7 @@ __all__ = [
     "LIBRARY_MODES",
     "MultistepRetrosynthesisResult",
     "MultistepRetrosynthesisRoute",
+    "MultistepRouteEvidenceSummary",
     "MultistepRankingPolicy",
     "MultistepSearchDiagnostics",
     "OneStepExpansionBatch",

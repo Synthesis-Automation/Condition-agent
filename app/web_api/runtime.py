@@ -859,28 +859,92 @@ class LocalRecommendationRuntime:
             if stock_type == "supplier_stock_portfolio"
             else CanonicalMoleculeIndex(stock_path)
         )
-        with stock_context as stock_index:
-            result = plan_multistep_routes(
-                request.target_smiles.strip(),
-                library,
-                stock_index,
-                max_depth=request.max_depth,
-                molecular_weight_threshold=(
-                    request.molecular_weight_threshold
-                ),
-                top_k_routes=request.top_k_routes,
-                per_step_top_k=5,
-                beam_width=max(12, request.top_k_routes * 3),
-                max_expansions=max(4, request.top_k_routes),
-                max_templates_to_apply=WEB_MULTISTEP_TEMPLATE_BUDGET,
-                max_candidates_to_validate=(
-                    WEB_MULTISTEP_VALIDATION_BUDGET
-                ),
-                use_context=request.use_context,
-                include_l0=request.include_l0,
-                diversify=request.diversify,
+        realism_scorer = None
+        close_realism_sources = lambda: None
+        if request.use_precursor_realism:
+            realism_scorer, close_realism_sources = (
+                self._precursor_realism_scorer()
             )
+        condition_recommender = None
+        condition_setup_warning = None
+        if request.use_condition_availability:
+            try:
+                condition_recommender = self._get_recommender(
+                    library_mode=request.library_mode,
+                    use_rxnmapper=False,
+                    include_review=False,
+                )
+            except FileNotFoundError:
+                condition_setup_warning = "CONDITION_INDEX_UNAVAILABLE"
+
+        def condition_evidence(reaction_smiles: str):
+            if condition_recommender is None:
+                raise RuntimeError("condition recommender is unavailable")
+            return recommend_retrosynthesis_conditions(
+                reaction_smiles,
+                condition_recommender,
+                condition_top_k=3,
+            )
+
+        try:
+            with stock_context as stock_index:
+                result = plan_multistep_routes(
+                    request.target_smiles.strip(),
+                    library,
+                    stock_index,
+                    max_depth=request.max_depth,
+                    molecular_weight_threshold=(
+                        request.molecular_weight_threshold
+                    ),
+                    top_k_routes=request.top_k_routes,
+                    per_step_top_k=5,
+                    beam_width=max(12, request.top_k_routes * 3),
+                    max_expansions=max(4, request.top_k_routes),
+                    max_templates_to_apply=WEB_MULTISTEP_TEMPLATE_BUDGET,
+                    max_candidates_to_validate=(
+                        WEB_MULTISTEP_VALIDATION_BUDGET
+                    ),
+                    use_context=request.use_context,
+                    include_l0=request.include_l0,
+                    diversify=request.diversify,
+                    precursor_realism_scorer=realism_scorer,
+                    condition_evidence_evaluator=(
+                        condition_evidence
+                        if condition_recommender is not None
+                        else None
+                    ),
+                )
+        finally:
+            close_realism_sources()
         payload = result.to_dict()
+        if condition_recommender is not None:
+            reference_catalog = self._get_reference_catalog(
+                condition_recommender.source_path
+            )
+            experimental_catalog = self._get_experimental_detail_catalog(
+                condition_recommender.source_path
+            )
+            for route in (*payload["routes"], *payload["partial_routes"]):
+                for step in route["steps"]:
+                    evidence = step.get("condition_evidence")
+                    if not evidence:
+                        continue
+                    recommendation_payload = {
+                        "recommendations": list(
+                            evidence.get("recommendations") or ()
+                        )
+                    }
+                    attach_recommendation_references(
+                        recommendation_payload,
+                        reference_catalog,
+                    )
+                    attach_recommendation_experimental_details(
+                        recommendation_payload,
+                        experimental_catalog,
+                    )
+                    evidence["recommendations"] = recommendation_payload[
+                        "recommendations"
+                    ]
         elapsed_seconds = round(time.perf_counter() - started_at, 3)
         payload.update(
             {
@@ -894,6 +958,18 @@ class LocalRecommendationRuntime:
                 "library_operator_count": len(library.operators),
                 "library_template_count": len(library.templates),
                 "search_elapsed_seconds": elapsed_seconds,
+                "precursor_realism_requested": request.use_precursor_realism,
+                "condition_availability_requested": (
+                    request.use_condition_availability
+                ),
+                "precursor_realism_sources": {
+                    "buyable": bool(
+                        self._prefer_stock_portfolio
+                        and self.stock_portfolio_path.is_file()
+                    ),
+                    "compound_registry": True,
+                    "literature": self.literature_index_path.is_file(),
+                },
                 "terminal_stock_source": {
                     "type": stock_type,
                     "name": stock_path.name,
@@ -909,6 +985,8 @@ class LocalRecommendationRuntime:
                 },
             }
         )
+        if condition_setup_warning is not None:
+            payload["warnings"].append(condition_setup_warning)
         return payload
 
     def render_reaction(

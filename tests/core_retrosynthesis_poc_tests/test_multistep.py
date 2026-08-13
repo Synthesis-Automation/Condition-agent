@@ -7,6 +7,7 @@ from dataclasses import replace
 
 from core_retrosynthesis_poc import (
     GenericDisconnectionCandidate,
+    RetrosynthesisConditionEvidence,
     plan_multistep_routes,
     route_tree_distance,
 )
@@ -93,6 +94,37 @@ def _expander(mapping):
         return tuple(mapping.get(product, ()))[:top_k]
 
     return expand
+
+
+def _condition_evidence(
+    reaction_smiles: str,
+    status: str,
+) -> RetrosynthesisConditionEvidence:
+    return RetrosynthesisConditionEvidence(
+        status=status,
+        query_reaction_smiles=reaction_smiles,
+        recommender_valid=status != "insufficient_evidence",
+        recommendation_mode="verified_signature",
+        retrieval_level="L4" if status != "insufficient_evidence" else None,
+        uses_type_agnostic_fallback=status == "recommended_fallback",
+        candidate_count=1 if status != "insufficient_evidence" else 0,
+        independent_candidate_count=1 if status != "insufficient_evidence" else 0,
+        compatible_candidate_count=1 if status != "insufficient_evidence" else 0,
+        independent_compatible_candidate_count=(
+            1 if status != "insufficient_evidence" else 0
+        ),
+        excluded_candidate_count=0,
+        best_recipe_score=0.8 if status != "insufficient_evidence" else None,
+        best_recipe_compatibility_score=(
+            1.0 if status != "insufficient_evidence" else None
+        ),
+        best_recipe_reference_support=(
+            1 if status != "insufficient_evidence" else 0
+        ),
+        recommendations=(),
+        warnings=(),
+        error=None,
+    )
 
 
 def test_two_depth_route_requires_every_leaf_to_be_terminal() -> None:
@@ -338,7 +370,7 @@ def test_search_does_not_stop_at_first_more_expensive_solved_route() -> None:
 
     assert result.routes[0].reaction_count == 2
     assert result.routes[0].route_cost < 2.55
-    assert result.ranking_policy_definition_id == "multistep_ranking.v1"
+    assert result.ranking_policy_definition_id == "multistep_ranking.v2"
 
 
 def test_search_retains_distinct_paths_to_the_same_leaf_state() -> None:
@@ -369,3 +401,101 @@ def test_search_retains_distinct_paths_to_the_same_leaf_state() -> None:
     ) > 0.0
     matrix = result.to_dict()["route_postprocessing"]["distance_matrix"]
     assert matrix[0][1] == matrix[1][0]
+
+
+def test_route_cost_and_summary_include_compatibility_and_realism() -> None:
+    candidate = replace(
+        _candidate("CCCCCCCC", "C.C", score=1.0),
+        precursor_compatibility_disposition="demote",
+        precursor_compatibility_warning_strength="strong",
+        precursor_compatibility_band_penalty=2,
+        precursor_realism_score=0.2,
+        precursor_realism_band_penalty=3,
+    )
+
+    result = plan_multistep_routes(
+        "CCCCCCCC",
+        object(),
+        _LiteratureIndex(),
+        max_depth=2,
+        molecular_weight_threshold=50.0,
+        expander=_expander({"CCCCCCCC": (candidate,)}),
+    )
+
+    route = result.routes[0]
+    components = dict(route.steps[0].step_cost_components)
+    assert components["precursor_compatibility"] == 1.0
+    assert components["precursor_realism"] == 0.6
+    assert route.evidence_summary.strong_compatibility_warning_step_count == 1
+    assert route.evidence_summary.weakest_precursor_realism_score == 0.2
+    assert "STRONG_INTRAMOLECULAR_COMPATIBILITY_WARNING" in route.warnings
+    assert "LOW_PRECURSOR_REALISM" in route.warnings
+
+
+def test_condition_availability_reranks_routes_and_is_auditable() -> None:
+    no_conditions = _candidate("CCCCCCCC", "C.C", score=1.0)
+    supported = _candidate("CCCCCCCC", "N.O", score=0.8)
+
+    def evaluate(reaction_smiles: str) -> RetrosynthesisConditionEvidence:
+        status = (
+            "insufficient_evidence"
+            if reaction_smiles.startswith("C.C>>")
+            else "recommended_direct"
+        )
+        return _condition_evidence(reaction_smiles, status)
+
+    result = plan_multistep_routes(
+        "CCCCCCCC",
+        object(),
+        _LiteratureIndex(),
+        max_depth=2,
+        molecular_weight_threshold=50.0,
+        top_k_routes=2,
+        condition_evidence_evaluator=evaluate,
+        expander=_expander({"CCCCCCCC": (no_conditions, supported)}),
+    )
+
+    assert result.routes[0].steps[0].candidate.precursor_smiles == "N.O"
+    unsupported = next(
+        route
+        for route in result.routes
+        if route.steps[0].candidate.precursor_smiles == "C.C"
+    )
+    assert dict(unsupported.steps[0].step_cost_components)[
+        "condition_availability"
+    ] == 0.75
+    assert unsupported.evidence_summary.condition_insufficient_step_count == 1
+    assert unsupported.evidence_summary.condition_coverage_fraction == 0.0
+    assert "CONDITION_EVIDENCE_INCOMPLETE" in unsupported.warnings
+    assert result.condition_availability_enabled is True
+
+
+def test_condition_queries_are_cached_across_routes() -> None:
+    calls: list[str] = []
+
+    def evaluate(reaction_smiles: str) -> RetrosynthesisConditionEvidence:
+        calls.append(reaction_smiles)
+        return _condition_evidence(reaction_smiles, "recommended_direct")
+
+    result = plan_multistep_routes(
+        "CCCCCCCC",
+        object(),
+        _LiteratureIndex(),
+        max_depth=2,
+        molecular_weight_threshold=50.0,
+        top_k_routes=2,
+        condition_evidence_evaluator=evaluate,
+        expander=_expander(
+            {
+                "CCCCCCCC": (_candidate("CCCCCCCC", "CCCCCCC"),),
+                "CCCCCCC": (
+                    _candidate("CCCCCCC", "C.C"),
+                    _candidate("CCCCCCC", "N.O"),
+                ),
+            }
+        ),
+    )
+
+    assert len(result.routes) == 2
+    assert len(calls) == 3
+    assert calls.count("CCCCCCC>>CCCCCCCC") == 1

@@ -617,13 +617,67 @@ function MultistepRouteDetails({
               <small>{step.candidate.abstraction_level} · score {step.candidate.score.toFixed(3)}</small>
             </div>
             <ReactionImage smiles={step.candidate.proposed_reaction_smiles} label={`Route reaction ${index + 1}`} compact />
+            <MessageList
+              title="Strong intramolecular compatibility warning"
+              values={(step.candidate.precursor_compatibility_assessments ?? []).map((assessment) => assessment.message)}
+              tone="caution"
+            />
             <dl className="detail-list">
               <div><dt>Precursors</dt><dd>{step.precursor_smiles.join(' · ')}</dd></div>
               <div><dt>Step cost</dt><dd>{step.step_cost.toFixed(3)} · {Object.entries(step.step_cost_components).filter(([, value]) => value > 0).map(([name, value]) => `${displayName(name)} ${value.toFixed(3)}`).join(' · ')}</dd></div>
               <div><dt>Forward validation</dt><dd>{displayName(step.candidate.forward_validation_status)}</dd></div>
               <div><dt>Independent support</dt><dd>{step.candidate.independent_reference_support}</dd></div>
+              {step.candidate.precursor_realism_score != null && <div><dt>Precursor realism</dt><dd>{step.candidate.precursor_realism_score.toFixed(3)} · band +{step.candidate.precursor_realism_band_penalty}</dd></div>}
+              {(step.candidate.precursor_compatibility_band_penalty ?? 0) > 0 && <div><dt>Compatibility audit</dt><dd>{displayName(step.candidate.precursor_compatibility_disposition ?? 'warn')} · band +{step.candidate.precursor_compatibility_band_penalty}</dd></div>}
+              {step.condition_evidence && <div><dt>Condition availability</dt><dd>{displayName(step.condition_evidence.status)} · {step.condition_evidence.compatible_candidate_count} compatible precedents</dd></div>}
               <div><dt>Operator</dt><dd className="mono-value">{step.candidate.operator_id}</dd></div>
             </dl>
+            {(step.candidate.precursor_compatibility_assessments ?? []).length > 0 && (
+              <details className="trace-panel">
+                <summary>Compatibility audit trace</summary>
+                {(step.candidate.precursor_compatibility_assessments ?? []).map((assessment) => (
+                  <dl className="detail-list" key={assessment.assessment_id}>
+                    <div><dt>Rule</dt><dd className="mono-value">{assessment.rule_id}</dd></div>
+                    <div><dt>Component</dt><dd className="mono-value">{assessment.component_smiles}</dd></div>
+                    <div><dt>Reactive pair</dt><dd>{assessment.left_site.chemist_label} + {assessment.right_site.chemist_label}</dd></div>
+                    <div><dt>Warning</dt><dd>{displayName(assessment.warning_strength)} · same molecular component</dd></div>
+                  </dl>
+                ))}
+              </details>
+            )}
+            {(step.candidate.precursor_realism_assessments ?? []).length > 0 && (
+              <details className="trace-panel">
+                <summary>Precursor realism trace</summary>
+                {(step.candidate.precursor_realism_assessments ?? []).map((assessment) => (
+                  <dl className="detail-list" key={assessment.canonical_smiles}>
+                    <div><dt>Precursor</dt><dd className="mono-value">{assessment.canonical_smiles}</dd></div>
+                    <div><dt>Tier / score</dt><dd>{displayName(assessment.evidence_tier)} · {assessment.score.toFixed(3)}</dd></div>
+                    <div><dt>Evidence</dt><dd>{[assessment.evidence.buyable && 'buyable', assessment.evidence.in_compound_registry && 'registry', assessment.evidence.in_literature && 'literature'].filter(Boolean).join(' · ') || 'none'}</dd></div>
+                  </dl>
+                ))}
+              </details>
+            )}
+            {step.condition_evidence && (
+              <details className="trace-panel retrosynthesis-conditions" open>
+                <summary>Recommended conditions ({step.condition_evidence.recommendations.length})</summary>
+                {step.condition_evidence.recommendations.length > 0 ? (
+                  <div className="retrosynthesis-condition-list">
+                    {step.condition_evidence.recommendations.map((recommendation) => (
+                      <article key={recommendation.recipe_id}>
+                        <div className="retrosynthesis-condition-heading">
+                          <div><strong>Recipe rank {recommendation.rank}</strong><span>{compactRecipeSummary(recommendation.resolved_recipe)}</span></div>
+                          <small>Score {recommendation.score.toFixed(3)}</small>
+                        </div>
+                        <Conditions recipe={recommendation.resolved_recipe} />
+                        <ReferenceRecords records={recommendation.precedent_references ?? []} />
+                        <ExperimentalDetails details={recommendation.precedent_experimental_details ?? []} />
+                      </article>
+                    ))}
+                  </div>
+                ) : <p className="retrosynthesis-empty-evidence">No compatible condition recipe was found for this reaction.</p>}
+                <MessageList title="Condition cautions" values={step.condition_evidence.warnings} tone="caution" />
+              </details>
+            )}
           </article>
         ))}
       </section>
@@ -684,7 +738,7 @@ export function MultistepRetrosynthesisResults({ result }: { result: MultistepRe
         <div className="results-layout multistep-results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Route</th><th>Status</th><th>Steps</th><th>Depth</th><th>Cost</th><th>Terminal leaves</th></tr></thead>
+              <thead><tr><th>Route</th><th>Status</th><th>Steps</th><th>Depth</th><th>Cost</th><th>Realism</th><th>Conditions</th><th>Strong incompat.</th><th>Terminal leaves</th></tr></thead>
               <tbody>
                 {availableRoutes.map((route, index) => (
                   <tr key={route.route_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
@@ -693,6 +747,9 @@ export function MultistepRetrosynthesisResults({ result }: { result: MultistepRe
                     <td>{route.reaction_count}</td>
                     <td>{route.maximum_depth}</td>
                     <td>{route.route_cost.toFixed(3)}</td>
+                    <td>{route.evidence_summary.weakest_precursor_realism_score == null ? '—' : route.evidence_summary.weakest_precursor_realism_score.toFixed(3)}</td>
+                    <td>{route.evidence_summary.condition_assessed_step_count === 0 ? '—' : `${route.evidence_summary.condition_supported_step_count}/${route.evidence_summary.condition_assessed_step_count}`}</td>
+                    <td>{route.evidence_summary.strong_compatibility_warning_step_count}</td>
                     <td>{route.leaves.filter((leaf) => leaf.terminal).length}/{route.leaves.length}</td>
                   </tr>
                 ))}
