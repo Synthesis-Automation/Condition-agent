@@ -36,6 +36,7 @@ from .generic_models import (
     GenericHandleCompletionGroup,
     GenericTemplateLibrary,
     OperatorLadderDiagnostics,
+    StrategyProposal,
 )
 from .generic_search import (
     disconnect_generic_target,
@@ -117,6 +118,8 @@ from .selectivity_poc import (
     condition_tokens_from_recipe,
     detect_functional_group_competition,
 )
+from .strategy_identity import STRATEGY_ID_NAMESPACE, build_strategy_id
+from .strategy_search import disconnect_strategies, group_strategy_candidates
 from .sources import (
     LIBRARY_MODES,
     iter_library_rows,
@@ -172,6 +175,8 @@ __all__ = [
     "RetrosynthesisRankingPolicy",
     "SelectivityAssessment",
     "StartingMaterialAssessment",
+    "STRATEGY_ID_NAMESPACE",
+    "StrategyProposal",
     "TemplateContext",
     "analyze_generic_reaction",
     "audit_operator_library_coverage",
@@ -194,6 +199,7 @@ __all__ = [
     "disconnect_generic_target_detailed",
     "disconnect_operator_ladder",
     "disconnect_operator_ladder_detailed",
+    "disconnect_strategies",
     "load_library",
     "load_generic_library",
     "load_hierarchical_ranking_policy",
@@ -209,6 +215,8 @@ __all__ = [
     "rank_operator_site_diverse",
     "rank_hierarchical_candidates",
     "rank_precursor_realism",
+    "group_strategy_candidates",
+    "build_strategy_id",
     "build_canonical_route_tree",
     "route_distance_matrix",
     "route_tree_distance",

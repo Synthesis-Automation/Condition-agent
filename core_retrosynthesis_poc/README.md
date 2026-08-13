@@ -389,6 +389,32 @@ python -m core_retrosynthesis_poc disconnect-operators `
   "Cc1ccnc(-c2ccccc2)c1" --top-k 10 --concise
 ```
 
+### Strategy-grouped single-step results
+
+The flat validated-candidate API remains available for benchmarks and detailed
+precursor review. For chemist-facing single-step results, candidates can also
+be grouped by the handle-independent strategy identity:
+
+```python
+from core_retrosynthesis_poc import disconnect_strategies
+
+strategies = disconnect_strategies(
+    target_smiles,
+    operator_library,
+    top_k_strategies=10,
+    max_realizations_per_strategy=3,
+)
+```
+
+`STRAT1` is the deterministic combination of `OP1`, `SITE1`, and `SYN1`.
+Different halides, boronates, protecting groups, templates, or other concrete
+`REAL1` handle choices therefore consume one strategy slot and are returned as
+nested realizations. Grouping happens only after the existing hard forward-graph
+and operator-signature validation; incomplete or core-only candidates are not
+promoted into strategy proposals. Strategy support uses the maximum independent
+template support rather than a sum, avoiding double-counting overlapping
+template evidence.
+
 Exact precursor recovery remains intentionally separate from site, operator,
 and synthon recovery. A different source-supported handle realization is not
 called the recorded reaction, and condition compatibility is reported as not

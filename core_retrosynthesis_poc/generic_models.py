@@ -15,6 +15,7 @@ from reactive_taxonomy.strategic_complexity import (
 
 from .models import CenterReactivityContext, TemplateContext
 from .selectivity_poc import FunctionalGroupCompetitionWarning
+from .strategy_identity import build_strategy_id
 
 
 GenericLevel = Literal["RDCHIRAL", "L0", "L1", "L2"]
@@ -368,6 +369,7 @@ class GenericDisconnectionCandidate:
     realization_id: str = ""
     operator_signature: str = ""
     synthon_signature: str = ""
+    strategy_id: str = ""
     pre_diversity_rank: int = 0
     diversity_rank: int = 0
     diversity_group_key: Tuple[str, ...] = ()
@@ -411,10 +413,117 @@ class GenericDisconnectionCandidate:
     hierarchical_rank: int = 0
     hierarchical_ranking_definition_id: str = ""
 
+    def __post_init__(self) -> None:
+        """Materialize and validate the handle-independent strategy identity."""
+
+        identity_fields = (
+            self.operator_id,
+            self.disconnection_site_key,
+            self.synthon_signature,
+        )
+        if all(identity_fields):
+            expected = build_strategy_id(*identity_fields)
+            if self.strategy_id and self.strategy_id != expected:
+                raise ValueError("candidate strategy ID contradicts graph identity")
+            if not self.strategy_id:
+                object.__setattr__(self, "strategy_id", expected)
+        elif self.strategy_id:
+            raise ValueError("candidate strategy ID requires complete graph identity")
+
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible candidate."""
 
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class StrategyProposal:
+    """One validated strategy with ranked concrete precursor realizations."""
+
+    strategy_rank: int
+    strategy_id: str
+    operator_id: str
+    disconnection_site_key: str
+    synthon_signature: str
+    representative: GenericDisconnectionCandidate
+    alternate_realizations: Tuple[GenericDisconnectionCandidate, ...]
+    total_realization_count: int
+    independent_reference_support: int
+    precedent_reaction_ids: Tuple[str, ...]
+    definition_id: str = "single_step_strategy.v1"
+    schema_version: str = "1.0"
+
+    def __post_init__(self) -> None:
+        """Reject mixed, unvalidated, or internally inconsistent groups."""
+
+        if self.strategy_rank < 1:
+            raise ValueError("strategy rank must be positive")
+        realizations = self.realizations
+        if not realizations:
+            raise ValueError("strategy proposal requires a representative")
+        if self.total_realization_count < len(realizations):
+            raise ValueError("total realization count cannot be truncated")
+        if self.independent_reference_support < 1:
+            raise ValueError("strategy reference support must be positive")
+        targets = {candidate.target_smiles for candidate in realizations}
+        if len(targets) != 1:
+            raise ValueError("strategy realizations must share one target")
+        for candidate in realizations:
+            if candidate.forward_validation_status != "verified_signature":
+                raise ValueError(
+                    "strategy proposals require verified-signature candidates"
+                )
+            if candidate.strategy_id != self.strategy_id:
+                raise ValueError("strategy proposal mixes strategy identities")
+            if (
+                candidate.operator_id != self.operator_id
+                or candidate.disconnection_site_key != self.disconnection_site_key
+                or candidate.synthon_signature != self.synthon_signature
+            ):
+                raise ValueError("strategy proposal contradicts graph identity")
+
+    @property
+    def target_smiles(self) -> str:
+        """Return the common target molecule."""
+
+        return self.representative.target_smiles
+
+    @property
+    def representative_score(self) -> float:
+        """Return the score of the selected concrete representative."""
+
+        return self.representative.score
+
+    @property
+    def realizations(self) -> Tuple[GenericDisconnectionCandidate, ...]:
+        """Return the representative followed by retained alternatives."""
+
+        return (self.representative, *self.alternate_realizations)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Return a JSON-compatible strategy proposal."""
+
+        return {
+            "definition_id": self.definition_id,
+            "schema_version": self.schema_version,
+            "strategy_rank": self.strategy_rank,
+            "strategy_id": self.strategy_id,
+            "target_smiles": self.target_smiles,
+            "operator_id": self.operator_id,
+            "disconnection_site_key": self.disconnection_site_key,
+            "synthon_signature": self.synthon_signature,
+            "representative_score": self.representative_score,
+            "independent_reference_support": self.independent_reference_support,
+            "precedent_reaction_ids": list(self.precedent_reaction_ids),
+            "returned_realization_count": len(self.realizations),
+            "total_realization_count": self.total_realization_count,
+            "representative": self.representative.to_dict(),
+            "alternate_realizations": [
+                candidate.to_dict() for candidate in self.alternate_realizations
+            ],
+        }
+
+
 __all__ = [
     "GenericCoreTemplate",
     "GenericDisconnectionCandidate",
@@ -422,6 +531,7 @@ __all__ = [
     "GenericRetrievalIndex",
     "GenericSearchDiagnostics",
     "OperatorLadderDiagnostics",
+    "StrategyProposal",
     "GenericHandleCompletionGroup",
     "GenericTemplateLibrary",
     "GenericTemplatePrecedent",
