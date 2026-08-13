@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
+from pathlib import Path
 
 from reactive_taxonomy import (
     assess_reactive_pair_interactions,
@@ -25,6 +27,21 @@ def test_reactive_pair_definition_is_versioned_and_taxonomy_valid() -> None:
     assert definition["allowed_scopes"] == ["same_component"]
     assert not validate_reactive_pair_interaction_definition(definition)
     assert not validate_taxonomy()
+
+
+def test_warning_rules_do_not_invalidate_signature_or_condition_indexes() -> None:
+    manifest_path = (
+        Path(__file__).resolve().parents[2]
+        / "reactive_taxonomy"
+        / "definitions"
+        / "taxonomy_manifest.v4.json"
+    )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    assert "reactive_pair_interactions.v1.json" not in {
+        *manifest["identity_definitions"],
+        *manifest["annotation_definitions"],
+    }
 
 
 def test_reactive_pair_definition_rejects_unknown_selector_operator() -> None:
@@ -80,4 +97,3 @@ def test_grignard_and_ketone_intramolecular_pair_is_detected() -> None:
     assert "RPI002_ORGANOMETALLIC_CARBONYL_SELF_REACTION" in {
         item.rule_id for item in assessments
     }
-
