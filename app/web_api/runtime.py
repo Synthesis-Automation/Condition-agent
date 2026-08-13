@@ -78,7 +78,7 @@ DEFAULT_LITERATURE_MOLECULE_INDEX = (
     PROJECT_ROOT / "results" / "literature_molecule_index.sqlite"
 )
 DEFAULT_STOCK_PORTFOLIO = (
-    PROJECT_ROOT / "results" / "stock_portfolio" / "stock_portfolio.sqlite"
+    PROJECT_ROOT / "cas_tools" / "data" / "stock_portfolio.sqlite"
 )
 WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET = 100
 WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET = 30

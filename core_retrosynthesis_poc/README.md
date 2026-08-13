@@ -721,7 +721,7 @@ run:
 ```powershell
 python -m core_retrosynthesis_poc plan-routes `
   results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
-  results/stock_portfolio/stock_portfolio.sqlite `
+  cas_tools/data/stock_portfolio.sqlite `
   "TARGET_SMILES" `
   --max-depth 3 `
   --top-k-routes 5

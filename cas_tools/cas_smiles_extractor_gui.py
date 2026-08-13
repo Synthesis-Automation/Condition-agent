@@ -13,7 +13,7 @@ from PyQt6 import QtCore, QtWidgets
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 DEFAULT_DATASET_DIR = PROJECT_ROOT / "raw_dataset" / "literature_reaction_dataset"
-DEFAULT_OUTPUT_PATH = SCRIPT_DIR / "literature_cas_smiles_pairs.csv"
+DEFAULT_OUTPUT_PATH = SCRIPT_DIR / "data" / "literature_cas_smiles_pairs.csv"
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 

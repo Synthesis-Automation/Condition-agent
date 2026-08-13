@@ -77,7 +77,7 @@ Build the literature index from the repository root:
 
 ```powershell
 python -m cas_tools.molecule_index_cli `
-  cas_tools/literature_cas_smiles_pairs.csv `
+  cas_tools/data/literature_cas_smiles_pairs.csv `
   results/literature_molecule_index.sqlite `
   --provenance-column cas_no `
   --provenance-column reaction_id `
@@ -117,7 +117,7 @@ Compile all sources listed in that manifest into one atomic SQLite portfolio:
 ```powershell
 python -m cas_tools.stock_cli build `
   results/stock_portfolio/sources/stock_sources.v1.json `
-  results/stock_portfolio/stock_portfolio.sqlite `
+  cas_tools/data/stock_portfolio.sqlite `
   --workers 12 `
   --chunk-size 5000
 ```
