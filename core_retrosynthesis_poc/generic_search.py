@@ -14,7 +14,7 @@ from rdchiral.main import rdchiralReactants, rdchiralReaction, rdchiralRun
 
 from cas_tools import (
     PrecursorRealismAssessment,
-    aggregate_precursor_realism,
+    aggregate_precursor_realism_trace,
 )
 from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
 from retrosynthesis_poc.chemistry import canonical_smiles, maximum_similarity
@@ -509,11 +509,13 @@ def _attach_precursor_realism(
     values = []
     for candidate in candidates:
         assessments = scorer(candidate.precursor_smiles)
+        aggregation = aggregate_precursor_realism_trace(assessments)
         values.append(
             replace(
                 candidate,
-                precursor_realism_score=aggregate_precursor_realism(assessments),
+                precursor_realism_score=aggregation.score,
                 precursor_realism_assessments=assessments,
+                precursor_realism_aggregation=aggregation,
             )
         )
     return tuple(values)

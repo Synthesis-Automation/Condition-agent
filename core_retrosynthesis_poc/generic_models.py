@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Literal, Optional, Tuple
 
-from cas_tools import PrecursorRealismAssessment
+from cas_tools import PrecursorRealismAggregation, PrecursorRealismAssessment
 
 from .models import CenterReactivityContext, TemplateContext
 from .selectivity_poc import FunctionalGroupCompetitionWarning
@@ -371,6 +371,7 @@ class GenericDisconnectionCandidate:
     selectivity_warnings: Tuple[FunctionalGroupCompetitionWarning, ...] = ()
     precursor_realism_score: Optional[float] = None
     precursor_realism_assessments: Tuple[PrecursorRealismAssessment, ...] = ()
+    precursor_realism_aggregation: Optional[PrecursorRealismAggregation] = None
     pre_realism_rank: int = 0
     precursor_realism_rank: int = 0
     precursor_realism_band_penalty: int = 0

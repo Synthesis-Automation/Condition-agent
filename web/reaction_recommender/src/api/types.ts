@@ -511,6 +511,7 @@ export interface RetrosynthesisCandidate {
   selectivity_warnings?: FunctionalGroupCompetitionWarning[]
   precursor_realism_score?: number | null
   precursor_realism_assessments?: PrecursorRealismAssessment[]
+  precursor_realism_aggregation?: PrecursorRealismAggregation | null
   pre_realism_rank: number
   precursor_realism_rank: number
   precursor_realism_band_penalty: number
@@ -531,6 +532,17 @@ export interface PrecursorRealismAssessment {
   molecular_weight_smallness: number
   molecular_weight_penalty: number
   score: number
+  definition_id: string
+  schema_version: string
+}
+
+export interface PrecursorRealismAggregation {
+  weakest_component_score: number
+  known_substantial_component_bonus: number
+  score: number
+  supporting_component_smiles: string | null
+  supporting_evidence_tier: string | null
+  substantive_component_molecular_weight_threshold_da: number
   definition_id: string
   schema_version: string
 }

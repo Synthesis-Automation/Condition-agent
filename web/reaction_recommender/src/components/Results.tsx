@@ -488,6 +488,8 @@ function RetrosynthesisDetails({
           <div><strong>Diversity rank</strong><span>{candidate.diversity_rank || candidate.rank}</span></div>
           <div><strong>Score band</strong><span>{candidate.structural_score_band}</span></div>
           {candidate.precursor_realism_score != null && <div><strong>Realism rerank</strong><span>{candidate.pre_realism_rank} → {candidate.precursor_realism_rank}</span></div>}
+          {candidate.precursor_realism_aggregation && <div><strong>Weakest precursor</strong><span>{candidate.precursor_realism_aggregation.weakest_component_score.toFixed(3)}</span></div>}
+          {candidate.precursor_realism_aggregation && <div><strong>Known substantial component bonus</strong><span>+{candidate.precursor_realism_aggregation.known_substantial_component_bonus.toFixed(3)}</span></div>}
           {candidate.precursor_realism_score != null && <div><strong>Realism band penalty</strong><span>+{candidate.precursor_realism_band_penalty}</span></div>}
           {candidate.precursor_realism_score != null && <div><strong>Effective band</strong><span>{candidate.effective_structural_score_band}</span></div>}
         </div>

@@ -20,9 +20,9 @@ from rdkit import Chem
 from .molecule_index import MoleculeIdentity, molecule_identity
 
 
-PRECURSOR_REALISM_SCHEMA_VERSION = "1.0"
+PRECURSOR_REALISM_SCHEMA_VERSION = "2.0"
 PRECURSOR_REALISM_DEFINITION_PATH = (
-    Path(__file__).with_name("definitions") / "precursor_realism.v1.json"
+    Path(__file__).with_name("definitions") / "precursor_realism.v2.json"
 )
 
 _EVIDENCE_TIERS = (
@@ -59,6 +59,9 @@ class PrecursorRealismPolicy:
     maximum_smallness_da: float
     no_smallness_da: float
     tier_scores: tuple[tuple[str, float, float], ...]
+    substantive_component_molecular_weight_threshold_da: float
+    substantive_component_bonuses: tuple[tuple[str, float], ...]
+    maximum_substantive_component_bonus: float
 
     def tier(self, tier_id: str) -> tuple[float, float]:
         """Return the base score and maximum MW penalty for an evidence tier."""
@@ -69,6 +72,15 @@ class PrecursorRealismPolicy:
         }
         try:
             return tiers[tier_id]
+        except KeyError as error:
+            raise ValueError(f"unsupported precursor evidence tier: {tier_id}") from error
+
+    def substantive_component_bonus(self, tier_id: str) -> float:
+        """Return the route bonus for one substantive supported component."""
+
+        bonuses = dict(self.substantive_component_bonuses)
+        try:
+            return bonuses[tier_id]
         except KeyError as error:
             raise ValueError(f"unsupported precursor evidence tier: {tier_id}") from error
 
@@ -95,6 +107,25 @@ class PrecursorRealismAssessment:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class PrecursorRealismAggregation:
+    """Auditable route score derived from the weakest precursor and support."""
+
+    weakest_component_score: float
+    known_substantial_component_bonus: float
+    score: float
+    supporting_component_smiles: str | None
+    supporting_evidence_tier: str | None
+    substantive_component_molecular_weight_threshold_da: float
+    definition_id: str
+    schema_version: str = PRECURSOR_REALISM_SCHEMA_VERSION
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible aggregation trace."""
+
+        return asdict(self)
+
+
 def _finite_score(value: object, field: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ValueError(f"{field} must be a finite number between zero and one")
@@ -116,14 +147,20 @@ def _positive_float(value: object, field: str) -> float:
 def validate_precursor_realism_definition(value: Mapping[str, Any]) -> None:
     """Validate a precursor-realism definition without mutating global state."""
 
-    if value.get("definition_id") != "precursor_realism.v1":
+    if value.get("definition_id") != "precursor_realism.v2":
         raise ValueError("unexpected precursor-realism definition ID")
     if value.get("schema_version") != PRECURSOR_REALISM_SCHEMA_VERSION:
         raise ValueError("unsupported precursor-realism schema")
     molecular_weight = value.get("molecular_weight")
     tiers = value.get("evidence_tiers")
-    if not isinstance(molecular_weight, Mapping) or not isinstance(tiers, Mapping):
-        raise ValueError("precursor-realism definition requires MW and tier rules")
+    aggregation = value.get("route_aggregation")
+    if not all(
+        isinstance(section, Mapping)
+        for section in (molecular_weight, tiers, aggregation)
+    ):
+        raise ValueError(
+            "precursor-realism definition requires MW, tier, and aggregation rules"
+        )
     maximum_smallness = _positive_float(
         molecular_weight.get("maximum_smallness_da"),
         "maximum-smallness molecular weight",
@@ -145,6 +182,28 @@ def validate_precursor_realism_definition(value: Mapping[str, Any]) -> None:
             tier.get("maximum_molecular_weight_penalty"),
             f"{tier_id} maximum molecular-weight penalty",
         )
+    _positive_float(
+        aggregation.get("substantive_component_molecular_weight_threshold_da"),
+        "substantive-component molecular-weight threshold",
+    )
+    maximum_bonus = _finite_score(
+        aggregation.get("maximum_substantive_component_bonus"),
+        "maximum substantive-component bonus",
+    )
+    bonuses = aggregation.get("evidence_tier_bonuses")
+    if not isinstance(bonuses, Mapping) or set(bonuses) != set(_EVIDENCE_TIERS):
+        raise ValueError("substantive-component evidence-tier bonuses are incomplete")
+    for tier_id in _EVIDENCE_TIERS:
+        bonus = _finite_score(
+            bonuses[tier_id],
+            f"{tier_id} substantive-component bonus",
+        )
+        if bonus > maximum_bonus:
+            raise ValueError(
+                f"{tier_id} substantive-component bonus exceeds the maximum"
+            )
+    if float(bonuses["unsupported"]) != 0.0:
+        raise ValueError("unsupported components must not receive a route bonus")
 
 
 @lru_cache(maxsize=1)
@@ -157,6 +216,8 @@ def load_precursor_realism_policy() -> PrecursorRealismPolicy:
     validate_precursor_realism_definition(value)
     molecular_weight = value["molecular_weight"]
     tiers = value["evidence_tiers"]
+    aggregation = value["route_aggregation"]
+    bonuses = aggregation["evidence_tier_bonuses"]
     return PrecursorRealismPolicy(
         definition_id=str(value["definition_id"]),
         schema_version=str(value["schema_version"]),
@@ -169,6 +230,15 @@ def load_precursor_realism_policy() -> PrecursorRealismPolicy:
                 float(tiers[tier_id]["maximum_molecular_weight_penalty"]),
             )
             for tier_id in _EVIDENCE_TIERS
+        ),
+        substantive_component_molecular_weight_threshold_da=float(
+            aggregation["substantive_component_molecular_weight_threshold_da"]
+        ),
+        substantive_component_bonuses=tuple(
+            (tier_id, float(bonuses[tier_id])) for tier_id in _EVIDENCE_TIERS
+        ),
+        maximum_substantive_component_bonus=float(
+            aggregation["maximum_substantive_component_bonus"]
         ),
     )
 
@@ -240,11 +310,74 @@ def assess_precursor_realism(
 def aggregate_precursor_realism(
     assessments: tuple[PrecursorRealismAssessment, ...],
 ) -> float:
-    """Return the weakest required precursor score for one reaction candidate."""
+    """Return the route realism score, including supported-component credit."""
+
+    return aggregate_precursor_realism_trace(assessments).score
+
+
+def aggregate_precursor_realism_trace(
+    assessments: tuple[PrecursorRealismAssessment, ...],
+    *,
+    policy: PrecursorRealismPolicy | None = None,
+) -> PrecursorRealismAggregation:
+    """Aggregate component scores while retaining the weakest-link baseline.
+
+    A substantial precursor with exact source evidence gives a small, capped
+    route-level bonus. This distinguishes a partially grounded route from one
+    whose components are all unsupported without concealing its weakest
+    required precursor.
+    """
 
     if not assessments:
         raise ValueError("at least one precursor assessment is required")
-    return min(assessment.score for assessment in assessments)
+    resolved = policy or load_precursor_realism_policy()
+    weakest_score = min(assessment.score for assessment in assessments)
+    eligible = tuple(
+        assessment
+        for assessment in assessments
+        if (
+            assessment.molecular_weight
+            > resolved.substantive_component_molecular_weight_threshold_da
+            and resolved.substantive_component_bonus(assessment.evidence_tier)
+            > 0.0
+        )
+    )
+    supporting = max(
+        eligible,
+        key=lambda assessment: (
+            resolved.substantive_component_bonus(assessment.evidence_tier),
+            assessment.molecular_weight,
+            assessment.canonical_smiles,
+        ),
+        default=None,
+    )
+    configured_bonus = (
+        min(
+            resolved.maximum_substantive_component_bonus,
+            resolved.substantive_component_bonus(supporting.evidence_tier),
+        )
+        if supporting is not None
+        else 0.0
+    )
+    bonus = min(configured_bonus, 1.0 - weakest_score)
+    score = min(1.0, weakest_score + bonus)
+    return PrecursorRealismAggregation(
+        weakest_component_score=round(weakest_score, 6),
+        known_substantial_component_bonus=round(bonus, 6),
+        score=round(score, 6),
+        supporting_component_smiles=(
+            supporting.canonical_smiles if supporting is not None else None
+        ),
+        supporting_evidence_tier=(
+            supporting.evidence_tier if supporting is not None else None
+        ),
+        substantive_component_molecular_weight_threshold_da=round(
+            resolved.substantive_component_molecular_weight_threshold_da,
+            6,
+        ),
+        definition_id=resolved.definition_id,
+        schema_version=resolved.schema_version,
+    )
 
 
 def assess_precursor_components(
@@ -293,9 +426,11 @@ __all__ = [
     "PRECURSOR_REALISM_DEFINITION_PATH",
     "PRECURSOR_REALISM_SCHEMA_VERSION",
     "PrecursorEvidence",
+    "PrecursorRealismAggregation",
     "PrecursorRealismAssessment",
     "PrecursorRealismPolicy",
     "aggregate_precursor_realism",
+    "aggregate_precursor_realism_trace",
     "assess_precursor_components",
     "assess_precursor_realism",
     "load_precursor_realism_policy",

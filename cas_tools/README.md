@@ -35,7 +35,10 @@ ranking policy converts low realism into monotonic penalty bands: an unlikely
 candidate may be demoted but a realistic candidate is never promoted above its
 original structural band. Each returned candidate retains its structural rank,
 original band, penalty, effective band, realism rank, component assessments,
-and source evidence.
+and source evidence. Route aggregation keeps the weakest component as its
+baseline. An exact source match for a component above 100 Da adds a
+versioned, source-strength-dependent bonus capped at 0.15; the response exposes
+the baseline, bonus, supporting component, and final score separately.
 
 ## Literature CAS/SMILES extractor
 

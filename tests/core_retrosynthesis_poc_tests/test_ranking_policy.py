@@ -264,6 +264,11 @@ def test_realism_option_attaches_component_score_before_diversity(monkeypatch) -
     assert [candidate.precursor_smiles for candidate in ranked] == ["CCO", "CO"]
     assert ranked[0].precursor_realism_score == 0.95
     assert ranked[0].precursor_realism_assessments[0].evidence.buyable is True
+    assert ranked[0].precursor_realism_aggregation is not None
+    assert (
+        ranked[0].precursor_realism_aggregation.known_substantial_component_bonus
+        == 0.0
+    )
 
 
 def test_operator_ladder_expands_pool_before_diverse_selection(

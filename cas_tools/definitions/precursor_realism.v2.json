@@ -1,0 +1,51 @@
+{
+  "definition_id": "precursor_realism.v2",
+  "schema_version": "2.0",
+  "molecular_weight": {
+    "maximum_smallness_da": 50.0,
+    "no_smallness_da": 200.0
+  },
+  "evidence_tiers": {
+    "buyable_registry_literature": {
+      "base_score": 1.0,
+      "maximum_molecular_weight_penalty": 0.0
+    },
+    "buyable_corroborated": {
+      "base_score": 0.975,
+      "maximum_molecular_weight_penalty": 0.0
+    },
+    "buyable_only": {
+      "base_score": 0.95,
+      "maximum_molecular_weight_penalty": 0.0
+    },
+    "registry_literature": {
+      "base_score": 0.75,
+      "maximum_molecular_weight_penalty": 0.05
+    },
+    "registry_only": {
+      "base_score": 0.55,
+      "maximum_molecular_weight_penalty": 0.1
+    },
+    "literature_only": {
+      "base_score": 0.5,
+      "maximum_molecular_weight_penalty": 0.1
+    },
+    "unsupported": {
+      "base_score": 0.25,
+      "maximum_molecular_weight_penalty": 0.2
+    }
+  },
+  "route_aggregation": {
+    "substantive_component_molecular_weight_threshold_da": 100.0,
+    "maximum_substantive_component_bonus": 0.15,
+    "evidence_tier_bonuses": {
+      "buyable_registry_literature": 0.15,
+      "buyable_corroborated": 0.15,
+      "buyable_only": 0.15,
+      "registry_literature": 0.1,
+      "registry_only": 0.05,
+      "literature_only": 0.075,
+      "unsupported": 0.0
+    }
+  }
+}
