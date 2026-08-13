@@ -396,6 +396,24 @@ def rank_operator_site_diverse(
         id(candidate): rank
         for rank, candidate in enumerate(structurally_ranked, start=1)
     }
+    realism_enabled = any(
+        candidate.precursor_realism_score is not None
+        for candidate in structurally_ranked
+    )
+    realism_penalties = {
+        id(candidate): (
+            resolved.precursor_realism_band_penalty(
+                float(candidate.precursor_realism_score)
+            )
+            if candidate.precursor_realism_score is not None
+            else 0
+        )
+        for candidate in structurally_ranked
+    }
+    effective_bands = {
+        id(candidate): bands[id(candidate)] + realism_penalties[id(candidate)]
+        for candidate in structurally_ranked
+    }
     partitions: dict[
         tuple[int, int],
         dict[tuple[str, ...], list[GenericDisconnectionCandidate]],
@@ -407,7 +425,7 @@ def rank_operator_site_diverse(
                 if resolved.preserve_abstraction_level_order
                 else 0
             ),
-            bands[id(candidate)],
+            effective_bands[id(candidate)],
         )
         groups = partitions.setdefault(partition_key, {})
         groups.setdefault(
@@ -415,10 +433,6 @@ def rank_operator_site_diverse(
             [],
         ).append(candidate)
 
-    realism_enabled = any(
-        candidate.precursor_realism_score is not None
-        for candidate in structurally_ranked
-    )
     realism_ranks: dict[int, int] = {}
     if realism_enabled:
         realism_order = sorted(
@@ -429,7 +443,7 @@ def rank_operator_site_diverse(
                     if resolved.preserve_abstraction_level_order
                     else 0
                 ),
-                bands[id(candidate)],
+                effective_bands[id(candidate)],
                 -float(candidate.precursor_realism_score or 0.0),
                 pre_ranks[id(candidate)],
             ),
@@ -479,6 +493,8 @@ def rank_operator_site_diverse(
             precursor_realism_rank=(
                 realism_ranks[id(candidate)] if realism_enabled else 0
             ),
+            precursor_realism_band_penalty=realism_penalties[id(candidate)],
+            effective_structural_score_band=effective_bands[id(candidate)],
         )
         for rank, candidate in enumerate(diversified, start=1)
     )
@@ -508,7 +524,7 @@ def rank_precursor_realism(
     *,
     policy: RetrosynthesisRankingPolicy | None = None,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
-    """Rerank assessed candidates only within structural-quality bands."""
+    """Demote assessed candidates through versioned effective score bands."""
 
     resolved = policy or load_retrosynthesis_ranking_policy()
     values = tuple(candidates)
@@ -537,6 +553,20 @@ def rank_precursor_realism(
         id(candidate): rank
         for rank, candidate in enumerate(chemistry_order, start=1)
     }
+    realism_penalties = {
+        id(candidate): (
+            resolved.precursor_realism_band_penalty(
+                float(candidate.precursor_realism_score)
+            )
+            if candidate.precursor_realism_score is not None
+            else 0
+        )
+        for candidate in chemistry_order
+    }
+    effective_bands = {
+        id(candidate): bands[id(candidate)] + realism_penalties[id(candidate)]
+        for candidate in chemistry_order
+    }
     ranked = sorted(
         chemistry_order,
         key=lambda candidate: (
@@ -545,7 +575,7 @@ def rank_precursor_realism(
                 if resolved.preserve_abstraction_level_order
                 else 0
             ),
-            bands[id(candidate)],
+            effective_bands[id(candidate)],
             -float(candidate.precursor_realism_score or 0.0),
             pre_ranks[id(candidate)],
         ),
@@ -557,6 +587,8 @@ def rank_precursor_realism(
             ranking_policy_definition_id=resolved.definition_id,
             pre_realism_rank=pre_ranks[id(candidate)],
             precursor_realism_rank=rank,
+            precursor_realism_band_penalty=realism_penalties[id(candidate)],
+            effective_structural_score_band=effective_bands[id(candidate)],
         )
         for rank, candidate in enumerate(ranked, start=1)
     )

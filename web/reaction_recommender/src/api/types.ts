@@ -513,6 +513,8 @@ export interface RetrosynthesisCandidate {
   precursor_realism_assessments?: PrecursorRealismAssessment[]
   pre_realism_rank: number
   precursor_realism_rank: number
+  precursor_realism_band_penalty: number
+  effective_structural_score_band: number
 }
 
 export interface PrecursorRealismAssessment {

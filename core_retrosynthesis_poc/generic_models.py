@@ -373,6 +373,8 @@ class GenericDisconnectionCandidate:
     precursor_realism_assessments: Tuple[PrecursorRealismAssessment, ...] = ()
     pre_realism_rank: int = 0
     precursor_realism_rank: int = 0
+    precursor_realism_band_penalty: int = 0
+    effective_structural_score_band: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible candidate."""

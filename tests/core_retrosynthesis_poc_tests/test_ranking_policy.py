@@ -55,8 +55,8 @@ def _candidate(
 def test_ranking_policy_is_versioned_and_general() -> None:
     policy = load_retrosynthesis_ranking_policy()
 
-    assert policy.definition_id == "retrosynthesis_ranking.v1"
-    assert policy.schema_version == "1.0"
+    assert policy.definition_id == "retrosynthesis_ranking.v2"
+    assert policy.schema_version == "2.0"
     assert policy.diversity_group_fields == (
         "operator_id",
         "disconnection_site_key",
@@ -65,6 +65,10 @@ def test_ranking_policy_is_versioned_and_general() -> None:
     assert policy.candidate_pool_multiplier == 4
     assert policy.diversity_score_band_width == 0.05
     assert policy.condition_score_band_width == 0.05
+    assert policy.precursor_realism_band_penalty(0.95) == 0
+    assert policy.precursor_realism_band_penalty(0.50) == 1
+    assert policy.precursor_realism_band_penalty(0.25) == 2
+    assert policy.precursor_realism_band_penalty(0.05) == 3
 
     multistep = load_multistep_ranking_policy()
     assert multistep.definition_id == "multistep_ranking.v1"
@@ -93,7 +97,7 @@ def test_diversity_interleaves_groups_only_within_structural_band() -> None:
     assert [value.structural_score_band for value in ranked] == [0, 0, 0, 4]
     assert ranked[1].diversity_group_key == ("B", "site-b", "syn-b")
     assert all(
-        value.ranking_policy_definition_id == "retrosynthesis_ranking.v1"
+        value.ranking_policy_definition_id == "retrosynthesis_ranking.v2"
         for value in ranked
     )
     assert [value.precursor_smiles for value in reversed_input] == [
@@ -127,7 +131,7 @@ def test_diversity_preserves_abstraction_specificity() -> None:
     ]
 
 
-def test_realism_reranks_only_within_structural_score_band() -> None:
+def test_realism_penalty_can_demote_across_structural_score_bands() -> None:
     unlikely = _candidate(
         "CO",
         0.90,
@@ -172,12 +176,68 @@ def test_realism_reranks_only_within_structural_score_band() -> None:
 
     assert [candidate.precursor_smiles for candidate in ranked] == [
         "CCO",
-        "CO",
         "CCBr",
+        "CO",
     ]
-    assert [candidate.pre_realism_rank for candidate in ranked] == [2, 1, 3]
+    assert [candidate.pre_realism_rank for candidate in ranked] == [2, 3, 1]
     assert [candidate.precursor_realism_rank for candidate in ranked] == [1, 2, 3]
-    assert [candidate.structural_score_band for candidate in ranked] == [0, 0, 2]
+    assert [candidate.structural_score_band for candidate in ranked] == [0, 2, 0]
+    assert [candidate.precursor_realism_band_penalty for candidate in ranked] == [
+        0,
+        0,
+        3,
+    ]
+    assert [candidate.effective_structural_score_band for candidate in ranked] == [
+        0,
+        2,
+        3,
+    ]
+
+
+def test_reported_free_carbamic_acid_route_is_demoted_by_realism() -> None:
+    best = _candidate(
+        "best",
+        0.66160498,
+        operator="A",
+        site="site-a",
+        synthon="syn-a",
+    )
+    carbamic_acid = _candidate(
+        "CC(C)(C)I.COC(=O)[C@@H](Cc1ccc(O)cc1)NC(=O)O",
+        0.60049131,
+        operator="B",
+        site="site-b",
+        synthon="syn-b",
+    )
+    boc_chloride = _candidate(
+        "CC(C)(C)OC(=O)Cl.COC(=O)[C@H](N)Cc1ccc(O)cc1",
+        0.51744618,
+        operator="C",
+        site="site-c",
+        synthon="syn-c",
+    )
+    best = replace(best, precursor_realism_score=0.975)
+    carbamic_acid = replace(carbamic_acid, precursor_realism_score=0.25)
+    boc_chloride = replace(boc_chloride, precursor_realism_score=0.457719)
+
+    ranked = rank_precursor_realism((carbamic_acid, boc_chloride, best))
+
+    assert [candidate.precursor_smiles for candidate in ranked] == [
+        "best",
+        "CC(C)(C)OC(=O)Cl.COC(=O)[C@H](N)Cc1ccc(O)cc1",
+        "CC(C)(C)I.COC(=O)[C@@H](Cc1ccc(O)cc1)NC(=O)O",
+    ]
+    assert [candidate.structural_score_band for candidate in ranked] == [0, 2, 1]
+    assert [candidate.precursor_realism_band_penalty for candidate in ranked] == [
+        0,
+        1,
+        2,
+    ]
+    assert [candidate.effective_structural_score_band for candidate in ranked] == [
+        0,
+        3,
+        3,
+    ]
 
 
 def test_realism_option_attaches_component_score_before_diversity(monkeypatch) -> None:

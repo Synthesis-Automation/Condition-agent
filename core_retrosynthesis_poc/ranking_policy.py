@@ -14,7 +14,7 @@ from .generic_models import GenericDisconnectionCandidate
 
 RANKING_POLICY_PATH = (
     Path(__file__).with_name("definitions")
-    / "retrosynthesis_ranking.v1.json"
+    / "retrosynthesis_ranking.v2.json"
 )
 _ALLOWED_GROUP_FIELDS = frozenset(
     {
@@ -44,6 +44,7 @@ class RetrosynthesisRankingPolicy:
     condition_score_band_width: float
     abstraction_level_order: Tuple[str, ...]
     condition_status_order: Tuple[str, ...]
+    precursor_realism_band_penalties: Tuple[Tuple[float, int], ...]
 
     def level_rank(self, level: str) -> int:
         """Return the configured specificity rank for one abstraction level."""
@@ -61,6 +62,16 @@ class RetrosynthesisRankingPolicy:
         except ValueError:
             return len(self.condition_status_order)
 
+    def precursor_realism_band_penalty(self, score: float) -> int:
+        """Return the configured demotion for one precursor-realism score."""
+
+        if not math.isfinite(score) or not 0.0 <= score <= 1.0:
+            raise ValueError("precursor realism score must be between zero and one")
+        for minimum_score, penalty in self.precursor_realism_band_penalties:
+            if score >= minimum_score:
+                return penalty
+        raise ValueError("precursor realism penalty policy does not cover score")
+
 
 def _positive_float(value: object, field: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -76,14 +87,20 @@ def load_retrosynthesis_ranking_policy() -> RetrosynthesisRankingPolicy:
     """Load and validate the canonical general ranking policy."""
 
     value = json.loads(RANKING_POLICY_PATH.read_text(encoding="utf-8"))
-    if value.get("definition_id") != "retrosynthesis_ranking.v1":
+    if value.get("definition_id") != "retrosynthesis_ranking.v2":
         raise ValueError("unexpected retrosynthesis ranking definition ID")
-    if value.get("schema_version") != "1.0":
+    if value.get("schema_version") != "2.0":
         raise ValueError("unsupported retrosynthesis ranking schema")
     diversity = value.get("candidate_diversity")
     condition = value.get("condition_reranking")
-    if not isinstance(diversity, dict) or not isinstance(condition, dict):
-        raise ValueError("ranking policy requires diversity and condition rules")
+    realism = value.get("precursor_realism_reranking")
+    if not all(
+        isinstance(section, dict)
+        for section in (diversity, condition, realism)
+    ):
+        raise ValueError(
+            "ranking policy requires diversity, condition, and realism rules"
+        )
     group_fields = tuple(diversity.get("group_fields") or ())
     if (
         not group_fields
@@ -107,6 +124,40 @@ def load_retrosynthesis_ranking_policy() -> RetrosynthesisRankingPolicy:
     status_order = tuple(condition.get("status_order") or ())
     if set(status_order) != set(_CONDITION_STATUSES):
         raise ValueError("ranking policy condition statuses are incomplete")
+    raw_penalties = realism.get("band_penalties")
+    if not isinstance(raw_penalties, list) or not raw_penalties:
+        raise ValueError("ranking policy requires precursor-realism penalties")
+    penalties = []
+    for item in raw_penalties:
+        if not isinstance(item, dict):
+            raise ValueError("precursor-realism penalties must be objects")
+        minimum_score = item.get("minimum_score")
+        band_penalty = item.get("band_penalty")
+        if (
+            isinstance(minimum_score, bool)
+            or not isinstance(minimum_score, (int, float))
+            or not math.isfinite(float(minimum_score))
+            or not 0.0 <= float(minimum_score) <= 1.0
+        ):
+            raise ValueError("realism minimum scores must be between zero and one")
+        if (
+            isinstance(band_penalty, bool)
+            or not isinstance(band_penalty, int)
+            or band_penalty < 0
+        ):
+            raise ValueError("realism band penalties must be nonnegative integers")
+        penalties.append((float(minimum_score), band_penalty))
+    if penalties != sorted(penalties, reverse=True):
+        raise ValueError("realism minimum scores must be strictly descending")
+    if len({minimum for minimum, _ in penalties}) != len(penalties):
+        raise ValueError("realism minimum scores must be unique")
+    if penalties[-1][0] != 0.0:
+        raise ValueError("realism penalty policy must cover a zero score")
+    if any(
+        left_penalty > right_penalty
+        for (_, left_penalty), (_, right_penalty) in zip(penalties, penalties[1:])
+    ):
+        raise ValueError("lower realism must not receive a smaller band penalty")
     return RetrosynthesisRankingPolicy(
         definition_id=str(value["definition_id"]),
         schema_version=str(value["schema_version"]),
@@ -123,6 +174,7 @@ def load_retrosynthesis_ranking_policy() -> RetrosynthesisRankingPolicy:
         ),
         abstraction_level_order=level_order,
         condition_status_order=status_order,
+        precursor_realism_band_penalties=tuple(penalties),
     )
 
 

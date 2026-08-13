@@ -30,9 +30,12 @@ rerank candidates of comparable chemical quality.
 Single-step retrosynthesis exposes this as the opt-in
 `use_precursor_realism` request field. The default remains `false`. When enabled,
 the web runtime queries the configured supplier stock portfolio, the condition
-compound registry, and the literature molecule index, then reranks only within
-the existing structural score bands. Each returned candidate retains its
-structural rank, realism rank, component assessments, and source evidence.
+compound registry, and the literature molecule index. The retrosynthesis-owned
+ranking policy converts low realism into monotonic penalty bands: an unlikely
+candidate may be demoted but a realistic candidate is never promoted above its
+original structural band. Each returned candidate retains its structural rank,
+original band, penalty, effective band, realism rank, component assessments,
+and source evidence.
 
 ## Literature CAS/SMILES extractor
 

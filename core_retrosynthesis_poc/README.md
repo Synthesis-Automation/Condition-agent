@@ -481,7 +481,7 @@ Diversification is conservative: it round-robins chemistry-distinct groups only
 within 0.05-wide structural-score bands and never moves an L1 or L0 proposal
 ahead of an available L2 proposal. Use `--no-diversity` only for an ablation or
 before/after comparison. The versioned defaults live in
-`definitions/retrosynthesis_ranking.v1.json`; output candidates record the
+`definitions/retrosynthesis_ranking.v2.json`; output candidates record the
 policy ID, original structural rank, diversity rank, group key, and score band.
 
 The JSON output exposes product-index retrieval, SMARTS applicability,

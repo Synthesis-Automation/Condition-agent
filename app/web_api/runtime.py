@@ -738,8 +738,9 @@ class LocalRecommendationRuntime:
         ]
         if request.use_precursor_realism:
             warnings.append(
-                "Precursor realism is an experimental heuristic that reranks "
-                "only within structural score bands; it is not a probability."
+                "Precursor realism is an experimental heuristic that adds "
+                "versioned penalty bands to unlikely precursor sets; it is "
+                "not a probability."
             )
             if not (
                 self._prefer_stock_portfolio
@@ -763,7 +764,7 @@ class LocalRecommendationRuntime:
             "library_mode": request.library_mode,
             "valid": bool(candidates),
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
-            "schema_version": "1.4",
+            "schema_version": "1.5",
             "precursor_realism_enabled": request.use_precursor_realism,
             "precursor_realism_sources": {
                 "buyable": bool(

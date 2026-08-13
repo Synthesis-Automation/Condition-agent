@@ -522,7 +522,7 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     )
 
     result = payload["candidates"][0]
-    assert payload["schema_version"] == "1.4"
+    assert payload["schema_version"] == "1.5"
     assert payload["precursor_realism_enabled"] is False
     assert search_options["precursor_realism_scorer"] is None
     assert search_options["max_templates_to_apply"] == 100

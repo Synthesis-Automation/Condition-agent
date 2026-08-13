@@ -1,6 +1,6 @@
 {
-  "definition_id": "retrosynthesis_ranking.v1",
-  "schema_version": "1.0",
+  "definition_id": "retrosynthesis_ranking.v2",
+  "schema_version": "2.0",
   "candidate_diversity": {
     "candidate_pool_multiplier": 4,
     "group_fields": [
@@ -18,6 +18,26 @@
       "insufficient_evidence"
     ],
     "structural_score_band_width": 0.05
+  },
+  "precursor_realism_reranking": {
+    "band_penalties": [
+      {
+        "minimum_score": 0.75,
+        "band_penalty": 0
+      },
+      {
+        "minimum_score": 0.4,
+        "band_penalty": 1
+      },
+      {
+        "minimum_score": 0.2,
+        "band_penalty": 2
+      },
+      {
+        "minimum_score": 0.0,
+        "band_penalty": 3
+      }
+    ]
   },
   "abstraction_level_order": [
     "L2",
