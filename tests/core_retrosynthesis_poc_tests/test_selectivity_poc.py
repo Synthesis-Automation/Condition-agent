@@ -20,6 +20,10 @@ S_ALKYLATION = (
 N_ALKYLATION = (
     "Cc1[nH]cnc1CCl.NCCS>>SCCNCc1c(C)[nH]cn1"
 )
+N_HETEROARYL_COUPLING = (
+    "Cc1sc2nc(NCc3ccccc3)cnc2c1I.Clc1ncnc2[nH]ccc12"
+    ">>Cc1sc2nc(NCc3ccccc3)cnc2c1n4ccc5c(Cl)ncnc45"
+)
 ACIDIC_RECIPE = {
     "medium": "acidic",
     "salt_state": "hydrochloride",
@@ -121,6 +125,27 @@ def test_same_enumerator_handles_n_o_competition() -> None:
 
     assert choice_set.selected_candidate.element == "O"
     assert {candidate.element for candidate in choice_set.candidates} == {"N", "O"}
+
+
+def test_n_heteroaryl_coupling_excludes_aromatic_ch_cross_mode_outcomes() -> None:
+    choice_set = build_reaction_choice_set(N_HETEROARYL_COUPLING, {})
+    warning = detect_functional_group_competition(N_HETEROARYL_COUPLING)
+
+    assert choice_set.selected_candidate.element == "N"
+    assert {candidate.site_type for candidate in choice_set.candidates} == {
+        "pronucleophile_XH"
+    }
+    assert {
+        (candidate.component_index, candidate.atom_index)
+        for candidate in choice_set.candidates
+    } == {(0, 6), (1, 6)}
+    assert warning is not None
+    assert warning.audit_id == "structural_endpoint_competition_audit.v2"
+    assert warning.selected_outcome.component_index == 1
+    assert {
+        (outcome.component_index, outcome.atom_index, outcome.element)
+        for outcome in warning.competing_outcomes
+    } == {(0, 6, "N")}
 
 
 def _training_rows() -> tuple:

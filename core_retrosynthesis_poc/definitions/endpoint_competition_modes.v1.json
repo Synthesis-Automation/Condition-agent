@@ -1,0 +1,35 @@
+{
+  "definition_id": "endpoint_competition_modes.v1",
+  "schema_version": "1.0",
+  "rules": [
+    {
+      "mode": "heteroatom_nucleophile",
+      "source_site_type": "pronucleophile_XH",
+      "elements": ["N", "O", "P", "S"]
+    },
+    {
+      "mode": "heteroatom_nucleophile",
+      "source_site_type": "nucleophile_anion",
+      "elements": ["N", "O", "P", "S"]
+    },
+    {
+      "mode": "aromatic_ch_functionalization",
+      "source_site_type": "aromatic_CH",
+      "elements": ["C"]
+    },
+    {
+      "mode": "terminal_alkyne_functionalization",
+      "source_site_type": "pronucleophile_XH",
+      "elements": ["C"],
+      "signature_prefixes": ["XH|Csp|"]
+    },
+    {
+      "mode": "activated_carbon_functionalization",
+      "source_site_type": "pronucleophile_XH",
+      "elements": ["C"],
+      "signature_prefixes": ["XH|Csp3|"]
+    }
+  ],
+  "minimum_intramolecular_ring_size": 5,
+  "fallback": "source_site_type_and_element"
+}

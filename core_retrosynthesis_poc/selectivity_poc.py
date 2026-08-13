@@ -18,6 +18,7 @@ import json
 import math
 from dataclasses import asdict, dataclass
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Sequence, Tuple
 
 from condition_registry import CONDITION_RECIPE_COMPONENT_BUCKETS
@@ -26,9 +27,14 @@ from reactive_taxonomy.reaction_graph_editing import bond_type, set_total_hydrog
 
 
 SELECTIVITY_POC_SCHEMA_VERSION = "1.0"
-SELECTIVITY_POC_MODEL_ID = "conditional_edit_choice_poc.v1"
+SELECTIVITY_POC_MODEL_ID = "conditional_edit_choice_poc.v2"
 FUNCTIONAL_GROUP_COMPETITION_AUDIT_ID = (
-    "structural_endpoint_competition_audit.v1"
+    "structural_endpoint_competition_audit.v2"
+)
+ENDPOINT_COMPETITION_POLICY_ID = "endpoint_competition_modes.v1"
+ENDPOINT_COMPETITION_MODES_PATH = (
+    Path(__file__).with_name("definitions")
+    / "endpoint_competition_modes.v1.json"
 )
 
 
@@ -425,6 +431,119 @@ def _endpoint_feature_tokens(endpoint: Any) -> Tuple[str, ...]:
     return tuple(sorted(values))
 
 
+@lru_cache(maxsize=1)
+def _load_endpoint_competition_policy() -> tuple[
+    Tuple[Mapping[str, Any], ...], int
+]:
+    """Load and validate structural endpoint-competition mode rules."""
+
+    payload = json.loads(
+        ENDPOINT_COMPETITION_MODES_PATH.read_text(encoding="utf-8")
+    )
+    if payload.get("definition_id") != ENDPOINT_COMPETITION_POLICY_ID:
+        raise ValueError("unexpected endpoint competition definition ID")
+    if payload.get("schema_version") != "1.0":
+        raise ValueError("unsupported endpoint competition schema")
+    if payload.get("fallback") != "source_site_type_and_element":
+        raise ValueError("unsupported endpoint competition fallback")
+    minimum_ring_size = payload.get("minimum_intramolecular_ring_size")
+    if (
+        isinstance(minimum_ring_size, bool)
+        or not isinstance(minimum_ring_size, int)
+        or minimum_ring_size < 3
+    ):
+        raise ValueError(
+            "minimum intramolecular ring size must be an integer of at least 3"
+        )
+    rules = payload.get("rules")
+    if not isinstance(rules, list) or not rules:
+        raise ValueError("endpoint competition rules must be a non-empty list")
+    validated = []
+    for rule in rules:
+        if not isinstance(rule, dict):
+            raise ValueError("endpoint competition rules must be mappings")
+        mode = str(rule.get("mode") or "")
+        source_site_type = str(rule.get("source_site_type") or "")
+        elements = tuple(str(value) for value in rule.get("elements") or ())
+        signature_prefixes = tuple(
+            str(value) for value in rule.get("signature_prefixes") or ()
+        )
+        if not mode or not source_site_type or not elements:
+            raise ValueError(
+                "endpoint competition rules require mode, site type, and elements"
+            )
+        if len(set(elements)) != len(elements) or any(
+            not value for value in elements
+        ):
+            raise ValueError("endpoint competition rule elements must be unique")
+        if len(set(signature_prefixes)) != len(signature_prefixes) or any(
+            not value for value in signature_prefixes
+        ):
+            raise ValueError(
+                "endpoint competition signature prefixes must be unique"
+            )
+        validated.append(
+            {
+                "mode": mode,
+                "source_site_type": source_site_type,
+                "elements": elements,
+                "signature_prefixes": signature_prefixes,
+            }
+        )
+    return tuple(validated), minimum_ring_size
+
+
+def _endpoint_competition_mode(endpoint: Any) -> str:
+    """Return the chemistry mode within which an endpoint can compete.
+
+    A graph-valid product is not sufficient evidence that two sites compete
+    under the same transformation.  In particular, heteroatom X-H coupling,
+    aromatic C-H functionalization, terminal-alkyne coupling, and activated
+    carbon functionalization are distinct structural modes.
+    """
+
+    site_type = str(endpoint.source_site_type)
+    element = str(endpoint.endpoint.element)
+    signature = str(endpoint.source_signature)
+    rules, _ = _load_endpoint_competition_policy()
+    for rule in rules:
+        if (
+            site_type != rule["source_site_type"]
+            or element not in rule["elements"]
+        ):
+            continue
+        prefixes = rule["signature_prefixes"]
+        if prefixes and not any(signature.startswith(prefix) for prefix in prefixes):
+            continue
+        return str(rule["mode"])
+    return f"site:{site_type}|element:{element}"
+
+
+def _passes_intramolecular_topology_filter(
+    component_smiles: Sequence[str],
+    *,
+    electrophile: Any,
+    candidate_component_index: int,
+    candidate_atom_index: int,
+) -> bool:
+    """Reject unobserved small-ring closures from the competition audit."""
+
+    from rdkit import Chem
+
+    if candidate_component_index != int(electrophile.component_index):
+        return True
+    molecule = Chem.MolFromSmiles(component_smiles[candidate_component_index])
+    if molecule is None:
+        return False
+    path = Chem.GetShortestPath(
+        molecule,
+        int(electrophile.atom_index),
+        candidate_atom_index,
+    )
+    _, minimum_ring_size = _load_endpoint_competition_policy()
+    return len(path) >= minimum_ring_size
+
+
 def build_reaction_choice_set(
     reaction_smiles: str,
     conditions: Mapping[str, Any] | Iterable[str],
@@ -434,10 +553,11 @@ def build_reaction_choice_set(
 ) -> ReactionChoiceSet:
     """Enumerate validated endpoint alternatives for an observed reaction.
 
-    The POC holds the reaction partners and single-connection replacement
-    topology fixed.  It varies endpoints on the component containing the
-    observed connection partner, which captures intramolecular functional-group
-    competition without inventing additional reactant equivalents.
+    The POC holds the selected electrophile and single-connection replacement
+    topology fixed. It varies structurally mode-compatible endpoints across all
+    supplied reactant components, which captures inter- and intramolecular
+    functional-group competition without conflating, for example, N-H coupling
+    with aromatic C-H functionalization.
     """
 
     if not 0.0 < label_strength <= 1.0:
@@ -451,20 +571,51 @@ def build_reaction_choice_set(
     formed_edit = next(
         edit for edit in analysis.observation.edits if edit.edit_type == "formed"
     )
-    observed_component_index = int(selected.component_index)
-    molecule_analysis = analyze_molecule(component_smiles[observed_component_index])
-    endpoint_by_atom: dict[int, list[Any]] = {}
-    for interfaces in molecule_analysis.connectivity_hypotheses:
-        for endpoint in interfaces.connection_endpoints:
-            atom_index = endpoint.endpoint.atom_index
-            if atom_index is None:
-                continue
-            endpoint_by_atom.setdefault(int(atom_index), []).append(endpoint)
+    selected_key = (int(selected.component_index), int(selected.atom_index))
+    endpoint_by_atom: dict[tuple[int, int], list[Any]] = {}
+    for component_index, smiles in enumerate(component_smiles):
+        molecule_analysis = analyze_molecule(smiles)
+        for interfaces in molecule_analysis.connectivity_hypotheses:
+            for endpoint in interfaces.connection_endpoints:
+                atom_index = endpoint.endpoint.atom_index
+                if atom_index is None:
+                    continue
+                endpoint_by_atom.setdefault(
+                    (component_index, int(atom_index)), []
+                ).append(endpoint)
+
+    selected_endpoints = endpoint_by_atom.get(selected_key, ())
+    if not selected_endpoints:
+        raise ValueError("observed connection endpoint was not enumerated")
+    selected_endpoint = sorted(
+        selected_endpoints,
+        key=lambda value: (
+            value.source_site_type,
+            value.source_signature,
+            value.site_id,
+        ),
+    )[0]
+    selected_mode = _endpoint_competition_mode(selected_endpoint)
 
     provisional = []
-    for atom_index, endpoints in sorted(endpoint_by_atom.items()):
+    for (component_index, atom_index), endpoints in sorted(endpoint_by_atom.items()):
+        compatible_endpoints = tuple(
+            endpoint
+            for endpoint in endpoints
+            if _endpoint_competition_mode(endpoint) == selected_mode
+        )
+        if not compatible_endpoints:
+            continue
+        is_selected = (component_index, atom_index) == selected_key
+        if not is_selected and not _passes_intramolecular_topology_filter(
+            component_smiles,
+            electrophile=electrophile,
+            candidate_component_index=component_index,
+            candidate_atom_index=atom_index,
+        ):
+            continue
         endpoint = sorted(
-            endpoints,
+            compatible_endpoints,
             key=lambda value: (
                 value.source_site_type,
                 value.source_signature,
@@ -475,15 +626,16 @@ def build_reaction_choice_set(
             component_smiles,
             electrophile=electrophile,
             leaving_group=leaving_group,
-            candidate_component_index=observed_component_index,
+            candidate_component_index=component_index,
             candidate_endpoint=endpoint,
             formed_order=str(formed_edit.new_order or "SINGLE"),
         )
         if product_smiles is None:
             continue
         combined_features = set()
-        for alternative in endpoints:
+        for alternative in compatible_endpoints:
             combined_features.update(_endpoint_feature_tokens(alternative))
+        combined_features.add(f"competition_mode={selected_mode}")
         site_signature = "|".join(
             (
                 str(endpoint.endpoint.element),
@@ -495,20 +647,16 @@ def build_reaction_choice_set(
         )
         candidate_id = "ROC1:" + _digest(
             (
-                observed_component_index,
+                component_index,
                 atom_index,
                 site_signature,
                 product_smiles,
             )
         )
-        is_selected = (
-            observed_component_index == int(selected.component_index)
-            and atom_index == int(selected.atom_index)
-        )
         provisional.append(
             ReactionOutcomeCandidate(
                 candidate_id=candidate_id,
-                component_index=observed_component_index,
+                component_index=component_index,
                 atom_index=atom_index,
                 element=str(endpoint.endpoint.element),
                 site_type=str(endpoint.source_site_type),
@@ -544,6 +692,7 @@ def build_reaction_choice_set(
         "reaction": reaction_smiles,
         "conditions": condition_tokens,
         "reference": reference_id,
+        "endpoint_competition_policy": ENDPOINT_COMPETITION_POLICY_ID,
     }
     return ReactionChoiceSet(
         choice_set_id="RCS1:" + _digest(identity),
@@ -631,7 +780,8 @@ def detect_functional_group_competition(
         "Possible functional-group competition: the selected "
         f"{selected.element} endpoint has {count} structurally valid "
         f"alternative endpoint{'s' if count != 1 else ''} "
-        f"({competitor_elements}) on the same reactant component. "
+        f"({competitor_elements}) in the same connection mode across the "
+        "supplied reactants. "
         "This is a screening warning only; reaction conditions and relative "
         "outcome probabilities have not been evaluated."
     )
