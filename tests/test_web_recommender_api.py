@@ -313,8 +313,8 @@ def test_runtime_precursor_realism_combines_three_exact_evidence_sources(
     )
     monkeypatch.setattr(
         runtime,
-        "_registered_compound_smiles",
-        lambda: frozenset(("CCO", "CCBr")),
+        "_registered_compound_identities",
+        lambda: (frozenset(("CCO", "CCBr")), frozenset()),
     )
 
     scorer, close = runtime._precursor_realism_scorer()
@@ -328,6 +328,29 @@ def test_runtime_precursor_realism_combines_three_exact_evidence_sources(
     assert by_smiles["CO"].evidence_tier == "literature_only"
     assert by_smiles["CCBr"].evidence_tier == "registry_literature"
     assert by_smiles["CCN"].evidence_tier == "unsupported"
+
+
+def test_runtime_registry_matches_equivalent_salt_by_full_inchi_key(
+    tmp_path,
+) -> None:
+    runtime = LocalRecommendationRuntime(
+        library_root=tmp_path,
+        retrosynthesis_library_root=tmp_path,
+        stock_portfolio_path=tmp_path / "missing-stock.sqlite",
+        literature_index_path=tmp_path / "missing-literature.sqlite",
+    )
+
+    scorer, close = runtime._precursor_realism_scorer()
+    try:
+        assessment = scorer("[F][Ag]")[0]
+    finally:
+        close()
+
+    assert assessment.canonical_smiles == "[F][Ag]"
+    assert assessment.inchi_key == "REYHXKZHIMGNSE-UHFFFAOYSA-M"
+    assert assessment.evidence.in_compound_registry is True
+    assert assessment.evidence_tier == "registry_only"
+    assert assessment.score == 0.501244
 
 
 def test_local_runtime_runs_multistep_planner_with_web_limits(

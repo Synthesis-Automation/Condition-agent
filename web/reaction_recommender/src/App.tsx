@@ -60,7 +60,7 @@ function App() {
   const [includeL0, setIncludeL0] = useState(true)
   const [useRetrosynthesisContext, setUseRetrosynthesisContext] = useState(true)
   const [diversifyRetrosynthesis, setDiversifyRetrosynthesis] = useState(true)
-  const [usePrecursorRealism, setUsePrecursorRealism] = useState(false)
+  const [usePrecursorRealism, setUsePrecursorRealism] = useState(true)
   const [multistepDepth, setMultistepDepth] = useState<2 | 3>(3)
   const [molecularWeightThreshold, setMolecularWeightThreshold] = useState(150)
   const retrosynthesisRun = useRef(0)
@@ -411,7 +411,7 @@ function App() {
             <legend>Analysis mode</legend>
             <label className={mode === 'recommendation' ? 'active' : ''}><input type="radio" name="analysis-mode" value="recommendation" checked={mode === 'recommendation'} onChange={() => changeMode('recommendation')} /><strong>Condition recommendation</strong></label>
             <label className={mode === 'discovery' ? 'active' : ''}><input type="radio" name="analysis-mode" value="discovery" checked={mode === 'discovery'} onChange={() => changeMode('discovery')} /><strong>Reaction discovery</strong></label>
-            <label className={mode === 'retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="retrosynthesis" checked={mode === 'retrosynthesis'} onChange={() => changeMode('retrosynthesis')} /><strong>Retrosynthesis</strong></label>
+            <label className={mode === 'retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="retrosynthesis" checked={mode === 'retrosynthesis'} onChange={() => changeMode('retrosynthesis')} /><strong>Single-step retrosynthesis</strong></label>
             <label className={mode === 'multistep_retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="multistep_retrosynthesis" checked={mode === 'multistep_retrosynthesis'} onChange={() => changeMode('multistep_retrosynthesis')} /><strong>Multi-step retrosynthesis</strong></label>
             <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Feature analysis</strong></label>
           </fieldset>

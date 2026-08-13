@@ -235,24 +235,35 @@ class LocalRecommendationRuntime:
         self._retrosynthesis_libraries: Dict[
             tuple[str, int, int], GenericTemplateLibrary
         ] = {}
-        self._compound_registry_smiles: frozenset[str] | None = None
+        self._compound_registry_identities: (
+            tuple[frozenset[str], frozenset[str]] | None
+        ) = None
 
-    def _registered_compound_smiles(self) -> frozenset[str]:
-        """Return exact canonical structures from the condition registry."""
+    def _registered_compound_identities(
+        self,
+    ) -> tuple[frozenset[str], frozenset[str]]:
+        """Return exact canonical SMILES and full InChIKeys from the registry."""
 
         with self._lock:
-            if self._compound_registry_smiles is None:
-                identities = (
+            if self._compound_registry_identities is None:
+                identities = tuple(
                     molecule_identity(substance.smiles)
                     for substance in load_substances()
                     if substance.smiles
                 )
-                self._compound_registry_smiles = frozenset(
-                    identity.canonical_smiles
-                    for identity in identities
-                    if identity is not None
+                self._compound_registry_identities = (
+                    frozenset(
+                        identity.canonical_smiles
+                        for identity in identities
+                        if identity is not None
+                    ),
+                    frozenset(
+                        identity.inchi_key
+                        for identity in identities
+                        if identity is not None and identity.inchi_key is not None
+                    ),
                 )
-            return self._compound_registry_smiles
+            return self._compound_registry_identities
 
     @staticmethod
     def _is_terminal_stock_match(match: Any) -> bool:
@@ -278,7 +289,9 @@ class LocalRecommendationRuntime:
             if self.literature_index_path.is_file()
             else None
         )
-        registry_smiles = self._registered_compound_smiles()
+        registry_smiles, registry_inchi_keys = (
+            self._registered_compound_identities()
+        )
 
         def evidence(identity: MoleculeIdentity) -> PrecursorEvidence:
             stock_match = stock.lookup(identity) if stock is not None else None
@@ -287,7 +300,13 @@ class LocalRecommendationRuntime:
             )
             return PrecursorEvidence(
                 buyable=self._is_terminal_stock_match(stock_match),
-                in_compound_registry=(identity.canonical_smiles in registry_smiles),
+                in_compound_registry=(
+                    identity.canonical_smiles in registry_smiles
+                    or (
+                        identity.inchi_key is not None
+                        and identity.inchi_key in registry_inchi_keys
+                    )
+                ),
                 in_literature=(literature_match is not None),
             )
 
