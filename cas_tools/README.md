@@ -2,6 +2,38 @@
 
 This standalone package provides CAS extraction and web-backed compound lookup.
 
+## Precursor-realism heuristic
+
+`precursor_realism.py` provides a reusable, versioned ranking heuristic based on
+exact matches in a buyable portfolio, a compound registry, and literature, plus
+a smooth molecular-weight penalty. The scorer consumes explicit evidence flags
+instead of opening databases, so any application can supply the evidence while
+retaining the same deterministic score contract and complete trace.
+
+```python
+from cas_tools import PrecursorEvidence, assess_precursor_realism
+
+assessment = assess_precursor_realism(
+    "CCBr",
+    PrecursorEvidence(
+        buyable=False,
+        in_compound_registry=True,
+        in_literature=True,
+    ),
+)
+```
+
+The heuristic is not a probability of existence or reaction success. Invalid
+graphs must be rejected before scoring, and consumers should use this score to
+rerank candidates of comparable chemical quality.
+
+Single-step retrosynthesis exposes this as the opt-in
+`use_precursor_realism` request field. The default remains `false`. When enabled,
+the web runtime queries the configured supplier stock portfolio, the condition
+compound registry, and the literature molecule index, then reranks only within
+the existing structural score bands. Each returned candidate retains its
+structural rank, realism rank, component assessments, and source evidence.
+
 ## Literature CAS/SMILES extractor
 
 Launch the small desktop UI from the repository root:

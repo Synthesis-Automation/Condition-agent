@@ -60,6 +60,7 @@ function App() {
   const [includeL0, setIncludeL0] = useState(true)
   const [useRetrosynthesisContext, setUseRetrosynthesisContext] = useState(true)
   const [diversifyRetrosynthesis, setDiversifyRetrosynthesis] = useState(true)
+  const [usePrecursorRealism, setUsePrecursorRealism] = useState(false)
   const [multistepDepth, setMultistepDepth] = useState<2 | 3>(3)
   const [molecularWeightThreshold, setMolecularWeightThreshold] = useState(150)
   const retrosynthesisRun = useRef(0)
@@ -275,6 +276,7 @@ function App() {
         include_l0: includeL0,
         use_context: useRetrosynthesisContext,
         diversify: diversifyRetrosynthesis,
+        use_precursor_realism: usePrecursorRealism,
       })
       if (retrosynthesisRun.current !== runId) return
       setResult(next)
@@ -437,7 +439,7 @@ function App() {
               {mode === 'recommendation' && <label><span>Minimum precedent pool</span><input type="number" min="1" max="100" placeholder="Definition default" value={minimumPoolSize ?? ''} onChange={(event) => setMinimumPoolSize(event.target.value ? Number(event.target.value) : null)} /></label>}
               {!isRetrosynthesisMode && <label className="check-option"><input type="checkbox" checked={useRxnmapper} disabled={!capabilities?.rxnmapper_available || (mode === 'features' && !reactionSmiles.includes('>'))} onChange={(event) => { setUseRxnmapper(event.target.checked); if (!event.target.checked) setForceResolvedMapping(false) }} /><span>Use RXNMapper for unresolved or ambiguous reactions</span></label>}
               {isRetrosynthesisMode ? (
-                <><label className="check-option"><input type="checkbox" checked={useRetrosynthesisContext} onChange={(event) => setUseRetrosynthesisContext(event.target.checked)} /><span>Rank with local reaction-context similarity</span></label><label className="check-option"><input type="checkbox" checked={diversifyRetrosynthesis} onChange={(event) => setDiversifyRetrosynthesis(event.target.checked)} /><span>Diversify operators, disconnection sites, and synthons within score bands</span></label><label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label></>
+                <><label className="check-option"><input type="checkbox" checked={useRetrosynthesisContext} onChange={(event) => setUseRetrosynthesisContext(event.target.checked)} /><span>Rank with local reaction-context similarity</span></label><label className="check-option"><input type="checkbox" checked={diversifyRetrosynthesis} onChange={(event) => setDiversifyRetrosynthesis(event.target.checked)} /><span>Diversify operators, disconnection sites, and synthons within score bands</span></label>{mode === 'retrosynthesis' && <label className="check-option"><input type="checkbox" checked={usePrecursorRealism} onChange={(event) => setUsePrecursorRealism(event.target.checked)} /><span>De-rank unlikely precursors using stock, registry, literature, and molecular weight</span></label>}<label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label></>
               ) : mode === 'features' ? (
                 <label className="check-option"><input type="checkbox" checked={forceResolvedMapping} disabled={!useRxnmapper || !reactionSmiles.includes('>')} onChange={(event) => setForceResolvedMapping(event.target.checked)} /><span>Map resolved reactions too, for additional atom-mapping evidence</span></label>
               ) : (

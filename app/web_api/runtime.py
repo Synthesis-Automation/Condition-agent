@@ -8,7 +8,15 @@ from pathlib import Path
 from threading import RLock
 from typing import Any, Dict, Protocol
 
-from cas_tools import CanonicalMoleculeIndex, StockPortfolio
+from cas_tools import (
+    CanonicalMoleculeIndex,
+    MoleculeIdentity,
+    PrecursorEvidence,
+    StockPortfolio,
+    assess_precursor_components,
+    molecule_identity,
+)
+from condition_registry.loader import load_substances
 from condition_recommender import (
     ChemistRankingPreferences,
     GenericConditionRecommender,
@@ -227,6 +235,72 @@ class LocalRecommendationRuntime:
         self._retrosynthesis_libraries: Dict[
             tuple[str, int, int], GenericTemplateLibrary
         ] = {}
+        self._compound_registry_smiles: frozenset[str] | None = None
+
+    def _registered_compound_smiles(self) -> frozenset[str]:
+        """Return exact canonical structures from the condition registry."""
+
+        with self._lock:
+            if self._compound_registry_smiles is None:
+                identities = (
+                    molecule_identity(substance.smiles)
+                    for substance in load_substances()
+                    if substance.smiles
+                )
+                self._compound_registry_smiles = frozenset(
+                    identity.canonical_smiles
+                    for identity in identities
+                    if identity is not None
+                )
+            return self._compound_registry_smiles
+
+    @staticmethod
+    def _is_terminal_stock_match(match: Any) -> bool:
+        """Return whether a stock match has current terminal-grade evidence."""
+
+        if match is None:
+            return False
+        return any(
+            str(record.get("terminal_eligible") or "").casefold() == "true"
+            for record in match.source_records
+        )
+
+    def _precursor_realism_scorer(self):
+        """Open configured evidence stores and return a scorer plus close hook."""
+
+        stock = (
+            StockPortfolio(self.stock_portfolio_path)
+            if self._prefer_stock_portfolio and self.stock_portfolio_path.is_file()
+            else None
+        )
+        literature = (
+            CanonicalMoleculeIndex(self.literature_index_path)
+            if self.literature_index_path.is_file()
+            else None
+        )
+        registry_smiles = self._registered_compound_smiles()
+
+        def evidence(identity: MoleculeIdentity) -> PrecursorEvidence:
+            stock_match = stock.lookup(identity) if stock is not None else None
+            literature_match = (
+                literature.lookup(identity) if literature is not None else None
+            )
+            return PrecursorEvidence(
+                buyable=self._is_terminal_stock_match(stock_match),
+                in_compound_registry=(identity.canonical_smiles in registry_smiles),
+                in_literature=(literature_match is not None),
+            )
+
+        def score(precursors: str):
+            return assess_precursor_components(precursors, evidence)
+
+        def close() -> None:
+            if stock is not None:
+                stock.close()
+            if literature is not None:
+                literature.close()
+
+        return score, close
 
     def _index_path(self, library_mode: str) -> Path:
         """Resolve one isolated Full or Compact runtime index."""
@@ -594,16 +668,26 @@ class LocalRecommendationRuntime:
                 request.top_k * 2,
             ),
         )
-        candidates = disconnect_operator_ladder(
-            request.target_smiles.strip(),
-            library,
-            top_k=request.top_k,
-            use_context=request.use_context,
-            include_l0=request.include_l0,
-            diversify=request.diversify,
-            max_templates_to_apply=template_budget,
-            max_candidates_to_validate=validation_budget,
-        )
+        realism_scorer = None
+        close_realism_sources = lambda: None
+        if request.use_precursor_realism:
+            realism_scorer, close_realism_sources = (
+                self._precursor_realism_scorer()
+            )
+        try:
+            candidates = disconnect_operator_ladder(
+                request.target_smiles.strip(),
+                library,
+                top_k=request.top_k,
+                use_context=request.use_context,
+                include_l0=request.include_l0,
+                diversify=request.diversify,
+                max_templates_to_apply=template_budget,
+                max_candidates_to_validate=validation_budget,
+                precursor_realism_scorer=realism_scorer,
+            )
+        finally:
+            close_realism_sources()
         index_path = self._index_path(request.library_mode)
         reference_catalog = self._get_reference_catalog(index_path)
         templates = {
@@ -646,6 +730,30 @@ class LocalRecommendationRuntime:
                 )
             value["supporting_precedents"] = supporting_precedents
             serialized.append(value)
+        warnings = [
+            "Single-step proposals are generated from source-round-tripped "
+            "graph operators and still require chemist review.",
+            "Interactive search uses a bounded operator-validation budget; "
+            "condition evidence loads progressively for each hit.",
+        ]
+        if request.use_precursor_realism:
+            warnings.append(
+                "Precursor realism is an experimental heuristic that reranks "
+                "only within structural score bands; it is not a probability."
+            )
+            if not (
+                self._prefer_stock_portfolio
+                and self.stock_portfolio_path.is_file()
+            ):
+                warnings.append(
+                    "No supplier stock portfolio was available; buyable "
+                    "evidence was treated as absent."
+                )
+            if not self.literature_index_path.is_file():
+                warnings.append(
+                    "No literature molecule index was available; literature "
+                    "evidence was treated as absent."
+                )
         return {
             "target_smiles": (
                 candidates[0].target_smiles
@@ -655,16 +763,20 @@ class LocalRecommendationRuntime:
             "library_mode": request.library_mode,
             "valid": bool(candidates),
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
-            "schema_version": "1.3",
+            "schema_version": "1.4",
+            "precursor_realism_enabled": request.use_precursor_realism,
+            "precursor_realism_sources": {
+                "buyable": bool(
+                    self._prefer_stock_portfolio
+                    and self.stock_portfolio_path.is_file()
+                ),
+                "compound_registry": True,
+                "literature": self.literature_index_path.is_file(),
+            },
             "candidate_count": len(candidates),
             "library_operator_count": len(library.operators),
             "library_template_count": len(library.templates),
-            "warnings": [
-                "Single-step proposals are generated from source-round-tripped "
-                "graph operators and still require chemist review.",
-                "Interactive search uses a bounded operator-validation budget; "
-                "condition evidence loads progressively for each hit.",
-            ],
+            "warnings": warnings,
             "candidates": serialized,
         }
 

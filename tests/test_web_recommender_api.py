@@ -3,11 +3,17 @@
 from __future__ import annotations
 
 import gzip
+import csv
 import json
 from types import SimpleNamespace
 from typing import Any, Dict
 
 from fastapi.testclient import TestClient
+from cas_tools import (
+    StockSourceDefinition,
+    build_canonical_molecule_index,
+    build_stock_portfolio,
+)
 
 from app.web_api.main import create_app
 from app.web_api.contracts import (
@@ -112,6 +118,7 @@ class FakeRuntime:
             "valid": True,
             "error": None,
             "schema_version": "1.0",
+            "precursor_realism_enabled": request.use_precursor_realism,
             "candidate_count": 1,
             "library_operator_count": 12,
             "library_template_count": 34,
@@ -265,6 +272,62 @@ def test_local_runtime_prefers_explicit_supplier_stock_portfolio(tmp_path) -> No
     assert capabilities["multistep_retrosynthesis"] is True
     assert capabilities["stock_portfolio_available"] is True
     assert capabilities["stock_portfolio_name"] == "stock.sqlite"
+
+
+def test_runtime_precursor_realism_combines_three_exact_evidence_sources(
+    monkeypatch, tmp_path
+) -> None:
+    stock_source = tmp_path / "stock.smi"
+    stock_source.write_text("CCO\tstock-1\n", encoding="utf-8")
+    stock_path = tmp_path / "stock.sqlite"
+    build_stock_portfolio(
+        (
+            StockSourceDefinition(
+                path=str(stock_source),
+                supplier="Test supplier",
+                collection="In stock",
+                snapshot_date="2026-08-12",
+                availability_status="in_stock",
+                evidence_level="supplier_in_stock",
+                terminal_eligible=True,
+                source_url="https://example.test/source",
+                terms_url="https://example.test/terms",
+            ),
+        ),
+        stock_path,
+    )
+    literature_csv = tmp_path / "literature.csv"
+    with literature_csv.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=("compound_smiles",))
+        writer.writeheader()
+        writer.writerows(
+            ({"compound_smiles": "CO"}, {"compound_smiles": "CCBr"})
+        )
+    literature_path = tmp_path / "literature.sqlite"
+    build_canonical_molecule_index(literature_csv, literature_path)
+    runtime = LocalRecommendationRuntime(
+        library_root=tmp_path,
+        retrosynthesis_library_root=tmp_path,
+        stock_portfolio_path=stock_path,
+        literature_index_path=literature_path,
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_registered_compound_smiles",
+        lambda: frozenset(("CCO", "CCBr")),
+    )
+
+    scorer, close = runtime._precursor_realism_scorer()
+    try:
+        assessments = scorer("CCO.CO.CCBr.CCN")
+    finally:
+        close()
+
+    by_smiles = {item.canonical_smiles: item for item in assessments}
+    assert by_smiles["CCO"].evidence_tier == "buyable_corroborated"
+    assert by_smiles["CO"].evidence_tier == "literature_only"
+    assert by_smiles["CCBr"].evidence_tier == "registry_literature"
+    assert by_smiles["CCN"].evidence_tier == "unsupported"
 
 
 def test_local_runtime_runs_multistep_planner_with_web_limits(
@@ -459,7 +522,9 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     )
 
     result = payload["candidates"][0]
-    assert payload["schema_version"] == "1.3"
+    assert payload["schema_version"] == "1.4"
+    assert payload["precursor_realism_enabled"] is False
+    assert search_options["precursor_realism_scorer"] is None
     assert search_options["max_templates_to_apply"] == 100
     assert search_options["max_candidates_to_validate"] == 30
     assert "precedent_reaction_ids" not in result
@@ -668,6 +733,7 @@ def test_retrosynthesis_contract_forwards_operator_options() -> None:
             "include_l0": False,
             "use_context": True,
             "diversify": True,
+            "use_precursor_realism": True,
         },
     )
 
@@ -675,6 +741,7 @@ def test_retrosynthesis_contract_forwards_operator_options() -> None:
     payload = response.json()["data"]
     assert payload["target_smiles"] == "CCN"
     assert payload["library_mode"] == "compact"
+    assert payload["precursor_realism_enabled"] is True
     assert payload["candidates"][0]["precursor_smiles"] == "CCBr.N"
 
 

@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Literal, Optional, Tuple
 
+from cas_tools import PrecursorRealismAssessment
+
 from .models import CenterReactivityContext, TemplateContext
 from .selectivity_poc import FunctionalGroupCompetitionWarning
 
@@ -367,6 +369,10 @@ class GenericDisconnectionCandidate:
     ranking_policy_definition_id: str = ""
     condition_query_reaction_smiles: str = ""
     selectivity_warnings: Tuple[FunctionalGroupCompetitionWarning, ...] = ()
+    precursor_realism_score: Optional[float] = None
+    precursor_realism_assessments: Tuple[PrecursorRealismAssessment, ...] = ()
+    pre_realism_rank: int = 0
+    precursor_realism_rank: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-compatible candidate."""

@@ -410,6 +410,7 @@ export interface RetrosynthesisRequest {
   include_l0: boolean
   use_context: boolean
   diversify: boolean
+  use_precursor_realism: boolean
 }
 
 export interface MultistepRetrosynthesisRequest {
@@ -508,6 +509,28 @@ export interface RetrosynthesisCandidate {
   structural_score_band: number
   ranking_policy_definition_id: string
   selectivity_warnings?: FunctionalGroupCompetitionWarning[]
+  precursor_realism_score?: number | null
+  precursor_realism_assessments?: PrecursorRealismAssessment[]
+  pre_realism_rank: number
+  precursor_realism_rank: number
+}
+
+export interface PrecursorRealismAssessment {
+  canonical_smiles: string
+  inchi_key?: string | null
+  molecular_weight: number
+  evidence: {
+    buyable: boolean
+    in_compound_registry: boolean
+    in_literature: boolean
+  }
+  evidence_tier: string
+  base_score: number
+  molecular_weight_smallness: number
+  molecular_weight_penalty: number
+  score: number
+  definition_id: string
+  schema_version: string
 }
 
 export interface RetrosynthesisResult {
@@ -519,6 +542,12 @@ export interface RetrosynthesisResult {
   candidate_count: number
   library_operator_count: number
   library_template_count: number
+  precursor_realism_enabled: boolean
+  precursor_realism_sources: {
+    buyable: boolean
+    compound_registry: boolean
+    literature: boolean
+  }
   warnings: string[]
   candidates: RetrosynthesisCandidate[]
 }

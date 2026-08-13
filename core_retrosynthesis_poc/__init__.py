@@ -43,6 +43,7 @@ from .generic_search import (
     disconnect_operator_ladder,
     disconnect_operator_ladder_detailed,
     rank_operator_site_diverse,
+    rank_precursor_realism,
 )
 from .html_report import render_comparison_html, write_comparison_html
 from .library import build_library, load_library, save_library
@@ -180,6 +181,7 @@ __all__ = [
     "rank_retrosynthesis_candidates_with_conditions",
     "recommend_retrosynthesis_conditions",
     "rank_operator_site_diverse",
+    "rank_precursor_realism",
     "build_canonical_route_tree",
     "route_distance_matrix",
     "route_tree_distance",

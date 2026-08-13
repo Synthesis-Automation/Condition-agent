@@ -109,6 +109,7 @@ class RetrosynthesisRequest(StrictRequest):
     include_l0: bool = True
     use_context: bool = True
     diversify: bool = True
+    use_precursor_realism: bool = False
 
 
 class MultistepRetrosynthesisRequest(StrictRequest):

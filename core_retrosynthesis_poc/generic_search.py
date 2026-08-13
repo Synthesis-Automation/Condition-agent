@@ -7,11 +7,15 @@ import math
 from contextlib import redirect_stdout
 from dataclasses import replace
 from functools import lru_cache
-from typing import Iterable
+from typing import Callable, Iterable
 
 from rdkit import Chem
 from rdchiral.main import rdchiralReactants, rdchiralReaction, rdchiralRun
 
+from cas_tools import (
+    PrecursorRealismAssessment,
+    aggregate_precursor_realism,
+)
 from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
 from retrosynthesis_poc.chemistry import canonical_smiles, maximum_similarity
 
@@ -411,9 +415,46 @@ def rank_operator_site_diverse(
             [],
         ).append(candidate)
 
+    realism_enabled = any(
+        candidate.precursor_realism_score is not None
+        for candidate in structurally_ranked
+    )
+    realism_ranks: dict[int, int] = {}
+    if realism_enabled:
+        realism_order = sorted(
+            structurally_ranked,
+            key=lambda candidate: (
+                (
+                    resolved.level_rank(candidate.abstraction_level)
+                    if resolved.preserve_abstraction_level_order
+                    else 0
+                ),
+                bands[id(candidate)],
+                -float(candidate.precursor_realism_score or 0.0),
+                pre_ranks[id(candidate)],
+            ),
+        )
+        realism_ranks = {
+            id(candidate): rank
+            for rank, candidate in enumerate(realism_order, start=1)
+        }
     diversified = []
     for partition_key in sorted(partitions):
-        group_values = tuple(partitions[partition_key].values())
+        group_values = list(partitions[partition_key].values())
+        if realism_enabled:
+            for group in group_values:
+                group.sort(
+                    key=lambda candidate: (
+                        -float(candidate.precursor_realism_score or 0.0),
+                        pre_ranks[id(candidate)],
+                    )
+                )
+            group_values.sort(
+                key=lambda group: (
+                    -float(group[0].precursor_realism_score or 0.0),
+                    min(pre_ranks[id(candidate)] for candidate in group),
+                )
+            )
         depth = 0
         while True:
             added = False
@@ -432,8 +473,92 @@ def rank_operator_site_diverse(
             diversity_group_key=diversity_group_key(candidate, resolved),
             structural_score_band=bands[id(candidate)],
             ranking_policy_definition_id=resolved.definition_id,
+            pre_realism_rank=(
+                pre_ranks[id(candidate)] if realism_enabled else 0
+            ),
+            precursor_realism_rank=(
+                realism_ranks[id(candidate)] if realism_enabled else 0
+            ),
         )
         for rank, candidate in enumerate(diversified, start=1)
+    )
+
+
+def _attach_precursor_realism(
+    candidates: Iterable[GenericDisconnectionCandidate],
+    scorer: Callable[[str], tuple[PrecursorRealismAssessment, ...]],
+) -> tuple[GenericDisconnectionCandidate, ...]:
+    """Attach auditable component assessments before optional reranking."""
+
+    values = []
+    for candidate in candidates:
+        assessments = scorer(candidate.precursor_smiles)
+        values.append(
+            replace(
+                candidate,
+                precursor_realism_score=aggregate_precursor_realism(assessments),
+                precursor_realism_assessments=assessments,
+            )
+        )
+    return tuple(values)
+
+
+def rank_precursor_realism(
+    candidates: Iterable[GenericDisconnectionCandidate],
+    *,
+    policy: RetrosynthesisRankingPolicy | None = None,
+) -> tuple[GenericDisconnectionCandidate, ...]:
+    """Rerank assessed candidates only within structural-quality bands."""
+
+    resolved = policy or load_retrosynthesis_ranking_policy()
+    values = tuple(candidates)
+    chemistry_order = tuple(
+        sorted(
+            values,
+            key=lambda candidate: (
+                (
+                    resolved.level_rank(candidate.abstraction_level)
+                    if resolved.preserve_abstraction_level_order
+                    else 0
+                ),
+                -candidate.score,
+                -candidate.independent_reference_support,
+                candidate.precursor_smiles,
+                candidate.template_id,
+            ),
+        )
+    )
+    bands = structural_score_bands(
+        chemistry_order,
+        width=resolved.diversity_score_band_width,
+        separate_by_level=resolved.preserve_abstraction_level_order,
+    )
+    pre_ranks = {
+        id(candidate): rank
+        for rank, candidate in enumerate(chemistry_order, start=1)
+    }
+    ranked = sorted(
+        chemistry_order,
+        key=lambda candidate: (
+            (
+                resolved.level_rank(candidate.abstraction_level)
+                if resolved.preserve_abstraction_level_order
+                else 0
+            ),
+            bands[id(candidate)],
+            -float(candidate.precursor_realism_score or 0.0),
+            pre_ranks[id(candidate)],
+        ),
+    )
+    return tuple(
+        replace(
+            candidate,
+            structural_score_band=bands[id(candidate)],
+            ranking_policy_definition_id=resolved.definition_id,
+            pre_realism_rank=pre_ranks[id(candidate)],
+            precursor_realism_rank=rank,
+        )
+        for rank, candidate in enumerate(ranked, start=1)
     )
 
 
@@ -448,6 +573,9 @@ def disconnect_operator_ladder(
     include_l0: bool = True,
     diversify: bool = True,
     minimum_candidates_per_level: int = 0,
+    precursor_realism_scorer: (
+        Callable[[str], tuple[PrecursorRealismAssessment, ...]] | None
+    ) = None,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
     """Fill specificity tiers with general operator/site-diverse candidates.
 
@@ -485,11 +613,18 @@ def disconnect_operator_ladder(
             max_candidates_to_validate=max_candidates_to_validate,
             use_context=use_context,
         )
+        if precursor_realism_scorer is not None:
+            candidates = _attach_precursor_realism(
+                candidates,
+                precursor_realism_scorer,
+            )
         if diversify:
             candidates = rank_operator_site_diverse(
                 candidates,
                 policy=policy,
             )
+        elif precursor_realism_scorer is not None:
+            candidates = rank_precursor_realism(candidates, policy=policy)
         candidates_by_level[level] = candidates
         if minimum_candidates_per_level > 0:
             continue
@@ -636,5 +771,6 @@ __all__ = [
     "disconnect_operator_ladder",
     "disconnect_operator_ladder_detailed",
     "rank_operator_site_diverse",
+    "rank_precursor_realism",
     "rank_site_diverse",
 ]

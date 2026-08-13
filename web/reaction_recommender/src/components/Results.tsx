@@ -435,6 +435,7 @@ function RetrosynthesisDetails({
             <div><dt>Template specificity</dt><dd>{candidate.template_specificity.toFixed(3)}</dd></div>
             <div><dt>Independent references</dt><dd>{candidate.independent_reference_support}</dd></div>
             <div><dt>Forward validation</dt><dd>{displayName(candidate.forward_validation_status)}</dd></div>
+            {candidate.precursor_realism_score != null && <div><dt>Precursor realism</dt><dd>{candidate.precursor_realism_score.toFixed(3)}</dd></div>}
           </dl>
         </section>
       </div>
@@ -486,7 +487,21 @@ function RetrosynthesisDetails({
           <div><strong>Structural rank</strong><span>{candidate.pre_diversity_rank || candidate.rank}</span></div>
           <div><strong>Diversity rank</strong><span>{candidate.diversity_rank || candidate.rank}</span></div>
           <div><strong>Score band</strong><span>{candidate.structural_score_band}</span></div>
+          {candidate.precursor_realism_score != null && <div><strong>Realism rerank</strong><span>{candidate.pre_realism_rank} → {candidate.precursor_realism_rank}</span></div>}
         </div>
+        {(candidate.precursor_realism_assessments ?? []).map((assessment) => (
+          <dl className="detail-list" key={assessment.canonical_smiles}>
+            <div><dt>Precursor</dt><dd className="mono-value">{assessment.canonical_smiles}</dd></div>
+            <div><dt>Realism tier</dt><dd>{displayName(assessment.evidence_tier)}</dd></div>
+            <div><dt>Molecular weight</dt><dd>{assessment.molecular_weight.toFixed(2)} Da</dd></div>
+            <div><dt>MW penalty</dt><dd>−{assessment.molecular_weight_penalty.toFixed(3)}</dd></div>
+            <div><dt>Evidence</dt><dd>{[
+              assessment.evidence.buyable && 'buyable',
+              assessment.evidence.in_compound_registry && 'registry',
+              assessment.evidence.in_literature && 'literature',
+            ].filter(Boolean).join(', ') || 'none'}</dd></div>
+          </dl>
+        ))}
       </details>
       <details className="trace-panel machine-code-panel">
         <summary>Operator identity</summary>
@@ -522,12 +537,13 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Score</th>{result.precursor_realism_enabled && <th>Realism</th>}<th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.candidates.map((candidate, index) => (
                   <tr key={`${candidate.template_id}:${candidate.precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
                     <td><strong>{candidate.rank}</strong></td>
                     <td>{candidate.score.toFixed(3)}</td>
+                    {result.precursor_realism_enabled && <td>{candidate.precursor_realism_score?.toFixed(3) ?? '—'}</td>}
                     <td>{candidate.abstraction_level}</td>
                     <td>{displayName(candidate.transformation_kind ?? 'graph operator')}</td>
                     <td>{candidate.condition_evidence?.recommendations?.[0] ? compactRecipeSummary(candidate.condition_evidence.recommendations[0].resolved_recipe) : 'No compatible conditions'}</td>
