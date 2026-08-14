@@ -165,7 +165,7 @@
       "case_id": "aryl_bpin",
       "smiles": "CC1(C)OB(c2ccccc2)OC1(C)C",
       "expected_valid": true,
-      "expected_group_counts": {"ether": 2},
+      "expected_group_counts": {},
       "expected_site_counts": {"CH|ArH": 5, "TM|Ar|BPin": 1}
     },
     {

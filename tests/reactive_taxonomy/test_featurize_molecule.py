@@ -89,6 +89,27 @@ def test_transfer_groups() -> None:
     assert "TM|Ar|BPin" in signatures("CC1(C)OB(c2ccccc2)OC1(C)C")
 
 
+def test_bpin_oxygens_are_not_reported_as_generic_ethers() -> None:
+    result = analyze_molecule(
+        "Cc1c(B2OC(C)(C)C(C)(C)O2)c2c(cnn2C3OCCCC3)cc1Cl"
+    )
+
+    assert any(
+        site.canonical_signature == "TM|HetAr|BPin"
+        for site in result.reactive_site_hypotheses
+    )
+    ether_matches = [
+        group for group in result.motifs if group.motif_id == "ether"
+    ]
+    assert len(ether_matches) == 1
+
+
+def test_generic_ether_still_requires_two_carbon_neighbors() -> None:
+    assert [
+        group.motif_id for group in analyze_molecule("COC").motifs
+    ] == ["ether"]
+
+
 def test_electrophilic_centers() -> None:
     assert "EC|Acyl|Alkyl|OH|latent" in signatures("CC(=O)O")
     assert "EC|Acyl|Alkyl|Cl|activated" in signatures("CC(=O)Cl")

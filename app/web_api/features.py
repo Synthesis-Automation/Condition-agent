@@ -156,9 +156,20 @@ def _reaction_sites(analysis: Any) -> list[Dict[str, Any]]:
     return sites
 
 
-def _reaction_core_summary(core: Any) -> Dict[str, Any] | None:
+def _reaction_core_summary(
+    core: Any,
+    completeness: Any = None,
+) -> Dict[str, Any] | None:
     if core is None:
         return None
+    incomplete = (
+        completeness is not None and completeness.status == "incomplete"
+    )
+    blocking_reasons = set(core.quality.blocking_reasons)
+    warnings = set(core.warnings)
+    if incomplete:
+        blocking_reasons.add("incomplete_product_atom_provenance")
+        warnings.add("REACTION_CORE_DISPLAY_BLOCKED_INCOMPLETE_REACTION")
     return {
         "core_id": core.core_id,
         "evidence": core.evidence,
@@ -180,15 +191,15 @@ def _reaction_core_summary(core: Any) -> Dict[str, Any] | None:
             for event in core.events
         ],
         "quality": {
-            "status": core.quality.status,
+            "status": "blocked" if incomplete else core.quality.status,
             "review_reasons": list(core.quality.review_reasons),
-            "blocking_reasons": list(core.quality.blocking_reasons),
+            "blocking_reasons": sorted(blocking_reasons),
             "checked_edit_fraction": core.quality.checked_edit_fraction,
             "active_atom_mapping_coverage": (
                 core.quality.active_atom_mapping_coverage
             ),
         },
-        "warnings": list(core.warnings),
+        "warnings": sorted(warnings),
     }
 
 
@@ -281,7 +292,14 @@ def analyze_features(
     core_graphic_svg = None
     core_projection = None
     core_graphic_error = None
-    if analysis.reaction_core is not None:
+    if (
+        analysis.reaction_core is not None
+        and analysis.reaction_core.quality.status != "blocked"
+        and (
+            analysis.reaction_completeness is None
+            or analysis.reaction_completeness.status != "incomplete"
+        )
+    ):
         try:
             projection = build_reaction_display_projection(
                 reaction_render_context_from_analysis(analysis)
@@ -303,6 +321,11 @@ def analyze_features(
             }
         except (RuntimeError, ValueError) as exc:
             core_graphic_error = str(exc)
+    elif analysis.reaction_core is not None:
+        core_graphic_error = (
+            "Reaction core graphic withheld because the structural evidence "
+            "is blocked; review the listed core reasons and reaction warnings."
+        )
 
     return {
         "input_kind": kind,
@@ -312,7 +335,10 @@ def analyze_features(
         "overview": _reaction_overview(analysis),
         "motifs": _reaction_motifs(analysis),
         "reactive_sites": _reaction_sites(analysis),
-        "reaction_core": _reaction_core_summary(analysis.reaction_core),
+        "reaction_core": _reaction_core_summary(
+            analysis.reaction_core,
+            analysis.reaction_completeness,
+        ),
         "partners": _reaction_partners(analysis),
         "mapping": (
             assessment.to_provenance_dict()

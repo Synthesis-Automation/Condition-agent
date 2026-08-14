@@ -419,7 +419,7 @@
     {
       "id": "ether",
       "label": "R–O–R",
-      "smarts": "[O;X2;H0;!$([O]-[C,S,P]=O):1]",
+      "smarts": "[O;X2;H0;$([O]([#6])[#6]);!$([O]-[C,S,P]=O):1]",
       "priority": 60,
       "tags": [
         "hydrogen_bond_acceptor",

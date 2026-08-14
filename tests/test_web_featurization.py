@@ -33,6 +33,18 @@ MAPPED_CHANGED_CONTINUITY_MACROCYCLIZATION = (
     "[CH3:37])([CH3:35])[CH3:34])[n:28][c:26]3[CH3:27])"
     "[c:12]([Cl:13])[c:14]([F:15])[cH:16][cH:17]2"
 )
+MAPPED_INCOMPLETE_BPIN_REACTION = (
+    "[CH3:17][C@H:18]1[CH:24]=[CH:23][C:21](=[O:22])"
+    "[CH2:20][CH2:19]1.[CH3:1][c:2]1[c:16](B2O[C:29]"
+    "([CH3:31])([CH3:30])[C:26]([CH3:28])([CH3:27])[O:25]2)"
+    "[c:6]3[c:5]([n:9]([C@@H:10]4[O:15][CH2:14][CH2:13]"
+    "[CH2:12][CH2:11]4)[n:8][cH:7]3)[cH:4][c:3]1Cl>>"
+    "[CH3:1][c:2]1[c:16]([CH:21]2[CH2:23][c:24]3[c:18]"
+    "([c:17](N4CCN(C([O:25][C:26]([CH3:29])([CH3:28])"
+    "[CH3:27])=[O:22])[CH2:31][CH2:30]4)ncn3)[CH2:19]"
+    "[CH2:20]2)[c:6]5[c:5]([n:9]([CH:10]6[O:15][CH2:14]"
+    "[CH2:13][CH2:12][CH2:11]6)[n:8][cH:7]5)[cH:4][cH:3]1"
+)
 
 
 def test_detect_input_kind_supports_molecules_and_reactions() -> None:
@@ -63,6 +75,31 @@ def test_reaction_feature_analysis_includes_core_projection() -> None:
     assert "<svg" in result["core_graphic_svg"]
     assert result["reactive_sites"]
     assert all(site["side"] == "reactant" for site in result["reactive_sites"])
+
+
+def test_web_withholds_core_graphic_for_incomplete_bpin_reaction() -> None:
+    result = analyze_features(MAPPED_INCOMPLETE_BPIN_REACTION)
+
+    assert result["overview"]["completeness_status"] == "incomplete"
+    assert result["reaction_core"] is not None
+    assert result["reaction_core"]["quality"]["status"] == "blocked"
+    assert "incomplete_product_atom_provenance" in (
+        result["reaction_core"]["quality"]["blocking_reasons"]
+    )
+    assert result["core_projection"] is None
+    assert result["core_graphic_svg"] is None
+    assert "withheld" in result["core_graphic_error"]
+    assert any(
+        site["label"] == "HetAr–BPin"
+        for site in result["reactive_sites"]
+    )
+    assert [
+        motif["label"]
+        for motif in result["motifs"]
+        if motif["label"] == "R–O–R"
+        and motif["side"] == "reactant"
+        and motif["component_index"] == 1
+    ] == ["R–O–R"]
 
 
 def test_web_core_graphic_preserves_intercomponent_annulation_ring() -> None:
