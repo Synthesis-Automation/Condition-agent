@@ -146,7 +146,7 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         definition = dict(json.load(handle))
     expected = {
         "schema_version": "1.0",
-        "definition_id": "reaction_display_projection.v1.9",
+        "definition_id": "reaction_display_projection.v1.10",
         "reaction_interface_block_definition_id": (
             "reaction_interface_blocks.v1.0"
         ),
@@ -541,6 +541,38 @@ def _reaction_interface_closure(
     # fragment. Iterate to a fixed point so overlapping blocks compose without
     # relying on definition or atom order.
     _retain_interface_blocks(molecule, retained)
+
+    # Later interface rules can introduce an aromatic atom even when no active
+    # edit endpoint was itself aromatic. A directly attached heteroatom is the
+    # common case (for example an acyl tetrazole). Complete every aromatic
+    # bond-connected system touched by the final retained interface; otherwise
+    # the minimized graph contains an isolated atom still marked aromatic and
+    # cannot be sanitized. Repeat because a completed system or interface
+    # block can expose another defined part of the same local interface.
+    while True:
+        previous = frozenset(retained)
+        for atom_index in tuple(sorted(retained)):
+            if not molecule.GetAtomWithIdx(atom_index).GetIsAromatic():
+                continue
+            system = _aromatic_system(molecule, atom_index)
+            if not system:
+                continue
+            retained.update(system)
+            aromatic_systems.add(tuple(sorted(system)))
+        completed_aromatic_atoms = {
+            atom_index
+            for system in aromatic_systems
+            for atom_index in system
+        }
+        for atom_index in tuple(sorted(completed_aromatic_atoms)):
+            atom = molecule.GetAtomWithIdx(atom_index)
+            for bond in atom.GetBonds():
+                if bond.GetIsAromatic() or bond.GetBondTypeAsDouble() < 2.0:
+                    continue
+                retained.add(int(bond.GetOtherAtomIdx(atom_index)))
+        _retain_interface_blocks(molecule, retained)
+        if frozenset(retained) == previous:
+            break
     return retained, aromatic_systems, aromatic_policy_atoms
 
 
@@ -1079,11 +1111,27 @@ def _side_component_drafts(
     active, aromatic_seeds = _active_coordinates(analysis, side=side)
     core = analysis.reaction_core
     explicit_remote: Dict[int, set[int]] = {}
-    formed_ring_paths: Dict[int, set[int]] = {}
+    formed_ring_path_maps: Dict[int, set[int]] = {}
+    formed_ring_path_coordinates: Dict[int, set[int]] = {}
+    formed_ring_path_fallback: Dict[int, set[int]] = {}
     if core is not None:
+        topology = analysis.reaction_topology
+        ring_references = tuple(
+            reference
+            for change in tuple(
+                getattr(topology, "ring_changes", ()) or ()
+            )
+            for reference in tuple(change.atom_references or ())
+        )
+        ring_maps = {
+            int(reference.atom_map_number)
+            for reference in ring_references
+            if reference.atom_map_number is not None
+            and int(reference.atom_map_number) > 0
+        }
         formed_ring_path_ids = formed_ring_path_subgraph_ids(
             core=core,
-            topology=analysis.reaction_topology,
+            topology=topology,
             side=side,
         )
         for subgraph in core.remote_subgraphs:
@@ -1096,9 +1144,31 @@ def _side_component_drafts(
             if str(subgraph.side) != side:
                 continue
             if str(subgraph.subgraph_id) in formed_ring_path_ids:
-                formed_ring_paths.setdefault(
-                    int(subgraph.component_index), set()
-                ).update(int(value) for value in subgraph.atom_indices)
+                component_index = int(subgraph.component_index)
+                matching_maps = ring_maps.intersection(
+                    int(value) for value in subgraph.atom_map_numbers
+                )
+                matching_coordinates = {
+                    int(reference.atom_index)
+                    for reference in ring_references
+                    if (
+                        str(reference.side) == side
+                        and int(reference.component_index) == component_index
+                        and int(reference.atom_index) in subgraph.atom_indices
+                    )
+                }
+                if matching_maps:
+                    formed_ring_path_maps.setdefault(
+                        component_index, set()
+                    ).update(matching_maps)
+                if matching_coordinates:
+                    formed_ring_path_coordinates.setdefault(
+                        component_index, set()
+                    ).update(matching_coordinates)
+                if not matching_maps and not matching_coordinates:
+                    formed_ring_path_fallback.setdefault(
+                        component_index, set()
+                    ).update(int(value) for value in subgraph.atom_indices)
             if (
                 continuity in {"departing", "appearing"}
                 or preserve_small_unresolved_heteroatom
@@ -1113,6 +1183,19 @@ def _side_component_drafts(
         molecule = parse_smiles(components[component_index].input_smiles)
         if molecule is None:
             raise ValueError("reaction display component could not be reparsed")
+        formed_ring_path_atom_indices = set(
+            formed_ring_path_coordinates.get(component_index, set())
+        )
+        path_maps = formed_ring_path_maps.get(component_index, set())
+        if path_maps:
+            formed_ring_path_atom_indices.update(
+                int(atom.GetIdx())
+                for atom in molecule.GetAtoms()
+                if int(atom.GetAtomMapNum()) in path_maps
+            )
+        formed_ring_path_atom_indices.update(
+            formed_ring_path_fallback.get(component_index, set())
+        )
         output.append(
             _display_component_draft(
                 molecule,
@@ -1125,9 +1208,7 @@ def _side_component_drafts(
                 explicit_remote_atom_indices=explicit_remote.get(
                     component_index, set()
                 ),
-                formed_ring_path_atom_indices=formed_ring_paths.get(
-                    component_index, set()
-                ),
+                formed_ring_path_atom_indices=formed_ring_path_atom_indices,
                 core=core,
             )
         )

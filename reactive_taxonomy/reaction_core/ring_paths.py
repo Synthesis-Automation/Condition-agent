@@ -13,14 +13,16 @@ def formed_ring_path_subgraph_ids(
     topology: Optional[ReactionTopology],
     side: Literal["reactant", "product"] | None = None,
 ) -> frozenset[str]:
-    """Return retained subgraphs required to display observed formed rings.
+    """Return remote subgraphs required to display observed formed rings.
 
     A formed ring can result from multiple bonds joining originally separate
     reactant components. Consequently, the overall intramolecular versus
     intermolecular scope cannot decide whether a retained tether is safe to
     abstract. Atom-mapped ring paths are used when available; topology with
     only a ring-size or cycle-rank delta falls back conservatively to all
-    retained subgraphs spanning multiple active boundary atoms.
+    subgraphs spanning multiple active boundary atoms. Continuity labels do
+    not gate selection: cyclization can change a remote fragment's derived
+    class or serialization while its mapped path still carries the ring.
     """
     if topology is None or core is None:
         return frozenset()
@@ -34,10 +36,7 @@ def formed_ring_path_subgraph_ids(
 
     protected = set()
     for subgraph in core.remote_subgraphs:
-        if (
-            subgraph.continuity != "retained"
-            or (side is not None and subgraph.side != side)
-        ):
+        if side is not None and subgraph.side != side:
             continue
         boundary_coordinates = {
             (int(port.core_component_index), int(port.core_atom_index))

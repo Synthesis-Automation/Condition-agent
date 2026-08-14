@@ -18,6 +18,13 @@ MAPPED_INTERCOMPONENT_ANNULATION = (
     "[CH3:26][N:28]1[CH2:1][CH2:2][c:3]2[c:9]1"
     "[cH:8][cH:7][cH:6][cH:4]2"
 )
+MAPPED_ACYL_TETRAZOLE_REARRANGEMENT = (
+    "[CH3:1][CH:2]=[O:3]."
+    "[CH3:4][CH2:5][O:6][C:7]([n:9]1[n:13][n:12][n:11][cH:10]1)"
+    "=[O:8]>>"
+    "[CH3:1][CH2:2][O:3][C:5]([O:6][CH:7]"
+    "([n:9]1[n:13][n:12][n:11][cH:10]1)[CH3:4])=[O:8]"
+)
 
 
 def _projection(reaction_smiles: str):
@@ -278,7 +285,7 @@ def test_click_reaction_keeps_new_ring_and_uses_two_r_groups() -> None:
 def test_intercomponent_annulation_retains_formed_ring_path() -> None:
     projection = _projection(MAPPED_INTERCOMPONENT_ANNULATION)
 
-    assert projection.definition_id == "reaction_display_projection.v1.9"
+    assert projection.definition_id == "reaction_display_projection.v1.10"
     assert projection.reaction_scope == "intermolecular"
     assert projection.formed_ring_sizes == (5,)
     assert projection.minimum_reaction_smiles == (
@@ -306,6 +313,22 @@ def test_intercomponent_annulation_retains_formed_ring_path() -> None:
         ("product", 1): ("R¹", "ring_aliphatic"),
         ("product", 3): ("R²", "ring_aliphatic"),
     }
+
+
+def test_interface_heteroatom_completes_attached_aromatic_system() -> None:
+    projection = _projection(MAPPED_ACYL_TETRAZOLE_REARRANGEMENT)
+
+    assert projection.minimum_reaction_smiles == (
+        "*C=O.CCOC(=O)n1cnnn1>>*COC(=O)OC(C)n1cnnn1"
+    )
+    assert sum(
+        component.retained_aromatic_system_count
+        for component in projection.reactants
+    ) == 1
+    assert sum(
+        component.retained_aromatic_system_count
+        for component in projection.products
+    ) == 1
 
 
 def test_intramolecular_projection_reports_formed_ring_size() -> None:
