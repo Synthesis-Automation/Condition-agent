@@ -23,7 +23,7 @@ def resolve_identifier(
     *,
     identifier_type: str = "auto",
 ) -> ResolutionResult:
-    """Resolve a typed CAS, name, abbreviation, or external identifier."""
+    """Resolve a typed CAS, name, structure, or external identifier."""
     return get_registry().resolve_identifier(
         value,
         identifier_type=identifier_type,

@@ -52,13 +52,20 @@ preferences are owned by `condition_recommender`.
 ## Resolution
 
 Resolution is exact and conservative. CAS values require a valid checksum.
-Names resolve through canonical names and typed aliases; shared aliases return
-an ambiguous result rather than selecting a record by order.
+Names resolve through canonical names and typed aliases. SMILES resolve through
+canonical isomeric structures. Shared names or structures return an ambiguous
+result rather than selecting a record by order.
 
 ```python
 from condition_registry import resolve_identifier
 
 result = resolve_identifier("EtOH", identifier_type="abbreviation")
+assert result.substance is not None
+assert result.substance.substance_id == "cas:64-17-5"
+```
+
+```python
+result = resolve_identifier("OCC", identifier_type="smiles")
 assert result.substance is not None
 assert result.substance.substance_id == "cas:64-17-5"
 ```

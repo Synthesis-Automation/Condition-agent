@@ -19008,7 +19008,7 @@
 {"cas":"75-39-8","id":"cas:75-39-8","name":"Ethanol, 1-amino-(8CI,9CI)","smiles":"CC(N)O"}
 {"cas":"7460-82-4","id":"cas:7460-82-4","name":"Ethanol, 2,2'-oxybis-,1,1'-bis(4-methylbenzenesulfonate)","smiles":"Cc1ccc(S(=O)(=O)OCCOCCOS(=O)(=O)c2ccc(C)cc2)cc1"}
 {"cas":"1116-54-7","id":"cas:1116-54-7","name":"Ethanol,2,2'-(nitrosoimino)bis-","smiles":"O=NN(CCO)CCO"}
-{"cas":"1516-08-1","id":"cas:1516-08-1","name":"Ethanol-D6","smiles":"CCO"}
+{"cas":"1516-08-1","id":"cas:1516-08-1","name":"Ethanol-D6","smiles":"[2H]OC([2H])([2H])C([2H])([2H])[2H]"}
 {"cas":"545375-30-2","id":"cas:545375-30-2","name":"Ethanolaminebenzoatehydrochloride","smiles":"C1=CC=C(C=C1)C(=O)OCCN"}
 {"cas":"2002-24-6","id":"cas:2002-24-6","name":"Ethanolaminehydrochloride","smiles":"C(CO)N"}
 {"cas":"177942-47-1","id":"cas:177942-47-1","name":"ethanone, 1-(3-fluoro-2-methylphenyl)-","smiles":"CC(=O)c1cccc(F)c1C"}
@@ -25263,7 +25263,7 @@
 {"aliases":[{"type":"abbreviation","value":"SDS"}],"cas":"151-21-3","id":"cas:151-21-3","name":"sodium dodecyl sulfate","smiles":"CCCCCCCCCCCCOS(=O)(=O)[O-]"}
 {"cas":"25155-30-0","id":"cas:25155-30-0","name":"sodium dodecyl-benzenesulfonate","smiles":"CCCCCCCCCCCCc1ccccc1S(=O)(=O)[O-]"}
 {"cas":"5324-47-0","id":"cas:5324-47-0","name":"sodium ethanesulphonate","smiles":"CCS(=O)(=O)[O-]"}
-{"cas":"141-52-6","id":"cas:141-52-6","name":"Sodium ethylate","smiles":"CCO"}
+{"cas":"141-52-6","id":"cas:141-52-6","name":"Sodium ethylate","smiles":"CC[O-].[Na+]"}
 {"cas":"17013-01-3","id":"cas:17013-01-3","name":"sodium fumarate"}
 {"cas":"532-94-5","id":"cas:532-94-5","name":"sodium hippurate","smiles":"O=C([O-])CNC(=O)c1ccccc1"}
 {"cas":"62625-22-3","id":"cas:62625-22-3","name":"sodium hydrogen 2-[1-(2-hydroxy-5-sulphonatophenyl)-3-phenyl-5-formazano]benzoate","smiles":"O=C(O)c1ccccc1N=NC(=NNc1cc(S(=O)(=O)[O-])ccc1O)c1ccccc1"}
@@ -26103,8 +26103,8 @@
 {"cas":"3699-67-0","id":"cas:3699-67-0","name":"Triethyl3-phosphonopropionate","smiles":"COC1(C2CC(C1C=C2)C3OCCO3)OC"}
 {"cas":"2327-69-7","id":"cas:2327-69-7","name":"Triethyl4-phosphonobutyrate","smiles":"C[Sn](=O)C"}
 {"cas":"97-93-8","id":"cas:97-93-8","name":"Triethylaluminum,w/winhexane","smiles":"COCCCCCCCCCCCC(=O)O"}
-{"cas":"636-70-4","id":"cas:636-70-4","name":"Triethylamine hydrobromide","smiles":"CCN(CC)CC"}
-{"cas":"554-68-7","id":"cas:554-68-7","name":"Triethylamine hydrochloride","smiles":"CCN(CC)CC"}
+{"cas":"636-70-4","id":"cas:636-70-4","name":"Triethylamine hydrobromide","smiles":"CC[NH+](CC)CC.[Br-]"}
+{"cas":"554-68-7","id":"cas:554-68-7","name":"Triethylamine hydrochloride","smiles":"CC[NH+](CC)CC.[Cl-]"}
 {"aliases":[{"language":"en","type":"legacy_name","value":"Et3N.3HF"}],"cas":"73602-61-6","id":"cas:73602-61-6","name":"Triethylamine trihydrofluoride","smiles":"CCN(CC)CC.F.F.F"}
 {"cas":"97-94-9","id":"cas:97-94-9","name":"Triethylborane","smiles":"CCB(CC)CC"}
 {"cas":"150-46-9","id":"cas:150-46-9","name":"Triethylborate","smiles":"CCOB(OCC)OCC"}

@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from typing import Optional
 
+from rdkit import Chem, rdBase
+
 from .models import CONDITION_NAME_IDENTIFIER_TYPES
 
 _CAS_RE = re.compile(r"^(\d{2,7})-(\d{2})-(\d)$")
@@ -16,6 +18,7 @@ _IDENTIFIER_NORMALIZATION_PROFILES = {
     "abbreviation": "abbreviation_v1",
     "trade_name": "trade_name_v1",
     "legacy_name": "chemical_name_v1",
+    "smiles": "canonical_smiles_v1",
     "cas": "cas_v1",
     "inchi_key": "inchi_key_v1",
     "database_id": "database_id_v1",
@@ -47,12 +50,26 @@ def normalize_cas(value: str) -> Optional[str]:
     return text if checksum % 10 == int(match.group(3)) else None
 
 
+def normalize_smiles(value: str) -> Optional[str]:
+    """Return canonical isomeric SMILES for an exact structure identifier."""
+    text = str(value or "").strip()
+    if not text:
+        return None
+    with rdBase.BlockLogs():
+        molecule = Chem.MolFromSmiles(text)
+    if molecule is None:
+        return None
+    return Chem.MolToSmiles(molecule, canonical=True, isomericSmiles=True)
+
+
 def normalize_identifier(value: str, identifier_type: str) -> Optional[str]:
     """Normalize one typed condition identifier for deterministic indexing."""
     if identifier_type == "cas":
         return normalize_cas(value)
     if identifier_type in CONDITION_NAME_IDENTIFIER_TYPES:
         return normalize_chemical_name(value)
+    if identifier_type == "smiles":
+        return normalize_smiles(value)
     if identifier_type == "inchi_key":
         text = re.sub(r"\s+", "", str(value or "")).upper()
         return text or None
@@ -72,5 +89,6 @@ __all__ = [
     "normalize_chemical_name",
     "normalize_identifier",
     "normalize_name",
+    "normalize_smiles",
     "identifier_normalization_profile",
 ]

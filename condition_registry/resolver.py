@@ -19,6 +19,7 @@ from .models import (
     SubstanceIdentifier,
 )
 from .normalization import normalize_cas, normalize_identifier
+from .normalization import identifier_normalization_profile
 
 _CAS_SHAPE_RE = re.compile(r"\d{2,7}-\d{2}-\d")
 
@@ -52,7 +53,27 @@ class ConditionRegistry:
             self._by_id[substance.substance_id] = substance
             if substance.cas:
                 self._by_cas[substance.cas].append(substance)
-            for identifier in substance.identifiers:
+            identifiers = list(substance.identifiers)
+            if substance.smiles and not any(
+                identifier.identifier_type == "smiles"
+                for identifier in identifiers
+            ):
+                identifiers.append(
+                    SubstanceIdentifier(
+                        identifier_id=(
+                            f"structure:{substance.substance_id}:smiles"
+                        ),
+                        substance_id=substance.substance_id,
+                        identifier_type="smiles",
+                        value=substance.smiles,
+                        is_preferred=True,
+                        normalization_profile=identifier_normalization_profile(
+                            "smiles"
+                        ),
+                        allow_ambiguous=True,
+                    )
+                )
+            for identifier in identifiers:
                 if identifier.identifier_id in identifier_ids:
                     raise ValueError(
                         f"Duplicate substance identifier ID: {identifier.identifier_id}"
@@ -147,6 +168,12 @@ class ConditionRegistry:
                 query=query,
                 status="invalid_identifier",
                 warnings=("INVALID_CAS",),
+            )
+        if identifier_type == "smiles" and normalized is None:
+            return ResolutionResult(
+                query=query,
+                status="invalid_identifier",
+                warnings=("INVALID_SMILES",),
             )
         return self._result_from_identifiers(
             query=query,

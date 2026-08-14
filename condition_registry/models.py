@@ -13,6 +13,7 @@ CONDITION_IDENTIFIER_TYPES = (
     "abbreviation",
     "trade_name",
     "legacy_name",
+    "smiles",
     "cas",
     "inchi_key",
     "database_id",

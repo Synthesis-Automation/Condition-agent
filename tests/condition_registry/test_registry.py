@@ -97,6 +97,74 @@ def test_substance_supports_unbounded_typed_aliases() -> None:
     assert result.matched_identifier.identifier_type == "systematic_name"
 
 
+def test_canonical_smiles_resolves_exact_condition_identity() -> None:
+    ethanol = resolve_identifier("OCC", identifier_type="smiles")
+    triethylamine = resolve_identifier(
+        "CCN(CC)CC",
+        identifier_type="smiles",
+    )
+
+    assert ethanol.status == "resolved"
+    assert ethanol.match_kind == "exact_smiles"
+    assert ethanol.substance is not None
+    assert ethanol.substance.canonical_name == "Ethanol"
+    assert ethanol.substance.cas == "64-17-5"
+    assert triethylamine.status == "resolved"
+    assert triethylamine.substance is not None
+    assert triethylamine.substance.canonical_name == "Triethylamine"
+    assert triethylamine.substance.cas == "121-44-8"
+
+
+def test_invalid_smiles_is_not_silently_treated_as_a_name() -> None:
+    result = resolve_identifier("not smiles", identifier_type="smiles")
+
+    assert result.status == "invalid_identifier"
+    assert result.warnings == ("INVALID_SMILES",)
+
+
+def test_shared_structure_returns_all_candidates_instead_of_guessing() -> None:
+    first = Substance(
+        substance_id="sub:test:first-structure",
+        canonical_name="First structure",
+        cas=None,
+        smiles="CCO",
+        identifiers=(
+            _identifier(
+                "id:first-structure:name",
+                "sub:test:first-structure",
+                "canonical_name",
+                "First structure",
+            ),
+        ),
+    )
+    second = Substance(
+        substance_id="sub:test:second-structure",
+        canonical_name="Second structure",
+        cas=None,
+        smiles="OCC",
+        identifiers=(
+            _identifier(
+                "id:second-structure:name",
+                "sub:test:second-structure",
+                "canonical_name",
+                "Second structure",
+            ),
+        ),
+    )
+
+    result = ConditionRegistry(substances=(first, second)).resolve_identifier(
+        "CCO",
+        identifier_type="smiles",
+    )
+
+    assert result.status == "ambiguous"
+    assert result.candidates == (
+        "sub:test:first-structure",
+        "sub:test:second-structure",
+    )
+    assert result.warnings == ("AMBIGUOUS_IDENTIFIER",)
+
+
 def test_shared_alias_returns_all_candidates_instead_of_guessing() -> None:
     first_id = "sub:test:first"
     second_id = "sub:test:second"

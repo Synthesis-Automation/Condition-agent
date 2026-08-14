@@ -52,7 +52,9 @@ def _identifier_input(
     )[0]
     source_type = str(selected.get("identifier_type") or "auto")
     registry_type = (
-        source_type if source_type in {"cas", "name", "substance_id"} else "name"
+        source_type
+        if source_type in {"cas", "name", "smiles", "substance_id"}
+        else "name"
     )
     group_key = str(component.get("group_key") or "")
     amount = component.get("amount")

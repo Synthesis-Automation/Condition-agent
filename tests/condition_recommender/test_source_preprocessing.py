@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from condition_registry import CONDITION_RECIPE_COMPONENT_BUCKETS
 from condition_recommender.ingestion import (
     INTERMEDIATE_OBSERVATION_SCHEMA_VERSION,
     detect_adapter,
@@ -315,6 +316,42 @@ def test_uspto_preprocessing_prefers_mapped_reaction_and_preserves_conditions(
     converted = convert_record(raw_record)
     assert converted.reaction_signature is not None
     assert converted.evidence_quality == "validated_atom_mapping"
+
+
+def test_uspto_smiles_conditions_resolve_to_names_and_cas(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "USPTO_condition_reactions_cleaned.csv"
+    output = tmp_path / "intermediate"
+    row = _uspto_row()
+    row.update(
+        {
+            "catalyst1": "",
+            "solvent1": "OCC",
+            "reagent1": "CCN(CC)CC",
+            "reagent2": "",
+        }
+    )
+    _write_csv(source, [row])
+
+    report = preprocess_file(source, output)
+    raw_record = next(iter_conversion_records(report["output_path"]))
+    converted = convert_record(raw_record)
+    components = {
+        component["raw_identifier"]: component
+        for bucket in CONDITION_RECIPE_COMPONENT_BUCKETS
+        for component in converted.resolved_recipe[bucket]
+    }
+
+    assert {
+        item.identifier_type for item in raw_record.condition_component_inputs
+    } == {"smiles"}
+    assert components["OCC"]["identity_status"] == "resolved"
+    assert components["OCC"]["canonical_name"] == "Ethanol"
+    assert components["OCC"]["cas"] == "64-17-5"
+    assert components["CCN(CC)CC"]["identity_status"] == "resolved"
+    assert components["CCN(CC)CC"]["canonical_name"] == "Triethylamine"
+    assert components["CCN(CC)CC"]["cas"] == "121-44-8"
 
 
 def test_uspto_preprocessing_falls_back_when_remapped_reaction_is_unusable(

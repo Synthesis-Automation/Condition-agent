@@ -55,6 +55,7 @@ function componentName(component: RecipeComponent): string {
     component.canonical_name ??
       component.display_name ??
       component.name ??
+      component.cas ??
       component.raw_identifier ??
       component.substance_id ??
       'Unresolved',
