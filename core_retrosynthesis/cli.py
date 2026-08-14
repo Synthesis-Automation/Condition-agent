@@ -42,7 +42,15 @@ from .route_conversion import (
     DEFAULT_OBSERVED_ROUTE_SAMPLE_SEED,
     convert_observed_route_corpus,
 )
+from .route_core_conversion import (
+    DEFAULT_ROUTE_CORE_SAMPLE_SEED,
+    convert_route_core_corpus,
+)
 from .route_review import DEFAULT_ROUTE_REVIEW_SEED, write_route_review_html
+from .route_core_review import (
+    DEFAULT_ROUTE_CORE_REVIEW_SEED,
+    write_route_core_review_html,
+)
 from .search import disconnect_target
 from .sources import LIBRARY_MODES, iter_library_rows, resolve_library_mode
 
@@ -408,6 +416,40 @@ def _parser() -> argparse.ArgumentParser:
     route_conversion.add_argument("--allow-rejections", action="store_true")
     route_conversion.add_argument("--overwrite", action="store_true")
 
+    route_core = commands.add_parser(
+        "build-route-cores",
+        help="build minimized chemistry projections from canonical route trees",
+    )
+    route_core.add_argument("source_trees")
+    route_core.add_argument("output_jsonl")
+    route_core.add_argument("--manifest")
+    route_core.add_argument("--sample-size", type=int)
+    route_core.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_ROUTE_CORE_SAMPLE_SEED,
+    )
+    route_core.add_argument("--allow-rejections", action="store_true")
+    route_core.add_argument("--overwrite", action="store_true")
+    route_core.add_argument("--workers", type=int, default=1)
+
+    route_core_review = commands.add_parser(
+        "render-route-core-review",
+        help="render minimized route-core projections as self-contained HTML",
+    )
+    route_core_review.add_argument("source_route_cores")
+    route_core_review.add_argument("output_html")
+    route_core_review.add_argument("--sample-size", type=int, default=50)
+    route_core_review.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_ROUTE_CORE_REVIEW_SEED,
+    )
+    route_core_review.add_argument(
+        "--title",
+        default="Minimized route-core review",
+    )
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -487,6 +529,29 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             seed=arguments.seed,
             overwrite=arguments.overwrite,
             strict=not arguments.allow_rejections,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "build-route-cores":
+        report = convert_route_core_corpus(
+            arguments.source_trees,
+            arguments.output_jsonl,
+            manifest_path=arguments.manifest,
+            sample_size=arguments.sample_size,
+            seed=arguments.seed,
+            overwrite=arguments.overwrite,
+            strict=not arguments.allow_rejections,
+            workers=arguments.workers,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "render-route-core-review":
+        report = write_route_core_review_html(
+            arguments.source_route_cores,
+            arguments.output_html,
+            sample_size=arguments.sample_size,
+            seed=arguments.seed,
+            title=arguments.title,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0

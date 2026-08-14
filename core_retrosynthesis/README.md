@@ -76,6 +76,30 @@ predicted evidence. Existing planned routes now serialize through the same v2
 contract while retaining temporary compatibility fields. See
 [`../docs/new/route_tree_contract_and_conversion.md`](../docs/new/route_tree_contract_and_conversion.md).
 
+Build context-preserving route-core projections from those trees:
+
+```powershell
+python -m core_retrosynthesis build-route-cores `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.tree.v2.jsonl.gz `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.core.v1.jsonl.gz `
+  --workers 8
+```
+
+Render the minimized chemistry and cross-step atom lineage:
+
+```powershell
+python -m core_retrosynthesis render-route-core-review `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.random50.core.v1.jsonl.gz `
+  results/core_retrosynthesis/route_reviews/higher_level_routes_random50_route_core.html `
+  --sample-size 50 --seed 20260814
+```
+
+Route cores contain complete generic step signatures and cores, display-only
+minimum reactions, ambiguity-preserving cross-step atom lineage, route-core
+identities, and explicit two-/three-event motif definitions. They are projection
+and learning evidence, not executable multistep templates. See
+[`../docs/new/route_core_projection_design_and_status.md`](../docs/new/route_core_projection_design_and_status.md).
+
 ## Representation
 
 Two initial abstraction levels are generated:

@@ -181,6 +181,14 @@ schema. The 50-route tree artifact matches the HTML sample exactly, and all
 commands, and artifact hashes are documented in
 `docs/new/route_tree_contract_and_conversion.md`.
 
+All route steps have additionally been analyzed through the generic reaction
+signature and reaction-core pipeline. The resulting route-core sidecars preserve
+cross-step atom-lineage ambiguity and define inspectable two-/three-event motifs.
+The minimized 50-route chemistry review is generated at
+`results/core_retrosynthesis/route_reviews/higher_level_routes_random50_route_core.html`.
+Design, audit results, commands, and hashes are documented in
+`docs/new/route_core_projection_design_and_status.md`.
+
 ## How to use it first
 
 The highest-ROI first experiment is route-action ranking, not a new end-to-end

@@ -187,12 +187,14 @@ for tree in iter_route_trees("routes.poc.tree.v2.jsonl.gz"):
 
 ## Deliberate next work
 
-The contract is ready for route-learning experiments, but two chemistry layers
-remain intentionally empty:
+The tree contract remains evidence-neutral. Chemistry enrichment is now produced
+as a rebuildable route-core sidecar rather than embedding large core objects in
+every tree node:
 
-- `reaction_signature_id` will be populated only after each step reconciles
-  mapped edits with `reactive_taxonomy`; and
+- `routes.poc.core.v1.jsonl.gz` contains per-step signatures, reaction cores,
+  minimized displays, cross-step atom lineage, and route motifs; and
 - `condition_recipe_id` will be populated only after the reagent field is
   normalized through `condition_registry`.
 
-Neither field is inferred from names or raw strings during route conversion.
+The source tree is not mutated when chemistry definitions change. See
+[`route_core_projection_design_and_status.md`](route_core_projection_design_and_status.md).
