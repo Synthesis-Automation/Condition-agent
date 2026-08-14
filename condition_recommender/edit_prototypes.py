@@ -5,11 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Mapping, Tuple
 
 
-ANONYMOUS_EDIT_PROTOTYPE_VERSION = "1.0"
+ANONYMOUS_EDIT_PROTOTYPE_VERSION = "1.1"
 
 
 def _bond_pair(token: Any) -> str:
@@ -26,11 +26,60 @@ def _counter_tokens(values: Any, parser: Any) -> Tuple[str, ...]:
     return tuple(sorted(parser(value) for value in values or () if str(value)))
 
 
+def _atom_center_class(atom: Mapping[str, Any]) -> str:
+    """Return a coarse electronic/geometric class for an edit endpoint."""
+
+    if bool(atom.get("aromatic")):
+        return "AROMATIC"
+    hybridization = str(atom.get("hybridization") or "").upper()
+    if hybridization in {"SP", "SP2", "SP3"}:
+        return hybridization
+    return "UNKNOWN"
+
+
+def _edit_state_pair(edit: Mapping[str, Any]) -> str | None:
+    atom_1 = edit.get("atom_1")
+    atom_2 = edit.get("atom_2")
+    if not isinstance(atom_1, Mapping) or not isinstance(atom_2, Mapping):
+        return None
+    atoms = (atom_1, atom_2)
+    carbon_count = sum(str(atom.get("element") or "") == "C" for atom in atoms)
+    endpoints = sorted(
+        (
+            f"{str(atom.get('element') or '')}"
+            + (
+                f"@{_atom_center_class(atom)}"
+                if carbon_count != 1 or str(atom.get("element") or "") == "C"
+                else ""
+            )
+            for atom in atoms
+        )
+    )
+    if any(endpoint.startswith("@") for endpoint in endpoints):
+        return None
+    return "-".join(endpoints)
+
+
+def _signature_state_pairs(
+    signature: Mapping[str, Any], edit_type: str
+) -> Tuple[str, ...]:
+    values = []
+    for edit in signature.get("edits") or ():
+        if not isinstance(edit, Mapping) or edit.get("edit_type") != edit_type:
+            continue
+        token = _edit_state_pair(edit)
+        if token is not None:
+            values.append(token)
+    return tuple(sorted(values))
+
+
 def _build_prototype(
     *,
     formed: Tuple[str, ...],
     broken: Tuple[str, ...],
     changed: Tuple[str, ...],
+    formed_states: Tuple[str, ...],
+    broken_states: Tuple[str, ...],
     topology: Mapping[str, Any],
     event_count: int,
 ) -> "AnonymousEditPrototype | None":
@@ -55,7 +104,12 @@ def _build_prototype(
     prototype_id = "EP1:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[
         :24
     ]
-    return AnonymousEditPrototype(prototype_id=prototype_id, **payload)
+    return AnonymousEditPrototype(
+        prototype_id=prototype_id,
+        formed_atom_state_pairs=formed_states,
+        broken_atom_state_pairs=broken_states,
+        **payload,
+    )
 
 
 @dataclass(frozen=True)
@@ -69,6 +123,15 @@ class AnonymousEditPrototype:
     ring_count_delta: int
     formed_ring_sizes: Tuple[int, ...]
     event_count: int
+    # Center states refine compatibility, but are intentionally excluded from
+    # prototype identity/equality. Ambiguous interpretation hypotheses can
+    # describe different atom assignments for the same anonymous edit graph.
+    formed_atom_state_pairs: Tuple[str, ...] = field(
+        default=(), compare=False
+    )
+    broken_atom_state_pairs: Tuple[str, ...] = field(
+        default=(), compare=False
+    )
     version: str = ANONYMOUS_EDIT_PROTOTYPE_VERSION
 
 
@@ -84,6 +147,8 @@ def anonymous_edit_prototype(
         formed=formed,
         broken=broken,
         changed=changed,
+        formed_states=_signature_state_pairs(signature, "formed"),
+        broken_states=_signature_state_pairs(signature, "broken"),
         topology=topology,
         event_count=int(signature.get("event_count") or 0),
     )
@@ -153,6 +218,8 @@ def anonymous_edit_prototype_from_hypothesis(
     formed = []
     broken = []
     changed = []
+    formed_states = []
+    broken_states = []
     for edit in edits:
         pair = _hypothesis_element_pair(edit)
         if not pair:
@@ -160,8 +227,14 @@ def anonymous_edit_prototype_from_hypothesis(
         edit_type = str(edit.get("edit_type") or "")
         if edit_type == "formed":
             formed.append(pair)
+            state_pair = _edit_state_pair(edit)
+            if state_pair is not None:
+                formed_states.append(state_pair)
         elif edit_type == "broken":
             broken.append(pair)
+            state_pair = _edit_state_pair(edit)
+            if state_pair is not None:
+                broken_states.append(state_pair)
         elif edit_type == "order_changed":
             changed.append(pair)
     topology = hypothesis.get("topology")
@@ -170,6 +243,8 @@ def anonymous_edit_prototype_from_hypothesis(
         formed=tuple(sorted(formed)),
         broken=tuple(sorted(broken)),
         changed=tuple(sorted(changed)),
+        formed_states=tuple(sorted(formed_states)),
+        broken_states=tuple(sorted(broken_states)),
         topology=topology_value,
         event_count=_hypothesis_event_count(edits),
     )
@@ -193,6 +268,8 @@ def anonymous_edit_compatible(
     right_formed = set(right.formed_element_pairs)
     if not left_formed.intersection(right_formed):
         return False
+    if not anonymous_edit_center_compatible(left, right):
+        return False
     left_broken = set(left.broken_element_pairs)
     right_broken = set(right.broken_element_pairs)
     if (
@@ -206,6 +283,26 @@ def anonymous_edit_compatible(
     if left_ring_sign != right_ring_sign:
         return False
     if left_ring_sign and abs(left.ring_count_delta - right.ring_count_delta) > 1:
+        return False
+    return True
+
+
+def anonymous_edit_center_compatible(
+    left: AnonymousEditPrototype,
+    right: AnonymousEditPrototype,
+) -> bool:
+    """Reject only contradictory known formed-bond center states."""
+    left_states = {
+        token
+        for token in left.formed_atom_state_pairs
+        if "@UNKNOWN" not in token
+    }
+    right_states = {
+        token
+        for token in right.formed_atom_state_pairs
+        if "@UNKNOWN" not in token
+    }
+    if left_states and right_states and not left_states.intersection(right_states):
         return False
     return True
 
@@ -253,6 +350,7 @@ def anonymous_edit_similarity(
 __all__ = [
     "ANONYMOUS_EDIT_PROTOTYPE_VERSION",
     "AnonymousEditPrototype",
+    "anonymous_edit_center_compatible",
     "anonymous_edit_compatible",
     "anonymous_edit_prototype",
     "anonymous_edit_prototype_from_hypothesis",

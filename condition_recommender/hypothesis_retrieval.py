@@ -281,6 +281,12 @@ def _prototype_from_mapping(
         order_changed_element_pairs=tuple(
             value.get("order_changed_element_pairs") or ()
         ),
+        formed_atom_state_pairs=tuple(
+            value.get("formed_atom_state_pairs") or ()
+        ),
+        broken_atom_state_pairs=tuple(
+            value.get("broken_atom_state_pairs") or ()
+        ),
         ring_count_delta=int(value.get("ring_count_delta") or 0),
         formed_ring_sizes=tuple(
             int(item) for item in value.get("formed_ring_sizes") or ()

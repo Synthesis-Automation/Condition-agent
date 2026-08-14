@@ -202,8 +202,11 @@ def build_reaction_ring_changes(
     return tuple(changes)
 
 
-def _cycle_rank(components: Tuple[ReactionComponent, ...]) -> Optional[int]:
-    """Return total graph cycle rank, or None when any component is unparseable."""
+def _cycle_rank(
+    components: Tuple[ReactionComponent, ...],
+    included_atoms: Optional[Dict[int, set[int]]] = None,
+) -> Optional[int]:
+    """Return cycle rank for the full or atom-corresponded component graphs."""
     from rdkit import Chem
 
     total = 0
@@ -211,8 +214,34 @@ def _cycle_rank(components: Tuple[ReactionComponent, ...]) -> Optional[int]:
         molecule = parse_smiles(component.input_smiles)
         if molecule is None:
             return None
-        fragment_count = len(Chem.GetMolFrags(molecule, asMols=False))
-        total += molecule.GetNumBonds() - molecule.GetNumAtoms() + fragment_count
+        if included_atoms is None:
+            fragment_count = len(Chem.GetMolFrags(molecule, asMols=False))
+            total += molecule.GetNumBonds() - molecule.GetNumAtoms() + fragment_count
+            continue
+        selected = set(included_atoms.get(component.component_index, set()))
+        if not selected:
+            continue
+        adjacency = {atom_index: set() for atom_index in selected}
+        edge_count = 0
+        for bond in molecule.GetBonds():
+            left = int(bond.GetBeginAtomIdx())
+            right = int(bond.GetEndAtomIdx())
+            if left not in selected or right not in selected:
+                continue
+            adjacency[left].add(right)
+            adjacency[right].add(left)
+            edge_count += 1
+        remaining = set(selected)
+        fragment_count = 0
+        while remaining:
+            fragment_count += 1
+            stack = [remaining.pop()]
+            while stack:
+                current = stack.pop()
+                neighbors = adjacency[current] & remaining
+                remaining.difference_update(neighbors)
+                stack.extend(neighbors)
+        total += edge_count - len(selected) + fragment_count
     return total
 
 
@@ -298,8 +327,49 @@ def build_reaction_topology(
     else:
         reaction_scope = "unresolved"
 
-    reactant_rank = _cycle_rank(reactants)
-    product_rank = _cycle_rank(products)
+    project_one_sided_fragments = any(
+        warning.startswith(
+            "REACTANT_ONLY_FRAGMENT_INTERNAL_BONDS_IGNORED:"
+        )
+        for warning in edit_result.warnings
+    )
+    if project_one_sided_fragments:
+        reactant_included: Dict[int, set[int]] = defaultdict(set)
+        product_included: Dict[int, set[int]] = defaultdict(set)
+        reactant_locations: Dict[int, tuple[int, int]] = {}
+        product_locations: Dict[int, tuple[int, int]] = {}
+        for component in reactants:
+            molecule = parse_smiles(component.input_smiles)
+            if molecule is None:
+                continue
+            for atom in molecule.GetAtoms():
+                map_number = int(atom.GetAtomMapNum())
+                if map_number > 0:
+                    reactant_locations[map_number] = (
+                        component.component_index,
+                        int(atom.GetIdx()),
+                    )
+        for component in products:
+            molecule = parse_smiles(component.input_smiles)
+            if molecule is None:
+                continue
+            for atom in molecule.GetAtoms():
+                map_number = int(atom.GetAtomMapNum())
+                if map_number > 0:
+                    product_locations[map_number] = (
+                        component.component_index,
+                        int(atom.GetIdx()),
+                    )
+        for map_number in set(reactant_locations).intersection(product_locations):
+            reactant_component, reactant_atom = reactant_locations[map_number]
+            product_component, product_atom = product_locations[map_number]
+            reactant_included[reactant_component].add(reactant_atom)
+            product_included[product_component].add(product_atom)
+        reactant_rank = _cycle_rank(reactants, reactant_included)
+        product_rank = _cycle_rank(products, product_included)
+    else:
+        reactant_rank = _cycle_rank(reactants)
+        product_rank = _cycle_rank(products)
     ring_count_delta = (
         product_rank - reactant_rank
         if reactant_rank is not None and product_rank is not None

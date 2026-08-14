@@ -109,3 +109,41 @@ def test_ambiguous_fischer_hypotheses_share_one_anonymous_prototype() -> None:
     assert prototypes[0] == prototypes[1]
     assert prototypes[0].formed_element_pairs == ("C-C", "C-N")
     assert prototypes[0].broken_element_pairs == ("C-O", "N-N")
+
+
+def test_center_state_separates_alkylation_from_amide_formation() -> None:
+    mapped_mesylate = featurize_reaction(
+        "[CH3:1][O:2][S:3]([CH3:4])(=[O:5])=[O:6]."
+        "[NH2:7][CH3:8]>>[CH3:1][NH:7][CH3:8]"
+    )
+    partially_mapped_mesylate = featurize_reaction(
+        "CS(=O)(=O)O[CH3:1].[NH2:7][CH3:8]"
+        ">>[CH3:1][NH:7][CH3:8]"
+    )
+    amidation = featurize_reaction(
+        "[CH3:1][C:2](=[O:3])[O:4].[NH2:5][CH3:6]"
+        ">>[CH3:1][C:2](=[O:3])[NH:5][CH3:6]"
+    )
+    assert mapped_mesylate.reaction_signature is not None
+    assert partially_mapped_mesylate.reaction_signature is not None
+    assert amidation.reaction_signature is not None
+
+    mapped_prototype = anonymous_edit_prototype(
+        asdict(mapped_mesylate.reaction_signature)
+    )
+    partial_prototype = anonymous_edit_prototype(
+        asdict(partially_mapped_mesylate.reaction_signature)
+    )
+    amide_prototype = anonymous_edit_prototype(
+        asdict(amidation.reaction_signature)
+    )
+    assert mapped_prototype is not None
+    assert partial_prototype is not None
+    assert amide_prototype is not None
+
+    assert mapped_prototype.formed_atom_state_pairs == ("C@SP3-N",)
+    assert amide_prototype.formed_atom_state_pairs == ("C@SP2-N",)
+    assert anonymous_edit_compatible(mapped_prototype, partial_prototype)
+    assert anonymous_edit_similarity(mapped_prototype, partial_prototype) >= 0.6
+    assert not anonymous_edit_compatible(mapped_prototype, amide_prototype)
+    assert anonymous_edit_similarity(mapped_prototype, amide_prototype) == 0.0

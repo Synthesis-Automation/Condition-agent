@@ -82,6 +82,40 @@ def test_absent_leaving_group_is_projected_not_observed_no_bond() -> None:
     assert legacy.new_order is None
 
 
+def test_mapped_mesylate_inventory_is_not_expanded_into_internal_edits() -> None:
+    analysis = featurize_reaction(
+        "[CH3:1][O:2][S:3]([CH3:4])(=[O:5])=[O:6]."
+        "[NH2:7][CH3:8]>>[CH3:1][NH:7][CH3:8]"
+    )
+
+    signature = analysis.reaction_signature
+    assert signature is not None
+    assert signature.formed_bond_types == ("C-N:SINGLE",)
+    assert signature.broken_bond_types == ("C-O:SINGLE",)
+    assert signature.topology.ring_count_delta == 0
+    assert (
+        "REACTANT_ONLY_FRAGMENT_INTERNAL_BONDS_IGNORED:4"
+        in analysis.warnings
+    )
+
+
+def test_mapped_tosylate_inventory_does_not_create_ring_deletion() -> None:
+    analysis = featurize_reaction(
+        "[CH3:1][O:2][S:3](=[O:4])(=[O:5])"
+        "[c:6]1[cH:7][cH:8][cH:9][cH:10][cH:11]1."
+        "[NH2:12][CH3:13]>>[CH3:1][NH:12][CH3:13]"
+    )
+
+    signature = analysis.reaction_signature
+    assert signature is not None
+    assert signature.formed_bond_types == ("C-N:SINGLE",)
+    assert signature.broken_bond_types == ("C-O:SINGLE",)
+    assert signature.topology.ring_count_delta == 0
+    assert not any(
+        token.startswith("C-C:") for token in signature.broken_bond_types
+    )
+
+
 def test_explicit_pair_addition_has_only_exact_bond_transitions() -> None:
     result = _mapped(
         "[CH2:1]=[CH2:2].[Br:3][Br:4]>>"

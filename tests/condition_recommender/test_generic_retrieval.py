@@ -189,6 +189,49 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     }
 
 
+def test_center_state_gate_applies_before_every_signature_tier() -> None:
+    query_analysis = featurize_reaction(
+        "[CH3:1][O:2][S:3]([CH3:4])(=[O:5])=[O:6]."
+        "[NH2:7][CH3:8]>>[CH3:1][NH:7][CH3:8]"
+    )
+    alkylation_analysis = featurize_reaction(
+        "CS(=O)(=O)O[CH3:1].[NH2:7][CH3:8]"
+        ">>[CH3:1][NH:7][CH3:8]"
+    )
+    amidation_analysis = featurize_reaction(
+        "[CH3:1][C:2](=[O:3])[O:4].[NH2:5][CH3:6]"
+        ">>[CH3:1][C:2](=[O:3])[NH:5][CH3:6]"
+    )
+    assert query_analysis.reaction_signature is not None
+    assert alkylation_analysis.reaction_signature is not None
+    assert amidation_analysis.reaction_signature is not None
+    query = asdict(query_analysis.reaction_signature)
+    alkylation = asdict(alkylation_analysis.reaction_signature)
+    amidation = asdict(amidation_analysis.reaction_signature)
+    assert (
+        query["bond_edit_signature_key"]
+        == amidation["bond_edit_signature_key"]
+    )
+
+    records = [
+        _record(0, amidation),
+        _record(1, amidation),
+        _record(2, alkylation),
+        _record(3, alkylation),
+    ]
+    result = retrieve_compatible_generic_pool_with_trace(
+        query,
+        build_generic_index(records),
+        minimum_pool_size=2,
+    )
+
+    assert result.level == "edit_graph_neighbors"
+    assert {row.reaction_id for row, _ in result.pool} == {
+        "reaction-2",
+        "reaction-3",
+    }
+
+
 def _core(
     token: str,
     *,

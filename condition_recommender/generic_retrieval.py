@@ -11,6 +11,8 @@ from typing import Any, Dict, Iterator, Literal, Mapping, Tuple
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
 from .core_retrieval import reaction_core_query_eligible
 from .edit_prototypes import (
+    anonymous_edit_center_compatible,
+    anonymous_edit_compatible,
     anonymous_edit_prototype,
     anonymous_edit_similarity,
 )
@@ -108,8 +110,31 @@ def _positions(mapping: Mapping[str, Tuple[int, ...]], key: Any) -> set[int]:
 def _compatible_edit_positions(
     signature: Mapping[str, Any], index: GenericReactionIndex
 ) -> set[int]:
-    """Enforce the net bond-edit compatibility gate before similarity."""
-    return _positions(index.bond_edits, signature.get("bond_edit_signature_key"))
+    """Enforce net-edit and reactive-center compatibility before similarity."""
+    positions = _positions(
+        index.bond_edits,
+        signature.get("bond_edit_signature_key"),
+    )
+    return _center_compatible_positions(signature, index, positions)
+
+
+def _center_compatible_positions(
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    positions: set[int],
+) -> set[int]:
+    """Filter arbitrary retrieval tiers only on contradictory center states."""
+    query = anonymous_edit_prototype(signature)
+    if query is None or not positions:
+        return positions
+    ordered_positions = tuple(sorted(positions))
+    rows = index.select(ordered_positions)
+    compatible = set()
+    for position, row in zip(ordered_positions, rows):
+        candidate = anonymous_edit_prototype(row.signature)
+        if candidate is None or anonymous_edit_center_compatible(query, candidate):
+            compatible.add(position)
+    return compatible
 
 
 def _candidate_levels(
@@ -167,11 +192,15 @@ def _candidate_levels(
         elif level == "bond_edit_signature":
             positions = compatible
         elif level.startswith("reaction_core_"):
-            positions = _core_level_positions(
-                reaction_core,
+            positions = _center_compatible_positions(
+                signature,
                 index,
-                level=level,
-                query_eligible=core_eligible,
+                _core_level_positions(
+                    reaction_core,
+                    index,
+                    level=level,
+                    query_eligible=core_eligible,
+                ),
             )
         elif level == "edit_graph_neighbors":
             positions = _edit_graph_neighbor_positions(
@@ -600,7 +629,11 @@ def retrieve_progressive_compatible_pools_with_trace(
     for level in rules["retrieval_ladder"]:
         target_reached = process_level(
             level,
-            _positions(lookup_maps[level], keys[level]),
+            _center_compatible_positions(
+                signature,
+                index,
+                _positions(lookup_maps[level], keys[level]),
+            ),
         )
         if target_reached:
             break

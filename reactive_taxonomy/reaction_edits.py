@@ -361,11 +361,25 @@ def normalize_mapped_edits(
         return EditNormalizationResult(
             (), "invalid_atom_mapping", 0.0, tuple(sorted(set(warnings))), False
         )
+    left_only_maps = set(left.atoms) - set(right.atoms)
+    ignored_reactant_internal_bonds = 0
     edits = []
     for pair in sorted(set(left.bonds).union(right.bonds)):
         old_order = left.bonds.get(pair)
         new_order = right.bonds.get(pair)
         if old_order == new_order:
+            continue
+        # A main-product reaction record commonly omits a complete departing
+        # fragment. Bonds wholly inside that one-sided fragment are inventory
+        # differences, not reaction-center edits. Retain the boundary bond
+        # whenever one endpoint survives, so C-X and C-O leaving-group
+        # departures remain explicit structural evidence.
+        if (
+            old_order is not None
+            and new_order is None
+            and set(pair).issubset(left_only_maps)
+        ):
+            ignored_reactant_internal_bonds += 1
             continue
         if old_order is None:
             edit_type = "formed"
@@ -388,6 +402,11 @@ def normalize_mapped_edits(
                 evidence="supplied_atom_mapping",
                 confidence=1.0,
             )
+        )
+    if ignored_reactant_internal_bonds:
+        warnings.append(
+            "REACTANT_ONLY_FRAGMENT_INTERNAL_BONDS_IGNORED:"
+            f"{ignored_reactant_internal_bonds}"
         )
     for map_number in sorted(
         set(left.hydrogen_counts).intersection(right.hydrogen_counts)
@@ -412,16 +431,17 @@ def normalize_mapped_edits(
             )
     if not edits:
         warnings.append("NO_MAPPED_BOND_EDITS")
+    atom_correspondence = tuple(
+        (
+            left.atoms[map_number].component_index,
+            left.atoms[map_number].atom_index,
+            right.atoms[map_number].component_index,
+            right.atoms[map_number].atom_index,
+        )
+        for map_number in sorted(set(left.atoms).intersection(right.atoms))
+    )
     stereo_changes = _correspondence_stereo_changes(
-        tuple(
-            (
-                left.atoms[map_number].component_index,
-                left.atoms[map_number].atom_index,
-                right.atoms[map_number].component_index,
-                right.atoms[map_number].atom_index,
-            )
-            for map_number in sorted(set(left.atoms).intersection(right.atoms))
-        ),
+        atom_correspondence,
         reactants,
         products,
         evidence="supplied_atom_mapping",
