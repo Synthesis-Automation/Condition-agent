@@ -7,6 +7,10 @@ from .api import (
     observe_molecular_structure,
 )
 from .reaction_api import featurize_reaction, identify_reaction_patterns
+from .departing_fragments import (
+    DEPARTING_FRAGMENT_TOKEN_VERSION,
+    departing_fragment_tokens,
+)
 from .reactive_pair_interactions import (
     REACTIVE_PAIR_INTERACTION_DEFINITION_ID,
     REACTIVE_PAIR_INTERACTION_SCHEMA_VERSION,
@@ -210,6 +214,7 @@ from .molecular_feature_evaluation import (
 )
 
 __all__ = [
+    "DEPARTING_FRAGMENT_TOKEN_VERSION",
     "AtomStateTransition",
     "ActivatedCenterContextDescriptor",
     "AlkylContextDescriptor",
@@ -346,6 +351,7 @@ __all__ = [
     "build_reaction_render_context",
     "detect_molecular_motifs",
     "detect_reactive_site_hypotheses",
+    "departing_fragment_tokens",
     "evaluate_molecular_features",
     "analyze_molecule",
     "assess_molecule_complexity",

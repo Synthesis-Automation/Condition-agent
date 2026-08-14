@@ -8,11 +8,12 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterator, Literal, Mapping, Tuple
 
+from reactive_taxonomy import departing_fragment_tokens
+
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
 from .core_retrieval import reaction_core_query_eligible
 from .edit_prototypes import (
     anonymous_edit_center_compatible,
-    anonymous_edit_compatible,
     anonymous_edit_prototype,
     anonymous_edit_similarity,
 )
@@ -108,22 +109,32 @@ def _positions(mapping: Mapping[str, Tuple[int, ...]], key: Any) -> set[int]:
 
 
 def _compatible_edit_positions(
-    signature: Mapping[str, Any], index: GenericReactionIndex
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    *,
+    query_reaction_smiles: str = "",
 ) -> set[int]:
     """Enforce net-edit and reactive-center compatibility before similarity."""
     positions = _positions(
         index.bond_edits,
         signature.get("bond_edit_signature_key"),
     )
-    return _center_compatible_positions(signature, index, positions)
+    return _structurally_compatible_positions(
+        signature,
+        index,
+        positions,
+        query_reaction_smiles=query_reaction_smiles,
+    )
 
 
-def _center_compatible_positions(
+def _structurally_compatible_positions(
     signature: Mapping[str, Any],
     index: GenericReactionIndex,
     positions: set[int],
+    *,
+    query_reaction_smiles: str = "",
 ) -> set[int]:
-    """Filter arbitrary retrieval tiers only on contradictory center states."""
+    """Filter tiers on contradictory center and departing-fragment graphs."""
     query = anonymous_edit_prototype(signature)
     if query is None or not positions:
         return positions
@@ -134,7 +145,20 @@ def _center_compatible_positions(
         candidate = anonymous_edit_prototype(row.signature)
         if candidate is None or anonymous_edit_center_compatible(query, candidate):
             compatible.add(position)
-    return compatible
+    query_departing = (
+        departing_fragment_tokens(query_reaction_smiles, signature)
+        if query_reaction_smiles
+        else ()
+    )
+    if not query_departing or not compatible:
+        return compatible
+    known = set(index.departing_fragments.get("DF1:KNOWN", ()))
+    matching = {
+        position
+        for token in query_departing
+        for position in index.departing_fragments.get(token, ())
+    }
+    return compatible - known | compatible & matching
 
 
 def _candidate_levels(
@@ -143,9 +167,14 @@ def _candidate_levels(
     *,
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
+    query_reaction_smiles: str = "",
 ) -> Iterator[tuple[str, set[int]]]:
     """Yield retrieval tiers in order without computing later fallbacks early."""
-    compatible = _compatible_edit_positions(signature, index)
+    compatible = _compatible_edit_positions(
+        signature,
+        index,
+        query_reaction_smiles=query_reaction_smiles,
+    )
     rules = load_generic_retrieval_rules()
     ladder = (
         rules["retrieval_ladder"]
@@ -192,7 +221,7 @@ def _candidate_levels(
         elif level == "bond_edit_signature":
             positions = compatible
         elif level.startswith("reaction_core_"):
-            positions = _center_compatible_positions(
+            positions = _structurally_compatible_positions(
                 signature,
                 index,
                 _core_level_positions(
@@ -201,12 +230,19 @@ def _candidate_levels(
                     level=level,
                     query_eligible=core_eligible,
                 ),
+                query_reaction_smiles=query_reaction_smiles,
             )
         elif level == "edit_graph_neighbors":
-            positions = _edit_graph_neighbor_positions(
+            positions = _structurally_compatible_positions(
                 signature,
                 index,
-                exclude=compatible,
+                _edit_graph_neighbor_positions(
+                    signature,
+                    index,
+                    exclude=compatible,
+                    query_reaction_smiles=query_reaction_smiles,
+                ),
+                query_reaction_smiles=query_reaction_smiles,
             )
         else:  # pragma: no cover - validated definitions prevent this branch.
             raise ValueError(f"Unsupported generic retrieval level: {level}")
@@ -261,11 +297,17 @@ def _edit_graph_neighbor_positions(
     index: GenericReactionIndex,
     *,
     exclude: set[int],
+    query_reaction_smiles: str = "",
 ) -> set[int]:
     """Find chemistry-gated approximate edit graphs without family routing."""
     query = anonymous_edit_prototype(signature)
     if query is None:
         return set()
+    query = _project_departing_ring_inventory(
+        query,
+        query_reaction_smiles,
+        signature,
+    )
     rules = load_generic_retrieval_rules()
     threshold = float(rules["edit_graph_neighbor_min_similarity"])
     limit = int(rules["edit_graph_neighbor_limit"])
@@ -275,11 +317,10 @@ def _edit_graph_neighbor_positions(
         "edit_graph_candidate_positions",
         None,
     )
-    positions = tuple(
-        candidate_positions(query)
-        if callable(candidate_positions)
-        else range(len(index.rows))
-    )
+    if callable(candidate_positions):
+        positions = tuple(candidate_positions(query))
+    else:
+        positions = tuple(range(len(index.rows)))
     included_positions = tuple(
         position for position in positions if position not in exclude
     )
@@ -290,6 +331,11 @@ def _edit_graph_neighbor_positions(
         candidate = anonymous_edit_prototype(row.signature)
         if candidate is None:
             continue
+        candidate = _project_departing_ring_inventory(
+            candidate,
+            row.reaction_smiles,
+            row.signature,
+        )
         score = anonymous_edit_similarity(query, candidate)
         if score >= threshold:
             scored.append(
@@ -303,6 +349,38 @@ def _edit_graph_neighbor_positions(
             )
     scored.sort(key=lambda item: (-item[0],) + item[1:])
     return {item[-1] for item in scored[:limit]}
+
+
+def _project_departing_ring_inventory(
+    prototype: Any,
+    reaction_smiles: str,
+    signature: Mapping[str, Any],
+) -> Any:
+    """Remove cycles belonging wholly to a structurally observed departure."""
+
+    if prototype.ring_count_delta >= 0 or not reaction_smiles:
+        return prototype
+    ring_count = _departing_ring_count(reaction_smiles, signature)
+    if not ring_count:
+        return prototype
+    return replace(
+        prototype,
+        ring_count_delta=min(0, prototype.ring_count_delta + ring_count),
+    )
+
+
+def _departing_ring_count(
+    reaction_smiles: str,
+    signature: Mapping[str, Any],
+) -> int:
+    """Return cycles wholly contained in observed departing fragments."""
+
+    ring_count = 0
+    for token in departing_fragment_tokens(reaction_smiles, signature):
+        parts = token.split(":", 3)
+        if len(parts) >= 3 and parts[1].startswith("R"):
+            ring_count += int(parts[1][1:] or 0)
+    return ring_count
 
 
 def _environment_neighbor_positions(
@@ -526,6 +604,7 @@ def retrieve_progressive_compatible_pools_with_trace(
     fallback_descriptor: Mapping[str, Any] | None = None,
     target_recipe_count: int,
     minimum_pool_size: int | None = None,
+    query_reaction_smiles: str = "",
 ) -> ProgressiveCompatibleRetrievalResult | None:
     """Collect ordered facet tiers without allowing broad rows to displace exact ones.
 
@@ -629,10 +708,11 @@ def retrieve_progressive_compatible_pools_with_trace(
     for level in rules["retrieval_ladder"]:
         target_reached = process_level(
             level,
-            _center_compatible_positions(
+            _structurally_compatible_positions(
                 signature,
                 index,
                 _positions(lookup_maps[level], keys[level]),
+                query_reaction_smiles=query_reaction_smiles,
             ),
         )
         if target_reached:
@@ -643,6 +723,7 @@ def retrieve_progressive_compatible_pools_with_trace(
             index,
             reaction_core=reaction_core,
             strategy="hybrid",
+            query_reaction_smiles=query_reaction_smiles,
         ):
             target_reached = process_level(level, positions)
             if target_reached:
@@ -669,6 +750,7 @@ def retrieve_compatible_generic_pool_with_trace(
     minimum_pool_size: int | None = None,
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
+    query_reaction_smiles: str = "",
 ) -> CompatibleRetrievalResult:
     """Apply compatibility before independent-support checks at every tier."""
     minimum = _minimum_support(minimum_pool_size)
@@ -677,6 +759,7 @@ def retrieve_compatible_generic_pool_with_trace(
         index,
         reaction_core=reaction_core,
         strategy=strategy,
+        query_reaction_smiles=query_reaction_smiles,
     )
     fallback = None
     traces = []
@@ -758,7 +841,15 @@ def retrieve_compatible_generic_pool_with_trace(
             return CompatibleRetrievalResult(
                 "no_compatible_bond_edit", (), 0, 0, 0, 0, (trace,)
             )
-        bond_rows = index.select(sorted(_compatible_edit_positions(signature, index)))
+        bond_rows = index.select(
+            sorted(
+                _compatible_edit_positions(
+                    signature,
+                    index,
+                    query_reaction_smiles=query_reaction_smiles,
+                )
+            )
+        )
         _, excluded = filter_compatible_precedents(signature, bond_rows)
         support = summarize_evidence_support(bond_rows)
         return CompatibleRetrievalResult(
@@ -800,6 +891,7 @@ def retrieve_compatible_generic_pool(
     minimum_pool_size: int | None = None,
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
+    query_reaction_smiles: str = "",
 ) -> tuple[
     str,
     tuple[tuple[GenericIndexedReaction, CompatibilityAssessment], ...],
@@ -813,6 +905,7 @@ def retrieve_compatible_generic_pool(
         minimum_pool_size=minimum_pool_size,
         reaction_core=reaction_core,
         strategy=strategy,
+        query_reaction_smiles=query_reaction_smiles,
     )
     return (
         result.level,

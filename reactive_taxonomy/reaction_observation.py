@@ -16,7 +16,6 @@ from .reaction_edits import (
 from .reaction_models import (
     ReactionComponent,
     ReactionObservation,
-    ReactionStructureComponent,
 )
 from .reaction_topology import build_reaction_topology
 from .reaction_parser import parse_reaction_smiles
@@ -57,6 +56,7 @@ def _observation_hypotheses(
                     valid=False,
                     stereo_changes=hypothesis.stereo_changes,
                     edit_hypotheses=(),
+                    atom_correspondence=hypothesis.atom_correspondence,
                 ),
             ),
         )

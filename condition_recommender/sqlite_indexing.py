@@ -13,6 +13,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Tuple, overload
 
+from reactive_taxonomy import departing_fragment_tokens
+
 from .edit_prototypes import AnonymousEditPrototype, anonymous_edit_prototype
 from .fallback_similarity import fallback_index_tokens
 from .reaction_facets import reaction_facet_keys
@@ -39,6 +41,25 @@ from .signature_features import environment_tokens
 SQLITE_INDEX_STORAGE_SCHEMA_VERSION = "1.0"
 _ROW_ENCODING = "json+zlib.v1"
 _POSITIONS_ENCODING = "json+zlib.v1"
+
+
+def _indexed_edit_prototype(row: GenericIndexedReaction) -> AnonymousEditPrototype | None:
+    """Project cycles wholly contained in departing fragments before indexing."""
+
+    prototype = anonymous_edit_prototype(row.signature)
+    if prototype is None or prototype.ring_count_delta >= 0:
+        return prototype
+    ring_count = 0
+    for token in departing_fragment_tokens(row.reaction_smiles, row.signature):
+        parts = token.split(":", 3)
+        if len(parts) >= 3 and parts[1].startswith("R"):
+            ring_count += int(parts[1][1:] or 0)
+    if not ring_count:
+        return prototype
+    return replace(
+        prototype,
+        ring_count_delta=min(0, prototype.ring_count_delta + ring_count),
+    )
 
 
 class SQLiteIndexBuildCancelled(RuntimeError):
@@ -442,6 +463,13 @@ def build_sqlite_generic_index(
                 lookup_batch.append(("families", row.named_family, position))
             for token in set(environment_tokens(row.signature)):
                 lookup_batch.append(("environment_features", token, position))
+            fragment_tokens = set(
+                departing_fragment_tokens(row.reaction_smiles, row.signature)
+            )
+            if fragment_tokens:
+                lookup_batch.append(("departing_fragments", "DF1:KNOWN", position))
+            for token in fragment_tokens:
+                lookup_batch.append(("departing_fragments", token, position))
             for token in fallback_index_tokens(row.fallback_descriptor):
                 lookup_batch.append(("fallback_features", token, position))
             partial_key = str(
@@ -451,7 +479,7 @@ def build_sqlite_generic_index(
                 lookup_batch.append(
                     ("partial_transformations", partial_key, position)
                 )
-            prototype = anonymous_edit_prototype(row.signature)
+            prototype = _indexed_edit_prototype(row)
             if prototype is not None:
                 ring_sign = (prototype.ring_count_delta > 0) - (
                     prototype.ring_count_delta < 0
@@ -500,6 +528,7 @@ def build_sqlite_generic_index(
             "core_shapes",
             "core_centers",
             "environment_features",
+            "departing_fragments",
             "fallback_features",
             "partial_transformations",
             "families",
@@ -688,7 +717,7 @@ def save_sqlite_generic_index(
         row_batch = []
         for position, row in enumerate(index.rows):
             payload = _indexed_reaction_payload(row)
-            prototype = anonymous_edit_prototype(row.signature)
+            prototype = _indexed_edit_prototype(row)
             if prototype is not None:
                 ring_sign = (prototype.ring_count_delta > 0) - (
                     prototype.ring_count_delta < 0
@@ -829,6 +858,7 @@ def load_sqlite_generic_index(path: str | Path) -> GenericReactionIndex:
         "core_shapes",
         "core_centers",
         "environment_features",
+        "departing_fragments",
         "fallback_features",
         "partial_transformations",
         "families",
@@ -855,6 +885,7 @@ def load_sqlite_generic_index(path: str | Path) -> GenericReactionIndex:
         core_shapes=maps["core_shapes"],
         core_centers=maps["core_centers"],
         environment_features=maps["environment_features"],
+        departing_fragments=maps["departing_fragments"],
         fallback_features=maps["fallback_features"],
         partial_transformations=maps["partial_transformations"],
         families=maps["families"],

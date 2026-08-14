@@ -16,6 +16,7 @@ from reactive_taxonomy import (
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
     REACTION_TOPOLOGY_SCHEMA_VERSION,
+    departing_fragment_tokens,
     reaction_fallback_definition_versions,
     reaction_signature_definition_versions,
 )
@@ -36,7 +37,7 @@ from .fallback_similarity import fallback_index_tokens
 from .reaction_facets import reaction_facet_keys
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "6.1"
+GENERIC_INDEX_SCHEMA_VERSION = "6.2"
 
 
 @dataclass(frozen=True)
@@ -102,6 +103,7 @@ class GenericReactionIndex:
     core_shapes: Mapping[str, Tuple[int, ...]]
     core_centers: Mapping[str, Tuple[int, ...]]
     environment_features: Mapping[str, Tuple[int, ...]]
+    departing_fragments: Mapping[str, Tuple[int, ...]]
     fallback_features: Mapping[str, Tuple[int, ...]]
     partial_transformations: Mapping[str, Tuple[int, ...]]
     families: Mapping[str, Tuple[int, ...]]
@@ -312,6 +314,7 @@ def build_generic_index_from_rows(
         for name in ("exact", "typed", "shapes", "centers")
     }
     environment_features: Dict[str, list[int]] = defaultdict(list)
+    departing_fragments: Dict[str, list[int]] = defaultdict(list)
     fallback_features: Dict[str, list[int]] = defaultdict(list)
     partial_transformations: Dict[str, list[int]] = defaultdict(list)
     facet_maps: Dict[str, Dict[str, list[int]]] = {
@@ -337,6 +340,13 @@ def build_generic_index_from_rows(
             families[row.named_family].append(position)
         for token in set(environment_tokens(row.signature)):
             environment_features[token].append(position)
+        fragment_tokens = set(
+            departing_fragment_tokens(row.reaction_smiles, row.signature)
+        )
+        if fragment_tokens:
+            departing_fragments["DF1:KNOWN"].append(position)
+        for token in fragment_tokens:
+            departing_fragments[token].append(position)
         for token in fallback_index_tokens(row.fallback_descriptor):
             fallback_features[token].append(position)
         facet_keys = reaction_facet_keys(
@@ -371,6 +381,7 @@ def build_generic_index_from_rows(
         core_shapes=_freeze(core_maps["shapes"]),
         core_centers=_freeze(core_maps["centers"]),
         environment_features=_freeze(environment_features),
+        departing_fragments=_freeze(departing_fragments),
         fallback_features=_freeze(fallback_features),
         partial_transformations=_freeze(partial_transformations),
         families=_freeze(families),
@@ -681,6 +692,7 @@ def _index_maps(
         "core_shapes": index.core_shapes,
         "core_centers": index.core_centers,
         "environment_features": index.environment_features,
+        "departing_fragments": index.departing_fragments,
         "fallback_features": index.fallback_features,
         "partial_transformations": index.partial_transformations,
         "families": index.families,

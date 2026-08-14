@@ -232,6 +232,89 @@ def test_center_state_gate_applies_before_every_signature_tier() -> None:
     }
 
 
+def test_departing_fragment_gate_separates_alcohol_mesylate_and_tosylate(
+    tmp_path: Path,
+) -> None:
+    mapped_mesylate_reaction = (
+        "[CH3:1][CH2:2][O:3][S:4]([CH3:5])(=[O:6])=[O:7]."
+        "[NH:8]1[CH2:9][CH2:10][CH2:11][CH2:12][CH2:13]1"
+        ">>[CH3:1][CH2:2][N:8]1[CH2:9][CH2:10][CH2:11][CH2:12][CH2:13]1"
+    )
+    mapped_tosylate_reaction = (
+        "[CH3:1][CH2:2][O:3][S:4](=[O:5])(=[O:6])"
+        "[c:7]1[cH:14][cH:15][cH:16][cH:17][cH:18]1."
+        "[NH:8]1[CH2:9][CH2:10][CH2:11][CH2:12][CH2:13]1"
+        ">>[CH3:1][CH2:2][N:8]1[CH2:9][CH2:10][CH2:11][CH2:12][CH2:13]1"
+    )
+    source_reactions = {
+        "alcohol": (
+            "CCCCCCC(C)O.O=C1NC(=O)c2ccccc21.[K]"
+            ">>CCCCCCC(C)N1C(=O)c2ccccc2C1=O"
+        ),
+        "mesylate": (
+            "CCCCCCC(C)OS(C)(=O)=O.O=C1NC(=O)c2ccccc21.[K]"
+            ">>CCCCCCC(C)N1C(=O)c2ccccc2C1=O"
+        ),
+        "tosylate": (
+            "CCCCCCC(C)OS(=O)(=O)c1ccccc1.O=C1NC(=O)c2ccccc21.[K]"
+            ">>CCCCCCC(C)N1C(=O)c2ccccc2C1=O"
+        ),
+    }
+    source_signatures = {}
+    for name, reaction in source_reactions.items():
+        analysis = featurize_reaction(reaction)
+        assert analysis.reaction_signature is not None
+        source_signatures[name] = asdict(analysis.reaction_signature)
+    # Simulate a pre-fix converted tosylate record: its disappearing phenyl
+    # ring was counted as a reaction ring loss and therefore produced distinct
+    # hierarchical signature keys. The rebuilt condition index must project
+    # that leaving-group inventory without requiring reconversion.
+    source_signatures["tosylate"]["topology"]["ring_count_delta"] = -1
+    for field in (
+        "exact_signature_key",
+        "handle_signature_key",
+        "transformation_signature_key",
+        "bond_edit_signature_key",
+        "environment_signature_key",
+    ):
+        source_signatures["tosylate"][field] = f"legacy-{field}"
+    records = [
+        _record(0, source_signatures["alcohol"]),
+        _record(1, source_signatures["mesylate"]),
+        _record(2, source_signatures["tosylate"]),
+    ]
+    for record, name in zip(records, source_reactions):
+        record["reaction_smiles"] = source_reactions[name]
+    index = build_generic_index(records)
+
+    mesylate_analysis = featurize_reaction(mapped_mesylate_reaction)
+    tosylate_analysis = featurize_reaction(mapped_tosylate_reaction)
+    assert mesylate_analysis.reaction_signature is not None
+    assert tosylate_analysis.reaction_signature is not None
+    sqlite_path = tmp_path / "departing-fragment-index.sqlite"
+    save_sqlite_generic_index(index, sqlite_path)
+    for candidate_index in (index, load_generic_index(sqlite_path)):
+        mesylate_result = retrieve_compatible_generic_pool_with_trace(
+            asdict(mesylate_analysis.reaction_signature),
+            candidate_index,
+            minimum_pool_size=1,
+            query_reaction_smiles=mapped_mesylate_reaction,
+        )
+        tosylate_result = retrieve_compatible_generic_pool_with_trace(
+            asdict(tosylate_analysis.reaction_signature),
+            candidate_index,
+            minimum_pool_size=1,
+            query_reaction_smiles=mapped_tosylate_reaction,
+        )
+
+        assert {row.reaction_id for row, _ in mesylate_result.pool} == {
+            "reaction-1"
+        }
+        assert {row.reaction_id for row, _ in tosylate_result.pool} == {
+            "reaction-2"
+        }
+
+
 def _core(
     token: str,
     *,

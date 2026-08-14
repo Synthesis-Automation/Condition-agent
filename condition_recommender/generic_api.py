@@ -228,6 +228,7 @@ def recommend_indexed_signature(
             fallback_descriptor=fallback_descriptor,
             target_recipe_count=top_k,
             minimum_pool_size=minimum_pool_size,
+            query_reaction_smiles=query_reaction_smiles,
         )
         if retrieval_strategy == "hybrid"
         else None
@@ -241,6 +242,7 @@ def recommend_indexed_signature(
             minimum_pool_size=minimum_pool_size,
             reaction_core=reaction_core,
             strategy=retrieval_strategy,
+            query_reaction_smiles=query_reaction_smiles,
         )
     )
     if progressive is not None and not progressive.tiers:

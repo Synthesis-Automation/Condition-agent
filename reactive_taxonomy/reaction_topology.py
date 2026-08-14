@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 import hashlib
 import json
-from typing import Dict, Iterable, Optional, Tuple
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_edits import EditNormalizationResult, reaction_atom_reference
@@ -253,6 +253,104 @@ def _formed_edits(edits: Iterable[ReactionEdit]) -> Tuple[ReactionEdit, ...]:
     )
 
 
+def _neighbor_descriptor(
+    center: Any,
+    neighbor: Any,
+    molecule: Any,
+) -> tuple[Any, ...]:
+    bond = molecule.GetBondBetweenAtoms(
+        int(center.GetIdx()),
+        int(neighbor.GetIdx()),
+    )
+    return (
+        str(neighbor.GetSymbol()),
+        str(bond.GetBondType()),
+        bool(neighbor.GetIsAromatic()),
+        int(neighbor.GetFormalCharge()),
+    )
+
+
+def _has_one_sided_departure(
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+    edits: Iterable[ReactionEdit],
+) -> bool:
+    """Return whether a substitution center has an observed departing branch."""
+
+    edits = tuple(edits)
+    formed_atoms = {
+        (atom.component_index, atom.atom_index)
+        for edit in edits
+        if edit.edit_type == "formed"
+        for atom in (edit.atom_1, edit.atom_2)
+        if atom is not None and atom.side == "reactant"
+    }
+    for edit in edits:
+        if edit.edit_type != "broken" or edit.atom_2 is None:
+            continue
+        endpoints = tuple(
+            (atom.component_index, atom.atom_index)
+            for atom in (edit.atom_1, edit.atom_2)
+            if atom.side == "reactant"
+        )
+        if len(endpoints) == 2 and sum(
+            endpoint in formed_atoms for endpoint in endpoints
+        ) == 1:
+            return True
+
+    reactant_components = {
+        component.component_index: component for component in reactants
+    }
+    product_atoms_by_map = {}
+    for component in products:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        for atom in molecule.GetAtoms():
+            map_number = int(atom.GetAtomMapNum())
+            if map_number > 0:
+                product_atoms_by_map[map_number] = (molecule, atom)
+
+    for edit in edits:
+        if edit.edit_type != "formed":
+            continue
+        for endpoint in (edit.atom_1, edit.atom_2):
+            if (
+                endpoint is None
+                or endpoint.side != "reactant"
+                or endpoint.element != "C"
+            ):
+                continue
+            component = reactant_components.get(endpoint.component_index)
+            molecule = parse_smiles(component.input_smiles) if component else None
+            if molecule is None:
+                continue
+            carbon = molecule.GetAtomWithIdx(endpoint.atom_index)
+            product_carbon = product_atoms_by_map.get(
+                int(carbon.GetAtomMapNum())
+            )
+            retained_unmapped: Counter[tuple[Any, ...]] = Counter()
+            if product_carbon is not None:
+                product_molecule, product_atom = product_carbon
+                retained_unmapped.update(
+                    _neighbor_descriptor(product_atom, neighbor, product_molecule)
+                    for neighbor in product_atom.GetNeighbors()
+                    if int(neighbor.GetAtomMapNum()) == 0
+                )
+            for neighbor in carbon.GetNeighbors():
+                if neighbor.GetSymbol() == "C":
+                    continue
+                map_number = int(neighbor.GetAtomMapNum())
+                if map_number > 0 and map_number in product_atoms_by_map:
+                    continue
+                descriptor = _neighbor_descriptor(carbon, neighbor, molecule)
+                if map_number == 0 and retained_unmapped[descriptor]:
+                    retained_unmapped[descriptor] -= 1
+                    continue
+                return True
+    return False
+
+
 def build_reaction_topology(
     *,
     reactants: Tuple[ReactionComponent, ...],
@@ -332,39 +430,57 @@ def build_reaction_topology(
             "REACTANT_ONLY_FRAGMENT_INTERNAL_BONDS_IGNORED:"
         )
         for warning in edit_result.warnings
+    ) or _has_one_sided_departure(
+        reactants,
+        products,
+        edit_result.edits,
     )
     if project_one_sided_fragments:
         reactant_included: Dict[int, set[int]] = defaultdict(set)
         product_included: Dict[int, set[int]] = defaultdict(set)
         reactant_locations: Dict[int, tuple[int, int]] = {}
         product_locations: Dict[int, tuple[int, int]] = {}
-        for component in reactants:
-            molecule = parse_smiles(component.input_smiles)
-            if molecule is None:
-                continue
-            for atom in molecule.GetAtoms():
-                map_number = int(atom.GetAtomMapNum())
-                if map_number > 0:
-                    reactant_locations[map_number] = (
-                        component.component_index,
-                        int(atom.GetIdx()),
-                    )
-        for component in products:
-            molecule = parse_smiles(component.input_smiles)
-            if molecule is None:
-                continue
-            for atom in molecule.GetAtoms():
-                map_number = int(atom.GetAtomMapNum())
-                if map_number > 0:
-                    product_locations[map_number] = (
-                        component.component_index,
-                        int(atom.GetIdx()),
-                    )
-        for map_number in set(reactant_locations).intersection(product_locations):
-            reactant_component, reactant_atom = reactant_locations[map_number]
-            product_component, product_atom = product_locations[map_number]
-            reactant_included[reactant_component].add(reactant_atom)
-            product_included[product_component].add(product_atom)
+        if edit_result.atom_correspondence:
+            for (
+                reactant_component,
+                reactant_atom,
+                product_component,
+                product_atom,
+            ) in edit_result.atom_correspondence:
+                reactant_included[reactant_component].add(reactant_atom)
+                product_included[product_component].add(product_atom)
+        else:
+            for component in reactants:
+                molecule = parse_smiles(component.input_smiles)
+                if molecule is None:
+                    continue
+                for atom in molecule.GetAtoms():
+                    map_number = int(atom.GetAtomMapNum())
+                    if map_number > 0:
+                        reactant_locations[map_number] = (
+                            component.component_index,
+                            int(atom.GetIdx()),
+                        )
+            for component in products:
+                molecule = parse_smiles(component.input_smiles)
+                if molecule is None:
+                    continue
+                for atom in molecule.GetAtoms():
+                    map_number = int(atom.GetAtomMapNum())
+                    if map_number > 0:
+                        product_locations[map_number] = (
+                            component.component_index,
+                            int(atom.GetIdx()),
+                        )
+            for map_number in set(reactant_locations).intersection(
+                product_locations
+            ):
+                reactant_component, reactant_atom = reactant_locations[
+                    map_number
+                ]
+                product_component, product_atom = product_locations[map_number]
+                reactant_included[reactant_component].add(reactant_atom)
+                product_included[product_component].add(product_atom)
         reactant_rank = _cycle_rank(reactants, reactant_included)
         product_rank = _cycle_rank(products, product_included)
     else:
