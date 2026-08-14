@@ -10,6 +10,9 @@ from typing import Any, Dict, Mapping, Tuple
 
 from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles, rdkit_available
 from reactive_taxonomy.notation import format_chemist_text, render_remote_class
+from reactive_taxonomy.reaction_core.ring_paths import (
+    formed_ring_path_subgraph_ids,
+)
 from reactive_taxonomy.reaction_render_context import ReactionRenderContext
 
 from .rendering import apply_render_preset
@@ -85,7 +88,7 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     if str(definition.get("schema_version") or "") != "2.0":
         raise ValueError("unsupported reaction-core graphic schema")
     if str(definition.get("definition_id") or "") != (
-        "reaction_core_graphic.v2.0"
+        "reaction_core_graphic.v2.1"
     ):
         raise ValueError("unexpected reaction-core graphic definition ID")
     continuities = tuple(
@@ -100,9 +103,9 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
         raise ValueError(
             "reaction-core graphic must collapse retained multi-site scaffolds"
         )
-    if definition.get("preserve_intramolecular_tethers") is not True:
+    if definition.get("preserve_formed_ring_paths") is not True:
         raise ValueError(
-            "reaction-core graphic must preserve intramolecular tethers"
+            "reaction-core graphic must preserve formed-ring paths"
         )
     if definition.get("render_nonretained_subgraphs_explicitly") is not True:
         raise ValueError(
@@ -187,43 +190,22 @@ def _topology_protected_subgraph_ids(
     *,
     side: str | None = None,
 ) -> set[str]:
-    """Return retained tethers that cannot be safely contracted to dummies.
+    """Return retained graph paths required by an observed formed ring.
 
-    A connected remote graph spanning multiple active atoms carries the path
-    closed by an intramolecular formed bond. Replacing each attachment port by
-    an unrelated dummy atom destroys that path and therefore the observed ring
-    topology. Keep such graphs explicit whenever the analysis establishes a
-    ring-forming intramolecular event.
+    Ring formation is not necessarily intramolecular relative to the original
+    components. Annulations can join two components with several formed bonds,
+    after which a retained path from either component completes a cycle.
+    Replacing each attachment port of that path with an unrelated dummy atom
+    destroys the displayed cycle. Protect the exact retained subgraphs that
+    connect two ring atoms, independent of the reaction-scope label.
     """
-    topology = getattr(analysis, "reaction_topology", None)
-    if topology is None or str(topology.reaction_scope) not in {
-        "intramolecular",
-        "mixed",
-    }:
-        return set()
-    ring_sizes = tuple(getattr(topology, "formed_ring_sizes", ()) or ())
-    ring_count_delta = getattr(topology, "ring_count_delta", None)
-    if not ring_sizes and not (
-        ring_count_delta is not None and int(ring_count_delta) > 0
-    ):
-        return set()
-    core = getattr(analysis, "reaction_core", None)
-    if core is None:
-        return set()
-    protected = set()
-    for subgraph in core.remote_subgraphs:
-        if (
-            subgraph.continuity != "retained"
-            or (side is not None and str(subgraph.side) != side)
-        ):
-            continue
-        boundary = {
-            (int(port.core_component_index), int(port.core_atom_index))
-            for port in subgraph.attachment_ports
-        }
-        if len(boundary) >= 2:
-            protected.add(str(subgraph.subgraph_id))
-    return protected
+    return set(
+        formed_ring_path_subgraph_ids(
+            core=analysis.reaction_core,
+            topology=analysis.reaction_topology,
+            side=side,
+        )
+    )
 
 
 def _multisite_scaffold_collapses(

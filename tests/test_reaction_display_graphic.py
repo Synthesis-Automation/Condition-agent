@@ -8,6 +8,14 @@ from reactive_taxonomy import (
 from visualization import build_reaction_display_graphic
 
 
+MAPPED_INTERCOMPONENT_ANNULATION = (
+    "CS(=O)(=O)O[CH2:1][CH2:2][c:3]1[c:9](Cl)"
+    "[cH:8][cH:7][cH:6][cH:4]1.[NH2:28][CH3:26]>>"
+    "[CH3:26][N:28]1[CH2:1][CH2:2][c:3]2[c:9]1"
+    "[cH:8][cH:7][cH:6][cH:4]2"
+)
+
+
 def _projection(reaction_smiles: str):
     analysis = featurize_reaction(reaction_smiles)
     return build_reaction_display_projection(
@@ -50,6 +58,17 @@ def test_multisite_projection_renders_nonchemical_dashed_connector() -> None:
     )
     graphic = build_reaction_display_graphic(projection)
 
+    assert graphic.image_bytes.count(b"stroke-dasharray") == 2
+
+
+def test_intercomponent_annulation_renders_product_ring_connector() -> None:
+    projection = _projection(MAPPED_INTERCOMPONENT_ANNULATION)
+    graphic = build_reaction_display_graphic(projection)
+
+    assert {connector.side for connector in projection.connectors} == {
+        "reactant",
+        "product",
+    }
     assert graphic.image_bytes.count(b"stroke-dasharray") == 2
 
 

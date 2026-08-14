@@ -21,6 +21,7 @@ from .chemistry.rdkit_utils import (
     rdkit_available,
 )
 from .reaction_core.substituents import build_substituent_profile
+from .reaction_core.ring_paths import formed_ring_path_subgraph_ids
 from .reaction_models import ReactionCoreSubstituentProfile
 from .reaction_render_context import ReactionRenderContext
 
@@ -145,7 +146,7 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         definition = dict(json.load(handle))
     expected = {
         "schema_version": "1.0",
-        "definition_id": "reaction_display_projection.v1.7",
+        "definition_id": "reaction_display_projection.v1.9",
         "reaction_interface_block_definition_id": (
             "reaction_interface_blocks.v1.0"
         ),
@@ -164,9 +165,15 @@ def load_reaction_display_projection_definition() -> Dict[str, Any]:
         "nonaromatic_boundary_policy": "retain_R_attachment",
         "placeholder_smiles": "*",
         "placeholder_label_template": "R{index}",
+        "placeholder_identity_policy": (
+            "reactant_ordered_mapped_port_then_structure"
+        ),
         "hidden_connector_policy": "collapse_shared_omitted_component",
         "hidden_connector_bond_type": "zero_order_dashed",
         "hidden_connector_label_template": "S{index}",
+        "formed_ring_path_policy": (
+            "connect_topology_carrying_remote_subgraphs"
+        ),
         "intramolecular_annotation_policy": (
             "formed_cycle_or_hidden_connector"
         ),
@@ -785,6 +792,7 @@ def _display_component_draft(
     active_atom_indices: set[int],
     aromatic_seed_indices: set[int],
     explicit_remote_atom_indices: set[int],
+    formed_ring_path_atom_indices: set[int],
     core: Any,
 ) -> _ComponentDraft:
     retained, aromatic_systems, aromatic_policy_atom_indices = (
@@ -843,10 +851,15 @@ def _display_component_draft(
         ),
     ):
         atom = molecule.GetAtomWithIdx(retained_index)
+        omitted_atoms = component_by_atom[attachment_index]
+        formed_ring_path_omission = bool(
+            set(omitted_atoms).intersection(formed_ring_path_atom_indices)
+        )
         should_cap = (
             retained_index in aromatic_policy_atom_indices
             and atom.GetIsAromatic()
             and atom.GetAtomicNum() == 6
+            and not formed_ring_path_omission
             and len(
                 boundary_retained_components[
                     component_by_atom[attachment_index]
@@ -854,7 +867,6 @@ def _display_component_draft(
             )
             == 1
         )
-        omitted_atoms = component_by_atom[attachment_index]
         attachment_atom = molecule.GetAtomWithIdx(attachment_index)
         atom_maps = tuple(
             sorted(
@@ -936,21 +948,28 @@ def _display_component_draft(
             )
     connectors: list[_ConnectorDraft] = []
     for omitted_atoms, ports in sorted(connector_ports.items()):
+        formed_ring_path_omission = bool(
+            set(omitted_atoms).intersection(formed_ring_path_atom_indices)
+        )
         ports_by_retained_component: Dict[int, list[_SubstituentDraft]] = {}
         for port in ports:
             ports_by_retained_component.setdefault(
                 retained_component_by_atom[port.center_atom_index], []
             ).append(port)
-        if len(ports_by_retained_component) < 2:
+        if formed_ring_path_omission:
+            port_groups: Dict[int, list[_SubstituentDraft]] = {}
+            for port in ports:
+                port_groups.setdefault(port.center_atom_index, []).append(port)
+        else:
+            port_groups = ports_by_retained_component
+        if len(port_groups) < 2:
             continue
         allowed_atoms = set(omitted_atoms)
-        if len(ports_by_retained_component) == 2:
-            first_component, second_component = sorted(
-                ports_by_retained_component
-            )
+        if len(port_groups) == 2:
+            first_component, second_component = sorted(port_groups)
             candidates = []
-            for first in ports_by_retained_component[first_component]:
-                for second in ports_by_retained_component[second_component]:
+            for first in port_groups[first_component]:
+                for second in port_groups[second_component]:
                     path = _shortest_path_within(
                         molecule,
                         allowed_atom_indices=allowed_atoms,
@@ -975,13 +994,13 @@ def _display_component_draft(
             shortest_path_bond_count: Optional[int] = len(shortest_path) - 1
         else:
             selected_ports = []
-            for retained_component in sorted(ports_by_retained_component):
+            for retained_component in sorted(port_groups):
                 candidates = []
-                for port in ports_by_retained_component[retained_component]:
+                for port in port_groups[retained_component]:
                     other_ports = (
                         other
                         for other_component, values in (
-                            ports_by_retained_component.items()
+                            port_groups.items()
                         )
                         if other_component != retained_component
                         for other in values
@@ -1060,7 +1079,13 @@ def _side_component_drafts(
     active, aromatic_seeds = _active_coordinates(analysis, side=side)
     core = analysis.reaction_core
     explicit_remote: Dict[int, set[int]] = {}
+    formed_ring_paths: Dict[int, set[int]] = {}
     if core is not None:
+        formed_ring_path_ids = formed_ring_path_subgraph_ids(
+            core=core,
+            topology=analysis.reaction_topology,
+            side=side,
+        )
         for subgraph in core.remote_subgraphs:
             continuity = str(subgraph.continuity)
             preserve_small_unresolved_heteroatom = (
@@ -1068,7 +1093,13 @@ def _side_component_drafts(
                 and str(subgraph.remote_class) == "heteroatom"
                 and int(subgraph.fragment_heavy_atom_count) <= 1
             )
-            if str(subgraph.side) == side and (
+            if str(subgraph.side) != side:
+                continue
+            if str(subgraph.subgraph_id) in formed_ring_path_ids:
+                formed_ring_paths.setdefault(
+                    int(subgraph.component_index), set()
+                ).update(int(value) for value in subgraph.atom_indices)
+            if (
                 continuity in {"departing", "appearing"}
                 or preserve_small_unresolved_heteroatom
             ):
@@ -1094,6 +1125,9 @@ def _side_component_drafts(
                 explicit_remote_atom_indices=explicit_remote.get(
                     component_index, set()
                 ),
+                formed_ring_path_atom_indices=formed_ring_paths.get(
+                    component_index, set()
+                ),
                 core=core,
             )
         )
@@ -1109,7 +1143,9 @@ def _placeholder_label(index: int, count: int) -> str:
     return f"R{str(index).translate(_SUPERSCRIPT_DIGITS)}"
 
 
-def _placeholder_base_identity(draft: _SubstituentDraft) -> tuple[Any, ...]:
+def _placeholder_structural_identity(
+    draft: _SubstituentDraft,
+) -> tuple[Any, ...]:
     return (
         "fragment",
         draft.fragment_smiles,
@@ -1118,6 +1154,18 @@ def _placeholder_base_identity(draft: _SubstituentDraft) -> tuple[Any, ...]:
         draft.center_element,
         draft.attachment_bond_order,
     )
+
+
+def _placeholder_base_identity(draft: _SubstituentDraft) -> tuple[Any, ...]:
+    mapped_atoms = tuple(sorted(set(draft.atom_map_numbers)))
+    if draft.center_atom_map_number is not None and mapped_atoms:
+        return (
+            "mapped_port",
+            int(draft.center_atom_map_number),
+            int(draft.attachment_atom_map_number or 0),
+            mapped_atoms,
+        )
+    return _placeholder_structural_identity(draft)
 
 
 def _assign_placeholder_labels(components: list[_ComponentDraft]) -> None:
@@ -1152,7 +1200,24 @@ def _assign_placeholder_labels(components: list[_ComponentDraft]) -> None:
         )
         for ordinal, draft in enumerate(ordered, start=1):
             instance_keys[id(draft)] = (base, ordinal)
-    ordered_keys = sorted(set(instance_keys.values()), key=repr)
+    ordered_keys = []
+    seen_keys = set()
+    for draft in sorted(
+        placeholders,
+        key=lambda value: (
+            0 if value.side == "reactant" else 1,
+            repr(_placeholder_structural_identity(value)),
+            value.source_component_index,
+            value.center_atom_map_number or 0,
+            value.center_atom_index,
+            value.attachment_atom_map_number or 0,
+            value.attachment_atom_index,
+        ),
+    ):
+        identity = instance_keys[id(draft)]
+        if identity not in seen_keys:
+            seen_keys.add(identity)
+            ordered_keys.append(identity)
     index_by_key = {
         identity: index for index, identity in enumerate(ordered_keys, start=1)
     }

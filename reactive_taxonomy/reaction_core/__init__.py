@@ -1,6 +1,7 @@
 """Type-agnostic reaction-core observation API."""
 
 from .builder import build_reaction_core_projection
+from .ring_paths import formed_ring_path_subgraph_ids
 from .substituents import (
     build_substituent_profile,
     load_substituent_profile_definition,
@@ -35,5 +36,6 @@ __all__ = [
     "ReactionCoreSubstituentProfile",
     "build_reaction_core_projection",
     "build_substituent_profile",
+    "formed_ring_path_subgraph_ids",
     "load_substituent_profile_definition",
 ]

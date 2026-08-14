@@ -12,6 +12,14 @@ from reactive_taxonomy.reaction_display_projection import (
 )
 
 
+MAPPED_INTERCOMPONENT_ANNULATION = (
+    "CS(=O)(=O)O[CH2:1][CH2:2][c:3]1[c:9](Cl)"
+    "[cH:8][cH:7][cH:6][cH:4]1.[NH2:28][CH3:26]>>"
+    "[CH3:26][N:28]1[CH2:1][CH2:2][c:3]2[c:9]1"
+    "[cH:8][cH:7][cH:6][cH:4]2"
+)
+
+
 def _projection(reaction_smiles: str):
     analysis = featurize_reaction(reaction_smiles)
     assert analysis.reaction_core is not None
@@ -265,6 +273,39 @@ def test_click_reaction_keeps_new_ring_and_uses_two_r_groups() -> None:
     assert projection.formed_ring_sizes == (5,)
     assert sum(value.r_group_count for value in projection.reactants) == 2
     assert projection.products[0].r_group_count == 2
+
+
+def test_intercomponent_annulation_retains_formed_ring_path() -> None:
+    projection = _projection(MAPPED_INTERCOMPONENT_ANNULATION)
+
+    assert projection.definition_id == "reaction_display_projection.v1.9"
+    assert projection.reaction_scope == "intermolecular"
+    assert projection.formed_ring_sizes == (5,)
+    assert projection.minimum_reaction_smiles == (
+        "*COS(C)(=O)=O.*c1ccccc1Cl.*N>>*CN(*)c1ccccc1*"
+    )
+    assert {
+        (connector.side, connector.port_display_labels)
+        for connector in projection.connectors
+    } == {
+        ("reactant", ("R¹", "R²")),
+        ("product", ("R¹", "R²")),
+    }
+    ring_path_ports = {
+        (value.side, value.center_atom_map_number): (
+            value.display_label,
+            value.remote_class,
+        )
+        for value in projection.substituents
+        if value.center_atom_map_number in {1, 3}
+        and value.attachment_atom_map_number == 2
+    }
+    assert ring_path_ports == {
+        ("reactant", 1): ("R¹", "alkyl"),
+        ("reactant", 3): ("R²", "alkyl"),
+        ("product", 1): ("R¹", "ring_aliphatic"),
+        ("product", 3): ("R²", "ring_aliphatic"),
+    }
 
 
 def test_intramolecular_projection_reports_formed_ring_size() -> None:

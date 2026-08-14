@@ -79,6 +79,19 @@ MAPPED_INTRAMOLECULAR_CN = (
     "[NH:1]1[CH2:2][CH2:3][c:4]2[cH:5][cH:6][cH:7][cH:8]"
     "[c:9]21"
 )
+MAPPED_INTERCOMPONENT_ANNULATION = (
+    "CS(O[CH2:1][CH2:2][c:3]1[c:9](Cl)[n:8][c:7]"
+    "([N:10]2[CH2:15][CH2:14][O:13][CH2:12][CH2:11]2)"
+    "[n:6][c:4]1[Cl:5])(=O)=O."
+    "[CH3:16][C:17]([O:20][C:21]([N:23]1[CH2:29]"
+    "[C:26]([NH2:28])([CH3:27])[CH2:25][CH2:24]1)=[O:22])"
+    "([CH3:19])[CH3:18]>>"
+    "[CH3:16][C:17]([O:20][C:21]([N:23]1[CH2:29]"
+    "[C:26]([N:28]2[c:9]([c:3]3[CH2:2][CH2:1]2)[n:8]"
+    "[c:7]([N:10]4[CH2:15][CH2:14][O:13][CH2:12][CH2:11]4)"
+    "[n:6][c:4]3[Cl:5])([CH3:27])[CH2:25][CH2:24]1)=[O:22])"
+    "([CH3:19])[CH3:18]"
+)
 REPEATED_SUZUKI = (
     "Brc1ccc(Br)cc1.OB(O)c1ccccc1.OB(O)c1ccccc1"
     ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
@@ -385,7 +398,7 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
 
     assert b"<svg" in graphic.image_bytes[:512]
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
-    assert graphic.definition_id == "reaction_core_graphic.v2.0"
+    assert graphic.definition_id == "reaction_core_graphic.v2.1"
     assert graphic.schema_version == "2.0"
     assert [placeholder.label for placeholder in graphic.placeholders] == [
         "Alk¹",
@@ -404,7 +417,7 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
         "collapse_retained_multisite_scaffolds"
     ] is True
     assert load_reaction_core_graphic_definition()[
-        "preserve_intramolecular_tethers"
+        "preserve_formed_ring_paths"
     ] is True
     assert load_reaction_core_graphic_definition()[
         "render_nonretained_subgraphs_explicitly"
@@ -583,6 +596,65 @@ def test_renderer_preserves_intramolecular_ring_tethers(
         assert len(Chem.GetMolFrags(reduced[0])) == 1
         assert reduced[0].GetNumAtoms() == expected.GetNumAtoms()
         assert reduced[0].GetNumBonds() == expected.GetNumBonds()
+
+    graphic = build_reaction_core_graphic(
+        context,
+        size=(1200, 260),
+        image_format="svg",
+    )
+    assert b"<svg" in graphic.image_bytes[:512]
+
+
+def test_renderer_preserves_intercomponent_annulation_ring_path() -> None:
+    from visualization.reaction_core_graphic import (
+        _build_side_molecules,
+        _placeholder_assignments,
+    )
+
+    analysis = featurize_reaction(MAPPED_INTERCOMPONENT_ANNULATION)
+    context = reaction_render_context_from_analysis(analysis)
+    assignments, placeholders, collapses = _placeholder_assignments(context)
+
+    assert analysis.reaction_topology is not None
+    assert analysis.reaction_topology.reaction_scope == "intermolecular"
+    assert analysis.reaction_topology.formed_ring_sizes == (5,)
+    assert analysis.reaction_topology.ring_count_delta == 1
+    assert len(analysis.reaction_topology.ring_changes) == 1
+    assert {
+        reference.atom_map_number
+        for reference in analysis.reaction_topology.ring_changes[
+            0
+        ].atom_references
+    } == {1, 2, 3, 9, 28}
+    assert [placeholder.remote_class for placeholder in placeholders] == [
+        "ring_aliphatic"
+    ]
+
+    reactants = _build_side_molecules(
+        context,
+        side="reactant",
+        assignments=assignments,
+        scaffold_collapses=collapses,
+    )
+    products = _build_side_molecules(
+        context,
+        side="product",
+        assignments=assignments,
+        scaffold_collapses=collapses,
+    )
+
+    def cycle_rank(molecule: Chem.Mol) -> int:
+        return (
+            molecule.GetNumBonds()
+            - molecule.GetNumAtoms()
+            + len(Chem.GetMolFrags(molecule))
+        )
+
+    assert len(products) == 1
+    assert len(Chem.GetMolFrags(products[0])) == 1
+    assert sum(map(cycle_rank, products)) - sum(
+        map(cycle_rank, reactants)
+    ) == 1
 
     graphic = build_reaction_core_graphic(
         context,
