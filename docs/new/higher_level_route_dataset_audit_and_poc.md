@@ -166,11 +166,20 @@ route-level counts, validation status, and ordered steps. Each step retains:
 - explicit internal and terminal precursors; and
 - retrosynthetic position.
 
-A reproducible 50-route visual review is generated at
-`results/core_retrosynthesis/route_reviews/higher_level_routes_random50.html`.
-It uses simple random sampling with seed `20260814`, renders all original and
-non-empty higher-level reactions, and supports locally persisted review status,
-notes, filtering, and JSON export.
+A reproducible 50-route chemist review is generated at
+`results/core_retrosynthesis/route_reviews/higher_level_routes_random50_chemist_sequence.html`.
+It uses simple random sampling with seed `20260814`. Each route starts with a
+forward synthetic sequence of structures, added reactants, recorded conditions,
+intermediates, and final product; the toolbar can reverse it into retrosynthetic
+order. Original and non-empty higher-level reactions remain below each sequence.
+The report also supports locally persisted review status, notes, filtering, and
+JSON export.
+
+The curated records have also been converted to the shared nested route-tree
+schema. The 50-route tree artifact matches the HTML sample exactly, and all
+5,000 POC routes converted with zero rejections. Design, schema, invariants,
+commands, and artifact hashes are documented in
+`docs/new/route_tree_contract_and_conversion.md`.
 
 ## How to use it first
 

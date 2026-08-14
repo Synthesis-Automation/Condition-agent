@@ -172,6 +172,15 @@ def test_two_depth_route_requires_every_leaf_to_be_terminal() -> None:
 
     serialized = result.to_dict()
     assert serialized["routes"][0]["route_tree"]["tree_id"]
+    serialized_tree = serialized["routes"][0]["route_tree"]
+    assert serialized_tree["schema_version"] == "2.0"
+    assert serialized_tree["route_kind"] == "planned"
+    assert serialized_tree["root"]["occurrence_id"]
+    assert (
+        serialized_tree["root"]["reaction"]["evidence"]["evidence_kind"]
+        == "predicted"
+    )
+    assert serialized_tree["root"]["reaction"]["planned_action"]
     assert serialized["route_postprocessing"]["distance_matrix"] == [[0.0]]
 
 

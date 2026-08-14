@@ -61,6 +61,11 @@ def test_route_review_contains_reaction_drawings_and_review_controls() -> None:
     assert document.count("<svg") >= 6
     assert "Original recorded reaction" in document
     assert "Higher-level abstraction" in document
+    assert "Synthetic sequence" in document
+    assert "Starting material(s)" in document
+    assert "Final product" in document
+    assert "Show retrosynthesis" in document
+    assert "class=\"sequence-track\"" in document
     assert "Export review JSON" in document
     assert "localStorage" in document
 

@@ -52,9 +52,26 @@ python -m core_retrosynthesis render-route-review `
   --sample-size 50 --seed 20260814
 ```
 
-The self-contained report shows original and higher-level reaction drawings,
-reagents, intermediate continuity, and terminal precursors. Review status and
-notes persist in browser storage and can be exported as JSON.
+The self-contained report opens with a chemist-oriented synthetic sequence:
+starting materials, intermediates, added reactants and conditions, then final
+product. A toolbar control reverses it into retrosynthetic reading order. The
+original and higher-level mapped reaction drawings remain below for auditability.
+Review status and notes persist in browser storage and can be exported as JSON.
+
+Convert the curated observations to the shared evidence-neutral route-tree
+schema:
+
+```powershell
+python -m core_retrosynthesis convert-route-trees `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.v1.jsonl.gz `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.tree.v2.jsonl.gz
+```
+
+`ReactionRouteTree` alternates molecule occurrences and reaction occurrences,
+supports convergent branches, and distinguishes observed, inferred, and
+predicted evidence. Existing planned routes now serialize through the same v2
+contract while retaining temporary compatibility fields. See
+[`../docs/new/route_tree_contract_and_conversion.md`](../docs/new/route_tree_contract_and_conversion.md).
 
 ## Representation
 

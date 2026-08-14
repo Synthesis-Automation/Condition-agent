@@ -1,15 +1,20 @@
-"""Canonical molecule-to-reaction route trees and deterministic distances."""
+"""Planned-route adapter and deterministic distances for shared route trees."""
 
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import asdict, dataclass
 from typing import Any, Iterable, Optional, Protocol
 
 from .chemistry import digest
-
-
-ROUTE_TREE_SCHEMA_VERSION = "1.0"
+from .route_contract import (
+    ROUTE_TREE_SCHEMA_VERSION,
+    MoleculeOccurrenceNode,
+    PlannedRouteAction,
+    ReactionRouteTree,
+    RouteReactionNode,
+    RouteStepEvidence,
+    assert_valid_route_tree,
+)
 
 
 class RouteStepLike(Protocol):
@@ -35,76 +40,9 @@ class RouteLeafLike(Protocol):
     unresolved_reason: Optional[str]
 
 
-@dataclass(frozen=True)
-class RouteTreeReactionNode:
-    """A validated retrosynthetic action and its precursor molecule nodes."""
-
-    reaction_node_id: str
-    step_id: str
-    depth: int
-    proposed_reaction_smiles: str
-    operator_id: str
-    disconnection_site_key: str
-    children: tuple["RouteTreeMoleculeNode", ...]
-
-    def to_dict(self) -> dict[str, Any]:
-        """Return a JSON-compatible reaction subtree."""
-
-        return {
-            "reaction_node_id": self.reaction_node_id,
-            "step_id": self.step_id,
-            "depth": self.depth,
-            "proposed_reaction_smiles": self.proposed_reaction_smiles,
-            "operator_id": self.operator_id,
-            "disconnection_site_key": self.disconnection_site_key,
-            "children": [child.to_dict() for child in self.children],
-        }
-
-
-@dataclass(frozen=True)
-class RouteTreeMoleculeNode:
-    """One molecule occurrence in a route, distinct from molecular identity."""
-
-    molecule_node_id: str
-    smiles: str
-    depth: int
-    terminal: bool
-    terminal_evidence: str
-    unresolved_reason: Optional[str]
-    reaction: Optional[RouteTreeReactionNode] = None
-
-    def to_dict(self) -> dict[str, Any]:
-        """Return a JSON-compatible molecule subtree."""
-
-        value = asdict(self)
-        value["reaction"] = self.reaction.to_dict() if self.reaction else None
-        return value
-
-
-@dataclass(frozen=True)
-class CanonicalRouteTree:
-    """A versioned, occurrence-preserving route-tree representation."""
-
-    tree_id: str
-    target_smiles: str
-    root: RouteTreeMoleculeNode
-    reaction_count: int
-    maximum_depth: int
-    fingerprint_tokens: tuple[str, ...]
-    schema_version: str = ROUTE_TREE_SCHEMA_VERSION
-
-    def to_dict(self) -> dict[str, Any]:
-        """Return a JSON-compatible tree."""
-
-        return {
-            "tree_id": self.tree_id,
-            "target_smiles": self.target_smiles,
-            "root": self.root.to_dict(),
-            "reaction_count": self.reaction_count,
-            "maximum_depth": self.maximum_depth,
-            "fingerprint_tokens": list(self.fingerprint_tokens),
-            "schema_version": self.schema_version,
-        }
+RouteTreeReactionNode = RouteReactionNode
+RouteTreeMoleculeNode = MoleculeOccurrenceNode
+CanonicalRouteTree = ReactionRouteTree
 
 
 def build_canonical_route_tree(
@@ -131,17 +69,27 @@ def build_canonical_route_tree(
                     step.precursor_smiles,
                 )
             )
-            reaction = RouteTreeReactionNode(
+            reaction = RouteReactionNode(
                 reaction_node_id=digest("RTREACTION1", node_id, step.step_id),
                 step_id=step.step_id,
                 depth=step.depth,
-                proposed_reaction_smiles=step.candidate.proposed_reaction_smiles,
-                operator_id=step.candidate.operator_id,
-                disconnection_site_key=step.candidate.disconnection_site_key,
+                reaction_smiles=step.candidate.proposed_reaction_smiles,
+                evidence=RouteStepEvidence(
+                    evidence_kind="predicted",
+                    source_dataset_id="core_retrosynthesis",
+                    connectivity_method="planned_search_action",
+                ),
                 children=children,
+                planned_action=PlannedRouteAction(
+                    operator_id=step.candidate.operator_id,
+                    disconnection_site_key=(
+                        step.candidate.disconnection_site_key
+                    ),
+                    template_id=step.candidate.template_id,
+                ),
             )
-        return RouteTreeMoleculeNode(
-            molecule_node_id=node_id,
+        return MoleculeOccurrenceNode(
+            occurrence_id=node_id,
             smiles=smiles,
             depth=depth,
             terminal=bool(leaf and leaf.terminal),
@@ -168,14 +116,22 @@ def build_canonical_route_tree(
         str(maximum_depth),
         *tokens,
     )
-    return CanonicalRouteTree(
+    tree = ReactionRouteTree(
         tree_id=tree_id,
+        route_kind="planned",
         target_smiles=target_smiles,
         root=root,
         reaction_count=len(ordered_steps),
         maximum_depth=maximum_depth,
         fingerprint_tokens=tokens,
+        source_dataset_id="core_retrosynthesis",
+        connectivity_method="planned_search_action",
+        warnings=(
+            "Planned route actions are predictions and require chemistry review.",
+        ),
     )
+    assert_valid_route_tree(tree)
+    return tree
 
 
 def route_tree_distance(

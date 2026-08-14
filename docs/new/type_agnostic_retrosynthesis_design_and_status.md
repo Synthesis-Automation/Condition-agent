@@ -1,6 +1,6 @@
 # Type-Agnostic Retrosynthesis: Design and Implementation Status
 
-**Status date:** 2026-08-13  
+**Status date:** 2026-08-14
 **Primary implementation:** [`core_retrosynthesis`](../../core_retrosynthesis/)  
 **Current product priority:** reliable, diverse single-step disconnections
 
@@ -49,6 +49,8 @@ define operator identity.
 | Full-scale sharded build | Implemented | Restartable builds, ledgers, manifests, exact deduplication, and merge. |
 | Condition-aware reranking | Optional/partial | Can reorder close structural candidates; cannot create or rescue them. |
 | Selectivity competition model | Review-only POC | Emits cautions; it is not calibrated for production decisions. |
+| Shared route-tree contract | Implemented | Observed and planned routes use the same evidence-neutral, occurrence-preserving schema. |
+| Observed route corpus | 5,000-route POC | Patent-disjoint curated routes are converted with zero rejected records; strategy annotations remain weak labels. |
 | Multistep planning | Bounded POC | Available for experiments, but not the current product priority. |
 | Strategy-aware validation scheduling | Not implemented | Grouping currently improves output quality, not validation cost. |
 | Public CLI/API for grouped strategies | Not implemented | Current grouped result contract is Python-only. |
@@ -393,6 +395,12 @@ to enable evaluation at the correct level.
 - The historical RDChiral baseline and family-constrained compiler remain in an
   explicitly evaluation-only boundary until generic-path parity tests make them
   removable.
+- The shared route-tree contract represents one concrete synthesis tree, not the
+  alternative choices in an AND/OR search network. Search state should remain a
+  separate contract rather than overloading observed route data.
+- Converted route steps do not yet carry `ReactionSignature` or canonical
+  condition-recipe references. The schema reserves these links, but their owning
+  packages must populate them from molecular and condition evidence.
 - Multistep planning uses bounded search and simple terminal/stock evidence. It
   should remain secondary until single-step strategy quality and interfaces are
   stable.

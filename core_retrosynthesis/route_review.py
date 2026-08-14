@@ -55,6 +55,102 @@ def sample_route_records(
     return tuple(random.Random(seed).sample(ordered, sample_size))
 
 
+def _sequence_molecule(
+    smiles_values: Sequence[str],
+    *,
+    label: str,
+    kind: str,
+) -> str:
+    smiles = ".".join(value for value in smiles_values if value)
+    return (
+        f'<div class="sequence-molecule {html.escape(kind)}">'
+        f'<div class="sequence-label">{html.escape(label)}</div>'
+        f'<div class="sequence-molecule-svg">'
+        f'{molecule_svg(smiles, width=270, height=190)}</div>'
+        f'<code>{html.escape(smiles)}</code></div>'
+    )
+
+
+def _sequence_arrow(step: Mapping[str, Any], forward_position: int) -> str:
+    additions = tuple(str(value) for value in step.get("terminal_precursor_smiles") or ())
+    addition_smiles = ".".join(additions)
+    reagents = str(step.get("reagents_smiles") or "")
+    source_id = str(step.get("source_reaction_id") or "unknown")
+    additions_block = (
+        '<div class="sequence-additions">'
+        '<span>Added reactant</span>'
+        f'<div>{molecule_svg(addition_smiles, width=190, height=105)}</div>'
+        f'<code>{html.escape(addition_smiles)}</code></div>'
+        if additions
+        else ""
+    )
+    return (
+        '<div class="sequence-arrow">'
+        f'<div class="sequence-step">Step {forward_position}</div>'
+        f'{additions_block}'
+        '<div class="arrow-glyph" aria-hidden="true">'
+        '<span class="forward-arrow">⟶</span><span class="retro-arrow">⟵</span>'
+        '</div>'
+        '<div class="sequence-conditions">'
+        '<span>Recorded conditions</span>'
+        f'<code>{html.escape(reagents or "none recorded")}</code>'
+        f'<small>source {html.escape(source_id)}</small></div></div>'
+    )
+
+
+def _sequence_overview(route: Mapping[str, Any]) -> str:
+    steps = sorted(
+        (step for step in route.get("steps") or () if isinstance(step, Mapping)),
+        key=lambda step: int(step.get("retrosynthetic_position") or 0),
+        reverse=True,
+    )
+    if not steps:
+        return '<p class="sequence-unavailable">No route steps available.</p>'
+    deepest = steps[0]
+    starting_materials = tuple(
+        str(value) for value in deepest.get("precursor_smiles") or ()
+    )
+    if not starting_materials:
+        starting_materials = tuple(
+            str(value) for value in deepest.get("terminal_precursor_smiles") or ()
+        )
+    sequence: list[str] = [
+        _sequence_molecule(
+            starting_materials,
+            label="Starting material(s)",
+            kind="starting-material",
+        )
+    ]
+    total_steps = len(steps)
+    for index, step in enumerate(steps, start=1):
+        arrow_step = dict(step)
+        if index == 1:
+            # The deepest step's terminal reactants are already shown as the
+            # starting-material node; avoid displaying them twice.
+            arrow_step["terminal_precursor_smiles"] = []
+        sequence.append(_sequence_arrow(arrow_step, index))
+        label = (
+            "Final product"
+            if index == total_steps
+            else f"Intermediate {index}"
+        )
+        sequence.append(
+            _sequence_molecule(
+                (str(step.get("product_smiles") or ""),),
+                label=label,
+                kind="final-product" if index == total_steps else "intermediate",
+            )
+        )
+    return (
+        '<section class="sequence-panel">'
+        '<div class="sequence-heading"><h2>Synthetic sequence</h2>'
+        '<p><span class="forward-copy">Starting materials → final product</span>'
+        '<span class="retro-copy">Target ← precursors</span></p></div>'
+        f'<div class="sequence-scroll"><div class="sequence-track">'
+        f'{"".join(sequence)}</div></div></section>'
+    )
+
+
 def _route_card(route: Mapping[str, Any], index: int) -> str:
     route_id = str(route.get("route_id") or f"route-{index}")
     patent_id = str(route.get("patent_id") or "unknown")
@@ -119,6 +215,7 @@ def _route_card(route: Mapping[str, Any], index: int) -> str:
         f'<span class="tag">reduction {reduction}</span>'
         "</summary>"
         '<div class="route-body">'
+        f"{_sequence_overview(route)}"
         '<section class="target-panel">'
         '<div><h2>Target</h2>'
         f'<code>{html.escape(target)}</code></div>'
@@ -185,6 +282,39 @@ main { max-width:1500px; margin:auto; padding:20px; }
 .target-panel h2,.route-step h3,.reaction-panel h4 { margin:0 0 7px; font-weight:500; }
 .target-svg svg,.reaction-svg svg { display:block; width:100%; height:auto; max-height:250px; }
 .review-fields { display:grid; gap:5px; }.review-fields textarea { resize:vertical; }
+.sequence-panel { margin-bottom:16px; padding:13px; overflow:hidden; background:#fbfdfd;
+  border:1px solid #cbd9de; border-radius:9px; }
+.sequence-heading { display:flex; align-items:baseline; gap:12px; }
+.sequence-heading h2 { margin:0; font-size:17px; font-weight:550; }
+.sequence-heading p { margin:0; color:var(--muted); font-size:12px; }
+.retro-copy,.retro-arrow { display:none; }
+.sequence-scroll { overflow-x:auto; padding:12px 3px 5px; }
+.sequence-track { display:flex; width:max-content; min-width:100%; align-items:center; }
+.sequence-molecule { display:grid; flex:0 0 270px; align-self:stretch; align-content:start;
+  min-height:245px; padding:8px; background:#fff; border:1px solid var(--line);
+  border-radius:8px; text-align:center; }
+.sequence-molecule.starting-material { border-top:4px solid #557d8c; }
+.sequence-molecule.intermediate { border-top:4px solid #c69b3c; }
+.sequence-molecule.final-product { border-top:4px solid var(--good); }
+.sequence-label { font-weight:600; color:#294b55; }
+.sequence-molecule-svg svg { display:block; width:100%; height:190px; }
+.sequence-molecule code { max-height:48px; overflow:auto; }
+.sequence-arrow { display:grid; flex:0 0 205px; align-self:stretch; align-content:center;
+  justify-items:center; padding:4px 8px; text-align:center; }
+.sequence-step { padding:2px 8px; color:#31535d; background:#e6eff2;
+  border-radius:999px; font-size:11px; font-weight:600; }
+.arrow-glyph { color:var(--accent); font:46px/1 Arial,sans-serif; }
+.sequence-additions { width:100%; margin:4px 0; padding:5px; background:#fff;
+  border:1px dashed #c4d1d6; border-radius:6px; }
+.sequence-additions span,.sequence-conditions span { display:block; color:var(--muted);
+  font-size:10px; text-transform:uppercase; letter-spacing:.04em; }
+.sequence-additions svg { display:block; width:100%; height:105px; }
+.sequence-additions code { max-height:34px; overflow:auto; }
+.sequence-conditions { width:100%; }.sequence-conditions code { max-height:50px; overflow:auto; }
+.sequence-conditions small { display:block; margin-top:3px; color:var(--muted); }
+body.retro-direction .sequence-track { flex-direction:row-reverse; }
+body.retro-direction .forward-arrow,body.retro-direction .forward-copy { display:none; }
+body.retro-direction .retro-arrow,body.retro-direction .retro-copy { display:inline; }
 .route-step { padding:14px 0; border-top:1px solid var(--line); }
 .step-heading { display:flex; gap:9px; align-items:center; margin-bottom:10px; }
 .step-heading h3 { margin:0; }.source-id { margin-left:auto; }
@@ -256,6 +386,10 @@ document.querySelectorAll('.review-status,.review-note').forEach(control => {{
 [search, split, steps, status].forEach(control => control.addEventListener('input', filterCards));
 document.getElementById('expand-all').addEventListener('click', () => cards.forEach(card => card.open = true));
 document.getElementById('collapse-all').addEventListener('click', () => cards.forEach(card => card.open = false));
+document.getElementById('toggle-direction').addEventListener('click', event => {{
+  const retro = document.body.classList.toggle('retro-direction');
+  event.currentTarget.textContent = retro ? 'Show forward synthesis' : 'Show retrosynthesis';
+}});
 document.getElementById('export-review').addEventListener('click', () => {{
   const payload = {{sample:sampleMetadata, reviews:cards.map(card => ({{
     route_id:card.dataset.routeId,
@@ -327,6 +461,7 @@ def render_route_review_html(
         '<option value="question">Questionable</option><option value="reject">Reject</option></select></label>'
         '<button id="expand-all" type="button">Expand all</button>'
         '<button id="collapse-all" type="button">Collapse all</button>'
+        '<button id="toggle-direction" type="button">Show retrosynthesis</button>'
         '<button id="export-review" type="button">Export review JSON</button>'
         '<span id="visible-count"></span></section>'
         f'<section id="routes">{route_cards}</section></main>'

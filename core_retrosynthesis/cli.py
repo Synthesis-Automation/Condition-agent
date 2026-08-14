@@ -37,6 +37,11 @@ from .operator_benchmark import (
     run_operator_coverage_benchmark,
 )
 from .route_curation import RouteSubsetPolicy, curate_route_subset
+from .route_conversion import (
+    DEFAULT_OBSERVED_ROUTE_DATASET_ID,
+    DEFAULT_OBSERVED_ROUTE_SAMPLE_SEED,
+    convert_observed_route_corpus,
+)
 from .route_review import DEFAULT_ROUTE_REVIEW_SEED, write_route_review_html
 from .search import disconnect_target
 from .sources import LIBRARY_MODES, iter_library_rows, resolve_library_mode
@@ -378,6 +383,26 @@ def _parser() -> argparse.ArgumentParser:
     route_review.add_argument("--seed", type=int, default=DEFAULT_ROUTE_REVIEW_SEED)
     route_review.add_argument("--title", default="Random route review")
 
+    route_conversion = commands.add_parser(
+        "convert-route-trees",
+        help="convert curated observed routes to the canonical tree schema",
+    )
+    route_conversion.add_argument("source_routes")
+    route_conversion.add_argument("output_jsonl")
+    route_conversion.add_argument("--manifest")
+    route_conversion.add_argument(
+        "--source-dataset-id",
+        default=DEFAULT_OBSERVED_ROUTE_DATASET_ID,
+    )
+    route_conversion.add_argument("--sample-size", type=int)
+    route_conversion.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_OBSERVED_ROUTE_SAMPLE_SEED,
+    )
+    route_conversion.add_argument("--allow-rejections", action="store_true")
+    route_conversion.add_argument("--overwrite", action="store_true")
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -443,6 +468,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             sample_size=arguments.sample_size,
             seed=arguments.seed,
             title=arguments.title,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "convert-route-trees":
+        report = convert_observed_route_corpus(
+            arguments.source_routes,
+            arguments.output_jsonl,
+            manifest_path=arguments.manifest,
+            source_dataset_id=arguments.source_dataset_id,
+            sample_size=arguments.sample_size,
+            seed=arguments.seed,
+            overwrite=arguments.overwrite,
+            strict=not arguments.allow_rejections,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
