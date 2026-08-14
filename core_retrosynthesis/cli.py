@@ -46,6 +46,11 @@ from .route_core_conversion import (
     DEFAULT_ROUTE_CORE_SAMPLE_SEED,
     convert_route_core_corpus,
 )
+from .route_action_conversion import (
+    DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
+    convert_route_action_corpus,
+)
+from .route_action_evaluation import RouteActionEvaluationConfig
 from .route_review import DEFAULT_ROUTE_REVIEW_SEED, write_route_review_html
 from .route_core_review import (
     DEFAULT_ROUTE_CORE_REVIEW_SEED,
@@ -450,6 +455,35 @@ def _parser() -> argparse.ArgumentParser:
         default="Minimized route-core review",
     )
 
+    route_action = commands.add_parser(
+        "evaluate-route-actions",
+        help="replay observed route steps through validated single-step search",
+    )
+    route_action.add_argument("source_trees")
+    route_action.add_argument("operator_library")
+    route_action.add_argument("output_jsonl")
+    route_action.add_argument("--manifest")
+    route_action.add_argument("--sample-size", type=int)
+    route_action.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
+    )
+    route_action.add_argument("--top-k", type=int, default=25)
+    route_action.add_argument("--max-templates-to-apply", type=int, default=500)
+    route_action.add_argument(
+        "--max-candidates-to-validate", type=int, default=100
+    )
+    route_action.add_argument("--minimum-candidates-per-level", type=int, default=0)
+    route_action.add_argument("--no-context", action="store_true")
+    route_action.add_argument("--skip-l0", action="store_true")
+    route_action.add_argument("--no-diversity", action="store_true")
+    route_action.add_argument("--no-hierarchical-ranking", action="store_true")
+    route_action.add_argument("--lazy-validation", action="store_true")
+    route_action.add_argument("--workers", type=int, default=1)
+    route_action.add_argument("--allow-rejections", action="store_true")
+    route_action.add_argument("--overwrite", action="store_true")
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -552,6 +586,35 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             sample_size=arguments.sample_size,
             seed=arguments.seed,
             title=arguments.title,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "evaluate-route-actions":
+        report = convert_route_action_corpus(
+            arguments.source_trees,
+            arguments.operator_library,
+            arguments.output_jsonl,
+            manifest_path=arguments.manifest,
+            config=RouteActionEvaluationConfig(
+                top_k=arguments.top_k,
+                max_templates_to_apply=arguments.max_templates_to_apply,
+                max_candidates_to_validate=arguments.max_candidates_to_validate,
+                use_context=not arguments.no_context,
+                include_l0=not arguments.skip_l0,
+                diversify=not arguments.no_diversity,
+                use_hierarchical_ranking=(
+                    not arguments.no_hierarchical_ranking
+                ),
+                minimum_candidates_per_level=(
+                    arguments.minimum_candidates_per_level
+                ),
+                lazy_validation=arguments.lazy_validation,
+            ),
+            sample_size=arguments.sample_size,
+            seed=arguments.seed,
+            overwrite=arguments.overwrite,
+            strict=not arguments.allow_rejections,
+            workers=arguments.workers,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0

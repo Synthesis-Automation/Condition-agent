@@ -141,8 +141,9 @@ python -m core_retrosynthesis render-route-core-review `
 
 1. Review the blocked, unavailable, and bounded-lineage examples in the HTML and
    targeted audit exports.
-2. Replay the validated one-step disconnector at every route-core step and label
-   exact, strategy, site, and operator recovery.
+2. Expand the implemented route-action replay POC after improving strict
+   single-step eligibility coverage; see
+   `route_action_replay_benchmark_design_and_status.md`.
 3. Compute patent-disjoint empirical support for typed and shape motifs.
 4. Add motif compatibility as optional ranking evidence; do not make it a hard
    routing rule.

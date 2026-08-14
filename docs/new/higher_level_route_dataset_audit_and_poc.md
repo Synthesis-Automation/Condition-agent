@@ -208,6 +208,15 @@ route generator:
 This leaves candidate generation and chemistry validation deterministic while
 using data to learn which valid action is strategically preferable.
 
+This first experiment is now implemented as the versioned route-action replay
+benchmark. On the random 50-route review sample, 18 of 188 observed steps are
+strictly eligible positives; all 18 receive validated candidates. Exact precursor
+recall is 33.3% at top 1 and 66.7% at top 10/25, while SITE1 recall is 44.4% at
+top 1 and 72.2% at top 10/25. The low 9.6% positive eligibility is the immediate
+data/chemistry bottleneck and must be improved without weakening validation.
+Design and audit details live in
+`docs/new/route_action_replay_benchmark_design_and_status.md`.
+
 ## Required cleanup after the POC
 
 Before production use:

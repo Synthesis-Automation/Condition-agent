@@ -100,6 +100,21 @@ identities, and explicit two-/three-event motif definitions. They are projection
 and learning evidence, not executable multistep templates. See
 [`../docs/new/route_core_projection_design_and_status.md`](../docs/new/route_core_projection_design_and_status.md).
 
+Replay observed route actions through the validated single-step operator ladder:
+
+```powershell
+python -m core_retrosynthesis evaluate-route-actions `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.random50.tree.v2.jsonl.gz `
+  results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
+  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_replay.v1.jsonl.gz `
+  --workers 8 --overwrite
+```
+
+The benchmark retains every step, admits positives only after source round trip
+and generic identity reconstruction, measures exact/SITE1/OP1/SYN1/STRAT1
+recovery, and stores compact validated hard negatives. See
+[`../docs/new/route_action_replay_benchmark_design_and_status.md`](../docs/new/route_action_replay_benchmark_design_and_status.md).
+
 ## Representation
 
 Two initial abstraction levels are generated:
