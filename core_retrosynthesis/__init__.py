@@ -83,6 +83,22 @@ from .route_tree import (
     route_distance_matrix,
     route_tree_distance,
 )
+from .route_curation import (
+    ROUTE_CORPUS_SCHEMA_VERSION,
+    ROUTE_CURATION_POLICY_VERSION,
+    RouteQualityError,
+    RouteSubsetPolicy,
+    curate_route_subset,
+    load_reaction_exclusions,
+    normalize_linear_route_record,
+)
+from .route_review import (
+    DEFAULT_ROUTE_REVIEW_SEED,
+    load_curated_routes,
+    render_route_review_html,
+    sample_route_records,
+    write_route_review_html,
+)
 from .multistep_ranking import (
     MultistepRankingPolicy,
     load_multistep_ranking_policy,
@@ -167,6 +183,11 @@ __all__ = [
     "CanonicalRouteTree",
     "RouteTreeMoleculeNode",
     "RouteTreeReactionNode",
+    "ROUTE_CORPUS_SCHEMA_VERSION",
+    "ROUTE_CURATION_POLICY_VERSION",
+    "DEFAULT_ROUTE_REVIEW_SEED",
+    "RouteQualityError",
+    "RouteSubsetPolicy",
     "RankedReactionOutcome",
     "ReactionChoiceSet",
     "ReactionOutcomeCandidate",
@@ -218,6 +239,13 @@ __all__ = [
     "group_strategy_candidates",
     "build_strategy_id",
     "build_canonical_route_tree",
+    "curate_route_subset",
+    "load_reaction_exclusions",
+    "load_curated_routes",
+    "normalize_linear_route_record",
+    "render_route_review_html",
+    "sample_route_records",
+    "write_route_review_html",
     "route_distance_matrix",
     "route_tree_distance",
     "run_comparison",

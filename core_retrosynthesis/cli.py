@@ -36,6 +36,8 @@ from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
 )
+from .route_curation import RouteSubsetPolicy, curate_route_subset
+from .route_review import DEFAULT_ROUTE_REVIEW_SEED, write_route_review_html
 from .search import disconnect_target
 from .sources import LIBRARY_MODES, iter_library_rows, resolve_library_mode
 
@@ -349,6 +351,33 @@ def _parser() -> argparse.ArgumentParser:
         ),
     )
 
+    route_curation = commands.add_parser(
+        "curate-route-corpus",
+        help="validate and extract a patent-disjoint multistep route corpus",
+    )
+    route_curation.add_argument("source_routes")
+    route_curation.add_argument("output_jsonl")
+    route_curation.add_argument("--manifest")
+    route_curation.add_argument("--testset")
+    route_curation.add_argument("--minimum-steps", type=int, default=3)
+    route_curation.add_argument("--maximum-steps", type=int, default=6)
+    route_curation.add_argument("--maximum-routes", type=int, default=5_000)
+    route_curation.add_argument(
+        "--allow-no-abstraction-reduction",
+        action="store_true",
+    )
+    route_curation.add_argument("--overwrite", action="store_true")
+
+    route_review = commands.add_parser(
+        "render-route-review",
+        help="render a random curated-route sample as self-contained HTML",
+    )
+    route_review.add_argument("source_routes")
+    route_review.add_argument("output_html")
+    route_review.add_argument("--sample-size", type=int, default=50)
+    route_review.add_argument("--seed", type=int, default=DEFAULT_ROUTE_REVIEW_SEED)
+    route_review.add_argument("--title", default="Random route review")
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -389,6 +418,34 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     """Run library construction, disconnection, or paired evaluation."""
 
     arguments = _parser().parse_args(argv)
+    if arguments.command == "curate-route-corpus":
+        report = curate_route_subset(
+            arguments.source_routes,
+            arguments.output_jsonl,
+            manifest_path=arguments.manifest,
+            testset_path=arguments.testset,
+            policy=RouteSubsetPolicy(
+                minimum_steps=arguments.minimum_steps,
+                maximum_steps=arguments.maximum_steps,
+                maximum_routes=arguments.maximum_routes,
+                require_abstraction_reduction=(
+                    not arguments.allow_no_abstraction_reduction
+                ),
+            ),
+            overwrite=arguments.overwrite,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "render-route-review":
+        report = write_route_review_html(
+            arguments.source_routes,
+            arguments.output_html,
+            sample_size=arguments.sample_size,
+            seed=arguments.seed,
+            title=arguments.title,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
     source = (
         resolve_library_mode(arguments.source, arguments.library_mode)
         if hasattr(arguments, "source") and hasattr(arguments, "library_mode")

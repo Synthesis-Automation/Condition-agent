@@ -16,6 +16,46 @@ This package composes `reactive_taxonomy`, `condition_registry`, and optional
 For the current architecture and implementation matrix, see
 [`../docs/new/type_agnostic_retrosynthesis_design_and_status.md`](../docs/new/type_agnostic_retrosynthesis_design_and_status.md).
 
+## Curate an external route corpus
+
+The released higher-level retrosynthesis route JSONL can be converted into a
+small, deterministic POC corpus without making its unordered reaction arrays
+part of our public route contract:
+
+```powershell
+python -m core_retrosynthesis curate-route-corpus `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/extracted/datasets/routes/uspto.higher-level.routes.jsonl.gz `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.v1.jsonl.gz `
+  --testset datasets/external/higher_level_retrosynthesis/figshare_v2/extracted/datasets/route_testset/uspto190_canon_reactions.smi `
+  --maximum-routes 5000
+```
+
+The curator reconstructs retrosynthetic step order from canonical molecular
+identity, validates complete atom mapping and route connectivity, retains the
+full reagent field, excludes routes whose targets occur as products in the
+released USPTO-190 reaction list, and assigns splits by patent. The default POC
+uses 3-6-step linear routes with at least one algorithmic higher-level step
+reduction and selects at most one route per patent. These are sampling
+constraints for a clean first experiment, not production rejection rules for
+branched chemistry.
+
+See
+[`../docs/new/higher_level_route_dataset_audit_and_poc.md`](../docs/new/higher_level_route_dataset_audit_and_poc.md)
+for the source audit, limitations, and required follow-up cleanup.
+
+Render a reproducible random sample for chemistry review:
+
+```powershell
+python -m core_retrosynthesis render-route-review `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.v1.jsonl.gz `
+  results/core_retrosynthesis/route_reviews/higher_level_routes_random50.html `
+  --sample-size 50 --seed 20260814
+```
+
+The self-contained report shows original and higher-level reaction drawings,
+reagents, intermediate continuity, and terminal precursors. Review status and
+notes persist in browser storage and can be exported as JSON.
+
 ## Representation
 
 Two initial abstraction levels are generated:
