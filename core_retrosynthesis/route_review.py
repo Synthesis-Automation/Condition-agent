@@ -151,7 +151,31 @@ def _sequence_overview(route: Mapping[str, Any]) -> str:
     )
 
 
-def _route_card(route: Mapping[str, Any], index: int) -> str:
+def _review_fields(route_id: str, index: int, *, compact: bool = False) -> str:
+    compact_class = " compact-review" if compact else ""
+    return (
+        f'<div class="review-fields{compact_class}">'
+        f'<label for="status-{index}">Review status</label>'
+        f'<select id="status-{index}" class="review-status" '
+        f'data-route="{html.escape(route_id)}">'
+        '<option value="unreviewed">Unreviewed</option>'
+        '<option value="accept">Accept</option>'
+        '<option value="question">Questionable</option>'
+        '<option value="reject">Reject</option></select>'
+        f'<label for="note-{index}">Notes</label>'
+        f'<textarea id="note-{index}" class="review-note" '
+        f'data-route="{html.escape(route_id)}" rows="3" '
+        'placeholder="Optional chemistry or data-quality note"></textarea>'
+        "</div>"
+    )
+
+
+def _route_card(
+    route: Mapping[str, Any],
+    index: int,
+    *,
+    include_step_details: bool,
+) -> str:
     route_id = str(route.get("route_id") or f"route-{index}")
     patent_id = str(route.get("patent_id") or "unknown")
     split = str(route.get("split") or "unknown")
@@ -159,7 +183,7 @@ def _route_card(route: Mapping[str, Any], index: int) -> str:
     steps = tuple(route.get("steps") or ())
     reduction = int(route.get("abstraction_reduction") or 0)
     step_blocks = []
-    for fallback_position, step in enumerate(steps):
+    for fallback_position, step in enumerate(steps if include_step_details else ()):
         position = int(step.get("retrosynthetic_position", fallback_position))
         original = str(step.get("reaction_smiles") or "")
         abstracted = str(step.get("abstracted_reaction_smiles") or "")
@@ -200,6 +224,19 @@ def _route_card(route: Mapping[str, Any], index: int) -> str:
             "</dl></section>"
         )
     search_value = " ".join((route_id, patent_id, split, target)).lower()
+    detailed_review = (
+        '<section class="target-panel">'
+        '<div><h2>Target</h2>'
+        f'<code>{html.escape(target)}</code></div>'
+        f'<div class="target-svg">{molecule_svg(target, width=420, height=240)}</div>'
+        f'{_review_fields(route_id, index)}</section>'
+        f'{"".join(step_blocks)}'
+        if include_step_details
+        else (
+            '<section class="sequence-only-review">'
+            f'{_review_fields(route_id, index, compact=True)}</section>'
+        )
+    )
     return (
         f'<details class="route-card" data-route-id="{html.escape(route_id)}" '
         f'data-split="{html.escape(split)}" data-steps="{len(steps)}" '
@@ -216,22 +253,7 @@ def _route_card(route: Mapping[str, Any], index: int) -> str:
         "</summary>"
         '<div class="route-body">'
         f"{_sequence_overview(route)}"
-        '<section class="target-panel">'
-        '<div><h2>Target</h2>'
-        f'<code>{html.escape(target)}</code></div>'
-        f'<div class="target-svg">{molecule_svg(target, width=420, height=240)}</div>'
-        '<div class="review-fields">'
-        f'<label for="status-{index}">Review status</label>'
-        f'<select id="status-{index}" class="review-status" data-route="{html.escape(route_id)}">'
-        '<option value="unreviewed">Unreviewed</option>'
-        '<option value="accept">Accept</option>'
-        '<option value="question">Questionable</option>'
-        '<option value="reject">Reject</option></select>'
-        f'<label for="note-{index}">Notes</label>'
-        f'<textarea id="note-{index}" class="review-note" data-route="{html.escape(route_id)}" '
-        'rows="3" placeholder="Optional chemistry or data-quality note"></textarea>'
-        "</div></section>"
-        f"{''.join(step_blocks)}</div></details>"
+        f"{detailed_review}</div></details>"
     )
 
 
@@ -282,6 +304,9 @@ main { max-width:1500px; margin:auto; padding:20px; }
 .target-panel h2,.route-step h3,.reaction-panel h4 { margin:0 0 7px; font-weight:500; }
 .target-svg svg,.reaction-svg svg { display:block; width:100%; height:auto; max-height:250px; }
 .review-fields { display:grid; gap:5px; }.review-fields textarea { resize:vertical; }
+.sequence-only-review { padding-top:12px; border-top:1px solid var(--line); }
+.compact-review { grid-template-columns:auto minmax(140px,220px) auto 1fr;
+  align-items:center; }
 .sequence-panel { margin-bottom:16px; padding:13px; overflow:hidden; background:#fbfdfd;
   border:1px solid #cbd9de; border-radius:9px; }
 .sequence-heading { display:flex; align-items:baseline; gap:12px; }
@@ -410,6 +435,7 @@ def render_route_review_html(
     sample_size: int = 50,
     seed: int = DEFAULT_ROUTE_REVIEW_SEED,
     title: str = "Random route review",
+    include_step_details: bool = True,
 ) -> str:
     """Render a random route sample as a self-contained review document."""
 
@@ -424,7 +450,11 @@ def render_route_review_html(
         for step in route.get("steps") or ()
     )
     route_cards = "".join(
-        _route_card(route, index)
+        _route_card(
+            route,
+            index,
+            include_step_details=include_step_details,
+        )
         for index, route in enumerate(sampled, start=1)
     )
     split_options = "".join(
@@ -476,6 +506,7 @@ def write_route_review_html(
     sample_size: int = 50,
     seed: int = DEFAULT_ROUTE_REVIEW_SEED,
     title: str = "Random route review",
+    include_step_details: bool = True,
 ) -> dict[str, Any]:
     """Load, sample, and write a self-contained visual route review."""
 
@@ -485,6 +516,7 @@ def write_route_review_html(
         sample_size=sample_size,
         seed=seed,
         title=title,
+        include_step_details=include_step_details,
     )
     output = Path(output_html)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -495,6 +527,7 @@ def write_route_review_html(
         "output_html": str(output.resolve()),
         "sample_size": sample_size,
         "seed": seed,
+        "include_step_details": include_step_details,
         "route_ids": [str(route.get("route_id") or "") for route in sampled],
         "html_bytes": output.stat().st_size,
     }
@@ -507,6 +540,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--sample-size", type=int, default=50)
     parser.add_argument("--seed", type=int, default=DEFAULT_ROUTE_REVIEW_SEED)
     parser.add_argument("--title", default="Random route review")
+    parser.add_argument(
+        "--sequence-only",
+        action="store_true",
+        help="omit detailed retrosynthetic step panels",
+    )
     return parser
 
 
@@ -520,6 +558,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         sample_size=arguments.sample_size,
         seed=arguments.seed,
         title=arguments.title,
+        include_step_details=not arguments.sequence_only,
     )
     print(json.dumps(report, indent=2, sort_keys=True))
     return 0

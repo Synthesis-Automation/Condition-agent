@@ -89,3 +89,20 @@ def test_route_review_writer_loads_gzip_jsonl(tmp_path: Path) -> None:
     assert report["sample_size"] == 1
     assert report["html_bytes"] == output.stat().st_size
     assert "<!doctype html>" in output.read_text(encoding="utf-8")
+
+
+def test_sequence_only_review_omits_detailed_step_panels() -> None:
+    document = render_route_review_html(
+        [_record("route-a", "patent-a")],
+        sample_size=1,
+        seed=3,
+        include_step_details=False,
+    )
+
+    assert "Synthetic sequence" in document
+    assert "Final product" in document
+    assert "Retrosynthetic step" not in document
+    assert "Original recorded reaction" not in document
+    assert "Higher-level abstraction" not in document
+    assert "class=\"sequence-only-review\"" in document
+    assert "Review status" in document

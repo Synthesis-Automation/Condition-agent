@@ -382,6 +382,11 @@ def _parser() -> argparse.ArgumentParser:
     route_review.add_argument("--sample-size", type=int, default=50)
     route_review.add_argument("--seed", type=int, default=DEFAULT_ROUTE_REVIEW_SEED)
     route_review.add_argument("--title", default="Random route review")
+    route_review.add_argument(
+        "--sequence-only",
+        action="store_true",
+        help="omit detailed retrosynthetic step panels",
+    )
 
     route_conversion = commands.add_parser(
         "convert-route-trees",
@@ -468,6 +473,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             sample_size=arguments.sample_size,
             seed=arguments.seed,
             title=arguments.title,
+            include_step_details=not arguments.sequence_only,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0

@@ -58,6 +58,9 @@ product. A toolbar control reverses it into retrosynthetic reading order. The
 original and higher-level mapped reaction drawings remain below for auditability.
 Review status and notes persist in browser storage and can be exported as JSON.
 
+For a smaller report containing only the sequence and review controls, add
+`--sequence-only`.
+
 Convert the curated observations to the shared evidence-neutral route-tree
 schema:
 
