@@ -6,6 +6,7 @@ import type {
   CompletionProposal,
   DiscoveryResult,
   FeatureAnalysisResult,
+  ForwardSynthesisResult,
   MultistepRetrosynthesisResult,
   RankingProfile,
   RecommendationResult,
@@ -15,9 +16,9 @@ import { CompletionDialog } from './components/CompletionDialog'
 import { FeatureResults } from './components/FeatureResults'
 import { RankingDialog } from './components/RankingDialog'
 import { ReactionEditor } from './components/ReactionEditor'
-import { DiscoveryResults, MultistepRetrosynthesisResults, RecommendationResults, RetrosynthesisResults } from './components/Results'
+import { DiscoveryResults, ForwardSynthesisResults, MultistepRetrosynthesisResults, RecommendationResults, RetrosynthesisResults } from './components/Results'
 
-type Mode = 'recommendation' | 'discovery' | 'retrosynthesis' | 'multistep_retrosynthesis' | 'features'
+type Mode = 'recommendation' | 'discovery' | 'forward_synthesis' | 'retrosynthesis' | 'multistep_retrosynthesis' | 'features'
 type LibraryMode = 'full' | 'compact'
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -27,6 +28,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   NO_COMPATIBLE_PRECEDENTS: 'No chemically compatible precedents were found.',
   NO_RETROSYNTHESIS_CANDIDATES: 'No structurally validated single-step disconnections were found.',
   NO_MULTISTEP_ROUTES: 'No fully terminated route was found within the selected depth and search limits.',
+  INVALID_STARTING_MATERIALS: 'The starting materials could not be parsed. Enter dot-separated molecule SMILES.',
 }
 
 function friendlyError(error: unknown): string {
@@ -48,7 +50,7 @@ function App() {
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState('Ready')
   const [error, setError] = useState('')
-  const [result, setResult] = useState<RecommendationResult | DiscoveryResult | RetrosynthesisResult | MultistepRetrosynthesisResult | FeatureAnalysisResult | null>(null)
+  const [result, setResult] = useState<RecommendationResult | DiscoveryResult | ForwardSynthesisResult | RetrosynthesisResult | MultistepRetrosynthesisResult | FeatureAnalysisResult | null>(null)
   const [topK, setTopK] = useState(5)
   const [minimumPoolSize, setMinimumPoolSize] = useState<number | null>(null)
   const [unrestrictedFallback, setUnrestrictedFallback] = useState(false)
@@ -64,6 +66,9 @@ function App() {
   const [useConditionAvailability, setUseConditionAvailability] = useState(true)
   const [multistepDepth, setMultistepDepth] = useState<2 | 3>(3)
   const [molecularWeightThreshold, setMolecularWeightThreshold] = useState(150)
+  const [intendedProduct, setIntendedProduct] = useState('')
+  const [forwardOperatorHint, setForwardOperatorHint] = useState('')
+  const [forwardRecipeText, setForwardRecipeText] = useState('')
   const retrosynthesisRun = useRef(0)
 
   useEffect(() => {
@@ -94,7 +99,7 @@ function App() {
     setMode(nextMode)
     setResult(null)
     setError('')
-    if ((nextMode === 'retrosynthesis' || nextMode === 'multistep_retrosynthesis') && capabilities) {
+    if ((nextMode === 'forward_synthesis' || nextMode === 'retrosynthesis' || nextMode === 'multistep_retrosynthesis') && capabilities) {
       setLibraryMode(capabilities.default_retrosynthesis_library_mode ?? 'compact')
     }
     if (nextMode === 'multistep_retrosynthesis') {
@@ -297,6 +302,57 @@ function App() {
     }
   }
 
+  const runForwardSynthesis = async () => {
+    const runId = retrosynthesisRun.current + 1
+    retrosynthesisRun.current = runId
+    let recipe: Record<string, unknown> | null = null
+    if (forwardRecipeText.trim()) {
+      try {
+        const parsed: unknown = JSON.parse(forwardRecipeText)
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          throw new Error('Recipe must be a JSON object.')
+        }
+        recipe = parsed as Record<string, unknown>
+      } catch (recipeError) {
+        setError(recipeError instanceof Error ? `Condition recipe: ${recipeError.message}` : 'Condition recipe JSON is invalid.')
+        return
+      }
+    }
+    const startedAt = Date.now()
+    setBusy(true)
+    setError('')
+    setStatus('Applying forward graph operators and validating possible products… 0s')
+    const timer = window.setInterval(() => {
+      if (retrosynthesisRun.current === runId) {
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000)
+        setStatus(`Applying forward graph operators and validating possible products… ${elapsed}s`)
+      }
+    }, 1000)
+    try {
+      const next = await api.forwardSynthesize({
+        starting_materials: reactionSmiles.trim(),
+        intended_product: intendedProduct.trim() || null,
+        operator_hint: forwardOperatorHint.trim() || null,
+        recipe,
+        library_mode: libraryMode,
+        top_k: topK,
+        include_l0: includeL0,
+      })
+      if (retrosynthesisRun.current !== runId) return
+      setResult(next)
+      setStatus(next.prediction.candidates.length
+        ? `Done — ${next.prediction.candidates.length} possible product(s), ${next.prediction.diagnostics.valid_pathway_count} pathway(s)`
+        : 'No supported forward product generated')
+    } catch (nextError) {
+      if (retrosynthesisRun.current !== runId) return
+      setError(friendlyError(nextError))
+      setStatus('Forward synthesis failed')
+    } finally {
+      window.clearInterval(timer)
+      if (retrosynthesisRun.current === runId) setBusy(false)
+    }
+  }
+
   const runMultistepRetrosynthesis = async () => {
     const runId = retrosynthesisRun.current + 1
     retrosynthesisRun.current = runId
@@ -340,7 +396,7 @@ function App() {
 
   const run = () => {
     if (!reactionSmiles.trim()) {
-      setError(mode === 'features' ? 'Enter or draw a molecule or reaction before analyzing features.' : mode === 'retrosynthesis' || mode === 'multistep_retrosynthesis' ? 'Draw or paste a target molecule before running retrosynthesis.' : 'Draw or paste a reaction before running the analysis.')
+      setError(mode === 'features' ? 'Enter or draw a molecule or reaction before analyzing features.' : mode === 'forward_synthesis' ? 'Draw or paste the starting materials before predicting products.' : mode === 'retrosynthesis' || mode === 'multistep_retrosynthesis' ? 'Draw or paste a target molecule before running retrosynthesis.' : 'Draw or paste a reaction before running the analysis.')
       return
     }
     if ((mode === 'recommendation' || mode === 'discovery') && !reactionSmiles.includes('>')) {
@@ -351,8 +407,13 @@ function App() {
       setError('Retrosynthesis requires one target molecule, not a reaction.')
       return
     }
+    if (mode === 'forward_synthesis' && reactionSmiles.includes('>')) {
+      setError('Forward synthesis requires starting materials only, not a reaction arrow.')
+      return
+    }
     if (mode === 'recommendation') void startRecommendation()
     else if (mode === 'discovery') void runDiscovery()
+    else if (mode === 'forward_synthesis') void runForwardSynthesis()
     else if (mode === 'retrosynthesis') void runRetrosynthesis()
     else if (mode === 'multistep_retrosynthesis') void runMultistepRetrosynthesis()
     else void runFeatureAnalysis()
@@ -368,6 +429,8 @@ function App() {
       ? 'generic_recommendation.json'
       : mode === 'discovery'
         ? 'reaction_discovery.json'
+        : mode === 'forward_synthesis'
+          ? 'forward_synthesis_products.json'
         : mode === 'retrosynthesis'
           ? 'retrosynthesis_candidates.json'
           : mode === 'multistep_retrosynthesis'
@@ -379,11 +442,16 @@ function App() {
 
   const recommendationResult = result && 'recommendations' in result ? result : null
   const discoveryResult = result && 'hits' in result ? result : null
+  const forwardSynthesisResult = result && 'prediction' in result ? result : null
   const retrosynthesisResult = result && 'candidates' in result ? result : null
   const multistepRetrosynthesisResult = result && 'routes' in result && 'diagnostics' in result ? result : null
   const featureResult = result && 'input_kind' in result ? result : null
   const isRetrosynthesisMode = mode === 'retrosynthesis' || mode === 'multistep_retrosynthesis'
-  const selectedLibraryAvailable = isRetrosynthesisMode
+  const isForwardMode = mode === 'forward_synthesis'
+  const isOperatorMode = isRetrosynthesisMode || isForwardMode
+  const selectedLibraryAvailable = isForwardMode
+    ? capabilities?.forward_library_modes?.[libraryMode]?.library_available ?? false
+    : isRetrosynthesisMode
     ? (capabilities?.retrosynthesis_library_modes?.[libraryMode]?.library_available ?? false)
       && (mode !== 'multistep_retrosynthesis'
         || capabilities?.stock_portfolio_available === true
@@ -391,12 +459,12 @@ function App() {
     : capabilities?.library_modes?.[libraryMode]?.index_available
       ?? capabilities?.index_available
       ?? false
-  const libraryKind = isRetrosynthesisMode ? 'operator library' : 'index'
+  const libraryKind = isOperatorMode ? 'operator library' : 'index'
 
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div><h1>Reaction Chemistry Workbench</h1><p>Plan disconnections, inspect molecular evidence, and find compatible conditions.</p></div>
+        <div><h1>Reaction Chemistry Workbench</h1><p>Predict products, audit competing pathways, plan disconnections, and find compatible conditions.</p></div>
         <div className="service-status">
           <span className={`status-dot ${selectedLibraryAvailable ? '' : 'offline'}`} />
           <strong>{capabilities ? `${libraryMode === 'full' ? 'Full' : 'Compact'} ${libraryKind} ${selectedLibraryAvailable ? 'ready' : 'unavailable'}` : 'Connecting…'}</strong>
@@ -414,18 +482,21 @@ function App() {
             <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Feature analysis</strong></label>
             <label className={mode === 'recommendation' ? 'active' : ''}><input type="radio" name="analysis-mode" value="recommendation" checked={mode === 'recommendation'} onChange={() => changeMode('recommendation')} /><strong>Condition recommendation</strong></label>
             <label className={mode === 'discovery' ? 'active' : ''}><input type="radio" name="analysis-mode" value="discovery" checked={mode === 'discovery'} onChange={() => changeMode('discovery')} /><strong>Reaction discovery</strong></label>
+            <label className={mode === 'forward_synthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="forward_synthesis" checked={mode === 'forward_synthesis'} onChange={() => changeMode('forward_synthesis')} /><strong>Forward synthesis</strong></label>
             <label className={mode === 'retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="retrosynthesis" checked={mode === 'retrosynthesis'} onChange={() => changeMode('retrosynthesis')} /><strong>Single-step retrosynthesis</strong></label>
             <label className={mode === 'multistep_retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="multistep_retrosynthesis" checked={mode === 'multistep_retrosynthesis'} onChange={() => changeMode('multistep_retrosynthesis')} /><strong>Multi-step retrosynthesis</strong></label>
           </fieldset>
 
           <div className="analysis-options">
             <div className={`option-grid ${mode === 'features' ? 'feature-options' : ''}`}>
-              {mode !== 'features' && <label className="library-option"><span>{isRetrosynthesisMode ? 'Operator library' : 'Precedent library'}</span><select aria-label={isRetrosynthesisMode ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full — complete</option><option value="compact">Compact — faster</option></select></label>}
+              {mode !== 'features' && <label className="library-option"><span>{isOperatorMode ? 'Operator library' : 'Precedent library'}</span><select aria-label={isOperatorMode ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full — complete</option><option value="compact">Compact — faster</option></select></label>}
               {mode !== 'features' && <label><span>{mode === 'multistep_retrosynthesis' ? 'Top routes' : 'Top results'}</span><input type="number" min="1" max={mode === 'multistep_retrosynthesis' ? 10 : 50} value={topK} onChange={(event) => setTopK(Math.min(mode === 'multistep_retrosynthesis' ? 10 : 50, Math.max(1, Number(event.target.value))))} /></label>}
               {mode === 'recommendation' ? (
                 <label className="wide-option"><span>Ranking profile</span><div className="joined-control"><select value={profileId} onChange={(event) => { setProfileId(event.target.value); setCustomWeights(null) }}>{profiles.map((profile) => <option key={profile.profile_id} value={profile.profile_id}>{profile.label}</option>)}</select><button type="button" className="button quiet" onClick={() => setRankingOpen(true)} disabled={!selectedProfile}>Customize</button></div></label>
               ) : mode === 'discovery' ? (
                 <label className="wide-option"><span>Discovery view</span><select value={discoveryView} onChange={(event) => setDiscoveryView(event.target.value)}><option value="closest_chemistry">Closest chemistry</option><option value="diverse_strategies">Diverse strategies</option><option value="successful_precedents">Successful precedents</option><option value="failure_informed">Failure-informed</option></select></label>
+              ) : mode === 'forward_synthesis' ? (
+                <div className="feature-mode-note"><strong>Product and pathway prediction</strong><span>Forward operators generate products without seeing a target, then validate graph edits and reverse recovery.</span></div>
               ) : mode === 'retrosynthesis' ? (
                 <div className="feature-mode-note"><strong>Single-step operator search</strong><span>Structure-derived operators propose and forward-validate precursor sets.</span></div>
               ) : mode === 'multistep_retrosynthesis' ? (
@@ -436,11 +507,14 @@ function App() {
             </div>
 
             {mode === 'discovery' && <div className="inline-checks"><label><input type="checkbox" checked={includeLowYield} onChange={(event) => setIncludeLowYield(event.target.checked)} /> Include low-yield precedents</label><label><input type="checkbox" checked={includeUnreported} onChange={(event) => setIncludeUnreported(event.target.checked)} /> Include unreported outcomes</label></div>}
+            {mode === 'forward_synthesis' && <div className="forward-audit-options"><label><span>Intended product <small>(optional route audit)</small></span><input type="text" value={intendedProduct} onChange={(event) => { setIntendedProduct(event.target.value); setResult(null) }} placeholder="Leave blank for blind product prediction" spellCheck={false} /></label><label><span>Retrosynthesis operator ID <small>(optional)</small></span><input type="text" value={forwardOperatorHint} onChange={(event) => setForwardOperatorHint(event.target.value)} placeholder="OP1:… or FOP1:…" spellCheck={false} /></label></div>}
 
             <details className="advanced-options"><summary>Advanced options</summary><div>
               {mode === 'recommendation' && <label><span>Minimum precedent pool</span><input type="number" min="1" max="100" placeholder="Definition default" value={minimumPoolSize ?? ''} onChange={(event) => setMinimumPoolSize(event.target.value ? Number(event.target.value) : null)} /></label>}
-              {!isRetrosynthesisMode && <label className="check-option"><input type="checkbox" checked={useRxnmapper} disabled={!capabilities?.rxnmapper_available || (mode === 'features' && !reactionSmiles.includes('>'))} onChange={(event) => { setUseRxnmapper(event.target.checked); if (!event.target.checked) setForceResolvedMapping(false) }} /><span>Use RXNMapper for unresolved or ambiguous reactions</span></label>}
-              {isRetrosynthesisMode ? (
+              {!isOperatorMode && <label className="check-option"><input type="checkbox" checked={useRxnmapper} disabled={!capabilities?.rxnmapper_available || (mode === 'features' && !reactionSmiles.includes('>'))} onChange={(event) => { setUseRxnmapper(event.target.checked); if (!event.target.checked) setForceResolvedMapping(false) }} /><span>Use RXNMapper for unresolved or ambiguous reactions</span></label>}
+              {isForwardMode ? (
+                <><label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label><label className="wide-option"><span>Canonical condition recipe JSON <small>(optional)</small></span><textarea value={forwardRecipeText} onChange={(event) => setForwardRecipeText(event.target.value)} placeholder='{"bases": [{"substance_id": "…"}], "temperature_c": 80}' spellCheck={false} /></label></>
+              ) : isRetrosynthesisMode ? (
                 <><label className="check-option"><input type="checkbox" checked={useRetrosynthesisContext} onChange={(event) => setUseRetrosynthesisContext(event.target.checked)} /><span>Rank with local reaction-context similarity</span></label><label className="check-option"><input type="checkbox" checked={diversifyRetrosynthesis} onChange={(event) => setDiversifyRetrosynthesis(event.target.checked)} /><span>Rank SITE1 → SYN1/REAL1 with completion priors and diversify within score bands</span></label><label className="check-option"><input type="checkbox" checked={usePrecursorRealism} onChange={(event) => setUsePrecursorRealism(event.target.checked)} /><span>De-rank unlikely precursors using stock, registry, literature, and molecular weight</span></label>{mode === 'multistep_retrosynthesis' && <label className="check-option"><input type="checkbox" checked={useConditionAvailability} onChange={(event) => setUseConditionAvailability(event.target.checked)} /><span>Audit condition availability for each retained reaction and rerank routes</span></label>}<label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label></>
               ) : mode === 'features' ? (
                 <label className="check-option"><input type="checkbox" checked={forceResolvedMapping} disabled={!useRxnmapper || !reactionSmiles.includes('>')} onChange={(event) => setForceResolvedMapping(event.target.checked)} /><span>Map resolved reactions too, for additional atom-mapping evidence</span></label>
@@ -459,11 +533,12 @@ function App() {
             onChange={setReactionSmiles}
             onError={setError}
             allowMolecule={mode === 'features' || isRetrosynthesisMode}
-            moleculeOnly={isRetrosynthesisMode}
+            moleculeOnly={isOperatorMode}
+            moleculePurpose={isForwardMode ? 'starting_materials' : 'target'}
           />
 
           <div className="run-control workbench-action-row" aria-label="Analysis action">
-            <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze features'}</button>
+            <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'forward_synthesis' ? intendedProduct.trim() ? 'Audit forward step' : 'Predict products' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze features'}</button>
             <span role="status" aria-live="polite">{status}</span>
           </div>
         </div>
@@ -471,11 +546,12 @@ function App() {
 
       {recommendationResult && <RecommendationResults result={recommendationResult} />}
       {discoveryResult && <DiscoveryResults result={discoveryResult} />}
+      {forwardSynthesisResult && <ForwardSynthesisResults result={forwardSynthesisResult} />}
       {retrosynthesisResult && <RetrosynthesisResults result={retrosynthesisResult} />}
       {multistepRetrosynthesisResult && <MultistepRetrosynthesisResults result={multistepRetrosynthesisResult} />}
       {featureResult && <FeatureResults result={featureResult} />}
 
-      {!result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, supplier-stock provenance, and unresolved stopping reasons.' : 'Recommendations, discovery hits, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
+      {!result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'forward_synthesis' ? 'Inspect possible products and competing pathways' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'forward_synthesis' ? 'Validated products, blind ranks, pathway alternatives, operator identities, graph correspondence, and condition compatibility will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, supplier-stock provenance, and unresolved stopping reasons.' : 'Recommendations, discovery hits, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
 
       <footer>All chemistry and data remain on this machine. Molecular structure is the source of truth.</footer>
 

@@ -16,6 +16,7 @@ export interface Capabilities {
   featurization: boolean
   reaction_rendering: boolean
   retrosynthesis?: boolean
+  forward_synthesis?: boolean
   multistep_retrosynthesis?: boolean
   literature_molecule_index_available?: boolean
   literature_molecule_index_name?: string
@@ -33,6 +34,12 @@ export interface Capabilities {
     label: string
     library_name: string
     library_available: boolean
+  }>
+  forward_library_modes?: Record<string, {
+    label: string
+    library_name: string
+    library_available: boolean
+    prepared: boolean
   }>
 }
 
@@ -411,6 +418,132 @@ export interface RetrosynthesisRequest {
   use_context: boolean
   diversify: boolean
   use_precursor_realism: boolean
+}
+
+export interface ForwardSynthesisRequest {
+  starting_materials: string
+  intended_product?: string | null
+  operator_hint?: string | null
+  recipe?: JsonObject | null
+  library_mode: 'full' | 'compact'
+  top_k: number
+  include_l0: boolean
+}
+
+export interface ForwardRecipeEvidence {
+  evaluated: boolean
+  compatible?: boolean | null
+  score?: number | null
+  hard_conflicts: string[]
+  cautions: string[]
+  definition_id: string
+  definition_version: string
+}
+
+export interface OperatorAtomCorrespondence {
+  product_component_index: number
+  product_atom_index: number
+  precursor_component_index: number
+  precursor_atom_index: number
+  atom_map_number: number
+  operator_map_number?: number | null
+}
+
+export interface ForwardProductCandidate {
+  rank: number
+  product_smiles: string
+  reaction_smiles: string
+  mapped_reaction_smiles: string
+  pathway_id: string
+  operator_id: string
+  forward_operator_id: string
+  realization_id: string
+  template_id: string
+  abstraction_level: string
+  participating_component_indices: number[]
+  participating_precursor_smiles: string
+  assignment: number[]
+  atom_correspondence: OperatorAtomCorrespondence[]
+  score: number
+  score_components: Record<string, number>
+  structural_score_band: number
+  reverse_round_trip: boolean
+  reaction_signature_id?: string | null
+  reaction_signature_schema_version?: string | null
+  operator_edit_agreement: boolean
+  observed_edit_tokens: string[]
+  independent_reference_support: number
+  observation_support: number
+  precedent_reaction_ids: string[]
+  precedent_reference_ids: string[]
+  recipe_evidence: ForwardRecipeEvidence
+  alternative_pathway_ids: string[]
+  alternative_operator_ids: string[]
+  alternative_template_ids: string[]
+  named_annotations: string[]
+  warnings: string[]
+  schema_version: string
+}
+
+export interface ForwardSearchDiagnostics {
+  library_operator_count: number
+  indexed_operator_count: number
+  applied_operator_count: number
+  generated_outcome_count: number
+  reverse_round_trip_failure_count: number
+  invalid_reaction_count: number
+  missing_signature_count: number
+  operator_edit_mismatch_count: number
+  recipe_conflict_count: number
+  valid_pathway_count: number
+  unique_product_count: number
+}
+
+export interface ForwardCompetitionGroup {
+  competition_level: 'operator' | 'site' | 'product'
+  group_key: string
+  candidate_ranks: number[]
+  product_smiles: string[]
+  operator_ids: string[]
+}
+
+export interface ForwardPrediction {
+  query_starting_materials: string
+  canonical_starting_materials: string
+  conditions_supplied: boolean
+  valid: boolean
+  status: string
+  candidates: ForwardProductCandidate[]
+  competition_groups: ForwardCompetitionGroup[]
+  diagnostics: ForwardSearchDiagnostics
+  warnings: string[]
+  error?: string | null
+  ranking_definition_id: string
+  schema_version: string
+}
+
+export interface ForwardStepAssessment {
+  starting_materials: string
+  intended_product: string
+  intended_match: 'exact' | 'stereo_relaxed' | 'connectivity_only' | 'absent' | 'invalid'
+  targeted_replay_status: string
+  intended_product_rank?: number | null
+  best_competitor_product?: string | null
+  score_margin?: number | null
+  disposition: 'clear' | 'competitive' | 'unsupported' | 'structurally_inconsistent' | 'out_of_scope'
+  operator_hint?: string | null
+  warnings: string[]
+  schema_version: string
+}
+
+export interface ForwardSynthesisResult {
+  analysis_mode: 'blind_prediction' | 'step_assessment'
+  library_mode: 'full' | 'compact'
+  valid: boolean
+  schema_version: string
+  forward_library_operator_count: number
+  prediction: ForwardPrediction
+  assessment?: ForwardStepAssessment | null
 }
 
 export interface MultistepRetrosynthesisRequest {

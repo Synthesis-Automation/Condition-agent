@@ -142,6 +142,9 @@ input::placeholder, textarea::placeholder { color: #94a198; }
 .analysis-workbench .inline-checks { gap: 14px; }
 .analysis-workbench .advanced-options > div { grid-template-columns: minmax(180px,.6fr) repeat(2,minmax(0,1fr)); gap: 12px; }
 .inline-checks { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 11px; color: #536b5e; font-size: .73rem; }
+.forward-audit-options { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin-top: 12px; }
+.forward-audit-options label { display: flex; min-width: 0; flex-direction: column; gap: 6px; color: #385646; font-size: .75rem; font-weight: 750; }
+.forward-audit-options small { color: #718078; font-weight: 500; }
 .inline-checks label, .check-option { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 7px !important; cursor: pointer; }
 .inline-checks input, .check-option input { width: 15px; height: 15px; flex: 0 0 auto; margin: 1px 0 0; accent-color: #256c4e; }
 .advanced-options { margin-top: 13px; border-top: 1px solid #e0e7e2; color: #536b5e; }
@@ -149,6 +152,7 @@ input::placeholder, textarea::placeholder { color: #94a198; }
 .advanced-options > div { display: grid; grid-template-columns: 210px 1fr 1fr; gap: 16px; padding: 12px 0 2px; }
 .alert { margin-top: 13px; padding: 10px 12px; border-radius: 9px; font-size: .78rem; line-height: 1.45; }
 .alert.error { color: #843e2c; background: #faebe6; border: 1px solid #efd1c7; }
+.alert.caution { color: #6f541e; background: #fff8e8; border: 1px solid #ead9ad; }
 
 .results-summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 19px; border-bottom: 1px solid #dbe4de; background: #f8faf8; }
 .results-summary-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
@@ -357,6 +361,7 @@ footer { padding: 4px 4px 0; color: #77877e; font-size: .7rem; text-align: cente
   .analysis-control-layout { grid-template-columns: 1fr; }
   .editor-action-layout { grid-template-columns: 1fr; }
   .analysis-workbench .option-grid { grid-template-columns: 1fr; }
+  .forward-audit-options { grid-template-columns: 1fr; }
   .reaction-main-input label { grid-template-columns: 1fr; gap: 5px; }
   .smiles-actions { flex-direction: row; align-items: center; }
   .option-grid.feature-options { grid-template-columns: 1fr; }

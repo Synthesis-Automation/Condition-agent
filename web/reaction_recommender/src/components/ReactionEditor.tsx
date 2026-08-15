@@ -7,6 +7,7 @@ import { ReactionImage } from './ReactionImage'
 const EXAMPLE_REACTION =
   'Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1'
 const EXAMPLE_TARGET = 'Cc1ccnc(-c2ccccc2)c1'
+const EXAMPLE_STARTING_MATERIALS = 'Brc1ccccc1.OB(O)c1ccccc1'
 
 interface ReactionEditorProps {
   value: string
@@ -14,6 +15,7 @@ interface ReactionEditorProps {
   onError: (message: string) => void
   allowMolecule?: boolean
   moleculeOnly?: boolean
+  moleculePurpose?: 'target' | 'starting_materials'
 }
 
 function formatError(smiles: string): string | null {
@@ -31,7 +33,7 @@ function inputFormatError(
 ): string | null {
   if (moleculeOnly) {
     return smiles.includes('>')
-      ? 'Enter one target molecule, not a reaction.'
+      ? 'Enter molecules without a reaction arrow.'
       : null
   }
   if (allowMolecule && !smiles.includes('>')) return null
@@ -48,8 +50,11 @@ function DrawingDialog({
   onError,
   allowMolecule = false,
   moleculeOnly = false,
+  moleculePurpose = 'target',
   onClose,
 }: DrawingDialogProps) {
+  const isStartingMaterials = moleculeOnly && moleculePurpose === 'starting_materials'
+  const moleculeLabel = isStartingMaterials ? 'starting materials' : 'target molecule'
   const provider = useMemo(() => new StandaloneStructServiceProvider(), [])
   const [ketcher, setKetcher] = useState<Ketcher | null>(null)
   const [draftSmiles, setDraftSmiles] = useState(value)
@@ -70,13 +75,13 @@ function DrawingDialog({
   const load = async (smiles: string) => {
     if (!ketcher) return
     if (!smiles.trim()) {
-      onError(`Enter ${moleculeOnly ? 'a target molecule' : 'a reaction'} SMILES before loading it.`)
+      onError(`Enter ${moleculeOnly ? moleculeLabel : 'a reaction'} SMILES before loading it.`)
       return
     }
     try {
       await ketcher.setMolecule(smiles.trim())
       setDraftSmiles(smiles.trim())
-      setStatus(`${moleculeOnly ? 'Target' : 'Reaction'} loaded into the drawing canvas.`)
+      setStatus(`${isStartingMaterials ? 'Starting materials' : moleculeOnly ? 'Target' : 'Reaction'} loaded into the drawing canvas.`)
       onError('')
     } catch {
       onError('Ketcher could not load this reaction SMILES.')
@@ -119,12 +124,14 @@ function DrawingDialog({
       >
         <div className="modal-heading drawing-heading">
           <div>
-            <span className="eyebrow">{moleculeOnly ? 'TARGET DRAWING' : 'REACTION DRAWING'}</span>
+            <span className="eyebrow">{isStartingMaterials ? 'STARTING MATERIALS' : moleculeOnly ? 'TARGET DRAWING' : 'REACTION DRAWING'}</span>
             <h2 id="drawing-title">
-              {moleculeOnly ? 'Draw the target molecule' : allowMolecule ? 'Draw a molecule or reaction' : 'Draw the transformation'}
+              {isStartingMaterials ? 'Draw the starting materials' : moleculeOnly ? 'Draw the target molecule' : allowMolecule ? 'Draw a molecule or reaction' : 'Draw the transformation'}
             </h2>
             <p>
-              {moleculeOnly
+              {isStartingMaterials
+                ? 'Draw every starting material as a separate molecular component. Do not add a reaction arrow or product.'
+                : moleculeOnly
                 ? 'Draw the product structure for single-step precursor generation.'
                 : allowMolecule
                 ? 'Draw one molecule, or place reactants and products around a reaction arrow.'
@@ -135,7 +142,7 @@ function DrawingDialog({
             <button
               className="button quiet"
               type="button"
-              onClick={() => void load(moleculeOnly ? EXAMPLE_TARGET : EXAMPLE_REACTION)}
+              onClick={() => void load(isStartingMaterials ? EXAMPLE_STARTING_MATERIALS : moleculeOnly ? EXAMPLE_TARGET : EXAMPLE_REACTION)}
               disabled={!ketcher}
             >
               Load example
@@ -173,12 +180,12 @@ function DrawingDialog({
 
         <div className="drawing-smiles-row">
           <label htmlFor="drawing-reaction-smiles">
-            <span>{moleculeOnly ? 'Target molecule SMILES' : 'Reaction SMILES'}</span>
+            <span>{isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : 'Reaction SMILES'}</span>
             <textarea
               id="drawing-reaction-smiles"
               value={draftSmiles}
               onChange={(event) => setDraftSmiles(event.target.value)}
-              placeholder={moleculeOnly ? 'target product' : 'reactants>>products'}
+              placeholder={isStartingMaterials ? 'starting.materials' : moleculeOnly ? 'target product' : 'reactants>>products'}
               spellCheck={false}
             />
           </label>
@@ -212,7 +219,9 @@ export function ReactionEditor({
   onError,
   allowMolecule = false,
   moleculeOnly = false,
+  moleculePurpose = 'target',
 }: ReactionEditorProps) {
+  const isStartingMaterials = moleculeOnly && moleculePurpose === 'starting_materials'
   const [open, setOpen] = useState(false)
   const normalizedValue = value.trim()
   const inputError = normalizedValue
@@ -230,10 +239,12 @@ export function ReactionEditor({
           <span className="step-number">2</span>
           <div>
             <h2 id="editor-title">
-              {moleculeOnly ? 'Define the target' : allowMolecule ? 'Define the structure' : 'Define the reaction'}
+              {isStartingMaterials ? 'Define the starting materials' : moleculeOnly ? 'Define the target' : allowMolecule ? 'Define the structure' : 'Define the reaction'}
             </h2>
             <p>
-              {moleculeOnly
+              {isStartingMaterials
+                ? <>Enter or draw dot-separated starting-material SMILES without a reaction arrow.</>
+                : moleculeOnly
                 ? 'Enter or draw one product molecule for precursor generation.'
                 : allowMolecule
                 ? 'Enter or draw a molecule or complete reaction SMILES.'
@@ -255,7 +266,7 @@ export function ReactionEditor({
 
       <div className="reaction-main-input">
         <label htmlFor="main-reaction-smiles">
-          <span>{moleculeOnly ? 'Target molecule SMILES' : allowMolecule ? 'Molecule or reaction SMILES' : 'Reaction SMILES'}</span>
+          <span>{isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : allowMolecule ? 'Molecule or reaction SMILES' : 'Reaction SMILES'}</span>
           <input
             id="main-reaction-smiles"
             type="text"
@@ -264,7 +275,7 @@ export function ReactionEditor({
               onChange(event.target.value)
               onError('')
             }}
-            placeholder={moleculeOnly ? 'target product' : allowMolecule ? 'CCO or reactants>>products' : 'reactants>>products'}
+            placeholder={isStartingMaterials ? 'reactant1.reactant2' : moleculeOnly ? 'target product' : allowMolecule ? 'CCO or reactants>>products' : 'reactants>>products'}
             spellCheck={false}
           />
         </label>
@@ -281,14 +292,14 @@ export function ReactionEditor({
       ) : normalizedValue ? (
         <button className="reaction-paper-empty incomplete" type="button" onClick={() => setOpen(true)}>
           <span className="empty-reaction-mark">!</span>
-          <strong>{moleculeOnly ? 'Target input is not valid' : 'Reaction SMILES is not complete'}</strong>
+          <strong>{isStartingMaterials ? 'Starting-material input is not valid' : moleculeOnly ? 'Target input is not valid' : 'Reaction SMILES is not complete'}</strong>
           <small>{inputError ?? `Check the ${moleculeOnly ? 'target' : 'reaction'} text, or finish it in the drawing editor.`}</small>
         </button>
       ) : (
         <button className="reaction-paper-empty" type="button" onClick={() => setOpen(true)}>
           <span className="empty-reaction-mark">→</span>
-          <strong>{moleculeOnly ? 'No target drawn yet' : 'No reaction drawn yet'}</strong>
-          <small>Click to open the {moleculeOnly ? 'target' : 'reaction'} drawing editor</small>
+          <strong>{isStartingMaterials ? 'No starting materials drawn yet' : moleculeOnly ? 'No target drawn yet' : 'No reaction drawn yet'}</strong>
+          <small>Click to open the {isStartingMaterials ? 'starting-material' : moleculeOnly ? 'target' : 'reaction'} drawing editor</small>
         </button>
       )}
 
@@ -299,6 +310,7 @@ export function ReactionEditor({
           onError={onError}
           allowMolecule={allowMolecule}
           moleculeOnly={moleculeOnly}
+          moleculePurpose={moleculePurpose}
           onClose={() => setOpen(false)}
         />
       )}

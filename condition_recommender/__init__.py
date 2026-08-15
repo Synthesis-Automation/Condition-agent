@@ -51,6 +51,7 @@ from .reaction_completion import (
     build_completed_reaction_smiles,
     propose_reaction_completion,
 )
+from .recipe_assessment import assess_reaction_recipe
 
 __all__ = [
     "AdmissionTier",
@@ -78,6 +79,7 @@ __all__ = [
     "ReactionCompletionProposal",
     "ReactionCompletionRequirement",
     "ReactionCompletionSelection",
+    "assess_reaction_recipe",
     "ReferenceIdentity",
     "RecommendationRecord",
     "RecommendationScoreTrace",

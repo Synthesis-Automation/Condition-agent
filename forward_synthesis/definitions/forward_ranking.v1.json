@@ -1,0 +1,27 @@
+{
+  "definition_id": "forward_ranking.v1",
+  "schema_version": "1.0",
+  "calibration_status": "deterministic_priority_not_probability",
+  "weights": {
+    "precursor_similarity": 0.35,
+    "template_specificity": 0.20,
+    "independent_support": 0.20,
+    "operator_edit_agreement": 0.15,
+    "recipe_compatibility": 0.10
+  },
+  "abstraction_priority": ["L2", "L1", "RDCHIRAL", "L0"],
+  "score_band_width": 0.05,
+  "hard_requirements": [
+    "sanitized_product",
+    "reverse_precursor_recovery",
+    "valid_reaction_analysis",
+    "operator_edit_agreement"
+  ],
+  "route_dispositions": {
+    "structurally_inconsistent": 0,
+    "clear": 1,
+    "competitive": 2,
+    "unsupported": 3,
+    "out_of_scope": 4
+  }
+}

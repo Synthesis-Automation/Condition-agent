@@ -51,6 +51,14 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
 - Retrieve and rank chemically compatible canonical condition recipes.
 - Apply declarative ranking profiles or transparent custom weights.
 - Browse structural precedents through the four discovery views.
+- Predict possible products from dot-separated starting materials with the
+  Forward synthesis mode. Optionally supply an intended product and the
+  retrosynthesis operator ID to audit a proposed route step against target-blind
+  competing pathways. A canonical condition-recipe JSON object can be supplied
+  to apply hard compatibility checks before ranking.
+- Inspect forward graph-validation evidence, alternative operator/template
+  pathways, competition groups, atom correspondence, source support, and route
+  audit disposition, or export the complete result as JSON.
 - Analyze a molecule or reaction with the same deterministic featurization used
   by the Qt tool, including motifs, reactive sites, reaction-core evidence,
   partner roles, mapping provenance, and the canonical nested analysis.
@@ -61,6 +69,11 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
 - Preview and download the selected recommendation's versioned synthesis
   protocol JSON, including registry substance IDs, CAS numbers, quantities,
   operating conditions, observed operations, and execution-readiness gaps.
+
+The forward endpoint uses a prebuilt `forward_operator_library_v1.json.gz` next
+to the selected retrosynthesis library when available. Otherwise the API derives
+and process-caches a source-round-tripped forward library on first use; that
+first request can take longer than later requests.
 
 The UI intentionally exposes no arbitrary file paths or upload endpoints. Local
 dataset identity and access remain server configuration concerns.

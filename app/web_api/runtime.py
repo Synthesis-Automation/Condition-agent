@@ -36,6 +36,13 @@ from core_retrosynthesis import (
     plan_multistep_routes,
     recommend_retrosynthesis_conditions,
 )
+from forward_synthesis import (
+    ForwardOperatorLibrary,
+    assess_proposed_step,
+    build_forward_library,
+    load_forward_library,
+    predict_products,
+)
 from reactive_taxonomy import (
     STRATEGIC_COMPLEXITY_DEFINITION_ID,
     RxnMapperProvider,
@@ -49,6 +56,7 @@ from visualization import (
 from .contracts import (
     DiscoveryRequest,
     FeatureAnalysisRequest,
+    ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     RecommendationRequest,
     RetrosynthesisConditionsRequest,
@@ -150,6 +158,10 @@ class WebRuntime(Protocol):
         self, request: FeatureAnalysisRequest
     ) -> Dict[str, Any]: ...
 
+    def forward_synthesize(
+        self, request: ForwardSynthesisRequest
+    ) -> Dict[str, Any]: ...
+
     def retrosynthesize(
         self, request: RetrosynthesisRequest
     ) -> Dict[str, Any]: ...
@@ -238,6 +250,9 @@ class LocalRecommendationRuntime:
         ] = {}
         self._retrosynthesis_libraries: Dict[
             tuple[str, int, int], GenericTemplateLibrary
+        ] = {}
+        self._forward_libraries: Dict[
+            tuple[str, int, int], ForwardOperatorLibrary
         ] = {}
         self._compound_registry_identities: (
             tuple[frozenset[str], frozenset[str]] | None
@@ -376,6 +391,50 @@ class LocalRecommendationRuntime:
             self._retrosynthesis_libraries[key] = library
             return library
 
+    def _forward_library_path(self, library_mode: str) -> Path:
+        """Resolve an optional prebuilt forward-operator artifact."""
+
+        mode = library_mode.strip().casefold()
+        if mode not in {"full", "compact"}:
+            raise ValueError(f"unsupported library mode: {library_mode}")
+        return (
+            self.retrosynthesis_library_root
+            / mode
+            / "forward_operator_library_v1.json.gz"
+        )
+
+    def _get_forward_library(self, library_mode: str) -> ForwardOperatorLibrary:
+        """Load a prebuilt forward library or derive and cache it once."""
+
+        prepared_path = self._forward_library_path(library_mode)
+        source_path = (
+            prepared_path
+            if prepared_path.is_file()
+            else self._retrosynthesis_library_path(library_mode)
+        )
+        if not source_path.is_file():
+            raise FileNotFoundError(
+                "forward operator source library is unavailable for "
+                f"{library_mode} mode"
+            )
+        stat = source_path.stat()
+        key = (str(source_path.resolve()), stat.st_size, stat.st_mtime_ns)
+        with self._lock:
+            cached = self._forward_libraries.get(key)
+            if cached is not None:
+                return cached
+            for old_key in tuple(self._forward_libraries):
+                if old_key[0] == key[0] and old_key[1:] != key[1:]:
+                    self._forward_libraries.pop(old_key, None)
+            if prepared_path.is_file():
+                library = load_forward_library(prepared_path)
+            else:
+                library = build_forward_library(
+                    self._get_retrosynthesis_library(library_mode)
+                )
+            self._forward_libraries[key] = library
+            return library
+
     def _get_reference_catalog(
         self, index_path: str | Path
     ) -> Dict[str, Dict[str, Any]]:
@@ -478,6 +537,10 @@ class LocalRecommendationRuntime:
             mode: self._retrosynthesis_library_path(mode)
             for mode in ("full", "compact")
         }
+        forward_paths = {
+            mode: self._forward_library_path(mode)
+            for mode in ("full", "compact")
+        }
         default_retrosynthesis_mode = (
             "full" if retrosynthesis_paths["full"].is_file() else "compact"
         )
@@ -500,6 +563,9 @@ class LocalRecommendationRuntime:
             "discovery": True,
             "featurization": True,
             "reaction_rendering": True,
+            "forward_synthesis": any(
+                path.is_file() for path in retrosynthesis_paths.values()
+            ),
             "retrosynthesis": any(
                 path.is_file() for path in retrosynthesis_paths.values()
             ),
@@ -528,6 +594,19 @@ class LocalRecommendationRuntime:
                     "label": mode.title(),
                     "library_name": path.name,
                     "library_available": path.is_file(),
+                }
+                for mode, path in retrosynthesis_paths.items()
+            },
+            "forward_library_modes": {
+                mode: {
+                    "label": mode.title(),
+                    "library_name": (
+                        forward_paths[mode].name
+                        if forward_paths[mode].is_file()
+                        else path.name
+                    ),
+                    "library_available": path.is_file(),
+                    "prepared": forward_paths[mode].is_file(),
                 }
                 for mode, path in retrosynthesis_paths.items()
             },
@@ -828,6 +907,59 @@ class LocalRecommendationRuntime:
             "library_template_count": len(library.templates),
             "warnings": warnings,
             "candidates": serialized,
+        }
+
+    def forward_synthesize(
+        self,
+        request: ForwardSynthesisRequest,
+    ) -> Dict[str, Any]:
+        """Predict products and optionally audit a proposed route product."""
+
+        library = self._get_forward_library(request.library_mode)
+        levels = ("L4", "L3", "L2", "L1", "RDCHIRAL")
+        if request.include_l0:
+            levels += ("L0",)
+        starting_materials = request.starting_materials.strip()
+        if request.intended_product and request.intended_product.strip():
+            assessment = assess_proposed_step(
+                starting_materials,
+                request.intended_product.strip(),
+                library,
+                recipe=request.recipe,
+                operator_hint=(
+                    request.operator_hint.strip()
+                    if request.operator_hint and request.operator_hint.strip()
+                    else None
+                ),
+                levels=levels,
+                top_k=request.top_k,
+            )
+            assessment_payload = assessment.to_dict()
+            prediction = assessment_payload.pop("blind_prediction")
+            return {
+                "analysis_mode": "step_assessment",
+                "library_mode": request.library_mode,
+                "valid": bool(prediction["valid"]),
+                "schema_version": assessment.schema_version,
+                "forward_library_operator_count": len(library.operators),
+                "prediction": prediction,
+                "assessment": assessment_payload,
+            }
+        prediction_result = predict_products(
+            starting_materials,
+            library,
+            recipe=request.recipe,
+            levels=levels,
+            top_k=request.top_k,
+        )
+        return {
+            "analysis_mode": "blind_prediction",
+            "library_mode": request.library_mode,
+            "valid": prediction_result.valid,
+            "schema_version": prediction_result.schema_version,
+            "forward_library_operator_count": len(library.operators),
+            "prediction": prediction_result.to_dict(),
+            "assessment": None,
         }
 
     def retrosynthesis_conditions(

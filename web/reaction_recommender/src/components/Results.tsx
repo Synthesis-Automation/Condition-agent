@@ -3,6 +3,8 @@ import type {
   DiscoveryHit,
   DiscoveryResult,
   ExperimentalDetail,
+  ForwardProductCandidate,
+  ForwardSynthesisResult,
   MultistepRetrosynthesisResult,
   MultistepRetrosynthesisRoute,
   RecipeComponent,
@@ -612,6 +614,147 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
           {active && <RetrosynthesisDetails candidate={active} scopeWarnings={result.warnings} />}
         </div>
       )}
+    </section>
+  )
+}
+
+function ForwardProductDetails({
+  candidate,
+}: {
+  candidate: ForwardProductCandidate
+}) {
+  const alternativeCount = candidate.alternative_pathway_ids.length
+  return (
+    <article className="result-detail">
+      <div className="detail-title-row">
+        <div>
+          <span className="eyebrow">PREDICTED PRODUCT</span>
+          <h3>Rank {candidate.rank} · {candidate.abstraction_level}</h3>
+          <p className="mono-value">{candidate.product_smiles}</p>
+        </div>
+        <div className="score-orbit"><strong>{candidate.score.toFixed(3)}</strong><span>score</span></div>
+      </div>
+      <ReactionImage smiles={candidate.reaction_smiles} label={`Forward product rank ${candidate.rank}`} />
+      <dl className="detail-list">
+        <div><dt>Reverse round trip</dt><dd>{candidate.reverse_round_trip ? 'Passed' : 'Failed'}</dd></div>
+        <div><dt>Observed edit agreement</dt><dd>{candidate.operator_edit_agreement ? 'Passed' : 'Failed'}</dd></div>
+        <div><dt>Independent references</dt><dd>{candidate.independent_reference_support}</dd></div>
+        <div><dt>Observation support</dt><dd>{candidate.observation_support}</dd></div>
+        <div><dt>Alternative pathways</dt><dd>{alternativeCount}</dd></div>
+        <div><dt>Structural score band</dt><dd>{candidate.structural_score_band}</dd></div>
+        <div><dt>Condition compatibility</dt><dd>{candidate.recipe_evidence.evaluated ? `${candidate.recipe_evidence.compatible ? 'Compatible' : 'Conflict'}${candidate.recipe_evidence.score == null ? '' : ` · ${candidate.recipe_evidence.score.toFixed(3)}`}` : 'Not evaluated'}</dd></div>
+        <div><dt>Participating components</dt><dd>{candidate.participating_component_indices.map((value) => value + 1).join(', ')}</dd></div>
+      </dl>
+      <details className="trace-panel" open>
+        <summary>Ranking evidence</summary>
+        <dl className="detail-list">
+          {Object.entries(candidate.score_components).map(([name, value]) => (
+            <div key={name}><dt>{displayName(name)}</dt><dd>{value.toFixed(3)}</dd></div>
+          ))}
+        </dl>
+      </details>
+      <details className="trace-panel">
+        <summary>Graph and operator trace</summary>
+        <dl className="detail-list">
+          <div><dt>Operator</dt><dd className="mono-value">{candidate.operator_id}</dd></div>
+          <div><dt>Forward operator</dt><dd className="mono-value">{candidate.forward_operator_id}</dd></div>
+          <div><dt>Realization</dt><dd className="mono-value">{candidate.realization_id || 'Unavailable'}</dd></div>
+          <div><dt>Template</dt><dd className="mono-value">{candidate.template_id}</dd></div>
+          <div><dt>Reaction signature</dt><dd className="mono-value">{candidate.reaction_signature_id || 'Unavailable'}</dd></div>
+          <div><dt>Observed edits</dt><dd className="mono-value">{candidate.observed_edit_tokens.join(' · ') || 'Unavailable'}</dd></div>
+          <div><dt>Atom correspondence</dt><dd>{candidate.atom_correspondence.length} product atoms traced to precursors</dd></div>
+        </dl>
+      </details>
+      {alternativeCount > 0 && (
+        <details className="trace-panel">
+          <summary>Alternative pathways ({alternativeCount})</summary>
+          <dl className="detail-list">
+            <div><dt>Operators</dt><dd className="mono-value">{candidate.alternative_operator_ids.join(' · ') || 'Same operator, different assignment'}</dd></div>
+            <div><dt>Templates</dt><dd className="mono-value">{candidate.alternative_template_ids.join(' · ') || 'Same template'}</dd></div>
+          </dl>
+        </details>
+      )}
+      <MessageList title="Condition cautions" values={[...candidate.recipe_evidence.hard_conflicts, ...candidate.recipe_evidence.cautions]} tone="caution" />
+      <MessageList title="Prediction warnings" values={candidate.warnings} tone="caution" />
+    </article>
+  )
+}
+
+export function ForwardSynthesisResults({ result }: { result: ForwardSynthesisResult }) {
+  const [selected, setSelected] = useState(0)
+  useEffect(() => setSelected(0), [result])
+  const active = result.prediction.candidates[selected]
+  const diagnostics = result.prediction.diagnostics
+  const assessment = result.assessment
+  return (
+    <section className="results-card">
+      <div className="results-summary">
+        <div>
+          <span className="eyebrow">{assessment ? 'FORWARD ROUTE AUDIT' : 'FORWARD SYNTHESIS'}</span>
+          <h2>{result.prediction.candidates.length} possible product{result.prediction.candidates.length === 1 ? '' : 's'}</h2>
+        </div>
+        <div className="metric-strip">
+          <div><strong>{diagnostics.unique_product_count}</strong><span>products</span></div>
+          <div><strong>{diagnostics.valid_pathway_count}</strong><span>pathways</span></div>
+          <div><strong>{diagnostics.applied_operator_count}</strong><span>operators applied</span></div>
+          <div><strong>{result.prediction.competition_groups.length}</strong><span>competition groups</span></div>
+        </div>
+      </div>
+      {assessment && (
+        <div className={`alert ${assessment.disposition === 'clear' ? '' : 'caution'}`}>
+          <strong>{displayName(assessment.disposition)} route-step assessment.</strong>{' '}
+          Intended product: {displayName(assessment.intended_match)}
+          {assessment.intended_product_rank != null && ` at blind rank ${assessment.intended_product_rank}`}.
+          {' '}Targeted replay: {displayName(assessment.targeted_replay_status)}.
+          {assessment.best_competitor_product && <> Best competitor: <code>{assessment.best_competitor_product}</code>.</>}
+          {assessment.score_margin != null && <> Score margin: {assessment.score_margin.toFixed(3)}.</>}
+        </div>
+      )}
+      {!result.valid && <div className="alert error">{displayName(result.prediction.error ?? result.prediction.status)}</div>}
+      <MessageList title="Assessment warnings" values={assessment?.warnings ?? []} tone="caution" />
+      {result.prediction.candidates.length === 0 && <MessageList title="Scope and cautions" values={result.prediction.warnings} tone="caution" />}
+      {result.prediction.candidates.length > 0 && (
+        <div className="results-layout">
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>Rank</th><th>Score</th><th>Product</th><th>Level</th><th>Support</th><th>Pathways</th><th>Conditions</th></tr></thead>
+              <tbody>
+                {result.prediction.candidates.map((candidate, index) => (
+                  <tr key={candidate.pathway_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
+                    <td><strong>{candidate.rank}</strong></td>
+                    <td>{candidate.score.toFixed(3)}</td>
+                    <td className="mono-value">{candidate.product_smiles}</td>
+                    <td>{candidate.abstraction_level}</td>
+                    <td>{candidate.independent_reference_support}</td>
+                    <td>{1 + candidate.alternative_pathway_ids.length}</td>
+                    <td>{candidate.recipe_evidence.evaluated ? (candidate.recipe_evidence.compatible ? 'Compatible' : 'Conflict') : 'Not supplied'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {active && <ForwardProductDetails candidate={active} />}
+        </div>
+      )}
+      {result.prediction.competition_groups.length > 0 && (
+        <details className="trace-panel">
+          <summary>Competing pathway groups ({result.prediction.competition_groups.length})</summary>
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>Level</th><th>Candidate ranks</th><th>Products</th><th>Operators</th></tr></thead>
+              <tbody>{result.prediction.competition_groups.map((group) => (
+                <tr key={`${group.competition_level}:${group.group_key}`}>
+                  <td>{displayName(group.competition_level)}</td>
+                  <td>{group.candidate_ranks.join(', ')}</td>
+                  <td>{group.product_smiles.length}</td>
+                  <td>{group.operator_ids.length}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </details>
+      )}
+      <MessageList title="Prediction scope" values={result.prediction.warnings} tone="caution" />
     </section>
   )
 }

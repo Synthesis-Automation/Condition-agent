@@ -112,6 +112,30 @@ class RetrosynthesisRequest(StrictRequest):
     use_precursor_realism: bool = False
 
 
+class ForwardSynthesisRequest(StrictRequest):
+    """Predict products or audit one proposed forward route step."""
+
+    starting_materials: str = Field(min_length=1, max_length=20_000)
+    intended_product: Optional[str] = Field(default=None, max_length=20_000)
+    operator_hint: Optional[str] = Field(default=None, max_length=500)
+    recipe: Optional[Dict[str, Any]] = None
+    library_mode: Literal["full", "compact"] = "compact"
+    top_k: int = Field(default=10, ge=1, le=50)
+    include_l0: bool = True
+
+    @model_validator(mode="after")
+    def molecule_collections_only(self) -> "ForwardSynthesisRequest":
+        if ">" in self.starting_materials:
+            raise ValueError(
+                "starting_materials must be molecules, not reaction SMILES"
+            )
+        if self.intended_product and ">" in self.intended_product:
+            raise ValueError(
+                "intended_product must be one molecule, not reaction SMILES"
+            )
+        return self
+
+
 class MultistepRetrosynthesisRequest(StrictRequest):
     """One bounded, structure-derived multistep retrosynthesis request."""
 
@@ -173,6 +197,7 @@ __all__ = [
     "CompletionChoiceRequest",
     "DiscoveryRequest",
     "FeatureAnalysisRequest",
+    "ForwardSynthesisRequest",
     "MultistepRetrosynthesisRequest",
     "PrepareReactionRequest",
     "RankingPreferencesRequest",

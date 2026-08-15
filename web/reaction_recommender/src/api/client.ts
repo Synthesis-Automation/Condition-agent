@@ -5,6 +5,8 @@ import type {
   DiscoveryResult,
   FeatureAnalysisRequest,
   FeatureAnalysisResult,
+  ForwardSynthesisRequest,
+  ForwardSynthesisResult,
   MultistepRetrosynthesisRequest,
   MultistepRetrosynthesisResult,
   PrepareReactionResult,
@@ -81,6 +83,12 @@ export const api = {
 
   analyzeFeatures: (request: FeatureAnalysisRequest) =>
     jsonRequest<FeatureAnalysisResult>('/features/analyze', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  forwardSynthesize: (request: ForwardSynthesisRequest) =>
+    jsonRequest<ForwardSynthesisResult>('/forward-synthesis', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

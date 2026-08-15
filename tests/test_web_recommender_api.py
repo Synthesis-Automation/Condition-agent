@@ -17,6 +17,7 @@ from cas_tools import (
 
 from app.web_api.main import create_app
 from app.web_api.contracts import (
+    ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
@@ -135,6 +136,42 @@ class FakeRuntime:
             ],
         }
 
+    def forward_synthesize(self, request: Any) -> Dict[str, Any]:
+        assessment = None
+        mode = "blind_prediction"
+        if request.intended_product:
+            mode = "step_assessment"
+            assessment = {
+                "starting_materials": request.starting_materials,
+                "intended_product": request.intended_product,
+                "intended_match": "exact",
+                "targeted_replay_status": "structurally_reproduced",
+                "intended_product_rank": 1,
+                "best_competitor_product": "CCO",
+                "score_margin": 0.2,
+                "disposition": "clear",
+                "operator_hint": request.operator_hint,
+                "warnings": [],
+                "schema_version": "1.0",
+            }
+        return {
+            "analysis_mode": mode,
+            "library_mode": request.library_mode,
+            "valid": True,
+            "schema_version": "1.0",
+            "forward_library_operator_count": 12,
+            "prediction": {
+                "query_starting_materials": request.starting_materials,
+                "valid": True,
+                "status": "predicted",
+                "candidates": [{"rank": 1, "product_smiles": "CCN"}],
+                "competition_groups": [],
+                "diagnostics": {"valid_pathway_count": 2},
+                "warnings": [],
+            },
+            "assessment": assessment,
+        }
+
     def retrosynthesis_conditions(self, request: Any) -> Dict[str, Any]:
         return {
             "status": "recommended_direct",
@@ -237,6 +274,68 @@ def test_local_runtime_reports_retrosynthesis_library_modes(tmp_path) -> None:
         capabilities["retrosynthesis_library_modes"]["full"]["library_available"]
         is False
     )
+    assert capabilities["forward_synthesis"] is True
+    assert (
+        capabilities["forward_library_modes"]["compact"]["library_available"]
+        is True
+    )
+    assert capabilities["forward_library_modes"]["compact"]["prepared"] is False
+
+
+def test_local_runtime_forward_synthesis_forwards_audit_options(
+    monkeypatch, tmp_path
+) -> None:
+    library = SimpleNamespace(operators=("operator",))
+    runtime = LocalRecommendationRuntime(retrosynthesis_library_root=tmp_path)
+    monkeypatch.setattr(runtime, "_get_forward_library", lambda mode: library)
+    captured = {}
+
+    def fake_assessment(starting_materials, intended_product, selected, **options):
+        captured.update(
+            {
+                "starting_materials": starting_materials,
+                "intended_product": intended_product,
+                "library": selected,
+                **options,
+            }
+        )
+        return SimpleNamespace(
+            schema_version="1.0",
+            to_dict=lambda: {
+                "starting_materials": starting_materials,
+                "intended_product": intended_product,
+                "disposition": "competitive",
+                "blind_prediction": {
+                    "valid": True,
+                    "candidates": [{"product_smiles": intended_product}],
+                },
+            },
+        )
+
+    monkeypatch.setattr(runtime_module, "assess_proposed_step", fake_assessment)
+    payload = runtime.forward_synthesize(
+        ForwardSynthesisRequest(
+            starting_materials=" CCBr.N ",
+            intended_product=" CCN ",
+            operator_hint=" OP1:test ",
+            recipe={"temperature_c": 80},
+            library_mode="compact",
+            include_l0=False,
+            top_k=7,
+        )
+    )
+
+    assert captured["starting_materials"] == "CCBr.N"
+    assert captured["intended_product"] == "CCN"
+    assert captured["library"] is library
+    assert captured["operator_hint"] == "OP1:test"
+    assert captured["recipe"] == {"temperature_c": 80}
+    assert "L0" not in captured["levels"]
+    assert captured["top_k"] == 7
+    assert payload["analysis_mode"] == "step_assessment"
+    assert payload["assessment"]["disposition"] == "competitive"
+    assert "blind_prediction" not in payload["assessment"]
+    assert payload["prediction"]["valid"] is True
 
 
 def test_local_runtime_reports_multistep_index_availability(tmp_path) -> None:
@@ -768,6 +867,46 @@ def test_retrosynthesis_contract_forwards_operator_options() -> None:
     assert payload["library_mode"] == "compact"
     assert payload["precursor_realism_enabled"] is True
     assert payload["candidates"][0]["precursor_smiles"] == "CCBr.N"
+
+
+def test_forward_synthesis_contract_supports_blind_prediction_and_step_audit() -> None:
+    web = client()
+    blind = web.post(
+        "/api/v1/forward-synthesis",
+        json={
+            "starting_materials": "CCBr.N",
+            "library_mode": "compact",
+            "top_k": 7,
+            "include_l0": False,
+        },
+    )
+    audit = web.post(
+        "/api/v1/forward-synthesis",
+        json={
+            "starting_materials": "CCBr.N",
+            "intended_product": "CCN",
+            "operator_hint": "OP1:test",
+            "recipe": {"temperature_c": 80},
+            "library_mode": "compact",
+        },
+    )
+
+    assert blind.status_code == 200
+    assert blind.json()["data"]["analysis_mode"] == "blind_prediction"
+    assert blind.json()["data"]["prediction"]["candidates"][0]["product_smiles"] == "CCN"
+    assert audit.status_code == 200
+    assert audit.json()["data"]["analysis_mode"] == "step_assessment"
+    assert audit.json()["data"]["assessment"]["disposition"] == "clear"
+    assert audit.json()["data"]["assessment"]["operator_hint"] == "OP1:test"
+
+
+def test_forward_synthesis_contract_rejects_reaction_smiles_inputs() -> None:
+    response = client().post(
+        "/api/v1/forward-synthesis",
+        json={"starting_materials": "CCBr.N>>CCN"},
+    )
+
+    assert response.status_code == 422
 
 
 def test_retrosynthesis_conditions_contract_is_independent() -> None:

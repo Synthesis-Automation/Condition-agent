@@ -14,6 +14,7 @@ from .contracts import (
     API_SCHEMA_VERSION,
     DiscoveryRequest,
     FeatureAnalysisRequest,
+    ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     PrepareReactionRequest,
     RecommendationRequest,
@@ -137,6 +138,21 @@ def create_app(
     ) -> dict[str, Any]:
         try:
             data = active_runtime(request).retrosynthesize(payload)
+        except (ValueError, FileNotFoundError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(
+                status_code=status,
+                detail=error_payload(exc),
+            ) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/forward-synthesis")
+    def forward_synthesize(
+        payload: ForwardSynthesisRequest,
+        request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).forward_synthesize(payload)
         except (ValueError, FileNotFoundError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(
