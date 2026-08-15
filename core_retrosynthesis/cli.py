@@ -49,12 +49,17 @@ from .route_core_conversion import (
 from .route_action_conversion import (
     DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
     convert_route_action_corpus,
+    merge_route_action_shards,
 )
 from .route_action_evaluation import RouteActionEvaluationConfig
 from .route_review import DEFAULT_ROUTE_REVIEW_SEED, write_route_review_html
 from .route_core_review import (
     DEFAULT_ROUTE_CORE_REVIEW_SEED,
     write_route_core_review_html,
+)
+from .route_action_review import (
+    DEFAULT_ROUTE_ACTION_REVIEW_SEED,
+    write_route_action_review_html,
 )
 from .search import disconnect_target
 from .sources import LIBRARY_MODES, iter_library_rows, resolve_library_mode
@@ -486,8 +491,38 @@ def _parser() -> argparse.ArgumentParser:
         help="extract supervision facets without running candidate search",
     )
     route_action.add_argument("--workers", type=int, default=1)
+    route_action.add_argument("--shard-count", type=int, default=1)
+    route_action.add_argument("--shard-index", type=int, default=0)
+    route_action.add_argument(
+        "--resume",
+        action="store_true",
+        help="reuse an existing shard only after validating its manifest",
+    )
     route_action.add_argument("--allow-rejections", action="store_true")
     route_action.add_argument("--overwrite", action="store_true")
+
+    route_action_merge = commands.add_parser(
+        "merge-route-action-shards",
+        help="validate and merge a complete deterministic route-action shard set",
+    )
+    route_action_merge.add_argument("output_jsonl")
+    route_action_merge.add_argument("shard_outputs", nargs="+")
+    route_action_merge.add_argument("--manifest")
+    route_action_merge.add_argument("--overwrite", action="store_true")
+
+    route_action_review = commands.add_parser(
+        "render-route-action-review",
+        help="render promoted observed-action labels for chemist review",
+    )
+    route_action_review.add_argument("source_evaluations")
+    route_action_review.add_argument("output_html")
+    route_action_review.add_argument("--sample-size", type=int, default=100)
+    route_action_review.add_argument(
+        "--seed", type=int, default=DEFAULT_ROUTE_ACTION_REVIEW_SEED
+    )
+    route_action_review.add_argument(
+        "--title", default="Promoted route-action label review"
+    )
 
     report = commands.add_parser(
         "render-report",
@@ -621,6 +656,28 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             overwrite=arguments.overwrite,
             strict=not arguments.allow_rejections,
             workers=arguments.workers,
+            shard_count=arguments.shard_count,
+            shard_index=arguments.shard_index,
+            resume=arguments.resume,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "merge-route-action-shards":
+        report = merge_route_action_shards(
+            arguments.shard_outputs,
+            arguments.output_jsonl,
+            manifest_path=arguments.manifest,
+            overwrite=arguments.overwrite,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "render-route-action-review":
+        report = write_route_action_review_html(
+            arguments.source_evaluations,
+            arguments.output_html,
+            sample_size=arguments.sample_size,
+            seed=arguments.seed,
+            title=arguments.title,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0

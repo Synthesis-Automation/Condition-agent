@@ -15,9 +15,10 @@ from pathlib import Path
 import random
 import tempfile
 import time
-from typing import Any, Iterator, Optional, Sequence
+from typing import Any, Iterable, Iterator, Mapping, Optional, Sequence
 
 from .generic_library import load_generic_library
+from .generic_models import GenericTemplateLibrary
 from .hierarchical_ranking import build_completion_prior_index
 from .route_action_evaluation import (
     ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION,
@@ -27,9 +28,10 @@ from .route_action_evaluation import (
     evaluate_route_actions,
 )
 from .route_conversion import iter_route_trees
+from .observed_route_action import load_observed_route_action_label_policy
 
 
-ROUTE_ACTION_CONVERTER_VERSION = "2.0"
+ROUTE_ACTION_CONVERTER_VERSION = "3.1"
 DEFAULT_ROUTE_ACTION_SAMPLE_SEED = 20_260_814
 _WORKER_LIBRARY: Any = None
 _WORKER_PRIOR_INDEX: Any = None
@@ -44,13 +46,56 @@ def _sha256_file(path: Path) -> str:
     return checksum.hexdigest()
 
 
+def stable_route_shard(route_id: str, shard_count: int) -> int:
+    """Return the stable content-derived shard for a route identity."""
+
+    if shard_count < 1:
+        raise ValueError("shard_count must be positive")
+    if not route_id:
+        raise ValueError("route_id cannot be empty")
+    token = hashlib.sha256(route_id.encode("utf-8")).digest()
+    return int.from_bytes(token[:8], byteorder="big") % shard_count
+
+
+def _atomic_write_json(path: Path, value: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=path.parent
+    )
+    os.close(descriptor)
+    temporary = Path(temporary_name)
+    try:
+        temporary.write_text(
+            json.dumps(value, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+
+
 def _initialize_worker(library_path: str, config_values: dict[str, Any]) -> None:
     global _WORKER_LIBRARY, _WORKER_PRIOR_INDEX, _WORKER_CONFIG
-    _WORKER_LIBRARY = load_generic_library(library_path)
     _WORKER_CONFIG = RouteActionEvaluationConfig(**config_values)
+    _WORKER_LIBRARY = (
+        load_generic_library(library_path)
+        if _WORKER_CONFIG.run_search
+        else GenericTemplateLibrary(
+            templates=(),
+            source_row_count=0,
+            accepted_observation_count=0,
+            rejection_counts={},
+            definition={},
+        )
+    )
     _WORKER_PRIOR_INDEX = (
         build_completion_prior_index(_WORKER_LIBRARY)
-        if _WORKER_CONFIG.use_hierarchical_ranking
+        if _WORKER_CONFIG.run_search and _WORKER_CONFIG.use_hierarchical_ranking
         else None
     )
 
@@ -78,19 +123,29 @@ def _selected_trees(
     *,
     sample_size: Optional[int],
     seed: int,
+    shard_count: int,
+    shard_index: int,
 ) -> Iterator[Any]:
+    if shard_count < 1:
+        raise ValueError("shard_count must be positive")
+    if shard_index < 0 or shard_index >= shard_count:
+        raise ValueError("shard_index must be in [0, shard_count)")
     if sample_size is None:
-        yield from iter_route_trees(source)
-        return
-    trees = tuple(
-        sorted(
-            iter_route_trees(source),
-            key=lambda tree: tree.source_route_id or tree.tree_id,
+        trees: Iterable[Any] = iter_route_trees(source)
+    else:
+        ordered = tuple(
+            sorted(
+                iter_route_trees(source),
+                key=lambda tree: tree.source_route_id or tree.tree_id,
+            )
         )
-    )
-    if sample_size < 1 or sample_size > len(trees):
-        raise ValueError(f"sample_size must be between 1 and {len(trees)}")
-    yield from random.Random(seed).sample(trees, sample_size)
+        if sample_size < 1 or sample_size > len(ordered):
+            raise ValueError(f"sample_size must be between 1 and {len(ordered)}")
+        trees = random.Random(seed).sample(ordered, sample_size)
+    for tree in trees:
+        route_id = tree.source_route_id or tree.tree_id
+        if stable_route_shard(route_id, shard_count) == shard_index:
+            yield tree
 
 
 def _evaluation_results(
@@ -101,8 +156,16 @@ def _evaluation_results(
     sample_size: Optional[int],
     seed: int,
     workers: int,
+    shard_count: int,
+    shard_index: int,
 ) -> Iterator[tuple[str, Optional[RouteActionEvaluation], str, str]]:
-    trees = _selected_trees(source, sample_size=sample_size, seed=seed)
+    trees = _selected_trees(
+        source,
+        sample_size=sample_size,
+        seed=seed,
+        shard_count=shard_count,
+        shard_index=shard_index,
+    )
     config_values = asdict(config)
     if workers == 1:
         _initialize_worker(str(library_path), config_values)
@@ -131,6 +194,9 @@ def _new_metrics() -> dict[str, Any]:
         "core_quality": Counter(),
         "limitations": Counter(),
         "operator_admission": Counter(),
+        "departing_edit_descriptors": Counter(),
+        "named_annotations": Counter(),
+        "promoted": Counter(),
         "outcomes": Counter(),
         "candidate_supervision": Counter(),
         "diagnostics": Counter(),
@@ -164,6 +230,17 @@ def _accumulate(metrics: dict[str, Any], evaluation: RouteActionEvaluation) -> N
         metrics["operator_admission"][
             observed.operator_admission_reason or "accepted"
         ] += 1
+        metrics["departing_edit_descriptors"].update(
+            observed.departing_edit_descriptors
+        )
+        metrics["named_annotations"][
+            observed.named_annotation or "unannotated"
+        ] += 1
+        if observed.retained_edits_verified and not observed.operator_roundtrip_verified:
+            metrics["promoted"]["all"] += 1
+            metrics["promoted"][
+                "strategy" if observed.strategy_verified else "retained_only"
+            ] += 1
         if not observed.search_eligible:
             continue
         metrics["search_eligible_step_count"] += 1
@@ -250,6 +327,17 @@ def _finalize_metrics(
         "operator_admission_counts": dict(
             sorted(metrics["operator_admission"].items())
         ),
+        "departing_edit_descriptor_counts": dict(
+            sorted(metrics["departing_edit_descriptors"].items())
+        ),
+        "named_annotation_counts": dict(
+            sorted(metrics["named_annotations"].items())
+        ),
+        "promoted_step_count": int(metrics["promoted"]["all"]),
+        "promoted_strategy_step_count": int(metrics["promoted"]["strategy"]),
+        "promoted_retained_only_step_count": int(
+            metrics["promoted"]["retained_only"]
+        ),
         "outcome_counts": dict(sorted(metrics["outcomes"].items())),
         "candidate_supervision_label_counts": dict(
             sorted(metrics["candidate_supervision"].items())
@@ -283,6 +371,9 @@ def convert_route_action_corpus(
     overwrite: bool = False,
     strict: bool = True,
     workers: int = 1,
+    shard_count: int = 1,
+    shard_index: int = 0,
+    resume: bool = False,
 ) -> dict[str, Any]:
     """Replay a route-tree corpus and write deterministic route-level JSONL."""
 
@@ -299,6 +390,60 @@ def convert_route_action_corpus(
             raise FileNotFoundError(required)
     if workers < 1:
         raise ValueError("workers must be positive")
+    if shard_count < 1:
+        raise ValueError("shard_count must be positive")
+    if shard_index < 0 or shard_index >= shard_count:
+        raise ValueError("shard_index must be in [0, shard_count)")
+    if overwrite and resume:
+        raise ValueError("overwrite and resume are mutually exclusive")
+    if resume and (output.exists() or manifest.exists()):
+        if not output.is_file() or not manifest.is_file():
+            raise ValueError("resume requires both output and manifest")
+        report = json.loads(manifest.read_text(encoding="utf-8"))
+        expected_selection = {
+            "sample_size": sample_size,
+            "seed": seed if sample_size is not None else None,
+            "shard_count": shard_count,
+            "shard_index": shard_index,
+        }
+        actual_selection = dict(report.get("selection") or {})
+        comparable_selection = {
+            key: actual_selection.get(key) for key in expected_selection
+        }
+        checks = {
+            "schema": report.get("route_action_schema_version")
+            == ROUTE_ACTION_EVALUATION_SCHEMA_VERSION,
+            "algorithm": report.get("route_action_algorithm_version")
+            == ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION,
+            "converter": report.get("converter_version")
+            == ROUTE_ACTION_CONVERTER_VERSION,
+            "label_policy": report.get("label_policy_definition_id")
+            == load_observed_route_action_label_policy().definition_id,
+            "source": (report.get("source") or {}).get("sha256")
+            == _sha256_file(source),
+            "library": (report.get("operator_library") or {}).get("sha256")
+            == _sha256_file(library_path),
+            "config": report.get("search_config") == config.to_dict(),
+            "selection": comparable_selection == expected_selection,
+            "output": (report.get("output") or {}).get("sha256")
+            == _sha256_file(output),
+        }
+        failed = sorted(name for name, passed in checks.items() if not passed)
+        if failed:
+            raise ValueError(
+                "existing shard is not resumable; mismatched " + ", ".join(failed)
+            )
+        resumed_count = 0
+        for evaluation in iter_route_action_evaluations(output):
+            route_id = evaluation.source_route_id or evaluation.tree_id
+            if stable_route_shard(route_id, shard_count) != shard_index:
+                raise ValueError("existing shard contains a misassigned route")
+            if evaluation.search_config_id != config.config_id:
+                raise ValueError("existing shard contains a mismatched search config")
+            resumed_count += 1
+        if resumed_count != int((report.get("output") or {}).get("record_count") or 0):
+            raise ValueError("existing shard record count contradicts its manifest")
+        return report
     if not overwrite:
         for candidate in (output, manifest):
             if candidate.exists():
@@ -329,6 +474,8 @@ def convert_route_action_corpus(
                         sample_size=sample_size,
                         seed=seed,
                         workers=workers,
+                        shard_count=shard_count,
+                        shard_index=shard_index,
                     ):
                         if evaluation is None:
                             rejections[error_type] += 1
@@ -367,6 +514,9 @@ def convert_route_action_corpus(
             ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION
         ),
         "converter_version": ROUTE_ACTION_CONVERTER_VERSION,
+        "label_policy_definition_id": (
+            load_observed_route_action_label_policy().definition_id
+        ),
         "source": {
             "path": str(source.resolve()),
             "sha256": _sha256_file(source),
@@ -379,6 +529,8 @@ def convert_route_action_corpus(
             "sample_size": sample_size,
             "seed": seed if sample_size is not None else None,
             "workers": workers,
+            "shard_count": shard_count,
+            "shard_index": shard_index,
         },
         "search_config": config.to_dict(),
         "metrics": _finalize_metrics(metrics, top_k=config.top_k),
@@ -411,11 +563,226 @@ def convert_route_action_corpus(
             "Elapsed time is manifest metadata and is not part of record identity.",
         ],
     }
-    manifest.write_text(
-        json.dumps(report, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-        newline="\n",
+    _atomic_write_json(manifest, report)
+    return report
+
+
+def merge_route_action_shards(
+    shard_outputs: Sequence[str | Path],
+    output_jsonl: str | Path,
+    *,
+    manifest_path: Optional[str | Path] = None,
+    overwrite: bool = False,
+) -> dict[str, Any]:
+    """Validate and deterministically merge a complete route-action shard set."""
+
+    if not shard_outputs:
+        raise ValueError("at least one shard output is required")
+    output = Path(output_jsonl)
+    manifest = (
+        Path(manifest_path)
+        if manifest_path is not None
+        else Path(f"{output}.manifest.json")
     )
+    if not overwrite:
+        for candidate in (output, manifest):
+            if candidate.exists():
+                raise FileExistsError(candidate)
+
+    entries = []
+    common: Optional[dict[str, Any]] = None
+    expected_count: Optional[int] = None
+    for raw_path in shard_outputs:
+        shard_path = Path(raw_path)
+        shard_manifest_path = Path(f"{shard_path}.manifest.json")
+        if not shard_path.is_file() or not shard_manifest_path.is_file():
+            raise FileNotFoundError(
+                shard_path if not shard_path.is_file() else shard_manifest_path
+            )
+        shard_manifest = json.loads(
+            shard_manifest_path.read_text(encoding="utf-8")
+        )
+        if shard_manifest.get("converter_version") != ROUTE_ACTION_CONVERTER_VERSION:
+            raise ValueError(
+                f"shard converter version mismatch: {shard_manifest_path}"
+            )
+        if (
+            shard_manifest.get("route_action_schema_version")
+            != ROUTE_ACTION_EVALUATION_SCHEMA_VERSION
+            or shard_manifest.get("route_action_algorithm_version")
+            != ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION
+            or shard_manifest.get("label_policy_definition_id")
+            != load_observed_route_action_label_policy().definition_id
+        ):
+            raise ValueError(f"shard contract mismatch: {shard_manifest_path}")
+        selection = dict(shard_manifest.get("selection") or {})
+        shard_count = int(selection.get("shard_count") or 0)
+        raw_shard_index = selection.get("shard_index")
+        shard_index = int(raw_shard_index) if raw_shard_index is not None else -1
+        if shard_count < 1 or shard_index < 0 or shard_index >= shard_count:
+            raise ValueError(f"invalid shard metadata: {shard_manifest_path}")
+        if expected_count is None:
+            expected_count = shard_count
+        elif shard_count != expected_count:
+            raise ValueError("shards disagree on shard_count")
+        comparable = {
+            "route_action_schema_version": shard_manifest.get(
+                "route_action_schema_version"
+            ),
+            "route_action_algorithm_version": shard_manifest.get(
+                "route_action_algorithm_version"
+            ),
+            "converter_version": shard_manifest.get("converter_version"),
+            "label_policy_definition_id": shard_manifest.get(
+                "label_policy_definition_id"
+            ),
+            "source_sha256": (shard_manifest.get("source") or {}).get("sha256"),
+            "library_sha256": (shard_manifest.get("operator_library") or {}).get(
+                "sha256"
+            ),
+            "search_config": shard_manifest.get("search_config"),
+            "sample_size": selection.get("sample_size"),
+            "seed": selection.get("seed"),
+            "shard_count": shard_count,
+        }
+        if common is None:
+            common = comparable
+        elif comparable != common:
+            raise ValueError("shard manifests describe incompatible conversions")
+        if (shard_manifest.get("output") or {}).get("sha256") != _sha256_file(
+            shard_path
+        ):
+            raise ValueError(f"shard output checksum mismatch: {shard_path}")
+        entries.append((shard_index, shard_path, shard_manifest))
+
+    assert expected_count is not None and common is not None
+    indices = [index for index, _, _ in entries]
+    if len(set(indices)) != len(indices):
+        raise ValueError("duplicate shard index")
+    if set(indices) != set(range(expected_count)):
+        missing = sorted(set(range(expected_count)) - set(indices))
+        raise ValueError(f"incomplete shard set; missing indices {missing}")
+
+    records: dict[str, RouteActionEvaluation] = {}
+    for shard_index, shard_path, shard_manifest in sorted(entries):
+        shard_record_count = 0
+        for evaluation in iter_route_action_evaluations(shard_path):
+            route_id = evaluation.source_route_id or evaluation.tree_id
+            if stable_route_shard(route_id, expected_count) != shard_index:
+                raise ValueError(
+                    f"route {route_id} is stored in the wrong shard"
+                )
+            if route_id in records:
+                raise ValueError(f"duplicate route identity across shards: {route_id}")
+            if evaluation.search_config_id != dict(common["search_config"]).get(
+                "config_id"
+            ):
+                raise ValueError(f"route {route_id} has a mismatched search config")
+            records[route_id] = evaluation
+            shard_record_count += 1
+        if shard_record_count != int(
+            (shard_manifest.get("output") or {}).get("record_count") or 0
+        ):
+            raise ValueError(
+                f"shard record count contradicts manifest: {shard_path}"
+            )
+
+    metrics = _new_metrics()
+    split_metrics: dict[str, dict[str, Any]] = {}
+    output.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{output.name}.", suffix=".tmp", dir=output.parent
+    )
+    os.close(descriptor)
+    temporary_output = Path(temporary_name)
+    try:
+        with temporary_output.open("wb") as raw_handle:
+            with gzip.GzipFile(
+                filename="", mode="wb", fileobj=raw_handle, mtime=0
+            ) as gzip_handle:
+                with io.TextIOWrapper(gzip_handle, encoding="utf-8") as handle:
+                    for route_id in sorted(records):
+                        evaluation = records[route_id]
+                        handle.write(
+                            json.dumps(
+                                evaluation.to_dict(),
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            )
+                        )
+                        handle.write("\n")
+                        _accumulate(metrics, evaluation)
+                        split_key = evaluation.split or "unknown"
+                        _accumulate(
+                            split_metrics.setdefault(split_key, _new_metrics()),
+                            evaluation,
+                        )
+        os.replace(temporary_output, output)
+    except BaseException:
+        try:
+            temporary_output.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+
+    top_k = int(dict(common["search_config"]).get("top_k") or 25)
+    elapsed = sum(
+        float((item[2].get("conversion") or {}).get("elapsed_seconds") or 0)
+        for item in entries
+    )
+    rejection_counts: Counter[str] = Counter()
+    rejection_examples: dict[str, list[str]] = {}
+    for _, _, item in entries:
+        conversion = dict(item.get("conversion") or {})
+        rejection_counts.update(conversion.get("rejection_counts") or {})
+        for reason, examples in (conversion.get("rejection_examples") or {}).items():
+            retained = rejection_examples.setdefault(str(reason), [])
+            retained.extend(str(example) for example in examples[: 5 - len(retained)])
+    first_manifest = sorted(entries)[0][2]
+    report = {
+        "route_action_schema_version": common["route_action_schema_version"],
+        "route_action_algorithm_version": common[
+            "route_action_algorithm_version"
+        ],
+        "converter_version": ROUTE_ACTION_CONVERTER_VERSION,
+        "label_policy_definition_id": common["label_policy_definition_id"],
+        "source": first_manifest["source"],
+        "operator_library": first_manifest["operator_library"],
+        "selection": {
+            "sample_size": common["sample_size"],
+            "seed": common["seed"],
+            "shard_count": expected_count,
+            "merged_shard_indices": list(range(expected_count)),
+        },
+        "search_config": common["search_config"],
+        "metrics": _finalize_metrics(metrics, top_k=top_k),
+        "metrics_by_split": {
+            key: _finalize_metrics(value, top_k=top_k)
+            for key, value in sorted(split_metrics.items())
+        },
+        "conversion": {
+            "rejected_route_count": sum(rejection_counts.values()),
+            "rejection_counts": dict(sorted(rejection_counts.items())),
+            "rejection_examples": rejection_examples,
+            "summed_shard_elapsed_seconds": round(elapsed, 3),
+        },
+        "shards": [
+            {
+                "shard_index": index,
+                "path": str(path.resolve()),
+                "sha256": (item.get("output") or {}).get("sha256"),
+                "record_count": (item.get("output") or {}).get("record_count"),
+            }
+            for index, path, item in sorted(entries)
+        ],
+        "output": {
+            "path": str(output.resolve()),
+            "sha256": _sha256_file(output),
+            "record_count": len(records),
+        },
+        "warnings": list(first_manifest.get("warnings") or ()),
+    }
+    _atomic_write_json(manifest, report)
     return report
 
 
@@ -453,6 +820,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-templates-to-apply", type=int, default=500)
     parser.add_argument("--max-candidates-to-validate", type=int, default=100)
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--shard-count", type=int, default=1)
+    parser.add_argument("--shard-index", type=int, default=0)
+    parser.add_argument("--resume", action="store_true")
     parser.add_argument("--labels-only", action="store_true")
     parser.add_argument("--allow-rejections", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
@@ -479,6 +849,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         overwrite=arguments.overwrite,
         strict=not arguments.allow_rejections,
         workers=arguments.workers,
+        shard_count=arguments.shard_count,
+        shard_index=arguments.shard_index,
+        resume=arguments.resume,
     )
     print(json.dumps(report, indent=2, sort_keys=True))
     return 0
@@ -493,4 +866,6 @@ __all__ = [
     "ROUTE_ACTION_CONVERTER_VERSION",
     "convert_route_action_corpus",
     "iter_route_action_evaluations",
+    "merge_route_action_shards",
+    "stable_route_shard",
 ]

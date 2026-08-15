@@ -409,21 +409,25 @@ def evaluate_route_actions(
     """Replay every observed route step through the validated operator ladder."""
 
     prior_index = completion_prior_index
-    if config.use_hierarchical_ranking and prior_index is None:
+    if config.run_search and config.use_hierarchical_ranking and prior_index is None:
         prior_index = build_completion_prior_index(library)
     steps = []
     for molecule in iter_molecule_occurrences(tree):
         reaction = molecule.reaction
         if reaction is None:
             continue
-        evaluation_id = digest(
-            "RAE1", tree.tree_id, reaction.reaction_node_id, config.config_id
-        )
         observed = build_observed_route_action_label(
             reaction.reaction_smiles,
             route_product_smiles=molecule.smiles,
             reaction_id=reaction.evidence.source_reaction_id or reaction.step_id,
             reference_id=tree.patent_id or tree.source_route_id or tree.tree_id,
+        )
+        evaluation_id = digest(
+            "RAE1",
+            tree.tree_id,
+            reaction.reaction_node_id,
+            config.config_id,
+            observed.policy_definition_id,
         )
         raw_diagnostics: Any = {}
         candidates: tuple[GenericDisconnectionCandidate, ...] = ()

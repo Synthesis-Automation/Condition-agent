@@ -20,6 +20,7 @@ from .generic_compiler import (
     GenericCompilationResult,
     GenericReactionIdentity,
     analyze_generic_reaction,
+    build_generic_reaction_identity,
     compile_generic_templates,
 )
 from .generic_library import (
@@ -161,6 +162,8 @@ from .route_action_conversion import (
     ROUTE_ACTION_CONVERTER_VERSION,
     convert_route_action_corpus,
     iter_route_action_evaluations,
+    merge_route_action_shards,
+    stable_route_shard,
 )
 from .route_review import (
     DEFAULT_ROUTE_REVIEW_SEED,
@@ -174,6 +177,13 @@ from .route_core_review import (
     render_route_core_review_html,
     sample_route_core_projections,
     write_route_core_review_html,
+)
+from .route_action_review import (
+    DEFAULT_ROUTE_ACTION_REVIEW_SEED,
+    is_promoted_route_action,
+    render_route_action_review_html,
+    sample_promoted_route_actions,
+    write_route_action_review_html,
 )
 from .multistep_ranking import (
     MultistepRankingPolicy,
@@ -300,6 +310,7 @@ __all__ = [
     "DEFAULT_ROUTE_CORE_SAMPLE_SEED",
     "DEFAULT_ROUTE_CORE_REVIEW_SEED",
     "DEFAULT_ROUTE_ACTION_SAMPLE_SEED",
+    "DEFAULT_ROUTE_ACTION_REVIEW_SEED",
     "RouteQualityError",
     "RouteSubsetPolicy",
     "RankedReactionOutcome",
@@ -314,6 +325,7 @@ __all__ = [
     "StrategyProposal",
     "TemplateContext",
     "analyze_generic_reaction",
+    "build_generic_reaction_identity",
     "audit_operator_library_coverage",
     "build_full_scale_operator_library",
     "build_library",
@@ -372,14 +384,20 @@ __all__ = [
     "iter_route_core_projections",
     "iter_route_core_steps",
     "iter_route_action_evaluations",
+    "is_promoted_route_action",
+    "merge_route_action_shards",
     "render_route_review_html",
     "render_route_core_review_html",
+    "render_route_action_review_html",
     "evaluate_route_actions",
     "normalize_observed_reaction",
     "sample_route_records",
     "sample_route_core_projections",
+    "sample_promoted_route_actions",
+    "stable_route_shard",
     "write_route_review_html",
     "write_route_core_review_html",
+    "write_route_action_review_html",
     "validate_route_tree",
     "validate_route_core_projection",
     "route_distance_matrix",

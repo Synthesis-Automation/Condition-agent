@@ -52,11 +52,11 @@ define operator identity.
 | Shared route-tree contract | Implemented | Observed and planned routes use the same evidence-neutral, occurrence-preserving schema. |
 | Observed route corpus | 5,000-route POC | Patent-disjoint curated routes are converted with zero rejected records; strategy annotations remain weak labels. |
 | Route-core projection | Implemented | 18,644/18,647 steps have generic cores, signatures and minimized drawings; cross-step symmetry remains explicit. |
-| Observed route-action labels | 50-route POC | 184/188 steps have retained-edit, synthon, and exact-precursor labels; 139 have SITE1/STRAT1 labels; only the independent executable-operator facet remains 18/188. |
+| Observed route-action labels | 5,000-route POC | 18,280/18,647 steps have retained-edit labels, 18,078 have synthon labels, 18,307 have exact precursors, and 13,099 have STRAT1; the independent executable-operator facet is 1,201/18,647. |
 | Multistep planning | Bounded POC | Available for experiments, but not the current product priority. |
 | Strategy-aware validation scheduling | Not implemented | Grouping currently improves output quality, not validation cost. |
 | Public CLI/API for grouped strategies | Not implemented | Current grouped result contract is Python-only. |
-| Broad release benchmark and chemist review | Not completed | Existing results establish feasibility, not production accuracy. |
+| Broad release benchmark and chemist review | Review artifact ready | Full labels are audited and 120 promoted examples are rendered; human decisions and leakage-controlled replay remain. |
 
 ## Design principles
 

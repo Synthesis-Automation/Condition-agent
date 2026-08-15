@@ -871,7 +871,16 @@ def analyze_generic_reaction(
     if prepared is None:
         return None
     materialized, analysis = prepared
-    split = split_reaction_smiles(materialized.reaction_smiles)
+    return build_generic_reaction_identity(materialized.reaction_smiles, analysis)
+
+
+def build_generic_reaction_identity(
+    materialized_reaction_smiles: str,
+    analysis: Any,
+) -> GenericReactionIdentity | None:
+    """Build generic action identities from an existing mapped graph analysis."""
+
+    split = split_reaction_smiles(materialized_reaction_smiles)
     if not analysis.valid or split is None:
         return None
     reactant_smiles, product_smiles = split
@@ -914,6 +923,7 @@ __all__ = [
     "GenericReactionIdentity",
     "SUPPORTED_TRANSFORMATIONS",
     "analyze_generic_reaction",
+    "build_generic_reaction_identity",
     "classify_reaction_smiles",
     "classify_reaction_with_site",
     "compile_generic_templates",

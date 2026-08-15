@@ -12,7 +12,11 @@ from rdkit import Chem
 from reactive_taxonomy import featurize_reaction
 
 from .chemistry import canonical_smiles, contributing_reactants, digest, split_reaction_smiles
-from .generic_compiler import analyze_generic_reaction, compile_generic_templates
+from .generic_compiler import (
+    build_generic_reaction_identity,
+    compile_generic_templates,
+    generic_rejection_stage,
+)
 from .mapping import materialize_atom_mapping
 from .strategy_identity import build_strategy_id
 
@@ -182,6 +186,7 @@ def _edit_partition(
 ) -> tuple[int, tuple[str, ...]]:
     retained_count = 0
     departing = []
+    periodic_table = Chem.GetPeriodicTable()
     for raw_edit in observation.get("edits") or ():
         edit = dict(raw_edit)
         atom_1 = dict(edit.get("atom_1") or {})
@@ -197,6 +202,14 @@ def _edit_partition(
         elements = [str(atom_1.get("element") or "?")]
         if atom_2_raw is not None:
             elements.append(str(atom_2.get("element") or "?"))
+        elements.sort(
+            key=lambda symbol: (
+                periodic_table.GetAtomicNumber(symbol)
+                if symbol != "?"
+                else 10_000,
+                symbol,
+            )
+        )
         departing.append(
             ":".join(
                 (
@@ -307,7 +320,10 @@ def build_observed_route_action_label(
     retained_count, departing_descriptors = _edit_partition(
         observation, product_maps
     )
-    identity = analyze_generic_reaction(materialized.reaction_smiles)
+    identity = build_generic_reaction_identity(
+        materialized.reaction_smiles,
+        analysis,
+    )
     expected_precursors = contributing_reactants(reactant_smiles, product_smiles)
     canonical_product = canonical_smiles(product_smiles)
     route_product = (
@@ -357,17 +373,26 @@ def build_observed_route_action_label(
         if strategy_verified
         else ""
     )
-    compiled = compile_generic_templates(
-        {
-            "reaction_id": reaction_id,
-            "reference_id": reference_id,
-            "reaction_smiles": normalized,
-        },
-        engine="reaction_core",
-        levels=("L0", "L1", "L2"),
-        admission_mode="data_driven",
-    )
-    roundtrip = bool(compiled.templates)
+    if quality.status == "pass":
+        compiled = compile_generic_templates(
+            {
+                "reaction_id": reaction_id,
+                "reference_id": reference_id,
+                "reaction_smiles": normalized,
+            },
+            engine="reaction_core",
+            levels=("L0", "L1", "L2"),
+            admission_mode="data_driven",
+        )
+        roundtrip = bool(compiled.templates)
+        admission_reason = compiled.rejection_reason
+        admission_stage = (
+            "accepted" if roundtrip else compiled.rejection_stage or "unknown"
+        )
+    else:
+        roundtrip = False
+        admission_reason = "materialized_core_not_verified"
+        admission_stage = generic_rejection_stage(admission_reason)
     limitations = []
     if not route_product_matches:
         limitations.append("target_identity_mismatch")
@@ -392,7 +417,7 @@ def build_observed_route_action_label(
     if not expected_precursors:
         limitations.append("precursor_identity_unavailable")
     if not roundtrip:
-        limitations.append(str(compiled.rejection_reason or "operator_not_roundtripped"))
+        limitations.append(str(admission_reason or "operator_not_roundtripped"))
     return ObservedRouteActionLabel(
         normalized_reaction_smiles=normalized,
         target_smiles=canonical_product,
@@ -419,12 +444,8 @@ def build_observed_route_action_label(
         realization_verified=bool(strategy_verified and exact_verified),
         operator_roundtrip_verified=roundtrip,
         search_eligible=bool(site_verified or retained_verified),
-        operator_admission_stage=(
-            "accepted" if roundtrip else compiled.rejection_stage or "unknown"
-        ),
-        operator_admission_reason=(
-            None if roundtrip else str(compiled.rejection_reason or "unknown_rejection")
-        ),
+        operator_admission_stage=admission_stage,
+        operator_admission_reason=(None if roundtrip else str(admission_reason)),
         limitations=tuple(dict.fromkeys(limitations)),
         policy_definition_id=resolved.definition_id,
     )

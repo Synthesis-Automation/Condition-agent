@@ -20,7 +20,7 @@ SULFONAMIDE_FORMATION = (
 def test_policy_is_versioned_and_rejects_only_declared_review_reasons() -> None:
     policy = load_observed_route_action_label_policy()
 
-    assert policy.definition_id == "observed_route_action_label.v1@1.0"
+    assert policy.definition_id == "observed_route_action_label.v1@1.1"
     assert policy.allowed_review_reasons == ("not_all_edits_graph_checked",)
     assert "active_atom_mapping_complete" in policy.required_passed_checks
 

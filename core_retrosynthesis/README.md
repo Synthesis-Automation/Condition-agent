@@ -106,7 +106,7 @@ Replay observed route actions through the validated single-step operator ladder:
 python -m core_retrosynthesis evaluate-route-actions `
   datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.random50.tree.v2.jsonl.gz `
   results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
-  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_labels.v2.jsonl.gz `
+  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_labels.v3.jsonl.gz `
   --labels-only --workers 8 --overwrite
 ```
 
@@ -115,6 +115,34 @@ synthon, exact-precursor, strategy, realization, and executable-operator evidenc
 Candidate replay is optional; returned alternatives are validated but remain
 unchosen alternatives rather than asserted negatives. See
 [`../docs/new/route_action_replay_benchmark_design_and_status.md`](../docs/new/route_action_replay_benchmark_design_and_status.md).
+
+For long label or replay jobs, partition routes by stable identity and resume
+only manifest-validated shards:
+
+```powershell
+python -m core_retrosynthesis evaluate-route-actions SOURCE LIBRARY PART `
+  --labels-only --workers 8 --shard-count 16 --shard-index 0 --resume
+
+python -m core_retrosynthesis merge-route-action-shards MERGED PARTS...
+```
+
+The strict merger requires a complete, compatible shard set, verifies each
+checksum and route assignment, rejects duplicates, and writes deterministic
+route order. The complete 5,000-route labels audit contains 18,647 steps:
+18,280 retained-edit labels, 18,078 synthon labels, 18,307 exact-precursor
+labels, 13,099 STRAT1 labels, and 1,201 independently executable operators.
+
+Render a stratified review of labels promoted beyond strict operator admission:
+
+```powershell
+python -m core_retrosynthesis render-route-action-review `
+  results/core_retrosynthesis/route_action_evaluation/routes.poc.full5000.action_labels.v3.jsonl.gz `
+  results/core_retrosynthesis/route_reviews/higher_level_routes_promoted_action_labels_v3.html `
+  --sample-size 120
+```
+
+Review decisions and notes persist in browser storage and export as JSON. A
+chemist accepting a route label does not admit an executable template.
 
 ## Representation
 

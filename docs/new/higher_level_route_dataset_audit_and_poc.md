@@ -210,11 +210,20 @@ This leaves candidate generation and chemistry validation deterministic while
 using data to learn which valid action is strategically preferable.
 
 This first experiment now separates route-learning labels from executable
-operator admission. On the random 50-route sample, 184 of 188 steps have
-verified retained-edit, synthon, and exact-precursor labels; 139 have full
-SITE1/STRAT1 labels; 18 independently pass executable-operator round trip. No
-operator admission threshold was relaxed. Design and audit details live in
+operator admission. Across all 5,000 routes, 18,280 of 18,647 steps have
+verified retained-edit labels, 18,078 have synthon labels, 18,307 have exact
+precursors, and 13,099 have full STRAT1 labels; 1,201 independently pass
+executable-operator round trip. No operator admission threshold was relaxed.
+The labels were extracted through 16 stable, resumable route-ID shards and
+strictly merged with zero rejected routes. Design and audit details live in
 `docs/new/route_action_replay_benchmark_design_and_status.md`.
+
+A 120-step stratified chemist review of the 17,079 labels promoted beyond
+strict operator admission is available at
+`results/core_retrosynthesis/route_reviews/higher_level_routes_promoted_action_labels_v3.html`.
+It samples across core quality, annotation, departing-edit descriptor, and
+STRAT1-versus-retained-only evidence while preserving local review decisions
+and notes.
 
 ## Required cleanup after the POC
 
