@@ -139,3 +139,59 @@ def test_recipe_compatibility_is_audited_not_presented_as_yield() -> None:
     assert result.candidates[0].recipe_evidence.evaluated
     assert result.candidates[0].recipe_evidence.compatible
     assert result.candidates[0].recipe_evidence.score is not None
+
+
+def test_bromoaniline_self_coupling_is_an_explicit_competing_pathway() -> None:
+    library = _library(
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+    )
+
+    included = predict_products("Brc1ccc(N)cc1", library)
+    excluded = predict_products(
+        "Brc1ccc(N)cc1",
+        library,
+        include_self_reactions=False,
+    )
+
+    assert tuple(item.product_smiles for item in included.candidates) == (
+        "Nc1ccc(Nc2ccc(Br)cc2)cc1",
+    )
+    candidate = included.candidates[0]
+    assert candidate.uses_virtual_copies is True
+    assert candidate.reactant_stoichiometry == ((0, 2),)
+    assert candidate.score_components["virtual_copy_penalty"] == -0.05
+    assert included.self_reactions_considered is True
+    assert included.diagnostics.self_reaction_pathway_count == 2
+    assert (
+        "SELF_REACTION_PATHWAYS_ASSUME_MULTIPLE_EQUIVALENTS_OF_ONE_INPUT"
+        in included.warnings
+    )
+    assert excluded.self_reactions_considered is False
+    assert excluded.candidates == ()
+
+
+def test_transition_metal_profile_favors_structural_cross_coupling_evidence() -> None:
+    library = _library(
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+    )
+
+    baseline = predict_products("Brc1ccc(N)cc1", library)
+    palladium = predict_products(
+        "Brc1ccc(N)cc1",
+        library,
+        condition_profile={
+            "strategy": "transition_metal_catalysis",
+            "catalyst_family": "palladium",
+        },
+    )
+
+    evidence = palladium.candidates[0].condition_profile_evidence
+    assert palladium.condition_profile_supplied is True
+    assert palladium.condition_profile.catalyst_family == "palladium"
+    assert evidence.evaluated is True
+    assert evidence.score_adjustment == 0.12
+    assert evidence.matched_rules == ("transition_metal_cross_coupling",)
+    assert palladium.candidates[0].score == round(
+        baseline.candidates[0].score + 0.12,
+        8,
+    )

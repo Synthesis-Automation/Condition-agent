@@ -23,6 +23,11 @@ from reactive_taxonomy import (
 )
 
 from .library import indexed_forward_operators
+from .condition_profiles import (
+    ForwardConditionProfile,
+    assess_condition_profile,
+    normalize_condition_profile,
+)
 from .models import (
     ForwardCompetitionGroup,
     ForwardOperatorLibrary,
@@ -138,6 +143,7 @@ def _validated_seed(
     outcome: Any,
     recipe: Mapping[str, Any] | None,
     assessor: RecipeAssessorProtocol | None,
+    condition_profile: ForwardConditionProfile,
 ) -> tuple[_CandidateSeed | None, str | None]:
     if not reverse_recovers_precursors(operator, outcome):
         return None, "reverse_round_trip"
@@ -186,6 +192,30 @@ def _validated_seed(
     structural_components = dict(raw_components)
     structural_components["recipe_compatibility"] = None
     structural_score, _ = weighted_forward_score(structural_components, policy)
+    virtual_copy_penalty = (
+        policy.virtual_copy_score_penalty if outcome.uses_virtual_copies else 0.0
+    )
+    condition_profile_evidence = assess_condition_profile(
+        observed_tokens,
+        condition_profile,
+    )
+    score = round(
+        max(
+            0.0,
+            min(
+                1.0,
+                score
+                - virtual_copy_penalty
+                + condition_profile_evidence.score_adjustment,
+            ),
+        ),
+        8,
+    )
+    structural_score = max(0.0, structural_score - virtual_copy_penalty)
+    contributions["virtual_copy_penalty"] = -virtual_copy_penalty
+    contributions["condition_profile_adjustment"] = (
+        condition_profile_evidence.score_adjustment
+    )
     signature = analysis.reaction_signature
     pathway_id = _digest(
         "FWP1",
@@ -193,7 +223,7 @@ def _validated_seed(
         outcome.application_id,
         signature.signature_id,
     )
-    warnings = tuple(sorted(set(analysis.warnings)))
+    warnings = tuple(sorted(set((*analysis.warnings, *outcome.warnings))))
     candidate = ForwardProductCandidate(
         rank=0,
         product_smiles=outcome.product_smiles,
@@ -208,6 +238,8 @@ def _validated_seed(
         participating_component_indices=outcome.participating_component_indices,
         participating_precursor_smiles=outcome.participating_precursor_smiles,
         assignment=outcome.assignment,
+        reactant_stoichiometry=outcome.reactant_stoichiometry,
+        uses_virtual_copies=outcome.uses_virtual_copies,
         atom_correspondence=outcome.atom_correspondence,
         score=score,
         score_components=contributions,
@@ -240,6 +272,7 @@ def _validated_seed(
             )
         ),
         recipe_evidence=recipe_evidence,
+        condition_profile_evidence=condition_profile_evidence,
         named_annotations=operator.named_annotations,
         warnings=warnings,
     )
@@ -318,6 +351,8 @@ def predict_products(
     recipe_assessor: RecipeAssessorProtocol | None = None,
     operator_ids: tuple[str, ...] = (),
     levels: tuple[str, ...] = (),
+    include_self_reactions: bool = True,
+    condition_profile: Mapping[str, Any] | ForwardConditionProfile | None = None,
     top_k: int = 20,
     max_operators_to_apply: int = 300,
     max_assignments_per_operator: int = 128,
@@ -335,12 +370,17 @@ def predict_products(
         < 1
     ):
         raise ValueError("forward search limits must be positive")
+    normalized_profile = normalize_condition_profile(condition_profile)
+    condition_profile_supplied = normalized_profile != ForwardConditionProfile()
     canonical = canonical_molecule_collection(starting_materials)
     if canonical is None:
         return ForwardPredictionResult(
             query_starting_materials=starting_materials,
             canonical_starting_materials="",
             conditions_supplied=recipe is not None,
+            condition_profile_supplied=condition_profile_supplied,
+            condition_profile=normalized_profile,
+            self_reactions_considered=include_self_reactions,
             valid=False,
             status="invalid_query",
             candidates=(),
@@ -354,7 +394,11 @@ def predict_products(
     allowed_levels = set(levels)
     retrieved = tuple(
         operator
-        for operator in indexed_forward_operators(canonical, library)
+        for operator in indexed_forward_operators(
+            canonical,
+            library,
+            allow_self_reaction=include_self_reactions,
+        )
         if (
             not allowed_operators
             or operator.operator_id in allowed_operators
@@ -379,6 +423,7 @@ def predict_products(
             canonical,
             max_assignments=max_assignments_per_operator,
             max_outcomes=max_outcomes_per_operator,
+            allow_self_reaction=include_self_reactions,
         )
         if outcomes:
             counters["applied"] += 1
@@ -389,22 +434,20 @@ def predict_products(
                 outcome,
                 recipe,
                 recipe_assessor,
+                normalized_profile,
             )
             if rejection:
                 counters[rejection] += 1
             elif seed is not None:
                 seeds.append(seed)
+                if seed.candidate.uses_virtual_copies:
+                    counters["self_reaction_pathway"] += 1
     seeds.sort(
         key=lambda item: (
             policy.level_rank(item.candidate.abstraction_level),
-            item.candidate.structural_score_band,
-            -(
-                item.candidate.recipe_evidence.score
-                if item.candidate.recipe_evidence.score is not None
-                else -1.0
-            ),
-            -item.structural_score,
             -item.candidate.score,
+            item.candidate.structural_score_band,
+            -item.structural_score,
             item.candidate.product_smiles,
             item.candidate.pathway_id,
         )
@@ -443,13 +486,8 @@ def predict_products(
     representatives.sort(
         key=lambda item: (
             policy.level_rank(item.abstraction_level),
-            item.structural_score_band,
-            -(
-                item.recipe_evidence.score
-                if item.recipe_evidence.score is not None
-                else -1.0
-            ),
             -item.score,
+            item.structural_score_band,
             item.product_smiles,
         )
     )
@@ -468,17 +506,25 @@ def predict_products(
         operator_edit_mismatch_count=counters["operator_edit_mismatch"],
         recipe_conflict_count=counters["recipe_conflict"],
         valid_pathway_count=len(seeds),
+        self_reaction_pathway_count=counters["self_reaction_pathway"],
         unique_product_count=len(by_product),
     )
     warnings = []
     if recipe is None:
         warnings.append("CONDITIONS_NOT_SUPPLIED_PRODUCTS_ARE_POSSIBILITIES")
+    if counters["self_reaction_pathway"]:
+        warnings.append(
+            "SELF_REACTION_PATHWAYS_ASSUME_MULTIPLE_EQUIVALENTS_OF_ONE_INPUT"
+        )
     if not candidates:
         warnings.append("NO_FORWARD_PRODUCT_GENERATED")
     return ForwardPredictionResult(
         query_starting_materials=starting_materials,
         canonical_starting_materials=canonical,
         conditions_supplied=recipe is not None,
+        condition_profile_supplied=condition_profile_supplied,
+        condition_profile=normalized_profile,
+        self_reactions_considered=include_self_reactions,
         valid=True,
         status="predicted" if candidates else "no_supported_product",
         candidates=candidates,
@@ -514,6 +560,8 @@ def assess_proposed_step(
     recipe_assessor: RecipeAssessorProtocol | None = None,
     operator_hint: str | None = None,
     levels: tuple[str, ...] = (),
+    include_self_reactions: bool = True,
+    condition_profile: Mapping[str, Any] | ForwardConditionProfile | None = None,
     top_k: int = 20,
 ) -> RouteStepForwardAssessment:
     """Audit a route step using separate targeted and target-blind passes."""
@@ -525,6 +573,8 @@ def assess_proposed_step(
         recipe=recipe,
         recipe_assessor=recipe_assessor,
         levels=levels,
+        include_self_reactions=include_self_reactions,
+        condition_profile=condition_profile,
         top_k=top_k,
     )
     if canonical_target is None or "." in canonical_target:
@@ -554,7 +604,11 @@ def assess_proposed_step(
     elif hinted:
         targeted_matches = []
         for operator in hinted:
-            for outcome in apply_forward_operator(operator, starting_materials):
+            for outcome in apply_forward_operator(
+                operator,
+                starting_materials,
+                allow_self_reaction=include_self_reactions,
+            ):
                 if _match_kind(canonical_target, outcome.product_smiles) != "absent":
                     targeted_matches.append(outcome)
         targeted_status = (

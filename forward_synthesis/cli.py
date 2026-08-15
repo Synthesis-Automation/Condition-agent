@@ -34,6 +34,30 @@ def _recipe(path: str | None) -> Mapping[str, Any] | None:
     return value
 
 
+def _condition_profile(arguments: Any) -> Mapping[str, str] | None:
+    value = {
+        "strategy": arguments.condition_strategy,
+        "redox_mode": arguments.redox_mode,
+        "medium": arguments.medium,
+        "catalyst_family": arguments.catalyst_family,
+    }
+    if value == {
+        "strategy": "unspecified",
+        "redox_mode": "neutral",
+        "medium": "neutral",
+        "catalyst_family": "unspecified",
+    }:
+        return None
+    return value
+
+
+def _add_condition_profile_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--condition-strategy", default="unspecified")
+    parser.add_argument("--redox-mode", default="neutral")
+    parser.add_argument("--medium", default="neutral")
+    parser.add_argument("--catalyst-family", default="unspecified")
+
+
 def _rows(path: str | Path) -> tuple[Mapping[str, Any], ...]:
     source = Path(path)
     if source.suffix.casefold() in {".json", ".gz"}:
@@ -70,6 +94,8 @@ def build_parser() -> argparse.ArgumentParser:
     predict.add_argument("starting_materials")
     predict.add_argument("--recipe")
     predict.add_argument("--top-k", type=int, default=20)
+    predict.add_argument("--no-self-reactions", action="store_true")
+    _add_condition_profile_arguments(predict)
 
     assess = commands.add_parser(
         "assess-step",
@@ -81,6 +107,8 @@ def build_parser() -> argparse.ArgumentParser:
     assess.add_argument("--recipe")
     assess.add_argument("--operator-hint")
     assess.add_argument("--top-k", type=int, default=20)
+    assess.add_argument("--no-self-reactions", action="store_true")
+    _add_condition_profile_arguments(assess)
 
     evaluate = commands.add_parser(
         "evaluate",
@@ -120,6 +148,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             arguments.starting_materials,
             library,
             recipe=recipe,
+            include_self_reactions=not arguments.no_self_reactions,
+            condition_profile=_condition_profile(arguments),
             top_k=arguments.top_k,
         )
     else:
@@ -129,6 +159,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             library,
             recipe=recipe,
             operator_hint=arguments.operator_hint,
+            include_self_reactions=not arguments.no_self_reactions,
+            condition_profile=_condition_profile(arguments),
             top_k=arguments.top_k,
         )
     print(json.dumps(result.to_dict(), indent=2, sort_keys=True))

@@ -7,10 +7,15 @@ from typing import Any, Dict, Literal, Optional, Tuple
 
 from reactive_taxonomy import BidirectionalReactionOperator, OperatorAtomCorrespondence
 
+from .condition_profiles import (
+    ForwardConditionProfile,
+    ForwardConditionProfileEvidence,
+)
+
 
 FORWARD_LIBRARY_SCHEMA_VERSION = "1.0"
-FORWARD_PREDICTION_SCHEMA_VERSION = "1.0"
-FORWARD_ROUTE_ASSESSMENT_SCHEMA_VERSION = "1.0"
+FORWARD_PREDICTION_SCHEMA_VERSION = "1.2"
+FORWARD_ROUTE_ASSESSMENT_SCHEMA_VERSION = "1.2"
 
 ForwardDisposition = Literal[
     "clear",
@@ -92,6 +97,8 @@ class ForwardProductCandidate:
     participating_component_indices: Tuple[int, ...]
     participating_precursor_smiles: str
     assignment: Tuple[int, ...]
+    reactant_stoichiometry: Tuple[Tuple[int, int], ...]
+    uses_virtual_copies: bool
     atom_correspondence: Tuple[OperatorAtomCorrespondence, ...]
     score: float
     score_components: Dict[str, float]
@@ -106,6 +113,7 @@ class ForwardProductCandidate:
     precedent_reaction_ids: Tuple[str, ...]
     precedent_reference_ids: Tuple[str, ...]
     recipe_evidence: ForwardRecipeEvidence
+    condition_profile_evidence: ForwardConditionProfileEvidence
     alternative_pathway_ids: Tuple[str, ...] = ()
     alternative_operator_ids: Tuple[str, ...] = ()
     alternative_template_ids: Tuple[str, ...] = ()
@@ -131,6 +139,7 @@ class ForwardSearchDiagnostics:
     operator_edit_mismatch_count: int = 0
     recipe_conflict_count: int = 0
     valid_pathway_count: int = 0
+    self_reaction_pathway_count: int = 0
     unique_product_count: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
@@ -158,6 +167,9 @@ class ForwardPredictionResult:
     query_starting_materials: str
     canonical_starting_materials: str
     conditions_supplied: bool
+    condition_profile_supplied: bool
+    condition_profile: ForwardConditionProfile
+    self_reactions_considered: bool
     valid: bool
     status: str
     candidates: Tuple[ForwardProductCandidate, ...]
@@ -165,7 +177,7 @@ class ForwardPredictionResult:
     diagnostics: ForwardSearchDiagnostics
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    ranking_definition_id: str = "forward_ranking.v1"
+    ranking_definition_id: str = "forward_ranking.v3"
     schema_version: str = FORWARD_PREDICTION_SCHEMA_VERSION
 
     def to_dict(self) -> Dict[str, Any]:

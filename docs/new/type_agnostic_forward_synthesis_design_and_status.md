@@ -44,8 +44,11 @@ No new-system package imports legacy `chemtools`.
    product and reverse application recovers its contributing precursors.
 3. Build a conservative precursor index from component counts and necessary
    fixed elements.
-4. Enumerate all injective matches between precursor templates and supplied
-   components. Unmatched input components remain explicit nonparticipants.
+4. Enumerate matches between precursor templates and supplied components.
+   Ordinary assignments remain injective; the optional self-reaction mode may
+   assign one bifunctional input to multiple template roles as explicitly
+   traced virtual stoichiometric copies. Unmatched inputs remain explicit
+   nonparticipants.
 5. Apply the graph transformation with RDKit and reject unsanitizable products.
 6. Re-featurize each generated reaction through `reactive_taxonomy`.
 7. Require a reaction signature, verified reaction core, generating edit-token
@@ -56,8 +59,34 @@ No new-system package imports legacy `chemtools`.
    preserve alternative operator/template pathway identities.
 
 The current ranking definition is
-[`forward_ranking.v1.json`](../../forward_synthesis/definitions/forward_ranking.v1.json).
+[`forward_ranking.v3.json`](../../forward_synthesis/definitions/forward_ranking.v3.json).
 Its score is explicitly an uncalibrated deterministic priority.
+
+Version 3 applies a small disclosed score penalty to virtual-copy pathways and
+accepts bounded adjustments from
+[`condition_profiles.v1.json`](../../forward_synthesis/definitions/condition_profiles.v1.json).
+This preserves self-coupling as a competing possibility without silently
+assuming that multiple equivalents were actually supplied. Condition-profile
+adjustments are traced separately and never admit an invalid graph outcome.
+
+## Condition input layers
+
+Forward prediction supports two intentionally different condition inputs:
+
+1. A coarse `ForwardConditionProfile` records reaction strategy, catalyst
+   family, redox environment, and acidic/basic medium. It is convenient but is
+   not a resolved recipe.
+2. A canonical condition-registry recipe identifies actual substances and can
+   trigger hard compatibility rules. It remains the expert input.
+
+The profile catalog includes transition-metal catalysis, metal-free polar,
+radical, photochemical, and thermal strategies; neutral/oxidative/reductive
+environments; neutral/acidic/basic media; and common transition-metal families.
+Only structure-supported rules affect ranking. For example, transition-metal
+catalysis favors a validated heavy-bond formation accompanied by C–halogen
+cleavage, while a catalyst-family choice is recorded but never treated as proof
+of product formation. Radical and photochemical selections carry an uncertainty
+notice when net edits cannot establish the mechanism.
 
 ## Public contracts
 
@@ -96,6 +125,10 @@ route.
 - Named reaction families never generate or admit a candidate.
 - Missing conditions mean that returned products are possibilities, not a major
   product prediction.
+- Self-reaction candidates assume multiple equivalents of the repeated input.
+  They carry source-component stoichiometry, distinct molecular-instance atom
+  provenance, a warning, and a ranking penalty; they are not intramolecular
+  reactions.
 - Recipe compatibility is neither a yield estimate nor proof of product
   formation.
 - Patent and literature rows usually report one isolated product. Generated
@@ -122,6 +155,14 @@ The local workbench exposes Forward synthesis as a first-class analysis mode at
 `POST /api/v1/forward-synthesis`. Starting materials are required; intended
 product, retrosynthesis operator hint, resolved recipe, broad L0 fallback, result
 count, and Full/Compact operator-library mode are explicit request fields.
+Intermolecular self-reactions are enabled by default and can be disabled
+explicitly.
+
+The workbench obtains its category labels from
+`GET /api/v1/forward-synthesis/condition-profiles`. The routine form exposes the
+coarse profile; canonical recipe JSON is retained under Advanced options as an
+expert override. Candidate details show the exact rule, score adjustment, and
+caution produced by the selected profile.
 
 Without an intended product the response contains blind predictions. With an
 intended product it also contains a separate route-step assessment while keeping

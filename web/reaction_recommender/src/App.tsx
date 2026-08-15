@@ -7,6 +7,7 @@ import type {
   DiscoveryResult,
   FeatureAnalysisResult,
   ForwardSynthesisResult,
+  ForwardConditionProfileCatalog,
   MultistepRetrosynthesisResult,
   RankingProfile,
   RecommendationResult,
@@ -69,13 +70,20 @@ function App() {
   const [intendedProduct, setIntendedProduct] = useState('')
   const [forwardOperatorHint, setForwardOperatorHint] = useState('')
   const [forwardRecipeText, setForwardRecipeText] = useState('')
+  const [includeSelfReactions, setIncludeSelfReactions] = useState(true)
+  const [forwardConditionCatalog, setForwardConditionCatalog] = useState<ForwardConditionProfileCatalog | null>(null)
+  const [forwardStrategy, setForwardStrategy] = useState('unspecified')
+  const [forwardRedoxMode, setForwardRedoxMode] = useState('neutral')
+  const [forwardMedium, setForwardMedium] = useState('neutral')
+  const [forwardCatalystFamily, setForwardCatalystFamily] = useState('unspecified')
   const retrosynthesisRun = useRef(0)
 
   useEffect(() => {
-    Promise.all([api.capabilities(), api.rankingProfiles()])
-      .then(([nextCapabilities, nextProfiles]) => {
+    Promise.all([api.capabilities(), api.rankingProfiles(), api.forwardConditionProfiles()])
+      .then(([nextCapabilities, nextProfiles, conditionCatalog]) => {
         setCapabilities(nextCapabilities)
         setProfiles(nextProfiles)
+        setForwardConditionCatalog(conditionCatalog)
         setUseRxnmapper(nextCapabilities.rxnmapper_available)
       })
       .catch((nextError) => setError(`Local API unavailable: ${friendlyError(nextError)}`))
@@ -337,6 +345,13 @@ function App() {
         library_mode: libraryMode,
         top_k: topK,
         include_l0: includeL0,
+        include_self_reactions: includeSelfReactions,
+        condition_profile: {
+          strategy: forwardStrategy,
+          redox_mode: forwardRedoxMode,
+          medium: forwardMedium,
+          catalyst_family: forwardCatalystFamily,
+        },
       })
       if (retrosynthesisRun.current !== runId) return
       setResult(next)
@@ -508,12 +523,13 @@ function App() {
 
             {mode === 'discovery' && <div className="inline-checks"><label><input type="checkbox" checked={includeLowYield} onChange={(event) => setIncludeLowYield(event.target.checked)} /> Include low-yield precedents</label><label><input type="checkbox" checked={includeUnreported} onChange={(event) => setIncludeUnreported(event.target.checked)} /> Include unreported outcomes</label></div>}
             {mode === 'forward_synthesis' && <div className="forward-audit-options"><label><span>Intended product <small>(optional route audit)</small></span><input type="text" value={intendedProduct} onChange={(event) => { setIntendedProduct(event.target.value); setResult(null) }} placeholder="Leave blank for blind product prediction" spellCheck={false} /></label><label><span>Retrosynthesis operator ID <small>(optional)</small></span><input type="text" value={forwardOperatorHint} onChange={(event) => setForwardOperatorHint(event.target.value)} placeholder="OP1:… or FOP1:…" spellCheck={false} /></label></div>}
+            {mode === 'forward_synthesis' && forwardConditionCatalog && <div className="forward-condition-panel"><div className="forward-condition-heading"><strong>Condition profile</strong><span>Coarse categories guide ranking without pretending to be a complete recipe.</span></div><div className="forward-condition-grid"><label><span>Reaction strategy</span><select value={forwardStrategy} onChange={(event) => { const value = event.target.value; setForwardStrategy(value); if (value !== 'transition_metal_catalysis') setForwardCatalystFamily('unspecified') }}>{forwardConditionCatalog.strategies.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label><label><span>Catalyst family</span><select value={forwardCatalystFamily} disabled={forwardStrategy !== 'transition_metal_catalysis'} onChange={(event) => setForwardCatalystFamily(event.target.value)}>{forwardConditionCatalog.catalyst_families.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label><label><span>Redox environment</span><select value={forwardRedoxMode} onChange={(event) => setForwardRedoxMode(event.target.value)}>{forwardConditionCatalog.redox_modes.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label><label><span>Medium</span><select value={forwardMedium} onChange={(event) => setForwardMedium(event.target.value)}>{forwardConditionCatalog.media.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label></div><p>{forwardConditionCatalog.strategies.find((option) => option.id === forwardStrategy)?.description}</p></div>}
 
             <details className="advanced-options"><summary>Advanced options</summary><div>
               {mode === 'recommendation' && <label><span>Minimum precedent pool</span><input type="number" min="1" max="100" placeholder="Definition default" value={minimumPoolSize ?? ''} onChange={(event) => setMinimumPoolSize(event.target.value ? Number(event.target.value) : null)} /></label>}
               {!isOperatorMode && <label className="check-option"><input type="checkbox" checked={useRxnmapper} disabled={!capabilities?.rxnmapper_available || (mode === 'features' && !reactionSmiles.includes('>'))} onChange={(event) => { setUseRxnmapper(event.target.checked); if (!event.target.checked) setForceResolvedMapping(false) }} /><span>Use RXNMapper for unresolved or ambiguous reactions</span></label>}
               {isForwardMode ? (
-                <><label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label><label className="wide-option"><span>Canonical condition recipe JSON <small>(optional)</small></span><textarea value={forwardRecipeText} onChange={(event) => setForwardRecipeText(event.target.value)} placeholder='{"bases": [{"substance_id": "…"}], "temperature_c": 80}' spellCheck={false} /></label></>
+                <><label className="check-option"><input type="checkbox" checked={includeSelfReactions} onChange={(event) => setIncludeSelfReactions(event.target.checked)} /><span>Include intermolecular self-reactions by allowing multiple equivalents of one input</span></label><label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label><label className="wide-option"><span>Expert override: canonical recipe JSON <small>(optional)</small></span><textarea value={forwardRecipeText} onChange={(event) => setForwardRecipeText(event.target.value)} placeholder='{"bases": [{"substance_id": "…"}], "temperature_c": 80}' spellCheck={false} /></label></>
               ) : isRetrosynthesisMode ? (
                 <><label className="check-option"><input type="checkbox" checked={useRetrosynthesisContext} onChange={(event) => setUseRetrosynthesisContext(event.target.checked)} /><span>Rank with local reaction-context similarity</span></label><label className="check-option"><input type="checkbox" checked={diversifyRetrosynthesis} onChange={(event) => setDiversifyRetrosynthesis(event.target.checked)} /><span>Rank SITE1 → SYN1/REAL1 with completion priors and diversify within score bands</span></label><label className="check-option"><input type="checkbox" checked={usePrecursorRealism} onChange={(event) => setUsePrecursorRealism(event.target.checked)} /><span>De-rank unlikely precursors using stock, registry, literature, and molecular weight</span></label>{mode === 'multistep_retrosynthesis' && <label className="check-option"><input type="checkbox" checked={useConditionAvailability} onChange={(event) => setUseConditionAvailability(event.target.checked)} /><span>Audit condition availability for each retained reaction and rerank routes</span></label>}<label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label></>
               ) : mode === 'features' ? (

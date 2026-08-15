@@ -425,9 +425,45 @@ export interface ForwardSynthesisRequest {
   intended_product?: string | null
   operator_hint?: string | null
   recipe?: JsonObject | null
+  condition_profile?: ForwardConditionProfile | null
   library_mode: 'full' | 'compact'
   top_k: number
   include_l0: boolean
+  include_self_reactions: boolean
+}
+
+export interface ForwardConditionProfileOption {
+  id: string
+  label: string
+  description?: string
+}
+
+export interface ForwardConditionProfileCatalog {
+  definition_id: string
+  schema_version: string
+  strategies: ForwardConditionProfileOption[]
+  redox_modes: ForwardConditionProfileOption[]
+  media: ForwardConditionProfileOption[]
+  catalyst_families: ForwardConditionProfileOption[]
+}
+
+export interface ForwardConditionProfile {
+  strategy: string
+  redox_mode: string
+  medium: string
+  catalyst_family: string
+  source?: string
+  schema_version?: string
+}
+
+export interface ForwardConditionProfileEvidence {
+  evaluated: boolean
+  profile: ForwardConditionProfile
+  score_adjustment: number
+  matched_rules: string[]
+  cautions: string[]
+  definition_id: string
+  definition_version: string
 }
 
 export interface ForwardRecipeEvidence {
@@ -447,6 +483,7 @@ export interface OperatorAtomCorrespondence {
   precursor_atom_index: number
   atom_map_number: number
   operator_map_number?: number | null
+  precursor_instance_index: number
 }
 
 export interface ForwardProductCandidate {
@@ -463,6 +500,8 @@ export interface ForwardProductCandidate {
   participating_component_indices: number[]
   participating_precursor_smiles: string
   assignment: number[]
+  reactant_stoichiometry: Array<[number, number]>
+  uses_virtual_copies: boolean
   atom_correspondence: OperatorAtomCorrespondence[]
   score: number
   score_components: Record<string, number>
@@ -477,6 +516,7 @@ export interface ForwardProductCandidate {
   precedent_reaction_ids: string[]
   precedent_reference_ids: string[]
   recipe_evidence: ForwardRecipeEvidence
+  condition_profile_evidence: ForwardConditionProfileEvidence
   alternative_pathway_ids: string[]
   alternative_operator_ids: string[]
   alternative_template_ids: string[]
@@ -496,6 +536,7 @@ export interface ForwardSearchDiagnostics {
   operator_edit_mismatch_count: number
   recipe_conflict_count: number
   valid_pathway_count: number
+  self_reaction_pathway_count: number
   unique_product_count: number
 }
 
@@ -511,6 +552,9 @@ export interface ForwardPrediction {
   query_starting_materials: string
   canonical_starting_materials: string
   conditions_supplied: boolean
+  condition_profile_supplied: boolean
+  condition_profile: ForwardConditionProfile
+  self_reactions_considered: boolean
   valid: boolean
   status: string
   candidates: ForwardProductCandidate[]

@@ -40,6 +40,7 @@ from forward_synthesis import (
     ForwardOperatorLibrary,
     assess_proposed_step,
     build_forward_library,
+    condition_profile_catalog,
     load_forward_library,
     predict_products,
 )
@@ -161,6 +162,8 @@ class WebRuntime(Protocol):
     def forward_synthesize(
         self, request: ForwardSynthesisRequest
     ) -> Dict[str, Any]: ...
+
+    def forward_condition_profiles(self) -> Dict[str, Any]: ...
 
     def retrosynthesize(
         self, request: RetrosynthesisRequest
@@ -920,6 +923,11 @@ class LocalRecommendationRuntime:
         if request.include_l0:
             levels += ("L0",)
         starting_materials = request.starting_materials.strip()
+        condition_profile = (
+            request.condition_profile.model_dump()
+            if request.condition_profile is not None
+            else None
+        )
         if request.intended_product and request.intended_product.strip():
             assessment = assess_proposed_step(
                 starting_materials,
@@ -932,6 +940,8 @@ class LocalRecommendationRuntime:
                     else None
                 ),
                 levels=levels,
+                include_self_reactions=request.include_self_reactions,
+                condition_profile=condition_profile,
                 top_k=request.top_k,
             )
             assessment_payload = assessment.to_dict()
@@ -950,6 +960,8 @@ class LocalRecommendationRuntime:
             library,
             recipe=request.recipe,
             levels=levels,
+            include_self_reactions=request.include_self_reactions,
+            condition_profile=condition_profile,
             top_k=request.top_k,
         )
         return {
@@ -961,6 +973,11 @@ class LocalRecommendationRuntime:
             "prediction": prediction_result.to_dict(),
             "assessment": None,
         }
+
+    def forward_condition_profiles(self) -> Dict[str, Any]:
+        """Expose the versioned chemist-facing condition profile catalog."""
+
+        return condition_profile_catalog()
 
     def retrosynthesis_conditions(
         self,

@@ -1,5 +1,5 @@
 {
-  "definition_id": "forward_ranking.v1",
+  "definition_id": "forward_ranking.v3",
   "schema_version": "1.0",
   "calibration_status": "deterministic_priority_not_probability",
   "weights": {
@@ -11,6 +11,8 @@
   },
   "abstraction_priority": ["L2", "L1", "RDCHIRAL", "L0"],
   "score_band_width": 0.05,
+  "virtual_copy_score_penalty": 0.05,
+  "condition_profile_adjustment_definition": "forward_condition_profiles.v1",
   "hard_requirements": [
     "sanitized_product",
     "reverse_precursor_recovery",

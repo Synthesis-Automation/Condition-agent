@@ -1,0 +1,69 @@
+{
+  "definition_id": "forward_condition_profiles.v1",
+  "schema_version": "1.0",
+  "strategies": [
+    {
+      "id": "unspecified",
+      "label": "Not specified",
+      "description": "Do not use a reaction-mechanism condition prior."
+    },
+    {
+      "id": "transition_metal_catalysis",
+      "label": "Transition-metal catalysis",
+      "description": "Favor structurally supported C–C and C–heteroatom coupling pathways with leaving-group departure."
+    },
+    {
+      "id": "metal_free_polar",
+      "label": "Metal-free polar chemistry",
+      "description": "Slightly de-emphasize classic cross-coupling patterns without excluding SNAr or substitution pathways."
+    },
+    {
+      "id": "radical",
+      "label": "Radical conditions",
+      "description": "Record a radical-mechanism hypothesis without inventing selectivity from structure alone."
+    },
+    {
+      "id": "photochemical",
+      "label": "Photochemical",
+      "description": "Record light-driven conditions; structural ranking changes only when supported by explicit rules."
+    },
+    {
+      "id": "thermal",
+      "label": "Thermal / uncatalyzed",
+      "description": "Record thermal conditions without assuming a named mechanism."
+    }
+  ],
+  "redox_modes": [
+    {"id": "neutral", "label": "Redox-neutral"},
+    {"id": "oxidative", "label": "Oxidizing"},
+    {"id": "reductive", "label": "Reducing"}
+  ],
+  "media": [
+    {"id": "neutral", "label": "Neutral / not specified"},
+    {"id": "acidic", "label": "Acidic"},
+    {"id": "basic", "label": "Basic"}
+  ],
+  "catalyst_families": [
+    {"id": "unspecified", "label": "Metal not specified"},
+    {"id": "palladium", "label": "Palladium"},
+    {"id": "nickel", "label": "Nickel"},
+    {"id": "copper", "label": "Copper"},
+    {"id": "iron", "label": "Iron"},
+    {"id": "cobalt", "label": "Cobalt"},
+    {"id": "rhodium", "label": "Rhodium"},
+    {"id": "ruthenium", "label": "Ruthenium"},
+    {"id": "iridium", "label": "Iridium"},
+    {"id": "other_transition_metal", "label": "Other transition metal"}
+  ],
+  "score_adjustments": {
+    "transition_metal_cross_coupling": 0.12,
+    "transition_metal_heavy_bond_formation": 0.04,
+    "transition_metal_no_heavy_bond_formation": -0.08,
+    "metal_free_classic_coupling_caution": -0.06,
+    "oxidative_pattern_match": 0.08,
+    "oxidative_pattern_conflict": -0.06,
+    "reductive_pattern_match": 0.08,
+    "reductive_pattern_conflict": -0.06
+  },
+  "maximum_absolute_adjustment": 0.16
+}

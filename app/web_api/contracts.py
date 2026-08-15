@@ -112,6 +112,44 @@ class RetrosynthesisRequest(StrictRequest):
     use_precursor_realism: bool = False
 
 
+class ForwardConditionProfileRequest(StrictRequest):
+    """Coarse condition intent without pretending to be a resolved recipe."""
+
+    strategy: Literal[
+        "unspecified",
+        "transition_metal_catalysis",
+        "metal_free_polar",
+        "radical",
+        "photochemical",
+        "thermal",
+    ] = "unspecified"
+    redox_mode: Literal["neutral", "oxidative", "reductive"] = "neutral"
+    medium: Literal["neutral", "acidic", "basic"] = "neutral"
+    catalyst_family: Literal[
+        "unspecified",
+        "palladium",
+        "nickel",
+        "copper",
+        "iron",
+        "cobalt",
+        "rhodium",
+        "ruthenium",
+        "iridium",
+        "other_transition_metal",
+    ] = "unspecified"
+
+    @model_validator(mode="after")
+    def catalyst_requires_metal_strategy(self) -> "ForwardConditionProfileRequest":
+        if (
+            self.catalyst_family != "unspecified"
+            and self.strategy != "transition_metal_catalysis"
+        ):
+            raise ValueError(
+                "catalyst_family requires transition_metal_catalysis strategy"
+            )
+        return self
+
+
 class ForwardSynthesisRequest(StrictRequest):
     """Predict products or audit one proposed forward route step."""
 
@@ -119,9 +157,11 @@ class ForwardSynthesisRequest(StrictRequest):
     intended_product: Optional[str] = Field(default=None, max_length=20_000)
     operator_hint: Optional[str] = Field(default=None, max_length=500)
     recipe: Optional[Dict[str, Any]] = None
+    condition_profile: Optional[ForwardConditionProfileRequest] = None
     library_mode: Literal["full", "compact"] = "compact"
     top_k: int = Field(default=10, ge=1, le=50)
     include_l0: bool = True
+    include_self_reactions: bool = True
 
     @model_validator(mode="after")
     def molecule_collections_only(self) -> "ForwardSynthesisRequest":
@@ -197,6 +237,7 @@ __all__ = [
     "CompletionChoiceRequest",
     "DiscoveryRequest",
     "FeatureAnalysisRequest",
+    "ForwardConditionProfileRequest",
     "ForwardSynthesisRequest",
     "MultistepRetrosynthesisRequest",
     "PrepareReactionRequest",

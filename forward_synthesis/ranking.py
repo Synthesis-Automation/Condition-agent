@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, Mapping, Tuple
 
 
-_PATH = Path(__file__).with_name("definitions") / "forward_ranking.v1.json"
+_PATH = Path(__file__).with_name("definitions") / "forward_ranking.v3.json"
 
 
 @dataclass(frozen=True)
@@ -22,6 +22,7 @@ class ForwardRankingPolicy:
     weights: Dict[str, float]
     abstraction_priority: Tuple[str, ...]
     score_band_width: float
+    virtual_copy_score_penalty: float
 
     def level_rank(self, level: str) -> int:
         try:
@@ -35,7 +36,7 @@ def load_forward_ranking_policy() -> ForwardRankingPolicy:
     """Load and strictly validate the forward ranking definition."""
 
     value = json.loads(_PATH.read_text(encoding="utf-8"))
-    if value.get("definition_id") != "forward_ranking.v1":
+    if value.get("definition_id") != "forward_ranking.v3":
         raise ValueError("unexpected forward ranking definition ID")
     if value.get("schema_version") != "1.0":
         raise ValueError("unsupported forward ranking definition schema")
@@ -59,13 +60,17 @@ def load_forward_ranking_policy() -> ForwardRankingPolicy:
     width = float(value.get("score_band_width") or 0.0)
     if not 0.0 < width <= 1.0:
         raise ValueError("forward score-band width must be in (0, 1]")
+    virtual_copy_penalty = float(value.get("virtual_copy_score_penalty") or 0.0)
+    if not 0.0 <= virtual_copy_penalty <= 1.0:
+        raise ValueError("virtual-copy score penalty must be in [0, 1]")
     return ForwardRankingPolicy(
-        definition_id="forward_ranking.v1",
+        definition_id="forward_ranking.v3",
         schema_version="1.0",
         calibration_status=str(value.get("calibration_status") or ""),
         weights=weights,
         abstraction_priority=priority,
         score_band_width=width,
+        virtual_copy_score_penalty=virtual_copy_penalty,
     )
 
 

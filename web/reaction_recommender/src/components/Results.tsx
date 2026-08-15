@@ -643,7 +643,10 @@ function ForwardProductDetails({
         <div><dt>Alternative pathways</dt><dd>{alternativeCount}</dd></div>
         <div><dt>Structural score band</dt><dd>{candidate.structural_score_band}</dd></div>
         <div><dt>Condition compatibility</dt><dd>{candidate.recipe_evidence.evaluated ? `${candidate.recipe_evidence.compatible ? 'Compatible' : 'Conflict'}${candidate.recipe_evidence.score == null ? '' : ` · ${candidate.recipe_evidence.score.toFixed(3)}`}` : 'Not evaluated'}</dd></div>
+        <div><dt>Condition-profile adjustment</dt><dd>{candidate.condition_profile_evidence.evaluated ? `${candidate.condition_profile_evidence.score_adjustment >= 0 ? '+' : ''}${candidate.condition_profile_evidence.score_adjustment.toFixed(3)}` : 'Not applied'}</dd></div>
         <div><dt>Participating components</dt><dd>{candidate.participating_component_indices.map((value) => value + 1).join(', ')}</dd></div>
+        <div><dt>Stoichiometric input</dt><dd>{candidate.reactant_stoichiometry.map(([index, count]) => `component ${index + 1} × ${count}`).join(' · ')}</dd></div>
+        <div><dt>Self-reaction assumption</dt><dd>{candidate.uses_virtual_copies ? 'Yes — multiple equivalents assumed' : 'No'}</dd></div>
       </dl>
       <details className="trace-panel" open>
         <summary>Ranking evidence</summary>
@@ -653,6 +656,19 @@ function ForwardProductDetails({
           ))}
         </dl>
       </details>
+      {candidate.condition_profile_evidence.evaluated && (
+        <details className="trace-panel" open>
+          <summary>Condition-profile evidence</summary>
+          <dl className="detail-list">
+            <div><dt>Strategy</dt><dd>{displayName(candidate.condition_profile_evidence.profile.strategy)}</dd></div>
+            <div><dt>Catalyst family</dt><dd>{displayName(candidate.condition_profile_evidence.profile.catalyst_family)}</dd></div>
+            <div><dt>Redox environment</dt><dd>{displayName(candidate.condition_profile_evidence.profile.redox_mode)}</dd></div>
+            <div><dt>Medium</dt><dd>{displayName(candidate.condition_profile_evidence.profile.medium)}</dd></div>
+            <div><dt>Matched rules</dt><dd>{candidate.condition_profile_evidence.matched_rules.map(displayName).join(' · ') || 'No structure-only ranking rule'}</dd></div>
+            <div><dt>Score adjustment</dt><dd>{candidate.condition_profile_evidence.score_adjustment >= 0 ? '+' : ''}{candidate.condition_profile_evidence.score_adjustment.toFixed(3)}</dd></div>
+          </dl>
+        </details>
+      )}
       <details className="trace-panel">
         <summary>Graph and operator trace</summary>
         <dl className="detail-list">
@@ -675,6 +691,7 @@ function ForwardProductDetails({
         </details>
       )}
       <MessageList title="Condition cautions" values={[...candidate.recipe_evidence.hard_conflicts, ...candidate.recipe_evidence.cautions]} tone="caution" />
+      <MessageList title="Condition-profile cautions" values={candidate.condition_profile_evidence.cautions} tone="caution" />
       <MessageList title="Prediction warnings" values={candidate.warnings} tone="caution" />
     </article>
   )
@@ -696,8 +713,8 @@ export function ForwardSynthesisResults({ result }: { result: ForwardSynthesisRe
         <div className="metric-strip">
           <div><strong>{diagnostics.unique_product_count}</strong><span>products</span></div>
           <div><strong>{diagnostics.valid_pathway_count}</strong><span>pathways</span></div>
+          <div><strong>{diagnostics.self_reaction_pathway_count}</strong><span>self pathways</span></div>
           <div><strong>{diagnostics.applied_operator_count}</strong><span>operators applied</span></div>
-          <div><strong>{result.prediction.competition_groups.length}</strong><span>competition groups</span></div>
         </div>
       </div>
       {assessment && (

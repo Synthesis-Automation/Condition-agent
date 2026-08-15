@@ -254,11 +254,19 @@ def _library_from_dict(value: Mapping[str, Any]) -> ForwardOperatorLibrary:
             raw_index.get("definition_id") or "forward_precursor_index.v1"
         ),
     )
+    operators = tuple(
+        BidirectionalReactionOperator.from_dict(item)
+        for item in value.get("operators") or ()
+    )
+    current_ids = {operator.forward_operator_id for operator in operators}
+    indexed_ids = set(index.operator_required_atomic_numbers)
+    if indexed_ids != current_ids:
+        # Directional IDs include the application-engine version. Rebuild this
+        # derived index when loading an artifact created by an older engine;
+        # the admitted chemistry and its source-round-trip evidence are intact.
+        index = build_forward_precursor_index(operators)
     return ForwardOperatorLibrary(
-        operators=tuple(
-            BidirectionalReactionOperator.from_dict(item)
-            for item in value.get("operators") or ()
-        ),
+        operators=operators,
         source_template_count=int(value.get("source_template_count") or 0),
         admitted_operator_count=int(value.get("admitted_operator_count") or 0),
         rejection_counts={
@@ -313,6 +321,8 @@ def load_forward_library(path: str | Path) -> ForwardOperatorLibrary:
 def indexed_forward_operators(
     starting_materials: str,
     library: ForwardOperatorLibrary,
+    *,
+    allow_self_reaction: bool = False,
 ) -> tuple[BidirectionalReactionOperator, ...]:
     """Retrieve operators using only conservative precursor-observable facts."""
 
@@ -333,7 +343,7 @@ def indexed_forward_operators(
         required_count,
         operator_ids,
     ) in library.precursor_index.component_count_to_operator_ids.items():
-        if required_count <= input_components:
+        if required_count <= input_components or allow_self_reaction:
             eligible_ids.update(operator_ids)
     selected = []
     for operator in library.operators:
@@ -346,10 +356,15 @@ def indexed_forward_operators(
                 (),
             )
         )
-        if any(
-            atomic_counts[number] < count for number, count in required_counts.items()
-        ):
-            continue
+        sufficient_inventory = not any(
+            atomic_counts[number] < count
+            for number, count in required_counts.items()
+        )
+        if not sufficient_inventory:
+            if not allow_self_reaction or any(
+                atomic_counts[number] < 1 for number in required_counts
+            ):
+                continue
         selected.append(operator)
     return tuple(selected)
 

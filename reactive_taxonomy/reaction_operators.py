@@ -22,7 +22,7 @@ from .chemistry.smarts_cache import compile_smarts
 
 
 REACTION_OPERATOR_SCHEMA_VERSION = "1.0"
-REACTION_OPERATOR_APPLICATION_VERSION = "reaction_operator_application.v1"
+REACTION_OPERATOR_APPLICATION_VERSION = "reaction_operator_application.v2"
 
 
 def _digest(namespace: str, *values: str) -> str:
@@ -171,6 +171,7 @@ class OperatorAtomCorrespondence:
     precursor_atom_index: int
     atom_map_number: int
     operator_map_number: Optional[int] = None
+    precursor_instance_index: int = 0
 
 
 @dataclass(frozen=True)
@@ -185,6 +186,8 @@ class OperatorApplicationOutcome:
     assignment: Tuple[int, ...]
     atom_correspondence: Tuple[OperatorAtomCorrespondence, ...]
     application_id: str
+    reactant_stoichiometry: Tuple[Tuple[int, int], ...] = ()
+    uses_virtual_copies: bool = False
     warnings: Tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
@@ -220,9 +223,12 @@ def _candidate_assignments(
     components: Sequence[tuple[str, Any]],
     *,
     max_assignments: int,
+    allow_self_reaction: bool,
 ) -> tuple[tuple[int, ...], ...]:
     template_count = int(reaction.GetNumReactantTemplates())
-    if template_count < 1 or template_count > len(components):
+    if template_count < 1 or (
+        template_count > len(components) and not allow_self_reaction
+    ):
         return ()
     matches: list[tuple[int, ...]] = []
     for template_index in range(template_count):
@@ -236,10 +242,29 @@ def _candidate_assignments(
             return ()
         matches.append(matching)
     assignments = []
+    injective_signatures = set()
     for assignment in itertools.product(*matches):
         if len(set(assignment)) != len(assignment):
             continue
-        assignments.append(tuple(int(index) for index in assignment))
+        normalized = tuple(int(index) for index in assignment)
+        assignments.append(normalized)
+        injective_signatures.add(
+            tuple(components[index][0] for index in normalized)
+        )
+        if len(assignments) >= max_assignments:
+            return tuple(assignments)
+    if not allow_self_reaction:
+        return tuple(assignments)
+    for assignment in itertools.product(*matches):
+        if len(set(assignment)) == len(assignment):
+            continue
+        normalized = tuple(int(index) for index in assignment)
+        molecular_signature = tuple(
+            components[index][0] for index in normalized
+        )
+        if molecular_signature in injective_signatures:
+            continue
+        assignments.append(normalized)
         if len(assignments) >= max_assignments:
             break
     return tuple(assignments)
@@ -251,27 +276,35 @@ def apply_reaction_smarts(
     *,
     max_assignments: int = 256,
     max_outcomes: int = 1024,
+    allow_self_reaction: bool = False,
 ) -> Tuple[OperatorApplicationOutcome, ...]:
-    """Apply reaction SMARTS to all deterministic compatible component tuples."""
+    """Apply reaction SMARTS to deterministic compatible component tuples.
+
+    When ``allow_self_reaction`` is true, one supplied component may fill more
+    than one reactant-template role.  Each repeated role is treated as a
+    separate stoichiometric molecular instance, while correspondence retains
+    the original user-supplied component index.
+    """
 
     if min(max_assignments, max_outcomes) < 1:
         raise ValueError("application limits must be positive")
     reaction = _compiled_reaction(reaction_smarts)
     components = _component_molecules(starting_materials)
-    atom_maps = {}
-    next_map = 1
-    for component_index, (_, molecule) in enumerate(components):
-        for atom in molecule.GetAtoms():
-            atom_maps[(component_index, int(atom.GetIdx()))] = next_map
-            next_map += 1
     assignments = _candidate_assignments(
         reaction,
         components,
         max_assignments=max_assignments,
+        allow_self_reaction=allow_self_reaction,
     )
     outcomes: dict[tuple[str, tuple[int, ...]], OperatorApplicationOutcome] = {}
     for assignment in assignments:
-        reactants = tuple(components[index][1] for index in assignment)
+        reactants = tuple(Chem.Mol(components[index][1]) for index in assignment)
+        atom_maps = {}
+        next_map = 1
+        for reactant_position, molecule in enumerate(reactants):
+            for atom in molecule.GetAtoms():
+                atom_maps[(reactant_position, int(atom.GetIdx()))] = next_map
+                next_map += 1
         try:
             generated = reaction.RunReactants(reactants)
         except Exception:
@@ -293,7 +326,7 @@ def apply_reaction_smarts(
                         precursor_component_index = assignment[reactant_position]
                         precursor_atom_index = int(atom.GetProp("react_atom_idx"))
                         map_number = atom_maps[
-                            (precursor_component_index, precursor_atom_index)
+                            (reactant_position, precursor_atom_index)
                         ]
                         operator_map_number = (
                             int(atom.GetProp("old_mapno"))
@@ -309,6 +342,7 @@ def apply_reaction_smarts(
                                 precursor_atom_index=precursor_atom_index,
                                 atom_map_number=map_number,
                                 operator_map_number=operator_map_number,
+                                precursor_instance_index=reactant_position,
                             )
                         )
                     mapped_product_parts.append(
@@ -339,13 +373,15 @@ def apply_reaction_smarts(
             mapped_product_smiles = ".".join(sorted(mapped_product_parts))
             indices = tuple(sorted(set(assignment)))
             precursor_smiles = ".".join(
-                sorted(components[index][0] for index in indices)
+                sorted(components[index][0] for index in assignment)
             )
             mapped_precursor_parts = []
-            for component_index in indices:
+            for reactant_position, component_index in enumerate(assignment):
                 precursor = Chem.Mol(components[component_index][1])
                 for atom in precursor.GetAtoms():
-                    atom.SetAtomMapNum(atom_maps[(component_index, int(atom.GetIdx()))])
+                    atom.SetAtomMapNum(
+                        atom_maps[(reactant_position, int(atom.GetIdx()))]
+                    )
                 mapped_precursor_parts.append(
                     Chem.MolToSmiles(
                         precursor,
@@ -354,6 +390,13 @@ def apply_reaction_smarts(
                     )
                 )
             mapped_precursor_smiles = ".".join(sorted(mapped_precursor_parts))
+            stoichiometry = tuple(
+                sorted(
+                    (component_index, assignment.count(component_index))
+                    for component_index in set(assignment)
+                )
+            )
+            uses_virtual_copies = any(count > 1 for _, count in stoichiometry)
             key = (product_smiles, indices)
             outcomes[key] = OperatorApplicationOutcome(
                 product_smiles=product_smiles,
@@ -379,6 +422,13 @@ def apply_reaction_smarts(
                     json.dumps(assignment),
                     REACTION_OPERATOR_APPLICATION_VERSION,
                 ),
+                reactant_stoichiometry=stoichiometry,
+                uses_virtual_copies=uses_virtual_copies,
+                warnings=(
+                    ("SELF_REACTION_USES_VIRTUAL_STOICHIOMETRIC_COPIES",)
+                    if uses_virtual_copies
+                    else ()
+                ),
             )
             if len(outcomes) >= max_outcomes:
                 break
@@ -402,6 +452,7 @@ def apply_forward_operator(
     *,
     max_assignments: int = 256,
     max_outcomes: int = 1024,
+    allow_self_reaction: bool = False,
 ) -> Tuple[OperatorApplicationOutcome, ...]:
     """Apply one admitted operator from precursors to possible products."""
 
@@ -410,6 +461,7 @@ def apply_forward_operator(
         starting_materials,
         max_assignments=max_assignments,
         max_outcomes=max_outcomes,
+        allow_self_reaction=allow_self_reaction,
     )
 
 

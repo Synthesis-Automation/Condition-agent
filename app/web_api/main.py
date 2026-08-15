@@ -161,6 +161,10 @@ def create_app(
             ) from exc
         return envelope(data)
 
+    @app.get("/api/v1/forward-synthesis/condition-profiles")
+    def forward_condition_profiles(request: Request) -> dict[str, Any]:
+        return envelope(active_runtime(request).forward_condition_profiles())
+
     @app.post("/api/v1/retrosynthesis/conditions")
     def retrosynthesis_conditions(
         payload: RetrosynthesisConditionsRequest,

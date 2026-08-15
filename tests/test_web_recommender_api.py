@@ -45,6 +45,18 @@ class FakeRuntime:
             },
         )
 
+    def forward_condition_profiles(self) -> Dict[str, Any]:
+        return {
+            "definition_id": "forward_condition_profiles.v1",
+            "schema_version": "1.0",
+            "strategies": [{"id": "unspecified", "label": "Not specified"}],
+            "redox_modes": [{"id": "neutral", "label": "Redox-neutral"}],
+            "media": [{"id": "neutral", "label": "Neutral"}],
+            "catalyst_families": [
+                {"id": "unspecified", "label": "Metal not specified"}
+            ],
+        }
+
     def prepare_reaction(self, reaction_smiles: str) -> Dict[str, Any]:
         if reaction_smiles == "invalid":
             raise ValueError("INVALID_REACTION")
@@ -319,6 +331,10 @@ def test_local_runtime_forward_synthesis_forwards_audit_options(
             intended_product=" CCN ",
             operator_hint=" OP1:test ",
             recipe={"temperature_c": 80},
+            condition_profile={
+                "strategy": "transition_metal_catalysis",
+                "catalyst_family": "palladium",
+            },
             library_mode="compact",
             include_l0=False,
             top_k=7,
@@ -330,6 +346,11 @@ def test_local_runtime_forward_synthesis_forwards_audit_options(
     assert captured["library"] is library
     assert captured["operator_hint"] == "OP1:test"
     assert captured["recipe"] == {"temperature_c": 80}
+    assert captured["include_self_reactions"] is True
+    assert captured["condition_profile"]["strategy"] == (
+        "transition_metal_catalysis"
+    )
+    assert captured["condition_profile"]["catalyst_family"] == "palladium"
     assert "L0" not in captured["levels"]
     assert captured["top_k"] == 7
     assert payload["analysis_mode"] == "step_assessment"
@@ -728,6 +749,15 @@ def test_health_and_capabilities_are_versioned() -> None:
     assert capabilities.json()["data"]["index_available"] is True
 
 
+def test_forward_condition_profile_catalog_is_versioned() -> None:
+    response = client().get("/api/v1/forward-synthesis/condition-profiles")
+
+    assert response.status_code == 200
+    assert response.json()["data"]["definition_id"] == (
+        "forward_condition_profiles.v1"
+    )
+
+
 def test_multistep_retrosynthesis_contract_forwards_bounded_options() -> None:
     response = client().post(
         "/api/v1/retrosynthesis/routes",
@@ -878,6 +908,7 @@ def test_forward_synthesis_contract_supports_blind_prediction_and_step_audit() -
             "library_mode": "compact",
             "top_k": 7,
             "include_l0": False,
+            "include_self_reactions": False,
         },
     )
     audit = web.post(

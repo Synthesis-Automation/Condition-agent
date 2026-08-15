@@ -56,6 +56,16 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
   retrosynthesis operator ID to audit a proposed route step against target-blind
   competing pathways. A canonical condition-recipe JSON object can be supplied
   to apply hard compatibility checks before ranking.
+- Include or exclude intermolecular self-reactions. When enabled, a
+  bifunctional input can occupy multiple operator roles as separate assumed
+  equivalents; these pathways are labelled, stoichiometrically traced, and
+  modestly penalized rather than treated as ordinary single-equivalent paths.
+- Select a structured condition profile instead of writing JSON: reaction
+  strategy, transition-metal family, redox environment, and medium are loaded
+  from a versioned backend catalog. Every structural ranking adjustment and
+  uncertainty notice appears in the candidate evidence. Canonical recipe JSON
+  remains available under Advanced options for expert, substance-resolved
+  compatibility checks.
 - Inspect forward graph-validation evidence, alternative operator/template
   pathways, competition groups, atom correspondence, source support, and route
   audit disposition, or export the complete result as JSON.

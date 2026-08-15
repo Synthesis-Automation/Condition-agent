@@ -7,6 +7,7 @@ import type {
   FeatureAnalysisResult,
   ForwardSynthesisRequest,
   ForwardSynthesisResult,
+  ForwardConditionProfileCatalog,
   MultistepRetrosynthesisRequest,
   MultistepRetrosynthesisResult,
   PrepareReactionResult,
@@ -92,6 +93,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(request),
     }),
+
+  forwardConditionProfiles: () =>
+    jsonRequest<ForwardConditionProfileCatalog>('/forward-synthesis/condition-profiles'),
 
   retrosynthesize: (request: RetrosynthesisRequest) =>
     jsonRequest<RetrosynthesisResult>('/retrosynthesis', {

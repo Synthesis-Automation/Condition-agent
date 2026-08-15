@@ -145,6 +145,13 @@ input::placeholder, textarea::placeholder { color: #94a198; }
 .forward-audit-options { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin-top: 12px; }
 .forward-audit-options label { display: flex; min-width: 0; flex-direction: column; gap: 6px; color: #385646; font-size: .75rem; font-weight: 750; }
 .forward-audit-options small { color: #718078; font-weight: 500; }
+.forward-condition-panel { margin-top: 12px; padding: 12px; border: 1px solid #cbdacf; border-radius: 10px; background: #f4f8f5; }
+.forward-condition-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+.forward-condition-heading strong { color: #28533e; font-size: .78rem; }
+.forward-condition-heading span, .forward-condition-panel > p { color: #6c7d73; font-size: .69rem; line-height: 1.4; }
+.forward-condition-panel > p { margin-top: 8px; }
+.forward-condition-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; }
+.forward-condition-grid label { display: flex; min-width: 0; flex-direction: column; gap: 5px; color: #385646; font-size: .7rem; font-weight: 750; }
 .inline-checks label, .check-option { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 7px !important; cursor: pointer; }
 .inline-checks input, .check-option input { width: 15px; height: 15px; flex: 0 0 auto; margin: 1px 0 0; accent-color: #256c4e; }
 .advanced-options { margin-top: 13px; border-top: 1px solid #e0e7e2; color: #536b5e; }
@@ -362,6 +369,7 @@ footer { padding: 4px 4px 0; color: #77877e; font-size: .7rem; text-align: cente
   .editor-action-layout { grid-template-columns: 1fr; }
   .analysis-workbench .option-grid { grid-template-columns: 1fr; }
   .forward-audit-options { grid-template-columns: 1fr; }
+  .forward-condition-grid { grid-template-columns: 1fr 1fr; }
   .reaction-main-input label { grid-template-columns: 1fr; gap: 5px; }
   .smiles-actions { flex-direction: row; align-items: center; }
   .option-grid.feature-options { grid-template-columns: 1fr; }
@@ -387,6 +395,7 @@ footer { padding: 4px 4px 0; color: #77877e; font-size: .7rem; text-align: cente
   .section-heading { flex-direction: column; }
   .editor-frame { height: 470px; min-height: 400px; }
   .joined-control { grid-template-columns: 1fr; }
+  .forward-condition-grid { grid-template-columns: 1fr; }
   .smiles-actions { align-items: stretch; flex-direction: column; }
   .detail-title-row { flex-direction: column; }
   .score-orbit { width: auto; height: auto; align-self: stretch; flex-direction: row; gap: 5px; padding: 8px; border-radius: 9px; }
