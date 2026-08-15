@@ -1,0 +1,79 @@
+{
+  "panel_id": "multistep_familiar_target_panel.v1@1.0",
+  "schema_version": "1.0",
+  "description": "Small chemist-readable panel for qualitative multistep planner review.",
+  "targets": [
+    {
+      "target_id": "acetanilide",
+      "name": "Acetanilide",
+      "category": "amide",
+      "smiles": "CC(=O)Nc1ccccc1"
+    },
+    {
+      "target_id": "paracetamol",
+      "name": "Paracetamol",
+      "category": "amide",
+      "smiles": "CC(=O)Nc1ccc(O)cc1"
+    },
+    {
+      "target_id": "aspirin",
+      "name": "Aspirin",
+      "category": "ester",
+      "smiles": "CC(=O)Oc1ccccc1C(=O)O"
+    },
+    {
+      "target_id": "benzocaine",
+      "name": "Benzocaine",
+      "category": "ester",
+      "smiles": "CCOC(=O)c1ccc(N)cc1"
+    },
+    {
+      "target_id": "ethyl_benzoate",
+      "name": "Ethyl benzoate",
+      "category": "ester",
+      "smiles": "CCOC(=O)c1ccccc1"
+    },
+    {
+      "target_id": "benzyl_benzoate",
+      "name": "Benzyl benzoate",
+      "category": "ester",
+      "smiles": "O=C(OCc1ccccc1)c1ccccc1"
+    },
+    {
+      "target_id": "anisole",
+      "name": "Anisole",
+      "category": "ether",
+      "smiles": "COc1ccccc1"
+    },
+    {
+      "target_id": "diphenyl_ether",
+      "name": "Diphenyl ether",
+      "category": "ether",
+      "smiles": "c1ccc(Oc2ccccc2)cc1"
+    },
+    {
+      "target_id": "biphenyl",
+      "name": "Biphenyl",
+      "category": "biaryl",
+      "smiles": "c1ccc(-c2ccccc2)cc1"
+    },
+    {
+      "target_id": "four_methylbiphenyl",
+      "name": "4-Methylbiphenyl",
+      "category": "biaryl",
+      "smiles": "Cc1ccc(-c2ccccc2)cc1"
+    },
+    {
+      "target_id": "benzenesulfonamide",
+      "name": "Benzenesulfonamide",
+      "category": "sulfonamide",
+      "smiles": "NS(=O)(=O)c1ccccc1"
+    },
+    {
+      "target_id": "tosylanilide",
+      "name": "N-Phenyl-p-toluenesulfonamide",
+      "category": "sulfonamide",
+      "smiles": "Cc1ccc(S(=O)(=O)Nc2ccccc2)cc1"
+    }
+  ]
+}

@@ -214,14 +214,20 @@ patents and close chemistry analogues.
 
 ## Interpretation and next gate
 
-The supervision contract is now broad enough for a route-policy POC. Before
-training:
+The first route-policy POC is implemented. A bounded 50-route replay yielded 81
+listwise choice sets and exercised deterministic training, serialization, CLI
+loading, and multistep ranking. Only five examples belonged to validation, so
+the versioned safety gate selected a zero residual and the artifact has zero
+planner influence. See `docs/new/multistep_route_action_policy_poc.md`.
+
+The next gate is to:
 
 1. complete chemist decisions in the generated promoted-label review;
 2. rebuild an evaluation library excluding route patents and close analogues;
-3. replay leakage-controlled evaluation shards with a frozen search budget;
-4. train a confidence-weighted or positive-unlabeled action reranker;
-5. evaluate next-action recovery and whole-route search outcomes; and
+3. replay larger leakage-controlled shards with a frozen search budget;
+4. require a sufficiently populated held-out validation split before activation;
+5. evaluate next-action recovery and whole-route search outcomes on untouched
+   test routes; and
 6. keep deterministic candidate generation and forward validation authoritative.
 
 The 45 observations without product-site identity can still supervise retained

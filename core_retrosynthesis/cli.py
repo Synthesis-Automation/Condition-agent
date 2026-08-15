@@ -52,6 +52,10 @@ from .route_action_conversion import (
     merge_route_action_shards,
 )
 from .route_action_evaluation import RouteActionEvaluationConfig
+from .route_action_policy import (
+    load_route_action_policy,
+    train_route_action_policy_from_replay,
+)
 from .route_review import DEFAULT_ROUTE_REVIEW_SEED, write_route_review_html
 from .route_core_review import (
     DEFAULT_ROUTE_CORE_REVIEW_SEED,
@@ -366,6 +370,10 @@ def _parser() -> argparse.ArgumentParser:
     route_search.add_argument("--no-diversity", action="store_true")
     route_search.add_argument("--no-hierarchical-ranking", action="store_true")
     route_search.add_argument(
+        "--route-action-policy",
+        help="optional learned policy over already validated one-step actions",
+    )
+    route_search.add_argument(
         "--allow-untyped-literature-terminals",
         action="store_true",
         help=(
@@ -524,6 +532,15 @@ def _parser() -> argparse.ArgumentParser:
         "--title", default="Promoted route-action label review"
     )
 
+    route_policy = commands.add_parser(
+        "train-route-action-policy",
+        help="train a listwise multistep action policy from replay choices",
+    )
+    route_policy.add_argument("source_replay")
+    route_policy.add_argument("output_model")
+    route_policy.add_argument("--report")
+    route_policy.add_argument("--overwrite", action="store_true")
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -678,6 +695,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             sample_size=arguments.sample_size,
             seed=arguments.seed,
             title=arguments.title,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "train-route-action-policy":
+        report = train_route_action_policy_from_replay(
+            arguments.source_replay,
+            arguments.output_model,
+            report_path=arguments.report,
+            overwrite=arguments.overwrite,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
@@ -945,6 +971,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 use_hierarchical_ranking=not arguments.no_hierarchical_ranking,
                 allow_untyped_literature_terminals=(
                     arguments.allow_untyped_literature_terminals
+                ),
+                route_action_policy=(
+                    load_route_action_policy(arguments.route_action_policy)
+                    if arguments.route_action_policy
+                    else None
                 ),
             )
         print(json.dumps(result.to_dict(), indent=2, sort_keys=True))

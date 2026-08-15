@@ -966,3 +966,28 @@ different branches from collapsing. `route_postprocessing` exposes stable tree
 IDs and a deterministic multiset-Jaccard distance matrix, providing a canonical
 contract for route clustering and diversity selection without changing the
 chemistry-first cost ranking in this release.
+
+### Optional precedent-route action policy
+
+Candidate replay from observed route trees can train a deterministic listwise
+policy over validated single-step actions. It is a residual over the existing
+candidate order: it cannot generate candidates, bypass graph validation, or
+change terminal-material rules. Exact operator/template/precursor identities
+are excluded from the default features, and an artifact has zero planner
+influence until its held-out validation population satisfies the versioned
+activation gate.
+
+```powershell
+python -m core_retrosynthesis train-route-action-policy REPLAY MODEL `
+  --report REPORT --overwrite
+
+python -m core_retrosynthesis plan-routes LIBRARY STOCK_INDEX TARGET `
+  --route-action-policy MODEL
+```
+
+Planner JSON includes the model and definition IDs, residual scale, activation
+status, per-step policy diagnostics, and the number of reordered expansions.
+The current 50-route artifact is an inactive end-to-end POC because it contains
+only five validation choice sets. See
+`docs/new/multistep_route_action_policy_poc.md` for design, metrics, artifacts,
+and the next evidence gate.

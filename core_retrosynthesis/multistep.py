@@ -20,6 +20,7 @@ from .generic_models import (
 from .generic_search import disconnect_operator_ladder_detailed
 from .hierarchical_ranking import build_completion_prior_index
 from .multistep_ranking import load_multistep_ranking_policy
+from .route_action_policy import RouteActionPolicyModel
 from .route_tree import (
     CanonicalRouteTree,
     build_canonical_route_tree,
@@ -32,7 +33,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.4"
+MULTISTEP_SCHEMA_VERSION = "1.5"
 _TERMINAL_STOCK_ROLES = frozenset(
     {
         "reactant",
@@ -109,6 +110,9 @@ class RetrosynthesisRouteStep:
     product_node_id: str = ""
     precursor_node_ids: tuple[str, ...] = ()
     condition_evidence: Optional[RetrosynthesisConditionEvidence] = None
+    route_policy_probability: Optional[float] = None
+    route_policy_rank: Optional[int] = None
+    original_candidate_rank: Optional[int] = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible route step."""
@@ -128,6 +132,9 @@ class RetrosynthesisRouteStep:
                 if self.condition_evidence is not None
                 else None
             ),
+            "route_policy_probability": self.route_policy_probability,
+            "route_policy_rank": self.route_policy_rank,
+            "original_candidate_rank": self.original_candidate_rank,
         }
 
 
@@ -216,6 +223,8 @@ class MultistepSearchDiagnostics:
     beam_pruned_states: int = 0
     dead_end_states: int = 0
     expansion_level_calls: tuple[tuple[str, int], ...] = ()
+    route_policy_scored_actions: int = 0
+    route_policy_reordered_expansions: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -236,6 +245,10 @@ class MultistepRetrosynthesisResult:
     ranking_policy_definition_id: str
     precursor_realism_enabled: bool = False
     condition_availability_enabled: bool = False
+    route_action_policy_model_id: Optional[str] = None
+    route_action_policy_definition_id: Optional[str] = None
+    route_action_policy_residual_scale: Optional[float] = None
+    route_action_policy_active: bool = False
     schema_version: str = MULTISTEP_SCHEMA_VERSION
 
     def to_dict(self) -> dict[str, Any]:
@@ -260,6 +273,18 @@ class MultistepRetrosynthesisResult:
                 "Condition availability reports precedent support for each "
                 "retained reaction; it does not guarantee route execution."
             )
+        if self.route_action_policy_model_id:
+            if self.route_action_policy_active:
+                warnings.append(
+                    "The learned route-action policy only reorders validated "
+                    "single-step candidates; it does not establish feasibility."
+                )
+            else:
+                warnings.append(
+                    "The route-action model is loaded for audit but has zero "
+                    "planner influence because held-out activation criteria "
+                    "were not satisfied."
+                )
         return {
             "target_smiles": self.target_smiles,
             "routes": [route.to_dict() for route in self.routes],
@@ -270,6 +295,14 @@ class MultistepRetrosynthesisResult:
             "ranking_policy_definition_id": (self.ranking_policy_definition_id),
             "precursor_realism_enabled": self.precursor_realism_enabled,
             "condition_availability_enabled": self.condition_availability_enabled,
+            "route_action_policy_model_id": self.route_action_policy_model_id,
+            "route_action_policy_definition_id": (
+                self.route_action_policy_definition_id
+            ),
+            "route_action_policy_residual_scale": (
+                self.route_action_policy_residual_scale
+            ),
+            "route_action_policy_active": self.route_action_policy_active,
             "schema_version": self.schema_version,
             "route_postprocessing": {
                 "definition_id": "route_distance_multiset_jaccard.v1",
@@ -517,6 +550,9 @@ def _step_cost(
     candidate: GenericDisconnectionCandidate,
     candidate_rank: int,
     child_leaves: tuple[_Leaf, ...],
+    *,
+    route_policy_probability: Optional[float] = None,
+    route_policy_weight: float = 0.0,
 ) -> tuple[float, tuple[tuple[str, float], ...]]:
     policy = load_multistep_ranking_policy()
     components = {
@@ -563,6 +599,11 @@ def _step_cost(
             else 0.0
         ),
         "candidate_rank_tiebreak": (policy.candidate_rank_tiebreak * candidate_rank),
+        "route_policy_probability_deficit": (
+            route_policy_weight * max(0.0, 1.0 - route_policy_probability)
+            if route_policy_probability is not None
+            else 0.0
+        ),
     }
     normalized = tuple((name, round(value, 8)) for name, value in components.items())
     return round(sum(value for _, value in normalized), 8), normalized
@@ -867,6 +908,7 @@ def plan_multistep_routes(
     minimum_candidates_per_level: int | None = None,
     precursor_realism_scorer: PrecursorRealismScorer | None = None,
     condition_evidence_evaluator: ConditionEvidenceEvaluator | None = None,
+    route_action_policy: RouteActionPolicyModel | None = None,
     expander: OneStepExpander | None = None,
 ) -> MultistepRetrosynthesisResult:
     """Find short routes whose leaves pass the explicit terminal predicate."""
@@ -986,6 +1028,8 @@ def plan_multistep_routes(
     beam_pruned_states = 0
     dead_end_states = 0
     expansion_level_calls: dict[str, int] = {}
+    route_policy_scored_actions = 0
+    route_policy_reordered_expansions = 0
 
     while queue and expanded_states < max_expansions:
         _, _, state = heapq.heappop(queue)
@@ -1072,7 +1116,33 @@ def plan_multistep_routes(
             ] = partial
             continue
 
-        for candidate_rank, candidate in enumerate(candidates, start=1):
+        if route_action_policy is not None:
+            policy_assessments = route_action_policy.rank_candidates(
+                product,
+                candidates,
+                retrosynthetic_depth=leaf.assessment.depth,
+            )
+            route_policy_scored_actions += len(policy_assessments)
+            if tuple(item.original_rank for item in policy_assessments) != tuple(
+                range(1, len(policy_assessments) + 1)
+            ):
+                route_policy_reordered_expansions += 1
+            candidate_entries = tuple(
+                (
+                    item.candidate,
+                    item.probability,
+                    item.policy_rank,
+                    item.original_rank,
+                )
+                for item in policy_assessments
+            )
+        else:
+            candidate_entries = tuple(
+                (candidate, None, rank, rank)
+                for rank, candidate in enumerate(candidates, 1)
+            )
+
+        for candidate, policy_probability, candidate_rank, original_rank in candidate_entries:
             if candidate.forward_validation_status != "verified_signature":
                 rejected_invalid += 1
                 continue
@@ -1133,6 +1203,12 @@ def plan_multistep_routes(
                 candidate,
                 candidate_rank,
                 normalized_child_leaves,
+                route_policy_probability=policy_probability,
+                route_policy_weight=(
+                    route_action_policy.planner_probability_deficit_weight
+                    if route_action_policy is not None
+                    else 0.0
+                ),
             )
             step = RetrosynthesisRouteStep(
                 step_id=step_id,
@@ -1144,6 +1220,13 @@ def plan_multistep_routes(
                 candidate=candidate,
                 product_node_id=leaf.assessment.route_node_id,
                 precursor_node_ids=tuple(precursor_node_ids),
+                route_policy_probability=policy_probability,
+                route_policy_rank=(
+                    candidate_rank if route_action_policy is not None else None
+                ),
+                original_candidate_rank=(
+                    original_rank if route_action_policy is not None else None
+                ),
             )
             next_leaves = list(state.leaves)
             next_leaves[leaf_index : leaf_index + 1] = child_leaves
@@ -1317,6 +1400,8 @@ def plan_multistep_routes(
         beam_pruned_states=beam_pruned_states,
         dead_end_states=dead_end_states,
         expansion_level_calls=tuple(sorted(expansion_level_calls.items())),
+        route_policy_scored_actions=route_policy_scored_actions,
+        route_policy_reordered_expansions=route_policy_reordered_expansions,
     )
     return MultistepRetrosynthesisResult(
         target_smiles=target.canonical_smiles,
@@ -1328,6 +1413,24 @@ def plan_multistep_routes(
         ranking_policy_definition_id=ranking_policy.definition_id,
         precursor_realism_enabled=precursor_realism_scorer is not None,
         condition_availability_enabled=condition_evidence_evaluator is not None,
+        route_action_policy_model_id=(
+            route_action_policy.model_id if route_action_policy is not None else None
+        ),
+        route_action_policy_definition_id=(
+            route_action_policy.definition.definition_id
+            if route_action_policy is not None
+            else None
+        ),
+        route_action_policy_residual_scale=(
+            route_action_policy.residual_scale
+            if route_action_policy is not None
+            else None
+        ),
+        route_action_policy_active=(
+            route_action_policy.planner_probability_deficit_weight > 0.0
+            if route_action_policy is not None
+            else False
+        ),
     )
 
 

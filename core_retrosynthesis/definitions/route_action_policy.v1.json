@@ -1,0 +1,39 @@
+{
+  "definition_id": "route_action_policy.v1@1.2",
+  "schema_version": "1.0",
+  "feature_dimension": 4096,
+  "l2_penalty": 0.001,
+  "epochs": 250,
+  "learning_rate": 0.08,
+  "strategy_equivalent_label_strength": 0.7,
+  "planner_probability_deficit_weight": 0.6,
+  "baseline_rank_logit_weight": 0.5,
+  "validation_residual_scales": [
+    0.0,
+    0.1,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "minimum_validation_examples_for_activation": 20,
+  "product_fingerprint_radius": 2,
+  "product_fingerprint_size": 256,
+  "feature_groups": [
+    "existing_candidate_rank",
+    "structural_score_band",
+    "candidate_score_bin",
+    "strategic_complexity_bin",
+    "strategic_class",
+    "abstraction_level",
+    "precursor_compatibility",
+    "independent_reference_support_bin",
+    "retrosynthetic_depth",
+    "product_morgan_bits"
+  ],
+  "notes": [
+    "Training is listwise over validated alternatives returned by single-step replay.",
+    "Unchosen candidates are relative preference alternatives, not asserted chemical negatives.",
+    "The model only reranks candidates that already passed deterministic graph validation.",
+    "A learned residual has zero planner influence until the held-out activation sample is large enough."
+  ]
+}
