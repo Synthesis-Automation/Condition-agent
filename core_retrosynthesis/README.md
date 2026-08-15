@@ -991,3 +991,8 @@ The current 50-route artifact is an inactive end-to-end POC because it contains
 only five validation choice sets. See
 `docs/new/multistep_route_action_policy_poc.md` for design, metrics, artifacts,
 and the next evidence gate.
+
+The same status document links a 12-target familiar-chemistry comparison panel.
+The reusable `multistep_panel_review` module renders baseline and policy routes
+side by side with inline reaction drawings, search diagnostics, filters,
+persistent accept/question/reject decisions, notes, and review JSON export.

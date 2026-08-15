@@ -206,6 +206,13 @@ from .multistep_ranking import (
     MultistepRankingPolicy,
     load_multistep_ranking_policy,
 )
+from .multistep_panel_review import (
+    MultistepPanelCase,
+    MultistepPanelTarget,
+    load_multistep_panel_targets,
+    render_multistep_panel_html,
+    write_multistep_panel_artifacts,
+)
 from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
@@ -281,6 +288,8 @@ __all__ = [
     "MultistepRetrosynthesisRoute",
     "MultistepRouteEvidenceSummary",
     "MultistepRankingPolicy",
+    "MultistepPanelCase",
+    "MultistepPanelTarget",
     "MultistepSearchDiagnostics",
     "OneStepExpansionBatch",
     "CanonicalRouteTree",
@@ -382,6 +391,7 @@ __all__ = [
     "load_precursor_compatibility_policy",
     "load_retrosynthesis_ranking_policy",
     "load_multistep_ranking_policy",
+    "load_multistep_panel_targets",
     "iter_library_rows",
     "merge_operator_shards",
     "plan_multistep_routes",
@@ -417,6 +427,7 @@ __all__ = [
     "render_route_review_html",
     "render_route_core_review_html",
     "render_route_action_review_html",
+    "render_multistep_panel_html",
     "evaluate_route_actions",
     "evaluate_route_action_policy",
     "evaluate_route_action_baseline",
@@ -429,6 +440,7 @@ __all__ = [
     "write_route_review_html",
     "write_route_core_review_html",
     "write_route_action_review_html",
+    "write_multistep_panel_artifacts",
     "train_route_action_policy_from_replay",
     "validate_route_tree",
     "validate_route_core_projection",

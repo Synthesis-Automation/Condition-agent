@@ -1,0 +1,57 @@
+{
+  "panel_id": "multistep_complex_route_panel.v1@1.0",
+  "schema_version": "1.0",
+  "description": "Eight heavy-atom-rich targets with three-step observed precedents selected from the deterministic random-50 route sample.",
+  "source": "results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_replay.bounded.v3.jsonl.gz",
+  "selection": "reaction_count=3, maximum_depth=3, descending target heavy-atom count",
+  "targets": [
+    {
+      "target_id": "US06355640B1_575699",
+      "name": "US06355640B1_575699 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "CN(CC(=O)O)C(=O)CC1=C(n2nc(-c3c(-c4ccccc4)nn4ccccc34)ccc2=O)CCCC1"
+    },
+    {
+      "target_id": "US07282608B2_728111",
+      "name": "US07282608B2_728111 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "Cc1ccc(S(=O)(=O)NCC=Cc2ccc(C(=O)Nc3ccccc3NC(=O)OC(C)(C)C)cc2)cc1"
+    },
+    {
+      "target_id": "US04904652_745379",
+      "name": "US04904652_745379 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "O=C(CON=C(C(=O)O)c1csc(NC(=O)C(F)(F)F)n1)OC(c1ccccc1)c1ccccc1"
+    },
+    {
+      "target_id": "US05869483_243813",
+      "name": "US05869483_243813 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "O=C(Nc1ccc(C(=O)N2Cc3ccccc3Cc3ccccc32)cc1)c1cc(Cl)cc(Cl)c1Cl"
+    },
+    {
+      "target_id": "US07572817B2_834112",
+      "name": "US07572817B2_834112 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "CN(CCc1ccccc1)C(=O)c1cccc(CCC(S)C(Cc2ccc(N)nc2)C(=O)O)c1"
+    },
+    {
+      "target_id": "US05093363_888610",
+      "name": "US05093363_888610 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "CC(C)(C)OC(=O)C[C@H]1C[C@@H](CSc2cc(C(C)(C)C)c(O)c(C(C)(C)C)c2)OC(C)(C)O1"
+    },
+    {
+      "target_id": "US05650428_254323",
+      "name": "US05650428_254323 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "O=C(O)CCCCCCNC(=O)C(COc1cccnc1)NS(=O)(=O)c1ccc(Cl)cc1"
+    },
+    {
+      "target_id": "US08822471B2_181981",
+      "name": "US08822471B2_181981 · observed 3-step route",
+      "category": "observed_3_step",
+      "smiles": "Cc1nccn1-c1ccc(C(=O)N(C2CC2)C2CCN(c3nc(C(C)C)no3)CC2)cc1"
+    }
+  ]
+}

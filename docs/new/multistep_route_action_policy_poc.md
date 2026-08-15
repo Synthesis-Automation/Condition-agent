@@ -151,3 +151,65 @@ efficiency, route diversity, and chemist preference on test routes.
 The 5,000-route labels remain useful positive supervision, but training against
 planner choices requires replayed alternatives. Scaling replay and excluding
 source-patent or close-analogue precedents are therefore the next data tasks.
+
+## Familiar-target qualitative panel
+
+A reproducible 12-target panel now covers amides, esters, ethers, biaryls, and
+sulfonamides. Baseline and policy searches use the same depth-two budget and
+display the top three solved or bounded partial routes side by side:
+
+```text
+results/core_retrosynthesis/route_reviews/
+  multistep_familiar_targets_policy_poc.html
+  multistep_familiar_targets_policy_poc.json
+```
+
+All 12 targets returned at least one solved route. The inactive policy scored
+candidate actions but changed zero route rankings, matching its zero-influence
+contract. Static verification found 12 target cards, 70 displayed route cards,
+82 inline SVGs, 12 review controls, and no drawing failures.
+
+The review also exposes the current planner's main qualitative weakness:
+forward graph validity is not equivalent to synthetic plausibility. The top
+acetanilide, ethyl benzoate, benzyl benzoate, diphenyl ether, and biaryl routes
+are recognizable disconnections. Several paracetamol, aspirin, benzocaine, and
+sulfonamide suggestions are graph-valid but mechanistically or strategically
+questionable. These examples should be retained as regression targets for
+precursor-role compatibility and precedent-route ranking rather than removed
+from the panel.
+
+The panel definition is versioned at
+`core_retrosynthesis/definitions/multistep_familiar_target_panel.v1.json`, and
+`core_retrosynthesis.multistep_panel_review` owns its validation, deterministic
+JSON serialization, self-contained HTML rendering, persistent review notes,
+filters, and review export.
+
+### Complex observed-route stress panel
+
+The simple familiar-target panel mostly terminates after one reaction. A second
+panel therefore selects the eight heaviest targets with exactly three-step
+precedents from the deterministic random-50 route sample. Three steps is also
+the current planner's maximum supported depth, so every reference is in scope:
+
+```text
+results/core_retrosynthesis/route_reviews/
+  multistep_complex_observed50_depth3_review.html
+  multistep_complex_observed50_depth3_review.json
+```
+
+The review places the unmapped observed precedent beside the planner's top
+solved or bounded partial routes. With a fixed budget of four actions per step,
+15 beam states, 100 proposed templates per expansion, and 20 forward-validation
+attempts, four of eight targets produced solved routes. Four returned only
+partial routes. Every target consumed the 15-expansion budget.
+
+Across displayed routes, exact observed STRAT1 identities were recovered for
+only two targets (three strategy identities total). This does not mean the
+other proposed routes are invalid, but it shows that the current action order
+and bounded search rarely follow the recorded strategy. The panel is therefore
+a better benchmark for route-action learning than the one-step familiar set.
+
+The deterministic selection is versioned in
+`core_retrosynthesis/definitions/multistep_complex_route_panel.v1.json`. These
+eight targets should remain fixed while replay scale, action ranking, and search
+allocation are improved.
