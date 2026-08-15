@@ -49,6 +49,7 @@ from .route_core_conversion import (
 from .route_action_conversion import (
     DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
     convert_route_action_corpus,
+    iter_route_action_evaluations,
     merge_route_action_shards,
 )
 from .route_action_evaluation import RouteActionEvaluationConfig
@@ -56,6 +57,13 @@ from .route_action_policy import (
     load_route_action_policy,
     train_route_action_policy_from_replay,
 )
+from .route_policy_calibration import (
+    RoutePolicyCalibrationConfig,
+    build_route_policy_calibration_targets,
+    calibrate_route_action_policy,
+    save_route_policy_calibration,
+)
+from .multistep_panel_review import load_multistep_panel_targets
 from .route_review import DEFAULT_ROUTE_REVIEW_SEED, write_route_review_html
 from .route_core_review import (
     DEFAULT_ROUTE_CORE_REVIEW_SEED,
@@ -541,6 +549,34 @@ def _parser() -> argparse.ArgumentParser:
     route_policy.add_argument("--report")
     route_policy.add_argument("--overwrite", action="store_true")
 
+    route_policy_calibration = commands.add_parser(
+        "calibrate-route-action-policy",
+        help="freeze learned policy influence using whole-route validation",
+    )
+    route_policy_calibration.add_argument("source_replay")
+    route_policy_calibration.add_argument("library")
+    route_policy_calibration.add_argument("stock_index")
+    route_policy_calibration.add_argument("input_model")
+    route_policy_calibration.add_argument("validation_panel")
+    route_policy_calibration.add_argument("output_model")
+    route_policy_calibration.add_argument("--report")
+    route_policy_calibration.add_argument("--max-depth", type=int, default=3)
+    route_policy_calibration.add_argument(
+        "--molecular-weight-threshold", type=float, default=80.0
+    )
+    route_policy_calibration.add_argument("--top-k-routes", type=int, default=3)
+    route_policy_calibration.add_argument("--per-step-top-k", type=int, default=4)
+    route_policy_calibration.add_argument("--beam-width", type=int, default=15)
+    route_policy_calibration.add_argument("--max-expansions", type=int, default=15)
+    route_policy_calibration.add_argument("--max-templates", type=int, default=100)
+    route_policy_calibration.add_argument(
+        "--max-candidates-to-validate", type=int, default=20
+    )
+    route_policy_calibration.add_argument(
+        "--minimum-validation-targets", type=int, default=5
+    )
+    route_policy_calibration.add_argument("--overwrite", action="store_true")
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -703,6 +739,57 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             arguments.source_replay,
             arguments.output_model,
             report_path=arguments.report,
+            overwrite=arguments.overwrite,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "calibrate-route-action-policy":
+        panel_targets = load_multistep_panel_targets(arguments.validation_panel)
+        calibration_targets = build_route_policy_calibration_targets(
+            iter_route_action_evaluations(arguments.source_replay),
+            tuple(target.target_id for target in panel_targets),
+        )
+        panel_smiles = {target.target_id: target.smiles for target in panel_targets}
+        for target in calibration_targets:
+            if panel_smiles[target.route_id] != target.target_smiles:
+                raise ValueError(
+                    f"calibration panel target contradicts replay: {target.route_id}"
+                )
+        loaded_library = load_generic_library(arguments.library)
+        input_model = load_route_action_policy(arguments.input_model)
+        with open_stock_lookup(arguments.stock_index) as stock_index:
+            calibrated_model, calibration_report = calibrate_route_action_policy(
+                input_model,
+                calibration_targets,
+                loaded_library,
+                stock_index,
+                config=RoutePolicyCalibrationConfig(
+                    max_depth=arguments.max_depth,
+                    molecular_weight_threshold=(
+                        arguments.molecular_weight_threshold
+                    ),
+                    top_k_routes=arguments.top_k_routes,
+                    per_step_top_k=arguments.per_step_top_k,
+                    beam_width=arguments.beam_width,
+                    max_expansions=arguments.max_expansions,
+                    max_templates_to_apply=arguments.max_templates,
+                    max_candidates_to_validate=(
+                        arguments.max_candidates_to_validate
+                    ),
+                    minimum_validation_targets=(
+                        arguments.minimum_validation_targets
+                    ),
+                ),
+                progress=lambda message: print(message, flush=True),
+            )
+        report_path = arguments.report or f"{arguments.output_model}.calibration.json"
+        report = save_route_policy_calibration(
+            calibrated_model,
+            calibration_report,
+            arguments.output_model,
+            report_path,
+            source_replay=arguments.source_replay,
+            input_model=arguments.input_model,
             overwrite=arguments.overwrite,
         )
         print(json.dumps(report, indent=2, sort_keys=True))

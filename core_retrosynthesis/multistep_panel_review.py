@@ -77,7 +77,12 @@ def load_multistep_panel_targets(
         raise ValueError("unsupported multistep target-panel schema")
     panel_id = str(value.get("panel_id") or "")
     if not panel_id.startswith(
-        ("multistep_familiar_target_panel.v1@", "multistep_complex_route_panel.v1@")
+        (
+            "multistep_familiar_target_panel.v1@",
+            "multistep_complex_route_panel.v1@",
+            "multistep_route_policy_test_panel.v1@",
+            "multistep_route_policy_validation_panel.v1@",
+        )
     ):
         raise ValueError("unexpected multistep target-panel identity")
     targets = tuple(

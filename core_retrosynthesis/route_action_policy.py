@@ -50,6 +50,7 @@ class RouteActionPolicyDefinition:
     baseline_rank_logit_weight: float
     validation_residual_scales: tuple[float, ...]
     minimum_validation_examples_for_activation: int
+    exclude_source_patent_precedent_overlap: bool
     product_fingerprint_radius: int
     product_fingerprint_size: int
     feature_groups: tuple[str, ...]
@@ -111,6 +112,9 @@ def load_route_action_policy_definition() -> RouteActionPolicyDefinition:
         ),
         minimum_validation_examples_for_activation=int(
             value["minimum_validation_examples_for_activation"]
+        ),
+        exclude_source_patent_precedent_overlap=bool(
+            value["exclude_source_patent_precedent_overlap"]
         ),
         product_fingerprint_radius=int(value["product_fingerprint_radius"]),
         product_fingerprint_size=int(value["product_fingerprint_size"]),
@@ -247,6 +251,11 @@ def build_route_policy_examples(
                 RoutePolicyCandidate.from_replay_candidate(candidate)
                 for candidate in step.candidates
             )
+            if policy.exclude_source_patent_precedent_overlap and any(
+                candidate.source_patent_precedent_overlap
+                for candidate in candidates
+            ):
+                continue
             exact = tuple(
                 candidate.candidate_id
                 for candidate in candidates
@@ -701,6 +710,11 @@ class RouteActionPolicyModel:
             float(item)
             for item in raw_definition.get("validation_residual_scales") or ()
         )
+        # Schema 1.1 artifacts written before definition v1@1.3 did not own an
+        # overlap filter. Preserve their serialized behavior when loading them.
+        raw_definition.setdefault(
+            "exclude_source_patent_precedent_overlap", False
+        )
         definition = RouteActionPolicyDefinition(**raw_definition)
         weights = [0.0] * definition.feature_dimension
         for raw_index, raw_weight in value.get("sparse_weights") or ():
@@ -875,7 +889,9 @@ def train_route_action_policy_from_replay(
         "warnings": [
             "The model ranks only candidates admitted by deterministic chemistry.",
             "Unchosen alternatives provide relative preference, not hard negatives.",
-            "Patent and close-analogue leakage must be controlled before release evaluation.",
+            "Visible source-patent overlaps are excluded from training choices; "
+            "library-wide patent/scaffold and close-analogue leakage remain to be "
+            "controlled before release evaluation.",
         ]
         + (
             []

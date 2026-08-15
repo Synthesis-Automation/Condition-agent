@@ -96,7 +96,7 @@ def _trained_policy() -> RouteActionPolicyModel:
 
 def test_policy_definition_and_serialization_are_deterministic(tmp_path: Path) -> None:
     definition = load_route_action_policy_definition()
-    assert definition.definition_id == "route_action_policy.v1@1.2"
+    assert definition.definition_id == "route_action_policy.v1@1.3"
     model = _trained_policy()
     first = tmp_path / "first.json.gz"
     second = tmp_path / "second.json.gz"
@@ -108,6 +108,17 @@ def test_policy_definition_and_serialization_are_deterministic(tmp_path: Path) -
     restored = load_route_action_policy(first)
     assert restored.model_id == model.model_id
     assert restored.to_dict() == model.to_dict()
+
+
+def test_policy_loader_preserves_pre_overlap_filter_artifacts() -> None:
+    model = _trained_policy()
+    value = model.to_dict()
+    value["definition"].pop("exclude_source_patent_precedent_overlap")
+
+    restored = RouteActionPolicyModel.from_dict(value)
+
+    assert restored.model_id == model.model_id
+    assert restored.definition.exclude_source_patent_precedent_overlap is False
 
 
 def test_replay_choices_become_listwise_route_policy_examples() -> None:
@@ -161,6 +172,18 @@ def test_replay_choices_become_listwise_route_policy_examples() -> None:
     assert examples[0].label_source == "observed_exact"
     assert len(examples[0].selected_candidate_ids) == 1
     assert examples[0].target_product_smiles == PRODUCT
+
+    leaky_exact = replace(exact, source_patent_precedent_overlap=True)
+    leaky_evaluation = replace(
+        evaluation,
+        steps=(
+            replace(
+                evaluation.steps[0],
+                candidates=(evaluation.steps[0].candidates[0], leaky_exact),
+            ),
+        ),
+    )
+    assert build_route_policy_examples((leaky_evaluation,)) == ()
 
 
 def test_policy_without_sufficient_validation_has_zero_planner_influence() -> None:

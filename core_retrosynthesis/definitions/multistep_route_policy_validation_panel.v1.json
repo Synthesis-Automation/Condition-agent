@@ -1,0 +1,57 @@
+{
+  "panel_id": "multistep_route_policy_validation_panel.v1@1.0",
+  "schema_version": "1.0",
+  "description": "Eight heavy-atom-rich, depth-three targets selected without policy outcomes from the validation split of the deterministic 500-route replay.",
+  "source": "results/core_retrosynthesis/route_action_evaluation/route_policy_500_v1/routes.sample500.action_replay.v1.jsonl.gz",
+  "selection": "split=validation, reaction_count>=3, maximum_depth=3, no visible source-patent overlap, descending target heavy-atom count, route ID tie-break, first eight",
+  "targets": [
+    {
+      "target_id": "US08513184B2_572658",
+      "name": "US08513184B2_572658 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "COC1CCC=Cc2cccc(c2)C(C)NC(=O)C2CCCN(N2)C(=O)C(Cc2cccc(O[Si](C)(C)C(C)(C)C)c2)NC(=O)C(C(C)C)NC(=O)C1C"
+    },
+    {
+      "target_id": "US07473701B2_270160",
+      "name": "US07473701B2_270160 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "C[Si](C)(C)CCOCn1nc(-c2nc3ccccc3[nH]2)c2cc(NS(=O)(=O)c3ccccc3S(C)(=O)=O)ccc21"
+    },
+    {
+      "target_id": "US06906055B2_862970",
+      "name": "US06906055B2_862970 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "N[C@@H]1C(=O)N2C(C(=O)OC(c3ccccc3)c3ccccc3)=C(Sc3nc(-c4ccncc4)cs3)CS[C@H]12"
+    },
+    {
+      "target_id": "US04708955_772542",
+      "name": "US04708955_772542 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "CC/C=C\\C1=C(C(=O)OCOC(=O)C(C)(C)C)N2C(=O)C(NC(=O)/C(=N\\OC)c3csc(N)n3)[C@H]2SC1"
+    },
+    {
+      "target_id": "US07294639B2_678483",
+      "name": "US07294639B2_678483 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "COC(=O)CCCCCCC(=O)N(C)Cc1cccc(-c2ccc(CC3SC(=O)NC3=O)cc2)c1"
+    },
+    {
+      "target_id": "US09422293B2_641800",
+      "name": "US09422293B2_641800 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "COC(=O)c1cnc(N2CCc3nc(SC)nc(Nc4ccc(C(F)(F)F)cc4)c3CC2)c(Cl)c1"
+    },
+    {
+      "target_id": "US08461159B2_787964",
+      "name": "US08461159B2_787964 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "O=C(Nc1nc2ccccc2o1)N1CCN(Cc2cccc(Oc3ccc(Cl)cc3)c2)CC1"
+    },
+    {
+      "target_id": "US04731443_250648",
+      "name": "US04731443_250648 · validation 3-step route",
+      "category": "validation_observed_3_step",
+      "smiles": "C=CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(=NOCC(=O)O)c3csc(NC=O)n3)[C@H]2SC1"
+    }
+  ]
+}

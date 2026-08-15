@@ -987,10 +987,21 @@ python -m core_retrosynthesis plan-routes LIBRARY STOCK_INDEX TARGET `
 
 Planner JSON includes the model and definition IDs, residual scale, activation
 status, per-step policy diagnostics, and the number of reordered expansions.
-The current 50-route artifact is an inactive end-to-end POC because it contains
-only five validation choice sets. See
-`docs/new/multistep_route_action_policy_poc.md` for design, metrics, artifacts,
-and the next evidence gate.
+The initial 50-route artifact is an inactive safety POC. A deterministic
+500-route artifact passes the validation activation gate and improves held-out
+next-action ranking, but its fixed complex-target A/B does not improve solved
+routes, expansion count, or observed-strategy recovery. It therefore remains
+optional and experimental rather than becoming the default planner policy. See
+`docs/new/multistep_route_action_policy_poc.md` for the split metrics,
+whole-route result, artifacts, limitations, and next evidence gate.
+
+Before application use, run `calibrate-route-action-policy` on a fixed
+validation-route panel. The whole-route gate compares every versioned residual
+scale by solved targets, observed-strategy recovery, terminal progress, and
+search effort, preferring zero influence on ties. The current 500-route model
+fails that gate and is frozen at residual scale zero; the untouched test panel
+then reproduces baseline routes exactly. Raw trained models are research
+artifacts, while route-calibrated models are the deployment-facing contract.
 
 The same status document links a 12-target familiar-chemistry comparison panel.
 The reusable `multistep_panel_review` module renders baseline and policy routes

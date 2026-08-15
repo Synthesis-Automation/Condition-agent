@@ -1,0 +1,57 @@
+{
+  "panel_id": "multistep_route_policy_test_panel.v1@1.0",
+  "schema_version": "1.0",
+  "description": "Eight heavy-atom-rich, depth-three targets selected without policy outcomes from the untouched test split of the deterministic 500-route replay.",
+  "source": "results/core_retrosynthesis/route_action_evaluation/route_policy_500_v1/routes.sample500.action_replay.v1.jsonl.gz",
+  "selection": "split=test, reaction_count>=3, maximum_depth=3, no visible source-patent overlap, descending target heavy-atom count, first eight",
+  "targets": [
+    {
+      "target_id": "US04128540_769590",
+      "name": "US04128540_769590 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "COC(=O)[C@H](CC(C)C)NC(=O)CNC(=O)[C@H](Cc1ccc(O)cc1)NC(=O)[C@H](CO)NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H](Cc1c[nH]cn1)NC(=O)[C@@H]1CCC(=O)N1"
+    },
+    {
+      "target_id": "US08372864B2_514030",
+      "name": "US08372864B2_514030 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "CCCC(CCC)N1CCc2c(C(=O)N[C@@H](Cc3cc(F)cc(F)c3)[C@H](O)CNC3(c4cccc(C(F)(F)F)c4)CC3)cc(-c3ncco3)cc2C1=O"
+    },
+    {
+      "target_id": "US08633182B2_574798",
+      "name": "US08633182B2_574798 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "CCOC(=O)[C@H]1C[C@@H]1c1ccc(O[C@@H]2CCc3c2ccc(C(F)(F)F)c3-c2ccc(OCC3(O)CCOCC3)cc2)cc1"
+    },
+    {
+      "target_id": "US07956070B2_544920",
+      "name": "US07956070B2_544920 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "Cc1c(OC2CCN(C[C@H](O)CNC(=O)c3ccc(Cl)c(OCC(=O)OC(C)(C)C)c3)CC2)ccc(Cl)c1Cl"
+    },
+    {
+      "target_id": "US06066648_601431",
+      "name": "US06066648_601431 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "CCOC(=O)C[C@@H](c1ccc2c(c1)OCC2)N1CCC(CCCc2ccc3c(n2)NCCC3)C1=O"
+    },
+    {
+      "target_id": "US07348017B2_484508",
+      "name": "US07348017B2_484508 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "COCCOCOC(C(=O)Nc1nc(=S)ss1)c1ccc(OCc2ccc(F)cc2)cc1"
+    },
+    {
+      "target_id": "US06211241B1_791070",
+      "name": "US06211241B1_791070 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "O=[N+]([O-])c1ccccc1S(=O)(=O)NCCCCCCNCc1ccc2ccccc2c1"
+    },
+    {
+      "target_id": "US06028032_652144",
+      "name": "US06028032_652144 · observed 3-step route",
+      "category": "heldout_observed_3_step",
+      "smiles": "CS(=O)CC1=C(c2ccccc2)C(=O)N(C(C)(C)C(=O)Nc2cc(F)ccc2F)CO1"
+    }
+  ]
+}

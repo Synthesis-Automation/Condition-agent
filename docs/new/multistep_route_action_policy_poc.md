@@ -1,6 +1,6 @@
 # Data-Driven Multistep Route-Action Policy POC
 
-**Status date:** 2026-08-14
+**Status date:** 2026-08-15
 
 ## Outcome
 
@@ -9,11 +9,13 @@ validated single-step disconnections. The integration is optional and does not
 change template generation, graph validation, terminal-material checks, or the
 existing planner when no model is supplied.
 
-The first 50-route training artifact exercises the complete path from route
-replay to multistep search, but it is deliberately inactive. Only five
-validation choice sets were available, below the versioned activation minimum
-of 20. Its learned residual therefore has zero planner influence. This is a
-successful plumbing and safety POC, not evidence that route quality improved.
+The first 50-route artifact established the inactive safety path. A second,
+deterministic 500-route experiment now passes the held-out activation gate and
+improves next-action ranking on both validation and test examples. It does not,
+however, improve the bounded whole-route result. This separates two claims that
+must not be conflated: the route data contain learnable action-ordering signal,
+but the current action-level objective is not yet an effective multistep
+planning objective.
 
 ## Design
 
@@ -115,15 +117,170 @@ required for an inactive artifact. The small search budget produced two
 partial routes and no solved route in both baseline and policy modes; this was
 an integration check, not a route-quality benchmark.
 
+## 500-route held-out experiment
+
+The next evidence gate was exercised on a deterministic 500-route sample. The
+bounded replay contains 1,862 reported steps and 1,826 searched steps. Retaining
+only choice sets whose observed exact precursor or verified strategy appears
+among at least two validated alternatives produced 832 examples before leakage
+filtering. Definition `route_action_policy.v1@1.3` removes a complete choice set
+when any retained candidate cites the source patent; this excluded five train
+examples and no validation or test examples, leaving 827 choices:
+
+| Split | Examples | Baseline top-1 | Policy top-1 | Baseline MRR | Policy MRR |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Train | 664 | 0.4187 | 0.4654 | 0.6356 | 0.6678 |
+| Validation | 75 | 0.3733 | 0.5067 | 0.5891 | 0.6884 |
+| Test | 88 | 0.3864 | 0.5000 | 0.6102 | 0.6803 |
+
+Validation selected residual scale `1.0`, so the model is active. On untouched
+test examples, 26 observed choices moved to a better rank, 53 were unchanged,
+and nine became worse. A deterministic route-group bootstrap gives a 95%
+interval of `0.0275` to `0.1176` for mean route-level MRR improvement. Both
+exact-precursor and strategy-equivalent labels improved, so the result is not
+confined to the weaker supervision tier.
+
+Artifacts:
+
+```text
+results/core_retrosynthesis/route_action_evaluation/route_policy_500_v1/
+  routes.sample500.action_replay.v1.jsonl.gz
+results/core_retrosynthesis/route_policy/
+  sample500.route_action_policy.v1.json.gz
+  sample500.route_action_policy.v1.report.json
+```
+
+The replay SHA-256 is
+`5a7e71077c42256e6b7311d7aa245e9080faa23468834d6dba7e9a49133df619`.
+The active model ID is
+`RAPM1:d31b2e97f6d3d47a93c48740bfbc98e44d5a8992b50bf5c1d5b875cd627489c8`.
+
+### Whole-route transfer result
+
+The whole-route A/B uses the eight heaviest depth-three targets from the replay
+test split. Selection used only split, route depth, visible source-patent
+overlap, and target heavy-atom count; it did not use policy outcomes. Baseline
+and policy searches used the same depth-three budget: four actions per step, a
+15-state beam, 15 expansions, 100 template applications per expansion, 20
+forward validations, and the same local stock portfolio.
+
+| Metric | Baseline | Policy |
+| --- | ---: | ---: |
+| Targets solved | 1 / 8 | 1 / 8 |
+| Expanded states | 108 | 108 |
+| Observed STRAT1 identities recovered in returned routes | 3 | 2 |
+
+The policy reordered 58 expansions and changed the ranked returned routes for
+all eight targets, so this is not a no-op comparison. Nevertheless, it did not
+improve solved-route rate or search effort and lost one observed strategy
+identity. The active model therefore remains experimental and must not become
+the default planner policy.
+
+Review artifacts:
+
+```text
+results/core_retrosynthesis/route_reviews/
+  multistep_route_policy_sample500_test.html
+  multistep_route_policy_sample500_test.json
+```
+
+The fixed target definition is
+`core_retrosynthesis/definitions/multistep_route_policy_test_panel.v1.json`.
+The review places the observed precedent, baseline routes, and policy routes
+side by side.
+
+### Interpretation
+
+The experiment supports learning *which recovered one-step action resembles a
+recorded decision*. It does not yet support using that score as a proxy for
+route completion. Only recovered positives enter training, downstream planner
+states drift away from recorded route states, and next-action reciprocal rank
+does not encode whether the resulting precursors lead to stock within the
+remaining search budget. The next model change should therefore target
+completion-aware route value or observed remaining steps, and should be judged
+by whole-route recovery and search efficiency rather than action MRR alone.
+
+Leakage control is still incomplete. The experiment excludes visible
+source-patent precedent overlap among retained replay candidates. It does not
+yet rebuild the operator library under patent/scaffold holdouts or exclude
+close structural analogues, so the numbers are POC evidence rather than release
+metrics.
+
+## Whole-route activation gate
+
+Action-level validation is no longer sufficient to activate planner influence.
+`core_retrosynthesis.route_policy_calibration` evaluates the trained weights at
+every versioned residual scale on a fixed validation-route panel. Selection is
+lexicographic and deliberately conservative:
+
+1. maximize solved targets;
+2. maximize recovered observed strategy identities;
+3. maximize best terminal-leaf progress;
+4. prefer earlier solutions and fewer expanded states; and
+5. prefer the smaller residual scale on a complete tie.
+
+The eight validation targets were fixed by split, depth, visible source-patent
+overlap, and heavy-atom count before any policy outcomes were observed. The
+calibration result was:
+
+| Residual | Solved | Strategies recovered | Mean best terminal fraction | Expansions | Reordered expansions |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.00 | 3 / 8 | 2 | 0.7604 | 120 | 0 |
+| 0.10 | 3 / 8 | 1 | 0.7813 | 120 | 0 |
+| 0.25 | 3 / 8 | 1 | 0.7813 | 120 | 0 |
+| 0.50 | 3 / 8 | 1 | 0.7604 | 120 | 18 |
+| 1.00 | 3 / 8 | 1 | 0.7813 | 120 | 51 |
+
+All scales tied on solved routes, while every nonzero scale lost one recovered
+strategy. The gate therefore selected residual scale `0.0` with activation
+reason `whole_route_validation_selected_baseline`. This is the desired safe
+failure: learned weights are retained, but they have zero planner influence.
+
+The calibrated artifact and complete per-target report are:
+
+```text
+results/core_retrosynthesis/route_policy/
+  sample500.route_action_policy.route_calibrated.v1.json.gz
+  sample500.route_action_policy.route_calibrated.v1.report.json
+```
+
+The fixed validation definition is
+`core_retrosynthesis/definitions/multistep_route_policy_validation_panel.v1.json`.
+The calibrated model ID is
+`RAPM1:7be7b0a2d5a0af3f122c5c8b18e2f1832d34f636fbecbad0f8f15e6b03f8bab4`.
+
+After freezing the scale, an independent untouched-test execution confirmed
+identical ranked route IDs and costs on all eight targets, identical solved
+count (`1 / 8`), identical expansion count (`108`), and zero reordered
+expansions. The chemist-facing audit is:
+
+```text
+results/core_retrosynthesis/route_reviews/
+  multistep_route_policy_route_calibrated_test.html
+  multistep_route_policy_route_calibrated_test.json
+```
+
+Run calibration after action-policy training and before supplying a model to an
+application planner:
+
+```powershell
+python -m core_retrosynthesis calibrate-route-action-policy `
+  REPLAY LIBRARY STOCK_INDEX TRAINED_MODEL VALIDATION_PANEL CALIBRATED_MODEL `
+  --report CALIBRATION_REPORT --overwrite
+```
+
+The raw trained model remains an action-ranking research artifact. The
+route-calibrated model is the deployment-facing artifact.
+
 ## Commands
 
 Train a deterministic model from a candidate-replay artifact:
 
 ```powershell
 python -m core_retrosynthesis train-route-action-policy `
-  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_replay.bounded.v3.jsonl.gz `
-  results/core_retrosynthesis/route_policy/random50.route_action_policy.v1.json.gz `
-  --report results/core_retrosynthesis/route_policy/random50.route_action_policy.v1.report.json `
+  results/core_retrosynthesis/route_action_evaluation/route_policy_500_v1/routes.sample500.action_replay.v1.jsonl.gz `
+  results/core_retrosynthesis/route_policy/sample500.route_action_policy.v1.json.gz `
+  --report results/core_retrosynthesis/route_policy/sample500.route_action_policy.v1.report.json `
   --overwrite
 ```
 
@@ -136,21 +293,19 @@ python -m core_retrosynthesis plan-routes `
   "TARGET_SMILES" `
   --max-depth 3 `
   --top-k-routes 5 `
-  --route-action-policy results/core_retrosynthesis/route_policy/random50.route_action_policy.v1.json.gz
+  --route-action-policy results/core_retrosynthesis/route_policy/sample500.route_action_policy.v1.json.gz
 ```
 
 ## Next evidence gate
 
-The next useful experiment is larger leakage-controlled replay, not a more
-complex model. It should provide at least 20 validation choice sets and a
-meaningful untouched test set, preferably from patent-group and scaffold-aware
-splits. Activate a learned residual only if validation improves over the
-existing ranker, then compare whole-route recovery, solved-route rate, search
-efficiency, route diversity, and chemist preference on test routes.
-
-The 5,000-route labels remain useful positive supervision, but training against
-planner choices requires replayed alternatives. Scaling replay and excluding
-source-patent or close-analogue precedents are therefore the next data tasks.
+Do not scale the current action-MRR objective blindly. First add a
+completion-aware evaluation that asks whether a proposed action preserves or
+shortens a path to the observed leaves, then train or calibrate a route-value
+term on train routes and gate it with validation whole-route metrics. Rebuild
+the operator library under patent-group and scaffold-aware holdouts before
+reporting release-quality test numbers. A larger chemist-reviewed test panel is
+then useful for synthetic plausibility and alternate-route quality that exact
+precedent recovery cannot measure.
 
 ## Familiar-target qualitative panel
 

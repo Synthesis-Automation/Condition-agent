@@ -50,6 +50,40 @@ def test_familiar_target_definition_is_valid_and_diverse() -> None:
     }
 
 
+def test_route_policy_test_panel_is_valid_and_fixed() -> None:
+    definition = (
+        Path(__file__).resolve().parents[2]
+        / "core_retrosynthesis"
+        / "definitions"
+        / "multistep_route_policy_test_panel.v1.json"
+    )
+
+    targets = load_multistep_panel_targets(definition)
+
+    assert len(targets) == 8
+    assert len({target.target_id for target in targets}) == 8
+    assert {target.category for target in targets} == {
+        "heldout_observed_3_step"
+    }
+
+
+def test_route_policy_validation_panel_is_valid_and_fixed() -> None:
+    definition = (
+        Path(__file__).resolve().parents[2]
+        / "core_retrosynthesis"
+        / "definitions"
+        / "multistep_route_policy_validation_panel.v1.json"
+    )
+
+    targets = load_multistep_panel_targets(definition)
+
+    assert len(targets) == 8
+    assert len({target.target_id for target in targets}) == 8
+    assert {target.category for target in targets} == {
+        "validation_observed_3_step"
+    }
+
+
 def test_multistep_panel_html_contains_routes_and_review_controls() -> None:
     base_case = _case()
     case = MultistepPanelCase(
