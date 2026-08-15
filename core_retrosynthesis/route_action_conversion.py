@@ -29,7 +29,7 @@ from .route_action_evaluation import (
 from .route_conversion import iter_route_trees
 
 
-ROUTE_ACTION_CONVERTER_VERSION = "1.0"
+ROUTE_ACTION_CONVERTER_VERSION = "2.0"
 DEFAULT_ROUTE_ACTION_SAMPLE_SEED = 20_260_814
 _WORKER_LIBRARY: Any = None
 _WORKER_PRIOR_INDEX: Any = None
@@ -122,14 +122,19 @@ def _new_metrics() -> dict[str, Any]:
     return {
         "route_count": 0,
         "step_count": 0,
-        "eligible_step_count": 0,
+        "search_eligible_step_count": 0,
+        "searched_step_count": 0,
         "steps_with_candidates": 0,
         "candidate_count": 0,
         "source_patent_overlap_count": 0,
-        "eligibility": Counter(),
+        "eligibility_facets": Counter(),
+        "core_quality": Counter(),
+        "limitations": Counter(),
+        "operator_admission": Counter(),
         "outcomes": Counter(),
-        "candidate_match_levels": Counter(),
+        "candidate_supervision": Counter(),
         "diagnostics": Counter(),
+        "rank_denominators": Counter(),
         "ranks": {
             name: Counter()
             for name in ("exact_precursor", "site", "operator", "synthon", "strategy")
@@ -141,27 +146,53 @@ def _accumulate(metrics: dict[str, Any], evaluation: RouteActionEvaluation) -> N
     metrics["route_count"] += 1
     metrics["step_count"] += len(evaluation.steps)
     for step in evaluation.steps:
-        metrics["eligibility"][step.eligibility_status] += 1
-        if not step.eligible:
+        observed = step.observed_action
+        facets = {
+            "product_site": observed.product_site_verified,
+            "retained_edits": observed.retained_edits_verified,
+            "synthon_partition": observed.synthon_partition_verified,
+            "exact_precursors": observed.exact_precursors_verified,
+            "strategy": observed.strategy_verified,
+            "realization": observed.realization_verified,
+            "operator_roundtrip": observed.operator_roundtrip_verified,
+            "search": observed.search_eligible,
+        }
+        for name, available in facets.items():
+            metrics["eligibility_facets"][name] += int(available)
+        metrics["core_quality"][observed.core_quality_status] += 1
+        metrics["limitations"].update(observed.limitations)
+        metrics["operator_admission"][
+            observed.operator_admission_reason or "accepted"
+        ] += 1
+        if not observed.search_eligible:
             continue
-        metrics["eligible_step_count"] += 1
+        metrics["search_eligible_step_count"] += 1
+        if step.search_status != "searched":
+            continue
+        metrics["searched_step_count"] += 1
         metrics["steps_with_candidates"] += int(bool(step.candidates))
         metrics["candidate_count"] += len(step.candidates)
-        metrics["candidate_match_levels"].update(
-            candidate.match_level for candidate in step.candidates
+        metrics["candidate_supervision"].update(
+            candidate.supervision_label for candidate in step.candidates
         )
         metrics["source_patent_overlap_count"] += int(
             step.source_patent_precedent_overlap
         )
         metrics["outcomes"][step.outcome] += 1
         rank_values = {
-            "exact_precursor": step.exact_precursor_rank,
-            "site": step.site_rank,
-            "operator": step.operator_rank,
-            "synthon": step.synthon_rank,
-            "strategy": step.strategy_rank,
+            "exact_precursor": (
+                step.exact_precursor_rank,
+                observed.exact_precursors_verified,
+            ),
+            "site": (step.site_rank, observed.product_site_verified),
+            "operator": (step.operator_rank, observed.retained_edits_verified),
+            "synthon": (step.synthon_rank, observed.synthon_partition_verified),
+            "strategy": (step.strategy_rank, observed.strategy_verified),
         }
-        for name, rank in rank_values.items():
+        for name, (rank, available) in rank_values.items():
+            if not available:
+                continue
+            metrics["rank_denominators"][name] += 1
             for limit in (1, 5, 10, 25):
                 metrics["ranks"][name][limit] += int(
                     rank is not None and rank <= limit
@@ -175,33 +206,65 @@ def _accumulate(metrics: dict[str, Any], evaluation: RouteActionEvaluation) -> N
             metrics["diagnostics"][name] += int(diagnostics.get(name) or 0)
 
 
-def _finalize_metrics(metrics: dict[str, Any]) -> dict[str, Any]:
-    eligible = int(metrics["eligible_step_count"])
-    denominator = max(1, eligible)
+def _finalize_metrics(
+    metrics: dict[str, Any],
+    *,
+    top_k: int,
+) -> dict[str, Any]:
+    search_eligible = int(metrics["search_eligible_step_count"])
+    searched = int(metrics["searched_step_count"])
+    search_denominator = max(1, searched)
+    step_count = int(metrics["step_count"])
+    facet_counts = {
+        name: int(value)
+        for name, value in sorted(metrics["eligibility_facets"].items())
+    }
+    recall_limits = tuple(limit for limit in (1, 5, 10, 25) if limit <= top_k)
     return {
         "route_count": int(metrics["route_count"]),
-        "step_count": int(metrics["step_count"]),
-        "eligible_step_count": eligible,
-        "eligible_step_fraction": eligible / max(1, int(metrics["step_count"])),
+        "step_count": step_count,
+        "eligibility_facet_counts": facet_counts,
+        "eligibility_facet_fractions": {
+            name: count / max(1, step_count)
+            for name, count in facet_counts.items()
+        },
+        "search_eligible_step_count": search_eligible,
+        "searched_step_count": searched,
         "steps_with_candidates": int(metrics["steps_with_candidates"]),
-        "candidate_coverage": int(metrics["steps_with_candidates"]) / denominator,
+        "candidate_coverage": (
+            int(metrics["steps_with_candidates"]) / search_denominator
+            if searched
+            else None
+        ),
         "candidate_count": int(metrics["candidate_count"]),
-        "mean_candidates_per_eligible_step": (
-            int(metrics["candidate_count"]) / denominator
+        "mean_candidates_per_search_eligible_step": (
+            int(metrics["candidate_count"]) / search_denominator
+            if searched
+            else None
         ),
         "source_patent_precedent_overlap_count": int(
             metrics["source_patent_overlap_count"]
         ),
-        "eligibility_status_counts": dict(sorted(metrics["eligibility"].items())),
+        "core_quality_status_counts": dict(sorted(metrics["core_quality"].items())),
+        "limitation_counts": dict(sorted(metrics["limitations"].items())),
+        "operator_admission_counts": dict(
+            sorted(metrics["operator_admission"].items())
+        ),
         "outcome_counts": dict(sorted(metrics["outcomes"].items())),
-        "candidate_match_level_counts": dict(
-            sorted(metrics["candidate_match_levels"].items())
+        "candidate_supervision_label_counts": dict(
+            sorted(metrics["candidate_supervision"].items())
         ),
         "search_diagnostics": dict(sorted(metrics["diagnostics"].items())),
         "recall": {
             name: {
-                f"top{limit}": counts[limit] / denominator
-                for limit in (1, 5, 10, 25)
+                "denominator": int(metrics["rank_denominators"][name]),
+                **{
+                    f"top{limit}": counts[limit]
+                    / max(1, int(metrics["rank_denominators"][name]))
+                    if int(metrics["rank_denominators"][name])
+                    else None
+                    for limit in recall_limits
+                },
             }
             for name, counts in metrics["ranks"].items()
         },
@@ -318,9 +381,9 @@ def convert_route_action_corpus(
             "workers": workers,
         },
         "search_config": config.to_dict(),
-        "metrics": _finalize_metrics(metrics),
+        "metrics": _finalize_metrics(metrics, top_k=config.top_k),
         "metrics_by_split": {
-            key: _finalize_metrics(value)
+            key: _finalize_metrics(value, top_k=config.top_k)
             for key, value in sorted(split_metrics.items())
         },
         "conversion": {
@@ -328,8 +391,9 @@ def convert_route_action_corpus(
             "rejection_counts": dict(sorted(rejections.items())),
             "rejection_examples": rejection_examples,
             "elapsed_seconds": round(elapsed, 3),
-            "eligible_steps_per_second": round(
-                int(metrics["eligible_step_count"]) / max(elapsed, 1e-9), 3
+            "processed_steps_per_second": round(
+                int(metrics["step_count"]) / max(elapsed, 1e-9),
+                3,
             ),
         },
         "output": {
@@ -338,8 +402,10 @@ def convert_route_action_corpus(
             "record_count": int(metrics["route_count"]),
         },
         "warnings": [
-            "Only structurally reconstructed steps are benchmark positives.",
+            "Eligibility is reported independently for each supervision task.",
             "Candidate generation and hard graph validation remain deterministic.",
+            "Review-grade route labels do not relax operator-library admission.",
+            "Unchosen alternatives are not asserted to be chemically negative.",
             "Patent overlap flags cover visible retained precedents only.",
             "A leakage-controlled library is required for release-quality metrics.",
             "Elapsed time is manifest metadata and is not part of record identity.",
@@ -387,6 +453,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-templates-to-apply", type=int, default=500)
     parser.add_argument("--max-candidates-to-validate", type=int, default=100)
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--labels-only", action="store_true")
     parser.add_argument("--allow-rejections", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
     return parser
@@ -405,6 +472,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             top_k=arguments.top_k,
             max_templates_to_apply=arguments.max_templates_to_apply,
             max_candidates_to_validate=arguments.max_candidates_to_validate,
+            run_search=not arguments.labels_only,
         ),
         sample_size=arguments.sample_size,
         seed=arguments.seed,

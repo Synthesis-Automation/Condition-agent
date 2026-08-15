@@ -1,0 +1,21 @@
+{
+  "definition_id": "observed_route_action_label.v1@1.0",
+  "required_completeness_status": "verified",
+  "allowed_core_statuses": [
+    "pass",
+    "review"
+  ],
+  "allowed_review_reasons": [
+    "not_all_edits_graph_checked"
+  ],
+  "required_passed_checks": [
+    "active_atom_mapping_complete",
+    "primary_center_changes_state",
+    "remote_continuity_resolved"
+  ],
+  "notes": [
+    "This policy controls route-learning labels, not executable operator admission.",
+    "Review-grade evidence is accepted only when unresolved edits involve non-product fragments and all retained edits remain structurally identifiable.",
+    "Executable operators continue to require their independent compiler and source-round-trip contract."
+  ]
+}

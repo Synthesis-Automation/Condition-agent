@@ -480,6 +480,11 @@ def _parser() -> argparse.ArgumentParser:
     route_action.add_argument("--no-diversity", action="store_true")
     route_action.add_argument("--no-hierarchical-ranking", action="store_true")
     route_action.add_argument("--lazy-validation", action="store_true")
+    route_action.add_argument(
+        "--labels-only",
+        action="store_true",
+        help="extract supervision facets without running candidate search",
+    )
     route_action.add_argument("--workers", type=int, default=1)
     route_action.add_argument("--allow-rejections", action="store_true")
     route_action.add_argument("--overwrite", action="store_true")
@@ -609,6 +614,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     arguments.minimum_candidates_per_level
                 ),
                 lazy_validation=arguments.lazy_validation,
+                run_search=not arguments.labels_only,
             ),
             sample_size=arguments.sample_size,
             seed=arguments.seed,

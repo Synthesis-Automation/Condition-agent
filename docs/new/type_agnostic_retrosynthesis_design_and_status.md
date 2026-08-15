@@ -52,7 +52,7 @@ define operator identity.
 | Shared route-tree contract | Implemented | Observed and planned routes use the same evidence-neutral, occurrence-preserving schema. |
 | Observed route corpus | 5,000-route POC | Patent-disjoint curated routes are converted with zero rejected records; strategy annotations remain weak labels. |
 | Route-core projection | Implemented | 18,644/18,647 steps have generic cores, signatures and minimized drawings; cross-step symmetry remains explicit. |
-| Route-action replay benchmark | 50-route POC | Typed exact/SITE1/OP1/SYN1/STRAT1 recovery and hard-negative records exist; strict positive eligibility is currently only 18/188 steps. |
+| Observed route-action labels | 50-route POC | 184/188 steps have retained-edit, synthon, and exact-precursor labels; 139 have SITE1/STRAT1 labels; only the independent executable-operator facet remains 18/188. |
 | Multistep planning | Bounded POC | Available for experiments, but not the current product priority. |
 | Strategy-aware validation scheduling | Not implemented | Grouping currently improves output quality, not validation cost. |
 | Public CLI/API for grouped strategies | Not implemented | Current grouped result contract is Python-only. |

@@ -1,94 +1,105 @@
-# Route-Action Replay Benchmark: Design and Status
+# Observed Route-Action Labels and Replay: Design and Status
 
 **Status date:** 2026-08-14
 
 ## Decision
 
-Route-action replay is the first use of the observed multistep corpus for model
-development. At every observed target or intermediate, it runs the existing
-validated single-step operator ladder and measures whether the recorded action
-is recovered. It does not learn chemistry, bypass forward validation, or turn
-route motifs into executable rules.
+Route-learning evidence and executable-operator admission are separate
+contracts. A reported reaction can reliably identify the chosen product site,
+retained transformation, synthon partition, and exact precursor realization
+even when a leaving group disappears and prevents every reactant-side bond edit
+from being checked on the product graph.
 
-Only an observed step that passes the existing data-driven compiler, source
-round trip, reaction-core quality, product completeness, and identity checks is
-an eligible positive. Every other step remains in the artifact with its failure
-stage and reason.
+`ObservedRouteActionLabel` therefore exposes independent supervision facets.
+It does not relax generic operator compilation: executable templates still need
+the existing strict core-quality and source-round-trip checks.
 
-## Contracts
+## Evidence facets
 
-Schema `1.0` has three immutable records:
+The versioned `observed_route_action_label.v1@1.0` policy requires:
 
-- `RouteActionEvaluation`: route provenance, split, search configuration, and
-  every reaction occurrence;
-- `RouteActionStepEvaluation`: the observed exact precursor, SITE1, OP1, SYN1,
-  STRAT1 identities, recovery ranks, outcome, and search diagnostics; and
-- `RouteActionCandidate`: a compact validated action with ranking features,
-  evidence, matching flags, and visible-precedent leakage evidence.
+- verified product completeness;
+- matching route and reaction product identity;
+- complete active-atom mapping;
+- a changed primary center and resolved retained continuity;
+- no blocking core reason; and
+- for review-grade cores, only `not_all_edits_graph_checked` as a review reason.
 
-Candidate labels are explicit:
+The last case admits route supervision only when unresolved edits concern atoms
+absent from the product. OP1 remains the existing handle-independent signature
+of product-retained edits.
+
+Every label reports these booleans independently:
+
+- `product_site_verified`;
+- `retained_edits_verified`;
+- `synthon_partition_verified`;
+- `exact_precursors_verified`;
+- `strategy_verified`;
+- `realization_verified`;
+- `operator_roundtrip_verified`; and
+- `search_eligible`.
+
+It also preserves core quality, completeness, retained/departing edit counts,
+departing edit descriptors, operator rejection stage/reason, and all limitations.
+
+Schema `2.0` nests this label inside every `RouteActionStepEvaluation`.
+Candidate replay remains optional. `--labels-only` extracts supervision without
+running the expensive single-step search.
+
+## Candidate supervision
+
+When replay is enabled, every returned candidate remains hard graph- and
+signature-validated. Its relationship to the observed route is one of:
 
 - `observed_exact`;
 - `strategy_equivalent`;
 - `same_site_operator`;
-- `same_site`; and
-- `hard_negative`.
+- `same_site`; or
+- `unchosen_alternative`.
 
-Exact precursor rank is over concrete returned candidates. SITE1, OP1, SYN1,
-and STRAT1 ranks are over first occurrences of distinct identities, so repeated
-handle realizations do not consume multiple strategy ranks.
+An unchosen alternative is not asserted to be chemically wrong. It is weak
+preference evidence because the patent records one concrete route rather than a
+comparison against every feasible route.
 
-The converter writes deterministic gzip JSONL atomically. The manifest records
-the source-tree and operator-library hashes, complete search configuration,
-aggregate and split metrics, eligibility reasons, search work, and output hash.
-Elapsed time is manifest metadata and is excluded from record identity.
+Exact precursor rank is over concrete candidates. SITE1, OP1, SYN1, and STRAT1
+ranks are over first occurrences of distinct identities. Each recall metric has
+its own evidence-appropriate denominator.
 
-## POC audit
+## 50-route supervision audit
 
-The strict top-25 replay over the existing random 50-route review sample used
-the full-scale v3 library with 31,791 templates. It produced:
+The complete labels-only audit produced:
 
 | Measure | Result |
 | --- | ---: |
 | Routes | 50 |
 | Observed reaction occurrences | 188 |
-| Eligible positive steps | 18 (9.6%) |
-| Core-not-verified steps | 169 |
-| Source-round-trip failures | 1 |
-| Eligible steps with candidates | 18/18 |
-| Returned validated candidates | 450 |
-| Exact observed candidates | 12 |
-| Same-site candidates with different operators | 16 |
-| Hard negatives | 422 |
-| Exact precursor recall at 1 | 33.3% |
-| Exact precursor recall at 5 | 55.6% |
-| Exact precursor recall at 10/25 | 66.7% |
-| SITE1 recall at 1 | 44.4% |
-| SITE1 recall at 5 | 66.7% |
-| SITE1 recall at 10/25 | 72.2% |
-| STRAT1 recall at 1 | 33.3% |
-| STRAT1 recall at 5 | 61.1% |
-| STRAT1 recall at 10/25 | 66.7% |
-| Validation attempts | 1,800 |
-| Visible same-patent precedent overlaps | 0 |
+| Retained-edit labels | 184 (97.9%) |
+| Synthon-partition labels | 184 (97.9%) |
+| Exact-precursor labels | 184 (97.9%) |
+| Product-site labels | 139 (73.9%) |
+| STRAT1 labels | 139 (73.9%) |
+| Realization labels | 139 (73.9%) |
+| Executable operator round trips | 18 (9.6%) |
+| Blocked observations | 4 |
+| Product-site identity unavailable | 45 |
 | Route conversion failures | 0 |
+
+The original 9.6% result was valid for executable operators but was the wrong
+denominator for route learning. The new contract raises STRAT1 supervision to
+73.9% and retained-transformation supervision to 97.9% without admitting one
+additional operator into the library.
 
 Artifact:
 
 ```text
 results/core_retrosynthesis/route_action_evaluation/
-  routes.poc.random50.action_replay.v1.jsonl.gz
-  routes.poc.random50.action_replay.v1.jsonl.gz.manifest.json
+  routes.poc.random50.action_labels.v2.jsonl.gz
+  routes.poc.random50.action_labels.v2.jsonl.gz.manifest.json
 ```
 
 The JSONL SHA-256 is
-`ccf9ef10f4ef8614a33bc3c721afd247bf33f0b2c96d186c312eb03f25b926d5`.
-
-These are diagnostic POC results, not release accuracy. The sample contains
-only three eligible test-split steps, and the operator library has not yet been
-rebuilt with all route patents and near-analogues excluded. The patent-overlap
-flag covers retained candidate precedents only and cannot prove absence of
-training leakage.
+`37be39eb3ca4b2b79ca3abf74fb1abd6086649dd39399eee8b14851eee178253`.
 
 ## Command
 
@@ -96,28 +107,29 @@ training leakage.
 python -m core_retrosynthesis evaluate-route-actions `
   datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.random50.tree.v2.jsonl.gz `
   results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
-  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_replay.v1.jsonl.gz `
-  --workers 8 --overwrite
+  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_labels.v2.jsonl.gz `
+  --labels-only --workers 8 --overwrite
 ```
+
+Remove `--labels-only` to run candidate replay. Large replay jobs should be
+partitioned into deterministic route shards because forward validation, not
+label extraction, dominates runtime.
 
 ## Interpretation and next gate
 
-The benchmark infrastructure works, candidate coverage is complete for eligible
-steps, and the current ranking leaves useful headroom. The immediate blocker is
-positive coverage: 90.4% of observed steps do not yet satisfy the strict generic
-operator admission contract.
+The supervision contract is now broad enough for a route-policy POC. Before
+training:
 
-Before training a route-context reranker:
+1. conduct chemist review of promoted review-grade labels, stratified by
+   departing edit type;
+2. add deterministic resumable replay shards and merge validation;
+3. rebuild an evaluation library excluding route patents and close analogues;
+4. replay the full 5,000-route corpus with frozen search configuration;
+5. train a confidence-weighted or positive-unlabeled action reranker; and
+6. keep deterministic candidate generation and forward validation authoritative.
 
-1. stratify the 169 core-quality failures by chemistry and evidence defect;
-2. improve generic single-step support only where graph evidence is sufficient;
-3. build an operator library that excludes evaluation patents and close chemical
-   analogues;
-4. replay the full 5,000-route corpus with the frozen library and configuration;
-5. require materially broader eligibility and a sufficiently large untouched
-   test set; and
-6. only then train a simple pairwise action reranker over the retained candidate
-   features and route context.
-
-The system must not weaken core quality thresholds merely to increase the number
-of positives.
+The 45 observations without product-site identity can still supervise retained
+OP1/SYN1 and exact-precursor tasks. A future unary/transformation-site identity
+may cover reductions and deprotections, but it must be versioned and matched on
+both observed and candidate reactions before it contributes to SITE1 or STRAT1
+metrics.

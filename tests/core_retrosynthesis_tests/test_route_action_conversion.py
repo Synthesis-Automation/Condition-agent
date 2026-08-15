@@ -70,8 +70,35 @@ def test_route_action_corpus_is_deterministic_and_reloadable(
     assert first_report["output"]["sha256"] == second_report["output"]["sha256"]
     assert first_report["metrics"]["route_count"] == 1
     assert first_report["metrics"]["step_count"] == 1
-    assert first_report["metrics"]["eligible_step_count"] == 1
+    assert first_report["metrics"]["eligibility_facet_counts"]["strategy"] == 1
+    assert first_report["metrics"]["eligibility_facet_counts"][
+        "operator_roundtrip"
+    ] == 1
     assert first_report["metrics"]["recall"]["exact_precursor"]["top1"] == 1.0
     restored = tuple(iter_route_action_evaluations(first))
     assert len(restored) == 1
     assert restored[0].steps[0].exact_precursor_rank == 1
+
+
+def test_labels_only_conversion_reports_facets_without_false_zero_recall(
+    tmp_path: Path,
+) -> None:
+    trees, library = _write_inputs(tmp_path)
+    output = tmp_path / "labels.jsonl.gz"
+
+    report = convert_route_action_corpus(
+        trees,
+        library,
+        output,
+        config=RouteActionEvaluationConfig(run_search=False),
+    )
+
+    metrics = report["metrics"]
+    assert metrics["search_eligible_step_count"] == 1
+    assert metrics["searched_step_count"] == 0
+    assert metrics["candidate_coverage"] is None
+    assert metrics["recall"]["strategy"]["denominator"] == 0
+    assert metrics["recall"]["strategy"]["top1"] is None
+    restored = tuple(iter_route_action_evaluations(output))
+    assert restored[0].steps[0].search_status == "not_run"
+    assert restored[0].steps[0].observed_action.strategy_verified

@@ -106,13 +106,14 @@ Replay observed route actions through the validated single-step operator ladder:
 python -m core_retrosynthesis evaluate-route-actions `
   datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.random50.tree.v2.jsonl.gz `
   results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
-  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_replay.v1.jsonl.gz `
-  --workers 8 --overwrite
+  results/core_retrosynthesis/route_action_evaluation/routes.poc.random50.action_labels.v2.jsonl.gz `
+  --labels-only --workers 8 --overwrite
 ```
 
-The benchmark retains every step, admits positives only after source round trip
-and generic identity reconstruction, measures exact/SITE1/OP1/SYN1/STRAT1
-recovery, and stores compact validated hard negatives. See
+The benchmark retains every step and reports independent site, retained-edit,
+synthon, exact-precursor, strategy, realization, and executable-operator evidence.
+Candidate replay is optional; returned alternatives are validated but remain
+unchosen alternatives rather than asserted negatives. See
 [`../docs/new/route_action_replay_benchmark_design_and_status.md`](../docs/new/route_action_replay_benchmark_design_and_status.md).
 
 ## Representation

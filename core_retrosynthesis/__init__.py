@@ -149,6 +149,13 @@ from .route_action_evaluation import (
     evaluate_route_actions,
     normalize_observed_reaction,
 )
+from .observed_route_action import (
+    OBSERVED_ROUTE_ACTION_LABEL_SCHEMA_VERSION,
+    ObservedRouteActionLabel,
+    ObservedRouteActionLabelPolicy,
+    build_observed_route_action_label,
+    load_observed_route_action_label_policy,
+)
 from .route_action_conversion import (
     DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
     ROUTE_ACTION_CONVERTER_VERSION,
@@ -252,6 +259,8 @@ __all__ = [
     "CanonicalRouteTree",
     "MoleculeOccurrenceNode",
     "ObservedRouteConversionError",
+    "ObservedRouteActionLabel",
+    "ObservedRouteActionLabelPolicy",
     "PlannedRouteAction",
     "ReactionRouteTree",
     "RouteReactionNode",
@@ -282,6 +291,7 @@ __all__ = [
     "ROUTE_ACTION_CONVERTER_VERSION",
     "ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION",
     "ROUTE_ACTION_EVALUATION_SCHEMA_VERSION",
+    "OBSERVED_ROUTE_ACTION_LABEL_SCHEMA_VERSION",
     "LINEAGE_STATUSES",
     "MAX_LINEAGE_CANDIDATES",
     "DEFAULT_ROUTE_REVIEW_SEED",
@@ -329,6 +339,7 @@ __all__ = [
     "load_generic_library",
     "load_hierarchical_ranking_policy",
     "load_operator_rows",
+    "load_observed_route_action_label_policy",
     "load_precursor_compatibility_policy",
     "load_retrosynthesis_ranking_policy",
     "load_multistep_ranking_policy",
@@ -344,6 +355,7 @@ __all__ = [
     "build_strategy_id",
     "build_canonical_route_tree",
     "build_observed_route_tree",
+    "build_observed_route_action_label",
     "build_route_core_projection",
     "convert_route_core_corpus",
     "convert_route_action_corpus",

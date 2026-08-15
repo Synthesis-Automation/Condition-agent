@@ -7,8 +7,7 @@ import json
 import re
 from typing import Any, Callable, Mapping, Optional, Sequence
 
-from .chemistry import canonical_smiles, digest
-from .generic_compiler import analyze_generic_reaction, compile_generic_templates
+from .chemistry import digest
 from .generic_models import (
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
@@ -16,12 +15,16 @@ from .generic_models import (
 )
 from .generic_search import disconnect_operator_ladder_detailed
 from .hierarchical_ranking import CompletionPriorIndex, build_completion_prior_index
+from .observed_route_action import (
+    ObservedRouteActionLabel,
+    build_observed_route_action_label,
+    normalize_observed_reaction,
+)
 from .route_contract import ReactionRouteTree, iter_molecule_occurrences
-from .strategy_identity import build_strategy_id
 
 
-ROUTE_ACTION_EVALUATION_SCHEMA_VERSION = "1.0"
-ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION = "route_action_replay.v1"
+ROUTE_ACTION_EVALUATION_SCHEMA_VERSION = "2.0"
+ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION = "route_action_replay.v2"
 _PATENT_TOKEN = re.compile(r"US0*(\d+)([A-Z]\d)", re.IGNORECASE)
 
 
@@ -38,6 +41,7 @@ class RouteActionEvaluationConfig:
     use_hierarchical_ranking: bool = True
     minimum_candidates_per_level: int = 0
     lazy_validation: bool = False
+    run_search: bool = True
 
     def __post_init__(self) -> None:
         if self.top_k < 1:
@@ -46,6 +50,8 @@ class RouteActionEvaluationConfig:
             raise ValueError("maximum templates to apply must be positive")
         if self.max_candidates_to_validate < 1:
             raise ValueError("maximum candidates to validate must be positive")
+        if self.max_candidates_to_validate < self.top_k:
+            raise ValueError("candidate validation budget must cover top-k")
         if self.minimum_candidates_per_level < 0:
             raise ValueError("minimum candidates per level cannot be negative")
 
@@ -89,7 +95,7 @@ class RouteActionCandidate:
     site_match: bool
     operator_match: bool
     synthon_match: bool
-    match_level: str
+    supervision_label: str
     source_patent_precedent_overlap: bool
     precedent_reaction_ids: tuple[str, ...]
 
@@ -123,19 +129,9 @@ class RouteActionStepEvaluation:
     retrosynthetic_depth: int
     observed_remaining_steps: int
     reaction_smiles: str
-    normalized_reaction_smiles: Optional[str]
     route_target_smiles: str
-    target_smiles: str
-    expected_precursor_smiles: Optional[str]
-    expected_disconnection_site_key: Optional[str]
-    expected_operator_id: Optional[str]
-    expected_operator_signature: Optional[str]
-    expected_synthon_signature: Optional[str]
-    expected_strategy_id: Optional[str]
-    named_annotation: Optional[str]
-    eligibility_status: str
-    eligibility_stage: str
-    eligibility_reason: Optional[str]
+    observed_action: ObservedRouteActionLabel
+    search_status: str
     candidate_count: int
     exact_precursor_rank: Optional[int]
     site_rank: Optional[int]
@@ -148,33 +144,25 @@ class RouteActionStepEvaluation:
     candidates: tuple[RouteActionCandidate, ...]
     warnings: tuple[str, ...] = ()
 
-    @property
-    def eligible(self) -> bool:
-        """Return whether the observed action was safe to use as a positive."""
-
-        return self.eligibility_status == "eligible"
-
     def __post_init__(self) -> None:
         if self.candidate_count != len(self.candidates):
             raise ValueError("candidate count contradicts retained candidates")
-        if self.eligible and not all(
-            (
-                self.expected_precursor_smiles,
-                self.expected_disconnection_site_key,
-                self.expected_operator_id,
-                self.expected_operator_signature,
-                self.expected_synthon_signature,
-                self.expected_strategy_id,
-            )
-        ):
-            raise ValueError("eligible route action requires complete identity")
-        if not self.eligible and self.candidates:
-            raise ValueError("ineligible route actions cannot contain candidates")
+        if self.search_status not in {
+            "searched",
+            "not_search_eligible",
+            "not_run",
+        }:
+            raise ValueError("unsupported route-action search status")
+        if self.search_status == "searched" and not self.observed_action.search_eligible:
+            raise ValueError("searched action lacks a learnable identity")
+        if self.search_status != "searched" and self.candidates:
+            raise ValueError("unsearched route actions cannot contain candidates")
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible step evaluation."""
 
         value = asdict(self)
+        value["observed_action"] = self.observed_action.to_dict()
         value["candidates"] = [candidate.to_dict() for candidate in self.candidates]
         value["warnings"] = list(self.warnings)
         return value
@@ -184,6 +172,12 @@ class RouteActionStepEvaluation:
         """Reconstruct a step evaluation from JSON data."""
 
         fields = dict(value)
+        observed_action = fields.get("observed_action")
+        if not isinstance(observed_action, Mapping):
+            raise ValueError("step evaluation requires an observed-action label")
+        fields["observed_action"] = ObservedRouteActionLabel.from_dict(
+            observed_action
+        )
         fields["candidates"] = tuple(
             RouteActionCandidate.from_dict(item)
             for item in fields.get("candidates") or ()
@@ -225,10 +219,10 @@ class RouteActionEvaluation:
             raise ValueError("route-action evaluation IDs must be unique")
 
     @property
-    def eligible_step_count(self) -> int:
-        """Return the number of reconstructable observed positives."""
+    def strategy_verified_step_count(self) -> int:
+        """Return the number of steps with verified STRAT1 supervision."""
 
-        return sum(step.eligible for step in self.steps)
+        return sum(step.observed_action.strategy_verified for step in self.steps)
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible route evaluation."""
@@ -250,20 +244,6 @@ class RouteActionEvaluation:
 
 
 RouteActionSearcher = Callable[..., tuple[Sequence[GenericDisconnectionCandidate], Any]]
-
-
-def normalize_observed_reaction(reaction_smiles: str) -> Optional[str]:
-    """Remove the condition middle field while preserving reaction participants."""
-
-    if reaction_smiles.count(">>") == 1:
-        reactants, products = reaction_smiles.split(">>")
-    elif reaction_smiles.count(">") == 2:
-        reactants, _, products = reaction_smiles.split(">")
-    else:
-        return None
-    if not reactants or not products:
-        return None
-    return f"{reactants}>>{products}"
 
 
 def _remaining_steps(node: Any) -> int:
@@ -327,11 +307,11 @@ def _outcome(
 def _candidate_actions(
     candidates: Sequence[GenericDisconnectionCandidate],
     *,
-    expected_precursors: str,
-    expected_site: str,
-    expected_operator: str,
-    expected_synthon: str,
-    expected_strategy: str,
+    expected_precursors: Optional[str],
+    expected_site: Optional[str],
+    expected_operator: Optional[str],
+    expected_synthon: Optional[str],
+    expected_strategy: Optional[str],
     patent_id: Optional[str],
 ) -> tuple[RouteActionCandidate, ...]:
     site_ranks = _distinct_ranks([item.disconnection_site_key for item in candidates])
@@ -370,80 +350,52 @@ def _candidate_actions(
                 precursor_compatibility_disposition=(
                     candidate.precursor_compatibility_disposition
                 ),
-                exact_precursor_match=(
-                    candidate.precursor_smiles == expected_precursors
+                exact_precursor_match=bool(
+                    expected_precursors
+                    and candidate.precursor_smiles == expected_precursors
                 ),
-                strategy_match=candidate.strategy_id == expected_strategy,
-                site_match=candidate.disconnection_site_key == expected_site,
-                operator_match=candidate.operator_id == expected_operator,
-                synthon_match=candidate.synthon_signature == expected_synthon,
-                match_level=(
+                strategy_match=bool(
+                    expected_strategy and candidate.strategy_id == expected_strategy
+                ),
+                site_match=bool(
+                    expected_site
+                    and candidate.disconnection_site_key == expected_site
+                ),
+                operator_match=bool(
+                    expected_operator and candidate.operator_id == expected_operator
+                ),
+                synthon_match=bool(
+                    expected_synthon
+                    and candidate.synthon_signature == expected_synthon
+                ),
+                supervision_label=(
                     "observed_exact"
-                    if candidate.precursor_smiles == expected_precursors
+                    if (
+                        expected_precursors
+                        and candidate.precursor_smiles == expected_precursors
+                    )
                     else "strategy_equivalent"
-                    if candidate.strategy_id == expected_strategy
+                    if expected_strategy and candidate.strategy_id == expected_strategy
                     else "same_site_operator"
                     if (
+                        expected_site
+                        and expected_operator
+                        and
                         candidate.disconnection_site_key == expected_site
                         and candidate.operator_id == expected_operator
                     )
                     else "same_site"
-                    if candidate.disconnection_site_key == expected_site
-                    else "hard_negative"
+                    if (
+                        expected_site
+                        and candidate.disconnection_site_key == expected_site
+                    )
+                    else "unchosen_alternative"
                 ),
                 source_patent_precedent_overlap=overlaps,
                 precedent_reaction_ids=candidate.precedent_reaction_ids,
             )
         )
     return tuple(values)
-
-
-def _empty_step(
-    *,
-    evaluation_id: str,
-    reaction: Any,
-    molecule: Any,
-    normalized_reaction: Optional[str],
-    target_smiles: str,
-    status: str,
-    stage: str,
-    reason: str,
-    warning: Optional[str] = None,
-) -> RouteActionStepEvaluation:
-    return RouteActionStepEvaluation(
-        evaluation_id=evaluation_id,
-        reaction_node_id=reaction.reaction_node_id,
-        step_id=reaction.step_id,
-        source_reaction_id=reaction.evidence.source_reaction_id,
-        product_occurrence_id=molecule.occurrence_id,
-        retrosynthetic_depth=molecule.depth,
-        observed_remaining_steps=_remaining_steps(molecule),
-        reaction_smiles=reaction.reaction_smiles,
-        normalized_reaction_smiles=normalized_reaction,
-        route_target_smiles=target_smiles,
-        target_smiles=canonical_smiles(molecule.smiles) or molecule.smiles,
-        expected_precursor_smiles=None,
-        expected_disconnection_site_key=None,
-        expected_operator_id=None,
-        expected_operator_signature=None,
-        expected_synthon_signature=None,
-        expected_strategy_id=None,
-        named_annotation=None,
-        eligibility_status=status,
-        eligibility_stage=stage,
-        eligibility_reason=reason,
-        candidate_count=0,
-        exact_precursor_rank=None,
-        site_rank=None,
-        operator_rank=None,
-        synthon_rank=None,
-        strategy_rank=None,
-        outcome="ineligible",
-        source_patent_precedent_overlap=False,
-        search_diagnostics={},
-        candidates=(),
-        warnings=(warning,) if warning else (),
-    )
 
 
 def evaluate_route_actions(
@@ -467,108 +419,55 @@ def evaluate_route_actions(
         evaluation_id = digest(
             "RAE1", tree.tree_id, reaction.reaction_node_id, config.config_id
         )
-        normalized = normalize_observed_reaction(reaction.reaction_smiles)
-        if normalized is None:
-            steps.append(
-                _empty_step(
-                    evaluation_id=evaluation_id,
-                    reaction=reaction,
-                    molecule=molecule,
-                    normalized_reaction=None,
-                    target_smiles=tree.target_smiles,
-                    status="invalid_reaction_format",
-                    stage="source",
-                    reason="invalid_reaction_format",
-                )
-            )
-            continue
-        compiled = compile_generic_templates(
-            {
-                "reaction_id": reaction.evidence.source_reaction_id or reaction.step_id,
-                "reference_id": tree.patent_id or tree.source_route_id or tree.tree_id,
-                "reaction_smiles": normalized,
-            },
-            engine="reaction_core",
-            levels=("L0", "L1", "L2"),
-            admission_mode="data_driven",
+        observed = build_observed_route_action_label(
+            reaction.reaction_smiles,
+            route_product_smiles=molecule.smiles,
+            reaction_id=reaction.evidence.source_reaction_id or reaction.step_id,
+            reference_id=tree.patent_id or tree.source_route_id or tree.tree_id,
         )
-        if not compiled.templates:
-            steps.append(
-                _empty_step(
-                    evaluation_id=evaluation_id,
-                    reaction=reaction,
-                    molecule=molecule,
-                    normalized_reaction=normalized,
-                    target_smiles=tree.target_smiles,
-                    status=str(compiled.rejection_reason or "unknown_rejection"),
-                    stage=compiled.rejection_stage or "unknown",
-                    reason=str(compiled.rejection_reason or "unknown_rejection"),
-                )
+        raw_diagnostics: Any = {}
+        candidates: tuple[GenericDisconnectionCandidate, ...] = ()
+        if config.run_search and observed.search_eligible and observed.target_smiles:
+            searched, raw_diagnostics = searcher(
+                observed.target_smiles,
+                library,
+                top_k=config.top_k,
+                max_templates_to_apply=config.max_templates_to_apply,
+                max_candidates_to_validate=config.max_candidates_to_validate,
+                use_context=config.use_context,
+                include_l0=config.include_l0,
+                diversify=config.diversify,
+                use_hierarchical_ranking=config.use_hierarchical_ranking,
+                minimum_candidates_per_level=config.minimum_candidates_per_level,
+                lazy_validation=config.lazy_validation,
+                completion_prior_index=prior_index,
             )
-            continue
-        template = compiled.templates[0]
-        precedent = template.precedents[0]
-        identity = analyze_generic_reaction(precedent.mapped_reaction_smiles)
-        if identity is None or not identity.disconnection_site_key:
-            steps.append(
-                _empty_step(
-                    evaluation_id=evaluation_id,
-                    reaction=reaction,
-                    molecule=molecule,
-                    normalized_reaction=normalized,
-                    target_smiles=tree.target_smiles,
-                    status="expected_identity_unavailable",
-                    stage="identity",
-                    reason="expected_identity_unavailable",
-                )
-            )
-            continue
-        route_product = canonical_smiles(molecule.smiles)
-        if route_product != precedent.product_smiles:
-            steps.append(
-                _empty_step(
-                    evaluation_id=evaluation_id,
-                    reaction=reaction,
-                    molecule=molecule,
-                    normalized_reaction=normalized,
-                    target_smiles=tree.target_smiles,
-                    status="target_identity_mismatch",
-                    stage="route_context",
-                    reason="target_identity_mismatch",
-                    warning=(
-                        f"route_product={route_product};"
-                        f"reaction_product={precedent.product_smiles}"
-                    ),
-                )
-            )
-            continue
-        expected_strategy = build_strategy_id(
-            template.operator_id,
-            identity.disconnection_site_key,
-            template.synthon_signature,
-        )
-        candidates, raw_diagnostics = searcher(
-            precedent.product_smiles,
-            library,
-            top_k=config.top_k,
-            max_templates_to_apply=config.max_templates_to_apply,
-            max_candidates_to_validate=config.max_candidates_to_validate,
-            use_context=config.use_context,
-            include_l0=config.include_l0,
-            diversify=config.diversify,
-            use_hierarchical_ranking=config.use_hierarchical_ranking,
-            minimum_candidates_per_level=config.minimum_candidates_per_level,
-            lazy_validation=config.lazy_validation,
-            completion_prior_index=prior_index,
-        )
-        candidates = tuple(candidates)
+            candidates = tuple(searched)
         actions = _candidate_actions(
             candidates,
-            expected_precursors=precedent.precursor_smiles,
-            expected_site=identity.disconnection_site_key,
-            expected_operator=template.operator_id,
-            expected_synthon=template.synthon_signature,
-            expected_strategy=expected_strategy,
+            expected_precursors=(
+                observed.expected_precursor_smiles
+                if observed.exact_precursors_verified
+                else None
+            ),
+            expected_site=(
+                observed.disconnection_site_key
+                if observed.product_site_verified
+                else None
+            ),
+            expected_operator=(
+                observed.retained_operator_id
+                if observed.retained_edits_verified
+                else None
+            ),
+            expected_synthon=(
+                observed.synthon_signature
+                if observed.synthon_partition_verified
+                else None
+            ),
+            expected_strategy=(
+                observed.strategy_id if observed.strategy_verified else None
+            ),
             patent_id=tree.patent_id,
         )
         exact_rank = next(
@@ -577,16 +476,19 @@ def evaluate_route_actions(
         )
         site_rank = _identity_rank(
             [item.disconnection_site_key for item in actions],
-            identity.disconnection_site_key,
+            observed.disconnection_site_key if observed.product_site_verified else None,
         )
         operator_rank = _identity_rank(
-            [item.operator_id for item in actions], template.operator_id
+            [item.operator_id for item in actions],
+            observed.retained_operator_id if observed.retained_edits_verified else None,
         )
         synthon_rank = _identity_rank(
-            [item.synthon_signature for item in actions], template.synthon_signature
+            [item.synthon_signature for item in actions],
+            observed.synthon_signature if observed.synthon_partition_verified else None,
         )
         strategy_rank = _identity_rank(
-            [item.strategy_id for item in actions], expected_strategy
+            [item.strategy_id for item in actions],
+            observed.strategy_id if observed.strategy_verified else None,
         )
         diagnostics = (
             raw_diagnostics.to_dict()
@@ -603,19 +505,15 @@ def evaluate_route_actions(
                 retrosynthetic_depth=molecule.depth,
                 observed_remaining_steps=_remaining_steps(molecule),
                 reaction_smiles=reaction.reaction_smiles,
-                normalized_reaction_smiles=normalized,
                 route_target_smiles=tree.target_smiles,
-                target_smiles=precedent.product_smiles,
-                expected_precursor_smiles=precedent.precursor_smiles,
-                expected_disconnection_site_key=identity.disconnection_site_key,
-                expected_operator_id=template.operator_id,
-                expected_operator_signature=template.operator_signature,
-                expected_synthon_signature=template.synthon_signature,
-                expected_strategy_id=expected_strategy,
-                named_annotation=template.transformation_kind,
-                eligibility_status="eligible",
-                eligibility_stage="accepted",
-                eligibility_reason=None,
+                observed_action=observed,
+                search_status=(
+                    "searched"
+                    if config.run_search and observed.search_eligible
+                    else "not_run"
+                    if observed.search_eligible
+                    else "not_search_eligible"
+                ),
                 candidate_count=len(actions),
                 exact_precursor_rank=exact_rank,
                 site_rank=site_rank,
@@ -628,7 +526,11 @@ def evaluate_route_actions(
                     site_rank,
                     operator_rank,
                     len(actions),
-                ),
+                )
+                if config.run_search and observed.search_eligible
+                else "not_run"
+                if observed.search_eligible
+                else "not_search_eligible",
                 source_patent_precedent_overlap=any(
                     item.source_patent_precedent_overlap for item in actions
                 ),

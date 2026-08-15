@@ -198,7 +198,8 @@ route generator:
    single-step engine for candidate disconnections.
 2. Mark the recorded next step as the positive only when its graph edit and
    precursors can be reconstructed by our contracts.
-3. Use other structurally valid candidates at the same state as hard negatives.
+3. Retain other structurally valid candidates as unchosen alternatives with
+   weak preference evidence, not asserted chemical negatives.
 4. Train or tune a route-context reranker using structure-derived state,
    disconnection, complexity, compatibility, and terminal-material evidence.
 5. Use the higher-level reduction flag only as an auxiliary weak target.
@@ -208,13 +209,11 @@ route generator:
 This leaves candidate generation and chemistry validation deterministic while
 using data to learn which valid action is strategically preferable.
 
-This first experiment is now implemented as the versioned route-action replay
-benchmark. On the random 50-route review sample, 18 of 188 observed steps are
-strictly eligible positives; all 18 receive validated candidates. Exact precursor
-recall is 33.3% at top 1 and 66.7% at top 10/25, while SITE1 recall is 44.4% at
-top 1 and 72.2% at top 10/25. The low 9.6% positive eligibility is the immediate
-data/chemistry bottleneck and must be improved without weakening validation.
-Design and audit details live in
+This first experiment now separates route-learning labels from executable
+operator admission. On the random 50-route sample, 184 of 188 steps have
+verified retained-edit, synthon, and exact-precursor labels; 139 have full
+SITE1/STRAT1 labels; 18 independently pass executable-operator round trip. No
+operator admission threshold was relaxed. Design and audit details live in
 `docs/new/route_action_replay_benchmark_design_and_status.md`.
 
 ## Required cleanup after the POC

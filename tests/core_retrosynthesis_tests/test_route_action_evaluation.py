@@ -145,7 +145,9 @@ def test_route_replay_ranks_distinct_strategy_and_exact_realization() -> None:
     )
 
     step = evaluation.steps[0]
-    assert step.eligible
+    assert step.observed_action.strategy_verified
+    assert step.observed_action.operator_roundtrip_verified
+    assert step.search_status == "searched"
     assert step.exact_precursor_rank == 3
     assert step.site_rank == 2
     assert step.operator_rank == 2
@@ -155,8 +157,8 @@ def test_route_replay_ranks_distinct_strategy_and_exact_realization() -> None:
     assert step.source_patent_precedent_overlap
     assert step.candidates[1].strategy_match
     assert not step.candidates[1].exact_precursor_match
-    assert step.candidates[1].match_level == "strategy_equivalent"
-    assert step.candidates[2].match_level == "observed_exact"
+    assert step.candidates[1].supervision_label == "strategy_equivalent"
+    assert step.candidates[2].supervision_label == "observed_exact"
     assert RouteActionEvaluation.from_dict(evaluation.to_dict()) == evaluation
 
 
@@ -173,7 +175,7 @@ def test_unreconstructable_observation_is_retained_as_ineligible() -> None:
     )
 
     step = evaluation.steps[0]
-    assert not step.eligible
-    assert step.eligibility_status == "materialized_core_missing"
-    assert step.outcome == "ineligible"
+    assert not step.observed_action.search_eligible
+    assert "reaction_core_unavailable" in step.observed_action.limitations
+    assert step.outcome == "not_search_eligible"
     assert step.candidates == ()
