@@ -24,7 +24,7 @@ export function ReactionImage({
     setSource(null)
     if (!smiles) return () => undefined
     const render = kind === 'molecule' ? api.renderMolecule : api.renderReaction
-    render(smiles, compact ? 660 : 980, compact ? 180 : 240)
+    render(smiles, compact ? 660 : 980, compact ? 260 : 240)
       .then((blob) => {
         if (!active) return
         objectUrl = URL.createObjectURL(blob)
