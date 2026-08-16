@@ -213,11 +213,11 @@ function CitationText({ record }: { record: ReferenceRecord }) {
   )
 }
 
-function ReferenceRecords({ records }: { records: ReferenceRecord[] }) {
+function ReferenceRecords({ records, title = 'Dataset references' }: { records: ReferenceRecord[]; title?: string }) {
   if (!records.length) return null
   return (
     <div className="reference-records">
-      <h5>Dataset references</h5>
+      {title && <h5>{title}</h5>}
       <ul>
         {records.map((record) => {
           const metadata = [
@@ -323,6 +323,11 @@ function ProtocolPanel({ protocol, rank }: { protocol: SynthesisProtocolDraft; r
 function RecommendationDetails({ item }: { item: Recommendation }) {
   const precedent = item.precedent_reaction_smiles[0] ?? ''
   const protocol = item.synthesis_protocol
+  const rationale = item.explanation.filter((note) => ![
+    'Retrieved at ',
+    'Recipe compatibility score:',
+    'Supported by ',
+  ].some((prefix) => note.startsWith(prefix)))
   return (
     <article className="result-detail">
       <div className="detail-title-row">
@@ -334,24 +339,25 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
         <div className="score-orbit"><strong>{item.score.toFixed(3)}</strong><span>score</span></div>
       </div>
       <ReactionImage smiles={precedent} label="Selected precedent reaction" compact />
-      <div className="detail-columns">
-        <section><h4>Conditions</h4><Conditions recipe={item.resolved_recipe} /></section>
-        <section>
-          <h4>Evidence</h4>
-          <dl className="detail-list">
-            <div><dt>Similarity</dt><dd>{item.similarity_score.toFixed(3)}</dd></div>
-            <div><dt>Compatibility</dt><dd>{item.compatibility_score.toFixed(3)}</dd></div>
-            <div><dt>Reaction support</dt><dd>{item.support}</dd></div>
-            <div><dt>Reference support</dt><dd>{item.reference_support}</dd></div>
-            <div><dt>Dataset support</dt><dd>{item.dataset_support}</dd></div>
-            <div><dt>Expected yield</dt><dd>{item.expected_yield_pct == null ? 'Unreported' : `${item.expected_yield_pct.toFixed(1)}%`}</dd></div>
-          </dl>
-          <ReferenceRecords records={item.precedent_references ?? []} />
+      <div className="detail-columns recommendation-overview">
+        <section className="recommendation-rationale">
+          <h4>Why this recipe</h4>
+          <p className="evidence-summary">
+            Similarity {item.similarity_score.toFixed(3)} · compatibility {item.compatibility_score.toFixed(3)} · expected yield {item.expected_yield_pct == null ? 'unreported' : `${item.expected_yield_pct.toFixed(1)}%`}
+          </p>
+          <p className="support-summary">
+            {item.support} reaction{item.support === 1 ? '' : 's'} · {item.reference_support} reference{item.reference_support === 1 ? '' : 's'} · {item.dataset_support} dataset{item.dataset_support === 1 ? '' : 's'}
+          </p>
+          {rationale.length > 0 && <ul>{rationale.map((note) => <li key={note}>{note}</li>)}</ul>}
+        </section>
+        <section className="recommendation-reference">
+          <h4>Reference{(item.precedent_references?.length ?? 0) === 1 ? '' : 's'}</h4>
+          <ReferenceRecords records={item.precedent_references ?? []} title="" />
+          {(item.precedent_references?.length ?? 0) === 0 && <p>Publication details unavailable.</p>}
         </section>
       </div>
       <ExperimentalDetails details={item.precedent_experimental_details ?? []} />
       {protocol && <ProtocolPanel protocol={protocol} rank={item.rank} />}
-      <MessageList title="Why this recipe" values={item.explanation} />
       <MessageList title="Compatibility evidence" values={item.compatibility_evidence} />
       <MessageList title="Cautions" values={item.cautions} tone="caution" />
       <details className="trace-panel">
@@ -371,12 +377,6 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
           })}
         </div>
       </details>
-      {(item.precedent_reference_ids.length > 0 || item.precedent_reaction_ids.length > 0) && (
-        <details className="trace-panel"><summary>Precedent provenance</summary>
-          <p className="mono-wrap">References: {item.precedent_reference_ids.join(', ') || 'Unavailable'}</p>
-          <p className="mono-wrap">Reactions: {item.precedent_reaction_ids.join(', ') || 'Unavailable'}</p>
-        </details>
-      )}
     </article>
   )
 }

@@ -192,6 +192,12 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .detail-columns { display: grid; grid-template-columns: 1fr; gap: 13px; }
 .detail-columns > section, .message-group { padding: 12px; border: 1px solid #dce5df; border-radius: 9px; background: #fff; }
 .detail-columns h4, .message-group h4 { margin-bottom: 8px; }
+.recommendation-overview { grid-template-columns: minmax(0,1.25fr) minmax(260px,.75fr); }
+.recommendation-rationale .evidence-summary { color: #294b3b; font-size: .73rem; font-weight: 750; line-height: 1.45; }
+.recommendation-rationale .support-summary { margin-top: 3px; color: #718078; font-size: .67rem; line-height: 1.4; }
+.recommendation-rationale ul { display: grid; gap: 4px; margin: 9px 0 0; padding: 9px 0 0 18px; border-top: 1px solid #edf1ee; color: #4c6659; font-size: .7rem; line-height: 1.4; }
+.recommendation-reference > p { color: #718078; font-size: .7rem; line-height: 1.45; }
+.recommendation-reference .reference-records { margin-top: 0; padding-top: 0; border-top: 0; }
 .detail-list { display: grid; gap: 0; margin: 0; }
 .detail-list > div { display: grid; grid-template-columns: minmax(95px,.75fr) minmax(0,1.25fr); gap: 8px; padding: 6px 0; border-top: 1px solid #edf1ee; font-size: .7rem; }
 .detail-list > div:first-child { border-top: 0; }
