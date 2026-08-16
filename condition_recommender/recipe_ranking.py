@@ -68,7 +68,9 @@ def _precedent_reaction_context(
     fallback = precedent.fallback_descriptor
     return {
         "reaction_id": precedent.reaction_id,
+        "observation_id": precedent.observation_id,
         "reaction_smiles": precedent.reaction_smiles,
+        "reference_id": precedent.reference_id,
         "reaction_label": precedent.reaction_label or None,
         "spectator_groups": spectators,
         "reaction_partners": partners,

@@ -936,6 +936,15 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
         "score": 0.9,
         "resolved_recipe": {"bases": []},
         "precedent_reaction_ids": ["reaction:1"],
+        "precedent_reaction_smiles": ["CCBr.N>>CCN"],
+        "precedent_reaction_contexts": [
+            {
+                "reaction_id": "reaction:1",
+                "observation_id": "observation:1",
+                "reaction_smiles": "CCBr.N>>CCN",
+                "reference_id": "REF1:paper",
+            }
+        ],
         "precedent_reference_ids": ["REF1:paper"],
     }
     evidence = SimpleNamespace(
@@ -1028,6 +1037,16 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
     condition = payload["recommendations"][0]
     assert condition["precedent_references"] == [reference]
     assert condition["precedent_experimental_details"] == [experimental]
+    assert condition["condition_precedents"] == [
+        {
+            "reaction_id": "reaction:1",
+            "observation_id": "observation:1",
+            "reaction_smiles": "CCBr.N>>CCN",
+            "reference_id": "REF1:paper",
+            "reference_record": reference,
+            "experimental_detail": experimental,
+        }
+    ]
     assert captured["library"] is forward_library
     assert captured["recipe"] == {"bases": []}
     assert payload["forward_assessment"]["validity"] == (

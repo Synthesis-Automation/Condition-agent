@@ -1052,6 +1052,8 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
         == "balanced"
     )
     hit_context = result.recommendations[0].precedent_reaction_contexts[0]
+    assert hit_context["observation_id"]
+    assert hit_context["reference_id"]
     assert hit_context["reaction_label"]["concise"] == "Precedent reaction 1"
     assert hit_context["reaction_label"]["status"] == "observed_edits"
     assert hit_context["spectator_groups"][0]["group_id"] == "ether"

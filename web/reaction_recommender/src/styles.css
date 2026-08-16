@@ -234,6 +234,15 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .retrosynthesis-condition-heading small { flex: 0 0 auto; color: #718078; font-size: .63rem; }
 .retrosynthesis-condition-list .detail-list { padding: 4px 0 0; }
 .retrosynthesis-condition-list .experimental-panel { background: #fff; }
+.condition-precedents { margin-top: 12px; padding-top: 10px; border-top: 1px solid #dbe5de; }
+.condition-precedents > h5 { margin: 0 0 8px; color: #315541; font-size: .69rem; letter-spacing: .04em; text-transform: uppercase; }
+.condition-precedent-list { display: grid; gap: 9px; }
+.condition-precedent-list > article { min-width: 0; padding: 9px; border: 1px solid #e1e8e3; border-radius: 7px; background: #fff; }
+.condition-precedent-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+.condition-precedent-heading strong { color: #3d594b; font-size: .69rem; }
+.condition-precedent-heading small { overflow: hidden; color: #718078; font-size: .59rem; text-overflow: ellipsis; white-space: nowrap; }
+.condition-precedent-list .reaction-image { margin: 0 0 8px; }
+.condition-precedent-list .reference-records { margin-top: 7px; }
 .retrosynthesis-empty-evidence { margin: 0; padding: 0 12px 12px; color: #718078; font-size: .7rem; line-height: 1.45; }
 .multistep-results-layout { grid-template-columns: minmax(500px,.8fr) minmax(620px,1.2fr); }
 .route-step-list { display: grid; gap: 11px; margin-top: 16px; }

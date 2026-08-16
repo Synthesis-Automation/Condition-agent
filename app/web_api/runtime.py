@@ -63,6 +63,7 @@ from .contracts import (
     RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
 )
+from .condition_precedents import attach_condition_precedents
 from .experimental_details import (
     EXPERIMENTAL_DETAIL_CATALOG_FILENAME,
     attach_discovery_experimental_details,
@@ -745,13 +746,22 @@ class LocalRecommendationRuntime:
             ranking_preferences=preferences,
             completion_selections=selections,
         )
+        reference_catalog = self._get_reference_catalog(recommender.source_path)
+        experimental_catalog = self._get_experimental_detail_catalog(
+            recommender.source_path
+        )
         payload = attach_recommendation_references(
             result.to_dict(),
-            self._get_reference_catalog(recommender.source_path),
+            reference_catalog,
         )
-        return attach_recommendation_experimental_details(
+        payload = attach_recommendation_experimental_details(
             payload,
-            self._get_experimental_detail_catalog(recommender.source_path),
+            experimental_catalog,
+        )
+        return attach_condition_precedents(
+            payload,
+            reference_catalog,
+            experimental_catalog,
         )
 
     def discover(self, request: DiscoveryRequest) -> Dict[str, Any]:
@@ -1093,16 +1103,25 @@ class LocalRecommendationRuntime:
             recommender,
             condition_top_k=request.top_k,
         ).to_dict()
+        reference_catalog = self._get_reference_catalog(recommender.source_path)
+        experimental_catalog = self._get_experimental_detail_catalog(
+            recommender.source_path
+        )
         recommendation_payload = {
             "recommendations": list(evidence.get("recommendations") or ())
         }
         attach_recommendation_references(
             recommendation_payload,
-            self._get_reference_catalog(recommender.source_path),
+            reference_catalog,
         )
         attach_recommendation_experimental_details(
             recommendation_payload,
-            self._get_experimental_detail_catalog(recommender.source_path),
+            experimental_catalog,
+        )
+        attach_condition_precedents(
+            recommendation_payload,
+            reference_catalog,
+            experimental_catalog,
         )
         evidence["recommendations"] = recommendation_payload["recommendations"]
         evidence["forward_assessment"] = None
@@ -1322,6 +1341,11 @@ class LocalRecommendationRuntime:
                     )
                     attach_recommendation_experimental_details(
                         recommendation_payload,
+                        experimental_catalog,
+                    )
+                    attach_condition_precedents(
+                        recommendation_payload,
+                        reference_catalog,
                         experimental_catalog,
                     )
                     evidence["recommendations"] = recommendation_payload[

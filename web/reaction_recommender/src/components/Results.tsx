@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type {
+  ConditionPrecedent,
   DiscoveryHit,
   DiscoveryResult,
   ExperimentalDetail,
@@ -252,6 +253,37 @@ function ExperimentalDetails({ details }: { details: ExperimentalDetail[] }) {
         ))}
       </div>
     </details>
+  )
+}
+
+function ConditionPrecedents({ precedents }: { precedents: ConditionPrecedent[] }) {
+  if (!precedents.length) return null
+  return (
+    <section className="condition-precedents" aria-label="Condition precedent reactions">
+      <h5>Condition precedent reactions</h5>
+      <div className="condition-precedent-list">
+        {precedents.map((precedent, index) => (
+          <article key={precedent.observation_id || precedent.reaction_id || `${precedent.reaction_smiles}:${index}`}>
+            <div className="condition-precedent-heading">
+              <strong>Precedent {index + 1}</strong>
+              {precedent.reaction_id && <small>{precedent.reaction_id}</small>}
+            </div>
+            <ReactionImage
+              smiles={precedent.reaction_smiles}
+              label={`Condition precedent reaction ${index + 1}`}
+              compact
+            />
+            <ReferenceRecords records={precedent.reference_record ? [precedent.reference_record] : []} />
+            {!precedent.reference_record && (
+              <p className="retrosynthesis-empty-evidence">
+                Publication details unavailable for this condition precedent.
+              </p>
+            )}
+            <ExperimentalDetails details={precedent.experimental_detail ? [precedent.experimental_detail] : []} />
+          </article>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -545,8 +577,13 @@ function RetrosynthesisDetails({
                   <small>Score {recommendation.score.toFixed(3)}{recommendation.expected_yield_pct == null ? '' : ` · ${recommendation.expected_yield_pct.toFixed(1)}% expected yield`}</small>
                 </div>
                 <Conditions recipe={recommendation.resolved_recipe} />
-                <ReferenceRecords records={recommendation.precedent_references ?? []} />
-                <ExperimentalDetails details={recommendation.precedent_experimental_details ?? []} />
+                <ConditionPrecedents precedents={recommendation.condition_precedents ?? []} />
+                {recommendation.condition_precedents == null && (
+                  <>
+                    <ReferenceRecords records={recommendation.precedent_references ?? []} />
+                    <ExperimentalDetails details={recommendation.precedent_experimental_details ?? []} />
+                  </>
+                )}
               </article>
             ))}
           </div>
@@ -560,7 +597,7 @@ function RetrosynthesisDetails({
       </details>
       {candidate.supporting_precedents.length > 0 && (
         <details className="trace-panel supporting-precedents">
-          <summary>Supporting precedent reactions ({candidate.supporting_precedents.length})</summary>
+          <summary>Disconnection-template precedents ({candidate.supporting_precedents.length})</summary>
           <div className="supporting-precedent-list">
             {candidate.supporting_precedents.map((precedent, index) => (
               <article key={`${precedent.reaction_smiles}:${index}`}>
@@ -914,8 +951,13 @@ function MultistepRouteDetails({
                           <small>Score {recommendation.score.toFixed(3)}</small>
                         </div>
                         <Conditions recipe={recommendation.resolved_recipe} />
-                        <ReferenceRecords records={recommendation.precedent_references ?? []} />
-                        <ExperimentalDetails details={recommendation.precedent_experimental_details ?? []} />
+                        <ConditionPrecedents precedents={recommendation.condition_precedents ?? []} />
+                        {recommendation.condition_precedents == null && (
+                          <>
+                            <ReferenceRecords records={recommendation.precedent_references ?? []} />
+                            <ExperimentalDetails details={recommendation.precedent_experimental_details ?? []} />
+                          </>
+                        )}
                       </article>
                     ))}
                   </div>

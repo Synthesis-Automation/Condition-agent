@@ -220,8 +220,18 @@ export interface Recommendation {
   precedent_reference_ids: string[]
   precedent_references?: ReferenceRecord[]
   precedent_experimental_details?: ExperimentalDetail[]
+  condition_precedents?: ConditionPrecedent[]
   score_trace: ScoreTrace
   factor_evidence: JsonObject
+}
+
+export interface ConditionPrecedent {
+  reaction_id: string
+  observation_id: string
+  reaction_smiles: string
+  reference_id: string
+  reference_record?: ReferenceRecord | null
+  experimental_detail?: ExperimentalDetail | null
 }
 
 export interface RetrievalTrace {
