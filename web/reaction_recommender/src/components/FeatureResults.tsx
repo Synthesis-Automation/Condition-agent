@@ -78,12 +78,27 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
       : result.overview,
     [isReaction, result.overview],
   )
+  const chemistryOverviewValues = useMemo(
+    () => ({
+      ...overviewValues,
+      ...(mappingRows
+        ? {
+            atom_mapping: mappingRows.status,
+            mapping_confidence: mappingRows.mapper_confidence,
+            structure_preserved: mappingRows.structure_preserved,
+            reactant_mapping_coverage: mappingRows.reactant_mapping_coverage,
+            product_mapping_coverage: mappingRows.product_mapping_coverage,
+          }
+        : {}),
+    }),
+    [mappingRows, overviewValues],
+  )
 
   return (
     <section className={`results-card feature-results ${isReaction ? 'reaction-features' : 'molecule-features'}`}>
       <div className="results-summary">
         <div>
-          <span className="eyebrow">FEATURE ANALYSIS</span>
+          <span className="eyebrow">{isReaction ? 'REACTION ANALYSIS' : 'STRUCTURE ANALYSIS'}</span>
           <h2>{isReaction ? 'Reaction features' : 'Molecular features'}</h2>
         </div>
         <div className="metric-strip">
@@ -109,16 +124,9 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
       <div className="feature-layout">
         <section className="feature-panel">
           <h3>Chemistry overview</h3>
-          <Overview values={overviewValues} />
+          <Overview values={chemistryOverviewValues} />
           <InlineNotes label="Analysis notes" values={result.warnings} />
         </section>
-
-        {mappingRows && Object.keys(mappingRows).length > 0 && (
-          <section className="feature-panel">
-            <h3>Atom-mapping evidence</h3>
-            <Overview values={mappingRows} />
-          </section>
-        )}
 
         {result.reaction_core && (
           <section className="feature-panel feature-panel-wide feature-core-panel">
@@ -145,20 +153,34 @@ export function FeatureResults({ result }: { result: FeatureAnalysisResult }) {
 
         {result.partners.length > 0 && (
           <section className="feature-panel">
-            <h3>Reaction partners <span className="feature-count">{result.partners.length}</span></h3>
+            <h3>Reaction partners and functional motifs <span className="feature-count">{result.partners.length}</span></h3>
             <div className="feature-card-list">
-              {result.partners.map((partner, index) => (
-                <article key={`${partner.component_index}-${partner.role}-${index}`}>
-                  <strong>{partner.label || `Component ${partner.component_index + 1}`}</strong>
-                  <span>{displayName(partner.role ?? 'unassigned')} · {(partner.role_confidence * 100).toFixed(0)}%</span>
-                  {partner.anchor_contexts.length > 0 && <small>{partner.anchor_contexts.map(displayName).join(', ')}</small>}
-                </article>
-              ))}
+              {result.partners.map((partner, index) => {
+                const motifs = result.motifs.filter((motif) => (
+                  (!motif.side || motif.side === 'reactant')
+                  && motif.component_index === partner.component_index
+                ))
+                return (
+                  <article key={`${partner.component_index}-${partner.role}-${index}`}>
+                    <strong>{partner.label || `Reactant ${partner.component_index + 1}`}</strong>
+                    <span>
+                      Reactant {partner.component_index + 1}
+                      {partner.role ? ` · ${displayName(partner.role)} (${(partner.role_confidence * 100).toFixed(0)}%)` : ''}
+                    </span>
+                    <div className="partner-motifs">
+                      <small>Functional motifs</small>
+                      {motifs.length > 0
+                        ? <ul>{motifs.map((motif, motifIndex) => <li key={`${motif.motif_id}-${motifIndex}`}>{motif.label || displayName(motif.motif_id)}</li>)}</ul>
+                        : <em>None recognized</em>}
+                    </div>
+                  </article>
+                )
+              })}
             </div>
           </section>
         )}
 
-        {result.motifs.length > 0 && (
+        {(!isReaction || result.partners.length === 0) && result.motifs.length > 0 && (
           <section className="feature-panel">
             <h3>Functional motifs <span className="feature-count">{result.motifs.length}</span></h3>
             <div className="feature-card-list">

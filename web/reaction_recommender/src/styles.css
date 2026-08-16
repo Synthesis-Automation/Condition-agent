@@ -295,6 +295,11 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .feature-card-list strong { color: #2d503f; font-size: .73rem; }
 .feature-card-list span { color: #5d7166; font-size: .68rem; }
 .feature-card-list small { color: #7b8981; font-size: .63rem; line-height: 1.35; }
+.partner-motifs { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; margin-top: 6px; padding-top: 6px; border-top: 1px solid #dfe8e2; }
+.partner-motifs > small { font-weight: 750; text-transform: uppercase; }
+.partner-motifs ul { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.partner-motifs li { padding: 3px 7px; border-radius: 999px; color: #315743; background: #e2eee7; font-size: .65rem; }
+.partner-motifs em { color: #7b8981; font-size: .65rem; font-style: normal; }
 .quality-badge { padding: 5px 8px; border-radius: 999px; color: #3c684f; background: #e5f1e9; font-size: .64rem; font-weight: 800; }
 .quality-badge.review { color: #805728; background: #f8eddc; }
 .quality-badge.blocked, .quality-badge.invalid { color: #873d2d; background: #f8e7e2; }

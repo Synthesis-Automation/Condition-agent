@@ -273,7 +273,7 @@ function App() {
       setStatus(`Done — ${next.input_kind} features analyzed`)
     } catch (nextError) {
       setError(friendlyError(nextError))
-      setStatus('Feature analysis failed')
+      setStatus('Reaction analysis failed')
     } finally {
       setBusy(false)
     }
@@ -507,7 +507,7 @@ function App() {
         </div>
         <div className="analysis-control-layout">
           <fieldset className="mode-switch" aria-labelledby="analysis-title">
-            <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Feature analysis</strong></label>
+            <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Analyze reactions</strong></label>
             <label className={mode === 'recommendation' ? 'active' : ''}><input type="radio" name="analysis-mode" value="recommendation" checked={mode === 'recommendation'} onChange={() => changeMode('recommendation')} /><strong>Condition recommendation</strong></label>
             <label className={mode === 'discovery' ? 'active' : ''}><input type="radio" name="analysis-mode" value="discovery" checked={mode === 'discovery'} onChange={() => changeMode('discovery')} /><strong>Reaction discovery</strong></label>
             <label className={mode === 'forward_synthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="forward_synthesis" checked={mode === 'forward_synthesis'} onChange={() => changeMode('forward_synthesis')} /><strong>Forward synthesis</strong></label>
@@ -567,7 +567,7 @@ function App() {
           />
 
           <div className="run-control workbench-action-row" aria-label="Analysis action">
-            <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'forward_synthesis' ? intendedProduct.trim() ? 'Audit forward step' : 'Predict products' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze features'}</button>
+            <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'discovery' ? 'Discover precedents' : mode === 'forward_synthesis' ? intendedProduct.trim() ? 'Audit forward step' : 'Predict products' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze reactions'}</button>
             <span role="status" aria-live="polite">{status}</span>
           </div>
         </div>
