@@ -13,6 +13,7 @@ import type {
   ReferenceRecord,
   ResolvedRecipe,
   RetrosynthesisCandidate,
+  RetrosynthesisForwardAssessment,
   RetrosynthesisResult,
   SynthesisProtocolDraft,
 } from '../api/types'
@@ -122,6 +123,54 @@ function MessageList({ title, values, tone = '' }: { title: string; values: stri
       <h4>{title}</h4>
       <ul>{values.map((value, index) => <li key={`${value}-${index}`}>{value}</li>)}</ul>
     </div>
+  )
+}
+
+function ForwardValidityAudit({ audit }: { audit?: RetrosynthesisForwardAssessment | null }) {
+  if (!audit?.evaluated) return null
+  const caution = audit.validity !== 'structurally_supported'
+  return (
+    <details className="trace-panel" open>
+      <summary>Independent forward validity audit · {displayName(audit.validity)}</summary>
+      <div className={`alert ${caution ? 'caution' : ''}`}>
+        This audit is advisory. It independently replays the proposed operator and runs a target-blind competing-product search.
+      </div>
+      <dl className="detail-list">
+        <div><dt>Targeted operator replay</dt><dd>{displayName(audit.targeted_replay_status)}</dd></div>
+        <div><dt>Blind target recovery</dt><dd>{audit.intended_product_rank == null ? 'Not recovered' : `Rank ${audit.intended_product_rank} · ${displayName(audit.intended_match)}`}</dd></div>
+        <div><dt>Validated pathways</dt><dd>{audit.blind_prediction_summary.valid_pathway_count}</dd></div>
+        <div><dt>Generated products</dt><dd>{audit.blind_prediction_summary.candidate_count}</dd></div>
+        <div><dt>Condition basis</dt><dd>{audit.blind_prediction_summary.conditions_supplied ? 'Canonical recipe applied' : audit.blind_prediction_summary.condition_profile_supplied ? 'Coarse condition profile applied' : 'Unconditioned structural possibilities'}</dd></div>
+        <div><dt>Best competitor</dt><dd className="mono-value">{audit.best_competitor_product ?? 'None generated'}</dd></div>
+        <div><dt>Target margin</dt><dd>{audit.score_margin == null ? 'Not available' : audit.score_margin.toFixed(3)}</dd></div>
+      </dl>
+      <div className="table-scroll">
+        <table>
+          <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody>{audit.checks.map((check) => (
+            <tr key={check.check_id}>
+              <td>{displayName(check.check_id)}</td>
+              <td>{displayName(check.status)}</td>
+              <td>{check.detail}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
+      {audit.blind_prediction_summary.top_products.length > 0 && (
+        <details className="trace-panel">
+          <summary>Blind forward products ({audit.blind_prediction_summary.top_products.length} shown)</summary>
+          <div className="table-scroll"><table>
+            <thead><tr><th>Rank</th><th>Score</th><th>Product</th><th>Role</th></tr></thead>
+            <tbody>{audit.blind_prediction_summary.top_products.map((product) => (
+              <tr key={`${product.rank}:${product.product_smiles}`}>
+                <td>{product.rank}</td><td>{product.score.toFixed(3)}</td><td className="mono-value">{product.product_smiles}</td><td>{product.is_intended ? 'Intended' : 'Competitor'}</td>
+              </tr>
+            ))}</tbody>
+          </table></div>
+        </details>
+      )}
+      <MessageList title="Forward-audit cautions" values={[...audit.warnings, ...audit.blind_prediction_summary.warnings]} tone="caution" />
+    </details>
   )
 }
 
@@ -408,6 +457,7 @@ function RetrosynthesisDetails({
         <div className="score-orbit"><strong>{candidate.score.toFixed(3)}</strong><span>score</span></div>
       </div>
       <ReactionImage smiles={candidate.proposed_reaction_smiles} label="Proposed single-step retrosynthesis" compact />
+      <ForwardValidityAudit audit={candidate.forward_assessment} />
       {candidate.strategic_complexity && (
         <details className="trace-panel" open>
           <summary>Strategic complexity reduction · {(100 * candidate.strategic_complexity_score).toFixed(1)}/100 · {displayName(candidate.strategic_class)}</summary>
@@ -475,7 +525,7 @@ function RetrosynthesisDetails({
             <div><dt>Context similarity</dt><dd>{candidate.context_similarity.toFixed(3)}</dd></div>
             <div><dt>Template specificity</dt><dd>{candidate.template_specificity.toFixed(3)}</dd></div>
             <div><dt>Independent references</dt><dd>{candidate.independent_reference_support}</dd></div>
-            <div><dt>Forward validation</dt><dd>{displayName(candidate.forward_validation_status)}</dd></div>
+            <div><dt>Signature sanity check</dt><dd>{displayName(candidate.forward_validation_status)}</dd></div>
             <div><dt>Strategic reduction</dt><dd>{(100 * candidate.strategic_complexity_score).toFixed(1)}/100 · {displayName(candidate.strategic_class)}</dd></div>
             {candidate.precursor_realism_score != null && <div><dt>Precursor realism</dt><dd>{candidate.precursor_realism_score.toFixed(3)}</dd></div>}
           </dl>
@@ -587,6 +637,7 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
           <div><strong>{result.library_operator_count}</strong><span>operators</span></div>
           <div><strong>{result.library_template_count}</strong><span>templates</span></div>
           <div><strong>{result.strategic_candidate_count}</strong><span>strategic</span></div>
+          <div><strong>{(result.forward_validity_counts.structurally_supported ?? 0) + (result.forward_validity_counts.structurally_supported_with_competition ?? 0)}</strong><span>forward supported</span></div>
         </div>
       </div>
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No retrosynthesis candidates')}</div>}
@@ -595,7 +646,7 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Strategic</th>{result.precursor_realism_enabled && <th>Realism</th>}<th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Score</th><th>Strategic</th>{result.precursor_realism_enabled && <th>Realism</th>}<th>Forward audit</th><th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.candidates.map((candidate, index) => (
                   <tr key={`${candidate.template_id}:${candidate.precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
@@ -603,6 +654,7 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
                     <td>{candidate.score.toFixed(3)}</td>
                     <td>{(100 * candidate.strategic_complexity_score).toFixed(1)} · {displayName(candidate.strategic_class)}</td>
                     {result.precursor_realism_enabled && <td>{candidate.precursor_realism_score?.toFixed(3) ?? '—'}</td>}
+                    <td>{candidate.forward_assessment ? displayName(candidate.forward_assessment.validity) : 'Not evaluated'}</td>
                     <td>{candidate.abstraction_level}</td>
                     <td>{displayName(candidate.transformation_kind ?? 'graph operator')}</td>
                     <td>{candidate.condition_evidence?.recommendations?.[0] ? compactRecipeSummary(candidate.condition_evidence.recommendations[0].resolved_recipe) : 'No compatible conditions'}</td>
@@ -714,6 +766,7 @@ export function ForwardSynthesisResults({ result }: { result: ForwardSynthesisRe
           <div><strong>{diagnostics.unique_product_count}</strong><span>products</span></div>
           <div><strong>{diagnostics.valid_pathway_count}</strong><span>pathways</span></div>
           <div><strong>{diagnostics.self_reaction_pathway_count}</strong><span>self pathways</span></div>
+          <div><strong>{diagnostics.condition_profile_conflict_count}</strong><span>conditions excluded</span></div>
           <div><strong>{diagnostics.applied_operator_count}</strong><span>operators applied</span></div>
         </div>
       </div>
@@ -807,6 +860,7 @@ function MultistepRouteDetails({
               <small>{step.candidate.abstraction_level} · score {step.candidate.score.toFixed(3)}</small>
             </div>
             <ReactionImage smiles={step.candidate.proposed_reaction_smiles} label={`Route reaction ${index + 1}`} compact />
+            <ForwardValidityAudit audit={step.forward_assessment} />
             <MessageList
               title="Strong intramolecular compatibility warning"
               values={(step.candidate.precursor_compatibility_assessments ?? []).map((assessment) => assessment.message)}
@@ -815,7 +869,7 @@ function MultistepRouteDetails({
             <dl className="detail-list">
               <div><dt>Precursors</dt><dd>{step.precursor_smiles.join(' · ')}</dd></div>
               <div><dt>Step cost</dt><dd>{step.step_cost.toFixed(3)} · {Object.entries(step.step_cost_components).filter(([, value]) => value > 0).map(([name, value]) => `${displayName(name)} ${value.toFixed(3)}`).join(' · ')}</dd></div>
-              <div><dt>Forward validation</dt><dd>{displayName(step.candidate.forward_validation_status)}</dd></div>
+              <div><dt>Signature sanity check</dt><dd>{displayName(step.candidate.forward_validation_status)}</dd></div>
               <div><dt>Independent support</dt><dd>{step.candidate.independent_reference_support}</dd></div>
               {step.candidate.precursor_realism_score != null && <div><dt>Precursor realism</dt><dd>{step.candidate.precursor_realism_score.toFixed(3)} · band +{step.candidate.precursor_realism_band_penalty}</dd></div>}
               <div><dt>Strategic reduction</dt><dd>{(100 * step.candidate.strategic_complexity_score).toFixed(1)}/100 · {displayName(step.candidate.strategic_class)}</dd></div>

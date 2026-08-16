@@ -91,7 +91,30 @@ def test_competing_endpoint_products_are_retained_and_route_is_competitive() -> 
     }
     assert assessment.intended_product_rank == 2
     assert assessment.disposition == "competitive"
+    assert assessment.validity == "structurally_supported_with_competition"
+    assert {
+        check.check_id: check.status for check in assessment.checks
+    }["competing_product_risk"] == "warning"
     assert assessment.best_competitor_product is not None
+
+
+def test_missing_operator_hint_is_out_of_scope_not_a_chemical_contradiction() -> None:
+    library = _library("CCBr.N>>CCN")
+
+    assessment = assess_proposed_step(
+        "CCBr.N",
+        "CCN",
+        library,
+        operator_hint="OP1:not-in-forward-library",
+    )
+
+    assert assessment.targeted_replay_status == "operator_hint_not_found"
+    assert assessment.disposition == "out_of_scope"
+    assert assessment.validity == "out_of_scope"
+    assert "RETROSYNTHESIS_OPERATOR_NOT_FORWARD_ADMITTED" in assessment.warnings
+    checks = {check.check_id: check.status for check in assessment.checks}
+    assert checks["targeted_operator_replay"] == "not_evaluated"
+    assert checks["blind_target_recovery"] == "pass"
 
 
 def test_targeted_replay_does_not_rescue_blind_operator_mismatch() -> None:
@@ -194,4 +217,57 @@ def test_transition_metal_profile_favors_structural_cross_coupling_evidence() ->
     assert palladium.candidates[0].score == round(
         baseline.candidates[0].score + 0.12,
         8,
+    )
+
+
+def test_uncatalyzed_profile_rejects_unactivated_bromoaniline_self_coupling() -> None:
+    library = _library(
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+    )
+
+    result = predict_products(
+        "Brc1ccc(N)cc1",
+        library,
+        condition_profile={"strategy": "thermal"},
+    )
+
+    assert result.status == "no_supported_product"
+    assert result.candidates == ()
+    assert result.diagnostics.condition_profile_conflict_count == 2
+    assert "CONDITION_PROFILE_EXCLUDED_PATHWAYS" in result.warnings
+
+    audit = assess_proposed_step(
+        "Brc1ccc(N)cc1",
+        "Nc1ccc(Nc2ccc(Br)cc2)cc1",
+        library,
+        operator_hint=library.operators[0].operator_id,
+        condition_profile={"strategy": "thermal"},
+    )
+    checks = {check.check_id: check.status for check in audit.checks}
+    assert audit.targeted_replay_status == "structurally_reproduced"
+    assert audit.blind_prediction.candidates == ()
+    assert audit.disposition == "condition_incompatible"
+    assert audit.validity == "contradicted"
+    assert checks["condition_compatibility"] == "warning"
+
+
+def test_uncatalyzed_profile_retains_activated_aryl_substitution() -> None:
+    library = _library(
+        "Brc1ccc([N+](=O)[O-])cc1.N>>Nc1ccc([N+](=O)[O-])cc1"
+    )
+
+    result = predict_products(
+        "Brc1ccc([N+](=O)[O-])cc1.N",
+        library,
+        condition_profile={"strategy": "thermal"},
+    )
+
+    assert tuple(candidate.product_smiles for candidate in result.candidates) == (
+        "Nc1ccc([N+](=O)[O-])cc1",
+    )
+    evidence = result.candidates[0].condition_profile_evidence
+    assert evidence.compatible is True
+    assert evidence.hard_conflicts == ()
+    assert evidence.matched_rules == (
+        "thermal_activated_aryl_substitution_allowed",
     )

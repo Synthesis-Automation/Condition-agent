@@ -17,7 +17,7 @@ from .generic_models import GenericDisconnectionCandidate, GenericTemplateLibrar
 from .route_contract import ReactionRouteTree, iter_molecule_occurrences
 
 
-ROUTE_FORWARD_ASSESSMENT_SCHEMA_VERSION = "1.0"
+ROUTE_FORWARD_ASSESSMENT_SCHEMA_VERSION = "1.1"
 
 
 @dataclass(frozen=True)
@@ -123,7 +123,8 @@ def assess_route_tree_forward(
     high_risk = tuple(
         item.step_id
         for item in assessments
-        if item.assessment.disposition in {"competitive", "structurally_inconsistent"}
+        if item.assessment.disposition
+        in {"competitive", "structurally_inconsistent", "condition_incompatible"}
     )
     return RouteForwardAssessmentReport(
         tree_id=tree.tree_id,

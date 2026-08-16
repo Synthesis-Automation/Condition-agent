@@ -15,15 +15,41 @@ from .condition_profiles import (
 
 FORWARD_LIBRARY_SCHEMA_VERSION = "1.0"
 FORWARD_PREDICTION_SCHEMA_VERSION = "1.2"
-FORWARD_ROUTE_ASSESSMENT_SCHEMA_VERSION = "1.2"
+FORWARD_ROUTE_ASSESSMENT_SCHEMA_VERSION = "1.3"
 
 ForwardDisposition = Literal[
     "clear",
     "competitive",
     "unsupported",
     "structurally_inconsistent",
+    "condition_incompatible",
     "out_of_scope",
 ]
+ForwardValidity = Literal[
+    "structurally_supported",
+    "structurally_supported_with_competition",
+    "inconclusive",
+    "contradicted",
+    "out_of_scope",
+]
+ForwardValidityCheckStatus = Literal[
+    "pass",
+    "warning",
+    "fail",
+    "not_evaluated",
+]
+
+
+@dataclass(frozen=True)
+class ForwardValidityCheck:
+    """One independently inspectable part of a planned-step forward audit."""
+
+    check_id: str
+    status: ForwardValidityCheckStatus
+    detail: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
 
 
 @dataclass(frozen=True)
@@ -138,6 +164,7 @@ class ForwardSearchDiagnostics:
     missing_signature_count: int = 0
     operator_edit_mismatch_count: int = 0
     recipe_conflict_count: int = 0
+    condition_profile_conflict_count: int = 0
     valid_pathway_count: int = 0
     self_reaction_pathway_count: int = 0
     unique_product_count: int = 0
@@ -199,7 +226,10 @@ class RouteStepForwardAssessment:
     score_margin: Optional[float]
     disposition: ForwardDisposition
     blind_prediction: ForwardPredictionResult
+    validity: ForwardValidity
+    checks: Tuple[ForwardValidityCheck, ...]
     operator_hint: Optional[str] = None
+    advisory_only: bool = True
     warnings: Tuple[str, ...] = ()
     schema_version: str = FORWARD_ROUTE_ASSESSMENT_SCHEMA_VERSION
 
@@ -219,5 +249,8 @@ __all__ = [
     "ForwardProductCandidate",
     "ForwardRecipeEvidence",
     "ForwardSearchDiagnostics",
+    "ForwardValidity",
+    "ForwardValidityCheck",
+    "ForwardValidityCheckStatus",
     "RouteStepForwardAssessment",
 ]

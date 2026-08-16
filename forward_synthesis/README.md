@@ -35,6 +35,14 @@ Scores are deterministic priorities, not calibrated probabilities or yield
 predictions. Without supplied conditions, results are possible products rather
 than claims about the major product.
 
+A coarse `condition_profile` can be supplied when a full canonical recipe is
+not available. Profile evidence can rerank structurally valid outcomes and can
+exclude a narrowly defined mechanism conflict. In particular, the
+`thermal`/uncatalyzed strategy rejects C-N/C-O/C-S/C-C substitution at an
+unactivated aryl halide, while retaining graph-supported activated aryl
+substitution (for example, an ortho/para electron-withdrawing group). This is a
+conservative compatibility rule, not a yield prediction.
+
 ## CLI
 
 ```powershell
@@ -53,6 +61,11 @@ that the product was experimentally observed.
 product rank. Reference overlap with the operator library is rejected by
 default. Enumerated alternatives are not treated as experimental negatives.
 
-Retrosynthesis integration is advisory: route forward assessments currently
-have `route_ranking_impact="none_advisory_only"` until broad, leakage-controlled
+Single-step retrosynthesis candidates and retained multistep route reactions can
+now be audited independently with targeted operator replay and target-blind
+product competition. The audit reports individual graph/replay/signature/edit/
+round-trip/competition checks and distinguishes support, competition,
+inconclusive coverage, contradiction, and out-of-scope cases. It remains
+advisory: route forward assessments have
+`route_ranking_impact="none_advisory_only"` until broad, leakage-controlled
 competition and false-warning benchmarks support stronger use.

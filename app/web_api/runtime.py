@@ -142,6 +142,45 @@ def _pending_retrosynthesis_conditions(
     return value
 
 
+def _compact_forward_assessment(assessment: Any) -> Dict[str, Any]:
+    """Project a full forward audit into a bounded retrosynthesis payload."""
+
+    payload = assessment.to_dict()
+    blind = payload.pop("blind_prediction")
+    intended_rank = payload.get("intended_product_rank")
+    candidates = list(blind.get("candidates") or ())
+    payload.update(
+        {
+            "evaluated": True,
+            "blind_prediction_summary": {
+                "valid": bool(blind.get("valid")),
+                "status": blind.get("status"),
+                "conditions_supplied": bool(blind.get("conditions_supplied")),
+                "condition_profile_supplied": bool(
+                    blind.get("condition_profile_supplied")
+                ),
+                "candidate_count": len(candidates),
+                "valid_pathway_count": int(
+                    (blind.get("diagnostics") or {}).get(
+                        "valid_pathway_count", 0
+                    )
+                ),
+                "top_products": [
+                    {
+                        "rank": candidate.get("rank"),
+                        "product_smiles": candidate.get("product_smiles"),
+                        "score": candidate.get("score"),
+                        "is_intended": candidate.get("rank") == intended_rank,
+                    }
+                    for candidate in candidates[:5]
+                ],
+                "warnings": list(blind.get("warnings") or ()),
+            },
+        }
+    )
+    return payload
+
+
 class WebRuntime(Protocol):
     """Narrow application runtime consumed by the HTTP routes."""
 
@@ -801,6 +840,20 @@ class LocalRecommendationRuntime:
         templates = {
             template.template_id: template for template in library.templates
         }
+        forward_library = None
+        forward_setup_warning = None
+        if request.use_forward_validation:
+            try:
+                forward_library = self._get_forward_library(
+                    request.library_mode
+                )
+            except (FileNotFoundError, RuntimeError, ValueError):
+                forward_setup_warning = "FORWARD_VALIDATION_UNAVAILABLE"
+        forward_validity_counts: Dict[str, int] = {}
+        forward_partial_failure = False
+        forward_levels = ("L4", "L3", "L2", "L1", "RDCHIRAL")
+        if request.include_l0:
+            forward_levels += ("L0",)
         serialized = []
         for rank, candidate in enumerate(candidates, start=1):
             value = {
@@ -815,6 +868,29 @@ class LocalRecommendationRuntime:
             value["condition_evidence"] = _pending_retrosynthesis_conditions(
                 condition_query
             )
+            if forward_library is not None:
+                try:
+                    forward_assessment = assess_proposed_step(
+                        value["precursor_smiles"],
+                        value["target_smiles"],
+                        forward_library,
+                        operator_hint=value.get("operator_id") or None,
+                        levels=forward_levels,
+                        top_k=max(10, min(20, request.top_k)),
+                    )
+                except (RuntimeError, ValueError):
+                    value["forward_assessment"] = None
+                    forward_partial_failure = True
+                else:
+                    value["forward_assessment"] = _compact_forward_assessment(
+                        forward_assessment
+                    )
+                    validity = forward_assessment.validity
+                    forward_validity_counts[validity] = (
+                        forward_validity_counts.get(validity, 0) + 1
+                    )
+            else:
+                value["forward_assessment"] = None
             value.pop("precedent_reaction_ids", None)
             template = templates.get(candidate.template_id)
             supporting_precedents = []
@@ -844,6 +920,10 @@ class LocalRecommendationRuntime:
             "Interactive search uses a bounded operator-validation budget; "
             "condition evidence loads progressively for each hit.",
         ]
+        if forward_setup_warning is not None:
+            warnings.append(forward_setup_warning)
+        if forward_partial_failure:
+            warnings.append("FORWARD_VALIDATION_PARTIALLY_UNAVAILABLE")
         if request.use_precursor_realism:
             warnings.append(
                 "Precursor realism is an experimental heuristic that uses "
@@ -888,7 +968,11 @@ class LocalRecommendationRuntime:
             "library_mode": request.library_mode,
             "valid": bool(candidates),
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
-            "schema_version": "1.7",
+            "schema_version": "1.8",
+            "forward_validation_enabled": request.use_forward_validation,
+            "forward_validity_counts": dict(
+                sorted(forward_validity_counts.items())
+            ),
             "precursor_realism_enabled": request.use_precursor_realism,
             "strategic_complexity_definition_id": (
                 STRATEGIC_COMPLEXITY_DEFINITION_ID
@@ -1007,6 +1091,31 @@ class LocalRecommendationRuntime:
             self._get_experimental_detail_catalog(recommender.source_path),
         )
         evidence["recommendations"] = recommendation_payload["recommendations"]
+        evidence["forward_assessment"] = None
+        if request.use_forward_validation and evidence["recommendations"]:
+            recipe = evidence["recommendations"][0].get("resolved_recipe")
+            try:
+                forward_library = self._get_forward_library(request.library_mode)
+                levels = ("L4", "L3", "L2", "L1", "RDCHIRAL")
+                if request.include_l0:
+                    levels += ("L0",)
+                assessment = assess_proposed_step(
+                    request.starting_materials or "",
+                    request.intended_product or "",
+                    forward_library,
+                    operator_hint=request.operator_hint or None,
+                    recipe=recipe,
+                    levels=levels,
+                    top_k=10,
+                )
+            except (FileNotFoundError, RuntimeError, ValueError):
+                evidence["warnings"].append(
+                    "CONDITIONED_FORWARD_VALIDATION_UNAVAILABLE"
+                )
+            else:
+                evidence["forward_assessment"] = _compact_forward_assessment(
+                    assessment
+                )
         return evidence
 
     def multistep_retrosynthesize(
@@ -1099,6 +1208,81 @@ class LocalRecommendationRuntime:
         finally:
             close_realism_sources()
         payload = result.to_dict()
+        forward_setup_warning = None
+        forward_partial_failure = False
+        forward_validity_counts: Dict[str, int] = {}
+        if request.use_forward_validation:
+            try:
+                forward_library = self._get_forward_library(
+                    request.library_mode
+                )
+            except (FileNotFoundError, RuntimeError, ValueError):
+                forward_library = None
+                forward_setup_warning = "FORWARD_VALIDATION_UNAVAILABLE"
+            if forward_library is not None:
+                audit_cache: Dict[
+                    tuple[str, str, str, str], Dict[str, Any]
+                ] = {}
+                forward_levels = ("L4", "L3", "L2", "L1", "RDCHIRAL")
+                if request.include_l0:
+                    forward_levels += ("L0",)
+                for route in (*payload["routes"], *payload["partial_routes"]):
+                    route_counts: Dict[str, int] = {}
+                    for step in route["steps"]:
+                        candidate = step["candidate"]
+                        recommendations = list(
+                            (step.get("condition_evidence") or {}).get(
+                                "recommendations"
+                            )
+                            or ()
+                        )
+                        recipe = (
+                            recommendations[0].get("resolved_recipe")
+                            if recommendations
+                            else None
+                        )
+                        recipe_key = (
+                            str(recommendations[0].get("recipe_id") or recipe)
+                            if recommendations
+                            else ""
+                        )
+                        cache_key = (
+                            str(candidate["precursor_smiles"]),
+                            str(step["product_smiles"]),
+                            str(candidate.get("operator_id") or ""),
+                            recipe_key,
+                        )
+                        audit = audit_cache.get(cache_key)
+                        if audit is None:
+                            try:
+                                assessment = assess_proposed_step(
+                                    cache_key[0],
+                                    cache_key[1],
+                                    forward_library,
+                                    operator_hint=cache_key[2] or None,
+                                    recipe=recipe,
+                                    levels=forward_levels,
+                                    top_k=10,
+                                )
+                            except (RuntimeError, ValueError):
+                                step["forward_assessment"] = None
+                                forward_partial_failure = True
+                                continue
+                            audit = _compact_forward_assessment(assessment)
+                            audit_cache[cache_key] = audit
+                        step["forward_assessment"] = audit
+                        validity = str(audit["validity"])
+                        route_counts[validity] = route_counts.get(validity, 0) + 1
+                        forward_validity_counts[validity] = (
+                            forward_validity_counts.get(validity, 0) + 1
+                        )
+                    route["forward_validity_counts"] = dict(
+                        sorted(route_counts.items())
+                    )
+            else:
+                for route in (*payload["routes"], *payload["partial_routes"]):
+                    for step in route["steps"]:
+                        step["forward_assessment"] = None
         if condition_recommender is not None:
             reference_catalog = self._get_reference_catalog(
                 condition_recommender.source_path
@@ -1144,6 +1328,10 @@ class LocalRecommendationRuntime:
                 "condition_availability_requested": (
                     request.use_condition_availability
                 ),
+                "forward_validation_requested": request.use_forward_validation,
+                "forward_validity_counts": dict(
+                    sorted(forward_validity_counts.items())
+                ),
                 "strategic_complexity_definition_id": (
                     STRATEGIC_COMPLEXITY_DEFINITION_ID
                 ),
@@ -1172,6 +1360,12 @@ class LocalRecommendationRuntime:
         )
         if condition_setup_warning is not None:
             payload["warnings"].append(condition_setup_warning)
+        if forward_setup_warning is not None:
+            payload["warnings"].append(forward_setup_warning)
+        if forward_partial_failure:
+            payload["warnings"].append(
+                "FORWARD_VALIDATION_PARTIALLY_UNAVAILABLE"
+            )
         return payload
 
     def render_reaction(

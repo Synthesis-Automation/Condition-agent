@@ -64,6 +64,7 @@ function App() {
   const [useRetrosynthesisContext, setUseRetrosynthesisContext] = useState(true)
   const [diversifyRetrosynthesis, setDiversifyRetrosynthesis] = useState(true)
   const [usePrecursorRealism, setUsePrecursorRealism] = useState(true)
+  const [useForwardValidation, setUseForwardValidation] = useState(true)
   const [useConditionAvailability, setUseConditionAvailability] = useState(true)
   const [multistepDepth, setMultistepDepth] = useState<2 | 3>(3)
   const [molecularWeightThreshold, setMolecularWeightThreshold] = useState(150)
@@ -130,6 +131,11 @@ function App() {
             || candidate.proposed_reaction_smiles,
           library_mode: activeLibraryMode,
           top_k: 3,
+          starting_materials: candidate.precursor_smiles,
+          intended_product: candidate.target_smiles,
+          operator_hint: candidate.operator_id || null,
+          use_forward_validation: useForwardValidation,
+          include_l0: includeL0,
         })
         if (retrosynthesisRun.current !== runId) return
         setResult((current) => {
@@ -139,7 +145,12 @@ function App() {
             candidates: current.candidates.map((value) =>
               value.template_id === candidate.template_id
               && value.proposed_reaction_smiles === candidate.proposed_reaction_smiles
-                ? { ...value, condition_evidence: conditionEvidence }
+                ? {
+                    ...value,
+                    condition_evidence: conditionEvidence,
+                    forward_assessment: conditionEvidence.forward_assessment
+                      ?? value.forward_assessment,
+                  }
                 : value,
             ),
           }
@@ -291,6 +302,7 @@ function App() {
         use_context: useRetrosynthesisContext,
         diversify: diversifyRetrosynthesis,
         use_precursor_realism: usePrecursorRealism,
+        use_forward_validation: useForwardValidation,
       })
       if (retrosynthesisRun.current !== runId) return
       setResult(next)
@@ -393,6 +405,7 @@ function App() {
         diversify: diversifyRetrosynthesis,
         use_precursor_realism: usePrecursorRealism,
         use_condition_availability: useConditionAvailability,
+        use_forward_validation: useForwardValidation,
       })
       if (retrosynthesisRun.current !== runId) return
       setResult(next)
@@ -531,7 +544,7 @@ function App() {
               {isForwardMode ? (
                 <><label className="check-option"><input type="checkbox" checked={includeSelfReactions} onChange={(event) => setIncludeSelfReactions(event.target.checked)} /><span>Include intermolecular self-reactions by allowing multiple equivalents of one input</span></label><label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label><label className="wide-option"><span>Expert override: canonical recipe JSON <small>(optional)</small></span><textarea value={forwardRecipeText} onChange={(event) => setForwardRecipeText(event.target.value)} placeholder='{"bases": [{"substance_id": "…"}], "temperature_c": 80}' spellCheck={false} /></label></>
               ) : isRetrosynthesisMode ? (
-                <><label className="check-option"><input type="checkbox" checked={useRetrosynthesisContext} onChange={(event) => setUseRetrosynthesisContext(event.target.checked)} /><span>Rank with local reaction-context similarity</span></label><label className="check-option"><input type="checkbox" checked={diversifyRetrosynthesis} onChange={(event) => setDiversifyRetrosynthesis(event.target.checked)} /><span>Rank SITE1 → SYN1/REAL1 with completion priors and diversify within score bands</span></label><label className="check-option"><input type="checkbox" checked={usePrecursorRealism} onChange={(event) => setUsePrecursorRealism(event.target.checked)} /><span>De-rank unlikely precursors using stock, registry, literature, and molecular weight</span></label>{mode === 'multistep_retrosynthesis' && <label className="check-option"><input type="checkbox" checked={useConditionAvailability} onChange={(event) => setUseConditionAvailability(event.target.checked)} /><span>Audit condition availability for each retained reaction and rerank routes</span></label>}<label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label></>
+                <><label className="check-option"><input type="checkbox" checked={useRetrosynthesisContext} onChange={(event) => setUseRetrosynthesisContext(event.target.checked)} /><span>Rank with local reaction-context similarity</span></label><label className="check-option"><input type="checkbox" checked={diversifyRetrosynthesis} onChange={(event) => setDiversifyRetrosynthesis(event.target.checked)} /><span>Rank SITE1 → SYN1/REAL1 with completion priors and diversify within score bands</span></label><label className="check-option"><input type="checkbox" checked={usePrecursorRealism} onChange={(event) => setUsePrecursorRealism(event.target.checked)} /><span>De-rank unlikely precursors using stock, registry, literature, and molecular weight</span></label><label className="check-option"><input type="checkbox" checked={useForwardValidation} onChange={(event) => setUseForwardValidation(event.target.checked)} /><span>Independently replay each proposed reaction forward and audit competing products</span></label>{mode === 'multistep_retrosynthesis' && <label className="check-option"><input type="checkbox" checked={useConditionAvailability} onChange={(event) => setUseConditionAvailability(event.target.checked)} /><span>Audit condition availability for each retained reaction and rerank routes</span></label>}<label className="check-option"><input type="checkbox" checked={includeL0} onChange={(event) => setIncludeL0(event.target.checked)} /><span>Use broad L0 operators as the final fallback tier</span></label></>
               ) : mode === 'features' ? (
                 <label className="check-option"><input type="checkbox" checked={forceResolvedMapping} disabled={!useRxnmapper || !reactionSmiles.includes('>')} onChange={(event) => setForceResolvedMapping(event.target.checked)} /><span>Map resolved reactions too, for additional atom-mapping evidence</span></label>
               ) : (

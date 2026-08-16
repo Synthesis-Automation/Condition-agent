@@ -87,3 +87,10 @@ def test_planned_route_step_receives_advisory_forward_assessment() -> None:
     assert step.step_id == "step-1"
     assert step.assessment.targeted_replay_status == "structurally_reproduced"
     assert step.assessment.intended_product_rank == 1
+    assert step.assessment.validity == "structurally_supported"
+    checks = {check.check_id: check.status for check in step.assessment.checks}
+    assert checks["targeted_operator_replay"] == "pass"
+    assert checks["reaction_signature"] == "pass"
+    assert checks["reverse_precursor_recovery"] == "pass"
+    assert checks["operator_edit_agreement"] == "pass"
+    assert checks["condition_compatibility"] == "not_evaluated"

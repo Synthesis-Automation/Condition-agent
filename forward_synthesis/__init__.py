@@ -34,6 +34,9 @@ from .models import (
     ForwardProductCandidate,
     ForwardRecipeEvidence,
     ForwardSearchDiagnostics,
+    ForwardValidity,
+    ForwardValidityCheck,
+    ForwardValidityCheckStatus,
     RouteStepForwardAssessment,
 )
 from .prediction import (
@@ -61,6 +64,9 @@ __all__ = [
     "ForwardReplayCaseResult",
     "ForwardReplayEvaluationReport",
     "ForwardSearchDiagnostics",
+    "ForwardValidity",
+    "ForwardValidityCheck",
+    "ForwardValidityCheckStatus",
     "RecipeAssessorProtocol",
     "RouteStepForwardAssessment",
     "assess_proposed_step",

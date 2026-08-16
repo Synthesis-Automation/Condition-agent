@@ -132,6 +132,8 @@ class FakeRuntime:
             "error": None,
             "schema_version": "1.0",
             "precursor_realism_enabled": request.use_precursor_realism,
+            "forward_validation_enabled": request.use_forward_validation,
+            "forward_validity_counts": {},
             "candidate_count": 1,
             "library_operator_count": 12,
             "library_template_count": 34,
@@ -144,6 +146,7 @@ class FakeRuntime:
                     "score": 0.91,
                     "abstraction_level": "L2",
                     "forward_validation_status": "verified_signature",
+                    "forward_assessment": None,
                 }
             ],
         }
@@ -214,6 +217,8 @@ class FakeRuntime:
             "schema_version": "1.0",
             "max_depth": request.max_depth,
             "molecular_weight_threshold": (request.molecular_weight_threshold),
+            "forward_validation_requested": request.use_forward_validation,
+            "forward_validity_counts": {},
             "route_count": 1,
             "partial_route_count": 0,
             "routes": [
@@ -374,6 +379,132 @@ def test_local_runtime_reports_multistep_index_availability(tmp_path) -> None:
     assert capabilities["multistep_retrosynthesis"] is True
     assert capabilities["literature_molecule_index_available"] is True
     assert capabilities["literature_molecule_index_name"] == "literature.sqlite"
+
+
+def test_local_multistep_retrosynthesis_audits_each_route_step_forward(
+    monkeypatch, tmp_path
+) -> None:
+    literature_index = tmp_path / "literature.sqlite"
+    literature_index.touch()
+    retrosynthesis_library = SimpleNamespace(
+        operators=(object(),),
+        templates=(object(),),
+    )
+    forward_library = SimpleNamespace(operators=(object(),))
+    runtime = LocalRecommendationRuntime(
+        retrosynthesis_library_root=tmp_path,
+        literature_index_path=literature_index,
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_get_retrosynthesis_library",
+        lambda mode: retrosynthesis_library,
+    )
+    monkeypatch.setattr(runtime, "_get_forward_library", lambda mode: forward_library)
+
+    class FakeMoleculeIndex:
+        def __init__(self, path) -> None:
+            self.path = path
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback) -> None:
+            return None
+
+    result = SimpleNamespace(
+        routes=("route",),
+        partial_routes=(),
+        to_dict=lambda: {
+            "target_smiles": "CCN",
+            "routes": [
+                {
+                    "route_id": "route:1",
+                    "steps": [
+                        {
+                            "step_id": "step:1",
+                            "product_smiles": "CCN",
+                            "candidate": {
+                                "precursor_smiles": "CCBr.N",
+                                "operator_id": "OP1:test",
+                            },
+                            "condition_evidence": {
+                                "recommendations": [
+                                    {
+                                        "resolved_recipe": {
+                                            "temperature_c": 80.0
+                                        }
+                                    }
+                                ]
+                            },
+                        }
+                    ],
+                    "warnings": [],
+                }
+            ],
+            "partial_routes": [],
+            "warnings": [],
+        },
+    )
+    monkeypatch.setattr(runtime_module, "CanonicalMoleculeIndex", FakeMoleculeIndex)
+    monkeypatch.setattr(
+        runtime_module,
+        "plan_multistep_routes",
+        lambda *args, **kwargs: result,
+    )
+    captured_assessment_options = {}
+
+    def fake_assessment(*args, **kwargs):
+        captured_assessment_options.update(kwargs)
+        return SimpleNamespace(
+            validity="structurally_supported",
+            to_dict=lambda: {
+                "starting_materials": "CCBr.N",
+                "intended_product": "CCN",
+                "intended_match": "exact",
+                "targeted_replay_status": "structurally_reproduced",
+                "intended_product_rank": 1,
+                "best_competitor_product": None,
+                "score_margin": None,
+                "disposition": "clear",
+                "validity": "structurally_supported",
+                "checks": [],
+                "operator_hint": "OP1:test",
+                "advisory_only": True,
+                "warnings": [],
+                "schema_version": "1.3",
+                "blind_prediction": {
+                    "valid": True,
+                    "status": "predicted",
+                    "conditions_supplied": True,
+                    "condition_profile_supplied": False,
+                    "candidates": [
+                        {"rank": 1, "product_smiles": "CCN", "score": 0.9}
+                    ],
+                    "diagnostics": {"valid_pathway_count": 2},
+                    "warnings": [],
+                },
+            },
+        )
+
+    monkeypatch.setattr(runtime_module, "assess_proposed_step", fake_assessment)
+
+    payload = runtime.multistep_retrosynthesize(
+        MultistepRetrosynthesisRequest(
+            target_smiles="CCN",
+            library_mode="compact",
+            max_depth=2,
+            use_condition_availability=False,
+        )
+    )
+
+    route = payload["routes"][0]
+    assert route["steps"][0]["forward_assessment"]["validity"] == (
+        "structurally_supported"
+    )
+    assert route["forward_validity_counts"] == {"structurally_supported": 1}
+    assert payload["forward_validity_counts"] == {"structurally_supported": 1}
+    assert captured_assessment_options["recipe"] == {"temperature_c": 80.0}
 
 
 def test_local_runtime_prefers_explicit_supplier_stock_portfolio(tmp_path) -> None:
@@ -663,12 +794,18 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     )
 
     payload = runtime.retrosynthesize(
-        RetrosynthesisRequest(target_smiles="CCN", library_mode="compact")
+        RetrosynthesisRequest(
+            target_smiles="CCN",
+            library_mode="compact",
+            use_forward_validation=False,
+        )
     )
 
     result = payload["candidates"][0]
-    assert payload["schema_version"] == "1.7"
+    assert payload["schema_version"] == "1.8"
     assert payload["precursor_realism_enabled"] is False
+    assert payload["forward_validation_enabled"] is False
+    assert result["forward_assessment"] is None
     assert search_options["precursor_realism_scorer"] is None
     assert search_options["max_templates_to_apply"] == 100
     assert search_options["max_candidates_to_validate"] == 30
@@ -682,6 +819,109 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     assert result["condition_evidence"]["status"] == "pending"
     assert result["condition_evidence"]["recommendations"] == []
     assert result["selectivity_warnings"][0]["ranking_impact"] == "none"
+
+
+def test_local_retrosynthesis_attaches_compact_forward_validity_audit(
+    monkeypatch, tmp_path
+) -> None:
+    candidate = SimpleNamespace(
+        target_smiles="CCN",
+        template_id="template:1",
+        proposed_reaction_smiles="CCBr.N>>CCN",
+        to_dict=lambda: {
+            "target_smiles": "CCN",
+            "template_id": "template:1",
+            "precursor_smiles": "CCBr.N",
+            "proposed_reaction_smiles": "CCBr.N>>CCN",
+            "operator_id": "OP1:test",
+            "precedent_reaction_ids": [],
+        },
+    )
+    retrosynthesis_library = SimpleNamespace(
+        operators=(object(),),
+        templates=(SimpleNamespace(template_id="template:1", precedents=()),),
+    )
+    forward_library = SimpleNamespace(operators=(object(),))
+    runtime = LocalRecommendationRuntime(
+        library_root=tmp_path,
+        retrosynthesis_library_root=tmp_path,
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_get_retrosynthesis_library",
+        lambda mode: retrosynthesis_library,
+    )
+    monkeypatch.setattr(runtime, "_get_forward_library", lambda mode: forward_library)
+    monkeypatch.setattr(runtime, "_get_reference_catalog", lambda path: {})
+    monkeypatch.setattr(
+        runtime_module,
+        "disconnect_operator_ladder",
+        lambda *args, **kwargs: (candidate,),
+    )
+    captured = {}
+
+    def fake_assessment(starting_materials, intended_product, selected, **options):
+        captured.update(
+            {
+                "starting_materials": starting_materials,
+                "intended_product": intended_product,
+                "library": selected,
+                **options,
+            }
+        )
+        return SimpleNamespace(
+            validity="structurally_supported",
+            to_dict=lambda: {
+                "starting_materials": starting_materials,
+                "intended_product": intended_product,
+                "intended_match": "exact",
+                "targeted_replay_status": "structurally_reproduced",
+                "intended_product_rank": 1,
+                "best_competitor_product": None,
+                "score_margin": None,
+                "disposition": "clear",
+                "validity": "structurally_supported",
+                "checks": [
+                    {
+                        "check_id": "targeted_operator_replay",
+                        "status": "pass",
+                        "detail": "reproduced",
+                    }
+                ],
+                "operator_hint": options.get("operator_hint"),
+                "advisory_only": True,
+                "warnings": [],
+                "schema_version": "1.3",
+                "blind_prediction": {
+                    "valid": True,
+                    "status": "predicted",
+                    "candidates": [
+                        {"rank": 1, "product_smiles": "CCN", "score": 0.9}
+                    ],
+                    "diagnostics": {"valid_pathway_count": 2},
+                    "warnings": [],
+                },
+            },
+        )
+
+    monkeypatch.setattr(runtime_module, "assess_proposed_step", fake_assessment)
+
+    payload = runtime.retrosynthesize(
+        RetrosynthesisRequest(target_smiles="CCN", library_mode="compact")
+    )
+
+    audit = payload["candidates"][0]["forward_assessment"]
+    assert captured["starting_materials"] == "CCBr.N"
+    assert captured["intended_product"] == "CCN"
+    assert captured["library"] is forward_library
+    assert captured["operator_hint"] == "OP1:test"
+    assert audit["validity"] == "structurally_supported"
+    assert audit["blind_prediction_summary"]["valid_pathway_count"] == 2
+    assert audit["blind_prediction_summary"]["top_products"][0][
+        "is_intended"
+    ] is True
+    assert "blind_prediction" not in audit
+    assert payload["forward_validity_counts"] == {"structurally_supported": 1}
 
 
 def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
@@ -726,17 +966,73 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
         "_get_experimental_detail_catalog",
         lambda path: {"reaction:reaction:1": experimental},
     )
+    forward_library = SimpleNamespace(operators=(object(),))
+    monkeypatch.setattr(runtime, "_get_forward_library", lambda mode: forward_library)
+    captured = {}
+
+    def fake_assessment(starting_materials, intended_product, selected, **options):
+        captured.update(
+            {
+                "starting_materials": starting_materials,
+                "intended_product": intended_product,
+                "library": selected,
+                **options,
+            }
+        )
+        return SimpleNamespace(
+            to_dict=lambda: {
+                "starting_materials": starting_materials,
+                "intended_product": intended_product,
+                "intended_match": "exact",
+                "targeted_replay_status": "structurally_reproduced",
+                "intended_product_rank": 1,
+                "best_competitor_product": None,
+                "score_margin": None,
+                "disposition": "clear",
+                "validity": "structurally_supported",
+                "checks": [],
+                "operator_hint": options.get("operator_hint"),
+                "advisory_only": True,
+                "warnings": [],
+                "schema_version": "1.3",
+                "blind_prediction": {
+                    "valid": True,
+                    "status": "predicted",
+                    "conditions_supplied": True,
+                    "condition_profile_supplied": False,
+                    "candidates": [
+                        {"rank": 1, "product_smiles": "CCN", "score": 0.9}
+                    ],
+                    "diagnostics": {"valid_pathway_count": 1},
+                    "warnings": [],
+                },
+            }
+        )
+
+    monkeypatch.setattr(runtime_module, "assess_proposed_step", fake_assessment)
 
     payload = runtime.retrosynthesis_conditions(
         RetrosynthesisConditionsRequest(
             reaction_smiles="CCBr.N>>CCN",
             library_mode="compact",
+            starting_materials="CCBr.N",
+            intended_product="CCN",
+            operator_hint="OP1:test",
+            use_forward_validation=True,
         )
     )
 
     condition = payload["recommendations"][0]
     assert condition["precedent_references"] == [reference]
     assert condition["precedent_experimental_details"] == [experimental]
+    assert captured["library"] is forward_library
+    assert captured["recipe"] == {"bases": []}
+    assert payload["forward_assessment"]["validity"] == (
+        "structurally_supported"
+    )
+    assert payload["forward_assessment"]["blind_prediction_summary"][
+        "conditions_supplied"
+    ] is True
 
 
 def test_health_and_capabilities_are_versioned() -> None:
@@ -888,6 +1184,7 @@ def test_retrosynthesis_contract_forwards_operator_options() -> None:
             "use_context": True,
             "diversify": True,
             "use_precursor_realism": True,
+            "use_forward_validation": False,
         },
     )
 
@@ -896,6 +1193,7 @@ def test_retrosynthesis_contract_forwards_operator_options() -> None:
     assert payload["target_smiles"] == "CCN"
     assert payload["library_mode"] == "compact"
     assert payload["precursor_realism_enabled"] is True
+    assert payload["forward_validation_enabled"] is False
     assert payload["candidates"][0]["precursor_smiles"] == "CCBr.N"
 
 
@@ -954,6 +1252,18 @@ def test_retrosynthesis_conditions_contract_is_independent() -> None:
     payload = response.json()["data"]
     assert payload["status"] == "recommended_direct"
     assert payload["query_reaction_smiles"] == "CCBr.N>>CCN"
+
+
+def test_conditioned_forward_reaudit_requires_the_proposed_step() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis/conditions",
+        json={
+            "reaction_smiles": "CCBr.N>>CCN",
+            "use_forward_validation": True,
+        },
+    )
+
+    assert response.status_code == 422
 
 
 def test_retrosynthesis_contract_requires_one_target() -> None:

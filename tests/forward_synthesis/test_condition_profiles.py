@@ -15,6 +15,7 @@ def test_condition_profile_catalog_is_versioned_and_complete() -> None:
     catalog = condition_profile_catalog()
 
     assert catalog["definition_id"] == "forward_condition_profiles.v1"
+    assert catalog["definition_version"] == "1.1"
     assert {item["id"] for item in catalog["strategies"]} >= {
         "unspecified",
         "transition_metal_catalysis",
@@ -41,7 +42,7 @@ def test_redox_profiles_use_net_edit_evidence_without_hard_filtering() -> None:
         {"redox_mode": "reductive"},
     )
     oxidation = assess_condition_profile(
-        ("hydrogen_change:C-H:SINGLE>NONE",),
+        ("order_changed:C-O:SINGLE>DOUBLE",),
         {"redox_mode": "oxidative"},
     )
 

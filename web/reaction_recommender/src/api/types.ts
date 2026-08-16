@@ -418,6 +418,7 @@ export interface RetrosynthesisRequest {
   use_context: boolean
   diversify: boolean
   use_precursor_realism: boolean
+  use_forward_validation: boolean
 }
 
 export interface ForwardSynthesisRequest {
@@ -440,6 +441,7 @@ export interface ForwardConditionProfileOption {
 
 export interface ForwardConditionProfileCatalog {
   definition_id: string
+  definition_version: string
   schema_version: string
   strategies: ForwardConditionProfileOption[]
   redox_modes: ForwardConditionProfileOption[]
@@ -460,6 +462,8 @@ export interface ForwardConditionProfileEvidence {
   evaluated: boolean
   profile: ForwardConditionProfile
   score_adjustment: number
+  compatible?: boolean | null
+  hard_conflicts: string[]
   matched_rules: string[]
   cautions: string[]
   definition_id: string
@@ -535,6 +539,7 @@ export interface ForwardSearchDiagnostics {
   missing_signature_count: number
   operator_edit_mismatch_count: number
   recipe_conflict_count: number
+  condition_profile_conflict_count: number
   valid_pathway_count: number
   self_reaction_pathway_count: number
   unique_product_count: number
@@ -574,10 +579,40 @@ export interface ForwardStepAssessment {
   intended_product_rank?: number | null
   best_competitor_product?: string | null
   score_margin?: number | null
-  disposition: 'clear' | 'competitive' | 'unsupported' | 'structurally_inconsistent' | 'out_of_scope'
+  disposition: 'clear' | 'competitive' | 'unsupported' | 'structurally_inconsistent' | 'condition_incompatible' | 'out_of_scope'
+  validity: 'structurally_supported' | 'structurally_supported_with_competition' | 'inconclusive' | 'contradicted' | 'out_of_scope'
+  checks: ForwardValidityCheck[]
+  advisory_only: boolean
   operator_hint?: string | null
   warnings: string[]
   schema_version: string
+}
+
+export interface ForwardValidityCheck {
+  check_id: string
+  status: 'pass' | 'warning' | 'fail' | 'not_evaluated'
+  detail: string
+}
+
+export interface ForwardBlindPredictionSummary {
+  valid: boolean
+  status: string
+  conditions_supplied: boolean
+  condition_profile_supplied: boolean
+  candidate_count: number
+  valid_pathway_count: number
+  top_products: Array<{
+    rank: number
+    product_smiles: string
+    score: number
+    is_intended: boolean
+  }>
+  warnings: string[]
+}
+
+export interface RetrosynthesisForwardAssessment extends ForwardStepAssessment {
+  evaluated: boolean
+  blind_prediction_summary: ForwardBlindPredictionSummary
 }
 
 export interface ForwardSynthesisResult {
@@ -601,12 +636,18 @@ export interface MultistepRetrosynthesisRequest {
   diversify: boolean
   use_precursor_realism: boolean
   use_condition_availability: boolean
+  use_forward_validation: boolean
 }
 
 export interface RetrosynthesisConditionsRequest {
   reaction_smiles: string
   library_mode: 'full' | 'compact'
   top_k: number
+  starting_materials?: string | null
+  intended_product?: string | null
+  operator_hint?: string | null
+  use_forward_validation: boolean
+  include_l0: boolean
 }
 
 export interface RetrosynthesisConditionEvidence {
@@ -627,6 +668,7 @@ export interface RetrosynthesisConditionEvidence {
   recommendations: Recommendation[]
   warnings: string[]
   error?: string | null
+  forward_assessment?: RetrosynthesisForwardAssessment | null
 }
 
 export interface RetrosynthesisSupportingPrecedent {
@@ -743,6 +785,7 @@ export interface RetrosynthesisCandidate {
   template_specificity: number
   independent_reference_support: number
   forward_validation_status: string
+  forward_assessment?: RetrosynthesisForwardAssessment | null
   center_transition_key: string
   disconnection_site_key: string
   supporting_precedents: RetrosynthesisSupportingPrecedent[]
@@ -833,6 +876,8 @@ export interface RetrosynthesisResult {
   strategic_complexity_definition_id: string
   strategic_candidate_count: number
   precursor_realism_enabled: boolean
+  forward_validation_enabled: boolean
+  forward_validity_counts: Record<string, number>
   precursor_realism_sources: {
     buyable: boolean
     compound_registry: boolean
@@ -904,6 +949,7 @@ export interface MultistepRouteStep {
   product_node_id: string
   precursor_node_ids: string[]
   condition_evidence?: RetrosynthesisConditionEvidence | null
+  forward_assessment?: RetrosynthesisForwardAssessment | null
 }
 
 export interface MultistepRouteEvidenceSummary {
@@ -967,6 +1013,7 @@ export interface MultistepRetrosynthesisRoute {
   leaves: StartingMaterialAssessment[]
   route_tree: CanonicalRouteTree
   evidence_summary: MultistepRouteEvidenceSummary
+  forward_validity_counts?: Record<string, number>
   warnings: string[]
 }
 
@@ -1003,6 +1050,8 @@ export interface MultistepRetrosynthesisResult {
   ranking_policy_definition_id: string
   precursor_realism_enabled: boolean
   condition_availability_enabled: boolean
+  forward_validation_requested: boolean
+  forward_validity_counts: Record<string, number>
   precursor_realism_requested: boolean
   condition_availability_requested: boolean
   strategic_complexity_definition_id: string

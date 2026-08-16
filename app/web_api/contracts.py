@@ -110,6 +110,7 @@ class RetrosynthesisRequest(StrictRequest):
     use_context: bool = True
     diversify: bool = True
     use_precursor_realism: bool = False
+    use_forward_validation: bool = True
 
 
 class ForwardConditionProfileRequest(StrictRequest):
@@ -189,6 +190,7 @@ class MultistepRetrosynthesisRequest(StrictRequest):
     diversify: bool = True
     use_precursor_realism: bool = False
     use_condition_availability: bool = False
+    use_forward_validation: bool = True
 
 
 class RetrosynthesisConditionsRequest(StrictRequest):
@@ -197,6 +199,21 @@ class RetrosynthesisConditionsRequest(StrictRequest):
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
     library_mode: Literal["full", "compact"] = "compact"
     top_k: int = Field(default=3, ge=1, le=5)
+    starting_materials: Optional[str] = Field(default=None, max_length=20_000)
+    intended_product: Optional[str] = Field(default=None, max_length=20_000)
+    operator_hint: Optional[str] = Field(default=None, max_length=500)
+    use_forward_validation: bool = False
+    include_l0: bool = True
+
+    @model_validator(mode="after")
+    def forward_audit_requires_step(self) -> "RetrosynthesisConditionsRequest":
+        if self.use_forward_validation and not (
+            self.starting_materials and self.intended_product
+        ):
+            raise ValueError(
+                "forward validation requires starting_materials and intended_product"
+            )
+        return self
 
 
 class RenderReactionRequest(StrictRequest):

@@ -8,6 +8,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Tuple
 
+from rdkit import Chem
+
 
 _PATH = Path(__file__).with_name("definitions") / "condition_profiles.v1.json"
 CONDITION_PROFILE_SCHEMA_VERSION = "1.0"
@@ -35,10 +37,12 @@ class ForwardConditionProfileEvidence:
     evaluated: bool
     profile: ForwardConditionProfile
     score_adjustment: float
+    compatible: bool | None = None
+    hard_conflicts: Tuple[str, ...] = ()
     matched_rules: Tuple[str, ...] = ()
     cautions: Tuple[str, ...] = ()
     definition_id: str = "forward_condition_profiles.v1"
-    definition_version: str = "1.0"
+    definition_version: str = "1.1"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -53,6 +57,8 @@ def load_condition_profile_definition() -> dict[str, Any]:
         raise ValueError("unexpected forward condition-profile definition")
     if value.get("schema_version") != CONDITION_PROFILE_SCHEMA_VERSION:
         raise ValueError("unsupported forward condition-profile schema")
+    if value.get("definition_version") != "1.1":
+        raise ValueError("unsupported forward condition-profile definition version")
     for field in ("strategies", "redox_modes", "media", "catalyst_families"):
         entries = value.get(field)
         if not isinstance(entries, list) or not entries:
@@ -68,6 +74,24 @@ def load_condition_profile_definition() -> dict[str, Any]:
     cap = float(value.get("maximum_absolute_adjustment") or 0.0)
     if not 0.0 < cap <= 1.0:
         raise ValueError("condition-profile adjustment cap must be in (0, 1]")
+    thermal_rule = (value.get("hard_compatibility_rules") or {}).get(
+        "thermal_unactivated_aryl_halide_coupling"
+    )
+    required_rule_fields = {
+        "strategy",
+        "leaving_group_atomic_numbers",
+        "activated_ring_distances",
+        "activated_ring_hetero_atomic_numbers",
+        "oxo_center_atomic_numbers",
+        "positive_center_atomic_numbers",
+        "pi_acceptor_center_atomic_numbers",
+        "pi_acceptor_terminal_atomic_numbers",
+        "exception_rule",
+        "rejection_rule",
+        "hard_conflict",
+    }
+    if not isinstance(thermal_rule, dict) or set(thermal_rule) != required_rule_fields:
+        raise ValueError("thermal aryl-halide compatibility rule is invalid")
     return value
 
 
@@ -79,6 +103,7 @@ def condition_profile_catalog() -> dict[str, Any]:
         key: value[key]
         for key in (
             "definition_id",
+            "definition_version",
             "schema_version",
             "strategies",
             "redox_modes",
@@ -146,6 +171,123 @@ def _classic_coupling(tokens: tuple[str, ...]) -> bool:
     return leaving_group_loss and coupling_bond
 
 
+def _is_electron_withdrawing_substituent(
+    atom: Any,
+    ring_atoms: set[int],
+    rule: Mapping[str, Any],
+) -> bool:
+    atomic_number = int(atom.GetAtomicNum())
+    oxo_centers = set(int(value) for value in rule["oxo_center_atomic_numbers"])
+    positive_centers = set(
+        int(value) for value in rule["positive_center_atomic_numbers"]
+    )
+    pi_acceptor_centers = set(
+        int(value) for value in rule["pi_acceptor_center_atomic_numbers"]
+    )
+    pi_acceptor_terminals = set(
+        int(value) for value in rule["pi_acceptor_terminal_atomic_numbers"]
+    )
+    if atomic_number in oxo_centers:
+        if atomic_number in positive_centers and atom.GetFormalCharge() > 0:
+            return True
+        return any(
+            int(bond.GetBondTypeAsDouble()) >= 2
+            and int(bond.GetOtherAtom(atom).GetAtomicNum()) == 8
+            for bond in atom.GetBonds()
+        )
+    if atomic_number not in pi_acceptor_centers:
+        return False
+    for bond in atom.GetBonds():
+        other = bond.GetOtherAtom(atom)
+        if int(other.GetIdx()) in ring_atoms:
+            continue
+        order = int(bond.GetBondTypeAsDouble())
+        if order >= 2 and int(other.GetAtomicNum()) in pi_acceptor_terminals:
+            return True
+    return False
+
+
+def _aryl_substitution_activation_status(
+    mapped_reaction_smiles: str | None,
+    rule: Mapping[str, Any],
+) -> str | None:
+    """Classify the reacted aryl-halide center for a conservative SNAr gate."""
+
+    if not mapped_reaction_smiles or ">>" not in mapped_reaction_smiles:
+        return None
+    reactants_text, products_text = mapped_reaction_smiles.split(">>", 1)
+    reactants = Chem.MolFromSmiles(reactants_text)
+    products = Chem.MolFromSmiles(products_text)
+    if reactants is None or products is None:
+        return None
+    product_by_map = {
+        int(atom.GetAtomMapNum()): atom
+        for atom in products.GetAtoms()
+        if int(atom.GetAtomMapNum()) > 0
+    }
+    leaving_groups = set(
+        int(value) for value in rule["leaving_group_atomic_numbers"]
+    )
+    activation_distances = set(
+        int(value) for value in rule["activated_ring_distances"]
+    )
+    ring_heteroatoms = set(
+        int(value) for value in rule["activated_ring_hetero_atomic_numbers"]
+    )
+    centers = []
+    for carbon in reactants.GetAtoms():
+        if not carbon.GetIsAromatic() or int(carbon.GetAtomicNum()) != 6:
+            continue
+        carbon_map = int(carbon.GetAtomMapNum())
+        product_carbon = product_by_map.get(carbon_map)
+        if product_carbon is None:
+            continue
+        halogens = tuple(
+            neighbor
+            for neighbor in carbon.GetNeighbors()
+            if int(neighbor.GetAtomicNum()) in leaving_groups
+        )
+        if not halogens:
+            continue
+        product_neighbor_maps = {
+            int(neighbor.GetAtomMapNum()) for neighbor in product_carbon.GetNeighbors()
+        }
+        if all(
+            int(halogen.GetAtomMapNum()) in product_neighbor_maps
+            for halogen in halogens
+        ):
+            continue
+        centers.append(carbon)
+    if not centers:
+        return None
+    ring_info = reactants.GetRingInfo()
+    for center in centers:
+        center_index = int(center.GetIdx())
+        for ring in ring_info.AtomRings():
+            if center_index not in ring:
+                continue
+            ring_atoms = set(int(index) for index in ring)
+            for ring_index in ring_atoms - {center_index}:
+                path_length = len(
+                    Chem.GetShortestPath(reactants, center_index, ring_index)
+                ) - 1
+                if path_length not in activation_distances:
+                    continue
+                ring_atom = reactants.GetAtomWithIdx(ring_index)
+                if int(ring_atom.GetAtomicNum()) in ring_heteroatoms:
+                    return "activated"
+                for substituent in ring_atom.GetNeighbors():
+                    if int(substituent.GetIdx()) in ring_atoms:
+                        continue
+                    if _is_electron_withdrawing_substituent(
+                        substituent,
+                        ring_atoms,
+                        rule,
+                    ):
+                        return "activated"
+    return "unactivated_aryl_halide"
+
+
 def _hydrogen_gain(tokens: tuple[str, ...]) -> bool:
     return any(
         token.startswith("hydrogen_change:") and token.endswith("NONE>SINGLE")
@@ -153,30 +295,48 @@ def _hydrogen_gain(tokens: tuple[str, ...]) -> bool:
     )
 
 
-def _hydrogen_loss(tokens: tuple[str, ...]) -> bool:
-    return any(
-        token.startswith("hydrogen_change:") and token.endswith("SINGLE>NONE")
-        for token in tokens
-    )
+def _bond_order_direction(tokens: tuple[str, ...]) -> int:
+    ranks = {"NONE": 0, "SINGLE": 1, "AROMATIC": 1, "DOUBLE": 2, "TRIPLE": 3}
+    directions = []
+    for token in tokens:
+        if not token.startswith("order_changed:") or ">" not in token:
+            continue
+        transition = token.rsplit(":", 1)[-1]
+        before, after = transition.split(">", 1)
+        directions.append(ranks.get(after, 0) - ranks.get(before, 0))
+    if any(value > 0 for value in directions):
+        return 1
+    if any(value < 0 for value in directions):
+        return -1
+    return 0
 
 
 def assess_condition_profile(
     observed_edit_tokens: tuple[str, ...],
     profile: Mapping[str, Any] | ForwardConditionProfile | None,
+    *,
+    mapped_reaction_smiles: str | None = None,
 ) -> ForwardConditionProfileEvidence:
     """Score only structurally defensible effects of a coarse condition prior."""
 
     normalized = normalize_condition_profile(profile)
+    definition = load_condition_profile_definition()
     evaluated = normalized != ForwardConditionProfile()
     if not evaluated:
-        return ForwardConditionProfileEvidence(False, normalized, 0.0)
-    definition = load_condition_profile_definition()
+        return ForwardConditionProfileEvidence(
+            False,
+            normalized,
+            0.0,
+            definition_version=str(definition["definition_version"]),
+        )
     amounts = definition["score_adjustments"]
     rules = []
     cautions = []
+    hard_conflicts = []
     adjustment = 0.0
     classic_coupling = _classic_coupling(observed_edit_tokens)
     heavy_formation = _formed_heavy_bond(observed_edit_tokens)
+    order_direction = _bond_order_direction(observed_edit_tokens)
     if normalized.strategy == "transition_metal_catalysis":
         if classic_coupling:
             adjustment += amounts["transition_metal_cross_coupling"]
@@ -197,10 +357,27 @@ def assess_condition_profile(
         cautions.append("CLASSIC_COUPLING_PATTERN_MAY_STILL_PROCEED_METAL_FREE")
     elif normalized.strategy in {"radical", "photochemical"}:
         cautions.append("MECHANISM_NOT_RESOLVED_FROM_NET_BOND_EDITS")
+    elif normalized.strategy == "thermal" and classic_coupling:
+        thermal_rule = definition["hard_compatibility_rules"][
+            "thermal_unactivated_aryl_halide_coupling"
+        ]
+        activation = _aryl_substitution_activation_status(
+            mapped_reaction_smiles,
+            thermal_rule,
+        )
+        if activation == "activated":
+            rules.append(str(thermal_rule["exception_rule"]))
+            cautions.append(
+                "ACTIVATED_ARYL_SUBSTITUTION_REMAINS_CONDITION_DEPENDENT"
+            )
+        elif activation == "unactivated_aryl_halide":
+            rules.append(str(thermal_rule["rejection_rule"]))
+            hard_conflicts.append(str(thermal_rule["hard_conflict"]))
     if normalized.redox_mode == "oxidative":
         key = (
-            "oxidative_pattern_match" if _hydrogen_loss(observed_edit_tokens)
-            else "oxidative_pattern_conflict" if _hydrogen_gain(observed_edit_tokens)
+            "oxidative_pattern_match" if order_direction > 0
+            else "oxidative_pattern_conflict"
+            if _hydrogen_gain(observed_edit_tokens) or order_direction < 0
             else None
         )
         if key:
@@ -208,8 +385,9 @@ def assess_condition_profile(
             rules.append(key)
     elif normalized.redox_mode == "reductive":
         key = (
-            "reductive_pattern_match" if _hydrogen_gain(observed_edit_tokens)
-            else "reductive_pattern_conflict" if _hydrogen_loss(observed_edit_tokens)
+            "reductive_pattern_match"
+            if _hydrogen_gain(observed_edit_tokens) or order_direction < 0
+            else "reductive_pattern_conflict" if order_direction > 0
             else None
         )
         if key:
@@ -223,8 +401,11 @@ def assess_condition_profile(
         evaluated=True,
         profile=normalized,
         score_adjustment=adjustment,
+        compatible=not hard_conflicts,
+        hard_conflicts=tuple(hard_conflicts),
         matched_rules=tuple(rules),
         cautions=tuple(cautions),
+        definition_version=str(definition["definition_version"]),
     )
 
 

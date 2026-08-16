@@ -693,6 +693,13 @@ candidates. Retained candidates should have
 `forward_validation_status: "verified_signature"`. Use `--skip-l0` to test only
 the more specific L2/L1 tiers and `--no-context` as a ranking ablation.
 
+That field is the inexpensive reaction-signature sanity check, not the complete
+forward audit. The web runtime can additionally replay each retained operator
+from its proposed precursors, run a target-blind product search, verify signature
+and edit agreement plus reverse precursor recovery, and disclose competing
+products. This independent audit is advisory and is serialized separately as
+`forward_assessment`.
+
 Next run a quantitative audit against a JSONL dataset excluded from every batch
 used to build the library. For example, if the Dess–Martin observations were
 not part of the Compact build:

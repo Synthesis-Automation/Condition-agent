@@ -35,6 +35,7 @@ from .models import (
     ForwardProductCandidate,
     ForwardRecipeEvidence,
     ForwardSearchDiagnostics,
+    ForwardValidityCheck,
     RouteStepForwardAssessment,
 )
 from .ranking import load_forward_ranking_policy, weighted_forward_score
@@ -198,7 +199,10 @@ def _validated_seed(
     condition_profile_evidence = assess_condition_profile(
         observed_tokens,
         condition_profile,
+        mapped_reaction_smiles=mapped_reaction_smiles,
     )
+    if condition_profile_evidence.compatible is False:
+        return None, "condition_profile_conflict"
     score = round(
         max(
             0.0,
@@ -505,6 +509,7 @@ def predict_products(
         missing_signature_count=counters["missing_signature"],
         operator_edit_mismatch_count=counters["operator_edit_mismatch"],
         recipe_conflict_count=counters["recipe_conflict"],
+        condition_profile_conflict_count=counters["condition_profile_conflict"],
         valid_pathway_count=len(seeds),
         self_reaction_pathway_count=counters["self_reaction_pathway"],
         unique_product_count=len(by_product),
@@ -516,6 +521,8 @@ def predict_products(
         warnings.append(
             "SELF_REACTION_PATHWAYS_ASSUME_MULTIPLE_EQUIVALENTS_OF_ONE_INPUT"
         )
+    if counters["condition_profile_conflict"]:
+        warnings.append("CONDITION_PROFILE_EXCLUDED_PATHWAYS")
     if not candidates:
         warnings.append("NO_FORWARD_PRODUCT_GENERATED")
     return ForwardPredictionResult(
@@ -549,6 +556,185 @@ def _match_kind(expected: str, candidate: str) -> str:
     if _without_stereo(expected) == _without_stereo(candidate):
         return "stereo_relaxed"
     return "absent"
+
+
+def _forward_validity_checks(
+    *,
+    blind: ForwardPredictionResult,
+    targeted_status: str,
+    matched: ForwardProductCandidate | None,
+    best_competitor: ForwardProductCandidate | None,
+    margin: float | None,
+    score_band_width: float,
+) -> tuple[ForwardValidityCheck, ...]:
+    """Expose independent graph, replay, recovery, and competition checks."""
+
+    checks = [
+        ForwardValidityCheck(
+            check_id="starting_material_graphs",
+            status="pass" if blind.valid else "fail",
+            detail=(
+                "Starting-material graphs parsed and entered forward search."
+                if blind.valid
+                else "Starting materials could not enter forward search."
+            ),
+        )
+    ]
+    targeted_status_map = {
+        "structurally_reproduced": (
+            "pass",
+            "The proposed retrosynthesis operator reproduced the intended product.",
+        ),
+        "not_reproduced": (
+            "fail",
+            "The proposed operator did not reproduce the intended product.",
+        ),
+        "operator_hint_not_found": (
+            "not_evaluated",
+            "The proposed operator is absent from the forward-admitted library.",
+        ),
+        "not_requested": (
+            "not_evaluated",
+            "No operator identity was supplied for targeted replay.",
+        ),
+    }
+    targeted_check = targeted_status_map[targeted_status]
+    checks.append(
+        ForwardValidityCheck(
+            check_id="targeted_operator_replay",
+            status=targeted_check[0],
+            detail=targeted_check[1],
+        )
+    )
+    if matched is None:
+        recovery_status = "warning" if blind.candidates else "not_evaluated"
+        checks.extend(
+            (
+                ForwardValidityCheck(
+                    check_id="blind_target_recovery",
+                    status=recovery_status,
+                    detail=(
+                        "Blind forward search generated products but did not recover "
+                        "the intended target."
+                        if blind.candidates
+                        else "Blind forward search generated no validated product."
+                    ),
+                ),
+                ForwardValidityCheck(
+                    check_id="reaction_signature",
+                    status="not_evaluated",
+                    detail="No blind target pathway was available to inspect.",
+                ),
+                ForwardValidityCheck(
+                    check_id="reverse_precursor_recovery",
+                    status="not_evaluated",
+                    detail="No blind target pathway was available to inspect.",
+                ),
+                ForwardValidityCheck(
+                    check_id="operator_edit_agreement",
+                    status="not_evaluated",
+                    detail="No blind target pathway was available to inspect.",
+                ),
+            )
+        )
+    else:
+        checks.extend(
+            (
+                ForwardValidityCheck(
+                    check_id="blind_target_recovery",
+                    status="pass",
+                    detail=f"Blind forward search recovered the target at rank {matched.rank}.",
+                ),
+                ForwardValidityCheck(
+                    check_id="reaction_signature",
+                    status=(
+                        "pass" if matched.reaction_signature_id else "fail"
+                    ),
+                    detail=(
+                        "The target pathway has a graph-derived reaction signature."
+                        if matched.reaction_signature_id
+                        else "The target pathway lacks a reaction signature."
+                    ),
+                ),
+                ForwardValidityCheck(
+                    check_id="reverse_precursor_recovery",
+                    status="pass" if matched.reverse_round_trip else "fail",
+                    detail=(
+                        "Reverse application recovered the proposed precursors."
+                        if matched.reverse_round_trip
+                        else "Reverse application did not recover the proposed precursors."
+                    ),
+                ),
+                ForwardValidityCheck(
+                    check_id="operator_edit_agreement",
+                    status="pass" if matched.operator_edit_agreement else "fail",
+                    detail=(
+                        "Observed bond edits agree with the generating operator."
+                        if matched.operator_edit_agreement
+                        else "Observed bond edits contradict the generating operator."
+                    ),
+                ),
+            )
+        )
+    if not blind.conditions_supplied and not blind.condition_profile_supplied:
+        condition_status = "not_evaluated"
+        condition_detail = (
+            "No recipe or condition profile was supplied; products are "
+            "structural possibilities."
+        )
+    elif matched is not None:
+        condition_status = "pass"
+        condition_detail = (
+            "The recovered target pathway survived the supplied condition "
+            "compatibility filters."
+        )
+    elif (
+        blind.diagnostics.recipe_conflict_count
+        or blind.diagnostics.condition_profile_conflict_count
+    ):
+        condition_status = "warning"
+        condition_detail = (
+            "Supplied condition constraints excluded generated pathways; "
+            "target-specific compatibility was not established."
+        )
+    else:
+        condition_status = "not_evaluated"
+        condition_detail = (
+            "The intended target was not recovered for condition assessment."
+        )
+    checks.append(
+        ForwardValidityCheck(
+            check_id="condition_compatibility",
+            status=condition_status,
+            detail=condition_detail,
+        )
+    )
+    if matched is None:
+        competition_status = "not_evaluated"
+        competition_detail = "The intended target was not recovered for comparison."
+    elif best_competitor is None:
+        competition_status = "pass"
+        competition_detail = "No competing validated product was generated."
+    elif margin is not None and margin >= score_band_width:
+        competition_status = "pass"
+        competition_detail = (
+            "The intended target leads the best competing product outside the "
+            "configured score band."
+        )
+    else:
+        competition_status = "warning"
+        competition_detail = (
+            f"A competing product ({best_competitor.product_smiles}) is within "
+            "or above the configured score band."
+        )
+    checks.append(
+        ForwardValidityCheck(
+            check_id="competing_product_risk",
+            status=competition_status,
+            detail=competition_detail,
+        )
+    )
+    return tuple(checks)
 
 
 def assess_proposed_step(
@@ -590,6 +776,14 @@ def assess_proposed_step(
             score_margin=None,
             disposition="out_of_scope",
             blind_prediction=blind,
+            validity="out_of_scope",
+            checks=(
+                ForwardValidityCheck(
+                    check_id="intended_product_graph",
+                    status="fail",
+                    detail="The intended product is not one valid molecular graph.",
+                ),
+            ),
             operator_hint=operator_hint,
             warnings=("INVALID_INTENDED_PRODUCT",),
         )
@@ -639,8 +833,19 @@ def assess_proposed_step(
         else None
     )
     policy = load_forward_ranking_policy()
-    if targeted_status in {"not_reproduced", "operator_hint_not_found"}:
+    if targeted_status == "not_reproduced":
         disposition = "structurally_inconsistent"
+    elif targeted_status == "operator_hint_not_found":
+        disposition = "out_of_scope"
+    elif (
+        not blind.candidates
+        and targeted_status == "structurally_reproduced"
+        and (
+            blind.diagnostics.recipe_conflict_count
+            or blind.diagnostics.condition_profile_conflict_count
+        )
+    ):
+        disposition = "condition_incompatible"
     elif not blind.candidates:
         disposition = "out_of_scope"
     elif not matched:
@@ -660,6 +865,28 @@ def assess_proposed_step(
         warnings.append("INTENDED_PRODUCT_NOT_FOUND_BY_BLIND_FORWARD_SEARCH")
     elif disposition == "structurally_inconsistent":
         warnings.append("RETROSYNTHESIS_OPERATOR_FAILED_TARGETED_FORWARD_REPLAY")
+    elif disposition == "condition_incompatible":
+        warnings.append(
+            "RETROSYNTHESIS_STEP_INCOMPATIBLE_WITH_SUPPLIED_CONDITIONS"
+        )
+    elif targeted_status == "operator_hint_not_found":
+        warnings.append("RETROSYNTHESIS_OPERATOR_NOT_FORWARD_ADMITTED")
+    validity = {
+        "clear": "structurally_supported",
+        "competitive": "structurally_supported_with_competition",
+        "unsupported": "inconclusive",
+        "structurally_inconsistent": "contradicted",
+        "condition_incompatible": "contradicted",
+        "out_of_scope": "out_of_scope",
+    }[disposition]
+    checks = _forward_validity_checks(
+        blind=blind,
+        targeted_status=targeted_status,
+        matched=matched[0] if matched else None,
+        best_competitor=best_competitor,
+        margin=margin,
+        score_band_width=policy.score_band_width,
+    )
     return RouteStepForwardAssessment(
         starting_materials=blind.canonical_starting_materials or starting_materials,
         intended_product=canonical_target,
@@ -672,6 +899,8 @@ def assess_proposed_step(
         score_margin=margin,
         disposition=disposition,
         blind_prediction=blind,
+        validity=validity,
+        checks=checks,
         operator_hint=operator_hint,
         warnings=tuple(warnings),
     )

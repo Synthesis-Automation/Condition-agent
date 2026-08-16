@@ -53,10 +53,12 @@ No new-system package imports legacy `chemtools`.
 6. Re-featurize each generated reaction through `reactive_taxonomy`.
 7. Require a reaction signature, verified reaction core, generating edit-token
    agreement, and reverse precursor recovery.
-8. Apply hard recipe conflicts before scoring when a resolved recipe is
+8. Apply hard recipe conflicts when a resolved recipe is supplied and narrow,
+   structure-supported condition-profile conflicts when a coarse profile is
    supplied.
-9. Rank with versioned structural evidence, group duplicate products, and
-   preserve alternative operator/template pathway identities.
+9. Rank the surviving outcomes with versioned structural evidence, group
+   duplicate products, and preserve alternative operator/template pathway
+   identities.
 
 The current ranking definition is
 [`forward_ranking.v3.json`](../../forward_synthesis/definitions/forward_ranking.v3.json).
@@ -65,9 +67,10 @@ Its score is explicitly an uncalibrated deterministic priority.
 Version 3 applies a small disclosed score penalty to virtual-copy pathways and
 accepts bounded adjustments from
 [`condition_profiles.v1.json`](../../forward_synthesis/definitions/condition_profiles.v1.json).
-This preserves self-coupling as a competing possibility without silently
-assuming that multiple equivalents were actually supplied. Condition-profile
-adjustments are traced separately and never admit an invalid graph outcome.
+This preserves self-coupling as a competing possibility when conditions are
+unknown without silently assuming that multiple equivalents were actually
+supplied. Condition-profile adjustments and exclusions are traced separately
+and never admit an invalid graph outcome.
 
 ## Condition input layers
 
@@ -87,6 +90,15 @@ catalysis favors a validated heavy-bond formation accompanied by C–halogen
 cleavage, while a catalyst-family choice is recorded but never treated as proof
 of product formation. Radical and photochemical selections carry an uncertainty
 notice when net edits cannot establish the mechanism.
+
+The thermal/uncatalyzed profile also applies a conservative graph gate to a
+classic coupling edit: substitution at an unactivated aryl chloride, bromide,
+or iodide is excluded. An aryl center with an ortho/para ring nitrogen or a
+recognized electron-withdrawing substituent remains eligible as an activated
+aryl-substitution hypothesis. This prevents a bromoaniline virtual-copy C-N
+self-coupling from being proposed under uncatalyzed conditions without turning
+the profile into a blanket ban on SNAr-like chemistry. Excluded pathways are
+reported in diagnostics rather than silently discarded.
 
 ## Public contracts
 
@@ -114,7 +126,29 @@ occurrences and independently evaluates the parent molecule. Results distinguish
 - `unsupported`: targeted chemistry may be plausible but blind retrieval did not
   recover the intended product;
 - `structurally_inconsistent`: the proposed operator cannot reproduce the target;
+- `condition_incompatible`: the operator reproduces the target structurally, but
+  the supplied recipe or condition profile rejects the generated pathway;
 - `out_of_scope`: the query or current operator library cannot be assessed.
+
+The public assessment also normalizes those dispositions into
+`structurally_supported`, `structurally_supported_with_competition`,
+`inconclusive`, `contradicted`, or `out_of_scope` validity and exposes separate
+checks for starting-material parsing, targeted
+operator replay, blind target recovery, reaction-signature availability,
+reverse precursor recovery, operator-edit agreement, and competing-product
+risk. Failure to find an operator in the forward-admitted library is explicitly
+out of scope rather than a chemical contradiction.
+
+The web retrosynthesis endpoints run this independent audit by default for
+every single-step candidate and every retained multistep reaction. Their compact
+JSON projection retains the check evidence, top blind products, pathway count,
+and condition basis without duplicating the full forward search payload for
+every route step. A user can disable the audit when latency matters. Multistep
+audits apply the best resolved condition recipe when route condition evidence is
+available. Single-step results begin with an unconditioned structural audit,
+then the progressive condition lookup reruns that audit with its top resolved
+recipe. When no recipe is available, the UI continues to label the result as an
+unconditioned structural possibility audit.
 
 These labels are review evidence only. They do not currently reject or rerank a
 route.
@@ -162,7 +196,8 @@ The workbench obtains its category labels from
 `GET /api/v1/forward-synthesis/condition-profiles`. The routine form exposes the
 coarse profile; canonical recipe JSON is retained under Advanced options as an
 expert override. Candidate details show the exact rule, score adjustment, and
-caution produced by the selected profile.
+caution produced by the selected profile. The result summary also reports how
+many generated pathways were excluded by the selected condition profile.
 
 Without an intended product the response contains blind predictions. With an
 intended product it also contains a separate route-step assessment while keeping
