@@ -915,6 +915,9 @@ def test_local_retrosynthesis_attaches_compact_forward_validity_audit(
     assert captured["intended_product"] == "CCN"
     assert captured["library"] is forward_library
     assert captured["operator_hint"] == "OP1:test"
+    assert captured["max_operators_to_apply"] == 40
+    assert captured["max_assignments_per_operator"] == 32
+    assert captured["max_outcomes_per_operator"] == 64
     assert audit["validity"] == "structurally_supported"
     assert audit["blind_prediction_summary"]["valid_pathway_count"] == 2
     assert audit["blind_prediction_summary"]["top_products"][0][

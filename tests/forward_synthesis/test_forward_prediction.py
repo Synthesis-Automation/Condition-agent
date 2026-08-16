@@ -71,6 +71,19 @@ def test_blind_prediction_recovers_product_without_target_input() -> None:
     assert "CONDITIONS_NOT_SUPPLIED_PRODUCTS_ARE_POSSIBILITIES" in result.warnings
 
 
+def test_blind_prediction_reports_a_truncated_operator_search() -> None:
+    library = _library(S_ALKYLATION, N_ALKYLATION)
+
+    result = predict_products(
+        "Cc1[nH]cnc1CCl.NCCS",
+        library,
+        max_operators_to_apply=1,
+    )
+
+    assert result.diagnostics.indexed_operator_count > 1
+    assert "FORWARD_OPERATOR_SEARCH_TRUNCATED" in result.warnings
+
+
 def test_competing_endpoint_products_are_retained_and_route_is_competitive() -> None:
     library = _library(S_ALKYLATION, N_ALKYLATION)
     starting_materials = "Cc1[nH]cnc1CCl.NCCS"

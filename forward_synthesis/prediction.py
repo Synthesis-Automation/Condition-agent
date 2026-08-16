@@ -515,6 +515,8 @@ def predict_products(
         unique_product_count=len(by_product),
     )
     warnings = []
+    if len(retrieved) > len(ordered_operators):
+        warnings.append("FORWARD_OPERATOR_SEARCH_TRUNCATED")
     if recipe is None:
         warnings.append("CONDITIONS_NOT_SUPPLIED_PRODUCTS_ARE_POSSIBILITIES")
     if counters["self_reaction_pathway"]:
@@ -749,8 +751,16 @@ def assess_proposed_step(
     include_self_reactions: bool = True,
     condition_profile: Mapping[str, Any] | ForwardConditionProfile | None = None,
     top_k: int = 20,
+    max_operators_to_apply: int = 300,
+    max_assignments_per_operator: int = 128,
+    max_outcomes_per_operator: int = 256,
 ) -> RouteStepForwardAssessment:
-    """Audit a route step using separate targeted and target-blind passes."""
+    """Audit a route step using separate targeted and target-blind passes.
+
+    Enumeration limits apply to both the blind search and the targeted replay.
+    A blind search that reaches its operator limit retains an explicit warning
+    rather than presenting its competition audit as exhaustive.
+    """
 
     canonical_target = canonical_molecule_collection(intended_product)
     blind = predict_products(
@@ -762,6 +772,9 @@ def assess_proposed_step(
         include_self_reactions=include_self_reactions,
         condition_profile=condition_profile,
         top_k=top_k,
+        max_operators_to_apply=max_operators_to_apply,
+        max_assignments_per_operator=max_assignments_per_operator,
+        max_outcomes_per_operator=max_outcomes_per_operator,
     )
     if canonical_target is None or "." in canonical_target:
         return RouteStepForwardAssessment(
@@ -801,6 +814,8 @@ def assess_proposed_step(
             for outcome in apply_forward_operator(
                 operator,
                 starting_materials,
+                max_assignments=max_assignments_per_operator,
+                max_outcomes=max_outcomes_per_operator,
                 allow_self_reaction=include_self_reactions,
             ):
                 if _match_kind(canonical_target, outcome.product_smiles) != "absent":

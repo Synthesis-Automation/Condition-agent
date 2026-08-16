@@ -97,6 +97,19 @@ WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET = 100
 WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET = 30
 WEB_MULTISTEP_TEMPLATE_BUDGET = 40
 WEB_MULTISTEP_VALIDATION_BUDGET = 10
+WEB_FORWARD_AUDIT_OPERATOR_BUDGET = 40
+WEB_FORWARD_AUDIT_ASSIGNMENT_BUDGET = 32
+WEB_FORWARD_AUDIT_OUTCOME_BUDGET = 64
+
+
+def _web_forward_audit_limits() -> Dict[str, int]:
+    """Return bounded enumeration limits for interactive forward audits."""
+
+    return {
+        "max_operators_to_apply": WEB_FORWARD_AUDIT_OPERATOR_BUDGET,
+        "max_assignments_per_operator": WEB_FORWARD_AUDIT_ASSIGNMENT_BUDGET,
+        "max_outcomes_per_operator": WEB_FORWARD_AUDIT_OUTCOME_BUDGET,
+    }
 
 
 def _unavailable_retrosynthesis_conditions(
@@ -877,6 +890,7 @@ class LocalRecommendationRuntime:
                         operator_hint=value.get("operator_id") or None,
                         levels=forward_levels,
                         top_k=max(10, min(20, request.top_k)),
+                        **_web_forward_audit_limits(),
                     )
                 except (RuntimeError, ValueError):
                     value["forward_assessment"] = None
@@ -1107,6 +1121,7 @@ class LocalRecommendationRuntime:
                     recipe=recipe,
                     levels=levels,
                     top_k=10,
+                    **_web_forward_audit_limits(),
                 )
             except (FileNotFoundError, RuntimeError, ValueError):
                 evidence["warnings"].append(
@@ -1263,6 +1278,7 @@ class LocalRecommendationRuntime:
                                     recipe=recipe,
                                     levels=forward_levels,
                                     top_k=10,
+                                    **_web_forward_audit_limits(),
                                 )
                             except (RuntimeError, ValueError):
                                 step["forward_assessment"] = None
