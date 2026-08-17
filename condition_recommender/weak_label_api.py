@@ -34,7 +34,7 @@ _RULES_PATH = (
 )
 DEFAULT_WEAK_LABEL_RECORDS_PATH = (
     Path(__file__).resolve().parents[1]
-    / "raw_dataset"
+    / "datasets"
     / "weak_label"
     / "v2.1_cleaned.csv"
 )

@@ -3,7 +3,7 @@
 ## Purpose
 
 This proof of concept tests whether the structured conditions in
-`datasets/reaction_label/v2.1_cleaned.csv` can support role-aware statistical
+`datasets/weak_label/v2.1_cleaned.csv` can support role-aware statistical
 condition groups. It does not change production recipe identity, admission,
 retrieval, compatibility, or ranking.
 
@@ -45,7 +45,7 @@ without completely dominating rare material systems.
 
 ```powershell
 python -m condition_recommender.condition_grouping_poc_cli `
-  datasets/reaction_label/v2.1_cleaned.csv `
+  datasets/weak_label/v2.1_cleaned.csv `
   results/condition_grouping_poc/v2_core `
   --clusters 256 `
   --latent-dimensions 48 `

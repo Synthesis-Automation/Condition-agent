@@ -1236,8 +1236,8 @@ Regenerate the cleaned CSV with:
 
 ```powershell
 python -m scripts.clean_reaction_label_csv `
-  datasets/reaction_label/v2.1.csv `
-  datasets/reaction_label/v2.1_cleaned.csv
+  datasets/weak_label/v2.1.csv `
+  datasets/weak_label/v2.1_cleaned.csv
 ```
 
 ## Shared compatibility behavior

@@ -30,7 +30,7 @@ Open `http://127.0.0.1:5173/`. Vite proxies `/api` to the local service on port
 8000. The default recommendation index is
 `datasets/literature/generic_index.sqlite`; override it with
 `CONDITION_RECOMMENDER_INDEX` or `python -m app.web_api --index <path>`.
-The weak-label mode uses `raw_dataset/weak_label/v2.1_cleaned.csv` and its
+The weak-label mode uses `datasets/weak_label/v2.1_cleaned.csv` and its
 paired recipe catalog by default. Override the CSV with
 `CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS`.
 

@@ -173,8 +173,10 @@ data/kmn_index/
 # Claude Code temporary working directories
 tmpclaude-*
 
-# Generated and local recommendation datasets
-/datasets/
+# Generated and local recommendation datasets. The curated weak-label source
+# and its canonical recipe catalog are versioned inputs, not generated output.
+/datasets/*
+!/datasets/weak_label/
 
 # Local USPTO source dataset (exceeds GitHub's 100 MB file limit)
 /raw_dataset/USPTO/USPTO_condition_reactions_cleaned.csv
