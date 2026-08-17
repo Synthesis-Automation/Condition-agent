@@ -18,10 +18,12 @@ from condition_recommender import (
 QUERY = "Brc1ccccc1.CN>>CNc1ccccc1"
 FIELDS = (
     "source_reaction_type",
+    "reactive_site_1_display_label",
     "reactive_site_1_signature",
     "reactive_site_1_center_class",
     "reactive_site_1_attachment_class",
     "reactive_site_1_alpha_branched",
+    "reactive_site_2_display_label",
     "reactive_site_2_signature",
     "reactive_site_2_center_class",
     "reactive_site_2_attachment_class",
@@ -84,7 +86,9 @@ def _dataset(tmp_path: Path) -> Path:
     rows = [
         {
             "source_reaction_type": "Buchwald-Hartwig",
+            "reactive_site_1_display_label": "Ar–Br",
             "reactive_site_1_signature": "LG|Ar|Br",
+            "reactive_site_2_display_label": "Alk–NH₂",
             "reactive_site_2_signature": "XH|N|H2|Alkyl",
             "yield_pct": "82",
             "z_score": "1.2",
@@ -92,7 +96,9 @@ def _dataset(tmp_path: Path) -> Path:
         },
         {
             "source_reaction_type": "CN-Coupling",
+            "reactive_site_1_display_label": "Alk–NH₂",
             "reactive_site_1_signature": "XH|N|H2|Alkyl",
+            "reactive_site_2_display_label": "Ar–Br",
             "reactive_site_2_signature": "LG|Ar|Br",
             "yield_pct": "90",
             "z_score": "1.5",
@@ -100,7 +106,9 @@ def _dataset(tmp_path: Path) -> Path:
         },
         {
             "source_reaction_type": "SNAr",
+            "reactive_site_1_display_label": "Ar–Br",
             "reactive_site_1_signature": "LG|Ar|Br",
+            "reactive_site_2_display_label": "Alk–NH₂",
             "reactive_site_2_signature": "XH|N|H2|Alkyl",
             "yield_pct": "75",
             "z_score": "0.4",
@@ -108,7 +116,9 @@ def _dataset(tmp_path: Path) -> Path:
         },
         {
             "source_reaction_type": "Buchwald-Hartwig",
+            "reactive_site_1_display_label": "Ar–Br",
             "reactive_site_1_signature": "LG|Ar|Br",
+            "reactive_site_2_display_label": "Alk–OH",
             "reactive_site_2_signature": "XH|O|H1|Alkyl",
             "yield_pct": "99",
             "z_score": "4.0",
@@ -134,6 +144,7 @@ def test_weak_label_rules_and_index_are_valid(tmp_path: Path) -> None:
     assert validate_weak_label_retrieval_rules() == []
     assert len(index.rows) == 4
     assert len(index.select_types(("Buchwald-Hartwig",))) == 2
+    assert index.rows[0].participants[0].display_label == "Ar–Br"
 
 
 def test_fallback_requires_graph_hint_and_matches_unordered_sites(
@@ -160,6 +171,22 @@ def test_fallback_requires_graph_hint_and_matches_unordered_sites(
         "RCR1:b",
     ]
     assert result.recommendations[0].support == 2
+    assert result.schema_version == "1.1"
+    assert result.recommendations[0].source_matches[0].source_reaction_type == (
+        "CN-Coupling"
+    )
+    assert result.recommendations[0].source_matches[0].participant_roles == (
+        "electrophile",
+        "nitrogen_partner",
+    )
+    assert (
+        result.recommendations[0].source_matches[0].participant_display_labels
+        == ("Ar–Br", "Alk–NH₂")
+    )
+    assert result.recommendations[0].source_matches[0].participant_signatures == (
+        "LG|Ar|Br",
+        "XH|N|H2|Alkyl",
+    )
     assert "WEAK_LABEL_PRECEDENTS_NOT_STRUCTURE_VERIFIED" in result.warnings
 
 

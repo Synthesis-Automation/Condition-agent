@@ -36,6 +36,7 @@ from .models import (
     RetrievalLevelTrace,
     WeakLabelConditionRecommendation,
     WeakLabelRecommendationResult,
+    WeakLabelSourceMatch,
 )
 from .ranking_preferences import (
     available_ranking_profiles,
@@ -95,6 +96,7 @@ __all__ = [
     "WeakLabelIndexedObservation",
     "WeakLabelParticipant",
     "WeakLabelRecommendationResult",
+    "WeakLabelSourceMatch",
     "DEFAULT_WEAK_LABEL_RECORDS_PATH",
     "available_ranking_profiles",
     "evaluate_reaction_core_index",

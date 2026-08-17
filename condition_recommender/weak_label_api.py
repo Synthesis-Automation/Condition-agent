@@ -20,6 +20,7 @@ from .compatibility import assess_recipe_compatibility
 from .models import (
     WeakLabelConditionRecommendation,
     WeakLabelRecommendationResult,
+    WeakLabelSourceMatch,
 )
 from .weak_label_indexing import (
     WeakLabelIndexedObservation,
@@ -160,19 +161,19 @@ def _qualifier_similarity(query: Any, precedent: WeakLabelParticipant) -> float:
 def _pair_similarity(
     query: Sequence[Any],
     precedent: Tuple[WeakLabelParticipant, WeakLabelParticipant],
-) -> tuple[float, float, float]:
+) -> tuple[float, float, float, tuple[int, int]]:
     weights = load_weak_label_retrieval_rules()["participant_similarity_weights"]
     alternatives = []
     for order in ((0, 1), (1, 0)):
         ordered = (precedent[order[0]], precedent[order[1]])
         if any(not item.signature for item in ordered):
-            alternatives.append((0.0, 0.0, 0.0))
+            alternatives.append((0.0, 0.0, 0.0, order))
             continue
         if any(
             _known_incompatible(query[index].canonical_signature, ordered[index].signature)
             for index in range(2)
         ):
-            alternatives.append((0.0, 0.0, 0.0))
+            alternatives.append((0.0, 0.0, 0.0, order))
             continue
         signatures = tuple(
             _signature_similarity(
@@ -193,9 +194,10 @@ def _pair_similarity(
                 + float(weights["qualifier"]) * qualifier_score,
                 signature_score,
                 qualifier_score,
+                order,
             )
         )
-    return max(alternatives)
+    return max(alternatives, key=lambda value: value[:3])
 
 
 def _sigmoid(value: float) -> float:
@@ -310,7 +312,7 @@ def _rank_recipes(
     excluded = 0
     compatibility_cache = {}
     for row in rows:
-        label_score, signature_score, qualifier_score = _pair_similarity(
+        label_score, signature_score, qualifier_score, participant_order = _pair_similarity(
             query_participants, row.participants
         )
         if signature_score <= 0.0:
@@ -327,7 +329,14 @@ def _rank_recipes(
             excluded += 1
             continue
         assessed.append(
-            (label_score, signature_score, qualifier_score, compatibility, row)
+            (
+                label_score,
+                signature_score,
+                qualifier_score,
+                participant_order,
+                compatibility,
+                row,
+            )
         )
 
     groups = defaultdict(list)
@@ -361,7 +370,14 @@ def _rank_recipes(
             if z_values
             else None
         )
-        best_label, best_signature, best_qualifier, compatibility, best_row = members[0]
+        (
+            best_label,
+            best_signature,
+            best_qualifier,
+            _best_order,
+            compatibility,
+            best_row,
+        ) = members[0]
         support_score = min(1.0, math.log1p(len(members)) / math.log1p(10))
         score = (
             float(weights["label_similarity"]) * best_label
@@ -388,6 +404,28 @@ def _rank_recipes(
                 ),
                 source_row_numbers=tuple(
                     item[-1].source_row_number for item in members[:maximum]
+                ),
+                source_matches=tuple(
+                    WeakLabelSourceMatch(
+                        source_row_number=item[-1].source_row_number,
+                        source_reaction_type=item[-1].reaction_type,
+                        participant_roles=tuple(
+                            str(query_participants[index].role or f"participant_{index + 1}")
+                            for index in range(2)
+                        ),
+                        participant_display_labels=tuple(
+                            item[-1].participants[source_index].display_label
+                            for source_index in item[3]
+                        ),
+                        participant_signatures=tuple(
+                            item[-1].participants[source_index].signature
+                            for source_index in item[3]
+                        ),
+                        label_similarity=round(item[0], 6),
+                        signature_similarity=round(item[1], 6),
+                        qualifier_similarity=round(item[2], 6),
+                    )
+                    for item in members[:maximum]
                 ),
                 explanation=(
                     "Compatible graph-derived reaction-type hint",

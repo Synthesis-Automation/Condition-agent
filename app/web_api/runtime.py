@@ -19,11 +19,14 @@ from cas_tools import (
 from condition_registry.loader import load_substances
 from condition_recommender import (
     ChemistRankingPreferences,
+    DEFAULT_WEAK_LABEL_RECORDS_PATH,
     GenericConditionRecommender,
     available_ranking_profiles,
     build_completion_selection,
     propose_reaction_completion,
+    recommend_weak_label_conditions,
     resolve_ranking_preferences,
+    weak_label_recipe_catalog_path,
 )
 from condition_recommender.reaction_completion import (
     validate_completion_selections,
@@ -244,6 +247,7 @@ class LocalRecommendationRuntime:
         retrosynthesis_library_root: str | Path | None = None,
         literature_index_path: str | Path | None = None,
         stock_portfolio_path: str | Path | None = None,
+        weak_label_records_path: str | Path | None = None,
     ) -> None:
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
         self._configured_index_path = Path(configured) if configured else None
@@ -281,6 +285,13 @@ class LocalRecommendationRuntime:
         )
         self.stock_portfolio_path = Path(
             configured_stock_portfolio or DEFAULT_STOCK_PORTFOLIO
+        )
+        configured_weak_labels = (
+            weak_label_records_path
+            or os.environ.get("CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS")
+        )
+        self.weak_label_records_path = Path(
+            configured_weak_labels or DEFAULT_WEAK_LABEL_RECORDS_PATH
         )
         # An explicitly supplied legacy index is an intentional test/runtime
         # override unless a stock portfolio was also explicitly configured.
@@ -610,6 +621,13 @@ class LocalRecommendationRuntime:
             "loaded_runtime_variants": len(self._recommenders),
             "rxnmapper_available": RxnMapperProvider.is_available(),
             "recommendation": True,
+            "weak_label_recommendation": (
+                self.weak_label_records_path.is_file()
+                and weak_label_recipe_catalog_path(
+                    self.weak_label_records_path
+                ).is_file()
+            ),
+            "weak_label_dataset_name": self.weak_label_records_path.name,
             "featurization": True,
             "reaction_rendering": True,
             "forward_synthesis": any(
@@ -713,9 +731,23 @@ class LocalRecommendationRuntime:
         return selections
 
     def recommend(self, request: RecommendationRequest) -> Dict[str, Any]:
-        """Execute the canonical generic recommendation use case."""
+        """Execute the selected generic or explicitly weak-label use case."""
 
         reaction_smiles = request.reaction_smiles.strip()
+        if request.recommendation_mode != "generic":
+            if request.completion_choices:
+                raise ValueError("WEAK_LABEL_COMPLETION_UNSUPPORTED")
+            result = recommend_weak_label_conditions(
+                reaction_smiles,
+                records_path=self.weak_label_records_path,
+                top_k=request.top_k,
+                mode=(
+                    "screening"
+                    if request.recommendation_mode == "weak_label_screening"
+                    else "fallback"
+                ),
+            )
+            return result.to_dict()
         selections = self._completion_selections(
             reaction_smiles,
             request.completion_choices,

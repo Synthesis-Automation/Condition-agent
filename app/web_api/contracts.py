@@ -57,6 +57,11 @@ class RecommendationRequest(StrictRequest):
     """One condition-recommendation request."""
 
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
+    recommendation_mode: Literal[
+        "generic",
+        "weak_label_fallback",
+        "weak_label_screening",
+    ] = "generic"
     library_mode: Literal["full", "compact"] = "full"
     top_k: int = Field(default=5, ge=1, le=50)
     minimum_pool_size: Optional[int] = Field(default=None, ge=1, le=100)

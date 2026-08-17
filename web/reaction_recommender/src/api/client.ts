@@ -11,7 +11,7 @@ import type {
   PrepareReactionResult,
   RankingProfile,
   RecommendationRequest,
-  RecommendationResult,
+  RecommendationApiResult,
   RetrosynthesisRequest,
   RetrosynthesisConditionsRequest,
   RetrosynthesisConditionEvidence,
@@ -69,7 +69,7 @@ export const api = {
     }),
 
   recommend: (request: RecommendationRequest) =>
-    jsonRequest<RecommendationResult>('/recommendations', {
+    jsonRequest<RecommendationApiResult>('/recommendations', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

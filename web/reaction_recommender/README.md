@@ -30,6 +30,9 @@ Open `http://127.0.0.1:5173/`. Vite proxies `/api` to the local service on port
 8000. The default recommendation index is
 `datasets/literature/generic_index.sqlite`; override it with
 `CONDITION_RECOMMENDER_INDEX` or `python -m app.web_api --index <path>`.
+The weak-label mode uses `raw_dataset/weak_label/v2.1_cleaned.csv` and its
+paired recipe catalog by default. Override the CSV with
+`CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS`.
 
 ## Single-port local build
 
@@ -49,6 +52,10 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
 - Draw, clear, load, paste, and export reaction SMILES with Ketcher.
 - Validate product-fragment source requirements before recommendation.
 - Retrieve and rank chemically compatible canonical condition recipes.
+- Run a separate weak-label condition mode as either ranked fallback recipes
+  or a diversity-selected screening array. The UI shows the graph-derived
+  reaction-type hint, matched participants, source-label evidence, and
+  persistent warnings that the precedent reactions are not structure verified.
 - Apply declarative ranking profiles or transparent custom weights.
 - Predict possible products from dot-separated starting materials with the
   target-blind Forward synthesis mode. A canonical condition-recipe JSON object

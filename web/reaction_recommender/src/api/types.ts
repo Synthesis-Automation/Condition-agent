@@ -12,6 +12,8 @@ export interface Capabilities {
   loaded_runtime_variants: number
   rxnmapper_available: boolean
   recommendation: boolean
+  weak_label_recommendation?: boolean
+  weak_label_dataset_name?: string
   featurization: boolean
   reaction_rendering: boolean
   retrosynthesis?: boolean
@@ -265,8 +267,76 @@ export interface RecommendationResult {
   ranking_preferences: JsonObject
 }
 
+export interface WeakLabelParticipant {
+  component_index: number
+  site_id: string
+  site_type: string
+  canonical_signature: string
+  chemist_label: string
+  active_atom_indices: number[]
+  role?: string | null
+  role_confidence: number
+  center_substitution_class?: string | null
+  attachment_carbon_classes: string[]
+  alpha_branched?: boolean | null
+  evidence: string[]
+  schema_version: string
+}
+
+export interface WeakLabelRecommendation {
+  rank: number
+  recipe_id: string
+  resolved_recipe: ResolvedRecipe
+  score: number
+  label_similarity: number
+  signature_similarity: number
+  qualifier_similarity: number
+  compatibility_score: number
+  expected_yield_pct?: number | null
+  mean_z_score?: number | null
+  support: number
+  source_reaction_types: string[]
+  source_row_numbers: number[]
+  source_matches: WeakLabelSourceMatch[]
+  explanation: string[]
+  compatibility_evidence: string[]
+  cautions: string[]
+}
+
+export interface WeakLabelSourceMatch {
+  source_row_number: number
+  source_reaction_type: string
+  participant_roles: [string, string]
+  participant_display_labels: [string, string]
+  participant_signatures: [string, string]
+  label_similarity: number
+  signature_similarity: number
+  qualifier_similarity: number
+}
+
+export interface WeakLabelRecommendationResult {
+  query_reaction_smiles: string
+  valid: boolean
+  recommendation_mode: 'weak_label_fallback' | 'weak_label_screening'
+  reaction_type_hint_id?: string | null
+  reaction_type_id?: string | null
+  source_reaction_type_candidates: string[]
+  query_participants: WeakLabelParticipant[]
+  candidate_count: number
+  compatible_candidate_count: number
+  excluded_candidate_count: number
+  recipe_count: number
+  recommendations: WeakLabelRecommendation[]
+  warnings: string[]
+  error?: string | null
+  schema_version: string
+}
+
+export type RecommendationApiResult = RecommendationResult | WeakLabelRecommendationResult
+
 export interface RecommendationRequest {
   reaction_smiles: string
+  recommendation_mode: 'generic' | 'weak_label_fallback' | 'weak_label_screening'
   library_mode: 'full' | 'compact'
   top_k: number
   minimum_pool_size: number | null

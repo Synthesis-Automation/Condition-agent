@@ -15,6 +15,7 @@ from typing import Any, Dict, Mapping, Optional, Tuple
 class WeakLabelParticipant:
     """One normalized source-asserted reactive participant."""
 
+    display_label: str
     signature: str
     center_class: Optional[str]
     attachment_class: Optional[str]
@@ -73,6 +74,7 @@ def _optional_bool(value: Any) -> Optional[bool]:
 
 def _participant(row: Mapping[str, str], prefix: str) -> WeakLabelParticipant:
     return WeakLabelParticipant(
+        display_label=str(row.get(f"{prefix}_display_label") or "").strip(),
         signature=str(row.get(f"{prefix}_signature") or "").strip(),
         center_class=(
             str(row.get(f"{prefix}_center_class") or "").strip() or None
@@ -135,7 +137,9 @@ def _load_weak_label_index_cached(
         required = {
             "source_reaction_type",
             "reactive_site_1_signature",
+            "reactive_site_1_display_label",
             "reactive_site_2_signature",
+            "reactive_site_2_display_label",
             "yield_pct",
             "condition_recipe_id",
         }

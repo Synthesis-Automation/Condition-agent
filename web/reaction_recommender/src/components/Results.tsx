@@ -15,6 +15,8 @@ import type {
   RetrosynthesisForwardAssessment,
   RetrosynthesisResult,
   SynthesisProtocolDraft,
+  WeakLabelRecommendation,
+  WeakLabelRecommendationResult,
 } from '../api/types'
 import { ReactionImage } from './ReactionImage'
 
@@ -457,6 +459,126 @@ export function RecommendationResults({ result }: { result: RecommendationResult
             </table>
           </div>
           {active && <RecommendationDetails item={active} />}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function WeakLabelRecommendationDetails({ item }: { item: WeakLabelRecommendation }) {
+  return (
+    <article className="result-detail weak-label-detail">
+      <div className="detail-title-row">
+        <div className="selected-recipe-heading">
+          <span className="eyebrow">WEAK-LABEL RECIPE</span>
+          <h3>Rank {item.rank}</h3>
+          <SelectedRecipeConditions recipe={item.resolved_recipe} />
+        </div>
+        <div className="score-orbit"><strong>{item.score.toFixed(3)}</strong><span>score</span></div>
+      </div>
+      <div className="detail-columns recommendation-overview">
+        <section className="recommendation-rationale">
+          <h4>Why this recipe</h4>
+          <p className="evidence-summary">
+            Label {item.label_similarity.toFixed(3)} · signatures {item.signature_similarity.toFixed(3)} · compatibility {item.compatibility_score.toFixed(3)}
+          </p>
+          <p className="support-summary">
+            {item.support} weak-label observation{item.support === 1 ? '' : 's'} · expected yield {item.expected_yield_pct == null ? 'unreported' : `${item.expected_yield_pct.toFixed(1)}%`}
+          </p>
+          {item.explanation.length > 0 && <ul>{item.explanation.map((note) => <li key={note}>{note}</li>)}</ul>}
+        </section>
+        <section className="recommendation-reference">
+          <h4>Matched source labels</h4>
+          <div className="weak-label-match-list">
+            {item.source_matches.map((match) => (
+              <article key={`${match.source_row_number}:${match.source_reaction_type}`}>
+                <div><strong>{match.source_reaction_type}</strong><small>row {match.source_row_number}</small></div>
+                {match.participant_roles.map((role, index) => (
+                  <p key={`${role}:${index}`}>
+                    <span>{displayName(role)}</span>
+                    <strong>{match.participant_display_labels[index] || match.participant_signatures[index]}</strong>
+                    <code>{match.participant_signatures[index]}</code>
+                  </p>
+                ))}
+              </article>
+            ))}
+          </div>
+          {item.source_matches.length === 0 && <p>No source participant labels were retained.</p>}
+        </section>
+      </div>
+      <MessageList title="Compatibility evidence" values={item.compatibility_evidence} />
+      <MessageList title="Cautions" values={item.cautions} tone="caution" />
+    </article>
+  )
+}
+
+export function WeakLabelRecommendationResults({ result }: { result: WeakLabelRecommendationResult }) {
+  const [selected, setSelected] = useState(0)
+  useEffect(() => setSelected(0), [result])
+  const active = result.recommendations[selected]
+  const screening = result.recommendation_mode === 'weak_label_screening'
+  return (
+    <section className="results-card weak-label-results">
+      <div className="results-summary">
+        <div>
+          <span className="eyebrow">UNVERIFIED WEAK-LABEL EVIDENCE</span>
+          <h2>{result.recommendations.length} {screening ? 'screening condition' : 'ranked recipe'}{result.recommendations.length === 1 ? '' : 's'}</h2>
+        </div>
+        <div className="metric-strip">
+          <div><strong>{result.candidate_count}</strong><span>label rows</span></div>
+          <div><strong>{result.compatible_candidate_count}</strong><span>compatible</span></div>
+          <div><strong>{displayName(result.reaction_type_id ?? 'unsupported')}</strong><span>graph hint</span></div>
+        </div>
+      </div>
+      <div className="alert caution weak-label-banner">
+        Source reactions are not structure-verified. Use these recipes as expert-reviewed fallback or screening hypotheses, not literature-validated precedents.
+      </div>
+      {result.query_participants.length > 0 && (
+        <div className="weak-labels-used" aria-label="Graph-derived query labels used">
+          <strong>Query labels used</strong>
+          {result.query_participants.map((participant) => (
+            <span key={`${participant.component_index}:${participant.site_id}`}>
+              {displayName(participant.role ?? 'participant')}: <b>{participant.chemist_label}</b> <code>{participant.canonical_signature}</code>
+            </span>
+          ))}
+        </div>
+      )}
+      {!result.valid && <div className="alert error">{displayName(result.error ?? 'No weak-label recommendation')}</div>}
+      <MessageList title="Query warnings" values={result.warnings} tone="caution" />
+      {result.query_participants.length > 0 && (
+        <details className="trace-panel weak-label-query">
+          <summary>Graph-derived query hint and participants</summary>
+          <dl className="detail-list">
+            <div><dt>Hint ID</dt><dd>{result.reaction_type_hint_id ?? 'Unavailable'}</dd></div>
+            <div><dt>Compatible source types</dt><dd>{result.source_reaction_type_candidates.join(', ')}</dd></div>
+            {result.query_participants.map((participant) => (
+              <div key={`${participant.component_index}:${participant.site_id}`}>
+                <dt>{displayName(participant.role ?? 'participant')}</dt>
+                <dd>{participant.chemist_label} · {participant.canonical_signature}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
+      {result.recommendations.length > 0 && (
+        <div className="results-layout">
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>Rank</th><th>Score</th><th>Source labels used</th><th>Yield</th><th>Conditions</th></tr></thead>
+              <tbody>
+                {result.recommendations.map((item, index) => (
+                  <tr key={item.recipe_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
+                    <td><strong>{item.rank}</strong></td>
+                    <td>{item.score.toFixed(3)}</td>
+                    <td>{item.source_matches[0]?.participant_display_labels.map((label, labelIndex) => label || item.source_matches[0].participant_signatures[labelIndex]).join(' + ') ?? 'Unreported'}</td>
+                    <td>{item.expected_yield_pct == null ? '—' : `${item.expected_yield_pct.toFixed(1)}%`}</td>
+                    <td>{compactRecipeSummary(item.resolved_recipe)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {active && <WeakLabelRecommendationDetails item={active} />}
         </div>
       )}
     </section>

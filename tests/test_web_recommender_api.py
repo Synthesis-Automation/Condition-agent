@@ -19,6 +19,7 @@ from app.web_api.main import create_app
 from app.web_api.contracts import (
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
+    RecommendationRequest,
     RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
 )
@@ -73,6 +74,7 @@ class FakeRuntime:
     def recommend(self, request: Any) -> Dict[str, Any]:
         return {
             "query_reaction_smiles": request.reaction_smiles,
+            "recommendation_mode": request.recommendation_mode,
             "library_mode": request.library_mode,
             "valid": True,
             "recommendations": [
@@ -261,6 +263,61 @@ def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> No
     assert capabilities["default_library_mode"] == "full"
     assert capabilities["library_modes"]["full"]["index_available"] is True
     assert capabilities["library_modes"]["compact"]["index_available"] is True
+
+
+def test_local_runtime_reports_weak_label_dataset_availability(tmp_path) -> None:
+    records = tmp_path / "weak_labels.csv"
+    records.touch()
+    (tmp_path / "weak_labels.condition_recipes.jsonl.gz").touch()
+
+    capabilities = LocalRecommendationRuntime(
+        weak_label_records_path=records
+    ).capabilities()
+
+    assert capabilities["weak_label_recommendation"] is True
+    assert capabilities["weak_label_dataset_name"] == "weak_labels.csv"
+
+
+def test_local_runtime_routes_weak_label_screening_without_generic_index(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    calls = {}
+
+    def fake_recommend(reaction_smiles, **options):
+        calls.update({"reaction_smiles": reaction_smiles, **options})
+        return SimpleNamespace(
+            to_dict=lambda: {
+                "query_reaction_smiles": reaction_smiles,
+                "valid": True,
+                "recommendation_mode": "weak_label_screening",
+                "recommendations": [],
+            }
+        )
+
+    monkeypatch.setattr(
+        runtime_module,
+        "recommend_weak_label_conditions",
+        fake_recommend,
+    )
+    records = tmp_path / "weak_labels.csv"
+    runtime = LocalRecommendationRuntime(weak_label_records_path=records)
+
+    result = runtime.recommend(
+        RecommendationRequest(
+            reaction_smiles="Brc1ccccc1.CN>>CNc1ccccc1",
+            recommendation_mode="weak_label_screening",
+            top_k=12,
+        )
+    )
+
+    assert result["recommendation_mode"] == "weak_label_screening"
+    assert calls == {
+        "reaction_smiles": "Brc1ccccc1.CN>>CNc1ccccc1",
+        "records_path": records,
+        "top_k": 12,
+        "mode": "screening",
+    }
 
 
 def test_local_runtime_reports_retrosynthesis_library_modes(tmp_path) -> None:
@@ -1133,6 +1190,7 @@ def test_recommendation_contract_forwards_validated_options() -> None:
     payload = response.json()
     assert payload["api_schema_version"] == "1.0"
     assert payload["data"]["query_reaction_smiles"] == "CCBr.N>>CCN"
+    assert payload["data"]["recommendation_mode"] == "generic"
     assert payload["data"]["library_mode"] == "compact"
     assert payload["data"]["recommendations"][0]["recipe_id"] == "recipe:1"
     assert (
@@ -1141,6 +1199,34 @@ def test_recommendation_contract_forwards_validated_options() -> None:
         ]
         == "584-08-7"
     )
+
+
+def test_recommendation_contract_accepts_weak_label_mode() -> None:
+    response = client().post(
+        "/api/v1/recommendations",
+        json={
+            "reaction_smiles": "Brc1ccccc1.CN>>CNc1ccccc1",
+            "recommendation_mode": "weak_label_fallback",
+            "top_k": 8,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["data"]["recommendation_mode"] == (
+        "weak_label_fallback"
+    )
+
+
+def test_recommendation_contract_rejects_unknown_mode() -> None:
+    response = client().post(
+        "/api/v1/recommendations",
+        json={
+            "reaction_smiles": "Brc1ccccc1.CN>>CNc1ccccc1",
+            "recommendation_mode": "label_only_magic",
+        },
+    )
+
+    assert response.status_code == 422
 
 
 def test_reaction_svg_rendering_contract() -> None:

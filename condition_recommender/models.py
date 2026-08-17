@@ -16,7 +16,7 @@ COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
 GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.4"
-WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "1.0"
+WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "1.1"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
     "fragment_source_capabilities.v1@1.3"
@@ -442,6 +442,23 @@ class GenericRecommendationResult:
 
 
 @dataclass(frozen=True)
+class WeakLabelSourceMatch:
+    """One source-label pair actually used to support a recipe."""
+
+    source_row_number: int
+    source_reaction_type: str
+    participant_roles: Tuple[str, str]
+    participant_display_labels: Tuple[str, str]
+    participant_signatures: Tuple[str, str]
+    label_similarity: float
+    signature_similarity: float
+    qualifier_similarity: float
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class WeakLabelConditionRecommendation:
     """One canonical recipe supported only by weak-label observations."""
 
@@ -458,6 +475,7 @@ class WeakLabelConditionRecommendation:
     support: int
     source_reaction_types: Tuple[str, ...]
     source_row_numbers: Tuple[int, ...]
+    source_matches: Tuple[WeakLabelSourceMatch, ...]
     explanation: Tuple[str, ...]
     compatibility_evidence: Tuple[str, ...] = ()
     cautions: Tuple[str, ...] = ()
