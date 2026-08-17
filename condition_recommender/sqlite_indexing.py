@@ -422,6 +422,8 @@ def build_sqlite_generic_index(
             digest.update(b"\0")
             digest.update(canonical)
             row_batch.append((position, compressed_payload))
+            if row.reaction_id:
+                lookup_batch.append(("reaction_ids", row.reaction_id, position))
 
             signature_fields = {
                 "exact": "exact_signature_key",
@@ -516,6 +518,7 @@ def build_sqlite_generic_index(
         stage_connection.commit()
 
         lookup_names = (
+            "reaction_ids",
             "exact",
             "handles",
             "transformations",
@@ -846,6 +849,7 @@ def load_sqlite_generic_index(path: str | Path) -> GenericReactionIndex:
     lookup_counts = metadata.get("lookup_counts") or {}
     auxiliary_lookup_counts = metadata.get("auxiliary_lookup_counts") or {}
     map_names = (
+        "reaction_ids",
         "exact",
         "handles",
         "transformations",
@@ -873,6 +877,7 @@ def load_sqlite_generic_index(path: str | Path) -> GenericReactionIndex:
     }
     return GenericReactionIndex(
         rows=SQLiteReactionRows(source, row_count),
+        reaction_ids=maps["reaction_ids"],
         exact=maps["exact"],
         handles=maps["handles"],
         transformations=maps["transformations"],

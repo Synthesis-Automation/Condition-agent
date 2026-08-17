@@ -193,6 +193,7 @@ def test_streamed_sqlite_index_matches_in_memory_builder(tmp_path: Path) -> None
     assert streamed_report["index_id"] == expected_report["index_id"]
     assert tuple(streamed_index.rows) == expected_index.rows
     for field in (
+        "reaction_ids",
         "exact",
         "handles",
         "transformations",
@@ -249,6 +250,7 @@ def test_sqlite_index_round_trip_is_lazy_and_equivalent(tmp_path: Path) -> None:
     assert isinstance(loaded.exact, SQLiteLookupMapping)
     assert tuple(loaded.rows) == index.rows
     for field in (
+        "reaction_ids",
         "exact",
         "handles",
         "transformations",

@@ -25871,7 +25871,7 @@
 {"cas":"1271-19-8","id":"cas:1271-19-8","name":"Titanocene dichloride","smiles":"C1=C(C=C(C=C1C(F)(F)F)C(F)(F)F)C(=O)Cl"}
 {"cas":"64-77-7","id":"cas:64-77-7","name":"Tolbutamide","smiles":"CCCCNC(=O)NS(=O)(=O)C1=CC=C(C=C1)C"}
 {"cas":"91-08-7","id":"cas:91-08-7","name":"Toluene-2,6-diisocyanate","smiles":"CC1=C(C=CC=C1N=C=O)N=C=O"}
-{"cas":"2037-26-5","id":"cas:2037-26-5","name":"Toluene-d8","smiles":"Cc1ccccc1"}
+{"cas":"2037-26-5","id":"cas:2037-26-5","name":"Toluene-d8","smiles":"[2H]c1c([2H])c([2H])c(C([2H])([2H])[2H])c([2H])c1[2H]"}
 {"cas":"26471-62-5","id":"cas:26471-62-5","name":"toluenediisocyanate","smiles":"Cc1c(N=C=O)cccc1N=C=O"}
 {"cas":"584-84-9","id":"cas:584-84-9","name":"Tolylene-2,4-diisocyanate","smiles":"Cc1ccc(N=C=O)cc1N=C=O"}
 {"cas":"1302-59-6","id":"cas:1302-59-6","name":"Topaz,naturallyoccuringmineral,grains,approximately0.06-","smiles":"CCCC(CN1C=NC=N1)C2=C(C=C(C=C2)Cl)Cl"}

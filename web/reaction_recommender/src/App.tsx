@@ -131,6 +131,7 @@ function App() {
             || candidate.proposed_reaction_smiles,
           library_mode: activeLibraryMode,
           top_k: 3,
+          preferred_reaction_ids: candidate.condition_precedent_reaction_ids,
           starting_materials: candidate.precursor_smiles,
           intended_product: candidate.target_smiles,
           operator_hint: candidate.operator_id || null,

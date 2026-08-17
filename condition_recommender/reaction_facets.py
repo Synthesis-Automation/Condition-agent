@@ -31,18 +31,32 @@ def load_reaction_facet_rules() -> dict[str, Any]:
     """Load and validate the versioned reaction-facet definition."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if rules.get("schema_version") != "1.0":
+    if rules.get("schema_version") != "1.1":
         raise ValueError("unsupported reaction-facet definition schema")
     if rules.get("definition_id") != "reaction_facet_retrieval.v1":
         raise ValueError("unexpected reaction-facet definition ID")
     if not str(rules.get("calibration_status") or "").strip():
         raise ValueError("reaction-facet definition requires calibration status")
     state_fields = tuple(str(value) for value in rules.get("state_fields") or ())
+    hard_state_fields = tuple(
+        str(value)
+        for value in rules.get("hard_compatibility_state_fields") or ()
+    )
     topology_fields = tuple(
         str(value) for value in rules.get("topology_fields") or ()
     )
     if not state_fields or len(set(state_fields)) != len(state_fields):
         raise ValueError("reaction-facet state fields are invalid")
+    if (
+        not hard_state_fields
+        or len(set(hard_state_fields)) != len(hard_state_fields)
+        or not set(hard_state_fields) <= set(state_fields)
+    ):
+        raise ValueError("reaction-facet hard compatibility fields are invalid")
+    if rules.get("hard_compatibility_requires_hydrogen_change") is not True:
+        raise ValueError(
+            "reaction-facet hard compatibility must require hydrogen change"
+        )
     if not topology_fields or len(set(topology_fields)) != len(topology_fields):
         raise ValueError("reaction-facet topology fields are invalid")
     parents = rules.get("attachment_parents")
@@ -60,6 +74,7 @@ def load_reaction_facet_rules() -> dict[str, Any]:
     ):
         raise ValueError("reaction-facet retrieval ladder is invalid")
     rules["state_fields"] = state_fields
+    rules["hard_compatibility_state_fields"] = hard_state_fields
     rules["topology_fields"] = topology_fields
     rules["active_site_signature_prefixes"] = prefixes
     rules["retrieval_ladder"] = ladder
@@ -82,6 +97,59 @@ def _state_payload(state: Any, fields: Tuple[str, ...]) -> Any:
     if not isinstance(state, Mapping):
         return None
     return tuple((field, state.get(field)) for field in fields)
+
+
+def active_atom_state_tokens(
+    reaction_core: Mapping[str, Any] | None,
+) -> Tuple[str, ...]:
+    """Return exact before/after states for atoms that lose or gain hydrogen.
+
+    These atoms encode nucleophile substitution level and electronic class.
+    Atom-map identifiers and remote substituent identity are deliberately
+    excluded so equivalent chemistry remains representation invariant.
+    """
+
+    if not reaction_core:
+        return ()
+    fields = load_reaction_facet_rules()["hard_compatibility_state_fields"]
+    tokens = []
+    for transition in reaction_core.get("atom_transitions") or ():
+        if not isinstance(transition, Mapping):
+            continue
+        if int(transition.get("incident_edit_count") or 0) < 1:
+            continue
+        before = transition.get("before_state")
+        after = transition.get("after_state")
+        if not isinstance(before, Mapping) or not isinstance(after, Mapping):
+            continue
+        before_h = before.get("total_hydrogens")
+        after_h = after.get("total_hydrogens")
+        if (
+            not isinstance(before_h, int)
+            or not isinstance(after_h, int)
+            or before_h == after_h
+        ):
+            continue
+        tokens.append(
+            _canonical_json(
+                {
+                    "before": _state_payload(before, fields),
+                    "after": _state_payload(after, fields),
+                }
+            )
+        )
+    return tuple(sorted(tokens))
+
+
+def active_atom_states_compatible(
+    query_core: Mapping[str, Any] | None,
+    precedent_core: Mapping[str, Any] | None,
+) -> bool:
+    """Reject a precedent only when both cores contradict at active X-H atoms."""
+
+    query = active_atom_state_tokens(query_core)
+    precedent = active_atom_state_tokens(precedent_core)
+    return not query or not precedent or query == precedent
 
 
 def _active_site_signatures(
@@ -239,6 +307,8 @@ def reaction_facet_keys(
 
 
 __all__ = [
+    "active_atom_state_tokens",
+    "active_atom_states_compatible",
     "load_reaction_facet_rules",
     "reaction_facet_keys",
 ]

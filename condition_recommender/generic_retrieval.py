@@ -23,7 +23,11 @@ from .signature_features import (
     environment_profile_similarity,
     environment_tokens,
 )
-from .reaction_facets import load_reaction_facet_rules, reaction_facet_keys
+from .reaction_facets import (
+    active_atom_states_compatible,
+    load_reaction_facet_rules,
+    reaction_facet_keys,
+)
 from .similarity import generic_signature_similarity, reaction_scope
 from .support import summarize_evidence_support
 
@@ -53,6 +57,7 @@ _EVALUATION_STRATEGIES = {
     "transformation_prior",
     "legacy_pilot",
 }
+RETROSYNTHESIS_PRECEDENT_BRIDGE_VERSION = "1.0"
 
 
 @lru_cache(maxsize=1)
@@ -112,6 +117,7 @@ def _compatible_edit_positions(
     signature: Mapping[str, Any],
     index: GenericReactionIndex,
     *,
+    reaction_core: Mapping[str, Any] | None = None,
     query_reaction_smiles: str = "",
 ) -> set[int]:
     """Enforce net-edit and reactive-center compatibility before similarity."""
@@ -123,6 +129,7 @@ def _compatible_edit_positions(
         signature,
         index,
         positions,
+        reaction_core=reaction_core,
         query_reaction_smiles=query_reaction_smiles,
     )
 
@@ -132,18 +139,27 @@ def _structurally_compatible_positions(
     index: GenericReactionIndex,
     positions: set[int],
     *,
+    reaction_core: Mapping[str, Any] | None = None,
     query_reaction_smiles: str = "",
 ) -> set[int]:
     """Filter tiers on contradictory center and departing-fragment graphs."""
-    query = anonymous_edit_prototype(signature)
-    if query is None or not positions:
+    if not positions:
         return positions
+    query = anonymous_edit_prototype(signature)
     ordered_positions = tuple(sorted(positions))
     rows = index.select(ordered_positions)
     compatible = set()
     for position, row in zip(ordered_positions, rows):
         candidate = anonymous_edit_prototype(row.signature)
-        if candidate is None or anonymous_edit_center_compatible(query, candidate):
+        edit_compatible = (
+            query is None
+            or candidate is None
+            or anonymous_edit_center_compatible(query, candidate)
+        )
+        if edit_compatible and active_atom_states_compatible(
+            reaction_core,
+            row.reaction_core,
+        ):
             compatible.add(position)
     query_departing = (
         departing_fragment_tokens(query_reaction_smiles, signature)
@@ -173,6 +189,7 @@ def _candidate_levels(
     compatible = _compatible_edit_positions(
         signature,
         index,
+        reaction_core=reaction_core,
         query_reaction_smiles=query_reaction_smiles,
     )
     rules = load_generic_retrieval_rules()
@@ -230,6 +247,7 @@ def _candidate_levels(
                     level=level,
                     query_eligible=core_eligible,
                 ),
+                reaction_core=reaction_core,
                 query_reaction_smiles=query_reaction_smiles,
             )
         elif level == "edit_graph_neighbors":
@@ -242,6 +260,7 @@ def _candidate_levels(
                     exclude=compatible,
                     query_reaction_smiles=query_reaction_smiles,
                 ),
+                reaction_core=reaction_core,
                 query_reaction_smiles=query_reaction_smiles,
             )
         else:  # pragma: no cover - validated definitions prevent this branch.
@@ -569,6 +588,80 @@ class CompatibleRetrievalResult:
     trace: Tuple[RetrievalLevelTrace, ...]
 
 
+def retrieve_preferred_reaction_pool_with_trace(
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    reaction_ids: Tuple[str, ...],
+    *,
+    reaction_core: Mapping[str, Any] | None = None,
+    minimum_pool_size: int | None = None,
+    query_reaction_smiles: str = "",
+) -> CompatibleRetrievalResult:
+    """Resolve exact source IDs, then apply every structural and recipe gate."""
+
+    minimum = _minimum_support(minimum_pool_size)
+    requested = tuple(dict.fromkeys(str(value) for value in reaction_ids if value))
+    raw_positions = {
+        position
+        for reaction_id in requested
+        for position in index.reaction_ids.get(reaction_id, ())
+    }
+    structural_positions = _structurally_compatible_positions(
+        signature,
+        index,
+        raw_positions,
+        reaction_core=reaction_core,
+        query_reaction_smiles=query_reaction_smiles,
+    )
+    raw_rows = index.select(sorted(raw_positions))
+    structural_rows = index.select(sorted(structural_positions))
+    accepted, recipe_excluded = filter_compatible_precedents(
+        signature,
+        structural_rows,
+    )
+    raw_support = summarize_evidence_support(raw_rows)
+    accepted_support = summarize_evidence_support(
+        tuple(row for row, _ in accepted)
+    )
+    excluded_count = (
+        len(raw_positions) - len(structural_positions) + len(recipe_excluded)
+    )
+    status = (
+        "selected"
+        if accepted_support.independent_count >= minimum
+        else "selected_limited_support"
+        if accepted
+        else "no_compatible_precedent"
+        if raw_positions
+        else "empty"
+    )
+    base_level = "retrosynthesis_precedent"
+    level = (
+        f"{base_level}_limited_support"
+        if accepted and accepted_support.independent_count < minimum
+        else base_level
+    )
+    trace = RetrievalLevelTrace(
+        level=base_level,
+        candidate_count=len(raw_rows),
+        independent_candidate_count=raw_support.independent_count,
+        compatible_candidate_count=len(accepted),
+        independent_compatible_candidate_count=accepted_support.independent_count,
+        excluded_candidate_count=excluded_count,
+        minimum_independent_support=minimum,
+        status=status,
+    )
+    return CompatibleRetrievalResult(
+        level=level,
+        pool=accepted,
+        candidate_count=len(raw_rows),
+        independent_candidate_count=raw_support.independent_count,
+        excluded_candidate_count=excluded_count,
+        independent_compatible_candidate_count=accepted_support.independent_count,
+        trace=(trace,),
+    )
+
+
 @dataclass(frozen=True)
 class ProgressiveCompatibleRetrievalResult:
     """Ordered chemistry tiers collected until enough recipe cores exist."""
@@ -712,6 +805,7 @@ def retrieve_progressive_compatible_pools_with_trace(
                 signature,
                 index,
                 _positions(lookup_maps[level], keys[level]),
+                reaction_core=reaction_core,
                 query_reaction_smiles=query_reaction_smiles,
             ),
         )
@@ -846,6 +940,7 @@ def retrieve_compatible_generic_pool_with_trace(
                 _compatible_edit_positions(
                     signature,
                     index,
+                    reaction_core=reaction_core,
                     query_reaction_smiles=query_reaction_smiles,
                 )
             )
@@ -920,11 +1015,13 @@ __all__ = [
     "CompatibleRetrievalResult",
     "ProgressiveCompatibleRetrievalResult",
     "RetrievalStrategy",
+    "RETROSYNTHESIS_PRECEDENT_BRIDGE_VERSION",
     "load_generic_retrieval_rules",
     "reaction_scope",
     "retrieve_compatible_generic_pool",
     "retrieve_compatible_generic_pool_with_trace",
     "retrieve_progressive_compatible_pools_with_trace",
+    "retrieve_preferred_reaction_pool_with_trace",
     "retrieve_generic_pool",
     "retrieve_generic_pool_with_trace",
 ]

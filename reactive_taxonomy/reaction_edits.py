@@ -52,6 +52,16 @@ class EditNormalizationResult:
 
 
 @dataclass(frozen=True)
+class _MappedBoundaryBond:
+    """Bond from a mapped atom to an unmapped heavy-atom endpoint."""
+
+    mapped_atom_map_number: int
+    mapped_atom: ReactionAtomReference
+    unmapped_atom: ReactionAtomReference
+    order: str
+
+
+@dataclass(frozen=True)
 class _MappedSide:
     atoms: Dict[int, ReactionAtomReference]
     bonds: Dict[Tuple[int, int], str]
@@ -60,6 +70,7 @@ class _MappedSide:
     mapped_atom_count: int
     heavy_atom_count: int
     mapped_heavy_atom_count: int
+    boundary_bonds: Tuple[_MappedBoundaryBond, ...]
 
 
 def _environment_id(mol: Any, atom_index: int) -> str:
@@ -139,6 +150,7 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
     mapped_atom_count = 0
     heavy_atom_count = 0
     mapped_heavy_atom_count = 0
+    boundary_bonds = []
     for component in components:
         mol = parse_smiles(component.input_smiles)
         if mol is None:
@@ -163,9 +175,24 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
                     atom.GetTotalNumHs(includeNeighbors=True)
                 )
         for bond in mol.GetBonds():
-            left = int(bond.GetBeginAtom().GetAtomMapNum())
-            right = int(bond.GetEndAtom().GetAtomMapNum())
-            if not left or not right:
+            begin = bond.GetBeginAtom()
+            end = bond.GetEndAtom()
+            left = int(begin.GetAtomMapNum())
+            right = int(end.GetAtomMapNum())
+            if bool(left) != bool(right):
+                mapped = begin if left else end
+                unmapped = end if left else begin
+                if unmapped.GetAtomicNum() > 1:
+                    boundary_bonds.append(
+                        _MappedBoundaryBond(
+                            mapped_atom_map_number=int(mapped.GetAtomMapNum()),
+                            mapped_atom=_atom_reference(component, mapped.GetIdx()),
+                            unmapped_atom=_atom_reference(component, unmapped.GetIdx()),
+                            order=str(bond.GetBondType()).upper(),
+                        )
+                    )
+                continue
+            if not left:
                 continue
             pair = tuple(sorted((left, right)))
             order = str(bond.GetBondType()).upper()
@@ -175,13 +202,35 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
                 )
             bonds[pair] = order
     return _MappedSide(
-        atoms,
-        bonds,
-        hydrogen_counts,
-        tuple(sorted(set(warnings))),
-        mapped_atom_count,
-        heavy_atom_count,
-        mapped_heavy_atom_count,
+        atoms=atoms,
+        bonds=bonds,
+        hydrogen_counts=hydrogen_counts,
+        warnings=tuple(sorted(set(warnings))),
+        mapped_atom_count=mapped_atom_count,
+        heavy_atom_count=heavy_atom_count,
+        mapped_heavy_atom_count=mapped_heavy_atom_count,
+        boundary_bonds=tuple(boundary_bonds),
+    )
+
+
+def _projected_departing_boundary_bonds(
+    left: _MappedSide,
+    right: _MappedSide,
+) -> Tuple[_MappedBoundaryBond, ...]:
+    """Return unambiguous mapped-to-unmapped leaving-group boundaries.
+
+    Projection is allowed only when every product heavy atom is mapped and the
+    mapped reactant endpoint survives in the product. Under those constraints,
+    an unmapped heavy neighbor on the reactant side is observed absent rather
+    than merely unmatched by an incomplete product mapping.
+    """
+
+    if right.mapped_heavy_atom_count != right.heavy_atom_count:
+        return ()
+    return tuple(
+        boundary
+        for boundary in left.boundary_bonds
+        if boundary.mapped_atom_map_number in right.atoms
     )
 
 
@@ -256,6 +305,23 @@ def _mapped_connectivity_graph(
                 evidence="supplied_atom_mapping",
                 confidence=confidence,
             )
+        )
+    for boundary in _projected_departing_boundary_bonds(left, right):
+        transitions.append(
+            make_bond_transition(
+                atom_1=boundary.mapped_atom,
+                atom_2=boundary.unmapped_atom,
+                before_state=bond_state(boundary.order),
+                after_state=endpoint_absent_state(),
+                observation_scope="main_product_projection",
+                evidence="supplied_atom_mapping",
+                confidence=1.0,
+            )
+        )
+        warnings.append(
+            "PROJECTED_UNMAPPED_DEPARTING_BOUNDARY:"
+            f"{boundary.mapped_atom_map_number}:"
+            f"{boundary.unmapped_atom.element}"
         )
     for map_number in sorted(
         set(left.hydrogen_counts).intersection(right.hydrogen_counts)
@@ -402,6 +468,23 @@ def normalize_mapped_edits(
                 evidence="supplied_atom_mapping",
                 confidence=1.0,
             )
+        )
+    for boundary in _projected_departing_boundary_bonds(left, right):
+        edits.append(
+            ReactionEdit(
+                edit_type="broken",
+                atom_1=boundary.mapped_atom,
+                atom_2=boundary.unmapped_atom,
+                old_order=boundary.order,
+                new_order=None,
+                evidence="supplied_atom_mapping",
+                confidence=1.0,
+            )
+        )
+        warnings.append(
+            "PROJECTED_UNMAPPED_DEPARTING_BOUNDARY:"
+            f"{boundary.mapped_atom_map_number}:"
+            f"{boundary.unmapped_atom.element}"
         )
     if ignored_reactant_internal_bonds:
         warnings.append(

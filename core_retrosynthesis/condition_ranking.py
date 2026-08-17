@@ -36,6 +36,7 @@ class ConditionRecommenderProtocol(Protocol):
         top_k: int = 5,
         minimum_pool_size: int | None = None,
         unrestricted_fallback: bool = False,
+        preferred_reaction_ids: Tuple[str, ...] = (),
     ) -> Any: ...
 
 
@@ -190,6 +191,7 @@ def recommend_retrosynthesis_conditions(
     condition_top_k: int = 3,
     minimum_pool_size: int | None = None,
     unrestricted_fallback: bool = False,
+    preferred_reaction_ids: Tuple[str, ...] = (),
 ) -> RetrosynthesisConditionEvidence:
     """Recommend conditions for one proposed, forward-validated reaction."""
 
@@ -203,6 +205,7 @@ def recommend_retrosynthesis_conditions(
             top_k=condition_top_k,
             minimum_pool_size=minimum_pool_size,
             unrestricted_fallback=unrestricted_fallback,
+            preferred_reaction_ids=preferred_reaction_ids,
         )
     except Exception as exc:
         return _failed_condition_evidence(reaction_smiles, exc)
@@ -276,6 +279,7 @@ def rank_retrosynthesis_candidates_with_conditions(
             condition_top_k=condition_top_k,
             minimum_pool_size=minimum_pool_size,
             unrestricted_fallback=unrestricted_fallback,
+            preferred_reaction_ids=candidate.precedent_reaction_ids,
         )
         assessed.append(
             (

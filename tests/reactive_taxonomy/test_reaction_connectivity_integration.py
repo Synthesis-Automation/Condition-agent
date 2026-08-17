@@ -82,6 +82,56 @@ def test_absent_leaving_group_is_projected_not_observed_no_bond() -> None:
     assert legacy.new_order is None
 
 
+def test_unmapped_leaving_group_boundary_is_projected_when_product_is_complete() -> None:
+    result = _mapped(
+        "Br[CH2:1][CH3:2].[NH2:3][CH3:4]>>"
+        "[CH3:2][CH2:1][NH:3][CH3:4]"
+    )
+    graph = result.connectivity_edit_graph
+    assert graph is not None
+
+    broken = next(edit for edit in result.edits if edit.edit_type == "broken")
+    assert {broken.atom_1.element, broken.atom_2.element} == {"Br", "C"}
+    assert broken.old_order == "SINGLE"
+    projected = next(
+        transition
+        for transition in graph.bond_transitions
+        if {transition.atom_1.element, transition.atom_2.element} == {"Br", "C"}
+    )
+    assert projected.after_state.state_kind == "endpoint_absent"
+    assert projected.observation_scope == "main_product_projection"
+    assert "PROJECTED_UNMAPPED_DEPARTING_BOUNDARY:1:Br" in result.warnings
+
+
+def test_mapped_unmapped_leaving_group_and_unmapped_reaction_share_keys() -> None:
+    mapped = featurize_reaction(
+        "Br[CH2:1][CH3:2].[NH2:3][CH3:4]>>"
+        "[CH3:2][CH2:1][NH:3][CH3:4]"
+    )
+    inferred = featurize_reaction("CCBr.NC>>CCNC")
+    assert mapped.reaction_signature is not None
+    assert inferred.reaction_signature is not None
+
+    assert mapped.reaction_signature.formed_bond_types == ("C-N:SINGLE",)
+    assert mapped.reaction_signature.broken_bond_types == ("Br-C:SINGLE",)
+    assert (
+        mapped.reaction_signature.transformation_signature_key
+        == inferred.reaction_signature.transformation_signature_key
+    )
+    assert (
+        mapped.reaction_signature.bond_edit_signature_key
+        == inferred.reaction_signature.bond_edit_signature_key
+    )
+    assert (
+        mapped.reaction_signature.handle_signature_key
+        == inferred.reaction_signature.handle_signature_key
+    )
+    assert (
+        mapped.reaction_signature.exact_signature_key
+        == inferred.reaction_signature.exact_signature_key
+    )
+
+
 def test_mapped_mesylate_inventory_is_not_expanded_into_internal_edits() -> None:
     analysis = featurize_reaction(
         "[CH3:1][O:2][S:3]([CH3:4])(=[O:5])=[O:6]."

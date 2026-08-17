@@ -186,6 +186,7 @@ class RetrosynthesisConditionsRequest(StrictRequest):
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
     library_mode: Literal["full", "compact"] = "compact"
     top_k: int = Field(default=3, ge=1, le=5)
+    preferred_reaction_ids: list[str] = Field(default_factory=list, max_length=32)
     starting_materials: Optional[str] = Field(default=None, max_length=20_000)
     intended_product: Optional[str] = Field(default=None, max_length=20_000)
     operator_hint: Optional[str] = Field(default=None, max_length=500)

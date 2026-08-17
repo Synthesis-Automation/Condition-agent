@@ -793,6 +793,7 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
         },
     )
     precedent = SimpleNamespace(
+        reaction_id="internal-row-id",
         precursor_smiles="CCBr.N",
         product_smiles="CCN",
         reference_id="REF1:paper",
@@ -858,8 +859,10 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     assert search_options["max_templates_to_apply"] == 100
     assert search_options["max_candidates_to_validate"] == 30
     assert "precedent_reaction_ids" not in result
+    assert result["condition_precedent_reaction_ids"] == ["internal-row-id"]
     assert result["supporting_precedents"] == [
         {
+            "reaction_id": "internal-row-id",
             "reaction_smiles": "CCBr.N>>CCN",
             "reference_record": reference,
         }
@@ -1011,10 +1014,16 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
     recommender = SimpleNamespace(source_path=str(tmp_path / "generic_index.sqlite"))
     runtime = LocalRecommendationRuntime(library_root=tmp_path)
     monkeypatch.setattr(runtime, "_get_recommender", lambda **options: recommender)
+    condition_options = {}
+
+    def fake_condition_recommendation(*args, **kwargs):
+        condition_options.update(kwargs)
+        return evidence
+
     monkeypatch.setattr(
         runtime_module,
         "recommend_retrosynthesis_conditions",
-        lambda *args, **kwargs: evidence,
+        fake_condition_recommendation,
     )
     monkeypatch.setattr(
         runtime,
@@ -1075,6 +1084,7 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
         RetrosynthesisConditionsRequest(
             reaction_smiles="CCBr.N>>CCN",
             library_mode="compact",
+            preferred_reaction_ids=["reaction:1"],
             starting_materials="CCBr.N",
             intended_product="CCN",
             operator_hint="OP1:test",
@@ -1095,6 +1105,7 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
             "experimental_detail": experimental,
         }
     ]
+    assert condition_options["preferred_reaction_ids"] == ("reaction:1",)
     assert captured["library"] is forward_library
     assert captured["recipe"] == {"bases": []}
     assert payload["forward_assessment"]["validity"] == (

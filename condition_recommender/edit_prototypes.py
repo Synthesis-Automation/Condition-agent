@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping, Tuple
 
 
-ANONYMOUS_EDIT_PROTOTYPE_VERSION = "1.1"
+ANONYMOUS_EDIT_PROTOTYPE_VERSION = "1.2"
 
 
 def _bond_pair(token: Any) -> str:
@@ -43,15 +43,10 @@ def _edit_state_pair(edit: Mapping[str, Any]) -> str | None:
     if not isinstance(atom_1, Mapping) or not isinstance(atom_2, Mapping):
         return None
     atoms = (atom_1, atom_2)
-    carbon_count = sum(str(atom.get("element") or "") == "C" for atom in atoms)
     endpoints = sorted(
         (
             f"{str(atom.get('element') or '')}"
-            + (
-                f"@{_atom_center_class(atom)}"
-                if carbon_count != 1 or str(atom.get("element") or "") == "C"
-                else ""
-            )
+            + f"@{_atom_center_class(atom)}"
             for atom in atoms
         )
     )

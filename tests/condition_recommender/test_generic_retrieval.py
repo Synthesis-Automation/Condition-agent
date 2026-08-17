@@ -225,7 +225,7 @@ def test_center_state_gate_applies_before_every_signature_tier() -> None:
         minimum_pool_size=2,
     )
 
-    assert result.level == "edit_graph_neighbors"
+    assert result.level == "exact_signature"
     assert {row.reaction_id for row, _ in result.pool} == {
         "reaction-2",
         "reaction-3",
@@ -248,16 +248,16 @@ def test_departing_fragment_gate_separates_alcohol_mesylate_and_tosylate(
     )
     source_reactions = {
         "alcohol": (
-            "CCCCCCC(C)O.O=C1NC(=O)c2ccccc21.[K]"
-            ">>CCCCCCC(C)N1C(=O)c2ccccc2C1=O"
+            "CCCCCCC(C)O.N1CCCCC1.[K]"
+            ">>CCCCCCC(C)N1CCCCC1"
         ),
         "mesylate": (
-            "CCCCCCC(C)OS(C)(=O)=O.O=C1NC(=O)c2ccccc21.[K]"
-            ">>CCCCCCC(C)N1C(=O)c2ccccc2C1=O"
+            "CCCCCCC(C)OS(C)(=O)=O.N1CCCCC1.[K]"
+            ">>CCCCCCC(C)N1CCCCC1"
         ),
         "tosylate": (
-            "CCCCCCC(C)OS(=O)(=O)c1ccccc1.O=C1NC(=O)c2ccccc21.[K]"
-            ">>CCCCCCC(C)N1C(=O)c2ccccc2C1=O"
+            "CCCCCCC(C)OS(=O)(=O)c1ccccc1.N1CCCCC1.[K]"
+            ">>CCCCCCC(C)N1CCCCC1"
         ),
     }
     source_signatures = {}
@@ -1240,12 +1240,12 @@ def test_chemist_reactant_category_priority_reranks_with_audit_trace() -> None:
     )
 
     assert result.valid
-    assert result.retrieval_level == "progressive_reaction_facets"
+    assert result.retrieval_level == "reaction_facet_exact"
     assert result.ranking_preferences["profile_id"] == "reactant_category"
     recommendation = result.recommendations[0]
     assert recommendation.recipe_core_id == "RCORE:aliphatic"
     assert recommendation.retrieval_level == "reaction_facet_exact"
-    assert result.recommendations[1].retrieval_level == "transformation_signature"
+    assert len(result.recommendations) == 1
     assert (
         recommendation.score_trace.ranking_components["partner_category"]
         == 1.0

@@ -217,6 +217,7 @@ def test_condition_enrichment_uses_validated_mapped_query() -> None:
 
     assert ranked[0].condition_evidence.query_reaction_smiles == mapped_query
     assert recommender.calls[0][0] == mapped_query
+    assert recommender.calls[0][1]["preferred_reaction_ids"] == ("precedent",)
 
 
 def test_condition_support_cannot_cross_structural_score_band() -> None:

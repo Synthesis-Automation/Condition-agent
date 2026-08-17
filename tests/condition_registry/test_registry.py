@@ -99,6 +99,7 @@ def test_substance_supports_unbounded_typed_aliases() -> None:
 
 def test_canonical_smiles_resolves_exact_condition_identity() -> None:
     ethanol = resolve_identifier("OCC", identifier_type="smiles")
+    toluene = resolve_identifier("Cc1ccccc1", identifier_type="smiles")
     triethylamine = resolve_identifier(
         "CCN(CC)CC",
         identifier_type="smiles",
@@ -109,6 +110,11 @@ def test_canonical_smiles_resolves_exact_condition_identity() -> None:
     assert ethanol.substance is not None
     assert ethanol.substance.canonical_name == "Ethanol"
     assert ethanol.substance.cas == "64-17-5"
+    assert toluene.status == "resolved"
+    assert toluene.match_kind == "exact_smiles"
+    assert toluene.substance is not None
+    assert toluene.substance.canonical_name == "Toluene"
+    assert toluene.substance.cas == "108-88-3"
     assert triethylamine.status == "resolved"
     assert triethylamine.substance is not None
     assert triethylamine.substance.canonical_name == "Triethylamine"

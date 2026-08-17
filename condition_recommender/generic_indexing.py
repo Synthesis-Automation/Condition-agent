@@ -37,7 +37,7 @@ from .fallback_similarity import fallback_index_tokens
 from .reaction_facets import reaction_facet_keys
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "6.2"
+GENERIC_INDEX_SCHEMA_VERSION = "6.3"
 
 
 @dataclass(frozen=True)
@@ -91,6 +91,7 @@ class GenericReactionIndex:
     """Immutable precedent collection with deterministic signature lookup maps."""
 
     rows: Sequence[GenericIndexedReaction]
+    reaction_ids: Mapping[str, Tuple[int, ...]]
     exact: Mapping[str, Tuple[int, ...]]
     handles: Mapping[str, Tuple[int, ...]]
     transformations: Mapping[str, Tuple[int, ...]]
@@ -309,6 +310,7 @@ def build_generic_index_from_rows(
         name: defaultdict(list) for name in _KEY_FIELDS
     }
     families: Dict[str, list[int]] = defaultdict(list)
+    reaction_ids: Dict[str, list[int]] = defaultdict(list)
     core_maps: Dict[str, Dict[str, list[int]]] = {
         name: defaultdict(list)
         for name in ("exact", "typed", "shapes", "centers")
@@ -322,6 +324,8 @@ def build_generic_index_from_rows(
         "attachments": defaultdict(list),
     }
     for position, row in enumerate(ordered):
+        if row.reaction_id:
+            reaction_ids[row.reaction_id].append(position)
         for name, field in _KEY_FIELDS.items():
             key = str(row.signature.get(field) or "")
             if key:
@@ -369,6 +373,7 @@ def build_generic_index_from_rows(
             partial_transformations[partial_key].append(position)
     return GenericReactionIndex(
         rows=tuple(ordered),
+        reaction_ids=_freeze(reaction_ids),
         exact=_freeze(maps["exact"]),
         handles=_freeze(maps["handles"]),
         transformations=_freeze(maps["transformations"]),
@@ -680,6 +685,7 @@ def _index_maps(
 ) -> Dict[str, Mapping[str, Tuple[int, ...]]]:
     """Return all deterministic lookup maps by their persisted names."""
     return {
+        "reaction_ids": index.reaction_ids,
         "exact": index.exact,
         "handles": index.handles,
         "transformations": index.transformations,

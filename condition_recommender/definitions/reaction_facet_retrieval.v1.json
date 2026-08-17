@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "reaction_facet_retrieval.v1",
   "calibration_status": "chemist_prior_not_statistically_calibrated",
   "state_fields": [
@@ -11,6 +11,16 @@
     "heavy_atom_degree",
     "radical_electrons"
   ],
+  "hard_compatibility_state_fields": [
+    "element",
+    "formal_charge",
+    "aromatic",
+    "hybridization",
+    "total_hydrogens",
+    "heavy_atom_degree",
+    "radical_electrons"
+  ],
+  "hard_compatibility_requires_hydrogen_change": true,
   "topology_fields": [
     "reaction_scope",
     "formed_bond_scopes",

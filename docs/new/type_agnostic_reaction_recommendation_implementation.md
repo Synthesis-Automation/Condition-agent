@@ -92,19 +92,19 @@ The current code declares:
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `10.0` |
-| Generic converter definition | `generic_conversion.v10.0` |
+| Recommendation record | `10.1` |
+| Generic converter definition | `generic_conversion.v10.1` |
 | Core eligibility policy | `core_eligibility.v1@1.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v5.0` |
 | Concise reaction review | `12.0` |
 | Shared chemist review summary | `3.0` |
-| Recommendation artifact workflow | `2.1` |
-| Generic persisted index | `6.1` |
+| Recommendation artifact workflow | `2.3` |
+| Generic persisted index | `6.3` |
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `3.3` |
-| Reaction correspondence definitions | `2.6` |
+| Reaction correspondence definitions | `2.7` |
 | Generic retrieval definition | `1.8` |
-| Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.0` |
+| Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.1` |
 | Generic ranking definition | `1.1` |
 | Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v3@1.0` |
@@ -119,7 +119,27 @@ Do not copy this table into executable code. The constants and definition files
 remain authoritative, and stale artifacts must fail validation rather than
 silently mixing chemistry identities.
 
+The `2.7` correspondence contract projects a mapped-atom/unmapped-heavy-atom
+reactant boundary as a departing bond only when the product heavy-atom mapping
+is complete and the mapped endpoint survives. This makes partially mapped
+leaving groups such as the unmapped bromide in `US04097491:row-34775`
+converge with the equivalent unmapped graph inference. The `1.1` facet contract
+also treats contradictory before/after states at hydrogen-changing active atoms
+as a hard incompatibility, preventing primary-amine queries from falling back
+to secondary-amine or amide N-alkylations.
+
+Retrosynthesis may pass its cited source reaction IDs to the condition
+recommender. Those IDs are an initial lookup tier, not trusted labels: every
+row must still pass net-edit, active-atom, departing-fragment, and recipe
+compatibility gates. Missing or rejected IDs fall through to the normal generic
+retrieval ladder.
+
 ### 2.3 Current local literature artifact
+
+> Rebuild required after the `reaction_correspondence=2.7`, reaction-facet
+> `1.1`, condition-registry structure correction, and generic-index `6.3`
+> changes. Older converted shards and SQLite indexes are intentionally rejected
+> instead of mixing pre-fix and post-fix chemistry identities.
 
 The checked local artifact under `datasets/literature/` was rebuilt on
 2026-08-04 in full mode from 120 selected intermediate source-observation

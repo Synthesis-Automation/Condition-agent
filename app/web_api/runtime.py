@@ -911,7 +911,9 @@ class LocalRecommendationRuntime:
                     )
             else:
                 value["forward_assessment"] = None
-            value.pop("precedent_reaction_ids", None)
+            value["condition_precedent_reaction_ids"] = list(
+                value.pop("precedent_reaction_ids", ()) or ()
+            )
             template = templates.get(candidate.template_id)
             supporting_precedents = []
             seen_support = set()
@@ -926,6 +928,7 @@ class LocalRecommendationRuntime:
                 reference = reference_catalog.get(precedent.reference_id)
                 supporting_precedents.append(
                     {
+                        "reaction_id": precedent.reaction_id,
                         "reaction_smiles": reaction_smiles,
                         "reference_record": (
                             dict(reference) if reference is not None else None
@@ -1098,6 +1101,7 @@ class LocalRecommendationRuntime:
             request.reaction_smiles.strip(),
             recommender,
             condition_top_k=request.top_k,
+            preferred_reaction_ids=tuple(request.preferred_reaction_ids),
         ).to_dict()
         reference_catalog = self._get_reference_catalog(recommender.source_path)
         experimental_catalog = self._get_experimental_detail_catalog(

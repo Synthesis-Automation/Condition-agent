@@ -25,10 +25,12 @@ from .core_retrieval import (
     retrieve_core_pool_with_trace,
 )
 from .generic_retrieval import (
+    RETROSYNTHESIS_PRECEDENT_BRIDGE_VERSION,
     RetrievalStrategy,
     load_generic_retrieval_rules,
     retrieve_compatible_generic_pool_with_trace,
     retrieve_progressive_compatible_pools_with_trace,
+    retrieve_preferred_reaction_pool_with_trace,
 )
 from .fallback_retrieval import retrieve_fallback_pool_with_trace
 from .fallback_similarity import (
@@ -173,6 +175,7 @@ def recommend_indexed_signature(
     retrieval_strategy: RetrievalStrategy = "hybrid",
     ranking_weights: Mapping[str, float] | None = None,
     ranking_preferences: ChemistRankingPreferences | None = None,
+    preferred_reaction_ids: Tuple[str, ...] = (),
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
     resolved_preferences = resolve_ranking_preferences(ranking_preferences)
@@ -220,6 +223,28 @@ def recommend_indexed_signature(
             False,
             error="INCOMPATIBLE_REACTION_TAXONOMY_DEFINITIONS",
         )
+    requested_precedents = tuple(
+        dict.fromkeys(str(value) for value in preferred_reaction_ids if value)
+    )
+    preferred = (
+        retrieve_preferred_reaction_pool_with_trace(
+            signature,
+            index,
+            requested_precedents,
+            reaction_core=reaction_core,
+            minimum_pool_size=minimum_pool_size,
+            query_reaction_smiles=query_reaction_smiles,
+        )
+        if requested_precedents
+        else None
+    )
+    preferred_selected = preferred is not None and bool(preferred.pool)
+    if requested_precedents:
+        retrieval_definition_version = (
+            "retrosynthesis_precedent_bridge.v1@"
+            f"{RETROSYNTHESIS_PRECEDENT_BRIDGE_VERSION};"
+            f"generic_retrieval.v1@{retrieval_definition_version}"
+        )
     progressive = (
         retrieve_progressive_compatible_pools_with_trace(
             signature,
@@ -230,11 +255,13 @@ def recommend_indexed_signature(
             minimum_pool_size=minimum_pool_size,
             query_reaction_smiles=query_reaction_smiles,
         )
-        if retrieval_strategy == "hybrid"
+        if retrieval_strategy == "hybrid" and not preferred_selected
         else None
     )
     retrieval = (
-        progressive
+        preferred
+        if preferred_selected
+        else progressive
         if progressive is not None and progressive.tiers
         else retrieve_compatible_generic_pool_with_trace(
             signature,
@@ -249,9 +276,14 @@ def recommend_indexed_signature(
         progressive = None
     if progressive is not None:
         facet_rules = load_reaction_facet_rules()
+        generic_definition = (
+            retrieval_definition_version
+            if requested_precedents
+            else f"generic_retrieval.v1@{retrieval_definition_version}"
+        )
         retrieval_definition_version = (
             f"{facet_rules['definition_id']}@{facet_rules['schema_version']};"
-            f"generic_retrieval.v1@{retrieval_definition_version}"
+            f"{generic_definition}"
         )
     level = retrieval.level
     progressive_tiers = progressive.tiers if progressive is not None else ()
@@ -284,14 +316,27 @@ def recommend_indexed_signature(
             independent_candidate_count=retrieval.independent_candidate_count,
             excluded_candidate_count=retrieval.excluded_candidate_count,
             retrieval_trace=retrieval.trace,
-            warnings=("ALL_RETRIEVED_RECIPES_FAILED_COMPATIBILITY",)
-            if compatibility_failure
-            else (),
+            warnings=tuple(
+                value
+                for value in (
+                    "RETROSYNTHESIS_PRECEDENT_SEED_REJECTED_OR_MISSING"
+                    if requested_precedents
+                    else None,
+                    "ALL_RETRIEVED_RECIPES_FAILED_COMPATIBILITY"
+                    if compatibility_failure
+                    else None,
+                )
+                if value is not None
+            ),
             error="NO_COMPATIBLE_CONDITION_PRECEDENT"
             if compatibility_failure
             else "NO_CHEMICALLY_COMPATIBLE_PRECEDENT",
         )
     warnings = []
+    if preferred_selected:
+        warnings.append("RETROSYNTHESIS_PRECEDENT_SEED_USED")
+    elif requested_precedents:
+        warnings.append("RETROSYNTHESIS_PRECEDENT_SEED_REJECTED_OR_MISSING")
     if level.endswith("limited_support") or any(
         trace.status == "selected_limited_support"
         for trace in retrieval.trace
@@ -299,7 +344,8 @@ def recommend_indexed_signature(
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     progressive_levels = tuple(value[0] for value in progressive_tiers)
     if (
-        level not in {
+        not level.startswith("retrosynthesis_precedent")
+        and level not in {
             "exact_signature",
             "handle_signature",
             "named_family",
@@ -383,6 +429,23 @@ def recommend_indexed_signature(
             ranking_preferences=resolved_preferences,
             query_reaction_core=reaction_core,
             query_reaction_smiles=query_reaction_smiles,
+        )
+    if preferred_selected:
+        recommendations = tuple(
+            replace(
+                recommendation,
+                explanation=tuple(
+                    dict.fromkeys(
+                        (
+                            *recommendation.explanation,
+                            "Condition precedent was cited by the selected "
+                            "retrosynthesis template and passed structural "
+                            "compatibility checks",
+                        )
+                    )
+                ),
+            )
+            for recommendation in recommendations
         )
     if any(
         caution.startswith("Reaction-scope mismatch:")
@@ -505,6 +568,7 @@ class GenericConditionRecommender:
         unrestricted_fallback: bool = False,
         ranking_preferences: ChemistRankingPreferences | None = None,
         completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
+        preferred_reaction_ids: Tuple[str, ...] = (),
     ) -> GenericRecommendationResult:
         """Featurize a query and recommend without reloading the index."""
         resolved_preferences = resolve_ranking_preferences(ranking_preferences)
@@ -517,6 +581,7 @@ class GenericConditionRecommender:
             mapping_provider=self.mapping_provider,
             ranking_preferences=resolved_preferences,
             completion_selections=completion_selections,
+            preferred_reaction_ids=preferred_reaction_ids,
         )
         result = replace(
             result,
@@ -578,6 +643,7 @@ def _recommend_with_index(
     mapping_provider: AtomMappingProvider | None = None,
     ranking_preferences: ChemistRankingPreferences | None = None,
     completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
+    preferred_reaction_ids: Tuple[str, ...] = (),
 ) -> GenericRecommendationResult:
     if top_k < 1:
         return GenericRecommendationResult(
@@ -836,6 +902,7 @@ def _recommend_with_index(
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
             ranking_preferences=ranking_preferences,
+            preferred_reaction_ids=preferred_reaction_ids,
         )
         result = replace(
             result,

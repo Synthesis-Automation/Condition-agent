@@ -661,6 +661,7 @@ export interface RetrosynthesisConditionsRequest {
   reaction_smiles: string
   library_mode: 'full' | 'compact'
   top_k: number
+  preferred_reaction_ids?: string[]
   starting_materials?: string | null
   intended_product?: string | null
   operator_hint?: string | null
@@ -690,6 +691,7 @@ export interface RetrosynthesisConditionEvidence {
 }
 
 export interface RetrosynthesisSupportingPrecedent {
+  reaction_id: string
   reaction_smiles: string
   reference_record?: ReferenceRecord | null
 }
@@ -807,6 +809,7 @@ export interface RetrosynthesisCandidate {
   center_transition_key: string
   disconnection_site_key: string
   supporting_precedents: RetrosynthesisSupportingPrecedent[]
+  condition_precedent_reaction_ids: string[]
   condition_evidence: RetrosynthesisConditionEvidence
   operator_id: string
   realization_id: string
