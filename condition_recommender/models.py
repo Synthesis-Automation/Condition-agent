@@ -16,6 +16,7 @@ COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
 GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.4"
+WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "1.0"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
     "fragment_source_capabilities.v1@1.3"
@@ -435,6 +436,55 @@ class GenericRecommendationResult:
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
     schema_version: str = GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class WeakLabelConditionRecommendation:
+    """One canonical recipe supported only by weak-label observations."""
+
+    rank: int
+    recipe_id: str
+    resolved_recipe: Dict[str, Any]
+    score: float
+    label_similarity: float
+    signature_similarity: float
+    qualifier_similarity: float
+    compatibility_score: float
+    expected_yield_pct: Optional[float]
+    mean_z_score: Optional[float]
+    support: int
+    source_reaction_types: Tuple[str, ...]
+    source_row_numbers: Tuple[int, ...]
+    explanation: Tuple[str, ...]
+    compatibility_evidence: Tuple[str, ...] = ()
+    cautions: Tuple[str, ...] = ()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class WeakLabelRecommendationResult:
+    """Explicitly weak-evidence recommendation or screening-array result."""
+
+    query_reaction_smiles: str
+    valid: bool
+    recommendation_mode: Literal["weak_label_fallback", "weak_label_screening"]
+    reaction_type_hint_id: Optional[str] = None
+    reaction_type_id: Optional[str] = None
+    source_reaction_type_candidates: Tuple[str, ...] = ()
+    query_participants: Tuple[Dict[str, Any], ...] = ()
+    candidate_count: int = 0
+    compatible_candidate_count: int = 0
+    excluded_candidate_count: int = 0
+    recipe_count: int = 0
+    recommendations: Tuple[WeakLabelConditionRecommendation, ...] = ()
+    warnings: Tuple[str, ...] = ()
+    error: Optional[str] = None
+    schema_version: str = WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

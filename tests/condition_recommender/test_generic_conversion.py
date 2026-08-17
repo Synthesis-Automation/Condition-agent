@@ -122,6 +122,13 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.reaction_interpretation["primary_pattern_id"] == (
         "organoboron_c_c_coupling_like"
     )
+    assert record.reaction_interpretation["schema_version"] == "7.2"
+    assert record.reaction_interpretation["primary_reaction_type_hint_id"].startswith(
+        "RTH1:"
+    )
+    assert record.reaction_interpretation["reaction_type_hints"][0]["type_id"] == (
+        "c_c_boron_transfer_coupling"
+    )
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"

@@ -34,6 +34,8 @@ from .models import (
     RecommendationRecord,
     RecommendationScoreTrace,
     RetrievalLevelTrace,
+    WeakLabelConditionRecommendation,
+    WeakLabelRecommendationResult,
 )
 from .ranking_preferences import (
     available_ranking_profiles,
@@ -46,6 +48,20 @@ from .reaction_completion import (
     propose_reaction_completion,
 )
 from .recipe_assessment import assess_reaction_recipe
+from .weak_label_api import (
+    DEFAULT_WEAK_LABEL_RECORDS_PATH,
+    generate_weak_label_screening_array,
+    load_weak_label_retrieval_rules,
+    recommend_weak_label_conditions,
+    validate_weak_label_retrieval_rules,
+)
+from .weak_label_indexing import (
+    WeakLabelIndex,
+    WeakLabelIndexedObservation,
+    WeakLabelParticipant,
+    load_weak_label_index,
+    weak_label_recipe_catalog_path,
+)
 
 __all__ = [
     "AdmissionTier",
@@ -74,6 +90,12 @@ __all__ = [
     "RecommendationRecord",
     "RecommendationScoreTrace",
     "RetrievalLevelTrace",
+    "WeakLabelConditionRecommendation",
+    "WeakLabelIndex",
+    "WeakLabelIndexedObservation",
+    "WeakLabelParticipant",
+    "WeakLabelRecommendationResult",
+    "DEFAULT_WEAK_LABEL_RECORDS_PATH",
     "available_ranking_profiles",
     "evaluate_reaction_core_index",
     "recommend_generic_conditions",
@@ -83,6 +105,12 @@ __all__ = [
     "build_completion_selection",
     "build_completed_reaction_smiles",
     "propose_reaction_completion",
+    "generate_weak_label_screening_array",
+    "load_weak_label_index",
+    "load_weak_label_retrieval_rules",
+    "recommend_weak_label_conditions",
+    "validate_weak_label_retrieval_rules",
+    "weak_label_recipe_catalog_path",
     "assess_recipe_compatibility",
     "assess_core_eligibility",
 ]

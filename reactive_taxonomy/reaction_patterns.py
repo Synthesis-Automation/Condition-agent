@@ -546,6 +546,70 @@ def _sp3_c_o_substitution_like(context: ReactionPatternContext) -> tuple[int, ..
     )
 
 
+def _sp2_c_s_substitution_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _centered_replacement(
+        context, installed_element="S", carbon_kind="sp2"
+    )
+
+
+def _sp3_c_s_substitution_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _centered_replacement(
+        context, installed_element="S", carbon_kind="sp3"
+    )
+
+
+def _aromatic_c_h_sp2_c_c_coupling_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    """Match aryl-leaving-group replacement by an aromatic C-H partner."""
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or context.element_pair(formed) != {"C"}:
+            continue
+        endpoint_keys = (context.atom_key(formed, 1), context.atom_key(formed, 2))
+        for aromatic_key, electrophile_key in (endpoint_keys, endpoint_keys[::-1]):
+            if aromatic_key is None or electrophile_key is None:
+                continue
+            molecule = context.molecule("reactant", aromatic_key[0])
+            if molecule is None:
+                continue
+            atom = molecule.GetAtomWithIdx(aromatic_key[1])
+            if not atom.GetIsAromatic() or atom.GetTotalNumHs(includeNeighbors=True) < 1:
+                continue
+            leaving = tuple(
+                index
+                for index in context.edits_at(electrophile_key, edit_type="broken")
+                if bool(context.element_pair(context.edits[index]) & _LEAVING_ELEMENTS)
+            )
+            hydrogen = context.edits_at(aromatic_key, edit_type="hydrogen_change")
+            if leaving:
+                return unique_indices(leaving, (formed_index,), hydrogen)
+    return ()
+
+
+def _other_metal_transfer_c_c_coupling_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    """Match C-C formation at a carbon transferred from Zn/Mg/Sn/Si."""
+    transfer_elements = {"Zn", "Mg", "Sn", "Si"}
+    for broken_index, broken in enumerate(context.edits):
+        if broken.edit_type != "broken" or not (
+            "C" in context.element_pair(broken)
+            and context.element_pair(broken) & transfer_elements
+        ):
+            continue
+        carbon = context.endpoint_for_element(broken, "C")
+        if carbon is None:
+            continue
+        formed = tuple(
+            index
+            for index in context.edits_at(carbon[2], edit_type="formed")
+            if context.element_pair(context.edits[index]) == {"C"}
+        )
+        if formed:
+            return unique_indices((broken_index,), formed)
+    return ()
+
+
 def _sulfonyl_transfer_like(
     context: ReactionPatternContext,
     installed_element: str,
@@ -1058,6 +1122,8 @@ _PREDICATES: Mapping[str, Callable[[ReactionPatternContext], tuple[int, ...]]] =
     "sp3_c_n_substitution_like": _sp3_c_n_substitution_like,
     "sp2_c_o_substitution_like": _sp2_c_o_substitution_like,
     "sp3_c_o_substitution_like": _sp3_c_o_substitution_like,
+    "sp2_c_s_substitution_like": _sp2_c_s_substitution_like,
+    "sp3_c_s_substitution_like": _sp3_c_s_substitution_like,
     "sulfonamide_formation_like": _sulfonamide_formation_like,
     "o_sulfonylation_like": _o_sulfonylation_like,
     "organoboron_c_c_coupling_like": lambda context: _organoboron_c_c_coupling_like(
@@ -1067,6 +1133,12 @@ _PREDICATES: Mapping[str, Callable[[ReactionPatternContext], tuple[int, ...]]] =
     "organoboron_c_o_coupling_like": _organoboron_c_o_coupling_like,
     "organoboron_c_s_coupling_like": _organoboron_c_s_coupling_like,
     "sonogashira_coupling_like": _sonogashira_coupling_like,
+    "aromatic_c_h_sp2_c_c_coupling_like": (
+        _aromatic_c_h_sp2_c_c_coupling_like
+    ),
+    "other_metal_transfer_c_c_coupling_like": (
+        _other_metal_transfer_c_c_coupling_like
+    ),
     "borylation_like": _borylation_like,
     "alkene_hydrogenation_like": _alkene_hydrogenation_like,
     "alkyne_hydrogenation_like": _alkyne_hydrogenation_like,

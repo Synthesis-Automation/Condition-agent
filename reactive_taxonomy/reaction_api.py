@@ -25,6 +25,7 @@ from .partial_product_correspondence import (
     infer_partial_product_transformation,
 )
 from .reaction_signatures import build_observation_signature
+from .reaction_type_hints import build_reaction_type_hints
 
 
 def featurize_reaction(
@@ -139,8 +140,29 @@ def featurize_reaction(
         warnings.extend(partial_product_transformation.warnings)
 
     # Optional interpretation starts only after the generic signature exists.
+    base_interpretation = interpret_reaction(
+        observation,
+        label_style=label_style,
+    )
+    reaction_type_hints = build_reaction_type_hints(
+        observation,
+        parsed.reactants,
+        base_interpretation.pattern_matches,
+    )
+    primary_hint = next(
+        (
+            hint
+            for hint in reaction_type_hints
+            if hint.pattern_id == base_interpretation.primary_pattern_id
+        ),
+        reaction_type_hints[0] if reaction_type_hints else None,
+    )
     interpretation = replace(
-        interpret_reaction(observation, label_style=label_style),
+        base_interpretation,
+        reaction_type_hints=reaction_type_hints,
+        primary_reaction_type_hint_id=(
+            primary_hint.hint_id if primary_hint is not None else None
+        ),
         spectator_groups=spectators,
         r_group_functional_contexts=r_group_functional_contexts,
     )

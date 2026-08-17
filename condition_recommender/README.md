@@ -48,16 +48,17 @@ are retained and condition-normalized but remain structurally ineligible for
 the generic precedent index.
 
 `condition_recommender` exposes one canonical structure-backed recommendation
-path. It consumes reaction observations from `reactive_taxonomy` and canonical
-condition identities and recipes from `condition_registry`. Former expert-rule
-and weak-label recommenders have been removed; label-only source observations
-may be preserved for audit but cannot become structural condition precedents.
+path. It also provides an explicitly lower-evidence weak-label fallback for
+structurally verified queries. Weak-label rows remain outside the generic
+precedent index and cannot become structural condition precedents.
 
 ## Recommendation paths and status
 
 | Path | Public entry point | Current status | Intended use |
 | --- | --- | --- | --- |
 | Generic structure-backed retrieval | `recommend_generic_conditions()` | Functional pilot; coverage and calibration depend on converted structure-rich records | Type-agnostic precedent retrieval and canonical recipe aggregation |
+| Weak-label fallback | `recommend_weak_label_conditions()` | Functional, uncalibrated auxiliary path | Fallback recipes when verified precedents are unavailable |
+| Weak-label screening array | `generate_weak_label_screening_array()` | Functional, uncalibrated auxiliary path | Diversity-selected candidate conditions for expert-reviewed screening |
 
 Supporting audit, conversion, indexing, and evaluation commands prepare data for
 this path; they do not recommend conditions by themselves.
@@ -66,6 +67,9 @@ this path; they do not recommend conditions by themselves.
 
 - Use generic structure-backed retrieval when a compatible converted record set
   or persisted generic index is available.
+- Use weak-label fallback only for a graph-verified query carrying a supported
+  reaction-type hint and two complete participant signatures. Its source rows
+  are not structure verified.
 - Abstain when structural evidence, compatible precedents, or independent
   support is insufficient. Review-qualified core, edit-hypothesis, external-map,
   partial-transformation, and structure-fallback modes remain inside the generic
@@ -1147,49 +1151,38 @@ metrics are separate required gates.
 - Production release remains gated by independent chemist review and the
   untouched-test report.
 
-## Removed weak-label recommendation (historical)
-
-> Historical design record only. The weak-label recommender and CLI described
-> in this section have been removed. Label-only observations may still be
-> ingested and condition-normalized for audit, but they are structurally
-> ineligible as recommendation precedents and none of the following commands is
-> part of the current public workflow.
+## Weak-label recommendation and screening
 
 The weak-label path uses a cleaned flat CSV whose precedent rows contain source
 reaction labels and reactive-site labels rather than reaction structures.
 
-```powershell
-python -m condition_recommender.recommend_cli `
-  "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
-```
+```python
+from condition_recommender import (
+    generate_weak_label_screening_array,
+    recommend_weak_label_conditions,
+)
 
-Options:
-
-```powershell
-python -m condition_recommender.recommend_cli "<reaction_smiles>" --top-k 10
-
-python -m condition_recommender.recommend_cli "<reaction_smiles>" `
-  --records datasets/reaction_label/v2.1_cleaned.csv
+fallback = recommend_weak_label_conditions(reaction_smiles, top_k=10)
+screen = generate_weak_label_screening_array(reaction_smiles, array_size=24)
 ```
 
 The query reaction is structure-verified with `reactive_taxonomy`, but precedent
 rows are not. The implementation:
 
-1. assigns a query reaction interpretation annotation;
+1. derives a versioned reaction-type hint from observed graph edits and active
+   reactive sites;
 2. restricts source reaction types through a declarative crosswalk;
 3. matches two reactive participants as an unordered pair;
 4. ranks by functional-group signature and structural qualifiers;
 5. uses yield, z-score, and support as lower-weight signals;
 6. aggregates canonical `condition_registry` recipes.
 
-Weights live in `definitions/label_retrieval.v1.json`.
+Weights and the source-label crosswalk live in
+`definitions/weak_label_retrieval.v1.json`. Reaction-type hint projections live
+in `reactive_taxonomy/definitions/reaction_type_hints.v1.json`.
 
-Weak handle signatures may be family-level prefixes when the source label lacks
-structural detail. Known incompatible handle families or `XH` center classes
-are hard mismatches; an unknown/blank participant may still contribute a
-partial match through the other participant. This allows `XH|Csp3` precedents
-to support an exact activated-carbon query without allowing N–H or O–H rows to
-leak into the candidate recipes.
+Known incompatible handle families or `XH` center classes are hard mismatches.
+Both source participant signatures are required; blanks do not enter retrieval.
 
 For the cleaned HTE data, `CH-Activation` is routed to the intermolecular
 `Ar–X + Ar–H → Ar–Ar` interpretation annotation. The same source reaction type also contains
@@ -1285,4 +1278,4 @@ their `recommendation_mode`, retrieval trace, warnings, and provenance.
 
 Production release remains gated by full-corpus reproducibility, leakage-safe
 evaluation, independent chemist review, and removal or archival of the
-historical documentation above.
+remaining historical implementation notes.

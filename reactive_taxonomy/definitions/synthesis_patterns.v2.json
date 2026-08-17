@@ -81,6 +81,22 @@
       "requires_condition_evidence": true
     },
     {
+      "id": "sp2_c_s_substitution_like",
+      "tier": "synthesis",
+      "predicate_id": "sp2_c_s_substitution_like",
+      "specificity": 88,
+      "display_importance": 94,
+      "compatible_named_families": ["c_s_coupling"],
+      "requires_condition_evidence": true
+    },
+    {
+      "id": "sp3_c_s_substitution_like",
+      "tier": "synthesis",
+      "predicate_id": "sp3_c_s_substitution_like",
+      "specificity": 86,
+      "display_importance": 92
+    },
+    {
       "id": "sulfonamide_formation_like",
       "tier": "synthesis",
       "predicate_id": "sulfonamide_formation_like",
@@ -136,6 +152,21 @@
       "specificity": 95,
       "display_importance": 97,
       "compatible_named_families": ["sonogashira"]
+    },
+    {
+      "id": "aromatic_c_h_sp2_c_c_coupling_like",
+      "tier": "synthesis",
+      "predicate_id": "aromatic_c_h_sp2_c_c_coupling_like",
+      "specificity": 93,
+      "display_importance": 96
+    },
+    {
+      "id": "other_metal_transfer_c_c_coupling_like",
+      "tier": "synthesis",
+      "predicate_id": "other_metal_transfer_c_c_coupling_like",
+      "specificity": 94,
+      "display_importance": 96,
+      "compatible_named_families": ["negishi", "kumada", "stille", "hiyama"]
     },
     {
       "id": "borylation_like",

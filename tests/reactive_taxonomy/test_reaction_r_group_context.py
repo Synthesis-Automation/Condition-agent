@@ -29,7 +29,7 @@ def test_shared_r_scaffold_contains_unchanged_functional_groups() -> None:
     analysis, context = _shared_piperazine_context()
 
     assert analysis.interpretation is not None
-    assert analysis.interpretation.schema_version == "7.1"
+    assert analysis.interpretation.schema_version == "7.2"
     assert context.context_id.startswith("RGFC1:")
     assert context.continuity == "retained"
     assert len(context.attachment_profile_ids) == 1

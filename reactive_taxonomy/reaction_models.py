@@ -15,6 +15,7 @@ REACTION_CORE_PROJECTION_SCHEMA_VERSION = "3.1"
 REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION = "1.0"
 REACTION_CORE_EVENT_RELATION_SCHEMA_VERSION = "1.0"
 REACTION_PATTERN_MATCH_SCHEMA_VERSION = "4.1"
+REACTION_TYPE_HINT_SCHEMA_VERSION = "1.0"
 REACTION_R_GROUP_FUNCTIONAL_CONTEXT_SCHEMA_VERSION = "1.0"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v11"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
@@ -1211,6 +1212,71 @@ class ReactionPatternMatch:
 
 
 @dataclass(frozen=True)
+class ReactionHintParticipant:
+    """One graph-bound reactant site used by a reaction-type hint."""
+
+    component_index: int
+    site_id: str
+    site_type: str
+    canonical_signature: str
+    chemist_label: str
+    active_atom_indices: Tuple[int, ...]
+    role: Optional[str]
+    role_confidence: float
+    center_substitution_class: Optional[str] = None
+    attachment_carbon_classes: Tuple[str, ...] = ()
+    alpha_branched: Optional[bool] = None
+    evidence: Tuple[str, ...] = (
+        "observed_edit_endpoint",
+        "reactive_site_overlap",
+    )
+    schema_version: str = REACTION_TYPE_HINT_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if self.component_index < 0 or not self.site_id:
+            raise ValueError("reaction-hint participant requires site provenance")
+        if not self.canonical_signature or not self.active_atom_indices:
+            raise ValueError("reaction-hint participant requires a signature and atoms")
+        if tuple(sorted(set(self.active_atom_indices))) != self.active_atom_indices:
+            raise ValueError("reaction-hint participant atoms must be unique and sorted")
+        if not 0.0 <= self.role_confidence <= 1.0:
+            raise ValueError("reaction-hint role confidence must be in [0, 1]")
+
+
+@dataclass(frozen=True)
+class ReactionTypeHint:
+    """Optional graph-derived reaction type without source-label authority."""
+
+    hint_id: str
+    type_id: str
+    category: str
+    display_name: str
+    pattern_id: str
+    confidence: float
+    reaction_scope: str
+    matched_edit_indices: Tuple[int, ...]
+    matched_core_event_ids: Tuple[str, ...]
+    participants: Tuple[ReactionHintParticipant, ...]
+    qualifier_tokens: Tuple[str, ...]
+    compatible_named_families: Tuple[str, ...]
+    requires_condition_evidence: bool
+    evidence: Tuple[str, ...]
+    warnings: Tuple[str, ...] = ()
+    definition_version: str = "reaction_type_hints.v1@1.0"
+    schema_version: str = REACTION_TYPE_HINT_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.hint_id.startswith("RTH1:"):
+            raise ValueError("reaction type hint IDs require the RTH1 namespace")
+        if not self.type_id or not self.pattern_id or not self.category:
+            raise ValueError("reaction type hint requires type, pattern, and category")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("reaction type hint confidence must be in [0, 1]")
+        if tuple(sorted(set(self.matched_edit_indices))) != self.matched_edit_indices:
+            raise ValueError("reaction type hint edit indices must be unique and sorted")
+
+
+@dataclass(frozen=True)
 class ReactionObservation:
     """Interpretation-independent facts derived from one reaction graph."""
 
@@ -1248,6 +1314,8 @@ class ReactionInterpretation:
     pattern_matches: Tuple[ReactionPatternMatch, ...] = ()
     primary_pattern_id: Optional[str] = None
     co_occurring_pattern_ids: Tuple[str, ...] = ()
+    reaction_type_hints: Tuple[ReactionTypeHint, ...] = ()
+    primary_reaction_type_hint_id: Optional[str] = None
     partners: Tuple[ReactionPartner, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
@@ -1259,7 +1327,7 @@ class ReactionInterpretation:
     ] = ()
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "7.1"
+    schema_version: str = "7.2"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (
@@ -1271,6 +1339,12 @@ class ReactionInterpretation:
             raise ValueError("primary pattern must refer to a matched pattern")
         if any(value not in pattern_ids for value in self.co_occurring_pattern_ids):
             raise ValueError("co-occurring patterns must refer to matched patterns")
+        hint_ids = {hint.hint_id for hint in self.reaction_type_hints}
+        if (
+            self.primary_reaction_type_hint_id
+            and self.primary_reaction_type_hint_id not in hint_ids
+        ):
+            raise ValueError("primary reaction type hint must refer to a known hint")
 
 
 @dataclass(frozen=True)
@@ -1330,6 +1404,7 @@ __all__ = [
     "REACTION_CORE_PROJECTION_SCHEMA_VERSION",
     "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
     "REACTION_RING_CHANGE_SCHEMA_VERSION",
+    "REACTION_TYPE_HINT_SCHEMA_VERSION",
     "REACTION_R_GROUP_FUNCTIONAL_CONTEXT_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
     "REACTION_TOPOLOGY_SCHEMA_VERSION",
@@ -1353,6 +1428,7 @@ __all__ = [
     "ReactionEventRelation",
     "ReactionFallbackDescriptor",
     "ReactionFamilyEnvironment",
+    "ReactionHintParticipant",
     "ReactionInterpretation",
     "ReactionObservation",
     "ReactionPartner",
@@ -1367,4 +1443,5 @@ __all__ = [
     "ReactionSpectatorGroup",
     "ReactionStereoChange",
     "ReactionTopology",
+    "ReactionTypeHint",
 ]

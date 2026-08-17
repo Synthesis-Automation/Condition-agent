@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reaction_type_hints.v1",
+  "definition_version": "1.0",
+  "hints": [
+    {
+      "pattern_id": "organoboron_c_c_coupling_like",
+      "type_id": "c_c_boron_transfer_coupling",
+      "category": "coupling",
+      "display_name": "C-C coupling with an organoboron partner",
+      "qualifier_tokens": ["boron_transfer"],
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "transfer_partner", "signature_prefixes": ["TM|"]}
+      ]
+    },
+    {
+      "pattern_id": "sp2_c_n_substitution_like",
+      "type_id": "sp2_c_n_substitution",
+      "category": "substitution",
+      "display_name": "sp2 C-N substitution or coupling",
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "nitrogen_partner", "signature_prefixes": ["XH|N|", "XH|N_aromatic|"]}
+      ]
+    },
+    {
+      "pattern_id": "sp2_c_o_substitution_like",
+      "type_id": "sp2_c_o_substitution",
+      "category": "substitution",
+      "display_name": "sp2 C-O substitution or coupling",
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "oxygen_partner", "signature_prefixes": ["XH|O|"]}
+      ]
+    },
+    {
+      "pattern_id": "sp2_c_s_substitution_like",
+      "type_id": "sp2_c_s_substitution",
+      "category": "substitution",
+      "display_name": "sp2 C-S substitution or coupling",
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "sulfur_partner", "signature_prefixes": ["XH|S|"]}
+      ]
+    },
+    {
+      "pattern_id": "sp3_c_n_substitution_like",
+      "type_id": "sp3_c_n_substitution",
+      "category": "substitution",
+      "display_name": "sp3 C-N substitution",
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|Alkyl|"]},
+        {"role": "nitrogen_partner", "signature_prefixes": ["XH|N|", "XH|N_aromatic|"]}
+      ]
+    },
+    {
+      "pattern_id": "amide_formation_like",
+      "type_id": "amide_formation",
+      "category": "acyl_substitution",
+      "display_name": "Amide formation",
+      "participant_slots": [
+        {"role": "acyl_partner", "signature_prefixes": ["EC|Acyl|"]},
+        {"role": "nitrogen_partner", "signature_prefixes": ["XH|N|", "XH|N_aromatic|"]}
+      ]
+    },
+    {
+      "pattern_id": "heck_coupling_like",
+      "type_id": "c_c_alkene_coupling",
+      "category": "coupling",
+      "display_name": "C-C coupling with an alkene",
+      "qualifier_tokens": ["alkene_partner"],
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "alkene_partner", "signature_prefixes": ["PI|Alkene"]}
+      ]
+    },
+    {
+      "pattern_id": "sonogashira_coupling_like",
+      "type_id": "c_c_terminal_alkyne_coupling",
+      "category": "coupling",
+      "display_name": "C-C coupling with a terminal alkyne",
+      "qualifier_tokens": ["terminal_alkyne"],
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "alkyne_partner", "signature_prefixes": ["XH|Csp|"]}
+      ]
+    },
+    {
+      "pattern_id": "carbonyl_alpha_c_h_sp2_c_c_coupling_like",
+      "type_id": "sp2_c_activated_c_coupling",
+      "category": "coupling",
+      "display_name": "sp2 C-C coupling with an activated C-H partner",
+      "qualifier_tokens": ["activated_c_h"],
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "carbon_partner", "signature_prefixes": ["XH|Csp3"]}
+      ]
+    },
+    {
+      "pattern_id": "aromatic_c_h_sp2_c_c_coupling_like",
+      "type_id": "sp2_c_aromatic_c_h_coupling",
+      "category": "coupling",
+      "display_name": "sp2 C-C coupling with an aromatic C-H partner",
+      "qualifier_tokens": ["aromatic_c_h"],
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "aromatic_partner", "signature_prefixes": ["CH|ArH", "CH|HetArH"]}
+      ]
+    },
+    {
+      "pattern_id": "other_metal_transfer_c_c_coupling_like",
+      "type_id": "c_c_metal_transfer_coupling",
+      "category": "coupling",
+      "display_name": "C-C coupling with an organometallic partner",
+      "qualifier_tokens": ["non_boron_metal_transfer"],
+      "participant_slots": [
+        {"role": "electrophile", "signature_prefixes": ["LG|"]},
+        {"role": "transfer_partner", "signature_prefixes": ["TM|"]}
+      ]
+    },
+    {
+      "pattern_id": "net_addition",
+      "type_id": "addition",
+      "category": "addition",
+      "display_name": "Addition",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_elimination",
+      "type_id": "elimination",
+      "category": "elimination",
+      "display_name": "Elimination",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_bond_order_increase",
+      "type_id": "bond_order_increase",
+      "category": "bond_order_change",
+      "display_name": "Bond-order increase",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_bond_order_decrease",
+      "type_id": "bond_order_decrease",
+      "category": "bond_order_change",
+      "display_name": "Bond-order decrease",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_ring_closure",
+      "type_id": "ring_formation",
+      "category": "ring_change",
+      "display_name": "Ring formation",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_ring_opening",
+      "type_id": "ring_opening",
+      "category": "ring_change",
+      "display_name": "Ring opening",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_bond_cleavage",
+      "type_id": "bond_cleavage",
+      "category": "cleavage",
+      "display_name": "Bond cleavage",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_coupling",
+      "type_id": "generic_coupling",
+      "category": "coupling",
+      "display_name": "Generic coupling",
+      "participant_slots": []
+    },
+    {
+      "pattern_id": "net_substitution",
+      "type_id": "generic_substitution",
+      "category": "substitution",
+      "display_name": "Generic substitution",
+      "participant_slots": []
+    }
+  ]
+}

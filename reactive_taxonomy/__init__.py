@@ -42,6 +42,13 @@ from .reaction_signatures import (
 )
 from .reaction_observation import observe_reaction
 from .reaction_interpretation import interpret_reaction
+from .reaction_type_hints import (
+    REACTION_TYPE_HINT_DEFINITION_ID,
+    REACTION_TYPE_HINT_DEFINITION_VERSION,
+    build_reaction_type_hints,
+    load_reaction_type_hint_definitions,
+    validate_reaction_type_hint_definitions,
+)
 from .reaction_rendering import reaction_label_definition_versions, render_reaction
 from .reaction_render_context import (
     ReactionRenderContext,
@@ -132,6 +139,7 @@ from .reaction_models import (
     REACTION_SIGNATURE_SCHEMA_VERSION,
     REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION,
     REACTION_TOPOLOGY_SCHEMA_VERSION,
+    REACTION_TYPE_HINT_SCHEMA_VERSION,
     ReactionAnalysis,
     ReactionAtomReference,
     ReactionCompletenessAssessment,
@@ -156,6 +164,7 @@ from .reaction_models import (
     ReactionEventRelation,
     ReactionFallbackDescriptor,
     ReactionFamilyEnvironment,
+    ReactionHintParticipant,
     ReactionInterpretation,
     ReactionPartner,
     ReactionPatternMatch,
@@ -169,6 +178,7 @@ from .reaction_models import (
     ReactionSpectatorGroup,
     ReactionStereoChange,
     ReactionTopology,
+    ReactionTypeHint,
     RenderedReactionLabel,
 )
 from .reaction_review import (
@@ -291,6 +301,9 @@ __all__ = [
     "REACTION_SIGNATURE_SCHEMA_VERSION",
     "REACTION_SUBSTITUENT_PROFILE_SCHEMA_VERSION",
     "REACTION_TOPOLOGY_SCHEMA_VERSION",
+    "REACTION_TYPE_HINT_DEFINITION_ID",
+    "REACTION_TYPE_HINT_DEFINITION_VERSION",
+    "REACTION_TYPE_HINT_SCHEMA_VERSION",
     "REACTION_REVIEW_SUMMARY_SCHEMA_VERSION",
     "ReactionAnalysis",
     "ReactionAtomReference",
@@ -317,6 +330,7 @@ __all__ = [
     "ReactionEventRelation",
     "ReactionFallbackDescriptor",
     "ReactionFamilyEnvironment",
+    "ReactionHintParticipant",
     "ReactionInterpretation",
     "ReactionPartner",
     "ReactionPatternMatch",
@@ -338,6 +352,7 @@ __all__ = [
     "ReactionSpectatorGroup",
     "ReactionStereoChange",
     "ReactionTopology",
+    "ReactionTypeHint",
     "BidirectionalReactionOperator",
     "OperatorApplicationOutcome",
     "OperatorAtomCorrespondence",
@@ -366,6 +381,7 @@ __all__ = [
     "build_reaction_display_projection",
     "build_observation_signature",
     "build_reaction_review_summary",
+    "build_reaction_type_hints",
     "build_r_group_functional_contexts",
     "build_reaction_render_context",
     "detect_molecular_motifs",
@@ -391,6 +407,7 @@ __all__ = [
     "load_strategic_complexity_definition",
     "load_handle_patterns",
     "load_reaction_interface_block_definitions",
+    "load_reaction_type_hint_definitions",
     "load_reaction_display_projection_definition",
     "load_molecular_feature_benchmark",
     "load_contextual_source_label_mappings",
@@ -412,6 +429,7 @@ __all__ = [
     "resolve_source_label",
     "validate_source_label_mappings",
     "validate_reactive_pair_interaction_definition",
+    "validate_reaction_type_hint_definitions",
     "validate_strategic_complexity_definition",
     "validate_taxonomy",
     "validate_external_atom_mapping",

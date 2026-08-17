@@ -48,7 +48,7 @@ reactive_taxonomy       condition_registry
 | Molecular structure and annotations | Implemented | Structure-only graph observations plus optional motifs, reactive-site hypotheses, connectivity hypotheses, and typed reactivity profiles |
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
 | Structural evidence | Implemented | Validated maps and bounded scaffold, global, and fragmented correspondence produce normalized edits or explicit alternatives; reaction patterns never generate edits |
-| Optional patterns | Implemented | Generic transformation and synthesis-pattern matches consume completed observations and cite normalized edits, core events, and R profiles; they may add display/family evidence only |
+| Optional patterns and reaction-type hints | Implemented | Generic transformation and synthesis-pattern matches consume completed observations and cite normalized edits, core events, and R profiles; versioned source-neutral reaction-type hints project supported matches onto graph-bound active sites without affecting reaction identity |
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, and persisted with model provenance; mapper-only or conflicting evidence is query-only, while full-coverage internal-consensus cores may enter only the explicit expert review-core index |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
 | Reaction signatures | Implemented | Deterministic graph-only RS3 L0–L4 signatures, events, ring-change observations, topology, and unknown-family support |
@@ -59,13 +59,15 @@ reactive_taxonomy       condition_registry
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
 | Generic index | Implemented | SQLite-only runtime indexes with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys; canonical JSONL shards remain the rebuild and audit source |
 | Generic retrieval | Implemented pilot | Explicit verified-signature ladder, robust reaction-core shape tier, conservative unsigned-query core and all-hypothesis routes, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
+| Weak-label fallback and screening | Implemented auxiliary path | Graph-verified queries with supported reaction-type hints may retrieve a separate label-only recipe index; results retain unverified-evidence warnings and never join generic retrieval |
 | Source-supported partial transformations | Implemented, review-qualified | Product-observed attachment replacement may retrieve only exact partial transformations whose precedent conditions have a curated source capability |
 | Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback for other unsigned queries; not represented as verified edit retrieval |
 | Evaluation and calibration | Implemented tooling | Grouped, scaffold-, source-, and time-disjoint modes; baselines; calibration; blind review/adjudication |
 | Release validation | Implemented tooling | Machine artifact checks plus hash-bound independent chemist sign-off |
 
-The generic structure-backed path is the single recommendation direction.
-The former expert-rule and weak-label recommendation paths have been removed.
+The generic structure-backed path remains canonical. The expert-rule path is
+removed; weak-label retrieval is an explicit lower-evidence fallback or
+screening-array generator rather than a parallel structural precedent system.
 
 ### 2.2 Active contract versions
 
@@ -75,7 +77,8 @@ The current code declares:
 | --- | --- |
 | Reaction analysis | `10.0` |
 | Reaction observation | `3.0` |
-| Reaction interpretation | `7.1` |
+| Reaction interpretation | `7.2` |
+| Reaction-type hint / ID namespace | `1.0` / `RTH1` |
 | Rendered reaction label | `1.1` |
 | Reaction signature / ID namespace | `3.4` / `RS3` |
 | Reaction ring change | `1.0` |
@@ -1028,10 +1031,9 @@ plus human release gates pass.
 
 ### Gate 6: Consolidate public paths
 
-The package-level consolidation is complete: the generic structure-backed
-workflow is canonical, and the former expert-rule and weak-label recommenders
-have been removed. Remaining work is documentation and legacy-application
-containment:
+The generic structure-backed workflow is canonical. The expert-rule recommender
+is removed, while weak-label retrieval is isolated as an explicitly unverified
+fallback. Remaining work is documentation and legacy-application containment:
 
 1. move any still-useful historical expert-rule and weak-label rationale out of
    the active package README or archive it explicitly;

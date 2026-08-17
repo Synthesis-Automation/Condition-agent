@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "weak_label_retrieval.v1",
+  "calibration_status": "chemistry_prior_not_statistically_calibrated",
+  "supported_reaction_scopes": ["intermolecular"],
+  "reaction_type_sources": {
+    "c_c_boron_transfer_coupling": [
+      "Suzuki-Miyaura",
+      "Suzuki-Miyaura, in situ"
+    ],
+    "sp2_c_n_substitution": [
+      "Buchwald-Hartwig",
+      "CN-Coupling",
+      "SNAr"
+    ],
+    "amide_formation": ["Amide coupling"],
+    "sp2_c_o_substitution": ["CO-Coupling", "SNAr"],
+    "sp2_c_s_substitution": ["CS-Coupling"],
+    "sp3_c_n_substitution": ["Alkylation"],
+    "c_c_alkene_coupling": ["Heck"],
+    "sp2_c_activated_c_coupling": ["Arylation, acidic C-H"],
+    "sp2_c_aromatic_c_h_coupling": ["CH-Activation"],
+    "c_c_terminal_alkyne_coupling": ["Sonogashira"],
+    "c_c_metal_transfer_coupling": ["Negishi", "Negishi, in-situ"]
+  },
+  "participant_similarity_weights": {
+    "signature": 0.85,
+    "qualifier": 0.15
+  },
+  "ranking_weights": {
+    "label_similarity": 0.65,
+    "compatibility": 0.15,
+    "yield": 0.12,
+    "z_score": 0.04,
+    "support": 0.04
+  },
+  "require_complete_participant_signatures": true,
+  "maximum_precedents_per_recipe": 5,
+  "screening_candidate_limit": 250,
+  "screening_diversity_weight": 0.35,
+  "transfer_handle_token_families": {
+    "B(OH)2": "boron",
+    "B(OR)2": "boron",
+    "BF3K": "boron",
+    "BPin": "boron",
+    "ZnX": "zinc",
+    "MgX": "magnesium",
+    "SnR3": "tin",
+    "SiR3": "silicon"
+  }
+}
