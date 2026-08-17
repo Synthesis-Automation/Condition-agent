@@ -93,6 +93,7 @@ def test_unmapped_leaving_group_boundary_is_projected_when_product_is_complete()
     broken = next(edit for edit in result.edits if edit.edit_type == "broken")
     assert {broken.atom_1.element, broken.atom_2.element} == {"Br", "C"}
     assert broken.old_order == "SINGLE"
+    assert broken.evidence == "supplied_atom_mapping_projected_boundary"
     projected = next(
         transition
         for transition in graph.bond_transitions
@@ -111,6 +112,12 @@ def test_mapped_unmapped_leaving_group_and_unmapped_reaction_share_keys() -> Non
     inferred = featurize_reaction("CCBr.NC>>CCNC")
     assert mapped.reaction_signature is not None
     assert inferred.reaction_signature is not None
+    assert mapped.reaction_core is not None
+    assert mapped.reaction_core.quality.status == "pass"
+    assert (
+        "partial_mapping_limited_to_validated_departures"
+        in mapped.reaction_core.quality.passed_checks
+    )
 
     assert mapped.reaction_signature.formed_bond_types == ("C-N:SINGLE",)
     assert mapped.reaction_signature.broken_bond_types == ("Br-C:SINGLE",)

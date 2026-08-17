@@ -12,7 +12,7 @@ from .reaction_models import ReactionComponent
 
 
 AtomPair = Tuple[int, int, int, int]
-REACTION_CORRESPONDENCE_VERSION = "2.7"
+REACTION_CORRESPONDENCE_VERSION = "2.8"
 
 
 def _has_unsupported_mcs_bond(molecule: Any) -> bool:

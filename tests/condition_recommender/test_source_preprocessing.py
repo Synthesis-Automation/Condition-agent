@@ -328,6 +328,7 @@ def test_uspto_smiles_conditions_resolve_to_names_and_cas(
         {
             "catalyst1": "",
             "solvent1": "OCC",
+            "solvent2": "Cc1ccccc1",
             "reagent1": "CCN(CC)CC",
             "reagent2": "",
         }
@@ -349,6 +350,9 @@ def test_uspto_smiles_conditions_resolve_to_names_and_cas(
     assert components["OCC"]["identity_status"] == "resolved"
     assert components["OCC"]["canonical_name"] == "Ethanol"
     assert components["OCC"]["cas"] == "64-17-5"
+    assert components["Cc1ccccc1"]["identity_status"] == "resolved"
+    assert components["Cc1ccccc1"]["canonical_name"] == "Toluene"
+    assert components["Cc1ccccc1"]["cas"] == "108-88-3"
     assert components["CCN(CC)CC"]["identity_status"] == "resolved"
     assert components["CCN(CC)CC"]["canonical_name"] == "Triethylamine"
     assert components["CCN(CC)CC"]["cas"] == "121-44-8"

@@ -225,7 +225,7 @@ def test_center_state_gate_applies_before_every_signature_tier() -> None:
         minimum_pool_size=2,
     )
 
-    assert result.level == "exact_signature"
+    assert result.level == "edit_graph_neighbors"
     assert {row.reaction_id for row, _ in result.pool} == {
         "reaction-2",
         "reaction-3",

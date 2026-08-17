@@ -141,8 +141,8 @@ def test_center_state_separates_alkylation_from_amide_formation() -> None:
     assert partial_prototype is not None
     assert amide_prototype is not None
 
-    assert mapped_prototype.formed_atom_state_pairs == ("C@SP3-N",)
-    assert amide_prototype.formed_atom_state_pairs == ("C@SP2-N",)
+    assert mapped_prototype.formed_atom_state_pairs == ("C@SP3-N@SP3",)
+    assert amide_prototype.formed_atom_state_pairs == ("C@SP2-N@SP3",)
     assert anonymous_edit_compatible(mapped_prototype, partial_prototype)
     assert anonymous_edit_similarity(mapped_prototype, partial_prototype) >= 0.6
     assert not anonymous_edit_compatible(mapped_prototype, amide_prototype)

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence, Tuple
 
 from ..reaction_models import ReactionEdit
+from ..reaction_edits import PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE
 from .common import Location
 from .models import ReactionCoreQuality
 
@@ -98,6 +99,17 @@ def validate_core_edits(
             value is None
             for value in (reactant_1, reactant_2, product_1, product_2)
         ):
+            if (
+                edit.evidence
+                == PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE
+                and edit.edit_type == "broken"
+                and edit.old_order is not None
+                and edit.new_order is None
+                and reactant_1 is not None
+                and product_1 is not None
+                and edit.atom_2.atom_map_number is None
+            ):
+                checked += 1
             continue
         checked += 1
         before_order = _bond_order(reactant_1, reactant_2)  # type: ignore[arg-type]
@@ -124,6 +136,7 @@ def assess_reaction_core_quality(
     event_count: int,
     remote_continuity_unresolved: bool,
     no_op_primary_center: bool,
+    unmapped_active_atoms_are_validated_departures: bool = False,
 ) -> ReactionCoreQuality:
     """Build a transparent pass/review/blocked core-quality assessment."""
     rules = load_reaction_core_quality_rules()
@@ -153,8 +166,13 @@ def assess_reaction_core_quality(
         review.append("large_active_core")
     else:
         passed.append("active_core_size_within_review_limit")
-    if coverage < float(rules["minimum_active_atom_mapping_coverage"]):
+    if (
+        coverage < float(rules["minimum_active_atom_mapping_coverage"])
+        and not unmapped_active_atoms_are_validated_departures
+    ):
         review.append("partial_active_atom_mapping")
+    elif coverage < float(rules["minimum_active_atom_mapping_coverage"]):
+        passed.append("partial_mapping_limited_to_validated_departures")
     else:
         passed.append("active_atom_mapping_complete")
     if checked_fraction < 1.0:

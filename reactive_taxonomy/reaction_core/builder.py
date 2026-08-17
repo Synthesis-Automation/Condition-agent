@@ -19,6 +19,7 @@ from ..reaction_models import (
     ReactionEdit,
     ReactionStereoChange,
 )
+from ..reaction_edits import PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE
 from .common import (
     AtomIdentity as _AtomIdentity,
     Coordinate as _Coordinate,
@@ -1124,6 +1125,16 @@ def build_reaction_core_projection(
         == _state_identity(transition.after_state, generic=False)
         for transition in primary
     )
+    unmapped_active_identities = {
+        identity for identity in identities if identity[0] != "map"
+    }
+    validated_departing_identities = {
+        _atom_identity(atom)
+        for edit in edits
+        if edit.evidence == PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE
+        for atom in (edit.atom_1, edit.atom_2)
+        if atom is not None and atom.atom_map_number is None
+    }
     quality = assess_reaction_core_quality(
         active_atom_count=len(identities),
         mapped_active_atom_count=sum(
@@ -1136,6 +1147,10 @@ def build_reaction_core_projection(
         event_count=len(events),
         remote_continuity_unresolved=remote_continuity_unresolved,
         no_op_primary_center=no_op_primary_center,
+        unmapped_active_atoms_are_validated_departures=bool(
+            unmapped_active_identities
+            and unmapped_active_identities <= validated_departing_identities
+        ),
     )
     warnings = set()
     if remote_continuity_unresolved:

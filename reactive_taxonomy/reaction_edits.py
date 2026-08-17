@@ -35,6 +35,12 @@ from .reaction_correspondence import (
 )
 
 
+PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE = (
+    "supplied_atom_mapping_projected_boundary"
+)
+_TERMINAL_LEAVING_GROUP_ELEMENTS = frozenset({"F", "Cl", "Br", "I"})
+
+
 @dataclass(frozen=True)
 class EditNormalizationResult:
     """Normalized edits plus validation and reconciliation evidence."""
@@ -182,7 +188,10 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
             if bool(left) != bool(right):
                 mapped = begin if left else end
                 unmapped = end if left else begin
-                if unmapped.GetAtomicNum() > 1:
+                if (
+                    unmapped.GetSymbol() in _TERMINAL_LEAVING_GROUP_ELEMENTS
+                    and unmapped.GetDegree() == 1
+                ):
                     boundary_bonds.append(
                         _MappedBoundaryBond(
                             mapped_atom_map_number=int(mapped.GetAtomMapNum()),
@@ -314,7 +323,7 @@ def _mapped_connectivity_graph(
                 before_state=bond_state(boundary.order),
                 after_state=endpoint_absent_state(),
                 observation_scope="main_product_projection",
-                evidence="supplied_atom_mapping",
+                evidence=PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE,
                 confidence=1.0,
             )
         )
@@ -477,7 +486,7 @@ def normalize_mapped_edits(
                 atom_2=boundary.unmapped_atom,
                 old_order=boundary.order,
                 new_order=None,
-                evidence="supplied_atom_mapping",
+                evidence=PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE,
                 confidence=1.0,
             )
         )
@@ -1460,6 +1469,7 @@ def resolve_structural_evidence(
 
 __all__ = [
     "EditNormalizationResult",
+    "PROJECTED_UNMAPPED_DEPARTING_BOUNDARY_EVIDENCE",
     "normalize_mapped_edits",
     "normalize_inferred_scaffold_edits",
     "reaction_atom_reference",

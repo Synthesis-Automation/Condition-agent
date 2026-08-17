@@ -102,7 +102,7 @@ The current code declares:
 | Generic persisted index | `6.3` |
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `3.3` |
-| Reaction correspondence definitions | `2.7` |
+| Reaction correspondence definitions | `2.8` |
 | Generic retrieval definition | `1.8` |
 | Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.1` |
 | Generic ranking definition | `1.1` |
@@ -119,9 +119,9 @@ Do not copy this table into executable code. The constants and definition files
 remain authoritative, and stale artifacts must fail validation rather than
 silently mixing chemistry identities.
 
-The `2.7` correspondence contract projects a mapped-atom/unmapped-heavy-atom
-reactant boundary as a departing bond only when the product heavy-atom mapping
-is complete and the mapped endpoint survives. This makes partially mapped
+The `2.8` correspondence contract projects a mapped-atom/unmapped-terminal-
+halogen reactant boundary as a departing bond only when the product heavy-atom
+mapping is complete and the mapped endpoint survives. This makes partially mapped
 leaving groups such as the unmapped bromide in `US04097491:row-34775`
 converge with the equivalent unmapped graph inference. The `1.1` facet contract
 also treats contradictory before/after states at hydrogen-changing active atoms
@@ -136,7 +136,7 @@ retrieval ladder.
 
 ### 2.3 Current local literature artifact
 
-> Rebuild required after the `reaction_correspondence=2.7`, reaction-facet
+> Rebuild required after the `reaction_correspondence=2.8`, reaction-facet
 > `1.1`, condition-registry structure correction, and generic-index `6.3`
 > changes. Older converted shards and SQLite indexes are intentionally rejected
 > instead of mixing pre-fix and post-fix chemistry identities.
