@@ -115,6 +115,45 @@ function Conditions({ recipe }: { recipe: ResolvedRecipe }) {
   )
 }
 
+function SelectedRecipeConditions({ recipe }: { recipe: ResolvedRecipe }) {
+  const groups = ROLE_FIELDS.flatMap(([field, label]) => {
+    const values = recipe[field]
+    return Array.isArray(values) && values.length
+      ? [{ key: field, label, values: values.map(componentName) }]
+      : []
+  })
+  const parameters = [
+    recipe.temperature_c != null ? `${recipe.temperature_c} °C` : '',
+    recipe.time_h != null ? `${recipe.time_h} h` : '',
+    recipe.concentration_m != null ? `${recipe.concentration_m} M` : '',
+    recipe.pressure_bar != null ? `${recipe.pressure_bar} bar` : '',
+    recipe.atmosphere ?? '',
+  ].filter(Boolean)
+
+  if (!groups.length && !parameters.length) {
+    return <p className="selected-recipe-empty">Resolved recipe details unavailable</p>
+  }
+
+  return (
+    <dl className="selected-recipe-conditions" aria-label="Selected reaction conditions">
+      {groups.map(({ key, label, values }) => (
+        <div className="selected-condition-group" data-role={key} key={key}>
+          <dt>{label}</dt>
+          <dd>
+            {values.map((value, index) => <span key={`${value}-${index}`}>{value}</span>)}
+          </dd>
+        </div>
+      ))}
+      {parameters.length > 0 && (
+        <div className="selected-condition-group" data-role="parameters">
+          <dt>Setup</dt>
+          <dd>{parameters.map((value, index) => <span key={`${value}-${index}`}>{value}</span>)}</dd>
+        </div>
+      )}
+    </dl>
+  )
+}
+
 function MessageList({ title, values, tone = '' }: { title: string; values: string[]; tone?: string }) {
   if (!values.length) return null
   return (
@@ -329,10 +368,10 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
   return (
     <article className="result-detail">
       <div className="detail-title-row">
-        <div>
+        <div className="selected-recipe-heading">
           <span className="eyebrow">SELECTED RECIPE</span>
           <h3>Rank {item.rank}</h3>
-          <p>{recipeSummary(item.resolved_recipe)}</p>
+          <SelectedRecipeConditions recipe={item.resolved_recipe} />
         </div>
         <div className="score-orbit"><strong>{item.score.toFixed(3)}</strong><span>score</span></div>
       </div>

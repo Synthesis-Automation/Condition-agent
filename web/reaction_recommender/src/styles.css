@@ -181,6 +181,31 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .result-detail { min-width: 0; padding: 18px; background: #fbfcfb; }
 .detail-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
 .detail-title-row p { max-width: 540px; margin-top: 5px; color: #64776c; font-size: .73rem; line-height: 1.45; }
+.selected-recipe-heading { min-width: 0; flex: 1; }
+.selected-recipe-conditions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; max-width: 720px; margin: 11px 0 0; }
+.selected-condition-group {
+  --condition-accent: #397359;
+  --condition-label: #285640;
+  --condition-surface: #eef6f1;
+  min-width: 0; padding: 9px 10px 10px 12px; border: 1px solid color-mix(in srgb, var(--condition-accent) 24%, white);
+  border-radius: 8px; background: var(--condition-surface); box-shadow: inset 3px 0 var(--condition-accent);
+}
+.selected-condition-group dt { margin-bottom: 5px; color: var(--condition-label); font-size: .6rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+.selected-condition-group dd { display: flex; min-width: 0; flex-wrap: wrap; gap: 4px 10px; margin: 0; }
+.selected-condition-group dd span { position: relative; color: #203c2f; font-size: .76rem; font-weight: 680; line-height: 1.4; overflow-wrap: anywhere; }
+.selected-condition-group dd span + span::before { position: absolute; left: -7px; color: var(--condition-accent); content: '•'; font-weight: 900; }
+.selected-condition-group[data-role="catalysts"] { --condition-accent: #77509a; --condition-label: #634181; --condition-surface: #f5f0f9; }
+.selected-condition-group[data-role="ligands"] { --condition-accent: #a26138; --condition-label: #804823; --condition-surface: #fbf2eb; }
+.selected-condition-group[data-role="bases"] { --condition-accent: #30749a; --condition-label: #255f80; --condition-surface: #edf6fa; }
+.selected-condition-group[data-role="condensation_agents"],
+.selected-condition-group[data-role="oxidants"],
+.selected-condition-group[data-role="reductants"] { --condition-accent: #a45c5c; --condition-label: #804545; --condition-surface: #fbf0f0; }
+.selected-condition-group[data-role="acids"] { --condition-accent: #b16b2c; --condition-label: #855020; --condition-surface: #fcf4e9; }
+.selected-condition-group[data-role="additives"] { --condition-accent: #887126; --condition-label: #6e5a1c; --condition-surface: #faf6e7; }
+.selected-condition-group[data-role="solvents"] { --condition-accent: #27806b; --condition-label: #216654; --condition-surface: #edf8f4; }
+.selected-condition-group[data-role="other_components"],
+.selected-condition-group[data-role="parameters"] { --condition-accent: #66766d; --condition-label: #536159; --condition-surface: #f2f5f3; }
+.selected-recipe-empty { margin-top: 9px !important; font-style: italic; }
 .score-orbit { display: flex; width: 64px; height: 64px; flex: 0 0 auto; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #bcd0c4; border-radius: 50%; color: #2a6749; background: #edf5f0; }
 .score-orbit strong { font-size: .94rem; }
 .score-orbit span { color: #6e8376; font-size: .58rem; text-transform: uppercase; }
@@ -414,6 +439,7 @@ footer { padding: 4px 4px 0; color: #77877e; font-size: .7rem; text-align: cente
   .forward-condition-grid { grid-template-columns: 1fr; }
   .smiles-actions { align-items: stretch; flex-direction: column; }
   .detail-title-row { flex-direction: column; }
+  .selected-recipe-conditions { grid-template-columns: 1fr; }
   .score-orbit { width: auto; height: auto; align-self: stretch; flex-direction: row; gap: 5px; padding: 8px; border-radius: 9px; }
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions .button { width: 100%; }
