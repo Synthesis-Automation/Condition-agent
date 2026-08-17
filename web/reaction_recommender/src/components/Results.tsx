@@ -465,7 +465,33 @@ export function RecommendationResults({ result }: { result: RecommendationResult
   )
 }
 
-function WeakLabelRecommendationDetails({ item }: { item: WeakLabelRecommendation }) {
+function weakLabelComparisonSummary(
+  item: WeakLabelRecommendation,
+  queryParticipants: WeakLabelRecommendationResult['query_participants'],
+): string {
+  const match = item.source_matches[0]
+  if (!match) return 'Unreported'
+  const queryByRole = new Map(
+    queryParticipants.map((participant) => [participant.role ?? '', participant]),
+  )
+  return match.participant_roles.map((role, index) => {
+    const query = queryByRole.get(role)
+    const queryLabel = query?.chemist_label || query?.canonical_signature || 'Query unavailable'
+    const sourceLabel = match.participant_display_labels[index] || match.participant_signatures[index]
+    return `${queryLabel} ↔ ${sourceLabel}`
+  }).join(' + ')
+}
+
+function WeakLabelRecommendationDetails({
+  item,
+  queryParticipants,
+}: {
+  item: WeakLabelRecommendation
+  queryParticipants: WeakLabelRecommendationResult['query_participants']
+}) {
+  const queryByRole = new Map(
+    queryParticipants.map((participant) => [participant.role ?? '', participant]),
+  )
   return (
     <article className="result-detail weak-label-detail">
       <div className="detail-title-row">
@@ -488,18 +514,22 @@ function WeakLabelRecommendationDetails({ item }: { item: WeakLabelRecommendatio
           {item.explanation.length > 0 && <ul>{item.explanation.map((note) => <li key={note}>{note}</li>)}</ul>}
         </section>
         <section className="recommendation-reference">
-          <h4>Matched source labels</h4>
+          <h4>Labels used · query ↔ matched source</h4>
           <div className="weak-label-match-list">
             {item.source_matches.map((match) => (
               <article key={`${match.source_row_number}:${match.source_reaction_type}`}>
                 <div><strong>{match.source_reaction_type}</strong><small>row {match.source_row_number}</small></div>
-                {match.participant_roles.map((role, index) => (
-                  <p key={`${role}:${index}`}>
+                {match.participant_roles.map((role, index) => {
+                  const query = queryByRole.get(role)
+                  return (
+                  <div className="weak-label-comparison" key={`${role}:${index}`}>
                     <span>{displayName(role)}</span>
-                    <strong>{match.participant_display_labels[index] || match.participant_signatures[index]}</strong>
-                    <code>{match.participant_signatures[index]}</code>
-                  </p>
-                ))}
+                    <p><small>Query</small><strong>{query?.chemist_label || 'Unavailable'}</strong><code>{query?.canonical_signature || '—'}</code></p>
+                    <i aria-hidden="true">↔</i>
+                    <p><small>Matched source</small><strong>{match.participant_display_labels[index] || match.participant_signatures[index]}</strong><code>{match.participant_signatures[index]}</code></p>
+                  </div>
+                  )
+                })}
               </article>
             ))}
           </div>
@@ -533,30 +563,14 @@ export function WeakLabelRecommendationResults({ result }: { result: WeakLabelRe
       <div className="alert caution weak-label-banner">
         Source reactions are not structure-verified. Use these recipes as expert-reviewed fallback or screening hypotheses, not literature-validated precedents.
       </div>
-      {result.query_participants.length > 0 && (
-        <div className="weak-labels-used" aria-label="Graph-derived query labels used">
-          <strong>Query labels used</strong>
-          {result.query_participants.map((participant) => (
-            <span key={`${participant.component_index}:${participant.site_id}`}>
-              {displayName(participant.role ?? 'participant')}: <b>{participant.chemist_label}</b> <code>{participant.canonical_signature}</code>
-            </span>
-          ))}
-        </div>
-      )}
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No weak-label recommendation')}</div>}
       <MessageList title="Query warnings" values={result.warnings} tone="caution" />
       {result.query_participants.length > 0 && (
         <details className="trace-panel weak-label-query">
-          <summary>Graph-derived query hint and participants</summary>
+          <summary>Graph-derived reaction-type hint</summary>
           <dl className="detail-list">
             <div><dt>Hint ID</dt><dd>{result.reaction_type_hint_id ?? 'Unavailable'}</dd></div>
             <div><dt>Compatible source types</dt><dd>{result.source_reaction_type_candidates.join(', ')}</dd></div>
-            {result.query_participants.map((participant) => (
-              <div key={`${participant.component_index}:${participant.site_id}`}>
-                <dt>{displayName(participant.role ?? 'participant')}</dt>
-                <dd>{participant.chemist_label} · {participant.canonical_signature}</dd>
-              </div>
-            ))}
           </dl>
         </details>
       )}
@@ -564,13 +578,13 @@ export function WeakLabelRecommendationResults({ result }: { result: WeakLabelRe
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Source labels used</th><th>Yield</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Score</th><th>Query ↔ source labels</th><th>Yield</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.recommendations.map((item, index) => (
                   <tr key={item.recipe_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
                     <td><strong>{item.rank}</strong></td>
                     <td>{item.score.toFixed(3)}</td>
-                    <td>{item.source_matches[0]?.participant_display_labels.map((label, labelIndex) => label || item.source_matches[0].participant_signatures[labelIndex]).join(' + ') ?? 'Unreported'}</td>
+                    <td>{weakLabelComparisonSummary(item, result.query_participants)}</td>
                     <td>{item.expected_yield_pct == null ? '—' : `${item.expected_yield_pct.toFixed(1)}%`}</td>
                     <td>{compactRecipeSummary(item.resolved_recipe)}</td>
                   </tr>
@@ -578,7 +592,7 @@ export function WeakLabelRecommendationResults({ result }: { result: WeakLabelRe
               </tbody>
             </table>
           </div>
-          {active && <WeakLabelRecommendationDetails item={active} />}
+          {active && <WeakLabelRecommendationDetails item={active} queryParticipants={result.query_participants} />}
         </div>
       )}
     </section>
