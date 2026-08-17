@@ -1,8 +1,6 @@
 import type {
   ApiEnvelope,
   Capabilities,
-  DiscoveryRequest,
-  DiscoveryResult,
   FeatureAnalysisRequest,
   FeatureAnalysisResult,
   ForwardSynthesisRequest,
@@ -72,12 +70,6 @@ export const api = {
 
   recommend: (request: RecommendationRequest) =>
     jsonRequest<RecommendationResult>('/recommendations', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    }),
-
-  discover: (request: DiscoveryRequest) =>
-    jsonRequest<DiscoveryResult>('/discovery', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

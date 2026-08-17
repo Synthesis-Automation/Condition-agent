@@ -6,7 +6,6 @@ import gzip
 import json
 
 from app.web_api.experimental_details import (
-    attach_discovery_experimental_details,
     attach_recommendation_experimental_details,
     load_experimental_detail_catalog,
 )
@@ -45,16 +44,3 @@ def test_experimental_details_are_attached_to_recommendations() -> None:
     assert enriched["recommendations"][0]["precedent_experimental_details"] == [
         _detail()
     ]
-
-
-def test_experimental_detail_is_attached_to_discovery_hit() -> None:
-    payload = {
-        "hits": [
-            {"observation_id": "observation:1", "reaction_id": "reaction:1"}
-        ]
-    }
-    catalog = {"observation:observation:1": _detail()}
-
-    enriched = attach_discovery_experimental_details(payload, catalog)
-
-    assert enriched["hits"][0]["experimental_detail"] == _detail()

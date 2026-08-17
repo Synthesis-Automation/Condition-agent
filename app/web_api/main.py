@@ -12,7 +12,6 @@ from fastapi.staticfiles import StaticFiles
 
 from .contracts import (
     API_SCHEMA_VERSION,
-    DiscoveryRequest,
     FeatureAnalysisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -99,18 +98,6 @@ def create_app(
     ) -> dict[str, Any]:
         try:
             data = active_runtime(request).recommend(payload)
-        except (ValueError, FileNotFoundError, RuntimeError) as exc:
-            status = 422 if isinstance(exc, ValueError) else 503
-            raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
-        return envelope(data)
-
-    @app.post("/api/v1/discovery")
-    def discover(
-        payload: DiscoveryRequest,
-        request: Request,
-    ) -> dict[str, Any]:
-        try:
-            data = active_runtime(request).discover(payload)
         except (ValueError, FileNotFoundError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(status_code=status, detail=error_payload(exc)) from exc

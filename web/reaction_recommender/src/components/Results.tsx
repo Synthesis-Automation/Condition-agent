@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import type {
   ConditionPrecedent,
-  DiscoveryHit,
-  DiscoveryResult,
   ExperimentalDetail,
   ForwardProductCandidate,
   ForwardSynthesisResult,
@@ -422,46 +420,6 @@ export function RecommendationResults({ result }: { result: RecommendationResult
           {active && <RecommendationDetails item={active} />}
         </div>
       )}
-    </section>
-  )
-}
-
-function DiscoveryDetails({ hit }: { hit: DiscoveryHit }) {
-  return (
-    <article className="result-detail">
-      <div className="detail-title-row"><div><span className="eyebrow">SELECTED PRECEDENT</span><h3>Rank {hit.rank} · {displayName(hit.relation_class)}</h3><p>Source: {displayName(hit.source_dataset)}</p></div><div className="score-orbit"><strong>{hit.discovery_score.toFixed(3)}</strong><span>score</span></div></div>
-      <ReactionImage smiles={hit.reaction_smiles} label="Selected precedent reaction" compact />
-      <div className="detail-columns"><section><h4>Observed conditions</h4><Conditions recipe={hit.resolved_recipe} /></section><section><h4>Provenance</h4><dl className="detail-list"><div><dt>Dataset</dt><dd>{displayName(hit.source_dataset)}</dd></div><div><dt>Evidence tier</dt><dd>{displayName(hit.evidence_tier)}</dd></div><div><dt>Chemistry</dt><dd>{displayName(hit.chemistry_status)}</dd></div><div><dt>Outcome</dt><dd>{displayName(hit.outcome_status)}</dd></div><div><dt>Observed yield</dt><dd>{hit.yield_pct == null ? 'Unreported' : `${hit.yield_pct.toFixed(1)}%`}</dd></div></dl><ReferenceRecords records={hit.reference_record ? [hit.reference_record] : []} /></section></div>
-      <ExperimentalDetails details={hit.experimental_detail ? [hit.experimental_detail] : []} />
-      <MessageList title="Why it is related" values={hit.score_trace.matches} />
-      <MessageList title="Structural differences" values={hit.score_trace.mismatches} tone="caution" />
-      <MessageList title="Insights" values={hit.insights} />
-      <MessageList title="Cautions" values={hit.cautions} tone="caution" />
-      <details className="trace-panel"><summary>Discovery score trace</summary><div className="factor-grid">
-        {Object.entries(hit.score_trace.configured_weights).map(([name, configured]) => {
-          const value = hit.score_trace.components[name]
-          const effective = hit.score_trace.effective_weights[name]
-          const contribution = hit.score_trace.contributions[name]
-          return <div key={name}><strong>{FACTOR_LABELS[name] ?? displayName(name)}</strong><span>Value {value == null ? '—' : value.toFixed(3)}</span><span>Configured {configured.toFixed(3)}</span><span>Effective {effective == null ? '—' : effective.toFixed(3)}</span><span>Contribution {contribution == null ? '—' : contribution.toFixed(3)}</span></div>
-        })}
-      </div></details>
-    </article>
-  )
-}
-
-export function DiscoveryResults({ result }: { result: DiscoveryResult }) {
-  const [selected, setSelected] = useState(0)
-  useEffect(() => setSelected(0), [result])
-  const active = result.hits[selected]
-  return (
-    <section className="results-card">
-      <div className="results-summary"><div><span className="eyebrow">DISCOVERY RESULT</span><h2>{result.hits.length} related precedent{result.hits.length === 1 ? '' : 's'}</h2></div><div className="metric-strip"><div><strong>{result.candidate_count}</strong><span>candidates</span></div><div><strong>{displayName(result.discovery_view)}</strong><span>view</span></div><div><strong>{Object.keys(result.relation_counts).length}</strong><span>relation classes</span></div></div></div>
-      <ReactionImage smiles={result.query_reaction_smiles} label="Discovery query reaction" compact />
-      {!result.valid && <div className="alert error">{displayName(result.error ?? 'No discovery result')}</div>}
-      <MessageList title="Discovery warnings" values={result.warnings} tone="caution" />
-      {result.hits.length > 0 && <div className="results-layout"><div className="table-scroll"><table><thead><tr><th>Rank</th><th>Score</th><th>Relationship</th><th>Yield</th><th>Conditions</th></tr></thead><tbody>
-        {result.hits.map((hit, index) => <tr key={hit.observation_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}><td><strong>{hit.rank}</strong></td><td>{hit.discovery_score.toFixed(3)}</td><td>{displayName(hit.relation_class)}</td><td>{hit.yield_pct == null ? '—' : `${hit.yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(hit.resolved_recipe)}</td></tr>)}
-      </tbody></table></div>{active && <DiscoveryDetails hit={active} />}</div>}
     </section>
   )
 }

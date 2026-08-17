@@ -12,7 +12,6 @@ export interface Capabilities {
   loaded_runtime_variants: number
   rxnmapper_available: boolean
   recommendation: boolean
-  discovery: boolean
   featurization: boolean
   reaction_rendering: boolean
   retrosynthesis?: boolean
@@ -266,56 +265,6 @@ export interface RecommendationResult {
   ranking_preferences: JsonObject
 }
 
-export interface DiscoveryScoreTrace {
-  components: Record<string, number | null>
-  contributions: Record<string, number>
-  configured_weights: Record<string, number>
-  effective_weights: Record<string, number>
-  matches: string[]
-  mismatches: string[]
-}
-
-export interface DiscoveryHit {
-  rank: number
-  reaction_id: string
-  observation_id: string
-  reaction_smiles: string
-  relation_class: string
-  relation_tiers: string[]
-  discovery_score: number
-  yield_pct?: number | null
-  outcome_status: string
-  evidence_tier: string
-  chemistry_status: string
-  source_dataset: string
-  reference_id: string
-  reference_record?: ReferenceRecord | null
-  experimental_detail?: ExperimentalDetail | null
-  resolved_recipe: ResolvedRecipe
-  recipe_id: string
-  recipe_core_id: string
-  hypothesis_id?: string | null
-  score_trace: DiscoveryScoreTrace
-  insights: string[]
-  cautions: string[]
-}
-
-export interface DiscoveryResult {
-  query_reaction_smiles: string
-  valid: boolean
-  error?: string | null
-  schema_version: string
-  query_signature_id?: string | null
-  query_reaction_core_id?: string | null
-  named_family?: string | null
-  transformation_class?: string | null
-  discovery_view: string
-  candidate_count: number
-  relation_counts: Record<string, number>
-  warnings: string[]
-  hits: DiscoveryHit[]
-}
-
 export interface RecommendationRequest {
   reaction_smiles: string
   library_mode: 'full' | 'compact'
@@ -328,17 +277,6 @@ export interface RecommendationRequest {
     weights: Record<string, number>
   }
   completion_choices: CompletionChoice[]
-}
-
-export interface DiscoveryRequest {
-  reaction_smiles: string
-  library_mode: 'full' | 'compact'
-  top_k: number
-  view: string
-  include_low_yield: boolean
-  include_unreported_outcomes: boolean
-  use_rxnmapper: boolean
-  include_review: boolean
 }
 
 export interface FeatureMotif {

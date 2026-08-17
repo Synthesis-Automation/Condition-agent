@@ -99,7 +99,6 @@ The current code declares:
 | Generic persisted index | `6.1` |
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `3.3` |
-| Reaction discovery result / definition | `1.0` / `discovery_retrieval.v1@1.0` |
 | Reaction correspondence definitions | `2.6` |
 | Generic retrieval definition | `1.8` |
 | Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.0` |
@@ -664,43 +663,6 @@ Compressed nested JSONL shards are the current canonical implementation
 artifact. CSV is a chemist review/export view. The longer-term preference for
 partitioned Parquet at full-corpus scale remains reasonable but is not the
 current implementation.
-
-## 3.9 Exploratory reaction discovery
-
-The existing desktop recommender now exposes a separate **Reaction discovery**
-mode backed by `ReactionDiscoveryExplorer.discover()`. It shares the validated
-SQLite index and query featurization, but it does not call the recommendation
-pipeline and returns `ReactionDiscoveryResult`, not
-`GenericRecommendationResult`.
-
-Discovery retrieves the union of exact signature, handle/edit signature,
-local-environment, reaction-core, transformation, and anonymous edit-graph
-analogue tiers. Named reaction family is not a routing key. Each precedent is
-ranked by the versioned `discovery_retrieval.v1` factors, in descending initial
-importance:
-
-1. anonymous bond-edit similarity (`0.35`);
-2. reacting-center transition similarity (`0.20`);
-3. local structural environment (`0.15`);
-4. graph-derived reactant/partner category (`0.10`);
-5. unchanged spectator-group overlap (`0.08`);
-6. inter-/intramolecular and ring topology (`0.07`); and
-7. reactive-component scaffold (`0.05`).
-
-Unavailable evidence is serialized as `null`; configured weights over the
-available factors are renormalized and both effective weights and contributions
-are returned. The GUI exposes closest-chemistry, diverse-strategy,
-successful-precedent, and failure-informed views plus controls for low-yield and
-unreported outcomes. Low-yield and missing-outcome observations are retained by
-default, clearly cautioned, and never silently promoted into successful
-evidence. Ambiguous edit hypotheses are retrieved and labeled separately.
-
-The result table and JSON call recipes **observed conditions**, never
-recommendations. The discovery MVP still uses admitted index rows, so it does
-not yet cover structurally verified failure/incomplete records that were never
-admitted. Such rows require a future discovery-specific corpus and must not be
-added to the trusted recommendation scope. Product-specified reaction SMILES is
-required in the current MVP.
 
 ## 4. Current retrieval and ranking behavior
 

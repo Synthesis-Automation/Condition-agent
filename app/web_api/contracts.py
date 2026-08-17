@@ -68,24 +68,6 @@ class RecommendationRequest(StrictRequest):
     completion_choices: tuple[CompletionChoiceRequest, ...] = ()
 
 
-class DiscoveryRequest(StrictRequest):
-    """One structurally related precedent-search request."""
-
-    reaction_smiles: str = Field(min_length=1, max_length=20_000)
-    library_mode: Literal["full", "compact"] = "full"
-    top_k: int = Field(default=10, ge=1, le=50)
-    view: Literal[
-        "closest_chemistry",
-        "diverse_strategies",
-        "successful_precedents",
-        "failure_informed",
-    ] = "closest_chemistry"
-    include_low_yield: bool = True
-    include_unreported_outcomes: bool = True
-    use_rxnmapper: bool = True
-    include_review: bool = False
-
-
 class FeatureAnalysisRequest(StrictRequest):
     """One auto-detected molecule or reaction featurization request."""
 
@@ -252,7 +234,6 @@ __all__ = [
     "API_SCHEMA_VERSION",
     "ApiEnvelope",
     "CompletionChoiceRequest",
-    "DiscoveryRequest",
     "FeatureAnalysisRequest",
     "ForwardConditionProfileRequest",
     "ForwardSynthesisRequest",

@@ -20,7 +20,6 @@ from condition_registry.loader import load_substances
 from condition_recommender import (
     ChemistRankingPreferences,
     GenericConditionRecommender,
-    ReactionDiscoveryExplorer,
     available_ranking_profiles,
     build_completion_selection,
     propose_reaction_completion,
@@ -55,7 +54,6 @@ from visualization import (
 )
 
 from .contracts import (
-    DiscoveryRequest,
     FeatureAnalysisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -66,14 +64,12 @@ from .contracts import (
 from .condition_precedents import attach_condition_precedents
 from .experimental_details import (
     EXPERIMENTAL_DETAIL_CATALOG_FILENAME,
-    attach_discovery_experimental_details,
     attach_recommendation_experimental_details,
     load_experimental_detail_catalog,
 )
 from .features import analyze_features, detect_input_kind
 from .references import (
     REFERENCE_CATALOG_FILENAME,
-    attach_discovery_references,
     attach_recommendation_references,
     load_reference_catalog,
 )
@@ -205,8 +201,6 @@ class WebRuntime(Protocol):
     def prepare_reaction(self, reaction_smiles: str) -> Dict[str, Any]: ...
 
     def recommend(self, request: RecommendationRequest) -> Dict[str, Any]: ...
-
-    def discover(self, request: DiscoveryRequest) -> Dict[str, Any]: ...
 
     def analyze_features(
         self, request: FeatureAnalysisRequest
@@ -616,7 +610,6 @@ class LocalRecommendationRuntime:
             "loaded_runtime_variants": len(self._recommenders),
             "rxnmapper_available": RxnMapperProvider.is_available(),
             "recommendation": True,
-            "discovery": True,
             "featurization": True,
             "reaction_rendering": True,
             "forward_synthesis": any(
@@ -762,35 +755,6 @@ class LocalRecommendationRuntime:
             payload,
             reference_catalog,
             experimental_catalog,
-        )
-
-    def discover(self, request: DiscoveryRequest) -> Dict[str, Any]:
-        """Execute exploratory precedent discovery over the shared index."""
-
-        recommender = self._get_recommender(
-            library_mode=request.library_mode,
-            use_rxnmapper=request.use_rxnmapper,
-            include_review=request.include_review,
-        )
-        explorer = ReactionDiscoveryExplorer(
-            recommender.index,
-            recommender.source_path,
-            recommender.mapping_provider,
-        )
-        result = explorer.discover(
-            request.reaction_smiles.strip(),
-            top_k=request.top_k,
-            view=request.view,
-            include_low_yield=request.include_low_yield,
-            include_unreported_outcomes=request.include_unreported_outcomes,
-        )
-        payload = attach_discovery_references(
-            result.to_dict(),
-            self._get_reference_catalog(recommender.source_path),
-        )
-        return attach_discovery_experimental_details(
-            payload,
-            self._get_experimental_detail_catalog(recommender.source_path),
         )
 
     def analyze_features(

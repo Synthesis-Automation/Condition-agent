@@ -96,15 +96,6 @@ class FakeRuntime:
             "schema_version": "test",
         }
 
-    def discover(self, request: Any) -> Dict[str, Any]:
-        return {
-            "query_reaction_smiles": request.reaction_smiles,
-            "library_mode": request.library_mode,
-            "valid": True,
-            "hits": [{"rank": 1, "reaction_id": "rxn:1"}],
-            "schema_version": "test",
-        }
-
     def analyze_features(self, request: Any) -> Dict[str, Any]:
         input_kind = "reaction" if ">" in request.input_smiles else "molecule"
         return {
@@ -1152,25 +1143,13 @@ def test_recommendation_contract_forwards_validated_options() -> None:
     )
 
 
-def test_discovery_and_svg_rendering_contracts() -> None:
+def test_reaction_svg_rendering_contract() -> None:
     web = client()
-    discovery = web.post(
-        "/api/v1/discovery",
-        json={
-            "reaction_smiles": "CCBr.N>>CCN",
-            "library_mode": "compact",
-            "view": "closest_chemistry",
-            "use_rxnmapper": False,
-        },
-    )
     drawing = web.post(
         "/api/v1/render/reaction",
         json={"reaction_smiles": "CCBr.N>>CCN"},
     )
 
-    assert discovery.status_code == 200
-    assert discovery.json()["data"]["library_mode"] == "compact"
-    assert discovery.json()["data"]["hits"][0]["reaction_id"] == "rxn:1"
     assert drawing.status_code == 200
     assert drawing.headers["content-type"].startswith("image/svg+xml")
     assert drawing.content.startswith(b"<svg")

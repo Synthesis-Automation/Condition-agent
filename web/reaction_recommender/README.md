@@ -2,7 +2,7 @@
 
 Local React/Ketcher client for the repository's canonical structure-first
 condition recommender. The browser only owns interaction and presentation; all
-reaction analysis, chemistry filtering, retrieval, scoring, discovery, recipe
+reaction analysis, chemistry filtering, retrieval, scoring, recipe
 aggregation, and SVG rendering stay in the standalone Python packages behind a
 versioned FastAPI boundary.
 
@@ -50,12 +50,9 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
 - Validate product-fragment source requirements before recommendation.
 - Retrieve and rank chemically compatible canonical condition recipes.
 - Apply declarative ranking profiles or transparent custom weights.
-- Browse structural precedents through the four discovery views.
 - Predict possible products from dot-separated starting materials with the
-  Forward synthesis mode. Optionally supply an intended product and the
-  retrosynthesis operator ID to audit a proposed route step against target-blind
-  competing pathways. A canonical condition-recipe JSON object can be supplied
-  to apply hard compatibility checks before ranking.
+  target-blind Forward synthesis mode. A canonical condition-recipe JSON object
+  can be supplied to apply hard compatibility checks before ranking.
 - Include or exclude intermolecular self-reactions. When enabled, a
   bifunctional input can occupy multiple operator roles as separate assumed
   equivalents; these pathways are labelled, stoichiometrically traced, and
@@ -74,7 +71,7 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
   partner roles, mapping provenance, and the canonical nested analysis.
 - Inspect score traces, structural matches and mismatches, cautions, conditions,
   yields, fallback levels, and precedent provenance.
-- Export the complete versioned recommendation, discovery, or feature result as
+- Export the complete versioned recommendation or feature result as
   JSON.
 - Preview and download the selected recommendation's versioned synthesis
   protocol JSON, including registry substance IDs, CAS numbers, quantities,

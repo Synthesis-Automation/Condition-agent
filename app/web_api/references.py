@@ -48,21 +48,8 @@ def attach_recommendation_references(
     return payload
 
 
-def attach_discovery_references(
-    payload: Dict[str, Any],
-    catalog: Mapping[str, Mapping[str, Any]],
-) -> Dict[str, Any]:
-    """Attach the readable source reference to each discovery hit."""
-
-    for hit in payload.get("hits") or ():
-        reference = catalog.get(str(hit.get("reference_id") or ""))
-        hit["reference_record"] = dict(reference) if reference else None
-    return payload
-
-
 __all__ = [
     "REFERENCE_CATALOG_FILENAME",
-    "attach_discovery_references",
     "attach_recommendation_references",
     "load_reference_catalog",
 ]

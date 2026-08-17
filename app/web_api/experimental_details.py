@@ -60,25 +60,8 @@ def attach_recommendation_experimental_details(
     return payload
 
 
-def attach_discovery_experimental_details(
-    payload: Dict[str, Any],
-    catalog: Mapping[str, Mapping[str, Any]],
-) -> Dict[str, Any]:
-    """Attach an observed procedure to each discovery hit when available."""
-
-    for hit in payload.get("hits") or ():
-        observation_id = str(hit.get("observation_id") or "")
-        reaction_id = str(hit.get("reaction_id") or "")
-        detail = catalog.get(f"observation:{observation_id}") or catalog.get(
-            f"reaction:{reaction_id}"
-        )
-        hit["experimental_detail"] = dict(detail) if detail else None
-    return payload
-
-
 __all__ = [
     "EXPERIMENTAL_DETAIL_CATALOG_FILENAME",
-    "attach_discovery_experimental_details",
     "attach_recommendation_experimental_details",
     "load_experimental_detail_catalog",
 ]

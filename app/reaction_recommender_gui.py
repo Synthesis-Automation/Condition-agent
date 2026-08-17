@@ -21,9 +21,6 @@ from condition_recommender import (  # noqa: E402
     ChemistRankingPreferences,
     GenericConditionRecommender,
     GenericRecommendationResult,
-    ReactionDiscoveryExplorer,
-    ReactionDiscoveryHit,
-    ReactionDiscoveryResult,
     ReactionCompletionProposal,
     ReactionCompletionSelection,
     available_ranking_profiles,
@@ -132,25 +129,6 @@ def _get_cached_recommender(
     )
     _RECOMMENDER_CACHE[key] = recommender
     return recommender
-
-
-def _get_cached_explorer(
-    path: str | Path,
-    *,
-    use_rxnmapper: bool = True,
-    include_review: bool = False,
-) -> ReactionDiscoveryExplorer:
-    """Share the GUI's cached validated index with the discovery API."""
-    recommender = _get_cached_recommender(
-        path,
-        use_rxnmapper=use_rxnmapper,
-        include_review=include_review,
-    )
-    return ReactionDiscoveryExplorer(
-        recommender.index,
-        recommender.source_path,
-        recommender.mapping_provider,
-    )
 
 
 def _component_name(component: Mapping[str, Any]) -> str:
@@ -312,49 +290,6 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
         f"Warnings: {warnings}"
     )
     return "\n".join(lines)
-
-
-def format_discovery_summary(result: ReactionDiscoveryResult) -> str:
-    """Render the query evidence and exploratory-result scope."""
-    reaction_label = result.reaction_label or {}
-    lines = [
-        (
-            f"Reaction: {reaction_label.get('text') or 'Unresolved'}  •  "
-            f"Label evidence: {_display_name(reaction_label.get('status'))}"
-        ),
-        (
-            f"Transformation: {_display_name(result.transformation_class)}  •  "
-            f"Discovery view: {_display_name(result.discovery_view)}"
-        ),
-        "Discovery ranks structural analogues, not condition recipes. "
-        "All displayed conditions are observations from individual precedents.",
-    ]
-    if result.query_edit_hypothesis_ids:
-        lines.append(
-            "Ambiguous edit hypotheses (searched separately): "
-            + ", ".join(result.query_edit_hypothesis_ids)
-        )
-    lines.append(f"Spectator groups: {_spectator_summary(result.spectator_groups)}")
-    partner_summaries = _partner_analysis_summaries(result.reaction_partners)
-    if partner_summaries:
-        lines.append("Reactivity profile:")
-        lines.extend(f"  {summary}" for summary in partner_summaries)
-    relation_text = (
-        ", ".join(
-            f"{_display_name(key)} {value}"
-            for key, value in sorted(result.relation_counts.items())
-        )
-        or "None"
-    )
-    lines.append(
-        f"Candidates: {result.candidate_count}  •  Relations: {relation_text}  •  "
-        f"Warnings: {', '.join(result.warnings) if result.warnings else 'None'}"
-    )
-    return "\n".join(lines)
-
-
-def _format_discovery_factor(value: Optional[float]) -> str:
-    return "—" if value is None else f"{value:.3f}"
 
 
 def _friendly_error(error: Any) -> str:
@@ -600,57 +535,6 @@ class GenericRecommendationWorker(QtCore.QObject):
             self.finished.emit(True, result, "")
 
 
-class ReactionDiscoveryWorker(QtCore.QObject):
-    """Find exploratory analogues outside the Qt event loop."""
-
-    progress = QtCore.pyqtSignal(str)
-    finished = QtCore.pyqtSignal(bool, object, str)
-
-    def __init__(
-        self,
-        data_path: str,
-        reaction_smiles: str,
-        *,
-        top_k: int,
-        view: str,
-        include_low_yield: bool,
-        include_unreported_outcomes: bool,
-        use_rxnmapper: bool = True,
-        include_review: bool = False,
-    ) -> None:
-        super().__init__()
-        self.data_path = data_path
-        self.reaction_smiles = reaction_smiles
-        self.top_k = top_k
-        self.view = view
-        self.include_low_yield = include_low_yield
-        self.include_unreported_outcomes = include_unreported_outcomes
-        self.use_rxnmapper = use_rxnmapper
-        self.include_review = include_review
-
-    @QtCore.pyqtSlot()
-    def run(self) -> None:
-        try:
-            self.progress.emit("Loading shared reaction index…")
-            explorer = _get_cached_explorer(
-                self.data_path,
-                use_rxnmapper=self.use_rxnmapper,
-                include_review=self.include_review,
-            )
-            self.progress.emit("Comparing bond edits and local structures…")
-            result = explorer.discover(
-                self.reaction_smiles,
-                top_k=self.top_k,
-                view=self.view,
-                include_low_yield=self.include_low_yield,
-                include_unreported_outcomes=self.include_unreported_outcomes,
-            )
-        except Exception as exc:
-            self.finished.emit(False, None, f"{type(exc).__name__}: {exc}")
-        else:
-            self.finished.emit(True, result, "")
-
-
 class GenericRecommenderWindow(QtWidgets.QWidget):
     """Simple desktop interface for the clean generic recommender."""
 
@@ -661,9 +545,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.resize(1180, 760)
         self.thread: Optional[QtCore.QThread] = None
         self.worker: Optional[QtCore.QObject] = None
-        self.last_result: Optional[
-            GenericRecommendationResult | ReactionDiscoveryResult
-        ] = None
+        self.last_result: Optional[GenericRecommendationResult] = None
 
         self.data_path_edit = QtWidgets.QLineEdit(
             str(default_recommendation_data_path("full"))
@@ -698,34 +580,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.completed_query_edit.setReadOnly(True)
         self.completed_query_label.setVisible(False)
         self.completed_query_edit.setVisible(False)
-
-        self.mode_combo = QtWidgets.QComboBox()
-        self.mode_combo.setObjectName("analysisMode")
-        self.mode_combo.addItem("Condition recommendation", "recommendation")
-        self.mode_combo.addItem("Reaction discovery", "discovery")
-        self.mode_combo.setToolTip(
-            "Recommendation ranks compatible recipes. Discovery searches "
-            "structural analogues and shows their observed conditions."
-        )
-        self.discovery_view_combo = QtWidgets.QComboBox()
-        self.discovery_view_combo.setObjectName("discoveryView")
-        for label, value in (
-            ("Closest chemistry", "closest_chemistry"),
-            ("Diverse strategies", "diverse_strategies"),
-            ("Successful precedents", "successful_precedents"),
-            ("Failure-informed", "failure_informed"),
-        ):
-            self.discovery_view_combo.addItem(label, value)
-        self.include_low_yield_check = QtWidgets.QCheckBox(
-            "Include low-yield precedents"
-        )
-        self.include_low_yield_check.setObjectName("includeLowYield")
-        self.include_low_yield_check.setChecked(True)
-        self.include_unreported_check = QtWidgets.QCheckBox(
-            "Include unreported outcomes"
-        )
-        self.include_unreported_check.setObjectName("includeUnreportedOutcomes")
-        self.include_unreported_check.setChecked(True)
 
         self.top_k_spin = QtWidgets.QSpinBox()
         self.top_k_spin.setObjectName("topK")
@@ -859,7 +713,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self._build_layout()
         self._bind_signals()
         self._update_data_summary()
-        self._mode_changed(0)
         QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+Return"),
             self,
@@ -888,7 +741,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         reaction_row_label_layout = QtWidgets.QHBoxLayout(self.reaction_row_label)
         reaction_row_label_layout.setContentsMargins(0, 0, 0, 0)
         reaction_row_label_layout.setSpacing(8)
-        reaction_row_label_layout.addWidget(self.mode_combo)
         reaction_row_label_layout.addWidget(QtWidgets.QLabel("Reaction SMILES:"))
         form.addRow(self.reaction_row_label, self.reaction_edit)
         form.addRow(self.completed_query_label, self.completed_query_edit)
@@ -910,18 +762,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         ranking_options.addWidget(self.ranking_profile_status)
         ranking_options.addStretch()
         form.addRow("Ranking priorities:", ranking_options)
-        self.discovery_options_widget = QtWidgets.QWidget()
-        discovery_options = QtWidgets.QHBoxLayout(self.discovery_options_widget)
-        discovery_options.setContentsMargins(0, 0, 0, 0)
-        discovery_options.addWidget(self.discovery_view_combo)
-        discovery_options.addWidget(self.include_low_yield_check)
-        discovery_options.addWidget(self.include_unreported_check)
-        discovery_options.addStretch()
-        self.discovery_options_label = QtWidgets.QLabel("Discovery options:")
-        form.addRow(
-            self.discovery_options_label,
-            self.discovery_options_widget,
-        )
         layout.addLayout(form)
 
         buttons = QtWidgets.QHBoxLayout()
@@ -1016,7 +856,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.ranking_profile_combo.currentIndexChanged.connect(
             self._ranking_profile_changed
         )
-        self.mode_combo.currentIndexChanged.connect(self._mode_changed)
         self.customize_ranking_button.clicked.connect(self.customize_ranking_priorities)
         self.results_table.itemSelectionChanged.connect(
             self._synchronize_results_current_cell
@@ -1029,61 +868,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         mode = str(self.library_mode_combo.currentData() or "full")
         self.data_path_edit.setText(str(default_recommendation_data_path(mode)))
         self._update_data_summary()
-        self.clear_results()
-
-    @QtCore.pyqtSlot(int)
-    def _mode_changed(self, _index: int) -> None:
-        """Switch presentation and controls without changing backend contracts."""
-        discovery = self.mode_combo.currentData() == "discovery"
-        self.discovery_options_label.setVisible(discovery)
-        self.discovery_options_widget.setVisible(discovery)
-        self.ranking_profile_combo.setEnabled(not discovery)
-        self.customize_ranking_button.setEnabled(not discovery)
-        self.minimum_pool_spin.setEnabled(not discovery)
-        self.run_button.setText(
-            "Discover Related Reactions" if discovery else "Recommend Conditions"
-        )
-        self.results_heading.setText(
-            "Related reaction precedents" if discovery else "Recommended recipes"
-        )
-        self.details_heading.setText(
-            "Selected precedent evidence" if discovery else "Selected recipe details"
-        )
-        self.precedent_heading.setText(
-            "Precedent reaction" if discovery else "First precedent reaction"
-        )
-        headers = (
-            [
-                "Rank",
-                "Relation",
-                "Score",
-                "Edit",
-                "Center",
-                "Environment",
-                "Reactant category",
-                "Yield",
-                "Observed conditions",
-                "Cautions",
-            ]
-            if discovery
-            else [
-                "Rank",
-                "Default rank",
-                "Score",
-                "Similarity",
-                "Compatibility",
-                "Expected yield",
-                "Rxn support",
-                "Ref support",
-                "Conditions",
-                "Cautions",
-            ]
-        )
-        self.results_table.setHorizontalHeaderLabels(headers)
-        self.results_table.horizontalHeader().setSectionResizeMode(
-            8,
-            QtWidgets.QHeaderView.ResizeMode.Stretch,
-        )
         self.clear_results()
 
     @QtCore.pyqtSlot()
@@ -1342,28 +1126,16 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
 
         minimum = self.minimum_pool_spin.value()
         thread = QtCore.QThread(self)
-        if self.mode_combo.currentData() == "discovery":
-            worker = ReactionDiscoveryWorker(
-                str(data_path),
-                reaction_smiles,
-                top_k=self.top_k_spin.value(),
-                view=str(self.discovery_view_combo.currentData()),
-                include_low_yield=self.include_low_yield_check.isChecked(),
-                include_unreported_outcomes=(self.include_unreported_check.isChecked()),
-                use_rxnmapper=self.use_rxnmapper_check.isChecked(),
-                include_review=self.unrestricted_fallback_check.isChecked(),
-            )
-        else:
-            worker = GenericRecommendationWorker(
-                str(data_path),
-                reaction_smiles,
-                top_k=self.top_k_spin.value(),
-                minimum_pool_size=minimum or None,
-                unrestricted_fallback=(self.unrestricted_fallback_check.isChecked()),
-                use_rxnmapper=self.use_rxnmapper_check.isChecked(),
-                ranking_preferences=self._ranking_preferences(),
-                completion_selections=completion_selections,
-            )
+        worker = GenericRecommendationWorker(
+            str(data_path),
+            reaction_smiles,
+            top_k=self.top_k_spin.value(),
+            minimum_pool_size=minimum or None,
+            unrestricted_fallback=(self.unrestricted_fallback_check.isChecked()),
+            use_rxnmapper=self.use_rxnmapper_check.isChecked(),
+            ranking_preferences=self._ranking_preferences(),
+            completion_selections=completion_selections,
+        )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.progress.connect(self.status_label.setText)
@@ -1391,60 +1163,11 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             return
         self.last_result = result
         self.export_button.setEnabled(True)
-        if isinstance(result, ReactionDiscoveryResult):
-            self._render_discovery_result(result)
-        elif isinstance(result, GenericRecommendationResult):
+        if isinstance(result, GenericRecommendationResult):
             self._render_result(result)
         else:
             self.status_label.setText("Error")
             self.summary_box.setPlainText("Unsupported result contract")
-
-    def _render_discovery_result(
-        self,
-        result: ReactionDiscoveryResult,
-    ) -> None:
-        self._render_reaction_graph(result.query_reaction_smiles)
-        self.summary_box.setPlainText(
-            format_discovery_summary(result)
-            + (
-                f"\nDiscovery: {_friendly_error(result.error)}"
-                if not result.valid
-                else ""
-            )
-        )
-        hits = tuple(result.hits) if result.valid else ()
-        self.results_table.setSortingEnabled(False)
-        self.results_table.setRowCount(len(hits))
-        for row, hit in enumerate(hits):
-            components = hit.score_trace.components
-            values = (
-                str(hit.rank),
-                _display_name(hit.relation_class),
-                f"{hit.discovery_score:.3f}",
-                _format_discovery_factor(components.get("edit_similarity")),
-                _format_discovery_factor(components.get("reaction_center")),
-                _format_discovery_factor(components.get("local_environment")),
-                _format_discovery_factor(components.get("partner_category")),
-                (f"{hit.yield_pct:.1f}%" if hit.yield_pct is not None else "—"),
-                format_recipe_summary(hit.resolved_recipe),
-                "; ".join(hit.cautions),
-            )
-            for column, value in enumerate(values):
-                item = QtWidgets.QTableWidgetItem(value)
-                if column == 0:
-                    item.setData(QtCore.Qt.ItemDataRole.UserRole, hit)
-                self.results_table.setItem(row, column, item)
-        self.results_table.setSortingEnabled(True)
-        self.results_table.resizeColumnsToContents()
-        self.results_table.horizontalHeader().setSectionResizeMode(
-            8,
-            QtWidgets.QHeaderView.ResizeMode.Stretch,
-        )
-        self.status_label.setText(
-            f"Done — {len(hits)} analogue(s)" if hits else "No structural analogue"
-        )
-        if hits:
-            self.results_table.selectRow(0)
 
     def _render_result(self, result: GenericRecommendationResult) -> None:
         if result.effective_query_reaction_smiles:
@@ -1570,9 +1293,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             return
         recommendation = item.data(QtCore.Qt.ItemDataRole.UserRole)
         if recommendation is None:
-            return
-        if isinstance(recommendation, ReactionDiscoveryHit):
-            self._show_discovery_details(recommendation)
             return
         precedent_reaction_smiles = tuple(recommendation.precedent_reaction_smiles)
         self._render_selected_reaction_graph(
@@ -1754,73 +1474,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             )
         self.details_box.setPlainText("\n".join(lines))
 
-    def _show_discovery_details(self, hit: ReactionDiscoveryHit) -> None:
-        """Explain one analogue without presenting its conditions as advice."""
-        self._render_selected_reaction_graph(hit.reaction_smiles)
-        recipe = hit.resolved_recipe
-        lines = [
-            f"Rank {hit.rank}: {_display_name(hit.relation_class)}",
-            f"Discovery score: {hit.discovery_score:.3f}",
-            f"Precedent reaction: {hit.reaction_smiles}",
-            f"Evidence tier: {_display_name(hit.evidence_tier)}",
-            f"Chemistry status: {_display_name(hit.chemistry_status)}",
-            f"Source: {hit.source_dataset or 'Unavailable'}",
-            f"Reference: {hit.reference_id or 'Unavailable'}",
-            (
-                f"Observed yield: {hit.yield_pct:.1f}%"
-                if hit.yield_pct is not None
-                else "Observed yield: Unreported"
-            ),
-        ]
-        if hit.hypothesis_id:
-            lines.append(f"Query edit hypothesis: {hit.hypothesis_id}")
-        lines.extend(("", "Why it is related"))
-        lines.extend(f"• {value}" for value in hit.score_trace.matches)
-        if hit.score_trace.mismatches:
-            lines.extend(("", "Structural differences"))
-            lines.extend(f"• {value}" for value in hit.score_trace.mismatches)
-        lines.extend(("", "Discovery score factors"))
-        for name, configured_weight in hit.score_trace.configured_weights.items():
-            value = hit.score_trace.components.get(name)
-            effective = hit.score_trace.effective_weights.get(name)
-            contribution = hit.score_trace.contributions.get(name)
-            lines.append(
-                f"• {_display_name(name)}: "
-                f"value {_format_discovery_factor(value)}; "
-                f"configured weight {configured_weight:.3f}; "
-                + (
-                    f"effective weight {effective:.3f}; contribution {contribution:.3f}"
-                    if effective is not None and contribution is not None
-                    else "unavailable for this comparison"
-                )
-            )
-        lines.extend(
-            (
-                "",
-                "Observed conditions (precedent evidence, not a recommendation)",
-            )
-        )
-        for field, label in _RECIPE_ROLE_LABELS:
-            names = _component_names(recipe, field)
-            if names:
-                lines.append(f"{label}: {names}")
-        for field, label, unit in (
-            ("temperature_c", "Temperature", "°C"),
-            ("time_h", "Time", "h"),
-            ("concentration_m", "Concentration", "M"),
-            ("pressure_bar", "Pressure", "bar"),
-        ):
-            value = recipe.get(field)
-            if value is not None:
-                lines.append(f"{label}: {value:g} {unit}")
-        if hit.insights:
-            lines.extend(("", "Insights"))
-            lines.extend(f"• {value}" for value in hit.insights)
-        if hit.cautions:
-            lines.extend(("", "Cautions"))
-            lines.extend(f"• {value}" for value in hit.cautions)
-        self.details_box.setPlainText("\n".join(lines))
-
     @QtCore.pyqtSlot()
     def export_json(self) -> None:
         if self.last_result is None:
@@ -1831,11 +1484,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             str(
                 PROJECT_ROOT
                 / "results"
-                / (
-                    "reaction_discovery.json"
-                    if isinstance(self.last_result, ReactionDiscoveryResult)
-                    else "generic_recommendation.json"
-                )
+                / "generic_recommendation.json"
             ),
             "JSON files (*.json)",
         )

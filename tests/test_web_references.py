@@ -6,7 +6,6 @@ import gzip
 import json
 
 from app.web_api.references import (
-    attach_discovery_references,
     attach_recommendation_references,
     load_reference_catalog,
 )
@@ -46,17 +45,3 @@ def test_reference_records_are_attached_to_recommendations() -> None:
     assert enriched["recommendations"][0]["precedent_references"] == [
         catalog["REF1:paper"]
     ]
-
-
-def test_reference_record_is_attached_to_discovery_hit() -> None:
-    payload = {"hits": [{"reference_id": "REF1:paper"}]}
-    catalog = {
-        "REF1:paper": {
-            "reference_id": "REF1:paper",
-            "raw_reference": "Example Journal (2024), 1, 1-5",
-        }
-    }
-
-    enriched = attach_discovery_references(payload, catalog)
-
-    assert enriched["hits"][0]["reference_record"] == catalog["REF1:paper"]

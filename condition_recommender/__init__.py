@@ -35,12 +35,6 @@ from .models import (
     RecommendationScoreTrace,
     RetrievalLevelTrace,
 )
-from .discovery import ReactionDiscoveryExplorer, load_discovery_rules
-from .discovery_models import (
-    DiscoveryScoreTrace,
-    ReactionDiscoveryHit,
-    ReactionDiscoveryResult,
-)
 from .ranking_preferences import (
     available_ranking_profiles,
     load_chemist_ranking_profiles,
@@ -64,13 +58,9 @@ __all__ = [
     "CompatibilityAssessment",
     "CoreEligibilityAssessment",
     "CoreEligibility",
-    "DiscoveryScoreTrace",
     "GenericConditionRecommendation",
     "GenericConditionRecommender",
     "GenericRecommendationResult",
-    "ReactionDiscoveryExplorer",
-    "ReactionDiscoveryHit",
-    "ReactionDiscoveryResult",
     "IndexEligibility",
     "OutcomeStatus",
     "PrecedentIndexScope",
@@ -89,7 +79,6 @@ __all__ = [
     "recommend_generic_conditions",
     "recommend_indexed_signature",
     "load_chemist_ranking_profiles",
-    "load_discovery_rules",
     "resolve_ranking_preferences",
     "build_completion_selection",
     "build_completed_reaction_smiles",
