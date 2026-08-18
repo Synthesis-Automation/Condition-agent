@@ -70,6 +70,7 @@ from .route_core_conversion import (
     DEFAULT_ROUTE_CORE_SAMPLE_SEED,
     convert_route_core_corpus,
 )
+from .route_step_observations import extract_route_step_observations
 from .route_action_conversion import (
     DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
     convert_route_action_corpus,
@@ -509,6 +510,17 @@ def _parser() -> argparse.ArgumentParser:
         default="Minimized route-core review",
     )
 
+    route_step_observations = commands.add_parser(
+        "extract-route-step-observations",
+        help="extract patent-split one-step observations from multistep routes",
+    )
+    route_step_observations.add_argument("source_route_trees")
+    route_step_observations.add_argument("source_route_cores")
+    route_step_observations.add_argument("output_directory")
+    route_step_observations.add_argument(
+        "--minimum-reaction-count", type=int, default=2
+    )
+
     route_action = commands.add_parser(
         "evaluate-route-actions",
         help="replay observed route steps through validated single-step search",
@@ -779,6 +791,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             sample_size=arguments.sample_size,
             seed=arguments.seed,
             title=arguments.title,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "extract-route-step-observations":
+        report = extract_route_step_observations(
+            arguments.source_route_trees,
+            arguments.source_route_cores,
+            arguments.output_directory,
+            minimum_reaction_count=arguments.minimum_reaction_count,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
