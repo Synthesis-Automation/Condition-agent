@@ -262,6 +262,12 @@ from .precedent_route_expansion import (
     run_precedent_route_expansion_poc,
     validate_precedent_route_sources,
 )
+from .precedent_route_expansion_review import (
+    PRECEDENT_ROUTE_EXPANSION_REVIEW_VERSION,
+    load_precedent_route_expansion_report,
+    render_precedent_route_expansion_html,
+    write_precedent_route_expansion_html,
+)
 from .ranking_policy import (
     RetrosynthesisRankingPolicy,
     load_retrosynthesis_ranking_policy,
@@ -509,6 +515,7 @@ __all__ = [
     "EXPANSION_LEVELS",
     "PRECEDENT_ROUTE_EXPANSION_ALGORITHM_VERSION",
     "PRECEDENT_ROUTE_EXPANSION_SCHEMA_VERSION",
+    "PRECEDENT_ROUTE_EXPANSION_REVIEW_VERSION",
     "PrecedentRouteExpansionDefinition",
     "PrecedentRouteExpansionInput",
     "PrecedentRouteInputEvidence",
@@ -519,8 +526,11 @@ __all__ = [
     "TwoStepPrecedentRouteDefinition",
     "expand_two_step_precedent_route",
     "load_precedent_route_expansion_definition",
+    "load_precedent_route_expansion_report",
+    "render_precedent_route_expansion_html",
     "run_precedent_route_expansion_poc",
     "validate_precedent_route_sources",
+    "write_precedent_route_expansion_html",
     "save_library",
     "save_generic_library",
     "split_by_reference",

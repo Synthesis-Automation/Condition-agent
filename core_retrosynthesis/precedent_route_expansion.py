@@ -287,6 +287,8 @@ class PrecedentRouteExpansionResult:
     source_lineage_id: str
     first_source_reaction_id: str
     second_source_reaction_id: str
+    first_reaction_smiles: str
+    second_reaction_smiles: str
     intermediate_smiles: str
     target_smiles: str
     exact_replay_valid: bool
@@ -315,6 +317,8 @@ class PrecedentRouteExpansionResult:
             "source_lineage_id": self.source_lineage_id,
             "first_source_reaction_id": self.first_source_reaction_id,
             "second_source_reaction_id": self.second_source_reaction_id,
+            "first_reaction_smiles": self.first_reaction_smiles,
+            "second_reaction_smiles": self.second_reaction_smiles,
             "intermediate_smiles": self.intermediate_smiles,
             "target_smiles": self.target_smiles,
             "exact_replay_valid": self.exact_replay_valid,
@@ -922,6 +926,8 @@ def expand_two_step_precedent_route(
         source_lineage_id=route.source_lineage_id,
         first_source_reaction_id=route.first_source_reaction_id,
         second_source_reaction_id=route.second_source_reaction_id,
+        first_reaction_smiles=route.first_reaction_smiles,
+        second_reaction_smiles=route.second_reaction_smiles,
         intermediate_smiles=canonical_molecule_collection(
             route.intermediate_smiles
         )

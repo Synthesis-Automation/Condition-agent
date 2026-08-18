@@ -109,6 +109,20 @@ python -m core_retrosynthesis expand-precedent-routes `
   --route-core-source datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.core.v1.jsonl.gz
 ```
 
+Render the generated products and their complete two-step pathways as a
+self-contained chemist-review page:
+
+```powershell
+python -m core_retrosynthesis render-precedent-route-expansion `
+  results/core_retrosynthesis/precedent_route_expansion/two_step_observed_poc.v1.json `
+  results/core_retrosynthesis/precedent_route_expansion/two_step_observed_poc.v1.html
+```
+
+The page distinguishes R0/R1/R2 products, shows both generated reaction steps
+beside the observed patent precedent, exposes stock provenance, and stores
+per-product review decisions locally in the browser. Reviews can be exported as
+a standalone JSON file.
+
 ## Evidence boundary and next gate
 
 This iteration establishes deterministic route-conditioned enumeration from

@@ -37,6 +37,9 @@ from .operator_benchmark import (
     run_operator_coverage_benchmark,
 )
 from .precedent_route_expansion import run_precedent_route_expansion_poc
+from .precedent_route_expansion_review import (
+    write_precedent_route_expansion_html,
+)
 from .route_curation import RouteSubsetPolicy, curate_route_subset
 from .route_conversion import (
     DEFAULT_OBSERVED_ROUTE_DATASET_ID,
@@ -587,6 +590,16 @@ def _parser() -> argparse.ArgumentParser:
     precedent_expansion.add_argument("--stock-index")
     precedent_expansion.add_argument("--route-core-source")
 
+    precedent_review = commands.add_parser(
+        "render-precedent-route-expansion",
+        help="render precedent-route products as a self-contained chemistry review",
+    )
+    precedent_review.add_argument("source_report")
+    precedent_review.add_argument("output_html")
+    precedent_review.add_argument(
+        "--title", default="Two-step precedent-route product review"
+    )
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -812,6 +825,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             route_core_source=arguments.route_core_source,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "render-precedent-route-expansion":
+        summary = write_precedent_route_expansion_html(
+            arguments.source_report,
+            arguments.output_html,
+            title=arguments.title,
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
     source = (
         resolve_library_mode(arguments.source, arguments.library_mode)
