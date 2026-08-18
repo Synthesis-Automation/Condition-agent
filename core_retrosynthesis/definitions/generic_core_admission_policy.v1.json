@@ -1,0 +1,46 @@
+{
+  "definition_id": "generic_core_admission_policy.v1",
+  "definition_version": "1.0",
+  "schema_version": "1.0",
+  "policies": {
+    "pass_only": {
+      "allowed_core_statuses": [
+        "pass"
+      ],
+      "allowed_review_reasons": [],
+      "allowed_edit_evidence": [],
+      "minimum_active_atom_mapping_coverage": 1.0,
+      "required_completeness_status": "verified",
+      "required_passed_checks": [],
+      "require_validated_departures_for_review": false
+    },
+    "validated_departures": {
+      "allowed_core_statuses": [
+        "pass",
+        "review"
+      ],
+      "allowed_review_reasons": [
+        "not_all_edits_graph_checked"
+      ],
+      "allowed_edit_evidence": [
+        "external_atom_mapping",
+        "supplied_atom_mapping",
+        "validated_atom_mapping"
+      ],
+      "minimum_active_atom_mapping_coverage": 1.0,
+      "required_completeness_status": "verified",
+      "required_passed_checks": [
+        "active_atom_mapping_complete",
+        "primary_center_changes_state",
+        "remote_continuity_resolved"
+      ],
+      "require_validated_departures_for_review": true
+    }
+  },
+  "notes": [
+    "pass_only is the production default and preserves the strict compiler gate.",
+    "validated_departures is opt-in and admits review cores only when every unchecked edit is a mapped broken bond to an atom omitted from the reported product.",
+    "All retained heavy-atom and schema-level hydrogen edits must remain graph-checked and consistent.",
+    "Operator admission still requires verified completeness and successful source round-trip reconstruction."
+  ]
+}

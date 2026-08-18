@@ -109,9 +109,30 @@ records remain available for analysis and future policy work.
 The motivating two-step aryl sequence is present as source reactions `21308_0`
 (nitration) and `21309_0` (nitro reduction) under patent `US04011323`. Both have
 verified stored completeness and supplied-map confidence 1.0, but both are
-currently rejected as `materialized_core_not_verified` because the recomputed
-core status is `review`. Consequently, this strict route-only library does not
-yet expand retrosynthesis coverage for that example.
+rejected from the strict baseline as `materialized_core_not_verified` because
+the recomputed core status is `review`.
+
+An opt-in `validated_departures` compiler policy now distinguishes this narrow
+case from general review evidence. It requires complete active-atom mapping,
+verified product completeness, no blocking reason, all retained edits to be
+graph-checked, and every unchecked edit to be a mapped broken bond from a
+retained atom to an atom omitted from the reported product. The default remains
+`pass_only`.
+
+The policy exposed and fixed a template-materialization defect: product-absent
+mapped atoms must become unmapped precursor handles before RDChiral execution.
+After that fix, nitration exactly recovers the observed substrate and nitric
+acid at L0, L1, and L2. Nitro reduction exactly recovers the observed nitro
+precursor at L0; its L1 and L2 templates produce no outcome and are discarded.
+Both reactions therefore pass the mandatory source round trip under the opt-in
+policy, but they are not part of the unchanged strict baseline library.
+
+The per-level, provenance-bearing result is:
+
+```text
+results/core_retrosynthesis/route_step_operator_library/v1/
+  validated_departure_round_trip_audit.v1.json
+```
 
 ## Reproduction
 
@@ -130,15 +151,20 @@ python -m core_retrosynthesis build-operators-full `
   results/core_retrosynthesis/route_step_operator_library/v1/train_conversion_final/shards `
   results/core_retrosynthesis/route_step_operator_library/v1/operators_final `
   --workers 4 --quiet-progress
+
+python -m core_retrosynthesis audit-operator-round-trips `
+  results/core_retrosynthesis/route_step_operator_library/v1/train_conversion_final/shards `
+  results/core_retrosynthesis/route_step_operator_library/v1/validated_departure_round_trip_audit.v1.json `
+  --reaction-id US04011323:21308_0 `
+  --reaction-id US04011323:21309_0 `
+  --core-admission-policy validated_departures
 ```
 
 ## Next evidence gate
 
-The next iteration should define and test an explicit route-core review policy,
-instead of silently treating all review records as pass. A candidate policy
-should require validated supplied mapping, verified reaction completeness, no
-blocking reasons, an enumerated non-blocking review reason, and successful
-forward round-trip reconstruction. It should be measured on validation routes
-for accepted-operator coverage, exact observed-precursor recovery, invalid
-product rate, and the two-step strategy examples before changing the production
-compiler contract.
+The next iteration should rebuild a separate experimental route-only library
+with `--core-admission-policy validated_departures`, quantify which additional
+review records pass source round trip, and evaluate the resulting operators on
+validation routes. Promotion still requires held-out observed-precursor
+recovery and invalid-product measurements before changing the production
+default.

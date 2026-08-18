@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Literal
 
 from .chemistry import digest
+from .core_admission import CoreAdmissionPolicyName
 
 try:
     import orjson
@@ -131,6 +132,7 @@ def build_generic_library(
     engine: Literal["reaction_core", "rdchiral"] = "reaction_core",
     levels: Iterable[Literal["L0", "L1", "L2"]] = ("L1", "L2"),
     admission_mode: Literal["supported", "data_driven"] = "supported",
+    core_admission_policy: CoreAdmissionPolicyName = "pass_only",
     max_precedents_per_template: int = 8,
     admission_callback: AdmissionCallback | None = None,
 ) -> GenericTemplateLibrary:
@@ -156,6 +158,7 @@ def build_generic_library(
             engine=engine,
             levels=levels,
             admission_mode=admission_mode,
+            core_admission_policy=core_admission_policy,
         )
         if not result.templates:
             rejections[str(result.rejection_reason or "unknown_rejection")] += 1
@@ -329,6 +332,7 @@ def build_generic_library(
             **GENERIC_LIBRARY_DEFINITION,
             "compiler_engine": engine,
             "admission_mode": admission_mode,
+            "core_admission_policy": core_admission_policy,
             "annotated_accepted_observation_count": annotated_accepted_count,
             "unannotated_accepted_observation_count": unannotated_accepted_count,
         },

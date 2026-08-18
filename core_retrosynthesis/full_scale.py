@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Iterator, Literal, Sequence
 
 from .chemistry import digest
+from .core_admission import CoreAdmissionPolicyName
 from .generic_library import (
     build_generic_library,
     load_generic_library,
@@ -41,6 +42,7 @@ class FullScaleBuildConfig:
 
     levels: tuple[Literal["L0", "L1", "L2"], ...] = ("L0", "L1", "L2")
     admission_mode: Literal["supported", "data_driven"] = "data_driven"
+    core_admission_policy: CoreAdmissionPolicyName = "pass_only"
     max_precedents_per_template: int = 8
     max_rows_per_shard: int | None = None
     definition_id: str = "full_scale_operator_build.v2"
@@ -177,6 +179,7 @@ def compile_operator_shard(
                     ),
                     levels=settings.levels,
                     admission_mode=settings.admission_mode,
+                    core_admission_policy=settings.core_admission_policy,
                     max_precedents_per_template=(
                         settings.max_precedents_per_template
                     ),
@@ -511,6 +514,7 @@ def merge_operator_shards(
             "build_config_id": settings.config_id,
             "routing_source": "normalized_graph_edits",
             "admission_mode": settings.admission_mode,
+            "core_admission_policy": settings.core_admission_policy,
             "levels": list(settings.levels),
             "source_shard_count": len(manifests),
             "annotated_accepted_observation_count": annotated_count,

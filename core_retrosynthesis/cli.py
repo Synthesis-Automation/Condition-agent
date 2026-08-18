@@ -42,6 +42,7 @@ from .diverse_benchmark import (
 )
 from .ensemble import disconnect_ensemble
 from .coverage_audit import audit_operator_library_coverage
+from .core_admission import CORE_ADMISSION_POLICY_NAMES
 from .full_scale import FullScaleBuildConfig, build_full_scale_operator_library
 from .generic_library import load_generic_library
 from .generic_search import (
@@ -71,6 +72,7 @@ from .route_core_conversion import (
     convert_route_core_corpus,
 )
 from .route_step_observations import extract_route_step_observations
+from .round_trip_audit import audit_generic_round_trips
 from .route_action_conversion import (
     DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
     convert_route_action_corpus,
@@ -296,7 +298,30 @@ def _parser() -> argparse.ArgumentParser:
     full_build.add_argument("--quiet-progress", action="store_true")
     full_build.add_argument("--skip-l0", action="store_true")
     full_build.add_argument("--force", action="store_true")
+    full_build.add_argument(
+        "--core-admission-policy",
+        choices=CORE_ADMISSION_POLICY_NAMES,
+        default="pass_only",
+        help="core-quality policy; validated_departures is experimental",
+    )
     _add_library_mode_argument(full_build)
+
+    round_trip_audit = commands.add_parser(
+        "audit-operator-round-trips",
+        help="compile selected observations and report per-level source recovery",
+    )
+    round_trip_audit.add_argument("source")
+    round_trip_audit.add_argument("output_json")
+    round_trip_audit.add_argument(
+        "--reaction-id",
+        action="append",
+        required=True,
+    )
+    round_trip_audit.add_argument(
+        "--core-admission-policy",
+        choices=CORE_ADMISSION_POLICY_NAMES,
+        default="pass_only",
+    )
 
     coverage_audit = commands.add_parser(
         "audit-operator-coverage",
@@ -1103,6 +1128,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             arguments.output_directory,
             config=FullScaleBuildConfig(
                 levels=levels,
+                core_admission_policy=arguments.core_admission_policy,
                 max_precedents_per_template=(
                     arguments.max_precedents_per_template
                 ),
@@ -1117,6 +1143,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             progress_interval_seconds=arguments.progress_interval,
         )
         print(json.dumps(build_report, indent=2, sort_keys=True))
+        return 0
+
+    if arguments.command == "audit-operator-round-trips":
+        audit_report = audit_generic_round_trips(
+            arguments.source,
+            arguments.output_json,
+            reaction_ids=arguments.reaction_id,
+            core_admission_policy=arguments.core_admission_policy,
+        )
+        print(json.dumps(audit_report, indent=2, sort_keys=True))
         return 0
 
     if arguments.command == "audit-operator-coverage":

@@ -15,11 +15,16 @@ from rdchiral.main import rdchiralReactants, rdchiralReaction, rdchiralRun
 from rdchiral.template_extractor import extract_from_reaction
 
 from reactive_taxonomy import featurize_reaction
+
 from .chemistry import (
     canonical_smiles,
     contributing_reactants,
     digest,
     split_reaction_smiles,
+)
+from .core_admission import (
+    CoreAdmissionPolicyName,
+    assess_generic_core_admission,
 )
 from .mapping import materialize_atom_mapping
 
@@ -73,6 +78,14 @@ class GenericOperatorIdentity:
 
     operator_id: str
     operator_signature: str
+
+
+@dataclass(frozen=True)
+class _RoundTripAssessment:
+    policy: Literal["exact", "relaxed"] | None
+    outcomes: tuple[str, ...]
+    error: str | None = None
+    error_detail: str | None = None
 
 
 @lru_cache(maxsize=20_000)
@@ -567,34 +580,53 @@ def _without_stereo(smiles: str) -> str | None:
     return Chem.MolToSmiles(molecule, canonical=True, isomericSmiles=False)
 
 
-def _round_trip_policy(
+def _round_trip_assessment(
     reaction_smarts: str,
     product_smiles: str,
     expected_precursors: str,
-) -> Literal["exact", "relaxed"] | None:
+) -> _RoundTripAssessment:
     try:
         with redirect_stdout(io.StringIO()):
             outcomes = rdchiralRun(
                 rdchiralReaction(reaction_smarts),
                 rdchiralReactants(product_smiles),
             )
-    except Exception:
-        return None
-    canonical_outcomes = {
+    except Exception as error:
+        return _RoundTripAssessment(
+            policy=None,
+            outcomes=(),
+            error=type(error).__name__,
+            error_detail=str(error)[:200],
+        )
+    canonical_outcomes = tuple(sorted({
         canonical
         for outcome in outcomes
         if (canonical := canonical_smiles(str(outcome))) is not None
-    }
+    }))
     if expected_precursors in canonical_outcomes:
-        return "exact"
+        return _RoundTripAssessment("exact", canonical_outcomes)
     expected_relaxed = _without_stereo(expected_precursors)
     if expected_relaxed and expected_relaxed in {
         relaxed
         for outcome in canonical_outcomes
         if (relaxed := _without_stereo(outcome)) is not None
     }:
-        return "relaxed"
-    return None
+        return _RoundTripAssessment("relaxed", canonical_outcomes)
+    return _RoundTripAssessment(None, canonical_outcomes)
+
+
+def _round_trip_diagnostics(
+    level: str,
+    assessment: _RoundTripAssessment,
+) -> dict[str, Any]:
+    return {
+        "level": level,
+        "status": assessment.policy or "failed",
+        "outcome_count": len(assessment.outcomes),
+        "outcome_examples": list(assessment.outcomes[:5]),
+        "error": assessment.error,
+        "error_detail": assessment.error_detail,
+    }
 
 
 def compile_generic_templates(
@@ -603,6 +635,7 @@ def compile_generic_templates(
     engine: Literal["reaction_core", "rdchiral"] = "reaction_core",
     levels: Iterable[Literal["L0", "L1", "L2"]] = ("L1", "L2"),
     admission_mode: Literal["supported", "data_driven"] = "supported",
+    core_admission_policy: CoreAdmissionPolicyName = "pass_only",
 ) -> GenericCompilationResult:
     """Compile source-round-tripped templates from normalized graph edits."""
 
@@ -645,14 +678,19 @@ def compile_generic_templates(
         return _rejection("materialized_analysis_invalid", diagnostics)
     if analysis.reaction_core is None:
         return _rejection("materialized_core_missing", diagnostics)
-    if analysis.reaction_core.quality.status != "pass":
-        diagnostics["recomputed_core_status"] = str(
-            analysis.reaction_core.quality.status
-        )
-        return _rejection("materialized_core_not_verified", diagnostics)
     value = analysis.to_dict()
     observation = value.get("observation") or {}
-    diagnostics["recomputed_core_status"] = "pass"
+    core_decision = assess_generic_core_admission(
+        value.get("reaction_core") or {},
+        observation,
+        policy_name=core_admission_policy,
+    )
+    diagnostics.update(core_decision.diagnostics())
+    diagnostics["recomputed_core_status"] = str(
+        analysis.reaction_core.quality.status
+    )
+    if not core_decision.admitted:
+        return _rejection("materialized_core_not_verified", diagnostics)
     diagnostics["recomputed_completeness_status"] = str(
         (observation.get("completeness") or {}).get("status") or "missing"
     )
@@ -682,6 +720,14 @@ def compile_generic_templates(
     active_maps, hydrogen_maps = _active_maps(observation)
     if not active_maps:
         return _rejection("missing_mapped_active_atoms", diagnostics)
+    product_map_numbers = {
+        int(atom.GetAtomMapNum())
+        for atom in product.GetAtoms()
+        if int(atom.GetAtomMapNum()) > 0
+    }
+    retained_active_maps = active_maps.intersection(product_map_numbers)
+    if not retained_active_maps:
+        return _rejection("missing_mapped_active_atoms", diagnostics)
     operator_signature = _generic_operator_signature(observation, product)
     if not operator_signature:
         return _rejection("missing_generic_operator_signature", diagnostics)
@@ -700,14 +746,27 @@ def compile_generic_templates(
         context=context,
     )
     edit_tokens = tuple(analysis.reaction_core.edit_tokens)
-    lookup = _canonical_map_lookup(reactants, product, active_maps)
-    canonical_active = {lookup[value] for value in active_maps if value in lookup}
-    canonical_hydrogen = {
-        lookup[value] for value in hydrogen_maps if value in lookup
+    lookup = _canonical_map_lookup(reactants, product, retained_active_maps)
+    canonical_active = {
+        lookup[value] for value in retained_active_maps if value in lookup
     }
-    handle_signature = _handle_signature(reactants, active_maps)
+    canonical_hydrogen = {
+        lookup[value]
+        for value in hydrogen_maps.intersection(product_map_numbers)
+        if value in lookup
+    }
+    departing_canonical_maps = {
+        lookup[int(atom.GetAtomMapNum())]
+        for atom in reactants.GetAtoms()
+        if int(atom.GetAtomMapNum()) > 0
+        and int(atom.GetAtomMapNum()) not in product_map_numbers
+    }
     _apply_map_lookup(reactants, lookup)
     _apply_map_lookup(product, lookup)
+    for atom in reactants.GetAtoms():
+        if int(atom.GetAtomMapNum()) in departing_canonical_maps:
+            atom.SetAtomMapNum(0)
+    handle_signature = _handle_signature(reactants, canonical_active)
     try:
         generalized_product = _generalized_product_atoms(
             product,
@@ -768,8 +827,15 @@ def compile_generic_templates(
         normalized_product_smarts, normalized_precursor_smarts = (
             reaction_smarts.split(">>")
         )
-        policy = _round_trip_policy(reaction_smarts, product_smiles, expected)
-        if policy is None:
+        assessment = _round_trip_assessment(
+            reaction_smarts,
+            product_smiles,
+            expected,
+        )
+        diagnostics["round_trip_levels"] = [
+            _round_trip_diagnostics("RDCHIRAL", assessment)
+        ]
+        if assessment.policy is None:
             return _rejection("source_round_trip_failed", diagnostics)
         template_id = digest("GRT3", realization_id, "RDCHIRAL", reaction_smarts)
         return GenericCompilationResult(
@@ -784,8 +850,8 @@ def compile_generic_templates(
                     product_smarts=normalized_product_smarts,
                     precursor_smarts=normalized_precursor_smarts,
                     edit_tokens=edit_tokens,
-                    handle_signature=_handle_signature(reactants, active_maps),
-                    stereo_policy=policy,
+                    handle_signature=handle_signature,
+                    stereo_policy=assessment.policy,
                     observation_support=1,
                     independent_reference_support=1,
                     precedents=(precedent,),
@@ -801,6 +867,7 @@ def compile_generic_templates(
         )
 
     templates = []
+    round_trip_levels = []
     for level in requested_levels:
         try:
             if level == "L0":
@@ -833,8 +900,13 @@ def compile_generic_templates(
             f"{product_smarts}>>{precursor_smarts}"
         )
         product_smarts, precursor_smarts = reaction_smarts.split(">>")
-        policy = _round_trip_policy(reaction_smarts, product_smiles, expected)
-        if policy is None:
+        assessment = _round_trip_assessment(
+            reaction_smarts,
+            product_smiles,
+            expected,
+        )
+        round_trip_levels.append(_round_trip_diagnostics(level, assessment))
+        if assessment.policy is None:
             continue
         template_id = digest("GRT3", realization_id, level, reaction_smarts)
         templates.append(
@@ -849,7 +921,7 @@ def compile_generic_templates(
                 precursor_smarts=precursor_smarts,
                 edit_tokens=edit_tokens,
                 handle_signature=handle_signature,
-                stereo_policy=policy,
+                stereo_policy=assessment.policy,
                 observation_support=1,
                 independent_reference_support=1,
                 precedents=(precedent,),
@@ -859,6 +931,7 @@ def compile_generic_templates(
                 named_annotations=annotations,
             )
         )
+    diagnostics["round_trip_levels"] = round_trip_levels
     if not templates:
         return _rejection("source_round_trip_failed", diagnostics)
     return GenericCompilationResult(

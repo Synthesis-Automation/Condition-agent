@@ -59,6 +59,14 @@ from .coupled_strategy_evaluation_review import (
     render_v1_coupled_strategy_evaluation_html,
     write_v1_coupled_strategy_evaluation_html,
 )
+from .core_admission import (
+    CORE_ADMISSION_POLICY_NAMES,
+    CoreAdmissionPolicyName,
+    GenericCoreAdmissionDecision,
+    GenericCoreAdmissionPolicy,
+    assess_generic_core_admission,
+    load_generic_core_admission_policy,
+)
 from .ensemble import EnsembleCandidate, disconnect_ensemble
 from .coverage_audit import audit_operator_library_coverage
 from .full_scale import (
@@ -209,6 +217,11 @@ from .route_step_observations import (
     ROUTE_STEP_OBSERVATION_SCHEMA_VERSION,
     ROUTE_STEP_SPLITS,
     extract_route_step_observations,
+)
+from .round_trip_audit import (
+    ROUND_TRIP_AUDIT_ALGORITHM_VERSION,
+    ROUND_TRIP_AUDIT_SCHEMA_VERSION,
+    audit_generic_round_trips,
 )
 from .route_action_evaluation import (
     ROUTE_ACTION_EVALUATION_ALGORITHM_VERSION,
@@ -474,6 +487,12 @@ __all__ = [
     "DEFAULT_ROUTE_CORE_REVIEW_SEED",
     "DEFAULT_ROUTE_ACTION_SAMPLE_SEED",
     "DEFAULT_ROUTE_ACTION_REVIEW_SEED",
+    "CORE_ADMISSION_POLICY_NAMES",
+    "CoreAdmissionPolicyName",
+    "GenericCoreAdmissionDecision",
+    "GenericCoreAdmissionPolicy",
+    "ROUND_TRIP_AUDIT_ALGORITHM_VERSION",
+    "ROUND_TRIP_AUDIT_SCHEMA_VERSION",
     "ROUTE_STEP_OBSERVATION_ADAPTER_ID",
     "ROUTE_STEP_OBSERVATION_ADAPTER_VERSION",
     "ROUTE_STEP_OBSERVATION_ALGORITHM_VERSION",
@@ -498,6 +517,8 @@ __all__ = [
     "V1_ADMITTED_RELATIONSHIPS",
     "V2_ADMITTED_DEPENDENCIES",
     "analyze_generic_reaction",
+    "assess_generic_core_admission",
+    "audit_generic_round_trips",
     "build_generic_reaction_identity",
     "audit_operator_library_coverage",
     "build_full_scale_operator_library",
@@ -528,6 +549,7 @@ __all__ = [
     "load_library",
     "load_coupled_route_strategy_report",
     "load_generic_library",
+    "load_generic_core_admission_policy",
     "load_hierarchical_ranking_policy",
     "load_operator_rows",
     "load_observed_route_action_label_policy",
