@@ -21,9 +21,9 @@ from .route_core import (
 from .route_core_conversion import iter_route_core_projections
 
 
-COUPLED_ROUTE_STRATEGY_SCHEMA_VERSION = "1.0"
-COUPLED_ROUTE_STRATEGY_ALGORITHM_VERSION = "coupled_route_strategy.v1"
-COUPLED_ROUTE_STRATEGY_REVIEW_VERSION = "1.0"
+COUPLED_ROUTE_STRATEGY_SCHEMA_VERSION = "1.1"
+COUPLED_ROUTE_STRATEGY_ALGORITHM_VERSION = "coupled_route_strategy.v2"
+COUPLED_ROUTE_STRATEGY_REVIEW_VERSION = "1.1"
 RELATIONSHIP_CLASSES = frozenset(
     {
         "handle_progression",
@@ -35,8 +35,24 @@ RELATIONSHIP_CLASSES = frozenset(
     }
 )
 ADMISSION_CLASSES = frozenset({"strict", "review", "rejected"})
-_STRICT_RELATIONSHIPS = frozenset(
-    {"handle_progression", "same_site_coupled"}
+DEPENDENCY_CLASSES = frozenset(
+    {
+        "created_handle_consumed",
+        "activation_then_conversion",
+        "temporary_group_removed",
+        "continued_site_transformation",
+        "shared_local_environment",
+        "independent_sites",
+        "lineage_ambiguous",
+        "unresolved",
+    }
+)
+_STRICT_DEPENDENCIES = frozenset(
+    {
+        "created_handle_consumed",
+        "activation_then_conversion",
+        "continued_site_transformation",
+    }
 )
 
 
@@ -50,6 +66,8 @@ class CouplingEvidence:
     consumer_intermediate_active_maps: tuple[int, ...]
     overlap_counts: tuple[int, ...]
     formed_overlap_counts: tuple[int, ...]
+    transient_bond_counts: tuple[int, ...]
+    replacement_bond_counts: tuple[int, ...]
     minimum_distances: tuple[Optional[int], ...]
     ambiguity_invariant: bool
     candidate_limit_reached: bool
@@ -69,6 +87,8 @@ class CouplingEvidence:
             ),
             "overlap_counts": list(self.overlap_counts),
             "formed_overlap_counts": list(self.formed_overlap_counts),
+            "transient_bond_counts": list(self.transient_bond_counts),
+            "replacement_bond_counts": list(self.replacement_bond_counts),
             "minimum_distances": list(self.minimum_distances),
             "ambiguity_invariant": self.ambiguity_invariant,
             "candidate_limit_reached": self.candidate_limit_reached,
@@ -93,6 +113,7 @@ class CoupledRouteStrategyOccurrence:
     lineage_id: str
     lineage_status: str
     relationship_class: str
+    dependency_class: str
     admission_class: str
     coupling_score: float
     first_reaction_node_id: str
@@ -119,13 +140,15 @@ class CoupledRouteStrategyOccurrence:
     def __post_init__(self) -> None:
         if self.relationship_class not in RELATIONSHIP_CLASSES:
             raise ValueError("unsupported coupled-strategy relationship")
+        if self.dependency_class not in DEPENDENCY_CLASSES:
+            raise ValueError("unsupported coupled-strategy dependency")
         if self.admission_class not in ADMISSION_CLASSES:
             raise ValueError("unsupported coupled-strategy admission class")
         if not 0.0 <= self.coupling_score <= 1.0:
             raise ValueError("coupling score must be between zero and one")
-        if self.relationship_class in _STRICT_RELATIONSHIPS:
+        if self.dependency_class in _STRICT_DEPENDENCIES:
             if self.admission_class != "strict":
-                raise ValueError("strict relationship requires strict admission")
+                raise ValueError("strict dependency requires strict admission")
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible strategy occurrence."""
@@ -144,6 +167,7 @@ class CoupledRouteStrategyOccurrence:
             "lineage_id": self.lineage_id,
             "lineage_status": self.lineage_status,
             "relationship_class": self.relationship_class,
+            "dependency_class": self.dependency_class,
             "admission_class": self.admission_class,
             "coupling_score": self.coupling_score,
             "first_reaction_node_id": self.first_reaction_node_id,
@@ -271,11 +295,64 @@ def _formed_overlap_counts(
     )
 
 
+def _edit_bonds(
+    step: RouteCoreStep, edit_types: set[str]
+) -> set[tuple[int, int]]:
+    """Return normalized mapped bonds for selected signature edit types."""
+
+    bonds: set[tuple[int, int]] = set()
+    signature = step.reaction_signature or {}
+    for edit in signature.get("edits") or ():
+        if str(edit.get("edit_type") or "") not in edit_types:
+            continue
+        first = edit.get("atom_1")
+        second = edit.get("atom_2")
+        if not isinstance(first, Mapping) or not isinstance(second, Mapping):
+            continue
+        first_map = int(first.get("atom_map_number") or 0)
+        second_map = int(second.get("atom_map_number") or 0)
+        if first_map > 0 and second_map > 0 and first_map != second_map:
+            bonds.add(tuple(sorted((first_map, second_map))))
+    return bonds
+
+
+def _bond_dependency_counts(
+    candidates: Sequence[RouteAtomLineageCandidate],
+    producer_formed_bonds: set[tuple[int, int]],
+    consumer_broken_bonds: set[tuple[int, int]],
+    consumer_constructive_bonds: set[tuple[int, int]],
+) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    """Measure bonds installed by step 1 and consumed or replaced in step 2."""
+
+    transient_counts: list[int] = []
+    replacement_counts: list[int] = []
+    for candidate in candidates:
+        correspondence = dict(candidate.atom_map_pairs)
+        translated = {
+            tuple(sorted((correspondence[first], correspondence[second])))
+            for first, second in producer_formed_bonds
+            if first in correspondence and second in correspondence
+        }
+        transient = translated.intersection(consumer_broken_bonds)
+        replacements = {
+            constructive
+            for constructive in consumer_constructive_bonds
+            if any(
+                constructive != removed
+                and bool(set(constructive).intersection(removed))
+                for removed in transient
+            )
+        }
+        transient_counts.append(len(transient))
+        replacement_counts.append(len(replacements))
+    return tuple(transient_counts), tuple(replacement_counts)
+
+
 def _classify(
     link: RouteCoreLineageLink,
     first: RouteCoreStep,
     second: RouteCoreStep,
-) -> tuple[str, str, float, CouplingEvidence, tuple[str, ...]]:
+) -> tuple[str, str, str, float, CouplingEvidence, tuple[str, ...]]:
     producer_active = _active_maps(first)
     consumer_active = _active_maps(second)
     producer_maps = {
@@ -296,6 +373,12 @@ def _classify(
         _formed_maps(first).intersection(producer_maps),
         intermediate_active,
     )
+    transient_counts, replacement_counts = _bond_dependency_counts(
+        link.candidates,
+        _edit_bonds(first, {"formed"}),
+        _edit_bonds(second, {"broken"}),
+        _edit_bonds(second, {"formed", "order_changed"}),
+    )
     warnings: list[str] = []
     rationale: list[str] = []
     complete_candidates = (
@@ -310,47 +393,114 @@ def _classify(
         for step in (first, second)
     )
     if not chemistry_resolved:
-        relationship, admission, score = "unresolved", "review", 0.20
+        relationship = "unresolved"
+        dependency, admission, score = "unresolved", "review", 0.20
         rationale.append("one or both step cores lack admissible chemistry evidence")
     elif not complete_candidates:
-        relationship, admission, score = "lineage_ambiguous", "review", 0.25
+        relationship = "lineage_ambiguous"
+        dependency, admission, score = "lineage_ambiguous", "review", 0.25
         rationale.append("cross-step atom lineage is incomplete or bounded")
     elif not persistent_active or not intermediate_active:
-        relationship, admission, score = "independent_sites", "rejected", 0.0
+        relationship = "independent_sites"
+        dependency, admission, score = "independent_sites", "rejected", 0.0
         rationale.append("one step does not edit the carried intermediate site")
     elif overlaps and min(overlaps) > 0:
         if formed_overlaps and min(formed_overlaps) > 0:
-            relationship, admission, score = (
-                "handle_progression",
-                "strict",
-                1.0,
+            relationship = "handle_progression"
+            if transient_counts and min(transient_counts) > 0:
+                if replacement_counts and min(replacement_counts) > 0:
+                    dependency, admission, score = (
+                        "activation_then_conversion",
+                        "strict",
+                        1.0,
+                    )
+                    rationale.append(
+                        "step 2 breaks a step-1-installed bond and forms or "
+                        "changes another bond at that handle"
+                    )
+                elif replacement_counts and max(replacement_counts) > 0:
+                    dependency, admission, score = (
+                        "lineage_ambiguous",
+                        "review",
+                        0.40,
+                    )
+                    rationale.append(
+                        "whether the consumed handle is replaced depends on "
+                        "the atom-lineage candidate"
+                    )
+                else:
+                    dependency, admission, score = (
+                        "temporary_group_removed",
+                        "review",
+                        0.65,
+                    )
+                    rationale.append(
+                        "step 2 removes a step-1-installed bond without a "
+                        "mapped heavy-atom replacement; strategic value needs review"
+                    )
+            elif transient_counts and max(transient_counts) > 0:
+                dependency, admission, score = (
+                    "lineage_ambiguous",
+                    "review",
+                    0.40,
+                )
+                rationale.append(
+                    "whether step 2 breaks the step-1-installed bond depends "
+                    "on the atom-lineage candidate"
+                )
+            else:
+                dependency, admission, score = (
+                    "created_handle_consumed",
+                    "strict",
+                    1.0,
+                )
+                rationale.append(
+                    "step 2 transforms an atom in a bond installed by step 1"
+                )
+        elif formed_overlaps and max(formed_overlaps) > 0:
+            relationship = "lineage_ambiguous"
+            dependency, admission, score = (
+                "lineage_ambiguous",
+                "review",
+                0.35,
             )
             rationale.append(
-                "step 2 consumes an atom participating in a step-1 formed bond"
+                "whether step 2 consumes a step-1-created handle depends on "
+                "the atom-lineage candidate"
             )
         else:
-            relationship, admission, score = (
-                "same_site_coupled",
+            relationship = "same_site_coupled"
+            dependency, admission, score = (
+                "continued_site_transformation",
                 "strict",
                 0.90,
             )
-            rationale.append("both steps edit the same lineage-traced atom")
+            rationale.append(
+                "both steps transform the same lineage-traced site without "
+                "consuming a newly installed bond"
+            )
     elif overlaps and max(overlaps) > 0:
-        relationship, admission, score = "lineage_ambiguous", "review", 0.35
+        relationship = "lineage_ambiguous"
+        dependency, admission, score = "lineage_ambiguous", "review", 0.35
         rationale.append("site overlap depends on the lineage candidate")
     elif distances and all(value is not None and value <= 2 for value in distances):
-        relationship, admission, score = (
+        relationship = "shared_local_environment"
+        dependency, admission, score = (
             "shared_local_environment",
             "review",
             0.55,
         )
         rationale.append("active sites are lineage-invariant and within two bonds")
     else:
-        relationship, admission, score = "independent_sites", "rejected", 0.0
+        relationship = "independent_sites"
+        dependency, admission, score = "independent_sites", "rejected", 0.0
         rationale.append("active sites are separated by more than two bonds")
     ambiguity_invariant = bool(
         complete_candidates
         and len(set(overlaps)) <= 1
+        and len(set(formed_overlaps)) <= 1
+        and len(set(transient_counts)) <= 1
+        and len(set(replacement_counts)) <= 1
         and len(set(distances)) <= 1
     )
     if link.status != "unique" and not ambiguity_invariant:
@@ -364,12 +514,14 @@ def _classify(
         consumer_intermediate_active_maps=tuple(sorted(intermediate_active)),
         overlap_counts=overlaps,
         formed_overlap_counts=formed_overlaps,
+        transient_bond_counts=transient_counts,
+        replacement_bond_counts=replacement_counts,
         minimum_distances=distances,
         ambiguity_invariant=ambiguity_invariant,
         candidate_limit_reached=link.candidate_limit_reached,
         rationale=tuple(rationale),
     )
-    return relationship, admission, score, evidence, tuple(warnings)
+    return relationship, dependency, admission, score, evidence, tuple(warnings)
 
 
 def _overall_reaction(
@@ -405,35 +557,40 @@ def extract_coupled_route_strategies(
         second = steps.get(link.consumer_reaction_node_id)
         if first is None or second is None:
             continue
-        relationship, admission, score, evidence, warnings = _classify(
-            link, first, second
-        )
+        (
+            relationship,
+            dependency,
+            admission,
+            score,
+            evidence,
+            warnings,
+        ) = _classify(link, first, second)
         exact_seed = "|".join(
             (
                 str(first.exact_core_key or first.reaction_signature_id or ""),
                 str(second.exact_core_key or second.reaction_signature_id or ""),
-                relationship,
+                dependency,
             )
         )
         typed_seed = "|".join(
             (
                 str(first.typed_core_key or first.transformation_class or ""),
                 str(second.typed_core_key or second.transformation_class or ""),
-                relationship,
+                dependency,
             )
         )
         shape_seed = "|".join(
             (
                 str(first.shape_core_key or ""),
                 str(second.shape_core_key or ""),
-                relationship,
+                dependency,
             )
         )
-        exact_id = digest("CRSE1", exact_seed)
-        typed_id = digest("CRST1", typed_seed)
-        shape_id = digest("CRSS1", shape_seed)
+        exact_id = digest("CRSE2", exact_seed)
+        typed_id = digest("CRST2", typed_seed)
+        shape_id = digest("CRSS2", shape_seed)
         occurrence_id = digest(
-            "CRSO1",
+            "CRSO2",
             projection.route_core_id,
             link.lineage_id,
             exact_id,
@@ -462,6 +619,7 @@ def extract_coupled_route_strategies(
                 lineage_id=link.lineage_id,
                 lineage_status=link.status,
                 relationship_class=relationship,
+                dependency_class=dependency,
                 admission_class=admission,
                 coupling_score=score,
                 first_reaction_node_id=first.reaction_node_id,
@@ -586,7 +744,11 @@ def mine_coupled_route_strategy_poc(
         route_count += 1
         occurrences.extend(extract_coupled_route_strategies(projection))
     relationship_counts = Counter(item.relationship_class for item in occurrences)
+    dependency_counts = Counter(item.dependency_class for item in occurrences)
     admission_counts = Counter(item.admission_class for item in occurrences)
+    comparison_counts = Counter(
+        (item.relationship_class, item.dependency_class) for item in occurrences
+    )
     grouped: dict[str, list[CoupledRouteStrategyOccurrence]] = defaultdict(list)
     for item in occurrences:
         if item.admission_class == "strict":
@@ -602,6 +764,7 @@ def mine_coupled_route_strategy_poc(
                 "typed_strategy_id": strategy_id,
                 "shape_strategy_id": items[0].shape_strategy_id,
                 "relationship_class": items[0].relationship_class,
+                "dependency_class": items[0].dependency_class,
                 "occurrence_count": len(items),
                 "patent_count": len(patents),
                 "route_count": len(routes),
@@ -647,6 +810,17 @@ def mine_coupled_route_strategy_poc(
         "route_count": route_count,
         "lineage_pair_count": len(occurrences),
         "relationship_counts": dict(sorted(relationship_counts.items())),
+        "dependency_counts": dict(sorted(dependency_counts.items())),
+        "baseline_to_dependency_counts": [
+            {
+                "relationship_class": relationship,
+                "dependency_class": dependency,
+                "count": count,
+            }
+            for (relationship, dependency), count in sorted(
+                comparison_counts.items()
+            )
+        ],
         "admission_counts": dict(sorted(admission_counts.items())),
         "strict_typed_strategy_count": len(strategy_summaries),
         "recurrent_strict_strategy_count": recurring,
@@ -682,6 +856,7 @@ __all__ = [
     "COUPLED_ROUTE_STRATEGY_ALGORITHM_VERSION",
     "COUPLED_ROUTE_STRATEGY_REVIEW_VERSION",
     "COUPLED_ROUTE_STRATEGY_SCHEMA_VERSION",
+    "DEPENDENCY_CLASSES",
     "RELATIONSHIP_CLASSES",
     "CoupledRouteStrategyOccurrence",
     "CouplingEvidence",

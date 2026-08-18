@@ -175,12 +175,71 @@ def test_formed_handle_consumed_at_same_site_is_strict_strategy() -> None:
     occurrence = extract_coupled_route_strategies(_positive_projection())[0]
 
     assert occurrence.relationship_class == "handle_progression"
+    assert occurrence.dependency_class == "created_handle_consumed"
     assert occurrence.admission_class == "strict"
     assert occurrence.coupling_score == 1.0
     assert occurrence.evidence.overlap_counts == (2,)
     assert occurrence.evidence.formed_overlap_counts == (2,)
+    assert occurrence.evidence.transient_bond_counts == (0,)
     assert occurrence.overall_reaction_smiles
-    assert occurrence.typed_strategy_id.startswith("CRST1:")
+    assert occurrence.typed_strategy_id.startswith("CRST2:")
+
+
+def test_installed_bond_replaced_is_activation_then_conversion() -> None:
+    projection = _positive_projection()
+    second = replace(
+        projection.steps[1],
+        reaction_signature={
+            "edits": [
+                {
+                    "edit_type": "broken",
+                    "atom_1": _atom(12),
+                    "atom_2": _atom(13),
+                },
+                {
+                    "edit_type": "formed",
+                    "atom_1": _atom(10),
+                    "atom_2": _atom(12),
+                },
+            ]
+        },
+    )
+
+    occurrence = extract_coupled_route_strategies(
+        replace(projection, steps=(projection.steps[0], second))
+    )[0]
+
+    assert occurrence.relationship_class == "handle_progression"
+    assert occurrence.dependency_class == "activation_then_conversion"
+    assert occurrence.admission_class == "strict"
+    assert occurrence.evidence.transient_bond_counts == (1,)
+    assert occurrence.evidence.replacement_bond_counts == (1,)
+
+
+def test_installed_bond_removed_without_replacement_requires_review() -> None:
+    projection = _positive_projection()
+    second = replace(
+        projection.steps[1],
+        reaction_signature={
+            "edits": [
+                {
+                    "edit_type": "broken",
+                    "atom_1": _atom(12),
+                    "atom_2": _atom(13),
+                }
+            ]
+        },
+    )
+
+    occurrence = extract_coupled_route_strategies(
+        replace(projection, steps=(projection.steps[0], second))
+    )[0]
+
+    assert occurrence.relationship_class == "handle_progression"
+    assert occurrence.dependency_class == "temporary_group_removed"
+    assert occurrence.admission_class == "review"
+    assert occurrence.evidence.transient_bond_counts == (1,)
+    assert occurrence.evidence.replacement_bond_counts == (0,)
 
 
 def test_distant_active_sites_are_rejected_as_independent() -> None:
@@ -193,6 +252,7 @@ def test_distant_active_sites_are_rejected_as_independent() -> None:
     occurrence = extract_coupled_route_strategies(projection)[0]
 
     assert occurrence.relationship_class == "independent_sites"
+    assert occurrence.dependency_class == "independent_sites"
     assert occurrence.admission_class == "rejected"
     assert occurrence.evidence.minimum_distances == (3,)
 
@@ -211,6 +271,7 @@ def test_lineage_dependent_site_overlap_is_retained_for_review() -> None:
     occurrence = extract_coupled_route_strategies(projection)[0]
 
     assert occurrence.relationship_class == "lineage_ambiguous"
+    assert occurrence.dependency_class == "lineage_ambiguous"
     assert occurrence.admission_class == "review"
     assert occurrence.evidence.overlap_counts == (1, 0)
     assert not occurrence.evidence.ambiguity_invariant
@@ -224,7 +285,7 @@ def test_strategy_identity_is_deterministic() -> None:
     second = extract_coupled_route_strategies(projection)[0]
 
     assert first == second
-    assert first.occurrence_id.startswith("CRSO1:")
+    assert first.occurrence_id.startswith("CRSO2:")
 
 
 def test_mining_aggregates_patent_disjoint_support_and_balanced_sample(
@@ -277,6 +338,11 @@ def test_mining_aggregates_patent_disjoint_support_and_balanced_sample(
         "strict": 2,
     }
     assert report["recurrent_strict_strategy_count"] == 1
+    assert report["dependency_counts"] == {
+        "created_handle_consumed": 2,
+        "independent_sites": 1,
+        "lineage_ambiguous": 1,
+    }
     assert report["sample_counts"] == {
         "rejected": 1,
         "review": 1,
@@ -309,6 +375,8 @@ def test_report_and_review_artifacts_are_deterministic(tmp_path) -> None:
     assert "Physical step 1" in document
     assert "Carried intermediate" in document
     assert "Structural coupling evidence" in document
+    assert "Installed bond later broken" in document
+    assert "created handle consumed" in document
     assert "Export review JSON" in document
     assert "localStorage" in document
     assert 'class="render-error"' not in document
