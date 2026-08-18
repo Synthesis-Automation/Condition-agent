@@ -162,9 +162,66 @@ python -m core_retrosynthesis audit-operator-round-trips `
 
 ## Next evidence gate
 
-The next iteration should rebuild a separate experimental route-only library
-with `--core-admission-policy validated_departures`, quantify which additional
-review records pass source round trip, and evaluate the resulting operators on
-validation routes. Promotion still requires held-out observed-precursor
-recovery and invalid-product measurements before changing the production
-default.
+The separate experimental build is complete:
+
+```text
+results/core_retrosynthesis/route_step_operator_library/v1/
+  operators_validated_departures/
+```
+
+| Metric | Strict `pass_only` | `validated_departures` |
+|---|---:|---:|
+| accepted observations | 966 (6.47%) | 14,218 (95.21%) |
+| templates | 477 | 7,298 |
+| operators | 104 | 644 |
+| realizations | 149 | 1,971 |
+| completion groups | 104 | 985 |
+
+The experimental rejections are 276 `materialized_core_not_verified`, 411
+`source_round_trip_failed`, 24 `missing_generic_operator_signature`, 3
+`materialized_core_missing`, and 1 `generic_l0_compilation_failed`. The large
+admission change confirms that product-omitted departing fragments dominate
+route-core review status; it also makes held-out validation mandatory before
+promotion.
+
+### Library-independent held-out comparison
+
+Panel selection is now separated from library coverage. The frozen panel has a
+content-derived ID and contains 12 distinct validation/test patents, six
+`handle_progression` and six `same_site_coupled` cases. No exact target occurs
+in training; two targets have a training Murcko-scaffold match. The panel forces
+in the recurrent nitration-reduction strategy so that the original capability
+gap cannot disappear through case filtering.
+
+```text
+results/core_retrosynthesis/coupled_strategy_evaluation/
+  route_only_fixed_panel.v1.json
+  route_only_strict_fixed_panel.v1.json
+  route_only_strict_fixed_panel.v1.html
+  route_only_validated_departures_fixed_panel.v1.json
+  route_only_validated_departures_fixed_panel.v1.html
+```
+
+| Fixed-panel metric | Strict route-only | Validated departures |
+|---|---:|---:|
+| selected cases | 12 | 12 |
+| operator-pair coverage gaps | 12 | 0 |
+| ordinary depth-two recovery | 0/12 | 1/12 |
+| promoted v1 pair recovery | 0/12 | 9/12 |
+| promoted validation attempts | 0 | 399 |
+
+The held-out nitration-reduction case is from validation patent `US08598374B2`.
+Its exact target and Murcko scaffold are absent from strategy training. The
+experimental pair-guided search recovers the observed nitro intermediate at
+rank 1; strict search has neither constituent operator.
+
+Three experimental cases remain unrecovered. Two return alternate validated
+macro actions but not the observed intermediate within top 3, while one returns
+no macro action under the fixed budget. These are search/selectivity or
+realization misses rather than operator-coverage gaps.
+
+The evidence supports retaining `validated_departures` as an experimental
+route-library policy and using it for the next unified-library comparison. It
+does not yet justify replacing the production `pass_only` default: prospective
+invalid-product, selectivity, and broader route-quality measurements remain
+required.

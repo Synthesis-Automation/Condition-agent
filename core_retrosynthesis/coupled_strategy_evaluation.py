@@ -34,6 +34,8 @@ from .route_core_conversion import iter_route_core_projections
 
 COUPLED_STRATEGY_EVALUATION_SCHEMA_VERSION = "1.0"
 COUPLED_STRATEGY_EVALUATION_ALGORITHM_VERSION = "coupled_strategy_eval.v1"
+FROZEN_V1_PANEL_SCHEMA_VERSION = "1.0"
+FROZEN_V1_PANEL_ALGORITHM_VERSION = "v1_coupled_strategy_panel.v1"
 _PATENT_TOKEN = re.compile(r"[^A-Z0-9]+")
 SearchFunction = Callable[..., tuple[
     tuple[GenericDisconnectionCandidate, ...], GenericSearchDiagnostics
@@ -108,6 +110,86 @@ class CoupledStrategyEvaluationCase:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class FrozenV1HeldoutPanel:
+    """Library-independent patent-held-out operator-pair evaluation panel."""
+
+    panel_id: str
+    route_core_source: str
+    route_core_sha256: str
+    config: CoupledStrategyEvaluationConfig
+    strategies: tuple[PromotedV1OperatorPair, ...]
+    cases: tuple[CoupledStrategyEvaluationCase, ...]
+    required_strategy_ids: tuple[str, ...] = ()
+    schema_version: str = FROZEN_V1_PANEL_SCHEMA_VERSION
+    algorithm_version: str = FROZEN_V1_PANEL_ALGORITHM_VERSION
+
+    def __post_init__(self) -> None:
+        if self.schema_version != FROZEN_V1_PANEL_SCHEMA_VERSION:
+            raise ValueError("unsupported frozen v1 panel schema")
+        if self.algorithm_version != FROZEN_V1_PANEL_ALGORITHM_VERSION:
+            raise ValueError("unsupported frozen v1 panel algorithm")
+        if not self.panel_id.startswith("CRV1PANEL2:"):
+            raise ValueError("frozen v1 panel requires a content identity")
+        strategy_ids = {item.strategy_id for item in self.strategies}
+        if not self.cases or len(self.cases) > self.config.panel_size:
+            raise ValueError("frozen v1 panel case count is invalid")
+        if any(item.strategy_id not in strategy_ids for item in self.cases):
+            raise ValueError("frozen v1 panel case lacks its strategy")
+        if not set(self.required_strategy_ids).issubset(strategy_ids):
+            raise ValueError("required frozen-panel strategy was not selected")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "artifact_type": "v1_coupled_strategy_frozen_panel",
+            "schema_version": self.schema_version,
+            "algorithm_version": self.algorithm_version,
+            "panel_id": self.panel_id,
+            "route_core_source": self.route_core_source,
+            "route_core_sha256": self.route_core_sha256,
+            "config": asdict(self.config),
+            "required_strategy_ids": list(self.required_strategy_ids),
+            "strategies": [item.to_dict() for item in self.strategies],
+            "cases": [item.to_dict() for item in self.cases],
+        }
+
+    @classmethod
+    def from_dict(cls, value: Mapping[str, Any]) -> "FrozenV1HeldoutPanel":
+        if value.get("artifact_type") != "v1_coupled_strategy_frozen_panel":
+            raise ValueError("unexpected frozen v1 panel artifact")
+        strategies = tuple(
+            PromotedV1OperatorPair(
+                **{
+                    **raw,
+                    "training_patent_ids": tuple(
+                        raw.get("training_patent_ids") or ()
+                    ),
+                    "v2_dependency_counts": tuple(
+                        sorted((raw.get("v2_dependency_counts") or {}).items())
+                    ),
+                }
+            )
+            for raw in value.get("strategies") or ()
+        )
+        cases = tuple(
+            CoupledStrategyEvaluationCase(**raw)
+            for raw in value.get("cases") or ()
+        )
+        return cls(
+            panel_id=str(value.get("panel_id") or ""),
+            route_core_source=str(value.get("route_core_source") or ""),
+            route_core_sha256=str(value.get("route_core_sha256") or ""),
+            config=CoupledStrategyEvaluationConfig(**(value.get("config") or {})),
+            strategies=strategies,
+            cases=cases,
+            required_strategy_ids=tuple(
+                str(item) for item in value.get("required_strategy_ids") or ()
+            ),
+            schema_version=str(value.get("schema_version") or ""),
+            algorithm_version=str(value.get("algorithm_version") or ""),
+        )
 
 
 @dataclass(frozen=True)
@@ -230,20 +312,16 @@ def _strategy_id(
     )
 
 
-def build_v1_heldout_panel(
+def _v1_heldout_candidate_pool(
     route_core_source: str | Path,
-    library: GenericTemplateLibrary,
-    *,
-    config: CoupledStrategyEvaluationConfig | None = None,
+    config: CoupledStrategyEvaluationConfig,
 ) -> tuple[
-    tuple[PromotedV1OperatorPair, ...],
+    dict[str, PromotedV1OperatorPair],
     tuple[CoupledStrategyEvaluationCase, ...],
-    tuple[dict[str, Any], ...],
+    dict[str, int],
 ]:
-    """Build a deterministic patent-disjoint panel from route-core records."""
+    """Build all recurrent held-out cases without consulting a library."""
 
-    resolved = config or CoupledStrategyEvaluationConfig()
-    library_operators = {item.operator_id for item in library.templates}
     raw: list[tuple[Any, str, str]] = []
     for projection in iter_route_core_projections(route_core_source):
         steps = {item.reaction_node_id: item for item in projection.steps}
@@ -265,13 +343,13 @@ def build_v1_heldout_panel(
 
     definitions: dict[str, PromotedV1OperatorPair] = {}
     cases: list[CoupledStrategyEvaluationCase] = []
-    gaps: list[dict[str, Any]] = []
+    heldout_counts: dict[str, int] = {}
     for key, eval_occurrences in heldout.items():
         train_items = training.get(key, [])
         patents = tuple(
             sorted({str(item.patent_id) for item in train_items if item.patent_id})
         )
-        if len(patents) < resolved.minimum_training_patents:
+        if len(patents) < config.minimum_training_patents:
             continue
         relationship, first_operator, second_operator = key
         strategy_id = _strategy_id(relationship, first_operator, second_operator)
@@ -285,22 +363,8 @@ def build_v1_heldout_panel(
             training_occurrence_count=len(train_items),
             v2_dependency_counts=tuple(sorted(dependencies.items())),
         )
-        missing = tuple(
-            operator
-            for operator in (first_operator, second_operator)
-            if operator not in library_operators
-        )
-        if missing:
-            gaps.append(
-                {
-                    "strategy_id": strategy_id,
-                    "relationship_class": relationship,
-                    "missing_operator_ids": list(missing),
-                    "heldout_occurrence_count": len(eval_occurrences),
-                }
-            )
-            continue
         definitions[strategy_id] = definition
+        heldout_counts[strategy_id] = len(eval_occurrences)
         train_targets = {
             canonical_smiles(item.final_product_smiles)
             for item in train_items
@@ -338,18 +402,45 @@ def build_v1_heldout_panel(
                 )
             )
 
+    return definitions, tuple(cases), heldout_counts
+
+
+def _select_v1_cases(
+    cases: Sequence[CoupledStrategyEvaluationCase],
+    config: CoupledStrategyEvaluationConfig,
+    *,
+    required_strategy_ids: Sequence[str] = (),
+    identity_namespace: str = "CRV1PANEL2",
+) -> tuple[CoupledStrategyEvaluationCase, ...]:
     ranked = sorted(
         cases,
         key=lambda item: (
             item.exact_target_seen_in_training,
-            digest("CRV1PANEL1", str(resolved.seed), item.case_id),
+            digest(identity_namespace, str(config.seed), item.case_id),
         ),
     )
     selected: list[CoupledStrategyEvaluationCase] = []
     used_patents: set[str] = set()
     used_strategies: set[str] = set()
+    for strategy_id in required_strategy_ids:
+        required = next(
+            (
+                item
+                for item in ranked
+                if item.strategy_id == strategy_id
+                and item.patent_id not in used_patents
+            ),
+            None,
+        )
+        if required is None:
+            raise ValueError(
+                f"required held-out strategy has no selectable case: {strategy_id}"
+            )
+        selected.append(required)
+        used_patents.add(required.patent_id)
+        used_strategies.add(required.strategy_id)
     per_class_target = {
-        relationship: resolved.panel_size // 2
+        relationship: config.panel_size // 2
         for relationship in sorted(V1_ADMITTED_RELATIONSHIPS)
     }
     for relationship in sorted(V1_ADMITTED_RELATIONSHIPS):
@@ -367,17 +458,153 @@ def build_v1_heldout_panel(
                 used_patents.add(item.patent_id)
                 used_strategies.add(item.strategy_id)
     for item in ranked:
-        if len(selected) >= resolved.panel_size:
+        if len(selected) >= config.panel_size:
             break
         if item.patent_id not in used_patents:
             selected.append(item)
             used_patents.add(item.patent_id)
             used_strategies.add(item.strategy_id)
     selected.sort(key=lambda item: item.case_id)
+    return tuple(sorted(selected[: config.panel_size], key=lambda item: item.case_id))
+
+
+def _library_gaps(
+    definitions: Iterable[PromotedV1OperatorPair],
+    library: GenericTemplateLibrary,
+    heldout_counts: Mapping[str, int],
+) -> tuple[dict[str, Any], ...]:
+    library_operators = {item.operator_id for item in library.templates}
+    gaps = []
+    for definition in definitions:
+        missing = tuple(
+            operator
+            for operator in (
+                definition.first_operator_id,
+                definition.second_operator_id,
+            )
+            if operator not in library_operators
+        )
+        if missing:
+            gaps.append(
+                {
+                    "strategy_id": definition.strategy_id,
+                    "relationship_class": definition.relationship_class,
+                    "missing_operator_ids": list(missing),
+                    "heldout_occurrence_count": int(
+                        heldout_counts.get(definition.strategy_id) or 0
+                    ),
+                }
+            )
+    return tuple(sorted(gaps, key=lambda item: item["strategy_id"]))
+
+
+def build_frozen_v1_heldout_panel(
+    route_core_source: str | Path,
+    *,
+    config: CoupledStrategyEvaluationConfig | None = None,
+    required_strategy_ids: Sequence[str] = (),
+) -> FrozenV1HeldoutPanel:
+    """Build a deterministic panel whose selection is library-independent."""
+
+    resolved = config or CoupledStrategyEvaluationConfig()
+    source = Path(route_core_source)
+    definitions, cases, _ = _v1_heldout_candidate_pool(source, resolved)
+    required = tuple(dict.fromkeys(str(item) for item in required_strategy_ids))
+    if len(required) > resolved.panel_size:
+        raise ValueError("required strategies exceed frozen panel size")
+    selected = _select_v1_cases(
+        cases,
+        resolved,
+        required_strategy_ids=required,
+    )
     selected_definitions = tuple(
         definitions[key] for key in sorted({item.strategy_id for item in selected})
     )
-    return selected_definitions, tuple(selected), tuple(gaps)
+    route_sha256 = _sha256(source)
+    panel_id = digest(
+        "CRV1PANEL2",
+        route_sha256,
+        json.dumps(asdict(resolved), sort_keys=True, separators=(",", ":")),
+        json.dumps(
+            [item.case_id for item in selected],
+            sort_keys=True,
+            separators=(",", ":"),
+        ),
+    )
+    return FrozenV1HeldoutPanel(
+        panel_id=panel_id,
+        route_core_source=str(source.resolve()),
+        route_core_sha256=route_sha256,
+        config=resolved,
+        strategies=selected_definitions,
+        cases=selected,
+        required_strategy_ids=required,
+    )
+
+
+def write_frozen_v1_heldout_panel(
+    panel: FrozenV1HeldoutPanel,
+    output_path: str | Path,
+) -> dict[str, Any]:
+    """Write one deterministic library-independent panel artifact."""
+
+    destination = Path(output_path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(
+        json.dumps(panel.to_dict(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    return {
+        "output_json": str(destination.resolve()),
+        "panel_id": panel.panel_id,
+        "panel_case_count": len(panel.cases),
+        "strategy_count": len(panel.strategies),
+    }
+
+
+def load_frozen_v1_heldout_panel(
+    source: str | Path,
+) -> FrozenV1HeldoutPanel:
+    """Load and validate one frozen v1 held-out panel."""
+
+    value = json.loads(Path(source).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError("frozen v1 panel must be an object")
+    return FrozenV1HeldoutPanel.from_dict(value)
+
+
+def build_v1_heldout_panel(
+    route_core_source: str | Path,
+    library: GenericTemplateLibrary,
+    *,
+    config: CoupledStrategyEvaluationConfig | None = None,
+) -> tuple[
+    tuple[PromotedV1OperatorPair, ...],
+    tuple[CoupledStrategyEvaluationCase, ...],
+    tuple[dict[str, Any], ...],
+]:
+    """Build the legacy library-covered deterministic held-out panel."""
+
+    resolved = config or CoupledStrategyEvaluationConfig()
+    definitions, cases, heldout_counts = _v1_heldout_candidate_pool(
+        route_core_source,
+        resolved,
+    )
+    gaps = _library_gaps(definitions.values(), library, heldout_counts)
+    gap_ids = {str(item["strategy_id"]) for item in gaps}
+    eligible_cases = tuple(
+        item for item in cases if item.strategy_id not in gap_ids
+    )
+    selected = _select_v1_cases(
+        eligible_cases,
+        resolved,
+        identity_namespace="CRV1PANEL1",
+    )
+    selected_definitions = tuple(
+        definitions[key] for key in sorted({item.strategy_id for item in selected})
+    )
+    return selected_definitions, selected, gaps
 
 
 def _patent_overlap(candidate: GenericDisconnectionCandidate, patent_id: str) -> bool:
@@ -608,14 +835,29 @@ def run_v1_coupled_strategy_evaluation(
     *,
     operator_library_source: str | Path | None = None,
     config: CoupledStrategyEvaluationConfig | None = None,
+    frozen_panel: FrozenV1HeldoutPanel | None = None,
     searcher: SearchFunction = disconnect_generic_target_detailed,
 ) -> dict[str, Any]:
     """Build the held-out panel and run the paired real-example benchmark."""
 
-    resolved = config or CoupledStrategyEvaluationConfig()
-    definitions, cases, gaps = build_v1_heldout_panel(
-        route_core_source, library, config=resolved
+    resolved = config or (
+        frozen_panel.config
+        if frozen_panel is not None
+        else CoupledStrategyEvaluationConfig()
     )
+    route_source = Path(route_core_source)
+    route_sha256 = _sha256(route_source)
+    if frozen_panel is None:
+        definitions, cases, gaps = build_v1_heldout_panel(
+            route_source, library, config=resolved
+        )
+    else:
+        if frozen_panel.route_core_sha256 != route_sha256:
+            raise ValueError("frozen panel route-core hash does not match source")
+        definitions = frozen_panel.strategies
+        cases = frozen_panel.cases
+        selected_counts = Counter(item.strategy_id for item in cases)
+        gaps = _library_gaps(definitions, library, selected_counts)
     by_id = {item.strategy_id: item for item in definitions}
     results = tuple(
         evaluate_v1_case(
@@ -642,7 +884,13 @@ def run_v1_coupled_strategy_evaluation(
         },
         "config": asdict(resolved),
         "route_core_source": str(route_core_source),
-        "route_core_sha256": _sha256(Path(route_core_source)),
+        "route_core_sha256": route_sha256,
+        "frozen_panel_id": frozen_panel.panel_id if frozen_panel else None,
+        "panel_selection": (
+            "library_independent_frozen"
+            if frozen_panel is not None
+            else "library_covered_legacy"
+        ),
         "operator_library_source": (
             str(operator_library_source) if operator_library_source else None
         ),
@@ -703,13 +951,19 @@ def write_v1_coupled_strategy_evaluation(
 __all__ = [
     "COUPLED_STRATEGY_EVALUATION_ALGORITHM_VERSION",
     "COUPLED_STRATEGY_EVALUATION_SCHEMA_VERSION",
+    "FROZEN_V1_PANEL_ALGORITHM_VERSION",
+    "FROZEN_V1_PANEL_SCHEMA_VERSION",
     "CoupledStrategyCaseResult",
     "CoupledStrategyEvaluationCase",
     "CoupledStrategyEvaluationConfig",
+    "FrozenV1HeldoutPanel",
     "PromotedTwoStepAction",
     "PromotedV1OperatorPair",
+    "build_frozen_v1_heldout_panel",
     "build_v1_heldout_panel",
     "evaluate_v1_case",
+    "load_frozen_v1_heldout_panel",
     "run_v1_coupled_strategy_evaluation",
+    "write_frozen_v1_heldout_panel",
     "write_v1_coupled_strategy_evaluation",
 ]

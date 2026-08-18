@@ -29,7 +29,10 @@ from .coupled_strategy_search import (
 )
 from .coupled_strategy_evaluation import (
     CoupledStrategyEvaluationConfig,
+    build_frozen_v1_heldout_panel,
+    load_frozen_v1_heldout_panel,
     run_v1_coupled_strategy_evaluation,
+    write_frozen_v1_heldout_panel,
     write_v1_coupled_strategy_evaluation,
 )
 from .coupled_strategy_evaluation_review import (
@@ -713,6 +716,32 @@ def _parser() -> argparse.ArgumentParser:
         "--max-candidates-to-validate", type=int, default=20
     )
     coupled_evaluation.add_argument("--seed", type=int, default=20260818)
+    coupled_evaluation.add_argument(
+        "--title", default="V1 two-step strategy held-out evaluation"
+    )
+    coupled_evaluation.add_argument(
+        "--frozen-panel",
+        help="library-independent panel artifact; its stored budgets are used",
+    )
+
+    coupled_panel = commands.add_parser(
+        "build-v1-coupled-panel",
+        help="freeze a patent-held-out panel before consulting operator libraries",
+    )
+    coupled_panel.add_argument("source_route_cores")
+    coupled_panel.add_argument("output_json")
+    coupled_panel.add_argument("--panel-size", type=int, default=12)
+    coupled_panel.add_argument("--top-k", type=int, default=3)
+    coupled_panel.add_argument("--max-templates", type=int, default=50)
+    coupled_panel.add_argument(
+        "--max-candidates-to-validate", type=int, default=12
+    )
+    coupled_panel.add_argument("--seed", type=int, default=20260818)
+    coupled_panel.add_argument(
+        "--include-strategy-id",
+        action="append",
+        help="force one recurrent held-out strategy into the fixed panel",
+    )
 
     report = commands.add_parser(
         "render-report",
@@ -1000,12 +1029,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
         print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
-    if arguments.command == "evaluate-v1-coupled-strategies":
-        library = load_generic_library(arguments.operator_library)
-        report = run_v1_coupled_strategy_evaluation(
+    if arguments.command == "build-v1-coupled-panel":
+        panel = build_frozen_v1_heldout_panel(
             arguments.source_route_cores,
-            library,
-            operator_library_source=arguments.operator_library,
             config=CoupledStrategyEvaluationConfig(
                 panel_size=arguments.panel_size,
                 top_k=arguments.top_k,
@@ -1015,12 +1041,44 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 ),
                 seed=arguments.seed,
             ),
+            required_strategy_ids=tuple(arguments.include_strategy_id or ()),
+        )
+        summary = write_frozen_v1_heldout_panel(panel, arguments.output_json)
+        print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "evaluate-v1-coupled-strategies":
+        library = load_generic_library(arguments.operator_library)
+        frozen_panel = (
+            load_frozen_v1_heldout_panel(arguments.frozen_panel)
+            if arguments.frozen_panel
+            else None
+        )
+        report = run_v1_coupled_strategy_evaluation(
+            arguments.source_route_cores,
+            library,
+            operator_library_source=arguments.operator_library,
+            config=(
+                None
+                if frozen_panel is not None
+                else CoupledStrategyEvaluationConfig(
+                    panel_size=arguments.panel_size,
+                    top_k=arguments.top_k,
+                    max_templates_to_apply=arguments.max_templates,
+                    max_candidates_to_validate=(
+                        arguments.max_candidates_to_validate
+                    ),
+                    seed=arguments.seed,
+                )
+            ),
+            frozen_panel=frozen_panel,
         )
         json_summary = write_v1_coupled_strategy_evaluation(
             report, arguments.output_json
         )
         html_summary = write_v1_coupled_strategy_evaluation_html(
-            report, arguments.output_html
+            report,
+            arguments.output_html,
+            title=arguments.title,
         )
         print(
             json.dumps(

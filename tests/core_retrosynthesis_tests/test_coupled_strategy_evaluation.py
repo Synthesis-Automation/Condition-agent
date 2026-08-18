@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
+
 from core_retrosynthesis.cli import _parser
 from core_retrosynthesis.coupled_strategy_evaluation import (
     CoupledStrategyEvaluationCase,
     CoupledStrategyEvaluationConfig,
+    FrozenV1HeldoutPanel,
     PromotedV1OperatorPair,
     evaluate_v1_case,
+    load_frozen_v1_heldout_panel,
+    run_v1_coupled_strategy_evaluation,
+    write_frozen_v1_heldout_panel,
 )
 from core_retrosynthesis.coupled_strategy_evaluation_review import (
     render_v1_coupled_strategy_evaluation_html,
@@ -197,3 +204,93 @@ def test_cli_exposes_heldout_v1_evaluation() -> None:
     )
     assert arguments.panel_size == 12
     assert arguments.top_k == 5
+
+
+def test_frozen_panel_evaluates_missing_library_without_reselection(
+    tmp_path: Path,
+) -> None:
+    route_source = tmp_path / "routes.core.jsonl.gz"
+    route_source.write_bytes(b"fixed-route-source")
+    strategy = PromotedV1OperatorPair(
+        strategy_id="strategy:frozen",
+        relationship_class="handle_progression",
+        first_operator_id="op:first",
+        second_operator_id="op:second",
+        training_patent_ids=("TRAIN1", "TRAIN2"),
+        training_occurrence_count=3,
+        v2_dependency_counts=(("created_handle_consumed", 3),),
+    )
+    case = CoupledStrategyEvaluationCase(
+        case_id="case:frozen",
+        occurrence_id="occurrence:frozen",
+        strategy_id=strategy.strategy_id,
+        patent_id="HELDOUT1",
+        split="test",
+        relationship_class="handle_progression",
+        v2_dependency_class="created_handle_consumed",
+        target_smiles="CN",
+        expected_intermediate_smiles="C=O",
+        expected_terminal_precursor_smiles="CO",
+        observed_first_reaction_smiles="CO>>C=O",
+        observed_second_reaction_smiles="C=O>>CN",
+        exact_target_seen_in_training=False,
+        target_scaffold_seen_in_training=False,
+    )
+    config = CoupledStrategyEvaluationConfig(
+        panel_size=1,
+        top_k=3,
+        max_templates_to_apply=3,
+        max_candidates_to_validate=3,
+    )
+    panel = FrozenV1HeldoutPanel(
+        panel_id="CRV1PANEL2:test",
+        route_core_source=str(route_source),
+        route_core_sha256=hashlib.sha256(route_source.read_bytes()).hexdigest(),
+        config=config,
+        strategies=(strategy,),
+        cases=(case,),
+        required_strategy_ids=(strategy.strategy_id,),
+    )
+    panel_path = tmp_path / "panel.json"
+    write_frozen_v1_heldout_panel(panel, panel_path)
+
+    loaded = load_frozen_v1_heldout_panel(panel_path)
+    report = run_v1_coupled_strategy_evaluation(
+        route_source,
+        GenericTemplateLibrary((), 0, 0, {}, {}),
+        config=None,
+        frozen_panel=loaded,
+    )
+
+    assert loaded == panel
+    assert report["frozen_panel_id"] == panel.panel_id
+    assert report["panel_selection"] == "library_independent_frozen"
+    assert report["panel_case_count"] == 1
+    assert len(report["capability_gaps"]) == 1
+    assert report["metrics"]["promoted_pair_hit_count"] == 0
+
+
+def test_cli_exposes_library_independent_panel() -> None:
+    panel = _parser().parse_args(
+        [
+            "build-v1-coupled-panel",
+            "routes.jsonl.gz",
+            "panel.json",
+            "--include-strategy-id",
+            "strategy:required",
+        ]
+    )
+    evaluation = _parser().parse_args(
+        [
+            "evaluate-v1-coupled-strategies",
+            "routes.jsonl.gz",
+            "operators.json.gz",
+            "report.json",
+            "report.html",
+            "--frozen-panel",
+            "panel.json",
+        ]
+    )
+
+    assert panel.include_strategy_id == ["strategy:required"]
+    assert evaluation.frozen_panel == "panel.json"

@@ -116,6 +116,8 @@ def render_v1_coupled_strategy_evaluation_html(
 
     metrics = report.get("metrics") or {}
     results = report.get("results") or ()
+    panel_id = str(report.get("frozen_panel_id") or "legacy selection")
+    library_source = str(report.get("operator_library_source") or "in memory")
     cards = "".join(
         _case_card(result, ordinal)
         for ordinal, result in enumerate(results, 1)
@@ -135,6 +137,7 @@ details{{margin:10px 0}} summary{{cursor:pointer;font-weight:650}} svg{{max-widt
 </style></head><body><main>
 <section class="summary"><h1>{html.escape(title)}</h1>
 <p>Patent-held-out real route segments. V1 structural relationships determine promotion; v2 labels are displayed only as annotations. Every returned macro retains two independently forward-validated physical reactions.</p>
+<p class="meta">Panel: <code>{html.escape(panel_id)}</code><br>Library: <code>{html.escape(library_source)}</code></p>
 <div class="metrics">
 <div class="metric"><b>{int(report.get('panel_case_count') or 0)}</b>held-out cases</div>
 <div class="metric"><b>{float(metrics.get('baseline_pair_recall') or 0):.1%}</b>ordinary depth-two recall</div>

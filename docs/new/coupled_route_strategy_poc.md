@@ -237,11 +237,13 @@ evidence that pair guidance improves bounded search, not an estimate of broad
 prospective accuracy: the panel is small and was filtered to operator-library
 coverage.
 
-The earlier aryl nitration-reduction positive control remains a useful known
-coverage gap. The route relationship and exact replay are valid, and the
-reduction operator is present, but its nitration operator does not pass the
-current generic compiler/library gate. It must not be counted as a generalized
-macro success until that single-step coverage is added.
+The earlier aryl nitration-reduction positive control was a useful known
+coverage gap in the strict library. A separate route-only build using the
+opt-in `validated_departures` policy now contains both operators after exact
+source round trips. On a library-independent panel, a validation-patent analogue
+with an unseen target and scaffold recovers the observed nitro intermediate at
+rank 1. The strict production library remains unchanged; see
+`docs/new/route_step_only_operator_library_poc.md` for the policy and A/B result.
 
 Artifacts:
 
