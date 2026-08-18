@@ -14,6 +14,7 @@ from core_retrosynthesis.coupled_strategy_evaluation import (
     evaluate_v1_case,
     load_frozen_v1_heldout_panel,
     run_v1_coupled_strategy_evaluation,
+    search_promoted_v1_strategies,
     write_frozen_v1_heldout_panel,
 )
 from core_retrosynthesis.coupled_strategy_evaluation_review import (
@@ -24,6 +25,7 @@ from core_retrosynthesis.generic_compiler import (
 )
 from core_retrosynthesis.generic_models import (
     GenericDisconnectionCandidate,
+    GenericGraphOperator,
     GenericSearchDiagnostics,
     GenericTemplateLibrary,
 )
@@ -125,7 +127,9 @@ def test_promoted_v1_pair_executes_two_validated_steps_with_fallback() -> None:
     first = _candidate("C=O", "CO", "op:first", "first", 0.9)
 
     def searcher(target, _library, *, operator_ids=(), **_kwargs):
-        candidates = (second,) if target == "CN" else (first,) if target == "C=O" else ()
+        candidates = (
+            (second,) if target == "CN" else (first,) if target == "C=O" else ()
+        )
         if operator_ids:
             candidates = tuple(
                 item for item in candidates if item.operator_id in operator_ids
@@ -173,6 +177,139 @@ def test_promoted_v1_pair_executes_two_validated_steps_with_fallback() -> None:
     assert "two independently forward-validated physical reactions" in page
     assert "HELDOUT1" in page
     assert "Promoted logical actions" in page
+
+
+def test_promoted_v1_target_query_preserves_physical_steps_and_fallback() -> None:
+    strategy = PromotedV1OperatorPair(
+        strategy_id="strategy:query",
+        relationship_class="same_site_coupled",
+        first_operator_id="op:first",
+        second_operator_id="op:second",
+        training_patent_ids=("TRAIN1", "TRAIN2"),
+        training_occurrence_count=4,
+        v2_dependency_counts=(("continued_site_transformation", 4),),
+    )
+    second = _candidate("CN", "C=O", "op:second", "second", 0.8)
+    first = _candidate("C=O", "CO", "op:first", "first", 0.9)
+
+    def searcher(target, _library, *, operator_ids=(), **_kwargs):
+        candidates = (
+            (second,) if target == "CN" else (first,) if target == "C=O" else ()
+        )
+        if operator_ids:
+            candidates = tuple(
+                item for item in candidates if item.operator_id in operator_ids
+            )
+        return candidates, GenericSearchDiagnostics(
+            validation_attempt_count=len(candidates),
+            valid_candidate_count=len(candidates),
+        )
+
+    operators = tuple(
+        GenericGraphOperator(
+            operator_id=operator_id,
+            operator_signature=operator_id,
+            edit_tokens=(),
+            realization_ids=(),
+            abstraction_levels=("L1",),
+            observation_support=4,
+            independent_reference_support=2,
+        )
+        for operator_id in ("op:first", "op:second")
+    )
+    result = search_promoted_v1_strategies(
+        "CN",
+        GenericTemplateLibrary((), 0, 0, {}, {}, operators=operators),
+        (strategy,),
+        top_k=3,
+        max_templates_to_apply=3,
+        max_candidates_to_validate=3,
+        searcher=searcher,
+    )
+
+    assert len(result.actions) == 1
+    assert result.actions[0].first_reaction_smiles == "CO>>C=O"
+    assert result.actions[0].second_reaction_smiles == "C=O>>CN"
+    assert result.actions[0].training_patent_count == 2
+    assert result.one_step_fallbacks[0]["operator_id"] == "op:second"
+    assert result.diagnostics.capability_gap_count == 0
+    assert result.to_dict()["valid"] is True
+
+
+def test_promoted_query_diversifies_strategy_pairs_before_variants() -> None:
+    def strategy(name: str) -> PromotedV1OperatorPair:
+        return PromotedV1OperatorPair(
+            strategy_id=f"strategy:{name}",
+            relationship_class="same_site_coupled",
+            first_operator_id=f"op:first:{name}",
+            second_operator_id=f"op:second:{name}",
+            training_patent_ids=("TRAIN1", "TRAIN2"),
+            training_occurrence_count=3,
+            v2_dependency_counts=(("continued_site_transformation", 3),),
+        )
+
+    strategies = (strategy("a"), strategy("b"))
+    second_a = (
+        _candidate("CN", "C=O", "op:second:a", "second:a:1", 0.95),
+        _candidate("CN", "CC=O", "op:second:a", "second:a:2", 0.90),
+    )
+    second_b = (_candidate("CN", "N=O", "op:second:b", "second:b", 0.70),)
+    first_by_target = {
+        "C=O": _candidate("C=O", "CO", "op:first:a", "first:a:1", 0.95),
+        "CC=O": _candidate("CC=O", "CCO", "op:first:a", "first:a:2", 0.90),
+        "N=O": _candidate("N=O", "NO", "op:first:b", "first:b", 0.70),
+    }
+
+    def searcher(target, _library, *, operator_ids=(), **_kwargs):
+        operator_id = next(iter(operator_ids), "")
+        if target == "CN" and operator_id == "op:second:a":
+            candidates = second_a
+        elif target == "CN" and operator_id == "op:second:b":
+            candidates = second_b
+        elif target in first_by_target:
+            candidate = first_by_target[target]
+            candidates = (candidate,) if candidate.operator_id == operator_id else ()
+        else:
+            candidates = ()
+        return candidates, GenericSearchDiagnostics(
+            validation_attempt_count=len(candidates),
+            valid_candidate_count=len(candidates),
+        )
+
+    operator_ids = (
+        "op:first:a",
+        "op:second:a",
+        "op:first:b",
+        "op:second:b",
+    )
+    operators = tuple(
+        GenericGraphOperator(
+            operator_id=operator_id,
+            operator_signature=operator_id,
+            edit_tokens=(),
+            realization_ids=(),
+            abstraction_levels=("L1",),
+            observation_support=3,
+            independent_reference_support=2,
+        )
+        for operator_id in operator_ids
+    )
+    result = search_promoted_v1_strategies(
+        "CN",
+        GenericTemplateLibrary((), 0, 0, {}, {}, operators=operators),
+        strategies,
+        top_k=3,
+        max_templates_to_apply=3,
+        max_candidates_to_validate=3,
+        include_one_step_fallbacks=False,
+        searcher=searcher,
+    )
+
+    assert [item.strategy_id for item in result.actions] == [
+        "strategy:a",
+        "strategy:b",
+        "strategy:a",
+    ]
 
 
 def test_v1_promotion_rejects_independent_steps() -> None:

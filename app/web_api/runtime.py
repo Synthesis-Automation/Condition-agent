@@ -32,11 +32,14 @@ from condition_recommender.reaction_completion import (
     validate_completion_selections,
 )
 from core_retrosynthesis import (
+    FrozenV1HeldoutPanel,
     GenericTemplateLibrary,
     disconnect_operator_ladder,
+    load_frozen_v1_heldout_panel,
     load_generic_library,
     plan_multistep_routes,
     recommend_retrosynthesis_conditions,
+    search_promoted_v1_strategies,
 )
 from forward_synthesis import (
     ForwardOperatorLibrary,
@@ -57,6 +60,7 @@ from visualization import (
 )
 
 from .contracts import (
+    CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -82,21 +86,34 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LIBRARY_ROOT = PROJECT_ROOT / "datasets" / "literature"
 DEFAULT_INDEX_PATH = DEFAULT_LIBRARY_ROOT / "generic_index.sqlite"
 DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = (
+    PROJECT_ROOT / "results" / "operator_retrosynthesis_poc" / "full_scale_v3"
+)
+DEFAULT_COUPLED_STRATEGY_LIBRARY_PATH = (
     PROJECT_ROOT
     / "results"
-    / "operator_retrosynthesis_poc"
-    / "full_scale_v3"
+    / "core_retrosynthesis"
+    / "route_step_operator_library"
+    / "v1"
+    / "operators_validated_departures"
+    / "operator_library_v3.json.gz"
+)
+DEFAULT_COUPLED_STRATEGY_PANEL_PATH = (
+    PROJECT_ROOT
+    / "results"
+    / "core_retrosynthesis"
+    / "coupled_strategy_evaluation"
+    / "route_only_fixed_panel.v1.json"
 )
 DEFAULT_LITERATURE_MOLECULE_INDEX = (
     PROJECT_ROOT / "results" / "literature_molecule_index.sqlite"
 )
-DEFAULT_STOCK_PORTFOLIO = (
-    PROJECT_ROOT / "cas_tools" / "data" / "stock_portfolio.sqlite"
-)
+DEFAULT_STOCK_PORTFOLIO = PROJECT_ROOT / "cas_tools" / "data" / "stock_portfolio.sqlite"
 WEB_RETROSYNTHESIS_BASE_TEMPLATE_BUDGET = 100
 WEB_RETROSYNTHESIS_BASE_VALIDATION_BUDGET = 30
 WEB_MULTISTEP_TEMPLATE_BUDGET = 40
 WEB_MULTISTEP_VALIDATION_BUDGET = 10
+WEB_COUPLED_STRATEGY_TEMPLATE_BUDGET = 50
+WEB_COUPLED_STRATEGY_VALIDATION_BUDGET = 12
 WEB_FORWARD_AUDIT_OPERATOR_BUDGET = 40
 WEB_FORWARD_AUDIT_ASSIGNMENT_BUDGET = 32
 WEB_FORWARD_AUDIT_OUTCOME_BUDGET = 64
@@ -174,9 +191,7 @@ def _compact_forward_assessment(assessment: Any) -> Dict[str, Any]:
                 ),
                 "candidate_count": len(candidates),
                 "valid_pathway_count": int(
-                    (blind.get("diagnostics") or {}).get(
-                        "valid_pathway_count", 0
-                    )
+                    (blind.get("diagnostics") or {}).get("valid_pathway_count", 0)
                 ),
                 "top_products": [
                     {
@@ -205,9 +220,7 @@ class WebRuntime(Protocol):
 
     def recommend(self, request: RecommendationRequest) -> Dict[str, Any]: ...
 
-    def analyze_features(
-        self, request: FeatureAnalysisRequest
-    ) -> Dict[str, Any]: ...
+    def analyze_features(self, request: FeatureAnalysisRequest) -> Dict[str, Any]: ...
 
     def forward_synthesize(
         self, request: ForwardSynthesisRequest
@@ -215,12 +228,14 @@ class WebRuntime(Protocol):
 
     def forward_condition_profiles(self) -> Dict[str, Any]: ...
 
-    def retrosynthesize(
-        self, request: RetrosynthesisRequest
-    ) -> Dict[str, Any]: ...
+    def retrosynthesize(self, request: RetrosynthesisRequest) -> Dict[str, Any]: ...
 
     def multistep_retrosynthesize(
         self, request: MultistepRetrosynthesisRequest
+    ) -> Dict[str, Any]: ...
+
+    def coupled_strategy_retrosynthesize(
+        self, request: CoupledStrategyRetrosynthesisRequest
     ) -> Dict[str, Any]: ...
 
     def retrosynthesis_conditions(
@@ -248,6 +263,8 @@ class LocalRecommendationRuntime:
         literature_index_path: str | Path | None = None,
         stock_portfolio_path: str | Path | None = None,
         weak_label_records_path: str | Path | None = None,
+        coupled_strategy_library_path: str | Path | None = None,
+        coupled_strategy_panel_path: str | Path | None = None,
     ) -> None:
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
         self._configured_index_path = Path(configured) if configured else None
@@ -266,32 +283,41 @@ class LocalRecommendationRuntime:
         else:
             self.library_root = DEFAULT_LIBRARY_ROOT
         self.index_path = self._index_path("full")
-        configured_retrosynthesis = (
-            retrosynthesis_library_root
-            or os.environ.get("CORE_RETROSYNTHESIS_LIBRARY_ROOT")
+        configured_retrosynthesis = retrosynthesis_library_root or os.environ.get(
+            "CORE_RETROSYNTHESIS_LIBRARY_ROOT"
         )
         self.retrosynthesis_library_root = Path(
             configured_retrosynthesis or DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT
         )
-        configured_literature_index = (
-            literature_index_path
-            or os.environ.get("CORE_RETROSYNTHESIS_LITERATURE_INDEX")
+        configured_literature_index = literature_index_path or os.environ.get(
+            "CORE_RETROSYNTHESIS_LITERATURE_INDEX"
         )
         self.literature_index_path = Path(
             configured_literature_index or DEFAULT_LITERATURE_MOLECULE_INDEX
         )
-        configured_stock_portfolio = (
-            stock_portfolio_path or os.environ.get("RETROSYNTHESIS_STOCK_PORTFOLIO")
+        configured_stock_portfolio = stock_portfolio_path or os.environ.get(
+            "RETROSYNTHESIS_STOCK_PORTFOLIO"
         )
         self.stock_portfolio_path = Path(
             configured_stock_portfolio or DEFAULT_STOCK_PORTFOLIO
         )
-        configured_weak_labels = (
-            weak_label_records_path
-            or os.environ.get("CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS")
+        configured_weak_labels = weak_label_records_path or os.environ.get(
+            "CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS"
         )
         self.weak_label_records_path = Path(
             configured_weak_labels or DEFAULT_WEAK_LABEL_RECORDS_PATH
+        )
+        configured_coupled_library = coupled_strategy_library_path or os.environ.get(
+            "CORE_RETROSYNTHESIS_COUPLED_LIBRARY"
+        )
+        self.coupled_strategy_library_path = Path(
+            configured_coupled_library or DEFAULT_COUPLED_STRATEGY_LIBRARY_PATH
+        )
+        configured_coupled_panel = coupled_strategy_panel_path or os.environ.get(
+            "CORE_RETROSYNTHESIS_COUPLED_PANEL"
+        )
+        self.coupled_strategy_panel_path = Path(
+            configured_coupled_panel or DEFAULT_COUPLED_STRATEGY_PANEL_PATH
         )
         # An explicitly supplied legacy index is an intentional test/runtime
         # override unless a stock portfolio was also explicitly configured.
@@ -312,8 +338,9 @@ class LocalRecommendationRuntime:
         self._retrosynthesis_libraries: Dict[
             tuple[str, int, int], GenericTemplateLibrary
         ] = {}
-        self._forward_libraries: Dict[
-            tuple[str, int, int], ForwardOperatorLibrary
+        self._forward_libraries: Dict[tuple[str, int, int], ForwardOperatorLibrary] = {}
+        self._coupled_strategy_panels: Dict[
+            tuple[str, int, int], FrozenV1HeldoutPanel
         ] = {}
         self._compound_registry_identities: (
             tuple[frozenset[str], frozenset[str]] | None
@@ -369,9 +396,7 @@ class LocalRecommendationRuntime:
             if self.literature_index_path.is_file()
             else None
         )
-        registry_smiles, registry_inchi_keys = (
-            self._registered_compound_identities()
-        )
+        registry_smiles, registry_inchi_keys = self._registered_compound_identities()
 
         def evidence(identity: MoleculeIdentity) -> PrecursorEvidence:
             stock_match = stock.lookup(identity) if stock is not None else None
@@ -421,11 +446,7 @@ class LocalRecommendationRuntime:
         mode = library_mode.strip().casefold()
         if mode not in {"full", "compact"}:
             raise ValueError(f"unsupported library mode: {library_mode}")
-        return (
-            self.retrosynthesis_library_root
-            / mode
-            / "operator_library_v3.json.gz"
-        )
+        return self.retrosynthesis_library_root / mode / "operator_library_v3.json.gz"
 
     def _get_retrosynthesis_library(
         self,
@@ -451,6 +472,42 @@ class LocalRecommendationRuntime:
             library = load_generic_library(path)
             self._retrosynthesis_libraries[key] = library
             return library
+
+    def _get_coupled_strategy_library(self) -> GenericTemplateLibrary:
+        """Load the isolated experimental route-step operator library."""
+
+        path = self.coupled_strategy_library_path
+        if not path.is_file():
+            raise FileNotFoundError(
+                "experimental coupled-strategy operator library is unavailable"
+            )
+        stat = path.stat()
+        key = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
+        with self._lock:
+            cached = self._retrosynthesis_libraries.get(key)
+            if cached is not None:
+                return cached
+            library = load_generic_library(path)
+            self._retrosynthesis_libraries[key] = library
+            return library
+
+    def _get_coupled_strategy_panel(self) -> FrozenV1HeldoutPanel:
+        """Load the frozen, library-independent promoted-pair catalog."""
+
+        path = self.coupled_strategy_panel_path
+        if not path.is_file():
+            raise FileNotFoundError(
+                "experimental coupled-strategy panel is unavailable"
+            )
+        stat = path.stat()
+        key = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
+        with self._lock:
+            cached = self._coupled_strategy_panels.get(key)
+            if cached is not None:
+                return cached
+            panel = load_frozen_v1_heldout_panel(path)
+            self._coupled_strategy_panels[key] = panel
+            return panel
 
     def _forward_library_path(self, library_mode: str) -> Path:
         """Resolve an optional prebuilt forward-operator artifact."""
@@ -580,9 +637,7 @@ class LocalRecommendationRuntime:
                     self._recommenders.pop(old_key, None)
             recommender = GenericConditionRecommender.from_path(
                 index_path,
-                mapping_provider=(
-                    RxnMapperProvider() if use_rxnmapper else None
-                ),
+                mapping_provider=(RxnMapperProvider() if use_rxnmapper else None),
                 include_review=include_review,
             )
             self._recommenders[key] = recommender
@@ -591,20 +646,29 @@ class LocalRecommendationRuntime:
     def capabilities(self) -> Dict[str, Any]:
         """Report local feature availability without exposing absolute paths."""
 
-        mode_paths = {
-            mode: self._index_path(mode) for mode in ("full", "compact")
-        }
+        mode_paths = {mode: self._index_path(mode) for mode in ("full", "compact")}
         retrosynthesis_paths = {
             mode: self._retrosynthesis_library_path(mode)
             for mode in ("full", "compact")
         }
         forward_paths = {
-            mode: self._forward_library_path(mode)
-            for mode in ("full", "compact")
+            mode: self._forward_library_path(mode) for mode in ("full", "compact")
         }
         default_retrosynthesis_mode = (
             "full" if retrosynthesis_paths["full"].is_file() else "compact"
         )
+        coupled_strategy_available = (
+            self.coupled_strategy_library_path.is_file()
+            and self.coupled_strategy_panel_path.is_file()
+        )
+        coupled_strategy_count = 0
+        if coupled_strategy_available:
+            try:
+                coupled_strategy_count = len(
+                    self._get_coupled_strategy_panel().strategies
+                )
+            except (OSError, ValueError):
+                coupled_strategy_available = False
         return {
             "service": "reaction-condition-recommender",
             "index_name": mode_paths["full"].name,
@@ -646,16 +710,17 @@ class LocalRecommendationRuntime:
                 )
                 and any(path.is_file() for path in retrosynthesis_paths.values())
             ),
+            "coupled_strategy_retrosynthesis": coupled_strategy_available,
+            "coupled_strategy_catalog_size": coupled_strategy_count,
+            "coupled_strategy_library_name": (self.coupled_strategy_library_path.name),
+            "coupled_strategy_panel_name": self.coupled_strategy_panel_path.name,
             "literature_molecule_index_available": self.literature_index_path.is_file(),
             "literature_molecule_index_name": self.literature_index_path.name,
             "stock_portfolio_available": (
-                self._prefer_stock_portfolio
-                and self.stock_portfolio_path.is_file()
+                self._prefer_stock_portfolio and self.stock_portfolio_path.is_file()
             ),
             "stock_portfolio_name": self.stock_portfolio_path.name,
-            "default_retrosynthesis_library_mode": (
-                default_retrosynthesis_mode
-            ),
+            "default_retrosynthesis_library_mode": (default_retrosynthesis_mode),
             "retrosynthesis_library_modes": {
                 mode: {
                     "label": mode.title(),
@@ -837,9 +902,7 @@ class LocalRecommendationRuntime:
             return None
 
         if request.use_precursor_realism:
-            realism_scorer, close_realism_sources = (
-                self._precursor_realism_scorer()
-            )
+            realism_scorer, close_realism_sources = self._precursor_realism_scorer()
         try:
             candidates = disconnect_operator_ladder(
                 request.target_smiles.strip(),
@@ -856,16 +919,12 @@ class LocalRecommendationRuntime:
             close_realism_sources()
         index_path = self._index_path(request.library_mode)
         reference_catalog = self._get_reference_catalog(index_path)
-        templates = {
-            template.template_id: template for template in library.templates
-        }
+        templates = {template.template_id: template for template in library.templates}
         forward_library = None
         forward_setup_warning = None
         if request.use_forward_validation:
             try:
-                forward_library = self._get_forward_library(
-                    request.library_mode
-                )
+                forward_library = self._get_forward_library(request.library_mode)
             except (FileNotFoundError, RuntimeError, ValueError):
                 forward_setup_warning = "FORWARD_VALIDATION_UNAVAILABLE"
         forward_validity_counts: Dict[str, int] = {}
@@ -879,11 +938,14 @@ class LocalRecommendationRuntime:
                 "rank": rank,
                 **candidate.to_dict(),
             }
-            condition_query = getattr(
-                candidate,
-                "condition_query_reaction_smiles",
-                "",
-            ) or candidate.proposed_reaction_smiles
+            condition_query = (
+                getattr(
+                    candidate,
+                    "condition_query_reaction_smiles",
+                    "",
+                )
+                or candidate.proposed_reaction_smiles
+            )
             value["condition_evidence"] = _pending_retrosynthesis_conditions(
                 condition_query
             )
@@ -954,8 +1016,7 @@ class LocalRecommendationRuntime:
                 "probability."
             )
             if not (
-                self._prefer_stock_portfolio
-                and self.stock_portfolio_path.is_file()
+                self._prefer_stock_portfolio and self.stock_portfolio_path.is_file()
             ):
                 warnings.append(
                     "No supplier stock portfolio was available; buyable "
@@ -973,13 +1034,8 @@ class LocalRecommendationRuntime:
         )
         if (
             strategic_assessments
-            and complex_target_requires_strategic_candidate(
-                strategic_assessments[0]
-            )
-            and not any(
-                assessment.is_strategic
-                for assessment in strategic_assessments
-            )
+            and complex_target_requires_strategic_candidate(strategic_assessments[0])
+            and not any(assessment.is_strategic for assessment in strategic_assessments)
         ):
             warnings.append("NO_SCAFFOLD_SIMPLIFYING_CANDIDATE_GENERATED")
         return {
@@ -993,21 +1049,16 @@ class LocalRecommendationRuntime:
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
             "schema_version": "1.8",
             "forward_validation_enabled": request.use_forward_validation,
-            "forward_validity_counts": dict(
-                sorted(forward_validity_counts.items())
-            ),
+            "forward_validity_counts": dict(sorted(forward_validity_counts.items())),
             "precursor_realism_enabled": request.use_precursor_realism,
-            "strategic_complexity_definition_id": (
-                STRATEGIC_COMPLEXITY_DEFINITION_ID
-            ),
+            "strategic_complexity_definition_id": (STRATEGIC_COMPLEXITY_DEFINITION_ID),
             "strategic_candidate_count": sum(
                 bool(getattr(candidate, "strategic_candidate", False))
                 for candidate in candidates
             ),
             "precursor_realism_sources": {
                 "buyable": bool(
-                    self._prefer_stock_portfolio
-                    and self.stock_portfolio_path.is_file()
+                    self._prefer_stock_portfolio and self.stock_portfolio_path.is_file()
                 ),
                 "compound_registry": True,
                 "literature": self.literature_index_path.is_file(),
@@ -1147,9 +1198,7 @@ class LocalRecommendationRuntime:
                     "CONDITIONED_FORWARD_VALIDATION_UNAVAILABLE"
                 )
             else:
-                evidence["forward_assessment"] = _compact_forward_assessment(
-                    assessment
-                )
+                evidence["forward_assessment"] = _compact_forward_assessment(assessment)
         return evidence
 
     def multistep_retrosynthesize(
@@ -1162,18 +1211,12 @@ class LocalRecommendationRuntime:
         started_at = time.perf_counter()
         stock_path = (
             self.stock_portfolio_path
-            if (
-                self._prefer_stock_portfolio
-                and self.stock_portfolio_path.is_file()
-            )
+            if (self._prefer_stock_portfolio and self.stock_portfolio_path.is_file())
             else self.literature_index_path
         )
         stock_type = (
             "supplier_stock_portfolio"
-            if (
-                self._prefer_stock_portfolio
-                and self.stock_portfolio_path.is_file()
-            )
+            if (self._prefer_stock_portfolio and self.stock_portfolio_path.is_file())
             else "literature_molecule_index"
         )
         stock_context = (
@@ -1187,9 +1230,7 @@ class LocalRecommendationRuntime:
             return None
 
         if request.use_precursor_realism:
-            realism_scorer, close_realism_sources = (
-                self._precursor_realism_scorer()
-            )
+            realism_scorer, close_realism_sources = self._precursor_realism_scorer()
         condition_recommender = None
         condition_setup_warning = None
         if request.use_condition_availability:
@@ -1218,17 +1259,13 @@ class LocalRecommendationRuntime:
                     library,
                     stock_index,
                     max_depth=request.max_depth,
-                    molecular_weight_threshold=(
-                        request.molecular_weight_threshold
-                    ),
+                    molecular_weight_threshold=(request.molecular_weight_threshold),
                     top_k_routes=request.top_k_routes,
                     per_step_top_k=5,
                     beam_width=max(12, request.top_k_routes * 3),
                     max_expansions=max(4, request.top_k_routes),
                     max_templates_to_apply=WEB_MULTISTEP_TEMPLATE_BUDGET,
-                    max_candidates_to_validate=(
-                        WEB_MULTISTEP_VALIDATION_BUDGET
-                    ),
+                    max_candidates_to_validate=(WEB_MULTISTEP_VALIDATION_BUDGET),
                     use_context=request.use_context,
                     include_l0=request.include_l0,
                     diversify=request.diversify,
@@ -1247,16 +1284,12 @@ class LocalRecommendationRuntime:
         forward_validity_counts: Dict[str, int] = {}
         if request.use_forward_validation:
             try:
-                forward_library = self._get_forward_library(
-                    request.library_mode
-                )
+                forward_library = self._get_forward_library(request.library_mode)
             except (FileNotFoundError, RuntimeError, ValueError):
                 forward_library = None
                 forward_setup_warning = "FORWARD_VALIDATION_UNAVAILABLE"
             if forward_library is not None:
-                audit_cache: Dict[
-                    tuple[str, str, str, str], Dict[str, Any]
-                ] = {}
+                audit_cache: Dict[tuple[str, str, str, str], Dict[str, Any]] = {}
                 forward_levels = ("L4", "L3", "L2", "L1", "RDCHIRAL")
                 if request.include_l0:
                     forward_levels += ("L0",)
@@ -1331,9 +1364,7 @@ class LocalRecommendationRuntime:
                     if not evidence:
                         continue
                     recommendation_payload = {
-                        "recommendations": list(
-                            evidence.get("recommendations") or ()
-                        )
+                        "recommendations": list(evidence.get("recommendations") or ())
                     }
                     attach_recommendation_references(
                         recommendation_payload,
@@ -1356,9 +1387,7 @@ class LocalRecommendationRuntime:
             {
                 "library_mode": request.library_mode,
                 "valid": bool(result.routes),
-                "error": (
-                    None if result.routes else "NO_MULTISTEP_ROUTES"
-                ),
+                "error": (None if result.routes else "NO_MULTISTEP_ROUTES"),
                 "route_count": len(result.routes),
                 "partial_route_count": len(result.partial_routes),
                 "library_operator_count": len(library.operators),
@@ -1392,9 +1421,7 @@ class LocalRecommendationRuntime:
                     "beam_width": max(12, request.top_k_routes * 3),
                     "max_expansions": max(4, request.top_k_routes),
                     "max_templates_to_apply": WEB_MULTISTEP_TEMPLATE_BUDGET,
-                    "max_candidates_to_validate": (
-                        WEB_MULTISTEP_VALIDATION_BUDGET
-                    ),
+                    "max_candidates_to_validate": (WEB_MULTISTEP_VALIDATION_BUDGET),
                 },
             }
         )
@@ -1403,9 +1430,51 @@ class LocalRecommendationRuntime:
         if forward_setup_warning is not None:
             payload["warnings"].append(forward_setup_warning)
         if forward_partial_failure:
-            payload["warnings"].append(
-                "FORWARD_VALIDATION_PARTIALLY_UNAVAILABLE"
-            )
+            payload["warnings"].append("FORWARD_VALIDATION_PARTIALLY_UNAVAILABLE")
+        return payload
+
+    def coupled_strategy_retrosynthesize(
+        self,
+        request: CoupledStrategyRetrosynthesisRequest,
+    ) -> Dict[str, Any]:
+        """Search reusable v1 two-step operator pairs for one target."""
+
+        library = self._get_coupled_strategy_library()
+        panel = self._get_coupled_strategy_panel()
+        started_at = time.perf_counter()
+        result = search_promoted_v1_strategies(
+            request.target_smiles.strip(),
+            library,
+            panel.strategies,
+            top_k=request.top_k,
+            max_templates_to_apply=(WEB_COUPLED_STRATEGY_TEMPLATE_BUDGET),
+            max_candidates_to_validate=(WEB_COUPLED_STRATEGY_VALIDATION_BUDGET),
+            include_l0=request.include_l0,
+            use_context=request.use_context,
+            include_one_step_fallbacks=(request.include_one_step_fallbacks),
+        )
+        payload = result.to_dict()
+        payload.update(
+            {
+                "experimental": True,
+                "panel_id": panel.panel_id,
+                "strategy_catalog_size": len(panel.strategies),
+                "library_operator_count": len(library.operators),
+                "library_template_count": len(library.templates),
+                "library_name": self.coupled_strategy_library_path.name,
+                "search_elapsed_seconds": round(
+                    time.perf_counter() - started_at,
+                    3,
+                ),
+                "search_budget": {
+                    "top_k": request.top_k,
+                    "max_templates_to_apply": (WEB_COUPLED_STRATEGY_TEMPLATE_BUDGET),
+                    "max_candidates_to_validate": (
+                        WEB_COUPLED_STRATEGY_VALIDATION_BUDGET
+                    ),
+                },
+            }
+        )
         return payload
 
     def render_reaction(

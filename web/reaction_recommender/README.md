@@ -34,6 +34,12 @@ The weak-label mode uses `datasets/weak_label/v2.1_cleaned.csv` and its
 paired recipe catalog by default. Override the CSV with
 `CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS`.
 
+The experimental **Coupled two-step strategies** mode is enabled when both the
+validated-departures route-step operator library and frozen v1 strategy panel
+are available. Override their default result paths with
+`CORE_RETROSYNTHESIS_COUPLED_LIBRARY` and
+`CORE_RETROSYNTHESIS_COUPLED_PANEL`.
+
 ## Single-port local build
 
 ```powershell
@@ -78,6 +84,10 @@ documentation is available at `http://127.0.0.1:8000/api/docs`.
   partner roles, mapping provenance, and the canonical nested analysis.
 - Inspect score traces, structural matches and mismatches, cautions, conditions,
   yields, fallback levels, and precedent provenance.
+- Test promoted v1 two-step operator pairs against an arbitrary target. Each
+  logical strategy exposes its intermediate, terminal precursors, two physical
+  reactions, validation statuses, training support, and ordinary one-step
+  fallbacks. This mode is explicitly experimental and requires chemist review.
 - Export the complete versioned recommendation or feature result as
   JSON.
 - Preview and download the selected recommendation's versioned synthesis

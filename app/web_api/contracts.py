@@ -32,9 +32,7 @@ class CompletionChoiceRequest(StrictRequest):
     @model_validator(mode="after")
     def exactly_one_source(self) -> "CompletionChoiceRequest":
         if bool(self.option_id) == bool(self.custom_identifier):
-            raise ValueError(
-                "provide exactly one of option_id or custom_identifier"
-            )
+            raise ValueError("provide exactly one of option_id or custom_identifier")
         return self
 
 
@@ -180,6 +178,16 @@ class MultistepRetrosynthesisRequest(StrictRequest):
     use_forward_validation: bool = True
 
 
+class CoupledStrategyRetrosynthesisRequest(StrictRequest):
+    """One bounded experimental promoted two-step strategy query."""
+
+    target_smiles: str = Field(min_length=1, max_length=20_000)
+    top_k: int = Field(default=5, ge=1, le=10)
+    include_l0: bool = True
+    use_context: bool = True
+    include_one_step_fallbacks: bool = True
+
+
 class RetrosynthesisConditionsRequest(StrictRequest):
     """Progressive condition lookup for one retrosynthesis hit."""
 
@@ -240,6 +248,7 @@ __all__ = [
     "API_SCHEMA_VERSION",
     "ApiEnvelope",
     "CompletionChoiceRequest",
+    "CoupledStrategyRetrosynthesisRequest",
     "FeatureAnalysisRequest",
     "ForwardConditionProfileRequest",
     "ForwardSynthesisRequest",

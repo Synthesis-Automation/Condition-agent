@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type {
   ConditionPrecedent,
+  CoupledStrategyAction,
+  CoupledStrategyRetrosynthesisResult,
   ExperimentalDetail,
   ForwardProductCandidate,
   ForwardSynthesisResult,
@@ -995,6 +997,101 @@ export function ForwardSynthesisResults({ result }: { result: ForwardSynthesisRe
         </details>
       )}
       <MessageList title="Prediction scope" values={result.prediction.warnings} tone="caution" />
+    </section>
+  )
+}
+
+function CoupledStrategyDetails({ action }: { action: CoupledStrategyAction }) {
+  return (
+    <article className="result-detail coupled-strategy-detail">
+      <div className="detail-title-row">
+        <div>
+          <span className="eyebrow">EXPERIMENTAL LOGICAL STRATEGY</span>
+          <h3>Two related physical reactions</h3>
+          <p>{displayName(action.relationship_class)} · both steps passed operator-level forward validation.</p>
+        </div>
+        <div className="score-orbit"><strong>{action.score.toFixed(3)}</strong><span>score</span></div>
+      </div>
+
+      <dl className="detail-list">
+        <div><dt>Target</dt><dd className="mono-value">{action.second_reaction_smiles.split('>>').at(-1) ?? '—'}</dd></div>
+        <div><dt>Intermediate</dt><dd className="mono-value">{action.intermediate_smiles}</dd></div>
+        <div><dt>Terminal precursors</dt><dd className="mono-value">{action.terminal_precursor_smiles}</dd></div>
+        <div><dt>Training support</dt><dd>{action.training_patent_count} patents · {action.training_occurrence_count} route occurrences</dd></div>
+      </dl>
+
+      <section className="route-step-list" aria-label="Coupled strategy physical reactions">
+        <article className="route-step-card">
+          <div className="route-step-heading"><div><span>Physical step 1</span><strong>Build the intermediate</strong></div><small>{displayName(action.first_forward_validation_status)}</small></div>
+          <ReactionImage smiles={action.first_reaction_smiles} label="Coupled strategy physical step 1" compact />
+          <dl className="detail-list"><div><dt>Operator</dt><dd className="mono-value">{action.first_operator_id}</dd></div></dl>
+        </article>
+        <article className="route-step-card">
+          <div className="route-step-heading"><div><span>Physical step 2</span><strong>Convert the intermediate to the target</strong></div><small>{displayName(action.second_forward_validation_status)}</small></div>
+          <ReactionImage smiles={action.second_reaction_smiles} label="Coupled strategy physical step 2" compact />
+          <dl className="detail-list"><div><dt>Operator</dt><dd className="mono-value">{action.second_operator_id}</dd></div></dl>
+        </article>
+      </section>
+
+      <details className="trace-panel">
+        <summary>Strategy evidence</summary>
+        <dl className="detail-list">
+          <div><dt>Strategy ID</dt><dd className="mono-value">{action.strategy_id}</dd></div>
+          <div><dt>V2 review labels</dt><dd>{Object.entries(action.v2_dependency_counts).map(([name, count]) => `${displayName(name)} (${count})`).join(' · ') || 'None'}</dd></div>
+        </dl>
+      </details>
+    </article>
+  )
+}
+
+export function CoupledStrategyResults({ result }: { result: CoupledStrategyRetrosynthesisResult }) {
+  const [selected, setSelected] = useState(0)
+  useEffect(() => setSelected(0), [result])
+  const active = result.actions[selected]
+  const diagnostics = result.diagnostics
+  return (
+    <section className="results-card">
+      <div className="results-summary">
+        <div><span className="eyebrow">EXPERIMENTAL COUPLED TWO-STEP SEARCH</span><h2>{result.actions.length} promoted strateg{result.actions.length === 1 ? 'y' : 'ies'}</h2></div>
+        <div className="metric-strip">
+          <div><strong>{result.actions.length}</strong><span>strategies</span></div>
+          <div><strong>{result.one_step_fallbacks.length}</strong><span>fallbacks</span></div>
+          <div><strong>{diagnostics.capable_strategy_count}/{diagnostics.strategy_count}</strong><span>pairs available</span></div>
+          <div><strong>{diagnostics.first_step_validation_attempt_count + diagnostics.second_step_validation_attempt_count}</strong><span>pair validations</span></div>
+          <div><strong>{result.search_elapsed_seconds.toFixed(1)}s</strong><span>search time</span></div>
+        </div>
+      </div>
+      <div className="alert caution"><strong>Experimental strategy prior.</strong> The operator pair is learned from related route steps; review site selectivity, intermediate stability, and condition compatibility before use.</div>
+      {!result.valid && <div className="alert error">{displayName(result.error ?? 'No coupled strategy results')}</div>}
+      {result.actions.length > 0 && (
+        <div className="results-layout multistep-results-layout">
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>Rank</th><th>Score</th><th>Relationship</th><th>Intermediate</th><th>Terminal precursors</th><th>Patent support</th></tr></thead>
+              <tbody>{result.actions.map((action, index) => (
+                <tr key={`${action.strategy_id}:${action.intermediate_smiles}:${action.terminal_precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
+                  <td><strong>{action.rank}</strong></td>
+                  <td>{action.score.toFixed(3)}</td>
+                  <td>{displayName(action.relationship_class)}</td>
+                  <td className="mono-value">{action.intermediate_smiles}</td>
+                  <td className="mono-value">{action.terminal_precursor_smiles}</td>
+                  <td>{action.training_patent_count}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+          {active && <CoupledStrategyDetails action={active} />}
+        </div>
+      )}
+      <details className="trace-panel" open={result.actions.length === 0}>
+        <summary>Ordinary one-step fallbacks ({result.one_step_fallbacks.length})</summary>
+        {result.one_step_fallbacks.length > 0 ? (
+          <div className="table-scroll"><table><thead><tr><th>Rank</th><th>Score</th><th>Level</th><th>Precursors</th><th>Validation</th></tr></thead><tbody>{result.one_step_fallbacks.map((fallback) => (
+            <tr key={`${fallback.rank}:${fallback.operator_id}:${fallback.precursor_smiles}`}><td>{fallback.rank}</td><td>{fallback.score.toFixed(3)}</td><td>{fallback.abstraction_level}</td><td className="mono-value">{fallback.precursor_smiles}</td><td>{displayName(fallback.forward_validation_status)}</td></tr>
+          ))}</tbody></table></div>
+        ) : <p className="retrosynthesis-empty-evidence">No ordinary one-step fallback was generated within the bounded search.</p>}
+      </details>
+      <MessageList title="Experimental scope" values={result.warnings} tone="caution" />
     </section>
   )
 }

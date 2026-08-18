@@ -231,6 +231,43 @@ class FakeRuntime:
             "warnings": [],
         }
 
+    def coupled_strategy_retrosynthesize(self, request: Any) -> Dict[str, Any]:
+        return {
+            "artifact_type": "v1_coupled_strategy_target_query",
+            "target_smiles": request.target_smiles,
+            "valid": True,
+            "error": None,
+            "experimental": True,
+            "panel_id": "CRV1PANEL2:test",
+            "strategy_catalog_size": 1,
+            "library_operator_count": 2,
+            "library_template_count": 2,
+            "library_name": "operator_library_v3.json.gz",
+            "search_elapsed_seconds": 0.1,
+            "actions": [],
+            "one_step_fallbacks": [],
+            "diagnostics": {
+                "strategy_count": 1,
+                "capable_strategy_count": 1,
+                "capability_gap_count": 0,
+                "second_step_validation_attempt_count": 1,
+                "first_step_validation_attempt_count": 1,
+                "fallback_validation_attempt_count": 1,
+                "generated_action_count": 1,
+                "returned_action_count": 1,
+                "returned_fallback_count": 1,
+            },
+            "warnings": ["EXPERIMENTAL_PROMOTED_V1_OPERATOR_PAIRS"],
+            "schema_version": "1.0",
+            "algorithm_version": "test",
+            "request_options": {
+                "top_k": request.top_k,
+                "include_l0": request.include_l0,
+                "use_context": request.use_context,
+                "include_one_step_fallbacks": (request.include_one_step_fallbacks),
+            },
+        }
+
     def render_reaction(
         self, reaction_smiles: str, *, width: int, height: int
     ) -> bytes:
@@ -340,10 +377,7 @@ def test_local_runtime_reports_retrosynthesis_library_modes(tmp_path) -> None:
         is False
     )
     assert capabilities["forward_synthesis"] is True
-    assert (
-        capabilities["forward_library_modes"]["compact"]["library_available"]
-        is True
-    )
+    assert capabilities["forward_library_modes"]["compact"]["library_available"] is True
     assert capabilities["forward_library_modes"]["compact"]["prepared"] is False
 
 
@@ -400,9 +434,7 @@ def test_local_runtime_forward_synthesis_forwards_audit_options(
     assert captured["operator_hint"] == "OP1:test"
     assert captured["recipe"] == {"temperature_c": 80}
     assert captured["include_self_reactions"] is True
-    assert captured["condition_profile"]["strategy"] == (
-        "transition_metal_catalysis"
-    )
+    assert captured["condition_profile"]["strategy"] == ("transition_metal_catalysis")
     assert captured["condition_profile"]["catalyst_family"] == "palladium"
     assert "L0" not in captured["levels"]
     assert captured["top_k"] == 7
@@ -478,11 +510,7 @@ def test_local_multistep_retrosynthesis_audits_each_route_step_forward(
                             },
                             "condition_evidence": {
                                 "recommendations": [
-                                    {
-                                        "resolved_recipe": {
-                                            "temperature_c": 80.0
-                                        }
-                                    }
+                                    {"resolved_recipe": {"temperature_c": 80.0}}
                                 ]
                             },
                         }
@@ -526,9 +554,7 @@ def test_local_multistep_retrosynthesis_audits_each_route_step_forward(
                     "status": "predicted",
                     "conditions_supplied": True,
                     "condition_profile_supplied": False,
-                    "candidates": [
-                        {"rank": 1, "product_smiles": "CCN", "score": 0.9}
-                    ],
+                    "candidates": [{"rank": 1, "product_smiles": "CCN", "score": 0.9}],
                     "diagnostics": {"valid_pathway_count": 2},
                     "warnings": [],
                 },
@@ -599,9 +625,7 @@ def test_runtime_precursor_realism_combines_three_exact_evidence_sources(
     with literature_csv.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=("compound_smiles",))
         writer.writeheader()
-        writer.writerows(
-            ({"compound_smiles": "CO"}, {"compound_smiles": "CCBr"})
-        )
+        writer.writerows(({"compound_smiles": "CO"}, {"compound_smiles": "CCBr"}))
     literature_path = tmp_path / "literature.sqlite"
     build_canonical_molecule_index(literature_csv, literature_path)
     runtime = LocalRecommendationRuntime(
@@ -946,9 +970,7 @@ def test_local_retrosynthesis_attaches_compact_forward_validity_audit(
                 "blind_prediction": {
                     "valid": True,
                     "status": "predicted",
-                    "candidates": [
-                        {"rank": 1, "product_smiles": "CCN", "score": 0.9}
-                    ],
+                    "candidates": [{"rank": 1, "product_smiles": "CCN", "score": 0.9}],
                     "diagnostics": {"valid_pathway_count": 2},
                     "warnings": [],
                 },
@@ -971,9 +993,7 @@ def test_local_retrosynthesis_attaches_compact_forward_validity_audit(
     assert captured["max_outcomes_per_operator"] == 64
     assert audit["validity"] == "structurally_supported"
     assert audit["blind_prediction_summary"]["valid_pathway_count"] == 2
-    assert audit["blind_prediction_summary"]["top_products"][0][
-        "is_intended"
-    ] is True
+    assert audit["blind_prediction_summary"]["top_products"][0]["is_intended"] is True
     assert "blind_prediction" not in audit
     assert payload["forward_validity_counts"] == {"structurally_supported": 1}
 
@@ -1069,9 +1089,7 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
                     "status": "predicted",
                     "conditions_supplied": True,
                     "condition_profile_supplied": False,
-                    "candidates": [
-                        {"rank": 1, "product_smiles": "CCN", "score": 0.9}
-                    ],
+                    "candidates": [{"rank": 1, "product_smiles": "CCN", "score": 0.9}],
                     "diagnostics": {"valid_pathway_count": 1},
                     "warnings": [],
                 },
@@ -1108,12 +1126,11 @@ def test_local_retrosynthesis_condition_lookup_attaches_publication_records(
     assert condition_options["preferred_reaction_ids"] == ("reaction:1",)
     assert captured["library"] is forward_library
     assert captured["recipe"] == {"bases": []}
-    assert payload["forward_assessment"]["validity"] == (
-        "structurally_supported"
+    assert payload["forward_assessment"]["validity"] == ("structurally_supported")
+    assert (
+        payload["forward_assessment"]["blind_prediction_summary"]["conditions_supplied"]
+        is True
     )
-    assert payload["forward_assessment"]["blind_prediction_summary"][
-        "conditions_supplied"
-    ] is True
 
 
 def test_health_and_capabilities_are_versioned() -> None:
@@ -1130,9 +1147,7 @@ def test_forward_condition_profile_catalog_is_versioned() -> None:
     response = client().get("/api/v1/forward-synthesis/condition-profiles")
 
     assert response.status_code == 200
-    assert response.json()["data"]["definition_id"] == (
-        "forward_condition_profiles.v1"
-    )
+    assert response.json()["data"]["definition_id"] == ("forward_condition_profiles.v1")
 
 
 def test_multistep_retrosynthesis_contract_forwards_bounded_options() -> None:
@@ -1164,6 +1179,39 @@ def test_multistep_retrosynthesis_rejects_depth_above_three() -> None:
             "target_smiles": "Cc1ccccc1",
             "max_depth": 4,
         },
+    )
+
+    assert response.status_code == 422
+
+
+def test_coupled_strategy_contract_forwards_experimental_options() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis/coupled-strategies",
+        json={
+            "target_smiles": "CCOC(=O)c1cc(N)cc2c1OC(C)(C)C2",
+            "top_k": 4,
+            "include_l0": True,
+            "use_context": False,
+            "include_one_step_fallbacks": True,
+        },
+    )
+
+    assert response.status_code == 200
+    result = response.json()["data"]
+    assert result["experimental"] is True
+    assert result["target_smiles"] == "CCOC(=O)c1cc(N)cc2c1OC(C)(C)C2"
+    assert result["request_options"] == {
+        "top_k": 4,
+        "include_l0": True,
+        "use_context": False,
+        "include_one_step_fallbacks": True,
+    }
+
+
+def test_coupled_strategy_contract_rejects_more_than_ten_results() -> None:
+    response = client().post(
+        "/api/v1/retrosynthesis/coupled-strategies",
+        json={"target_smiles": "CN", "top_k": 11},
     )
 
     assert response.status_code == 422
@@ -1223,9 +1271,7 @@ def test_recommendation_contract_accepts_weak_label_mode() -> None:
     )
 
     assert response.status_code == 200
-    assert response.json()["data"]["recommendation_mode"] == (
-        "weak_label_fallback"
-    )
+    assert response.json()["data"]["recommendation_mode"] == ("weak_label_fallback")
 
 
 def test_recommendation_contract_rejects_unknown_mode() -> None:
@@ -1320,7 +1366,9 @@ def test_forward_synthesis_contract_supports_blind_prediction_and_step_audit() -
 
     assert blind.status_code == 200
     assert blind.json()["data"]["analysis_mode"] == "blind_prediction"
-    assert blind.json()["data"]["prediction"]["candidates"][0]["product_smiles"] == "CCN"
+    assert (
+        blind.json()["data"]["prediction"]["candidates"][0]["product_smiles"] == "CCN"
+    )
     assert audit.status_code == 200
     assert audit.json()["data"]["analysis_mode"] == "step_assessment"
     assert audit.json()["data"]["assessment"]["disposition"] == "clear"

@@ -37,9 +37,9 @@ COUPLED_STRATEGY_EVALUATION_ALGORITHM_VERSION = "coupled_strategy_eval.v1"
 FROZEN_V1_PANEL_SCHEMA_VERSION = "1.0"
 FROZEN_V1_PANEL_ALGORITHM_VERSION = "v1_coupled_strategy_panel.v1"
 _PATENT_TOKEN = re.compile(r"[^A-Z0-9]+")
-SearchFunction = Callable[..., tuple[
-    tuple[GenericDisconnectionCandidate, ...], GenericSearchDiagnostics
-]]
+SearchFunction = Callable[
+    ..., tuple[tuple[GenericDisconnectionCandidate, ...], GenericSearchDiagnostics]
+]
 
 
 @dataclass(frozen=True)
@@ -54,13 +54,16 @@ class CoupledStrategyEvaluationConfig:
     seed: int = 20260818
 
     def __post_init__(self) -> None:
-        if min(
-            self.panel_size,
-            self.minimum_training_patents,
-            self.top_k,
-            self.max_templates_to_apply,
-            self.max_candidates_to_validate,
-        ) < 1:
+        if (
+            min(
+                self.panel_size,
+                self.minimum_training_patents,
+                self.top_k,
+                self.max_templates_to_apply,
+                self.max_candidates_to_validate,
+            )
+            < 1
+        ):
             raise ValueError("evaluation budgets must be positive")
 
 
@@ -163,9 +166,7 @@ class FrozenV1HeldoutPanel:
             PromotedV1OperatorPair(
                 **{
                     **raw,
-                    "training_patent_ids": tuple(
-                        raw.get("training_patent_ids") or ()
-                    ),
+                    "training_patent_ids": tuple(raw.get("training_patent_ids") or ()),
                     "v2_dependency_counts": tuple(
                         sorted((raw.get("v2_dependency_counts") or {}).items())
                     ),
@@ -174,8 +175,7 @@ class FrozenV1HeldoutPanel:
             for raw in value.get("strategies") or ()
         )
         cases = tuple(
-            CoupledStrategyEvaluationCase(**raw)
-            for raw in value.get("cases") or ()
+            CoupledStrategyEvaluationCase(**raw) for raw in value.get("cases") or ()
         )
         return cls(
             panel_id=str(value.get("panel_id") or ""),
@@ -212,6 +212,87 @@ class PromotedTwoStepAction:
 
 
 @dataclass(frozen=True)
+class PromotedTwoStepQueryAction:
+    """One transferable v1 operator-pair result for an arbitrary target."""
+
+    rank: int
+    strategy_id: str
+    relationship_class: str
+    intermediate_smiles: str
+    terminal_precursor_smiles: str
+    first_operator_id: str
+    second_operator_id: str
+    first_reaction_smiles: str
+    second_reaction_smiles: str
+    first_forward_validation_status: str
+    second_forward_validation_status: str
+    training_patent_count: int
+    training_occurrence_count: int
+    v2_dependency_counts: tuple[tuple[str, int], ...]
+    score: float
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible query action."""
+
+        value = asdict(self)
+        value["v2_dependency_counts"] = dict(self.v2_dependency_counts)
+        return value
+
+
+@dataclass(frozen=True)
+class CoupledStrategyQueryDiagnostics:
+    """Transparent bounded-search counters for one target query."""
+
+    strategy_count: int
+    capable_strategy_count: int
+    capability_gap_count: int
+    second_step_validation_attempt_count: int
+    first_step_validation_attempt_count: int
+    fallback_validation_attempt_count: int
+    generated_action_count: int
+    returned_action_count: int
+    returned_fallback_count: int
+
+    def to_dict(self) -> dict[str, int]:
+        """Return JSON-compatible diagnostics."""
+
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class CoupledStrategyQueryResult:
+    """Promoted two-step actions with ordinary one-step fallbacks retained."""
+
+    target_smiles: str
+    actions: tuple[PromotedTwoStepQueryAction, ...]
+    one_step_fallbacks: tuple[dict[str, Any], ...]
+    diagnostics: CoupledStrategyQueryDiagnostics
+    warnings: tuple[str, ...]
+    schema_version: str = COUPLED_STRATEGY_EVALUATION_SCHEMA_VERSION
+    algorithm_version: str = COUPLED_STRATEGY_EVALUATION_ALGORITHM_VERSION
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible target-query result."""
+
+        return {
+            "artifact_type": "v1_coupled_strategy_target_query",
+            "schema_version": self.schema_version,
+            "algorithm_version": self.algorithm_version,
+            "target_smiles": self.target_smiles,
+            "valid": bool(self.actions or self.one_step_fallbacks),
+            "error": (
+                None
+                if self.actions or self.one_step_fallbacks
+                else "NO_COUPLED_STRATEGY_RESULTS"
+            ),
+            "actions": [item.to_dict() for item in self.actions],
+            "one_step_fallbacks": list(self.one_step_fallbacks),
+            "diagnostics": self.diagnostics.to_dict(),
+            "warnings": list(self.warnings),
+        }
+
+
+@dataclass(frozen=True)
 class CoupledStrategyCaseResult:
     """Paired ordinary-depth-two and promoted-v1 result for one target."""
 
@@ -232,9 +313,7 @@ class CoupledStrategyCaseResult:
             "baseline_intermediate_rank": self.baseline_intermediate_rank,
             "baseline_operator_pair_rank": self.baseline_operator_pair_rank,
             "promoted_operator_pair_rank": self.promoted_operator_pair_rank,
-            "baseline_top_level_candidates": list(
-                self.baseline_top_level_candidates
-            ),
+            "baseline_top_level_candidates": list(self.baseline_top_level_candidates),
             "promoted_actions": [item.to_dict() for item in self.promoted_actions],
             "baseline_validation_attempt_count": (
                 self.baseline_validation_attempt_count
@@ -242,9 +321,7 @@ class CoupledStrategyCaseResult:
             "promoted_validation_attempt_count": (
                 self.promoted_validation_attempt_count
             ),
-            "excluded_heldout_precedent_count": (
-                self.excluded_heldout_precedent_count
-            ),
+            "excluded_heldout_precedent_count": (self.excluded_heldout_precedent_count),
             "one_step_fallback_preserved": self.one_step_fallback_preserved,
         }
 
@@ -286,9 +363,7 @@ def _scaffold(smiles: str) -> str:
     return Chem.MolToSmiles(scaffold, canonical=True, isomericSmiles=True)
 
 
-def _operator_pair(
-    occurrence: Any, steps: Mapping[str, Any]
-) -> tuple[str, str] | None:
+def _operator_pair(occurrence: Any, steps: Mapping[str, Any]) -> tuple[str, str] | None:
     first = steps.get(occurrence.first_reaction_node_id)
     second = steps.get(occurrence.second_reaction_node_id)
     if first is None or second is None:
@@ -307,9 +382,7 @@ def _operator_pair(
 def _strategy_id(
     relationship: str, first_operator_id: str, second_operator_id: str
 ) -> str:
-    return digest(
-        "CRV1OP1", relationship, first_operator_id, second_operator_id
-    )
+    return digest("CRV1OP1", relationship, first_operator_id, second_operator_id)
 
 
 def _v1_heldout_candidate_pool(
@@ -445,9 +518,10 @@ def _select_v1_cases(
     }
     for relationship in sorted(V1_ADMITTED_RELATIONSHIPS):
         for item in ranked:
-            if len(
-                [x for x in selected if x.relationship_class == relationship]
-            ) >= per_class_target[relationship]:
+            if (
+                len([x for x in selected if x.relationship_class == relationship])
+                >= per_class_target[relationship]
+            ):
                 break
             if (
                 item.relationship_class == relationship
@@ -593,9 +667,7 @@ def build_v1_heldout_panel(
     )
     gaps = _library_gaps(definitions.values(), library, heldout_counts)
     gap_ids = {str(item["strategy_id"]) for item in gaps}
-    eligible_cases = tuple(
-        item for item in cases if item.strategy_id not in gap_ids
-    )
+    eligible_cases = tuple(item for item in cases if item.strategy_id not in gap_ids)
     selected = _select_v1_cases(
         eligible_cases,
         resolved,
@@ -657,6 +729,218 @@ def _search(
     )
 
 
+def search_promoted_v1_strategies(
+    target_smiles: str,
+    library: GenericTemplateLibrary,
+    strategies: Iterable[PromotedV1OperatorPair],
+    *,
+    top_k: int = 5,
+    max_templates_to_apply: int = 50,
+    max_candidates_to_validate: int = 12,
+    include_l0: bool = True,
+    use_context: bool = True,
+    include_one_step_fallbacks: bool = True,
+    searcher: SearchFunction = disconnect_generic_target_detailed,
+) -> CoupledStrategyQueryResult:
+    """Apply promoted v1 operator pairs to an arbitrary molecular target.
+
+    Every logical result retains the two independently validated physical
+    reactions. The strategy catalog supplies only operator-pair priors; graph
+    execution against the query target remains the source of truth.
+    """
+
+    if min(top_k, max_templates_to_apply, max_candidates_to_validate) < 1:
+        raise ValueError("coupled-strategy search limits must be positive")
+    canonical_target = canonical_smiles(target_smiles)
+    if canonical_target is None or "." in canonical_target:
+        raise ValueError("target must be one valid molecule")
+    definitions = tuple(sorted(strategies, key=lambda item: item.strategy_id))
+    operator_ids = {item.operator_id for item in library.operators}
+    levels = ("L2", "L1", "L0") if include_l0 else ("L2", "L1")
+
+    def query(
+        target: str,
+        *,
+        restricted_operator_ids: Sequence[str] = (),
+    ) -> tuple[tuple[GenericDisconnectionCandidate, ...], GenericSearchDiagnostics]:
+        return searcher(
+            target,
+            library,
+            operator_ids=restricted_operator_ids,
+            levels=levels,
+            top_k=top_k,
+            max_templates_to_apply=max_templates_to_apply,
+            max_candidates_to_validate=max_candidates_to_validate,
+            use_context=use_context,
+        )
+
+    capability_gaps = 0
+    capable = 0
+    second_attempts = 0
+    first_attempts = 0
+    first_cache: dict[
+        tuple[str, str],
+        tuple[tuple[GenericDisconnectionCandidate, ...], GenericSearchDiagnostics],
+    ] = {}
+    generated: list[tuple[PromotedV1OperatorPair, PromotedTwoStepAction]] = []
+    for strategy in definitions:
+        if (
+            strategy.first_operator_id not in operator_ids
+            or strategy.second_operator_id not in operator_ids
+        ):
+            capability_gaps += 1
+            continue
+        capable += 1
+        second_candidates, second_diagnostics = query(
+            canonical_target,
+            restricted_operator_ids=(strategy.second_operator_id,),
+        )
+        second_attempts += second_diagnostics.validation_attempt_count
+        for second in second_candidates:
+            for intermediate in _components(second.precursor_smiles):
+                cache_key = (intermediate, strategy.first_operator_id)
+                cached = first_cache.get(cache_key)
+                if cached is None:
+                    cached = query(
+                        intermediate,
+                        restricted_operator_ids=(strategy.first_operator_id,),
+                    )
+                    first_cache[cache_key] = cached
+                    first_attempts += cached[1].validation_attempt_count
+                for first in cached[0]:
+                    terminal = _merge_terminal_precursors(
+                        first.precursor_smiles,
+                        second.precursor_smiles,
+                        intermediate,
+                    )
+                    if terminal is None:
+                        continue
+                    support = min(
+                        1.0,
+                        math.log1p(len(strategy.training_patent_ids)) / math.log(11),
+                    )
+                    generated.append(
+                        (
+                            strategy,
+                            PromotedTwoStepAction(
+                                strategy_id=strategy.strategy_id,
+                                intermediate_smiles=intermediate,
+                                terminal_precursor_smiles=terminal,
+                                first_operator_id=first.operator_id,
+                                second_operator_id=second.operator_id,
+                                first_reaction_smiles=(first.proposed_reaction_smiles),
+                                second_reaction_smiles=(
+                                    second.proposed_reaction_smiles
+                                ),
+                                first_forward_validation_status=(
+                                    first.forward_validation_status
+                                ),
+                                second_forward_validation_status=(
+                                    second.forward_validation_status
+                                ),
+                                score=round(
+                                    0.45 * first.score
+                                    + 0.45 * second.score
+                                    + 0.10 * support,
+                                    8,
+                                ),
+                            ),
+                        )
+                    )
+
+    unique: dict[
+        tuple[str, str, str, str],
+        tuple[PromotedV1OperatorPair, PromotedTwoStepAction],
+    ] = {}
+    for strategy, action in generated:
+        key = (
+            action.first_operator_id,
+            action.second_operator_id,
+            action.intermediate_smiles,
+            action.terminal_precursor_smiles,
+        )
+        current = unique.get(key)
+        if current is None or (
+            -action.score,
+            strategy.strategy_id,
+        ) < (
+            -current[1].score,
+            current[0].strategy_id,
+        ):
+            unique[key] = (strategy, action)
+    all_ranked = sorted(
+        unique.values(),
+        key=lambda item: (
+            -item[1].score,
+            item[1].intermediate_smiles,
+            item[1].terminal_precursor_smiles,
+            item[0].strategy_id,
+        ),
+    )
+    first_per_strategy = []
+    repeated_strategy_actions = []
+    selected_strategy_ids = set()
+    for item in all_ranked:
+        strategy_id = item[0].strategy_id
+        if strategy_id in selected_strategy_ids:
+            repeated_strategy_actions.append(item)
+        else:
+            selected_strategy_ids.add(strategy_id)
+            first_per_strategy.append(item)
+    ranked = (first_per_strategy + repeated_strategy_actions)[:top_k]
+    actions = tuple(
+        PromotedTwoStepQueryAction(
+            rank=rank,
+            strategy_id=strategy.strategy_id,
+            relationship_class=strategy.relationship_class,
+            intermediate_smiles=action.intermediate_smiles,
+            terminal_precursor_smiles=action.terminal_precursor_smiles,
+            first_operator_id=action.first_operator_id,
+            second_operator_id=action.second_operator_id,
+            first_reaction_smiles=action.first_reaction_smiles,
+            second_reaction_smiles=action.second_reaction_smiles,
+            first_forward_validation_status=(action.first_forward_validation_status),
+            second_forward_validation_status=(action.second_forward_validation_status),
+            training_patent_count=len(strategy.training_patent_ids),
+            training_occurrence_count=strategy.training_occurrence_count,
+            v2_dependency_counts=strategy.v2_dependency_counts,
+            score=action.score,
+        )
+        for rank, (strategy, action) in enumerate(ranked, 1)
+    )
+
+    fallback_attempts = 0
+    fallback_values: tuple[dict[str, Any], ...] = ()
+    if include_one_step_fallbacks:
+        fallbacks, diagnostics = query(canonical_target)
+        fallback_attempts = diagnostics.validation_attempt_count
+        fallback_values = tuple(
+            {"rank": rank, **item.to_dict()} for rank, item in enumerate(fallbacks, 1)
+        )
+    warnings = (
+        "EXPERIMENTAL_PROMOTED_V1_OPERATOR_PAIRS",
+        "TWO_PHYSICAL_STEPS_REQUIRE_CHEMIST_REVIEW",
+        "STRATEGY_PAIR_DIVERSITY_APPLIED_BEFORE_REALIZATION_VARIANTS",
+    )
+    return CoupledStrategyQueryResult(
+        target_smiles=canonical_target,
+        actions=actions,
+        one_step_fallbacks=fallback_values,
+        diagnostics=CoupledStrategyQueryDiagnostics(
+            strategy_count=len(definitions),
+            capable_strategy_count=capable,
+            capability_gap_count=capability_gaps,
+            second_step_validation_attempt_count=second_attempts,
+            first_step_validation_attempt_count=first_attempts,
+            fallback_validation_attempt_count=fallback_attempts,
+            generated_action_count=len(unique),
+            returned_action_count=len(actions),
+            returned_fallback_count=len(fallback_values),
+        ),
+        warnings=warnings,
+    )
+
+
 def evaluate_v1_case(
     case: CoupledStrategyEvaluationCase,
     strategy: PromotedV1OperatorPair,
@@ -674,9 +958,7 @@ def evaluate_v1_case(
     baseline_top, baseline_diagnostics = _search(
         searcher, case.target_smiles, library, resolved
     )
-    baseline_top, count = _without_heldout_precedents(
-        baseline_top, case.patent_id
-    )
+    baseline_top, count = _without_heldout_precedents(baseline_top, case.patent_id)
     excluded += count
     baseline_intermediate_rank = next(
         (
@@ -708,20 +990,13 @@ def evaluate_v1_case(
                         (
                             first.operator_id == strategy.first_operator_id
                             and second.operator_id == strategy.second_operator_id
-                            and intermediate
-                            == case.expected_intermediate_smiles
+                            and intermediate == case.expected_intermediate_smiles
                         ),
                     )
                 )
-    baseline_depth_two_paths.sort(
-        key=lambda item: (-item[0], item[1], item[2])
-    )
+    baseline_depth_two_paths.sort(key=lambda item: (-item[0], item[1], item[2]))
     baseline_pair_rank = next(
-        (
-            rank
-            for rank, item in enumerate(baseline_depth_two_paths, 1)
-            if item[3]
-        ),
+        (rank for rank, item in enumerate(baseline_depth_two_paths, 1) if item[3]),
         None,
     )
 
@@ -780,9 +1055,7 @@ def evaluate_v1_case(
                             second.forward_validation_status
                         ),
                         score=round(
-                            0.45 * first.score
-                            + 0.45 * second.score
-                            + 0.10 * support,
+                            0.45 * first.score + 0.45 * second.score + 0.10 * support,
                             8,
                         ),
                     )
@@ -819,9 +1092,7 @@ def evaluate_v1_case(
         baseline_intermediate_rank=baseline_intermediate_rank,
         baseline_operator_pair_rank=baseline_pair_rank,
         promoted_operator_pair_rank=promoted_rank,
-        baseline_top_level_candidates=tuple(
-            item.to_dict() for item in baseline_top
-        ),
+        baseline_top_level_candidates=tuple(item.to_dict() for item in baseline_top),
         promoted_actions=ranked_actions,
         baseline_validation_attempt_count=baseline_attempts,
         promoted_validation_attempt_count=promoted_attempts,
@@ -869,8 +1140,12 @@ def run_v1_coupled_strategy_evaluation(
         )
         for case in cases
     )
-    baseline_hits = sum(item.baseline_operator_pair_rank is not None for item in results)
-    promoted_hits = sum(item.promoted_operator_pair_rank is not None for item in results)
+    baseline_hits = sum(
+        item.baseline_operator_pair_rank is not None for item in results
+    )
+    promoted_hits = sum(
+        item.promoted_operator_pair_rank is not None for item in results
+    )
     return {
         "artifact_type": "v1_coupled_strategy_heldout_evaluation",
         "schema_version": COUPLED_STRATEGY_EVALUATION_SCHEMA_VERSION,
@@ -895,9 +1170,7 @@ def run_v1_coupled_strategy_evaluation(
             str(operator_library_source) if operator_library_source else None
         ),
         "operator_library_sha256": (
-            _sha256(Path(operator_library_source))
-            if operator_library_source
-            else None
+            _sha256(Path(operator_library_source)) if operator_library_source else None
         ),
         "panel_case_count": len(cases),
         "strategy_count": len(definitions),
@@ -905,12 +1178,8 @@ def run_v1_coupled_strategy_evaluation(
             sorted(Counter(item.relationship_class for item in cases).items())
         ),
         "metrics": {
-            "baseline_pair_recall": (
-                baseline_hits / len(results) if results else 0.0
-            ),
-            "promoted_pair_recall": (
-                promoted_hits / len(results) if results else 0.0
-            ),
+            "baseline_pair_recall": (baseline_hits / len(results) if results else 0.0),
+            "promoted_pair_recall": (promoted_hits / len(results) if results else 0.0),
             "baseline_pair_hit_count": baseline_hits,
             "promoted_pair_hit_count": promoted_hits,
             "baseline_validation_attempt_count": sum(
@@ -956,14 +1225,18 @@ __all__ = [
     "CoupledStrategyCaseResult",
     "CoupledStrategyEvaluationCase",
     "CoupledStrategyEvaluationConfig",
+    "CoupledStrategyQueryDiagnostics",
+    "CoupledStrategyQueryResult",
     "FrozenV1HeldoutPanel",
     "PromotedTwoStepAction",
+    "PromotedTwoStepQueryAction",
     "PromotedV1OperatorPair",
     "build_frozen_v1_heldout_panel",
     "build_v1_heldout_panel",
     "evaluate_v1_case",
     "load_frozen_v1_heldout_panel",
     "run_v1_coupled_strategy_evaluation",
+    "search_promoted_v1_strategies",
     "write_frozen_v1_heldout_panel",
     "write_v1_coupled_strategy_evaluation",
 ]

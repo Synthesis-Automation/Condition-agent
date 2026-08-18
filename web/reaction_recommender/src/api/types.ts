@@ -19,6 +19,10 @@ export interface Capabilities {
   retrosynthesis?: boolean
   forward_synthesis?: boolean
   multistep_retrosynthesis?: boolean
+  coupled_strategy_retrosynthesis?: boolean
+  coupled_strategy_catalog_size?: number
+  coupled_strategy_library_name?: string
+  coupled_strategy_panel_name?: string
   literature_molecule_index_available?: boolean
   literature_molecule_index_name?: string
   stock_portfolio_available?: boolean
@@ -437,6 +441,81 @@ export interface RetrosynthesisRequest {
   diversify: boolean
   use_precursor_realism: boolean
   use_forward_validation: boolean
+}
+
+export interface CoupledStrategyRetrosynthesisRequest {
+  target_smiles: string
+  top_k: number
+  include_l0: boolean
+  use_context: boolean
+  include_one_step_fallbacks: boolean
+}
+
+export interface CoupledStrategyAction {
+  rank: number
+  strategy_id: string
+  relationship_class: string
+  intermediate_smiles: string
+  terminal_precursor_smiles: string
+  first_operator_id: string
+  second_operator_id: string
+  first_reaction_smiles: string
+  second_reaction_smiles: string
+  first_forward_validation_status: string
+  second_forward_validation_status: string
+  training_patent_count: number
+  training_occurrence_count: number
+  v2_dependency_counts: Record<string, number>
+  score: number
+}
+
+export interface CoupledStrategyOneStepFallback {
+  rank: number
+  target_smiles: string
+  precursor_smiles: string
+  proposed_reaction_smiles: string
+  operator_id: string
+  abstraction_level: string
+  score: number
+  independent_reference_support: number
+  forward_validation_status: string
+}
+
+export interface CoupledStrategyDiagnostics {
+  strategy_count: number
+  capable_strategy_count: number
+  capability_gap_count: number
+  second_step_validation_attempt_count: number
+  first_step_validation_attempt_count: number
+  fallback_validation_attempt_count: number
+  generated_action_count: number
+  returned_action_count: number
+  returned_fallback_count: number
+}
+
+export interface CoupledStrategyRetrosynthesisResult {
+  artifact_type: 'v1_coupled_strategy_target_query'
+  schema_version: string
+  algorithm_version: string
+  target_smiles: string
+  valid: boolean
+  error?: string | null
+  experimental: true
+  panel_id: string
+  strategy_catalog_size: number
+  library_operator_count: number
+  library_template_count: number
+  library_name: string
+  search_elapsed_seconds: number
+  actions: CoupledStrategyAction[]
+  one_step_fallbacks: CoupledStrategyOneStepFallback[]
+  diagnostics: CoupledStrategyDiagnostics
+  warnings: string[]
+  search_budget: {
+    top_k: number
+    max_templates_to_apply: number
+    max_candidates_to_validate: number
+  }
 }
 
 export interface ForwardSynthesisRequest {

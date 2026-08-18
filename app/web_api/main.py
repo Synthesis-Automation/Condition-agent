@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .contracts import (
     API_SCHEMA_VERSION,
+    CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -31,9 +32,7 @@ from .runtime import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_FRONTEND_DIST = (
-    PROJECT_ROOT / "web" / "reaction_recommender" / "dist"
-)
+DEFAULT_FRONTEND_DIST = PROJECT_ROOT / "web" / "reaction_recommender" / "dist"
 
 
 def create_app(
@@ -74,9 +73,7 @@ def create_app(
 
     @app.get("/api/v1/ranking-profiles")
     def ranking_profiles(request: Request) -> dict[str, Any]:
-        return envelope(
-            {"profiles": list(active_runtime(request).ranking_profiles())}
-        )
+        return envelope({"profiles": list(active_runtime(request).ranking_profiles())})
 
     @app.post("/api/v1/reactions/prepare")
     def prepare_reaction(
@@ -84,9 +81,7 @@ def create_app(
         request: Request,
     ) -> dict[str, Any]:
         try:
-            data = active_runtime(request).prepare_reaction(
-                payload.reaction_smiles
-            )
+            data = active_runtime(request).prepare_reaction(payload.reaction_smiles)
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
         return envelope(data)
@@ -174,6 +169,21 @@ def create_app(
     ) -> dict[str, Any]:
         try:
             data = active_runtime(request).multistep_retrosynthesize(payload)
+        except (ValueError, FileNotFoundError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(
+                status_code=status,
+                detail=error_payload(exc),
+            ) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/retrosynthesis/coupled-strategies")
+    def coupled_strategy_retrosynthesize(
+        payload: CoupledStrategyRetrosynthesisRequest,
+        request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).coupled_strategy_retrosynthesize(payload)
         except (ValueError, FileNotFoundError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(

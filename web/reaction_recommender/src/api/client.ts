@@ -1,6 +1,8 @@
 import type {
   ApiEnvelope,
   Capabilities,
+  CoupledStrategyRetrosynthesisRequest,
+  CoupledStrategyRetrosynthesisResult,
   FeatureAnalysisRequest,
   FeatureAnalysisResult,
   ForwardSynthesisRequest,
@@ -97,6 +99,11 @@ export const api = {
 
   multistepRetrosynthesize: (request: MultistepRetrosynthesisRequest) =>
     jsonRequest<MultistepRetrosynthesisResult>('/retrosynthesis/routes', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+  coupledStrategyRetrosynthesize: (request: CoupledStrategyRetrosynthesisRequest) =>
+    jsonRequest<CoupledStrategyRetrosynthesisResult>('/retrosynthesis/coupled-strategies', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
