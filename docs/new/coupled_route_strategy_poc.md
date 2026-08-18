@@ -133,7 +133,60 @@ python -m core_retrosynthesis mine-coupled-route-strategies `
   --include-reaction-pair 21308_0,21309_0
 ```
 
-## Evaluation gate
+## Exact retrosynthesis replay POC
+
+`core_retrosynthesis.coupled_strategy_search` provides the first executable
+comparison contract. It is intentionally an exact-target replay rather than a
+generalized composite template:
+
+1. match the query to an observed final product;
+2. apply the selected v1 or v2 admission policy;
+3. require the first reaction's product to equal the declared intermediate;
+4. require that exact intermediate among the second reaction's reactants;
+5. require the second product to equal the query target; and
+6. return one logical action while retaining both physical reactions in forward
+   and retrosynthetic order.
+
+The policies differ only in admission:
+
+| Policy | Admitted evidence |
+| --- | --- |
+| v1 | `handle_progression` and `same_site_coupled` relationships |
+| v2 | strict `created_handle_consumed`, `activation_then_conversion`, and `continued_site_transformation` dependencies |
+
+Deterministic simple-example tests cover nitration-reduction,
+activation-substitution, temporary-group removal, independent-site reactions,
+and a broken intermediate chain. Both policies recover the first two useful
+sequences. V1 admits the temporary-group replay; v2 suppresses it. Both reject
+the independent-site pair, and chain validation rejects a mismatched
+intermediate after policy admission.
+
+The real `US04011323` aryl-amine example was replayed from the 70-pair report.
+Both policies return one action, while v2 reports
+`created_handle_consumed`, the nitro intermediate, and two independently
+visible physical steps. The paired result is:
+
+```text
+results/core_retrosynthesis/coupled_route_strategy/
+  coupled_strategy_replay_aryl_amine.v1.json
+```
+
+It can be reproduced with:
+
+```powershell
+python -m core_retrosynthesis replay-coupled-route-strategies `
+  results/core_retrosynthesis/coupled_route_strategy/coupled_route_strategy_poc.v2.json `
+  "COC(=O)c1cc2c(cc1N)OCCO2" `
+  results/core_retrosynthesis/coupled_route_strategy/coupled_strategy_replay_aryl_amine.v1.json
+```
+
+This validates action admission, chain identity, expansion, provenance, and
+serialization. It does not yet measure transfer to a new scaffold or free
+target-to-stock search. That next stage requires compiling reviewed recurring
+strategies into generalized two-step operators and validating both constituent
+applications on the new target.
+
+## Promotion gate
 
 The first decision metric is chemist-reviewed precision among strict pairs.
 Report precision separately for `handle_progression` and `same_site_coupled`,

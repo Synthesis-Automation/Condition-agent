@@ -19,7 +19,14 @@ from .coupled_route_strategy import (
     mine_coupled_route_strategy_poc,
     write_coupled_route_strategy_report,
 )
-from .coupled_route_strategy_review import write_coupled_route_strategy_html
+from .coupled_route_strategy_review import (
+    load_coupled_route_strategy_report,
+    write_coupled_route_strategy_html,
+)
+from .coupled_strategy_search import (
+    compare_coupled_strategy_policies,
+    write_coupled_strategy_policy_comparison,
+)
 from .diverse_benchmark import (
     load_diverse_rows,
     load_stress_rows,
@@ -637,6 +644,15 @@ def _parser() -> argparse.ArgumentParser:
         "--title", default="Coupled two-step strategy review"
     )
 
+    coupled_replay = commands.add_parser(
+        "replay-coupled-route-strategies",
+        help="compare v1/v2 exact two-step strategy replay for one target",
+    )
+    coupled_replay.add_argument("source_report")
+    coupled_replay.add_argument("target_smiles")
+    coupled_replay.add_argument("output_json")
+    coupled_replay.add_argument("--top-k", type=int, default=10)
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -901,6 +917,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 {**json_summary, **html_summary}, indent=2, sort_keys=True
             )
         )
+        return 0
+    if arguments.command == "replay-coupled-route-strategies":
+        report = load_coupled_route_strategy_report(arguments.source_report)
+        comparison = compare_coupled_strategy_policies(
+            arguments.target_smiles,
+            report,
+            top_k=arguments.top_k,
+        )
+        summary = write_coupled_strategy_policy_comparison(
+            comparison, arguments.output_json
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
     source = (
         resolve_library_mode(arguments.source, arguments.library_mode)
