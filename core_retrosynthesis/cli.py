@@ -584,6 +584,8 @@ def _parser() -> argparse.ArgumentParser:
     )
     precedent_expansion.add_argument("definition")
     precedent_expansion.add_argument("output_json")
+    precedent_expansion.add_argument("--stock-index")
+    precedent_expansion.add_argument("--route-core-source")
 
     report = commands.add_parser(
         "render-report",
@@ -806,6 +808,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         report = run_precedent_route_expansion_poc(
             arguments.definition,
             output_path=arguments.output_json,
+            stock_index_path=arguments.stock_index,
+            route_core_source=arguments.route_core_source,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0

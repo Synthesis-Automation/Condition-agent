@@ -34,13 +34,42 @@ preserved, and the reverse operator recovers the proposed inputs.
 1. validates the declared linear two-step route;
 2. compiles each observed reaction into L2 and L1 generic operators;
 3. admits only source-forward-round-tripped operators;
-4. enumerates the first-step input sets allowed at each level;
-5. propagates every validated intermediate into the second step;
-6. enumerates the second-step partners allowed at that level; and
-7. retains complete operator, input, intermediate, product, validation, level,
+4. verifies observed segment IDs and unique lineage against the source route-core
+   artifact;
+5. verifies every curated substitute by exact identity against the supplier-stock
+   snapshot;
+6. enumerates the first-step input sets allowed at each level;
+7. propagates every validated intermediate into the second step;
+8. enumerates the second-step partners allowed at that level; and
+9. retains complete operator, input, intermediate, product, validation, level,
    and source-reference provenance for every pathway.
 
-The bounded panel is versioned in
+### Observed-route panel
+
+The primary evidence panel is versioned in
+`core_retrosynthesis/definitions/two_step_observed_route_expansion_poc.v1.json`.
+It contains three adjacent, uniquely linked, chemistry-resolved segments from the
+5,000-route patent corpus:
+
+- `US09238655B2_37209`: directed aryl addition followed by alcohol oxidation;
+- `US06673800B2_537307`: nitrone cycloaddition followed by alcohol oxidation;
+  and
+- `US07612113B2_830855`: ring reduction followed by urea formation.
+
+The runner verifies the declared patent, route tree, route core, step reactions,
+source reaction IDs, and lineage link against
+`routes.poc.core.v1.jsonl.gz`. The verified source SHA-256 is
+`7396640f621c27666b8ac4dd065b3d51f0c6c7ddaa709224bdf646cd72ee7f51`.
+
+All substituted inputs are exact matches in the local Mcule In Stock snapshot
+dated 2026-08-02. The report retains supplier, collection, snapshot date,
+availability, evidence level, region, and supplier record ID. A generated path
+is rejected unless all declared structural components participate; this excludes
+self-reaction and ignored-component artifacts.
+
+### Synthetic regression panel
+
+The original graph-smoke panel remains versioned in
 `core_retrosynthesis/definitions/two_step_precedent_route_expansion_poc.v1.json`.
 It contains N-, O-, and S-linked routes:
 
@@ -48,22 +77,24 @@ It contains N-, O-, and S-linked routes:
 - alkylation followed by alcohol acylation; and
 - thiol formation followed by thioether alkylation.
 
-These are intentionally small graph-chemistry probes, not literature-backed
-scope claims. The `POC:` references make that evidence boundary explicit.
+These are intentionally small graph-chemistry regression probes. Their `POC:`
+references make that evidence boundary explicit; they are no longer the primary
+evidence panel.
 
 ## Result
 
-All three routes replayed their exact intermediate and final target at R0.
+All three observed segments replayed their exact intermediate and final product
+at R0.
 
 | Route | R0 products | R1 cumulative products | R2 cumulative products |
 | --- | ---: | ---: | ---: |
-| Amine acylation | 1 | 9 | 20 |
-| Alcohol acylation | 1 | 9 | 20 |
-| Thiol alkylation | 1 | 6 | 15 |
-| **Total** | **3** | **24** | **55** |
+| Aryl addition → oxidation | 1 | 7 | 16 |
+| Nitrone cycloaddition → oxidation | 1 | 3 | 5 |
+| Ring reduction → urea formation | 1 | 6 | 12 |
+| **Total** | **3** | **16** | **33** |
 
 The deterministic report is
-`results/core_retrosynthesis/precedent_route_expansion/two_step_poc.v1.json`.
+`results/core_retrosynthesis/precedent_route_expansion/two_step_observed_poc.v1.json`.
 Each pathway records both steps' operator IDs, directional operator IDs,
 abstraction levels, reverse-round-trip results, edit-agreement results, and any
 warnings.
@@ -72,19 +103,22 @@ Run it with:
 
 ```powershell
 python -m core_retrosynthesis expand-precedent-routes `
-  core_retrosynthesis/definitions/two_step_precedent_route_expansion_poc.v1.json `
-  results/core_retrosynthesis/precedent_route_expansion/two_step_poc.v1.json
+  core_retrosynthesis/definitions/two_step_observed_route_expansion_poc.v1.json `
+  results/core_retrosynthesis/precedent_route_expansion/two_step_observed_poc.v1.json `
+  --stock-index cas_tools/data/stock_portfolio.sqlite `
+  --route-core-source datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.core.v1.jsonl.gz
 ```
 
 ## Evidence boundary and next gate
 
-This POC establishes deterministic route-conditioned enumeration. It does not
-yet establish experimental viability, condition transfer, yield, selectivity,
-building-block availability, or useful drug-like coverage.
+This iteration establishes deterministic route-conditioned enumeration from
+source-verified patent routes and stock-verified inputs. It does not establish
+experimental viability, condition transfer, yield, selectivity, or useful
+drug-like coverage. A patent-reported reaction is evidence for the exact R0
+route, not experimental evidence for its R1/R2 analogues.
 
-The next evidence gate should replace the synthetic panel with several clean,
-literature-backed two-step routes and a curated purchasable building-block set.
-For each level, report step attrition, incompatibility reasons, condition
-warnings, novelty, scaffold diversity, and chemist accept/question/reject review.
-R2 should remain visibly separate from precedent-local R1 results.
-
+The next gate is chemist review and condition-aware attrition. Render a
+stratified R1/R2 sample with both steps and source precedent side by side, attach
+condition-compatibility cautions, and record accept/question/reject decisions.
+After that review, scale to more route motifs selected without looking at their
+expansion outcomes.

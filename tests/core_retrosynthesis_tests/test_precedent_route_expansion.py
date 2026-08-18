@@ -15,6 +15,17 @@ from core_retrosynthesis.precedent_route_expansion import (
 )
 
 
+OBSERVED_DEFINITION = (
+    "core_retrosynthesis/definitions/"
+    "two_step_observed_route_expansion_poc.v1.json"
+)
+ROUTE_CORE_SOURCE = (
+    "datasets/external/higher_level_retrosynthesis/figshare_v2/curated/"
+    "routes.poc.core.v1.jsonl.gz"
+)
+STOCK_INDEX = "cas_tools/data/stock_portfolio.sqlite"
+
+
 @pytest.fixture(scope="module")
 def definition():
     return load_precedent_route_expansion_definition()
@@ -24,6 +35,15 @@ def definition():
 def amine_result(definition):
     return expand_two_step_precedent_route(
         definition.routes[0], definition_id=definition.definition_id
+    )
+
+
+@pytest.fixture(scope="module")
+def observed_report():
+    return run_precedent_route_expansion_poc(
+        OBSERVED_DEFINITION,
+        stock_index_path=STOCK_INDEX,
+        route_core_source=ROUTE_CORE_SOURCE,
     )
 
 
@@ -108,3 +128,56 @@ def test_panel_report_is_deterministic_and_serializable(
     assert first["route_count"] == 3
     assert first["exact_replay_count"] == 3
     assert first["level_product_counts"] == {"R0": 3, "R1": 24, "R2": 55}
+
+
+def test_observed_panel_is_source_verified_and_exact_at_r0(
+    observed_report,
+) -> None:
+    assert observed_report["source_validation"]["valid"]
+    assert observed_report["source_validation"]["validated_route_count"] == 3
+    assert observed_report["exact_replay_count"] == 3
+    assert observed_report["level_product_counts"] == {
+        "R0": 3,
+        "R1": 16,
+        "R2": 33,
+    }
+    for route in observed_report["routes"]:
+        assert route["source_route_id"]
+        assert route["patent_id"]
+        assert route["source_lineage_id"]
+        assert route["levels"][0]["product_smiles"] == [
+            route["target_smiles"]
+        ]
+        products = [set(level["product_smiles"]) for level in route["levels"]]
+        assert products[0] < products[1] < products[2]
+
+
+def test_observed_panel_uses_only_verified_stock_expansion_inputs(
+    observed_report,
+) -> None:
+    curated = [
+        evidence
+        for route in observed_report["routes"]
+        for level in route["levels"]
+        for evidence in level["input_evidence"]
+        if evidence["source_kind"] == "curated_stock"
+    ]
+    assert curated
+    assert all(item["stock_evidence_complete"] is True for item in curated)
+    assert all(
+        component["available"] and component["source_records"]
+        for item in curated
+        for component in item["stock_components"]
+    )
+    aryl_route = observed_report["routes"][0]
+    assert "CC(=O)C(C)O" not in aryl_route["levels"][-1]["product_smiles"]
+
+
+def test_observed_panel_requires_stock_and_route_source_evidence() -> None:
+    with pytest.raises(ValueError, match="requires a stock index"):
+        run_precedent_route_expansion_poc(OBSERVED_DEFINITION)
+    with pytest.raises(ValueError, match="require their route-core source"):
+        run_precedent_route_expansion_poc(
+            OBSERVED_DEFINITION,
+            stock_index_path=STOCK_INDEX,
+        )

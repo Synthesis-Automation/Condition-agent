@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.1",
+  "definition_id": "two_step_observed_route_expansion_poc.v1@1.0",
+  "description": "Three chemistry-resolved adjacent two-step segments from the patent-disjoint higher-level retrosynthesis corpus, expanded only with exact supplier-stock-verified building blocks.",
+  "routes": [
+    {
+      "route_id": "observed_aryl_addition_oxidation",
+      "reference_id": "PATENT:US09238655B2",
+      "source_dataset_id": "higher_level_retrosynthesis_figshare_v2",
+      "source_route_id": "US09238655B2_37209",
+      "patent_id": "US09238655B2",
+      "source_tree_id": "ROUTETREE2:bf2bff6c5f014403dfd6efefe40f41528ffff6c11ce66fff395b66f44dc8c4d2",
+      "source_route_core_id": "ROUTECORE1:c4382b832ac3ce37d635da26984a71fbd3d33550fd148a40f93a980f40587268",
+      "source_lineage_id": "ROUTELINEAGE1:1eace0eae3631315b4674a25d8b283335dbb8c29a2689f0474a4c84dd454f706",
+      "intermediate_smiles": "CC(O)c1cc(Br)ncc1F",
+      "target_smiles": "CC(=O)c1cc(Br)ncc1F",
+      "first_step": {
+        "step_id": "US09238655B2_37209:1718803_0",
+        "source_reaction_id": "1718803_0",
+        "reaction_smiles": "[Br:1][c:2]1[cH:3][cH:4][c:8]([F:9])[cH:10][n:11]1.[CH:5](=[O:6])[CH3:7]>>[Br:1][c:2]1[cH:3][c:4]([CH:5]([OH:6])[CH3:7])[c:8]([F:9])[cH:10][n:11]1",
+        "input_sets": [
+          {
+            "smiles": "CC=O.Fc1ccc(Br)nc1",
+            "minimum_level": "R0",
+            "source_kind": "observed",
+            "stock_components": ["CC=O", "Fc1ccc(Br)nc1"],
+            "label": "observed acetaldehyde and bromofluoropyridine"
+          },
+          {
+            "smiles": "CC=O.Brc1ccccn1",
+            "minimum_level": "R1",
+            "source_kind": "curated_stock",
+            "stock_components": ["CC=O", "Brc1ccccn1"],
+            "label": "stock bromopyridine positional analogue"
+          },
+          {
+            "smiles": "CC=O.COc1ccc(Br)nc1",
+            "minimum_level": "R1",
+            "source_kind": "curated_stock",
+            "stock_components": ["CC=O", "COc1ccc(Br)nc1"],
+            "label": "stock methoxy analogue"
+          },
+          {
+            "smiles": "CCC=O.Fc1ccc(Br)nc1",
+            "minimum_level": "R2",
+            "source_kind": "curated_stock",
+            "stock_components": ["CCC=O", "Fc1ccc(Br)nc1"],
+            "label": "stock propanal analogue"
+          },
+          {
+            "smiles": "O=Cc1ccccc1.Fc1ccc(Br)nc1",
+            "minimum_level": "R2",
+            "source_kind": "curated_stock",
+            "stock_components": ["O=Cc1ccccc1", "Fc1ccc(Br)nc1"],
+            "label": "stock benzaldehyde analogue"
+          }
+        ]
+      },
+      "second_step": {
+        "step_id": "US09238655B2_37209:1718804_0",
+        "source_reaction_id": "1718804_0",
+        "reaction_smiles": "[Br:1][c:2]1[cH:3][c:4]([CH:5]([OH:6])[CH3:7])[c:8]([F:9])[cH:10][n:11]1>>[Br:1][c:2]1[cH:3][c:4]([C:5](=[O:6])[CH3:7])[c:8]([F:9])[cH:10][n:11]1",
+        "partner_sets": [
+          {
+            "smiles": "",
+            "minimum_level": "R0",
+            "source_kind": "observed",
+            "label": "unimolecular oxidation substrate"
+          }
+        ]
+      }
+    },
+    {
+      "route_id": "observed_nitrone_cycloaddition_oxidation",
+      "reference_id": "PATENT:US06673800B2",
+      "source_dataset_id": "higher_level_retrosynthesis_figshare_v2",
+      "source_route_id": "US06673800B2_537307",
+      "patent_id": "US06673800B2",
+      "source_tree_id": "ROUTETREE2:39bb62a955c7a6db47c888a33cd5ce7926eeee85a9bea4fc9d9d75a9fe6585ff",
+      "source_route_core_id": "ROUTECORE1:fec83b60d5bb33f00c0e607a0eb367678f270b8ad618536faddd59093fac4388",
+      "source_lineage_id": "ROUTELINEAGE1:1bff7baf86131d418ccc636b47444e1c64560836635ef66f3dd413bdf27b9557",
+      "intermediate_smiles": "COc1ccc(C2=NOC(CCCO)C2)cc1OC",
+      "target_smiles": "COc1ccc(C2=NOC(CCC=O)C2)cc1OC",
+      "first_step": {
+        "step_id": "US06673800B2_537307:632413_0",
+        "source_reaction_id": "632413_0",
+        "reaction_smiles": "[CH3:1][O:2][c:3]1[cH:4][c:5]([CH:6]=[N:7][OH:8])[cH:15][cH:16][c:17]1[O:18][CH3:19].[CH:9]([CH2:10][CH2:11][CH2:12][OH:13])=[CH2:14]>>[CH3:1][O:2][c:3]1[cH:4][c:5]([C:6]2=[N:7][O:8][CH:9]([CH2:10][CH2:11][CH2:12][OH:13])[CH2:14]2)[cH:15][cH:16][c:17]1[O:18][CH3:19]",
+        "input_sets": [
+          {
+            "smiles": "C=CCCCO.COc1ccc(C=NO)cc1OC",
+            "minimum_level": "R0",
+            "source_kind": "observed",
+            "stock_components": ["C=CCCCO", "COc1ccc(C=NO)cc1OC"],
+            "label": "observed pentenol and aryl nitrone"
+          },
+          {
+            "smiles": "C=CCCO.COc1ccc(C=NO)cc1OC",
+            "minimum_level": "R1",
+            "source_kind": "curated_stock",
+            "stock_components": ["C=CCCO", "COc1ccc(C=NO)cc1OC"],
+            "label": "stock butenol homologue"
+          },
+          {
+            "smiles": "C=CCCCCO.COc1ccc(C=NO)cc1OC",
+            "minimum_level": "R1",
+            "source_kind": "curated_stock",
+            "stock_components": ["C=CCCCCO", "COc1ccc(C=NO)cc1OC"],
+            "label": "stock hexenol homologue"
+          },
+          {
+            "smiles": "C=CCCCCCO.COc1ccc(C=NO)cc1OC",
+            "minimum_level": "R2",
+            "source_kind": "curated_stock",
+            "stock_components": ["C=CCCCCCO", "COc1ccc(C=NO)cc1OC"],
+            "label": "stock heptenol homologue"
+          },
+          {
+            "smiles": "C=C(C)CCO.COc1ccc(C=NO)cc1OC",
+            "minimum_level": "R2",
+            "source_kind": "curated_stock",
+            "stock_components": ["C=C(C)CCO", "COc1ccc(C=NO)cc1OC"],
+            "label": "stock branched alkenol"
+          }
+        ]
+      },
+      "second_step": {
+        "step_id": "US06673800B2_537307:632414_0",
+        "source_reaction_id": "632414_0",
+        "reaction_smiles": "[CH3:1][O:2][c:3]1[cH:4][c:5]([C:6]2=[N:7][O:8][CH:9]([CH2:10][CH2:11][CH2:12][OH:13])[CH2:14]2)[cH:15][cH:16][c:17]1[O:18][CH3:19]>>[CH3:1][O:2][c:3]1[cH:4][c:5]([C:6]2=[N:7][O:8][CH:9]([CH2:10][CH2:11][CH:12]=[O:13])[CH2:14]2)[cH:15][cH:16][c:17]1[O:18][CH3:19]",
+        "partner_sets": [
+          {
+            "smiles": "",
+            "minimum_level": "R0",
+            "source_kind": "observed",
+            "label": "unimolecular oxidation substrate"
+          }
+        ]
+      }
+    },
+    {
+      "route_id": "observed_ring_reduction_urea_formation",
+      "reference_id": "PATENT:US07612113B2",
+      "source_dataset_id": "higher_level_retrosynthesis_figshare_v2",
+      "source_route_id": "US07612113B2_830855",
+      "patent_id": "US07612113B2",
+      "source_tree_id": "ROUTETREE2:dc2a4829dd5805a0dfd9378df7d2467a42ad82c76516f97d06de11ffd78bf28b",
+      "source_route_core_id": "ROUTECORE1:a30e80937eb56fc118ead6cf9a182dc8105c0db718854f34d93a6a93b3320b85",
+      "source_lineage_id": "ROUTELINEAGE1:e487b0eaff3fa3aa1e5fbfe31a2b5f092707fb47ff82b9ff9c0dfd8535d0d4b0",
+      "intermediate_smiles": "CCOC1=CCc2cccc(N)c2C1",
+      "target_smiles": "CCOC1=CCc2cccc(NC(=O)Nc3ccc(Cl)c(C(F)(F)F)c3)c2C1",
+      "first_step": {
+        "step_id": "US07612113B2_830855:935345_0",
+        "source_reaction_id": "935345_0",
+        "reaction_smiles": "[CH2:1]([O:2][c:3]1[cH:4][cH:5][c:6]2[c:7]([c:8]([NH2:9])[cH:10][cH:11][cH:12]2)[cH:13]1)[CH3:14]>>[CH2:1]([O:2][C:3]1=[CH:4][CH2:5][c:6]2[c:7]([c:8]([NH2:9])[cH:10][cH:11][cH:12]2)[CH2:13]1)[CH3:14]",
+        "input_sets": [
+          {
+            "smiles": "CCOc1ccc2cccc(N)c2c1",
+            "minimum_level": "R0",
+            "source_kind": "observed",
+            "label": "observed ethoxy aminonaphthalene"
+          },
+          {
+            "smiles": "COc1ccc2cccc(N)c2c1",
+            "minimum_level": "R1",
+            "source_kind": "curated_stock",
+            "stock_components": ["COc1ccc2cccc(N)c2c1"],
+            "label": "stock methoxy analogue"
+          },
+          {
+            "smiles": "Oc1ccc2cccc(N)c2c1",
+            "minimum_level": "R2",
+            "source_kind": "curated_stock",
+            "stock_components": ["Oc1ccc2cccc(N)c2c1"],
+            "label": "stock hydroxy analogue"
+          }
+        ]
+      },
+      "second_step": {
+        "step_id": "US07612113B2_830855:935351_0",
+        "source_reaction_id": "935351_0",
+        "reaction_smiles": "[C:10](=[N:11][c:12]1[cH:13][cH:14][c:15]([Cl:16])[c:17]([C:18]([F:19])([F:20])[F:21])[cH:22]1)=[O:23].[CH2:1]([O:2][C:3]1=[CH:4][CH2:5][c:6]2[c:7]([c:8]([NH2:9])[cH:24][cH:25][cH:26]2)[CH2:27]1)[CH3:28]>>[CH2:1]([O:2][C:3]1=[CH:4][CH2:5][c:6]2[c:7]([c:8]([NH:9][C:10]([NH:11][c:12]3[cH:13][cH:14][c:15]([Cl:16])[c:17]([C:18]([F:19])([F:20])[F:21])[cH:22]3)=[O:23])[cH:24][cH:25][cH:26]2)[CH2:27]1)[CH3:28]",
+        "partner_sets": [
+          {
+            "smiles": "O=C=Nc1ccc(Cl)c(C(F)(F)F)c1",
+            "minimum_level": "R0",
+            "source_kind": "observed",
+            "stock_components": ["O=C=Nc1ccc(Cl)c(C(F)(F)F)c1"],
+            "label": "observed aryl isocyanate"
+          },
+          {
+            "smiles": "O=C=Nc1ccccc1",
+            "minimum_level": "R1",
+            "source_kind": "curated_stock",
+            "stock_components": ["O=C=Nc1ccccc1"],
+            "label": "stock phenyl isocyanate"
+          },
+          {
+            "smiles": "O=C=Nc1ccc(F)cc1",
+            "minimum_level": "R1",
+            "source_kind": "curated_stock",
+            "stock_components": ["O=C=Nc1ccc(F)cc1"],
+            "label": "stock fluorophenyl isocyanate"
+          },
+          {
+            "smiles": "Cc1ccc(N=C=O)cc1",
+            "minimum_level": "R2",
+            "source_kind": "curated_stock",
+            "stock_components": ["Cc1ccc(N=C=O)cc1"],
+            "label": "stock tolyl isocyanate"
+          }
+        ]
+      }
+    }
+  ]
+}

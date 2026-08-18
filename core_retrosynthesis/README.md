@@ -1025,13 +1025,18 @@ cumulative ladder from exact replay (`R0`), through exact-context L2 expansion
 
 ```powershell
 python -m core_retrosynthesis expand-precedent-routes `
-  core_retrosynthesis/definitions/two_step_precedent_route_expansion_poc.v1.json `
-  results/core_retrosynthesis/precedent_route_expansion/two_step_poc.v1.json
+  core_retrosynthesis/definitions/two_step_observed_route_expansion_poc.v1.json `
+  results/core_retrosynthesis/precedent_route_expansion/two_step_observed_poc.v1.json `
+  --stock-index cas_tools/data/stock_portfolio.sqlite `
+  --route-core-source datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.core.v1.jsonl.gz
 ```
 
 Every retained pathway passes the existing forward product, reverse recovery,
-and operator-edit agreement checks. The initial N/O/S panel yields 3 exact R0,
-24 cumulative R1, and 55 cumulative R2 products. These are structural
-possibilities rather than experimental feasibility or yield predictions. See
+and operator-edit agreement checks. The primary panel contains three
+source-verified patent-route segments and exact supplier-stock-verified
+substitutes. It yields 3 exact R0, 16 cumulative R1, and 33 cumulative R2
+products. These are structural possibilities rather than experimental
+feasibility or yield predictions. The former N/O/S graph panel remains a fast
+regression fixture. See
 `docs/new/two_step_precedent_route_expansion_poc.md` for the design, result, and
 next evidence gate.
