@@ -67,6 +67,14 @@ class GenericReactionIdentity:
     synthon_signature: str
 
 
+@dataclass(frozen=True)
+class GenericOperatorIdentity:
+    """Stable operator identity derived from an observed mapped signature."""
+
+    operator_id: str
+    operator_signature: str
+
+
 @lru_cache(maxsize=20_000)
 def _materialized_analysis(reaction_smiles: str) -> tuple[Any, Any] | None:
     """Cache deterministic atom mapping and featurization across compilers."""
@@ -903,6 +911,35 @@ def build_generic_reaction_identity(
     )
 
 
+def generic_operator_identity_from_observation(
+    reaction_smiles: str,
+    observation: Dict[str, Any],
+) -> GenericOperatorIdentity | None:
+    """Return the OP1 identity already encoded by a mapped observation.
+
+    Route-core records already contain validated graph edits.  Reusing those
+    edits avoids remapping or reinterpreting the source reaction while keeping
+    operator identity identical to the generic-template compiler.
+    """
+
+    if reaction_smiles.count(">>") == 1:
+        _, product_smiles = reaction_smiles.split(">>", 1)
+    elif reaction_smiles.count(">") == 2:
+        _, _, product_smiles = reaction_smiles.split(">", 2)
+    else:
+        return None
+    product = Chem.MolFromSmiles(product_smiles)
+    if product is None:
+        return None
+    signature = _generic_operator_signature(observation, product)
+    if not signature:
+        return None
+    return GenericOperatorIdentity(
+        operator_id=digest("OP1", signature),
+        operator_signature=signature,
+    )
+
+
 def classify_reaction_with_site(reaction_smiles: str) -> tuple[str | None, str]:
     """Return optional named archetype and product disconnection-site key."""
 
@@ -920,6 +957,7 @@ def classify_reaction_smiles(reaction_smiles: str) -> str | None:
 
 __all__ = [
     "GenericCompilationResult",
+    "GenericOperatorIdentity",
     "GenericReactionIdentity",
     "SUPPORTED_TRANSFORMATIONS",
     "analyze_generic_reaction",
@@ -927,5 +965,6 @@ __all__ = [
     "classify_reaction_smiles",
     "classify_reaction_with_site",
     "compile_generic_templates",
+    "generic_operator_identity_from_observation",
     "generic_rejection_stage",
 ]

@@ -41,6 +41,24 @@ from .coupled_strategy_search import (
     search_coupled_strategy_replays,
     write_coupled_strategy_policy_comparison,
 )
+from .coupled_strategy_evaluation import (
+    COUPLED_STRATEGY_EVALUATION_ALGORITHM_VERSION,
+    COUPLED_STRATEGY_EVALUATION_SCHEMA_VERSION,
+    CoupledStrategyCaseResult,
+    CoupledStrategyEvaluationCase,
+    CoupledStrategyEvaluationConfig,
+    PromotedTwoStepAction,
+    PromotedV1OperatorPair,
+    build_v1_heldout_panel,
+    evaluate_v1_case,
+    run_v1_coupled_strategy_evaluation,
+    write_v1_coupled_strategy_evaluation,
+)
+from .coupled_strategy_evaluation_review import (
+    load_v1_coupled_strategy_evaluation,
+    render_v1_coupled_strategy_evaluation_html,
+    write_v1_coupled_strategy_evaluation_html,
+)
 from .ensemble import EnsembleCandidate, disconnect_ensemble
 from .coverage_audit import audit_operator_library_coverage
 from .full_scale import (
@@ -59,10 +77,12 @@ from .forward_assessment import (
 )
 from .generic_compiler import (
     GenericCompilationResult,
+    GenericOperatorIdentity,
     GenericReactionIdentity,
     analyze_generic_reaction,
     build_generic_reaction_identity,
     compile_generic_templates,
+    generic_operator_identity_from_observation,
 )
 from .generic_library import (
     build_generic_library,

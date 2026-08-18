@@ -27,6 +27,14 @@ from .coupled_strategy_search import (
     compare_coupled_strategy_policies,
     write_coupled_strategy_policy_comparison,
 )
+from .coupled_strategy_evaluation import (
+    CoupledStrategyEvaluationConfig,
+    run_v1_coupled_strategy_evaluation,
+    write_v1_coupled_strategy_evaluation,
+)
+from .coupled_strategy_evaluation_review import (
+    write_v1_coupled_strategy_evaluation_html,
+)
 from .diverse_benchmark import (
     load_diverse_rows,
     load_stress_rows,
@@ -653,6 +661,22 @@ def _parser() -> argparse.ArgumentParser:
     coupled_replay.add_argument("output_json")
     coupled_replay.add_argument("--top-k", type=int, default=10)
 
+    coupled_evaluation = commands.add_parser(
+        "evaluate-v1-coupled-strategies",
+        help="evaluate promoted v1 operator pairs on patent-held-out routes",
+    )
+    coupled_evaluation.add_argument("source_route_cores")
+    coupled_evaluation.add_argument("operator_library")
+    coupled_evaluation.add_argument("output_json")
+    coupled_evaluation.add_argument("output_html")
+    coupled_evaluation.add_argument("--panel-size", type=int, default=12)
+    coupled_evaluation.add_argument("--top-k", type=int, default=5)
+    coupled_evaluation.add_argument("--max-templates", type=int, default=80)
+    coupled_evaluation.add_argument(
+        "--max-candidates-to-validate", type=int, default=20
+    )
+    coupled_evaluation.add_argument("--seed", type=int, default=20260818)
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -929,6 +953,34 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             comparison, arguments.output_json
         )
         print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "evaluate-v1-coupled-strategies":
+        library = load_generic_library(arguments.operator_library)
+        report = run_v1_coupled_strategy_evaluation(
+            arguments.source_route_cores,
+            library,
+            operator_library_source=arguments.operator_library,
+            config=CoupledStrategyEvaluationConfig(
+                panel_size=arguments.panel_size,
+                top_k=arguments.top_k,
+                max_templates_to_apply=arguments.max_templates,
+                max_candidates_to_validate=(
+                    arguments.max_candidates_to_validate
+                ),
+                seed=arguments.seed,
+            ),
+        )
+        json_summary = write_v1_coupled_strategy_evaluation(
+            report, arguments.output_json
+        )
+        html_summary = write_v1_coupled_strategy_evaluation_html(
+            report, arguments.output_html
+        )
+        print(
+            json.dumps(
+                {**json_summary, **html_summary}, indent=2, sort_keys=True
+            )
+        )
         return 0
     source = (
         resolve_library_mode(arguments.source, arguments.library_mode)

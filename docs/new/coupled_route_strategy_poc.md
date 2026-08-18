@@ -205,3 +205,60 @@ A later executable composite action must additionally require:
 Protection/activation sequences at different sites remain outside this strict
 POC. They may be strategically related, but route adjacency alone cannot prove
 that causal relationship.
+
+## Held-out operator-pair evaluation
+
+The transferable POC now uses v1 as the promotion base. A logical action is
+identified by its v1 relationship plus the two generic `OP1` graph operators.
+V2 dependency classes are serialized as review metadata only; they neither
+admit nor reject an action.
+
+The deterministic panel builder requires at least two supporting training
+patents and selects validation/test occurrences from different patents. It
+also excludes exact targets seen in the supporting training routes, reports
+Murcko-scaffold overlap without using it as an admission rule, and requires
+both operators to exist in the reusable compact library. Candidate precedents
+matching the held-out patent are excluded. Every returned logical action
+retains and independently validates its two physical reactions.
+
+The first 12-case panel contains six `handle_progression` and six
+`same_site_coupled` examples. With the same top-3, 50-template, and
+12-validation-per-expansion budgets:
+
+| Metric | Ordinary depth-two | V1 pair-guided |
+| --- | ---: | ---: |
+| Observed operator-pair recovery | 2/12 (16.7%) | 10/12 (83.3%) |
+| Validation attempts | 852 | 466 |
+
+All 12 exact targets are absent from their strategy's supporting training
+routes; three have a training-route Murcko-scaffold match. No held-out patent
+precedent was found in the separate operator-library corpus. These results are
+evidence that pair guidance improves bounded search, not an estimate of broad
+prospective accuracy: the panel is small and was filtered to operator-library
+coverage.
+
+The earlier aryl nitration-reduction positive control remains a useful known
+coverage gap. The route relationship and exact replay are valid, and the
+reduction operator is present, but its nitration operator does not pass the
+current generic compiler/library gate. It must not be counted as a generalized
+macro success until that single-step coverage is added.
+
+Artifacts:
+
+```text
+results/core_retrosynthesis/coupled_strategy_evaluation/
+  v1_real_examples_poc.json
+  v1_real_examples_poc.html
+```
+
+Reproduction:
+
+```powershell
+python -m core_retrosynthesis evaluate-v1-coupled-strategies `
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.core.v1.jsonl.gz `
+  results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz `
+  results/core_retrosynthesis/coupled_strategy_evaluation/v1_real_examples_poc.json `
+  results/core_retrosynthesis/coupled_strategy_evaluation/v1_real_examples_poc.html `
+  --panel-size 12 --top-k 3 --max-templates 50 `
+  --max-candidates-to-validate 12
+```
