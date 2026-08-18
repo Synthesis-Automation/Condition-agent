@@ -15,6 +15,11 @@ from .baselines.cx_rdchiral import load_library as load_baseline_library
 
 from .comparison import run_comparison
 from .condition_ranking import rank_retrosynthesis_candidates_with_conditions
+from .coupled_route_strategy import (
+    mine_coupled_route_strategy_poc,
+    write_coupled_route_strategy_report,
+)
+from .coupled_route_strategy_review import write_coupled_route_strategy_html
 from .diverse_benchmark import (
     load_diverse_rows,
     load_stress_rows,
@@ -150,6 +155,15 @@ def _add_library_mode_argument(command: argparse.ArgumentParser) -> None:
             "compact/ directories (default: full)"
         ),
     )
+
+
+def _source_reaction_pair(value: str) -> tuple[str, str]:
+    first, separator, second = value.partition(",")
+    if not separator or not first.strip() or not second.strip():
+        raise argparse.ArgumentTypeError(
+            "reaction pair must be FIRST_SOURCE_ID,SECOND_SOURCE_ID"
+        )
+    return first.strip(), second.strip()
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -600,6 +614,29 @@ def _parser() -> argparse.ArgumentParser:
         "--title", default="Two-step precedent-route product review"
     )
 
+    coupled_strategy = commands.add_parser(
+        "mine-coupled-route-strategies",
+        help="mine lineage-coupled two-step strategies and render a review",
+    )
+    coupled_strategy.add_argument("source_route_cores")
+    coupled_strategy.add_argument("output_json")
+    coupled_strategy.add_argument("output_html")
+    coupled_strategy.add_argument("--strict-sample-size", type=int, default=30)
+    coupled_strategy.add_argument("--review-sample-size", type=int, default=20)
+    coupled_strategy.add_argument("--rejected-sample-size", type=int, default=20)
+    coupled_strategy.add_argument("--seed", type=int, default=20260818)
+    coupled_strategy.add_argument("--include-route", action="append")
+    coupled_strategy.add_argument(
+        "--include-reaction-pair",
+        action="append",
+        type=_source_reaction_pair,
+        help="required FIRST_ID,SECOND_ID positive-control pair",
+    )
+    coupled_strategy.add_argument("--max-routes", type=int)
+    coupled_strategy.add_argument(
+        "--title", default="Coupled two-step strategy review"
+    )
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -833,6 +870,37 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             title=arguments.title,
         )
         print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "mine-coupled-route-strategies":
+        report = mine_coupled_route_strategy_poc(
+            arguments.source_route_cores,
+            strict_sample_size=arguments.strict_sample_size,
+            review_sample_size=arguments.review_sample_size,
+            rejected_sample_size=arguments.rejected_sample_size,
+            seed=arguments.seed,
+            required_route_ids=(
+                tuple(arguments.include_route)
+                if arguments.include_route
+                else ()
+            ),
+            required_reaction_pairs=(
+                tuple(arguments.include_reaction_pair)
+                if arguments.include_reaction_pair
+                else (("21308_0", "21309_0"),)
+            ),
+            max_routes=arguments.max_routes,
+        )
+        json_summary = write_coupled_route_strategy_report(
+            report, arguments.output_json
+        )
+        html_summary = write_coupled_route_strategy_html(
+            report, arguments.output_html, title=arguments.title
+        )
+        print(
+            json.dumps(
+                {**json_summary, **html_summary}, indent=2, sort_keys=True
+            )
+        )
         return 0
     source = (
         resolve_library_mode(arguments.source, arguments.library_mode)

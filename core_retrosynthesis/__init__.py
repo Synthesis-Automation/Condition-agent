@@ -8,6 +8,23 @@ from .condition_ranking import (
     recommend_retrosynthesis_conditions,
 )
 from .comparison import run_comparison, split_by_reference
+from .coupled_route_strategy import (
+    ADMISSION_CLASSES,
+    COUPLED_ROUTE_STRATEGY_ALGORITHM_VERSION,
+    COUPLED_ROUTE_STRATEGY_REVIEW_VERSION,
+    COUPLED_ROUTE_STRATEGY_SCHEMA_VERSION,
+    RELATIONSHIP_CLASSES,
+    CoupledRouteStrategyOccurrence,
+    CouplingEvidence,
+    extract_coupled_route_strategies,
+    mine_coupled_route_strategy_poc,
+    write_coupled_route_strategy_report,
+)
+from .coupled_route_strategy_review import (
+    load_coupled_route_strategy_report,
+    render_coupled_route_strategy_html,
+    write_coupled_route_strategy_html,
+)
 from .ensemble import EnsembleCandidate, disconnect_ensemble
 from .coverage_audit import audit_operator_library_coverage
 from .full_scale import (
@@ -298,11 +315,15 @@ from .sources import (
 )
 
 __all__ = [
+    "ADMISSION_CLASSES",
     "CenterReactivityContext",
     "CompilationResult",
     "ChoiceModelTrainingReport",
     "ConditionalEditChoiceModel",
     "ConditionRankedRetrosynthesisCandidate",
+    "COUPLED_ROUTE_STRATEGY_ALGORITHM_VERSION",
+    "COUPLED_ROUTE_STRATEGY_REVIEW_VERSION",
+    "COUPLED_ROUTE_STRATEGY_SCHEMA_VERSION",
     "CompletionPriorEvidence",
     "CompletionPriorIndex",
     "CoreDisconnectionCandidate",
@@ -310,6 +331,8 @@ __all__ = [
     "CoreTemplate",
     "CoreTemplateLibrary",
     "CoreTemplatePrecedent",
+    "CoupledRouteStrategyOccurrence",
+    "CouplingEvidence",
     "EnsembleCandidate",
     "FullScaleBuildConfig",
     "FunctionalGroupCompetitionOutcome",
@@ -401,6 +424,7 @@ __all__ = [
     "RouteQualityError",
     "RouteSubsetPolicy",
     "RankedReactionOutcome",
+    "RELATIONSHIP_CLASSES",
     "ReactionChoiceSet",
     "ReactionOutcomeCandidate",
     "RetrosynthesisConditionEvidence",
@@ -430,6 +454,7 @@ __all__ = [
     "condition_tokens_from_mapping",
     "condition_tokens_from_recipe",
     "disconnect_target",
+    "extract_coupled_route_strategies",
     "detect_functional_group_competition",
     "disconnect_ensemble",
     "disconnect_generic_target",
@@ -438,6 +463,7 @@ __all__ = [
     "disconnect_operator_ladder_detailed",
     "disconnect_strategies",
     "load_library",
+    "load_coupled_route_strategy_report",
     "load_generic_library",
     "load_hierarchical_ranking_policy",
     "load_operator_rows",
@@ -450,6 +476,7 @@ __all__ = [
     "load_multistep_panel_targets",
     "iter_library_rows",
     "merge_operator_shards",
+    "mine_coupled_route_strategy_poc",
     "plan_multistep_routes",
     "rank_retrosynthesis_candidates_with_conditions",
     "recommend_retrosynthesis_conditions",
@@ -509,6 +536,7 @@ __all__ = [
     "run_comparison",
     "run_operator_coverage_benchmark",
     "render_comparison_html",
+    "render_coupled_route_strategy_html",
     "resolve_library_mode",
     "validate_precursor_compatibility_policy",
     "DEFAULT_PRECEDENT_ROUTE_EXPANSION_DEFINITION",
@@ -536,4 +564,6 @@ __all__ = [
     "split_by_reference",
     "source_shard_files",
     "write_comparison_html",
+    "write_coupled_route_strategy_html",
+    "write_coupled_route_strategy_report",
 ]
