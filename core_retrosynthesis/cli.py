@@ -36,6 +36,7 @@ from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
 )
+from .precedent_route_expansion import run_precedent_route_expansion_poc
 from .route_curation import RouteSubsetPolicy, curate_route_subset
 from .route_conversion import (
     DEFAULT_OBSERVED_ROUTE_DATASET_ID,
@@ -577,6 +578,13 @@ def _parser() -> argparse.ArgumentParser:
     )
     route_policy_calibration.add_argument("--overwrite", action="store_true")
 
+    precedent_expansion = commands.add_parser(
+        "expand-precedent-routes",
+        help="enumerate nested chemical space from two-step precedent routes",
+    )
+    precedent_expansion.add_argument("definition")
+    precedent_expansion.add_argument("output_json")
+
     report = commands.add_parser(
         "render-report",
         help="render comparison JSON as a self-contained chemistry HTML review",
@@ -791,6 +799,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             source_replay=arguments.source_replay,
             input_model=arguments.input_model,
             overwrite=arguments.overwrite,
+        )
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if arguments.command == "expand-precedent-routes":
+        report = run_precedent_route_expansion_poc(
+            arguments.definition,
+            output_path=arguments.output_json,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0

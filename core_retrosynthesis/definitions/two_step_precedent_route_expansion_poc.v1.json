@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "two_step_precedent_route_expansion_poc.v1@1.0",
+  "description": "Three bounded two-step routes for nested R0 exact, R1 exact-context, and R2 locally relaxed chemical-space expansion.",
+  "routes": [
+    {
+      "route_id": "two_step_amine_acylation",
+      "reference_id": "POC:two_step_amine_acylation",
+      "intermediate_smiles": "CCN",
+      "target_smiles": "CCNC(C)=O",
+      "first_step": {
+        "step_id": "two_step_amine_acylation:1",
+        "reaction_smiles": "CCBr.N>>CCN",
+        "input_sets": [
+          {"smiles": "CCBr.N", "minimum_level": "R0"},
+          {"smiles": "CCCBr.N", "minimum_level": "R1"},
+          {"smiles": "CCCCBr.N", "minimum_level": "R1"},
+          {"smiles": "CBr.N", "minimum_level": "R2"},
+          {"smiles": "Brc1ccccc1.N", "minimum_level": "R2"}
+        ]
+      },
+      "second_step": {
+        "step_id": "two_step_amine_acylation:2",
+        "reaction_smiles": "CCN.CC(=O)Cl>>CCNC(C)=O",
+        "partner_sets": [
+          {"smiles": "CC(=O)Cl", "minimum_level": "R0"},
+          {"smiles": "CCC(=O)Cl", "minimum_level": "R1"},
+          {"smiles": "O=C(Cl)c1ccccc1", "minimum_level": "R1"},
+          {"smiles": "COC(=O)Cl", "minimum_level": "R2"}
+        ]
+      }
+    },
+    {
+      "route_id": "two_step_alcohol_acylation",
+      "reference_id": "POC:two_step_alcohol_acylation",
+      "intermediate_smiles": "CCO",
+      "target_smiles": "CCOC(C)=O",
+      "first_step": {
+        "step_id": "two_step_alcohol_acylation:1",
+        "reaction_smiles": "CCBr.O>>CCO",
+        "input_sets": [
+          {"smiles": "CCBr.O", "minimum_level": "R0"},
+          {"smiles": "CCCBr.O", "minimum_level": "R1"},
+          {"smiles": "CCCCBr.O", "minimum_level": "R1"},
+          {"smiles": "CBr.O", "minimum_level": "R2"},
+          {"smiles": "Brc1ccccc1.O", "minimum_level": "R2"}
+        ]
+      },
+      "second_step": {
+        "step_id": "two_step_alcohol_acylation:2",
+        "reaction_smiles": "CCO.CC(=O)Cl>>CCOC(C)=O",
+        "partner_sets": [
+          {"smiles": "CC(=O)Cl", "minimum_level": "R0"},
+          {"smiles": "CCC(=O)Cl", "minimum_level": "R1"},
+          {"smiles": "O=C(Cl)c1ccccc1", "minimum_level": "R1"},
+          {"smiles": "COC(=O)Cl", "minimum_level": "R2"}
+        ]
+      }
+    },
+    {
+      "route_id": "two_step_thiol_alkylation",
+      "reference_id": "POC:two_step_thiol_alkylation",
+      "intermediate_smiles": "CCS",
+      "target_smiles": "CCSCCC",
+      "first_step": {
+        "step_id": "two_step_thiol_alkylation:1",
+        "reaction_smiles": "CCBr.S>>CCS",
+        "input_sets": [
+          {"smiles": "CCBr.S", "minimum_level": "R0"},
+          {"smiles": "CCCBr.S", "minimum_level": "R1"},
+          {"smiles": "CCCCBr.S", "minimum_level": "R1"},
+          {"smiles": "CBr.S", "minimum_level": "R2"},
+          {"smiles": "Brc1ccccc1.S", "minimum_level": "R2"}
+        ]
+      },
+      "second_step": {
+        "step_id": "two_step_thiol_alkylation:2",
+        "reaction_smiles": "CCS.CCCBr>>CCSCCC",
+        "partner_sets": [
+          {"smiles": "CCCBr", "minimum_level": "R0"},
+          {"smiles": "CCBr", "minimum_level": "R1"},
+          {"smiles": "CCCCBr", "minimum_level": "R1"},
+          {"smiles": "CBr", "minimum_level": "R2"},
+          {"smiles": "Brc1ccccc1", "minimum_level": "R2"}
+        ]
+      }
+    }
+  ]
+}

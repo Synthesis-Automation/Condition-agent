@@ -54,6 +54,7 @@ define operator identity.
 | Route-core projection | Implemented | 18,644/18,647 steps have generic cores, signatures and minimized drawings; cross-step symmetry remains explicit. |
 | Observed route-action labels | 5,000-route POC | 18,280/18,647 steps have retained-edit labels, 18,078 have synthon labels, 18,307 have exact precursors, and 13,099 have STRAT1; the independent executable-operator facet is 1,201/18,647. |
 | Multistep planning | Bounded POC | Available for experiments, but not the current product priority. |
+| Precedent-route expansion | Two-step POC | Three N/O/S routes expand cumulatively from 3 exact products to 24 L2-context and 55 L1-relaxed products; structural evidence only. |
 | Strategy-aware validation scheduling | Not implemented | Grouping currently improves output quality, not validation cost. |
 | Public CLI/API for grouped strategies | Not implemented | Current grouped result contract is Python-only. |
 | Broad release benchmark and chemist review | Review artifact ready | Full labels are audited and 120 promoted examples are rendered; human decisions and leakage-controlled replay remain. |

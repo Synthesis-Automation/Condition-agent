@@ -1014,3 +1014,24 @@ The same status document links a 12-target familiar-chemistry comparison panel.
 The reusable `multistep_panel_review` module renders baseline and policy routes
 side by side with inline reaction drawings, search diagnostics, filters,
 persistent accept/question/reject decisions, notes, and review JSON export.
+
+### Two-step precedent-route chemical-space expansion
+
+The route-expansion POC asks a different question from action ranking: given an
+observed two-step route, which products are structurally reachable when declared
+building blocks are substituted and each step is executed forward? It reports a
+cumulative ladder from exact replay (`R0`), through exact-context L2 expansion
+(`R1`), to explicit local-context relaxation with L1 operators (`R2`).
+
+```powershell
+python -m core_retrosynthesis expand-precedent-routes `
+  core_retrosynthesis/definitions/two_step_precedent_route_expansion_poc.v1.json `
+  results/core_retrosynthesis/precedent_route_expansion/two_step_poc.v1.json
+```
+
+Every retained pathway passes the existing forward product, reverse recovery,
+and operator-edit agreement checks. The initial N/O/S panel yields 3 exact R0,
+24 cumulative R1, and 55 cumulative R2 products. These are structural
+possibilities rather than experimental feasibility or yield predictions. See
+`docs/new/two_step_precedent_route_expansion_poc.md` for the design, result, and
+next evidence gate.
