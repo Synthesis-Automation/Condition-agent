@@ -249,6 +249,10 @@ class OpenAICompatibleMultistepReviewTransport:
                     "role": "user",
                     "content": json.dumps(
                         {
+                            "response_instruction": (
+                                "Return only one valid json object matching "
+                                "output_schema."
+                            ),
                             "output_schema": MultistepReviewPayload.model_json_schema(),
                             "evidence_packet": packet,
                         },

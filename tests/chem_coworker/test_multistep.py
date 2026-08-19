@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from contextlib import nullcontext
+from types import SimpleNamespace
 
 import pytest
 
@@ -19,6 +20,7 @@ from chem_coworker.multistep_review import (
     LLMMultistepReviewer,
     MultistepReviewPayload,
     MultistepReviewTransportResult,
+    OpenAICompatibleMultistepReviewTransport,
 )
 from core_retrosynthesis import GenericDisconnectionCandidate, plan_multistep_routes
 
@@ -199,6 +201,50 @@ def test_llm_review_rejects_unknown_evidence_ids_without_losing_routes() -> None
     assert review.presentation_route_ids == tuple(
         route.route_id for route in result.routes
     )
+
+
+def test_aliyun_multistep_message_explicitly_requests_json(monkeypatch) -> None:
+    requests = []
+    response = SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                message=SimpleNamespace(
+                    content=MultistepReviewPayload(
+                        summary="No routes supplied.", routes=[], questions=[]
+                    ).model_dump_json()
+                ),
+                finish_reason="stop",
+            )
+        ],
+        usage=SimpleNamespace(prompt_tokens=10, completion_tokens=5),
+        id="response-json",
+    )
+
+    def create(**kwargs):
+        requests.append(kwargs)
+        return response
+
+    client = SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+    )
+    monkeypatch.setenv("ALIYUN_API_KEY", "test-key")
+    transport = OpenAICompatibleMultistepReviewTransport(
+        client_factory=lambda **_: client
+    )
+
+    result = transport.complete(
+        {},
+        ConditionReviewSettings(
+            mode="always", provider="aliyun", model="glm-5.2"
+        ),
+    )
+
+    assert result.response_id == "response-json"
+    assert requests[0]["response_format"] == {"type": "json_object"}
+    message_text = " ".join(
+        str(message["content"]) for message in requests[0]["messages"]
+    )
+    assert "json" in message_text.casefold()
 
 
 def test_coworker_preserves_search_result_and_applies_review_order(

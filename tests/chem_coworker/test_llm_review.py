@@ -392,6 +392,12 @@ def test_aliyun_transport_retries_empty_glm_final_output(monkeypatch) -> None:
     assert result.response_id == "resp-glm"
     assert (result.input_tokens, result.output_tokens) == (180, 2_350)
     assert [item["max_tokens"] for item in requests] == [2_000, 8_000]
+    assert all(
+        "json" in " ".join(
+            str(message["content"]) for message in request["messages"]
+        ).casefold()
+        for request in requests
+    )
 
 
 def test_transport_reports_two_empty_outputs_without_raw_pydantic_error(

@@ -260,6 +260,10 @@ class OpenAICompatibleRetrosynthesisReviewTransport:
                     "role": "user",
                     "content": json.dumps(
                         {
+                            "response_instruction": (
+                                "Return only one valid json object matching "
+                                "output_schema."
+                            ),
                             "output_schema": RetrosynthesisReviewPayload.model_json_schema(),
                             "evidence_packet": evidence_packet,
                         },
