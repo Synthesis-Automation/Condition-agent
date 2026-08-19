@@ -154,6 +154,9 @@ class RichResponseRenderer:
         summary.add_row("Named family", Text(result.named_family or "unassigned"))
         summary.add_row("Retrieval", Text(result.retrieval_level or "none"))
         summary.add_row("Candidates", str(result.candidate_count))
+        if response.review and response.review.status == "completed":
+            summary.add_row("Recipes reviewed", str(len(response.review.candidates)))
+            summary.add_row("Condition strategies", str(len(response.review.groups)))
         self.console.print(
             Panel(summary, title="Reaction analysis", border_style="cyan")
         )
@@ -180,9 +183,14 @@ class RichResponseRenderer:
         table.add_column("Yield", justify="right")
         table.add_column("Refs", justify="right")
         table.add_column("LLM review")
+        table.add_column("Strategy group")
         review_by_id = {
             item.recipe_id: item
             for item in (response.review.candidates if response.review else ())
+        }
+        groups_by_representative = {
+            item.representative_recipe_id: item
+            for item in (response.review.groups if response.review else ())
         }
         ordered_ids = (
             response.review.presentation_recipe_ids
@@ -191,10 +199,18 @@ class RichResponseRenderer:
         )
         by_id = {item.recipe_id: item for item in result.recommendations}
         ordered = [by_id[value] for value in ordered_ids if value in by_id]
-        included = {item.recipe_id for item in ordered}
-        ordered.extend(
-            item for item in result.recommendations if item.recipe_id not in included
-        )
+        if not (
+            response.review
+            and response.review.status == "completed"
+            and response.review.groups
+        ):
+            included = {item.recipe_id for item in ordered}
+            ordered.extend(
+                item
+                for item in result.recommendations
+                if item.recipe_id not in included
+            )
+        ordered = ordered[: response.request.top_k]
         for display_rank, item in enumerate(ordered, start=1):
             recipe = self._recipe(item.resolved_recipe, item.recipe_core_id)
             expected_yield = (
@@ -208,6 +224,12 @@ class RichResponseRenderer:
                 if candidate_review is not None
                 else "—"
             )
+            group = groups_by_representative.get(item.recipe_id)
+            group_text = (
+                f"{len(group.member_recipe_ids)} variants"
+                if group is not None and len(group.member_recipe_ids) > 1
+                else "distinct"
+            )
             table.add_row(
                 str(display_rank),
                 Text(recipe),
@@ -215,6 +237,7 @@ class RichResponseRenderer:
                 expected_yield,
                 str(item.reference_support),
                 review_text,
+                group_text,
             )
         self.console.print(table)
 
@@ -242,6 +265,14 @@ class RichResponseRenderer:
                     f"{candidate_review.verdict} "
                     f"({candidate_review.confidence:.0%}): "
                     f"{candidate_review.rationale}"
+                )
+            group = groups_by_representative.get(item.recipe_id)
+            if group is not None and len(group.member_recipe_ids) > 1:
+                if details:
+                    details.append("\n\n")
+                details.append("Grouped condition strategy\n", style="bold blue")
+                details.append(
+                    f"{len(group.member_recipe_ids)} variants: {group.rationale}"
                 )
             if details:
                 self.console.print(

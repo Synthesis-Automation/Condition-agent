@@ -20,13 +20,28 @@ ConditionRequest
 `condition_recommender` owns admission, compatibility, retrieval, scoring, and
 recipe aggregation. A named reaction family is optional.
 
-The deterministic result remains the source of truth. The LLM reviews only the
-top existing recipes using a typed evidence packet. It can mark a recipe as
+The deterministic result remains the source of truth. When review is enabled,
+`top-k` is the requested number of final condition strategies, not the size of
+the initial recipe pool. The coworker retrieves at least twice `top-k` (capped at
+50, and at least the configured review limit), then sends the leading recipes to
+the LLM in a typed evidence packet. It can mark a recipe as
 `keep`, `downrank`, `flag`, or `needs_information`, and it can change the display
-order when that setting is enabled. It cannot modify a recipe or score, invent a
-precedent, restore a chemistry-filtered candidate, or replace the original
-ranking stored under `result` in JSON output. Model output with unknown recipe or
-evidence IDs is rejected as a failed review.
+order when that setting is enabled.
+
+The LLM must also place every reviewed recipe into exactly one condition-strategy
+group. Minor base, solvent, concentration, temperature, or workup differences
+may be grouped when the chemistry-defining catalyst/ligand or activation system
+is the same. Materially different catalyst systems, redox regimes, coupling
+reagents, or compatibility risks remain separate. For example, several Suzuki
+recipes using tetrakis(triphenylphosphine)palladium, carbonate base, and aqueous
+ethereal solvent can be shown as one strategy, while a Pd(dppf)Cl2 recipe remains
+distinct. The code chooses one group representative from the LLM verdict and the
+original deterministic rank.
+
+The LLM cannot modify a recipe or score, invent a precedent, restore a
+chemistry-filtered candidate, or replace the original ranking stored under
+`result` in JSON output. Model output with unknown recipe/evidence IDs, duplicate
+group membership, or incomplete grouping is rejected as a failed review.
 
 Start the interactive CLI with:
 
@@ -53,14 +68,15 @@ The main LLM controls are:
 /model gpt-5.6-terra           select model and infer its provider
 /review off|auto|always        select when review runs
 /reasoning none|low|medium|high|xhigh|max
-/review-limit 5                review at most the first five recipes
+/review-limit 10               review at most the first ten recipes
 /max-tokens 2000               cap model output
 /review-order on|off           apply or disable advisory display ordering
 ```
 
 `auto` reviews results with explicit uncertainty signals such as warnings,
 cautions, weak support, broad fallback retrieval, or closely scored leading
-recipes. `always` reviews every valid result that contains recommendations.
+recipes. Multiple retrieved condition variants also trigger grouping in `auto`
+mode. `always` reviews every valid result that contains recommendations.
 `off` performs deterministic recommendation only. Settings changed in the
 interactive app are saved in `~/.chemcoworker/config.json`.
 

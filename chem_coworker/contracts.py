@@ -37,7 +37,7 @@ class ConditionReviewSettings:
     provider: str = "openai"
     model: str = "gpt-5.6-terra"
     reasoning_effort: str = "medium"
-    max_candidates: int = 5
+    max_candidates: int = 10
     max_output_tokens: int = 2_000
     apply_order: bool = True
 
@@ -77,6 +77,18 @@ class ConditionCandidateReview:
 
 
 @dataclass(frozen=True)
+class ConditionGroupReview:
+    """One LLM-proposed condition strategy with a deterministic representative."""
+
+    group_id: str
+    representative_recipe_id: str
+    member_recipe_ids: Tuple[str, ...]
+    grouping_basis: Tuple[str, ...]
+    evidence_ids: Tuple[str, ...]
+    rationale: str
+
+
+@dataclass(frozen=True)
 class ConditionReview:
     """Auditable outcome of the optional LLM review stage."""
 
@@ -86,6 +98,7 @@ class ConditionReview:
     trigger_reasons: Tuple[str, ...] = ()
     summary: str = ""
     candidates: Tuple[ConditionCandidateReview, ...] = ()
+    groups: Tuple[ConditionGroupReview, ...] = ()
     questions: Tuple[str, ...] = ()
     presentation_recipe_ids: Tuple[str, ...] = ()
     warning: Optional[str] = None

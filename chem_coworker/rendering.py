@@ -51,6 +51,8 @@ def _ordered_recommendations(
         for recipe_id in review.presentation_recipe_ids
         if recipe_id in by_id
     ]
+    if review.status == "completed" and review.groups:
+        return tuple(ordered)
     included = {item.recipe_id for item in ordered}
     ordered.extend(
         item for item in result.recommendations if item.recipe_id not in included
@@ -61,6 +63,8 @@ def _ordered_recommendations(
 def render_recommendation(
     result: GenericRecommendationResult,
     review: ConditionReview | None = None,
+    *,
+    display_limit: int | None = None,
 ) -> str:
     """Render a concise answer while retaining the typed result as source of truth."""
 
@@ -82,6 +86,11 @@ def render_recommendation(
         f"Interpretation: {result.transformation_class or 'unresolved'}; family: {family}",
         f"Retrieval: {result.retrieval_level or 'none'} ({result.candidate_count} candidates)",
     ]
+    if review is not None and review.status == "completed" and review.groups:
+        lines.append(
+            f"LLM grouping: {len(review.candidates)} reviewed recipes -> "
+            f"{len(review.groups)} distinct condition strategies"
+        )
     if not result.recommendations:
         lines.append("No compatible condition recipe met the recommendation criteria.")
     else:
@@ -89,9 +98,14 @@ def render_recommendation(
         reviews_by_id = {
             item.recipe_id: item for item in (review.candidates if review else ())
         }
-        for display_rank, item in enumerate(
-            _ordered_recommendations(result, review), start=1
-        ):
+        ordered_recommendations = _ordered_recommendations(result, review)
+        if display_limit is not None:
+            ordered_recommendations = ordered_recommendations[:display_limit]
+        groups_by_representative = {
+            item.representative_recipe_id: item
+            for item in (review.groups if review else ())
+        }
+        for display_rank, item in enumerate(ordered_recommendations, start=1):
             yield_text = (
                 f", expected yield {item.expected_yield_pct:.1f}%"
                 if item.expected_yield_pct is not None
@@ -108,6 +122,13 @@ def render_recommendation(
                     f"{candidate_review.verdict} "
                     f"({candidate_review.confidence:.0%}) — "
                     f"{candidate_review.rationale}"
+                )
+            group = groups_by_representative.get(item.recipe_id)
+            if group is not None and len(group.member_recipe_ids) > 1:
+                lines.append(
+                    "   Grouped strategy: "
+                    f"{len(group.member_recipe_ids)} recipe variants — "
+                    f"{group.rationale}"
                 )
             if item.explanation:
                 lines.append("   Evidence: " + "; ".join(item.explanation))

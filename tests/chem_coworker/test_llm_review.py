@@ -14,6 +14,7 @@ from condition_recommender import (
 from chem_coworker.contracts import ConditionReviewSettings
 from chem_coworker.review import (
     CandidateReviewPayload,
+    ConditionGroupPayload,
     ConditionReviewPayload,
     LLMConditionReviewer,
     ReviewTransportResult,
@@ -110,6 +111,22 @@ def test_review_can_reorder_presentation_without_mutating_domain_ranking() -> No
                 confidence=0.7,
             ),
         ],
+        groups=[
+            ConditionGroupPayload(
+                group_id="flagged-strategy",
+                member_recipe_ids=["recipe-1"],
+                grouping_basis=["same_strategy"],
+                evidence_ids=["candidate.recipe-1"],
+                rationale="This recipe is a distinct strategy.",
+            ),
+            ConditionGroupPayload(
+                group_id="retained-strategy",
+                member_recipe_ids=["recipe-2"],
+                grouping_basis=["same_strategy"],
+                evidence_ids=["candidate.recipe-2"],
+                rationale="This recipe is a distinct strategy.",
+            ),
+        ],
         questions=["Which amine should react?"],
     )
     transport = FakeTransport(payload)
@@ -150,6 +167,15 @@ def test_unknown_model_evidence_reference_fails_closed() -> None:
                 confidence=0.9,
             )
         ],
+        groups=[
+            ConditionGroupPayload(
+                group_id="strategy-1",
+                member_recipe_ids=["recipe-1"],
+                grouping_basis=["same_strategy"],
+                evidence_ids=["candidate.recipe-1"],
+                rationale="This recipe is a distinct strategy.",
+            )
+        ],
         questions=[],
     )
     result = GenericRecommendationResult(
@@ -166,3 +192,62 @@ def test_unknown_model_evidence_reference_fails_closed() -> None:
     assert review.status == "failed"
     assert review.presentation_recipe_ids == ("recipe-1",)
     assert "unknown evidence IDs" in (review.warning or "")
+
+
+def test_similar_recipe_variants_collapse_to_one_strategy_representative() -> None:
+    payload = ConditionReviewPayload(
+        summary="Two carbonate/aqueous solvent recipes share one catalyst strategy.",
+        candidates=[
+            CandidateReviewPayload(
+                recipe_id=f"recipe-{rank}",
+                verdict="keep",
+                issue_codes=[],
+                evidence_ids=[f"candidate.recipe-{rank}"],
+                rationale="The supplied evidence supports this recipe.",
+                confidence=0.8,
+            )
+            for rank in (1, 2, 3)
+        ],
+        groups=[
+            ConditionGroupPayload(
+                group_id="pd-pph3-carbonate",
+                member_recipe_ids=["recipe-1", "recipe-2"],
+                grouping_basis=[
+                    "catalyst_system",
+                    "base_family",
+                    "solvent_system",
+                ],
+                evidence_ids=["candidate.recipe-1", "candidate.recipe-2"],
+                rationale=(
+                    "The same palladium catalyst strategy differs only in carbonate "
+                    "base and aqueous ethereal solvent."
+                ),
+            ),
+            ConditionGroupPayload(
+                group_id="pd-dppf",
+                member_recipe_ids=["recipe-3"],
+                grouping_basis=["catalyst_system"],
+                evidence_ids=["candidate.recipe-3"],
+                rationale="The catalyst/ligand system is materially different.",
+            ),
+        ],
+        questions=[],
+    )
+    result = GenericRecommendationResult(
+        query_reaction_smiles="B(O)O.ClC>>CC",
+        valid=True,
+        recommendations=tuple(
+            _recommendation(rank, score)
+            for rank, score in ((1, 0.72), (2, 0.71), (3, 0.69))
+        ),
+    )
+
+    review = LLMConditionReviewer(FakeTransport(payload)).review(
+        result,
+        ConditionReviewSettings(mode="always"),
+    )
+
+    assert review.status == "completed"
+    assert review.presentation_recipe_ids == ("recipe-1", "recipe-3")
+    assert review.groups[0].representative_recipe_id == "recipe-1"
+    assert review.groups[0].member_recipe_ids == ("recipe-1", "recipe-2")

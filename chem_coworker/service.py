@@ -143,9 +143,18 @@ class ConditionCoworker:
             weights=dict(request.ranking_weights),
             customized=bool(request.ranking_weights),
         )
+        candidate_pool_size = request.top_k
+        if request.review.mode != "off":
+            candidate_pool_size = min(
+                50,
+                max(
+                    request.top_k * 2,
+                    request.review.max_candidates,
+                ),
+            )
         result = self.recommender.recommend(
             reaction_smiles,
-            top_k=request.top_k,
+            top_k=candidate_pool_size,
             minimum_pool_size=request.minimum_pool_size,
             unrestricted_fallback=request.unrestricted_fallback,
             ranking_preferences=preferences,
@@ -169,6 +178,10 @@ class ConditionCoworker:
         return ConditionResponse(
             request=request,
             result=result,
-            answer=render_recommendation(result, review),
+            answer=render_recommendation(
+                result,
+                review,
+                display_limit=request.top_k,
+            ),
             review=review,
         )

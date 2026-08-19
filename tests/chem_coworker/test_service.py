@@ -129,6 +129,7 @@ def test_optional_llm_review_is_applied_after_deterministic_recommendation() -> 
     assert response.review is not None
     assert response.review.status == "completed"
     assert reviewer.calls == [(domain_result, response.request.review)]
+    assert recommender.calls[0][1]["top_k"] == 10
     assert "No contextual conflict found" in response.answer
 
 

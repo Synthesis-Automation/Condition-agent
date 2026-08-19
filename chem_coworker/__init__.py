@@ -3,6 +3,7 @@
 from .contracts import (
     CompletionChoice,
     ConditionCandidateReview,
+    ConditionGroupReview,
     ConditionRequest,
     ConditionResponse,
     ConditionReview,
@@ -13,6 +14,7 @@ from .service import ConditionCoworker
 __all__ = [
     "CompletionChoice",
     "ConditionCandidateReview",
+    "ConditionGroupReview",
     "ConditionCoworker",
     "ConditionRequest",
     "ConditionResponse",

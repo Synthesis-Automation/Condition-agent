@@ -49,7 +49,7 @@ class InteractiveSettings:
     provider: str = "openai"
     model: str = "gpt-5.6-terra"
     reasoning_effort: str = "medium"
-    review_candidates: int = 5
+    review_candidates: int = 10
     review_max_tokens: int = 2_000
     apply_review_order: bool = True
 

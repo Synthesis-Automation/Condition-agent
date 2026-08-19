@@ -10,10 +10,11 @@ from typing import Any, Dict
 CONFIG_PATH = Path.home() / ".chemcoworker" / "config.json"
 DEFAULT_MODEL: Dict[str, str] = {"name": "gpt-5.6-terra", "provider": "openai"}
 DEFAULT_REVIEW_CONFIG: Dict[str, Any] = {
+    "config_version": 2,
     **DEFAULT_MODEL,
     "review_mode": "auto",
     "reasoning_effort": "medium",
-    "review_candidates": 5,
+    "review_candidates": 10,
     "review_max_tokens": 2_000,
     "apply_review_order": True,
 }
@@ -26,6 +27,7 @@ def load_config() -> Dict[str, Any]:
     try:
         data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
         if isinstance(data, dict):
+            config_version = data.get("config_version")
             if isinstance(data.get("name"), str) and data["name"].strip():
                 config["name"] = data["name"]
             if data.get("provider") in {"openai", "aliyun"}:
@@ -43,7 +45,9 @@ def load_config() -> Dict[str, Any]:
                 config["reasoning_effort"] = data["reasoning_effort"]
             candidates = data.get("review_candidates")
             if isinstance(candidates, int) and 1 <= candidates <= 10:
-                config["review_candidates"] = candidates
+                config["review_candidates"] = (
+                    candidates if config_version == 2 else max(10, candidates)
+                )
             max_tokens = data.get("review_max_tokens")
             if isinstance(max_tokens, int) and 256 <= max_tokens <= 20_000:
                 config["review_max_tokens"] = max_tokens
@@ -60,7 +64,7 @@ def save_config(
     *,
     review_mode: str = "auto",
     reasoning_effort: str = "medium",
-    review_candidates: int = 5,
+    review_candidates: int = 10,
     review_max_tokens: int = 2_000,
     apply_review_order: bool = True,
 ) -> None:
@@ -70,6 +74,7 @@ def save_config(
     CONFIG_PATH.write_text(
         json.dumps(
             {
+                "config_version": 2,
                 "name": model,
                 "provider": provider,
                 "review_mode": review_mode,
