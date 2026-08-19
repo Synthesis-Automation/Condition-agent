@@ -8,9 +8,18 @@ from .style import C
 
 
 _FALLBACK_MODELS: List[Dict[str, str]] = [
-    {"name": "o4-mini", "provider": "openai"},
+    {"name": "gpt-5.6-terra", "provider": "openai"},
+    {"name": "gpt-5.6-sol", "provider": "openai"},
+    {"name": "gpt-5.6-luna", "provider": "openai"},
+    {"name": "gpt-5.5", "provider": "openai"},
     {"name": "gpt-5.4", "provider": "openai"},
+    {"name": "gpt-5.4-mini", "provider": "openai"},
+    {"name": "gpt-5.4-nano", "provider": "openai"},
     {"name": "gpt-5.2", "provider": "openai"},
+    {"name": "gpt-5-mini", "provider": "openai"},
+    {"name": "gpt-5-nano", "provider": "openai"},
+    {"name": "o3", "provider": "openai"},
+    {"name": "gpt-4.1", "provider": "openai"},
     {"name": "glm-5", "provider": "aliyun"},
     {"name": "glm-4.7", "provider": "aliyun"},
     {"name": "MiniMax-M2.1", "provider": "aliyun"},

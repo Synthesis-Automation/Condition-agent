@@ -8,7 +8,7 @@ from typing import Dict
 
 
 CONFIG_PATH = Path.home() / ".chemcoworker" / "config.json"
-DEFAULT_MODEL: Dict[str, str] = {"name": "o4-mini", "provider": "openai"}
+DEFAULT_MODEL: Dict[str, str] = {"name": "gpt-5.6-terra", "provider": "openai"}
 
 
 def load_config() -> Dict[str, str]:

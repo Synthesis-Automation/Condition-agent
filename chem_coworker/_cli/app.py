@@ -403,7 +403,7 @@ def _build_parser() -> argparse.ArgumentParser:
         epilog="""
 Examples:
   python -m chem_coworker._cli.app
-  python -m chem_coworker._cli.app --model gpt-5.4
+  python -m chem_coworker._cli.app --model gpt-5.6-terra
   python -m chem_coworker._cli.app --model glm-5 --provider aliyun
   python -m chem_coworker._cli.app --verbose
         """,

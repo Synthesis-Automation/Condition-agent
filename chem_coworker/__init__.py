@@ -6,7 +6,7 @@ ChemCoworker — General-purpose chemistry AI agent.
 Quick start:
     from chem_coworker import ChemCoworker
 
-    coworker = ChemCoworker(provider="openai", model="o4-mini")
+    coworker = ChemCoworker(provider="openai", model="gpt-5.6-terra")
     response = coworker.run("Recommend conditions for Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
     print(response.answer)
 

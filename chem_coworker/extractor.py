@@ -10,7 +10,7 @@ read_reaction_notes tool in chem_coworker/tools/notes.py.
 
 Usage (Python API):
     from chem_coworker.extractor import NotesExtractor
-    ex = NotesExtractor(provider="openai", model="o4-mini")
+    ex = NotesExtractor(provider="openai", model="gpt-5.6-terra")
     result = ex.intake("https://www.orgsyn.org/demo.aspx?prep=v102p0086",
                        reaction_type="suzuki_miyaura")
     print(result["notes_file"])
@@ -45,7 +45,7 @@ def _get_llm(provider: Optional[str] = None, model: Optional[str] = None) -> Any
     from langchain_openai import ChatOpenAI
 
     provider = provider or os.getenv("LLM_PROVIDER", "openai")
-    model = model or os.getenv("LLM_MODEL", "o4-mini")
+    model = model or os.getenv("LLM_MODEL", "gpt-5.6-terra")
 
     if provider == "aliyun":
         api_key = os.getenv("ALIYUN_API_KEY")
@@ -84,7 +84,7 @@ class NotesExtractor:
         verbose: bool = False,
     ):
         self.llm = _get_llm(provider, model)
-        self.model_name = model or os.getenv("LLM_MODEL", "o4-mini")
+        self.model_name = model or os.getenv("LLM_MODEL", "gpt-5.6-terra")
         self.verbose = verbose
 
     # ------------------------------------------------------------------

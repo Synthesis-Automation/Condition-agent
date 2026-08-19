@@ -234,7 +234,7 @@ def _get_llm_client(
     if provider is None:
         provider = os.getenv("LLM_PROVIDER", "openai")
     if model is None:
-        model = os.getenv("LLM_MODEL", "o4-mini")
+        model = os.getenv("LLM_MODEL", "gpt-5.6-terra")
 
     if provider == "aliyun":
         api_key = os.getenv("ALIYUN_API_KEY")
@@ -276,7 +276,7 @@ class ChemCoworker:
     mechanism explanation, reagent lookup, troubleshooting, and more.
 
     Usage:
-        coworker = ChemCoworker(provider="openai", model="o4-mini")
+        coworker = ChemCoworker(provider="openai", model="gpt-5.6-terra")
         response = coworker.run("Recommend conditions for Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
         print(response.answer)
         print(response.conditions)
@@ -301,7 +301,7 @@ class ChemCoworker:
         hooks: Optional[Any] = None,   # HookRegistry
     ):
         self.provider = provider or os.getenv("LLM_PROVIDER", "openai")
-        self.model_name = model or os.getenv("LLM_MODEL", "o4-mini")
+        self.model_name = model or os.getenv("LLM_MODEL", "gpt-5.6-terra")
         self.verbose = verbose
         self.event_bus = event_bus or EventBus()
         self.plan_callback = plan_callback

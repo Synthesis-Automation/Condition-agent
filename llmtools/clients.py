@@ -35,42 +35,39 @@ DEFAULT_BASE_URLS = {
 }
 
 
-# Recommended models by provider
+# Recommended models by provider and workload.
 RECOMMENDED_MODELS = {
     "aliyun": {
-        "reasoning": "deepseek-r1",  # Best reasoning
-        "fast": "deepseek-r1-distill-qwen-7b",  # Fast distilled
-        "balanced": "deepseek-v3.2",  # Latest balanced (v3.2 experimental)
-        "experimental": "deepseek-v3.2",  # Latest experimental
+        "reasoning": "deepseek-v4-pro",
+        "fast": "deepseek-v4-flash-0731",
+        "balanced": "glm-5.2",
+        "advanced": "qwen3.8-max",
+        "experimental": "deepseek-v4-flash-0731",
     },
     "openai": {
-        "reasoning": "o3-mini",  # Best reasoning
-        "fast": "gpt-4o",  # GPT-4o (default)
-        "balanced": "gpt-4o",  # Balanced quality/speed
-        "advanced": "gpt-5.4",  # GPT-5 series
+        "reasoning": "gpt-5.6-sol",
+        "fast": "gpt-5.6-luna",
+        "balanced": "gpt-5.6-terra",
+        "advanced": "gpt-5.6-sol",
     },
 }
 
-# All available models per provider (from test_llm.py)
+# General-purpose text models exposed by the supported providers.
 AVAILABLE_MODELS = {
-    "aliyun": [
-        "deepseek-v3.2",
-        "deepseek-r1-0528",
-        "kimi-k2.5",
-        "glm-4.7",
-        "MiniMax-M2.1",
-        "glm-5",
-        "qwen3-max",
-        
-    ],
+    "aliyun": ["glm-5.2", "deepseek-v4-pro", "deepseek-v4-flash-0731", "qwen3.8-max"],
     "openai": [
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
         "gpt-5.4",
         "gpt-5.4-mini",
+        "gpt-5.4-nano",
+        "gpt-5.2",
+        "gpt-5-mini",
         "gpt-5-nano",
         "o3",
-        "o4-mini",
-        "gpt-4o",
-        "gpt-4.1"
+        "gpt-4.1",
     ],
 }
 
@@ -103,7 +100,7 @@ class LLMClient:
 
     Examples:
         # Simple usage
-        client = LLMClient(provider="openai", model="gpt-4o-mini")
+        client = LLMClient(provider="openai", model="gpt-5.6-terra")
         response = client.chat("Suggest a solvent for Suzuki coupling")
 
         # With configuration
@@ -216,7 +213,8 @@ class LLMClient:
             system: Optional system message
             temperature: Override default temperature
             max_tokens: Override default max_tokens
-            reasoning_effort: For reasoning models: "low", "medium", "high"
+            reasoning_effort: For reasoning models: "none", "low", "medium",
+                "high", "xhigh", or "max"
 
         Returns:
             LLMResponse with content and metadata
@@ -247,7 +245,8 @@ class LLMClient:
             messages: List of message dicts with role and content
             temperature: Override default temperature
             max_tokens: Override default max_tokens
-            reasoning_effort: For reasoning models (o1/o3/GPT-5): "low", "medium", "high"
+            reasoning_effort: For reasoning models (o1/o3/GPT-5): "none", "low",
+                "medium", "high", "xhigh", or "max"
                 Controls depth of reasoning. Higher = more thorough but slower/costlier.
 
         Returns:
