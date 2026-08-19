@@ -1,7 +1,7 @@
 # Condition Coworker
 
 `chem_coworker` is the small application layer for structure-first condition
-recommendation and chemistry-first one-step retrosynthesis. It contains no
+recommendation and chemistry-first one- and multistep retrosynthesis. It contains no
 chemistry rules and no tool registry.
 
 The request flow is deliberately short, with the LLM used only where contextual
@@ -22,6 +22,14 @@ RetrosynthesisRequest
   -> optional condition_recommender evidence for each proposed reaction
   -> optional bounded LLM feasibility and chemoselectivity review
   -> deterministic rendering of the strategies and advisory review
+
+MultistepRetrosynthesisRequest
+  -> bounded core_retrosynthesis search over validated one-step operators
+  -> explicit supplier-stock/literature or molecular-weight terminal decisions
+  -> deterministic beam search, route scoring, and solved/partial separation
+  -> optional deterministic condition evidence for every retained step
+  -> optional bounded LLM review of fixed route candidates as complete sequences
+  -> deterministic rendering with original and advisory display ranks
 ```
 
 `reactive_taxonomy` remains the molecular source of truth,
@@ -100,6 +108,39 @@ The retrosynthesis controls are:
 /review off|auto|always        control advisory LLM route review
 ```
 
+Switch to multistep retrosynthesis with `/mode multistep`. The deterministic
+planner searches only to depth 2 or 3 and stops at an explicit expansion budget.
+It never treats a partial route as solved. Supplier-stock provenance is preferred
+for terminal starting materials; the literature molecule index is a fallback,
+and low molecular weight remains a clearly labeled heuristic.
+
+The route-level LLM is deliberately outside the search loop. It receives only
+the solved routes, or partial routes when there is no solution, and reviews the
+sequence for cross-step functional-group survival, chemoselectivity, protecting-
+group timing, redox/protection churn, convergence, starting-material evidence,
+and condition coverage. It cannot add a step, edit SMILES, mark a partial route
+solved, or override deterministic chemistry. Short aliases such as `route-1`,
+`evidence.route-1.step-2`, and `evidence.route-1.step-2.conditions` prevent long
+internal IDs from being copied incorrectly.
+
+Multistep interactive controls are:
+
+```text
+/mode multistep               switch the prompt to a route target
+/depth 2|3                    set maximum search depth
+/per-step 5                   retain five actions per molecule expansion
+/beam 20                      retain twenty frontier route states
+/expansions 12                cap expanded route states
+/guidance TEXT                set advisory route-ranking preferences
+/guidance clear               remove route guidance
+/retro-conditions on|off      attach deterministic conditions to every step
+```
+
+Guidance can express preferences such as “avoid palladium”, “prefer a convergent
+route”, or “minimize protecting groups”. It is untrusted preference data and only
+affects the LLM presentation order; it does not change route generation, route
+validity, terminal status, or the stored deterministic ranking.
+
 `auto` reviews a multi-strategy result and also responds to selectivity
 warnings, precursor-compatibility cautions, weak support, or generalized
 operator fallback. Condition evidence is advisory: lack of a matching recipe
@@ -161,6 +202,19 @@ Run one non-interactive one-step retrosynthesis with:
 python -m chem_coworker --mode retro "target_smiles"
 python -m chem_coworker --mode retro --top-k 5 --review always --model gpt-5.6-terra "target_smiles"
 ```
+
+Run a bounded multistep search with:
+
+```powershell
+python -m chem_coworker --mode multistep --max-depth 3 --top-k 5 "target_smiles"
+python -m chem_coworker --mode multistep --review always --guidance "prefer convergence and avoid protecting-group churn" "target_smiles"
+```
+
+Additional one-shot bounds are `--per-step-top-k`, `--beam-width`, and
+`--max-expansions`. Use `--stock-index PATH` to select a compatible supplier
+portfolio or literature molecule index. `--json` includes every route, partial
+route, leaf decision, step-level condition result, diagnostic counter, and LLM
+evidence citation.
 
 Use `--no-retro-conditions` for a faster structure-only search. Override the
 operator artifact with `--retrosynthesis-library PATH`; use

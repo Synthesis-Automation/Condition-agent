@@ -11,7 +11,10 @@ from chem_coworker.contracts import (
     CompletionChoice,
     ConditionRequest,
     ConditionReviewSettings,
+    MultistepRetrosynthesisRequest,
 )
+from chem_coworker.multistep import MultistepRetrosynthesisCoworker
+from chem_coworker.multistep_review import LLMMultistepReviewer
 from chem_coworker.review import LLMConditionReviewer
 from chem_coworker.retrosynthesis import RetrosynthesisCoworker
 from chem_coworker.retrosynthesis_review import LLMRetrosynthesisReviewer
@@ -26,16 +29,16 @@ from .models import infer_provider, provider_model_set, selectable_models
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="chem-coworker",
-        description="Condition recommendation and validated one-step retrosynthesis",
+        description="Condition recommendation and validated retrosynthesis",
     )
     parser.add_argument(
         "reaction_smiles",
         nargs="?",
-        help="Reaction SMILES, or target SMILES in --mode retro",
+        help="Reaction SMILES, or target SMILES in a retrosynthesis mode",
     )
     parser.add_argument(
         "--mode",
-        choices=("conditions", "retro"),
+        choices=("conditions", "retro", "multistep"),
         default="conditions",
         help="Workflow for positional input and initial interactive mode",
     )
@@ -57,6 +60,32 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-realizations", type=int, default=3)
     parser.add_argument("--max-templates-to-apply", type=int, default=500)
     parser.add_argument("--max-candidates-to-validate", type=int, default=100)
+    parser.add_argument(
+        "--stock-index",
+        type=Path,
+        help="Supplier stock portfolio or literature molecule index",
+    )
+    parser.add_argument("--max-depth", type=int, choices=(2, 3), default=3)
+    parser.add_argument("--per-step-top-k", type=int, default=5)
+    parser.add_argument("--beam-width", type=int, default=20)
+    parser.add_argument("--max-expansions", type=int, default=12)
+    parser.add_argument(
+        "--route-max-templates",
+        type=int,
+        default=40,
+        help="Template-application budget for each multistep expansion",
+    )
+    parser.add_argument(
+        "--route-validate-limit",
+        type=int,
+        default=10,
+        help="Candidate-validation budget for each multistep expansion",
+    )
+    parser.add_argument(
+        "--guidance",
+        default="",
+        help="Advisory route-ranking preferences for multistep LLM review",
+    )
     parser.add_argument(
         "--retro-conditions",
         action=argparse.BooleanOptionalAction,
@@ -192,12 +221,15 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser = _parser()
     args = parser.parse_args(argv)
+    if args.mode == "multistep" and not 1 <= args.top_k <= 10:
+        parser.error("--top-k must be between 1 and 10 in multistep mode")
     try:
         review_settings = _review_settings(args)
     except ValueError as exc:
         parser.error(str(exc))
     reviewer = LLMConditionReviewer()
     retrosynthesis_reviewer = LLMRetrosynthesisReviewer()
+    multistep_reviewer = LLMMultistepReviewer()
     try:
         if args.index is None:
             coworker = ConditionCoworker.from_default(
@@ -218,7 +250,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"Warning: {warning}")
     retrosynthesis_coworker = None
     needs_retrosynthesis = bool(
-        args.mode == "retro"
+        args.mode in {"retro", "multistep"}
         or args.reaction_smiles is None
         or args.interactive
         or args.retrosynthesis_library is not None
@@ -237,18 +269,33 @@ def main(argv: Sequence[str] | None = None) -> int:
                     reviewer=retrosynthesis_reviewer,
                 )
         except (OSError, RuntimeError, ValueError) as exc:
-            if args.mode == "retro" or args.retrosynthesis_library is not None:
+            if args.mode in {"retro", "multistep"} or args.retrosynthesis_library is not None:
                 parser.error(str(exc))
             print(f"Warning: retrosynthesis unavailable: {exc}")
     if retrosynthesis_coworker is not None:
         for warning in retrosynthesis_coworker.startup_warnings:
             print(f"Warning: {warning}")
+    multistep_coworker = None
+    if retrosynthesis_coworker is not None:
+        try:
+            multistep_coworker = (
+                MultistepRetrosynthesisCoworker.from_retrosynthesis_coworker(
+                    retrosynthesis_coworker,
+                    stock_path=args.stock_index,
+                    reviewer=multistep_reviewer,
+                )
+            )
+        except (OSError, RuntimeError, ValueError) as exc:
+            if args.mode == "multistep":
+                parser.error(str(exc))
+            print(f"Warning: multistep retrosynthesis unavailable: {exc}")
     if args.interactive or args.reaction_smiles is None:
         if args.completion:
             parser.error("--completion is only supported in one-shot mode")
         return run_interactive(
             coworker,
             retrosynthesis_coworker=retrosynthesis_coworker,
+            multistep_coworker=multistep_coworker,
             settings=InteractiveSettings(
                 top_k=args.top_k,
                 minimum_pool_size=args.minimum_pool_size,
@@ -270,11 +317,47 @@ def main(argv: Sequence[str] | None = None) -> int:
                 use_retro_context=args.retro_context,
                 include_retro_conditions=args.retro_conditions,
                 retro_condition_top_k=args.retro_condition_top_k,
+                multistep_max_depth=args.max_depth,
+                multistep_per_step_top_k=args.per_step_top_k,
+                multistep_beam_width=args.beam_width,
+                multistep_max_expansions=args.max_expansions,
+                multistep_max_templates_to_apply=args.route_max_templates,
+                multistep_max_candidates_to_validate=args.route_validate_limit,
+                strategic_guidance=args.guidance,
             ),
             initial_reaction=args.reaction_smiles,
             enhanced=False if args.plain else None,
             persistent_history=not args.no_history,
         )
+    if args.mode == "multistep":
+        if args.completion:
+            parser.error("--completion is not supported in multistep mode")
+        if multistep_coworker is None:
+            parser.error("multistep retrosynthesis is unavailable")
+        response = multistep_coworker.plan(
+            MultistepRetrosynthesisRequest(
+                target_smiles=args.reaction_smiles,
+                top_k=args.top_k,
+                max_depth=args.max_depth,
+                per_step_top_k=args.per_step_top_k,
+                beam_width=args.beam_width,
+                max_expansions=args.max_expansions,
+                max_templates_to_apply=args.route_max_templates,
+                max_candidates_to_validate=args.route_validate_limit,
+                use_context=args.retro_context,
+                include_l0=args.include_l0,
+                include_conditions=args.retro_conditions,
+                condition_top_k=args.retro_condition_top_k,
+                strategic_guidance=args.guidance,
+                review=review_settings,
+            )
+        )
+        print(
+            json.dumps(response.to_dict(), ensure_ascii=False, indent=2)
+            if args.as_json
+            else response.answer
+        )
+        return 0 if response.valid else 2
     if args.mode == "retro":
         if args.completion:
             parser.error("--completion is not supported in retro mode")

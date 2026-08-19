@@ -1,4 +1,4 @@
-"""Application shell for condition recommendation and one-step retrosynthesis."""
+"""Application shell for condition recommendation and retrosynthesis."""
 
 from .contracts import (
     CompletionChoice,
@@ -8,12 +8,17 @@ from .contracts import (
     ConditionResponse,
     ConditionReview,
     ConditionReviewSettings,
+    MultistepRetrosynthesisRequest,
+    MultistepRetrosynthesisResponse,
+    MultistepReview,
+    MultistepRouteReview,
     RetrosynthesisCandidateReview,
     RetrosynthesisRequest,
     RetrosynthesisResponse,
     RetrosynthesisReview,
     RetrosynthesisStrategyCondition,
 )
+from .multistep import MultistepRetrosynthesisCoworker
 from .retrosynthesis import RetrosynthesisCoworker
 from .service import ConditionCoworker
 
@@ -26,6 +31,11 @@ __all__ = [
     "ConditionResponse",
     "ConditionReview",
     "ConditionReviewSettings",
+    "MultistepRetrosynthesisCoworker",
+    "MultistepRetrosynthesisRequest",
+    "MultistepRetrosynthesisResponse",
+    "MultistepReview",
+    "MultistepRouteReview",
     "RetrosynthesisCandidateReview",
     "RetrosynthesisCoworker",
     "RetrosynthesisRequest",

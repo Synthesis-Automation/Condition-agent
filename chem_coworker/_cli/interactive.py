@@ -15,6 +15,8 @@ from chem_coworker.contracts import (
     ConditionRequest,
     ConditionResponse,
     ConditionReviewSettings,
+    MultistepRetrosynthesisRequest,
+    MultistepRetrosynthesisResponse,
     RetrosynthesisRequest,
     RetrosynthesisResponse,
 )
@@ -25,7 +27,9 @@ from .models import infer_provider, provider_model_set, selectable_models
 
 InputFunction = Callable[[str], str]
 OutputFunction = Callable[[str], None]
-CoworkerResponse = ConditionResponse | RetrosynthesisResponse
+CoworkerResponse = (
+    ConditionResponse | RetrosynthesisResponse | MultistepRetrosynthesisResponse
+)
 ResponseRenderer = Callable[[CoworkerResponse, bool], None]
 StatusFunction = Callable[[str], ContextManager[object]]
 ClearFunction = Callable[[], None]
@@ -42,6 +46,13 @@ class _InteractiveCoworker(Protocol):
 class _InteractiveRetrosynthesisCoworker(Protocol):
     def disconnect(self, request: RetrosynthesisRequest) -> RetrosynthesisResponse:
         """Return one single-step retrosynthesis response."""
+
+
+class _InteractiveMultistepCoworker(Protocol):
+    def plan(
+        self, request: MultistepRetrosynthesisRequest
+    ) -> MultistepRetrosynthesisResponse:
+        """Return one bounded multistep retrosynthesis response."""
 
 
 @dataclass
@@ -68,6 +79,13 @@ class InteractiveSettings:
     use_retro_context: bool = True
     include_retro_conditions: bool = True
     retro_condition_top_k: int = 3
+    multistep_max_depth: int = 3
+    multistep_per_step_top_k: int = 5
+    multistep_beam_width: int = 20
+    multistep_max_expansions: int = 12
+    multistep_max_templates_to_apply: int = 40
+    multistep_max_candidates_to_validate: int = 10
+    strategic_guidance: str = ""
 
     def review_settings(self) -> ConditionReviewSettings:
         """Return the immutable review settings for one request."""
@@ -91,6 +109,7 @@ class InteractiveSession:
         coworker: _InteractiveCoworker,
         *,
         retrosynthesis_coworker: Optional[_InteractiveRetrosynthesisCoworker] = None,
+        multistep_coworker: Optional[_InteractiveMultistepCoworker] = None,
         settings: Optional[InteractiveSettings] = None,
         input_fn: InputFunction = input,
         output_fn: OutputFunction = print,
@@ -100,6 +119,7 @@ class InteractiveSession:
     ) -> None:
         self.coworker = coworker
         self.retrosynthesis_coworker = retrosynthesis_coworker
+        self.multistep_coworker = multistep_coworker
         self.settings = settings or InteractiveSettings()
         self.input = input_fn
         self.output = output_fn
@@ -126,7 +146,11 @@ class InteractiveSession:
             self.submit(initial_reaction)
         while True:
             try:
-                prompt = "target> " if self.settings.mode == "retro" else "reaction> "
+                prompt = (
+                    "target> "
+                    if self.settings.mode in {"retro", "multistep"}
+                    else "reaction> "
+                )
                 value = self.input(prompt).strip()
             except EOFError:
                 self.output("\nSession closed.")
@@ -145,6 +169,8 @@ class InteractiveSession:
     def submit(self, value: str) -> Optional[CoworkerResponse]:
         """Dispatch one molecule/reaction input according to the active mode."""
 
+        if self.settings.mode == "multistep":
+            return self.plan_multistep(value)
         if self.settings.mode == "retro":
             return self.disconnect(value)
         return self.recommend(value)
@@ -178,6 +204,50 @@ class InteractiveSession:
             self.output(f"Error: {exc}")
             return None
 
+        self.last_response = response
+        self.output("")
+        self._render_response(response)
+        self.output("")
+        return response
+
+    def plan_multistep(
+        self, target_smiles: str
+    ) -> Optional[MultistepRetrosynthesisResponse]:
+        """Run bounded route search and optional route-level LLM review."""
+
+        if self.multistep_coworker is None:
+            self.output("Multistep retrosynthesis is unavailable.")
+            return None
+        status = "Searching and validating bounded multistep routes..."
+        if self.settings.review_mode != "off":
+            status = "Searching routes, checking conditions, and reviewing..."
+        try:
+            with self.status(status):
+                response = self.multistep_coworker.plan(
+                    MultistepRetrosynthesisRequest(
+                        target_smiles=target_smiles,
+                        top_k=min(10, self.settings.top_k),
+                        max_depth=self.settings.multistep_max_depth,  # type: ignore[arg-type]
+                        per_step_top_k=self.settings.multistep_per_step_top_k,
+                        beam_width=self.settings.multistep_beam_width,
+                        max_expansions=self.settings.multistep_max_expansions,
+                        max_templates_to_apply=(
+                            self.settings.multistep_max_templates_to_apply
+                        ),
+                        max_candidates_to_validate=(
+                            self.settings.multistep_max_candidates_to_validate
+                        ),
+                        use_context=self.settings.use_retro_context,
+                        include_l0=self.settings.include_l0,
+                        include_conditions=self.settings.include_retro_conditions,
+                        condition_top_k=self.settings.retro_condition_top_k,
+                        strategic_guidance=self.settings.strategic_guidance,
+                        review=self.settings.review_settings(),
+                    )
+                )
+        except (RuntimeError, ValueError) as exc:
+            self.output(f"Error: {exc}")
+            return None
         self.last_response = response
         self.output("")
         self._render_response(response)
@@ -335,6 +405,16 @@ class InteractiveSession:
             self._set_realizations(argument)
         elif name == "/validate-limit":
             self._set_validate_limit(argument)
+        elif name == "/depth":
+            self._set_depth(argument)
+        elif name == "/per-step":
+            self._set_per_step(argument)
+        elif name == "/beam":
+            self._set_beam(argument)
+        elif name == "/expansions":
+            self._set_expansions(argument)
+        elif name == "/guidance":
+            self._set_guidance(argument)
         elif name == "/json":
             self._set_json(argument)
         elif name == "/last":
@@ -349,13 +429,13 @@ class InteractiveSession:
 
     def _welcome(self) -> None:
         self.output("Chem Coworker")
-        self.output("Conditions and graph-validated one-step retrosynthesis.")
-        self.output("Enter reaction SMILES, or use /mode retro for a target molecule.")
+        self.output("Conditions plus graph-validated one- and multistep retrosynthesis.")
+        self.output("Enter reaction SMILES, or select a retrosynthesis mode.")
         self.output("")
 
     def _help(self) -> None:
         self.output("Commands:")
-        self.output("  /mode conditions|retro  Select the active workflow")
+        self.output("  /mode conditions|retro|multistep  Select the workflow")
         self.output("  /settings           Show current settings")
         self.output("  /top-k N            Set recommendation count (1-50)")
         self.output("  /minimum N|auto     Set minimum retrieval pool size")
@@ -370,6 +450,11 @@ class InteractiveSession:
         self.output("  /retro-conditions on|off Recommend conditions for routes")
         self.output("  /realizations N      Retain 1-10 precursor variants per strategy")
         self.output("  /validate-limit N    Bound forward-validation attempts")
+        self.output("  /depth 2|3           Set maximum multistep route depth")
+        self.output("  /per-step N          Set candidates retained per expansion")
+        self.output("  /beam N              Set multistep frontier beam width")
+        self.output("  /expansions N        Set multistep state-expansion budget")
+        self.output("  /guidance TEXT|clear Set advisory route preferences")
         self.output("  /json on|off        Toggle full JSON output")
         self.output("  /last               Show the previous result again")
         self.output("  /save PATH          Save the previous result as JSON")
@@ -408,6 +493,22 @@ class InteractiveSession:
             "retrosynthesis validation limit: "
             f"{self.settings.max_candidates_to_validate}"
         )
+        self.output(f"multistep max depth: {self.settings.multistep_max_depth}")
+        self.output(
+            f"multistep per-step top-k: {self.settings.multistep_per_step_top_k}"
+        )
+        self.output(f"multistep beam width: {self.settings.multistep_beam_width}")
+        self.output(
+            f"multistep expansion budget: {self.settings.multistep_max_expansions}"
+        )
+        self.output(
+            "multistep template/validation budgets: "
+            f"{self.settings.multistep_max_templates_to_apply}/"
+            f"{self.settings.multistep_max_candidates_to_validate}"
+        )
+        self.output(
+            "route guidance: " + (self.settings.strategic_guidance or "none")
+        )
 
     def _set_mode(self, argument: str) -> None:
         aliases = {
@@ -415,16 +516,26 @@ class InteractiveSession:
             "conditions": "conditions",
             "retro": "retro",
             "retrosynthesis": "retro",
+            "multi": "multistep",
+            "route": "multistep",
+            "multistep": "multistep",
         }
         mode = aliases.get(argument.casefold())
         if mode is None:
-            self.output("Usage: /mode conditions|retro.")
+            self.output("Usage: /mode conditions|retro|multistep.")
             return
         if mode == "retro" and self.retrosynthesis_coworker is None:
             self.output("Retrosynthesis is unavailable; check the startup warnings.")
             return
+        if mode == "multistep" and self.multistep_coworker is None:
+            self.output("Multistep retrosynthesis is unavailable.")
+            return
         self.settings.mode = mode
-        expected = "target SMILES" if mode == "retro" else "reaction SMILES"
+        expected = (
+            "target SMILES"
+            if mode in {"retro", "multistep"}
+            else "reaction SMILES"
+        )
         self.output(f"mode set to {mode}; enter {expected}.")
 
     def _set_top_k(self, argument: str) -> None:
@@ -605,6 +716,57 @@ class InteractiveSession:
         self.settings.max_candidates_to_validate = value
         self.output(f"retrosynthesis validation limit set to {value}.")
 
+    def _set_depth(self, argument: str) -> None:
+        try:
+            value = int(argument)
+        except ValueError:
+            value = 0
+        if value not in {2, 3}:
+            self.output("Usage: /depth 2|3.")
+            return
+        self.settings.multistep_max_depth = value
+        self.output(f"multistep maximum depth set to {value}.")
+
+    def _set_per_step(self, argument: str) -> None:
+        self._set_positive_multistep(argument, "per-step", "multistep_per_step_top_k")
+
+    def _set_beam(self, argument: str) -> None:
+        self._set_positive_multistep(argument, "beam", "multistep_beam_width")
+
+    def _set_expansions(self, argument: str) -> None:
+        self._set_positive_multistep(
+            argument, "expansions", "multistep_max_expansions"
+        )
+
+    def _set_positive_multistep(
+        self, argument: str, label: str, attribute: str
+    ) -> None:
+        try:
+            value = int(argument)
+        except ValueError:
+            value = 0
+        if value < 1:
+            self.output(f"Usage: /{label} N, where N is positive.")
+            return
+        setattr(self.settings, attribute, value)
+        self.output(f"multistep {label} set to {value}.")
+
+    def _set_guidance(self, argument: str) -> None:
+        if argument.casefold() in {"clear", "none", "off"}:
+            self.settings.strategic_guidance = ""
+            self.output("route guidance cleared.")
+            return
+        if not argument:
+            self.output(
+                "route guidance: " + (self.settings.strategic_guidance or "none")
+            )
+            return
+        if len(argument) > 2_000:
+            self.output("route guidance must be at most 2000 characters.")
+            return
+        self.settings.strategic_guidance = argument
+        self.output("route guidance updated; it affects advisory LLM ranking only.")
+
     def _persist_review_settings(self) -> None:
         try:
             save_config(
@@ -669,6 +831,7 @@ def run_interactive(
     coworker: _InteractiveCoworker,
     *,
     retrosynthesis_coworker: Optional[_InteractiveRetrosynthesisCoworker] = None,
+    multistep_coworker: Optional[_InteractiveMultistepCoworker] = None,
     settings: Optional[InteractiveSettings] = None,
     initial_reaction: Optional[str] = None,
     enhanced: Optional[bool] = None,
@@ -684,6 +847,7 @@ def run_interactive(
                 return run_terminal_ui(
                     coworker,
                     retrosynthesis_coworker=retrosynthesis_coworker,
+                    multistep_coworker=multistep_coworker,
                     settings=settings,
                     initial_reaction=initial_reaction,
                     persistent_history=persistent_history,
@@ -694,6 +858,7 @@ def run_interactive(
     return InteractiveSession(
         coworker,
         retrosynthesis_coworker=retrosynthesis_coworker,
+        multistep_coworker=multistep_coworker,
         settings=settings,
     ).run(initial_reaction)
 

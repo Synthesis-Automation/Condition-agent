@@ -23,7 +23,12 @@ from rich.text import Text
 
 from condition_recommender import available_ranking_profiles
 
-from chem_coworker.contracts import ConditionResponse, RetrosynthesisResponse
+from chem_coworker.contracts import (
+    ConditionResponse,
+    MultistepRetrosynthesisResponse,
+    RetrosynthesisResponse,
+)
+from chem_coworker.multistep_rendering import ordered_multistep_routes
 from chem_coworker.retrosynthesis_rendering import (
     ordered_retrosynthesis_strategies,
 )
@@ -32,6 +37,7 @@ from .interactive import (
     InteractiveSession,
     InteractiveSettings,
     _InteractiveCoworker,
+    _InteractiveMultistepCoworker,
     _InteractiveRetrosynthesisCoworker,
 )
 from .models import selectable_models
@@ -41,7 +47,7 @@ HISTORY_PATH = Path.home() / ".chemcoworker" / "history"
 
 COMMANDS = {
     "/help": "show commands and keyboard shortcuts",
-    "/mode": "select conditions or retro workflow",
+    "/mode": "select conditions, retro, or multistep workflow",
     "/settings": "show recommendation settings",
     "/top-k": "set the recommendation count",
     "/minimum": "set the retrieval pool minimum",
@@ -56,6 +62,11 @@ COMMANDS = {
     "/retro-conditions": "toggle condition lookup for retro routes",
     "/realizations": "set precursor variants retained per strategy",
     "/validate-limit": "set retrosynthesis forward-validation bound",
+    "/depth": "set maximum multistep route depth",
+    "/per-step": "set candidates retained per expansion",
+    "/beam": "set multistep frontier width",
+    "/expansions": "set multistep expansion budget",
+    "/guidance": "set advisory route-ranking preferences",
     "/json": "toggle full JSON output",
     "/last": "show the previous result",
     "/save": "save the previous result",
@@ -113,7 +124,7 @@ class SlashCommandCompleter(Completer):
         elif command.casefold() == "/minimum":
             options = ("auto",)
         elif command.casefold() == "/mode":
-            options = ("conditions", "retro")
+            options = ("conditions", "retro", "multistep")
         elif command.casefold() == "/retro-conditions":
             options = ("on", "off")
         for candidate in options:
@@ -142,7 +153,7 @@ class RichResponseRenderer:
 
     def __call__(
         self,
-        response: ConditionResponse | RetrosynthesisResponse,
+        response: ConditionResponse | RetrosynthesisResponse | MultistepRetrosynthesisResponse,
         as_json: bool,
     ) -> None:
         if as_json:
@@ -150,6 +161,9 @@ class RichResponseRenderer:
             return
         if isinstance(response, RetrosynthesisResponse):
             self._retrosynthesis(response)
+            return
+        if isinstance(response, MultistepRetrosynthesisResponse):
+            self._multistep(response)
             return
         result = response.result
         if not result.valid:
@@ -457,6 +471,149 @@ class RichResponseRenderer:
                 )
         self._warnings(response.warnings)
 
+    def _multistep(self, response: MultistepRetrosynthesisResponse) -> None:
+        if not response.valid or response.result is None:
+            self.console.print(
+                Panel(
+                    Text(response.error or "Invalid target", style="bold red"),
+                    title="Multistep retrosynthesis unavailable",
+                    border_style="red",
+                )
+            )
+            return
+        result = response.result
+        routes = result.routes or result.partial_routes
+        route_kind = "solved" if result.routes else "partial"
+        summary = Table.grid(padding=(0, 2))
+        summary.add_column(style="bold cyan")
+        summary.add_column()
+        summary.add_row("Target", response.request.target_smiles)
+        summary.add_row("Solved routes", str(len(result.routes)))
+        summary.add_row("Partial routes", str(len(result.partial_routes)))
+        summary.add_row("Search depth", str(result.max_depth))
+        summary.add_row("Expanded states", str(result.diagnostics.expanded_states))
+        summary.add_row("One-step calls", str(result.diagnostics.one_step_calls))
+        if result.diagnostics.stopped_by_expansion_limit:
+            summary.add_row("Stop reason", "expansion budget reached")
+        if response.request.strategic_guidance:
+            summary.add_row("Guidance", response.request.strategic_guidance)
+        self.console.print(
+            Panel(summary, title="Multistep retrosynthesis", border_style="cyan")
+        )
+        if not routes:
+            self.console.print(Panel("No route was retained.", border_style="yellow"))
+            self._warnings(response.warnings)
+            return
+        reviews = {
+            item.route_id: item
+            for item in (response.review.routes if response.review else ())
+        }
+        ordered = ordered_multistep_routes(response)[: response.request.top_k]
+        original_ranks = {
+            route.route_id: index for index, route in enumerate(routes, start=1)
+        }
+        table = Table(
+            title=f"{route_kind.title()} routes",
+            box=box.ROUNDED,
+            header_style="bold magenta",
+            show_lines=True,
+        )
+        table.add_column("Shown", justify="right", style="bold")
+        table.add_column("Original", justify="right")
+        table.add_column("Status")
+        table.add_column("Steps", justify="right")
+        table.add_column("Cost", justify="right")
+        table.add_column("Conditions")
+        table.add_column("Leaves")
+        table.add_column("LLM review")
+        for shown_rank, route in enumerate(ordered, start=1):
+            evidence = route.evidence_summary
+            condition_text = "not checked"
+            if evidence.condition_coverage_fraction is not None:
+                condition_text = f"{evidence.condition_coverage_fraction:.0%} covered"
+            terminal_count = sum(leaf.terminal for leaf in route.leaves)
+            review = reviews.get(route.route_id)
+            table.add_row(
+                str(shown_rank),
+                str(original_ranks[route.route_id]),
+                "solved" if route.solved else "partial",
+                str(route.reaction_count),
+                f"{route.route_cost:.3f}",
+                condition_text,
+                f"{terminal_count}/{len(route.leaves)} terminal",
+                (
+                    f"{review.verdict}\n{review.confidence:.0%}"
+                    if review is not None
+                    else "—"
+                ),
+            )
+        self.console.print(table)
+        for shown_rank, route in enumerate(ordered, start=1):
+            details = Text()
+            for step_number, step in enumerate(route.steps, start=1):
+                if details:
+                    details.append("\n\n")
+                details.append(f"Step {step_number}\n", style="bold green")
+                details.append(
+                    f"{'.'.join(step.precursor_smiles)} >> {step.product_smiles}\n"
+                )
+                details.append(
+                    f"{step.candidate.forward_validation_status}; "
+                    f"{step.candidate.abstraction_level}; "
+                    f"score {step.candidate.score:.3f}"
+                )
+                if step.condition_evidence is not None:
+                    details.append(
+                        "\nConditions: " + step.condition_evidence.status.replace("_", " ")
+                    )
+            unresolved = [
+                leaf.canonical_smiles for leaf in route.leaves if not leaf.terminal
+            ]
+            if unresolved:
+                details.append("\n\nUnresolved leaves\n", style="bold yellow")
+                details.append("\n".join(f"• {value}" for value in unresolved))
+            review = reviews.get(route.route_id)
+            if review is not None:
+                details.append("\n\nLLM review (advisory)\n", style="bold magenta")
+                details.append(
+                    f"{review.verdict} ({review.confidence:.0%}): {review.rationale}"
+                )
+            self.console.print(
+                Panel(
+                    details,
+                    title=(
+                        f"Shown row {shown_rank} details · original rank "
+                        f"{original_ranks[route.route_id]}"
+                    ),
+                    border_style="dim",
+                )
+            )
+        if response.review is not None:
+            review = response.review
+            if review.status == "completed":
+                body = Text(review.summary)
+                if review.questions:
+                    body.append("\n\nQuestions\n", style="bold cyan")
+                    body.append("\n".join(f"• {item}" for item in review.questions))
+                body.append(
+                    f"\n\n{review.model} · advisory · "
+                    f"{review.input_tokens + review.output_tokens} tokens · "
+                    f"{review.provider_attempts or 1} provider attempt(s)",
+                    style="dim",
+                )
+                self.console.print(
+                    Panel(body, title="LLM multistep review", border_style="magenta")
+                )
+            elif review.status == "failed":
+                self.console.print(
+                    Panel(
+                        Text(review.warning or "Review failed", style="yellow"),
+                        title="LLM review unavailable",
+                        border_style="yellow",
+                    )
+                )
+        self._warnings(response.warnings)
+
     def _review(self, response: ConditionResponse) -> None:
         review = response.review
         if review is None or review.status == "skipped":
@@ -533,6 +690,7 @@ def run_terminal_ui(
     coworker: _InteractiveCoworker,
     *,
     retrosynthesis_coworker: Optional[_InteractiveRetrosynthesisCoworker] = None,
+    multistep_coworker: Optional[_InteractiveMultistepCoworker] = None,
     settings: Optional[InteractiveSettings] = None,
     initial_reaction: Optional[str] = None,
     persistent_history: bool = True,
@@ -599,6 +757,7 @@ def run_terminal_ui(
     session = InteractiveSession(
         coworker,
         retrosynthesis_coworker=retrosynthesis_coworker,
+        multistep_coworker=multistep_coworker,
         settings=active_settings,
         input_fn=read_input,
         output_fn=write_output,
@@ -609,8 +768,8 @@ def run_terminal_ui(
     console.print(
         Panel.fit(
             "[bold cyan]Chem Coworker[/]\n"
-            "Conditions and graph-validated one-step retrosynthesis\n\n"
-            "Type a reaction SMILES, use [bold]/mode retro[/], or [bold]/help[/]",
+            "Conditions plus graph-validated one- and multistep retrosynthesis\n\n"
+            "Type input, use [bold]/mode retro|multistep[/], or [bold]/help[/]",
             border_style="cyan",
         )
     )
