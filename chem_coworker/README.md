@@ -52,3 +52,21 @@ python -m chem_coworker "reactants>>product"
 
 Use `--json` for the full, untruncated typed result. RXNMapper is optional and
 is enabled explicitly with `--use-rxnmapper`.
+
+## Windows and IDE launch command
+
+From any PowerShell working directory, use:
+
+```powershell
+cmd /d /c "cd /d C:\Git-softwares\Condition-agent && C:\Users\xubar\AppData\Local\Programs\Python\Python312\python.exe -m chem_coworker"
+```
+
+For an IDE run configuration, use:
+
+```text
+Program: C:\Windows\System32\cmd.exe
+Arguments: /d /c "cd /d C:\Git-softwares\Condition-agent && C:\Users\xubar\AppData\Local\Programs\Python\Python312\python.exe -m chem_coworker"
+```
+
+The value after `-m` must be the importable module name `chem_coworker`, not a
+filesystem path.
