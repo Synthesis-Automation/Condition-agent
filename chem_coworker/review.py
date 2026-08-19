@@ -10,10 +10,10 @@ from __future__ import annotations
 import json
 import os
 import re
-from dataclasses import dataclass
-from typing import Any, Dict, Literal, Mapping, Protocol, Sequence, Tuple
+from dataclasses import dataclass, replace
+from typing import Any, Callable, Dict, Literal, Mapping, Protocol, Sequence, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from condition_recommender import GenericRecommendationResult
 
@@ -42,6 +42,15 @@ _VERDICT_PRIORITY = {
     "flag": 3,
 }
 _SECRET_PATTERN = re.compile(r"\b(?:sk|dashscope)-[A-Za-z0-9_-]{8,}\b")
+_RETRY_MIN_OUTPUT_TOKENS = 8_000
+_RETRY_EFFORT = {
+    "none": "none",
+    "low": "none",
+    "medium": "low",
+    "high": "low",
+    "xhigh": "medium",
+    "max": "medium",
+}
 
 
 class CandidateReviewPayload(BaseModel):
@@ -100,6 +109,11 @@ class ReviewTransportResult:
     response_id: str | None = None
     input_tokens: int = 0
     output_tokens: int = 0
+    attempts: int = 1
+
+
+class IncompleteReviewOutputError(ValueError):
+    """A provider completed without a parseable final review payload."""
 
 
 class ReviewTransport(Protocol):
@@ -141,26 +155,58 @@ Hard boundaries:
 class OpenAICompatibleReviewTransport:
     """Use OpenAI Responses structured output or an OpenAI-compatible fallback."""
 
+    def __init__(
+        self,
+        client_factory: Callable[..., Any] | None = None,
+    ) -> None:
+        self._client_factory = client_factory
+
     def complete(
         self,
         evidence_packet: Mapping[str, Any],
         settings: ConditionReviewSettings,
     ) -> ReviewTransportResult:
-        if settings.provider == "openai":
-            return self._openai_response(evidence_packet, settings)
-        return self._compatible_chat(evidence_packet, settings)
+        retry_settings = replace(
+            settings,
+            reasoning_effort=_RETRY_EFFORT[settings.reasoning_effort],
+            max_output_tokens=min(
+                20_000,
+                max(_RETRY_MIN_OUTPUT_TOKENS, settings.max_output_tokens * 2),
+            ),
+        )
+        failures = []
+        for attempt, active_settings in enumerate(
+            (settings, retry_settings),
+            start=1,
+        ):
+            try:
+                if settings.provider == "openai":
+                    result = self._openai_response(
+                        evidence_packet,
+                        active_settings,
+                    )
+                else:
+                    result = self._compatible_chat(
+                        evidence_packet,
+                        active_settings,
+                    )
+                return replace(result, attempts=attempt)
+            except (IncompleteReviewOutputError, ValidationError) as exc:
+                failures.append(self._concise_failure(exc))
+        raise IncompleteReviewOutputError(
+            f"{settings.provider} returned no valid structured review after "
+            f"2 attempts ({'; '.join(failures)})"
+        )
 
-    @staticmethod
     def _openai_response(
+        self,
         evidence_packet: Mapping[str, Any],
         settings: ConditionReviewSettings,
     ) -> ReviewTransportResult:
-        from openai import OpenAI
-
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY is not set")
-        client = OpenAI(
+        client = self._build_client(
             api_key=api_key,
             base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
         )
@@ -168,18 +214,33 @@ class OpenAICompatibleReviewTransport:
             "model": settings.model,
             "instructions": _INSTRUCTIONS,
             "input": json.dumps(evidence_packet, ensure_ascii=False, sort_keys=True),
-            "text_format": ConditionReviewPayload,
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": "condition_review",
+                    "strict": True,
+                    "schema": ConditionReviewPayload.model_json_schema(),
+                }
+            },
             "max_output_tokens": settings.max_output_tokens,
             "store": False,
         }
         if settings.model.startswith(("gpt-5", "o3", "o4")):
             request["reasoning"] = {"effort": settings.reasoning_effort}
-        response = client.responses.parse(
-            **request,
-        )
-        parsed = response.output_parsed
-        if parsed is None:
-            raise ValueError("model returned no structured review")
+        response = client.responses.create(**request)
+        status = str(getattr(response, "status", "unknown") or "unknown")
+        if status == "incomplete":
+            reason = self._incomplete_reason(response)
+            raise IncompleteReviewOutputError(
+                "OpenAI response was incomplete"
+                + (f" ({reason})" if reason else "")
+            )
+        content = str(getattr(response, "output_text", "") or "").strip()
+        if not content:
+            raise IncompleteReviewOutputError(
+                f"OpenAI response contained no final JSON (status={status})"
+            )
+        parsed = ConditionReviewPayload.model_validate_json(content)
         usage = getattr(response, "usage", None)
         return ReviewTransportResult(
             payload=parsed,
@@ -188,17 +249,15 @@ class OpenAICompatibleReviewTransport:
             output_tokens=int(getattr(usage, "output_tokens", 0) or 0),
         )
 
-    @staticmethod
     def _compatible_chat(
+        self,
         evidence_packet: Mapping[str, Any],
         settings: ConditionReviewSettings,
     ) -> ReviewTransportResult:
-        from openai import OpenAI
-
         api_key = os.getenv("ALIYUN_API_KEY")
         if not api_key:
             raise RuntimeError("ALIYUN_API_KEY is not set")
-        client = OpenAI(
+        client = self._build_client(
             api_key=api_key,
             base_url=os.getenv(
                 "ALIYUN_BASE_URL",
@@ -224,7 +283,17 @@ class OpenAICompatibleReviewTransport:
             response_format={"type": "json_object"},
             max_tokens=settings.max_output_tokens,
         )
-        content = response.choices[0].message.content or ""
+        choice = response.choices[0]
+        content = str(choice.message.content or "").strip()
+        if not content:
+            reasoning_content = str(
+                getattr(choice.message, "reasoning_content", "") or ""
+            )
+            raise IncompleteReviewOutputError(
+                "Aliyun response contained no final JSON "
+                f"(finish_reason={choice.finish_reason or 'unknown'}, "
+                f"reasoning_chars={len(reasoning_content)})"
+            )
         parsed = ConditionReviewPayload.model_validate_json(content)
         usage = response.usage
         return ReviewTransportResult(
@@ -233,6 +302,28 @@ class OpenAICompatibleReviewTransport:
             input_tokens=int(getattr(usage, "prompt_tokens", 0) or 0),
             output_tokens=int(getattr(usage, "completion_tokens", 0) or 0),
         )
+
+    def _build_client(self, **kwargs: Any) -> Any:
+        if self._client_factory is not None:
+            return self._client_factory(**kwargs)
+        from openai import OpenAI
+
+        return OpenAI(**kwargs)
+
+    @staticmethod
+    def _incomplete_reason(response: Any) -> str:
+        details = getattr(response, "incomplete_details", None)
+        if isinstance(details, Mapping):
+            return str(details.get("reason") or "")
+        return str(getattr(details, "reason", "") or "")
+
+    @staticmethod
+    def _concise_failure(exc: Exception) -> str:
+        if isinstance(exc, ValidationError):
+            errors = exc.errors(include_url=False)
+            if errors:
+                return "invalid JSON/schema: " + str(errors[0].get("msg") or "")
+        return str(exc).replace("\n", " ")[:300]
 
 
 def _automatic_trigger_reasons(result: GenericRecommendationResult) -> Tuple[str, ...]:
@@ -426,6 +517,7 @@ class LLMConditionReviewer:
             response_id=transport_result.response_id,
             input_tokens=transport_result.input_tokens,
             output_tokens=transport_result.output_tokens,
+            provider_attempts=transport_result.attempts,
         )
 
     @staticmethod

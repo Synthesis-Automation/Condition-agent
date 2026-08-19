@@ -304,7 +304,8 @@ class RichResponseRenderer:
             body.append("\n".join(f"• {item}" for item in review.questions))
         body.append(
             f"\n\n{review.model} · advisory · "
-            f"{review.input_tokens + review.output_tokens} tokens",
+            f"{review.input_tokens + review.output_tokens} tokens · "
+            f"{review.provider_attempts or 1} provider attempt(s)",
             style="dim",
         )
         self.console.print(

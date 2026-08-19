@@ -38,7 +38,7 @@ class ConditionReviewSettings:
     model: str = "gpt-5.6-terra"
     reasoning_effort: str = "medium"
     max_candidates: int = 10
-    max_output_tokens: int = 2_000
+    max_output_tokens: int = 8_000
     apply_order: bool = True
 
     def __post_init__(self) -> None:
@@ -105,6 +105,7 @@ class ConditionReview:
     response_id: Optional[str] = None
     input_tokens: int = 0
     output_tokens: int = 0
+    provider_attempts: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize review evidence and model metadata."""

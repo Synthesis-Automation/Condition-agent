@@ -10,12 +10,12 @@ from typing import Any, Dict
 CONFIG_PATH = Path.home() / ".chemcoworker" / "config.json"
 DEFAULT_MODEL: Dict[str, str] = {"name": "gpt-5.6-terra", "provider": "openai"}
 DEFAULT_REVIEW_CONFIG: Dict[str, Any] = {
-    "config_version": 2,
+    "config_version": 3,
     **DEFAULT_MODEL,
     "review_mode": "auto",
     "reasoning_effort": "medium",
     "review_candidates": 10,
-    "review_max_tokens": 2_000,
+    "review_max_tokens": 8_000,
     "apply_review_order": True,
 }
 
@@ -46,11 +46,15 @@ def load_config() -> Dict[str, Any]:
             candidates = data.get("review_candidates")
             if isinstance(candidates, int) and 1 <= candidates <= 10:
                 config["review_candidates"] = (
-                    candidates if config_version == 2 else max(10, candidates)
+                    candidates if config_version in {2, 3} else max(10, candidates)
                 )
             max_tokens = data.get("review_max_tokens")
             if isinstance(max_tokens, int) and 256 <= max_tokens <= 20_000:
-                config["review_max_tokens"] = max_tokens
+                config["review_max_tokens"] = (
+                    max_tokens
+                    if config_version == 3
+                    else max(8_000, max_tokens)
+                )
             if isinstance(data.get("apply_review_order"), bool):
                 config["apply_review_order"] = data["apply_review_order"]
     except (OSError, ValueError, TypeError):
@@ -65,7 +69,7 @@ def save_config(
     review_mode: str = "auto",
     reasoning_effort: str = "medium",
     review_candidates: int = 10,
-    review_max_tokens: int = 2_000,
+    review_max_tokens: int = 8_000,
     apply_review_order: bool = True,
 ) -> None:
     """Persist interactive LLM review settings."""
@@ -74,7 +78,7 @@ def save_config(
     CONFIG_PATH.write_text(
         json.dumps(
             {
-                "config_version": 2,
+                "config_version": 3,
                 "name": model,
                 "provider": provider,
                 "review_mode": review_mode,

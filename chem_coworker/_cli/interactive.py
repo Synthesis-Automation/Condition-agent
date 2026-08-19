@@ -50,7 +50,7 @@ class InteractiveSettings:
     model: str = "gpt-5.6-terra"
     reasoning_effort: str = "medium"
     review_candidates: int = 10
-    review_max_tokens: int = 2_000
+    review_max_tokens: int = 8_000
     apply_review_order: bool = True
 
     def review_settings(self) -> ConditionReviewSettings:
