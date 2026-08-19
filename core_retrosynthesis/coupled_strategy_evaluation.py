@@ -679,6 +679,52 @@ def build_v1_heldout_panel(
     return selected_definitions, selected, gaps
 
 
+def build_v1_operator_pair_inventory(
+    route_core_source: str | Path,
+    library: GenericTemplateLibrary,
+    *,
+    minimum_training_patents: int = 2,
+    seed: int = 20260818,
+) -> tuple[
+    tuple[PromotedV1OperatorPair, ...],
+    tuple[CoupledStrategyEvaluationCase, ...],
+    tuple[dict[str, Any], ...],
+]:
+    """Return every recurrent patent-disjoint v1 pair covered by a library.
+
+    Unlike the held-out panel builder, this inventory does not sample or
+    balance strategies. It is intended for complete review catalogs and keeps
+    every eligible example for representative-example selection.
+    """
+
+    config = CoupledStrategyEvaluationConfig(
+        panel_size=1,
+        minimum_training_patents=minimum_training_patents,
+        seed=seed,
+    )
+    definitions, cases, heldout_counts = _v1_heldout_candidate_pool(
+        route_core_source,
+        config,
+    )
+    gaps = _library_gaps(definitions.values(), library, heldout_counts)
+    gap_ids = {str(item["strategy_id"]) for item in gaps}
+    eligible_ids = set(definitions) - gap_ids
+    eligible_definitions = tuple(
+        definitions[strategy_id] for strategy_id in sorted(eligible_ids)
+    )
+    eligible_cases = tuple(
+        sorted(
+            (case for case in cases if case.strategy_id in eligible_ids),
+            key=lambda item: (
+                item.strategy_id,
+                item.patent_id,
+                item.case_id,
+            ),
+        )
+    )
+    return eligible_definitions, eligible_cases, gaps
+
+
 def _patent_overlap(candidate: GenericDisconnectionCandidate, patent_id: str) -> bool:
     patent = _PATENT_TOKEN.sub("", patent_id.upper())
     if not patent:
@@ -1232,6 +1278,7 @@ __all__ = [
     "PromotedTwoStepQueryAction",
     "PromotedV1OperatorPair",
     "build_frozen_v1_heldout_panel",
+    "build_v1_operator_pair_inventory",
     "build_v1_heldout_panel",
     "evaluate_v1_case",
     "load_frozen_v1_heldout_panel",

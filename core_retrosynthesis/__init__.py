@@ -56,6 +56,7 @@ from .coupled_strategy_evaluation import (
     PromotedTwoStepQueryAction,
     PromotedV1OperatorPair,
     build_frozen_v1_heldout_panel,
+    build_v1_operator_pair_inventory,
     build_v1_heldout_panel,
     evaluate_v1_case,
     load_frozen_v1_heldout_panel,
@@ -68,6 +69,11 @@ from .coupled_strategy_evaluation_review import (
     load_v1_coupled_strategy_evaluation,
     render_v1_coupled_strategy_evaluation_html,
     write_v1_coupled_strategy_evaluation_html,
+)
+from .coupled_operator_catalog_review import (
+    COUPLED_OPERATOR_CATALOG_REVIEW_VERSION,
+    render_v1_operator_pair_catalog_html,
+    write_v1_operator_pair_catalog_html,
 )
 from .core_admission import (
     CORE_ADMISSION_POLICY_NAMES,
@@ -250,6 +256,11 @@ from .observed_route_action import (
     build_observed_route_action_label,
     load_observed_route_action_label_policy,
 )
+from .operator_catalog_review import (
+    OPERATOR_CATALOG_REVIEW_VERSION,
+    render_generic_operator_catalog_html,
+    write_generic_operator_catalog_html,
+)
 from .route_action_conversion import (
     DEFAULT_ROUTE_ACTION_SAMPLE_SEED,
     ROUTE_ACTION_CONVERTER_VERSION,
@@ -411,6 +422,7 @@ __all__ = [
     "CoupledStrategySearchResult",
     "COUPLED_STRATEGY_EVALUATION_ALGORITHM_VERSION",
     "COUPLED_STRATEGY_EVALUATION_SCHEMA_VERSION",
+    "COUPLED_OPERATOR_CATALOG_REVIEW_VERSION",
     "FROZEN_V1_PANEL_ALGORITHM_VERSION",
     "FROZEN_V1_PANEL_SCHEMA_VERSION",
     "CoupledStrategyCaseResult",
@@ -438,6 +450,7 @@ __all__ = [
     "GenericTemplateLibrary",
     "HierarchicalRankingPolicy",
     "OperatorLadderDiagnostics",
+    "OPERATOR_CATALOG_REVIEW_VERSION",
     "PrecursorCompatibilityPolicy",
     "PrecursorCompatibilityResult",
     "LIBRARY_MODES",
@@ -545,6 +558,7 @@ __all__ = [
     "audit_generic_round_trips",
     "build_generic_reaction_identity",
     "build_frozen_v1_heldout_panel",
+    "build_v1_operator_pair_inventory",
     "build_v1_heldout_panel",
     "audit_operator_library_coverage",
     "build_full_scale_operator_library",
@@ -627,6 +641,7 @@ __all__ = [
     "render_route_core_review_html",
     "render_route_action_review_html",
     "render_multistep_panel_html",
+    "render_generic_operator_catalog_html",
     "evaluate_route_actions",
     "evaluate_route_action_policy",
     "evaluate_route_action_baseline",
@@ -646,6 +661,7 @@ __all__ = [
     "write_route_core_review_html",
     "write_route_action_review_html",
     "write_multistep_panel_artifacts",
+    "write_generic_operator_catalog_html",
     "train_route_action_policy_from_replay",
     "validate_route_tree",
     "validate_route_core_projection",
@@ -657,6 +673,7 @@ __all__ = [
     "render_comparison_html",
     "render_coupled_route_strategy_html",
     "render_v1_coupled_strategy_evaluation_html",
+    "render_v1_operator_pair_catalog_html",
     "resolve_library_mode",
     "validate_precursor_compatibility_policy",
     "DEFAULT_PRECEDENT_ROUTE_EXPANSION_DEFINITION",
@@ -690,4 +707,5 @@ __all__ = [
     "write_frozen_v1_heldout_panel",
     "write_v1_coupled_strategy_evaluation",
     "write_v1_coupled_strategy_evaluation_html",
+    "write_v1_operator_pair_catalog_html",
 ]

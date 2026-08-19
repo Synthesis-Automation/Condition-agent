@@ -5,12 +5,14 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
+import core_retrosynthesis.coupled_strategy_evaluation as evaluation_module
 from core_retrosynthesis.cli import _parser
 from core_retrosynthesis.coupled_strategy_evaluation import (
     CoupledStrategyEvaluationCase,
     CoupledStrategyEvaluationConfig,
     FrozenV1HeldoutPanel,
     PromotedV1OperatorPair,
+    build_v1_operator_pair_inventory,
     evaluate_v1_case,
     load_frozen_v1_heldout_panel,
     run_v1_coupled_strategy_evaluation,
@@ -431,3 +433,63 @@ def test_cli_exposes_library_independent_panel() -> None:
 
     assert panel.include_strategy_id == ["strategy:required"]
     assert evaluation.frozen_panel == "panel.json"
+
+
+def test_complete_pair_inventory_excludes_only_library_gaps(monkeypatch) -> None:
+    eligible = PromotedV1OperatorPair(
+        strategy_id="strategy:eligible",
+        relationship_class="handle_progression",
+        first_operator_id="op:first",
+        second_operator_id="op:second",
+        training_patent_ids=("TRAIN1", "TRAIN2"),
+        training_occurrence_count=3,
+        v2_dependency_counts=(("created_handle_consumed", 3),),
+    )
+    gap = PromotedV1OperatorPair(
+        strategy_id="strategy:gap",
+        relationship_class="same_site_coupled",
+        first_operator_id="op:missing",
+        second_operator_id="op:second",
+        training_patent_ids=("TRAIN3", "TRAIN4"),
+        training_occurrence_count=2,
+        v2_dependency_counts=(("continued_site_transformation", 2),),
+    )
+    case = CoupledStrategyEvaluationCase(
+        case_id="case:eligible",
+        occurrence_id="occurrence:eligible",
+        strategy_id=eligible.strategy_id,
+        patent_id="HELDOUT1",
+        split="test",
+        relationship_class="handle_progression",
+        v2_dependency_class="created_handle_consumed",
+        target_smiles="CN",
+        expected_intermediate_smiles="C=O",
+        expected_terminal_precursor_smiles="CO",
+        observed_first_reaction_smiles="CO>>C=O",
+        observed_second_reaction_smiles="C=O>>CN",
+        exact_target_seen_in_training=False,
+        target_scaffold_seen_in_training=False,
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_v1_heldout_candidate_pool",
+        lambda _source, _config: (
+            {eligible.strategy_id: eligible, gap.strategy_id: gap},
+            (case,),
+            {eligible.strategy_id: 1, gap.strategy_id: 1},
+        ),
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_library_gaps",
+        lambda _definitions, _library, _counts: ({"strategy_id": gap.strategy_id},),
+    )
+
+    definitions, cases, gaps = build_v1_operator_pair_inventory(
+        "routes.jsonl.gz",
+        GenericTemplateLibrary((), 0, 0, {}, {}),
+    )
+
+    assert definitions == (eligible,)
+    assert cases == (case,)
+    assert gaps == ({"strategy_id": gap.strategy_id},)
