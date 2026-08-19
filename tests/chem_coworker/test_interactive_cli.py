@@ -44,6 +44,7 @@ def test_no_positional_reaction_selects_interactive_mode() -> None:
     args = _parser().parse_args([])
 
     assert args.reaction_smiles is None
+    assert args.index is None
 
 
 def test_session_updates_settings_and_recommends_repeatedly() -> None:

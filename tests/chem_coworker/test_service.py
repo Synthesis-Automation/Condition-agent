@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from condition_recommender import GenericRecommendationResult
 
 from chem_coworker import ConditionCoworker, ConditionRequest
+import chem_coworker.service as service_module
 
 
 @dataclass
@@ -82,3 +84,46 @@ def test_request_rejects_unsafe_ranking_weights() -> None:
         assert str(exc) == "ranking weights must be non-negative"
     else:
         raise AssertionError("negative ranking weights were accepted")
+
+
+def test_default_index_selection_skips_stale_full_artifact(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    stale = tmp_path / "full.sqlite"
+    current = tmp_path / "compact.sqlite"
+    stale.touch()
+    current.touch()
+    domain_result = GenericRecommendationResult(
+        query_reaction_smiles="C.N>>CN",
+        valid=True,
+    )
+
+    def fake_from_path(
+        cls,
+        path,
+        *,
+        use_rxnmapper=False,
+        include_review=False,
+    ):
+        del use_rxnmapper, include_review
+        if Path(path) == stale:
+            raise ValueError("Unsupported generic reaction index schema")
+        return cls(FakeRecommender(domain_result))
+
+    monkeypatch.setattr(
+        service_module,
+        "DEFAULT_INDEX_CANDIDATES",
+        (stale, current),
+    )
+    monkeypatch.setattr(
+        ConditionCoworker,
+        "from_path",
+        classmethod(fake_from_path),
+    )
+
+    coworker = ConditionCoworker.from_default()
+
+    assert len(coworker.startup_warnings) == 1
+    assert str(current) in coworker.startup_warnings[0]
+    assert "Unsupported generic reaction index schema" in coworker.startup_warnings[0]

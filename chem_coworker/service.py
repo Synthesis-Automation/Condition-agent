@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -20,7 +20,11 @@ from .contracts import ConditionRequest, ConditionResponse
 from .rendering import render_recommendation
 
 
-DEFAULT_INDEX_PATH = Path("datasets/literature/full/generic_index.sqlite")
+DEFAULT_INDEX_PATH = Path("datasets/literature/compact/generic_index.sqlite")
+DEFAULT_INDEX_CANDIDATES = (
+    Path("datasets/literature/full/generic_index.sqlite"),
+    DEFAULT_INDEX_PATH,
+)
 
 
 class _Recommender(Protocol):
@@ -33,6 +37,40 @@ class ConditionCoworker:
     """Coordinate completion, ranking preferences, and one canonical recommender."""
 
     recommender: _Recommender
+    startup_warnings: tuple[str, ...] = ()
+
+    @classmethod
+    def from_default(
+        cls,
+        *,
+        use_rxnmapper: bool = False,
+        include_review: bool = False,
+    ) -> "ConditionCoworker":
+        """Select the largest compatible default index without hiding staleness."""
+
+        failures = []
+        for candidate in DEFAULT_INDEX_CANDIDATES:
+            if not candidate.is_file():
+                failures.append(f"{candidate}: not found")
+                continue
+            try:
+                coworker = cls.from_path(
+                    candidate,
+                    use_rxnmapper=use_rxnmapper,
+                    include_review=include_review,
+                )
+            except (OSError, ValueError) as exc:
+                failures.append(f"{candidate}: {exc}")
+                continue
+            warnings = ()
+            if failures:
+                warnings = (
+                    "Default index fallback selected "
+                    f"{candidate}; skipped " + "; ".join(failures),
+                )
+            return replace(coworker, startup_warnings=warnings)
+        detail = "; ".join(failures) or "no default candidates configured"
+        raise ValueError(f"No compatible default recommendation index: {detail}")
 
     @classmethod
     def from_path(

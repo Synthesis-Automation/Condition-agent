@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Sequence
 
 from chem_coworker.contracts import CompletionChoice, ConditionRequest
-from chem_coworker.service import ConditionCoworker, DEFAULT_INDEX_PATH
+from chem_coworker.service import ConditionCoworker
 
 from .interactive import InteractiveSettings, run_interactive
 
@@ -23,7 +23,15 @@ def _parser() -> argparse.ArgumentParser:
         nargs="?",
         help="Reaction SMILES; omit it to start the interactive app",
     )
-    parser.add_argument("--index", type=Path, default=DEFAULT_INDEX_PATH)
+    parser.add_argument(
+        "--index",
+        type=Path,
+        default=None,
+        help=(
+            "Recommendation index; by default the largest compatible full/compact "
+            "artifact is selected"
+        ),
+    )
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--minimum-pool-size", type=int)
     parser.add_argument("--ranking-profile", default="default")
@@ -81,13 +89,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
     try:
-        coworker = ConditionCoworker.from_path(
-            args.index,
-            use_rxnmapper=args.use_rxnmapper,
-            include_review=args.unrestricted_fallback,
-        )
+        if args.index is None:
+            coworker = ConditionCoworker.from_default(
+                use_rxnmapper=args.use_rxnmapper,
+                include_review=args.unrestricted_fallback,
+            )
+        else:
+            coworker = ConditionCoworker.from_path(
+                args.index,
+                use_rxnmapper=args.use_rxnmapper,
+                include_review=args.unrestricted_fallback,
+            )
     except (OSError, RuntimeError, ValueError) as exc:
         parser.error(str(exc))
+    for warning in coworker.startup_warnings:
+        print(f"Warning: {warning}")
     if args.interactive or args.reaction_smiles is None:
         if args.completion:
             parser.error("--completion is only supported in one-shot mode")

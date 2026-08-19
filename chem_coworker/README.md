@@ -25,6 +25,10 @@ python -m pip install -r requirements-cli.txt
 python -m chem_coworker
 ```
 
+Startup checks the persisted index contract. It prefers the full index when it
+is current and automatically falls back to the compact index when the full
+artifact is stale or unavailable. An explicit `--index` never falls back.
+
 Enter reaction SMILES repeatedly at the `reaction>` prompt. The app guides
 missing-source confirmation and supports `/help`, `/settings`, `/top-k`,
 `/minimum`, `/profile`, `/json`, `/last`, `/save`, `/clear`, and `/quit`.
