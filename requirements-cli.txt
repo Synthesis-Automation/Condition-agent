@@ -1,0 +1,4 @@
+# Enhanced interactive terminal UI. The CLI falls back to the standard library
+# when these packages are unavailable or input/output is redirected.
+prompt-toolkit>=3.0.51,<4
+rich>=13.9,<15

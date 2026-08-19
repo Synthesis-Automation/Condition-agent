@@ -21,12 +21,24 @@ recipe aggregation. A named reaction family is optional.
 Start the interactive CLI with:
 
 ```powershell
+python -m pip install -r requirements-cli.txt
 python -m chem_coworker
 ```
 
 Enter reaction SMILES repeatedly at the `reaction>` prompt. The app guides
 missing-source confirmation and supports `/help`, `/settings`, `/top-k`,
-`/minimum`, `/profile`, `/json`, `/last`, `/save`, and `/quit`.
+`/minimum`, `/profile`, `/json`, `/last`, `/save`, `/clear`, and `/quit`.
+
+On an interactive terminal, the enhanced interface adds:
+
+- persistent history and up-arrow recall;
+- tab completion for slash commands and ranking profiles;
+- live analysis/retrieval status indicators;
+- structured result tables and evidence/caution panels;
+- multiline editing with `Alt+Enter` and submission with `Enter`.
+
+Reaction history is stored in `~/.chemcoworker/history`. Use `--no-history`
+for confidential sessions, or `--plain` for the dependency-free interface.
 
 Run one non-interactive recommendation with:
 

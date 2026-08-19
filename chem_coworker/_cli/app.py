@@ -36,6 +36,16 @@ def _parser() -> argparse.ArgumentParser:
         help="Continue interactively after an optional initial reaction",
     )
     parser.add_argument(
+        "--plain",
+        action="store_true",
+        help="Disable the enhanced terminal UI",
+    )
+    parser.add_argument(
+        "--no-history",
+        action="store_true",
+        help="Do not persist reaction input history",
+    )
+    parser.add_argument(
         "--completion",
         action="append",
         default=[],
@@ -91,6 +101,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 as_json=args.as_json,
             ),
             initial_reaction=args.reaction_smiles,
+            enhanced=False if args.plain else None,
+            persistent_history=not args.no_history,
         )
     response = coworker.recommend(
         ConditionRequest(

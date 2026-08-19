@@ -156,3 +156,17 @@ def test_json_toggle_and_save_previous_result(tmp_path) -> None:
     saved = target.read_text(encoding="utf-8")
     assert '"query_reaction_smiles": "C.N>>CN"' in saved
     assert any('"system": "condition_coworker.v1"' in line for line in output)
+
+
+def test_clear_command_uses_terminal_callback() -> None:
+    cleared: list[bool] = []
+    session = InteractiveSession(
+        FakeCoworker(),
+        input_fn=_inputs("/clear", "/quit"),
+        output_fn=lambda _: None,
+        clear_fn=lambda: cleared.append(True),
+    )
+
+    session.run()
+
+    assert cleared == [True]

@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional, Protocol
+from typing import Callable, ContextManager, Optional, Protocol
 
 from condition_recommender import available_ranking_profiles
 
@@ -18,6 +19,9 @@ from chem_coworker.contracts import (
 
 InputFunction = Callable[[str], str]
 OutputFunction = Callable[[str], None]
+ResponseRenderer = Callable[[ConditionResponse, bool], None]
+StatusFunction = Callable[[str], ContextManager[object]]
+ClearFunction = Callable[[], None]
 
 
 class _InteractiveCoworker(Protocol):
@@ -49,20 +53,32 @@ class InteractiveSession:
         settings: Optional[InteractiveSettings] = None,
         input_fn: InputFunction = input,
         output_fn: OutputFunction = print,
+        response_renderer: Optional[ResponseRenderer] = None,
+        status_fn: Optional[StatusFunction] = None,
+        clear_fn: Optional[ClearFunction] = None,
     ) -> None:
         self.coworker = coworker
         self.settings = settings or InteractiveSettings()
         self.input = input_fn
         self.output = output_fn
+        self.response_renderer = response_renderer
+        self.status = status_fn or (lambda _: nullcontext())
+        self.clear = clear_fn
         self.last_response: Optional[ConditionResponse] = None
         self._profiles = {
             str(item["profile_id"]): item for item in available_ranking_profiles()
         }
 
-    def run(self, initial_reaction: Optional[str] = None) -> int:
+    def run(
+        self,
+        initial_reaction: Optional[str] = None,
+        *,
+        show_welcome: bool = True,
+    ) -> int:
         """Run until the user quits or input closes."""
 
-        self._welcome()
+        if show_welcome:
+            self._welcome()
         if initial_reaction:
             self.recommend(initial_reaction)
         while True:
@@ -86,32 +102,30 @@ class InteractiveSession:
         """Prepare, optionally complete, and recommend one reaction."""
 
         try:
-            proposal = self.coworker.prepare_reaction(reaction_smiles)
+            with self.status("Analyzing reaction graph..."):
+                proposal = self.coworker.prepare_reaction(reaction_smiles)
             choices = self._completion_choices(proposal)
             if choices is None:
                 self.output("Recommendation cancelled.")
                 return None
-            response = self.coworker.recommend(
-                ConditionRequest(
-                    reaction_smiles=reaction_smiles,
-                    top_k=self.settings.top_k,
-                    minimum_pool_size=self.settings.minimum_pool_size,
-                    unrestricted_fallback=self.settings.unrestricted_fallback,
-                    ranking_profile=self.settings.ranking_profile,
-                    completion_choices=choices,
+            with self.status("Filtering chemistry and ranking precedents..."):
+                response = self.coworker.recommend(
+                    ConditionRequest(
+                        reaction_smiles=reaction_smiles,
+                        top_k=self.settings.top_k,
+                        minimum_pool_size=self.settings.minimum_pool_size,
+                        unrestricted_fallback=self.settings.unrestricted_fallback,
+                        ranking_profile=self.settings.ranking_profile,
+                        completion_choices=choices,
+                    )
                 )
-            )
         except (RuntimeError, ValueError) as exc:
             self.output(f"Error: {exc}")
             return None
 
         self.last_response = response
         self.output("")
-        self.output(
-            json.dumps(response.to_dict(), ensure_ascii=False, indent=2)
-            if self.settings.as_json
-            else response.answer
-        )
+        self._render_response(response)
         self.output("")
         return response
 
@@ -208,6 +222,8 @@ class InteractiveSession:
             self._show_last()
         elif name == "/save":
             self._save(argument)
+        elif name == "/clear":
+            self._clear()
         else:
             self.output(f"Unknown command: {command}. Use /help.")
         return True
@@ -227,6 +243,7 @@ class InteractiveSession:
         self.output("  /json on|off        Toggle full JSON output")
         self.output("  /last               Show the previous result again")
         self.output("  /save PATH          Save the previous result as JSON")
+        self.output("  /clear              Clear the terminal")
         self.output("  /quit               Exit")
 
     def _show_settings(self) -> None:
@@ -297,11 +314,23 @@ class InteractiveSession:
         if self.last_response is None:
             self.output("No recommendation has been run yet.")
             return
+        self._render_response(self.last_response)
+
+    def _render_response(self, response: ConditionResponse) -> None:
+        if self.response_renderer is not None:
+            self.response_renderer(response, self.settings.as_json)
+            return
         self.output(
-            json.dumps(self.last_response.to_dict(), ensure_ascii=False, indent=2)
+            json.dumps(response.to_dict(), ensure_ascii=False, indent=2)
             if self.settings.as_json
-            else self.last_response.answer
+            else response.answer
         )
+
+    def _clear(self) -> None:
+        if self.clear is not None:
+            self.clear()
+        else:
+            self.output("\n" * 40)
 
     def _save(self, argument: str) -> None:
         if self.last_response is None:
@@ -332,9 +361,27 @@ def run_interactive(
     *,
     settings: Optional[InteractiveSettings] = None,
     initial_reaction: Optional[str] = None,
+    enhanced: Optional[bool] = None,
+    persistent_history: bool = True,
 ) -> int:
-    """Run the standard input/output interactive session."""
+    """Run the enhanced TTY interface or its deterministic plain fallback."""
 
+    if enhanced is not False:
+        try:
+            from .terminal_ui import can_use_terminal_ui, run_terminal_ui
+
+            if enhanced is True or can_use_terminal_ui():
+                return run_terminal_ui(
+                    coworker,
+                    settings=settings,
+                    initial_reaction=initial_reaction,
+                    persistent_history=persistent_history,
+                )
+        except ImportError:
+            if enhanced is True:
+                print(
+                    "Enhanced terminal dependencies unavailable; using plain mode."
+                )
     return InteractiveSession(coworker, settings=settings).run(initial_reaction)
 
 
