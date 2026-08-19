@@ -38,11 +38,6 @@ try:  # pragma: no cover - import tested in runtime
 except Exception:  # pragma: no cover
     Chem = None  # type: ignore
 
-try:
-    from chemtools import registry as chemtools_registry
-except Exception:
-    chemtools_registry = None
-
 # Optional reactant classifier (loaded dynamically if local file exists).
 classify_reactant = None
 REACTANT_TYPES = None
@@ -991,18 +986,18 @@ def infer_reaction_type(core_generic_tokens: List[str]) -> str:
     return 'Other'
 
 def load_cas_maps(paths: List[str]) -> Dict[str, Dict[str, str]]:
-    """Load CAS metadata from JSONL files and/or chemtools taxonomy.
+    """Load source CAS metadata from explicitly supplied JSONL files.
 
     Returns a mapping: CAS -> {Name, GenericCore, Role, CategoryHint, Token}.
-    JSONL inputs remain supported for custom overrides; missing data fall back to the
-    in-repo taxonomy consumed by ``chemtools.registry``.
+    Canonical identity and contextual-role resolution happen downstream in
+    ``condition_registry``.
     """
 
     mapping: Dict[str, Dict[str, str]] = {}
 
     effective_paths: List[str] = [p for p in paths or [] if p]
     if not effective_paths:
-        env_path = os.environ.get('CHEMTOOLS_REGISTRY_PATH', '').strip()
+        env_path = os.environ.get('CONDITION_SOURCE_REGISTRY_PATH', '').strip()
         if env_path:
             effective_paths.append(env_path)
 
@@ -1036,27 +1031,6 @@ def load_cas_maps(paths: List[str]) -> Dict[str, Dict[str, str]]:
                     entry['Token'] = (entry_data.get('token') or '').strip()
         except Exception as exc:
             print(f"Warning: Failed to load CAS map from {p}: {exc}")
-
-    # Note: chemtools.registry has been deprecated/removed - skip this section
-    if False and chemtools_registry is not None:
-        try:
-            idx = chemtools_registry._load_registry()  # type: ignore[attr-defined]
-            for uid, rec in idx.by_uid.items():
-                cas = (rec.get('cas') or uid or '').strip()
-                if not cas:
-                    continue
-                entry = mapping.setdefault(cas, {})
-                entry.setdefault('Name', (rec.get('name') or '').strip())
-                entry.setdefault('GenericCore', (rec.get('generic_core') or '').strip())
-                entry.setdefault('CategoryHint', (rec.get('compound_type') or '').strip())
-                role = (rec.get('role') or '').strip()
-                if role and not entry.get('Role'):
-                    entry['Role'] = role
-                token = (rec.get('token') or '').strip()
-                if token and not entry.get('Token'):
-                    entry['Token'] = token
-        except Exception as exc:
-            print(f"Warning: Could not load chemtools taxonomy registry ({exc})")
 
     for cas, entry in mapping.items():
         if not entry.get('Token'):

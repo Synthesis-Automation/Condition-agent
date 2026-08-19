@@ -1,7 +1,7 @@
 """
 Root conftest.py — ensures the project root is on sys.path so that both
-`pytest` and `python -m pytest` find local packages (chemtools, chem_coworker,
-app, llmtools, etc.) without requiring an editable install.
+`pytest` and `python -m pytest` find the standalone chemistry, condition,
+application, and optional LLM packages without requiring an editable install.
 """
 import sys
 from pathlib import Path

@@ -940,12 +940,10 @@ Remaining limitations include:
 ### 5.3 Architectural cleanup
 
 The package now exposes one canonical structure-backed recommendation path.
-Remaining cleanup is outside that package boundary:
-
-- legacy `chemtools` and legacy application paths still exist outside the new
-  package dependency graph;
-- those legacy application paths should be removed after their user-facing
-  replacement is demonstrated.
+The legacy `chemtools` package and its coupled coworker were removed. The
+replacement `chem_coworker` is a thin application shell over
+`GenericConditionRecommender`; it owns no chemistry, compatibility, retrieval,
+or scoring rules.
 
 ## 6. Required next sequence
 
@@ -1052,15 +1050,13 @@ plus human release gates pass.
 ### Gate 6: Consolidate public paths
 
 The generic structure-backed workflow is canonical. The expert-rule recommender
-is removed, while weak-label retrieval is isolated as an explicitly unverified
-fallback. Remaining work is documentation and legacy-application containment:
+and legacy coworker are removed, while weak-label retrieval is isolated as an
+explicitly unverified fallback. Remaining work is documentation consolidation:
 
 1. move any still-useful historical expert-rule and weak-label rationale out of
    the active package README or archive it explicitly;
 2. remove migrated duplicate logic rather than maintaining parallel behavior;
-3. remove or isolate legacy `chemtools` application paths after their
-   user-facing replacement is demonstrated; and
-4. keep application and package READMEs pointed to the two consolidated
+3. keep application and package READMEs pointed to the two consolidated
    documents and the current generic API.
 
 **Pass condition:** every public application path invokes the generic workflow,

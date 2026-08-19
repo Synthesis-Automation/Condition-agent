@@ -18,7 +18,7 @@ import copy
 from typing import List, Optional, Dict, Any, Set, Tuple
 from pathlib import Path
 
-# Add parent directory to path so we can import chemtools
+# Add the project root so standalone packages are importable.
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -49,7 +49,14 @@ except Exception as e:
 # ---------------------------- Taxonomy integration ----------------------------
 
 import json as _json
-from chemtools.reagent.constants import ROLE_ALIASES
+
+
+# Export vocabulary only. Canonical contextual-role resolution belongs to
+# condition_registry after the source record has been parsed.
+ROLE_ALIASES: Dict[str, str] = {
+    "metal_precursor": "metal_catalyst",
+    "preformed_metal_catalyst": "metal_catalyst",
+}
 
 
 

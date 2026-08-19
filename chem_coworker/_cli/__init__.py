@@ -1,5 +1,1 @@
-"""Modular terminal CLI for ChemCoworker."""
-
-from .app import main
-
-__all__ = ["main"]
+"""Command-line interface for the condition coworker."""

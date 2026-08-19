@@ -1,4 +1,4 @@
-"""CLI config persistence."""
+"""Optional narration-model configuration kept separate from chemistry logic."""
 
 from __future__ import annotations
 
@@ -12,18 +12,20 @@ DEFAULT_MODEL: Dict[str, str] = {"name": "gpt-5.6-terra", "provider": "openai"}
 
 
 def load_config() -> Dict[str, str]:
-    """Load saved model config or return defaults."""
+    """Load saved model metadata or return a copy of the defaults."""
+
     try:
         data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
         if "name" in data and "provider" in data:
             return {"name": str(data["name"]), "provider": str(data["provider"])}
-    except Exception:
+    except (OSError, ValueError, TypeError):
         pass
     return DEFAULT_MODEL.copy()
 
 
 def save_config(model: str, provider: str) -> None:
-    """Persist model choice."""
+    """Persist optional narration-model metadata."""
+
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     CONFIG_PATH.write_text(
         json.dumps({"name": model, "provider": provider}, indent=2),
