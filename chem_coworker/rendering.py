@@ -18,8 +18,22 @@ def _reaction_label(result: GenericRecommendationResult) -> str:
 def _component_text(recipe: Mapping[str, Any]) -> str:
     components = recipe.get("components")
     if not isinstance(components, Iterable) or isinstance(components, (str, bytes)):
-        return str(
-            recipe.get("recipe_core_id") or recipe.get("recipe_id") or "resolved recipe"
+        components = tuple(
+            component
+            for key in (
+                "catalysts",
+                "ligands",
+                "bases",
+                "condensation_agents",
+                "oxidants",
+                "reductants",
+                "acids",
+                "additives",
+                "solvents",
+                "other_components",
+            )
+            for component in (recipe.get(key) or ())
+            if isinstance(component, Mapping)
         )
     rendered = []
     for component in components:
@@ -36,7 +50,11 @@ def _component_text(recipe: Mapping[str, Any]) -> str:
         rendered.append(f"{name} ({role})" if role else str(name))
     if rendered:
         return ", ".join(rendered)
-    return json.dumps(dict(recipe), ensure_ascii=False, sort_keys=True)
+    return str(
+        recipe.get("recipe_core_id")
+        or recipe.get("recipe_id")
+        or json.dumps(dict(recipe), ensure_ascii=False, sort_keys=True)
+    )
 
 
 def _ordered_recommendations(

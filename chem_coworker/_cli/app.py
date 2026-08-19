@@ -13,7 +13,10 @@ from chem_coworker.contracts import (
     ConditionReviewSettings,
 )
 from chem_coworker.review import LLMConditionReviewer
+from chem_coworker.retrosynthesis import RetrosynthesisCoworker
+from chem_coworker.retrosynthesis_review import LLMRetrosynthesisReviewer
 from chem_coworker.service import ConditionCoworker
+from chem_coworker.contracts import RetrosynthesisRequest
 
 from .config import load_config
 from .interactive import InteractiveSettings, run_interactive
@@ -23,12 +26,18 @@ from .models import infer_provider, provider_model_set, selectable_models
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="chem-coworker",
-        description="Structure-first reaction-condition recommendation",
+        description="Condition recommendation and validated one-step retrosynthesis",
     )
     parser.add_argument(
         "reaction_smiles",
         nargs="?",
-        help="Reaction SMILES; omit it to start the interactive app",
+        help="Reaction SMILES, or target SMILES in --mode retro",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=("conditions", "retro"),
+        default="conditions",
+        help="Workflow for positional input and initial interactive mode",
     )
     parser.add_argument(
         "--index",
@@ -40,6 +49,33 @@ def _parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument("--top-k", type=int, default=5)
+    parser.add_argument(
+        "--retrosynthesis-library",
+        type=Path,
+        help="Generic operator library for one-step retrosynthesis",
+    )
+    parser.add_argument("--max-realizations", type=int, default=3)
+    parser.add_argument("--max-templates-to-apply", type=int, default=500)
+    parser.add_argument("--max-candidates-to-validate", type=int, default=100)
+    parser.add_argument(
+        "--retro-conditions",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Attach deterministic condition evidence to retro strategies",
+    )
+    parser.add_argument("--retro-condition-top-k", type=int, default=3)
+    parser.add_argument(
+        "--include-l0",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Allow the broadest validated operator fallback in retro mode",
+    )
+    parser.add_argument(
+        "--retro-context",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Use precedent context in deterministic retro ranking",
+    )
     parser.add_argument("--minimum-pool-size", type=int)
     parser.add_argument("--ranking-profile", default="default")
     parser.add_argument("--unrestricted-fallback", action="store_true")
@@ -161,6 +197,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except ValueError as exc:
         parser.error(str(exc))
     reviewer = LLMConditionReviewer()
+    retrosynthesis_reviewer = LLMRetrosynthesisReviewer()
     try:
         if args.index is None:
             coworker = ConditionCoworker.from_default(
@@ -179,11 +216,39 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error(str(exc))
     for warning in coworker.startup_warnings:
         print(f"Warning: {warning}")
+    retrosynthesis_coworker = None
+    needs_retrosynthesis = bool(
+        args.mode == "retro"
+        or args.reaction_smiles is None
+        or args.interactive
+        or args.retrosynthesis_library is not None
+    )
+    if needs_retrosynthesis:
+        try:
+            if args.retrosynthesis_library is None:
+                retrosynthesis_coworker = RetrosynthesisCoworker.from_default(
+                    condition_recommender=coworker.recommender,
+                    reviewer=retrosynthesis_reviewer,
+                )
+            else:
+                retrosynthesis_coworker = RetrosynthesisCoworker.from_path(
+                    args.retrosynthesis_library,
+                    condition_recommender=coworker.recommender,
+                    reviewer=retrosynthesis_reviewer,
+                )
+        except (OSError, RuntimeError, ValueError) as exc:
+            if args.mode == "retro" or args.retrosynthesis_library is not None:
+                parser.error(str(exc))
+            print(f"Warning: retrosynthesis unavailable: {exc}")
+    if retrosynthesis_coworker is not None:
+        for warning in retrosynthesis_coworker.startup_warnings:
+            print(f"Warning: {warning}")
     if args.interactive or args.reaction_smiles is None:
         if args.completion:
             parser.error("--completion is only supported in one-shot mode")
         return run_interactive(
             coworker,
+            retrosynthesis_coworker=retrosynthesis_coworker,
             settings=InteractiveSettings(
                 top_k=args.top_k,
                 minimum_pool_size=args.minimum_pool_size,
@@ -197,11 +262,46 @@ def main(argv: Sequence[str] | None = None) -> int:
                 review_candidates=review_settings.max_candidates,
                 review_max_tokens=review_settings.max_output_tokens,
                 apply_review_order=review_settings.apply_order,
+                mode=args.mode,
+                max_realizations_per_strategy=args.max_realizations,
+                max_templates_to_apply=args.max_templates_to_apply,
+                max_candidates_to_validate=args.max_candidates_to_validate,
+                include_l0=args.include_l0,
+                use_retro_context=args.retro_context,
+                include_retro_conditions=args.retro_conditions,
+                retro_condition_top_k=args.retro_condition_top_k,
             ),
             initial_reaction=args.reaction_smiles,
             enhanced=False if args.plain else None,
             persistent_history=not args.no_history,
         )
+    if args.mode == "retro":
+        if args.completion:
+            parser.error("--completion is not supported in retro mode")
+        if retrosynthesis_coworker is None:
+            parser.error("retrosynthesis is unavailable")
+        response = retrosynthesis_coworker.disconnect(
+            RetrosynthesisRequest(
+                target_smiles=args.reaction_smiles,
+                top_k=args.top_k,
+                max_realizations_per_strategy=args.max_realizations,
+                max_templates_to_apply=args.max_templates_to_apply,
+                max_candidates_to_validate=args.max_candidates_to_validate,
+                use_context=args.retro_context,
+                include_l0=args.include_l0,
+                include_conditions=args.retro_conditions,
+                condition_top_k=args.retro_condition_top_k,
+                condition_minimum_pool_size=args.minimum_pool_size,
+                unrestricted_condition_fallback=args.unrestricted_fallback,
+                review=review_settings,
+            )
+        )
+        print(
+            json.dumps(response.to_dict(), ensure_ascii=False, indent=2)
+            if args.as_json
+            else response.answer
+        )
+        return 0 if response.valid else 2
     response = coworker.recommend(
         ConditionRequest(
             reaction_smiles=args.reaction_smiles,

@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Literal, Optional, Tuple
 
 from condition_recommender import GenericRecommendationResult
+from core_retrosynthesis import RetrosynthesisConditionEvidence, StrategyProposal
 
 
 @dataclass(frozen=True)
@@ -167,4 +168,143 @@ class ConditionResponse:
             "result": self.result.to_dict(),
             "answer": self.answer,
             "review": self.review.to_dict() if self.review is not None else None,
+        }
+
+
+RetrosynthesisIssueCode = Literal[
+    "functional_group_compatibility",
+    "chemoselectivity",
+    "ambiguous_reactive_site",
+    "precursor_plausibility",
+    "precursor_availability_unknown",
+    "condition_feasibility",
+    "protecting_group_requirement",
+    "precedent_mismatch",
+    "insufficient_evidence",
+    "other",
+]
+
+
+@dataclass(frozen=True)
+class RetrosynthesisRequest:
+    """One chemistry-first, single-step retrosynthesis request."""
+
+    target_smiles: str
+    top_k: int = 5
+    max_realizations_per_strategy: int = 3
+    max_templates_to_apply: int = 500
+    max_candidates_to_validate: int = 100
+    use_context: bool = True
+    include_l0: bool = True
+    include_conditions: bool = True
+    condition_top_k: int = 3
+    condition_minimum_pool_size: Optional[int] = None
+    unrestricted_condition_fallback: bool = False
+    review: ConditionReviewSettings = field(default_factory=ConditionReviewSettings)
+
+    def __post_init__(self) -> None:
+        if not self.target_smiles.strip():
+            raise ValueError("target_smiles must not be empty")
+        if self.top_k < 1 or self.top_k > 50:
+            raise ValueError("top_k must be between 1 and 50")
+        if self.max_realizations_per_strategy < 1 or self.max_realizations_per_strategy > 10:
+            raise ValueError("max_realizations_per_strategy must be between 1 and 10")
+        if self.max_templates_to_apply < 1:
+            raise ValueError("max_templates_to_apply must be positive")
+        if self.max_candidates_to_validate < 1:
+            raise ValueError("max_candidates_to_validate must be positive")
+        if self.condition_top_k < 1 or self.condition_top_k > 10:
+            raise ValueError("condition_top_k must be between 1 and 10")
+        if (
+            self.condition_minimum_pool_size is not None
+            and self.condition_minimum_pool_size < 1
+        ):
+            raise ValueError("condition_minimum_pool_size must be positive")
+
+
+@dataclass(frozen=True)
+class RetrosynthesisStrategyCondition:
+    """Condition evidence attached to one deterministic strategy."""
+
+    strategy_id: str
+    evidence: RetrosynthesisConditionEvidence
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize the evidence without weakening its domain contract."""
+
+        return {
+            "strategy_id": self.strategy_id,
+            "evidence": self.evidence.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class RetrosynthesisCandidateReview:
+    """One evidence-linked advisory verdict for a validated strategy."""
+
+    strategy_id: str
+    original_rank: int
+    suggested_rank: int
+    verdict: ReviewVerdict
+    issue_codes: Tuple[RetrosynthesisIssueCode, ...]
+    evidence_ids: Tuple[str, ...]
+    rationale: str
+    confidence: float
+
+
+@dataclass(frozen=True)
+class RetrosynthesisReview:
+    """Auditable outcome of bounded LLM review of validated strategies."""
+
+    status: Literal["skipped", "completed", "failed"]
+    provider: str
+    model: str
+    trigger_reasons: Tuple[str, ...] = ()
+    summary: str = ""
+    candidates: Tuple[RetrosynthesisCandidateReview, ...] = ()
+    questions: Tuple[str, ...] = ()
+    presentation_strategy_ids: Tuple[str, ...] = ()
+    warning: Optional[str] = None
+    response_id: Optional[str] = None
+    input_tokens: int = 0
+    output_tokens: int = 0
+    provider_attempts: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize review evidence and provider metadata."""
+
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class RetrosynthesisResponse:
+    """Lossless deterministic strategies plus optional bounded review."""
+
+    request: RetrosynthesisRequest
+    valid: bool
+    strategies: Tuple[StrategyProposal, ...] = ()
+    condition_evidence: Tuple[RetrosynthesisStrategyCondition, ...] = ()
+    answer: str = ""
+    review: Optional[RetrosynthesisReview] = None
+    warnings: Tuple[str, ...] = ()
+    error: Optional[str] = None
+    library_path: Optional[str] = None
+    system: str = "chem_coworker.retrosynthesis.v1"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize all strategies, evidence, and model annotations."""
+
+        return {
+            "system": self.system,
+            "request": asdict(self.request),
+            "valid": self.valid,
+            "strategies": [item.to_dict() for item in self.strategies],
+            "condition_evidence": [
+                item.to_dict() for item in self.condition_evidence
+            ],
+            "answer": self.answer,
+            "review": self.review.to_dict() if self.review is not None else None,
+            "warnings": list(self.warnings),
+            "error": self.error,
+            "library_path": self.library_path,
         }

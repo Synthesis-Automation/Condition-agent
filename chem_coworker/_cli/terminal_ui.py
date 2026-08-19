@@ -23,9 +23,17 @@ from rich.text import Text
 
 from condition_recommender import available_ranking_profiles
 
-from chem_coworker.contracts import ConditionResponse
+from chem_coworker.contracts import ConditionResponse, RetrosynthesisResponse
+from chem_coworker.retrosynthesis_rendering import (
+    ordered_retrosynthesis_strategies,
+)
 
-from .interactive import InteractiveSession, InteractiveSettings, _InteractiveCoworker
+from .interactive import (
+    InteractiveSession,
+    InteractiveSettings,
+    _InteractiveCoworker,
+    _InteractiveRetrosynthesisCoworker,
+)
 from .models import selectable_models
 
 
@@ -33,6 +41,7 @@ HISTORY_PATH = Path.home() / ".chemcoworker" / "history"
 
 COMMANDS = {
     "/help": "show commands and keyboard shortcuts",
+    "/mode": "select conditions or retro workflow",
     "/settings": "show recommendation settings",
     "/top-k": "set the recommendation count",
     "/minimum": "set the retrieval pool minimum",
@@ -41,9 +50,12 @@ COMMANDS = {
     "/provider": "select the LLM provider",
     "/review": "set off, auto, or always review",
     "/reasoning": "set the review reasoning effort",
-    "/review-limit": "set how many recipes are reviewed",
+    "/review-limit": "set how many recipes or strategies are reviewed",
     "/max-tokens": "set the review output-token limit",
     "/review-order": "toggle advisory presentation ordering",
+    "/retro-conditions": "toggle condition lookup for retro routes",
+    "/realizations": "set precursor variants retained per strategy",
+    "/validate-limit": "set retrosynthesis forward-validation bound",
     "/json": "toggle full JSON output",
     "/last": "show the previous result",
     "/save": "save the previous result",
@@ -100,6 +112,10 @@ class SlashCommandCompleter(Completer):
             options = ("on", "off")
         elif command.casefold() == "/minimum":
             options = ("auto",)
+        elif command.casefold() == "/mode":
+            options = ("conditions", "retro")
+        elif command.casefold() == "/retro-conditions":
+            options = ("on", "off")
         for candidate in options:
             if candidate.startswith(argument):
                 yield Completion(candidate, start_position=-len(argument))
@@ -124,9 +140,16 @@ class RichResponseRenderer:
     def __init__(self, console: Console) -> None:
         self.console = console
 
-    def __call__(self, response: ConditionResponse, as_json: bool) -> None:
+    def __call__(
+        self,
+        response: ConditionResponse | RetrosynthesisResponse,
+        as_json: bool,
+    ) -> None:
         if as_json:
             self.console.print(JSON.from_data(response.to_dict()))
+            return
+        if isinstance(response, RetrosynthesisResponse):
+            self._retrosynthesis(response)
             return
         result = response.result
         if not result.valid:
@@ -285,6 +308,155 @@ class RichResponseRenderer:
         self._review(response)
         self._warnings(result.warnings)
 
+    def _retrosynthesis(self, response: RetrosynthesisResponse) -> None:
+        if not response.valid:
+            self.console.print(
+                Panel(
+                    Text(response.error or "Invalid target", style="bold red"),
+                    title="Retrosynthesis unavailable",
+                    border_style="red",
+                )
+            )
+            return
+        summary = Table.grid(padding=(0, 2))
+        summary.add_column(style="bold cyan")
+        summary.add_column()
+        summary.add_row("Target", response.request.target_smiles)
+        summary.add_row("Validated strategies", str(len(response.strategies)))
+        summary.add_row("Requested", str(response.request.top_k))
+        summary.add_row(
+            "Condition evidence",
+            "on" if response.request.include_conditions else "off",
+        )
+        if response.review is not None and response.review.status == "completed":
+            summary.add_row(
+                "Order",
+                "LLM-reviewed display order; original deterministic rank retained",
+            )
+        self.console.print(
+            Panel(summary, title="One-step retrosynthesis", border_style="cyan")
+        )
+        if not response.strategies:
+            self.console.print(
+                Panel(
+                    "No forward-validated disconnection was found.",
+                    border_style="yellow",
+                )
+            )
+            self._warnings(response.warnings)
+            return
+        reviews = {
+            item.strategy_id: item
+            for item in (response.review.candidates if response.review else ())
+        }
+        conditions = {
+            item.strategy_id: item.evidence for item in response.condition_evidence
+        }
+        table = Table(
+            title="Validated disconnection strategies",
+            box=box.ROUNDED,
+            header_style="bold magenta",
+            show_lines=True,
+        )
+        table.add_column("Shown", justify="right", style="bold")
+        table.add_column("Original", justify="right")
+        table.add_column("Precursors", ratio=4)
+        table.add_column("Score", justify="right")
+        table.add_column("Level")
+        table.add_column("Refs", justify="right")
+        table.add_column("Conditions")
+        table.add_column("LLM review")
+        ordered = ordered_retrosynthesis_strategies(response)[
+            : response.request.top_k
+        ]
+        for rank, strategy in enumerate(ordered, start=1):
+            candidate = strategy.representative
+            condition = conditions.get(strategy.strategy_id)
+            condition_text = "—"
+            if condition is not None:
+                condition_text = condition.status.replace("_", " ")
+                if condition.best_recipe_score is not None:
+                    condition_text += f"\n{condition.best_recipe_score:.3f}"
+            review = reviews.get(strategy.strategy_id)
+            review_text = "—"
+            if review is not None:
+                review_text = f"{review.verdict}\n{review.confidence:.0%}"
+            table.add_row(
+                str(rank),
+                str(strategy.strategy_rank),
+                candidate.precursor_smiles,
+                f"{candidate.score:.3f}",
+                candidate.abstraction_level,
+                str(strategy.independent_reference_support),
+                condition_text,
+                review_text,
+            )
+        self.console.print(table)
+        for display_rank, strategy in enumerate(ordered, start=1):
+            candidate = strategy.representative
+            details = Text()
+            details.append("Forward validation\n", style="bold green")
+            details.append(candidate.forward_validation_status)
+            if candidate.transformation_kind:
+                details.append("\nTransformation\n", style="bold cyan")
+                details.append(candidate.transformation_kind)
+            if strategy.total_realization_count > 1:
+                details.append("\nRealizations\n", style="bold blue")
+                details.append(
+                    f"{strategy.total_realization_count} concrete variants; "
+                    f"{len(strategy.realizations)} retained"
+                )
+            review = reviews.get(strategy.strategy_id)
+            if review is not None:
+                details.append("\nLLM review (advisory)\n", style="bold magenta")
+                details.append(
+                    f"{review.verdict} ({review.confidence:.0%}): "
+                    f"{review.rationale}"
+                )
+            if candidate.selectivity_warnings:
+                details.append("\nSelectivity cautions\n", style="bold yellow")
+                details.append(
+                    "\n".join(
+                        f"• {warning.message}"
+                        for warning in candidate.selectivity_warnings
+                    )
+                )
+            self.console.print(
+                Panel(
+                    details,
+                    title=(
+                        f"Shown row {display_rank} details · "
+                        f"original rank {strategy.strategy_rank}"
+                    ),
+                    border_style="dim",
+                )
+            )
+        if response.review is not None:
+            review = response.review
+            if review.status == "completed":
+                body = Text(review.summary)
+                if review.questions:
+                    body.append("\n\nQuestions\n", style="bold cyan")
+                    body.append("\n".join(f"• {item}" for item in review.questions))
+                body.append(
+                    f"\n\n{review.model} · advisory · "
+                    f"{review.input_tokens + review.output_tokens} tokens · "
+                    f"{review.provider_attempts or 1} provider attempt(s)",
+                    style="dim",
+                )
+                self.console.print(
+                    Panel(body, title="LLM route review", border_style="magenta")
+                )
+            elif review.status == "failed":
+                self.console.print(
+                    Panel(
+                        Text(review.warning or "Review failed", style="yellow"),
+                        title="LLM review unavailable",
+                        border_style="yellow",
+                    )
+                )
+        self._warnings(response.warnings)
+
     def _review(self, response: ConditionResponse) -> None:
         review = response.review
         if review is None or review.status == "skipped":
@@ -360,6 +532,7 @@ def _key_bindings() -> KeyBindings:
 def run_terminal_ui(
     coworker: _InteractiveCoworker,
     *,
+    retrosynthesis_coworker: Optional[_InteractiveRetrosynthesisCoworker] = None,
     settings: Optional[InteractiveSettings] = None,
     initial_reaction: Optional[str] = None,
     persistent_history: bool = True,
@@ -413,6 +586,7 @@ def run_terminal_ui(
             HTML(f"<prompt>{prompt_label}</prompt>"),
             bottom_toolbar=lambda: HTML(
                 " <b>Enter</b> send  <b>Alt+Enter</b> newline  "
+                f"<b>mode</b> {active_settings.mode}  "
                 f"<b>profile</b> {active_settings.ranking_profile}  "
                 f"<b>review</b> {active_settings.review_mode}  "
                 f"<b>model</b> {active_settings.model}  <b>/help</b> commands "
@@ -424,6 +598,7 @@ def run_terminal_ui(
 
     session = InteractiveSession(
         coworker,
+        retrosynthesis_coworker=retrosynthesis_coworker,
         settings=active_settings,
         input_fn=read_input,
         output_fn=write_output,
@@ -433,9 +608,9 @@ def run_terminal_ui(
     )
     console.print(
         Panel.fit(
-            "[bold cyan]Condition Coworker[/]\n"
-            "Structure-first recommendation with auditable evidence\n\n"
-            "Type a reaction SMILES or [bold]/help[/]",
+            "[bold cyan]Chem Coworker[/]\n"
+            "Conditions and graph-validated one-step retrosynthesis\n\n"
+            "Type a reaction SMILES, use [bold]/mode retro[/], or [bold]/help[/]",
             border_style="cyan",
         )
     )

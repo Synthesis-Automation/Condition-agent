@@ -15,6 +15,8 @@ from chem_coworker.contracts import (
     ConditionRequest,
     ConditionResponse,
     ConditionReviewSettings,
+    RetrosynthesisRequest,
+    RetrosynthesisResponse,
 )
 
 from .config import save_config
@@ -23,7 +25,8 @@ from .models import infer_provider, provider_model_set, selectable_models
 
 InputFunction = Callable[[str], str]
 OutputFunction = Callable[[str], None]
-ResponseRenderer = Callable[[ConditionResponse, bool], None]
+CoworkerResponse = ConditionResponse | RetrosynthesisResponse
+ResponseRenderer = Callable[[CoworkerResponse, bool], None]
 StatusFunction = Callable[[str], ContextManager[object]]
 ClearFunction = Callable[[], None]
 
@@ -34,6 +37,11 @@ class _InteractiveCoworker(Protocol):
 
     def recommend(self, request: ConditionRequest) -> ConditionResponse:
         """Return one condition recommendation response."""
+
+
+class _InteractiveRetrosynthesisCoworker(Protocol):
+    def disconnect(self, request: RetrosynthesisRequest) -> RetrosynthesisResponse:
+        """Return one single-step retrosynthesis response."""
 
 
 @dataclass
@@ -52,6 +60,14 @@ class InteractiveSettings:
     review_candidates: int = 10
     review_max_tokens: int = 8_000
     apply_review_order: bool = True
+    mode: str = "conditions"
+    max_realizations_per_strategy: int = 3
+    max_templates_to_apply: int = 500
+    max_candidates_to_validate: int = 100
+    include_l0: bool = True
+    use_retro_context: bool = True
+    include_retro_conditions: bool = True
+    retro_condition_top_k: int = 3
 
     def review_settings(self) -> ConditionReviewSettings:
         """Return the immutable review settings for one request."""
@@ -74,6 +90,7 @@ class InteractiveSession:
         self,
         coworker: _InteractiveCoworker,
         *,
+        retrosynthesis_coworker: Optional[_InteractiveRetrosynthesisCoworker] = None,
         settings: Optional[InteractiveSettings] = None,
         input_fn: InputFunction = input,
         output_fn: OutputFunction = print,
@@ -82,13 +99,14 @@ class InteractiveSession:
         clear_fn: Optional[ClearFunction] = None,
     ) -> None:
         self.coworker = coworker
+        self.retrosynthesis_coworker = retrosynthesis_coworker
         self.settings = settings or InteractiveSettings()
         self.input = input_fn
         self.output = output_fn
         self.response_renderer = response_renderer
         self.status = status_fn or (lambda _: nullcontext())
         self.clear = clear_fn
-        self.last_response: Optional[ConditionResponse] = None
+        self.last_response: Optional[CoworkerResponse] = None
         self._profiles = {
             str(item["profile_id"]): item for item in available_ranking_profiles()
         }
@@ -105,10 +123,11 @@ class InteractiveSession:
         if show_welcome:
             self._welcome()
         if initial_reaction:
-            self.recommend(initial_reaction)
+            self.submit(initial_reaction)
         while True:
             try:
-                value = self.input("reaction> ").strip()
+                prompt = "target> " if self.settings.mode == "retro" else "reaction> "
+                value = self.input(prompt).strip()
             except EOFError:
                 self.output("\nSession closed.")
                 return 0
@@ -121,7 +140,14 @@ class InteractiveSession:
                 if not self._command(value):
                     return 0
                 continue
-            self.recommend(value)
+            self.submit(value)
+
+    def submit(self, value: str) -> Optional[CoworkerResponse]:
+        """Dispatch one molecule/reaction input according to the active mode."""
+
+        if self.settings.mode == "retro":
+            return self.disconnect(value)
+        return self.recommend(value)
 
     def recommend(self, reaction_smiles: str) -> Optional[ConditionResponse]:
         """Prepare, optionally complete, and recommend one reaction."""
@@ -152,6 +178,48 @@ class InteractiveSession:
             self.output(f"Error: {exc}")
             return None
 
+        self.last_response = response
+        self.output("")
+        self._render_response(response)
+        self.output("")
+        return response
+
+    def disconnect(self, target_smiles: str) -> Optional[RetrosynthesisResponse]:
+        """Run one deterministic one-step search and optional LLM review."""
+
+        if self.retrosynthesis_coworker is None:
+            self.output("Retrosynthesis is unavailable; check the startup warnings.")
+            return None
+        status = "Generating and forward-validating disconnections..."
+        if self.settings.review_mode != "off":
+            status = "Validating strategies, checking conditions, and reviewing..."
+        try:
+            with self.status(status):
+                response = self.retrosynthesis_coworker.disconnect(
+                    RetrosynthesisRequest(
+                        target_smiles=target_smiles,
+                        top_k=self.settings.top_k,
+                        max_realizations_per_strategy=(
+                            self.settings.max_realizations_per_strategy
+                        ),
+                        max_templates_to_apply=self.settings.max_templates_to_apply,
+                        max_candidates_to_validate=(
+                            self.settings.max_candidates_to_validate
+                        ),
+                        use_context=self.settings.use_retro_context,
+                        include_l0=self.settings.include_l0,
+                        include_conditions=self.settings.include_retro_conditions,
+                        condition_top_k=self.settings.retro_condition_top_k,
+                        condition_minimum_pool_size=self.settings.minimum_pool_size,
+                        unrestricted_condition_fallback=(
+                            self.settings.unrestricted_fallback
+                        ),
+                        review=self.settings.review_settings(),
+                    )
+                )
+        except (RuntimeError, ValueError) as exc:
+            self.output(f"Error: {exc}")
+            return None
         self.last_response = response
         self.output("")
         self._render_response(response)
@@ -239,6 +307,8 @@ class InteractiveSession:
             self._help()
         elif name == "/settings":
             self._show_settings()
+        elif name == "/mode":
+            self._set_mode(argument)
         elif name == "/top-k":
             self._set_top_k(argument)
         elif name == "/minimum":
@@ -259,6 +329,12 @@ class InteractiveSession:
             self._set_max_tokens(argument)
         elif name == "/review-order":
             self._set_review_order(argument)
+        elif name == "/retro-conditions":
+            self._set_retro_conditions(argument)
+        elif name == "/realizations":
+            self._set_realizations(argument)
+        elif name == "/validate-limit":
+            self._set_validate_limit(argument)
         elif name == "/json":
             self._set_json(argument)
         elif name == "/last":
@@ -272,13 +348,14 @@ class InteractiveSession:
         return True
 
     def _welcome(self) -> None:
-        self.output("Condition Coworker")
-        self.output("Structure-first condition recommendation; named family optional.")
-        self.output("Enter reaction SMILES, or /help for commands.")
+        self.output("Chem Coworker")
+        self.output("Conditions and graph-validated one-step retrosynthesis.")
+        self.output("Enter reaction SMILES, or use /mode retro for a target molecule.")
         self.output("")
 
     def _help(self) -> None:
         self.output("Commands:")
+        self.output("  /mode conditions|retro  Select the active workflow")
         self.output("  /settings           Show current settings")
         self.output("  /top-k N            Set recommendation count (1-50)")
         self.output("  /minimum N|auto     Set minimum retrieval pool size")
@@ -287,9 +364,12 @@ class InteractiveSession:
         self.output("  /provider [NAME]    List or select openai/aliyun")
         self.output("  /review MODE        Set off, auto, or always")
         self.output("  /reasoning LEVEL    Set none/low/medium/high/xhigh/max")
-        self.output("  /review-limit N     Review the first 1-10 recipes")
+        self.output("  /review-limit N     Review the first 1-10 recipes/strategies")
         self.output("  /max-tokens N       Set review output limit (256-20000)")
         self.output("  /review-order on|off Apply advisory presentation ordering")
+        self.output("  /retro-conditions on|off Recommend conditions for routes")
+        self.output("  /realizations N      Retain 1-10 precursor variants per strategy")
+        self.output("  /validate-limit N    Bound forward-validation attempts")
         self.output("  /json on|off        Toggle full JSON output")
         self.output("  /last               Show the previous result again")
         self.output("  /save PATH          Save the previous result as JSON")
@@ -298,6 +378,7 @@ class InteractiveSession:
 
     def _show_settings(self) -> None:
         minimum = self.settings.minimum_pool_size or "auto"
+        self.output(f"mode: {self.settings.mode}")
         self.output(f"top-k: {self.settings.top_k}")
         self.output(f"minimum pool: {minimum}")
         self.output(f"ranking profile: {self.settings.ranking_profile}")
@@ -315,6 +396,36 @@ class InteractiveSession:
             "unrestricted fallback: "
             + ("on" if self.settings.unrestricted_fallback else "off")
         )
+        self.output(
+            "retrosynthesis conditions: "
+            + ("on" if self.settings.include_retro_conditions else "off")
+        )
+        self.output(
+            "retrosynthesis realizations per strategy: "
+            f"{self.settings.max_realizations_per_strategy}"
+        )
+        self.output(
+            "retrosynthesis validation limit: "
+            f"{self.settings.max_candidates_to_validate}"
+        )
+
+    def _set_mode(self, argument: str) -> None:
+        aliases = {
+            "condition": "conditions",
+            "conditions": "conditions",
+            "retro": "retro",
+            "retrosynthesis": "retro",
+        }
+        mode = aliases.get(argument.casefold())
+        if mode is None:
+            self.output("Usage: /mode conditions|retro.")
+            return
+        if mode == "retro" and self.retrosynthesis_coworker is None:
+            self.output("Retrosynthesis is unavailable; check the startup warnings.")
+            return
+        self.settings.mode = mode
+        expected = "target SMILES" if mode == "retro" else "reaction SMILES"
+        self.output(f"mode set to {mode}; enter {expected}.")
 
     def _set_top_k(self, argument: str) -> None:
         try:
@@ -458,6 +569,42 @@ class InteractiveSession:
             "review presentation ordering " + ("enabled." if selected else "disabled.")
         )
 
+    def _set_retro_conditions(self, argument: str) -> None:
+        values = {"on": True, "off": False}
+        selected = values.get(argument.casefold())
+        if selected is None:
+            self.output("Usage: /retro-conditions on|off.")
+            return
+        self.settings.include_retro_conditions = selected
+        self.output(
+            "retrosynthesis condition lookup "
+            + ("enabled." if selected else "disabled.")
+        )
+
+    def _set_realizations(self, argument: str) -> None:
+        try:
+            value = int(argument)
+        except ValueError:
+            self.output("Usage: /realizations N, where N is 1-10.")
+            return
+        if value < 1 or value > 10:
+            self.output("realizations must be between 1 and 10.")
+            return
+        self.settings.max_realizations_per_strategy = value
+        self.output(f"retrosynthesis realizations set to {value}.")
+
+    def _set_validate_limit(self, argument: str) -> None:
+        try:
+            value = int(argument)
+        except ValueError:
+            self.output("Usage: /validate-limit N, where N is positive.")
+            return
+        if value < 1:
+            self.output("validation limit must be positive.")
+            return
+        self.settings.max_candidates_to_validate = value
+        self.output(f"retrosynthesis validation limit set to {value}.")
+
     def _persist_review_settings(self) -> None:
         try:
             save_config(
@@ -478,7 +625,7 @@ class InteractiveSession:
             return
         self._render_response(self.last_response)
 
-    def _render_response(self, response: ConditionResponse) -> None:
+    def _render_response(self, response: CoworkerResponse) -> None:
         if self.response_renderer is not None:
             self.response_renderer(response, self.settings.as_json)
             return
@@ -521,6 +668,7 @@ class InteractiveSession:
 def run_interactive(
     coworker: _InteractiveCoworker,
     *,
+    retrosynthesis_coworker: Optional[_InteractiveRetrosynthesisCoworker] = None,
     settings: Optional[InteractiveSettings] = None,
     initial_reaction: Optional[str] = None,
     enhanced: Optional[bool] = None,
@@ -535,6 +683,7 @@ def run_interactive(
             if enhanced is True or can_use_terminal_ui():
                 return run_terminal_ui(
                     coworker,
+                    retrosynthesis_coworker=retrosynthesis_coworker,
                     settings=settings,
                     initial_reaction=initial_reaction,
                     persistent_history=persistent_history,
@@ -542,7 +691,11 @@ def run_interactive(
         except ImportError:
             if enhanced is True:
                 print("Enhanced terminal dependencies unavailable; using plain mode.")
-    return InteractiveSession(coworker, settings=settings).run(initial_reaction)
+    return InteractiveSession(
+        coworker,
+        retrosynthesis_coworker=retrosynthesis_coworker,
+        settings=settings,
+    ).run(initial_reaction)
 
 
 __all__ = ["InteractiveSession", "InteractiveSettings", "run_interactive"]

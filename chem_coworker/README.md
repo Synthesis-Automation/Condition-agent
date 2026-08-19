@@ -1,7 +1,8 @@
 # Condition Coworker
 
-`chem_coworker` is the small application layer for structure-first reaction-
-condition recommendation. It contains no chemistry rules and no tool registry.
+`chem_coworker` is the small application layer for structure-first condition
+recommendation and chemistry-first one-step retrosynthesis. It contains no
+chemistry rules and no tool registry.
 
 The request flow is deliberately short, with the LLM used only where contextual
 judgment is useful:
@@ -13,6 +14,14 @@ ConditionRequest
   -> GenericRecommendationResult
   -> optional bounded LLM condition review
   -> deterministic rendering of the result and advisory review
+
+RetrosynthesisRequest
+  -> core_retrosynthesis generic operator retrieval
+  -> reverse graph application and hard forward-signature validation
+  -> deterministic STRAT1 strategy grouping and ranking
+  -> optional condition_recommender evidence for each proposed reaction
+  -> optional bounded LLM feasibility and chemoselectivity review
+  -> deterministic rendering of the strategies and advisory review
 ```
 
 `reactive_taxonomy` remains the molecular source of truth,
@@ -60,6 +69,41 @@ missing-source confirmation and supports `/help`, `/settings`, `/top-k`,
 `/minimum`, `/profile`, `/model`, `/provider`, `/review`, `/reasoning`,
 `/review-limit`, `/max-tokens`, `/review-order`, `/json`, `/last`, `/save`,
 `/clear`, and `/quit`.
+
+Switch to one-step retrosynthesis with `/mode retro`, then enter a single target
+SMILES at the `target>` prompt. Return with `/mode conditions`. Retrosynthesis
+uses the validated generic operator library in
+`results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz`
+by default. It returns distinct `STRAT1` strategies, not a list inflated by
+leaving-group or protecting-group variants.
+
+Only forward-validated graph proposals reach the LLM. The review can annotate
+and reorder those strategies for functional-group compatibility,
+chemoselectivity, competing reactive sites, precursor plausibility, protecting-
+group needs, precedent transfer, and condition feasibility. It cannot generate
+or edit precursors, restore a rejected proposal, or change the deterministic
+ranking stored under `strategies` in JSON.
+
+The model-facing packet uses short request-local aliases such as `strategy-1`
+and `evidence.strategy-1.conditions`. Code maps those aliases back to the full
+deterministic `STRAT1` identities after schema validation, avoiding copy errors
+in long hash IDs without accepting fuzzy or invented evidence references.
+
+The retrosynthesis controls are:
+
+```text
+/mode retro                    switch the prompt to target SMILES
+/top-k 5                       request five final strategies
+/realizations 3                retain up to three concrete variants per strategy
+/validate-limit 100            bound expensive forward-validation attempts
+/retro-conditions on|off       attach deterministic condition recommendations
+/review off|auto|always        control advisory LLM route review
+```
+
+`auto` reviews a multi-strategy result and also responds to selectivity
+warnings, precursor-compatibility cautions, weak support, or generalized
+operator fallback. Condition evidence is advisory: lack of a matching recipe
+does not invalidate a graph-verified route.
 
 The main LLM controls are:
 
@@ -110,6 +154,19 @@ Run one non-interactive recommendation with:
 ```powershell
 python -m chem_coworker "reactants>>product"
 ```
+
+Run one non-interactive one-step retrosynthesis with:
+
+```powershell
+python -m chem_coworker --mode retro "target_smiles"
+python -m chem_coworker --mode retro --top-k 5 --review always --model gpt-5.6-terra "target_smiles"
+```
+
+Use `--no-retro-conditions` for a faster structure-only search. Override the
+operator artifact with `--retrosynthesis-library PATH`; use
+`--max-realizations`, `--max-templates-to-apply`,
+`--max-candidates-to-validate`, `--no-include-l0`, or `--no-retro-context` for
+bounded search experiments.
 
 For example, run a deterministic-only request or force review with a selected
 model:
