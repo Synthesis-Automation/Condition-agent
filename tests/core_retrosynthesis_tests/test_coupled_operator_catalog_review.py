@@ -93,6 +93,11 @@ def test_pair_catalog_renders_both_physical_reaction_graphics() -> None:
     assert "Handle Progression" in page
     assert "created_handle_consumed" in page
     assert "3</strong><small>coverage gaps" in page
+    assert "graphic_layout&quot;: &quot;one_physical_reaction_per_row" in page
+    assert (
+        ".two-step-route { display: grid; grid-template-columns: minmax(0,1fr);" in page
+    )
+    assert "height: clamp(240px,22vw,340px)" in page
 
 
 def test_pair_catalog_writer_reports_pair_and_graphic_counts(

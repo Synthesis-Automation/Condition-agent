@@ -16,7 +16,7 @@ from .generic_models import GenericGraphOperator, GenericTemplateLibrary
 from .html_report import reaction_svg
 
 
-COUPLED_OPERATOR_CATALOG_REVIEW_VERSION = "v1_coupled_operator_catalog_review.v1"
+COUPLED_OPERATOR_CATALOG_REVIEW_VERSION = "v1_coupled_operator_catalog_review.v2"
 
 
 def _display_name(value: str) -> str:
@@ -85,7 +85,7 @@ def _step_graphic(
         '<div class="step-heading">'
         f"<span>Physical step {number}</span><strong>{html.escape(caption)}</strong>"
         "</div>"
-        f'<div class="reaction-graphic">{reaction_svg(reaction_smiles, sub_image_size=(220, 145))}</div>'
+        f'<div class="reaction-graphic">{reaction_svg(reaction_smiles, sub_image_size=(500, 300))}</div>'
         "</section>"
     )
 
@@ -231,6 +231,7 @@ def render_v1_operator_pair_catalog_html(
         "capability_gap_count": capability_gap_count,
         "ordering": "strategy_id_ascending",
         "graphic_source": "shortest_patent_disjoint_heldout_example_per_pair",
+        "graphic_layout": "one_physical_reaction_per_row",
         "minimum_training_patents": 2,
     }
     route_name = (
@@ -270,11 +271,11 @@ h2 {{ overflow-wrap: anywhere; margin: 3px 0 4px; color: #264d3a; font: 700 .76r
 .support-badge strong {{ color: #28533e; font-size: .78rem; text-align: right; }} .support-badge span {{ color: #728179; font-size: .64rem; }}
 .dependency-line {{ display: flex; gap: 10px; padding: 8px 17px; border-block: 1px solid #e1e8e3; color: #687a70; background: #f8faf8; font-size: .67rem; }}
 .dependency-line strong {{ color: #456653; }}
-.two-step-route {{ display: grid; grid-template-columns: minmax(0,1fr) 150px minmax(0,1fr); gap: 10px; align-items: stretch; padding: 15px 17px 12px; }}
+.two-step-route {{ display: grid; grid-template-columns: minmax(0,1fr); gap: 10px; align-items: stretch; padding: 15px 17px 12px; }}
 .physical-step {{ min-width: 0; overflow: hidden; border: 1px solid #d6e0d9; border-radius: 9px; background: #fff; }}
-.step-heading {{ display: flex; justify-content: space-between; gap: 12px; padding: 7px 9px; border-bottom: 1px solid #e0e7e2; color: #687a70; background: #f7faf8; font-size: .64rem; }}
-.step-heading strong {{ color: #3f614f; }} .reaction-graphic svg {{ display: block; width: 100%; height: auto; min-height: 145px; }}
-.route-bridge {{ display: flex; min-width: 0; flex-direction: column; justify-content: center; gap: 6px; color: #687a70; text-align: center; }}
+.step-heading {{ display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; border-bottom: 1px solid #e0e7e2; color: #687a70; background: #f7faf8; font-size: .72rem; }}
+.step-heading strong {{ color: #3f614f; }} .reaction-graphic svg {{ display: block; width: 100%; height: clamp(240px,22vw,340px); }}
+.route-bridge {{ display: flex; min-width: 0; min-height: 58px; flex-direction: column; justify-content: center; gap: 6px; padding: 4px 18px; color: #687a70; text-align: center; }}
 .route-bridge span {{ align-self: center; padding: 4px 10px; border-radius: 99px; color: #fff; background: #5d826e; font-size: .63rem; font-weight: 800; text-transform: uppercase; }}
 .route-bridge code {{ overflow-wrap: anywhere; color: #3d5d4d; font-size: .61rem; }}
 .operator-pair {{ display: grid; grid-template-columns: minmax(0,1fr) 34px minmax(0,1fr); gap: 8px; align-items: center; padding: 0 17px 14px; }}
@@ -291,7 +292,7 @@ details {{ border-top: 1px solid #e0e7e2; }} summary {{ padding: 10px 17px; colo
 dl {{ display: grid; gap: 7px; margin: 0; padding: 0 17px 15px; }} dl div {{ display: grid; grid-template-columns: 145px minmax(0,1fr); gap: 9px; }}
 dt {{ color: #748279; font-size: .64rem; }} dd {{ min-width: 0; margin: 0; color: #425f50; font-size: .65rem; }} code {{ overflow-wrap: anywhere; font-family: Consolas,monospace; }}
 .metadata {{ margin-top: 18px; padding: 12px; border: 1px solid #d3ded7; border-radius: 9px; color: #66786e; background: #f8faf8; font-size: .67rem; white-space: pre-wrap; }}
-@media (max-width:1050px) {{ .two-step-route {{ grid-template-columns: 1fr; }} .route-bridge {{ min-height: 70px; }} .operator-pair {{ grid-template-columns: 1fr; }} .pair-arrow {{ transform: rotate(90deg); }} .toolbar {{ grid-template-columns: 1fr 1fr; }} }}
+@media (max-width:1050px) {{ .operator-pair {{ grid-template-columns: 1fr; }} .pair-arrow {{ transform: rotate(90deg); }} .toolbar {{ grid-template-columns: 1fr 1fr; }} }}
 @media (max-width:650px) {{ .shell {{ padding: 12px; }} .page-heading {{ flex-direction: column; }} .toolbar,.pair-heading {{ grid-template-columns: 1fr; }} .visible-count {{ text-align: left; }} }}
 @media print {{ .toolbar {{ display:none; }} .pair-card {{ break-inside:avoid; }} }}
 </style>
