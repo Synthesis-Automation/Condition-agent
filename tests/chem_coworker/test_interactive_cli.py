@@ -208,3 +208,22 @@ def test_session_model_and_review_selectors_flow_into_request(
     assert settings.reasoning_effort == "high"
     assert settings.max_candidates == 3
     assert (tmp_path / "config.json").is_file()
+
+
+def test_version_two_config_migrates_small_review_output_budget(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    from chem_coworker._cli import config
+
+    target = tmp_path / "config.json"
+    target.write_text(
+        '{"config_version": 2, "name": "gpt-5.6-luna", '
+        '"provider": "openai", "review_max_tokens": 2000}',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(config, "CONFIG_PATH", target)
+
+    loaded = config.load_config()
+
+    assert loaded["review_max_tokens"] == 8_000

@@ -69,7 +69,7 @@ The main LLM controls are:
 /review off|auto|always        select when review runs
 /reasoning none|low|medium|high|xhigh|max
 /review-limit 10               review at most the first ten recipes
-/max-tokens 2000               cap model output
+/max-tokens 8000               cap model output
 /review-order on|off           apply or disable advisory display ordering
 ```
 
@@ -85,6 +85,14 @@ also available through its OpenAI-compatible chat endpoint; set
 `ALIYUN_API_KEY` before selecting an Aliyun model. If a key is missing or a
 provider call fails, the deterministic recommendation is still returned and the
 review is visibly marked unavailable.
+
+Structured condition review defaults to 8,000 output tokens because reviewing
+and grouping ten recipes can require substantially more output than a simple
+answer. If OpenAI or Aliyun returns incomplete, empty, or truncated JSON, the
+coworker retries once with a larger budget (up to 20,000) and reduced reasoning
+effort. A successful retry is reported in the review metadata. If both attempts
+fail, the warning reports the provider completion state instead of exposing a
+raw Pydantic end-of-file validation error.
 
 On an interactive terminal, the enhanced interface adds:
 

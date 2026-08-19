@@ -115,6 +115,17 @@ class ReviewTransportResult:
 class IncompleteReviewOutputError(ValueError):
     """A provider completed without a parseable final review payload."""
 
+    def __init__(
+        self,
+        message: str,
+        *,
+        input_tokens: int = 0,
+        output_tokens: int = 0,
+    ) -> None:
+        super().__init__(message)
+        self.input_tokens = input_tokens
+        self.output_tokens = output_tokens
+
 
 class ReviewTransport(Protocol):
     """Transport boundary used by the reviewer and deterministic tests."""
@@ -175,6 +186,8 @@ class OpenAICompatibleReviewTransport:
             ),
         )
         failures = []
+        consumed_input_tokens = 0
+        consumed_output_tokens = 0
         for attempt, active_settings in enumerate(
             (settings, retry_settings),
             start=1,
@@ -190,12 +203,21 @@ class OpenAICompatibleReviewTransport:
                         evidence_packet,
                         active_settings,
                     )
-                return replace(result, attempts=attempt)
+                return replace(
+                    result,
+                    input_tokens=result.input_tokens + consumed_input_tokens,
+                    output_tokens=result.output_tokens + consumed_output_tokens,
+                    attempts=attempt,
+                )
             except (IncompleteReviewOutputError, ValidationError) as exc:
                 failures.append(self._concise_failure(exc))
+                consumed_input_tokens += int(getattr(exc, "input_tokens", 0) or 0)
+                consumed_output_tokens += int(getattr(exc, "output_tokens", 0) or 0)
         raise IncompleteReviewOutputError(
             f"{settings.provider} returned no valid structured review after "
-            f"2 attempts ({'; '.join(failures)})"
+            f"2 attempts ({'; '.join(failures)})",
+            input_tokens=consumed_input_tokens,
+            output_tokens=consumed_output_tokens,
         )
 
     def _openai_response(
@@ -228,25 +250,38 @@ class OpenAICompatibleReviewTransport:
         if settings.model.startswith(("gpt-5", "o3", "o4")):
             request["reasoning"] = {"effort": settings.reasoning_effort}
         response = client.responses.create(**request)
+        usage = getattr(response, "usage", None)
+        input_tokens = int(getattr(usage, "input_tokens", 0) or 0)
+        output_tokens = int(getattr(usage, "output_tokens", 0) or 0)
         status = str(getattr(response, "status", "unknown") or "unknown")
         if status == "incomplete":
             reason = self._incomplete_reason(response)
             raise IncompleteReviewOutputError(
-                "OpenAI response was incomplete"
-                + (f" ({reason})" if reason else "")
+                "OpenAI response was incomplete" + (f" ({reason})" if reason else ""),
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
             )
         content = str(getattr(response, "output_text", "") or "").strip()
         if not content:
             raise IncompleteReviewOutputError(
-                f"OpenAI response contained no final JSON (status={status})"
+                f"OpenAI response contained no final JSON (status={status})",
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
             )
-        parsed = ConditionReviewPayload.model_validate_json(content)
-        usage = getattr(response, "usage", None)
+        try:
+            parsed = ConditionReviewPayload.model_validate_json(content)
+        except ValidationError as exc:
+            raise IncompleteReviewOutputError(
+                "OpenAI returned invalid structured JSON: "
+                + self._concise_failure(exc),
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            ) from exc
         return ReviewTransportResult(
             payload=parsed,
             response_id=getattr(response, "id", None),
-            input_tokens=int(getattr(usage, "input_tokens", 0) or 0),
-            output_tokens=int(getattr(usage, "output_tokens", 0) or 0),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
         )
 
     def _compatible_chat(
@@ -283,6 +318,9 @@ class OpenAICompatibleReviewTransport:
             response_format={"type": "json_object"},
             max_tokens=settings.max_output_tokens,
         )
+        usage = response.usage
+        input_tokens = int(getattr(usage, "prompt_tokens", 0) or 0)
+        output_tokens = int(getattr(usage, "completion_tokens", 0) or 0)
         choice = response.choices[0]
         content = str(choice.message.content or "").strip()
         if not content:
@@ -292,15 +330,24 @@ class OpenAICompatibleReviewTransport:
             raise IncompleteReviewOutputError(
                 "Aliyun response contained no final JSON "
                 f"(finish_reason={choice.finish_reason or 'unknown'}, "
-                f"reasoning_chars={len(reasoning_content)})"
+                f"reasoning_chars={len(reasoning_content)})",
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
             )
-        parsed = ConditionReviewPayload.model_validate_json(content)
-        usage = response.usage
+        try:
+            parsed = ConditionReviewPayload.model_validate_json(content)
+        except ValidationError as exc:
+            raise IncompleteReviewOutputError(
+                "Aliyun returned invalid structured JSON: "
+                + self._concise_failure(exc),
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            ) from exc
         return ReviewTransportResult(
             payload=parsed,
             response_id=getattr(response, "id", None),
-            input_tokens=int(getattr(usage, "prompt_tokens", 0) or 0),
-            output_tokens=int(getattr(usage, "completion_tokens", 0) or 0),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
         )
 
     def _build_client(self, **kwargs: Any) -> Any:
@@ -479,6 +526,11 @@ class LLMConditionReviewer:
                     item.recipe_id for item in result.recommendations
                 ),
                 warning=f"LLM review failed ({type(exc).__name__}): {message}",
+                input_tokens=int(getattr(exc, "input_tokens", 0) or 0),
+                output_tokens=int(getattr(exc, "output_tokens", 0) or 0),
+                provider_attempts=(
+                    2 if isinstance(exc, IncompleteReviewOutputError) else 1
+                ),
             )
 
         review_by_id = {item.recipe_id: item for item in candidate_reviews}
@@ -622,6 +674,7 @@ __all__ = [
     "CandidateReviewPayload",
     "ConditionGroupPayload",
     "ConditionReviewPayload",
+    "IncompleteReviewOutputError",
     "LLMConditionReviewer",
     "OpenAICompatibleReviewTransport",
     "REVIEW_SCHEMA_VERSION",

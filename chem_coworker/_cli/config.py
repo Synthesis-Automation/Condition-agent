@@ -51,9 +51,7 @@ def load_config() -> Dict[str, Any]:
             max_tokens = data.get("review_max_tokens")
             if isinstance(max_tokens, int) and 256 <= max_tokens <= 20_000:
                 config["review_max_tokens"] = (
-                    max_tokens
-                    if config_version == 3
-                    else max(8_000, max_tokens)
+                    max_tokens if config_version == 3 else max(8_000, max_tokens)
                 )
             if isinstance(data.get("apply_review_order"), bool):
                 config["apply_review_order"] = data["apply_review_order"]
