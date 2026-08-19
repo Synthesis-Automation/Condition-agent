@@ -22,7 +22,7 @@ def test_slash_completion_covers_commands_and_profile_arguments() -> None:
     commands = list(completer.get_completions(Document("/pro"), None))
     profiles = list(completer.get_completions(Document("/profile yi"), None))
 
-    assert [item.text for item in commands] == ["/profile"]
+    assert [item.text for item in commands] == ["/profile", "/provider"]
     assert [item.text for item in profiles] == ["yield"]
 
 

@@ -4,30 +4,81 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 
 CONFIG_PATH = Path.home() / ".chemcoworker" / "config.json"
 DEFAULT_MODEL: Dict[str, str] = {"name": "gpt-5.6-terra", "provider": "openai"}
+DEFAULT_REVIEW_CONFIG: Dict[str, Any] = {
+    **DEFAULT_MODEL,
+    "review_mode": "auto",
+    "reasoning_effort": "medium",
+    "review_candidates": 5,
+    "review_max_tokens": 2_000,
+    "apply_review_order": True,
+}
 
 
-def load_config() -> Dict[str, str]:
-    """Load saved model metadata or return a copy of the defaults."""
+def load_config() -> Dict[str, Any]:
+    """Load validated model/review settings, including older two-field files."""
 
+    config = DEFAULT_REVIEW_CONFIG.copy()
     try:
         data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-        if "name" in data and "provider" in data:
-            return {"name": str(data["name"]), "provider": str(data["provider"])}
+        if isinstance(data, dict):
+            if isinstance(data.get("name"), str) and data["name"].strip():
+                config["name"] = data["name"]
+            if data.get("provider") in {"openai", "aliyun"}:
+                config["provider"] = data["provider"]
+            if data.get("review_mode") in {"off", "auto", "always"}:
+                config["review_mode"] = data["review_mode"]
+            if data.get("reasoning_effort") in {
+                "none",
+                "low",
+                "medium",
+                "high",
+                "xhigh",
+                "max",
+            }:
+                config["reasoning_effort"] = data["reasoning_effort"]
+            candidates = data.get("review_candidates")
+            if isinstance(candidates, int) and 1 <= candidates <= 10:
+                config["review_candidates"] = candidates
+            max_tokens = data.get("review_max_tokens")
+            if isinstance(max_tokens, int) and 256 <= max_tokens <= 20_000:
+                config["review_max_tokens"] = max_tokens
+            if isinstance(data.get("apply_review_order"), bool):
+                config["apply_review_order"] = data["apply_review_order"]
     except (OSError, ValueError, TypeError):
         pass
-    return DEFAULT_MODEL.copy()
+    return config
 
 
-def save_config(model: str, provider: str) -> None:
-    """Persist optional narration-model metadata."""
+def save_config(
+    model: str,
+    provider: str,
+    *,
+    review_mode: str = "auto",
+    reasoning_effort: str = "medium",
+    review_candidates: int = 5,
+    review_max_tokens: int = 2_000,
+    apply_review_order: bool = True,
+) -> None:
+    """Persist interactive LLM review settings."""
 
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     CONFIG_PATH.write_text(
-        json.dumps({"name": model, "provider": provider}, indent=2),
+        json.dumps(
+            {
+                "name": model,
+                "provider": provider,
+                "review_mode": review_mode,
+                "reasoning_effort": reasoning_effort,
+                "review_candidates": review_candidates,
+                "review_max_tokens": review_max_tokens,
+                "apply_review_order": apply_review_order,
+            },
+            indent=2,
+        ),
         encoding="utf-8",
     )

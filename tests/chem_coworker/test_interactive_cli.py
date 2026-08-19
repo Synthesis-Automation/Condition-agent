@@ -171,3 +171,40 @@ def test_clear_command_uses_terminal_callback() -> None:
     session.run()
 
     assert cleared == [True]
+
+
+def test_session_model_and_review_selectors_flow_into_request(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    from chem_coworker._cli import config
+
+    monkeypatch.setattr(config, "CONFIG_PATH", tmp_path / "config.json")
+    monkeypatch.setattr(
+        "chem_coworker._cli.interactive.save_config",
+        config.save_config,
+    )
+    coworker = FakeCoworker()
+    output: list[str] = []
+    session = InteractiveSession(
+        coworker,
+        input_fn=_inputs(
+            "/model gpt-5.6-sol",
+            "/review always",
+            "/reasoning high",
+            "/review-limit 3",
+            "C.N>>CN",
+            "/quit",
+        ),
+        output_fn=output.append,
+    )
+
+    session.run()
+
+    settings = coworker.requests[0].review
+    assert settings.model == "gpt-5.6-sol"
+    assert settings.provider == "openai"
+    assert settings.mode == "always"
+    assert settings.reasoning_effort == "high"
+    assert settings.max_candidates == 3
+    assert (tmp_path / "config.json").is_file()

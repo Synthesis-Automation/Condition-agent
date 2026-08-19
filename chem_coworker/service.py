@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Optional, Protocol
 
 from condition_recommender import (
     ChemistRankingPreferences,
@@ -16,7 +16,7 @@ from condition_recommender import (
 from condition_recommender.reaction_completion import validate_completion_selections
 from reactive_taxonomy import RxnMapperProvider
 
-from .contracts import ConditionRequest, ConditionResponse
+from .contracts import ConditionRequest, ConditionResponse, ConditionReview
 from .rendering import render_recommendation
 
 
@@ -28,8 +28,15 @@ DEFAULT_INDEX_CANDIDATES = (
 
 
 class _Recommender(Protocol):
-    def recommend(self, reaction_smiles: str, **kwargs: Any) -> GenericRecommendationResult:
+    def recommend(
+        self, reaction_smiles: str, **kwargs: Any
+    ) -> GenericRecommendationResult:
         """Return a typed generic recommendation result."""
+
+
+class _ConditionReviewer(Protocol):
+    def review(self, result, settings) -> ConditionReview:
+        """Return a bounded post-recommendation review."""
 
 
 @dataclass(frozen=True)
@@ -37,6 +44,7 @@ class ConditionCoworker:
     """Coordinate completion, ranking preferences, and one canonical recommender."""
 
     recommender: _Recommender
+    reviewer: Optional[_ConditionReviewer] = None
     startup_warnings: tuple[str, ...] = ()
 
     @classmethod
@@ -45,6 +53,7 @@ class ConditionCoworker:
         *,
         use_rxnmapper: bool = False,
         include_review: bool = False,
+        reviewer: Optional[_ConditionReviewer] = None,
     ) -> "ConditionCoworker":
         """Select the largest compatible default index without hiding staleness."""
 
@@ -54,11 +63,13 @@ class ConditionCoworker:
                 failures.append(f"{candidate}: not found")
                 continue
             try:
-                coworker = cls.from_path(
-                    candidate,
-                    use_rxnmapper=use_rxnmapper,
-                    include_review=include_review,
-                )
+                kwargs: dict[str, Any] = {
+                    "use_rxnmapper": use_rxnmapper,
+                    "include_review": include_review,
+                }
+                if reviewer is not None:
+                    kwargs["reviewer"] = reviewer
+                coworker = cls.from_path(candidate, **kwargs)
             except (OSError, ValueError) as exc:
                 failures.append(f"{candidate}: {exc}")
                 continue
@@ -79,6 +90,7 @@ class ConditionCoworker:
         *,
         use_rxnmapper: bool = False,
         include_review: bool = False,
+        reviewer: Optional[_ConditionReviewer] = None,
     ) -> "ConditionCoworker":
         """Load one validated recommendation index for repeated requests."""
 
@@ -90,11 +102,12 @@ class ConditionCoworker:
                 )
             mapping_provider = RxnMapperProvider()
         return cls(
-            GenericConditionRecommender.from_path(
+            recommender=GenericConditionRecommender.from_path(
                 path,
                 mapping_provider=mapping_provider,
                 include_review=include_review,
-            )
+            ),
+            reviewer=reviewer,
         )
 
     @staticmethod
@@ -139,8 +152,23 @@ class ConditionCoworker:
             completion_selections=selections,
             preferred_reaction_ids=request.preferred_reaction_ids,
         )
+        review = None
+        if request.review.mode != "off":
+            if self.reviewer is None:
+                review = ConditionReview(
+                    status="failed",
+                    provider=request.review.provider,
+                    model=request.review.model,
+                    warning="LLM review is not configured for this coworker instance",
+                    presentation_recipe_ids=tuple(
+                        item.recipe_id for item in result.recommendations
+                    ),
+                )
+            else:
+                review = self.reviewer.review(result, request.review)
         return ConditionResponse(
             request=request,
             result=result,
-            answer=render_recommendation(result),
+            answer=render_recommendation(result, review),
+            review=review,
         )

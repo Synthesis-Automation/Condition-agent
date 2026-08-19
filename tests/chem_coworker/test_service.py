@@ -8,7 +8,12 @@ from typing import Any
 
 from condition_recommender import GenericRecommendationResult
 
-from chem_coworker import ConditionCoworker, ConditionRequest
+from chem_coworker import (
+    ConditionCoworker,
+    ConditionRequest,
+    ConditionReview,
+    ConditionReviewSettings,
+)
 import chem_coworker.service as service_module
 
 
@@ -17,9 +22,27 @@ class FakeRecommender:
     result: GenericRecommendationResult
     calls: list[tuple[str, dict[str, Any]]] = field(default_factory=list)
 
-    def recommend(self, reaction_smiles: str, **kwargs: Any) -> GenericRecommendationResult:
+    def recommend(
+        self, reaction_smiles: str, **kwargs: Any
+    ) -> GenericRecommendationResult:
         self.calls.append((reaction_smiles, kwargs))
         return self.result
+
+
+@dataclass
+class FakeReviewer:
+    calls: list[tuple[GenericRecommendationResult, ConditionReviewSettings]] = field(
+        default_factory=list
+    )
+
+    def review(self, result, settings) -> ConditionReview:
+        self.calls.append((result, settings))
+        return ConditionReview(
+            status="completed",
+            provider=settings.provider,
+            model=settings.model,
+            summary="No contextual conflict found.",
+        )
 
 
 def test_recommendation_is_delegated_once_to_generic_system() -> None:
@@ -84,6 +107,29 @@ def test_request_rejects_unsafe_ranking_weights() -> None:
         assert str(exc) == "ranking weights must be non-negative"
     else:
         raise AssertionError("negative ranking weights were accepted")
+
+
+def test_optional_llm_review_is_applied_after_deterministic_recommendation() -> None:
+    domain_result = GenericRecommendationResult(
+        query_reaction_smiles="C.N>>CN",
+        valid=True,
+    )
+    recommender = FakeRecommender(domain_result)
+    reviewer = FakeReviewer()
+    coworker = ConditionCoworker(recommender, reviewer=reviewer)
+
+    response = coworker.recommend(
+        ConditionRequest(
+            reaction_smiles="C.N>>CN",
+            review=ConditionReviewSettings(mode="always"),
+        )
+    )
+
+    assert response.result is domain_result
+    assert response.review is not None
+    assert response.review.status == "completed"
+    assert reviewer.calls == [(domain_result, response.request.review)]
+    assert "No contextual conflict found" in response.answer
 
 
 def test_default_index_selection_skips_stale_full_artifact(

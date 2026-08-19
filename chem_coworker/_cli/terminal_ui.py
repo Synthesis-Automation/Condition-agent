@@ -26,6 +26,7 @@ from condition_recommender import available_ranking_profiles
 from chem_coworker.contracts import ConditionResponse
 
 from .interactive import InteractiveSession, InteractiveSettings, _InteractiveCoworker
+from .models import selectable_models
 
 
 HISTORY_PATH = Path.home() / ".chemcoworker" / "history"
@@ -36,6 +37,13 @@ COMMANDS = {
     "/top-k": "set the recommendation count",
     "/minimum": "set the retrieval pool minimum",
     "/profile": "list or select a ranking profile",
+    "/model": "list or select the LLM review model",
+    "/provider": "select the LLM provider",
+    "/review": "set off, auto, or always review",
+    "/reasoning": "set the review reasoning effort",
+    "/review-limit": "set how many recipes are reviewed",
+    "/max-tokens": "set the review output-token limit",
+    "/review-order": "toggle advisory presentation ordering",
     "/json": "toggle full JSON output",
     "/last": "show the previous result",
     "/save": "save the previous result",
@@ -53,8 +61,13 @@ def can_use_terminal_ui() -> bool:
 class SlashCommandCompleter(Completer):
     """Complete slash commands and their finite argument vocabularies."""
 
-    def __init__(self, profile_ids: Iterable[str]) -> None:
+    def __init__(
+        self,
+        profile_ids: Iterable[str],
+        model_ids: Iterable[str] = (),
+    ) -> None:
         self.profile_ids = tuple(profile_ids)
+        self.model_ids = tuple(model_ids)
 
     def get_completions(self, document: Document, complete_event):  # type: ignore[no-untyped-def]
         text = document.text_before_cursor
@@ -73,7 +86,17 @@ class SlashCommandCompleter(Completer):
         options: tuple[str, ...] = ()
         if command.casefold() == "/profile":
             options = self.profile_ids
+        elif command.casefold() == "/model":
+            options = self.model_ids
         elif command.casefold() == "/json":
+            options = ("on", "off")
+        elif command.casefold() == "/review":
+            options = ("auto", "always", "off")
+        elif command.casefold() == "/provider":
+            options = ("openai", "aliyun")
+        elif command.casefold() == "/reasoning":
+            options = ("none", "low", "medium", "high", "xhigh", "max")
+        elif command.casefold() == "/review-order":
             options = ("on", "off")
         elif command.casefold() == "/minimum":
             options = ("auto",)
@@ -123,9 +146,7 @@ class RichResponseRenderer:
         summary.add_column()
         summary.add_row(
             "Reaction",
-            Text(
-                str(label.get("concise") or label.get("detailed") or "Unlabeled")
-            ),
+            Text(str(label.get("concise") or label.get("detailed") or "Unlabeled")),
         )
         summary.add_row(
             "Transformation", Text(result.transformation_class or "unresolved")
@@ -158,23 +179,46 @@ class RichResponseRenderer:
         table.add_column("Score", justify="right")
         table.add_column("Yield", justify="right")
         table.add_column("Refs", justify="right")
-        for item in result.recommendations:
+        table.add_column("LLM review")
+        review_by_id = {
+            item.recipe_id: item
+            for item in (response.review.candidates if response.review else ())
+        }
+        ordered_ids = (
+            response.review.presentation_recipe_ids
+            if response.review and response.review.presentation_recipe_ids
+            else tuple(item.recipe_id for item in result.recommendations)
+        )
+        by_id = {item.recipe_id: item for item in result.recommendations}
+        ordered = [by_id[value] for value in ordered_ids if value in by_id]
+        included = {item.recipe_id for item in ordered}
+        ordered.extend(
+            item for item in result.recommendations if item.recipe_id not in included
+        )
+        for display_rank, item in enumerate(ordered, start=1):
             recipe = self._recipe(item.resolved_recipe, item.recipe_core_id)
             expected_yield = (
                 f"{item.expected_yield_pct:.1f}%"
                 if item.expected_yield_pct is not None
                 else "—"
             )
+            candidate_review = review_by_id.get(item.recipe_id)
+            review_text = (
+                f"{candidate_review.verdict}\n{candidate_review.confidence:.0%}"
+                if candidate_review is not None
+                else "—"
+            )
             table.add_row(
-                str(item.rank),
+                str(display_rank),
                 Text(recipe),
                 f"{item.score:.3f}",
                 expected_yield,
                 str(item.reference_support),
+                review_text,
             )
         self.console.print(table)
 
-        for item in result.recommendations:
+        for item in ordered:
             details = Text()
             if item.explanation:
                 details.append("Evidence\n", style="bold green")
@@ -189,6 +233,16 @@ class RichResponseRenderer:
                     details.append("\n\n")
                 details.append("Precedents\n", style="bold cyan")
                 details.append(", ".join(item.precedent_reaction_ids))
+            candidate_review = review_by_id.get(item.recipe_id)
+            if candidate_review is not None:
+                if details:
+                    details.append("\n\n")
+                details.append("LLM review (advisory)\n", style="bold magenta")
+                details.append(
+                    f"{candidate_review.verdict} "
+                    f"({candidate_review.confidence:.0%}): "
+                    f"{candidate_review.rationale}"
+                )
             if details:
                 self.console.print(
                     Panel(
@@ -197,7 +251,34 @@ class RichResponseRenderer:
                         border_style="dim",
                     )
                 )
+        self._review(response)
         self._warnings(result.warnings)
+
+    def _review(self, response: ConditionResponse) -> None:
+        review = response.review
+        if review is None or review.status == "skipped":
+            return
+        if review.status == "failed":
+            self.console.print(
+                Panel(
+                    Text(review.warning or "Review failed", style="yellow"),
+                    title="LLM review unavailable",
+                    border_style="yellow",
+                )
+            )
+            return
+        body = Text(review.summary)
+        if review.questions:
+            body.append("\n\nQuestions\n", style="bold cyan")
+            body.append("\n".join(f"• {item}" for item in review.questions))
+        body.append(
+            f"\n\n{review.model} · advisory · "
+            f"{review.input_tokens + review.output_tokens} tokens",
+            style="dim",
+        )
+        self.console.print(
+            Panel(body, title="LLM condition review", border_style="magenta")
+        )
 
     def _warnings(self, warnings: tuple[str, ...]) -> None:
         if warnings:
@@ -274,7 +355,10 @@ def run_terminal_ui(
     prompt = PromptSession(
         history=history,
         auto_suggest=AutoSuggestFromHistory(),
-        completer=SlashCommandCompleter(profile_ids),
+        completer=SlashCommandCompleter(
+            profile_ids,
+            (item["name"] for item in selectable_models()),
+        ),
         complete_while_typing=False,
         key_bindings=_key_bindings(),
         multiline=True,
@@ -288,15 +372,18 @@ def run_terminal_ui(
     )
 
     def read_input(message: str) -> str:
-        prompt_label = "source › " if message.startswith("source") else (
-            "custom › " if message.startswith("custom") else "❯ "
+        prompt_label = (
+            "source › "
+            if message.startswith("source")
+            else ("custom › " if message.startswith("custom") else "❯ ")
         )
         return prompt.prompt(
             HTML(f"<prompt>{prompt_label}</prompt>"),
             bottom_toolbar=lambda: HTML(
                 " <b>Enter</b> send  <b>Alt+Enter</b> newline  "
                 f"<b>profile</b> {active_settings.ranking_profile}  "
-                f"<b>top-k</b> {active_settings.top_k}  <b>/help</b> commands "
+                f"<b>review</b> {active_settings.review_mode}  "
+                f"<b>model</b> {active_settings.model}  <b>/help</b> commands "
             ),
         )
 

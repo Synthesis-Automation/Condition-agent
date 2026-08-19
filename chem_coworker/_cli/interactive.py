@@ -14,7 +14,11 @@ from chem_coworker.contracts import (
     CompletionChoice,
     ConditionRequest,
     ConditionResponse,
+    ConditionReviewSettings,
 )
+
+from .config import save_config
+from .models import infer_provider, provider_model_set, selectable_models
 
 
 InputFunction = Callable[[str], str]
@@ -41,6 +45,26 @@ class InteractiveSettings:
     ranking_profile: str = "default"
     unrestricted_fallback: bool = False
     as_json: bool = False
+    review_mode: str = "auto"
+    provider: str = "openai"
+    model: str = "gpt-5.6-terra"
+    reasoning_effort: str = "medium"
+    review_candidates: int = 5
+    review_max_tokens: int = 2_000
+    apply_review_order: bool = True
+
+    def review_settings(self) -> ConditionReviewSettings:
+        """Return the immutable review settings for one request."""
+
+        return ConditionReviewSettings(
+            mode=self.review_mode,  # type: ignore[arg-type]
+            provider=self.provider,
+            model=self.model,
+            reasoning_effort=self.reasoning_effort,
+            max_candidates=self.review_candidates,
+            max_output_tokens=self.review_max_tokens,
+            apply_order=self.apply_review_order,
+        )
 
 
 class InteractiveSession:
@@ -68,6 +92,7 @@ class InteractiveSession:
         self._profiles = {
             str(item["profile_id"]): item for item in available_ranking_profiles()
         }
+        self._models = selectable_models()
 
     def run(
         self,
@@ -108,7 +133,10 @@ class InteractiveSession:
             if choices is None:
                 self.output("Recommendation cancelled.")
                 return None
-            with self.status("Filtering chemistry and ranking precedents..."):
+            status = "Filtering chemistry and ranking precedents..."
+            if self.settings.review_mode != "off":
+                status = "Ranking precedents and reviewing uncertainty..."
+            with self.status(status):
                 response = self.coworker.recommend(
                     ConditionRequest(
                         reaction_smiles=reaction_smiles,
@@ -117,6 +145,7 @@ class InteractiveSession:
                         unrestricted_fallback=self.settings.unrestricted_fallback,
                         ranking_profile=self.settings.ranking_profile,
                         completion_choices=choices,
+                        review=self.settings.review_settings(),
                     )
                 )
         except (RuntimeError, ValueError) as exc:
@@ -216,6 +245,20 @@ class InteractiveSession:
             self._set_minimum(argument)
         elif name == "/profile":
             self._set_profile(argument)
+        elif name == "/model":
+            self._set_model(argument)
+        elif name == "/provider":
+            self._set_provider(argument)
+        elif name == "/review":
+            self._set_review_mode(argument)
+        elif name == "/reasoning":
+            self._set_reasoning(argument)
+        elif name == "/review-limit":
+            self._set_review_limit(argument)
+        elif name == "/max-tokens":
+            self._set_max_tokens(argument)
+        elif name == "/review-order":
+            self._set_review_order(argument)
         elif name == "/json":
             self._set_json(argument)
         elif name == "/last":
@@ -240,6 +283,13 @@ class InteractiveSession:
         self.output("  /top-k N            Set recommendation count (1-50)")
         self.output("  /minimum N|auto     Set minimum retrieval pool size")
         self.output("  /profile [ID]       List or select a ranking profile")
+        self.output("  /model [NAME]       List or select the LLM review model")
+        self.output("  /provider [NAME]    List or select openai/aliyun")
+        self.output("  /review MODE        Set off, auto, or always")
+        self.output("  /reasoning LEVEL    Set none/low/medium/high/xhigh/max")
+        self.output("  /review-limit N     Review the first 1-10 recipes")
+        self.output("  /max-tokens N       Set review output limit (256-20000)")
+        self.output("  /review-order on|off Apply advisory presentation ordering")
         self.output("  /json on|off        Toggle full JSON output")
         self.output("  /last               Show the previous result again")
         self.output("  /save PATH          Save the previous result as JSON")
@@ -251,6 +301,15 @@ class InteractiveSession:
         self.output(f"top-k: {self.settings.top_k}")
         self.output(f"minimum pool: {minimum}")
         self.output(f"ranking profile: {self.settings.ranking_profile}")
+        self.output(f"LLM review: {self.settings.review_mode}")
+        self.output(f"model: {self.settings.model} ({self.settings.provider})")
+        self.output(f"reasoning effort: {self.settings.reasoning_effort}")
+        self.output(f"review candidate limit: {self.settings.review_candidates}")
+        self.output(f"review max tokens: {self.settings.review_max_tokens}")
+        self.output(
+            "apply review order: "
+            + ("on" if self.settings.apply_review_order else "off")
+        )
         self.output(f"JSON output: {'on' if self.settings.as_json else 'off'}")
         self.output(
             "unrestricted fallback: "
@@ -309,6 +368,109 @@ class InteractiveSession:
             return
         self.settings.as_json = selected
         self.output(f"JSON output {'enabled' if selected else 'disabled'}.")
+
+    def _set_model(self, argument: str) -> None:
+        if not argument:
+            self.output("Review models:")
+            for item in self._models:
+                marker = " *" if item["name"] == self.settings.model else ""
+                self.output(f"  {item['name']} ({item['provider']}){marker}")
+            return
+        known = {item["name"] for item in self._models}
+        if argument not in known:
+            self.output(f"Unknown model: {argument}. Use /model to list.")
+            return
+        self.settings.model = argument
+        self.settings.provider = infer_provider(argument)
+        self._persist_review_settings()
+        self.output(f"review model set to {argument} ({self.settings.provider}).")
+
+    def _set_provider(self, argument: str) -> None:
+        if not argument:
+            self.output("Providers: openai, aliyun")
+            return
+        provider = argument.casefold()
+        if provider not in {"openai", "aliyun"}:
+            self.output("Usage: /provider openai|aliyun.")
+            return
+        self.settings.provider = provider
+        provider_models = provider_model_set(provider)
+        if self.settings.model not in provider_models:
+            self.settings.model = next(
+                item["name"] for item in self._models if item["provider"] == provider
+            )
+        self._persist_review_settings()
+        self.output(f"review provider set to {provider}; model {self.settings.model}.")
+
+    def _set_review_mode(self, argument: str) -> None:
+        mode = argument.casefold()
+        if mode not in {"off", "auto", "always"}:
+            self.output("Usage: /review off|auto|always.")
+            return
+        self.settings.review_mode = mode
+        self._persist_review_settings()
+        self.output(f"LLM review mode set to {mode}.")
+
+    def _set_reasoning(self, argument: str) -> None:
+        effort = argument.casefold()
+        if effort not in {"none", "low", "medium", "high", "xhigh", "max"}:
+            self.output("Usage: /reasoning none|low|medium|high|xhigh|max.")
+            return
+        self.settings.reasoning_effort = effort
+        self._persist_review_settings()
+        self.output(f"reasoning effort set to {effort}.")
+
+    def _set_review_limit(self, argument: str) -> None:
+        try:
+            value = int(argument)
+        except ValueError:
+            self.output("Usage: /review-limit N, where N is 1-10.")
+            return
+        if value < 1 or value > 10:
+            self.output("review limit must be between 1 and 10.")
+            return
+        self.settings.review_candidates = value
+        self._persist_review_settings()
+        self.output(f"review candidate limit set to {value}.")
+
+    def _set_max_tokens(self, argument: str) -> None:
+        try:
+            value = int(argument)
+        except ValueError:
+            self.output("Usage: /max-tokens N, where N is 256-20000.")
+            return
+        if value < 256 or value > 20_000:
+            self.output("review max tokens must be between 256 and 20000.")
+            return
+        self.settings.review_max_tokens = value
+        self._persist_review_settings()
+        self.output(f"review max tokens set to {value}.")
+
+    def _set_review_order(self, argument: str) -> None:
+        values = {"on": True, "off": False}
+        selected = values.get(argument.casefold())
+        if selected is None:
+            self.output("Usage: /review-order on|off.")
+            return
+        self.settings.apply_review_order = selected
+        self._persist_review_settings()
+        self.output(
+            "review presentation ordering " + ("enabled." if selected else "disabled.")
+        )
+
+    def _persist_review_settings(self) -> None:
+        try:
+            save_config(
+                self.settings.model,
+                self.settings.provider,
+                review_mode=self.settings.review_mode,
+                reasoning_effort=self.settings.reasoning_effort,
+                review_candidates=self.settings.review_candidates,
+                review_max_tokens=self.settings.review_max_tokens,
+                apply_review_order=self.settings.apply_review_order,
+            )
+        except OSError as exc:
+            self.output(f"Warning: could not save LLM settings: {exc}")
 
     def _show_last(self) -> None:
         if self.last_response is None:
@@ -379,9 +541,7 @@ def run_interactive(
                 )
         except ImportError:
             if enhanced is True:
-                print(
-                    "Enhanced terminal dependencies unavailable; using plain mode."
-                )
+                print("Enhanced terminal dependencies unavailable; using plain mode.")
     return InteractiveSession(coworker, settings=settings).run(initial_reaction)
 
 
