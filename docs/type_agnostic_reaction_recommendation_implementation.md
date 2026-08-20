@@ -26,7 +26,7 @@ exchange, rearrangement, and other reaction patterns to one evidence-scoped
 connectivity-transition grammar is in
 [`connectivity_first_reaction_grammar_design.md`](connectivity_first_reaction_grammar_design.md).
 Its first implementation phase is specified in
-[`connectivity_first_reaction_grammar_phase1_implementation_plan.md`](connectivity_first_reaction_grammar_phase1_implementation_plan.md).
+the historical grammar-design document; the standalone phase note was removed.
 
 ```text
 Named family (optional):       Suzuki

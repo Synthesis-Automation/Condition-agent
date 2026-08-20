@@ -1328,8 +1328,7 @@ No arbitrary Python callable may be named or imported from a JSON definition.
 - Prove deterministic ordering and partner-order invariance.
 - Add a shadow edit-graph key without changing current signature identity,
   admission, retrieval, or recommendation behavior.
-- Follow the detailed Phase 1 plan in
-  [`connectivity_first_reaction_grammar_phase1_implementation_plan.md`](connectivity_first_reaction_grammar_phase1_implementation_plan.md).
+- The removed Phase 1 implementation note recorded this migration sequence.
 
 ### Phase 2: generic executor
 
@@ -1344,8 +1343,7 @@ Implemented on 2026-07-28:
   comparison with current operators; and
 - kept current operators authoritative pending later migration gates.
 
-See
-[`connectivity_first_reaction_grammar_phase2_implementation.md`](connectivity_first_reaction_grammar_phase2_implementation.md).
+The removed Phase 2 implementation note recorded this migration sequence.
 
 ### Phase 3: normalized site interfaces
 
@@ -1362,8 +1360,7 @@ Implemented on 2026-07-28:
   explicit A-B, Si-H, and B-H donors; and
 - kept the executor non-authoritative.
 
-See
-[`connectivity_first_reaction_grammar_phase3_implementation.md`](connectivity_first_reaction_grammar_phase3_implementation.md).
+The removed Phase 3 implementation note recorded this migration sequence.
 
 ### Phase 4: operator migration
 
@@ -1384,8 +1381,7 @@ Implemented on 2026-07-28:
   sequences on their existing operators until their full projection semantics
   are explicit.
 
-See
-[`connectivity_first_reaction_grammar_phase4_implementation.md`](connectivity_first_reaction_grammar_phase4_implementation.md).
+The removed Phase 4 implementation note recorded this migration sequence.
 
 ### Phase 5: derived edit shapes
 

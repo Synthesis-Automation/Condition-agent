@@ -40,28 +40,28 @@ reactive_taxonomy       condition_registry
 Package ownership is strict:
 
 - `reactive_taxonomy` must not import `condition_registry`,
-  `condition_recommender`, or legacy `chemtools`.
-- `condition_registry` must not import `condition_recommender` or legacy
-  `chemtools`. It may consume a narrow, typed reaction context without owning
-  reaction chemistry.
+  `condition_recommender`, or removed legacy packages.
+- `condition_registry` must not import `condition_recommender` or removed
+  legacy packages. It may consume a narrow, typed reaction context without
+  owning reaction chemistry.
 - `condition_recommender` may import `reactive_taxonomy` and
   `condition_registry`.
 - Application layers may compose all three packages but must not contain core
   chemistry or recommendation rules.
 
-## Legacy Boundary
+## Removed Legacy Boundary
 
-`chemtools/` and its existing application paths are legacy code. They may be read
-to understand prior behavior or to migrate deterministic chemistry ideas, but the
-new standalone packages must not depend on them.
+`chemtools/` and the former coupled coworker were removed. Their history remains
+available in Git, but they are not runtime code and must not be restored as a
+dependency or parallel public path.
 
-- Do not add imports from `chemtools` to any new-system package.
+- Do not reintroduce imports from `chemtools`.
 - Do not add adapters that make legacy models part of the new public contracts.
 - Do not preserve duplicate recommendation or conversion paths permanently.
 - When parity is established, remove migrated legacy paths instead of maintaining
   backward compatibility, unless compatibility is explicitly requested.
 - New features belong in the standalone package that owns the responsibility,
-  not in `chemtools`.
+  while `chem_coworker` remains a thin application shell.
 
 ## Core System Principles
 
@@ -120,23 +120,16 @@ and provenance in typed outputs.
 
 ## Current Implementation Priority
 
-Implement the plan in phases. Do not skip ahead when a later phase depends on an
-unfinished contract.
+The generic signature, conversion, indexing, and structure-backed retrieval
+contracts are implemented. Follow the release gates in the primary roadmap in
+order:
 
-The current priority is Phase A: the generic reaction-signature foundation.
-
-1. Add `ReactionAtomReference`, `ReactionEdit`, `ReactionPartner`,
-   `ProductTransformation`, and `ReactionSignature`.
-2. Normalize selected candidates, mapped bond changes, family environments,
-   product connections, and spectators into the generic schema.
-3. Generate deterministic, versioned L0-L4 signature keys and `signature_id`.
-4. Attach `reaction_signature` to `ReactionAnalysis` without changing current
-   family results.
-5. Support a valid mapped unknown-family reaction with `named_family=None`.
-6. Serialize the nested signature into recommendation records and review output
-   without changing admission or retrieval behavior yet.
-7. Establish parity tests before starting the family registry or unified
-   converter phases.
+1. freeze a current validation baseline;
+2. generate a blind chemist review packet;
+3. resolve disagreements without tuning against the untouched set;
+4. run the untouched evaluation;
+5. convert and validate the full source corpus; and
+6. consolidate public application paths around the validated generic index.
 
 Temporary compatibility fields are allowed only when they have clear removal
 criteria and regression tests.
@@ -181,10 +174,10 @@ criteria and regression tests.
   `tests/condition_recommender/`: new-system tests.
 - `docs/new/`: current architecture and implementation documents.
 - `app/`: application integration; keep domain logic out of this layer.
+- `chem_coworker/`: thin CLI/application shell over the standalone packages.
 - `data/` and `datasets/`: curated or source datasets; avoid committing large or
   proprietary artifacts.
 - `results/`: local generated analysis; do not commit large outputs.
-- `chemtools/`: legacy system, outside the dependency graph of new packages.
 
 ## Coding Standards
 
@@ -264,6 +257,6 @@ A change advances the new system only when it:
 - derives behavior from molecular evidence and versioned chemistry definitions;
 - preserves uncertainty and provenance;
 - adds or improves chemistry regression coverage;
-- avoids new dependencies on legacy `chemtools`; and
+- does not reintroduce the removed `chemtools` dependency or parallel paths; and
 - moves toward one canonical conversion and recommendation path rather than
   maintaining parallel family-specific systems.

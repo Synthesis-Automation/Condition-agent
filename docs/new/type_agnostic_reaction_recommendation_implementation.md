@@ -1152,7 +1152,7 @@ Required chemistry regressions include:
 | Older document | How to use it now |
 | --- | --- |
 | [`../type_agnostic_reaction_recommendation_implementation.md`](../type_agnostic_reaction_recommendation_implementation.md) | Primary historical architecture and phase plan. Its Phase A “immediate work” is implemented; current status and versions are superseded by this document. |
-| [`../reaction_featurization_workflow.md`](../reaction_featurization_workflow.md) | Detailed near-current technical walkthrough. Retain for code-level flow; read CEG1 as an internal shadow observation and RS3 as public identity. |
+| [`reaction_featurization_workflow.md`](reaction_featurization_workflow.md) | Detailed near-current technical walkthrough. Retain for code-level flow; read CEG1 as an internal shadow observation and RS3 as public identity. |
 | [`../connectivity_first_reaction_grammar_v2.md`](../connectivity_first_reaction_grammar_v2.md) | Historical summary of the removed combined v2 grammar/rewrite contract. |
 | [`../connectivity_first_reaction_grammar_design.md`](../connectivity_first_reaction_grammar_design.md) | Design rationale and migration history; combined grammar/executor stages are historical. |
 | [`../context_aware_reactivity_descriptors_implementation_plan.md`](../context_aware_reactivity_descriptors_implementation_plan.md) | Completed descriptor migration record and useful detailed contract. The phase sequence is history; typed profiles are already active. |
@@ -1166,11 +1166,9 @@ details are either migrated or intentionally archived. New status changes
 should be made here first, with links to machine-generated reports rather than
 copying transient metrics into several plans.
 
-Some older files still link to removed
-`connectivity_first_reaction_grammar_phase*_implementation*.md` documents.
-Those links describe migration history, not missing active contracts; the V2
-summary and current code supersede them. Do not restore the deleted phase files
-only to preserve an obsolete implementation sequence.
+The removed `connectivity_first_reaction_grammar_phase*_implementation*.md`
+notes described migration history, not active contracts. The V2 summary and
+current code supersede them; do not restore those files.
 
 ## 10. Release definition of done
 

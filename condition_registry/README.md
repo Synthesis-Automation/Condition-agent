@@ -2,7 +2,7 @@
 
 `condition_registry` owns condition-substance identity, aliases, possible roles,
 contextual role resolution, and canonical condition recipes. It is standalone
-and does not import `chemtools` or `condition_recommender`.
+and does not import `condition_recommender`.
 
 ## Canonical definitions
 
@@ -12,8 +12,8 @@ and does not import `chemtools` or `condition_recommender`.
 - `definitions/recipe_templates.v1.json`: expert recipe templates
 - `definitions/synthesis_protocol.v1.schema.json`: canonical protocol JSON schema
 
-`definitions/substances.v1.csv` remains only because legacy application paths
-outside this package still read it. The clean registry runtime does not.
+`definitions/substances.v1.csv` remains only for the older SciFinder data
+processor outside this package. The registry runtime does not read it.
 
 ## Minimal substance format
 

@@ -3,7 +3,6 @@
 from dataclasses import asdict
 import json
 
-import reactive_taxonomy.reaction_interpretation as interpretation_module
 import reactive_taxonomy.reaction_patterns as pattern_module
 import reactive_taxonomy.reaction_api as reaction_api_module
 from reactive_taxonomy import (

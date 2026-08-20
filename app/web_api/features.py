@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import asdict
 from typing import Any, Dict, Literal
 
 from reactive_taxonomy import (

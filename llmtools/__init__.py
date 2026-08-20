@@ -6,15 +6,12 @@ This package provides optional language-model client and review helpers:
 
 - Multi-provider LLM client management (OpenAI, Aliyun/DeepSeek, etc.)
 - Chemistry-specific prompt templates
-- Structured output parsing and validation
-- Reasoning chains for complex chemistry tasks
+- Structured reagent-review prompts and response validation
 
 Modules:
     clients: LLM client management and configuration
     prompts: Chemistry-specific prompt templates
-    parsers: Output parsing and structured extraction
-    reasoning: Multi-step reasoning chains
-    cache: Response caching and optimization
+    reagent_review: Optional structured review of registry proposals
 
 It does not own chemistry analysis or recommendation routing.
 

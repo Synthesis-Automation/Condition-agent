@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .reaction_models import (
-    REACTION_TYPE_HINT_SCHEMA_VERSION,
     ReactionComponent,
     ReactionHintParticipant,
     ReactionObservation,

@@ -240,9 +240,9 @@ def _prepare_record(
             errors.append(
                 f"MOLECULAR_WEIGHT_SMILES_MISMATCH:{molecular_weight}:{derived_mw}"
             )
-    density = _optional_number(request.density, "density", errors)
-    boiling_point = _optional_number(request.boiling_point_c, "boiling_point_c", errors)
-    melting_point = _optional_number(request.melting_point_c, "melting_point_c", errors)
+    _optional_number(request.density, "density", errors)
+    _optional_number(request.boiling_point_c, "boiling_point_c", errors)
+    _optional_number(request.melting_point_c, "melting_point_c", errors)
 
     known_roles = {
         str(item["id"]) for item in load_role_definitions().get("roles", ())

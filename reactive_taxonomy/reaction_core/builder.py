@@ -31,7 +31,6 @@ from .common import (
 from .keys import digest as _digest
 from .models import (
     REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
-    REACTION_CORE_PROJECTION_SCHEMA_VERSION,
     ReactionCoreAttachmentPort,
     ReactionCoreAtomState,
     ReactionCoreAtomTransition,
@@ -39,7 +38,6 @@ from .models import (
     ReactionCoreEventPath,
     ReactionCoreEventRelation,
     ReactionCoreProjection,
-    ReactionCoreRemoteClass,
     ReactionCoreRemoteSubgraph,
 )
 from .quality import assess_reaction_core_quality, validate_core_edits

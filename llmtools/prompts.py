@@ -13,7 +13,7 @@ Reusable prompt templates for common chemistry tasks:
 Templates use placeholder substitution and can be customized.
 """
 
-from typing import Any, Dict, Optional
+from typing import Dict
 
 
 class PromptTemplate:

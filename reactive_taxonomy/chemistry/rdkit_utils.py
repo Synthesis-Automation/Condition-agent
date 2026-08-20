@@ -1,8 +1,8 @@
 """Small, dependency-local RDKit helpers.
 
-The standalone taxonomy depends directly on RDKit and never imports the legacy
-``chemtools`` package. Parsing failures are intentionally returned as ``None``
-because invalid user input is represented by the public analysis models.
+The standalone taxonomy depends directly on RDKit. Parsing failures are
+intentionally returned as ``None`` because invalid user input is represented by
+the public analysis models.
 """
 
 from __future__ import annotations

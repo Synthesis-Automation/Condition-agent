@@ -152,10 +152,9 @@ broad reaction-space accuracy.
 
 ### Run the Phase 2 evaluation
 
-```powershell
-python -m reactive_taxonomy.reaction_edit_evaluation_cli `
-  results/reaction_edit_evaluation
-```
+The one-off Phase 2 evaluation CLI was removed after this historical baseline
+was recorded. Use the current validation commands in
+[`new/type_agnostic_reaction_recommendation_implementation.md`](new/type_agnostic_reaction_recommendation_implementation.md).
 
 Review `review_structures.html` without consulting `case_results.jsonl`.
 Reactant edit atoms are orange and corresponding mapped product atoms are

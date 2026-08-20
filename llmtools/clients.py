@@ -20,7 +20,7 @@ Based on tests/test_llm.py but production-ready with additional features.
 import os
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from openai import OpenAI
 

@@ -1,8 +1,7 @@
 """Render molecular graphs and reactions with consistent RDKit styling.
 
-The helpers are deliberately independent of the legacy :mod:`chemtools`
-package. File-based functions remain useful for exports, while the byte-based
-functions let application layers display drawings without temporary files.
+File-based functions support exports, while byte-based functions let
+application layers display drawings without temporary files.
 """
 
 from __future__ import annotations

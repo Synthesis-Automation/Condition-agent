@@ -173,6 +173,10 @@ data/kmn_index/
 # Claude Code temporary working directories
 tmpclaude-*
 
+# Local agent and test-run artifacts
+/.codex-tmp/
+/.test-tmp/
+
 # Generated and local recommendation datasets. The curated weak-label source
 # and its canonical recipe catalog are versioned inputs, not generated output.
 /datasets/*

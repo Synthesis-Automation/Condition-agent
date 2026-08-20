@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Iterable, Mapping, Tuple
+from typing import Any, Iterable, Tuple
 
 from .common import branch_contribution, heteroatom_substitution
 from .models import (

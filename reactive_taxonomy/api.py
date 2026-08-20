@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import Any, Iterable, List, Optional, Set
+from typing import Any, Iterable, List, Optional, Set, Tuple
 
 from .chemistry.rdkit_utils import mol_to_canonical_smiles, parse_smiles, rdkit_available
 from .environments import build_site_environment

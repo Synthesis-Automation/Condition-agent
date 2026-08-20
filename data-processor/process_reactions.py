@@ -24,7 +24,6 @@ import importlib.util
 import math
 import os
 import re
-from collections import defaultdict
 from typing import Dict, List, Tuple, Any, Optional
 
 try:
@@ -442,10 +441,6 @@ def _classify_reagent_role(name: str) -> str:
 
 def parse_txt(path: str) -> Dict[str, Dict[str, Any]]:
     reactions: Dict[str, Dict[str, Any]] = {}
-    current_title = ""
-    current_authors = ""
-    current_citation = ""
-    current_doi = ""
 
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
         lines = [ln.rstrip('\n') for ln in f]
@@ -453,21 +448,6 @@ def parse_txt(path: str) -> Dict[str, Dict[str, Any]]:
     i = 0
     while i < len(lines):
         line = lines[i].strip()
-
-        # Capture Title / Authors / Citation blocks
-        if line and not line.startswith(('Steps:', 'CAS Reaction Number:', 'View All', 'Reactions (', 'Search', 'Filtered By:', 'Scheme')) and not line.startswith('By:') and not line.startswith('10.'):
-            # Check if this line looks like a journal citation (contains year and volume/page numbers pattern)
-            if re.search(r"\(20\d{2}\).*\d+.*\d+", line):
-                # This is likely a journal citation line, not a title
-                current_citation = line.strip()
-            elif not re.search(r"\(20\d{2}\)", line):
-                # This looks like a title (doesn't contain publication year pattern)
-                current_title = line
-        if line.startswith('By:'):
-            current_authors = line.replace('By:', '').strip()
-        # Capture DOI lines (lines starting with '10.')
-        if line.startswith('10.'):
-            current_doi = line.strip()
 
         # If we hit a reaction header, start collecting
         if line.startswith('Steps:'):
