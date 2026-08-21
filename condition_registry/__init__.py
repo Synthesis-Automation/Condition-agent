@@ -8,6 +8,14 @@ from .api import (
     resolve_substance_id,
 )
 from .contextual_roles import resolve_contextual_component
+from .constraints import (
+    CONDITION_CONSTRAINT_SCHEMA_VERSION,
+    ConditionConstraint,
+    ConditionConstraintResolution,
+    ConditionConstraintSet,
+    condition_constraint_conflicts,
+    normalize_condition_constraint,
+)
 from .curation import (
     CompoundAdditionError,
     CompoundAdditionRequest,
@@ -84,6 +92,10 @@ __all__ = [
     "SubstanceAliasAdditionRequest",
     "SubstanceAliasAdditionResult",
     "ConditionComponentInput",
+    "ConditionConstraint",
+    "ConditionConstraintResolution",
+    "ConditionConstraintSet",
+    "CONDITION_CONSTRAINT_SCHEMA_VERSION",
     "ConditionProcessStage",
     "CONDITION_PROTOCOL_SCHEMA_VERSION",
     "ConditionRecipeTemplate",
@@ -109,6 +121,7 @@ __all__ = [
     "build_resolved_recipe_from_inputs",
     "build_synthesis_protocol_draft",
     "condition_registry_definition_versions",
+    "condition_constraint_conflicts",
     "add_compound",
     "add_substance_aliases",
     "update_compound",
@@ -116,6 +129,7 @@ __all__ = [
     "get_recipe_template",
     "load_recipe_template_set",
     "materialize_recipe_variant",
+    "normalize_condition_constraint",
     "load_condition_vocabulary",
     "resolve_condition_components",
     "resolve_identifier",

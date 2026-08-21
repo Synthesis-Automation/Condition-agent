@@ -170,6 +170,12 @@ from .route_tree import (
     route_distance_matrix,
     route_tree_distance,
 )
+from .search_policy import (
+    ROUTE_SEARCH_POLICY_SCHEMA_VERSION,
+    RouteSearchPolicy,
+    RouteSearchPolicyDelta,
+    apply_route_search_delta,
+)
 from .route_contract import (
     ROUTE_EVIDENCE_KINDS,
     ROUTE_KINDS,
@@ -394,6 +400,10 @@ from .sources import (
 )
 
 __all__ = [
+    "ROUTE_SEARCH_POLICY_SCHEMA_VERSION",
+    "RouteSearchPolicy",
+    "RouteSearchPolicyDelta",
+    "apply_route_search_delta",
     "ADMISSION_CLASSES",
     "CenterReactivityContext",
     "CompilationResult",

@@ -569,9 +569,13 @@ class GenericConditionRecommender:
         ranking_preferences: ChemistRankingPreferences | None = None,
         completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
         preferred_reaction_ids: Tuple[str, ...] = (),
+        condition_constraints: "ConditionConstraintSet | None" = None,
     ) -> GenericRecommendationResult:
         """Featurize a query and recommend without reloading the index."""
         resolved_preferences = resolve_ranking_preferences(ranking_preferences)
+        requested_top_k = top_k
+        if condition_constraints is not None and condition_constraints.constraints:
+            top_k = min(50, max(top_k + 20, top_k * 3))
         result = _recommend_with_index(
             reaction_smiles,
             self.index,
@@ -587,6 +591,14 @@ class GenericConditionRecommender:
             result,
             ranking_preferences=resolved_preferences.to_dict(),
         )
+        if condition_constraints is not None:
+            from .constraints import apply_condition_constraints
+
+            result = apply_condition_constraints(
+                result,
+                condition_constraints,
+                top_k=requested_top_k,
+            )
         if (
             completion_selections
             and self.fragment_source_artifact_current is False

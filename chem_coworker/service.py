@@ -160,6 +160,7 @@ class ConditionCoworker:
             ranking_preferences=preferences,
             completion_selections=selections,
             preferred_reaction_ids=request.preferred_reaction_ids,
+            condition_constraints=request.condition_constraints,
         )
         review = None
         if request.review.mode != "off":

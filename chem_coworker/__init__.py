@@ -21,9 +21,19 @@ from .contracts import (
 from .multistep import MultistepRetrosynthesisCoworker
 from .retrosynthesis import RetrosynthesisCoworker
 from .service import ConditionCoworker
+from .assistance import (
+    AssistanceApplicationService,
+    AssistanceController,
+    AssistanceRequest,
+    AssistanceRunResult,
+)
 
 __all__ = [
     "CompletionChoice",
+    "AssistanceApplicationService",
+    "AssistanceController",
+    "AssistanceRequest",
+    "AssistanceRunResult",
     "ConditionCandidateReview",
     "ConditionGroupReview",
     "ConditionCoworker",

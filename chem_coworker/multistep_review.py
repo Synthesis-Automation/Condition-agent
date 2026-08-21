@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-import json
-import os
 import re
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any, Callable, Literal, Mapping, Protocol, Sequence
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field
+
+from .assistance.transport import (
+    IncompleteAssistanceOutputError,
+    OpenAICompatibleStructuredTransport,
+)
 
 from core_retrosynthesis import MultistepRetrosynthesisRoute
 
@@ -28,16 +31,6 @@ _VERDICT_PRIORITY = {
     "needs_information": 2,
     "flag": 3,
 }
-_RETRY_EFFORT = {
-    "none": "none",
-    "low": "none",
-    "medium": "low",
-    "high": "low",
-    "xhigh": "medium",
-    "max": "medium",
-}
-
-
 class MultistepRoutePayload(BaseModel):
     """Strict model output for one supplied route alias."""
 
@@ -128,185 +121,37 @@ class OpenAICompatibleMultistepReviewTransport:
     """Use OpenAI Responses structured output or compatible chat JSON."""
 
     def __init__(self, client_factory: Callable[..., Any] | None = None) -> None:
-        self._client_factory = client_factory
+        self._structured = OpenAICompatibleStructuredTransport(client_factory)
 
     def complete(
         self,
         evidence_packet: Mapping[str, Any],
         settings: ConditionReviewSettings,
     ) -> MultistepReviewTransportResult:
-        retry = replace(
-            settings,
-            reasoning_effort=_RETRY_EFFORT[settings.reasoning_effort],
-            max_output_tokens=min(20_000, max(8_000, settings.max_output_tokens * 2)),
-        )
-        failures: list[str] = []
-        consumed_input = 0
-        consumed_output = 0
-        for attempt, active in enumerate((settings, retry), start=1):
-            try:
-                result = (
-                    self._openai_response(evidence_packet, active)
-                    if settings.provider == "openai"
-                    else self._compatible_chat(evidence_packet, active)
-                )
-                return replace(
-                    result,
-                    input_tokens=result.input_tokens + consumed_input,
-                    output_tokens=result.output_tokens + consumed_output,
-                    attempts=attempt,
-                )
-            except (IncompleteReviewOutputError, ValidationError) as exc:
-                failures.append(self._concise_failure(exc))
-                consumed_input += int(getattr(exc, "input_tokens", 0) or 0)
-                consumed_output += int(getattr(exc, "output_tokens", 0) or 0)
-        raise IncompleteReviewOutputError(
-            f"{settings.provider} returned no valid structured multistep review "
-            f"after 2 attempts ({'; '.join(failures)})",
-            input_tokens=consumed_input,
-            output_tokens=consumed_output,
-        )
-
-    def _openai_response(
-        self,
-        packet: Mapping[str, Any],
-        settings: ConditionReviewSettings,
-    ) -> MultistepReviewTransportResult:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY is not set")
-        client = self._build_client(
-            api_key=api_key,
-            base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
-        )
-        response = client.responses.create(
-            model=settings.model,
-            instructions=_INSTRUCTIONS,
-            input=json.dumps(packet, ensure_ascii=False, sort_keys=True),
-            text={
-                "format": {
-                    "type": "json_schema",
-                    "name": "multistep_route_review",
-                    "strict": True,
-                    "schema": MultistepReviewPayload.model_json_schema(),
-                }
-            },
-            max_output_tokens=settings.max_output_tokens,
-            store=False,
-            **(
-                {"reasoning": {"effort": settings.reasoning_effort}}
-                if settings.model.startswith(("gpt-5", "o3", "o4"))
-                else {}
-            ),
-        )
-        usage = getattr(response, "usage", None)
-        input_tokens = int(getattr(usage, "input_tokens", 0) or 0)
-        output_tokens = int(getattr(usage, "output_tokens", 0) or 0)
-        status = str(getattr(response, "status", "unknown") or "unknown")
-        content = str(getattr(response, "output_text", "") or "").strip()
-        if status == "incomplete" or not content:
-            raise IncompleteReviewOutputError(
-                f"OpenAI response contained no complete final JSON (status={status})",
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-            )
         try:
-            payload = MultistepReviewPayload.model_validate_json(content)
-        except ValidationError as exc:
-            raise IncompleteReviewOutputError(
-                "OpenAI returned invalid multistep JSON: "
-                + self._concise_failure(exc),
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-            ) from exc
-        return MultistepReviewTransportResult(
-            payload=payload,
-            response_id=getattr(response, "id", None),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-        )
-
-    def _compatible_chat(
-        self,
-        packet: Mapping[str, Any],
-        settings: ConditionReviewSettings,
-    ) -> MultistepReviewTransportResult:
-        api_key = os.getenv("ALIYUN_API_KEY")
-        if not api_key:
-            raise RuntimeError("ALIYUN_API_KEY is not set")
-        client = self._build_client(
-            api_key=api_key,
-            base_url=os.getenv(
-                "ALIYUN_BASE_URL",
-                "https://dashscope.aliyuncs.com/compatible-mode/v1",
-            ),
-        )
-        response = client.chat.completions.create(
-            model=settings.model,
-            messages=(
-                {"role": "system", "content": _INSTRUCTIONS},
-                {
-                    "role": "user",
-                    "content": json.dumps(
-                        {
-                            "response_instruction": (
-                                "Return only one valid json object matching "
-                                "output_schema."
-                            ),
-                            "output_schema": MultistepReviewPayload.model_json_schema(),
-                            "evidence_packet": packet,
-                        },
-                        ensure_ascii=False,
-                        sort_keys=True,
-                    ),
-                },
-            ),
-            response_format={"type": "json_object"},
-            max_tokens=settings.max_output_tokens,
-        )
-        usage = response.usage
-        input_tokens = int(getattr(usage, "prompt_tokens", 0) or 0)
-        output_tokens = int(getattr(usage, "completion_tokens", 0) or 0)
-        choice = response.choices[0]
-        content = str(choice.message.content or "").strip()
-        if not content:
-            raise IncompleteReviewOutputError(
-                "Aliyun response contained no final JSON "
-                f"(finish_reason={choice.finish_reason or 'unknown'})",
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
+            result = self._structured.complete(
+                evidence_packet,
+                settings,  # type: ignore[arg-type]
+                payload_model=MultistepReviewPayload,
+                schema_name="multistep_retrosynthesis_review",
+                instructions=_INSTRUCTIONS,
+                max_retries=1,
             )
-        try:
-            payload = MultistepReviewPayload.model_validate_json(content)
-        except ValidationError as exc:
+        except IncompleteAssistanceOutputError as exc:
             raise IncompleteReviewOutputError(
-                "Aliyun returned invalid multistep JSON: "
-                + self._concise_failure(exc),
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
+                str(exc),
+                input_tokens=exc.input_tokens,
+                output_tokens=exc.output_tokens,
             ) from exc
+        if not isinstance(result.payload, MultistepReviewPayload):
+            raise TypeError("structured transport returned the wrong review payload")
         return MultistepReviewTransportResult(
-            payload=payload,
-            response_id=getattr(response, "id", None),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
+            payload=result.payload,
+            response_id=result.response_id,
+            input_tokens=result.input_tokens,
+            output_tokens=result.output_tokens,
+            attempts=result.attempts,
         )
-
-    def _build_client(self, **kwargs: Any) -> Any:
-        if self._client_factory is not None:
-            return self._client_factory(**kwargs)
-        from openai import OpenAI
-
-        return OpenAI(**kwargs)
-
-    @staticmethod
-    def _concise_failure(exc: Exception) -> str:
-        if isinstance(exc, ValidationError):
-            errors = exc.errors(include_url=False)
-            if errors:
-                return "invalid JSON/schema: " + str(errors[0].get("msg") or "")
-        return str(exc).replace("\n", " ")[:300]
-
 
 def _build_evidence_packet(
     routes: Sequence[MultistepRetrosynthesisRoute],

@@ -228,6 +228,35 @@ class RenderMoleculeRequest(StrictRequest):
     height: int = Field(default=220, ge=100, le=1200)
 
 
+class AssistanceProviderRequest(StrictRequest):
+    """Explicit provider settings for experimental advisory assistance."""
+
+    provider: Literal["openai", "aliyun"] = "openai"
+    model: str = Field(default="gpt-5.6-terra", min_length=1, max_length=200)
+    reasoning_effort: Literal["none", "low", "medium", "high", "xhigh", "max"] = (
+        "medium"
+    )
+    max_output_tokens: int = Field(default=8000, ge=256, le=20000)
+
+
+class AssistanceSessionRequest(StrictRequest):
+    """An explicitly experimental, advisory-only assistance request."""
+
+    objective: str = Field(min_length=1, max_length=2000)
+    mode: Literal["conditions", "retro", "multistep"]
+    structure_input: str = Field(min_length=1, max_length=20000)
+    provider: AssistanceProviderRequest = Field(
+        default_factory=AssistanceProviderRequest
+    )
+
+
+class AssistanceConfirmationRequest(StrictRequest):
+    """One answer to the single pending typed condition question."""
+
+    state: Dict[str, Any]
+    raw_value: Any
+
+
 class ApiEnvelope(BaseModel):
     """Stable wrapper around versioned domain result payloads."""
 
@@ -247,6 +276,9 @@ def envelope(data: Dict[str, Any]) -> Dict[str, Any]:
 __all__ = [
     "API_SCHEMA_VERSION",
     "ApiEnvelope",
+    "AssistanceConfirmationRequest",
+    "AssistanceProviderRequest",
+    "AssistanceSessionRequest",
     "CompletionChoiceRequest",
     "CoupledStrategyRetrosynthesisRequest",
     "FeatureAnalysisRequest",

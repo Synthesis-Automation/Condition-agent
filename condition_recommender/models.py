@@ -15,7 +15,7 @@ COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
 )
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
-GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.4"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.5"
 WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "1.1"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
@@ -433,6 +433,8 @@ class GenericRecommendationResult:
     excluded_candidate_count: int = 0
     retrieval_trace: Tuple[RetrievalLevelTrace, ...] = ()
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
+    condition_constraints: Dict[str, Any] = field(default_factory=dict)
+    condition_constraint_trace: Tuple[Dict[str, Any], ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
     schema_version: str = GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION

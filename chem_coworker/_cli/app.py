@@ -7,6 +7,20 @@ import json
 from pathlib import Path
 from typing import Sequence
 
+from condition_registry import ConditionConstraintSet, normalize_condition_constraint
+from core_retrosynthesis import RouteSearchPolicy
+
+from chem_coworker.assistance import (
+    AssistanceController,
+    AssistanceRequest,
+    ConditionCapabilities,
+    ConfirmedConstraint,
+    MultistepCapabilities,
+    OpenAICompatibleAssistanceTransport,
+    RetrosynthesisCapabilities,
+    render_assistance,
+)
+
 from chem_coworker.contracts import (
     CompletionChoice,
     ConditionRequest,
@@ -115,6 +129,26 @@ def _parser() -> argparse.ArgumentParser:
         default=None,
         help="LLM review mode (saved default: auto)",
     )
+    parser.add_argument(
+        "--assistance",
+        choices=("off", "shadow", "advisory"),
+        default="off",
+        help="Experimental common assistance controller (default: off)",
+    )
+    parser.add_argument(
+        "--save-assistance-trace",
+        type=Path,
+        help="Opt in to saving the experimental assistance trace as JSON",
+    )
+    parser.add_argument(
+        "--exclude-condition",
+        action="append",
+        default=[],
+        help="Explicitly exclude a registry-resolved condition substance",
+    )
+    parser.add_argument("--maximum-temperature-c", type=float)
+    parser.add_argument("--required-atmosphere")
+    parser.add_argument("--required-solvent")
     parser.add_argument("--model", help="LLM review model")
     parser.add_argument("--provider", choices=("openai", "aliyun"))
     parser.add_argument(
@@ -216,6 +250,100 @@ def _review_settings(args: argparse.Namespace) -> ConditionReviewSettings:
     )
 
 
+def _condition_constraints(args: argparse.Namespace) -> ConditionConstraintSet:
+    raw = [
+        ("excluded_substance", value) for value in args.exclude_condition
+    ]
+    raw.extend(
+        (kind, value)
+        for kind, value in (
+            ("maximum_temperature_c", args.maximum_temperature_c),
+            ("required_atmosphere", args.required_atmosphere),
+            ("required_solvent", args.required_solvent),
+        )
+        if value is not None
+    )
+    constraints = []
+    for kind, value in raw:
+        resolution = normalize_condition_constraint(
+            kind,  # type: ignore[arg-type]
+            value,
+            provenance="explicit_user",
+        )
+        if resolution.status != "resolved" or resolution.constraint is None:
+            detail = ", ".join(resolution.warnings) or resolution.status
+            raise ValueError(f"could not resolve {kind}={value!r}: {detail}")
+        constraints.append(resolution.constraint)
+    return ConditionConstraintSet(tuple(constraints))
+
+
+def _run_assistance(
+    args: argparse.Namespace,
+    review_settings: ConditionReviewSettings,
+    coworker: ConditionCoworker,
+    retrosynthesis_coworker: RetrosynthesisCoworker | None,
+    multistep_coworker: MultistepRetrosynthesisCoworker | None,
+    condition_constraints: ConditionConstraintSet,
+):
+    controller = AssistanceController(
+        transport=OpenAICompatibleAssistanceTransport(),
+        condition_capabilities=ConditionCapabilities(coworker),
+        retrosynthesis_capabilities=(
+            RetrosynthesisCapabilities(retrosynthesis_coworker)
+            if retrosynthesis_coworker is not None
+            else None
+        ),
+        multistep_capabilities=(
+            MultistepCapabilities(multistep_coworker)
+            if multistep_coworker is not None
+            else None
+        ),
+    )
+    constraints = (
+        ConfirmedConstraint(
+            constraint_id="cli.top_k",
+            owner="condition_recommender",
+            kind="top_k",
+            value=args.top_k,
+            provenance="explicit_user",
+        ),
+        ConfirmedConstraint(
+            constraint_id="cli.ranking_profile",
+            owner="condition_recommender",
+            kind="ranking_profile",
+            value=args.ranking_profile,
+            provenance="explicit_user",
+        ),
+    )
+    route_policy = RouteSearchPolicy(
+        initial_max_depth=args.max_depth,
+        initial_beam_width=args.beam_width,
+        initial_max_expansions=args.max_expansions,
+        maximum_max_depth=args.max_depth,
+        maximum_beam_width=args.beam_width,
+        maximum_max_expansions=args.max_expansions,
+    )
+    request = AssistanceRequest(
+        objective={
+            "conditions": "Explain and compare deterministic condition recommendations",
+            "retro": "Explain and compare forward-validated disconnection strategies",
+            "multistep": "Explain and compare deterministic route-search results",
+        }[args.mode],
+        mode=args.mode,
+        structure_input=args.reaction_smiles,
+        constraints=constraints if args.mode == "conditions" else (),
+        condition_constraints=condition_constraints,
+        route_search_policy=route_policy,
+        provider_settings={
+            "provider": review_settings.provider,
+            "model": review_settings.model,
+            "reasoning_effort": review_settings.reasoning_effort,
+            "max_output_tokens": review_settings.max_output_tokens,
+        },
+    )
+    return controller, controller.run(request)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run one recommendation or an interactive session."""
 
@@ -225,6 +353,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--top-k must be between 1 and 10 in multistep mode")
     try:
         review_settings = _review_settings(args)
+        condition_constraints = _condition_constraints(args)
     except ValueError as exc:
         parser.error(str(exc))
     reviewer = LLMConditionReviewer()
@@ -290,6 +419,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 parser.error(str(exc))
             print(f"Warning: multistep retrosynthesis unavailable: {exc}")
     if args.interactive or args.reaction_smiles is None:
+        if args.assistance != "off":
+            parser.error("experimental assistance currently requires one-shot input")
         if args.completion:
             parser.error("--completion is only supported in one-shot mode")
         return run_interactive(
@@ -329,6 +460,46 @@ def main(argv: Sequence[str] | None = None) -> int:
             enhanced=False if args.plain else None,
             persistent_history=not args.no_history,
         )
+    if args.assistance != "off":
+        if args.completion:
+            parser.error("--completion is not yet supported with --assistance")
+        assistance_controller, run = _run_assistance(
+            args,
+            review_settings,
+            coworker,
+            retrosynthesis_coworker,
+            multistep_coworker,
+            condition_constraints,
+        )
+        if (
+            args.assistance == "advisory"
+            and run.state.status == "needs_user_input"
+            and run.state.unresolved_questions
+        ):
+            print(run.state.unresolved_questions[0].prompt)
+            raw_value = input("> ").strip()
+            if not raw_value:
+                parser.error("a non-empty clarification answer is required")
+            try:
+                run = assistance_controller.resume_with_condition_constraint(
+                    run.state,
+                    raw_value,
+                )
+            except ValueError as exc:
+                parser.error(str(exc))
+        if args.save_assistance_trace is not None:
+            args.save_assistance_trace.write_text(
+                run.state.to_json() + "\n",
+                encoding="utf-8",
+            )
+        if args.assistance == "advisory":
+            print(
+                json.dumps(run.to_dict(), ensure_ascii=False, indent=2)
+                if args.as_json
+                else render_assistance(run.state)
+            )
+            valid = getattr(run.authoritative_result, "valid", True)
+            return 0 if valid and run.state.status == "completed" else 2
     if args.mode == "multistep":
         if args.completion:
             parser.error("--completion is not supported in multistep mode")
@@ -393,6 +564,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             unrestricted_fallback=args.unrestricted_fallback,
             ranking_profile=args.ranking_profile,
             completion_choices=_completion_choices(args.completion),
+            condition_constraints=condition_constraints,
             review=review_settings,
         )
     )

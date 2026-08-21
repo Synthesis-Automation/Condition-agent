@@ -12,6 +12,8 @@ from fastapi.staticfiles import StaticFiles
 
 from .contracts import (
     API_SCHEMA_VERSION,
+    AssistanceConfirmationRequest,
+    AssistanceSessionRequest,
     CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
     ForwardSynthesisRequest,
@@ -38,6 +40,7 @@ DEFAULT_FRONTEND_DIST = PROJECT_ROOT / "web" / "reaction_recommender" / "dist"
 def create_app(
     *,
     runtime: WebRuntime | None = None,
+    assistance_service: Any | None = None,
     frontend_dist: str | Path | None = None,
 ) -> FastAPI:
     """Create an injectable local API without importing domain logic into UI code."""
@@ -59,6 +62,7 @@ def create_app(
         allow_headers=["Content-Type"],
     )
     app.state.runtime = runtime or LocalRecommendationRuntime()
+    app.state.assistance_service = assistance_service
 
     def active_runtime(request: Request) -> WebRuntime:
         return request.app.state.runtime
@@ -96,6 +100,54 @@ def create_app(
         except (ValueError, FileNotFoundError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/experimental/assistance")
+    def start_assistance(
+        payload: AssistanceSessionRequest,
+        request: Request,
+    ) -> dict[str, Any]:
+        service = request.app.state.assistance_service
+        if service is None:
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "error": "ASSISTANCE_NOT_CONFIGURED",
+                    "message": "Experimental advisory assistance is disabled.",
+                },
+            )
+        try:
+            data = service.start(
+                objective=payload.objective,
+                mode=payload.mode,
+                structure_input=payload.structure_input,
+                provider_settings=payload.provider.model_dump(),
+            )
+        except (ValueError, RuntimeError) as exc:
+            raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/experimental/assistance/confirm-condition")
+    def confirm_assistance_condition(
+        payload: AssistanceConfirmationRequest,
+        request: Request,
+    ) -> dict[str, Any]:
+        service = request.app.state.assistance_service
+        if service is None:
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "error": "ASSISTANCE_NOT_CONFIGURED",
+                    "message": "Experimental advisory assistance is disabled.",
+                },
+            )
+        try:
+            data = service.confirm_condition_constraint(
+                state=payload.state,
+                raw_value=payload.raw_value,
+            )
+        except (ValueError, RuntimeError) as exc:
+            raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
         return envelope(data)
 
     @app.post("/api/v1/features/analyze")

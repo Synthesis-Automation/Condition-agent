@@ -1,11 +1,23 @@
-# Condition Coworker
+# Chem Coworker
 
 `chem_coworker` is the small application layer for structure-first condition
 recommendation and chemistry-first one- and multistep retrosynthesis. It contains no
 chemistry rules and no tool registry.
 
-The request flow is deliberately short, with the LLM used only where contextual
-judgment is useful:
+The canonical optional LLM path is the bounded assistance controller in
+`chem_coworker.assistance`. It uses one immutable evidence ledger and one shared
+schema-constrained transport for conditions, one-step retrosynthesis, and
+multistep retrosynthesis. Chemistry, recommendation, and route-search packages
+remain authoritative; model claims are advisory and cannot mutate their typed
+results.
+
+Assistance defaults to `off`. The supported rollout sequence is `off`, `shadow`,
+`advisory`, and—only after the documented chemistry and human-review gates—
+`canonical_advisory`. The older single-pass review contracts remain a gated
+compatibility surface until those external activation gates are complete, but
+their provider and retry implementation now uses the same shared transport.
+
+The deterministic request flow remains deliberately short:
 
 ```text
 ConditionRequest
@@ -31,6 +43,32 @@ MultistepRetrosynthesisRequest
   -> optional bounded LLM review of fixed route candidates as complete sequences
   -> deterministic rendering with original and advisory display ranks
 ```
+
+Run an explicit one-shot advisory session with:
+
+```powershell
+python -m chem_coworker --assistance advisory --review off "reactants>>product"
+python -m chem_coworker --mode retro --assistance advisory --review off "target_smiles"
+python -m chem_coworker --mode multistep --assistance advisory --review off "target_smiles"
+```
+
+Use `--assistance shadow` to exercise the controller without displaying its
+answer. Traces are not persisted by default; `--save-assistance-trace PATH` is
+the explicit opt-in. If the controller asks a condition clarification in
+advisory mode, the CLI accepts exactly one answer, resolves it through
+`condition_registry`, and recomputes through `condition_recommender`.
+
+Hard condition restrictions can also be supplied directly:
+
+```powershell
+python -m chem_coworker --exclude-condition "Pd(PPh3)4" --maximum-temperature-c 60 "reactants>>product"
+```
+
+The local API exposes `/api/v1/experimental/assistance` and
+`/api/v1/experimental/assistance/confirm-condition` only when an
+`AssistanceApplicationService` is explicitly injected. An unconfigured server
+returns `ASSISTANCE_NOT_CONFIGURED`; ordinary deterministic endpoints are
+unchanged.
 
 `reactive_taxonomy` remains the molecular source of truth,
 `condition_registry` owns condition identities and roles, and

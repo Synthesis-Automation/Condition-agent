@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Literal, Optional, Tuple
 
 from condition_recommender import GenericRecommendationResult
+from condition_registry import ConditionConstraintSet
 from core_retrosynthesis import (
     MultistepRetrosynthesisResult,
     RetrosynthesisConditionEvidence,
@@ -130,6 +131,9 @@ class ConditionRequest:
     ranking_weights: Dict[str, float] = field(default_factory=dict)
     completion_choices: Tuple[CompletionChoice, ...] = ()
     preferred_reaction_ids: Tuple[str, ...] = ()
+    condition_constraints: ConditionConstraintSet = field(
+        default_factory=ConditionConstraintSet
+    )
     review: ConditionReviewSettings = field(default_factory=ConditionReviewSettings)
 
     def __post_init__(self) -> None:
