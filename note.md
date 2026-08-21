@@ -1,7 +1,7 @@
 # My notes
 
 python -m pip install --upgrade rdkit
-python -m app.web_api 
+python -m app.web_api
 
 ## 2-step tandem reaction
 
@@ -14,5 +14,3 @@ Brc1ccc(Br)cc1.CC(N)=O>>CC(=O)Nc1ccc(NC(C)=O)cc1
 ## general design
 
 Reactions often share the same transformation core, while differing mainly in substituents, unaffected functional groups, steric environment, and electronic context.
-
-
