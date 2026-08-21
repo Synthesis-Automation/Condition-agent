@@ -1,6 +1,7 @@
 # My notes
 
 python -m pip install --upgrade rdkit
+python -m app.web_api 
 
 ## 2-step tandem reaction
 
