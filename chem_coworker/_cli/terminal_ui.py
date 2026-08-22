@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import sys
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, Iterator, Optional
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -18,6 +19,7 @@ from rich import box
 from rich.console import Console
 from rich.json import JSON
 from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from rich.table import Table
 from rich.text import Text
 
@@ -153,7 +155,9 @@ class RichResponseRenderer:
 
     def __call__(
         self,
-        response: ConditionResponse | RetrosynthesisResponse | MultistepRetrosynthesisResponse,
+        response: ConditionResponse
+        | RetrosynthesisResponse
+        | MultistepRetrosynthesisResponse,
         as_json: bool,
     ) -> None:
         if as_json:
@@ -380,9 +384,7 @@ class RichResponseRenderer:
         table.add_column("Refs", justify="right")
         table.add_column("Conditions")
         table.add_column("LLM review")
-        ordered = ordered_retrosynthesis_strategies(response)[
-            : response.request.top_k
-        ]
+        ordered = ordered_retrosynthesis_strategies(response)[: response.request.top_k]
         for rank, strategy in enumerate(ordered, start=1):
             candidate = strategy.representative
             condition = conditions.get(strategy.strategy_id)
@@ -424,8 +426,7 @@ class RichResponseRenderer:
             if review is not None:
                 details.append("\nLLM review (advisory)\n", style="bold magenta")
                 details.append(
-                    f"{review.verdict} ({review.confidence:.0%}): "
-                    f"{review.rationale}"
+                    f"{review.verdict} ({review.confidence:.0%}): {review.rationale}"
                 )
             if candidate.selectivity_warnings:
                 details.append("\nSelectivity cautions\n", style="bold yellow")
@@ -564,7 +565,8 @@ class RichResponseRenderer:
                 )
                 if step.condition_evidence is not None:
                     details.append(
-                        "\nConditions: " + step.condition_evidence.status.replace("_", " ")
+                        "\nConditions: "
+                        + step.condition_evidence.status.replace("_", " ")
                     )
             unresolved = [
                 leaf.canonical_smiles for leaf in route.leaves if not leaf.terminal
@@ -694,10 +696,12 @@ def run_terminal_ui(
     settings: Optional[InteractiveSettings] = None,
     initial_reaction: Optional[str] = None,
     persistent_history: bool = True,
+    show_progress: bool = True,
 ) -> int:
     """Run the rich interactive terminal application."""
 
     console = Console(highlight=False)
+    progress_console = Console(stderr=True, highlight=False)
     active_settings = settings or InteractiveSettings()
     profile_ids = tuple(
         str(item["profile_id"]) for item in available_ranking_profiles()
@@ -754,6 +758,18 @@ def run_terminal_ui(
     def write_output(value: str) -> None:
         console.print(Text(value))
 
+    @contextmanager
+    def elapsed_status(message: str) -> Iterator[object]:
+        progress = Progress(
+            SpinnerColumn(),
+            TextColumn("{task.description}"),
+            TimeElapsedColumn(),
+            console=progress_console,
+            transient=True,
+        )
+        with progress:
+            yield progress.add_task(message, total=None)
+
     session = InteractiveSession(
         coworker,
         retrosynthesis_coworker=retrosynthesis_coworker,
@@ -762,7 +778,7 @@ def run_terminal_ui(
         input_fn=read_input,
         output_fn=write_output,
         response_renderer=RichResponseRenderer(console),
-        status_fn=lambda message: console.status(message, spinner="dots"),
+        status_fn=elapsed_status if show_progress else None,
         clear_fn=console.clear,
     )
     console.print(

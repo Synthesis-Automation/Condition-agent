@@ -254,6 +254,12 @@ portfolio or literature molecule index. `--json` includes every route, partial
 route, leaf decision, step-level condition result, diagnostic counter, and LLM
 evidence citation.
 
+Retro and multistep commands show a compact elapsed-time status while loading
+the operator library and running the bounded search. Interactive terminals
+refresh one line; redirected runs emit only start and completion lines. Progress
+is written to stderr, so `--json` stdout remains valid JSON. Use `--no-progress`
+to suppress it for quiet automation.
+
 Use `--no-retro-conditions` for a faster structure-only search. Override the
 operator artifact with `--retrosynthesis-library PATH`; use
 `--max-realizations`, `--max-templates-to-apply`,

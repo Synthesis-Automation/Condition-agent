@@ -23,6 +23,7 @@ from chem_coworker.contracts import (
 
 from .config import save_config
 from .models import infer_provider, provider_model_set, selectable_models
+from .progress import concise_progress
 
 
 InputFunction = Callable[[str], str]
@@ -218,9 +219,16 @@ class InteractiveSession:
         if self.multistep_coworker is None:
             self.output("Multistep retrosynthesis is unavailable.")
             return None
-        status = "Searching and validating bounded multistep routes..."
+        status = (
+            "Searching bounded routes "
+            f"(depth {self.settings.multistep_max_depth}, up to "
+            f"{self.settings.multistep_max_expansions} expansions)..."
+        )
         if self.settings.review_mode != "off":
-            status = "Searching routes, checking conditions, and reviewing..."
+            status = (
+                "Searching bounded routes, checking conditions, and reviewing "
+                f"(up to {self.settings.multistep_max_expansions} expansions)..."
+            )
         try:
             with self.status(status):
                 response = self.multistep_coworker.plan(
@@ -260,7 +268,10 @@ class InteractiveSession:
         if self.retrosynthesis_coworker is None:
             self.output("Retrosynthesis is unavailable; check the startup warnings.")
             return None
-        status = "Generating and forward-validating disconnections..."
+        status = (
+            "Generating and forward-validating disconnections "
+            f"(up to {self.settings.max_candidates_to_validate} candidates)..."
+        )
         if self.settings.review_mode != "off":
             status = "Validating strategies, checking conditions, and reviewing..."
         try:
@@ -429,7 +440,9 @@ class InteractiveSession:
 
     def _welcome(self) -> None:
         self.output("Chem Coworker")
-        self.output("Conditions plus graph-validated one- and multistep retrosynthesis.")
+        self.output(
+            "Conditions plus graph-validated one- and multistep retrosynthesis."
+        )
         self.output("Enter reaction SMILES, or select a retrosynthesis mode.")
         self.output("")
 
@@ -448,7 +461,9 @@ class InteractiveSession:
         self.output("  /max-tokens N       Set review output limit (256-20000)")
         self.output("  /review-order on|off Apply advisory presentation ordering")
         self.output("  /retro-conditions on|off Recommend conditions for routes")
-        self.output("  /realizations N      Retain 1-10 precursor variants per strategy")
+        self.output(
+            "  /realizations N      Retain 1-10 precursor variants per strategy"
+        )
         self.output("  /validate-limit N    Bound forward-validation attempts")
         self.output("  /depth 2|3           Set maximum multistep route depth")
         self.output("  /per-step N          Set candidates retained per expansion")
@@ -506,9 +521,7 @@ class InteractiveSession:
             f"{self.settings.multistep_max_templates_to_apply}/"
             f"{self.settings.multistep_max_candidates_to_validate}"
         )
-        self.output(
-            "route guidance: " + (self.settings.strategic_guidance or "none")
-        )
+        self.output("route guidance: " + (self.settings.strategic_guidance or "none"))
 
     def _set_mode(self, argument: str) -> None:
         aliases = {
@@ -532,9 +545,7 @@ class InteractiveSession:
             return
         self.settings.mode = mode
         expected = (
-            "target SMILES"
-            if mode in {"retro", "multistep"}
-            else "reaction SMILES"
+            "target SMILES" if mode in {"retro", "multistep"} else "reaction SMILES"
         )
         self.output(f"mode set to {mode}; enter {expected}.")
 
@@ -734,9 +745,7 @@ class InteractiveSession:
         self._set_positive_multistep(argument, "beam", "multistep_beam_width")
 
     def _set_expansions(self, argument: str) -> None:
-        self._set_positive_multistep(
-            argument, "expansions", "multistep_max_expansions"
-        )
+        self._set_positive_multistep(argument, "expansions", "multistep_max_expansions")
 
     def _set_positive_multistep(
         self, argument: str, label: str, attribute: str
@@ -836,6 +845,7 @@ def run_interactive(
     initial_reaction: Optional[str] = None,
     enhanced: Optional[bool] = None,
     persistent_history: bool = True,
+    show_progress: bool = True,
 ) -> int:
     """Run the enhanced TTY interface or its deterministic plain fallback."""
 
@@ -851,6 +861,7 @@ def run_interactive(
                     settings=settings,
                     initial_reaction=initial_reaction,
                     persistent_history=persistent_history,
+                    show_progress=show_progress,
                 )
         except ImportError:
             if enhanced is True:
@@ -860,6 +871,9 @@ def run_interactive(
         retrosynthesis_coworker=retrosynthesis_coworker,
         multistep_coworker=multistep_coworker,
         settings=settings,
+        status_fn=(
+            (lambda message: concise_progress(message)) if show_progress else None
+        ),
     ).run(initial_reaction)
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Sequence
 
@@ -38,6 +39,11 @@ from chem_coworker.contracts import RetrosynthesisRequest
 from .config import load_config
 from .interactive import InteractiveSettings, run_interactive
 from .models import infer_provider, provider_model_set, selectable_models
+from .progress import concise_progress
+
+
+def _count_label(count: int, singular: str, plural: str | None = None) -> str:
+    return f"{count} {singular if count == 1 else plural or singular + 's'}"
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -165,6 +171,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--json", action="store_true", dest="as_json")
     parser.add_argument(
+        "--progress",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Show concise elapsed-time progress on stderr (default: on)",
+    )
+    parser.add_argument(
         "--interactive",
         action="store_true",
         help="Continue interactively after an optional initial reaction",
@@ -251,9 +263,7 @@ def _review_settings(args: argparse.Namespace) -> ConditionReviewSettings:
 
 
 def _condition_constraints(args: argparse.Namespace) -> ConditionConstraintSet:
-    raw = [
-        ("excluded_substance", value) for value in args.exclude_condition
-    ]
+    raw = [("excluded_substance", value) for value in args.exclude_condition]
     raw.extend(
         (kind, value)
         for kind, value in (
@@ -376,7 +386,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (OSError, RuntimeError, ValueError) as exc:
         parser.error(str(exc))
     for warning in coworker.startup_warnings:
-        print(f"Warning: {warning}")
+        print(f"Warning: {warning}", file=sys.stderr)
     retrosynthesis_coworker = None
     needs_retrosynthesis = bool(
         args.mode in {"retro", "multistep"}
@@ -386,24 +396,31 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     if needs_retrosynthesis:
         try:
-            if args.retrosynthesis_library is None:
-                retrosynthesis_coworker = RetrosynthesisCoworker.from_default(
-                    condition_recommender=coworker.recommender,
-                    reviewer=retrosynthesis_reviewer,
-                )
-            else:
-                retrosynthesis_coworker = RetrosynthesisCoworker.from_path(
-                    args.retrosynthesis_library,
-                    condition_recommender=coworker.recommender,
-                    reviewer=retrosynthesis_reviewer,
-                )
+            with concise_progress(
+                "Loading validated retrosynthesis library",
+                enabled=args.progress,
+            ):
+                if args.retrosynthesis_library is None:
+                    retrosynthesis_coworker = RetrosynthesisCoworker.from_default(
+                        condition_recommender=coworker.recommender,
+                        reviewer=retrosynthesis_reviewer,
+                    )
+                else:
+                    retrosynthesis_coworker = RetrosynthesisCoworker.from_path(
+                        args.retrosynthesis_library,
+                        condition_recommender=coworker.recommender,
+                        reviewer=retrosynthesis_reviewer,
+                    )
         except (OSError, RuntimeError, ValueError) as exc:
-            if args.mode in {"retro", "multistep"} or args.retrosynthesis_library is not None:
+            if (
+                args.mode in {"retro", "multistep"}
+                or args.retrosynthesis_library is not None
+            ):
                 parser.error(str(exc))
-            print(f"Warning: retrosynthesis unavailable: {exc}")
+            print(f"Warning: retrosynthesis unavailable: {exc}", file=sys.stderr)
     if retrosynthesis_coworker is not None:
         for warning in retrosynthesis_coworker.startup_warnings:
-            print(f"Warning: {warning}")
+            print(f"Warning: {warning}", file=sys.stderr)
     multistep_coworker = None
     if retrosynthesis_coworker is not None:
         try:
@@ -417,7 +434,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         except (OSError, RuntimeError, ValueError) as exc:
             if args.mode == "multistep":
                 parser.error(str(exc))
-            print(f"Warning: multistep retrosynthesis unavailable: {exc}")
+            print(
+                f"Warning: multistep retrosynthesis unavailable: {exc}",
+                file=sys.stderr,
+            )
     if args.interactive or args.reaction_smiles is None:
         if args.assistance != "off":
             parser.error("experimental assistance currently requires one-shot input")
@@ -459,18 +479,28 @@ def main(argv: Sequence[str] | None = None) -> int:
             initial_reaction=args.reaction_smiles,
             enhanced=False if args.plain else None,
             persistent_history=not args.no_history,
+            show_progress=args.progress,
         )
     if args.assistance != "off":
         if args.completion:
             parser.error("--completion is not yet supported with --assistance")
-        assistance_controller, run = _run_assistance(
-            args,
-            review_settings,
-            coworker,
-            retrosynthesis_coworker,
-            multistep_coworker,
-            condition_constraints,
-        )
+        assistance_message = {
+            "conditions": "Running condition assistance",
+            "retro": "Running one-step retrosynthesis assistance",
+            "multistep": "Running multistep route assistance",
+        }[args.mode]
+        with concise_progress(
+            assistance_message,
+            enabled=args.progress and args.mode in {"retro", "multistep"},
+        ):
+            assistance_controller, run = _run_assistance(
+                args,
+                review_settings,
+                coworker,
+                retrosynthesis_coworker,
+                multistep_coworker,
+                condition_constraints,
+            )
         if (
             args.assistance == "advisory"
             and run.state.status == "needs_user_input"
@@ -505,24 +535,43 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--completion is not supported in multistep mode")
         if multistep_coworker is None:
             parser.error("multistep retrosynthesis is unavailable")
-        response = multistep_coworker.plan(
-            MultistepRetrosynthesisRequest(
-                target_smiles=args.reaction_smiles,
-                top_k=args.top_k,
-                max_depth=args.max_depth,
-                per_step_top_k=args.per_step_top_k,
-                beam_width=args.beam_width,
-                max_expansions=args.max_expansions,
-                max_templates_to_apply=args.route_max_templates,
-                max_candidates_to_validate=args.route_validate_limit,
-                use_context=args.retro_context,
-                include_l0=args.include_l0,
-                include_conditions=args.retro_conditions,
-                condition_top_k=args.retro_condition_top_k,
-                strategic_guidance=args.guidance,
-                review=review_settings,
+        with concise_progress(
+            (
+                "Searching bounded routes "
+                f"(depth {args.max_depth}, up to {args.max_expansions} expansions)"
+            ),
+            enabled=args.progress,
+        ) as progress:
+            response = multistep_coworker.plan(
+                MultistepRetrosynthesisRequest(
+                    target_smiles=args.reaction_smiles,
+                    top_k=args.top_k,
+                    max_depth=args.max_depth,
+                    per_step_top_k=args.per_step_top_k,
+                    beam_width=args.beam_width,
+                    max_expansions=args.max_expansions,
+                    max_templates_to_apply=args.route_max_templates,
+                    max_candidates_to_validate=args.route_validate_limit,
+                    use_context=args.retro_context,
+                    include_l0=args.include_l0,
+                    include_conditions=args.retro_conditions,
+                    condition_top_k=args.retro_condition_top_k,
+                    strategic_guidance=args.guidance,
+                    review=review_settings,
+                )
             )
-        )
+            if response.result is not None:
+                if response.result.routes:
+                    progress.set_result(
+                        _count_label(len(response.result.routes), "solved route")
+                    )
+                else:
+                    progress.set_result(
+                        _count_label(
+                            len(response.result.partial_routes),
+                            "partial route",
+                        )
+                    )
         print(
             json.dumps(response.to_dict(), ensure_ascii=False, indent=2)
             if args.as_json
@@ -534,22 +583,36 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--completion is not supported in retro mode")
         if retrosynthesis_coworker is None:
             parser.error("retrosynthesis is unavailable")
-        response = retrosynthesis_coworker.disconnect(
-            RetrosynthesisRequest(
-                target_smiles=args.reaction_smiles,
-                top_k=args.top_k,
-                max_realizations_per_strategy=args.max_realizations,
-                max_templates_to_apply=args.max_templates_to_apply,
-                max_candidates_to_validate=args.max_candidates_to_validate,
-                use_context=args.retro_context,
-                include_l0=args.include_l0,
-                include_conditions=args.retro_conditions,
-                condition_top_k=args.retro_condition_top_k,
-                condition_minimum_pool_size=args.minimum_pool_size,
-                unrestricted_condition_fallback=args.unrestricted_fallback,
-                review=review_settings,
+        with concise_progress(
+            (
+                "Generating and forward-validating disconnections "
+                f"(up to {args.max_candidates_to_validate} candidates)"
+            ),
+            enabled=args.progress,
+        ) as progress:
+            response = retrosynthesis_coworker.disconnect(
+                RetrosynthesisRequest(
+                    target_smiles=args.reaction_smiles,
+                    top_k=args.top_k,
+                    max_realizations_per_strategy=args.max_realizations,
+                    max_templates_to_apply=args.max_templates_to_apply,
+                    max_candidates_to_validate=args.max_candidates_to_validate,
+                    use_context=args.retro_context,
+                    include_l0=args.include_l0,
+                    include_conditions=args.retro_conditions,
+                    condition_top_k=args.retro_condition_top_k,
+                    condition_minimum_pool_size=args.minimum_pool_size,
+                    unrestricted_condition_fallback=args.unrestricted_fallback,
+                    review=review_settings,
+                )
             )
-        )
+            progress.set_result(
+                _count_label(
+                    len(response.strategies),
+                    "validated strategy",
+                    "validated strategies",
+                )
+            )
         print(
             json.dumps(response.to_dict(), ensure_ascii=False, indent=2)
             if args.as_json
