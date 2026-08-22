@@ -41,6 +41,7 @@ from ..models import (
     GENERIC_CONVERTER_DEFINITION_VERSION,
     RECOMMENDATION_RECORD_SCHEMA_VERSION,
 )
+from .atomic import atomic_json, atomic_output_path
 from .generic import GenericConversionCache, convert_record
 from .input_schema import (
     ConversionDatasetInput,
@@ -121,38 +122,32 @@ def _definition_contract(
 
 
 def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    temporary.replace(path)
+    atomic_json(path, payload)
 
 
 def _write_gzip_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> int:
-    temporary = path.with_suffix(path.suffix + ".tmp")
     count = 0
-    with temporary.open("wb") as raw:
-        with gzip.GzipFile(
-            filename="",
-            mode="wb",
-            fileobj=raw,
-            compresslevel=6,
-            mtime=0,
-        ) as compressed:
-            with io.TextIOWrapper(compressed, encoding="utf-8") as text:
-                for row in rows:
-                    text.write(
-                        json.dumps(
-                            row,
-                            ensure_ascii=False,
-                            sort_keys=True,
-                            separators=(",", ":"),
+    with atomic_output_path(path) as temporary:
+        with temporary.open("wb") as raw:
+            with gzip.GzipFile(
+                filename="",
+                mode="wb",
+                fileobj=raw,
+                compresslevel=6,
+                mtime=0,
+            ) as compressed:
+                with io.TextIOWrapper(compressed, encoding="utf-8") as text:
+                    for row in rows:
+                        text.write(
+                            json.dumps(
+                                row,
+                                ensure_ascii=False,
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            )
                         )
-                    )
-                    text.write("\n")
-                    count += 1
-    temporary.replace(path)
+                        text.write("\n")
+                        count += 1
     return count
 
 
@@ -624,12 +619,11 @@ def _write_catalogs(
 
 def _merge_shards(manifest: Mapping[str, Any], destination: Path) -> Dict[str, Any]:
     output = destination / "records.jsonl.gz"
-    temporary = output.with_suffix(output.suffix + ".tmp")
-    with temporary.open("wb") as target:
-        for entry in manifest["shards"]:
-            with (destination / entry["output_path"]).open("rb") as source:
-                shutil.copyfileobj(source, target)
-    temporary.replace(output)
+    with atomic_output_path(output) as temporary:
+        with temporary.open("wb") as target:
+            for entry in manifest["shards"]:
+                with (destination / entry["output_path"]).open("rb") as source:
+                    shutil.copyfileobj(source, target)
     return {
         "path": output.name,
         "sha256": _sha256(output),

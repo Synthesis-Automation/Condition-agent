@@ -18,6 +18,7 @@ from ..sqlite_indexing import (
     build_sqlite_generic_index,
 )
 from .concise_review import iter_canonical_records
+from .atomic import atomic_json
 from .sharded import (
     SHARD_MANIFEST_SCHEMA_VERSION,
     SHARDED_CONVERSION_DEFINITION_VERSION,
@@ -85,12 +86,7 @@ class RecommendationArtifactBuildCancelled(RuntimeError):
 
 
 def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    temporary.replace(path)
+    atomic_json(path, payload)
 
 
 def _artifact_entry(path: Path, root: Path) -> Dict[str, Any]:
