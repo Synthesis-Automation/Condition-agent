@@ -21,6 +21,7 @@ from .generic_search import disconnect_operator_ladder_detailed
 from .hierarchical_ranking import build_completion_prior_index
 from .multistep_ranking import load_multistep_ranking_policy
 from .route_action_policy import RouteActionPolicyModel
+from .route_refinement import RouteCandidateExclusion
 from .route_tree import (
     CanonicalRouteTree,
     build_canonical_route_tree,
@@ -33,7 +34,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.5"
+MULTISTEP_SCHEMA_VERSION = "1.6"
 _TERMINAL_STOCK_ROLES = frozenset(
     {
         "reactant",
@@ -225,6 +226,7 @@ class MultistepSearchDiagnostics:
     expansion_level_calls: tuple[tuple[str, int], ...] = ()
     route_policy_scored_actions: int = 0
     route_policy_reordered_expansions: int = 0
+    refinement_excluded_candidates: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -909,6 +911,7 @@ def plan_multistep_routes(
     precursor_realism_scorer: PrecursorRealismScorer | None = None,
     condition_evidence_evaluator: ConditionEvidenceEvaluator | None = None,
     route_action_policy: RouteActionPolicyModel | None = None,
+    candidate_exclusions: tuple[RouteCandidateExclusion, ...] = (),
     expander: OneStepExpander | None = None,
 ) -> MultistepRetrosynthesisResult:
     """Find short routes whose leaves pass the explicit terminal predicate."""
@@ -1030,6 +1033,7 @@ def plan_multistep_routes(
     expansion_level_calls: dict[str, int] = {}
     route_policy_scored_actions = 0
     route_policy_reordered_expansions = 0
+    refinement_excluded_candidates = 0
 
     while queue and expanded_states < max_expansions:
         _, _, state = heapq.heappop(queue)
@@ -1080,6 +1084,19 @@ def plan_multistep_routes(
                     candidate.forward_validation_status == "verified_signature"
                     for candidate in candidates
                 )
+            if candidate_exclusions:
+                retained_candidates = tuple(
+                    candidate
+                    for candidate in candidates
+                    if not any(
+                        exclusion.matches(product, candidate)
+                        for exclusion in candidate_exclusions
+                    )
+                )
+                refinement_excluded_candidates += (
+                    len(candidates) - len(retained_candidates)
+                )
+                candidates = retained_candidates
             expansion_cache[product] = candidates
             one_step_calls += 1
         else:
@@ -1402,6 +1419,7 @@ def plan_multistep_routes(
         expansion_level_calls=tuple(sorted(expansion_level_calls.items())),
         route_policy_scored_actions=route_policy_scored_actions,
         route_policy_reordered_expansions=route_policy_reordered_expansions,
+        refinement_excluded_candidates=refinement_excluded_candidates,
     )
     return MultistepRetrosynthesisResult(
         target_smiles=target.canonical_smiles,

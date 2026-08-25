@@ -287,7 +287,7 @@ class AssistanceController:
                     domain_result_ref=capability_result.result_ref,
                 )
                 last_result = capability_result.authoritative_result
-                if payload.action_name == "retry_route_search":
+                if payload.action_name in {"retry_route_search", "refine_route"}:
                     state = replace(
                         state,
                         usage=replace(
@@ -398,6 +398,7 @@ class AssistanceController:
                     "inspect_route",
                     "inspect_route_step",
                     "compare_routes",
+                    "refine_route",
                     "retry_route_search",
                     "propose_clarification",
                     "finish",
@@ -413,7 +414,9 @@ class AssistanceController:
             )
         if state.usage.search_expansions >= state.request.budget.max_search_expansions:
             candidates = tuple(
-                action for action in candidates if action != "retry_route_search"
+                action
+                for action in candidates
+                if action not in {"retry_route_search", "refine_route"}
             )
         return tuple(action for action in candidates if action in declared)
 
@@ -483,6 +486,7 @@ class AssistanceController:
             "inspect_route",
             "inspect_route_step",
             "compare_routes",
+            "refine_route",
             "retry_route_search",
         }:
             requested_ref = arguments.get("result_ref")
@@ -491,6 +495,30 @@ class AssistanceController:
                 arguments["result_ref"] = latest_ref
             elif requested_ref != latest_ref:
                 raise ValueError("action referenced a stale domain result")
+        if payload.action_name == "refine_route":
+            allowed = {
+                "result_ref",
+                "route_alias",
+                "step_index",
+                "refinement_objective",
+                "refinement_method",
+                "issue_evidence_ids",
+                "maximum_added_steps",
+            }
+            unknown = set(arguments) - allowed
+            if unknown:
+                raise ValueError(
+                    f"refine_route received unsupported arguments: {sorted(unknown)}"
+                )
+            issue_evidence_ids = arguments.get("issue_evidence_ids")
+            if not isinstance(issue_evidence_ids, list) or not issue_evidence_ids:
+                raise ValueError("refine_route requires typed issue evidence IDs")
+            if len(issue_evidence_ids) != len(set(issue_evidence_ids)):
+                raise ValueError("refine_route issue evidence IDs must be unique")
+            if not set(issue_evidence_ids).issubset(payload.cited_evidence_ids):
+                raise ValueError(
+                    "refine_route issue evidence must also be cited by the action"
+                )
         return arguments
 
     def _execute_action(
@@ -560,6 +588,34 @@ class AssistanceController:
             return self._multistep.compare_routes(
                 str(arguments["result_ref"]),
                 tuple(str(alias) for alias in aliases),
+            )
+        if action_name == "refine_route":
+            route_alias = arguments.get("route_alias")
+            step_index = arguments.get("step_index")
+            objective = arguments.get("refinement_objective")
+            method = arguments.get("refinement_method")
+            issue_evidence_ids = arguments.get("issue_evidence_ids")
+            if not isinstance(route_alias, str) or not route_alias:
+                raise ValueError("route_alias is required")
+            if not isinstance(step_index, int):
+                raise ValueError("step_index is required")
+            if not isinstance(objective, str) or not objective:
+                raise ValueError("refinement_objective is required")
+            if not isinstance(method, str) or not method:
+                raise ValueError("refinement_method is required")
+            if not isinstance(issue_evidence_ids, list):
+                raise ValueError("issue_evidence_ids are required")
+            return self._multistep.refine_route(
+                state.request,
+                str(arguments["result_ref"]),
+                route_alias=route_alias,
+                step_index=step_index,
+                objective=objective,
+                method=method,
+                issue_evidence_ids=tuple(
+                    str(value) for value in issue_evidence_ids
+                ),
+                maximum_added_steps=int(arguments.get("maximum_added_steps", 0)),
             )
         if action_name == "retry_route_search":
             delta = RouteSearchPolicyDelta(

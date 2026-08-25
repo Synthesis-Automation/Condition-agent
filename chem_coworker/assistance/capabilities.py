@@ -6,7 +6,15 @@ from dataclasses import dataclass
 from typing import Any, Dict, Mapping, Tuple
 
 from condition_recommender.models import GenericRecommendationResult
-from core_retrosynthesis import RouteSearchPolicyDelta, apply_route_search_delta
+from core_retrosynthesis import (
+    MultistepRetrosynthesisRoute,
+    RouteRefinementIntent,
+    RouteSearchPolicyDelta,
+    apply_route_search_delta,
+    build_route_refinement_plan,
+    collect_route_refinement_issues,
+    summarize_route_refinement,
+)
 
 from chem_coworker.contracts import (
     ConditionRequest,
@@ -299,6 +307,114 @@ class MultistepCapabilities:
         )
         return self._plan(expanded)
 
+    def refine_route(
+        self,
+        request: AssistanceRequest,
+        result_ref: str,
+        *,
+        route_alias: str,
+        step_index: int,
+        objective: str,
+        method: str,
+        issue_evidence_ids: Tuple[str, ...],
+        maximum_added_steps: int,
+    ) -> CapabilityResult:
+        """Run one chemistry-directed re-search without model-authored structures."""
+
+        source_route = self._route(result_ref, route_alias)
+        if step_index < 1 or step_index > len(source_route.steps):
+            raise ValueError("route refinement step index is out of range")
+        projection = self._projection(result_ref)
+        evidence_by_id = {item.evidence_id: item for item in projection.evidence}
+        issue_ids = []
+        for evidence_id in issue_evidence_ids:
+            evidence = evidence_by_id.get(evidence_id)
+            if evidence is None:
+                raise ValueError(f"unknown route issue evidence: {evidence_id}")
+            if evidence.payload_type != "route_refinement_issue":
+                raise ValueError("route refinement requires typed issue evidence")
+            if evidence.payload.get("route_alias") != route_alias:
+                raise ValueError("route issue evidence belongs to another route")
+            issue_id = str(evidence.payload.get("issue_id") or "")
+            if not issue_id:
+                raise ValueError("route issue evidence has no stable issue ID")
+            issue_ids.append(issue_id)
+        source_step = source_route.steps[step_index - 1]
+        intent = RouteRefinementIntent(
+            source_route_id=source_route.route_id,
+            source_step_id=source_step.step_id,
+            objective=objective,  # type: ignore[arg-type]
+            method=method,  # type: ignore[arg-type]
+            issue_ids=tuple(issue_ids),
+            maximum_added_steps=maximum_added_steps,
+        )
+        source_issues = collect_route_refinement_issues(source_route)
+        plan = build_route_refinement_plan(source_route, intent, source_issues)
+        prior = self._request(result_ref)
+        policy = request.route_search_policy
+        depth = min(
+            policy.maximum_max_depth,
+            prior.max_depth + maximum_added_steps,
+        )
+        refined_request = MultistepRetrosynthesisRequest(
+            **{
+                **prior.__dict__,
+                "max_depth": depth,
+                "beam_width": policy.maximum_beam_width,
+                "max_expansions": policy.maximum_max_expansions,
+            }
+        )
+        response = self._coworker.plan(
+            refined_request,
+            candidate_exclusions=(plan.exclusion,),
+        )
+        refined_projection = project_multistep_response(response)
+        if response.result is None:
+            raise ValueError("deterministic refinement returned no route result")
+        outcome = summarize_route_refinement(
+            source_route,
+            intent,
+            response.result,
+        )
+        lineage = EvidenceItem(
+            evidence_id=f"refinement.{intent.intent_id}",
+            layer="route",
+            source_id=refined_projection.result_ref,
+            payload_type="route_refinement_outcome",
+            payload={
+                **outcome.to_dict(),
+                "source_result_ref": result_ref,
+                "refined_result_ref": refined_projection.result_ref,
+                "excluded_candidate_scope": plan.excluded_candidate_scope,
+            },
+            provenance="deterministic_inference",
+            schema_versions={"route_refinement": outcome.schema_version},
+            uncertainty=(
+                "A lower deterministic issue count is not experimental proof of "
+                "reaction success."
+            ),
+        )
+        self._store(refined_request, response, refined_projection)
+        initial_ids = {
+            item["evidence_id"]
+            for item in refined_projection.initial_packet()["evidence"]
+        }
+        exposed = tuple(
+            item
+            for item in refined_projection.evidence
+            if item.evidence_id in initial_ids
+        )
+        packet = {
+            **refined_projection.initial_packet(),
+            "refinement": lineage.payload,
+        }
+        return CapabilityResult(
+            result_ref=refined_projection.result_ref,
+            evidence=(lineage, *exposed),
+            packet=packet,
+            authoritative_result=response,
+        )
+
     def inspect_route(
         self,
         result_ref: str,
@@ -344,9 +460,7 @@ class MultistepCapabilities:
     def _plan(self, request: MultistepRetrosynthesisRequest) -> CapabilityResult:
         response = self._coworker.plan(request)
         projection = project_multistep_response(response)
-        self._responses[projection.result_ref] = response
-        self._requests[projection.result_ref] = request
-        self._projections[projection.result_ref] = projection
+        self._store(request, response, projection)
         initial_ids = {
             item["evidence_id"] for item in projection.initial_packet()["evidence"]
         }
@@ -358,6 +472,35 @@ class MultistepCapabilities:
             packet=projection.initial_packet(),
             authoritative_result=response,
         )
+
+    def _store(
+        self,
+        request: MultistepRetrosynthesisRequest,
+        response: MultistepRetrosynthesisResponse,
+        projection: MultistepEvidenceProjection,
+    ) -> None:
+        self._responses[projection.result_ref] = response
+        self._requests[projection.result_ref] = request
+        self._projections[projection.result_ref] = projection
+
+    def _route(
+        self,
+        result_ref: str,
+        alias: str,
+    ) -> MultistepRetrosynthesisRoute:
+        projection = self._projection(result_ref)
+        try:
+            route_id = dict(projection.route_aliases)[alias]
+        except KeyError as exc:
+            raise ValueError(f"unknown multistep route alias: {alias}") from exc
+        response = self.result(result_ref)
+        if response.result is None:
+            raise ValueError("multistep response has no route result")
+        routes = (*response.result.routes, *response.result.partial_routes)
+        route = next((item for item in routes if item.route_id == route_id), None)
+        if route is None:
+            raise ValueError("multistep route alias resolved to a missing route")
+        return route
 
     def _projection(self, result_ref: str) -> MultistepEvidenceProjection:
         try:

@@ -1,6 +1,6 @@
 {
   "definition_id": "chem_coworker_assistance_policy.v1",
-  "definition_version": "1.0",
+  "definition_version": "1.1",
   "schema_version": "1.0",
   "default_rollout_state": "off",
   "rollout_states": ["off", "shadow", "advisory", "canonical_advisory"],
@@ -40,6 +40,7 @@
       "inspect_route",
       "inspect_route_step",
       "compare_routes",
+      "refine_route",
       "retry_route_search",
       "finish"
     ]

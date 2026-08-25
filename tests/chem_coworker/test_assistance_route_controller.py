@@ -84,6 +84,7 @@ class _MultistepCapabilities:
         self.first = object()
         self.second = object()
         self.delta = None
+        self.refinement = None
 
     def plan_routes(self, request):
         return CapabilityResult(
@@ -103,6 +104,51 @@ class _MultistepCapabilities:
             result_ref="route-result-2",
             evidence=(
                 _evidence("query.multistep.expanded", {"route_kind": "solved"}),
+                _evidence("route-2.summary", {"solved": True}),
+            ),
+            packet={},
+            authoritative_result=self.second,
+        )
+
+    def inspect_route(self, result_ref, alias, *, step_index=None):
+        assert result_ref == "route-result-1"
+        assert alias == "route-1"
+        assert step_index == 1
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(
+                _evidence("route-1.step-1", {"step_index": 1}),
+                EvidenceItem(
+                    evidence_id="route-1.issue-1",
+                    layer="route",
+                    source_id=result_ref,
+                    payload_type="route_refinement_issue",
+                    payload={
+                        "route_alias": "route-1",
+                        "issue_id": "RISS1:test",
+                        "kind": "condition_gap",
+                        "step_index": 1,
+                    },
+                    provenance="deterministic_inference",
+                ),
+            ),
+            packet={},
+            authoritative_result=self.first,
+        )
+
+    def refine_route(self, request, result_ref, **kwargs):
+        assert result_ref == "route-result-1"
+        self.refinement = kwargs
+        return CapabilityResult(
+            result_ref="route-result-2",
+            evidence=(
+                _evidence(
+                    "refinement.RINT1:test",
+                    {
+                        "status": "improved_alternative_found",
+                        "source_route_preserved": True,
+                    },
+                ),
                 _evidence("route-2.summary", {"solved": True}),
             ),
             packet={},
@@ -198,3 +244,67 @@ def test_multistep_retry_is_one_bounded_policy_delta_and_preserves_old_result() 
     assert capabilities.delta.max_depth_delta == 1
     assert capabilities.delta.max_expansions_delta == 2
     assert run.authoritative_result is capabilities.second
+
+
+def test_multistep_refinement_uses_typed_issue_without_structure_arguments() -> None:
+    transport = _QueueTransport(
+        _action("plan_routes"),
+        _action(
+            "inspect_route_step",
+            arguments={"route_alias": "route-1", "step_index": 1},
+            evidence=("route-1.summary",),
+        ),
+        _action(
+            "refine_route",
+            arguments={
+                "route_alias": "route-1",
+                "step_index": 1,
+                "refinement_objective": "resolve_condition_gap",
+                "refinement_method": "alternate_disconnection",
+                "issue_evidence_ids": ["route-1.issue-1"],
+                "maximum_added_steps": 0,
+            },
+            evidence=("route-1.issue-1",),
+        ),
+        _action(
+            "finish",
+            arguments={
+                "terminal_status": "completed",
+                "stopping_reason": "A deterministic alternative was generated.",
+            },
+            evidence=("refinement.RINT1:test",),
+            claims=(
+                _claim(
+                    "route-refinement",
+                    "refinement.RINT1:test",
+                    "The deterministic refinement found an alternative.",
+                ),
+            ),
+        ),
+    )
+    capabilities = _MultistepCapabilities()
+    controller = AssistanceController(
+        transport=transport,
+        multistep_capabilities=capabilities,  # type: ignore[arg-type]
+    )
+
+    run = controller.run(
+        AssistanceRequest(
+            objective="Resolve the route condition gap without editing chemistry",
+            mode="multistep",
+            structure_input="CCN",
+        )
+    )
+
+    assert run.state.status == "completed"
+    assert run.state.usage.search_expansions == 1
+    assert capabilities.refinement == {
+        "route_alias": "route-1",
+        "step_index": 1,
+        "objective": "resolve_condition_gap",
+        "method": "alternate_disconnection",
+        "issue_evidence_ids": ("route-1.issue-1",),
+        "maximum_added_steps": 0,
+    }
+    refine_action = run.state.action_history[2]
+    assert "smiles" not in str(refine_action.normalized_arguments).casefold()

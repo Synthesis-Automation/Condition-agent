@@ -70,12 +70,32 @@ def test_one_step_projection_keeps_graph_validation_and_conditions() -> None:
 
 
 def test_multistep_projection_never_presents_partial_route_as_solved() -> None:
-    step = _Value(
-        {
+    candidate = SimpleNamespace(
+        precursor_compatibility_disposition="pass",
+        precursor_compatibility_warning_strength=None,
+        precursor_compatibility_assessments=(),
+        precursor_compatibility_policy_definition_id="policy.v1",
+        selectivity_warnings=(),
+        strategic_class="unresolved",
+    )
+    condition = SimpleNamespace(
+        status="insufficient_evidence",
+        warnings=("no precedent",),
+    )
+    step = SimpleNamespace(
+        step_id="step:1",
+        candidate=candidate,
+        condition_evidence=condition,
+        to_dict=lambda: {
             "step_id": "step:1",
             "candidate": {"forward_validation_status": "verified_signature"},
-            "condition_evidence": {"status": "insufficient"},
-        }
+            "condition_evidence": {"status": "insufficient_evidence"},
+        },
+    )
+    leaf = SimpleNamespace(
+        terminal=False,
+        route_node_id="leaf:1",
+        unresolved_reason="maximum_depth",
     )
     route = SimpleNamespace(
         route_id="route:internal",
@@ -86,6 +106,7 @@ def test_multistep_projection_never_presents_partial_route_as_solved() -> None:
         evidence_summary=_Value({"condition_insufficient_step_count": 1}),
         warnings=("unresolved leaf",),
         steps=(step,),
+        leaves=(leaf,),
         to_dict=lambda: {
             "route_id": "route:internal",
             "solved": False,
@@ -120,4 +141,3 @@ def test_multistep_projection_never_presents_partial_route_as_solved() -> None:
     assert evidence["route-1.summary"]["payload"]["solved"] is False
     assert evidence["route-1.summary"]["uncertainty"] == "This is a partial route."
     assert step_packet["evidence"][0]["payload"]["route_solved"] is False
-

@@ -40,6 +40,8 @@ MultistepRetrosynthesisRequest
   -> explicit supplier-stock/literature or molecular-weight terminal decisions
   -> deterministic beam search, route scoring, and solved/partial separation
   -> optional deterministic condition evidence for every retained step
+  -> optional assistance inspection of typed route issues
+  -> at most one policy-bounded deterministic route refinement search
   -> optional bounded LLM review of fixed route candidates as complete sequences
   -> deterministic rendering with original and advisory display ranks
 ```
@@ -152,14 +154,33 @@ It never treats a partial route as solved. Supplier-stock provenance is preferre
 for terminal starting materials; the literature molecule index is a fallback,
 and low molecular weight remains a clearly labeled heuristic.
 
-The route-level LLM is deliberately outside the search loop. It receives only
-the solved routes, or partial routes when there is no solution, and reviews the
-sequence for cross-step functional-group survival, chemoselectivity, protecting-
-group timing, redox/protection churn, convergence, starting-material evidence,
-and condition coverage. It cannot add a step, edit SMILES, mark a partial route
-solved, or override deterministic chemistry. Short aliases such as `route-1`,
-`evidence.route-1.step-2`, and `evidence.route-1.step-2.conditions` prevent long
-internal IDs from being copied incorrectly.
+The older single-pass route-review contract remains outside the search loop and
+can only annotate fixed candidates. The assistance controller adds a separate,
+policy-bounded agent loop. It may inspect application-derived route issues and
+request one `refine_route` action, but it still cannot add a structure, edit
+SMILES, select atom edits, author conditions, mark a partial route solved, or
+override deterministic chemistry.
+
+`refine_route` accepts only an existing route alias, step index, cited typed
+issue evidence, a closed objective, and one of two initial methods:
+
+- `alternate_disconnection` excludes the selected step's exact `STRAT1`
+  strategy for that product expansion;
+- `alternate_realization` excludes only its exact concrete realization while
+  retaining other realizations of the same strategy.
+
+The deterministic planner derives the molecular exclusion from the stored
+route, reruns bounded search, recomputes step condition evidence, and compares
+the new routes with the source using objective-specific issue counts. The source
+route is never mutated or discarded. Refinement evidence records parent result
+and route IDs, the excluded candidate scope, accepted candidate IDs, remaining
+issue counts, and whether a verified deterministic improvement was found.
+
+Initial typed issue kinds are precursor compatibility, selectivity, insufficient
+condition evidence, unresolved leaves, and tactical functional-state changes.
+Resolving one of these signals does not establish experimental feasibility.
+Short aliases such as `route-1`, `route-1.step-2`, and `route-1.issue-1` prevent
+long internal IDs from being copied incorrectly.
 
 Multistep interactive controls are:
 

@@ -9,6 +9,7 @@ from condition_recommender.models import (
     GenericConditionRecommendation,
     GenericRecommendationResult,
 )
+from core_retrosynthesis import collect_route_refinement_issues
 from chem_coworker.contracts import (
     MultistepRetrosynthesisResponse,
     RetrosynthesisResponse,
@@ -483,6 +484,10 @@ class MultistepEvidenceProjection:
                 item
                 for item in evidence
                 if item.evidence_id == f"{alias}.step-{step_index}"
+                or (
+                    item.payload_type == "route_refinement_issue"
+                    and item.payload.get("step_index") == step_index
+                )
             )
             if not evidence:
                 raise ValueError(f"unknown route step index: {step_index}")
@@ -671,6 +676,7 @@ def project_multistep_response(
     for index, route in enumerate(routes[:max_routes], start=1):
         alias = f"route-{index}"
         aliases.append((alias, route.route_id))
+        route_issues = collect_route_refinement_issues(route)
         evidence.extend(
             (
                 _application_evidence(
@@ -684,6 +690,10 @@ def project_multistep_response(
                         "reaction_count": route.reaction_count,
                         "maximum_depth": route.maximum_depth,
                         "evidence_summary": route.evidence_summary.to_dict(),
+                        "refinement_issue_count": len(route_issues),
+                        "strong_refinement_issue_count": sum(
+                            item.severity == "strong" for item in route_issues
+                        ),
                         "warnings": list(route.warnings),
                     },
                     uncertainty=(
@@ -714,6 +724,22 @@ def project_multistep_response(
                         "route_solved": route.solved,
                     },
                     uncertainty="Parent route remains partial." if not route.solved else None,
+                )
+            )
+        for issue_index, issue in enumerate(route_issues, start=1):
+            evidence.append(
+                _application_evidence(
+                    f"{alias}.issue-{issue_index}",
+                    result_ref,
+                    "route_refinement_issue",
+                    {
+                        "route_alias": alias,
+                        **issue.to_dict(),
+                    },
+                    uncertainty=(
+                        "This issue is a deterministic search or evidence signal; "
+                        "resolving it does not establish experimental feasibility."
+                    ),
                 )
             )
     return MultistepEvidenceProjection(

@@ -10,6 +10,7 @@ from cas_tools import open_stock_lookup
 from core_retrosynthesis import (
     GenericTemplateLibrary,
     MultistepRetrosynthesisRoute,
+    RouteCandidateExclusion,
     plan_multistep_routes,
     recommend_retrosynthesis_conditions,
 )
@@ -98,6 +99,8 @@ class MultistepRetrosynthesisCoworker:
     def plan(
         self,
         request: MultistepRetrosynthesisRequest,
+        *,
+        candidate_exclusions: tuple[RouteCandidateExclusion, ...] = (),
     ) -> MultistepRetrosynthesisResponse:
         """Search bounded routes, then optionally review the fixed candidates."""
 
@@ -142,6 +145,7 @@ class MultistepRetrosynthesisCoworker:
                     use_context=request.use_context,
                     include_l0=request.include_l0,
                     condition_evidence_evaluator=condition_evaluator,
+                    candidate_exclusions=candidate_exclusions,
                 )
         except (OSError, RuntimeError, ValueError) as exc:
             response = MultistepRetrosynthesisResponse(

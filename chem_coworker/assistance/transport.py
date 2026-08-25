@@ -30,6 +30,7 @@ _ALL_ACTIONS = Literal[
     "inspect_route",
     "inspect_route_step",
     "compare_routes",
+    "refine_route",
     "retry_route_search",
     "finish",
 ]
@@ -74,6 +75,20 @@ class ActionArgumentsPayload(BaseModel):
     search_depth_delta: int | None = None
     beam_width_delta: int | None = None
     max_expansions_delta: int | None = None
+    refinement_objective: Literal[
+        "resolve_compatibility_conflict",
+        "resolve_selectivity_warning",
+        "resolve_condition_gap",
+        "resolve_unresolved_leaf",
+        "reduce_tactical_churn",
+        "find_alternative_route",
+    ] | None = None
+    refinement_method: Literal[
+        "alternate_disconnection",
+        "alternate_realization",
+    ] | None = None
+    issue_evidence_ids: list[str] | None = None
+    maximum_added_steps: int | None = Field(default=None, ge=0, le=1)
 
 
 class AssistanceActionPayload(BaseModel):

@@ -974,6 +974,17 @@ IDs and a deterministic multiset-Jaccard distance matrix, providing a canonical
 contract for route clustering and diversity selection without changing the
 chemistry-first cost ranking in this release.
 
+### Deterministic route refinement
+
+The assistance layer can turn typed route issues into one bounded refinement
+request. The model may select a closed objective and ask for either an alternate
+disconnection or an alternate realization, but it cannot provide reaction
+SMILES, atom edits, conditions, or replacement precursors. The deterministic
+planner derives the excluded candidate identity from the stored route, reruns
+validated search and condition recommendation, and reports issue-count changes
+with lineage back to the original route. Both the original and refined results
+remain available for comparison.
+
 ### Optional precedent-route action policy
 
 Candidate replay from observed route trees can train a deterministic listwise
