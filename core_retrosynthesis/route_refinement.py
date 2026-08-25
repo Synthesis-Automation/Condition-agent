@@ -51,6 +51,12 @@ RouteRefinementStatus = Literal[
     "alternatives_found_no_verified_improvement",
     "no_alternative_found",
 ]
+RouteRepairKind = Literal[
+    "alternate_realization",
+    "alternate_disconnection",
+    "temporary_masking_sequence",
+]
+RouteRepairProposalStatus = Literal["actionable", "unavailable"]
 
 ROUTE_REFINEMENT_OBJECTIVES = frozenset(
     {
@@ -132,6 +138,46 @@ class RouteRefinementIssue:
 
 
 @dataclass(frozen=True)
+class RouteRepairProposal:
+    """One deterministic action option derived from a typed route issue."""
+
+    proposal_id: str
+    issue_id: str
+    source_route_id: str
+    source_step_id: str
+    repair_kind: RouteRepairKind
+    status: RouteRepairProposalStatus
+    objective: RouteRefinementObjective
+    refinement_method: RouteRefinementMethod | None
+    maximum_added_steps: int
+    reason: str
+    schema_version: str = ROUTE_REFINEMENT_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not all(
+            (
+                self.proposal_id,
+                self.issue_id,
+                self.source_route_id,
+                self.source_step_id,
+                self.reason.strip(),
+            )
+        ):
+            raise ValueError("route repair proposals require stable provenance")
+        if self.status == "actionable" and self.refinement_method is None:
+            raise ValueError("actionable repair proposals require a method")
+        if self.status == "unavailable" and self.refinement_method is not None:
+            raise ValueError("unavailable repair proposals cannot expose a method")
+        if self.maximum_added_steps < 0:
+            raise ValueError("repair proposal added steps must be nonnegative")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a structure-free repair proposal."""
+
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class RouteCandidateExclusion:
     """One internally derived candidate exclusion for a product expansion."""
 
@@ -206,6 +252,98 @@ class RouteRefinementIntent:
         """Return the structure-free controller intent."""
 
         return {"intent_id": self.intent_id, **asdict(self)}
+
+
+def enumerate_route_repair_proposals(
+    route: "MultistepRetrosynthesisRoute",
+    issue: RouteRefinementIssue,
+) -> tuple[RouteRepairProposal, ...]:
+    """Enumerate bounded repair actions without generating molecular structures."""
+
+    objective_by_kind: dict[str, RouteRefinementObjective] = {
+        "precursor_compatibility": "resolve_compatibility_conflict",
+        "reaction_compatibility": "resolve_compatibility_conflict",
+        "selectivity": "resolve_selectivity_warning",
+        "condition_gap": "resolve_condition_gap",
+        "unresolved_leaf": "resolve_unresolved_leaf",
+        "tactical_step": "reduce_tactical_churn",
+    }
+    objective = objective_by_kind[issue.kind]
+    step = next(
+        (value for value in route.steps if value.step_id == issue.subject_id),
+        None,
+    )
+    if step is None:
+        return ()
+
+    def proposal(
+        repair_kind: RouteRepairKind,
+        status: RouteRepairProposalStatus,
+        method: RouteRefinementMethod | None,
+        maximum_added_steps: int,
+        reason: str,
+    ) -> RouteRepairProposal:
+        identity = {
+            "route_id": route.route_id,
+            "step_id": step.step_id,
+            "issue_id": issue.issue_id,
+            "repair_kind": repair_kind,
+            "status": status,
+            "objective": objective,
+            "method": method,
+            "maximum_added_steps": maximum_added_steps,
+            "schema_version": ROUTE_REFINEMENT_SCHEMA_VERSION,
+        }
+        return RouteRepairProposal(
+            proposal_id=_stable_id("RPROP1", identity),
+            issue_id=issue.issue_id,
+            source_route_id=route.route_id,
+            source_step_id=step.step_id,
+            repair_kind=repair_kind,
+            status=status,
+            objective=objective,
+            refinement_method=method,
+            maximum_added_steps=maximum_added_steps,
+            reason=reason,
+        )
+
+    proposals: list[RouteRepairProposal] = []
+    if getattr(step.candidate, "realization_id", ""):
+        proposals.append(
+            proposal(
+                "alternate_realization",
+                "actionable",
+                "alternate_realization",
+                1,
+                "Search validated concrete realizations while excluding only "
+                "the source realization.",
+            )
+        )
+    if getattr(step.candidate, "strategy_id", ""):
+        proposals.append(
+            proposal(
+                "alternate_disconnection",
+                "actionable",
+                "alternate_disconnection",
+                1,
+                "Search validated alternatives while excluding the source "
+                "disconnection strategy.",
+            )
+        )
+    if issue.kind == "reaction_compatibility":
+        rule_ids = tuple(dict(issue.details).get("rule_ids") or ())
+        if "RCI001_HALO_CARBON_TRANSFER_PROTIC_CONFLICT" in rule_ids:
+            proposals.append(
+                proposal(
+                    "temporary_masking_sequence",
+                    "unavailable",
+                    None,
+                    2,
+                    "No registered protection/deprotection sequence operator is "
+                    "available; the system will not invent protected structures.",
+                )
+            )
+    return tuple(proposals)
 
 
 @dataclass(frozen=True)
@@ -315,11 +453,18 @@ def collect_route_refinement_issues(
             getattr(candidate, "condition_query_reaction_smiles", "")
             or getattr(candidate, "proposed_reaction_smiles", "")
         )
-        reaction_assessments = (
-            assess_reaction_compatibility(reaction_smiles)
-            if reaction_smiles
-            else ()
+        stored_reaction_policy = str(
+            getattr(
+                candidate,
+                "reaction_compatibility_policy_definition_id",
+                "",
+            )
         )
+        reaction_assessments = tuple(
+            getattr(candidate, "reaction_compatibility_assessments", ())
+        )
+        if reaction_smiles and not stored_reaction_policy:
+            reaction_assessments = assess_reaction_compatibility(reaction_smiles)
         if reaction_assessments:
             assessment_ids = tuple(
                 item.assessment_id for item in reaction_assessments
@@ -567,6 +712,9 @@ __all__ = [
     "ROUTE_REFINEMENT_OBJECTIVES",
     "ROUTE_REFINEMENT_SCHEMA_VERSION",
     "RouteCandidateExclusion",
+    "RouteRepairKind",
+    "RouteRepairProposal",
+    "RouteRepairProposalStatus",
     "RouteRefinementCandidateAssessment",
     "RouteRefinementIntent",
     "RouteRefinementIssue",
@@ -576,5 +724,6 @@ __all__ = [
     "RouteRefinementPlan",
     "build_route_refinement_plan",
     "collect_route_refinement_issues",
+    "enumerate_route_repair_proposals",
     "summarize_route_refinement",
 ]

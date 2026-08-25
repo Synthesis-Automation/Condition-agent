@@ -77,6 +77,8 @@ def test_multistep_projection_never_presents_partial_route_as_solved() -> None:
         precursor_compatibility_policy_definition_id="policy.v1",
         selectivity_warnings=(),
         strategic_class="unresolved",
+        realization_id="realization:1",
+        strategy_id="strategy:1",
     )
     condition = SimpleNamespace(
         status="insufficient_evidence",
@@ -141,3 +143,7 @@ def test_multistep_projection_never_presents_partial_route_as_solved() -> None:
     assert evidence["route-1.summary"]["payload"]["solved"] is False
     assert evidence["route-1.summary"]["uncertainty"] == "This is a partial route."
     assert step_packet["evidence"][0]["payload"]["route_solved"] is False
+    assert any(
+        item["payload_type"] == "route_repair_proposal"
+        for item in step_packet["evidence"]
+    )

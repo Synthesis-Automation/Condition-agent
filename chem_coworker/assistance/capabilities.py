@@ -13,6 +13,7 @@ from core_retrosynthesis import (
     apply_route_search_delta,
     build_route_refinement_plan,
     collect_route_refinement_issues,
+    enumerate_route_repair_proposals,
     summarize_route_refinement,
 )
 
@@ -349,6 +350,26 @@ class MultistepCapabilities:
             maximum_added_steps=maximum_added_steps,
         )
         source_issues = collect_route_refinement_issues(source_route)
+        selected_issues = tuple(
+            issue for issue in source_issues if issue.issue_id in set(issue_ids)
+        )
+        actionable_proposals = tuple(
+            proposal
+            for issue in selected_issues
+            for proposal in enumerate_route_repair_proposals(source_route, issue)
+            if proposal.status == "actionable"
+        )
+        if not any(
+            proposal.source_step_id == source_step.step_id
+            and proposal.objective == objective
+            and proposal.refinement_method == method
+            and maximum_added_steps <= proposal.maximum_added_steps
+            for proposal in actionable_proposals
+        ):
+            raise ValueError(
+                "route refinement does not match an actionable deterministic "
+                "repair proposal"
+            )
         plan = build_route_refinement_plan(source_route, intent, source_issues)
         prior = self._request(result_ref)
         policy = request.route_search_policy

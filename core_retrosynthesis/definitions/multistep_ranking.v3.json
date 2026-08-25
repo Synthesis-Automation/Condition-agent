@@ -1,6 +1,6 @@
 {
   "definition_id": "multistep_ranking.v3",
-  "schema_version": "3.0",
+  "schema_version": "3.1",
   "search": {
     "maximum_paths_per_state": 2,
     "minimum_candidates_per_level": 0
@@ -17,6 +17,7 @@
     "selectivity_warning_penalty": 0.25,
     "heuristic_terminal_penalty": 0.2,
     "precursor_compatibility_band_penalty_weight": 0.5,
+    "reaction_compatibility_band_penalty_weight": 0.75,
     "precursor_realism_band_penalty_weight": 0.2,
     "strategic_progress_minimum_score": 0.25,
     "strategic_progress_deficit_penalty_weight": 0.4,

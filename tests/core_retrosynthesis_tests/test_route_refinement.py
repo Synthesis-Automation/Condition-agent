@@ -11,6 +11,7 @@ from core_retrosynthesis import (
     RouteRefinementIntent,
     build_route_refinement_plan,
     collect_route_refinement_issues,
+    enumerate_route_repair_proposals,
     plan_multistep_routes,
     summarize_route_refinement,
 )
@@ -225,6 +226,8 @@ def test_route_issues_include_graph_derived_reaction_compatibility() -> None:
         precursor_compatibility_policy_definition_id="policy.v1",
         selectivity_warnings=(),
         strategic_class="strategic_simplification",
+        realization_id="realization:carbonyl-addition",
+        strategy_id="strategy:carbonyl-addition",
     )
     step = SimpleNamespace(
         step_id="step:carbonyl-addition",
@@ -250,3 +253,16 @@ def test_route_issues_include_graph_derived_reaction_compatibility() -> None:
     assert dict(issue.details)["inferred_regimes"] == (
         "strongly_basic_carbon_transfer",
     )
+    proposals = enumerate_route_repair_proposals(route, issue)
+    assert [proposal.repair_kind for proposal in proposals] == [
+        "alternate_realization",
+        "alternate_disconnection",
+        "temporary_masking_sequence",
+    ]
+    assert [proposal.status for proposal in proposals] == [
+        "actionable",
+        "actionable",
+        "unavailable",
+    ]
+    assert proposals[-1].refinement_method is None
+    assert "will not invent protected structures" in proposals[-1].reason

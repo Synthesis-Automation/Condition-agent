@@ -28,6 +28,7 @@ class MultistepRankingPolicy:
     selectivity_warning_penalty: float
     heuristic_terminal_penalty: float
     precursor_compatibility_band_penalty_weight: float
+    reaction_compatibility_band_penalty_weight: float
     precursor_realism_band_penalty_weight: float
     strategic_progress_minimum_score: float
     strategic_progress_deficit_penalty_weight: float
@@ -77,7 +78,7 @@ def load_multistep_ranking_policy() -> MultistepRankingPolicy:
     value = json.loads(MULTISTEP_RANKING_POLICY_PATH.read_text(encoding="utf-8"))
     if value.get("definition_id") != "multistep_ranking.v3":
         raise ValueError("unexpected multistep ranking definition ID")
-    if value.get("schema_version") != "3.0":
+    if value.get("schema_version") != "3.1":
         raise ValueError("unsupported multistep ranking schema")
     search = value.get("search")
     costs = value.get("step_cost")
@@ -153,6 +154,10 @@ def load_multistep_ranking_policy() -> MultistepRankingPolicy:
         precursor_compatibility_band_penalty_weight=_nonnegative_float(
             costs.get("precursor_compatibility_band_penalty_weight"),
             "precursor-compatibility band-penalty weight",
+        ),
+        reaction_compatibility_band_penalty_weight=_nonnegative_float(
+            costs.get("reaction_compatibility_band_penalty_weight"),
+            "reaction-compatibility band-penalty weight",
         ),
         precursor_realism_band_penalty_weight=_nonnegative_float(
             costs.get("precursor_realism_band_penalty_weight"),

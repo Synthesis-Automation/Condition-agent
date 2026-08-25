@@ -37,6 +37,7 @@ from .hierarchical_ranking import (
     rank_hierarchical_candidates,
 )
 from .precursor_compatibility import assess_precursor_compatibility
+from .reaction_compatibility import assess_candidate_reaction_compatibility
 from .retrieval_index import indexed_template_ids
 from .ranking_policy import (
     RetrosynthesisRankingPolicy,
@@ -265,6 +266,9 @@ def disconnect_generic_target_detailed(
             0.85 * preliminary + 0.15 * context_score if use_context else preliminary
         )
         compatibility = assess_precursor_compatibility(precursors)
+        reaction_compatibility = assess_candidate_reaction_compatibility(
+            mapped_proposed
+        )
         strategic_complexity = _strategic_complexity(mapped_proposed)
         candidate = GenericDisconnectionCandidate(
             target_smiles=canonical_target,
@@ -306,6 +310,21 @@ def disconnect_generic_target_detailed(
             ),
             precursor_compatibility_policy_definition_id=(
                 compatibility.policy_definition_id
+            ),
+            reaction_compatibility_assessments=(
+                reaction_compatibility.assessments
+            ),
+            reaction_compatibility_disposition=(
+                reaction_compatibility.disposition
+            ),
+            reaction_compatibility_warning_strength=(
+                reaction_compatibility.warning_strength
+            ),
+            reaction_compatibility_band_penalty=(
+                reaction_compatibility.structural_band_penalty
+            ),
+            reaction_compatibility_policy_definition_id=(
+                reaction_compatibility.policy_definition_id
             ),
             strategic_complexity=strategic_complexity,
             strategic_complexity_score=(
@@ -462,7 +481,10 @@ def rank_operator_site_diverse(
         for candidate in structurally_ranked
     }
     compatibility_penalties = {
-        id(candidate): candidate.precursor_compatibility_band_penalty
+        id(candidate): (
+            candidate.precursor_compatibility_band_penalty
+            + candidate.reaction_compatibility_band_penalty
+        )
         for candidate in structurally_ranked
     }
     effective_bands = {
@@ -625,7 +647,10 @@ def rank_precursor_realism(
         for candidate in chemistry_order
     }
     compatibility_penalties = {
-        id(candidate): candidate.precursor_compatibility_band_penalty
+        id(candidate): (
+            candidate.precursor_compatibility_band_penalty
+            + candidate.reaction_compatibility_band_penalty
+        )
         for candidate in chemistry_order
     }
     effective_bands = {

@@ -992,6 +992,18 @@ O-H, N-H, or S-H handle. It reports a strong protic-quench warning with the
 matched edit and spectator provenance. This is an inferred strongly basic
 carbon-transfer regime, not a named-reaction assignment or proof of specific
 conditions; alternative realizations remain eligible for deterministic search.
+The assessment is attached to each validated candidate before ranking. Its
+versioned policy applies a structural-band demotion in one-step ranking and an
+explicit route-cost penalty in multistep search, so raw similarity cannot hide
+a known strong conflict.
+
+Each typed step issue also exposes deterministic repair proposals. Alternate
+realization and alternate disconnection proposals are actionable because they
+reuse the validated search engine. A temporary-masking proposal is reported as
+unavailable until registered protection and deprotection sequence operators can
+construct and forward-validate every added structure. This explicit unavailable
+state prevents the model from presenting an invented protected route as a
+system result.
 
 ### Optional precedent-route action policy
 

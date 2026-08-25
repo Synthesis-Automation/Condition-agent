@@ -9,7 +9,10 @@ from condition_recommender.models import (
     GenericConditionRecommendation,
     GenericRecommendationResult,
 )
-from core_retrosynthesis import collect_route_refinement_issues
+from core_retrosynthesis import (
+    collect_route_refinement_issues,
+    enumerate_route_repair_proposals,
+)
 from chem_coworker.contracts import (
     MultistepRetrosynthesisResponse,
     RetrosynthesisResponse,
@@ -488,6 +491,10 @@ class MultistepEvidenceProjection:
                     item.payload_type == "route_refinement_issue"
                     and item.payload.get("step_index") == step_index
                 )
+                or (
+                    item.payload_type == "route_repair_proposal"
+                    and item.payload.get("step_index") == step_index
+                )
             )
             if not evidence:
                 raise ValueError(f"unknown route step index: {step_index}")
@@ -727,6 +734,11 @@ def project_multistep_response(
                 )
             )
         for issue_index, issue in enumerate(route_issues, start=1):
+            proposals = enumerate_route_repair_proposals(route, issue)
+            proposal_evidence_ids = tuple(
+                f"{alias}.issue-{issue_index}.repair-{proposal_index}"
+                for proposal_index in range(1, len(proposals) + 1)
+            )
             evidence.append(
                 _application_evidence(
                     f"{alias}.issue-{issue_index}",
@@ -735,6 +747,9 @@ def project_multistep_response(
                     {
                         "route_alias": alias,
                         **issue.to_dict(),
+                        "repair_proposal_evidence_ids": list(
+                            proposal_evidence_ids
+                        ),
                     },
                     uncertainty=(
                         "This issue is a deterministic search or evidence signal; "
@@ -742,6 +757,28 @@ def project_multistep_response(
                     ),
                 )
             )
+            for proposal_evidence_id, proposal in zip(
+                proposal_evidence_ids,
+                proposals,
+                strict=True,
+            ):
+                evidence.append(
+                    _application_evidence(
+                        proposal_evidence_id,
+                        result_ref,
+                        "route_repair_proposal",
+                        {
+                            "route_alias": alias,
+                            "step_index": issue.step_index,
+                            **proposal.to_dict(),
+                        },
+                        uncertainty=(
+                            None
+                            if proposal.status == "actionable"
+                            else proposal.reason
+                        ),
+                    )
+                )
     return MultistepEvidenceProjection(
         result_ref=result_ref,
         evidence=tuple(evidence),

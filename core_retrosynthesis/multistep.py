@@ -34,7 +34,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.6"
+MULTISTEP_SCHEMA_VERSION = "1.7"
 _TERMINAL_STOCK_ROLES = frozenset(
     {
         "reactant",
@@ -145,6 +145,8 @@ class MultistepRouteEvidenceSummary:
 
     compatibility_warning_step_count: int
     strong_compatibility_warning_step_count: int
+    reaction_compatibility_warning_step_count: int
+    strong_reaction_compatibility_warning_step_count: int
     realism_assessed_step_count: int
     weakest_precursor_realism_score: Optional[float]
     strategic_complexity_assessed_step_count: int
@@ -578,6 +580,10 @@ def _step_cost(
             policy.precursor_compatibility_band_penalty_weight
             * candidate.precursor_compatibility_band_penalty
         ),
+        "reaction_compatibility": (
+            policy.reaction_compatibility_band_penalty_weight
+            * candidate.reaction_compatibility_band_penalty
+        ),
         "precursor_realism": (
             policy.precursor_realism_band_penalty_weight
             * candidate.precursor_realism_band_penalty
@@ -678,10 +684,20 @@ def _route_evidence_summary(
     return MultistepRouteEvidenceSummary(
         compatibility_warning_step_count=sum(
             step.candidate.precursor_compatibility_disposition != "pass"
+            or step.candidate.reaction_compatibility_disposition != "pass"
             for step in steps
         ),
         strong_compatibility_warning_step_count=sum(
             step.candidate.precursor_compatibility_warning_strength == "strong"
+            or step.candidate.reaction_compatibility_warning_strength == "strong"
+            for step in steps
+        ),
+        reaction_compatibility_warning_step_count=sum(
+            step.candidate.reaction_compatibility_disposition != "pass"
+            for step in steps
+        ),
+        strong_reaction_compatibility_warning_step_count=sum(
+            step.candidate.reaction_compatibility_warning_strength == "strong"
             for step in steps
         ),
         realism_assessed_step_count=len(realism_scores),
@@ -733,6 +749,11 @@ def _route_warnings(
         for step in steps
     ):
         warnings.append("STRONG_INTRAMOLECULAR_COMPATIBILITY_WARNING")
+    if any(
+        step.candidate.reaction_compatibility_warning_strength == "strong"
+        for step in steps
+    ):
+        warnings.append("STRONG_REACTION_REGIME_COMPATIBILITY_WARNING")
     if any(
         step.candidate.precursor_realism_band_penalty > 0 for step in steps
     ):

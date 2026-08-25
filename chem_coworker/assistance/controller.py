@@ -161,7 +161,18 @@ class AssistanceController:
                 )
                 break
 
-            normalized_arguments = self._normalized_arguments(payload, state)
+            try:
+                normalized_arguments = self._normalized_arguments(payload, state)
+            except ValueError as exc:
+                state = finish_session(
+                    state,
+                    status="blocked_by_policy",
+                    stopping_reason=self._safe_error(
+                        "invalid provider action",
+                        exc,
+                    ),
+                )
+                break
             action_id = stable_assistance_id(
                 "ACTION",
                 {
@@ -518,6 +529,34 @@ class AssistanceController:
             if not set(issue_evidence_ids).issubset(payload.cited_evidence_ids):
                 raise ValueError(
                     "refine_route issue evidence must also be cited by the action"
+                )
+            evidence_by_id = {
+                item.evidence_id: item for item in state.evidence
+            }
+            cited_proposals = tuple(
+                evidence_by_id[evidence_id]
+                for evidence_id in payload.cited_evidence_ids
+                if evidence_id in evidence_by_id
+                and evidence_by_id[evidence_id].payload_type
+                == "route_repair_proposal"
+            )
+            if not any(
+                item.payload.get("status") == "actionable"
+                and item.payload.get("route_alias")
+                == arguments.get("route_alias")
+                and item.payload.get("step_index")
+                == arguments.get("step_index")
+                and item.payload.get("objective")
+                == arguments.get("refinement_objective")
+                and item.payload.get("refinement_method")
+                == arguments.get("refinement_method")
+                and int(item.payload.get("maximum_added_steps") or 0)
+                >= int(arguments.get("maximum_added_steps") or 0)
+                for item in cited_proposals
+            ):
+                raise ValueError(
+                    "refine_route must cite a matching actionable deterministic "
+                    "repair proposal"
                 )
         return arguments
 

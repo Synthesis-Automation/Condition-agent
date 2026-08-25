@@ -9,6 +9,9 @@ from cas_tools import PrecursorRealismAggregation, PrecursorRealismAssessment
 from reactive_taxonomy.reactive_pair_interactions import (
     ReactivePairInteractionAssessment,
 )
+from reactive_taxonomy.reaction_compatibility import (
+    ReactionCompatibilityAssessment,
+)
 from reactive_taxonomy.strategic_complexity import (
     RetrosyntheticComplexityReduction,
 )
@@ -384,6 +387,13 @@ class GenericDisconnectionCandidate:
     precursor_compatibility_warning_strength: Optional[str] = None
     precursor_compatibility_band_penalty: int = 0
     precursor_compatibility_policy_definition_id: str = ""
+    reaction_compatibility_assessments: Tuple[
+        ReactionCompatibilityAssessment, ...
+    ] = ()
+    reaction_compatibility_disposition: str = "pass"
+    reaction_compatibility_warning_strength: Optional[str] = None
+    reaction_compatibility_band_penalty: int = 0
+    reaction_compatibility_policy_definition_id: str = ""
     strategic_complexity: Optional[RetrosyntheticComplexityReduction] = None
     strategic_complexity_score: float = 0.0
     strategic_class: str = "unresolved"

@@ -1,0 +1,26 @@
+{
+  "definition_id": "reaction_compatibility_policy.v1",
+  "schema_version": "1.0",
+  "severity_actions": {
+    "critical": {
+      "disposition": "demote",
+      "structural_band_penalty": 2
+    },
+    "high": {
+      "disposition": "demote",
+      "structural_band_penalty": 1
+    },
+    "medium": {
+      "disposition": "warn",
+      "structural_band_penalty": 0
+    },
+    "low": {
+      "disposition": "warn",
+      "structural_band_penalty": 0
+    }
+  },
+  "aggregation": {
+    "band_penalty": "maximum",
+    "disposition_order": ["pass", "warn", "demote", "reject"]
+  }
+}

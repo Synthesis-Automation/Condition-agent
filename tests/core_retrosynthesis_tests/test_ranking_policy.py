@@ -78,6 +78,7 @@ def test_ranking_policy_is_versioned_and_general() -> None:
 
     multistep = load_multistep_ranking_policy()
     assert multistep.definition_id == "multistep_ranking.v3"
+    assert multistep.schema_version == "3.1"
     assert multistep.maximum_paths_per_state == 2
     assert multistep.minimum_candidates_per_level == 0
     assert multistep.abstraction_penalty("L0") == 0.15

@@ -131,6 +131,36 @@ class _MultistepCapabilities:
                     },
                     provenance="deterministic_inference",
                 ),
+                EvidenceItem(
+                    evidence_id="route-1.issue-1.repair-2",
+                    layer="route",
+                    source_id=result_ref,
+                    payload_type="route_repair_proposal",
+                    payload={
+                        "route_alias": "route-1",
+                        "step_index": 1,
+                        "status": "unavailable",
+                        "objective": "resolve_condition_gap",
+                        "refinement_method": None,
+                        "maximum_added_steps": 2,
+                    },
+                    provenance="deterministic_inference",
+                ),
+                EvidenceItem(
+                    evidence_id="route-1.issue-1.repair-1",
+                    layer="route",
+                    source_id=result_ref,
+                    payload_type="route_repair_proposal",
+                    payload={
+                        "route_alias": "route-1",
+                        "step_index": 1,
+                        "status": "actionable",
+                        "objective": "resolve_condition_gap",
+                        "refinement_method": "alternate_disconnection",
+                        "maximum_added_steps": 1,
+                    },
+                    provenance="deterministic_inference",
+                ),
             ),
             packet={},
             authoritative_result=self.first,
@@ -264,7 +294,10 @@ def test_multistep_refinement_uses_typed_issue_without_structure_arguments() -> 
                 "issue_evidence_ids": ["route-1.issue-1"],
                 "maximum_added_steps": 0,
             },
-            evidence=("route-1.issue-1",),
+            evidence=(
+                "route-1.issue-1",
+                "route-1.issue-1.repair-1",
+            ),
         ),
         _action(
             "finish",
@@ -308,3 +341,48 @@ def test_multistep_refinement_uses_typed_issue_without_structure_arguments() -> 
     }
     refine_action = run.state.action_history[2]
     assert "smiles" not in str(refine_action.normalized_arguments).casefold()
+
+
+def test_multistep_refinement_rejects_unavailable_repair_proposal() -> None:
+    transport = _QueueTransport(
+        _action("plan_routes"),
+        _action(
+            "inspect_route_step",
+            arguments={"route_alias": "route-1", "step_index": 1},
+            evidence=("route-1.summary",),
+        ),
+        _action(
+            "refine_route",
+            arguments={
+                "route_alias": "route-1",
+                "step_index": 1,
+                "refinement_objective": "resolve_condition_gap",
+                "refinement_method": "alternate_disconnection",
+                "issue_evidence_ids": ["route-1.issue-1"],
+                "maximum_added_steps": 0,
+            },
+            evidence=(
+                "route-1.issue-1",
+                "route-1.issue-1.repair-2",
+            ),
+        ),
+    )
+    capabilities = _MultistepCapabilities()
+    controller = AssistanceController(
+        transport=transport,
+        multistep_capabilities=capabilities,  # type: ignore[arg-type]
+    )
+
+    run = controller.run(
+        AssistanceRequest(
+            objective="Do not execute unavailable chemistry",
+            mode="multistep",
+            structure_input="CCN",
+        )
+    )
+
+    assert run.state.status == "blocked_by_policy"
+    assert "actionable deterministic repair proposal" in (
+        run.state.stopping_reason or ""
+    )
+    assert capabilities.refinement is None

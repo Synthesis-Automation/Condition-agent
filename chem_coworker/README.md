@@ -176,13 +176,22 @@ route is never mutated or discarded. Refinement evidence records parent result
 and route IDs, the excluded candidate scope, accepted candidate IDs, remaining
 issue counts, and whether a verified deterministic improvement was found.
 
+Inspection evidence now includes typed repair proposals derived from each
+issue. The controller requires the model to cite both the issue and a matching
+actionable proposal before `refine_route` can run. Attempts to select an
+unavailable proposal are blocked by policy. For protic-quench conflicts,
+alternate realizations and disconnections can run now; temporary masking is
+explicitly unavailable until deterministic protection-sequence operators are
+registered and validated.
+
 Initial typed issue kinds are intrinsic precursor compatibility, graph-derived
 reaction-regime compatibility, selectivity, insufficient condition evidence,
 unresolved leaves, and tactical functional-state changes. The first
 reaction-regime rule detects formal halo-carbon addition to a carbonyl together
 with an unchanged free X-H group and emits a strong protic-quench warning. It
-does not force a Grignard label or assert unobserved conditions. Resolving one
-of these signals does not establish experimental feasibility. Short aliases
+does not force a Grignard label or assert unobserved conditions. The warning is
+attached before route ranking and contributes a declarative route penalty.
+Resolving one of these signals does not establish experimental feasibility. Short aliases
 such as `route-1`, `route-1.step-2`, and `route-1.issue-1` prevent long internal
 IDs from being copied incorrectly.
 

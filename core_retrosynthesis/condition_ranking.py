@@ -267,6 +267,15 @@ def rank_retrosynthesis_candidates_with_conditions(
         width=policy.condition_score_band_width,
         separate_by_level=True,
     )
+    effective_bands = {
+        id(candidate): (
+            bands[id(candidate)]
+            + candidate.precursor_compatibility_band_penalty
+            + candidate.reaction_compatibility_band_penalty
+            + candidate.precursor_realism_band_penalty
+        )
+        for candidate in verified
+    }
     assessed = []
     for original_rank, candidate in verified_ranked:
         condition_query = (
@@ -286,7 +295,7 @@ def rank_retrosynthesis_candidates_with_conditions(
                 original_rank,
                 candidate,
                 evidence,
-                bands[id(candidate)],
+                effective_bands[id(candidate)],
             )
         )
     ordered = (

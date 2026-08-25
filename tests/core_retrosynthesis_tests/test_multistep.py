@@ -419,6 +419,9 @@ def test_route_cost_and_summary_include_compatibility_and_realism() -> None:
         precursor_compatibility_disposition="demote",
         precursor_compatibility_warning_strength="strong",
         precursor_compatibility_band_penalty=2,
+        reaction_compatibility_disposition="demote",
+        reaction_compatibility_warning_strength="strong",
+        reaction_compatibility_band_penalty=1,
         precursor_realism_score=0.2,
         precursor_realism_band_penalty=3,
     )
@@ -435,11 +438,42 @@ def test_route_cost_and_summary_include_compatibility_and_realism() -> None:
     route = result.routes[0]
     components = dict(route.steps[0].step_cost_components)
     assert components["precursor_compatibility"] == 1.0
+    assert components["reaction_compatibility"] == 0.75
     assert components["precursor_realism"] == 0.6
     assert route.evidence_summary.strong_compatibility_warning_step_count == 1
+    assert route.evidence_summary.reaction_compatibility_warning_step_count == 1
+    assert (
+        route.evidence_summary.strong_reaction_compatibility_warning_step_count
+        == 1
+    )
     assert route.evidence_summary.weakest_precursor_realism_score == 0.2
     assert "STRONG_INTRAMOLECULAR_COMPATIBILITY_WARNING" in route.warnings
+    assert "STRONG_REACTION_REGIME_COMPATIBILITY_WARNING" in route.warnings
     assert "LOW_PRECURSOR_REALISM" in route.warnings
+
+
+def test_reaction_compatibility_demotes_route_before_final_selection() -> None:
+    conflicted = replace(
+        _candidate("CCCCCCCC", "C.C", score=0.95),
+        reaction_compatibility_disposition="demote",
+        reaction_compatibility_warning_strength="strong",
+        reaction_compatibility_band_penalty=1,
+    )
+    compatible = _candidate("CCCCCCCC", "N.O", score=0.85)
+
+    result = plan_multistep_routes(
+        "CCCCCCCC",
+        object(),
+        _LiteratureIndex(),
+        max_depth=2,
+        molecular_weight_threshold=50.0,
+        top_k_routes=2,
+        expander=_expander({"CCCCCCCC": (conflicted, compatible)}),
+    )
+
+    assert result.routes[0].steps[0].candidate.precursor_smiles == "N.O"
+    assert result.routes[1].steps[0].candidate.precursor_smiles == "C.C"
+    assert result.routes[0].route_cost < result.routes[1].route_cost
 
 
 def test_condition_availability_reranks_routes_and_is_auditable() -> None:

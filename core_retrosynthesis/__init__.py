@@ -181,6 +181,7 @@ from .route_refinement import (
     ROUTE_REFINEMENT_OBJECTIVES,
     ROUTE_REFINEMENT_SCHEMA_VERSION,
     RouteCandidateExclusion,
+    RouteRepairProposal,
     RouteRefinementCandidateAssessment,
     RouteRefinementIntent,
     RouteRefinementIssue,
@@ -188,6 +189,7 @@ from .route_refinement import (
     RouteRefinementPlan,
     build_route_refinement_plan,
     collect_route_refinement_issues,
+    enumerate_route_repair_proposals,
     summarize_route_refinement,
 )
 from .route_contract import (
@@ -360,6 +362,14 @@ from .precursor_compatibility import (
     load_precursor_compatibility_policy,
     validate_precursor_compatibility_policy,
 )
+from .reaction_compatibility import (
+    REACTION_COMPATIBILITY_POLICY_PATH,
+    ReactionCompatibilityPolicy,
+    ReactionCompatibilityResult,
+    assess_candidate_reaction_compatibility,
+    load_reaction_compatibility_policy,
+    validate_reaction_compatibility_policy,
+)
 from .precedent_route_expansion import (
     DEFAULT_PRECEDENT_ROUTE_EXPANSION_DEFINITION,
     EXPANSION_LEVELS,
@@ -517,6 +527,7 @@ __all__ = [
     "ROUTE_REFINEMENT_SCHEMA_VERSION",
     "RouteCandidateExclusion",
     "RouteRefinementCandidateAssessment",
+    "RouteRepairProposal",
     "RouteRefinementIntent",
     "RouteRefinementIssue",
     "RouteRefinementOutcome",
@@ -599,6 +610,7 @@ __all__ = [
     "build_library",
     "build_reaction_choice_set",
     "assess_precursor_compatibility",
+    "assess_candidate_reaction_compatibility",
     "assess_retrosynthesis_candidate_forward",
     "assess_route_tree_forward",
     "build_reaction_choice_set_from_record",
@@ -631,6 +643,7 @@ __all__ = [
     "load_route_action_policy",
     "load_route_action_policy_definition",
     "load_precursor_compatibility_policy",
+    "load_reaction_compatibility_policy",
     "load_retrosynthesis_ranking_policy",
     "load_multistep_ranking_policy",
     "load_multistep_panel_targets",
@@ -709,8 +722,13 @@ __all__ = [
     "render_v1_operator_pair_catalog_html",
     "resolve_library_mode",
     "validate_precursor_compatibility_policy",
+    "validate_reaction_compatibility_policy",
+    "REACTION_COMPATIBILITY_POLICY_PATH",
+    "ReactionCompatibilityPolicy",
+    "ReactionCompatibilityResult",
     "build_route_refinement_plan",
     "collect_route_refinement_issues",
+    "enumerate_route_repair_proposals",
     "summarize_route_refinement",
     "DEFAULT_PRECEDENT_ROUTE_EXPANSION_DEFINITION",
     "EXPANSION_LEVELS",
