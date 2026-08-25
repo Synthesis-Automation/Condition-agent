@@ -100,6 +100,31 @@ def _routes():
     )
 
 
+def _protic_conflict_route():
+    target = molecule_identity(
+        "OCC[N+]12CCC(C(O)(c3ccccc3)c3ccccc3)(CC1)CC2"
+    ).canonical_smiles  # type: ignore[union-attr]
+    precursors = (
+        "Brc1ccccc1.O=C(c1ccccc1)C12CC[N+](CCO)(CC1)CC2"
+    )
+    candidate = _candidate(target, precursors, 0.9)
+
+    def expand(product: str, top_k: int):
+        return (candidate,)[:top_k] if product == target else ()
+
+    result = plan_multistep_routes(
+        target,
+        object(),
+        _Stock(tuple(precursors.split("."))),
+        max_depth=2,
+        molecular_weight_threshold=20.0,
+        top_k_routes=1,
+        expander=expand,
+    )
+    assert len(result.routes) == 1
+    return result.routes[0]
+
+
 class _Transport:
     def __init__(self, payload: dict) -> None:
         self.payload = payload
@@ -201,6 +226,45 @@ def test_llm_review_rejects_unknown_evidence_ids_without_losing_routes() -> None
     assert review.presentation_route_ids == tuple(
         route.route_id for route in result.routes
     )
+
+
+def test_graph_derived_route_issue_triggers_review_and_is_citable() -> None:
+    route = _protic_conflict_route()
+    transport = _Transport(
+        {
+            "summary": "The deterministic route issue needs resolution.",
+            "routes": [
+                {
+                    "review_id": "route-1",
+                    "suggested_rank": 1,
+                    "verdict": "downrank",
+                    "issue_codes": [
+                        "cross_step_functional_group_compatibility"
+                    ],
+                    "evidence_ids": ["evidence.route-1.issue-1"],
+                    "rationale": "A code-derived protic-quench warning is present.",
+                    "confidence": 0.9,
+                }
+            ],
+            "questions": [],
+        }
+    )
+
+    review = LLMMultistepReviewer(transport).review(
+        (route,),
+        "solved",
+        ConditionReviewSettings(mode="auto", max_candidates=1),
+    )
+
+    assert review.status == "completed"
+    deterministic_issues = transport.packet["routes"][0][
+        "deterministic_issues"
+    ]
+    assert deterministic_issues[0]["kind"] == "reaction_compatibility"
+    assert deterministic_issues[0]["severity"] == "strong"
+    assert deterministic_issues[0]["evidence_id"] in transport.packet[
+        "allowed_evidence_ids"
+    ]
 
 
 def test_aliyun_multistep_message_explicitly_requests_json(monkeypatch) -> None:

@@ -24,6 +24,7 @@ from rich.table import Table
 from rich.text import Text
 
 from condition_recommender import available_ranking_profiles
+from core_retrosynthesis import collect_route_refinement_issues
 
 from chem_coworker.contracts import (
     ConditionResponse,
@@ -574,6 +575,15 @@ class RichResponseRenderer:
             if unresolved:
                 details.append("\n\nUnresolved leaves\n", style="bold yellow")
                 details.append("\n".join(f"• {value}" for value in unresolved))
+            issues = collect_route_refinement_issues(route)
+            if issues:
+                details.append("\n\nDeterministic route issues\n", style="bold red")
+                details.append(
+                    "\n".join(
+                        f"• [{issue.severity}; {issue.kind}] {issue.message}"
+                        for issue in issues
+                    )
+                )
             review = reviews.get(route.route_id)
             if review is not None:
                 details.append("\n\nLLM review (advisory)\n", style="bold magenta")

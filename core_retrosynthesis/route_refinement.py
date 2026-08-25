@@ -12,6 +12,8 @@ import hashlib
 import json
 from typing import Any, Literal, Sequence, TYPE_CHECKING
 
+from reactive_taxonomy import assess_reaction_compatibility
+
 from .generic_models import GenericDisconnectionCandidate
 
 if TYPE_CHECKING:
@@ -21,10 +23,11 @@ if TYPE_CHECKING:
     )
 
 
-ROUTE_REFINEMENT_SCHEMA_VERSION = "route_refinement.v1"
+ROUTE_REFINEMENT_SCHEMA_VERSION = "route_refinement.v2"
 
 RouteIssueKind = Literal[
     "precursor_compatibility",
+    "reaction_compatibility",
     "selectivity",
     "condition_gap",
     "unresolved_leaf",
@@ -64,7 +67,9 @@ ROUTE_REFINEMENT_METHODS = frozenset(
 )
 
 _OBJECTIVE_ISSUE_KINDS: dict[str, frozenset[str]] = {
-    "resolve_compatibility_conflict": frozenset({"precursor_compatibility"}),
+    "resolve_compatibility_conflict": frozenset(
+        {"precursor_compatibility", "reaction_compatibility"}
+    ),
     "resolve_selectivity_warning": frozenset({"selectivity"}),
     "resolve_condition_gap": frozenset({"condition_gap"}),
     "resolve_unresolved_leaf": frozenset({"unresolved_leaf"}),
@@ -103,6 +108,7 @@ class RouteRefinementIssue:
             raise ValueError("route-refinement issues require IDs and a message")
         if self.kind not in {
             "precursor_compatibility",
+            "reaction_compatibility",
             "selectivity",
             "condition_gap",
             "unresolved_leaf",
@@ -301,6 +307,63 @@ def collect_route_refinement_issues(
                         (
                             "policy_definition_id",
                             candidate.precursor_compatibility_policy_definition_id,
+                        ),
+                    ),
+                )
+            )
+        reaction_smiles = str(
+            getattr(candidate, "condition_query_reaction_smiles", "")
+            or getattr(candidate, "proposed_reaction_smiles", "")
+        )
+        reaction_assessments = (
+            assess_reaction_compatibility(reaction_smiles)
+            if reaction_smiles
+            else ()
+        )
+        if reaction_assessments:
+            assessment_ids = tuple(
+                item.assessment_id for item in reaction_assessments
+            )
+            rule_ids = tuple(
+                sorted({item.rule_id for item in reaction_assessments})
+            )
+            regimes = tuple(
+                sorted({item.inferred_regime for item in reaction_assessments})
+            )
+            payload = {
+                "route_id": route.route_id,
+                "step_id": step.step_id,
+                "kind": "reaction_compatibility",
+                "assessment_ids": assessment_ids,
+            }
+            issues.append(
+                RouteRefinementIssue(
+                    issue_id=_stable_id("RISS1", payload),
+                    kind="reaction_compatibility",
+                    severity=(
+                        "strong"
+                        if any(
+                            item.warning_strength == "strong"
+                            for item in reaction_assessments
+                        )
+                        else "advisory"
+                    ),
+                    subject_type="step",
+                    subject_id=step.step_id,
+                    step_index=step_index,
+                    message=(
+                        reaction_assessments[0].message
+                        if len(reaction_assessments) == 1
+                        else "The deterministic reaction-regime analysis returned "
+                        "compatibility conflicts."
+                    ),
+                    details=(
+                        ("assessment_ids", assessment_ids),
+                        ("rule_ids", rule_ids),
+                        ("inferred_regimes", regimes),
+                        (
+                            "definition_id",
+                            reaction_assessments[0].definition_id,
                         ),
                     ),
                 )

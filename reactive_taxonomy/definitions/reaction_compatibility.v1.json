@@ -1,0 +1,16 @@
+{
+  "definition_id": "reaction_compatibility.v1",
+  "schema_version": "1.0",
+  "rules": [
+    {
+      "rule_id": "RCI001_HALO_CARBON_TRANSFER_PROTIC_CONFLICT",
+      "interaction_class": "protic_quench_of_strong_carbon_nucleophile",
+      "required_edit_motif": "halo_carbon_transfer_to_carbonyl",
+      "spectator_tags_any": ["unprotected_XH"],
+      "inferred_regime": "strongly_basic_carbon_transfer",
+      "intrinsic_severity": "high",
+      "warning_strength": "strong",
+      "message": "The graph edits imply a halo-carbon-to-carbonyl realization that commonly requires a strongly basic carbon-transfer reagent; an unchanged free O-H, N-H, or S-H group would consume that reagent unless stoichiometry, temporary masking, or an alternative realization is addressed."
+    }
+  ]
+}

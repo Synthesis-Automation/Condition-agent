@@ -1,0 +1,88 @@
+---
+title: "My First Quarto Report"
+author: "Bo"
+date: today
+format:
+  html:
+    toc: true
+  docx:
+    toc: true
+    number-sections: true
+---
+
+# Introduction
+
+This report is written in a `.qmd` file using VS Code.
+
+# System Overview
+
+The laboratory automation system contains:
+
+- A glovebox
+- A custom reagent cabinet
+- A robotic arm
+- Reaction modules
+- Analytical instruments
+
+# Communication Interfaces
+
+| Device                 | Interface | Protocol        |
+|------------------------|-----------|-----------------|
+| Balance                | RS-232    | Vendor protocol |
+| Temperature controller | RS-485    | Modbus RTU      |
+| Motion controller      | Ethernet  | TCP/IP          |
+| AGV                    | Ethernet  | REST API        |
+
+# Conclusion
+
+The `.qmd` file is the editable source. Quarto generates the final Word or HTML document.--- title: "My First Quarto Report" author: "Bo" date: today format: html: toc: true docx: toc: true number-sections: true ---
+
+# Introduction
+
+This report is written in a `.qmd` file using VS Code.
+
+# System Overview
+
+The laboratory automation system contains:
+
+- A glovebox--- title: "My First Quarto Report" author: "Bo" date: today format: html: toc: true docx: toc: true number-sections: true ---
+
+# Introduction
+
+This report is written in a `.qmd` file using VS Code.
+
+# System Overview
+
+The laboratory automation system contains:
+
+- A glovebox
+- A reagent cabinet
+- A robotic arm
+- Reaction modules
+- Analytical instruments
+
+# Communication Interfaces
+
+| Device                 | Interface | Protocol        |
+|------------------------|-----------|-----------------|
+| Balance                | RS-232    | Vendor protocol |
+| Temperature controller | RS-485    | Modbus RTU      |
+| Motion controller      | Ethernet  | TCP/IP          |
+| AGV                    | Ethernet  | REST API        |
+
+# Conclusion
+
+The `.qmd` file is the editable source. Quarto generates the final Word or HTML document. - A reagent cabinet - A robotic arm - Reaction modules - Analytical instruments
+
+# Communication Interfaces
+
+| Device                 | Interface | Protocol        |
+|------------------------|-----------|-----------------|
+| Balance                | RS-232    | Vendor protocol |
+| Temperature controller | RS-485    | Modbus RTU      |
+| Motion controller      | Ethernet  | TCP/IP          |
+| AGV                    | Ethernet  | REST API        |
+
+# Conclusion
+
+The `.qmd` file is the editable source. Quarto generates the final Word or HTML document.

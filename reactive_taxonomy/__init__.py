@@ -20,6 +20,14 @@ from .reactive_pair_interactions import (
     load_reactive_pair_interaction_definition,
     validate_reactive_pair_interaction_definition,
 )
+from .reaction_compatibility import (
+    REACTION_COMPATIBILITY_DEFINITION_ID,
+    REACTION_COMPATIBILITY_SCHEMA_VERSION,
+    ReactionCompatibilityAssessment,
+    assess_reaction_compatibility,
+    load_reaction_compatibility_definition,
+    validate_reaction_compatibility_definition,
+)
 from .strategic_complexity import (
     STRATEGIC_COMPLEXITY_DEFINITION_ID,
     STRATEGIC_COMPLEXITY_SCHEMA_VERSION,
@@ -363,6 +371,7 @@ __all__ = [
     "ReactivityModifier",
     "ReactiveLinkSite",
     "ReactivePairInteractionAssessment",
+    "ReactionCompatibilityAssessment",
     "ReactivePairSiteReference",
     "ReactiveSiteHypothesis",
     "ReactiveSiteCandidate",
@@ -394,6 +403,7 @@ __all__ = [
     "assess_molecule_complexity",
     "assess_retrosynthetic_complexity_reduction",
     "assess_reactive_pair_interactions",
+    "assess_reaction_compatibility",
     "complex_target_requires_strategic_candidate",
     "canonical_molecule_collection",
     "interpret_molecular_reactivity",
@@ -404,6 +414,7 @@ __all__ = [
     "reaction_fallback_definition_versions",
     "load_molecular_motif_definitions",
     "load_reactive_pair_interaction_definition",
+    "load_reaction_compatibility_definition",
     "load_strategic_complexity_definition",
     "load_handle_patterns",
     "load_reaction_interface_block_definitions",
@@ -429,6 +440,7 @@ __all__ = [
     "resolve_source_label",
     "validate_source_label_mappings",
     "validate_reactive_pair_interaction_definition",
+    "validate_reaction_compatibility_definition",
     "validate_reaction_type_hint_definitions",
     "validate_strategic_complexity_definition",
     "validate_taxonomy",
@@ -437,4 +449,6 @@ __all__ = [
     "normalized_edit_profile",
     "REACTIVE_PAIR_INTERACTION_DEFINITION_ID",
     "REACTIVE_PAIR_INTERACTION_SCHEMA_VERSION",
+    "REACTION_COMPATIBILITY_DEFINITION_ID",
+    "REACTION_COMPATIBILITY_SCHEMA_VERSION",
 ]

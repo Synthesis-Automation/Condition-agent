@@ -13,7 +13,10 @@ from .assistance.transport import (
     OpenAICompatibleStructuredTransport,
 )
 
-from core_retrosynthesis import MultistepRetrosynthesisRoute
+from core_retrosynthesis import (
+    MultistepRetrosynthesisRoute,
+    collect_route_refinement_issues,
+)
 
 from .contracts import (
     ConditionReviewSettings,
@@ -225,6 +228,19 @@ def _build_evidence_packet(
                     "unresolved_reason": leaf.unresolved_reason,
                 }
             )
+        deterministic_issues = []
+        for issue_number, issue in enumerate(
+            collect_route_refinement_issues(route),
+            start=1,
+        ):
+            issue_evidence_id = f"{base_id}.issue-{issue_number}"
+            allowed.add(issue_evidence_id)
+            deterministic_issues.append(
+                {
+                    "evidence_id": issue_evidence_id,
+                    **issue.to_dict(),
+                }
+            )
         route_packets.append(
             {
                 "evidence_id": base_id,
@@ -238,6 +254,7 @@ def _build_evidence_packet(
                 "evidence_summary": route.evidence_summary.to_dict(),
                 "steps": steps,
                 "leaves": leaves,
+                "deterministic_issues": deterministic_issues,
                 "warnings": list(route.warnings),
             }
         )
@@ -365,6 +382,14 @@ class LLMMultistepReviewer:
             for route in routes
         ):
             reasons.append("compatibility_warnings")
+        if any(
+            any(
+                issue.severity == "strong"
+                for issue in collect_route_refinement_issues(route)
+            )
+            for route in routes
+        ):
+            reasons.append("deterministic_route_issues")
         return tuple(reasons) or ("skipped_no_uncertainty_signal",)
 
     @staticmethod

@@ -985,6 +985,14 @@ validated search and condition recommendation, and reports issue-count changes
 with lineage back to the original route. Both the original and refined results
 remain available for comparison.
 
+Reaction-regime compatibility is also derived from molecular evidence. The
+initial rule recognizes a linked C-halogen cleavage, C-C formation, and
+carbonyl C=O-to-C-O change, then checks unchanged spectator groups for a free
+O-H, N-H, or S-H handle. It reports a strong protic-quench warning with the
+matched edit and spectator provenance. This is an inferred strongly basic
+carbon-transfer regime, not a named-reaction assignment or proof of specific
+conditions; alternative realizations remain eligible for deterministic search.
+
 ### Optional precedent-route action policy
 
 Candidate replay from observed route trees can train a deterministic listwise

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 
@@ -208,3 +209,44 @@ def test_refinement_rejects_objective_issue_mismatch() -> None:
 
     with pytest.raises(ValueError, match="not supported by the cited issue"):
         build_route_refinement_plan(route, intent, issues)
+
+
+def test_route_issues_include_graph_derived_reaction_compatibility() -> None:
+    reaction = (
+        "Brc1ccccc1.O=C(c1ccccc1)C12CC[N+](CCO)(CC1)CC2"
+        ">>OCC[N+]12CCC(C(O)(c3ccccc3)c3ccccc3)(CC1)CC2"
+    )
+    candidate = SimpleNamespace(
+        proposed_reaction_smiles=reaction,
+        condition_query_reaction_smiles="",
+        precursor_compatibility_disposition="pass",
+        precursor_compatibility_warning_strength=None,
+        precursor_compatibility_assessments=(),
+        precursor_compatibility_policy_definition_id="policy.v1",
+        selectivity_warnings=(),
+        strategic_class="strategic_simplification",
+    )
+    step = SimpleNamespace(
+        step_id="step:carbonyl-addition",
+        candidate=candidate,
+        condition_evidence=None,
+    )
+    route = SimpleNamespace(
+        route_id="route:protic-conflict",
+        steps=(step,),
+        leaves=(),
+    )
+
+    issues = collect_route_refinement_issues(route)
+
+    assert len(issues) == 1
+    issue = issues[0]
+    assert issue.kind == "reaction_compatibility"
+    assert issue.severity == "strong"
+    assert issue.subject_id == "step:carbonyl-addition"
+    assert dict(issue.details)["rule_ids"] == (
+        "RCI001_HALO_CARBON_TRANSFER_PROTIC_CONFLICT",
+    )
+    assert dict(issue.details)["inferred_regimes"] == (
+        "strongly_basic_carbon_transfer",
+    )

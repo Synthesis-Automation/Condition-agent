@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from core_retrosynthesis import MultistepRetrosynthesisRoute
+from core_retrosynthesis import (
+    MultistepRetrosynthesisRoute,
+    collect_route_refinement_issues,
+)
 
 from .contracts import MultistepRetrosynthesisResponse
 
@@ -81,6 +84,12 @@ def render_multistep_retrosynthesis(
         unresolved = [leaf.canonical_smiles for leaf in route.leaves if not leaf.terminal]
         if unresolved:
             lines.append("   Unresolved leaves: " + ", ".join(unresolved))
+        issues = collect_route_refinement_issues(route)
+        for issue in issues:
+            lines.append(
+                "   Deterministic issue "
+                f"[{issue.severity}; {issue.kind}]: {issue.message}"
+            )
         review = reviews.get(route.route_id)
         if review is not None:
             lines.append(
