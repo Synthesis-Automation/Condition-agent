@@ -17,6 +17,8 @@ and implementation status remain in:
 
 ## 1. The short version
 
+Reactions often share the same transformation core, while differing mainly in substituents, unaffected functional groups, steric environment, and electronic context.
+
 The central mental model is:
 
 ```text
