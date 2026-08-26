@@ -1005,6 +1005,14 @@ construct and forward-validate every added structure. This explicit unavailable
 state prevents the model from presenting an invented protected route as a
 system result.
 
+The assistance-facing route tools reuse these contracts rather than exposing
+general RDKit execution. Step-precedent lookup returns only source-round-tripped
+observations attached to the selected admitted template. Whole-route
+verification independently checks route-tree integrity, target and step graph
+identity, forward-validation status, terminal leaves, deterministic chemistry
+issues, and condition-evidence coverage. Neither tool generates candidates or
+changes route ranking.
+
 ### Optional precedent-route action policy
 
 Candidate replay from observed route trees can train a deterministic listwise

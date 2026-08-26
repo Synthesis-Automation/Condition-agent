@@ -1,6 +1,6 @@
 {
   "definition_id": "chem_coworker_assistance_policy.v1",
-  "definition_version": "1.2",
+  "definition_version": "1.3",
   "schema_version": "1.0",
   "default_rollout_state": "off",
   "rollout_states": ["off", "shadow", "advisory", "canonical_advisory"],
@@ -29,6 +29,7 @@
       "finish"
     ],
     "retro": [
+      "audit_target",
       "disconnect_target",
       "inspect_strategy",
       "compare_strategies",
@@ -36,11 +37,14 @@
       "finish"
     ],
     "multistep": [
+      "audit_target",
       "plan_routes",
       "inspect_route",
       "inspect_route_step",
+      "search_step_precedents",
       "compare_routes",
-      "refine_route",
+      "apply_repair",
+      "verify_route",
       "retry_route_search",
       "finish"
     ]

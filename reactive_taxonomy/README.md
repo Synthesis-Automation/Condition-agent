@@ -43,6 +43,9 @@ conflicting internal observation.
 - `interpret_molecular_reactivity(structure)` adds optional motifs, reactive-site
   hypotheses, contexts, and reactivity profiles.
 - `analyze_molecule(smiles)` composes both molecular layers.
+- `audit_target(smiles)` returns a compact tool-facing projection of canonical
+  identity, assigned or unassigned stereocentres, double-bond stereo, motifs,
+  and reactive-site hypotheses without proposing structural changes.
 - `observe_reaction(reaction_smiles)` returns the interpretation-free reaction
   observation, minimum core, topology, and evidence alternatives.
 - `interpret_reaction(observation)` adds optional pattern and family annotations.

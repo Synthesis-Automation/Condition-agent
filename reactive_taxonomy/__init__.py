@@ -6,6 +6,15 @@ from .api import (
     interpret_molecular_reactivity,
     observe_molecular_structure,
 )
+from .target_audit import (
+    TARGET_AUDIT_SCHEMA_VERSION,
+    TargetAudit,
+    TargetDoubleBondStereo,
+    TargetMotif,
+    TargetReactiveSite,
+    TargetStereocenter,
+    audit_target,
+)
 from .reaction_api import featurize_reaction, identify_reaction_patterns
 from .departing_fragments import (
     DEPARTING_FRAGMENT_TOKEN_VERSION,
@@ -245,6 +254,12 @@ from .molecular_feature_evaluation import (
 )
 
 __all__ = [
+    "TARGET_AUDIT_SCHEMA_VERSION",
+    "TargetAudit",
+    "TargetDoubleBondStereo",
+    "TargetMotif",
+    "TargetReactiveSite",
+    "TargetStereocenter",
     "DEPARTING_FRAGMENT_TOKEN_VERSION",
     "AtomStateTransition",
     "ActivatedCenterContextDescriptor",
@@ -398,6 +413,7 @@ __all__ = [
     "departing_fragment_tokens",
     "evaluate_molecular_features",
     "analyze_molecule",
+    "audit_target",
     "apply_forward_operator",
     "apply_reaction_smarts",
     "assess_molecule_complexity",

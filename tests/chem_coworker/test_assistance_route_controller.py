@@ -139,6 +139,8 @@ class _MultistepCapabilities:
                     payload={
                         "route_alias": "route-1",
                         "step_index": 1,
+                        "proposal_id": "RPROP1:unavailable",
+                        "issue_id": "RISS1:test",
                         "status": "unavailable",
                         "objective": "resolve_condition_gap",
                         "refinement_method": None,
@@ -154,6 +156,8 @@ class _MultistepCapabilities:
                     payload={
                         "route_alias": "route-1",
                         "step_index": 1,
+                        "proposal_id": "RPROP1:actionable",
+                        "issue_id": "RISS1:test",
                         "status": "actionable",
                         "objective": "resolve_condition_gap",
                         "refinement_method": "alternate_disconnection",
@@ -166,7 +170,40 @@ class _MultistepCapabilities:
             authoritative_result=self.first,
         )
 
-    def refine_route(self, request, result_ref, **kwargs):
+    def search_step_precedents(self, result_ref, alias, *, step_index):
+        assert result_ref == "route-result-1"
+        assert alias == "route-1"
+        assert step_index == 1
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(
+                _evidence(
+                    "route-1.step-1.precedents.summary",
+                    {"returned_precedent_count": 1},
+                ),
+            ),
+            packet={},
+            authoritative_result=self.first,
+            register_result_ref=False,
+        )
+
+    def verify_route(self, result_ref, alias):
+        assert result_ref == "route-result-1"
+        assert alias == "route-1"
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(
+                _evidence(
+                    "route-1.verification",
+                    {"status": "verified_with_cautions"},
+                ),
+            ),
+            packet={},
+            authoritative_result=self.first,
+            register_result_ref=False,
+        )
+
+    def apply_repair(self, request, result_ref, **kwargs):
         assert result_ref == "route-result-1"
         self.refinement = kwargs
         return CapabilityResult(
@@ -230,6 +267,97 @@ def test_same_controller_completes_one_step_mode_without_structure_edits() -> No
     ]
 
 
+def test_target_audit_adds_read_only_evidence_before_one_step_search() -> None:
+    transport = _QueueTransport(
+        _action("audit_target"),
+        _action("disconnect_target", evidence=("target.audit",)),
+        _action(
+            "finish",
+            arguments={
+                "terminal_status": "completed",
+                "stopping_reason": "Target and strategy evidence are available.",
+            },
+            evidence=("target.audit", "strategy-1.summary"),
+            claims=(
+                _claim(
+                    "strategy-1",
+                    "strategy-1.summary",
+                    "Strategy 1 is forward validated.",
+                ),
+            ),
+        ),
+    )
+    capabilities = _RetroCapabilities()
+    controller = AssistanceController(
+        transport=transport,
+        retrosynthesis_capabilities=capabilities,  # type: ignore[arg-type]
+    )
+
+    run = controller.run(
+        AssistanceRequest(
+            objective="Audit then disconnect the target",
+            mode="retro",
+            structure_input="C[C@H](O)Cl",
+        )
+    )
+
+    audit = next(
+        item for item in run.state.evidence if item.payload_type == "target_audit"
+    )
+    assert run.state.status == "completed"
+    assert audit.payload["valid"] is True
+    assert audit.payload["stereocenters"][0]["assigned"] is True
+    assert run.state.domain_result_refs == ("retro-result-1",)
+
+
+def test_multistep_read_only_tools_do_not_replace_authoritative_route_result() -> None:
+    transport = _QueueTransport(
+        _action("plan_routes"),
+        _action(
+            "search_step_precedents",
+            arguments={"route_alias": "route-1", "step_index": 1},
+            evidence=("route-1.summary",),
+        ),
+        _action(
+            "verify_route",
+            arguments={"route_alias": "route-1"},
+            evidence=("route-1.step-1.precedents.summary",),
+        ),
+        _action(
+            "finish",
+            arguments={
+                "terminal_status": "completed",
+                "stopping_reason": "The deterministic verification is available.",
+            },
+            evidence=("route-1.verification",),
+            claims=(
+                _claim(
+                    "route-1",
+                    "route-1.verification",
+                    "The route passed deterministic verification with cautions.",
+                ),
+            ),
+        ),
+    )
+    capabilities = _MultistepCapabilities()
+    controller = AssistanceController(
+        transport=transport,
+        multistep_capabilities=capabilities,  # type: ignore[arg-type]
+    )
+
+    run = controller.run(
+        AssistanceRequest(
+            objective="Inspect precedents and verify the route",
+            mode="multistep",
+            structure_input="CCN",
+        )
+    )
+
+    assert run.state.status == "completed"
+    assert run.state.domain_result_refs == ("route-result-1",)
+    assert run.authoritative_result is capabilities.first
+
+
 def test_multistep_retry_is_one_bounded_policy_delta_and_preserves_old_result() -> None:
     transport = _QueueTransport(
         _action("plan_routes"),
@@ -276,7 +404,7 @@ def test_multistep_retry_is_one_bounded_policy_delta_and_preserves_old_result() 
     assert run.authoritative_result is capabilities.second
 
 
-def test_multistep_refinement_uses_typed_issue_without_structure_arguments() -> None:
+def test_multistep_repair_uses_only_deterministic_proposal_identity() -> None:
     transport = _QueueTransport(
         _action("plan_routes"),
         _action(
@@ -285,19 +413,9 @@ def test_multistep_refinement_uses_typed_issue_without_structure_arguments() -> 
             evidence=("route-1.summary",),
         ),
         _action(
-            "refine_route",
-            arguments={
-                "route_alias": "route-1",
-                "step_index": 1,
-                "refinement_objective": "resolve_condition_gap",
-                "refinement_method": "alternate_disconnection",
-                "issue_evidence_ids": ["route-1.issue-1"],
-                "maximum_added_steps": 0,
-            },
-            evidence=(
-                "route-1.issue-1",
-                "route-1.issue-1.repair-1",
-            ),
+            "apply_repair",
+            arguments={"proposal_id": "RPROP1:actionable"},
+            evidence=("route-1.issue-1.repair-1",),
         ),
         _action(
             "finish",
@@ -331,19 +449,12 @@ def test_multistep_refinement_uses_typed_issue_without_structure_arguments() -> 
 
     assert run.state.status == "completed"
     assert run.state.usage.search_expansions == 1
-    assert capabilities.refinement == {
-        "route_alias": "route-1",
-        "step_index": 1,
-        "objective": "resolve_condition_gap",
-        "method": "alternate_disconnection",
-        "issue_evidence_ids": ("route-1.issue-1",),
-        "maximum_added_steps": 0,
-    }
+    assert capabilities.refinement == {"proposal_id": "RPROP1:actionable"}
     refine_action = run.state.action_history[2]
     assert "smiles" not in str(refine_action.normalized_arguments).casefold()
 
 
-def test_multistep_refinement_rejects_unavailable_repair_proposal() -> None:
+def test_multistep_repair_rejects_unavailable_proposal() -> None:
     transport = _QueueTransport(
         _action("plan_routes"),
         _action(
@@ -352,19 +463,9 @@ def test_multistep_refinement_rejects_unavailable_repair_proposal() -> None:
             evidence=("route-1.summary",),
         ),
         _action(
-            "refine_route",
-            arguments={
-                "route_alias": "route-1",
-                "step_index": 1,
-                "refinement_objective": "resolve_condition_gap",
-                "refinement_method": "alternate_disconnection",
-                "issue_evidence_ids": ["route-1.issue-1"],
-                "maximum_added_steps": 0,
-            },
-            evidence=(
-                "route-1.issue-1",
-                "route-1.issue-1.repair-2",
-            ),
+            "apply_repair",
+            arguments={"proposal_id": "RPROP1:unavailable"},
+            evidence=("route-1.issue-1.repair-2",),
         ),
     )
     capabilities = _MultistepCapabilities()

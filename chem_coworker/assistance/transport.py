@@ -18,6 +18,7 @@ _PROMPT_PATH = (
     / "assistance_prompt.v1.txt"
 )
 _ALL_ACTIONS = Literal[
+    "audit_target",
     "recommend_conditions",
     "inspect_condition_candidate",
     "compare_condition_candidates",
@@ -29,8 +30,10 @@ _ALL_ACTIONS = Literal[
     "plan_routes",
     "inspect_route",
     "inspect_route_step",
+    "search_step_precedents",
     "compare_routes",
-    "refine_route",
+    "apply_repair",
+    "verify_route",
     "retry_route_search",
     "finish",
 ]
@@ -75,20 +78,7 @@ class ActionArgumentsPayload(BaseModel):
     search_depth_delta: int | None = None
     beam_width_delta: int | None = None
     max_expansions_delta: int | None = None
-    refinement_objective: Literal[
-        "resolve_compatibility_conflict",
-        "resolve_selectivity_warning",
-        "resolve_condition_gap",
-        "resolve_unresolved_leaf",
-        "reduce_tactical_churn",
-        "find_alternative_route",
-    ] | None = None
-    refinement_method: Literal[
-        "alternate_disconnection",
-        "alternate_realization",
-    ] | None = None
-    issue_evidence_ids: list[str] | None = None
-    maximum_added_steps: int | None = Field(default=None, ge=0, le=1)
+    proposal_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class AssistanceActionPayload(BaseModel):

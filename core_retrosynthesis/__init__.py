@@ -192,6 +192,18 @@ from .route_refinement import (
     enumerate_route_repair_proposals,
     summarize_route_refinement,
 )
+from .route_verification import (
+    ROUTE_VERIFICATION_SCHEMA_VERSION,
+    RouteVerificationGate,
+    RouteVerificationReport,
+    verify_planned_route,
+)
+from .step_precedents import (
+    STEP_PRECEDENT_LOOKUP_SCHEMA_VERSION,
+    StepPrecedentLookupResult,
+    StepPrecedentMatch,
+    lookup_step_precedents,
+)
 from .route_contract import (
     ROUTE_EVIDENCE_KINDS,
     ROUTE_KINDS,
@@ -424,6 +436,12 @@ from .sources import (
 )
 
 __all__ = [
+    "ROUTE_VERIFICATION_SCHEMA_VERSION",
+    "STEP_PRECEDENT_LOOKUP_SCHEMA_VERSION",
+    "RouteVerificationGate",
+    "RouteVerificationReport",
+    "StepPrecedentLookupResult",
+    "StepPrecedentMatch",
     "ROUTE_SEARCH_POLICY_SCHEMA_VERSION",
     "RouteSearchPolicy",
     "RouteSearchPolicyDelta",
@@ -632,6 +650,7 @@ __all__ = [
     "disconnect_operator_ladder_detailed",
     "disconnect_strategies",
     "load_library",
+    "lookup_step_precedents",
     "load_coupled_route_strategy_report",
     "load_generic_library",
     "load_generic_core_admission_policy",
@@ -710,6 +729,7 @@ __all__ = [
     "write_generic_operator_catalog_html",
     "train_route_action_policy_from_replay",
     "validate_route_tree",
+    "verify_planned_route",
     "validate_route_core_projection",
     "route_distance_matrix",
     "route_tree_distance",

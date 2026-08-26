@@ -11,6 +11,7 @@ from core_retrosynthesis import RouteSearchPolicyDelta
 
 from .capabilities import (
     CapabilityResult,
+    ChemistryCapabilities,
     ConditionCapabilities,
     MultistepCapabilities,
     RetrosynthesisCapabilities,
@@ -67,12 +68,14 @@ class AssistanceController:
         self,
         *,
         transport: AssistanceTransport,
+        chemistry_capabilities: ChemistryCapabilities | None = None,
         condition_capabilities: ConditionCapabilities | None = None,
         retrosynthesis_capabilities: RetrosynthesisCapabilities | None = None,
         multistep_capabilities: MultistepCapabilities | None = None,
         policy: AssistancePolicy | None = None,
     ) -> None:
         self._transport = transport
+        self._chemistry = chemistry_capabilities or ChemistryCapabilities()
         self._conditions = condition_capabilities
         self._retro = retrosynthesis_capabilities
         self._multistep = multistep_capabilities
@@ -295,10 +298,14 @@ class AssistanceController:
                 state = add_evidence(
                     state,
                     capability_evidence,
-                    domain_result_ref=capability_result.result_ref,
+                    domain_result_ref=(
+                        capability_result.result_ref
+                        if capability_result.register_result_ref
+                        else None
+                    ),
                 )
                 last_result = capability_result.authoritative_result
-                if payload.action_name in {"retry_route_search", "refine_route"}:
+                if payload.action_name in {"retry_route_search", "apply_repair"}:
                     state = replace(
                         state,
                         usage=replace(
@@ -390,6 +397,11 @@ class AssistanceController:
                 "multistep": "plan_routes",
             }[state.request.mode]
             candidates = (initial, "propose_clarification", "finish")
+            if state.request.mode in {"retro", "multistep"}:
+                candidates = (
+                    "audit_target",
+                    *candidates,
+                )
         else:
             candidates_by_mode = {
                 "conditions": (
@@ -399,6 +411,7 @@ class AssistanceController:
                     "finish",
                 ),
                 "retro": (
+                    "audit_target",
                     "inspect_strategy",
                     "compare_strategies",
                     "inspect_strategy_conditions",
@@ -406,10 +419,13 @@ class AssistanceController:
                     "finish",
                 ),
                 "multistep": (
+                    "audit_target",
                     "inspect_route",
                     "inspect_route_step",
+                    "search_step_precedents",
                     "compare_routes",
-                    "refine_route",
+                    "apply_repair",
+                    "verify_route",
                     "retry_route_search",
                     "propose_clarification",
                     "finish",
@@ -427,7 +443,7 @@ class AssistanceController:
             candidates = tuple(
                 action
                 for action in candidates
-                if action not in {"retry_route_search", "refine_route"}
+                if action not in {"retry_route_search", "apply_repair"}
             )
         return tuple(action for action in candidates if action in declared)
 
@@ -475,7 +491,10 @@ class AssistanceController:
         state: AssistanceSessionState,
     ) -> Dict[str, Any]:
         arguments = payload.arguments.model_dump(exclude_none=True)
-        if payload.action_name == "recommend_conditions":
+        if payload.action_name == "audit_target":
+            if arguments:
+                raise ValueError("audit_target does not accept model arguments")
+        elif payload.action_name == "recommend_conditions":
             if arguments:
                 raise ValueError("recommend_conditions does not accept model arguments")
             arguments["request_fingerprint"] = self._conditions.request_fingerprint(
@@ -496,8 +515,10 @@ class AssistanceController:
             "inspect_strategy_conditions",
             "inspect_route",
             "inspect_route_step",
+            "search_step_precedents",
             "compare_routes",
-            "refine_route",
+            "apply_repair",
+            "verify_route",
             "retry_route_search",
         }:
             requested_ref = arguments.get("result_ref")
@@ -506,56 +527,29 @@ class AssistanceController:
                 arguments["result_ref"] = latest_ref
             elif requested_ref != latest_ref:
                 raise ValueError("action referenced a stale domain result")
-        if payload.action_name == "refine_route":
-            allowed = {
-                "result_ref",
-                "route_alias",
-                "step_index",
-                "refinement_objective",
-                "refinement_method",
-                "issue_evidence_ids",
-                "maximum_added_steps",
-            }
+        if payload.action_name == "apply_repair":
+            allowed = {"result_ref", "proposal_id"}
             unknown = set(arguments) - allowed
             if unknown:
                 raise ValueError(
-                    f"refine_route received unsupported arguments: {sorted(unknown)}"
+                    f"apply_repair received unsupported arguments: {sorted(unknown)}"
                 )
-            issue_evidence_ids = arguments.get("issue_evidence_ids")
-            if not isinstance(issue_evidence_ids, list) or not issue_evidence_ids:
-                raise ValueError("refine_route requires typed issue evidence IDs")
-            if len(issue_evidence_ids) != len(set(issue_evidence_ids)):
-                raise ValueError("refine_route issue evidence IDs must be unique")
-            if not set(issue_evidence_ids).issubset(payload.cited_evidence_ids):
-                raise ValueError(
-                    "refine_route issue evidence must also be cited by the action"
-                )
-            evidence_by_id = {
-                item.evidence_id: item for item in state.evidence
+            proposal_id = arguments.get("proposal_id")
+            if not isinstance(proposal_id, str) or not proposal_id:
+                raise ValueError("apply_repair requires a proposal_id")
+            cited = {
+                item.evidence_id: item
+                for item in state.evidence
+                if item.evidence_id in payload.cited_evidence_ids
             }
-            cited_proposals = tuple(
-                evidence_by_id[evidence_id]
-                for evidence_id in payload.cited_evidence_ids
-                if evidence_id in evidence_by_id
-                and evidence_by_id[evidence_id].payload_type
-                == "route_repair_proposal"
-            )
             if not any(
-                item.payload.get("status") == "actionable"
-                and item.payload.get("route_alias")
-                == arguments.get("route_alias")
-                and item.payload.get("step_index")
-                == arguments.get("step_index")
-                and item.payload.get("objective")
-                == arguments.get("refinement_objective")
-                and item.payload.get("refinement_method")
-                == arguments.get("refinement_method")
-                and int(item.payload.get("maximum_added_steps") or 0)
-                >= int(arguments.get("maximum_added_steps") or 0)
-                for item in cited_proposals
+                item.payload_type == "route_repair_proposal"
+                and item.payload.get("status") == "actionable"
+                and item.payload.get("proposal_id") == proposal_id
+                for item in cited.values()
             ):
                 raise ValueError(
-                    "refine_route must cite a matching actionable deterministic "
+                    "apply_repair must cite a matching actionable deterministic "
                     "repair proposal"
                 )
         return arguments
@@ -566,6 +560,8 @@ class AssistanceController:
         action_name: str,
         arguments: Mapping[str, Any],
     ) -> CapabilityResult:
+        if action_name == "audit_target":
+            return self._chemistry.audit_target(state.request)
         if action_name == "recommend_conditions":
             return self._conditions.recommend_conditions(state.request)
         if action_name == "inspect_condition_candidate":
@@ -620,6 +616,18 @@ class AssistanceController:
                 alias,
                 step_index=step_index if action_name == "inspect_route_step" else None,
             )
+        if action_name == "search_step_precedents":
+            alias = arguments.get("route_alias")
+            step_index = arguments.get("step_index")
+            if not isinstance(alias, str) or not alias:
+                raise ValueError("route_alias is required")
+            if not isinstance(step_index, int):
+                raise ValueError("step_index is required")
+            return self._multistep.search_step_precedents(
+                str(arguments["result_ref"]),
+                alias,
+                step_index=step_index,
+            )
         if action_name == "compare_routes":
             aliases = arguments.get("route_aliases")
             if not isinstance(aliases, list):
@@ -628,33 +636,22 @@ class AssistanceController:
                 str(arguments["result_ref"]),
                 tuple(str(alias) for alias in aliases),
             )
-        if action_name == "refine_route":
-            route_alias = arguments.get("route_alias")
-            step_index = arguments.get("step_index")
-            objective = arguments.get("refinement_objective")
-            method = arguments.get("refinement_method")
-            issue_evidence_ids = arguments.get("issue_evidence_ids")
-            if not isinstance(route_alias, str) or not route_alias:
-                raise ValueError("route_alias is required")
-            if not isinstance(step_index, int):
-                raise ValueError("step_index is required")
-            if not isinstance(objective, str) or not objective:
-                raise ValueError("refinement_objective is required")
-            if not isinstance(method, str) or not method:
-                raise ValueError("refinement_method is required")
-            if not isinstance(issue_evidence_ids, list):
-                raise ValueError("issue_evidence_ids are required")
-            return self._multistep.refine_route(
+        if action_name == "apply_repair":
+            proposal_id = arguments.get("proposal_id")
+            if not isinstance(proposal_id, str) or not proposal_id:
+                raise ValueError("proposal_id is required")
+            return self._multistep.apply_repair(
                 state.request,
                 str(arguments["result_ref"]),
-                route_alias=route_alias,
-                step_index=step_index,
-                objective=objective,
-                method=method,
-                issue_evidence_ids=tuple(
-                    str(value) for value in issue_evidence_ids
-                ),
-                maximum_added_steps=int(arguments.get("maximum_added_steps", 0)),
+                proposal_id=proposal_id,
+            )
+        if action_name == "verify_route":
+            alias = arguments.get("route_alias")
+            if not isinstance(alias, str) or not alias:
+                raise ValueError("route_alias is required")
+            return self._multistep.verify_route(
+                str(arguments["result_ref"]),
+                alias,
             )
         if action_name == "retry_route_search":
             delta = RouteSearchPolicyDelta(

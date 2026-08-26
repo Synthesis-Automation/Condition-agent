@@ -14,8 +14,11 @@ from core_retrosynthesis import (
     build_route_refinement_plan,
     collect_route_refinement_issues,
     enumerate_route_repair_proposals,
+    lookup_step_precedents,
     summarize_route_refinement,
+    verify_planned_route,
 )
+from reactive_taxonomy import audit_target
 
 from chem_coworker.contracts import (
     ConditionRequest,
@@ -29,7 +32,12 @@ from chem_coworker.multistep import MultistepRetrosynthesisCoworker
 from chem_coworker.retrosynthesis import RetrosynthesisCoworker
 from chem_coworker.service import ConditionCoworker
 
-from .contracts import AssistanceRequest, EvidenceItem, canonical_json
+from .contracts import (
+    AssistanceRequest,
+    EvidenceItem,
+    canonical_json,
+    stable_assistance_id,
+)
 from .evidence import (
     ConditionEvidenceProjection,
     MultistepEvidenceProjection,
@@ -48,6 +56,43 @@ class CapabilityResult:
     evidence: Tuple[EvidenceItem, ...]
     packet: Mapping[str, Any]
     authoritative_result: object | None = None
+    register_result_ref: bool = True
+
+
+class ChemistryCapabilities:
+    """Read-only molecular tools shared by retrosynthesis assistance modes."""
+
+    def audit_target(self, request: AssistanceRequest) -> CapabilityResult:
+        """Return compact RDKit-backed target evidence without changing it."""
+
+        if request.mode not in {"retro", "multistep"}:
+            raise ValueError("target audit requires a retrosynthesis mode")
+        audit = audit_target(request.structure_input)
+        result_ref = stable_assistance_id("TARGETAUDIT", audit.to_dict())
+        evidence = EvidenceItem(
+            evidence_id="target.audit",
+            layer="observation",
+            source_id=result_ref,
+            payload_type="target_audit",
+            payload=audit.to_dict(),
+            provenance="deterministic_inference",
+            schema_versions={"target_audit": audit.schema_version},
+            uncertainty=(
+                audit.error
+                or "; ".join(audit.warnings)
+                or "Reactive sites are graph-derived hypotheses, not reaction claims."
+            ),
+        )
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(evidence,),
+            packet={
+                "result_ref": result_ref,
+                "evidence": [_evidence_packet(evidence)],
+            },
+            authoritative_result=audit,
+            register_result_ref=False,
+        )
 
 
 class ConditionCapabilities:
@@ -308,74 +353,67 @@ class MultistepCapabilities:
         )
         return self._plan(expanded)
 
-    def refine_route(
+    def apply_repair(
         self,
         request: AssistanceRequest,
         result_ref: str,
         *,
-        route_alias: str,
-        step_index: int,
-        objective: str,
-        method: str,
-        issue_evidence_ids: Tuple[str, ...],
-        maximum_added_steps: int,
+        proposal_id: str,
     ) -> CapabilityResult:
-        """Run one chemistry-directed re-search without model-authored structures."""
+        """Execute one actionable repair using only its deterministic identity."""
 
+        projection = self._projection(result_ref)
+        proposal_evidence = next(
+            (
+                item
+                for item in projection.evidence
+                if item.payload_type == "route_repair_proposal"
+                and item.payload.get("proposal_id") == proposal_id
+            ),
+            None,
+        )
+        if proposal_evidence is None:
+            raise ValueError("unknown deterministic repair proposal")
+        if proposal_evidence.payload.get("status") != "actionable":
+            raise ValueError("repair proposal is not actionable")
+        route_alias = str(proposal_evidence.payload.get("route_alias") or "")
+        step_index = int(proposal_evidence.payload.get("step_index") or 0)
         source_route = self._route(result_ref, route_alias)
         if step_index < 1 or step_index > len(source_route.steps):
-            raise ValueError("route refinement step index is out of range")
-        projection = self._projection(result_ref)
-        evidence_by_id = {item.evidence_id: item for item in projection.evidence}
-        issue_ids = []
-        for evidence_id in issue_evidence_ids:
-            evidence = evidence_by_id.get(evidence_id)
-            if evidence is None:
-                raise ValueError(f"unknown route issue evidence: {evidence_id}")
-            if evidence.payload_type != "route_refinement_issue":
-                raise ValueError("route refinement requires typed issue evidence")
-            if evidence.payload.get("route_alias") != route_alias:
-                raise ValueError("route issue evidence belongs to another route")
-            issue_id = str(evidence.payload.get("issue_id") or "")
-            if not issue_id:
-                raise ValueError("route issue evidence has no stable issue ID")
-            issue_ids.append(issue_id)
+            raise ValueError("repair proposal step index is out of range")
+        issue_id = str(proposal_evidence.payload.get("issue_id") or "")
+        source_issues = collect_route_refinement_issues(source_route)
+        issue = next(
+            (item for item in source_issues if item.issue_id == issue_id),
+            None,
+        )
+        if issue is None:
+            raise ValueError("repair proposal references an unavailable route issue")
+        proposal = next(
+            (
+                item
+                for item in enumerate_route_repair_proposals(source_route, issue)
+                if item.proposal_id == proposal_id and item.status == "actionable"
+            ),
+            None,
+        )
+        if proposal is None or proposal.refinement_method is None:
+            raise ValueError("repair proposal is no longer actionable")
         source_step = source_route.steps[step_index - 1]
         intent = RouteRefinementIntent(
             source_route_id=source_route.route_id,
             source_step_id=source_step.step_id,
-            objective=objective,  # type: ignore[arg-type]
-            method=method,  # type: ignore[arg-type]
-            issue_ids=tuple(issue_ids),
-            maximum_added_steps=maximum_added_steps,
+            objective=proposal.objective,
+            method=proposal.refinement_method,
+            issue_ids=(issue.issue_id,),
+            maximum_added_steps=proposal.maximum_added_steps,
         )
-        source_issues = collect_route_refinement_issues(source_route)
-        selected_issues = tuple(
-            issue for issue in source_issues if issue.issue_id in set(issue_ids)
-        )
-        actionable_proposals = tuple(
-            proposal
-            for issue in selected_issues
-            for proposal in enumerate_route_repair_proposals(source_route, issue)
-            if proposal.status == "actionable"
-        )
-        if not any(
-            proposal.source_step_id == source_step.step_id
-            and proposal.objective == objective
-            and proposal.refinement_method == method
-            and maximum_added_steps <= proposal.maximum_added_steps
-            for proposal in actionable_proposals
-        ):
-            raise ValueError(
-                "route refinement does not match an actionable deterministic "
-                "repair proposal"
-            )
         plan = build_route_refinement_plan(source_route, intent, source_issues)
         prior = self._request(result_ref)
         policy = request.route_search_policy
         depth = min(
             policy.maximum_max_depth,
-            prior.max_depth + maximum_added_steps,
+            prior.max_depth + proposal.maximum_added_steps,
         )
         refined_request = MultistepRetrosynthesisRequest(
             **{
@@ -434,6 +472,116 @@ class MultistepCapabilities:
             evidence=(lineage, *exposed),
             packet=packet,
             authoritative_result=response,
+        )
+
+    def search_step_precedents(
+        self,
+        result_ref: str,
+        alias: str,
+        *,
+        step_index: int,
+    ) -> CapabilityResult:
+        """Expose admitted precedents supporting one existing route step."""
+
+        route = self._route(result_ref, alias)
+        if step_index < 1 or step_index > len(route.steps):
+            raise ValueError("route precedent step index is out of range")
+        result = lookup_step_precedents(
+            route.steps[step_index - 1],
+            self._coworker.library,
+        )
+        prefix = f"{alias}.step-{step_index}.precedents"
+        evidence = [
+            EvidenceItem(
+                evidence_id=f"{prefix}.summary",
+                layer="route",
+                source_id=result_ref,
+                payload_type="step_precedent_lookup",
+                payload={
+                    "route_alias": alias,
+                    "step_index": step_index,
+                    "template_id": result.template_id,
+                    "operator_id": result.operator_id,
+                    "available_precedent_count": result.available_precedent_count,
+                    "returned_precedent_count": len(result.matches),
+                    "match_evidence_ids": [
+                        f"{prefix}.{index}"
+                        for index in range(1, len(result.matches) + 1)
+                    ],
+                },
+                provenance="deterministic_inference",
+                schema_versions={"step_precedents": result.schema_version},
+                uncertainty=(
+                    "Library precedent supports an operator context; it does not "
+                    "establish success for the planned substrate."
+                ),
+            )
+        ]
+        evidence.extend(
+            EvidenceItem(
+                evidence_id=f"{prefix}.{index}",
+                layer="observation",
+                source_id=match.match_id,
+                payload_type="admitted_step_precedent",
+                payload={
+                    "route_alias": alias,
+                    "step_index": step_index,
+                    **match.to_dict(),
+                },
+                provenance="observed",
+                schema_versions={"step_precedents": result.schema_version},
+                uncertainty=(
+                    "This is an admitted source observation, not an experimental "
+                    "validation of the planned step."
+                ),
+            )
+            for index, match in enumerate(result.matches, start=1)
+        )
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=tuple(evidence),
+            packet={
+                "result_ref": result_ref,
+                "route_alias": alias,
+                "step_index": step_index,
+                "evidence": [_evidence_packet(item) for item in evidence],
+            },
+            authoritative_result=self._responses[result_ref],
+            register_result_ref=False,
+        )
+
+    def verify_route(
+        self,
+        result_ref: str,
+        alias: str,
+    ) -> CapabilityResult:
+        """Run independent whole-route verification over an existing route."""
+
+        route = self._route(result_ref, alias)
+        report = verify_planned_route(route)
+        evidence = EvidenceItem(
+            evidence_id=f"{alias}.verification",
+            layer="route",
+            source_id=route.route_id,
+            payload_type="route_verification",
+            payload={"route_alias": alias, **report.to_dict()},
+            provenance="deterministic_inference",
+            schema_versions={"route_verification": report.schema_version},
+            uncertainty=(
+                "Deterministic route verification is not experimental proof of "
+                "yield or operational feasibility."
+            ),
+        )
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(evidence,),
+            packet={
+                "result_ref": result_ref,
+                "route_alias": alias,
+                "evidence": [_evidence_packet(evidence)],
+            },
+            authoritative_result=self._responses[result_ref],
+            register_result_ref=False,
         )
 
     def inspect_route(
@@ -553,4 +701,17 @@ def _packet(
             }
             for item in evidence
         ],
+    }
+
+
+def _evidence_packet(item: EvidenceItem) -> Dict[str, Any]:
+    """Return the compact evidence representation used by capability packets."""
+
+    return {
+        "evidence_id": item.evidence_id,
+        "layer": item.layer,
+        "payload_type": item.payload_type,
+        "payload": dict(item.payload),
+        "provenance": item.provenance,
+        "uncertainty": item.uncertainty,
     }

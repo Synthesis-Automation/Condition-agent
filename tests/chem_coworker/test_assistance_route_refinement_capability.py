@@ -9,10 +9,14 @@ from chem_coworker.assistance import AssistanceRequest
 from chem_coworker.assistance.capabilities import MultistepCapabilities
 from chem_coworker.contracts import MultistepRetrosynthesisResponse
 from core_retrosynthesis import (
+    GenericCoreTemplate,
     GenericDisconnectionCandidate,
+    GenericTemplateLibrary,
     RetrosynthesisConditionEvidence,
+    TemplateContext,
     plan_multistep_routes,
 )
+from core_retrosynthesis.generic_models import GenericTemplatePrecedent
 
 
 class _EmptyStock:
@@ -76,6 +80,42 @@ class _DeterministicCoworker:
         self.exclusions = ()
         self.source = _candidate("C.C", "source", 0.99)
         self.alternative = _candidate("N.O", "alternative", 0.90)
+        self.library = GenericTemplateLibrary(
+            templates=tuple(
+                GenericCoreTemplate(
+                    template_id=candidate.template_id,
+                    operator_id=candidate.operator_id,
+                    transformation_kind=None,
+                    abstraction_level="L2",
+                    compiler_engine="reaction_core",
+                    reaction_smarts="[*:1]>>[*:1]",
+                    product_smarts="[*:1]",
+                    precursor_smarts="[*:1]",
+                    edit_tokens=("formed:C-C",),
+                    handle_signature="fixture",
+                    stereo_policy="exact",
+                    observation_support=1,
+                    independent_reference_support=1,
+                    precedents=(
+                        GenericTemplatePrecedent(
+                            reaction_id="reaction",
+                            reference_id=f"reference:{candidate.template_id}",
+                            product_smiles=candidate.target_smiles,
+                            precursor_smiles=candidate.precursor_smiles,
+                            mapped_reaction_smiles=(
+                                candidate.proposed_reaction_smiles
+                            ),
+                            context=TemplateContext((), (), ()),
+                        ),
+                    ),
+                )
+                for candidate in (self.source, self.alternative)
+            ),
+            source_row_count=2,
+            accepted_observation_count=2,
+            rejection_counts={},
+            definition={"definition_id": "fixture"},
+        )
 
     def plan(self, request, *, candidate_exclusions=()):
         self.exclusions = candidate_exclusions
@@ -136,16 +176,19 @@ def test_refinement_capability_resolves_aliases_and_preserves_lineage() -> None:
         for item in inspection.evidence
         if item.payload_type == "route_refinement_issue"
     )
+    proposal = next(
+        item
+        for item in inspection.evidence
+        if item.payload_type == "route_repair_proposal"
+        and item.payload["status"] == "actionable"
+        and item.payload["refinement_method"] == "alternate_disconnection"
+    )
+    assert proposal.payload["issue_id"] == issue.payload["issue_id"]
 
-    refined = capabilities.refine_route(
+    refined = capabilities.apply_repair(
         request,
         initial.result_ref,
-        route_alias=source_alias,
-        step_index=1,
-        objective="resolve_condition_gap",
-        method="alternate_disconnection",
-        issue_evidence_ids=(issue.evidence_id,),
-        maximum_added_steps=0,
+        proposal_id=str(proposal.payload["proposal_id"]),
     )
 
     outcome = next(
@@ -158,3 +201,33 @@ def test_refinement_capability_resolves_aliases_and_preserves_lineage() -> None:
     assert outcome.payload["source_route_preserved"] is True
     assert coworker.exclusions[0].strategy_id == coworker.source.strategy_id
     assert capabilities.result(initial.result_ref) is response
+
+
+def test_multistep_chemistry_tools_expose_precedent_and_verification_evidence() -> None:
+    coworker = _DeterministicCoworker()
+    capabilities = MultistepCapabilities(coworker)  # type: ignore[arg-type]
+    request = AssistanceRequest(
+        objective="Inspect source evidence and verify the route",
+        mode="multistep",
+        structure_input="CCCCCCCC",
+    )
+    initial = capabilities.plan_routes(request)
+    projection = capabilities._projection(initial.result_ref)
+    route_alias = projection.route_aliases[0][0]
+
+    precedents = capabilities.search_step_precedents(
+        initial.result_ref,
+        route_alias,
+        step_index=1,
+    )
+    verification = capabilities.verify_route(initial.result_ref, route_alias)
+
+    assert precedents.register_result_ref is False
+    assert any(
+        item.payload_type == "admitted_step_precedent"
+        for item in precedents.evidence
+    )
+    assert verification.register_result_ref is False
+    report = verification.evidence[0]
+    assert report.payload_type == "route_verification"
+    assert report.payload["status"] in {"verified", "verified_with_cautions"}

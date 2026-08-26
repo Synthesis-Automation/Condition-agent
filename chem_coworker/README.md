@@ -156,13 +156,24 @@ and low molecular weight remains a clearly labeled heuristic.
 
 The older single-pass route-review contract remains outside the search loop and
 can only annotate fixed candidates. The assistance controller adds a separate,
-policy-bounded agent loop. It may inspect application-derived route issues and
-request one `refine_route` action, but it still cannot add a structure, edit
-SMILES, select atom edits, author conditions, mark a partial route solved, or
-override deterministic chemistry.
+policy-bounded chemistry-tool loop. It may audit a target, inspect admitted
+step precedents, verify an existing route, and execute one actionable repair
+proposal. It still cannot add a structure, edit SMILES or SMARTS, select atom
+edits, author conditions, mark a partial route solved, or override deterministic
+chemistry.
 
-`refine_route` accepts only an existing route alias, step index, cited typed
-issue evidence, a closed objective, and one of two initial methods:
+The read-only tools are deliberately narrow:
+
+- `audit_target` returns canonical identity, assigned or unassigned stereo,
+  molecular motifs, and reactive-site hypotheses from `reactive_taxonomy`;
+- `search_step_precedents` returns only source-round-tripped observations already
+  attached to the selected step's admitted operator-library template;
+- `verify_route` independently checks tree integrity, step graph agreement,
+  forward-validation status, terminal completion, deterministic issues, and
+  condition-evidence coverage.
+
+`apply_repair` accepts only the stable ID of an existing actionable repair
+proposal. Code resolves the proposal to one of two initial methods:
 
 - `alternate_disconnection` excludes the selected step's exact `STRAT1`
   strategy for that product expansion;
@@ -176,10 +187,11 @@ route is never mutated or discarded. Refinement evidence records parent result
 and route IDs, the excluded candidate scope, accepted candidate IDs, remaining
 issue counts, and whether a verified deterministic improvement was found.
 
-Inspection evidence now includes typed repair proposals derived from each
-issue. The controller requires the model to cite both the issue and a matching
-actionable proposal before `refine_route` can run. Attempts to select an
-unavailable proposal are blocked by policy. For protic-quench conflicts,
+Inspection evidence includes typed repair proposals derived from each issue.
+The controller requires the model to cite a matching actionable proposal before
+`apply_repair` can run and derives the route, step, issue, objective, method, and
+search allowance from the proposal ID. Attempts to select an unavailable
+proposal are blocked by policy. For protic-quench conflicts,
 alternate realizations and disconnections can run now; temporary masking is
 explicitly unavailable until deterministic protection-sequence operators are
 registered and validated.

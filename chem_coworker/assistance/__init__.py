@@ -27,6 +27,7 @@ from .evidence import (
     project_retrosynthesis_response,
 )
 from .capabilities import (
+    ChemistryCapabilities,
     ConditionCapabilities,
     MultistepCapabilities,
     RetrosynthesisCapabilities,
@@ -64,6 +65,7 @@ __all__ = [
     "AssistanceTransportResult",
     "AssistanceUsage",
     "ClarificationQuestion",
+    "ChemistryCapabilities",
     "ConditionEvidenceProjection",
     "ConditionCapabilities",
     "MultistepCapabilities",
