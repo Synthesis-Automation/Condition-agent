@@ -115,6 +115,39 @@ def test_refinement_excludes_source_strategy_and_finds_improved_route() -> None:
     assert outcome.status == "improved_alternative_found"
     assert outcome.source_route_preserved is True
     assert outcome.candidate_assessments[0].relevant_issue_count == 0
+    assert outcome.accepted_route_id is not None
+    assert outcome.retained_route_id == outcome.accepted_route_id
+    assert outcome.candidate_assessments[0].verification_status in {
+        "verified",
+        "verified_with_cautions",
+    }
+
+    repeated = summarize_route_refinement(
+        source_route,
+        intent,
+        refined,
+        previously_accepted_route_ids=(outcome.accepted_route_id,),
+    )
+
+    assert repeated.status == "alternatives_found_no_verified_improvement"
+    assert repeated.accepted_route_id is None
+    assert repeated.retained_route_id == source_route.route_id
+    assert "previously_accepted_route_repeated" in (
+        repeated.candidate_assessments[0].rejection_reasons
+    )
+
+    partial = replace(refined.routes[0], solved=False)
+    regressed_result = replace(
+        refined,
+        routes=(),
+        partial_routes=(partial,),
+    )
+    regressed = summarize_route_refinement(source_route, intent, regressed_result)
+
+    assert regressed.accepted_route_id is None
+    assert "solved_status_regressed" in (
+        regressed.candidate_assessments[0].rejection_reasons
+    )
 
 
 def test_alternate_realization_excludes_only_exact_realization() -> None:

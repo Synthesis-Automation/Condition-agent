@@ -102,12 +102,12 @@ def stable_assistance_id(prefix: str, value: Any) -> str:
 class AssistanceBudget:
     """Validated upper bounds for one assistance session."""
 
-    max_action_turns: int = 4
+    max_action_turns: int = 8
     max_clarification_cycles: int = 2
     max_provider_retries_per_turn: int = 1
-    max_search_expansions: int = 1
-    max_total_tokens: int = 24_000
-    max_elapsed_ms: int = 120_000
+    max_search_expansions: int = 3
+    max_total_tokens: int = 48_000
+    max_elapsed_ms: int = 180_000
 
     def __post_init__(self) -> None:
         for name, value in asdict(self).items():

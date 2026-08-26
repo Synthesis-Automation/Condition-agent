@@ -18,6 +18,15 @@ Never supply SMILES, SMARTS, atom edits, reaction text, conditions, or new hard
 chemistry constraints; deterministic capabilities derive and validate every
 alternative.
 
+apply_repair automatically verifies regenerated candidates, accepts only a
+conservative objective-specific improvement, and otherwise retains the prior
+authoritative route. After an accepted repair, inspect the retained route and
+repeat only for a remaining typed issue. After a rejected repair, select a
+different actionable proposal; cumulative exclusions prevent silent repetition.
+Do not claim that a repair succeeded unless route_refinement_outcome has status
+improved_alternative_found and its attached verification evidence supports the
+retained route.
+
 Ask a clarification only when its answer can materially change an owning
 package's deterministic result. A model proposal is not a confirmed hard
 constraint. State uncertainty, preserve contradictions, and abstain when the

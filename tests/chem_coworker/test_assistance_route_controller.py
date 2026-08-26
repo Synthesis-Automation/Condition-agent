@@ -165,6 +165,23 @@ class _MultistepCapabilities:
                     },
                     provenance="deterministic_inference",
                 ),
+                EvidenceItem(
+                    evidence_id="route-1.issue-1.repair-3",
+                    layer="route",
+                    source_id=result_ref,
+                    payload_type="route_repair_proposal",
+                    payload={
+                        "route_alias": "route-1",
+                        "step_index": 1,
+                        "proposal_id": "RPROP1:second-actionable",
+                        "issue_id": "RISS1:test",
+                        "status": "actionable",
+                        "objective": "resolve_condition_gap",
+                        "refinement_method": "alternate_realization",
+                        "maximum_added_steps": 1,
+                    },
+                    provenance="deterministic_inference",
+                ),
             ),
             packet={},
             authoritative_result=self.first,
@@ -224,6 +241,47 @@ class _MultistepCapabilities:
 
     def result(self, result_ref):
         return self.second if result_ref == "route-result-2" else self.first
+
+
+class _RollbackThenImproveCapabilities(_MultistepCapabilities):
+    def __init__(self):
+        super().__init__()
+        self.attempts = []
+
+    def apply_repair(self, request, result_ref, **kwargs):
+        self.attempts.append(kwargs["proposal_id"])
+        if kwargs["proposal_id"] == "RPROP1:actionable":
+            return CapabilityResult(
+                result_ref="route-result-1",
+                evidence=(
+                    _evidence(
+                        "refinement.RINT1:rejected",
+                        {
+                            "status": "alternatives_found_no_verified_improvement",
+                            "retained_result_ref": "route-result-1",
+                        },
+                    ),
+                ),
+                packet={},
+                authoritative_result=self.first,
+                register_result_ref=False,
+            )
+        result = super().apply_repair(request, result_ref, **kwargs)
+        return CapabilityResult(
+            result_ref=result.result_ref,
+            evidence=(
+                _evidence(
+                    "refinement.RINT1:accepted",
+                    {
+                        "status": "improved_alternative_found",
+                        "retained_result_ref": "route-result-2",
+                    },
+                ),
+                _evidence("route-2.summary", {"solved": True}),
+            ),
+            packet=result.packet,
+            authoritative_result=result.authoritative_result,
+        )
 
 
 def test_same_controller_completes_one_step_mode_without_structure_edits() -> None:
@@ -452,6 +510,63 @@ def test_multistep_repair_uses_only_deterministic_proposal_identity() -> None:
     assert capabilities.refinement == {"proposal_id": "RPROP1:actionable"}
     refine_action = run.state.action_history[2]
     assert "smiles" not in str(refine_action.normalized_arguments).casefold()
+
+
+def test_multistep_repair_can_retry_after_deterministic_rollback() -> None:
+    transport = _QueueTransport(
+        _action("plan_routes"),
+        _action(
+            "inspect_route_step",
+            arguments={"route_alias": "route-1", "step_index": 1},
+            evidence=("route-1.summary",),
+        ),
+        _action(
+            "apply_repair",
+            arguments={"proposal_id": "RPROP1:actionable"},
+            evidence=("route-1.issue-1.repair-1",),
+        ),
+        _action(
+            "apply_repair",
+            arguments={"proposal_id": "RPROP1:second-actionable"},
+            evidence=("route-1.issue-1.repair-3",),
+        ),
+        _action(
+            "finish",
+            arguments={
+                "terminal_status": "completed",
+                "stopping_reason": "The second deterministic repair improved the route.",
+            },
+            evidence=("refinement.RINT1:accepted",),
+            claims=(
+                _claim(
+                    "route-refinement",
+                    "refinement.RINT1:accepted",
+                    "The second bounded repair was accepted.",
+                ),
+            ),
+        ),
+    )
+    capabilities = _RollbackThenImproveCapabilities()
+    controller = AssistanceController(
+        transport=transport,
+        multistep_capabilities=capabilities,  # type: ignore[arg-type]
+    )
+
+    run = controller.run(
+        AssistanceRequest(
+            objective="Try another deterministic proposal after rollback",
+            mode="multistep",
+            structure_input="CCN",
+        )
+    )
+
+    assert run.state.status == "completed"
+    assert run.state.usage.search_expansions == 2
+    assert run.state.domain_result_refs == ("route-result-1", "route-result-2")
+    assert capabilities.attempts == [
+        "RPROP1:actionable",
+        "RPROP1:second-actionable",
+    ]
 
 
 def test_multistep_repair_rejects_unavailable_proposal() -> None:

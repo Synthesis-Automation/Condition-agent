@@ -53,7 +53,7 @@ def _candidate(precursors: str, identity: str, score: float):
 
 
 def _condition(reaction_smiles: str) -> RetrosynthesisConditionEvidence:
-    insufficient = reaction_smiles.startswith("C.C>>")
+    insufficient = reaction_smiles.startswith("C.C")
     return RetrosynthesisConditionEvidence(
         status="insufficient_evidence" if insufficient else "recommended_direct",
         query_reaction_smiles=reaction_smiles,
@@ -199,8 +199,86 @@ def test_refinement_capability_resolves_aliases_and_preserves_lineage() -> None:
     assert outcome.payload["status"] == "improved_alternative_found"
     assert outcome.payload["source_result_ref"] == initial.result_ref
     assert outcome.payload["source_route_preserved"] is True
+    assert outcome.payload["accepted_route_id"] is not None
+    assert outcome.payload["retained_result_ref"] == refined.result_ref
+    assert outcome.payload["cumulative_exclusion_count"] == 1
+    verification = next(
+        item
+        for item in refined.evidence
+        if item.payload_type == "route_refinement_verification"
+    )
+    assert verification.payload["accepted"] is True
+    assert verification.payload["route_id"] == outcome.payload["accepted_route_id"]
     assert coworker.exclusions[0].strategy_id == coworker.source.strategy_id
     assert capabilities.result(initial.result_ref) is response
+
+
+def test_refinement_rolls_back_and_accumulates_exclusions_without_improvement() -> None:
+    coworker = _DeterministicCoworker()
+    coworker.alternative = _candidate("C.CC", "alternative", 0.90)
+    capabilities = MultistepCapabilities(coworker)  # type: ignore[arg-type]
+    request = AssistanceRequest(
+        objective="Retain the best route while trying bounded repairs",
+        mode="multistep",
+        structure_input="CCCCCCCC",
+    )
+    initial = capabilities.plan_routes(request)
+    projection = capabilities._projection(initial.result_ref)
+    response = capabilities.result(initial.result_ref)
+    source_route = next(
+        route
+        for route in response.result.routes  # type: ignore[union-attr]
+        if route.steps[0].candidate.strategy_id == coworker.source.strategy_id
+    )
+    source_alias = next(
+        alias
+        for alias, route_id in projection.route_aliases
+        if route_id == source_route.route_id
+    )
+    inspection = capabilities.inspect_route(
+        initial.result_ref,
+        source_alias,
+        step_index=1,
+    )
+    proposals = {
+        str(item.payload["refinement_method"]): str(item.payload["proposal_id"])
+        for item in inspection.evidence
+        if item.payload_type == "route_repair_proposal"
+        and item.payload["status"] == "actionable"
+    }
+
+    first = capabilities.apply_repair(
+        request,
+        initial.result_ref,
+        proposal_id=proposals["alternate_realization"],
+    )
+
+    first_outcome = next(
+        item for item in first.evidence if item.payload_type == "route_refinement_outcome"
+    )
+    assert first.result_ref == initial.result_ref
+    assert first.register_result_ref is False
+    assert first_outcome.payload["accepted_route_id"] is None
+    assert first_outcome.payload["retained_result_ref"] == initial.result_ref
+    assert first_outcome.payload["cumulative_exclusion_count"] == 1
+    assert next(
+        item
+        for item in first.evidence
+        if item.payload_type == "route_refinement_verification"
+    ).payload["accepted"] is False
+
+    second = capabilities.apply_repair(
+        request,
+        initial.result_ref,
+        proposal_id=proposals["alternate_disconnection"],
+    )
+    second_outcome = next(
+        item for item in second.evidence if item.payload_type == "route_refinement_outcome"
+    )
+
+    assert second.result_ref == initial.result_ref
+    assert second_outcome.payload["cumulative_exclusion_count"] == 2
+    assert len(coworker.exclusions) == 2
 
 
 def test_multistep_chemistry_tools_expose_precedent_and_verification_evidence() -> None:

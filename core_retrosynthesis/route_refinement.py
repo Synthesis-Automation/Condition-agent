@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     )
 
 
-ROUTE_REFINEMENT_SCHEMA_VERSION = "route_refinement.v2"
+ROUTE_REFINEMENT_SCHEMA_VERSION = "route_refinement.v3"
 
 RouteIssueKind = Literal[
     "precursor_compatibility",
@@ -363,9 +363,20 @@ class RouteRefinementCandidateAssessment:
     route_id: str
     solved: bool
     route_cost: float
+    reaction_count: int
     relevant_issue_count: int
     source_relevant_issue_count: int
+    strong_issue_count: int
+    source_strong_issue_count: int
+    total_issue_count: int
+    source_total_issue_count: int
+    verification_status: Literal[
+        "verified", "verified_with_cautions", "failed"
+    ]
+    hard_verification_failures: tuple[str, ...]
+    previously_accepted: bool
     improved: bool
+    rejection_reasons: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible comparison."""
@@ -381,6 +392,8 @@ class RouteRefinementOutcome:
     status: RouteRefinementStatus
     source_route_id: str
     candidate_assessments: tuple[RouteRefinementCandidateAssessment, ...]
+    accepted_route_id: str | None = None
+    retained_route_id: str = ""
     source_route_preserved: bool = True
     schema_version: str = ROUTE_REFINEMENT_SCHEMA_VERSION
 
@@ -392,6 +405,8 @@ class RouteRefinementOutcome:
             "intent": self.intent.to_dict(),
             "status": self.status,
             "source_route_id": self.source_route_id,
+            "accepted_route_id": self.accepted_route_id,
+            "retained_route_id": self.retained_route_id,
             "source_route_preserved": self.source_route_preserved,
             "candidate_assessments": [
                 item.to_dict() for item in self.candidate_assessments
@@ -661,14 +676,29 @@ def summarize_route_refinement(
     source_route: "MultistepRetrosynthesisRoute",
     intent: RouteRefinementIntent,
     result: "MultistepRetrosynthesisResult",
+    *,
+    previously_accepted_route_ids: Sequence[str] = (),
 ) -> RouteRefinementOutcome:
-    """Compare regenerated routes to the source using deterministic issue counts."""
+    """Conservatively compare regenerated routes and select one verified improvement.
+
+    Repair is objective-specific: a candidate must reduce the selected issue kind,
+    pass every hard graph gate, preserve solved status, and avoid increasing either
+    strong or total deterministic issues.  Previously accepted route identities are
+    rejected to keep a multi-attempt controller from cycling.
+    """
+
+    # Imported lazily because route verification consumes the issue collector in
+    # this module.  The dependency remains entirely inside core_retrosynthesis.
+    from .route_verification import verify_planned_route
 
     relevant_kinds = _OBJECTIVE_ISSUE_KINDS[intent.objective]
     source_issues = collect_route_refinement_issues(source_route)
     source_count = sum(
         not relevant_kinds or item.kind in relevant_kinds for item in source_issues
     )
+    source_strong_count = sum(item.severity == "strong" for item in source_issues)
+    source_total_count = len(source_issues)
+    accepted_history = frozenset(previously_accepted_route_ids)
     candidates = (*result.routes, *result.partial_routes)
     assessments = []
     for route in candidates:
@@ -676,24 +706,74 @@ def summarize_route_refinement(
         issue_count = sum(
             not relevant_kinds or item.kind in relevant_kinds for item in issues
         )
-        improved = (
-            route.route_id != source_route.route_id
-            and (
-                issue_count < source_count
-                or (not relevant_kinds and route.route_id != source_route.route_id)
-            )
+        strong_count = sum(item.severity == "strong" for item in issues)
+        report = verify_planned_route(route)
+        hard_failures = tuple(
+            gate.gate
+            for gate in report.gates
+            if gate.gate
+            in {
+                "route_tree_integrity",
+                "target_identity",
+                "step_graph_consistency",
+                "forward_validation",
+            }
+            and gate.status == "fail"
         )
+        previously_accepted = route.route_id in accepted_history
+        rejection_reasons: list[str] = []
+        if route.route_id == source_route.route_id:
+            rejection_reasons.append("source_route_repeated")
+        if previously_accepted:
+            rejection_reasons.append("previously_accepted_route_repeated")
+        if hard_failures:
+            rejection_reasons.append("hard_verification_failed")
+        if source_route.solved and not route.solved:
+            rejection_reasons.append("solved_status_regressed")
+        if strong_count > source_strong_count:
+            rejection_reasons.append("strong_issue_count_increased")
+        if len(issues) > source_total_count:
+            rejection_reasons.append("total_issue_count_increased")
+        if relevant_kinds and issue_count >= source_count:
+            rejection_reasons.append("objective_issue_count_not_reduced")
+        improved = not rejection_reasons
         assessments.append(
             RouteRefinementCandidateAssessment(
                 route_id=route.route_id,
                 solved=route.solved,
                 route_cost=route.route_cost,
+                reaction_count=route.reaction_count,
                 relevant_issue_count=issue_count,
                 source_relevant_issue_count=source_count,
+                strong_issue_count=strong_count,
+                source_strong_issue_count=source_strong_count,
+                total_issue_count=len(issues),
+                source_total_issue_count=source_total_count,
+                verification_status=report.status,
+                hard_verification_failures=hard_failures,
+                previously_accepted=previously_accepted,
                 improved=improved,
+                rejection_reasons=tuple(rejection_reasons),
             )
         )
-    if any(item.improved for item in assessments):
+    improving = [item for item in assessments if item.improved]
+    accepted = (
+        min(
+            improving,
+            key=lambda item: (
+                not item.solved,
+                item.strong_issue_count,
+                item.relevant_issue_count,
+                item.total_issue_count,
+                item.reaction_count,
+                item.route_cost,
+                item.route_id,
+            ),
+        )
+        if improving
+        else None
+    )
+    if accepted is not None:
         status: RouteRefinementStatus = "improved_alternative_found"
     elif assessments:
         status = "alternatives_found_no_verified_improvement"
@@ -704,6 +784,10 @@ def summarize_route_refinement(
         status=status,
         source_route_id=source_route.route_id,
         candidate_assessments=tuple(assessments),
+        accepted_route_id=accepted.route_id if accepted is not None else None,
+        retained_route_id=(
+            accepted.route_id if accepted is not None else source_route.route_id
+        ),
     )
 
 

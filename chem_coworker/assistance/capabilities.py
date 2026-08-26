@@ -8,6 +8,7 @@ from typing import Any, Dict, Mapping, Tuple
 from condition_recommender.models import GenericRecommendationResult
 from core_retrosynthesis import (
     MultistepRetrosynthesisRoute,
+    RouteCandidateExclusion,
     RouteRefinementIntent,
     RouteSearchPolicyDelta,
     apply_route_search_delta,
@@ -315,6 +316,10 @@ class MultistepCapabilities:
         self._responses: Dict[str, MultistepRetrosynthesisResponse] = {}
         self._requests: Dict[str, MultistepRetrosynthesisRequest] = {}
         self._projections: Dict[str, MultistepEvidenceProjection] = {}
+        self._candidate_exclusions: Dict[
+            str, tuple[RouteCandidateExclusion, ...]
+        ] = {}
+        self._accepted_route_ids: Dict[str, frozenset[str]] = {}
 
     def plan_routes(self, request: AssistanceRequest) -> CapabilityResult:
         if request.mode != "multistep":
@@ -351,7 +356,11 @@ class MultistepCapabilities:
                 "max_expansions": expansions,
             }
         )
-        return self._plan(expanded)
+        return self._plan(
+            expanded,
+            candidate_exclusions=self._candidate_exclusions.get(result_ref, ()),
+            accepted_route_ids=self._accepted_route_ids.get(result_ref, frozenset()),
+        )
 
     def apply_repair(
         self,
@@ -423,18 +432,51 @@ class MultistepCapabilities:
                 "max_expansions": policy.maximum_max_expansions,
             }
         )
+        prior_exclusions = self._candidate_exclusions.get(result_ref, ())
+        cumulative_exclusions = tuple(
+            dict.fromkeys((*prior_exclusions, plan.exclusion))
+        )
         response = self._coworker.plan(
             refined_request,
-            candidate_exclusions=(plan.exclusion,),
+            candidate_exclusions=cumulative_exclusions,
         )
         refined_projection = project_multistep_response(response)
         if response.result is None:
             raise ValueError("deterministic refinement returned no route result")
+        accepted_history = frozenset(
+            {
+                *self._accepted_route_ids.get(result_ref, frozenset()),
+                source_route.route_id,
+            }
+        )
         outcome = summarize_route_refinement(
             source_route,
             intent,
             response.result,
+            previously_accepted_route_ids=accepted_history,
         )
+        accepted_route = next(
+            (
+                route
+                for route in (*response.result.routes, *response.result.partial_routes)
+                if route.route_id == outcome.accepted_route_id
+            ),
+            None,
+        )
+        accepted_alias = next(
+            (
+                alias
+                for alias, route_id in refined_projection.route_aliases
+                if route_id == outcome.accepted_route_id
+            ),
+            None,
+        )
+        retained_route = accepted_route or source_route
+        retained_result_ref = (
+            refined_projection.result_ref if accepted_route is not None else result_ref
+        )
+        retained_route_alias = accepted_alias or route_alias
+        verification = verify_planned_route(retained_route)
         lineage = EvidenceItem(
             evidence_id=f"refinement.{intent.intent_id}",
             layer="route",
@@ -444,7 +486,10 @@ class MultistepCapabilities:
                 **outcome.to_dict(),
                 "source_result_ref": result_ref,
                 "refined_result_ref": refined_projection.result_ref,
+                "retained_result_ref": retained_result_ref,
+                "retained_route_alias": retained_route_alias,
                 "excluded_candidate_scope": plan.excluded_candidate_scope,
+                "cumulative_exclusion_count": len(cumulative_exclusions),
             },
             provenance="deterministic_inference",
             schema_versions={"route_refinement": outcome.schema_version},
@@ -453,25 +498,78 @@ class MultistepCapabilities:
                 "reaction success."
             ),
         )
-        self._store(refined_request, response, refined_projection)
+        verification_evidence = EvidenceItem(
+            evidence_id=f"refinement.{intent.intent_id}.verification",
+            layer="route",
+            source_id=retained_route.route_id,
+            payload_type="route_refinement_verification",
+            payload={
+                "route_alias": retained_route_alias,
+                "accepted": accepted_route is not None,
+                **verification.to_dict(),
+            },
+            provenance="deterministic_inference",
+            schema_versions={"route_verification": verification.schema_version},
+            uncertainty=(
+                "Deterministic route verification is not experimental proof of "
+                "yield or operational feasibility."
+            ),
+        )
+        next_history = frozenset(
+            {
+                *accepted_history,
+                *(
+                    (accepted_route.route_id,)
+                    if accepted_route is not None
+                    else ()
+                ),
+            }
+        )
+        self._store(
+            refined_request,
+            response,
+            refined_projection,
+            candidate_exclusions=cumulative_exclusions,
+            accepted_route_ids=next_history,
+        )
+        # A failed attempt retains the authoritative source, but its exclusion is
+        # still remembered so the next proposal cannot silently repeat the search.
+        self._candidate_exclusions[result_ref] = cumulative_exclusions
+        self._accepted_route_ids[result_ref] = accepted_history
         initial_ids = {
             item["evidence_id"]
             for item in refined_projection.initial_packet()["evidence"]
         }
-        exposed = tuple(
+        refined_summaries = tuple(
             item
             for item in refined_projection.evidence
             if item.evidence_id in initial_ids
         )
+        exposed = refined_summaries if accepted_route is not None else ()
+        retained_packet = (
+            refined_projection.initial_packet()
+            if accepted_route is not None
+            else {
+                "result_ref": result_ref,
+                "route_aliases": [route_alias],
+                "evidence": [],
+            }
+        )
         packet = {
-            **refined_projection.initial_packet(),
+            **retained_packet,
+            "result_ref": retained_result_ref,
+            "search_result_ref": refined_projection.result_ref,
             "refinement": lineage.payload,
+            "verification": verification_evidence.payload,
         }
         return CapabilityResult(
-            result_ref=refined_projection.result_ref,
-            evidence=(lineage, *exposed),
+            result_ref=retained_result_ref,
+            evidence=(lineage, verification_evidence, *exposed),
             packet=packet,
-            authoritative_result=response,
+            authoritative_result=(
+                response if accepted_route is not None else self._responses[result_ref]
+            ),
+            register_result_ref=accepted_route is not None,
         )
 
     def search_step_precedents(
@@ -626,10 +724,25 @@ class MultistepCapabilities:
         except KeyError as exc:
             raise ValueError(f"unknown or stale multistep result: {result_ref}") from exc
 
-    def _plan(self, request: MultistepRetrosynthesisRequest) -> CapabilityResult:
-        response = self._coworker.plan(request)
+    def _plan(
+        self,
+        request: MultistepRetrosynthesisRequest,
+        *,
+        candidate_exclusions: tuple[RouteCandidateExclusion, ...] = (),
+        accepted_route_ids: frozenset[str] = frozenset(),
+    ) -> CapabilityResult:
+        response = self._coworker.plan(
+            request,
+            candidate_exclusions=candidate_exclusions,
+        )
         projection = project_multistep_response(response)
-        self._store(request, response, projection)
+        self._store(
+            request,
+            response,
+            projection,
+            candidate_exclusions=candidate_exclusions,
+            accepted_route_ids=accepted_route_ids,
+        )
         initial_ids = {
             item["evidence_id"] for item in projection.initial_packet()["evidence"]
         }
@@ -647,10 +760,15 @@ class MultistepCapabilities:
         request: MultistepRetrosynthesisRequest,
         response: MultistepRetrosynthesisResponse,
         projection: MultistepEvidenceProjection,
+        *,
+        candidate_exclusions: tuple[RouteCandidateExclusion, ...] = (),
+        accepted_route_ids: frozenset[str] = frozenset(),
     ) -> None:
         self._responses[projection.result_ref] = response
         self._requests[projection.result_ref] = request
         self._projections[projection.result_ref] = projection
+        self._candidate_exclusions[projection.result_ref] = candidate_exclusions
+        self._accepted_route_ids[projection.result_ref] = accepted_route_ids
 
     def _route(
         self,

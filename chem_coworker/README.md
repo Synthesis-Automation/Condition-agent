@@ -41,7 +41,7 @@ MultistepRetrosynthesisRequest
   -> deterministic beam search, route scoring, and solved/partial separation
   -> optional deterministic condition evidence for every retained step
   -> optional assistance inspection of typed route issues
-  -> at most one policy-bounded deterministic route refinement search
+  -> up to three policy-bounded deterministic route refinement attempts
   -> optional bounded LLM review of fixed route candidates as complete sequences
   -> deterministic rendering with original and advisory display ranks
 ```
@@ -182,10 +182,14 @@ proposal. Code resolves the proposal to one of two initial methods:
 
 The deterministic planner derives the molecular exclusion from the stored
 route, reruns bounded search, recomputes step condition evidence, and compares
-the new routes with the source using objective-specific issue counts. The source
-route is never mutated or discarded. Refinement evidence records parent result
-and route IDs, the excluded candidate scope, accepted candidate IDs, remaining
-issue counts, and whether a verified deterministic improvement was found.
+the new routes with the source using conservative objective-specific gates. A
+candidate must reduce the selected issue kind, pass hard graph verification,
+preserve solved status, avoid increasing strong or total issue counts, and not
+repeat a previously accepted route. Failed attempts roll back to the prior
+authoritative route. Exclusions accumulate across attempts, and every accepted
+repair is automatically verified. Refinement evidence records parent result and
+route IDs, the excluded candidate scope, cumulative exclusion count, accepted
+candidate ID, issue deltas, verification, and the retained route.
 
 Inspection evidence includes typed repair proposals derived from each issue.
 The controller requires the model to cite a matching actionable proposal before
