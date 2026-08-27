@@ -12,6 +12,7 @@ from reactive_taxonomy import assess_molecule_complexity
 from .chemistry import digest
 
 from .condition_ranking import RetrosynthesisConditionEvidence
+from .condition_selectivity_repair import ConditionSelectivityRepairAssessment
 from .generic_models import (
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
@@ -34,7 +35,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.7"
+MULTISTEP_SCHEMA_VERSION = "1.8"
 _TERMINAL_STOCK_ROLES = frozenset(
     {
         "reactant",
@@ -111,6 +112,9 @@ class RetrosynthesisRouteStep:
     product_node_id: str = ""
     precursor_node_ids: tuple[str, ...] = ()
     condition_evidence: Optional[RetrosynthesisConditionEvidence] = None
+    condition_selectivity_assessment: Optional[
+        ConditionSelectivityRepairAssessment
+    ] = None
     route_policy_probability: Optional[float] = None
     route_policy_rank: Optional[int] = None
     original_candidate_rank: Optional[int] = None
@@ -131,6 +135,11 @@ class RetrosynthesisRouteStep:
             "condition_evidence": (
                 self.condition_evidence.to_dict()
                 if self.condition_evidence is not None
+                else None
+            ),
+            "condition_selectivity_assessment": (
+                self.condition_selectivity_assessment.to_dict()
+                if self.condition_selectivity_assessment is not None
                 else None
             ),
             "route_policy_probability": self.route_policy_probability,

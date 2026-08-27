@@ -173,12 +173,16 @@ The read-only tools are deliberately narrow:
   condition-evidence coverage.
 
 `apply_repair` accepts only the stable ID of an existing actionable repair
-proposal. Code resolves the proposal to one of two initial methods:
+proposal. Code resolves the proposal to one of three initial methods:
 
 - `alternate_disconnection` excludes the selected step's exact `STRAT1`
   strategy for that product expansion;
 - `alternate_realization` excludes only its exact concrete realization while
-  retaining other realizations of the same strategy.
+  retaining other realizations of the same strategy;
+- `condition_selectivity` selects an already recommended canonical recipe only
+  when at least two independent, exact-condition admitted precedents support the
+  intended endpoint and the probability, margin, entropy, compatibility, and
+  direct-retrieval gates all pass.
 
 The deterministic planner derives the molecular exclusion from the stored
 route, reruns bounded search, recomputes step condition evidence, and compares
@@ -199,6 +203,16 @@ proposal are blocked by policy. For protic-quench conflicts,
 alternate realizations and disconnections can run now; temporary masking is
 explicitly unavailable until deterministic protection-sequence operators are
 registered and validated.
+
+Condition-selectivity repair never authors conditions or edits a reaction. It
+fits the deterministic endpoint-choice model only to the admitted
+reaction/reference contexts already attached to the step's recommendations.
+Competing-outcome, ambiguous, fallback-only, incompatible, unsupported-topology,
+and missing-evidence assessments are exposed as unavailable proposals. An
+accepted recipe is stored on the route step with its model scores, exact
+reference IDs, policy version, and uncertainty; the original structural
+competition warning remains in the candidate for audit while the resolved typed
+route issue is removed.
 
 Initial typed issue kinds are intrinsic precursor compatibility, graph-derived
 reaction-regime compatibility, selectivity, insufficient condition evidence,

@@ -14,6 +14,7 @@ from typing import Any, Literal, Sequence, TYPE_CHECKING
 
 from reactive_taxonomy import assess_reaction_compatibility
 
+from .condition_selectivity_repair import assess_condition_selectivity_repairs
 from .generic_models import GenericDisconnectionCandidate
 
 if TYPE_CHECKING:
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
     )
 
 
-ROUTE_REFINEMENT_SCHEMA_VERSION = "route_refinement.v3"
+ROUTE_REFINEMENT_SCHEMA_VERSION = "route_refinement.v4"
 
 RouteIssueKind = Literal[
     "precursor_compatibility",
@@ -45,6 +46,7 @@ RouteRefinementObjective = Literal[
 RouteRefinementMethod = Literal[
     "alternate_disconnection",
     "alternate_realization",
+    "condition_selectivity",
 ]
 RouteRefinementStatus = Literal[
     "improved_alternative_found",
@@ -54,6 +56,7 @@ RouteRefinementStatus = Literal[
 RouteRepairKind = Literal[
     "alternate_realization",
     "alternate_disconnection",
+    "condition_selectivity",
     "temporary_masking_sequence",
 ]
 RouteRepairProposalStatus = Literal["actionable", "unavailable"]
@@ -69,7 +72,7 @@ ROUTE_REFINEMENT_OBJECTIVES = frozenset(
     }
 )
 ROUTE_REFINEMENT_METHODS = frozenset(
-    {"alternate_disconnection", "alternate_realization"}
+    {"alternate_disconnection", "alternate_realization", "condition_selectivity"}
 )
 
 _OBJECTIVE_ISSUE_KINDS: dict[str, frozenset[str]] = {
@@ -151,6 +154,7 @@ class RouteRepairProposal:
     refinement_method: RouteRefinementMethod | None
     maximum_added_steps: int
     reason: str
+    details: tuple[tuple[str, Any], ...] = ()
     schema_version: str = ROUTE_REFINEMENT_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -174,7 +178,7 @@ class RouteRepairProposal:
     def to_dict(self) -> dict[str, Any]:
         """Return a structure-free repair proposal."""
 
-        return asdict(self)
+        return {**asdict(self), "details": dict(self.details)}
 
 
 @dataclass(frozen=True)
@@ -282,6 +286,7 @@ def enumerate_route_repair_proposals(
         method: RouteRefinementMethod | None,
         maximum_added_steps: int,
         reason: str,
+        details: tuple[tuple[str, Any], ...] = (),
     ) -> RouteRepairProposal:
         identity = {
             "route_id": route.route_id,
@@ -292,6 +297,7 @@ def enumerate_route_repair_proposals(
             "objective": objective,
             "method": method,
             "maximum_added_steps": maximum_added_steps,
+            "details": details,
             "schema_version": ROUTE_REFINEMENT_SCHEMA_VERSION,
         }
         return RouteRepairProposal(
@@ -305,9 +311,31 @@ def enumerate_route_repair_proposals(
             refinement_method=method,
             maximum_added_steps=maximum_added_steps,
             reason=reason,
+            details=details,
         )
 
     proposals: list[RouteRepairProposal] = []
+    if issue.kind == "selectivity":
+        for assessment in assess_condition_selectivity_repairs(step):
+            proposals.append(
+                proposal(
+                    "condition_selectivity",
+                    "actionable" if assessment.actionable else "unavailable",
+                    "condition_selectivity" if assessment.actionable else None,
+                    0,
+                    assessment.reason,
+                    details=(
+                        ("assessment_id", assessment.assessment_id),
+                        ("recipe_id", assessment.recipe_id),
+                        ("recipe_core_id", assessment.recipe_core_id),
+                        ("assessment_status", assessment.status),
+                        (
+                            "exact_condition_reference_ids",
+                            assessment.exact_condition_reference_ids,
+                        ),
+                    ),
+                )
+            )
     if getattr(step.candidate, "realization_id", ""):
         proposals.append(
             proposal(
@@ -528,10 +556,29 @@ def collect_route_refinement_issues(
                     ),
                 )
             )
-        if candidate.selectivity_warnings:
+        resolved_selectivity_warning_ids = frozenset(
+            getattr(
+                getattr(step, "condition_selectivity_assessment", None),
+                "warning_ids",
+                (),
+            )
+            if getattr(
+                getattr(step, "condition_selectivity_assessment", None),
+                "actionable",
+                False,
+            )
+            else ()
+        )
+        unresolved_selectivity_warnings = tuple(
+            warning
+            for warning in candidate.selectivity_warnings
+            if f"{warning.audit_id}:{warning.code}"
+            not in resolved_selectivity_warning_ids
+        )
+        if unresolved_selectivity_warnings:
             warning_ids = tuple(
                 f"{item.audit_id}:{item.code}"
-                for item in candidate.selectivity_warnings
+                for item in unresolved_selectivity_warnings
             )
             payload = {
                 "route_id": route.route_id,
@@ -628,6 +675,12 @@ def build_route_refinement_plan(
     issues: Sequence[RouteRefinementIssue],
 ) -> RouteRefinementPlan:
     """Resolve a structure-free intent to one exact deterministic exclusion."""
+
+    if intent.method == "condition_selectivity":
+        raise ValueError(
+            "condition-selectivity repair attaches an existing recipe and does not "
+            "build a candidate exclusion"
+        )
 
     if route.route_id != intent.source_route_id:
         raise ValueError("refinement intent references a different source route")

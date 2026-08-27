@@ -912,6 +912,18 @@ review displays those structures. It is explicitly condition-unaware and is
 not used by candidate admission, scoring, deduplication, or diversity ranking.
 Unsupported topologies fail open without changing the retrosynthesis result.
 
+The experimental route-repair adapter in
+`condition_selectivity_repair.py` evaluates only canonical recipes already
+attached to a route step. It trains the choice model exclusively on the
+recommendation's admitted reaction/reference contexts and exposes an actionable
+proposal only when versioned direct-retrieval, independent-reference,
+compatibility, probability, margin, and entropy gates all pass. The adapter does
+not author a condition, edit a reaction, or alter structural route ranking.
+Ambiguous, competing-outcome, fallback-only, incompatible, missing-evidence,
+and unsupported-topology results remain explicit unavailable proposals. These
+gates make the POC usable as conservative repair evidence; they do not make its
+probabilities experimentally calibrated.
+
 ## Bounded multistep route search
 
 The initial multistep planner recursively composes the existing validated

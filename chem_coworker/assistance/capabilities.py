@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Dict, Mapping, Tuple
 
 from condition_recommender.models import GenericRecommendationResult
 from core_retrosynthesis import (
     MultistepRetrosynthesisRoute,
     RouteCandidateExclusion,
+    RouteRepairProposal,
     RouteRefinementIntent,
     RouteSearchPolicyDelta,
     apply_route_search_delta,
+    assess_condition_selectivity_repairs,
     build_route_refinement_plan,
     collect_route_refinement_issues,
     enumerate_route_repair_proposals,
@@ -409,6 +411,14 @@ class MultistepCapabilities:
         if proposal is None or proposal.refinement_method is None:
             raise ValueError("repair proposal is no longer actionable")
         source_step = source_route.steps[step_index - 1]
+        if proposal.refinement_method == "condition_selectivity":
+            return self._apply_condition_selectivity_repair(
+                result_ref,
+                route_alias,
+                source_route,
+                source_step,
+                proposal,
+            )
         intent = RouteRefinementIntent(
             source_route_id=source_route.route_id,
             source_step_id=source_step.step_id,
@@ -570,6 +580,173 @@ class MultistepCapabilities:
                 response if accepted_route is not None else self._responses[result_ref]
             ),
             register_result_ref=accepted_route is not None,
+        )
+
+    def _apply_condition_selectivity_repair(
+        self,
+        result_ref: str,
+        route_alias: str,
+        source_route: MultistepRetrosynthesisRoute,
+        source_step: Any,
+        proposal: RouteRepairProposal,
+    ) -> CapabilityResult:
+        """Attach one supported existing recipe without changing route chemistry."""
+
+        details = dict(proposal.details)
+        assessment_id = str(details.get("assessment_id") or "")
+        assessment = next(
+            (
+                value
+                for value in assess_condition_selectivity_repairs(source_step)
+                if value.assessment_id == assessment_id and value.actionable
+            ),
+            None,
+        )
+        if assessment is None:
+            raise ValueError(
+                "condition-selectivity repair assessment is no longer actionable"
+            )
+        intent = RouteRefinementIntent(
+            source_route_id=source_route.route_id,
+            source_step_id=source_step.step_id,
+            objective=proposal.objective,
+            method="condition_selectivity",
+            issue_ids=(proposal.issue_id,),
+            maximum_added_steps=0,
+        )
+        updated_step = replace(
+            source_step,
+            condition_selectivity_assessment=assessment,
+        )
+        updated_steps = tuple(
+            updated_step if step.step_id == source_step.step_id else step
+            for step in source_route.steps
+        )
+        updated_route = replace(source_route, steps=updated_steps)
+        source_response = self._responses[result_ref]
+        if source_response.result is None:
+            raise ValueError("multistep response has no route result")
+        updated_result = replace(
+            source_response.result,
+            routes=tuple(
+                updated_route if route.route_id == source_route.route_id else route
+                for route in source_response.result.routes
+            ),
+            partial_routes=tuple(
+                updated_route if route.route_id == source_route.route_id else route
+                for route in source_response.result.partial_routes
+            ),
+        )
+        updated_response = replace(source_response, result=updated_result)
+        projection = project_multistep_response(updated_response)
+        updated_alias = next(
+            (
+                alias
+                for alias, route_id in projection.route_aliases
+                if route_id == updated_route.route_id
+            ),
+            route_alias,
+        )
+        source_issue_count = len(collect_route_refinement_issues(source_route))
+        updated_issue_count = len(collect_route_refinement_issues(updated_route))
+        if updated_issue_count >= source_issue_count:
+            raise ValueError(
+                "condition-selectivity repair did not reduce deterministic issues"
+            )
+        verification = verify_planned_route(updated_route)
+        hard_failures = tuple(
+            gate.gate
+            for gate in verification.gates
+            if gate.gate
+            in {
+                "route_tree_integrity",
+                "target_identity",
+                "step_graph_consistency",
+                "forward_validation",
+            }
+            and gate.status == "fail"
+        )
+        if hard_failures:
+            raise ValueError(
+                "condition-selectivity repair failed hard route verification"
+            )
+        lineage = EvidenceItem(
+            evidence_id=f"refinement.{intent.intent_id}",
+            layer="route",
+            source_id=projection.result_ref,
+            payload_type="route_refinement_outcome",
+            payload={
+                "schema_version": proposal.schema_version,
+                "intent": intent.to_dict(),
+                "status": "improved_alternative_found",
+                "source_route_id": source_route.route_id,
+                "accepted_route_id": updated_route.route_id,
+                "retained_route_id": updated_route.route_id,
+                "source_route_preserved": True,
+                "source_result_ref": result_ref,
+                "refined_result_ref": projection.result_ref,
+                "retained_result_ref": projection.result_ref,
+                "retained_route_alias": updated_alias,
+                "repair_kind": proposal.repair_kind,
+                "cumulative_exclusion_count": len(
+                    self._candidate_exclusions.get(result_ref, ())
+                ),
+                "source_issue_count": source_issue_count,
+                "retained_issue_count": updated_issue_count,
+                "condition_selectivity_assessment": assessment.to_dict(),
+            },
+            provenance="deterministic_inference",
+            schema_versions={"route_refinement": proposal.schema_version},
+            uncertainty=(
+                "Condition-supported endpoint preference is not experimental proof "
+                "of selectivity or yield."
+            ),
+        )
+        verification_evidence = EvidenceItem(
+            evidence_id=f"refinement.{intent.intent_id}.verification",
+            layer="route",
+            source_id=updated_route.route_id,
+            payload_type="route_refinement_verification",
+            payload={
+                "route_alias": updated_alias,
+                "accepted": True,
+                **verification.to_dict(),
+            },
+            provenance="deterministic_inference",
+            schema_versions={"route_verification": verification.schema_version},
+            uncertainty=(
+                "Deterministic route verification is not experimental proof of "
+                "yield or operational feasibility."
+            ),
+        )
+        accepted_ids = frozenset(
+            {
+                *self._accepted_route_ids.get(result_ref, frozenset()),
+                updated_route.route_id,
+            }
+        )
+        self._store(
+            self._request(result_ref),
+            updated_response,
+            projection,
+            candidate_exclusions=self._candidate_exclusions.get(result_ref, ()),
+            accepted_route_ids=accepted_ids,
+        )
+        initial_ids = {
+            item["evidence_id"] for item in projection.initial_packet()["evidence"]
+        }
+        exposed = tuple(
+            item for item in projection.evidence if item.evidence_id in initial_ids
+        )
+        return CapabilityResult(
+            result_ref=projection.result_ref,
+            evidence=(lineage, verification_evidence, *exposed),
+            packet={
+                **projection.initial_packet(),
+                "refinement": lineage.payload,
+                "verification": verification_evidence.payload,
+            },
+            authoritative_result=updated_response,
         )
 
     def search_step_precedents(

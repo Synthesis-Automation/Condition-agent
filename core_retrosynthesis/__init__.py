@@ -7,6 +7,12 @@ from .condition_ranking import (
     rank_retrosynthesis_candidates_with_conditions,
     recommend_retrosynthesis_conditions,
 )
+from .condition_selectivity_repair import (
+    CONDITION_SELECTIVITY_REPAIR_SCHEMA_VERSION,
+    ConditionSelectivityRepairAssessment,
+    assess_condition_selectivity_repairs,
+    load_condition_selectivity_repair_policy,
+)
 from .comparison import run_comparison, split_by_reference
 from .coupled_route_strategy import (
     ADMISSION_CLASSES,
@@ -452,6 +458,8 @@ __all__ = [
     "ChoiceModelTrainingReport",
     "ConditionalEditChoiceModel",
     "ConditionRankedRetrosynthesisCandidate",
+    "CONDITION_SELECTIVITY_REPAIR_SCHEMA_VERSION",
+    "ConditionSelectivityRepairAssessment",
     "COUPLED_ROUTE_STRATEGY_ALGORITHM_VERSION",
     "COUPLED_ROUTE_STRATEGY_REVIEW_VERSION",
     "COUPLED_ROUTE_STRATEGY_SCHEMA_VERSION",
@@ -605,6 +613,7 @@ __all__ = [
     "ReactionChoiceSet",
     "ReactionOutcomeCandidate",
     "RetrosynthesisConditionEvidence",
+    "assess_condition_selectivity_repairs",
     "RetrosynthesisRouteStep",
     "RetrosynthesisRankingPolicy",
     "SelectivityAssessment",
@@ -651,6 +660,7 @@ __all__ = [
     "disconnect_strategies",
     "load_library",
     "lookup_step_precedents",
+    "load_condition_selectivity_repair_policy",
     "load_coupled_route_strategy_report",
     "load_generic_library",
     "load_generic_core_admission_policy",

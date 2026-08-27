@@ -9,6 +9,7 @@ from chem_coworker.assistance import AssistanceRequest
 from chem_coworker.assistance.capabilities import MultistepCapabilities
 from chem_coworker.contracts import MultistepRetrosynthesisResponse
 from core_retrosynthesis import (
+    detect_functional_group_competition,
     GenericCoreTemplate,
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
@@ -140,6 +141,127 @@ class _DeterministicCoworker:
         )
         return MultistepRetrosynthesisResponse(
             request=replace(request, molecular_weight_threshold=50.0),
+            valid=True,
+            result=result,
+        )
+
+
+S_ALKYLATION = "Cc1[nH]cnc1CCl.NCCS>>NCCSCc1c(C)[nH]cn1"
+N_ALKYLATION = "Cc1[nH]cnc1CCl.NCCS>>SCCNCc1c(C)[nH]cn1"
+N_ALKYLATION_PRODUCT = molecule_identity(
+    N_ALKYLATION.split(">>", 1)[1]
+).canonical_smiles
+N_ALKYLATION_PRECURSORS = N_ALKYLATION.split(">>", 1)[0]
+N_ALKYLATION_QUERY = f"{N_ALKYLATION_PRECURSORS}>>{N_ALKYLATION_PRODUCT}"
+NEUTRAL_RECIPE = {
+    "medium": "neutral",
+    "salt_state": "free_base",
+    "temperature_c": 25.0,
+}
+
+
+def _selectivity_condition(reaction_smiles: str) -> RetrosynthesisConditionEvidence:
+    recommendation = {
+        "rank": 1,
+        "recipe_id": "recipe:neutral",
+        "recipe_core_id": "recipe-core:neutral",
+        "resolved_recipe": NEUTRAL_RECIPE,
+        "compatibility_score": 1.0,
+        "reference_support": 2,
+        "precedent_reaction_contexts": (
+            {
+                "reaction_smiles": N_ALKYLATION,
+                "reference_id": "reference:n-1",
+            },
+            {
+                "reaction_smiles": N_ALKYLATION,
+                "reference_id": "reference:n-2",
+            },
+        ),
+    }
+    return RetrosynthesisConditionEvidence(
+        status="recommended_direct",
+        query_reaction_smiles=reaction_smiles,
+        recommender_valid=True,
+        recommendation_mode="verified_signature",
+        retrieval_level="L2",
+        uses_type_agnostic_fallback=False,
+        candidate_count=2,
+        independent_candidate_count=2,
+        compatible_candidate_count=2,
+        independent_compatible_candidate_count=2,
+        excluded_candidate_count=0,
+        best_recipe_score=0.9,
+        best_recipe_compatibility_score=1.0,
+        best_recipe_reference_support=2,
+        recommendations=(recommendation,),
+        warnings=(),
+        error=None,
+    )
+
+
+class _SelectivityCoworker:
+    def __init__(self) -> None:
+        warning = detect_functional_group_competition(N_ALKYLATION_QUERY)
+        assert warning is not None
+        self.candidate = GenericDisconnectionCandidate(
+            target_smiles=N_ALKYLATION_PRODUCT,
+            precursor_smiles=N_ALKYLATION_PRECURSORS,
+            proposed_reaction_smiles=N_ALKYLATION_QUERY,
+            transformation_kind=None,
+            abstraction_level="L2",
+            compiler_engine="reaction_core",
+            template_id="template:n-alkylation",
+            score=0.9,
+            context_similarity=0.9,
+            product_similarity=0.9,
+            precursor_similarity=0.9,
+            template_specificity=1.0,
+            independent_reference_support=2,
+            forward_validation_status="verified_signature",
+            center_transition_key="center:n-alkylation",
+            disconnection_site_key="site:n-alkylation",
+            precedent_reaction_ids=("reaction:n-1", "reaction:n-2"),
+            operator_id="operator:n-alkylation",
+            realization_id="realization:n-alkylation",
+            operator_signature="signature:n-alkylation",
+            synthon_signature="synthon:n-alkylation",
+            selectivity_warnings=(warning,),
+        )
+        self.library = GenericTemplateLibrary(
+            templates=(),
+            source_row_count=0,
+            accepted_observation_count=0,
+            rejection_counts={},
+            definition={"definition_id": "fixture"},
+        )
+
+    def plan(self, request, *, candidate_exclusions=()):
+        def expand(product: str, top_k: int):
+            if product != N_ALKYLATION_PRODUCT:
+                return ()
+            if any(
+                exclusion.matches(product, self.candidate)
+                for exclusion in candidate_exclusions
+            ):
+                return ()
+            return (self.candidate,)
+
+        result = plan_multistep_routes(
+            request.target_smiles,
+            object(),
+            _EmptyStock(),
+            max_depth=request.max_depth,
+            molecular_weight_threshold=150.0,
+            top_k_routes=request.top_k,
+            beam_width=request.beam_width,
+            max_expansions=request.max_expansions,
+            condition_evidence_evaluator=_selectivity_condition,
+            candidate_exclusions=candidate_exclusions,
+            expander=expand,
+        )
+        return MultistepRetrosynthesisResponse(
+            request=replace(request, molecular_weight_threshold=150.0),
             valid=True,
             result=result,
         )
@@ -309,3 +431,68 @@ def test_multistep_chemistry_tools_expose_precedent_and_verification_evidence() 
     report = verification.evidence[0]
     assert report.payload_type == "route_verification"
     assert report.payload["status"] in {"verified", "verified_with_cautions"}
+
+
+def test_condition_selectivity_proposal_applies_existing_recipe_and_resolves_issue() -> None:
+    coworker = _SelectivityCoworker()
+    capabilities = MultistepCapabilities(coworker)  # type: ignore[arg-type]
+    request = AssistanceRequest(
+        objective="Resolve N versus S selectivity using admitted condition evidence",
+        mode="multistep",
+        structure_input=N_ALKYLATION_PRODUCT,
+    )
+    initial = capabilities.plan_routes(request)
+    initial_projection = capabilities._projection(initial.result_ref)
+    route_alias = initial_projection.route_aliases[0][0]
+    inspection = capabilities.inspect_route(
+        initial.result_ref,
+        route_alias,
+        step_index=1,
+    )
+    proposal = next(
+        item
+        for item in inspection.evidence
+        if item.payload_type == "route_repair_proposal"
+        and item.payload["repair_kind"] == "condition_selectivity"
+        and item.payload["status"] == "actionable"
+    )
+
+    repaired = capabilities.apply_repair(
+        request,
+        initial.result_ref,
+        proposal_id=str(proposal.payload["proposal_id"]),
+    )
+
+    outcome = next(
+        item
+        for item in repaired.evidence
+        if item.payload_type == "route_refinement_outcome"
+    )
+    assert repaired.result_ref != initial.result_ref
+    assert outcome.payload["status"] == "improved_alternative_found"
+    assert outcome.payload["source_route_id"] == outcome.payload["accepted_route_id"]
+    assert outcome.payload["source_issue_count"] == 1
+    assert outcome.payload["retained_issue_count"] == 0
+    assert outcome.payload["condition_selectivity_assessment"]["recipe_id"] == (
+        "recipe:neutral"
+    )
+    repaired_projection = capabilities._projection(repaired.result_ref)
+    repaired_alias = repaired_projection.route_aliases[0][0]
+    repaired_inspection = capabilities.inspect_route(
+        repaired.result_ref,
+        repaired_alias,
+        step_index=1,
+    )
+    repaired_step = next(
+        item
+        for item in repaired_inspection.evidence
+        if item.payload_type == "multistep_route_step"
+    )
+    assert not any(
+        item.payload_type == "route_refinement_issue"
+        for item in repaired_inspection.evidence
+    )
+    assert repaired_step.payload["step"]["condition_selectivity_assessment"][
+        "status"
+    ] == "supported"
+    assert repaired_step.payload["step"]["candidate"]["selectivity_warnings"]
