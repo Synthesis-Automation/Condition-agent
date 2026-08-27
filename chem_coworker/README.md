@@ -157,8 +157,8 @@ and low molecular weight remains a clearly labeled heuristic.
 The older single-pass route-review contract remains outside the search loop and
 can only annotate fixed candidates. The assistance controller adds a separate,
 policy-bounded chemistry-tool loop. It may audit a target, inspect admitted
-step precedents, verify an existing route, and execute one actionable repair
-proposal. It still cannot add a structure, edit SMILES or SMARTS, select atom
+step precedents, verify an existing one-step strategy or multistep route, and
+execute one actionable repair proposal. It still cannot add a structure, edit SMILES or SMARTS, select atom
 edits, author conditions, mark a partial route solved, or override deterministic
 chemistry.
 
@@ -173,7 +173,8 @@ The read-only tools are deliberately narrow:
   condition-evidence coverage.
 
 `apply_repair` accepts only the stable ID of an existing actionable repair
-proposal. Code resolves the proposal to one of three initial methods:
+proposal. For multistep routes, code resolves the proposal to one of three
+initial methods:
 
 - `alternate_disconnection` excludes the selected step's exact `STRAT1`
   strategy for that product expansion;
@@ -213,6 +214,20 @@ accepted recipe is stored on the route step with its model scores, exact
 reference IDs, policy version, and uncertainty; the original structural
 competition warning remains in the candidate for audit while the resolved typed
 route issue is removed.
+
+Single-step retrosynthesis uses the same loop and chemistry audit. Inspection
+projects typed compatibility, selectivity, condition-gap, and tactical issues
+for each `StrategyProposal`. Actionable proposal IDs may select an already
+retained alternate strategy, promote an already retained concrete realization,
+or attach a condition-selectivity assessment for an already recommended recipe.
+For a promoted realization, code recomputes its condition evidence; for every
+choice it compares objective-specific, strong, and total issue counts, verifies
+reaction parsing plus canonical precursor/product identities, and accepts or
+rolls back. The response records the selected strategy and realization without
+changing the original deterministic ranks. `verify_strategy` is read-only.
+
+Repair attempts have their own maximum-three counter. They do not consume the
+separate multistep search-expansion budget; a route-search retry still does.
 
 Initial typed issue kinds are intrinsic precursor compatibility, graph-derived
 reaction-regime compatibility, selectivity, insufficient condition evidence,

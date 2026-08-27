@@ -8,6 +8,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 from condition_recommender import GenericRecommendationResult
 from condition_registry import ConditionConstraintSet
 from core_retrosynthesis import (
+    ConditionSelectivityRepairAssessment,
     MultistepRetrosynthesisResult,
     RetrosynthesisConditionEvidence,
     StrategyProposal,
@@ -236,6 +237,9 @@ class RetrosynthesisStrategyCondition:
 
     strategy_id: str
     evidence: RetrosynthesisConditionEvidence
+    condition_selectivity_assessment: Optional[
+        ConditionSelectivityRepairAssessment
+    ] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize the evidence without weakening its domain contract."""
@@ -243,6 +247,11 @@ class RetrosynthesisStrategyCondition:
         return {
             "strategy_id": self.strategy_id,
             "evidence": self.evidence.to_dict(),
+            "condition_selectivity_assessment": (
+                self.condition_selectivity_assessment.to_dict()
+                if self.condition_selectivity_assessment is not None
+                else None
+            ),
         }
 
 
@@ -292,6 +301,8 @@ class RetrosynthesisResponse:
     valid: bool
     strategies: Tuple[StrategyProposal, ...] = ()
     condition_evidence: Tuple[RetrosynthesisStrategyCondition, ...] = ()
+    selected_strategy_id: Optional[str] = None
+    selected_realization_id: Optional[str] = None
     answer: str = ""
     review: Optional[RetrosynthesisReview] = None
     warnings: Tuple[str, ...] = ()
@@ -310,6 +321,8 @@ class RetrosynthesisResponse:
             "condition_evidence": [
                 item.to_dict() for item in self.condition_evidence
             ],
+            "selected_strategy_id": self.selected_strategy_id,
+            "selected_realization_id": self.selected_realization_id,
             "answer": self.answer,
             "review": self.review.to_dict() if self.review is not None else None,
             "warnings": list(self.warnings),

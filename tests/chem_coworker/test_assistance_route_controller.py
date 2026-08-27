@@ -79,6 +79,68 @@ class _RetroCapabilities:
         return self.value
 
 
+class _RepairRetroCapabilities(_RetroCapabilities):
+    def __init__(self):
+        super().__init__()
+        self.repaired = object()
+        self.proposal_id = None
+
+    def inspect_strategy(self, result_ref, alias):
+        assert result_ref == "retro-result-1"
+        assert alias == "strategy-1"
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(
+                EvidenceItem(
+                    evidence_id="strategy-1.issue-1.repair-1",
+                    layer="route",
+                    source_id=result_ref,
+                    payload_type="single_step_repair_proposal",
+                    payload={
+                        "proposal_id": "SSPROP1:actionable",
+                        "status": "actionable",
+                        "repair_kind": "alternate_strategy",
+                    },
+                    provenance="deterministic_inference",
+                ),
+            ),
+            packet={},
+            authoritative_result=self.value,
+        )
+
+    def apply_repair(self, request, result_ref, *, proposal_id):
+        del request
+        assert result_ref == "retro-result-1"
+        self.proposal_id = proposal_id
+        return CapabilityResult(
+            result_ref="retro-result-2",
+            evidence=(
+                _evidence(
+                    "refinement.SSREFINE:test",
+                    {"status": "improved_alternative_found"},
+                ),
+            ),
+            packet={},
+            authoritative_result=self.repaired,
+        )
+
+    def verify_strategy(self, result_ref, alias):
+        assert result_ref == "retro-result-2"
+        assert alias == "strategy-2"
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(
+                _evidence("strategy-2.verification", {"status": "verified"}),
+            ),
+            packet={},
+            authoritative_result=self.repaired,
+            register_result_ref=False,
+        )
+
+    def result(self, result_ref):
+        return self.repaired if result_ref == "retro-result-2" else self.value
+
+
 class _MultistepCapabilities:
     def __init__(self):
         self.first = object()
@@ -368,6 +430,61 @@ def test_target_audit_adds_read_only_evidence_before_one_step_search() -> None:
     assert run.state.domain_result_refs == ("retro-result-1",)
 
 
+def test_one_step_repair_loop_uses_proposal_id_and_separate_attempt_budget() -> None:
+    transport = _QueueTransport(
+        _action("disconnect_target"),
+        _action(
+            "inspect_strategy",
+            arguments={"strategy_alias": "strategy-1"},
+            evidence=("strategy-1.summary",),
+        ),
+        _action(
+            "apply_repair",
+            arguments={"proposal_id": "SSPROP1:actionable"},
+            evidence=("strategy-1.issue-1.repair-1",),
+        ),
+        _action(
+            "verify_strategy",
+            arguments={"strategy_alias": "strategy-2"},
+            evidence=("refinement.SSREFINE:test",),
+        ),
+        _action(
+            "finish",
+            arguments={
+                "terminal_status": "completed",
+                "stopping_reason": "The retained one-step strategy was verified.",
+            },
+            evidence=("strategy-2.verification",),
+            claims=(
+                _claim(
+                    "strategy-2",
+                    "strategy-2.verification",
+                    "The retained one-step strategy passed deterministic verification.",
+                ),
+            ),
+        ),
+    )
+    capabilities = _RepairRetroCapabilities()
+    controller = AssistanceController(
+        transport=transport,
+        retrosynthesis_capabilities=capabilities,  # type: ignore[arg-type]
+    )
+
+    run = controller.run(
+        AssistanceRequest(
+            objective="Repair and verify one disconnection without editing chemistry",
+            mode="retro",
+            structure_input="CCN",
+        )
+    )
+
+    assert run.state.status == "completed"
+    assert run.state.usage.repair_attempts == 1
+    assert run.state.usage.search_expansions == 0
+    assert run.state.domain_result_refs == ("retro-result-1", "retro-result-2")
+    assert capabilities.proposal_id == "SSPROP1:actionable"
+
+
 def test_multistep_read_only_tools_do_not_replace_authoritative_route_result() -> None:
     transport = _QueueTransport(
         _action("plan_routes"),
@@ -457,6 +574,7 @@ def test_multistep_retry_is_one_bounded_policy_delta_and_preserves_old_result() 
     assert run.state.status == "completed"
     assert run.state.domain_result_refs == ("route-result-1", "route-result-2")
     assert run.state.usage.search_expansions == 1
+    assert run.state.usage.repair_attempts == 0
     assert capabilities.delta.max_depth_delta == 1
     assert capabilities.delta.max_expansions_delta == 2
     assert run.authoritative_result is capabilities.second
@@ -506,7 +624,8 @@ def test_multistep_repair_uses_only_deterministic_proposal_identity() -> None:
     )
 
     assert run.state.status == "completed"
-    assert run.state.usage.search_expansions == 1
+    assert run.state.usage.search_expansions == 0
+    assert run.state.usage.repair_attempts == 1
     assert capabilities.refinement == {"proposal_id": "RPROP1:actionable"}
     refine_action = run.state.action_history[2]
     assert "smiles" not in str(refine_action.normalized_arguments).casefold()
@@ -561,7 +680,8 @@ def test_multistep_repair_can_retry_after_deterministic_rollback() -> None:
     )
 
     assert run.state.status == "completed"
-    assert run.state.usage.search_expansions == 2
+    assert run.state.usage.search_expansions == 0
+    assert run.state.usage.repair_attempts == 2
     assert run.state.domain_result_refs == ("route-result-1", "route-result-2")
     assert capabilities.attempts == [
         "RPROP1:actionable",

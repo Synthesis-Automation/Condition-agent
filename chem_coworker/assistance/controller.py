@@ -305,12 +305,20 @@ class AssistanceController:
                     ),
                 )
                 last_result = capability_result.authoritative_result
-                if payload.action_name in {"retry_route_search", "apply_repair"}:
+                if payload.action_name == "retry_route_search":
                     state = replace(
                         state,
                         usage=replace(
                             state.usage,
                             search_expansions=state.usage.search_expansions + 1,
+                        ),
+                    )
+                if payload.action_name == "apply_repair":
+                    state = replace(
+                        state,
+                        usage=replace(
+                            state.usage,
+                            repair_attempts=state.usage.repair_attempts + 1,
                         ),
                     )
                 no_progress_turns = 0 if new_ids else no_progress_turns + 1
@@ -415,6 +423,8 @@ class AssistanceController:
                     "inspect_strategy",
                     "compare_strategies",
                     "inspect_strategy_conditions",
+                    "apply_repair",
+                    "verify_strategy",
                     "propose_clarification",
                     "finish",
                 ),
@@ -443,7 +453,11 @@ class AssistanceController:
             candidates = tuple(
                 action
                 for action in candidates
-                if action not in {"retry_route_search", "apply_repair"}
+                if action != "retry_route_search"
+            )
+        if state.usage.repair_attempts >= state.request.budget.max_repair_attempts:
+            candidates = tuple(
+                action for action in candidates if action != "apply_repair"
             )
         return tuple(action for action in candidates if action in declared)
 
@@ -518,6 +532,7 @@ class AssistanceController:
             "search_step_precedents",
             "compare_routes",
             "apply_repair",
+            "verify_strategy",
             "verify_route",
             "retry_route_search",
         }:
@@ -543,7 +558,8 @@ class AssistanceController:
                 if item.evidence_id in payload.cited_evidence_ids
             }
             if not any(
-                item.payload_type == "route_repair_proposal"
+                item.payload_type
+                in {"route_repair_proposal", "single_step_repair_proposal"}
                 and item.payload.get("status") == "actionable"
                 and item.payload.get("proposal_id") == proposal_id
                 for item in cited.values()
@@ -640,10 +656,23 @@ class AssistanceController:
             proposal_id = arguments.get("proposal_id")
             if not isinstance(proposal_id, str) or not proposal_id:
                 raise ValueError("proposal_id is required")
+            if state.request.mode == "retro":
+                return self._retro.apply_repair(
+                    state.request,
+                    str(arguments["result_ref"]),
+                    proposal_id=proposal_id,
+                )
             return self._multistep.apply_repair(
                 state.request,
                 str(arguments["result_ref"]),
                 proposal_id=proposal_id,
+            )
+        if action_name == "verify_strategy":
+            alias = arguments.get("strategy_alias")
+            if not isinstance(alias, str) or not alias:
+                raise ValueError("strategy_alias is required")
+            return self._retro.verify_strategy(
+                str(arguments["result_ref"]), alias
             )
         if action_name == "verify_route":
             alias = arguments.get("route_alias")

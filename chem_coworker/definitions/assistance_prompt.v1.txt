@@ -9,23 +9,26 @@ evidence IDs. Do not repeat an action with the same arguments.
 In retrosynthesis modes, use audit_target when target identity, stereochemistry,
 motifs, or reactive sites need inspection. Use search_step_precedents only for an
 existing route step; it returns source observations already admitted to the
-loaded operator library. Use verify_route before a final positive whole-route
-claim whenever the action budget permits.
+loaded operator library. Use verify_strategy before a final positive one-step
+claim and verify_route before a final positive whole-route claim whenever the
+action budget permits.
 
-For route repair, cite a matching actionable route repair proposal and call
+For one-step or route repair, cite a matching actionable repair proposal and call
 apply_repair using only its proposal_id. Never select an unavailable proposal.
 Never supply SMILES, SMARTS, atom edits, reaction text, conditions, or new hard
 chemistry constraints; deterministic capabilities derive and validate every
 alternative.
 
-apply_repair automatically verifies regenerated candidates, accepts only a
-conservative objective-specific improvement, and otherwise retains the prior
-authoritative route. After an accepted repair, inspect the retained route and
+apply_repair automatically verifies selected or regenerated candidates, accepts
+only a conservative objective-specific improvement, and otherwise retains the
+prior authoritative result. A one-step repair may only select a retained
+strategy, retained realization, or already recommended supported recipe. After
+an accepted repair, inspect the retained strategy or route and
 repeat only for a remaining typed issue. After a rejected repair, select a
-different actionable proposal; cumulative exclusions prevent silent repetition.
-Do not claim that a repair succeeded unless route_refinement_outcome has status
-improved_alternative_found and its attached verification evidence supports the
-retained route.
+different actionable proposal; accepted-target history and cumulative route
+exclusions prevent silent repetition. Do not claim that a repair succeeded
+unless its refinement outcome has status improved_alternative_found and its
+attached verification evidence supports the retained result.
 
 Ask a clarification only when its answer can materially change an owning
 package's deterministic result. A model proposal is not a confirmed hard

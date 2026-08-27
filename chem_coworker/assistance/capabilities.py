@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from types import SimpleNamespace
 from typing import Any, Dict, Mapping, Tuple
 
 from condition_recommender.models import GenericRecommendationResult
@@ -16,10 +17,13 @@ from core_retrosynthesis import (
     assess_condition_selectivity_repairs,
     build_route_refinement_plan,
     collect_route_refinement_issues,
+    collect_single_step_refinement_issues,
+    enumerate_single_step_repair_proposals,
     enumerate_route_repair_proposals,
     lookup_step_precedents,
     summarize_route_refinement,
     verify_planned_route,
+    verify_single_step_strategy,
 )
 from reactive_taxonomy import audit_target
 
@@ -33,6 +37,7 @@ from chem_coworker.contracts import (
 )
 from chem_coworker.multistep import MultistepRetrosynthesisCoworker
 from chem_coworker.retrosynthesis import RetrosynthesisCoworker
+from chem_coworker.retrosynthesis_rendering import render_retrosynthesis
 from chem_coworker.service import ConditionCoworker
 
 from .contracts import (
@@ -223,6 +228,7 @@ class RetrosynthesisCapabilities:
         self._coworker = coworker
         self._responses: Dict[str, RetrosynthesisResponse] = {}
         self._projections: Dict[str, RetrosynthesisEvidenceProjection] = {}
+        self._accepted_targets: Dict[str, frozenset[str]] = {}
 
     def disconnect_target(self, request: AssistanceRequest) -> CapabilityResult:
         if request.mode != "retro":
@@ -236,6 +242,7 @@ class RetrosynthesisCapabilities:
         projection = project_retrosynthesis_response(response)
         self._responses[projection.result_ref] = response
         self._projections[projection.result_ref] = projection
+        self._accepted_targets[projection.result_ref] = frozenset()
         initial_ids = {
             item["evidence_id"] for item in projection.initial_packet()["evidence"]
         }
@@ -295,6 +302,371 @@ class RetrosynthesisCapabilities:
             ),
             packet=packet,
             authoritative_result=self._responses[result_ref],
+        )
+
+    def apply_repair(
+        self,
+        request: AssistanceRequest,
+        result_ref: str,
+        *,
+        proposal_id: str,
+    ) -> CapabilityResult:
+        """Apply one ID-selected recipe, realization, or retained strategy."""
+
+        response = self.result(result_ref)
+        projection = self._projection(result_ref)
+        proposal_evidence = next(
+            (
+                item
+                for item in projection.evidence
+                if item.payload_type == "single_step_repair_proposal"
+                and item.payload.get("proposal_id") == proposal_id
+            ),
+            None,
+        )
+        if proposal_evidence is None:
+            raise ValueError("unknown deterministic single-step repair proposal")
+        if proposal_evidence.payload.get("status") != "actionable":
+            raise ValueError("single-step repair proposal is not actionable")
+        source_id = str(proposal_evidence.payload.get("source_strategy_id") or "")
+        source = next(
+            (item for item in response.strategies if item.strategy_id == source_id),
+            None,
+        )
+        if source is None:
+            raise ValueError("single-step repair source strategy is unavailable")
+        conditions = {item.strategy_id: item for item in response.condition_evidence}
+        source_condition = conditions.get(source.strategy_id)
+        source_issues = collect_single_step_refinement_issues(
+            source,
+            condition_evidence=(source_condition.evidence if source_condition else None),
+            condition_selectivity_assessment=(
+                source_condition.condition_selectivity_assessment
+                if source_condition
+                else None
+            ),
+        )
+        issue_id = str(proposal_evidence.payload.get("issue_id") or "")
+        issue = next((item for item in source_issues if item.issue_id == issue_id), None)
+        if issue is None:
+            raise ValueError("single-step repair issue is no longer present")
+        proposals = enumerate_single_step_repair_proposals(
+            source,
+            issue,
+            strategies=response.strategies,
+            condition_evidence_by_strategy={
+                key: value.evidence for key, value in conditions.items()
+            },
+            selectivity_assessment_by_strategy={
+                key: value.condition_selectivity_assessment
+                for key, value in conditions.items()
+            },
+        )
+        proposal = next(
+            (
+                item
+                for item in proposals
+                if item.proposal_id == proposal_id and item.status == "actionable"
+            ),
+            None,
+        )
+        if proposal is None:
+            raise ValueError("single-step repair proposal is no longer actionable")
+        target_key = (
+            proposal.assessment_id
+            or proposal.target_realization_id
+            or proposal.target_strategy_id
+            or proposal.proposal_id
+        )
+        if target_key in self._accepted_targets.get(result_ref, frozenset()):
+            raise ValueError("single-step repair would revisit an accepted target")
+
+        updated_response = response
+        target_strategy = source
+        target_condition = source_condition
+        if proposal.repair_kind == "condition_selectivity":
+            subject = SimpleNamespace(
+                step_id=(
+                    source.representative.realization_id or source.strategy_id
+                ),
+                candidate=source.representative,
+                condition_evidence=(
+                    source_condition.evidence if source_condition else None
+                ),
+                condition_selectivity_assessment=(
+                    source_condition.condition_selectivity_assessment
+                    if source_condition
+                    else None
+                ),
+            )
+            assessment = next(
+                (
+                    item
+                    for item in assess_condition_selectivity_repairs(subject)
+                    if item.assessment_id == proposal.assessment_id and item.actionable
+                ),
+                None,
+            )
+            if assessment is None or source_condition is None:
+                raise ValueError("condition-selectivity evidence is no longer actionable")
+            target_condition = replace(
+                source_condition,
+                condition_selectivity_assessment=assessment,
+            )
+            conditions[source.strategy_id] = target_condition
+            updated_response = replace(
+                response,
+                condition_evidence=tuple(
+                    conditions.get(item.strategy_id, item)
+                    for item in response.condition_evidence
+                ),
+                selected_strategy_id=source.strategy_id,
+                selected_realization_id=(
+                    source.representative.realization_id or source.strategy_id
+                ),
+            )
+        elif proposal.repair_kind == "alternate_strategy":
+            target_strategy = next(
+                (
+                    item
+                    for item in response.strategies
+                    if item.strategy_id == proposal.target_strategy_id
+                ),
+                None,
+            )
+            if target_strategy is None:
+                raise ValueError("target single-step strategy is unavailable")
+            target_condition = conditions.get(target_strategy.strategy_id)
+            updated_response = replace(
+                response,
+                selected_strategy_id=target_strategy.strategy_id,
+                selected_realization_id=(
+                    target_strategy.representative.realization_id
+                    or target_strategy.strategy_id
+                ),
+            )
+        else:
+            target_candidate = next(
+                (
+                    item
+                    for item in source.alternate_realizations
+                    if item.realization_id == proposal.target_realization_id
+                ),
+                None,
+            )
+            if target_candidate is None:
+                raise ValueError("target single-step realization is unavailable")
+            retained_alternates = (
+                source.representative,
+                *(
+                    item
+                    for item in source.alternate_realizations
+                    if item.realization_id != target_candidate.realization_id
+                ),
+            )
+            target_strategy = replace(
+                source,
+                representative=target_candidate,
+                alternate_realizations=retained_alternates,
+            )
+            replacement_conditions = self._coworker.recommend_strategy_conditions(
+                target_strategy,
+                response.request,
+            )
+            target_condition = replacement_conditions
+            strategies = tuple(
+                target_strategy if item.strategy_id == source.strategy_id else item
+                for item in response.strategies
+            )
+            updated_conditions = tuple(
+                item
+                for item in response.condition_evidence
+                if item.strategy_id != source.strategy_id
+            )
+            if replacement_conditions is not None:
+                updated_conditions += (replacement_conditions,)
+            updated_response = replace(
+                response,
+                strategies=strategies,
+                condition_evidence=updated_conditions,
+                selected_strategy_id=target_strategy.strategy_id,
+                selected_realization_id=(
+                    target_candidate.realization_id or target_strategy.strategy_id
+                ),
+            )
+
+        target_issues = collect_single_step_refinement_issues(
+            target_strategy,
+            condition_evidence=(target_condition.evidence if target_condition else None),
+            condition_selectivity_assessment=(
+                target_condition.condition_selectivity_assessment
+                if target_condition
+                else None
+            ),
+        )
+        source_relevant = sum(item.kind == issue.kind for item in source_issues)
+        target_relevant = sum(item.kind == issue.kind for item in target_issues)
+        source_strong = sum(item.severity == "strong" for item in source_issues)
+        target_strong = sum(item.severity == "strong" for item in target_issues)
+        verification = verify_single_step_strategy(
+            target_strategy,
+            condition_evidence=(target_condition.evidence if target_condition else None),
+            condition_selectivity_assessment=(
+                target_condition.condition_selectivity_assessment
+                if target_condition
+                else None
+            ),
+        )
+        accepted = (
+            verification.status != "failed"
+            and target_relevant < source_relevant
+            and target_strong <= source_strong
+            and len(target_issues) <= len(source_issues)
+        )
+        retained_response = updated_response if accepted else response
+        if accepted:
+            retained_response = replace(
+                retained_response,
+                answer=render_retrosynthesis(retained_response),
+            )
+        retained_projection = project_retrosynthesis_response(retained_response)
+        outcome_id = stable_assistance_id(
+            "SSREFINE",
+            {
+                "source_result_ref": result_ref,
+                "proposal_id": proposal.proposal_id,
+                "accepted": accepted,
+                "retained_result_ref": retained_projection.result_ref,
+            },
+        )
+        outcome = EvidenceItem(
+            evidence_id=f"refinement.{outcome_id}",
+            layer="route",
+            source_id=result_ref,
+            payload_type="single_step_refinement_outcome",
+            payload={
+                "proposal_id": proposal.proposal_id,
+                "repair_kind": proposal.repair_kind,
+                "status": (
+                    "improved_alternative_found"
+                    if accepted
+                    else "alternatives_found_no_verified_improvement"
+                ),
+                "source_strategy_id": source.strategy_id,
+                "retained_strategy_id": (
+                    target_strategy.strategy_id if accepted else source.strategy_id
+                ),
+                "source_result_ref": result_ref,
+                "retained_result_ref": retained_projection.result_ref,
+                "source_relevant_issue_count": source_relevant,
+                "retained_relevant_issue_count": (
+                    target_relevant if accepted else source_relevant
+                ),
+                "source_issue_count": len(source_issues),
+                "retained_issue_count": (
+                    len(target_issues) if accepted else len(source_issues)
+                ),
+                "source_preserved": True,
+                "schema_version": proposal.schema_version,
+            },
+            provenance="deterministic_inference",
+            schema_versions={"single_step_refinement": proposal.schema_version},
+            uncertainty=(
+                "Deterministic issue reduction is not experimental proof of yield."
+            ),
+        )
+        verification_evidence = EvidenceItem(
+            evidence_id=f"refinement.{outcome_id}.verification",
+            layer="route",
+            source_id=target_strategy.strategy_id,
+            payload_type="single_step_refinement_verification",
+            payload={"accepted": accepted, **verification.to_dict()},
+            provenance="deterministic_inference",
+            schema_versions={
+                "single_step_refinement": verification.schema_version
+            },
+            uncertainty=(
+                "Deterministic verification is not experimental proof of success."
+            ),
+        )
+        if accepted:
+            history = frozenset(
+                {*self._accepted_targets.get(result_ref, frozenset()), target_key}
+            )
+            self._responses[retained_projection.result_ref] = retained_response
+            self._projections[retained_projection.result_ref] = retained_projection
+            self._accepted_targets[retained_projection.result_ref] = history
+            initial_ids = {
+                item["evidence_id"]
+                for item in retained_projection.initial_packet()["evidence"]
+            }
+            exposed = tuple(
+                item
+                for item in retained_projection.evidence
+                if item.evidence_id in initial_ids
+            )
+        else:
+            exposed = ()
+        return CapabilityResult(
+            result_ref=retained_projection.result_ref,
+            evidence=(outcome, verification_evidence, *exposed),
+            packet={
+                **retained_projection.initial_packet(),
+                "refinement": outcome.payload,
+                "verification": verification_evidence.payload,
+            },
+            authoritative_result=retained_response,
+            register_result_ref=accepted,
+        )
+
+    def verify_strategy(self, result_ref: str, alias: str) -> CapabilityResult:
+        """Independently verify one retained one-step strategy."""
+
+        projection = self._projection(result_ref)
+        strategy_id = dict(projection.strategy_aliases).get(alias)
+        if strategy_id is None:
+            raise ValueError(f"unknown retrosynthesis strategy alias: {alias}")
+        response = self.result(result_ref)
+        strategy = next(
+            item for item in response.strategies if item.strategy_id == strategy_id
+        )
+        condition = next(
+            (
+                item
+                for item in response.condition_evidence
+                if item.strategy_id == strategy_id
+            ),
+            None,
+        )
+        report = verify_single_step_strategy(
+            strategy,
+            condition_evidence=(condition.evidence if condition else None),
+            condition_selectivity_assessment=(
+                condition.condition_selectivity_assessment if condition else None
+            ),
+        )
+        evidence = EvidenceItem(
+            evidence_id=f"{alias}.verification",
+            layer="route",
+            source_id=strategy_id,
+            payload_type="single_step_verification",
+            payload={"strategy_alias": alias, **report.to_dict()},
+            provenance="deterministic_inference",
+            schema_versions={"single_step_refinement": report.schema_version},
+            uncertainty=(
+                "Deterministic verification is not experimental proof of success."
+            ),
+        )
+        return CapabilityResult(
+            result_ref=result_ref,
+            evidence=(evidence,),
+            packet={
+                "result_ref": result_ref,
+                "strategy_alias": alias,
+                "evidence": [_evidence_packet(evidence)],
+            },
+            authoritative_result=response,
+            register_result_ref=False,
         )
 
     def result(self, result_ref: str) -> RetrosynthesisResponse:

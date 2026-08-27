@@ -106,6 +106,7 @@ class AssistanceBudget:
     max_clarification_cycles: int = 2
     max_provider_retries_per_turn: int = 1
     max_search_expansions: int = 3
+    max_repair_attempts: int = 3
     max_total_tokens: int = 48_000
     max_elapsed_ms: int = 180_000
 
@@ -124,6 +125,7 @@ class AssistanceUsage:
     action_turns: int = 0
     clarification_cycles: int = 0
     search_expansions: int = 0
+    repair_attempts: int = 0
     provider_attempts: int = 0
     input_tokens: int = 0
     output_tokens: int = 0

@@ -10,7 +10,10 @@ from condition_recommender.models import (
     GenericRecommendationResult,
 )
 from core_retrosynthesis import (
+    StrategyProposal,
     collect_route_refinement_issues,
+    collect_single_step_refinement_issues,
+    enumerate_single_step_repair_proposals,
     enumerate_route_repair_proposals,
 )
 from chem_coworker.contracts import (
@@ -578,15 +581,52 @@ def project_retrosynthesis_response(
             uncertainty="; ".join(response.warnings) or response.error,
         )
     ]
+    condition_records = {
+        item.strategy_id: item for item in response.condition_evidence
+    }
     condition_by_id = {
-        item.strategy_id: item.evidence.to_dict()
-        for item in response.condition_evidence
+        strategy_id: item.evidence.to_dict()
+        for strategy_id, item in condition_records.items()
+    }
+    condition_objects = {
+        strategy_id: item.evidence
+        for strategy_id, item in condition_records.items()
+    }
+    selectivity_assessments = {
+        strategy_id: getattr(item, "condition_selectivity_assessment", None)
+        for strategy_id, item in condition_records.items()
     }
     aliases = []
     for index, strategy in enumerate(response.strategies[:max_strategies], start=1):
         alias = f"strategy-{index}"
         aliases.append((alias, strategy.strategy_id))
         payload = strategy.to_dict()
+        issues = (
+            collect_single_step_refinement_issues(
+                strategy,
+                condition_evidence=condition_objects.get(strategy.strategy_id),
+                condition_selectivity_assessment=selectivity_assessments.get(
+                    strategy.strategy_id
+                ),
+            )
+            if isinstance(strategy, StrategyProposal)
+            else ()
+        )
+        proposals_by_issue = {
+            issue.issue_id: enumerate_single_step_repair_proposals(
+                strategy,
+                issue,
+                strategies=response.strategies[:max_strategies],
+                condition_evidence_by_strategy=condition_objects,
+                selectivity_assessment_by_strategy=selectivity_assessments,
+            )
+            for issue in issues
+        }
+        actionable_count = sum(
+            proposal.status == "actionable"
+            for proposals in proposals_by_issue.values()
+            for proposal in proposals
+        )
         evidence.extend(
             (
                 _application_evidence(
@@ -604,6 +644,10 @@ def project_retrosynthesis_response(
                         "forward_validation_status": (
                             strategy.representative.forward_validation_status
                         ),
+                        "selected": strategy.strategy_id
+                        == getattr(response, "selected_strategy_id", None),
+                        "deterministic_issue_count": len(issues),
+                        "actionable_repair_count": actionable_count,
                     },
                 ),
                 _application_evidence(
@@ -619,6 +663,12 @@ def project_retrosynthesis_response(
                     {
                         "strategy_alias": alias,
                         "condition_evidence": condition_by_id.get(strategy.strategy_id),
+                        "condition_selectivity_assessment": (
+                            selectivity_assessments[strategy.strategy_id].to_dict()
+                            if selectivity_assessments.get(strategy.strategy_id)
+                            is not None
+                            else None
+                        ),
                     },
                     uncertainty=(
                         None
@@ -628,6 +678,32 @@ def project_retrosynthesis_response(
                 ),
             )
         )
+        for issue_index, issue in enumerate(issues, start=1):
+            issue_evidence_id = f"{alias}.issue-{issue_index}"
+            evidence.append(
+                _application_evidence(
+                    issue_evidence_id,
+                    result_ref,
+                    "single_step_refinement_issue",
+                    {"strategy_alias": alias, **issue.to_dict()},
+                )
+            )
+            for proposal_index, proposal in enumerate(
+                proposals_by_issue[issue.issue_id], start=1
+            ):
+                evidence.append(
+                    _application_evidence(
+                        f"{issue_evidence_id}.repair-{proposal_index}",
+                        result_ref,
+                        "single_step_repair_proposal",
+                        {"strategy_alias": alias, **proposal.to_dict()},
+                        uncertainty=(
+                            None
+                            if proposal.status == "actionable"
+                            else proposal.reason
+                        ),
+                    )
+                )
     return RetrosynthesisEvidenceProjection(
         result_ref=result_ref,
         evidence=tuple(evidence),

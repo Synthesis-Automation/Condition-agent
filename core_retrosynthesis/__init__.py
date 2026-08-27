@@ -13,6 +13,15 @@ from .condition_selectivity_repair import (
     assess_condition_selectivity_repairs,
     load_condition_selectivity_repair_policy,
 )
+from .single_step_refinement import (
+    SINGLE_STEP_REFINEMENT_SCHEMA_VERSION,
+    SingleStepRepairProposal,
+    SingleStepVerificationGate,
+    SingleStepVerificationReport,
+    collect_single_step_refinement_issues,
+    enumerate_single_step_repair_proposals,
+    verify_single_step_strategy,
+)
 from .comparison import run_comparison, split_by_reference
 from .coupled_route_strategy import (
     ADMISSION_CLASSES,
@@ -760,6 +769,13 @@ __all__ = [
     "collect_route_refinement_issues",
     "enumerate_route_repair_proposals",
     "summarize_route_refinement",
+    "SINGLE_STEP_REFINEMENT_SCHEMA_VERSION",
+    "SingleStepRepairProposal",
+    "SingleStepVerificationGate",
+    "SingleStepVerificationReport",
+    "collect_single_step_refinement_issues",
+    "enumerate_single_step_repair_proposals",
+    "verify_single_step_strategy",
     "DEFAULT_PRECEDENT_ROUTE_EXPANSION_DEFINITION",
     "EXPANSION_LEVELS",
     "PRECEDENT_ROUTE_EXPANSION_ALGORITHM_VERSION",

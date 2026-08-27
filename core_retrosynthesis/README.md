@@ -914,7 +914,7 @@ Unsupported topologies fail open without changing the retrosynthesis result.
 
 The experimental route-repair adapter in
 `condition_selectivity_repair.py` evaluates only canonical recipes already
-attached to a route step. It trains the choice model exclusively on the
+attached to a route step or one-step strategy. It trains the choice model exclusively on the
 recommendation's admitted reaction/reference contexts and exposes an actionable
 proposal only when versioned direct-retrieval, independent-reference,
 compatibility, probability, margin, and entropy gates all pass. The adapter does
@@ -923,6 +923,13 @@ Ambiguous, competing-outcome, fallback-only, incompatible, missing-evidence,
 and unsupported-topology results remain explicit unavailable proposals. These
 gates make the POC usable as conservative repair evidence; they do not make its
 probabilities experimentally calibrated.
+
+`single_step_refinement.py` exposes the corresponding non-generative one-step
+contracts. It reuses the route step issue collector, enumerates only retained
+`StrategyProposal` objects, their retained realizations, and supported attached
+recipes, and emits stable proposal IDs. Independent verification reparses the
+stored reaction and checks canonical precursor and target identity before an
+application controller may retain a lower-issue alternative.
 
 ## Bounded multistep route search
 

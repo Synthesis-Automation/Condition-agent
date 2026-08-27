@@ -205,26 +205,37 @@ class RetrosynthesisCoworker:
             return ()
         values = []
         for strategy in strategies:
-            candidate = strategy.representative
-            reaction_smiles = (
-                candidate.condition_query_reaction_smiles
-                or candidate.proposed_reaction_smiles
-            )
-            evidence = recommend_retrosynthesis_conditions(
-                reaction_smiles,
-                self.condition_recommender,
-                condition_top_k=request.condition_top_k,
-                minimum_pool_size=request.condition_minimum_pool_size,
-                unrestricted_fallback=request.unrestricted_condition_fallback,
-                preferred_reaction_ids=candidate.precedent_reaction_ids,
-            )
-            values.append(
-                RetrosynthesisStrategyCondition(
-                    strategy_id=strategy.strategy_id,
-                    evidence=evidence,
-                )
-            )
+            value = self.recommend_strategy_conditions(strategy, request)
+            if value is not None:
+                values.append(value)
         return tuple(values)
+
+    def recommend_strategy_conditions(
+        self,
+        strategy: StrategyProposal,
+        request: RetrosynthesisRequest,
+    ) -> RetrosynthesisStrategyCondition | None:
+        """Recommend conditions for one existing validated representative."""
+
+        if not request.include_conditions or self.condition_recommender is None:
+            return None
+        candidate = strategy.representative
+        reaction_smiles = (
+            candidate.condition_query_reaction_smiles
+            or candidate.proposed_reaction_smiles
+        )
+        evidence = recommend_retrosynthesis_conditions(
+            reaction_smiles,
+            self.condition_recommender,
+            condition_top_k=request.condition_top_k,
+            minimum_pool_size=request.condition_minimum_pool_size,
+            unrestricted_fallback=request.unrestricted_condition_fallback,
+            preferred_reaction_ids=candidate.precedent_reaction_ids,
+        )
+        return RetrosynthesisStrategyCondition(
+            strategy_id=strategy.strategy_id,
+            evidence=evidence,
+        )
 
     def _review(
         self,

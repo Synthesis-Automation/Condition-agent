@@ -1,6 +1,6 @@
 {
   "definition_id": "chem_coworker_assistance_policy.v1",
-  "definition_version": "1.4",
+  "definition_version": "1.5",
   "schema_version": "1.0",
   "default_rollout_state": "off",
   "rollout_states": ["off", "shadow", "advisory", "canonical_advisory"],
@@ -9,6 +9,7 @@
     "max_clarification_cycles": 2,
     "max_provider_retries_per_turn": 1,
     "max_search_expansions": 3,
+    "max_repair_attempts": 3,
     "max_total_tokens": 48000,
     "max_elapsed_ms": 180000
   },
@@ -17,6 +18,7 @@
     "max_clarification_cycles": 3,
     "max_provider_retries_per_turn": 1,
     "max_search_expansions": 3,
+    "max_repair_attempts": 3,
     "max_total_tokens": 96000,
     "max_elapsed_ms": 300000
   },
@@ -34,6 +36,8 @@
       "inspect_strategy",
       "compare_strategies",
       "inspect_strategy_conditions",
+      "apply_repair",
+      "verify_strategy",
       "finish"
     ],
     "multistep": [

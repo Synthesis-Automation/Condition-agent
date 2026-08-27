@@ -33,6 +33,7 @@ _ALL_ACTIONS = Literal[
     "search_step_precedents",
     "compare_routes",
     "apply_repair",
+    "verify_strategy",
     "verify_route",
     "retry_route_search",
     "finish",
