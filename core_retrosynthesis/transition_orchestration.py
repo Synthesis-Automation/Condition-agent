@@ -160,6 +160,11 @@ class ExpansionLeaf:
             raise ValueError("expansion leaf must contain one valid molecule")
         object.__setattr__(self, "molecule_smiles", canonical)
 
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible route-leaf observation."""
+
+        return asdict(self)
+
 
 @dataclass(frozen=True)
 class ExpansionState:
@@ -182,6 +187,14 @@ class ExpansionState:
             if leaf.leaf_id == leaf_id:
                 return leaf
         raise ValueError(f"unknown expansion leaf ID: {leaf_id}")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible state projection."""
+
+        return {
+            "state_id": self.state_id,
+            "leaves": [leaf.to_dict() for leaf in self.leaves],
+        }
 
 
 @dataclass(frozen=True)

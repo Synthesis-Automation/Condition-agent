@@ -176,6 +176,18 @@ from .multistep import (
     StartingMaterialAssessment,
     plan_multistep_routes,
 )
+from .provider_multistep import (
+    ProviderBackedOneStepExpander,
+    expansion_state_from_route,
+)
+from .route_workbench import (
+    ROUTE_WORKBENCH_SCHEMA_VERSION,
+    ProviderRouteWorkbenchResult,
+    RouteWorkbenchRouteReport,
+    RouteWorkbenchSettings,
+    RouteWorkbenchStepEvidence,
+    run_provider_route_workbench,
+)
 from .route_tree import (
     ROUTE_TREE_SCHEMA_VERSION,
     CanonicalRouteTree,
@@ -548,6 +560,12 @@ __all__ = [
     "MultistepPanelTarget",
     "MultistepSearchDiagnostics",
     "OneStepExpansionBatch",
+    "ProviderBackedOneStepExpander",
+    "ProviderRouteWorkbenchResult",
+    "RouteWorkbenchRouteReport",
+    "RouteWorkbenchSettings",
+    "RouteWorkbenchStepEvidence",
+    "ROUTE_WORKBENCH_SCHEMA_VERSION",
     "AdmittedTransition",
     "CallableTransitionProvider",
     "ExpandLeafAction",
@@ -721,6 +739,8 @@ __all__ = [
     "merge_operator_shards",
     "mine_coupled_route_strategy_poc",
     "plan_multistep_routes",
+    "expansion_state_from_route",
+    "run_provider_route_workbench",
     "rank_retrosynthesis_candidates_with_conditions",
     "recommend_retrosynthesis_conditions",
     "rank_operator_site_diverse",

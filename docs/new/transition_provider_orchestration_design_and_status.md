@@ -7,8 +7,10 @@ providers without allowing the agent to write or edit molecular structures.
 It adapts the useful control pattern from multi-model retrosynthesis agents to
 the chemistry-first contracts already present in this repository.
 
-The first implementation is deliberately shadow-only: it compares provider
-outputs but does not mutate a route tree or alter the public planner policy.
+The provider comparison remains shadow-only, but the canonical provider can now
+be selected explicitly for bounded multistep experiments. The planner receives
+only candidates that have crossed provider admission; this does not install an
+LLM router or change the default public planner policy.
 
 ## Ownership and dependency direction
 
@@ -81,6 +83,29 @@ The comparison is read-only. Its immediate purpose is to determine whether
 candidate providers are genuinely complementary before a router is allowed to
 affect search.
 
+## Provider-backed route workbench
+
+`ProviderBackedOneStepExpander` adapts one explicitly selected registered
+provider to the existing multistep planner contract. Each planner request is
+converted to an identifier-only `ExpandLeafAction`, and only admitted
+transitions are returned to search. Provider identity, local rank, transition
+identity, rejections, and diagnostics are retained outside the route score.
+
+`run_provider_route_workbench` composes the resulting search with existing
+deterministic tools:
+
+1. route-tree assembly and terminal-policy evaluation;
+2. provider attribution for every retained step;
+3. admitted operator-precedent lookup;
+4. route verification;
+5. typed compatibility, selectivity, tactical-step, and unresolved-leaf issues;
+6. deterministic weakest-issue selection; and
+7. repair-action enumeration when that issue has a supported repair action.
+
+The serialized route also contains an `ExpansionState` projection with stable
+leaf IDs. The projection exposes structures as observations, but the action
+contract still refers only to environment-owned IDs.
+
 ## Current status
 
 Implemented:
@@ -91,15 +116,22 @@ Implemented:
 - deterministic provider registry and budget validation;
 - target/reaction/signature/compatibility admission checks;
 - within-provider and cross-provider deduplication;
+- admitted-provider adapter for canonical multistep search;
+- stable route-leaf observation projection;
+- provider, precedent, verification, weakest-link, and repair evidence packet;
+- a reproducible three-target real-library/real-stock example runner;
 - public package exports and focused regression tests.
 
 Not yet implemented:
 
-- conversion from a live `ReactionRouteTree` into an agent observation;
 - `chem_coworker` tool exposure;
 - persistent provider telemetry and replay artifacts;
 - a provider router with planner influence;
 - external single-step model adapters; or
+- automatic execution and re-verification of a repair proposal;
+- forward-synthesis assessment beyond the evidence already carried by admitted
+  operator candidates;
+- condition recommendation in the real-example runner; or
 - reinforcement learning.
 
 External LLM, web, literature, chemist, and third-party SSR proposals require a

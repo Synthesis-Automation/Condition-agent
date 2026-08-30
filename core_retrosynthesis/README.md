@@ -27,10 +27,17 @@ rejections, and duplicates before admission. Cross-provider scores are not
 assumed to be calibrated.
 
 The first registered adapter exposes the existing generic operator ladder. The
-shadow comparison is read-only and does not yet alter multistep planner policy.
+shadow comparison is read-only and does not alter multistep planner policy. For
+explicit experiments, `run_provider_route_workbench` can select that provider,
+run bounded multistep search, and compose provider attribution, precedents,
+route verification, typed issues, weakest-link selection, and supported repair
+proposals. It still does not install an autonomous router.
 See
 [`../docs/new/transition_provider_orchestration_design_and_status.md`](../docs/new/transition_provider_orchestration_design_and_status.md)
-for the contract, current status, and release gate.
+for the provider contract and
+[`../docs/new/provider_backed_route_workbench_design_and_status.md`](../docs/new/provider_backed_route_workbench_design_and_status.md)
+for the integrated flow, real-example results, limitations, and next release
+gate.
 
 ## Curate an external route corpus
 
