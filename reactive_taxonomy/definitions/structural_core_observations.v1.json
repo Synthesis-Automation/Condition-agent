@@ -1,0 +1,38 @@
+{
+  "definition_id": "structural_core_observations.v1",
+  "definition_version": "1.1.0",
+  "schema_version": "1.0",
+  "maximum_observations": 5,
+  "component_policy": "largest_heavy_atom_component",
+  "minimum_candidate_heavy_atoms": 2,
+  "minimum_carbon_framework_atoms": 4,
+  "minimum_bridge_side_heavy_atoms": 4,
+  "minimum_bridge_balance_fraction": 0.15,
+  "bridge_neighborhood_radius": 1,
+  "stereo_neighborhood_radius": 1,
+  "maximum_coverage_by_kind": {
+    "scaffold_backbone": 0.85,
+    "bridge_interface": 0.5,
+    "linker_region": 0.35,
+    "carbon_framework": 0.75,
+    "stereo_backbone_region": 0.5,
+    "ring_system": 0.6
+  },
+  "maximum_per_kind": {
+    "scaffold_backbone": 1,
+    "bridge_interface": 2,
+    "linker_region": 2,
+    "carbon_framework": 1,
+    "stereo_backbone_region": 1,
+    "ring_system": 1
+  },
+  "simple_ring_policy": "distinctive_only",
+  "kind_priority": [
+    "scaffold_backbone",
+    "bridge_interface",
+    "linker_region",
+    "carbon_framework",
+    "stereo_backbone_region",
+    "ring_system"
+  ]
+}

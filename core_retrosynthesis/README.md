@@ -16,6 +16,22 @@ This package composes `reactive_taxonomy`, `condition_registry`, and optional
 For the current architecture and implementation matrix, see
 [`../docs/new/type_agnostic_retrosynthesis_design_and_status.md`](../docs/new/type_agnostic_retrosynthesis_design_and_status.md).
 
+## Transition-provider orchestration
+
+The package includes a shadow-mode provider orchestrator for bounded agentic
+tool selection. An `ExpandLeafAction` contains only a stable leaf ID, registered
+provider ID, and proposal budget; molecular structures remain inside the
+deterministic environment. Provider candidates are checked for target and
+reaction consistency, generic-signature reproduction, hard compatibility
+rejections, and duplicates before admission. Cross-provider scores are not
+assumed to be calibrated.
+
+The first registered adapter exposes the existing generic operator ladder. The
+shadow comparison is read-only and does not yet alter multistep planner policy.
+See
+[`../docs/new/transition_provider_orchestration_design_and_status.md`](../docs/new/transition_provider_orchestration_design_and_status.md)
+for the contract, current status, and release gate.
+
 ## Curate an external route corpus
 
 The released higher-level retrosynthesis route JSONL can be converted into a

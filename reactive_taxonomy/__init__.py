@@ -48,6 +48,24 @@ from .strategic_complexity import (
     load_strategic_complexity_definition,
     validate_strategic_complexity_definition,
 )
+from .structural_cores import (
+    STRUCTURAL_CORE_MATCHING_DEFINITION_ID,
+    STRUCTURAL_CORE_OBSERVATION_DEFINITION_ID,
+    STRUCTURAL_CORE_SCHEMA_VERSION,
+    MoleculeAtomReference,
+    StructuralCoreAnalysis,
+    StructuralCoreKind,
+    StructuralCoreObservation,
+    load_structural_core_matching_definition,
+    load_structural_core_observation_definition,
+    observe_structural_cores,
+    validate_structural_core_matching_definition,
+    validate_structural_core_observation_definition,
+)
+from .structural_core_review import (
+    render_structural_core_review_html,
+    write_structural_core_review_html,
+)
 from .reaction_core import (
     build_reaction_core_projection,
     build_substituent_profile,
@@ -254,6 +272,13 @@ from .molecular_feature_evaluation import (
 )
 
 __all__ = [
+    "STRUCTURAL_CORE_MATCHING_DEFINITION_ID",
+    "STRUCTURAL_CORE_OBSERVATION_DEFINITION_ID",
+    "STRUCTURAL_CORE_SCHEMA_VERSION",
+    "MoleculeAtomReference",
+    "StructuralCoreAnalysis",
+    "StructuralCoreKind",
+    "StructuralCoreObservation",
     "TARGET_AUDIT_SCHEMA_VERSION",
     "TargetAudit",
     "TargetDoubleBondStereo",
@@ -432,6 +457,8 @@ __all__ = [
     "load_reactive_pair_interaction_definition",
     "load_reaction_compatibility_definition",
     "load_strategic_complexity_definition",
+    "load_structural_core_matching_definition",
+    "load_structural_core_observation_definition",
     "load_handle_patterns",
     "load_reaction_interface_block_definitions",
     "load_reaction_type_hint_definitions",
@@ -444,6 +471,7 @@ __all__ = [
     "normalize_reaction_site",
     "normalize_site_assignment",
     "observe_reaction",
+    "observe_structural_cores",
     "reaction_signature_definition_versions",
     "precursor_pattern_tokens",
     "reverse_recovers_precursors",
@@ -453,12 +481,15 @@ __all__ = [
     "format_reaction_review_summary",
     "render_reactivity_profile",
     "render_reactivity_profile_expanded",
+    "render_structural_core_review_html",
     "resolve_source_label",
     "validate_source_label_mappings",
     "validate_reactive_pair_interaction_definition",
     "validate_reaction_compatibility_definition",
     "validate_reaction_type_hint_definitions",
     "validate_strategic_complexity_definition",
+    "validate_structural_core_matching_definition",
+    "validate_structural_core_observation_definition",
     "validate_taxonomy",
     "validate_external_atom_mapping",
     "analyze_reaction_with_external_mapping",
@@ -467,4 +498,5 @@ __all__ = [
     "REACTIVE_PAIR_INTERACTION_SCHEMA_VERSION",
     "REACTION_COMPATIBILITY_DEFINITION_ID",
     "REACTION_COMPATIBILITY_SCHEMA_VERSION",
+    "write_structural_core_review_html",
 ]

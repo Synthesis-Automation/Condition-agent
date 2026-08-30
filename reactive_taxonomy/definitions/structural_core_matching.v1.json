@@ -1,0 +1,42 @@
+{
+  "definition_id": "structural_core_matching.v1",
+  "definition_version": "1.0.0",
+  "schema_version": "1.0",
+  "weisfeiler_lehman_iterations": 4,
+  "exact_atom_fields": [
+    "element",
+    "isotope",
+    "formal_charge",
+    "aromatic",
+    "hybridization",
+    "chiral_tag",
+    "total_hydrogens"
+  ],
+  "typed_atom_fields": [
+    "element",
+    "formal_charge",
+    "aromatic",
+    "hybridization"
+  ],
+  "shape_atom_fields": [
+    "internal_degree",
+    "ring_membership"
+  ],
+  "exact_attachment_fields": [
+    "anchor_label",
+    "bond_order",
+    "external_element",
+    "external_formal_charge",
+    "external_aromatic"
+  ],
+  "typed_attachment_fields": [
+    "anchor_label",
+    "bond_order",
+    "external_element",
+    "external_aromatic"
+  ],
+  "shape_attachment_fields": [
+    "anchor_label",
+    "bond_order"
+  ]
+}

@@ -42,6 +42,8 @@ def validate_taxonomy() -> List[str]:
         "reactivity_descriptor_rules.v1",
         "reactive_pair_interactions.v1",
         "strategic_complexity.v1",
+        "structural_core_matching.v1",
+        "structural_core_observations.v1",
         "aromatic_systems.v1",
         "reactivity_rendering.v1",
         "signature_features.v3",
@@ -65,6 +67,21 @@ def validate_taxonomy() -> List[str]:
     errors.extend(
         validate_strategic_complexity_definition(
             payload["strategic_complexity.v1"]
+        )
+    )
+    from .structural_cores import (
+        validate_structural_core_matching_definition,
+        validate_structural_core_observation_definition,
+    )
+
+    errors.extend(
+        validate_structural_core_observation_definition(
+            payload["structural_core_observations.v1"]
+        )
+    )
+    errors.extend(
+        validate_structural_core_matching_definition(
+            payload["structural_core_matching.v1"]
         )
     )
     descriptor_profile_rules = payload["reactivity_descriptor_rules.v1"]

@@ -46,6 +46,13 @@ conflicting internal observation.
 - `audit_target(smiles)` returns a compact tool-facing projection of canonical
   identity, assigned or unassigned stereocentres, double-bond stereo, motifs,
   and reactive-site hypotheses without proposing structural changes.
+- `observe_structural_cores(smiles)` returns at most five deterministic,
+  target-scoped scaffold-backbone, balanced bridge-interface, explicit linker,
+  continuous-carbon-framework, distinctive-ring, or local stereochemical
+  observations. Exact, typed, and shape keys describe molecule subgraphs and
+  are deliberately separate from reaction-core keys. Bridge, linker, and
+  stereochemical observations retain explicit target-scoped focus atoms or
+  bonds for later comparison with route evidence.
 - `observe_reaction(reaction_smiles)` returns the interpretation-free reaction
   observation, minimum core, topology, and evidence alternatives.
 - `interpret_reaction(observation)` adds optional pattern and family annotations.
@@ -53,6 +60,11 @@ conflicting internal observation.
   terminal text and minimized-graphic renderers.
 - `render_reaction(context)` produces the sole reaction label.
 - `featurize_reaction(reaction_smiles)` composes the canonical public analysis.
+
+Structural-core observations are an experimental observation-layer contract.
+They do not retrieve precedents, choose disconnections, or influence route
+ranking. `render_structural_core_review_html(...)` produces a self-contained
+chemist-facing review view with target-scoped atom highlights.
 
 ## Definitions
 
