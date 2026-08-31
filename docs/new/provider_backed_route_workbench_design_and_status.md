@@ -41,6 +41,16 @@ second route representation:
 - `benchmarks.provider_route_workbench_examples` runs a CSV panel against an
   actual operator library and stock database and writes full JSON plus a compact
   case-summary CSV.
+- `benchmarks.render_provider_route_workbench_review` turns that JSON into a
+  self-contained chemist review with inline RDKit SVG structures and reactions.
+
+Render a completed panel report with:
+
+```powershell
+python -m benchmarks.render_provider_route_workbench_review `
+  results/provider_route_workbench_examples_20260830/report.json `
+  results/provider_route_workbench_examples_20260830/review.html
+```
 
 Provider-local ranks are provenance, not cross-provider scores. A route step is
 not strengthened merely because it was returned early by a provider.
