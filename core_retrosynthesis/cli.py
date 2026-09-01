@@ -56,6 +56,8 @@ from .generic_search import (
 from .html_report import DEFAULT_METHODS, write_comparison_html
 from .library import build_library, load_library, save_library
 from .multistep import plan_multistep_routes
+from .partition_landscape import build_operator_partition_landscape
+from .partition_review import write_partition_landscape_review
 from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
@@ -418,6 +420,31 @@ def _parser() -> argparse.ArgumentParser:
         "--keep-retrosynthesis-order",
         action="store_true",
         help="attach condition evidence without condition-informed reranking",
+    )
+
+    partition_landscape = commands.add_parser(
+        "partition-landscape",
+        help="build a review-only role-neutral target partition landscape",
+    )
+    partition_landscape.add_argument("library")
+    partition_landscape.add_argument("target")
+    partition_landscape.add_argument("output_json")
+    partition_landscape.add_argument("output_html")
+    partition_landscape.add_argument("--minimum-k", type=int, default=1)
+    partition_landscape.add_argument("--maximum-k", type=int, default=6)
+    partition_landscape.add_argument("--top-k", type=int, default=24)
+    partition_landscape.add_argument("--max-templates", type=int, default=500)
+    partition_landscape.add_argument(
+        "--max-candidates-to-validate",
+        type=int,
+        default=100,
+    )
+    partition_landscape.add_argument("--no-context", action="store_true")
+    partition_landscape.add_argument("--skip-l0", action="store_true")
+    partition_landscape.add_argument("--no-diversity", action="store_true")
+    partition_landscape.add_argument(
+        "--no-hierarchical-ranking",
+        action="store_true",
     )
 
     route_search = commands.add_parser(
@@ -1330,6 +1357,46 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 }
                 if arguments.diagnostics
                 else serialized_candidates,
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if arguments.command == "partition-landscape":
+        loaded_library = load_generic_library(arguments.library)
+        candidates = disconnect_operator_ladder(
+            arguments.target,
+            loaded_library,
+            top_k=arguments.top_k,
+            max_templates_to_apply=arguments.max_templates,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+            use_context=not arguments.no_context,
+            include_l0=not arguments.skip_l0,
+            diversify=not arguments.no_diversity,
+            use_hierarchical_ranking=not arguments.no_hierarchical_ranking,
+        )
+        landscape = build_operator_partition_landscape(
+            arguments.target,
+            candidates,
+            minimum_k=arguments.minimum_k,
+            maximum_k=arguments.maximum_k,
+        )
+        write_partition_landscape_review(
+            landscape,
+            arguments.output_json,
+            arguments.output_html,
+        )
+        print(
+            json.dumps(
+                {
+                    "target_id": landscape.target_id,
+                    "candidate_count": len(candidates),
+                    "partition_count": len(landscape.partitions),
+                    "abstained": landscape.abstained,
+                    "output_json": str(Path(arguments.output_json).resolve()),
+                    "output_html": str(Path(arguments.output_html).resolve()),
+                },
                 indent=2,
                 sort_keys=True,
             )

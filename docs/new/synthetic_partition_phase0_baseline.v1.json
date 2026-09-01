@@ -1,0 +1,50 @@
+{
+  "baseline_id": "synthetic_partition_phase0_baseline.v1",
+  "schema_version": "1.0",
+  "status": "frozen_before_partition_implementation",
+  "date": "2026-09-01",
+  "git_head": "31340bcc3b14464a91c97924d50429defd52a17b",
+  "runtime": {
+    "python": "3.12.7",
+    "rdkit": "2026.03.4"
+  },
+  "contract_versions": {
+    "generic_template_library": "3.0",
+    "multistep_retrosynthesis": "1.8",
+    "reaction_route_tree": "2.0",
+    "strategic_complexity": "1.0"
+  },
+  "panels": [
+    {
+      "purpose": "development",
+      "path": "core_retrosynthesis/definitions/multistep_familiar_target_panel.v1.json",
+      "sha256": "0e46a173b3ca03eb9aa015656f10cd53b8ab2eb0dc6ed42c8d1a9958bd144173"
+    },
+    {
+      "purpose": "development_complex",
+      "path": "core_retrosynthesis/definitions/multistep_complex_route_panel.v1.json",
+      "sha256": "7397c6375b24f9efd0e9c5044bea7e4766cdd77e247e4b02361dfd07398a568a"
+    },
+    {
+      "purpose": "validation",
+      "path": "core_retrosynthesis/definitions/multistep_route_policy_validation_panel.v1.json",
+      "sha256": "63586cd1f0143a9aab60a09c60fb3a83d701b5cd64595107591f5a827967b025"
+    },
+    {
+      "purpose": "untouched_test",
+      "path": "core_retrosynthesis/definitions/multistep_route_policy_test_panel.v1.json",
+      "sha256": "172782b592af05d301077f047decdc6dbe3877b7201839b78564ced317124c13"
+    }
+  ],
+  "test_baseline": {
+    "command": "pytest -q",
+    "collected": 1193,
+    "passed": 1193,
+    "failed": 0,
+    "duration_seconds": 280.49
+  },
+  "notes": [
+    "The untouched test panel is hash-bound before partition output review.",
+    "Partition work begins review-only and must not alter production ranking."
+  ]
+}

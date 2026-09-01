@@ -625,6 +625,19 @@ partition work begins as a review-only projection and must not alter production
 ranking until the existing baseline, blind review, disagreement resolution, and
 untouched evaluation gates are complete.
 
+### Current status — 2026-09-01
+
+| Phase | Status | Implementation |
+| --- | --- | --- |
+| Phase 0 | Complete | The pre-implementation commit, runtime, contract versions, panel hashes, and 1,193-test baseline are frozen in `synthetic_partition_phase0_baseline.v1.json`. |
+| Phase 1 | Implemented, review-only | Immutable role-neutral contracts, deterministic identities, mapped reaction projection, route-frontier projection, latent states, JSON round trips, and static HTML review. |
+| Phase 2 | Implemented, review-only | Validated-operator partition seeds, tactical-variant clustering, bounded interface combinations, evidence tiers, diversity limits, and explicit abstention. |
+| Phase 3 | Not started | Partition-constrained multistep realization remains separate from the Phase 2 landscape. |
+
+Phase 2 combinations show that independently supported interfaces induce a
+target partition. They are labeled `operator_combination_unrealized` and do not
+claim that the interfaces coexist in one route.
+
 ### Phase 0 — Freeze scope and baseline
 
 1. Record current route-tree, operator, reaction-signature, and ranking versions.

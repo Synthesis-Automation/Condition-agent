@@ -1,0 +1,29 @@
+{
+  "definition_id": "synthetic_partition_policy.v1",
+  "schema_version": "1.0",
+  "default_k_range": {
+    "minimum": 1,
+    "maximum": 6
+  },
+  "search_limits": {
+    "maximum_seed_candidates": 24,
+    "maximum_combination_size": 3,
+    "maximum_combinations": 512,
+    "maximum_partitions_per_k": 6,
+    "maximum_returned_partitions": 24
+  },
+  "evidence": {
+    "close_context_threshold": 0.5,
+    "strong_independent_reference_support": 2
+  },
+  "ranking": {
+    "evidence_order": ["E4", "E3", "E2", "E1", "E0"],
+    "source_order": [
+      "observed_route_frontier",
+      "planned_route_frontier",
+      "validated_operator_projection",
+      "operator_combination_unrealized",
+      "structural_baseline"
+    ]
+  }
+}
