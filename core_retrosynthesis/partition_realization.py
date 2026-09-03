@@ -17,6 +17,11 @@ from rdkit import Chem
 
 from .chemistry import digest
 from .generic_models import GenericTemplateLibrary
+from .latent_state_search import (
+    LatentStateActionSelector,
+    LatentStateRouteSearchPolicy,
+    classify_route_action,
+)
 from .multistep import (
     ConditionEvidenceEvaluator,
     LiteratureLookup,
@@ -98,6 +103,7 @@ class PartitionRealizationConfig:
     include_l0: bool = True
     diversify: bool = True
     use_hierarchical_ranking: bool = True
+    use_latent_state_portfolio: bool = False
 
     def __post_init__(self) -> None:
         if not 1 <= self.max_depth <= 6:
@@ -132,7 +138,13 @@ class PartitionRealizationConfig:
     def from_dict(cls, value: Mapping[str, Any]) -> "PartitionRealizationConfig":
         """Reconstruct a search configuration."""
 
-        return cls(**{field: value[field] for field in cls.__dataclass_fields__})
+        return cls(
+            **{
+                field: value[field]
+                for field in cls.__dataclass_fields__
+                if field in value
+            }
+        )
 
 
 @dataclass(frozen=True)
@@ -282,6 +294,8 @@ class StrategicRouteRealization:
     evidence_summary: RealizationEvidenceSummary
     verification_status: str
     warnings: tuple[str, ...]
+    first_action_class: str = "unclassified"
+    latent_state_transition_count: int = 0
     schema_version: str = PARTITION_REALIZATION_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -313,6 +327,8 @@ class StrategicRouteRealization:
             "evidence_summary": self.evidence_summary.to_dict(),
             "verification_status": self.verification_status,
             "warnings": list(self.warnings),
+            "first_action_class": self.first_action_class,
+            "latent_state_transition_count": self.latent_state_transition_count,
             "schema_version": self.schema_version,
         }
 
@@ -347,6 +363,12 @@ class StrategicRouteRealization:
             ),
             verification_status=str(value["verification_status"]),
             warnings=tuple(str(item) for item in value.get("warnings") or ()),
+            first_action_class=str(
+                value.get("first_action_class") or "unclassified"
+            ),
+            latent_state_transition_count=int(
+                value.get("latent_state_transition_count") or 0
+            ),
             schema_version=str(
                 value.get("schema_version") or PARTITION_REALIZATION_SCHEMA_VERSION
             ),
@@ -370,6 +392,11 @@ class PartitionRealizationDiagnostics:
     partially_realized_count: int
     contradicted_count: int
     returned_realization_count: int
+    route_action_selector_definition_id: str | None = None
+    route_action_pool_candidates: int = 0
+    route_action_selected_candidates: int = 0
+    beam_diversity_retained_states: int = 0
+    first_action_class_counts: tuple[tuple[str, int], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -383,7 +410,13 @@ class PartitionRealizationDiagnostics:
     ) -> "PartitionRealizationDiagnostics":
         """Reconstruct realization diagnostics."""
 
-        return cls(**{field: value[field] for field in cls.__dataclass_fields__})
+        return cls(
+            **{
+                field: value[field]
+                for field in cls.__dataclass_fields__
+                if field in value
+            }
+        )
 
 
 @dataclass(frozen=True)
@@ -994,6 +1027,16 @@ def _route_realization(
         step.candidate.forward_validation_status == "verified_signature"
         for step in route.steps
     )
+    action_classes = tuple(
+        classify_route_action(step.candidate).action_class for step in route.steps
+    )
+    first_action_class = (
+        classify_route_action(
+            min(route.steps, key=lambda step: (step.depth, step.step_id)).candidate
+        ).action_class
+        if route.steps
+        else "unclassified"
+    )
     summary = RealizationEvidenceSummary(
         requested_interface_count=len(interface_values),
         realized_interface_count=realized_count,
@@ -1035,6 +1078,12 @@ def _route_realization(
         evidence_summary=summary,
         verification_status=verification.status,
         warnings=tuple(sorted(warnings)),
+        first_action_class=first_action_class,
+        latent_state_transition_count=sum(
+            action_class
+            in {"single_carrier_installation", "unary_state_change"}
+            for action_class in action_classes
+        ),
     )
 
 
@@ -1052,6 +1101,51 @@ def _realization_sort_key(
         realization.reaction_count,
         realization.realization_id,
     )
+
+
+def _select_realization_portfolio(
+    realizations: tuple[StrategicRouteRealization, ...],
+    *,
+    limit: int,
+    policy: LatentStateRouteSearchPolicy,
+) -> tuple[StrategicRouteRealization, ...]:
+    """Interleave partition-ranked routes across target-forming action classes."""
+
+    if len(realizations) <= limit:
+        return realizations
+    groups: dict[str, list[StrategicRouteRealization]] = {
+        action_class: [] for action_class in policy.action_class_order
+    }
+    for realization in realizations:
+        groups[realization.first_action_class].append(realization)
+    selected = [realizations[0]] if policy.preserve_best_overall_route else []
+    selected_ids = {item.realization_id for item in selected}
+    depth = 0
+    while len(selected) < limit:
+        added = False
+        for action_class in policy.action_class_order:
+            group = groups[action_class]
+            if depth >= min(
+                len(group),
+                policy.maximum_routes_per_first_action_class,
+            ):
+                continue
+            realization = group[depth]
+            if realization.realization_id not in selected_ids:
+                selected.append(realization)
+                selected_ids.add(realization.realization_id)
+                added = True
+                if len(selected) >= limit:
+                    break
+        if not added:
+            break
+        depth += 1
+    for realization in realizations:
+        if len(selected) >= limit:
+            break
+        if realization.realization_id not in selected_ids:
+            selected.append(realization)
+    return tuple(selected)
 
 
 def realize_synthetic_partition(
@@ -1077,6 +1171,11 @@ def realize_synthetic_partition(
     active_config = config or default_partition_realization_config()
     policy = load_partition_realization_policy()
     guidance = PartitionSearchGuidance(partition)
+    action_selector = (
+        LatentStateActionSelector()
+        if active_config.use_latent_state_portfolio
+        else None
+    )
     search = plan_multistep_routes(
         canonical,
         library,
@@ -1099,6 +1198,7 @@ def realize_synthetic_partition(
         candidate_exclusions=candidate_exclusions,
         expander=expander,
         search_guidance=guidance,
+        route_action_selector=action_selector,
     )
     route_by_id = {
         route.route_id: route for route in (*search.routes, *search.partial_routes)
@@ -1113,11 +1213,20 @@ def realize_synthetic_partition(
             )
         except ValueError:
             projection_failures += 1
-    ordered = tuple(
+    ranked_realizations = tuple(
         sorted(
             realized_values,
             key=lambda item: _realization_sort_key(item, policy),
-        )[: active_config.maximum_realizations]
+        )
+    )
+    ordered = (
+        _select_realization_portfolio(
+            ranked_realizations,
+            limit=active_config.maximum_realizations,
+            policy=action_selector.policy,
+        )
+        if action_selector is not None
+        else ranked_realizations[: active_config.maximum_realizations]
     )
     if ordered:
         status = ordered[0].status
@@ -1136,6 +1245,13 @@ def realize_synthetic_partition(
         warnings.add("ROUTE_ATOM_PROJECTION_FAILURES")
     if partition.source_kind == "operator_combination_unrealized":
         warnings.add("SOURCE_PARTITION_WAS_UNREALIZED_HYPOTHESIS")
+    if action_selector is not None:
+        warnings.add("LATENT_STATE_PORTFOLIO_REVIEW_ONLY")
+    action_class_counts: dict[str, int] = {}
+    for item in realized_values:
+        action_class_counts[item.first_action_class] = (
+            action_class_counts.get(item.first_action_class, 0) + 1
+        )
     diagnostics = PartitionRealizationDiagnostics(
         expanded_states=search.diagnostics.expanded_states,
         generated_candidates=search.diagnostics.generated_candidates,
@@ -1156,6 +1272,19 @@ def realize_synthetic_partition(
             item.status == "contradicted" for item in realized_values
         ),
         returned_realization_count=len(ordered),
+        route_action_selector_definition_id=(
+            search.diagnostics.route_action_selector_definition_id
+        ),
+        route_action_pool_candidates=(
+            search.diagnostics.route_action_pool_candidates
+        ),
+        route_action_selected_candidates=(
+            search.diagnostics.route_action_selected_candidates
+        ),
+        beam_diversity_retained_states=(
+            search.diagnostics.beam_diversity_retained_states
+        ),
+        first_action_class_counts=tuple(sorted(action_class_counts.items())),
     )
     return PartitionRealizationResult(
         target_smiles=canonical,

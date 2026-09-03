@@ -267,6 +267,7 @@ def _route_panel(
         f"<h2>Route {route_index}</h2><div class='badges'>"
         f"{_badge('assessment', route.status, route_tone)}"
         f"{_badge('realization', route.source_realization_status, 'neutral')}"
+        f"{_badge('route shape', realization.first_action_class.replace('_', ' '), 'neutral')}"
         f"{_badge('steps', str(len(route.step_assessments)), 'neutral')}"
         "</div></div>"
         "<div class='route-metrics'>"

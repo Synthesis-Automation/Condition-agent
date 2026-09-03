@@ -89,6 +89,33 @@ class MultistepSearchGuidance(Protocol):
     ) -> int: ...
 
 
+class RouteActionSelector(Protocol):
+    """Optional review-mode portfolio over already validated actions.
+
+    The selector may request a wider ranked candidate pool, retain a bounded
+    subset, and provide diversity keys for beam and final-route retention. It
+    cannot generate reactions or bypass the planner's validation gates.
+    """
+
+    definition_id: str
+    candidate_pool_multiplier: int
+
+    def __call__(
+        self,
+        product_smiles: str,
+        candidates: tuple[GenericDisconnectionCandidate, ...],
+        top_k: int,
+    ) -> tuple[GenericDisconnectionCandidate, ...]: ...
+
+    def state_diversity_key(self, state: Any) -> str: ...
+
+    def select_routes(
+        self,
+        routes: tuple[Any, ...],
+        limit: int,
+    ) -> tuple[Any, ...]: ...
+
+
 @dataclass(frozen=True)
 class OneStepExpansionBatch:
     """Validated actions plus staged-expansion profiling."""
@@ -270,6 +297,10 @@ class MultistepSearchDiagnostics:
     route_policy_scored_actions: int = 0
     route_policy_reordered_expansions: int = 0
     refinement_excluded_candidates: int = 0
+    route_action_selector_definition_id: Optional[str] = None
+    route_action_pool_candidates: int = 0
+    route_action_selected_candidates: int = 0
+    beam_diversity_retained_states: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -374,6 +405,37 @@ class _RouteState:
     steps: tuple[RetrosynthesisRouteStep, ...]
     leaves: tuple[_Leaf, ...]
     cost: float
+
+
+def _select_heap_portfolio(
+    items: list[tuple[tuple[Any, ...], int, _RouteState]],
+    limit: int,
+    selector: RouteActionSelector | None,
+) -> list[tuple[tuple[Any, ...], int, _RouteState]]:
+    """Select best-first states, interleaving review-only diversity lanes."""
+
+    ordered = heapq.nsmallest(len(items), items)
+    if selector is None or len(ordered) <= limit:
+        return ordered[:limit]
+    groups: dict[str, list[tuple[tuple[Any, ...], int, _RouteState]]] = {}
+    for item in ordered:
+        key = selector.state_diversity_key(item[2])
+        groups.setdefault(key, []).append(item)
+    selected = []
+    depth = 0
+    while len(selected) < limit:
+        added = False
+        for group in groups.values():
+            if depth >= len(group):
+                continue
+            selected.append(group[depth])
+            added = True
+            if len(selected) >= limit:
+                break
+        if not added:
+            break
+        depth += 1
+    return selected
 
 
 def _catalog_role_status(
@@ -1018,6 +1080,7 @@ def plan_multistep_routes(
     candidate_exclusions: tuple[RouteCandidateExclusion, ...] = (),
     expander: OneStepExpander | None = None,
     search_guidance: MultistepSearchGuidance | None = None,
+    route_action_selector: RouteActionSelector | None = None,
 ) -> MultistepRetrosynthesisResult:
     """Find short routes whose leaves pass the explicit terminal predicate."""
 
@@ -1151,6 +1214,9 @@ def plan_multistep_routes(
     route_policy_scored_actions = 0
     route_policy_reordered_expansions = 0
     refinement_excluded_candidates = 0
+    route_action_pool_candidates = 0
+    route_action_selected_candidates = 0
+    beam_diversity_retained_states = 0
 
     while queue and expanded_states < max_expansions:
         _, _, state = heapq.heappop(queue)
@@ -1181,7 +1247,14 @@ def plan_multistep_routes(
         product = leaf.assessment.canonical_smiles
         candidates = expansion_cache.get(product)
         if candidates is None:
-            expansion = active_expander(product, per_step_top_k)
+            requested_top_k = per_step_top_k
+            if route_action_selector is not None:
+                requested_top_k = min(
+                    max_candidates_to_validate,
+                    per_step_top_k
+                    * route_action_selector.candidate_pool_multiplier,
+                )
+            expansion = active_expander(product, requested_top_k)
             if isinstance(expansion, OneStepExpansionBatch):
                 candidates = expansion.candidates
                 expansion_diagnostics = expansion.diagnostics
@@ -1220,6 +1293,32 @@ def plan_multistep_routes(
                     len(candidates) - len(retained_candidates)
                 )
                 candidates = retained_candidates
+            if route_action_selector is not None:
+                verified_candidates = tuple(
+                    candidate
+                    for candidate in candidates
+                    if candidate.forward_validation_status
+                    == "verified_signature"
+                )
+                rejected_invalid += len(candidates) - len(verified_candidates)
+                candidates = verified_candidates
+                route_action_pool_candidates += len(candidates)
+                selected_candidates = route_action_selector(
+                    product,
+                    candidates,
+                    per_step_top_k,
+                )
+                candidate_ids = {id(candidate) for candidate in candidates}
+                if len(selected_candidates) > per_step_top_k or any(
+                    id(candidate) not in candidate_ids
+                    for candidate in selected_candidates
+                ):
+                    raise ValueError(
+                        "route-action selector must return a bounded subset "
+                        "of the validated candidate pool"
+                    )
+                candidates = selected_candidates
+                route_action_selected_candidates += len(candidates)
             expansion_cache[product] = candidates
             one_step_calls += 1
         else:
@@ -1425,20 +1524,33 @@ def plan_multistep_routes(
                 for item in queue
                 if _is_retained_state_path(item[2], best_paths_by_state)
             ]
-            queue = heapq.nsmallest(beam_width, queue)
+            selected_queue = _select_heap_portfolio(
+                queue,
+                beam_width,
+                route_action_selector,
+            )
+            if route_action_selector is not None:
+                baseline_ids = {
+                    id(item[2]) for item in heapq.nsmallest(beam_width, queue)
+                }
+                beam_diversity_retained_states += sum(
+                    id(item[2]) not in baseline_ids for item in selected_queue
+                )
+            queue = selected_queue
             beam_pruned_states += max(0, queue_size_before_pruning - len(queue))
             heapq.heapify(queue)
 
     stopped_by_limit = bool(queue and expanded_states >= max_expansions)
     if stopped_by_limit:
-        retained_frontier = (
+        retained_frontier = [
             item
             for item in queue
             if _is_retained_state_path(item[2], best_paths_by_state)
-        )
-        for _, _, state in heapq.nsmallest(
-            top_k_routes,
+        ]
+        for _, _, state in _select_heap_portfolio(
             retained_frontier,
+            top_k_routes,
+            route_action_selector,
         ):
             leaves = tuple(
                 _Leaf(
@@ -1508,7 +1620,7 @@ def plan_multistep_routes(
             )
             for route in partial_route_values
         )
-    solved_routes = tuple(
+    ordered_solved_routes = tuple(
         sorted(
             solved_route_values,
             key=lambda route: (
@@ -1516,9 +1628,9 @@ def plan_multistep_routes(
                 route.reaction_count,
                 route.route_id,
             ),
-        )[:top_k_routes]
+        )
     )
-    partial_routes = tuple(
+    ordered_partial_routes = tuple(
         sorted(
             partial_route_values,
             key=lambda route: (
@@ -1527,8 +1639,32 @@ def plan_multistep_routes(
                 route.reaction_count,
                 route.route_id,
             ),
-        )[:top_k_routes]
+        )
     )
+    if route_action_selector is not None:
+        solved_routes = route_action_selector.select_routes(
+            ordered_solved_routes,
+            top_k_routes,
+        )
+        partial_routes = route_action_selector.select_routes(
+            ordered_partial_routes,
+            top_k_routes,
+        )
+        for selected_routes, available_routes in (
+            (solved_routes, ordered_solved_routes),
+            (partial_routes, ordered_partial_routes),
+        ):
+            available_ids = {id(route) for route in available_routes}
+            if len(selected_routes) > top_k_routes or any(
+                id(route) not in available_ids for route in selected_routes
+            ):
+                raise ValueError(
+                    "route-action selector must return a bounded subset "
+                    "of the ranked route pool"
+                )
+    else:
+        solved_routes = ordered_solved_routes[:top_k_routes]
+        partial_routes = ordered_partial_routes[:top_k_routes]
     diagnostics = MultistepSearchDiagnostics(
         expanded_states=expanded_states,
         one_step_calls=one_step_calls,
@@ -1552,6 +1688,14 @@ def plan_multistep_routes(
         route_policy_scored_actions=route_policy_scored_actions,
         route_policy_reordered_expansions=route_policy_reordered_expansions,
         refinement_excluded_candidates=refinement_excluded_candidates,
+        route_action_selector_definition_id=(
+            route_action_selector.definition_id
+            if route_action_selector is not None
+            else None
+        ),
+        route_action_pool_candidates=route_action_pool_candidates,
+        route_action_selected_candidates=route_action_selected_candidates,
+        beam_diversity_retained_states=beam_diversity_retained_states,
     )
     return MultistepRetrosynthesisResult(
         target_smiles=target.canonical_smiles,
@@ -1593,6 +1737,7 @@ __all__ = [
     "MultistepRetrosynthesisRoute",
     "MultistepSearchDiagnostics",
     "MultistepSearchGuidance",
+    "RouteActionSelector",
     "OneStepExpansionBatch",
     "RetrosynthesisRouteStep",
     "StartingMaterialAssessment",

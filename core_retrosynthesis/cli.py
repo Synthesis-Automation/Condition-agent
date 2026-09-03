@@ -510,6 +510,14 @@ def _parser() -> argparse.ArgumentParser:
         "--route-action-policy",
         help="optional learned policy over already validated route actions",
     )
+    partition_realization.add_argument(
+        "--latent-state-portfolio",
+        action="store_true",
+        help=(
+            "retain review-only route diversity across convergent, "
+            "single-carrier, unary, and ring action classes"
+        ),
+    )
 
     partition_assessment = commands.add_parser(
         "assess-partition",
@@ -1596,6 +1604,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             include_l0=not arguments.skip_l0,
             diversify=not arguments.no_diversity,
             use_hierarchical_ranking=not arguments.no_hierarchical_ranking,
+            use_latent_state_portfolio=arguments.latent_state_portfolio,
         )
         loaded_library = load_generic_library(arguments.library)
         with open_stock_lookup(arguments.stock_index) as stock_index:

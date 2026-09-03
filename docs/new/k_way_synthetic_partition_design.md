@@ -955,8 +955,69 @@ source provenance rather than validation evidence.
 
 Phase 5A exit remains open until an untouched identity-stripped internal parity
 panel, negative mapped/display contradiction cases, and blind chemist review
-meet the release thresholds. Phase 5B can then generate bounded latent
-precursor states and feed them through this same admission boundary.
+meet the release thresholds.
+
+#### Phase 5B — Validated latent-state route portfolio
+
+The first internal route-generation slice addresses a narrower, high-value
+failure mode: the generic operator ladder can already generate useful latent
+precursor states, but a small per-step top-k and partition-first beam can prune
+them before they become reviewable routes. Phase 5B preserves a bounded set of
+those existing actions; it does not invent reactions or concrete precursors.
+
+```text
+core_retrosynthesis/latent_state_search.py
+  RouteActionClassification
+  LatentStateActionSelector
+  classify_route_action(...)
+  select_latent_state_action_portfolio(...)
+  select_route_class_portfolio(...)
+
+core_retrosynthesis/definitions/
+  latent_state_route_search.v1.json
+```
+
+For an opt-in search, the planner requests a wider pool from the ordinary
+operator ladder, after which every action still must pass the existing forward
+signature and graph checks. The selector classifies the surviving action from
+mapped target-atom distribution across precursor components as convergent
+assembly, single-carrier installation, unary state change, ring
+reorganization, or multicomponent reorganization. These are route-shape
+descriptors, not module identities: no target module is named core, appendage,
+or privileged carrier. Reaction names are not routing keys.
+
+The selector retains the best actions plus a small reserve of different action
+shapes. The same first-action class is used as a diversity lane during beam
+pruning and final route selection. It never changes route costs or feasibility
+status. The policy fixes `ranking_influence` to `review_only_opt_in`, and the
+ordinary planner follows its previous path when the option is absent.
+
+```powershell
+python -m core_retrosynthesis realize-partition `
+  OPERATOR_LIBRARY STOCK_INDEX LANDSCAPE_JSON PARTITION_ID OUTPUT_JSON `
+  --latent-state-portfolio
+```
+
+On the worked target, the same depth-three, 12-expansion bound retained 12
+projectable routes spanning convergent assembly, single-carrier installation,
+and ring reorganization. The five-route review portfolio preserved the prior
+exact four-module N-assembly route and additionally exposed the chemically
+distinct phosphonate/ketone proposal:
+
+```text
+CCOP(=O)(CC(=O)O)OCC
+  + COC(=O)[C@H](c1ccccc1Cl)N1CCC(S)C(=O)C1
+  -> COC(=O)[C@H](c1ccccc1Cl)N1CCC(S)C(=CC(=O)O)C1
+```
+
+The controlled result is
+`results/core_retrosynthesis/synthetic_partition/worked_example_phase5b.v1.json`.
+It remains `partially_realized`: exposing a strategically useful first action
+does not establish terminal-material availability or a complete route. The
+corresponding structure-rich assessment is available as
+`worked_example_phase5b_review.v1.html` (with its JSON evidence beside it).
+The next gate is chemist comparison of these alternatives, followed by the
+unchanged external admission boundary for independently proposed routes.
 
 ## 11. Evaluation
 

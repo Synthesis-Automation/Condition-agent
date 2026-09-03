@@ -1,0 +1,27 @@
+{
+  "definition_id": "latent_state_route_search.v1",
+  "schema_version": "1.0",
+  "candidate_pool_multiplier": 4,
+  "single_carrier_target_atom_fraction": 0.72,
+  "action_class_order": [
+    "convergent_assembly",
+    "single_carrier_installation",
+    "unary_state_change",
+    "ring_reorganization",
+    "multicomponent_reorganization",
+    "unclassified"
+  ],
+  "candidate_reserve_per_class": {
+    "convergent_assembly": 1,
+    "single_carrier_installation": 1,
+    "unary_state_change": 0,
+    "ring_reorganization": 1,
+    "multicomponent_reorganization": 1,
+    "unclassified": 0
+  },
+  "route_portfolio": {
+    "maximum_routes_per_first_action_class": 2,
+    "preserve_best_overall_route": true,
+    "ranking_influence": "review_only_opt_in"
+  }
+}
