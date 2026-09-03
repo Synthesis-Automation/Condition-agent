@@ -625,7 +625,7 @@ partition work begins as a review-only projection and must not alter production
 ranking until the existing baseline, blind review, disagreement resolution, and
 untouched evaluation gates are complete.
 
-### Current status — 2026-09-02
+### Current status — 2026-09-03
 
 | Phase | Status | Implementation |
 | --- | --- | --- |
@@ -634,6 +634,7 @@ untouched evaluation gates are complete.
 | Phase 2 | Implemented, review-only | Validated-operator partition seeds, tactical-variant clustering, bounded interface combinations, evidence tiers, diversity limits, and explicit abstention. |
 | Phase 3 | Implemented, review-only | The canonical bounded multistep planner now accepts role-neutral search guidance; selected partitions are matched against every projected route frontier with explicit full, partial, unrealized, and contradicted outcomes. |
 | Phase 4 | Implemented, review-only; human gate pending | Persisted route reactions receive admitted structure-backed precedents, optional canonical condition evidence, compatibility cautions, latent-atom burden, weakest-link assessment, static review output, and separately blinded review cases and answer keys. Calibration remains blocked on completed chemist review. |
+| Phase 5A | Implemented, review-only; parity gate pending | Structured external physical steps and complete routes are independently mapped, signed, matched to admitted operators and precedents, checked for compatibility and topology, and rendered with structures. External claims cannot supply trusted IDs, all outputs have no ranking influence, and public actionability remains disabled. |
 
 Phase 2 combinations show that independently supported interfaces induce a
 target partition. They are labeled `operator_combination_unrealized` and do not
@@ -853,6 +854,109 @@ Only after deterministic validation:
 
 Exit criterion: the proposal layer improves held-out strategic coverage without
 reducing validity or abstention quality.
+
+#### Phase 5A — External complete-route admission
+
+The first Phase 5 slice admits *concrete physical-step proposals*, not names or
+drawings. It composes the existing graph source of truth and does not add a
+second reaction-validation path:
+
+```text
+core_retrosynthesis/external_proposal_assessment.py
+  ExternalProposalSource
+  ExternalRetrosynthesisProposal
+  ExternalProposalGate
+  ExternalOperatorMatch
+  ExternalRetrosynthesisAssessment
+  assess_external_retrosynthesis_proposal(...)
+
+core_retrosynthesis/external_route_admission.py
+  ExternalRouteStepProposal
+  ExternalRouteProposal
+  ExternalRouteAssessment
+  assess_external_route_proposal(...)
+  external_route_proposal_from_tree(...)
+
+core_retrosynthesis/external_proposal_review.py
+  render_external_route_assessment_html(...)
+  write_external_route_assessment_review(...)
+
+core_retrosynthesis/definitions/
+  external_proposal_admission_policy.v1.json
+```
+
+Each external step supplies only precursor and product structures, optional
+mapped reaction correspondence, proposed conditions, and source provenance.
+Input keys such as `operator_id`, `template_id`, `strategy_id`, admission
+status, compatibility disposition, or internal confidence are rejected. The
+system reconstructs its reaction signature and internal operator identity from
+the molecular graph.
+
+The serialized gate order is fixed:
+
+```text
+input structure -> reaction-side consistency -> atom correspondence
+-> completeness -> reaction signature -> exact operator support
+-> admitted precedent support -> stereochemistry -> compatibility/selectivity
+-> optional forward challenge -> optional condition support
+```
+
+An external complete route is assembled into the canonical
+`ReactionRouteTree` only when every physical step reaches the policy minimum of
+exact operator plus admitted precedent support, exactly one step owns each
+intermediate product, the declared target is produced, and the step graph is
+connected and acyclic. Leaves are explicitly marked
+`leaf_stock_status_not_assessed`; route admission is not a stock-availability
+claim or a solved-route claim.
+
+The CLI accepts a machine-readable route proposal and writes evidence JSON plus
+a structure-rich HTML review:
+
+```powershell
+python -m core_retrosynthesis assess-external-route `
+  OPERATOR_LIBRARY EXTERNAL_ROUTE.json ASSESSMENT.json REVIEW.html `
+  --forward-audit
+```
+
+`--forward-audit` is optional and uses the existing forward operator view. A
+missing forward library or condition index produces an explicit `not_run`
+gate, never a silent pass. `admission_eligible` records whether chemistry and
+topology meet the review threshold, while `actionable` remains `false` and
+`ranking_influence` remains `none_review_only` until the frozen release panel
+passes.
+
+The identity-stripped Phase 3 parity pilot is recorded in:
+
+```text
+results/core_retrosynthesis/synthetic_partition/
+  worked_example_phase5a_external_input.v1.json
+  worked_example_phase5a.v1.json
+  worked_example_phase5a.v1.html
+```
+
+It intentionally reports `partially_supported`: three of four persisted steps
+recover exact admitted operators and precedents, while the old Phase 3 artifact
+lost the validated mapped reaction for one structurally ambiguous
+correspondence. Phase 5A therefore does not trust the persisted operator ID.
+Planned route-tree construction now retains the validated mapped reactant and
+product structures, and `external_route_proposal_from_tree(...)` strips trusted
+IDs while preserving that correspondence for future parity cases.
+
+`proposed_retrosynthesis_route.svg` is not yet a valid Phase 5A input. It
+contains vector drawings and condition text but no semantic SMILES, molblocks,
+atom maps, or machine-readable reaction records for intermediates A--D.
+Inventing those graphs from the drawing would violate the admission boundary.
+The machine-readable intake diagnosis is retained at
+`results/core_retrosynthesis/synthetic_partition/proposed_retrosynthesis_route_phase5a_intake.v1.json`.
+The next pilot input must encode every drawn physical step as exact
+`precursor_smiles`, `target_smiles`, and, where deterministic correspondence is
+ambiguous, `mapped_reaction_smiles`. The SVG and its web/LLM origin then remain
+source provenance rather than validation evidence.
+
+Phase 5A exit remains open until an untouched identity-stripped internal parity
+panel, negative mapped/display contradiction cases, and blind chemist review
+meet the release thresholds. Phase 5B can then generate bounded latent
+precursor states and feed them through this same admission boundary.
 
 ## 11. Evaluation
 

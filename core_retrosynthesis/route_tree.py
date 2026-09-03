@@ -62,6 +62,14 @@ def build_canonical_route_tree(
         leaf = leaf_by_node.get(node_id)
         reaction = None
         if step is not None:
+            mapped_reaction = str(
+                getattr(step.candidate, "condition_query_reaction_smiles", "")
+                or ""
+            )
+            if mapped_reaction.count(">>") == 1:
+                mapped_reactants, mapped_product = mapped_reaction.split(">>", 1)
+            else:
+                mapped_reactants, mapped_product = "", ""
             children = tuple(
                 molecule_node(child_id, child_smiles, step.depth)
                 for child_id, child_smiles in zip(
@@ -78,6 +86,13 @@ def build_canonical_route_tree(
                     evidence_kind="predicted",
                     source_dataset_id="core_retrosynthesis",
                     connectivity_method="planned_search_action",
+                    reactants_smiles=mapped_reactants,
+                    product_smiles_mapped=mapped_product,
+                    warnings=(
+                        ("VALIDATED_MAPPED_REACTION_RETAINED",)
+                        if mapped_reaction
+                        else ()
+                    ),
                 ),
                 children=children,
                 planned_action=PlannedRouteAction(

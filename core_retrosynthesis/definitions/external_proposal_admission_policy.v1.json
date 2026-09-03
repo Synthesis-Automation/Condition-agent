@@ -1,0 +1,41 @@
+{
+  "definition_id": "external_proposal_admission_policy.v1",
+  "schema_version": "1.0",
+  "assessment_schema_version": "1.0",
+  "required_gate_order": [
+    "input_structure",
+    "reaction_side_consistency",
+    "atom_correspondence",
+    "reaction_completeness",
+    "reaction_signature",
+    "operator_support",
+    "precedent_support",
+    "stereochemistry",
+    "precursor_compatibility",
+    "reaction_compatibility",
+    "functional_group_selectivity",
+    "forward_reproduction",
+    "forward_competition",
+    "condition_support"
+  ],
+  "limits": {
+    "maximum_operator_matches": 20,
+    "maximum_precedent_matches": 10,
+    "maximum_forward_operators": 300,
+    "maximum_forward_products": 20,
+    "maximum_route_steps": 40
+  },
+  "admission": {
+    "minimum_evidence_tier": "precedent_supported",
+    "hard_reject_dispositions": ["reject"],
+    "ranking_influence": "none_review_only",
+    "public_actionability": "disabled_until_release_gate"
+  },
+  "route": {
+    "require_one_step_for_target": true,
+    "reject_duplicate_product_steps": true,
+    "reject_cycles": true,
+    "reject_disconnected_steps": true,
+    "leaf_stock_status": "not_assessed"
+  }
+}

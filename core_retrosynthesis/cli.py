@@ -49,7 +49,14 @@ from .diverse_benchmark import (
 from .ensemble import disconnect_ensemble
 from .coverage_audit import audit_operator_library_coverage
 from .core_admission import CORE_ADMISSION_POLICY_NAMES
+from .external_proposal_assessment import ExternalProposalAssessmentLimits
+from .external_proposal_review import write_external_route_assessment_review
+from .external_route_admission import (
+    ExternalRouteProposal,
+    assess_external_route_proposal,
+)
 from .full_scale import FullScaleBuildConfig, build_full_scale_operator_library
+from .forward_assessment import build_forward_library_from_generic
 from .generic_library import load_generic_library
 from .generic_search import (
     disconnect_generic_target,
@@ -523,6 +530,32 @@ def _parser() -> argparse.ArgumentParser:
     partition_assessment.add_argument("--blind-review-packet")
     partition_assessment.add_argument("--blind-answer-key")
     partition_assessment.add_argument("--review-seed", type=int, default=47)
+
+    external_route = commands.add_parser(
+        "assess-external-route",
+        help="validate a structured external route as review-only evidence",
+    )
+    external_route.add_argument("library")
+    external_route.add_argument("proposal_json")
+    external_route.add_argument("output_json")
+    external_route.add_argument("output_html")
+    external_route.add_argument("--maximum-operator-matches", type=int, default=20)
+    external_route.add_argument("--maximum-precedent-matches", type=int, default=10)
+    external_route.add_argument("--maximum-route-steps", type=int, default=40)
+    external_route.add_argument(
+        "--forward-audit",
+        action="store_true",
+        help="build the admitted forward view and challenge every supported step",
+    )
+    external_route.add_argument("--maximum-forward-operators", type=int, default=300)
+    external_route.add_argument("--maximum-forward-products", type=int, default=20)
+    external_route.add_argument("--condition-index")
+    external_route.add_argument("--condition-top-k", type=int, default=3)
+    external_route.add_argument("--condition-minimum-pool-size", type=int)
+    external_route.add_argument(
+        "--condition-unrestricted-fallback",
+        action="store_true",
+    )
 
     route_search = commands.add_parser(
         "plan-routes",
@@ -1438,6 +1471,58 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 sort_keys=True,
             )
         )
+        return 0
+
+    if arguments.command == "assess-external-route":
+        proposal_value = json.loads(
+            Path(arguments.proposal_json).read_text(encoding="utf-8")
+        )
+        proposal = ExternalRouteProposal.from_dict(proposal_value)
+        loaded_library = load_generic_library(arguments.library)
+        forward_library = (
+            build_forward_library_from_generic(loaded_library)
+            if arguments.forward_audit
+            else None
+        )
+        condition_evaluator = None
+        if arguments.condition_index:
+            from condition_recommender import GenericConditionRecommender
+
+            recommender = GenericConditionRecommender.from_path(
+                arguments.condition_index,
+                include_review=arguments.condition_unrestricted_fallback,
+            )
+
+            def condition_evaluator(reaction_smiles: str):
+                return recommend_retrosynthesis_conditions(
+                    reaction_smiles,
+                    recommender,
+                    condition_top_k=arguments.condition_top_k,
+                    minimum_pool_size=arguments.condition_minimum_pool_size,
+                    unrestricted_fallback=(
+                        arguments.condition_unrestricted_fallback
+                    ),
+                )
+
+        assessment = assess_external_route_proposal(
+            proposal,
+            loaded_library,
+            forward_library=forward_library,
+            condition_evaluator=condition_evaluator,
+            limits=ExternalProposalAssessmentLimits(
+                maximum_operator_matches=arguments.maximum_operator_matches,
+                maximum_precedent_matches=arguments.maximum_precedent_matches,
+                maximum_forward_operators=arguments.maximum_forward_operators,
+                maximum_forward_products=arguments.maximum_forward_products,
+                maximum_route_steps=arguments.maximum_route_steps,
+            ),
+        )
+        summary = write_external_route_assessment_review(
+            assessment,
+            arguments.output_json,
+            arguments.output_html,
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
 
     if arguments.command == "partition-landscape":
