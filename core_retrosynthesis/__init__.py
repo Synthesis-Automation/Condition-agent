@@ -565,6 +565,16 @@ from .multistep_panel_review import (
     render_multistep_panel_html,
     write_multistep_panel_artifacts,
 )
+from .multistep_dataset_evaluation import (
+    MULTISTEP_DATASET_EVALUATION_ALGORITHM_VERSION,
+    MULTISTEP_DATASET_EVALUATION_SCHEMA_VERSION,
+    MultistepDatasetCaseResult,
+    MultistepDatasetEvaluation,
+    MultistepDatasetEvaluationConfig,
+    build_multistep_dataset_evaluation,
+    evaluate_partition_review_routes,
+    write_multistep_dataset_evaluation,
+)
 from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
@@ -822,6 +832,9 @@ __all__ = [
     "MultistepRankingPolicy",
     "MultistepPanelCase",
     "MultistepPanelTarget",
+    "MultistepDatasetCaseResult",
+    "MultistepDatasetEvaluation",
+    "MultistepDatasetEvaluationConfig",
     "MultistepSearchDiagnostics",
     "MultistepSearchGuidance",
     "OneStepExpansionBatch",
@@ -1003,6 +1016,8 @@ __all__ = [
     "merge_operator_shards",
     "mine_coupled_route_strategy_poc",
     "plan_multistep_routes",
+    "build_multistep_dataset_evaluation",
+    "evaluate_partition_review_routes",
     "rank_retrosynthesis_candidates_with_conditions",
     "recommend_retrosynthesis_conditions",
     "rank_operator_site_diverse",
@@ -1059,6 +1074,7 @@ __all__ = [
     "write_route_core_review_html",
     "write_route_action_review_html",
     "write_multistep_panel_artifacts",
+    "write_multistep_dataset_evaluation",
     "write_generic_operator_catalog_html",
     "train_route_action_policy_from_replay",
     "validate_route_tree",

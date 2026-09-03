@@ -334,6 +334,18 @@ def render_multistep_panel_html(
         for index, case in enumerate(values, 1)
     )
     report_metadata = dict(metadata or {})
+    extra_summary = "".join(
+        "<div>"
+        f"<span>{html.escape(str(item.get('label') or 'Measure'))}</span>"
+        f"<strong>{html.escape(str(item.get('value') or '0'))}</strong>"
+        "</div>"
+        for item in report_metadata.get("summary_metrics") or ()
+        if isinstance(item, Mapping)
+    )
+    notices = "".join(
+        f"<li>{html.escape(str(item))}</li>"
+        for item in report_metadata.get("warnings") or ()
+    )
     storage_key = str(
         report_metadata.get("panel_id") or "multistep-familiar-panel-v1"
     )
@@ -349,6 +361,7 @@ def render_multistep_panel_html(
         f'<div><span>Observed references</span><strong>{reference_count}</strong></div>'
         f'<div><span>Planner solved</span><strong>{solved_baseline}</strong></div>'
         f'<div><span>Planner partial-only</span><strong>{partial_only_baseline}</strong></div>'
+        f"{extra_summary}"
         + (
             f'<div><span>Policy solved</span><strong>{solved_policy}</strong></div>'
             f'<div><span>Changed rankings</span><strong>{changed}</strong></div>'
@@ -357,7 +370,9 @@ def render_multistep_panel_html(
             else ""
         )
         + "</section></header>"
-        '<main><section class="toolbar"><label>Search<input id="search" type="search" '
+        '<main>'
+        + (f'<section class="notice"><ul>{notices}</ul></section>' if notices else "")
+        + '<section class="toolbar"><label>Search<input id="search" type="search" '
         'placeholder="Target, class, or SMILES"></label><label>Category<select id="category">'
         f'<option value="all">All</option>{category_options}</select></label>'
         '<label>Review status<select id="status"><option value="all">All</option>'

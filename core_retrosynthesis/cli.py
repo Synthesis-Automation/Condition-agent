@@ -66,6 +66,11 @@ from .generic_search import (
 from .html_report import DEFAULT_METHODS, write_comparison_html
 from .library import build_library, load_library, save_library
 from .multistep import plan_multistep_routes
+from .multistep_dataset_evaluation import (
+    MultistepDatasetEvaluationConfig,
+    build_multistep_dataset_evaluation,
+    write_multistep_dataset_evaluation,
+)
 from .partition_landscape import build_operator_partition_landscape
 from .partition_assessment import assess_partition_realizations
 from .partition_assessment_review import (
@@ -510,6 +515,47 @@ def _parser() -> argparse.ArgumentParser:
     )
     operator_coverage_comparison.add_argument(
         "--lazy-validation", action="store_true"
+    )
+
+    multistep_dataset_evaluation = commands.add_parser(
+        "evaluate-partition-review-routes",
+        help="run bounded multistep searches for every partition-review target",
+    )
+    multistep_dataset_evaluation.add_argument("source_partition_review")
+    multistep_dataset_evaluation.add_argument("library")
+    multistep_dataset_evaluation.add_argument("stock_index")
+    multistep_dataset_evaluation.add_argument("output_json")
+    multistep_dataset_evaluation.add_argument("output_html")
+    multistep_dataset_evaluation.add_argument(
+        "--max-depth", type=int, choices=tuple(range(1, 7)), default=3
+    )
+    multistep_dataset_evaluation.add_argument(
+        "--molecular-weight-threshold", type=float, default=150.0
+    )
+    multistep_dataset_evaluation.add_argument("--top-k-routes", type=int, default=3)
+    multistep_dataset_evaluation.add_argument(
+        "--per-step-top-k", type=int, default=3
+    )
+    multistep_dataset_evaluation.add_argument("--beam-width", type=int, default=8)
+    multistep_dataset_evaluation.add_argument(
+        "--max-expansions", type=int, default=15
+    )
+    multistep_dataset_evaluation.add_argument(
+        "--max-templates", type=int, default=100
+    )
+    multistep_dataset_evaluation.add_argument(
+        "--max-candidates-to-validate", type=int, default=25
+    )
+    multistep_dataset_evaluation.add_argument("--no-context", action="store_true")
+    multistep_dataset_evaluation.add_argument("--skip-l0", action="store_true")
+    multistep_dataset_evaluation.add_argument("--no-diversity", action="store_true")
+    multistep_dataset_evaluation.add_argument(
+        "--no-hierarchical-ranking", action="store_true"
+    )
+    multistep_dataset_evaluation.add_argument(
+        "--allow-untyped-literature-terminals",
+        action="store_true",
+        help="accept legacy literature matches without source-role provenance",
     )
 
     partition_realization = commands.add_parser(
@@ -1636,6 +1682,49 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 sort_keys=True,
             )
         )
+        return 0
+
+    if arguments.command == "evaluate-partition-review-routes":
+        config = MultistepDatasetEvaluationConfig(
+            max_depth=arguments.max_depth,
+            molecular_weight_threshold=arguments.molecular_weight_threshold,
+            top_k_routes=arguments.top_k_routes,
+            per_step_top_k=arguments.per_step_top_k,
+            beam_width=arguments.beam_width,
+            max_expansions=arguments.max_expansions,
+            max_templates_to_apply=arguments.max_templates,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+            use_context=not arguments.no_context,
+            include_l0=not arguments.skip_l0,
+            diversify=not arguments.no_diversity,
+            use_hierarchical_ranking=not arguments.no_hierarchical_ranking,
+            allow_untyped_literature_terminals=(
+                arguments.allow_untyped_literature_terminals
+            ),
+        )
+
+        def report_case(index: int, total: int, target: str) -> None:
+            print(
+                f"[multistep-evaluation] case {index}/{total}: {target}",
+                file=sys.stderr,
+                flush=True,
+            )
+
+        with open_stock_lookup(arguments.stock_index) as stock_index:
+            evaluation = build_multistep_dataset_evaluation(
+                arguments.source_partition_review,
+                arguments.library,
+                stock_index,
+                stock_index_path=arguments.stock_index,
+                config=config,
+                progress=report_case,
+            )
+        summary = write_multistep_dataset_evaluation(
+            evaluation,
+            arguments.output_json,
+            arguments.output_html,
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
 
     if arguments.command == "partition-landscape":
