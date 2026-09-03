@@ -1,6 +1,6 @@
 ---
 title: "General Synthetic Partition Landscape and Strategic Route Realization"
-version: "0.9"
+version: "0.10"
 status: "Design and implementation plan"
 encoding: "UTF-8"
 ---
@@ -1336,6 +1336,66 @@ review disclosure, top alternatives are shown as structures, source-patent
 overlap is labeled, and reviewer decisions persist locally. Exact first-step
 recovery still does not establish a terminal, feasible, condition-supported
 multistep route.
+
+#### 11.0.2 Bounded multistep evaluation on the same ten targets
+
+The guarded `validated_departures` library has now been exercised as an
+ordinary bounded multistep planner on all ten selected targets. This is a route
+generation test, not merely a K-way projection or single-step replay. Every
+case used the same depth-three limits: three retained routes, per-step top three,
+beam width eight, 15 expansions, 100 applied templates, and 25 validation
+attempts per operator-ladder level.
+
+| Measure | Result |
+| --- | ---: |
+| targets with heuristic-terminal solved routes | 4/10 |
+| targets with partial routes only | 6/10 |
+| exact observed root action retained | 8/10 |
+| any observed action retained in one route | 8/10 |
+| maximum matched observed actions | 12/40 |
+| complete observed routes reproduced | 0/10 |
+
+The distinction between the first two rows and chemical synthesis feasibility
+is essential. The available 311,105-molecule literature index lacks typed
+commercial starting-material provenance, so this test explicitly permits
+`untyped_literature` terminals. It also permits the existing molecular-weight
+terminal heuristic at 150 Da. All four planner-complete cases use one or both
+of those assumptions; they are therefore *search-complete under the declared
+heuristics*, not verified purchasable or experimentally feasible routes.
+
+The eight retained root recoveries are lower than the guarded 9/10 root
+operator coverage above because multistep search retains only three actions per
+expansion. The test-split case's exact root action was rank four in the wider
+single-step comparison and is consequently not retained by this deliberately
+narrow route-search configuration. Four cases hit the 15-expansion bound.
+Increasing compute can test ranking/search limitations, but it cannot replace
+typed stock evidence, reaction-condition assessment, or chemist review.
+
+The reusable evaluator records the fixed configuration, source and library
+hashes, terminal assumptions, per-case diagnostics, exact known-action matches,
+and complete-versus-partial route status. Its HTML juxtaposes the observed
+precedent structures with up to three generated route structures and their leaf
+assessments:
+
+```text
+python -m core_retrosynthesis evaluate-partition-review-routes \
+  results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.json \
+  results/core_retrosynthesis/route_step_operator_library/v1/operators_validated_departures/operator_library_v3.json.gz \
+  results/literature_molecule_index.sqlite \
+  results/core_retrosynthesis/synthetic_partition/dataset10_multistep_evaluation.v1.json \
+  results/core_retrosynthesis/synthetic_partition/dataset10_multistep_evaluation.v1.html \
+  --max-depth 3 --top-k-routes 3 --per-step-top-k 3 \
+  --beam-width 8 --max-expansions 15 --max-templates 100 \
+  --max-candidates-to-validate 25 \
+  --allow-untyped-literature-terminals
+```
+
+The immediate conclusion is that the code can now generate and review routes
+for every target, with strong first-action coverage, but it cannot yet claim a
+high-quality full retrosynthesis for all ten. The highest-ROI next gate is a
+typed commercial-stock index followed by a larger, leakage-controlled search
+that measures complete routes independently from recovery of the recorded
+route.
 
 ### 11.1 Required baselines
 

@@ -48,6 +48,7 @@ class MultistepPanelCase:
     reference_route_id: Optional[str] = None
     reference_reactions: tuple[str, ...] = ()
     reference_maximum_depth: Optional[int] = None
+    evaluation_metrics: tuple[tuple[str, str], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible panel case."""
@@ -59,6 +60,7 @@ class MultistepPanelCase:
             "reference_route_id": self.reference_route_id,
             "reference_reactions": list(self.reference_reactions),
             "reference_maximum_depth": self.reference_maximum_depth,
+            "evaluation_metrics": dict(self.evaluation_metrics),
             "same_ranked_routes": (
                 _route_projection(self.baseline) == _route_projection(self.policy)
                 if self.policy is not None
@@ -184,6 +186,8 @@ def _method_column(
         cards = '<p class="empty">No route or bounded partial route returned.</p>'
     return (
         f'<section class="method"><h3>{html.escape(label)}</h3>'
+        '<p class="method-definition">Generated independently by the current '
+        'bounded planner; it is not given the observed route.</p>'
         f'<p class="method-summary">{status}</p>{policy_note}{cards}</section>'
     )
 
@@ -204,6 +208,8 @@ def _reference_column(case: MultistepPanelCase) -> str:
     )
     return (
         '<section class="method reference"><h3>Observed precedent</h3>'
+        '<p class="method-definition">The synthesis route recorded in the '
+        'source dataset and used only as the evaluation reference.</p>'
         f'<p class="method-summary">{len(case.reference_reactions)} recorded reactions'
         f'{depth}</p><p class="reference-id">{html.escape(case.reference_route_id or "")}</p>'
         f'<div class="route-steps">{reactions}</div></section>'
@@ -226,6 +232,12 @@ def _case_card(case: MultistepPanelCase, index: int, *, top_k: int) -> str:
             case.target.smiles,
         )
     ).lower()
+    evaluation_metrics = "".join(
+        '<span class="evaluation-metric">'
+        f"{html.escape(label)} <strong>{html.escape(value)}</strong>"
+        "</span>"
+        for label, value in case.evaluation_metrics
+    )
     return (
         f'<article class="case" data-target-id="{html.escape(case.target.target_id)}" '
         f'data-category="{html.escape(case.target.category)}" '
@@ -238,9 +250,14 @@ def _case_card(case: MultistepPanelCase, index: int, *, top_k: int) -> str:
         '<div class="target-structure">'
         + molecule_svg(case.target.smiles, width=420, height=220)
         + f'<code>{html.escape(case.target.smiles)}</code></div>'
-        '<div class="methods">'
+        + (
+            f'<div class="evaluation-metrics">{evaluation_metrics}</div>'
+            if evaluation_metrics
+            else ""
+        )
+        + '<div class="methods">'
         + _reference_column(case)
-        + _method_column("Baseline", case.baseline, top_k=top_k)
+        + _method_column("Planner baseline", case.baseline, top_k=top_k)
         + (
             _method_column("Route policy", case.policy, top_k=top_k)
             if case.policy is not None
@@ -264,7 +281,9 @@ header{background:#173f33;color:white;padding:26px max(24px,calc((100% - 1500px)
 header h1{margin:0 0 5px;font-size:27px}header p{margin:0;color:#dcebe5;max-width:850px}.summary{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:1px;background:#42675b}.summary div{background:#234e41;padding:11px 15px}.summary span{display:block;color:#bcd2ca;font-size:12px}.summary strong{font-size:20px}
 main{max-width:1500px;margin:auto;padding:18px}.toolbar{position:sticky;top:0;z-index:5;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:12px;align-items:end;box-shadow:0 3px 14px #203c3120}.toolbar label{display:grid;gap:3px;color:var(--muted);font-size:12px}.toolbar input,.toolbar select,.review select,.review textarea{border:1px solid #bec9c4;border-radius:6px;padding:7px;background:#fff}.toolbar input{width:260px}.toolbar button{border:0;border-radius:6px;background:#315e50;color:white;padding:8px 12px;cursor:pointer}.visible{margin-left:auto;color:var(--muted)}
 .case{background:white;border:1px solid var(--line);border-radius:12px;margin:18px 0;padding:16px;box-shadow:0 3px 13px #223b3210}.target-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.target-head>div{display:flex;align-items:center;gap:10px}.target-head h2{margin:0;font-size:22px}.case-number{color:var(--muted);font-variant-numeric:tabular-nums}.category,.comparison,.badge{border-radius:999px;padding:3px 8px;font-size:12px;background:#edf2ef}.comparison.same{color:var(--green)}.comparison.changed{background:#fff0d2;color:var(--amber)}.comparison.reference{background:#eee9dc;color:#66583b}
-.target-structure{display:flex;align-items:center;gap:18px;overflow:auto;border-bottom:1px solid var(--line);padding:8px 0}.target-structure svg{max-width:420px;height:190px}.target-structure code{color:#43514c;overflow-wrap:anywhere}.methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px;margin-top:14px}.method{min-width:0;border:1px solid var(--line);border-radius:9px;padding:12px}.method.reference{background:#f7f5ef}.method h3{margin:0;font-size:18px}.method-summary,.reference-id{color:var(--muted);margin:2px 0 9px}.reference-id{font-family:ui-monospace,monospace}.policy-state{border-left:4px solid var(--green);padding:5px 8px;background:#eff8f3}.policy-state.inactive{border-color:var(--amber);background:#fff8e8}.route{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}.route-head{display:flex;gap:9px;align-items:center;color:var(--muted)}.route-head strong{color:var(--ink)}.route-steps{display:grid;gap:7px}.reaction{overflow:auto;background:#fafbfa;border-radius:7px}.reaction svg{width:100%;min-width:520px;height:auto;max-height:220px}.step-meta{padding:0 8px 6px;color:var(--muted);font-size:12px}.leaves{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:12px}.leaf{background:#edf4f0;border-radius:5px;padding:3px 6px;overflow-wrap:anywhere}.warnings{margin:7px 0;color:var(--amber)}
+.target-structure{display:flex;align-items:center;gap:18px;overflow:auto;border-bottom:1px solid var(--line);padding:8px 0}.target-structure svg{max-width:420px;height:190px}.target-structure code{color:#43514c;overflow-wrap:anywhere}.methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px;margin-top:14px}.method{min-width:0;border:1px solid var(--line);border-radius:9px;padding:12px}.method.reference{background:#f7f5ef}.method h3{margin:0;font-size:18px}.method-definition{max-width:62ch;color:#53615c;margin:5px 0 3px}.method-summary,.reference-id{color:var(--muted);margin:2px 0 9px}.reference-id{font-family:ui-monospace,monospace}.policy-state{border-left:4px solid var(--green);padding:5px 8px;background:#eff8f3}.policy-state.inactive{border-color:var(--amber);background:#fff8e8}.route{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}.route-head{display:flex;gap:9px;align-items:center;color:var(--muted)}.route-head strong{color:var(--ink)}.route-steps{display:grid;gap:7px}.reaction{overflow:auto;background:#fafbfa;border-radius:7px}.reaction svg{display:block;width:auto;min-width:520px;max-width:none;height:180px}.step-meta{padding:0 8px 6px;color:var(--muted);font-size:12px}.leaves{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:12px}.leaf{background:#edf4f0;border-radius:5px;padding:3px 6px;overflow-wrap:anywhere}.warnings{margin:7px 0;color:var(--amber)}
+.evaluation-metrics{display:flex;gap:8px;flex-wrap:wrap;padding-top:10px}.evaluation-metric{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--muted);background:#fafbfa}.evaluation-metric strong{color:var(--ink);margin-left:3px}
+.reaction svg{min-width:0;height:140px}
 .review{display:grid;grid-template-columns:180px 1fr;gap:12px;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.review label{display:grid;gap:4px;color:var(--muted);font-size:12px}.review textarea{width:100%;resize:vertical}.case[data-review="accept"]{border-left:5px solid var(--green)}.case[data-review="question"]{border-left:5px solid var(--amber)}.case[data-review="reject"]{border-left:5px solid var(--red)}
 @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.methods{grid-template-columns:1fr}.toolbar{position:static;flex-wrap:wrap}.toolbar input{width:190px}.review{grid-template-columns:1fr}}
 """
@@ -353,9 +372,10 @@ def render_multistep_panel_html(
         '<!doctype html><html lang="en"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
         f'<title>{html.escape(title)}</title><style>{_stylesheet()}</style></head><body>'
-        f'<header><div><h1>{html.escape(title)}</h1><p>Baseline and optional route-policy '
-        'searches use identical chemistry validation and bounded-search settings. Review '
-        'feasibility and strategic quality independently of structural validity.</p></div>'
+        f'<header><div><h1>{html.escape(title)}</h1><p>Observed precedent is the '
+        'dataset-recorded reference route. Planner baseline is generated independently '
+        'by the current bounded search. A graph-valid proposal still requires review for '
+        'feasibility, conditions, and strategic quality.</p></div>'
         '<section class="summary">'
         f'<div><span>Targets</span><strong>{len(values)}</strong></div>'
         f'<div><span>Observed references</span><strong>{reference_count}</strong></div>'

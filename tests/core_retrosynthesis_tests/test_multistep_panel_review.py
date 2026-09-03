@@ -101,6 +101,10 @@ def test_multistep_panel_html_contains_routes_and_review_controls() -> None:
     assert "Same ranked routes" in document
     assert "Export review JSON" in document
     assert "Observed precedent" in document
+    assert "source dataset and used only as the evaluation reference" in document
+    assert "Planner baseline" in document
+    assert "it is not given the observed route" in document
+    assert ".reaction svg{min-width:0;height:140px}" in document
     assert "observed-route" in document
     assert "<svg" in document
 

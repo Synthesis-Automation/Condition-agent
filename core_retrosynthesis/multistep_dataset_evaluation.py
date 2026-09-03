@@ -312,6 +312,17 @@ def evaluate_partition_review_routes(
             reference_route_id=(tree.source_route_id or tree.tree_id),
             reference_reactions=reference_reactions,
             reference_maximum_depth=tree.maximum_depth,
+            evaluation_metrics=(
+                (
+                    "Known root action",
+                    "recovered" if root_recovered else "not retained",
+                ),
+                ("Known actions", f"{matched}/{len(observed)}"),
+                (
+                    "Search result",
+                    "solved by heuristics" if result.routes else "partial only",
+                ),
+            ),
         )
         results.append(
             MultistepDatasetCaseResult(

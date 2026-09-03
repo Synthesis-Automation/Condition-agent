@@ -56,6 +56,13 @@ def test_html_rendering_hides_atom_mapping_numbers() -> None:
     ) == reaction_svg("[CH3][OH]>>[CH2]=[O]")
 
 
+def test_html_reactions_use_consistent_web_scale() -> None:
+    document = reaction_svg("CC(=O)O.CCN>>CCNC(C)=O")
+
+    assert "stroke-width:1.8px" in document
+    assert "viewBox='0 0" in document
+
+
 def _row(bond_kind: str, *, ordinal: int = 1) -> dict:
     reaction_smiles = MAPPED_REACTIONS[bond_kind]
     analysis = featurize_reaction(reaction_smiles)

@@ -75,6 +75,7 @@ def reaction_svg(
             reaction_smiles,
             size=(sub_image_size[0] * 3, sub_image_size[1]),
             image_format="svg",
+            render_preset="web_consistent",
         )
         return _inline_svg(drawing.decode("utf-8"))
     except (RuntimeError, ValueError, UnicodeDecodeError):
