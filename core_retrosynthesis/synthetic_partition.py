@@ -187,6 +187,25 @@ class NonTargetAtom:
     atom_map: int | None
     classification: str
 
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible non-target atom."""
+
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, value: Mapping[str, Any]) -> "NonTargetAtom":
+        """Reconstruct a non-target atom."""
+
+        return cls(
+            element=str(value["element"]),
+            atom_map=(
+                int(value["atom_map"])
+                if value.get("atom_map") is not None
+                else None
+            ),
+            classification=str(value["classification"]),
+        )
+
 
 @dataclass(frozen=True)
 class LatentModuleState:
@@ -199,6 +218,7 @@ class LatentModuleState:
     non_target_atoms: tuple[NonTargetAtom, ...] = ()
     state_annotations: tuple[str, ...] = ()
     evidence_status: str = "unresolved"
+    source_occurrence_id: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible latent state."""
@@ -208,10 +228,37 @@ class LatentModuleState:
             "module_ids": list(self.module_ids),
             "mapped_smiles": self.mapped_smiles,
             "target_atom_maps": list(self.target_atom_maps),
-            "non_target_atoms": [asdict(atom) for atom in self.non_target_atoms],
+            "non_target_atoms": [atom.to_dict() for atom in self.non_target_atoms],
             "state_annotations": list(self.state_annotations),
             "evidence_status": self.evidence_status,
+            "source_occurrence_id": self.source_occurrence_id,
         }
+
+    @classmethod
+    def from_dict(cls, value: Mapping[str, Any]) -> "LatentModuleState":
+        """Reconstruct a concrete latent module state."""
+
+        return cls(
+            latent_state_id=str(value["latent_state_id"]),
+            module_ids=tuple(str(item) for item in value.get("module_ids") or ()),
+            mapped_smiles=str(value["mapped_smiles"]),
+            target_atom_maps=tuple(
+                int(item) for item in value.get("target_atom_maps") or ()
+            ),
+            non_target_atoms=tuple(
+                NonTargetAtom.from_dict(item)
+                for item in value.get("non_target_atoms") or ()
+            ),
+            state_annotations=tuple(
+                str(item) for item in value.get("state_annotations") or ()
+            ),
+            evidence_status=str(value.get("evidence_status") or "unresolved"),
+            source_occurrence_id=(
+                str(value["source_occurrence_id"])
+                if value.get("source_occurrence_id") is not None
+                else None
+            ),
+        )
 
 
 @dataclass(frozen=True)

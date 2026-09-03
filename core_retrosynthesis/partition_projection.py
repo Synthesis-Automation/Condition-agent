@@ -211,6 +211,7 @@ def _propagate_reaction_ownership(
         warnings.append("PRODUCT_SYMMETRY_AMBIGUOUS_DETERMINISTIC_REPRESENTATIVE")
     match = product_matches[0]
     reaction_map_to_target: dict[int, int] = {}
+    reaction_map_to_atomic_number: dict[int, int] = {}
     for node_index, reaction_index in enumerate(match):
         target_map = product_atom_ownership.get(node_index)
         if target_map is None:
@@ -221,25 +222,40 @@ def _propagate_reaction_ownership(
         if reaction_map in reaction_map_to_target:
             raise ValueError("mapped product reuses an atom-map number")
         reaction_map_to_target[int(reaction_map)] = int(target_map)
+        reaction_map_to_atomic_number[int(reaction_map)] = int(
+            product.GetAtomWithIdx(reaction_index).GetAtomicNum()
+        )
     if set(reaction_map_to_target.values()) != set(product_atom_ownership.values()):
         raise ValueError("mapped product does not cover current target ownership")
     components: list[_ComponentProjection] = []
     distributed: list[int] = []
     for component in _split_mapped_components(reactant_side):
+        mapped_smiles = Chem.MolToSmiles(
+            component,
+            canonical=True,
+            isomericSmiles=True,
+        )
+        serialized_component = Chem.MolFromSmiles(mapped_smiles)
+        if serialized_component is None:
+            raise ValueError("mapped precursor component could not be serialized")
         ownership = []
-        for atom in component.GetAtoms():
-            target_map = reaction_map_to_target.get(int(atom.GetAtomMapNum()))
+        for atom in serialized_component.GetAtoms():
+            reaction_map = int(atom.GetAtomMapNum())
+            target_map = reaction_map_to_target.get(reaction_map)
             if target_map is not None:
+                if (
+                    atom.GetAtomicNum()
+                    != reaction_map_to_atomic_number[reaction_map]
+                ):
+                    raise ValueError(
+                        "reaction atom mapping changes target element"
+                    )
                 ownership.append((atom.GetIdx(), target_map))
                 distributed.append(target_map)
         components.append(
             _ComponentProjection(
-                mapped_smiles=Chem.MolToSmiles(
-                    component,
-                    canonical=True,
-                    isomericSmiles=True,
-                ),
-                canonical_smiles=_canonical_unmapped(component),
+                mapped_smiles=mapped_smiles,
+                canonical_smiles=_canonical_unmapped(serialized_component),
                 atom_ownership=tuple(sorted(ownership)),
             )
         )
@@ -441,6 +457,30 @@ def _frontier_at_depth(
     return tuple(values), complete
 
 
+def _validate_projected_elements(
+    projected: _ProjectedOccurrence,
+    target_elements: Mapping[int, str],
+) -> None:
+    """Reject ownership paths that change a target atom's element."""
+
+    molecule = Chem.MolFromSmiles(projected.node.smiles)
+    if molecule is None:
+        raise ValueError("projected route molecule could not be parsed")
+    for atom_index, target_map in projected.atom_ownership:
+        if atom_index >= molecule.GetNumAtoms():
+            raise ValueError("projected atom ownership index is out of range")
+        actual = molecule.GetAtomWithIdx(atom_index).GetSymbol()
+        expected = target_elements[target_map]
+        if actual != expected:
+            raise ValueError(
+                "route projection changes target element identity: "
+                f"{projected.node.occurrence_id}:atom-{atom_index}:"
+                f"map-{target_map}:{actual}!={expected}"
+            )
+    for child in projected.children:
+        _validate_projected_elements(child, target_elements)
+
+
 def _latent_state(
     tree_id: str,
     projected: _ProjectedOccurrence,
@@ -477,6 +517,7 @@ def _latent_state(
         target_atom_maps=target_maps,
         non_target_atoms=tuple(non_target),
         evidence_status="route_projected",
+        source_occurrence_id=projected.node.occurrence_id,
     )
 
 
@@ -501,6 +542,10 @@ def project_route_partitions(tree: ReactionRouteTree) -> RoutePartitionProjectio
     }
     unresolved: set[str] = set()
     projected_root = _project_occurrence(tree.root, root_ownership, unresolved)
+    _validate_projected_elements(
+        projected_root,
+        {reference.atom_map: reference.element for reference in target_atoms},
+    )
     evidence_level = "E4" if tree.route_kind == "observed" else "E3"
     source_kind = (
         "observed_route_frontier"

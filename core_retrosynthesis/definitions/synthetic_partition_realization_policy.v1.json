@@ -1,0 +1,26 @@
+{
+  "definition_id": "synthetic_partition_realization_policy.v1",
+  "schema_version": "1.0",
+  "search": {
+    "max_depth": 3,
+    "molecular_weight_threshold": 150.0,
+    "maximum_realizations": 5,
+    "route_candidate_limit": 20,
+    "per_step_top_k": 8,
+    "beam_width": 40,
+    "maximum_expansions": 200,
+    "maximum_templates_to_apply": 300,
+    "maximum_candidates_to_validate": 50
+  },
+  "matching": {
+    "partial_interface_coverage_threshold": 0.000001
+  },
+  "ranking": {
+    "status_order": [
+      "fully_realized",
+      "partially_realized",
+      "unrealized_but_plausible",
+      "contradicted"
+    ]
+  }
+}

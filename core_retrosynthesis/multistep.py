@@ -58,6 +58,38 @@ class LiteratureLookup(Protocol):
 
 
 @dataclass(frozen=True)
+class MultistepGuidanceState:
+    """Public, immutable search state exposed to optional route guidance."""
+
+    target_smiles: str
+    steps: tuple["RetrosynthesisRouteStep", ...]
+    leaves: tuple["StartingMaterialAssessment", ...]
+    max_depth: int
+
+
+class MultistepSearchGuidance(Protocol):
+    """Narrow hook for ordering the canonical bounded route search.
+
+    Guidance may change which already validated states are explored first.  It
+    cannot create candidates, bypass graph validation, or change terminal
+    decisions.
+    """
+
+    definition_id: str
+
+    def state_priority(
+        self,
+        state: MultistepGuidanceState,
+    ) -> tuple[Any, ...]: ...
+
+    def select_leaf(
+        self,
+        state: MultistepGuidanceState,
+        expandable_indices: tuple[int, ...],
+    ) -> int: ...
+
+
+@dataclass(frozen=True)
 class OneStepExpansionBatch:
     """Validated actions plus staged-expansion profiling."""
 
@@ -495,9 +527,51 @@ def _state_priority(
     )
 
 
+def _guidance_state(
+    target_smiles: str,
+    state: _RouteState,
+    max_depth: int,
+) -> MultistepGuidanceState:
+    return MultistepGuidanceState(
+        target_smiles=target_smiles,
+        steps=state.steps,
+        leaves=tuple(leaf.assessment for leaf in state.leaves),
+        max_depth=max_depth,
+    )
+
+
+def _guided_state_priority(
+    target_smiles: str,
+    state: _RouteState,
+    max_depth: int,
+    guidance: MultistepSearchGuidance | None,
+) -> tuple[Any, ...]:
+    base = _state_priority(state, max_depth)
+    if guidance is None:
+        return base
+    return (
+        tuple(guidance.state_priority(_guidance_state(target_smiles, state, max_depth))),
+        *base,
+    )
+
+
 def _select_leaf(
     expandable: tuple[tuple[int, _Leaf], ...],
+    *,
+    target_smiles: str,
+    state: _RouteState,
+    max_depth: int,
+    guidance: MultistepSearchGuidance | None,
 ) -> tuple[int, _Leaf]:
+    if guidance is not None:
+        selected = guidance.select_leaf(
+            _guidance_state(target_smiles, state, max_depth),
+            tuple(index for index, _ in expandable),
+        )
+        for index, leaf in expandable:
+            if index == selected:
+                return index, leaf
+        raise ValueError("search guidance selected a non-expandable leaf")
     return min(
         expandable,
         key=lambda item: (
@@ -943,11 +1017,12 @@ def plan_multistep_routes(
     route_action_policy: RouteActionPolicyModel | None = None,
     candidate_exclusions: tuple[RouteCandidateExclusion, ...] = (),
     expander: OneStepExpander | None = None,
+    search_guidance: MultistepSearchGuidance | None = None,
 ) -> MultistepRetrosynthesisResult:
     """Find short routes whose leaves pass the explicit terminal predicate."""
 
-    if max_depth not in {2, 3}:
-        raise ValueError("maximum route depth must be 2 or 3")
+    if max_depth < 1:
+        raise ValueError("maximum route depth must be positive")
     if molecular_weight_threshold <= 0:
         raise ValueError("molecular-weight threshold must be positive")
     for value, name in (
@@ -1033,7 +1108,19 @@ def plan_multistep_routes(
     initial = _RouteState(steps=(), leaves=(root,), cost=0.0)
     queue: list[tuple[tuple[Any, ...], int, _RouteState]] = []
     serial = 0
-    heapq.heappush(queue, (_state_priority(initial, max_depth), serial, initial))
+    heapq.heappush(
+        queue,
+        (
+            _guided_state_priority(
+                target.canonical_smiles,
+                initial,
+                max_depth,
+                search_guidance,
+            ),
+            serial,
+            initial,
+        ),
+    )
     best_paths_by_state = {
         _state_signature(initial): [(0.0, _route_history_signature(initial))]
     }
@@ -1084,7 +1171,13 @@ def plan_multistep_routes(
                 state,
             )
             continue
-        leaf_index, leaf = _select_leaf(expandable)
+        leaf_index, leaf = _select_leaf(
+            expandable,
+            target_smiles=target.canonical_smiles,
+            state=state,
+            max_depth=max_depth,
+            guidance=search_guidance,
+        )
         product = leaf.assessment.canonical_smiles
         candidates = expansion_cache.get(product)
         if candidates is None:
@@ -1314,7 +1407,16 @@ def plan_multistep_routes(
             serial += 1
             heapq.heappush(
                 queue,
-                (_state_priority(next_state, max_depth), serial, next_state),
+                (
+                    _guided_state_priority(
+                        target.canonical_smiles,
+                        next_state,
+                        max_depth,
+                        search_guidance,
+                    ),
+                    serial,
+                    next_state,
+                ),
             )
         if len(queue) > beam_width:
             queue_size_before_pruning = len(queue)
@@ -1485,10 +1587,12 @@ def plan_multistep_routes(
 __all__ = [
     "MULTISTEP_SCHEMA_VERSION",
     "LiteratureLookup",
+    "MultistepGuidanceState",
     "MultistepRouteEvidenceSummary",
     "MultistepRetrosynthesisResult",
     "MultistepRetrosynthesisRoute",
     "MultistepSearchDiagnostics",
+    "MultistepSearchGuidance",
     "OneStepExpansionBatch",
     "RetrosynthesisRouteStep",
     "StartingMaterialAssessment",

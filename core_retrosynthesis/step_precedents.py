@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any, TYPE_CHECKING
+from typing import Any, Iterable, TYPE_CHECKING
 
 from .chemistry import digest, maximum_similarity
 from .generic_models import GenericTemplateLibrary
@@ -37,6 +37,12 @@ class StepPrecedentMatch:
 
         return asdict(self)
 
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> "StepPrecedentMatch":
+        """Reconstruct one serialized precedent match."""
+
+        return cls(**{field: value[field] for field in cls.__dataclass_fields__})
+
 
 @dataclass(frozen=True)
 class StepPrecedentLookupResult:
@@ -57,41 +63,59 @@ class StepPrecedentLookupResult:
             "matches": [item.to_dict() for item in self.matches],
         }
 
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> "StepPrecedentLookupResult":
+        """Reconstruct one serialized step lookup."""
 
-def lookup_step_precedents(
-    step: "RetrosynthesisRouteStep",
-    library: GenericTemplateLibrary,
+        return cls(
+            step_id=str(value["step_id"]),
+            template_id=str(value["template_id"]),
+            operator_id=str(value["operator_id"]),
+            matches=tuple(
+                StepPrecedentMatch.from_dict(item)
+                for item in value.get("matches") or ()
+            ),
+            available_precedent_count=int(value["available_precedent_count"]),
+            schema_version=str(
+                value.get("schema_version") or STEP_PRECEDENT_LOOKUP_SCHEMA_VERSION
+            ),
+        )
+
+
+def lookup_reaction_precedents(
     *,
+    step_id: str,
+    template_id: str,
+    operator_id: str,
+    product_smiles: str,
+    precursor_smiles: str,
+    library: GenericTemplateLibrary,
+    admitted_reaction_ids: Iterable[str] = (),
     limit: int = 5,
 ) -> StepPrecedentLookupResult:
-    """Return only source precedents attached to the step's admitted template."""
+    """Look up admitted precedents from a persisted planned reaction node."""
 
     if limit < 1 or limit > 20:
         raise ValueError("step precedent limit must be between one and twenty")
     template = next(
-        (
-            item
-            for item in library.templates
-            if item.template_id == step.candidate.template_id
-        ),
+        (item for item in library.templates if item.template_id == template_id),
         None,
     )
     if template is None:
         raise ValueError("route step template is unavailable in the loaded library")
-    admitted_reaction_ids = set(step.candidate.precedent_reaction_ids)
+    if template.operator_id != operator_id:
+        raise ValueError("route step operator disagrees with its loaded template")
+    admitted = set(admitted_reaction_ids)
     precedents = tuple(
         item
         for item in template.precedents
-        if not admitted_reaction_ids or item.reaction_id in admitted_reaction_ids
+        if not admitted or item.reaction_id in admitted
     )
     ranked = sorted(
         (
             (
-                maximum_similarity(step.product_smiles, (item.product_smiles,)),
-                maximum_similarity(
-                    step.candidate.precursor_smiles,
-                    (item.precursor_smiles,),
-                ),
+                maximum_similarity(product_smiles, (item.product_smiles,)),
+                maximum_similarity(precursor_smiles, (item.precursor_smiles,)),
                 item,
             )
             for item in precedents
@@ -107,7 +131,7 @@ def lookup_step_precedents(
         StepPrecedentMatch(
             match_id=digest(
                 "SPREC1",
-                step.step_id,
+                step_id,
                 precedent.reaction_id,
                 precedent.reference_id,
                 precedent.mapped_reaction_smiles,
@@ -125,7 +149,7 @@ def lookup_step_precedents(
         for product_similarity, precursor_similarity, precedent in ranked[:limit]
     )
     return StepPrecedentLookupResult(
-        step_id=step.step_id,
+        step_id=step_id,
         template_id=template.template_id,
         operator_id=template.operator_id,
         matches=matches,
@@ -133,9 +157,30 @@ def lookup_step_precedents(
     )
 
 
+def lookup_step_precedents(
+    step: "RetrosynthesisRouteStep",
+    library: GenericTemplateLibrary,
+    *,
+    limit: int = 5,
+) -> StepPrecedentLookupResult:
+    """Return only source precedents attached to the step's admitted template."""
+
+    return lookup_reaction_precedents(
+        step_id=step.step_id,
+        template_id=step.candidate.template_id,
+        operator_id=step.candidate.operator_id,
+        product_smiles=step.product_smiles,
+        precursor_smiles=step.candidate.precursor_smiles,
+        library=library,
+        admitted_reaction_ids=step.candidate.precedent_reaction_ids,
+        limit=limit,
+    )
+
+
 __all__ = [
     "STEP_PRECEDENT_LOOKUP_SCHEMA_VERSION",
     "StepPrecedentLookupResult",
     "StepPrecedentMatch",
+    "lookup_reaction_precedents",
     "lookup_step_precedents",
 ]

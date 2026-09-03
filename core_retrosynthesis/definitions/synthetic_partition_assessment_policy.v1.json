@@ -1,0 +1,35 @@
+{
+  "definition_id": "synthetic_partition_assessment_policy.v1",
+  "schema_version": "1.0",
+  "precedent_similarity": {
+    "exact_product_minimum": 0.999999,
+    "exact_precursor_minimum": 0.999999,
+    "close_product_minimum": 0.65,
+    "close_precursor_minimum": 0.4
+  },
+  "precedent_evidence_levels": {
+    "exact": "E4",
+    "close": "E3",
+    "same_template": "E2",
+    "validated_operator_only": "E1",
+    "structurally_invalid": "E0"
+  },
+  "compatibility": {
+    "hard_incompatible_dispositions": ["reject"],
+    "caution_dispositions": ["warn", "demote"]
+  },
+  "latent_atom_classifications": [
+    "TACTICAL_HANDLE",
+    "PROTECTING_GROUP",
+    "AUXILIARY",
+    "COUNTERION_OR_SALT",
+    "UNKNOWN"
+  ],
+  "review_status_order": [
+    "supported",
+    "supported_with_cautions",
+    "insufficient_evidence",
+    "hard_incompatible"
+  ],
+  "ranking_influence": "none_review_only"
+}

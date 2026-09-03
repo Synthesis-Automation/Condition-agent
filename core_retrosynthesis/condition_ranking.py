@@ -77,6 +77,55 @@ class RetrosynthesisConditionEvidence:
 
         return asdict(self)
 
+    @classmethod
+    def from_dict(
+        cls,
+        value: Dict[str, Any],
+    ) -> "RetrosynthesisConditionEvidence":
+        """Reconstruct serialized condition evidence."""
+
+        return cls(
+            status=value["status"],
+            query_reaction_smiles=str(value["query_reaction_smiles"]),
+            recommender_valid=bool(value["recommender_valid"]),
+            recommendation_mode=str(value["recommendation_mode"]),
+            retrieval_level=(
+                str(value["retrieval_level"])
+                if value.get("retrieval_level") is not None
+                else None
+            ),
+            uses_type_agnostic_fallback=bool(
+                value["uses_type_agnostic_fallback"]
+            ),
+            candidate_count=int(value["candidate_count"]),
+            independent_candidate_count=int(
+                value["independent_candidate_count"]
+            ),
+            compatible_candidate_count=int(value["compatible_candidate_count"]),
+            independent_compatible_candidate_count=int(
+                value["independent_compatible_candidate_count"]
+            ),
+            excluded_candidate_count=int(value["excluded_candidate_count"]),
+            best_recipe_score=(
+                float(value["best_recipe_score"])
+                if value.get("best_recipe_score") is not None
+                else None
+            ),
+            best_recipe_compatibility_score=(
+                float(value["best_recipe_compatibility_score"])
+                if value.get("best_recipe_compatibility_score") is not None
+                else None
+            ),
+            best_recipe_reference_support=int(
+                value["best_recipe_reference_support"]
+            ),
+            recommendations=tuple(
+                dict(item) for item in value.get("recommendations") or ()
+            ),
+            warnings=tuple(str(item) for item in value.get("warnings") or ()),
+            error=str(value["error"]) if value.get("error") is not None else None,
+        )
+
 
 @dataclass(frozen=True)
 class ConditionRankedRetrosynthesisCandidate:

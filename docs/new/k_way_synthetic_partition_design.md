@@ -1,6 +1,6 @@
 ---
 title: "General Synthetic Partition Landscape and Strategic Route Realization"
-version: "0.2"
+version: "0.4"
 status: "Design and implementation plan"
 encoding: "UTF-8"
 ---
@@ -625,18 +625,26 @@ partition work begins as a review-only projection and must not alter production
 ranking until the existing baseline, blind review, disagreement resolution, and
 untouched evaluation gates are complete.
 
-### Current status — 2026-09-01
+### Current status — 2026-09-02
 
 | Phase | Status | Implementation |
 | --- | --- | --- |
 | Phase 0 | Complete | The pre-implementation commit, runtime, contract versions, panel hashes, and 1,193-test baseline are frozen in `synthetic_partition_phase0_baseline.v1.json`. |
 | Phase 1 | Implemented, review-only | Immutable role-neutral contracts, deterministic identities, mapped reaction projection, route-frontier projection, latent states, JSON round trips, and static HTML review. |
 | Phase 2 | Implemented, review-only | Validated-operator partition seeds, tactical-variant clustering, bounded interface combinations, evidence tiers, diversity limits, and explicit abstention. |
-| Phase 3 | Not started | Partition-constrained multistep realization remains separate from the Phase 2 landscape. |
+| Phase 3 | Implemented, review-only | The canonical bounded multistep planner now accepts role-neutral search guidance; selected partitions are matched against every projected route frontier with explicit full, partial, unrealized, and contradicted outcomes. |
+| Phase 4 | Implemented, review-only; human gate pending | Persisted route reactions receive admitted structure-backed precedents, optional canonical condition evidence, compatibility cautions, latent-atom burden, weakest-link assessment, static review output, and separately blinded review cases and answer keys. Calibration remains blocked on completed chemist review. |
 
 Phase 2 combinations show that independently supported interfaces induce a
 target partition. They are labeled `operator_combination_unrealized` and do not
 claim that the interfaces coexist in one route.
+
+Phase 3 does not convert that label into a route by assertion. It searches only
+existing forward-validated operator actions, projects target-atom ownership
+through the resulting canonical route tree, and promotes a partition to
+`fully_realized` only when a solved route exactly exposes its modules and covers
+every requested interface. Search exhaustion and missing operator coverage are
+reported separately.
 
 ### Phase 0 — Freeze scope and baseline
 
@@ -686,6 +694,53 @@ fragmentation and without treating heuristic seams as reactions.
 Exit criterion: fully realized results round-trip through validated physical
 steps; partial and contradicted results cannot be confused with them.
 
+Implemented contracts and entry points:
+
+```text
+core_retrosynthesis/partition_realization.py
+  PartitionRealizationConfig
+  PartitionFrontierMatch
+  InterfaceRealization
+  RealizationEvidenceSummary
+  StrategicRouteRealization
+  PartitionRealizationResult
+  realize_synthetic_partition(...)
+
+core_retrosynthesis/definitions/
+  synthetic_partition_realization_policy.v1.json
+```
+
+The guidance hook changes only state and frontier-component ordering. Candidate
+generation, forward-signature validation, terminal decisions, cycle rejection,
+route costs, and the canonical `ReactionRouteTree` remain owned by the existing
+multistep planner. Frontier priority uses unresolved desired boundaries and
+atom-weighted module agreement; it never assigns a privileged core module.
+
+The CLI realizes one partition selected from a serialized landscape:
+
+```powershell
+python -m core_retrosynthesis realize-partition `
+  OPERATOR_LIBRARY STOCK_INDEX LANDSCAPE_JSON PARTITION_ID OUTPUT_JSON `
+  --max-depth 3 --max-expansions 200
+```
+
+The output retains the best matched frontier, latent module states, per-interface
+route evidence, forward dependency edges, whole-route verification status,
+search diagnostics, and the exact bounded-search configuration.
+
+The first real-library pilot used the four-way `2 + 10 + 7 + 4` view of
+`COC(=O)[C@H](c1ccccc1Cl)N1CCC(S)C(=CC(=O)O)C1`. Within a 12-state,
+depth-three bound, the planner exactly exposed all four requested modules and
+all three interfaces with validated operators. It returned
+`partially_realized`, not `fully_realized`, because one leaf remained
+nonterminal at the depth bound. The serialized audit is
+`results/core_retrosynthesis/synthetic_partition/worked_example_phase3.v1.json`.
+
+That pilot also exposed and fixed an atom-ownership defect: component atom
+indices were retained across canonical SMILES serialization. Projection now
+rebuilds ownership indices from the serialized mapped component and rejects
+every route path that changes the element identity of a target atom.
+
 ### Phase 4 — Precedent, conditions, and review
 
 1. Retrieve structure-backed precedents for every realized interface.
@@ -696,6 +751,95 @@ steps; partial and contradicted results cannot be confused with them.
 
 Exit criterion: reviewed evidence supports the displayed ordering and no hard-
 incompatible realization is promoted.
+
+Implemented contracts and entry points:
+
+```text
+core_retrosynthesis/partition_assessment.py
+  PartitionStepAssessment
+  PartitionInterfaceAssessment
+  PartitionRouteAssessment
+  PartitionAssessmentResult
+  assess_partition_realizations(...)
+
+core_retrosynthesis/partition_assessment_review.py
+  render_partition_assessment_html(...)
+  build_partition_blind_review_packet(...)
+  write_partition_blind_review_packet(...)
+
+core_retrosynthesis/definitions/
+  synthetic_partition_assessment_policy.v1.json
+```
+
+Phase 4 consumes the serialized Phase 3 `ReactionRouteTree`, not transient
+planner objects. For every reaction occurrence it rechecks agreement among the
+reaction graph, product occurrence, precursor occurrences, planned operator,
+template, and loaded library. Only a structurally valid occurrence may be sent
+to the condition recommender.
+
+Precedent transfer is categorical and inspectable:
+
+```text
+E4  exact product and precursor structure in an admitted template precedent
+E3  same template with policy-defined close product and precursor similarity
+E2  admitted same-template precedent with broader structural transfer
+E1  validated operator but no admitted precedent match
+E0  structurally invalid persisted step
+```
+
+The assessment also reruns graph-derived precursor and reaction-regime
+compatibility checks, aggregates step evidence back to every requested
+interface, counts explicit `PROTECTING_GROUP` and `AUXILIARY` atoms, reports
+unclassified latent atoms separately, and identifies the weakest step and
+interface. It does not infer protecting groups from names or silently treat
+`UNKNOWN` atoms as protection burden.
+
+Assessment statuses are `supported`, `supported_with_cautions`,
+`insufficient_evidence`, and `hard_incompatible`. These do not replace or
+promote the Phase 3 realization status. The definition fixes
+`ranking_influence` to `none_review_only`, and hard structural or compatibility
+failures receive `HARD_INCOMPATIBLE_ROUTE_NOT_PROMOTABLE`.
+
+The CLI writes a self-contained evidence JSON and HTML review:
+
+```powershell
+python -m core_retrosynthesis assess-partition `
+  OPERATOR_LIBRARY PHASE3_JSON PHASE4_JSON PHASE4_HTML `
+  --condition-index GENERIC_CONDITION_INDEX.sqlite `
+  --blind-review-packet BLIND_PACKET.json `
+  --blind-answer-key ANSWER_KEY.json
+```
+
+Blind cases omit source kind, system status, realization rank, and weakest-link
+answer. Those fields are written only to the separate answer key. A packet
+explicitly warns when it lacks a negative control or abstention case; it does
+not manufacture controls to satisfy a quota.
+
+The four-way worked-example pilot produced three
+`supported_with_cautions` assessments while retaining their original
+`partially_realized` status and order. All four reaction occurrences in each
+route passed persisted graph/template validation and had admitted E2
+same-template precedents, with two to five independent references among the
+displayed top matches. No protection or auxiliary atom was asserted, while
+three latent atoms remained explicitly `UNKNOWN` in the leading route.
+
+Condition evidence is deliberately absent from this pilot. The available old
+JSON condition index is no longer a supported runtime format, and its historic
+shard manifest does not pass current integrity validation for rebuilding. The
+system therefore reports `CONDITION_EVIDENCE_NOT_REQUESTED`; it does not use
+stale evidence or downgrade structural validity. The review artifacts are:
+
+```text
+results/core_retrosynthesis/synthetic_partition/worked_example_phase4.v1.json
+results/core_retrosynthesis/synthetic_partition/worked_example_phase4.v1.html
+results/core_retrosynthesis/synthetic_partition/worked_example_phase4_blind_packet.v1.json
+results/core_retrosynthesis/synthetic_partition/worked_example_phase4_answer_key.v1.json
+```
+
+Because this single pilot contains only partial-route abstentions, its blind
+packet correctly reports `NO_NEGATIVE_CONTROL_PRESENT`. The Phase 4 software is
+implemented, but the phase exit criterion remains open until a mixed fixed
+panel is reviewed and development/validation-only calibration is completed.
 
 ### Phase 5 — Optional strategic proposal layer
 

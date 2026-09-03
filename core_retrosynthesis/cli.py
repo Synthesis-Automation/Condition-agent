@@ -14,7 +14,10 @@ from cas_tools import open_stock_lookup
 from .baselines.cx_rdchiral import load_library as load_baseline_library
 
 from .comparison import run_comparison
-from .condition_ranking import rank_retrosynthesis_candidates_with_conditions
+from .condition_ranking import (
+    rank_retrosynthesis_candidates_with_conditions,
+    recommend_retrosynthesis_conditions,
+)
 from .coupled_route_strategy import (
     mine_coupled_route_strategy_poc,
     write_coupled_route_strategy_report,
@@ -57,7 +60,18 @@ from .html_report import DEFAULT_METHODS, write_comparison_html
 from .library import build_library, load_library, save_library
 from .multistep import plan_multistep_routes
 from .partition_landscape import build_operator_partition_landscape
+from .partition_assessment import assess_partition_realizations
+from .partition_assessment_review import (
+    write_partition_assessment_review,
+    write_partition_blind_review_packet,
+)
+from .partition_realization import (
+    PartitionRealizationConfig,
+    PartitionRealizationResult,
+    realize_synthetic_partition,
+)
 from .partition_review import write_partition_landscape_review
+from .synthetic_partition import SyntheticPartitionLandscape
 from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
@@ -446,6 +460,69 @@ def _parser() -> argparse.ArgumentParser:
         "--no-hierarchical-ranking",
         action="store_true",
     )
+
+    partition_realization = commands.add_parser(
+        "realize-partition",
+        help="search validated routes for one partition from a landscape",
+    )
+    partition_realization.add_argument("library")
+    partition_realization.add_argument("stock_index")
+    partition_realization.add_argument("landscape_json")
+    partition_realization.add_argument("partition_id")
+    partition_realization.add_argument("output_json")
+    partition_realization.add_argument(
+        "--max-depth",
+        type=int,
+        choices=tuple(range(1, 7)),
+        default=3,
+    )
+    partition_realization.add_argument(
+        "--molecular-weight-threshold",
+        type=float,
+        default=150.0,
+    )
+    partition_realization.add_argument("--maximum-realizations", type=int, default=5)
+    partition_realization.add_argument("--route-candidate-limit", type=int, default=20)
+    partition_realization.add_argument("--per-step-top-k", type=int, default=8)
+    partition_realization.add_argument("--beam-width", type=int, default=40)
+    partition_realization.add_argument("--max-expansions", type=int, default=200)
+    partition_realization.add_argument("--max-templates", type=int, default=300)
+    partition_realization.add_argument(
+        "--max-candidates-to-validate",
+        type=int,
+        default=50,
+    )
+    partition_realization.add_argument("--no-context", action="store_true")
+    partition_realization.add_argument("--skip-l0", action="store_true")
+    partition_realization.add_argument("--no-diversity", action="store_true")
+    partition_realization.add_argument(
+        "--no-hierarchical-ranking",
+        action="store_true",
+    )
+    partition_realization.add_argument(
+        "--route-action-policy",
+        help="optional learned policy over already validated route actions",
+    )
+
+    partition_assessment = commands.add_parser(
+        "assess-partition",
+        help="attach review-only precedent, condition, and feasibility evidence",
+    )
+    partition_assessment.add_argument("library")
+    partition_assessment.add_argument("realization_json")
+    partition_assessment.add_argument("output_json")
+    partition_assessment.add_argument("output_html")
+    partition_assessment.add_argument("--precedent-limit", type=int, default=5)
+    partition_assessment.add_argument("--condition-index")
+    partition_assessment.add_argument("--condition-top-k", type=int, default=3)
+    partition_assessment.add_argument("--condition-minimum-pool-size", type=int)
+    partition_assessment.add_argument(
+        "--condition-unrestricted-fallback",
+        action="store_true",
+    )
+    partition_assessment.add_argument("--blind-review-packet")
+    partition_assessment.add_argument("--blind-answer-key")
+    partition_assessment.add_argument("--review-seed", type=int, default=47)
 
     route_search = commands.add_parser(
         "plan-routes",
@@ -1394,6 +1471,138 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     "candidate_count": len(candidates),
                     "partition_count": len(landscape.partitions),
                     "abstained": landscape.abstained,
+                    "output_json": str(Path(arguments.output_json).resolve()),
+                    "output_html": str(Path(arguments.output_html).resolve()),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if arguments.command == "realize-partition":
+        landscape_value = json.loads(
+            Path(arguments.landscape_json).read_text(encoding="utf-8")
+        )
+        landscape = SyntheticPartitionLandscape.from_dict(landscape_value)
+        selected = next(
+            (
+                partition
+                for partition in landscape.partitions
+                if partition.partition_id == arguments.partition_id
+            ),
+            None,
+        )
+        if selected is None:
+            raise ValueError("partition ID is not present in the landscape")
+        config = PartitionRealizationConfig(
+            max_depth=arguments.max_depth,
+            molecular_weight_threshold=arguments.molecular_weight_threshold,
+            maximum_realizations=arguments.maximum_realizations,
+            route_candidate_limit=arguments.route_candidate_limit,
+            per_step_top_k=arguments.per_step_top_k,
+            beam_width=arguments.beam_width,
+            maximum_expansions=arguments.max_expansions,
+            maximum_templates_to_apply=arguments.max_templates,
+            maximum_candidates_to_validate=(
+                arguments.max_candidates_to_validate
+            ),
+            use_context=not arguments.no_context,
+            include_l0=not arguments.skip_l0,
+            diversify=not arguments.no_diversity,
+            use_hierarchical_ranking=not arguments.no_hierarchical_ranking,
+        )
+        loaded_library = load_generic_library(arguments.library)
+        with open_stock_lookup(arguments.stock_index) as stock_index:
+            result = realize_synthetic_partition(
+                selected,
+                loaded_library,
+                stock_index,
+                config=config,
+                route_action_policy=(
+                    load_route_action_policy(arguments.route_action_policy)
+                    if arguments.route_action_policy
+                    else None
+                ),
+            )
+        output_path = Path(arguments.output_json)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(
+            json.dumps(result.to_dict(), indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+        print(
+            json.dumps(
+                {
+                    "partition_id": selected.partition_id,
+                    "status": result.status,
+                    "realization_count": len(result.realizations),
+                    "fully_realized_count": (
+                        result.diagnostics.fully_realized_count
+                    ),
+                    "output_json": str(output_path.resolve()),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if arguments.command == "assess-partition":
+        if bool(arguments.blind_review_packet) != bool(arguments.blind_answer_key):
+            raise ValueError(
+                "blind review packet and answer key paths must be provided together"
+            )
+        realization_value = json.loads(
+            Path(arguments.realization_json).read_text(encoding="utf-8")
+        )
+        realization = PartitionRealizationResult.from_dict(realization_value)
+        loaded_library = load_generic_library(arguments.library)
+        condition_evaluator = None
+        if arguments.condition_index:
+            from condition_recommender import GenericConditionRecommender
+
+            recommender = GenericConditionRecommender.from_path(
+                arguments.condition_index,
+                include_review=arguments.condition_unrestricted_fallback,
+            )
+
+            def condition_evaluator(reaction_smiles: str):
+                return recommend_retrosynthesis_conditions(
+                    reaction_smiles,
+                    recommender,
+                    condition_top_k=arguments.condition_top_k,
+                    minimum_pool_size=arguments.condition_minimum_pool_size,
+                    unrestricted_fallback=(
+                        arguments.condition_unrestricted_fallback
+                    ),
+                )
+
+        assessment = assess_partition_realizations(
+            realization,
+            loaded_library,
+            condition_evaluator=condition_evaluator,
+            precedent_limit=arguments.precedent_limit,
+        )
+        write_partition_assessment_review(
+            assessment,
+            arguments.output_json,
+            arguments.output_html,
+        )
+        if arguments.blind_review_packet:
+            write_partition_blind_review_packet(
+                (assessment,),
+                arguments.blind_review_packet,
+                arguments.blind_answer_key,
+                seed=arguments.review_seed,
+            )
+        print(
+            json.dumps(
+                {
+                    "partition_id": realization.partition.partition_id,
+                    "status": assessment.status,
+                    "route_assessment_count": len(assessment.route_assessments),
+                    "ranking_influence": assessment.ranking_influence,
                     "output_json": str(Path(arguments.output_json).resolve()),
                     "output_html": str(Path(arguments.output_html).resolve()),
                 },
