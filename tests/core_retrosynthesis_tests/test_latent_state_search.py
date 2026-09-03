@@ -11,12 +11,15 @@ from core_retrosynthesis import (
     GenericDisconnectionCandidate,
     LATENT_STATE_ROUTE_SEARCH_DEFINITION_PATH,
     LatentStateActionSelector,
+    PORTFOLIO_CONTINUATION_DEFINITION_PATH,
     PartitionRealizationConfig,
     classify_route_action,
     load_latent_state_route_search_policy,
+    load_portfolio_continuation_policy,
     plan_multistep_routes,
     select_latent_state_action_portfolio,
     validate_latent_state_route_search_policy,
+    validate_portfolio_continuation_policy,
 )
 
 from .test_multistep import _LiteratureIndex, _candidate
@@ -70,6 +73,20 @@ def test_latent_state_policy_is_validated_and_review_only() -> None:
         raise AssertionError("ranking-active policy must be rejected")
 
 
+def test_portfolio_continuation_policy_is_bounded_and_review_only() -> None:
+    raw = json.loads(
+        PORTFOLIO_CONTINUATION_DEFINITION_PATH.read_text(encoding="utf-8")
+    )
+
+    validate_portfolio_continuation_policy(raw)
+    policy = load_portfolio_continuation_policy()
+    assert policy.minimum_expansions_per_first_action == 2
+    assert policy.maximum_active_first_actions == 4
+    raw["maximum_active_first_actions"] = 17
+    with pytest.raises(ValueError, match="review bound"):
+        validate_portfolio_continuation_policy(raw)
+
+
 def test_route_actions_are_classified_from_mapped_target_atom_distribution() -> None:
     assert classify_route_action(CONVERGENT).action_class == "convergent_assembly"
     assert classify_route_action(SINGLE_CARRIER).action_class == (
@@ -114,6 +131,9 @@ def test_multistep_selector_requests_wider_pool_then_keeps_bounded_actions() -> 
     class _Selector:
         definition_id = "test_selector.v1"
         candidate_pool_multiplier = 3
+        continuation_definition_id = "test_continuation.v1"
+        minimum_expansions_per_first_action = 1
+        maximum_active_first_actions = 2
 
         def __call__(self, product_smiles, candidates, top_k):
             assert product_smiles == "CCCCCCCC"
@@ -121,6 +141,12 @@ def test_multistep_selector_requests_wider_pool_then_keeps_bounded_actions() -> 
             return candidates[-1:]
 
         def state_diversity_key(self, state):
+            return "selected"
+
+        def continuation_lane_key(self, state):
+            return state.steps[0].step_id if state.steps else "root"
+
+        def continuation_lane_class(self, state):
             return "selected"
 
         def select_routes(self, routes, limit):
@@ -166,12 +192,21 @@ def test_multistep_selector_cannot_inject_an_unvalidated_action() -> None:
     class _InjectingSelector:
         definition_id = "invalid_selector.v1"
         candidate_pool_multiplier = 1
+        continuation_definition_id = "test_continuation.v1"
+        minimum_expansions_per_first_action = 1
+        maximum_active_first_actions = 1
 
         def __call__(self, product_smiles, candidates, top_k):
             del product_smiles, top_k
             return (replace(candidates[0], template_id="injected"),)
 
         def state_diversity_key(self, state):
+            return "injected"
+
+        def continuation_lane_key(self, state):
+            return state.steps[0].step_id if state.steps else "root"
+
+        def continuation_lane_class(self, state):
             return "injected"
 
         def select_routes(self, routes, limit):
@@ -186,3 +221,41 @@ def test_multistep_selector_cannot_inject_an_unvalidated_action() -> None:
             expander=lambda product, top_k: (candidate,),
             route_action_selector=_InjectingSelector(),
         )
+
+
+def test_portfolio_continuation_expands_each_retained_first_action_lane() -> None:
+    first_a = _candidate("CCCCCCCCCCCC", "C.CCCCCCCCCC")
+    first_b = _candidate("CCCCCCCCCCCC", "C.CCCCCCCCN")
+    expansions = {
+        "CCCCCCCCCCCC": (first_a, first_b),
+        "CCCCCCCCCC": (_candidate("CCCCCCCCCC", "C.CCCCCCCC"),),
+        "CCCCCCCCN": (_candidate("CCCCCCCCN", "C.CCCCCCN"),),
+    }
+    calls = []
+
+    def expand(product: str, top_k: int):
+        calls.append(product)
+        return expansions.get(product, ())[:top_k]
+
+    result = plan_multistep_routes(
+        "CCCCCCCCCCCC",
+        object(),
+        _LiteratureIndex(),
+        max_depth=3,
+        molecular_weight_threshold=50.0,
+        per_step_top_k=2,
+        max_expansions=5,
+        expander=expand,
+        route_action_selector=LatentStateActionSelector(),
+    )
+
+    assert calls[0] == "CCCCCCCCCCCC"
+    assert calls.count("CCCCCCCCCC") == 1
+    assert calls.count("CCCCCCCCN") == 1
+    assert result.diagnostics.continuation_active_lane_count == 2
+    assert result.diagnostics.continuation_quota_selected_states == 4
+    assert result.diagnostics.continuation_lanes_reaching_minimum == 2
+    assert {
+        count
+        for _, _, count in result.diagnostics.continuation_lane_expansions
+    } == {2}

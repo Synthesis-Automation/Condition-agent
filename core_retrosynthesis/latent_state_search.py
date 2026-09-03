@@ -15,7 +15,12 @@ from typing import Any, Iterable, Mapping, Protocol, Sequence, TypeVar
 
 from rdkit import Chem
 
+from .chemistry import digest
 from .generic_models import GenericDisconnectionCandidate
+from .portfolio_continuation import (
+    PortfolioContinuationPolicy,
+    load_portfolio_continuation_policy,
+)
 
 
 LATENT_STATE_ROUTE_SEARCH_DEFINITION_PATH = (
@@ -71,11 +76,25 @@ class LatentStateActionSelector:
     """Planner hook retaining distinct validated action classes per product."""
 
     def __init__(
-        self, policy: LatentStateRouteSearchPolicy | None = None
+        self,
+        policy: LatentStateRouteSearchPolicy | None = None,
+        continuation_policy: PortfolioContinuationPolicy | None = None,
     ) -> None:
         self.policy = policy or load_latent_state_route_search_policy()
+        self.continuation_policy = (
+            continuation_policy or load_portfolio_continuation_policy()
+        )
         self.definition_id = self.policy.definition_id
         self.candidate_pool_multiplier = self.policy.candidate_pool_multiplier
+        self.continuation_definition_id = (
+            self.continuation_policy.definition_id
+        )
+        self.minimum_expansions_per_first_action = (
+            self.continuation_policy.minimum_expansions_per_first_action
+        )
+        self.maximum_active_first_actions = (
+            self.continuation_policy.maximum_active_first_actions
+        )
 
     def __call__(
         self,
@@ -91,15 +110,19 @@ class LatentStateActionSelector:
         )
 
     def state_diversity_key(self, state: Any) -> str:
-        """Return the target-forming action class for a planner state."""
+        """Return the distinct target-forming action lane for a state."""
 
-        if not state.steps:
-            return "unclassified"
-        first = min(state.steps, key=lambda step: (step.depth, step.step_id))
-        return classify_route_action(
-            first.candidate,
-            policy=self.policy,
-        ).action_class
+        return first_route_action_lane_id(state)
+
+    def continuation_lane_key(self, state: Any) -> str:
+        """Return the first-action identity used for fair continuation."""
+
+        return first_route_action_lane_id(state)
+
+    def continuation_lane_class(self, state: Any) -> str:
+        """Return the graph-derived route shape for continuation diagnostics."""
+
+        return first_route_action_class(state, policy=self.policy)
 
     def select_routes(
         self,
@@ -337,6 +360,20 @@ def first_route_action_class(
     return classify_route_action(first.candidate, policy=policy).action_class
 
 
+def first_route_action_lane_id(route: RouteLike) -> str:
+    """Return a stable identity for a route's distinct first reverse action."""
+
+    if not route.steps:
+        return "root"
+    first = min(route.steps, key=lambda step: (step.depth, step.step_id))
+    return digest(
+        "ROUTELANE1",
+        first.candidate.proposed_reaction_smiles,
+        first.candidate.operator_id,
+        first.candidate.disconnection_site_key,
+    )
+
+
 def select_route_class_portfolio(
     routes: Iterable[_RouteValue],
     *,
@@ -397,6 +434,7 @@ __all__ = [
     "RouteActionClassification",
     "classify_route_action",
     "first_route_action_class",
+    "first_route_action_lane_id",
     "load_latent_state_route_search_policy",
     "select_latent_state_action_portfolio",
     "select_route_class_portfolio",

@@ -514,8 +514,8 @@ def _parser() -> argparse.ArgumentParser:
         "--latent-state-portfolio",
         action="store_true",
         help=(
-            "retain review-only route diversity across convergent, "
-            "single-carrier, unary, and ring action classes"
+            "retain and fairly continue review-only route diversity across "
+            "convergent, single-carrier, unary, and ring action classes"
         ),
     )
 

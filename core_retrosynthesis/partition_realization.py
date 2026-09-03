@@ -21,6 +21,11 @@ from .latent_state_search import (
     LatentStateActionSelector,
     LatentStateRouteSearchPolicy,
     classify_route_action,
+    first_route_action_lane_id,
+)
+from .latent_transition import (
+    LatentRealizationGraph,
+    build_latent_realization_graph,
 )
 from .multistep import (
     ConditionEvidenceEvaluator,
@@ -262,6 +267,10 @@ class RealizationEvidenceSummary:
     forward_order_exists: bool
     terminal_leaf_count: int
     unresolved_leaf_count: int
+    latent_state_count: int = 0
+    latent_transition_count: int = 0
+    forward_stage_count: int = 0
+    parallel_forward_stage_count: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible evidence summary."""
@@ -272,7 +281,13 @@ class RealizationEvidenceSummary:
     def from_dict(cls, value: Mapping[str, Any]) -> "RealizationEvidenceSummary":
         """Reconstruct a realization evidence summary."""
 
-        return cls(**{field: value[field] for field in cls.__dataclass_fields__})
+        return cls(
+            **{
+                field: value[field]
+                for field in cls.__dataclass_fields__
+                if field in value
+            }
+        )
 
 
 @dataclass(frozen=True)
@@ -295,7 +310,10 @@ class StrategicRouteRealization:
     verification_status: str
     warnings: tuple[str, ...]
     first_action_class: str = "unclassified"
+    first_action_lane_id: str = "root"
+    continuation_expansion_count: int = 0
     latent_state_transition_count: int = 0
+    latent_realization_graph: LatentRealizationGraph | None = None
     schema_version: str = PARTITION_REALIZATION_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -328,7 +346,14 @@ class StrategicRouteRealization:
             "verification_status": self.verification_status,
             "warnings": list(self.warnings),
             "first_action_class": self.first_action_class,
+            "first_action_lane_id": self.first_action_lane_id,
+            "continuation_expansion_count": self.continuation_expansion_count,
             "latent_state_transition_count": self.latent_state_transition_count,
+            "latent_realization_graph": (
+                self.latent_realization_graph.to_dict()
+                if self.latent_realization_graph is not None
+                else None
+            ),
             "schema_version": self.schema_version,
         }
 
@@ -366,8 +391,21 @@ class StrategicRouteRealization:
             first_action_class=str(
                 value.get("first_action_class") or "unclassified"
             ),
+            first_action_lane_id=str(
+                value.get("first_action_lane_id") or "root"
+            ),
+            continuation_expansion_count=int(
+                value.get("continuation_expansion_count") or 0
+            ),
             latent_state_transition_count=int(
                 value.get("latent_state_transition_count") or 0
+            ),
+            latent_realization_graph=(
+                LatentRealizationGraph.from_dict(
+                    value["latent_realization_graph"]
+                )
+                if isinstance(value.get("latent_realization_graph"), Mapping)
+                else None
             ),
             schema_version=str(
                 value.get("schema_version") or PARTITION_REALIZATION_SCHEMA_VERSION
@@ -397,6 +435,11 @@ class PartitionRealizationDiagnostics:
     route_action_selected_candidates: int = 0
     beam_diversity_retained_states: int = 0
     first_action_class_counts: tuple[tuple[str, int], ...] = ()
+    continuation_policy_definition_id: str | None = None
+    continuation_active_lane_count: int = 0
+    continuation_quota_selected_states: int = 0
+    continuation_lanes_reaching_minimum: int = 0
+    continuation_lane_expansions: tuple[tuple[str, str, int], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -966,6 +1009,7 @@ def _route_realization(
     route: MultistepRetrosynthesisRoute,
     projection: RoutePartitionProjection,
     policy: PartitionRealizationPolicy,
+    continuation_expansions: Mapping[str, int] | None = None,
 ) -> StrategicRouteRealization:
     best_match, best_frontier = _best_frontier_match(partition, projection)
     interface_values = tuple(
@@ -1037,6 +1081,16 @@ def _route_realization(
         if route.steps
         else "unclassified"
     )
+    first_action_lane_id = first_route_action_lane_id(route)
+    latent_graph = build_latent_realization_graph(
+        route.route_tree,
+        projection,
+        partition,
+        action_classes={
+            step.step_id: classify_route_action(step.candidate).action_class
+            for step in route.steps
+        },
+    )
     summary = RealizationEvidenceSummary(
         requested_interface_count=len(interface_values),
         realized_interface_count=realized_count,
@@ -1053,6 +1107,13 @@ def _route_realization(
         forward_order_exists=dependency_valid,
         terminal_leaf_count=sum(leaf.terminal for leaf in route.leaves),
         unresolved_leaf_count=sum(not leaf.terminal for leaf in route.leaves),
+        latent_state_count=len(latent_graph.states),
+        latent_transition_count=len(latent_graph.transitions),
+        forward_stage_count=len(latent_graph.forward_stages),
+        parallel_forward_stage_count=sum(
+            len(stage.transition_ids) > 1
+            for stage in latent_graph.forward_stages
+        ),
     )
     realization_id = digest(
         "SPREAL1",
@@ -1079,11 +1140,16 @@ def _route_realization(
         verification_status=verification.status,
         warnings=tuple(sorted(warnings)),
         first_action_class=first_action_class,
+        first_action_lane_id=first_action_lane_id,
+        continuation_expansion_count=(
+            (continuation_expansions or {}).get(first_action_lane_id, 0)
+        ),
         latent_state_transition_count=sum(
             action_class
             in {"single_carrier_installation", "unary_state_change"}
             for action_class in action_classes
         ),
+        latent_realization_graph=latent_graph,
     )
 
 
@@ -1205,11 +1271,21 @@ def realize_synthetic_partition(
     }
     realized_values = []
     projection_failures = 0
+    continuation_expansions = {
+        lane: count
+        for lane, _, count in search.diagnostics.continuation_lane_expansions
+    }
     for route in route_by_id.values():
         try:
             projection = project_route_partitions(route.route_tree)
             realized_values.append(
-                _route_realization(partition, route, projection, policy)
+                _route_realization(
+                    partition,
+                    route,
+                    projection,
+                    policy,
+                    continuation_expansions,
+                )
             )
         except ValueError:
             projection_failures += 1
@@ -1285,6 +1361,21 @@ def realize_synthetic_partition(
             search.diagnostics.beam_diversity_retained_states
         ),
         first_action_class_counts=tuple(sorted(action_class_counts.items())),
+        continuation_policy_definition_id=(
+            search.diagnostics.continuation_policy_definition_id
+        ),
+        continuation_active_lane_count=(
+            search.diagnostics.continuation_active_lane_count
+        ),
+        continuation_quota_selected_states=(
+            search.diagnostics.continuation_quota_selected_states
+        ),
+        continuation_lanes_reaching_minimum=(
+            search.diagnostics.continuation_lanes_reaching_minimum
+        ),
+        continuation_lane_expansions=(
+            search.diagnostics.continuation_lane_expansions
+        ),
     )
     return PartitionRealizationResult(
         target_smiles=canonical,

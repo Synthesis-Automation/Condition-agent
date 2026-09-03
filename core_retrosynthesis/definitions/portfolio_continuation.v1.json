@@ -1,0 +1,8 @@
+{
+  "definition_id": "portfolio_continuation.v1",
+  "schema_version": "1.0",
+  "minimum_expansions_per_first_action": 2,
+  "maximum_active_first_actions": 4,
+  "scheduling_mode": "least_expanded_lane_then_state_priority",
+  "ranking_influence": "review_only_opt_in"
+}

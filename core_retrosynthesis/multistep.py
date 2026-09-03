@@ -99,6 +99,9 @@ class RouteActionSelector(Protocol):
 
     definition_id: str
     candidate_pool_multiplier: int
+    continuation_definition_id: str
+    minimum_expansions_per_first_action: int
+    maximum_active_first_actions: int
 
     def __call__(
         self,
@@ -108,6 +111,10 @@ class RouteActionSelector(Protocol):
     ) -> tuple[GenericDisconnectionCandidate, ...]: ...
 
     def state_diversity_key(self, state: Any) -> str: ...
+
+    def continuation_lane_key(self, state: Any) -> str: ...
+
+    def continuation_lane_class(self, state: Any) -> str: ...
 
     def select_routes(
         self,
@@ -301,6 +308,11 @@ class MultistepSearchDiagnostics:
     route_action_pool_candidates: int = 0
     route_action_selected_candidates: int = 0
     beam_diversity_retained_states: int = 0
+    continuation_policy_definition_id: Optional[str] = None
+    continuation_active_lane_count: int = 0
+    continuation_quota_selected_states: int = 0
+    continuation_lanes_reaching_minimum: int = 0
+    continuation_lane_expansions: tuple[tuple[str, str, int], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -436,6 +448,59 @@ def _select_heap_portfolio(
             break
         depth += 1
     return selected
+
+
+def _pop_continuation_state(
+    queue: list[tuple[tuple[Any, ...], int, _RouteState]],
+    selector: RouteActionSelector | None,
+    lane_expansions: dict[str, int],
+    active_lanes: dict[str, str],
+) -> tuple[tuple[tuple[Any, ...], int, _RouteState], bool]:
+    """Pop a state while guaranteeing bounded progress for route-entry lanes."""
+
+    if selector is None:
+        return heapq.heappop(queue), False
+    ordered = heapq.nsmallest(len(queue), queue)
+    for item in ordered:
+        state = item[2]
+        if not state.steps:
+            continue
+        lane = selector.continuation_lane_key(state)
+        if lane in active_lanes:
+            continue
+        if len(active_lanes) >= selector.maximum_active_first_actions:
+            break
+        active_lanes[lane] = selector.continuation_lane_class(state)
+    under_quota = [
+        item
+        for item in ordered
+        if item[2].steps
+        and selector.continuation_lane_key(item[2]) in active_lanes
+        and lane_expansions.get(
+            selector.continuation_lane_key(item[2]),
+            0,
+        )
+        < selector.minimum_expansions_per_first_action
+    ]
+    if not under_quota:
+        return heapq.heappop(queue), False
+    selected = min(
+        under_quota,
+        key=lambda item: (
+            lane_expansions.get(
+                selector.continuation_lane_key(item[2]),
+                0,
+            ),
+            item[0],
+            item[1],
+        ),
+    )
+    selected_index = next(
+        index for index, item in enumerate(queue) if item is selected
+    )
+    queue.pop(selected_index)
+    heapq.heapify(queue)
+    return selected, True
 
 
 def _catalog_role_status(
@@ -1217,9 +1282,17 @@ def plan_multistep_routes(
     route_action_pool_candidates = 0
     route_action_selected_candidates = 0
     beam_diversity_retained_states = 0
+    continuation_lane_expansions: dict[str, int] = {}
+    continuation_active_lanes: dict[str, str] = {}
+    continuation_quota_selected_states = 0
 
     while queue and expanded_states < max_expansions:
-        _, _, state = heapq.heappop(queue)
+        (_, _, state), quota_selected = _pop_continuation_state(
+            queue,
+            route_action_selector,
+            continuation_lane_expansions,
+            continuation_active_lanes,
+        )
         if not _is_retained_state_path(state, best_paths_by_state):
             continue
         if all(leaf.assessment.terminal for leaf in state.leaves):
@@ -1324,6 +1397,13 @@ def plan_multistep_routes(
         else:
             cache_hits += 1
         expanded_states += 1
+        if route_action_selector is not None and state.steps:
+            lane = route_action_selector.continuation_lane_key(state)
+            continuation_lane_expansions[lane] = (
+                continuation_lane_expansions.get(lane, 0) + 1
+            )
+            if quota_selected:
+                continuation_quota_selected_states += 1
         generated_candidates += len(candidates)
         if not candidates:
             dead_end_states += 1
@@ -1696,6 +1776,30 @@ def plan_multistep_routes(
         route_action_pool_candidates=route_action_pool_candidates,
         route_action_selected_candidates=route_action_selected_candidates,
         beam_diversity_retained_states=beam_diversity_retained_states,
+        continuation_policy_definition_id=(
+            route_action_selector.continuation_definition_id
+            if route_action_selector is not None
+            else None
+        ),
+        continuation_active_lane_count=len(continuation_active_lanes),
+        continuation_quota_selected_states=continuation_quota_selected_states,
+        continuation_lanes_reaching_minimum=(
+            sum(
+                count
+                >= route_action_selector.minimum_expansions_per_first_action
+                for count in continuation_lane_expansions.values()
+            )
+            if route_action_selector is not None
+            else 0
+        ),
+        continuation_lane_expansions=tuple(
+            (
+                lane,
+                continuation_active_lanes.get(lane, "unclassified"),
+                count,
+            )
+            for lane, count in sorted(continuation_lane_expansions.items())
+        ),
     )
     return MultistepRetrosynthesisResult(
         target_smiles=target.canonical_smiles,

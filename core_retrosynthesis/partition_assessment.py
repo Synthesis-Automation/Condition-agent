@@ -15,6 +15,7 @@ from typing import Any, Mapping
 from .chemistry import canonical_smiles, digest, split_reaction_smiles
 from .condition_ranking import RetrosynthesisConditionEvidence
 from .generic_models import GenericTemplateLibrary
+from .latent_transition import LatentStateTransition
 from .multistep import ConditionEvidenceEvaluator
 from .partition_realization import (
     InterfaceRealization,
@@ -22,6 +23,13 @@ from .partition_realization import (
     StrategicRouteRealization,
 )
 from .precursor_compatibility import assess_precursor_compatibility
+from .precursor_state_feasibility import (
+    PrecursorStateFeasibility,
+    PrecursorStateRouteFeasibility,
+    aggregate_precursor_state_route_feasibility,
+    assess_precursor_state_feasibility,
+    load_precursor_state_feasibility_policy,
+)
 from .reaction_compatibility import assess_candidate_reaction_compatibility
 from .route_contract import (
     MoleculeOccurrenceNode,
@@ -35,7 +43,7 @@ from .step_precedents import (
 
 
 PARTITION_ASSESSMENT_SCHEMA_VERSION = "1.0"
-PARTITION_ASSESSMENT_ALGORITHM_VERSION = "partition_evidence_review.v1"
+PARTITION_ASSESSMENT_ALGORITHM_VERSION = "partition_evidence_review.v2"
 PARTITION_ASSESSMENT_POLICY_PATH = (
     Path(__file__).with_name("definitions")
     / "synthetic_partition_assessment_policy.v1.json"
@@ -87,6 +95,7 @@ class PartitionStepAssessment:
     hard_incompatible: bool
     cautions: tuple[str, ...]
     warnings: tuple[str, ...]
+    precursor_state_feasibility: PrecursorStateFeasibility | None = None
     schema_version: str = PARTITION_ASSESSMENT_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -120,6 +129,11 @@ class PartitionStepAssessment:
             "hard_incompatible": self.hard_incompatible,
             "cautions": list(self.cautions),
             "warnings": list(self.warnings),
+            "precursor_state_feasibility": (
+                self.precursor_state_feasibility.to_dict()
+                if self.precursor_state_feasibility is not None
+                else None
+            ),
             "schema_version": self.schema_version,
         }
 
@@ -154,6 +168,13 @@ class PartitionStepAssessment:
             hard_incompatible=bool(value["hard_incompatible"]),
             cautions=tuple(str(item) for item in value.get("cautions") or ()),
             warnings=tuple(str(item) for item in value.get("warnings") or ()),
+            precursor_state_feasibility=(
+                PrecursorStateFeasibility.from_dict(
+                    value["precursor_state_feasibility"]
+                )
+                if isinstance(value.get("precursor_state_feasibility"), Mapping)
+                else None
+            ),
             schema_version=str(
                 value.get("schema_version") or PARTITION_ASSESSMENT_SCHEMA_VERSION
             ),
@@ -237,6 +258,7 @@ class PartitionRouteAssessment:
     protection_burden_count: int
     unresolved_latent_atom_count: int
     warnings: tuple[str, ...]
+    precursor_state_feasibility: PrecursorStateRouteFeasibility | None = None
 
     def __post_init__(self) -> None:
         if self.status not in _ASSESSMENT_STATUSES:
@@ -267,6 +289,11 @@ class PartitionRouteAssessment:
             "protection_burden_count": self.protection_burden_count,
             "unresolved_latent_atom_count": self.unresolved_latent_atom_count,
             "warnings": list(self.warnings),
+            "precursor_state_feasibility": (
+                self.precursor_state_feasibility.to_dict()
+                if self.precursor_state_feasibility is not None
+                else None
+            ),
         }
 
     @classmethod
@@ -308,6 +335,13 @@ class PartitionRouteAssessment:
             protection_burden_count=int(value["protection_burden_count"]),
             unresolved_latent_atom_count=int(value["unresolved_latent_atom_count"]),
             warnings=tuple(str(item) for item in value.get("warnings") or ()),
+            precursor_state_feasibility=(
+                PrecursorStateRouteFeasibility.from_dict(
+                    value["precursor_state_feasibility"]
+                )
+                if isinstance(value.get("precursor_state_feasibility"), Mapping)
+                else None
+            ),
         )
 
 
@@ -574,6 +608,7 @@ def _assess_step(
     condition_evaluator: ConditionEvidenceEvaluator | None,
     condition_cache: dict[str, RetrosynthesisConditionEvidence],
     precedent_limit: int,
+    transition: LatentStateTransition | None,
 ) -> PartitionStepAssessment:
     structural_issues = _structural_issues(owner, reaction, library)
     structurally_valid = not structural_issues
@@ -666,10 +701,21 @@ def _assess_step(
         if precedent_lookup is not None
         else 0
     )
+    precursor_state_feasibility = assess_precursor_state_feasibility(
+        step_id=reaction.step_id,
+        transition=transition,
+        precursor_nodes=reaction.children,
+        precedent_lookup=precedent_lookup,
+        structurally_valid=structurally_valid,
+        hard_incompatible=hard,
+        compatibility_dispositions=dispositions,
+        condition_status=condition.status,
+    )
     assessment_id = digest(
         "SPSTEP4",
         reaction.step_id,
         precedent_level,
+        precursor_state_feasibility.assessment_id,
         condition.status,
         "hard" if hard else "reviewable",
         policy.definition_id,
@@ -692,6 +738,7 @@ def _assess_step(
         hard_incompatible=hard,
         cautions=cautions,
         warnings=tuple(sorted(warnings)),
+        precursor_state_feasibility=precursor_state_feasibility,
     )
 
 
@@ -756,6 +803,14 @@ def _route_assessment(
 ) -> PartitionRouteAssessment:
     tree_report = validate_route_tree(realization.route_tree)
     occurrences = _reaction_occurrences(realization.route_tree.root)
+    transition_by_step = {
+        transition.step_id: transition
+        for transition in (
+            realization.latent_realization_graph.transitions
+            if realization.latent_realization_graph is not None
+            else ()
+        )
+    }
     steps = tuple(
         _assess_step(
             owner,
@@ -765,6 +820,7 @@ def _route_assessment(
             condition_evaluator,
             condition_cache,
             precedent_limit,
+            transition_by_step.get(reaction.step_id),
         )
         for owner, reaction in occurrences
     )
@@ -788,6 +844,15 @@ def _route_assessment(
     )
     caution_count = sum(bool(item.cautions or item.warnings) for item in steps)
     warnings = set(realization.warnings)
+    precursor_state_route = aggregate_precursor_state_route_feasibility(
+        (
+            item.precursor_state_feasibility
+            for item in steps
+            if item.precursor_state_feasibility is not None
+        ),
+        policy=load_precursor_state_feasibility_policy(),
+    )
+    warnings.update(precursor_state_route.warnings)
     if not tree_report.valid:
         warnings.add("ROUTE_TREE_INVALID")
     if hard_count or any(item.hard_incompatible for item in interfaces):
@@ -796,6 +861,9 @@ def _route_assessment(
     elif not steps or precedent_supported < len(steps):
         status = "insufficient_evidence"
         warnings.add("STEP_PRECEDENT_COVERAGE_INCOMPLETE")
+    elif precursor_state_route.promotion_recommendation == "hold_for_evidence":
+        status = "insufficient_evidence"
+        warnings.add("PRECURSOR_STATE_FEASIBILITY_HOLD")
     elif (
         condition_supported < len(steps)
         or caution_count
@@ -856,6 +924,7 @@ def _route_assessment(
         protection_burden_count=protection_burden,
         unresolved_latent_atom_count=unresolved_atoms,
         warnings=tuple(sorted(warnings)),
+        precursor_state_feasibility=precursor_state_route,
     )
 
 

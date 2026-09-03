@@ -1,0 +1,23 @@
+{
+  "definition_id": "precursor_state_feasibility.v1",
+  "schema_version": "1.0",
+  "precedent_similarity": {
+    "exact_product_minimum": 0.999999,
+    "exact_precursor_minimum": 0.999999,
+    "close_product_minimum": 0.75,
+    "close_precursor_minimum": 0.65
+  },
+  "strong_terminal_evidence": [
+    "supplier_stock_portfolio",
+    "role_supported_literature",
+    "observed_leaf"
+  ],
+  "weak_terminal_evidence": [
+    "heuristic_molecular_weight",
+    "untyped_literature"
+  ],
+  "supported_evidence_levels": ["E4", "E3"],
+  "hold_evidence_levels": ["E2", "E1"],
+  "contradicted_evidence_levels": ["E0"],
+  "ranking_influence": "none_review_only"
+}

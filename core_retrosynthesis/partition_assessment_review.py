@@ -17,7 +17,7 @@ from .partition_assessment import PartitionAssessmentResult
 from .synthetic_partition import SyntheticPartition, analyze_partition_target
 
 
-PARTITION_ASSESSMENT_REVIEW_VERSION = "partition_assessment_review.v1"
+PARTITION_ASSESSMENT_REVIEW_VERSION = "partition_assessment_review.v2"
 _MODULE_COLORS = (
     (0.24, 0.49, 0.91),
     (0.91, 0.35, 0.28),
@@ -171,6 +171,100 @@ def _frontier_gallery(
     )
 
 
+def _forward_schedule(
+    realization: Any,
+    route: Any,
+    partition: SyntheticPartition,
+) -> str:
+    graph = realization.latent_realization_graph
+    if graph is None or not graph.forward_stages:
+        return "<p class='empty'>No validated forward schedule available.</p>"
+    transition_by_id = {
+        transition.transition_id: transition
+        for transition in graph.transitions
+    }
+    state_by_id = {state.latent_state_id: state for state in graph.states}
+    step_by_id = {step.step_id: step for step in route.step_assessments}
+    module_labels = {
+        module.module_id: f"M{index}"
+        for index, module in enumerate(partition.modules, start=1)
+    }
+
+    def state_label(state_id: str) -> str:
+        state = state_by_id[state_id]
+        labels = tuple(
+            module_labels.get(module_id, module_id)
+            for module_id in state.module_ids
+        )
+        return " + ".join(labels) or "partial module state"
+
+    stages = []
+    for stage in graph.forward_stages:
+        cards = []
+        for transition_id in stage.transition_ids:
+            transition = transition_by_id[transition_id]
+            step = step_by_id.get(transition.step_id)
+            reaction_graphic = (
+                _reaction_svg(step.reaction_smiles, width=860, height=205)
+                if step is not None
+                else "<div class='structure-error'>Reaction unavailable</div>"
+            )
+            input_labels = " + ".join(
+                sorted(
+                    state_label(state_id)
+                    for state_id in transition.input_state_ids
+                )
+            )
+            output_label = state_label(transition.output_state_id)
+            tactical = (
+                f" · {len(transition.tactical_input_occurrence_ids)} tactical input(s)"
+                if transition.tactical_input_occurrence_ids
+                else ""
+            )
+            state_feasibility = (
+                step.precursor_state_feasibility if step is not None else None
+            )
+            state_badge = (
+                _badge(
+                    "precursor state",
+                    state_feasibility.evidence_level,
+                    (
+                        "evidence"
+                        if state_feasibility.evidence_level in {"E4", "E3"}
+                        else "danger"
+                        if state_feasibility.evidence_level == "E0"
+                        else "condition"
+                    ),
+                )
+                if state_feasibility is not None
+                else _badge("precursor state", "not assessed", "neutral")
+            )
+            cards.append(
+                "<article class='schedule-transition'>"
+                "<div class='precedent-heading'>"
+                f"<strong>{escape(input_labels)} → {escape(output_label)}</strong>"
+                f"{_badge('shape', transition.action_class.replace('_', ' '), 'neutral')}"
+                f"{state_badge}"
+                "</div>"
+                f"<p class='muted'>{escape(transition.transition_kind.replace('_', ' '))}"
+                f"{escape(tactical)}</p>"
+                f"<div class='reaction-graphic schedule-graphic'>{reaction_graphic}</div>"
+                "</article>"
+            )
+        parallel = (
+            " · transitions in this stage are independent"
+            if len(stage.transition_ids) > 1
+            else ""
+        )
+        stages.append(
+            "<section class='schedule-stage'>"
+            f"<h3>Forward stage {stage.stage_index}"
+            f"<small>{escape(parallel)}</small></h3>"
+            f"{''.join(cards)}</section>"
+        )
+    return "".join(stages)
+
+
 def _precedent_gallery(step: Any) -> str:
     matches = step.precedent_lookup.matches if step.precedent_lookup else ()
     if not matches:
@@ -207,8 +301,37 @@ def _condition_and_caution_panel(step: Any) -> str:
         for item in recommendations
     )
     caution_values = (*step.cautions, *step.warnings, *step.structural_issues)
+    state = step.precursor_state_feasibility
+    if state is None:
+        state_panel = (
+            "<section class='evidence-box'><h4>Precursor-state feasibility</h4>"
+            f"{_badge('support', 'not assessed', 'neutral')}"
+            "<p class='muted'>No latent transition evidence is available.</p></section>"
+        )
+    else:
+        similarity = (
+            "not available"
+            if state.best_precursor_similarity is None
+            else f"{state.best_precursor_similarity:.2f}"
+        )
+        tone = (
+            "evidence"
+            if state.evidence_level in {"E4", "E3"}
+            else "danger"
+            if state.evidence_level == "E0"
+            else "condition"
+        )
+        state_panel = (
+            "<section class='evidence-box precursor-state-box'><h4>Precursor-state feasibility</h4>"
+            f"{_badge('evidence', state.evidence_level, tone)}"
+            f"{_badge('decision', state.promotion_recommendation.replace('_', ' '), 'neutral')}"
+            f"<p><strong>{escape(state.reactant_state_support.replace('_', ' '))}</strong><br>"
+            f"<span class='muted'>Best precursor similarity: {escape(similarity)}</span></p>"
+            f"{_items((*state.reasons, *state.warnings))}</section>"
+        )
     return (
         "<div class='evidence-grid'>"
+        f"{state_panel}"
         "<section class='evidence-box'><h4>Conditions</h4>"
         f"{_badge('support', step.condition_evidence.status, 'condition')}"
         f"<ul>{recipes or '<li class="muted">No canonical recipe retrieved</li>'}</ul>"
@@ -228,6 +351,14 @@ def _route_panel(
     step_cards = []
     for step_index, step in enumerate(route.step_assessments, start=1):
         weakest = step.step_id == route.weakest_step_id
+        state = step.precursor_state_feasibility
+        state_tone = (
+            "evidence"
+            if state is not None and state.evidence_level in {"E4", "E3"}
+            else "danger"
+            if state is not None and state.evidence_level == "E0"
+            else "condition"
+        )
         step_cards.append(
             f"<article class='step-card{' weakest' if weakest else ''}'>"
             "<div class='step-heading'>"
@@ -237,6 +368,7 @@ def _route_panel(
             f"{_badge('structure', step.structural_status, 'good' if step.structural_status == 'validated' else 'danger')}"
             f"{_badge('precedent', step.precedent_evidence_level, 'evidence')}"
             f"{_badge('conditions', step.condition_evidence.status, 'condition')}"
+            f"{_badge('precursor state', state.evidence_level, state_tone) if state is not None else ''}"
             f"{'<span class="weakest-flag">weakest step</span>' if weakest else ''}"
             "</div></div>"
             "<p class='scheme-label'>Forward view · precursors → product</p>"
@@ -260,19 +392,32 @@ def _route_panel(
         for item in route.interface_assessments
     )
     route_tone = "danger" if route.status == "hard_incompatible" else "condition"
+    route_state = route.precursor_state_feasibility
+    route_state_tone = (
+        "evidence"
+        if route_state is not None
+        and route_state.promotion_recommendation == "eligible_for_route_review"
+        else "danger"
+        if route_state is not None
+        and route_state.promotion_recommendation == "not_promotable"
+        else "condition"
+    )
     return (
         f"<section class='route-panel{' active' if route_index == 1 else ''}' data-route-panel='{route_index}'>"
         "<div class='route-summary card'>"
         "<div><p class='eyebrow'>ROUTE OVERVIEW</p>"
         f"<h2>Route {route_index}</h2><div class='badges'>"
         f"{_badge('assessment', route.status, route_tone)}"
+        f"{_badge('precursor states', route_state.promotion_recommendation.replace('_', ' '), route_state_tone) if route_state is not None else ''}"
         f"{_badge('realization', route.source_realization_status, 'neutral')}"
         f"{_badge('route shape', realization.first_action_class.replace('_', ' '), 'neutral')}"
+        f"{_badge('continued states', str(realization.continuation_expansion_count), 'neutral')}"
         f"{_badge('steps', str(len(route.step_assessments)), 'neutral')}"
         "</div></div>"
         "<div class='route-metrics'>"
         f"<div><strong>{route.precedent_supported_step_count}/{len(route.step_assessments)}</strong><span>precedent-backed steps</span></div>"
         f"<div><strong>{route.condition_supported_step_count}/{len(route.step_assessments)}</strong><span>condition-backed steps</span></div>"
+        f"<div><strong>{route_state.supported_step_count if route_state is not None else 0}/{len(route.step_assessments)}</strong><span>reactant-state-supported steps</span></div>"
         f"<div><strong>{route.protection_burden_count}</strong><span>protection / auxiliary atoms</span></div>"
         f"<div><strong>{route.unresolved_latent_atom_count}</strong><span>unclassified latent atoms</span></div>"
         "</div></div>"
@@ -280,6 +425,10 @@ def _route_panel(
         "<h2>Target-derived modules in their latent forms</h2></div>"
         "<p>Structures are shown independently; tactical atoms do not change module ownership.</p></div>"
         f"<div class='frontier-gallery'>{_frontier_gallery(realization, partition)}</div></section>"
+        "<section class='card'><div class='section-heading'><div><p class='eyebrow'>FORWARD REALIZATION ORDER</p>"
+        "<h2>Dependency-derived schedule</h2></div>"
+        "<p>Stages run from precursor preparation to target formation; independent transitions may run in parallel.</p></div>"
+        f"<div class='forward-schedule'>{_forward_schedule(realization, route, partition)}</div></section>"
         "<section class='card'><div class='section-heading'><div><p class='eyebrow'>STRATEGIC INTERFACES</p>"
         "<h2>Coverage at a glance</h2></div></div>"
         f"<div class='interface-strip'>{interface_chips or '<p class="empty">No interfaces.</p>'}</div></section>"
@@ -344,13 +493,14 @@ h1 {{ margin:.2rem 0 .5rem; font-size:clamp(1.8rem,3vw,2.8rem); letter-spacing:-
 .module-legend {{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; margin:1rem 0; }} .module-key {{ display:grid; grid-template-columns:12px auto; column-gap:.55rem; align-items:center; padding:.6rem; border:1px solid var(--line); border-radius:10px; }} .module-key>span {{ width:12px; height:32px; border-radius:8px; grid-row:1/3; }} .module-key small {{ display:block; overflow-wrap:anywhere; }}
 .notice {{ border-left:4px solid var(--amber); background:#fff8ed; padding:.8rem 1rem; border-radius:7px; }} .route-nav {{ position:sticky; top:0; z-index:20; display:flex; gap:.6rem; max-width:1240px; margin:0 auto 1.25rem; padding:.65rem; background:#eef2f4eF; backdrop-filter:blur(10px); }}
 .route-tab {{ border:1px solid var(--line); background:white; color:var(--ink); border-radius:10px; padding:.7rem 1rem; font:inherit; font-weight:750; cursor:pointer; }} .route-tab small {{ display:block; font-weight:500; }} .route-tab.active {{ color:white; border-color:var(--navy); background:var(--navy); }} .route-tab.active small {{ color:#d8e9f3; }}
-.route-panel {{ display:none; }} .route-panel.active {{ display:block; }} .card,.step-card {{ padding:1.35rem; }} .route-summary {{ display:flex; align-items:center; justify-content:space-between; gap:1rem; }} .route-metrics {{ display:grid; grid-template-columns:repeat(4,minmax(120px,1fr)); gap:.65rem; }} .route-metrics div {{ background:#f5f8fa; border-radius:10px; padding:.7rem; }} .route-metrics strong,.route-metrics span {{ display:block; }} .route-metrics strong {{ font-size:1.35rem; }}
+.route-panel {{ display:none; }} .route-panel.active {{ display:block; }} .card,.step-card {{ padding:1.35rem; }} .route-summary {{ display:flex; align-items:center; justify-content:space-between; gap:1rem; }} .route-metrics {{ display:grid; grid-template-columns:repeat(5,minmax(120px,1fr)); gap:.65rem; }} .route-metrics div {{ background:#f5f8fa; border-radius:10px; padding:.7rem; }} .route-metrics strong,.route-metrics span {{ display:block; }} .route-metrics strong {{ font-size:1.35rem; }}
 .badges {{ display:flex; gap:.45rem; flex-wrap:wrap; align-items:center; }} .badge {{ display:inline-flex; gap:.35rem; align-items:center; border:1px solid var(--line); border-radius:999px; padding:.28rem .55rem; font-size:.73rem; }} .badge span {{ color:var(--muted); }} .badge.good {{ border-color:#9ad7b4; background:#effbf4; }} .badge.evidence {{ border-color:#b8caea; background:#f2f6fd; }} .badge.condition {{ border-color:#efd09f; background:#fff8ec; }} .badge.danger {{ border-color:#efaaaa; background:#fff1f1; }}
 .section-heading {{ display:flex; justify-content:space-between; gap:1rem; align-items:end; }} .section-heading>p {{ max-width:460px; color:var(--muted); margin:.2rem 0; }} .frontier-gallery {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.85rem; }} .molecule-tile {{ border:1px solid var(--line); border-radius:12px; overflow:hidden; min-width:0; }} .molecule-label {{ display:flex; justify-content:space-between; padding:.5rem .7rem 0; }} .molecule-tile code {{ display:block; padding:.5rem .7rem .8rem; }}
+.forward-schedule {{ display:grid; gap:1rem; }} .schedule-stage {{ border-left:4px solid var(--cyan); padding:.2rem 0 .2rem 1rem; }} .schedule-stage h3 {{ margin:.15rem 0 .75rem; }} .schedule-stage h3 small {{ color:var(--muted); font-weight:400; }} .schedule-transition {{ border:1px solid var(--line); border-radius:12px; padding:.8rem; margin:.65rem 0; background:#fbfdff; }} .schedule-graphic svg {{ max-height:205px; }}
 .interface-strip {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.7rem; }} .interface-chip {{ border-top:4px solid var(--cyan); background:#f5fafb; border-radius:9px; padding:.75rem; }} .interface-chip>* {{ display:block; }}
 .step-card {{ border-left:6px solid var(--navy); }} .step-card.weakest {{ border-left-color:var(--amber); }} .step-heading,.precedent-heading {{ display:flex; justify-content:space-between; align-items:center; gap:.8rem; }} .step-heading>div:first-child {{ display:grid; grid-template-columns:42px auto; column-gap:.7rem; align-items:center; }} .step-heading small {{ grid-column:2; }} .step-number {{ grid-row:1/3; display:grid; place-items:center; width:42px; height:42px; color:white; background:var(--navy); border-radius:50%; font-weight:850; }} .weakest-flag {{ color:#7c4306; background:#ffe8c4; border-radius:999px; padding:.35rem .65rem; font-size:.76rem; font-weight:800; }}
 .scheme-label {{ margin:1rem 0 -.55rem; color:var(--muted); font-size:.75rem; font-weight:750; letter-spacing:.04em; text-transform:uppercase; }} .reaction-graphic {{ min-height:190px; margin:1rem 0; border:1px solid var(--line); border-radius:12px; }} details {{ margin:.75rem 0; }} summary {{ cursor:pointer; font-weight:750; }} .evidence-details {{ background:#f7f9fa; border:1px solid var(--line); border-radius:12px; padding:.8rem; }} .precedent-card {{ background:white; border:1px solid var(--line); border-radius:10px; padding:.75rem; margin:.7rem 0; }} .precedent-graphic {{ min-height:170px; margin:.5rem 0; border:0; }}
-.evidence-grid,.review-grid {{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; }} .evidence-box {{ border:1px solid var(--line); border-radius:10px; padding:.85rem; }} .review {{ border-top:5px solid var(--cyan); }} label {{ display:block; font-weight:700; margin:.7rem 0; }} select,textarea {{ display:block; width:100%; margin-top:.4rem; border:1px solid #aebbc5; border-radius:8px; padding:.7rem; font:inherit; background:white; }} textarea {{ min-height:7rem; }} .structure-error {{ padding:2rem; color:var(--red); }}
+.evidence-grid,.review-grid {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.8rem; }} .evidence-box {{ border:1px solid var(--line); border-radius:10px; padding:.85rem; }} .precursor-state-box {{ border-top:4px solid var(--blue); }} .review {{ border-top:5px solid var(--cyan); }} label {{ display:block; font-weight:700; margin:.7rem 0; }} select,textarea {{ display:block; width:100%; margin-top:.4rem; border:1px solid #aebbc5; border-radius:8px; padding:.7rem; font:inherit; background:white; }} textarea {{ min-height:7rem; }} .structure-error {{ padding:2rem; color:var(--red); }}
 @media (max-width:800px) {{ .hero,.evidence-grid,.review-grid {{ grid-template-columns:1fr; }} .route-summary,.section-heading {{ display:block; }} .route-metrics {{ grid-template-columns:repeat(2,1fr); margin-top:1rem; }} .module-legend {{ grid-template-columns:1fr; }} header,.card,.step-card {{ border-radius:0; border-left:0; border-right:0; }} body {{ padding:0; }} }}
 </style></head><body>
 <header><div class="hero"><div class="target-graphic">{_target_partition_svg(partition)}</div>
@@ -486,6 +636,11 @@ def build_partition_blind_review_packet(
                     "system_assessment_status": assessment.status,
                     "source_realization_status": assessment.source_realization_status,
                     "weakest_step_id": assessment.weakest_step_id,
+                    "precursor_state_feasibility": (
+                        assessment.precursor_state_feasibility.to_dict()
+                        if assessment.precursor_state_feasibility is not None
+                        else None
+                    ),
                 }
             )
 

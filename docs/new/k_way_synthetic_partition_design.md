@@ -1,6 +1,6 @@
 ---
 title: "General Synthetic Partition Landscape and Strategic Route Realization"
-version: "0.4"
+version: "0.6"
 status: "Design and implementation plan"
 encoding: "UTF-8"
 ---
@@ -635,6 +635,10 @@ untouched evaluation gates are complete.
 | Phase 3 | Implemented, review-only | The canonical bounded multistep planner now accepts role-neutral search guidance; selected partitions are matched against every projected route frontier with explicit full, partial, unrealized, and contradicted outcomes. |
 | Phase 4 | Implemented, review-only; human gate pending | Persisted route reactions receive admitted structure-backed precedents, optional canonical condition evidence, compatibility cautions, latent-atom burden, weakest-link assessment, static review output, and separately blinded review cases and answer keys. Calibration remains blocked on completed chemist review. |
 | Phase 5A | Implemented, review-only; parity gate pending | Structured external physical steps and complete routes are independently mapped, signed, matched to admitted operators and precedents, checked for compatibility and topology, and rendered with structures. External claims cannot supply trusted IDs, all outputs have no ranking influence, and public actionability remains disabled. |
+| Phase 5B | Implemented, opt-in review-only | A wider validated action pool and graph-derived route-shape portfolio prevent strategically distinct first disconnections from being pruned by a small per-step top-k. |
+| Phase 5C | Implemented, opt-in review-only | A bounded continuation scheduler gives each retained first-action route lane a minimum opportunity to develop before ordinary global priority resumes. |
+| Phase 5D | Implemented, review-only | Every validated route step is represented as a target-provenance latent-state transition; its dependency DAG yields a deterministic forward schedule and exposes independent precursor preparations. |
+| Phase 5E | Implemented, review-only | A precursor-state feasibility gate separates product reconstruction from reactant-state precedent, directionality support, terminal evidence, and review promotability. |
 
 Phase 2 combinations show that independently supported interfaces induce a
 target partition. They are labeled `operator_combination_unrealized` and do not
@@ -987,10 +991,11 @@ descriptors, not module identities: no target module is named core, appendage,
 or privileged carrier. Reaction names are not routing keys.
 
 The selector retains the best actions plus a small reserve of different action
-shapes. The same first-action class is used as a diversity lane during beam
-pruning and final route selection. It never changes route costs or feasibility
-status. The policy fixes `ranking_influence` to `review_only_opt_in`, and the
-ordinary planner follows its previous path when the option is absent.
+shapes. A stable identity for each distinct first action is used during beam
+pruning, while its graph-derived class is used to diversify the final route
+portfolio. It never changes route costs or feasibility status. The policy
+fixes `ranking_influence` to `review_only_opt_in`, and the ordinary planner
+follows its previous path when the option is absent.
 
 ```powershell
 python -m core_retrosynthesis realize-partition `
@@ -1018,6 +1023,193 @@ corresponding structure-rich assessment is available as
 `worked_example_phase5b_review.v1.html` (with its JSON evidence beside it).
 The next gate is chemist comparison of these alternatives, followed by the
 unchanged external admission boundary for independently proposed routes.
+
+#### Phase 5C — Portfolio-aware route continuation
+
+Phase 5B can preserve a useful first disconnection without spending enough of
+the shared search budget to develop it. Phase 5C adds fair continuation within
+the same hard global bounds:
+
+```text
+core_retrosynthesis/portfolio_continuation.py
+  PortfolioContinuationPolicy
+  load_portfolio_continuation_policy(...)
+
+core_retrosynthesis/definitions/
+  portfolio_continuation.v1.json
+```
+
+Each distinct target-forming action receives a stable lane ID derived from its
+validated reaction, operator, and disconnection site. Up to four active lanes
+receive at least two state expansions each. The scheduler always chooses the
+least-expanded under-quota lane and then uses the existing partition and route
+priority within that lane. After all reachable lane minima are satisfied,
+ordinary global best-first scheduling resumes.
+
+The lane quota is not a new action score and cannot exceed
+`maximum_expansions`. It cannot insert candidates: selector outputs must be an
+object-identical bounded subset of the forward-validated operator pool. Dead
+ends, terminal decisions, cycle rejection, route costs, and all realization
+statuses retain their existing definitions. The behavior remains opt-in under
+`--latent-state-portfolio` and the policy fixes `ranking_influence` to
+`review_only_opt_in`.
+
+With the same worked-target limits used for Phase 5B—depth three and 12 total
+expansions—the scheduler activated four distinct first-action lanes and all
+four reached the two-expansion minimum. Eight state selections were quota-led.
+The phosphonate/ketone entry advanced from a one-step frontier to this
+three-step partial route:
+
+```text
+CO + NC(=O)[C@@H](Br)c1ccccc1Cl
+  -> COC(=O)[C@@H](Br)c1ccccc1Cl
+
+COC(=O)[C@@H](Br)c1ccccc1Cl + O=C1CNCCC1S
+  -> COC(=O)[C@H](c1ccccc1Cl)N1CCC(S)C(=O)C1
+
+CCOP(=O)(CC(=O)O)OCC
+  + COC(=O)[C@H](c1ccccc1Cl)N1CCC(S)C(=O)C1
+  -> Target
+```
+
+This route now exactly exposes the requested four-module partition, but it
+remains `partially_realized`: the phosphonate and brominated amide leaves are
+not terminal under the configured evidence and depth bounds. The auditable
+outputs are:
+
+```text
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5c.v1.json
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5c_review.v1.json
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5c_review.v1.html
+```
+
+#### Phase 5D — Explicit latent transitions and forward schedule
+
+Earlier phases stored projected latent states at route frontiers, but the
+relationship between those states and individual reaction steps was implicit.
+Phase 5D makes that relationship a validated, serialized graph:
+
+```text
+core_retrosynthesis/latent_transition.py
+  LatentStateTransition
+  ForwardRealizationStage
+  LatentRealizationGraph
+  build_latent_realization_graph(...)
+```
+
+Each validated route reaction becomes one transition from its target-bearing
+precursor states to its target-bearing product state. Target-free reactants are
+recorded separately as tactical inputs; they are not invented as target
+modules. State module membership is always recalculated against the selected
+partition, so a state can represent one complete module, several already
+joined modules, or a partial module state.
+
+The builder enforces exact target-atom ownership at every transition: input
+target map numbers must be unique and their union must equal the output target
+map numbers. It also rejects unknown state references, duplicate transitions,
+invalid dependency edges, cyclic schedules, skipped stage numbers, or schedules
+that fail to contain every transition exactly once.
+
+Forward order is derived from route dependencies rather than retrosynthetic
+depth labels. A precursor-producing transition must precede every transition
+that consumes its product. Deterministic topological layers form the forward
+stages; two or more transitions in the same stage are independent in this
+target-provenance graph and can be reviewed as parallel precursor preparations.
+This is a structural partial order, not yet a prediction of laboratory timing,
+telescoping, isolation, conditions, or operational compatibility.
+
+For the leading worked realization, the schedule is the three-stage sequence:
+
+```text
+Forward stage 1:
+  CO + NC(=O)[C@@H](Br)c1ccccc1Cl
+    -> COC(=O)[C@@H](Br)c1ccccc1Cl
+
+Forward stage 2:
+  COC(=O)[C@@H](Br)c1ccccc1Cl + O=C1CNCCC1S
+    -> COC(=O)[C@H](c1ccccc1Cl)N1CCC(S)C(=O)C1
+
+Forward stage 3:
+  CCOP(=O)(CC(=O)O)OCC
+    + COC(=O)[C@H](c1ccccc1Cl)N1CCC(S)C(=O)C1
+    -> Target
+```
+
+Two other retained routes contain two structurally independent transitions in
+their first forward stage, demonstrating that the schedule is a dependency
+graph rather than a reversed list. All five worked realizations produced valid
+latent graphs; four exactly expose the requested four-module partition. Route
+status remains `partially_realized`, because explicit transition order does not
+establish terminal-material availability or repair unsupported leaves.
+
+The structure-rich review now shows this schedule before the per-step evidence:
+
+```text
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5d.v1.json
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5d_review.v1.json
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5d_review.v1.html
+```
+
+#### Phase 5E — Precursor-state feasibility gate
+
+Forward product reconstruction proves that an operator can reproduce the
+product graph. It does not prove that the proposed precursor functional states
+or reaction direction are synthetically reasonable. Phase 5E therefore adds a
+separate review-only assessment:
+
+```text
+core_retrosynthesis/precursor_state_feasibility.py
+  PrecursorStateFeasibility
+  PrecursorStateRouteFeasibility
+  assess_precursor_state_feasibility(...)
+  aggregate_precursor_state_route_feasibility(...)
+
+core_retrosynthesis/definitions/
+  precursor_state_feasibility.v1.json
+```
+
+Each assessed step is linked to its Phase 5D transition and records the latent
+input and output state IDs, tactical-input count, compatibility dispositions,
+condition status, terminal-input evidence, and the best admitted product and
+precursor similarities. Evidence is assigned conservatively:
+
+| Level | Meaning |
+| --- | --- |
+| `E4` | Exact product and reactant-state precedent under the configured thresholds. |
+| `E3` | Close product and reactant-state precedent. |
+| `E2` | Same-template precedent only; the concrete reactant state and direction are not supported. |
+| `E1` | Validated operator without an admitted reactant-state precedent. |
+| `E0` | Structural or deterministic compatibility contradiction. |
+
+Only `E4` and `E3` steps are eligible for route review. `E2` and `E1` are held
+for evidence, while `E0` is not promotable. This is an evidence gate, not a
+reaction-name rule: missing evidence produces a hold rather than an invented
+chemical judgment. Exact step support also remains separate from route
+readiness. Heuristic terminal inputs, unresolved leaves, or a missing latent
+transition hold the whole route even when an individual transformation has
+strong precedent.
+
+The existing route order and realization scores are unchanged. The assessment
+definition fixes `ranking_influence` to `none_review_only`; promotion can be
+considered only after blind review and the repository's untouched evaluation
+gate.
+
+On the worked target, all five candidate routes are now correctly reported as
+`insufficient_evidence` and `hold_for_evidence`. Their steps reconstruct the
+products and have same-template precedents, but all 17 steps are `E2`: best
+precursor similarities range from approximately 0.17 to 0.51, no step meets
+the reactant-state threshold, and every route also contains heuristic or
+unresolved terminal inputs. In particular, graph-valid proposals such as the
+amide-to-methyl-ester state change are no longer presented as adequately
+supported routes.
+
+The updated structure-first artifact displays precursor-state evidence beside
+each forward transition and reaction step:
+
+```text
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5e.v1.json
+results/core_retrosynthesis/synthetic_partition/worked_example_phase5e.v1.html
+```
 
 ## 11. Evaluation
 

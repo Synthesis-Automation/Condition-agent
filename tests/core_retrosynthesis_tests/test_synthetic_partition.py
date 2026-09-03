@@ -14,6 +14,7 @@ import core_retrosynthesis.cli as cli_module
 from cas_tools import MoleculeIndexMatch, molecule_identity
 from core_retrosynthesis import (
     PARTITION_ASSESSMENT_POLICY_PATH,
+    PRECURSOR_STATE_FEASIBILITY_POLICY_PATH,
     GenericDisconnectionCandidate,
     GenericCoreTemplate,
     GenericTemplateLibrary,
@@ -45,6 +46,7 @@ from core_retrosynthesis import (
     render_partition_assessment_html,
     render_partition_landscape_html,
     validate_partition_assessment_policy,
+    validate_precursor_state_feasibility_policy,
     validate_partition_realization_policy,
     validate_synthetic_partition_policy,
     write_partition_landscape_review,
@@ -492,7 +494,53 @@ def test_partition_realization_finds_a_fully_validated_route() -> None:
         state.source_occurrence_id is not None
         for state in realization.frontier_states
     )
+    graph = realization.latent_realization_graph
+    assert graph is not None
+    assert graph.validation_status == "validated"
+    assert len(graph.transitions) == 2
+    assert [len(stage.transition_ids) for stage in graph.forward_stages] == [1, 1]
+    transitions = {transition.transition_id: transition for transition in graph.transitions}
+    assert [
+        transitions[stage.transition_ids[0]].retrosynthetic_depth
+        for stage in graph.forward_stages
+    ] == [2, 1]
+    assert realization.evidence_summary.latent_transition_count == 2
+    assert realization.evidence_summary.forward_stage_count == 2
+    assert realization.evidence_summary.parallel_forward_stage_count == 0
     assert PartitionRealizationResult.from_dict(result.to_dict()) == result
+
+    with pytest.raises(ValueError, match="forward schedule stages must be contiguous"):
+        replace(graph, forward_stages=tuple(reversed(graph.forward_stages)))
+    invalid_transition = replace(
+        graph.transitions[0],
+        output_state_id="LATENT_STATE:missing",
+    )
+    with pytest.raises(ValueError, match="unknown state"):
+        replace(
+            graph,
+            transitions=(invalid_transition, *graph.transitions[1:]),
+        )
+    assembly = next(
+        transition
+        for transition in graph.transitions
+        if len(transition.input_state_ids) > 1
+    )
+    invalid_ownership = replace(
+        assembly,
+        input_state_ids=assembly.input_state_ids[:1],
+    )
+    with pytest.raises(ValueError, match="changes target-atom ownership"):
+        replace(
+            graph,
+            transitions=tuple(
+                invalid_ownership
+                if transition.transition_id == assembly.transition_id
+                else transition
+                for transition in graph.transitions
+            ),
+        )
+    with pytest.raises(ValueError, match="dependencies do not match"):
+        replace(graph, dependency_edges=())
 
 
 def test_partition_realization_retains_partial_progress_and_failure_reason() -> None:
@@ -581,7 +629,60 @@ def test_partition_phase4_attaches_precedents_conditions_and_round_trips() -> No
         interface.precedent_match_ids
         for interface in route.interface_assessments
     )
+    assert route.precursor_state_feasibility is not None
+    assert route.precursor_state_feasibility.status == "supported"
+    assert (
+        route.precursor_state_feasibility.promotion_recommendation
+        == "eligible_for_route_review"
+    )
+    assert route.precursor_state_feasibility.supported_step_count == 2
+    assert all(
+        step.precursor_state_feasibility is not None
+        and step.precursor_state_feasibility.evidence_level == "E4"
+        and step.precursor_state_feasibility.reactant_state_support
+        == "exact_reactant_state"
+        for step in route.step_assessments
+    )
     assert PartitionAssessmentResult.from_dict(result.to_dict()) == result
+
+
+def test_partition_precursor_state_template_only_support_is_held() -> None:
+    library = _assessment_library()
+    distant_templates = tuple(
+        replace(
+            template,
+            precedents=tuple(
+                replace(
+                    precedent,
+                    product_smiles="c1ccccc1",
+                    precursor_smiles="CCCC.CCCC",
+                )
+                for precedent in template.precedents
+            ),
+        )
+        for template in library.templates
+    )
+    result = assess_partition_realizations(
+        _full_realization_result(),
+        replace(library, templates=distant_templates),
+        condition_evaluator=_direct_condition,
+    )
+
+    assert result.status == "insufficient_evidence"
+    route = result.route_assessments[0]
+    assert route.precursor_state_feasibility is not None
+    assert route.precursor_state_feasibility.status == "insufficient_evidence"
+    assert (
+        route.precursor_state_feasibility.promotion_recommendation
+        == "hold_for_evidence"
+    )
+    assert route.precursor_state_feasibility.held_step_count == 2
+    for step in route.step_assessments:
+        evidence = step.precursor_state_feasibility
+        assert evidence is not None
+        assert evidence.evidence_level == "E2"
+        assert evidence.reactant_state_support == "template_only"
+        assert "TEMPLATE_ONLY_PRECURSOR_STATE_SUPPORT" in evidence.warnings
 
 
 def test_partition_phase4_keeps_missing_conditions_as_review_caution() -> None:
@@ -600,6 +701,10 @@ def test_partition_phase4_keeps_missing_conditions_as_review_caution() -> None:
     assert "Structure-first route review" in html
     assert "Chemist review" in html
     assert "RETROSYNTHETIC FRONTIER" in html
+    assert "FORWARD REALIZATION ORDER" in html
+    assert "Forward stage 1" in html
+    assert "Precursor-state feasibility" in html
+    assert "eligible for route review" in html
     assert "Depicted precedents" in html
     assert html.count("<svg") >= 8
     assert "data-route-tab='1'" in html
@@ -628,6 +733,13 @@ def test_partition_phase4_blocks_conditions_after_structural_failure() -> None:
     assert all(
         "CONDITION_QUERY_BLOCKED_BY_STRUCTURAL_VALIDATION"
         in step.condition_evidence.warnings
+        for step in result.route_assessments[0].step_assessments
+    )
+    assert all(
+        step.precursor_state_feasibility is not None
+        and step.precursor_state_feasibility.evidence_level == "E0"
+        and step.precursor_state_feasibility.promotion_recommendation
+        == "not_promotable"
         for step in result.route_assessments[0].step_assessments
     )
 
@@ -677,6 +789,21 @@ def test_partition_phase4_policy_and_blind_packet_separate_answer_key() -> None:
         "negative_control",
         "abstention",
     }
+    assert all(
+        "precursor_state_feasibility" in answer
+        for answer in answer_key["answers"]
+    )
+
+
+def test_precursor_state_feasibility_policy_is_validated() -> None:
+    raw = json.loads(
+        PRECURSOR_STATE_FEASIBILITY_POLICY_PATH.read_text("utf-8")
+    )
+    assert validate_precursor_state_feasibility_policy(raw) == []
+    raw["ranking_influence"] = "production"
+    assert "invalid_ranking_influence" in (
+        validate_precursor_state_feasibility_policy(raw)
+    )
 
 
 def test_partition_realization_distinguishes_search_limit_from_dead_end() -> None:
@@ -783,6 +910,16 @@ def test_partition_guidance_expands_multiple_frontier_components() -> None:
     assert sum(child.reaction is not None for child in tree.root.reaction.children) == 2
     assert result.realizations[0].reaction_count == 3
     assert len(result.realizations[0].dependency_edges) == 2
+    graph = result.realizations[0].latent_realization_graph
+    assert graph is not None
+    assert [len(stage.transition_ids) for stage in graph.forward_stages] == [2, 1]
+    transitions = {transition.transition_id: transition for transition in graph.transitions}
+    assert {
+        transitions[transition_id].retrosynthetic_depth
+        for transition_id in graph.forward_stages[0].transition_ids
+    } == {2}
+    assert transitions[graph.forward_stages[1].transition_ids[0]].retrosynthetic_depth == 1
+    assert result.realizations[0].evidence_summary.parallel_forward_stage_count == 1
 
 
 def test_partition_realization_cli_writes_a_result(
