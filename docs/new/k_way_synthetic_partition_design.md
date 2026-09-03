@@ -1,6 +1,6 @@
 ---
 title: "General Synthetic Partition Landscape and Strategic Route Realization"
-version: "0.7"
+version: "0.8"
 status: "Design and implementation plan"
 encoding: "UTF-8"
 ---
@@ -1223,28 +1223,39 @@ datasets/external/higher_level_retrosynthesis/figshare_v2/curated/
   routes.poc.tree.v2.jsonl.gz
 ```
 
-All 5,000 route trees were projected before sampling. Maximum resolved `k`
-coverage is:
+All 5,000 route trees were projected before sampling. The projection algorithm
+normalizes mapped three-field reaction SMILES from
+`reactants>reagents>product` to the two-sided correspondence form
+`reactants>>product`; the reagent field remains separate route evidence and is
+not promoted to an atom source. Maximum successfully projected `k` coverage is:
 
-| Maximum resolved k | Routes | Corpus fraction |
+| Maximum successfully projected k | Routes | Corpus fraction |
 | ---: | ---: | ---: |
-| 1 | 4,692 | 93.84% |
-| 2 | 284 | 5.68% |
-| 3 | 24 | 0.48% |
+| 1 | 103 | 2.06% |
+| 2 | 1,372 | 27.44% |
+| 3 | 2,537 | 50.74% |
+| 4 | 802 | 16.04% |
+| 5 | 169 | 3.38% |
+| 6 | 16 | 0.32% |
+| 7 | 1 | 0.02% |
 
-This is primarily an atom-correspondence coverage result, not evidence that
-the remaining routes lack meaningful multi-module interpretations. The pilot
-is deliberately enriched for functionality testing: it selects one fully
-projected `k=3` anchor, then nine routes without replacement from the remaining
-`k=3`-eligible set using seed `20260903`. It must not be reported as an
-unbiased accuracy sample.
+The earlier pilot incorrectly reported 4,692 maximum-`k=1` routes because the
+projector rejected supplied atom mappings containing a nonempty reagent field.
+After normalization, 4,965 routes project through every observed occurrence;
+35 routes retain one unresolved occurrence. The remaining 103 maximum-`k=1`
+routes are therefore a small route-topology or correspondence subset rather
+than the dominant corpus behavior.
 
-The ten cases include seven 3-step routes, two 4-step routes, and one 5-step
-route across six train, three test, and one validation patents. They produce
-30 graphical frontier panels. One route is fully projected through the
-observed sequence; nine expose `k=3` before one unresolved occurrence stops
-further propagation. Partial cases are retained and visibly labeled rather
-than silently discarded.
+The pilot is deliberately enriched for functionality testing: it selects one
+fully projected anchor from the `k>=3` eligible pool, then nine routes without
+replacement from the remaining pool using seed `20260903`. It must not be
+reported as an unbiased accuracy sample.
+
+The regenerated ten cases include three 3-step routes, four 4-step routes, two
+5-step routes, and one 6-step route across nine train and one test patents.
+They produce 51 graphical frontier panels. All ten are fully projected through
+their observed sequences. Partial cases remain supported by the renderer and
+are visibly labeled rather than silently discarded.
 
 The reusable builder and CLI are:
 

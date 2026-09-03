@@ -52,6 +52,7 @@ from core_retrosynthesis import (
     write_partition_landscape_review,
 )
 from core_retrosynthesis.generic_models import GenericTemplatePrecedent
+from core_retrosynthesis.mapping import materialize_atom_mapping
 
 
 TARGET = "CNC(C)=O"
@@ -423,6 +424,39 @@ def test_mapped_reaction_projection_separates_target_and_tactical_atoms() -> Non
         for atom_map in module
     }
     assert projection.mapping_evidence == "supplied_atom_mapping"
+
+
+def test_mapped_three_field_reaction_excludes_reagents_from_projection() -> None:
+    three_field = AMIDE_FORMATION.replace(">>", ">O>")
+
+    materialized = materialize_atom_mapping(three_field)
+    assert materialized is not None
+    assert materialized.reaction_smiles == AMIDE_FORMATION
+
+    projection = project_reaction_to_target(TARGET, three_field)
+    assert projection.k == 2
+    assert set(projection.precursor_mapped_smiles) == {
+        "[CH3:1][C:2](=[O:3])[OH:6]",
+        "[NH2:4][CH3:5]",
+    }
+
+
+def test_route_projection_accepts_mapped_three_field_reactions() -> None:
+    tree = _observed_two_step_tree()
+    assert tree.root.reaction is not None
+    root_reaction = replace(
+        tree.root.reaction,
+        reaction_smiles=AMIDE_FORMATION.replace(">>", ">O>"),
+    )
+    normalized_tree = replace(
+        tree,
+        root=replace(tree.root, reaction=root_reaction),
+    )
+
+    projection = project_route_partitions(normalized_tree)
+
+    assert projection.unresolved_occurrence_ids == ()
+    assert [frontier.partition.k for frontier in projection.frontiers] == [1, 2, 3]
 
 
 def test_reaction_projection_reports_inferred_mapping_and_rejects_missing_source() -> None:

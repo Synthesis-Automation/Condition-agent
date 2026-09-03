@@ -18,7 +18,7 @@ from core_retrosynthesis import (
 
 REACTION = (
     "[CH3:1][C:2](=[O:3])[OH:6]."
-    "[NH2:4][CH2:5][CH3:7]>>"
+    "[NH2:4][CH2:5][CH3:7]>O>"
     "[CH3:1][C:2](=[O:3])[NH:4][CH2:5][CH3:7]"
 )
 
@@ -112,6 +112,7 @@ def test_partition_dataset_review_selects_and_renders_deterministically(
     )
     html = render_partition_dataset_review_html(review)
     assert "2-route graphical fragmentation review" in html
+    assert "maximum successfully projected k=2" in html
     assert html.count("<article class='case'") == 2
     assert html.count("<section class='frontier-panel'") == 4
     assert html.count("<svg") >= 12

@@ -24,6 +24,22 @@ class MaterializedMapping:
     confidence: float
 
 
+def _without_reagent_field(reaction_smiles: str) -> str:
+    """Return the two-sided reaction used for atom correspondence.
+
+    Reaction SMILES uses ``reactants>reagents>products``.  Reagents are
+    condition evidence rather than atom sources, so mapped correspondence and
+    reaction-core consumers must receive ``reactants>>products``.  Leave
+    malformed strings untouched so their normal parser rejects them.
+    """
+
+    fields = reaction_smiles.split(">")
+    if len(fields) != 3:
+        return reaction_smiles
+    reactants, _, products = fields
+    return f"{reactants}>>{products}"
+
+
 def _mapped_components(components: tuple, assignments: dict[tuple[int, int], int]) -> Optional[str]:
     values = []
     for component_index, component in enumerate(components):
@@ -45,11 +61,11 @@ def _mapped_components(components: tuple, assignments: dict[tuple[int, int], int
 
 
 def materialize_atom_mapping(reaction_smiles: str) -> Optional[MaterializedMapping]:
-    """Return supplied maps or re-run the deterministic correspondence provider."""
+    """Return a two-sided mapped reaction for deterministic correspondence."""
 
     if _ATOM_MAP.search(reaction_smiles):
         return MaterializedMapping(
-            reaction_smiles=reaction_smiles,
+            reaction_smiles=_without_reagent_field(reaction_smiles),
             evidence="supplied_atom_mapping",
             confidence=1.0,
         )

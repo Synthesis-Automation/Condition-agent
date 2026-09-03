@@ -23,7 +23,7 @@ from .synthetic_partition import (
 
 
 PARTITION_PROJECTION_SCHEMA_VERSION = "1.0"
-PARTITION_PROJECTION_ALGORITHM_VERSION = "route_partition_projection.v1"
+PARTITION_PROJECTION_ALGORITHM_VERSION = "route_partition_projection.v2"
 MAXIMUM_ISOMORPHISMS = 33
 
 
