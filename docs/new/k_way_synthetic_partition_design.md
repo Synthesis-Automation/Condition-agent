@@ -1,6 +1,6 @@
 ---
 title: "General Synthetic Partition Landscape and Strategic Route Realization"
-version: "0.8"
+version: "0.9"
 status: "Design and implementation plan"
 encoding: "UTF-8"
 ---
@@ -1278,6 +1278,64 @@ export. The generated artifacts are:
 results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.json
 results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.html
 ```
+
+#### 11.0.1 Guarded operator-coverage comparison
+
+The same ten selected targets now have a deterministic root-action comparison
+between the production-style strict `pass_only` library and the experimental
+`validated_departures` library. The guarded policy does not accept arbitrary
+review-grade reactions: it requires complete active-atom mapping, verified
+product completeness, no blocking core reason, graph-checked retained edits,
+and restricts unchecked edits to mapped departing atoms absent from the
+reported product.
+
+| Root-action metric | Strict pass-only | Guarded validated departures |
+| --- | ---: | ---: |
+| targets returning graph-validated candidates | 10/10 | 10/10 |
+| exact observed precursors recovered | 0/10 | 9/10 |
+| exact at rank 1 | 0/10 | 7/10 |
+| observed strategy recovered | 0/10 | 8/10 |
+| observed site recovered | 2/10 | 8/10 |
+| observed operator recovered | 0/10 | 9/10 |
+| exact recovery without visible source-patent overlap | 0/10 | 4/10 |
+
+The only test-split target is recovered exactly at rank 4 without source-patent
+overlap. Nine cases are train routes, five guarded exact recoveries visibly use
+source-patent precedent, and one additional case contains a non-exact candidate
+with source-patent overlap. These fields are exposed rather than filtered after
+generation. Consequently, this packet is an operator-coverage and review tool,
+not a blind accuracy estimate. A genuinely patent-excluded train-case result
+would require rebuilding the library without each source patent.
+
+The comparison also exposes the computational consequence of broader coverage.
+The guarded library contains 7,298 templates rather than 477; each target in
+this packet applies 110–1,000 templates across the specificity ladder and uses
+100–200 forward-validation attempts. Necessary-feature indexing remains active,
+but narrower retrieval and staged validation are the next performance work.
+
+The command and generated artifacts are:
+
+```text
+python -m core_retrosynthesis compare-root-operator-coverage \
+  results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.json \
+  results/core_retrosynthesis/route_step_operator_library/v1/operators_final/operator_library_v3.json.gz \
+  results/core_retrosynthesis/route_step_operator_library/v1/operators_validated_departures/operator_library_v3.json.gz \
+  results/core_retrosynthesis/synthetic_partition/dataset10_operator_coverage_comparison.v1.json \
+  results/core_retrosynthesis/synthetic_partition/dataset10_operator_coverage_comparison.v1.html \
+  --top-k 25 --max-templates-to-apply 500 \
+  --max-candidates-to-validate 100
+
+results/core_retrosynthesis/synthetic_partition/
+  dataset10_operator_coverage_comparison.v1.json
+  dataset10_operator_coverage_comparison.v1.html
+```
+
+Each candidate displayed in the HTML passed the same graph and forward-signature
+validation as ordinary single-step search. The observed reaction is hidden in a
+review disclosure, top alternatives are shown as structures, source-patent
+overlap is labeled, and reviewer decisions persist locally. Exact first-step
+recovery still does not establish a terminal, feasible, condition-supported
+multistep route.
 
 ### 11.1 Required baselines
 

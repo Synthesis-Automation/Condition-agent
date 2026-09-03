@@ -88,6 +88,10 @@ from .operator_benchmark import (
     load_operator_rows,
     run_operator_coverage_benchmark,
 )
+from .operator_coverage_comparison import (
+    build_root_operator_coverage_comparison,
+    write_operator_coverage_comparison,
+)
 from .precedent_route_expansion import run_precedent_route_expansion_poc
 from .precedent_route_expansion_review import (
     write_precedent_route_expansion_html,
@@ -487,6 +491,26 @@ def _parser() -> argparse.ArgumentParser:
         default=DEFAULT_PARTITION_DATASET_REVIEW_SEED,
     )
     partition_dataset_review.add_argument("--minimum-k", type=int, default=3)
+
+    operator_coverage_comparison = commands.add_parser(
+        "compare-root-operator-coverage",
+        help="compare strict and guarded operator libraries on selected roots",
+    )
+    operator_coverage_comparison.add_argument("source_partition_review")
+    operator_coverage_comparison.add_argument("strict_library")
+    operator_coverage_comparison.add_argument("guarded_library")
+    operator_coverage_comparison.add_argument("output_json")
+    operator_coverage_comparison.add_argument("output_html")
+    operator_coverage_comparison.add_argument("--top-k", type=int, default=25)
+    operator_coverage_comparison.add_argument(
+        "--max-templates-to-apply", type=int, default=500
+    )
+    operator_coverage_comparison.add_argument(
+        "--max-candidates-to-validate", type=int, default=100
+    )
+    operator_coverage_comparison.add_argument(
+        "--lazy-validation", action="store_true"
+    )
 
     partition_realization = commands.add_parser(
         "realize-partition",
@@ -1571,6 +1595,40 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     "source_route_count": review.source_route_count,
                     "eligible_route_count": review.eligible_route_count,
                     "sample_size": review.sample_size,
+                    "output_json": str(Path(arguments.output_json).resolve()),
+                    "output_html": str(Path(arguments.output_html).resolve()),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if arguments.command == "compare-root-operator-coverage":
+        comparison = build_root_operator_coverage_comparison(
+            arguments.source_partition_review,
+            arguments.strict_library,
+            arguments.guarded_library,
+            config=RouteActionEvaluationConfig(
+                top_k=arguments.top_k,
+                max_templates_to_apply=arguments.max_templates_to_apply,
+                max_candidates_to_validate=(
+                    arguments.max_candidates_to_validate
+                ),
+                lazy_validation=arguments.lazy_validation,
+            ),
+        )
+        write_operator_coverage_comparison(
+            comparison,
+            arguments.output_json,
+            arguments.output_html,
+        )
+        print(
+            json.dumps(
+                {
+                    "comparison_id": comparison.comparison_id,
+                    "strict_summary": comparison.strict_summary.to_dict(),
+                    "guarded_summary": comparison.guarded_summary.to_dict(),
                     "output_json": str(Path(arguments.output_json).resolve()),
                     "output_html": str(Path(arguments.output_html).resolve()),
                 },
