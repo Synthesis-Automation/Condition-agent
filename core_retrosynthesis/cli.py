@@ -72,6 +72,11 @@ from .partition_assessment_review import (
     write_partition_assessment_review,
     write_partition_blind_review_packet,
 )
+from .partition_dataset_review import (
+    DEFAULT_PARTITION_DATASET_REVIEW_SEED,
+    build_partition_dataset_review,
+    write_partition_dataset_review,
+)
 from .partition_realization import (
     PartitionRealizationConfig,
     PartitionRealizationResult,
@@ -467,6 +472,21 @@ def _parser() -> argparse.ArgumentParser:
         "--no-hierarchical-ranking",
         action="store_true",
     )
+
+    partition_dataset_review = commands.add_parser(
+        "render-partition-dataset-review",
+        help="sample observed routes and render their K-way frontiers",
+    )
+    partition_dataset_review.add_argument("source_route_trees")
+    partition_dataset_review.add_argument("output_json")
+    partition_dataset_review.add_argument("output_html")
+    partition_dataset_review.add_argument("--sample-size", type=int, default=10)
+    partition_dataset_review.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_PARTITION_DATASET_REVIEW_SEED,
+    )
+    partition_dataset_review.add_argument("--minimum-k", type=int, default=3)
 
     partition_realization = commands.add_parser(
         "realize-partition",
@@ -1531,6 +1551,33 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             arguments.output_html,
         )
         print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+
+    if arguments.command == "render-partition-dataset-review":
+        review = build_partition_dataset_review(
+            arguments.source_route_trees,
+            sample_size=arguments.sample_size,
+            seed=arguments.seed,
+            minimum_k=arguments.minimum_k,
+        )
+        write_partition_dataset_review(
+            review,
+            arguments.output_json,
+            arguments.output_html,
+        )
+        print(
+            json.dumps(
+                {
+                    "source_route_count": review.source_route_count,
+                    "eligible_route_count": review.eligible_route_count,
+                    "sample_size": review.sample_size,
+                    "output_json": str(Path(arguments.output_json).resolve()),
+                    "output_html": str(Path(arguments.output_html).resolve()),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
         return 0
 
     if arguments.command == "partition-landscape":

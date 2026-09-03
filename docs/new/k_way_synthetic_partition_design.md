@@ -1,6 +1,6 @@
 ---
 title: "General Synthetic Partition Landscape and Strategic Route Realization"
-version: "0.6"
+version: "0.7"
 status: "Design and implementation plan"
 encoding: "UTF-8"
 ---
@@ -1212,6 +1212,61 @@ results/core_retrosynthesis/synthetic_partition/worked_example_phase5e.v1.html
 ```
 
 ## 11. Evaluation
+
+### 11.0 Observed-route K-way pilot packet
+
+The first corpus-level system test uses the canonical patent-disjoint observed
+route trees:
+
+```text
+datasets/external/higher_level_retrosynthesis/figshare_v2/curated/
+  routes.poc.tree.v2.jsonl.gz
+```
+
+All 5,000 route trees were projected before sampling. Maximum resolved `k`
+coverage is:
+
+| Maximum resolved k | Routes | Corpus fraction |
+| ---: | ---: | ---: |
+| 1 | 4,692 | 93.84% |
+| 2 | 284 | 5.68% |
+| 3 | 24 | 0.48% |
+
+This is primarily an atom-correspondence coverage result, not evidence that
+the remaining routes lack meaningful multi-module interpretations. The pilot
+is deliberately enriched for functionality testing: it selects one fully
+projected `k=3` anchor, then nine routes without replacement from the remaining
+`k=3`-eligible set using seed `20260903`. It must not be reported as an
+unbiased accuracy sample.
+
+The ten cases include seven 3-step routes, two 4-step routes, and one 5-step
+route across six train, three test, and one validation patents. They produce
+30 graphical frontier panels. One route is fully projected through the
+observed sequence; nine expose `k=3` before one unresolved occurrence stops
+further propagation. Partial cases are retained and visibly labeled rather
+than silently discarded.
+
+The reusable builder and CLI are:
+
+```text
+core_retrosynthesis/partition_dataset_review.py
+
+python -m core_retrosynthesis render-partition-dataset-review \
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.tree.v2.jsonl.gz \
+  results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.json \
+  results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.html \
+  --sample-size 10 --seed 20260903 --minimum-k 3
+```
+
+The HTML contains target structures colored by module ownership, separate
+latent precursor structures, strategic interfaces, the observed reactions
+used for projection, filters, locally persisted review fields, and review JSON
+export. The generated artifacts are:
+
+```text
+results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.json
+results/core_retrosynthesis/synthetic_partition/dataset10_kway_review.v1.html
+```
 
 ### 11.1 Required baselines
 

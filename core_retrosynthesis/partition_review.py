@@ -30,7 +30,9 @@ _COLORS = (
 )
 
 
-def _partition_svg(partition: SyntheticPartition) -> str:
+def render_partition_svg(partition: SyntheticPartition) -> str:
+    """Render one target with role-neutral module coloring."""
+
     molecule = Chem.MolFromSmiles(partition.target_smiles)
     if molecule is None:
         return "<p>Target depiction unavailable.</p>"
@@ -99,7 +101,7 @@ def render_partition_landscape_html(
             f"<p>Source: <strong>{escape(partition.source_kind)}</strong>; "
             f"heuristic score: {partition.heuristic_score:.4f}; "
             f"realization: {escape(partition.realization_status)}</p>"
-            f"<div class='depiction'>{_partition_svg(partition)}</div>"
+            f"<div class='depiction'>{render_partition_svg(partition)}</div>"
             "<h3>Role-neutral modules</h3>"
             "<table><thead><tr><th>Display</th><th>Atoms</th>"
             "<th>Target maps</th><th>Attachment maps</th></tr></thead>"
@@ -175,6 +177,7 @@ def write_partition_landscape_review(
 
 __all__ = [
     "PARTITION_REVIEW_SCHEMA_VERSION",
+    "render_partition_svg",
     "render_partition_landscape_html",
     "write_partition_landscape_review",
 ]

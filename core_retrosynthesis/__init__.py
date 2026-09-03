@@ -294,6 +294,16 @@ from .partition_assessment_review import (
     write_partition_assessment_review,
     write_partition_blind_review_packet,
 )
+from .partition_dataset_review import (
+    DEFAULT_PARTITION_DATASET_REVIEW_SEED,
+    PARTITION_DATASET_REVIEW_ALGORITHM_VERSION,
+    PARTITION_DATASET_REVIEW_SCHEMA_VERSION,
+    PartitionDatasetReview,
+    PartitionDatasetReviewCase,
+    build_partition_dataset_review,
+    render_partition_dataset_review_html,
+    write_partition_dataset_review,
+)
 from .partition_landscape import (
     SYNTHETIC_PARTITION_POLICY_PATH,
     SyntheticPartitionPolicy,
@@ -313,6 +323,7 @@ from .partition_projection import (
 from .partition_review import (
     PARTITION_REVIEW_SCHEMA_VERSION,
     render_partition_landscape_html,
+    render_partition_svg,
     write_partition_landscape_review,
 )
 from .synthetic_partition import (
@@ -615,6 +626,7 @@ from .sources import (
 )
 
 __all__ = [
+    "DEFAULT_PARTITION_DATASET_REVIEW_SEED",
     "InterfaceHypothesis",
     "LatentModuleState",
     "ModuleAnnotation",
@@ -631,6 +643,8 @@ __all__ = [
     "PARTITION_ASSESSMENT_POLICY_PATH",
     "PARTITION_ASSESSMENT_REVIEW_VERSION",
     "PARTITION_ASSESSMENT_SCHEMA_VERSION",
+    "PARTITION_DATASET_REVIEW_ALGORITHM_VERSION",
+    "PARTITION_DATASET_REVIEW_SCHEMA_VERSION",
     "PRECURSOR_STATE_EVIDENCE_LEVELS",
     "PRECURSOR_STATE_DIRECTIONALITY_STATUSES",
     "PRECURSOR_STATE_FEASIBILITY_ALGORITHM_VERSION",
@@ -644,6 +658,8 @@ __all__ = [
     "PartitionSearchDiagnostics",
     "PartitionAssessmentPolicy",
     "PartitionAssessmentResult",
+    "PartitionDatasetReview",
+    "PartitionDatasetReviewCase",
     "PartitionInterfaceAssessment",
     "PartitionRouteAssessment",
     "PartitionStepAssessment",
@@ -678,6 +694,7 @@ __all__ = [
     "aggregate_precursor_state_route_feasibility",
     "assess_precursor_state_feasibility",
     "build_module_id",
+    "build_partition_dataset_review",
     "build_operator_partition_landscape",
     "build_partition_id",
     "build_target_id",
@@ -690,6 +707,8 @@ __all__ = [
     "project_reaction_to_target",
     "project_route_partitions",
     "render_partition_landscape_html",
+    "render_partition_dataset_review_html",
+    "render_partition_svg",
     "render_partition_assessment_html",
     "realize_synthetic_partition",
     "validate_synthetic_partition",
@@ -700,6 +719,7 @@ __all__ = [
     "build_partition_blind_review_packet",
     "write_partition_assessment_review",
     "write_partition_blind_review_packet",
+    "write_partition_dataset_review",
     "write_partition_landscape_review",
     "ROUTE_VERIFICATION_SCHEMA_VERSION",
     "STEP_PRECEDENT_LOOKUP_SCHEMA_VERSION",
