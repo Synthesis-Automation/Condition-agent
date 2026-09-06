@@ -1397,6 +1397,165 @@ typed commercial-stock index followed by a larger, leakage-controlled search
 that measures complete routes independently from recovery of the recorded
 route.
 
+#### 11.0.3 Literature-derived latent states and route ordering
+
+The next high-return layer is implemented as `route_state_learning.v1`. It does
+not train an unconstrained reaction generator. It mines two kinds of evidence
+from the existing patent-disjoint route cores:
+
+1. graph-observed amine and alcohol state-release steps, which provide evidence
+   that the inverse guarded operator can create a useful protected or otherwise
+   latent precursor state; and
+2. producer-consumer relations whose atom lineage supports a real dependency,
+   which provide an observed reverse-search ordering between two guarded
+   operators.
+
+The state label is secondary to the molecular evidence. A step first has to be
+a parsed bond cleavage with a matching reaction pattern. Direct precedent IDs
+map observed steps to guarded operators when available. For validation and test
+reactions hidden from operator construction, a fallback mapping is admitted
+only when the complete edit-token tuple identifies exactly one guarded
+operator. Ambiguous edit signatures remain unmapped.
+
+The catalogue obeys the following leakage and planning boundaries:
+
+- only `train` patents contribute operator and ordering support;
+- validation and test routes are used only to report coverage;
+- independent adjacent branches do not become ordering constraints;
+- review-class `temporary_group_removed` evidence remains visibly distinct
+  from strict created-handle or continued-site dependencies;
+- the planner hook can reserve a candidate from a train-supported state operator
+  only after the ordinary operator, graph, forward-validation, compatibility,
+  and realism gates have admitted it; and
+- ordering evidence only reorders already valid route states. It cannot create
+  a precursor, force a reaction, change a terminal decision, or bypass a hard
+  chemistry filter.
+
+This gives the planner a practical first version of `B + C + latent(A)`: if a
+guarded reverse operator already generates the latent form and training routes
+support that operator as a state-release inverse, the bounded portfolio keeps
+one such option from being lost to constructive transformations. Subsequent
+steps are favored only when their operator order occurred in a structurally
+linked training route. Unsupported protecting-group invention remains outside
+the contract.
+
+Build and inspect the catalogue with:
+
+```text
+python -m core_retrosynthesis mine-route-state-learning \
+  datasets/external/higher_level_retrosynthesis/figshare_v2/curated/routes.poc.core.v1.jsonl.gz \
+  results/core_retrosynthesis/route_step_operator_library/v1/operators_validated_departures/operator_library_v3.json.gz \
+  results/core_retrosynthesis/route_state_learning/route_state_learning.v1.json.gz \
+  results/core_retrosynthesis/route_state_learning/route_state_learning_review.v1.html
+```
+
+Opt into both safe planner hooks with:
+
+```text
+python -m core_retrosynthesis plan-routes LIBRARY STOCK_INDEX TARGET \
+  --route-state-catalog \
+  results/core_retrosynthesis/route_state_learning/route_state_learning.v1.json.gz
+```
+
+The HTML report shows structures for sampled state releases and paired physical
+steps, the forward dependency, and the order seen by retrosynthetic search. Its
+held-out percentages are catalogue coverage, not route accuracy or experimental
+feasibility.
+
+The full 5,000-route build produced the following observed evidence:
+
+| Measure | Result |
+| --- | ---: |
+| training state-release actions | 1,866 |
+| conservatively operator-mapped training state releases | 778 |
+| train-supported state operators | 28 |
+| admitted training dependencies | 5,316 |
+| review-class adjacent temporary-group removals | 74 |
+| distinct supported reverse operator transitions | 952 |
+| validation mapped ordering coverage | 6/15 |
+| test mapped ordering coverage | 5/11 |
+
+No validation or test state release mapped unambiguously to a guarded operator.
+That zero is retained rather than replaced with an optimistic ambiguous match:
+it says this corpus/library combination cannot yet measure transfer of a
+specific protecting-group operator without replaying operators against the
+held-out products. Coarse action-class ordering covered all held-out dependency
+pairs, but those classes are too broad to establish useful sequence prediction.
+
+The fixed-budget 10-target ablation was run both with state-operator reservation
+alone and with reservation plus learned operator-sequence ordering. Both modes
+kept the ordinary planner's solved count (4/10), partial-only count (6/10), root
+recovery (8/10), and any-known-action recovery (8/10), but known-action matches
+fell from 12/40 to 10/40. Cases 1 and 10 each lost one downstream known action.
+Supported latent-state operators nevertheless appeared in retained routes for
+four targets. This is evidence of strategic diversification, not an accuracy
+improvement: the added protected-state lane displaced an observed-route action
+under the fixed top-three budget. Learned ordering made no further difference
+on this panel.
+
+Consequently, no route-state mode is enabled by default. Supplying
+`--route-state-catalog` explicitly requests the validated state-operator
+portfolio and exposes its diversity/accuracy trade-off. Operator-sequence
+ordering requires the additional `--route-state-ordering` experimental flag.
+Promotion into default ranking requires a separate held-out panel with expert
+utility labels for useful latent alternatives; exact reproduction of one
+recorded route is not sufficient for that decision.
+
+The generated ablation artifacts are:
+
+```text
+results/core_retrosynthesis/synthetic_partition/
+  dataset10_multistep_route_state_selection.v1.json
+  dataset10_multistep_route_state_selection.v1.html
+```
+
+#### 11.0.4 Baseline-preserving latent-route portfolio
+
+The state-selection ablation exposed a search-budget problem rather than an
+invalid-chemistry problem: a useful protected-state lane had to replace one of
+the ordinary top-three actions. The high-ROI correction is implemented as
+`latent_route_portfolio.v1`.
+
+The ordinary planner and the state-aware planner now run independently. The
+ordinary result is retained verbatim. A second lane may add at most one route
+when all of the following are true:
+
+- the route differs from every ordinary solved and partial route by its physical
+  reaction sequence;
+- at least one step uses an operator supported by train-split state-release
+  evidence; and
+- every step has already passed the canonical planner's graph and validation
+  gates.
+
+The extra route never changes baseline route IDs, order, solved status, or
+metrics. This costs approximately two bounded searches, but makes the strategic
+trade-off explicit and prevents diversity from masquerading as a ranking gain.
+Operator support still does not prove that protection is necessary; the lane is
+presented for chemist review.
+
+The combined dataset-10 review preserves all ten baseline portfolios and their
+12/40 observed-action lower bound. It adds one novel supported latent-state
+route for four targets: cases 1, 3, 7, and 10.
+
+```text
+python -m core_retrosynthesis build-latent-portfolio-review \
+  results/core_retrosynthesis/synthetic_partition/dataset10_multistep_evaluation.v1.json \
+  results/core_retrosynthesis/synthetic_partition/dataset10_multistep_route_state_selection.v1.json \
+  results/core_retrosynthesis/route_state_learning/route_state_learning.v1.json.gz \
+  results/core_retrosynthesis/synthetic_partition/dataset10_multistep_latent_augmented.v1.json \
+  results/core_retrosynthesis/synthetic_partition/dataset10_multistep_latent_augmented.v1.html
+```
+
+For a new target, the live two-search command is:
+
+```text
+python -m core_retrosynthesis plan-latent-portfolio \
+  LIBRARY STOCK_INDEX ROUTE_STATE_CATALOG TARGET OUTPUT_JSON OUTPUT_HTML
+```
+
+Learned operator-sequence ordering remains disabled unless the additional
+`--route-state-ordering` experimental option is supplied.
+
 ### 11.1 Required baselines
 
 Compare:

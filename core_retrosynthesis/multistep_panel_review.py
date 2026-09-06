@@ -216,7 +216,13 @@ def _reference_column(case: MultistepPanelCase) -> str:
     )
 
 
-def _case_card(case: MultistepPanelCase, index: int, *, top_k: int) -> str:
+def _case_card(
+    case: MultistepPanelCase,
+    index: int,
+    *,
+    top_k: int,
+    policy_label: str = "Route policy",
+) -> str:
     if case.policy is None:
         comparison = "Observed vs planner"
         comparison_class = "reference"
@@ -259,7 +265,7 @@ def _case_card(case: MultistepPanelCase, index: int, *, top_k: int) -> str:
         + _reference_column(case)
         + _method_column("Planner baseline", case.baseline, top_k=top_k)
         + (
-            _method_column("Route policy", case.policy, top_k=top_k)
+            _method_column(policy_label, case.policy, top_k=top_k)
             if case.policy is not None
             else ""
         )
@@ -322,6 +328,7 @@ def render_multistep_panel_html(
     title: str = "Familiar-target multistep retrosynthesis review",
     top_k: int = 3,
     metadata: Optional[Mapping[str, Any]] = None,
+    policy_label: str = "Route policy",
 ) -> str:
     """Render baseline and policy results as a self-contained HTML review."""
 
@@ -349,7 +356,7 @@ def render_multistep_panel_html(
         for value in categories
     )
     cards = "".join(
-        _case_card(case, index, top_k=top_k)
+        _case_card(case, index, top_k=top_k, policy_label=policy_label)
         for index, case in enumerate(values, 1)
     )
     report_metadata = dict(metadata or {})

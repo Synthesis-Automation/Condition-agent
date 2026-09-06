@@ -96,9 +96,14 @@ def test_cli_exposes_partition_review_route_evaluation() -> None:
             "--max-depth",
             "4",
             "--allow-untyped-literature-terminals",
+            "--route-state-catalog",
+            "route-state.json.gz",
+            "--route-state-ordering",
         ]
     )
 
     assert arguments.command == "evaluate-partition-review-routes"
     assert arguments.max_depth == 4
     assert arguments.allow_untyped_literature_terminals is True
+    assert arguments.route_state_catalog == "route-state.json.gz"
+    assert arguments.route_state_ordering is True

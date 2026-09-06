@@ -1,0 +1,9 @@
+{
+  "definition_id": "latent_route_portfolio.v1",
+  "schema_version": "1.0",
+  "maximum_exploratory_routes": 1,
+  "require_supported_state_operator": true,
+  "require_route_novelty": true,
+  "preserve_baseline_routes": true,
+  "ranking_influence": "separate_opt_in_exploratory_lane"
+}

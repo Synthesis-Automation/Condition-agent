@@ -44,6 +44,9 @@ class MultistepDatasetEvaluationConfig:
     diversify: bool = True
     use_hierarchical_ranking: bool = True
     allow_untyped_literature_terminals: bool = False
+    route_state_definition_id: str = ""
+    route_state_catalog_sha256: str = ""
+    route_state_ordering_enabled: bool = False
 
     def __post_init__(self) -> None:
         for value, label in (
@@ -252,6 +255,8 @@ def evaluate_partition_review_routes(
     stock_index_path: str = "<in-memory>",
     planner: MultistepPlanner = plan_multistep_routes,
     progress: Optional[ProgressCallback] = None,
+    search_guidance: Any = None,
+    route_action_selector: Any = None,
 ) -> MultistepDatasetEvaluation:
     """Run the same bounded multistep search for every selected route root."""
 
@@ -286,6 +291,8 @@ def evaluate_partition_review_routes(
             allow_untyped_literature_terminals=(
                 config.allow_untyped_literature_terminals
             ),
+            search_guidance=search_guidance,
+            route_action_selector=route_action_selector,
         )
         observed = _observed_actions(tree)
         matched = _maximum_matches(result, observed)
@@ -350,6 +357,13 @@ def evaluate_partition_review_routes(
     ]
     if config.allow_untyped_literature_terminals:
         warnings.append("UNTYPED_LITERATURE_TERMINALS_ENABLED")
+    if config.route_state_definition_id:
+        warnings.append(
+            "TRAIN_ONLY_ROUTE_STATE_GUIDANCE_ENABLED_"
+            f"{config.route_state_definition_id}"
+        )
+    if config.route_state_ordering_enabled:
+        warnings.append("EXPERIMENTAL_ROUTE_STATE_ORDERING_ENABLED")
     policy = str(library.definition.get("core_admission_policy") or "pass_only")
     identity = digest(
         "MSDE1",
@@ -380,6 +394,8 @@ def build_multistep_dataset_evaluation(
     stock_index_path: str | Path,
     config: MultistepDatasetEvaluationConfig = MultistepDatasetEvaluationConfig(),
     progress: Optional[ProgressCallback] = None,
+    route_state_catalog_path: str | Path | None = None,
+    enable_route_state_ordering: bool = False,
 ) -> MultistepDatasetEvaluation:
     """Load file inputs and run a reproducible ten-target-style evaluation."""
 
@@ -389,6 +405,23 @@ def build_multistep_dataset_evaluation(
     from .generic_library import load_generic_library
 
     library = load_generic_library(resolved_library_path)
+    search_guidance = None
+    route_action_selector = None
+    if route_state_catalog_path is not None:
+        from .route_state_learning import (
+            LiteratureRouteActionSelector,
+            LiteratureRouteOrderingGuidance,
+            load_route_state_learning_catalog,
+        )
+
+        route_state_catalog = load_route_state_learning_catalog(
+            route_state_catalog_path
+        )
+        if enable_route_state_ordering:
+            search_guidance = LiteratureRouteOrderingGuidance(
+                route_state_catalog
+            )
+        route_action_selector = LiteratureRouteActionSelector(route_state_catalog)
     return evaluate_partition_review_routes(
         review,
         library,
@@ -400,6 +433,8 @@ def build_multistep_dataset_evaluation(
         library_sha256=_sha256(resolved_library_path),
         stock_index_path=str(Path(stock_index_path).resolve()),
         progress=progress,
+        search_guidance=search_guidance,
+        route_action_selector=route_action_selector,
     )
 
 

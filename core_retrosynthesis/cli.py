@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from dataclasses import asdict
@@ -66,6 +67,12 @@ from .generic_search import (
 from .html_report import DEFAULT_METHODS, write_comparison_html
 from .library import build_library, load_library, save_library
 from .multistep import plan_multistep_routes
+from .latent_route_portfolio import (
+    build_dataset_latent_portfolio_review,
+    plan_baseline_preserving_latent_portfolio,
+    write_dataset_latent_portfolio_review,
+    write_latent_route_portfolio,
+)
 from .multistep_dataset_evaluation import (
     MultistepDatasetEvaluationConfig,
     build_multistep_dataset_evaluation,
@@ -106,6 +113,14 @@ from .route_conversion import (
     DEFAULT_OBSERVED_ROUTE_DATASET_ID,
     DEFAULT_OBSERVED_ROUTE_SAMPLE_SEED,
     convert_observed_route_corpus,
+)
+from .route_state_learning import (
+    LiteratureRouteActionSelector,
+    LiteratureRouteOrderingGuidance,
+    load_route_state_learning_catalog,
+    mine_route_state_learning_catalog,
+    save_route_state_learning_catalog,
+    write_route_state_learning_html,
 )
 from .route_core_conversion import (
     DEFAULT_ROUTE_CORE_SAMPLE_SEED,
@@ -557,6 +572,18 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="accept legacy literature matches without source-role provenance",
     )
+    multistep_dataset_evaluation.add_argument(
+        "--route-state-catalog",
+        help=(
+            "optional train-only route-state catalogue for an ablation against "
+            "the ordinary planner"
+        ),
+    )
+    multistep_dataset_evaluation.add_argument(
+        "--route-state-ordering",
+        action="store_true",
+        help="include experimental learned state ordering in the ablation",
+    )
 
     partition_realization = commands.add_parser(
         "realize-partition",
@@ -679,6 +706,21 @@ def _parser() -> argparse.ArgumentParser:
         help="optional learned policy over already validated one-step actions",
     )
     route_search.add_argument(
+        "--route-state-catalog",
+        help=(
+            "optional train-only literature catalogue for validated latent-state "
+            "reservation"
+        ),
+    )
+    route_search.add_argument(
+        "--route-state-ordering",
+        action="store_true",
+        help=(
+            "experimentally order valid states by learned operator sequences; "
+            "requires --route-state-catalog"
+        ),
+    )
+    route_search.add_argument(
         "--allow-untyped-literature-terminals",
         action="store_true",
         help=(
@@ -686,6 +728,59 @@ def _parser() -> argparse.ArgumentParser:
             "provenance"
         ),
     )
+
+    latent_portfolio = commands.add_parser(
+        "plan-latent-portfolio",
+        help=(
+            "preserve ordinary top routes and add a separate supported "
+            "latent-state lane"
+        ),
+    )
+    latent_portfolio.add_argument("library")
+    latent_portfolio.add_argument("stock_index")
+    latent_portfolio.add_argument("route_state_catalog")
+    latent_portfolio.add_argument("target")
+    latent_portfolio.add_argument("output_json")
+    latent_portfolio.add_argument("output_html")
+    latent_portfolio.add_argument("--max-depth", type=int, choices=(2, 3), default=3)
+    latent_portfolio.add_argument(
+        "--molecular-weight-threshold", type=float, default=150.0
+    )
+    latent_portfolio.add_argument("--top-k-routes", type=int, default=5)
+    latent_portfolio.add_argument("--per-step-top-k", type=int, default=5)
+    latent_portfolio.add_argument("--beam-width", type=int, default=20)
+    latent_portfolio.add_argument("--max-expansions", type=int, default=100)
+    latent_portfolio.add_argument("--max-templates", type=int, default=300)
+    latent_portfolio.add_argument(
+        "--max-candidates-to-validate", type=int, default=50
+    )
+    latent_portfolio.add_argument("--no-context", action="store_true")
+    latent_portfolio.add_argument("--skip-l0", action="store_true")
+    latent_portfolio.add_argument("--no-diversity", action="store_true")
+    latent_portfolio.add_argument(
+        "--no-hierarchical-ranking", action="store_true"
+    )
+    latent_portfolio.add_argument(
+        "--allow-untyped-literature-terminals", action="store_true"
+    )
+    latent_portfolio.add_argument(
+        "--route-state-ordering",
+        action="store_true",
+        help="also enable experimental operator-sequence ordering",
+    )
+
+    latent_dataset_review = commands.add_parser(
+        "build-latent-portfolio-review",
+        help=(
+            "combine ordinary and state-search evaluations while preserving "
+            "all baseline routes"
+        ),
+    )
+    latent_dataset_review.add_argument("baseline_evaluation")
+    latent_dataset_review.add_argument("exploratory_evaluation")
+    latent_dataset_review.add_argument("route_state_catalog")
+    latent_dataset_review.add_argument("output_json")
+    latent_dataset_review.add_argument("output_html")
 
     route_curation = commands.add_parser(
         "curate-route-corpus",
@@ -925,6 +1020,22 @@ def _parser() -> argparse.ArgumentParser:
     coupled_strategy.add_argument("--max-routes", type=int)
     coupled_strategy.add_argument(
         "--title", default="Coupled two-step strategy review"
+    )
+
+    route_state = commands.add_parser(
+        "mine-route-state-learning",
+        help=(
+            "mine train-only latent-state and ordering evidence and render "
+            "held-out coverage"
+        ),
+    )
+    route_state.add_argument("source_route_cores")
+    route_state.add_argument("operator_library")
+    route_state.add_argument("output_json")
+    route_state.add_argument("output_html")
+    route_state.add_argument("--max-routes", type=int)
+    route_state.add_argument(
+        "--title", default="Literature route-state learning review"
     )
 
     coupled_replay = commands.add_parser(
@@ -1249,6 +1360,32 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(
             json.dumps(
                 {**json_summary, **html_summary}, indent=2, sort_keys=True
+            )
+        )
+        return 0
+    if arguments.command == "mine-route-state-learning":
+        catalog = mine_route_state_learning_catalog(
+            arguments.source_route_cores,
+            arguments.operator_library,
+            max_routes=arguments.max_routes,
+        )
+        save_route_state_learning_catalog(catalog, arguments.output_json)
+        write_route_state_learning_html(
+            catalog, arguments.output_html, title=arguments.title
+        )
+        print(
+            json.dumps(
+                {
+                    "route_counts": catalog.route_counts,
+                    "train_state_operator_count": len(
+                        catalog.supported_state_operator_ids
+                    ),
+                    "heldout_metrics": catalog.heldout_metrics,
+                    "output_json": str(Path(arguments.output_json).resolve()),
+                    "output_html": str(Path(arguments.output_html).resolve()),
+                },
+                indent=2,
+                sort_keys=True,
             )
         )
         return 0
@@ -1685,6 +1822,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
 
     if arguments.command == "evaluate-partition-review-routes":
+        if arguments.route_state_ordering and not arguments.route_state_catalog:
+            raise ValueError(
+                "--route-state-ordering requires --route-state-catalog"
+            )
+        evaluation_route_state_catalog = (
+            load_route_state_learning_catalog(arguments.route_state_catalog)
+            if arguments.route_state_catalog
+            else None
+        )
         config = MultistepDatasetEvaluationConfig(
             max_depth=arguments.max_depth,
             molecular_weight_threshold=arguments.molecular_weight_threshold,
@@ -1701,6 +1847,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             allow_untyped_literature_terminals=(
                 arguments.allow_untyped_literature_terminals
             ),
+            route_state_definition_id=(
+                evaluation_route_state_catalog.definition_id
+                if evaluation_route_state_catalog is not None
+                else ""
+            ),
+            route_state_catalog_sha256=(
+                hashlib.sha256(
+                    Path(arguments.route_state_catalog).read_bytes()
+                ).hexdigest()
+                if arguments.route_state_catalog
+                else ""
+            ),
+            route_state_ordering_enabled=arguments.route_state_ordering,
         )
 
         def report_case(index: int, total: int, target: str) -> None:
@@ -1718,6 +1877,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 stock_index_path=arguments.stock_index,
                 config=config,
                 progress=report_case,
+                route_state_catalog_path=arguments.route_state_catalog,
+                enable_route_state_ordering=arguments.route_state_ordering,
             )
         summary = write_multistep_dataset_evaluation(
             evaluation,
@@ -1900,8 +2061,72 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
         return 0
 
-    if arguments.command == "plan-routes":
+    if arguments.command == "build-latent-portfolio-review":
+        route_state_catalog = load_route_state_learning_catalog(
+            arguments.route_state_catalog
+        )
+        review = build_dataset_latent_portfolio_review(
+            arguments.baseline_evaluation,
+            arguments.exploratory_evaluation,
+            route_state_catalog,
+        )
+        summary = write_dataset_latent_portfolio_review(
+            review, arguments.output_json, arguments.output_html
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+
+    if arguments.command == "plan-latent-portfolio":
         loaded_library = load_generic_library(arguments.library)
+        route_state_catalog = load_route_state_learning_catalog(
+            arguments.route_state_catalog
+        )
+        with open_stock_lookup(arguments.stock_index) as stock_index:
+            portfolio = plan_baseline_preserving_latent_portfolio(
+                arguments.target,
+                loaded_library,
+                stock_index,
+                route_state_catalog,
+                enable_experimental_ordering=arguments.route_state_ordering,
+                max_depth=arguments.max_depth,
+                molecular_weight_threshold=(
+                    arguments.molecular_weight_threshold
+                ),
+                top_k_routes=arguments.top_k_routes,
+                per_step_top_k=arguments.per_step_top_k,
+                beam_width=arguments.beam_width,
+                max_expansions=arguments.max_expansions,
+                max_templates_to_apply=arguments.max_templates,
+                max_candidates_to_validate=(
+                    arguments.max_candidates_to_validate
+                ),
+                use_context=not arguments.no_context,
+                include_l0=not arguments.skip_l0,
+                diversify=not arguments.no_diversity,
+                use_hierarchical_ranking=(
+                    not arguments.no_hierarchical_ranking
+                ),
+                allow_untyped_literature_terminals=(
+                    arguments.allow_untyped_literature_terminals
+                ),
+            )
+        summary = write_latent_route_portfolio(
+            portfolio, arguments.output_json, arguments.output_html
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+
+    if arguments.command == "plan-routes":
+        if arguments.route_state_ordering and not arguments.route_state_catalog:
+            raise ValueError(
+                "--route-state-ordering requires --route-state-catalog"
+            )
+        loaded_library = load_generic_library(arguments.library)
+        route_state_catalog = (
+            load_route_state_learning_catalog(arguments.route_state_catalog)
+            if arguments.route_state_catalog
+            else None
+        )
         with open_stock_lookup(arguments.stock_index) as stock_index:
             result = plan_multistep_routes(
                 arguments.target,
@@ -1929,6 +2154,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 route_action_policy=(
                     load_route_action_policy(arguments.route_action_policy)
                     if arguments.route_action_policy
+                    else None
+                ),
+                search_guidance=(
+                    LiteratureRouteOrderingGuidance(route_state_catalog)
+                    if (
+                        route_state_catalog is not None
+                        and arguments.route_state_ordering
+                    )
+                    else None
+                ),
+                route_action_selector=(
+                    LiteratureRouteActionSelector(route_state_catalog)
+                    if route_state_catalog is not None
                     else None
                 ),
             )
