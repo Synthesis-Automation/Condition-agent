@@ -690,7 +690,7 @@ class LiteratureRouteActionSelector:
 class LiteratureRouteOrderingGuidance:
     """Order valid search states with train-supported operator sequences."""
 
-    definition_id = ROUTE_STATE_LEARNING_VERSION
+    definition_id = "dependency_route_ordering.v2"
 
     def __init__(self, catalog: RouteStateLearningCatalog) -> None:
         policy = load_route_state_learning_policy()
@@ -702,13 +702,26 @@ class LiteratureRouteOrderingGuidance:
         }
 
     def state_priority(self, state: MultistepGuidanceState) -> tuple[Any, ...]:
-        if len(state.steps) < 2:
-            return (0, 0.0)
-        first = state.steps[-2].candidate.operator_id
-        second = state.steps[-1].candidate.operator_id
-        support = self._support.get(f"{first}>{second}", 0)
-        # This optional priority is applied only after actions pass chemistry gates.
-        return (0 if support else 1, -math.log1p(support))
+        # Occurrence identity identifies real parent/child dependencies. Neither
+        # identical SMILES on sibling branches nor traversal adjacency suffices.
+        producers: dict[str, list[Any]] = {}
+        for step in state.steps:
+            for occurrence in step.precursor_node_ids:
+                if occurrence:
+                    producers.setdefault(occurrence, []).append(step)
+        supports = []
+        for child in state.steps:
+            parents = producers.get(child.product_node_id, ())
+            if len(parents) != 1 or parents[0] is child:
+                continue
+            first = parents[0].candidate.operator_id
+            second = child.candidate.operator_id
+            supports.append(self._support.get(f"{first}>{second}", 0))
+        if not supports:
+            return (0.0,)
+        # Normalize by dependency count so adding steps earns no automatic bonus.
+        return (-round(math.fsum(sorted(math.log1p(s) for s in supports))
+                       / len(supports), 8),)
 
     def select_leaf(
         self,

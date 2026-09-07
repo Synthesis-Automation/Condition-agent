@@ -1556,6 +1556,25 @@ python -m core_retrosynthesis plan-latent-portfolio \
 Learned operator-sequence ordering remains disabled unless the additional
 `--route-state-ordering` experimental option is supplied.
 
+#### 11.0.5 Dependency-aware ordering and deferred widening
+
+The follow-up implementation corrects search-time ordering to use actual
+parent/child occurrence links, bounds optional guidance within accumulated-cost
+bands, and adds opt-in deferred release of a larger validated candidate pool.
+It preserves the canonical one-step validation and multistep planner paths.
+
+The reproducible four-mode experiment compares ordinary top-three search,
+ordinary top-nine search, deferred widening, and deferred widening with corrected
+ordering. It records actual validation work and per-target gains and regressions,
+with paired molecular HTML reports and review export. Depth six removes the
+previous depth ceiling for the ten recorded routes. This remains a development
+experiment on the ordinary planner; it does not establish the effectiveness of
+partition-guided realization or performance on an untouched set.
+
+See [Search exploration implementation and effectiveness review](
+search_exploration_effectiveness.md) for controls, commands, limitations, and
+verification. Widening remains disabled by default.
+
 ### 11.1 Required baselines
 
 Compare:

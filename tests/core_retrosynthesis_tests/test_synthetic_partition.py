@@ -514,6 +514,12 @@ def test_partition_realization_finds_a_fully_validated_route() -> None:
     assert result.status == "fully_realized"
     assert result.partition.realization_status == "fully_realized"
     assert result.diagnostics.fully_realized_count == 1
+    assert result.diagnostics.search_exploration_definition_id == "search_exploration.v1"
+    legacy_diagnostics = result.diagnostics.to_dict()
+    legacy_diagnostics.pop("search_exploration_definition_id")
+    assert type(result.diagnostics).from_dict(
+        legacy_diagnostics
+    ).search_exploration_definition_id is None
     realization = result.realizations[0]
     assert realization.best_frontier.exact_partition_match is True
     assert realization.best_frontier.frontier_k == 3

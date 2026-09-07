@@ -1,0 +1,7 @@
+{
+  "definition_id": "search_exploration.v1",
+  "schema_version": "1.0",
+  "widening_interval": 4,
+  "guidance_cost_band": 1.0,
+  "ordering_definition_id": "dependency_route_ordering.v2"
+}

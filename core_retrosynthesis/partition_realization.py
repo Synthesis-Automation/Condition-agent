@@ -440,6 +440,7 @@ class PartitionRealizationDiagnostics:
     continuation_quota_selected_states: int = 0
     continuation_lanes_reaching_minimum: int = 0
     continuation_lane_expansions: tuple[tuple[str, str, int], ...] = ()
+    search_exploration_definition_id: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -1329,6 +1330,7 @@ def realize_synthetic_partition(
             action_class_counts.get(item.first_action_class, 0) + 1
         )
     diagnostics = PartitionRealizationDiagnostics(
+        search_exploration_definition_id=search.diagnostics.exploration_definition_id,
         expanded_states=search.diagnostics.expanded_states,
         generated_candidates=search.diagnostics.generated_candidates,
         rejected_cycles=search.diagnostics.rejected_cycles,

@@ -47,6 +47,7 @@ class MultistepDatasetEvaluationConfig:
     route_state_definition_id: str = ""
     route_state_catalog_sha256: str = ""
     route_state_ordering_enabled: bool = False
+    widening_factor: int = 1
 
     def __post_init__(self) -> None:
         for value, label in (
@@ -57,6 +58,7 @@ class MultistepDatasetEvaluationConfig:
             (self.max_expansions, "maximum expansions"),
             (self.max_templates_to_apply, "maximum templates"),
             (self.max_candidates_to_validate, "maximum validations"),
+            (self.widening_factor, "widening factor"),
         ):
             if value < 1:
                 raise ValueError(f"{label} must be positive")
@@ -293,6 +295,7 @@ def evaluate_partition_review_routes(
             ),
             search_guidance=search_guidance,
             route_action_selector=route_action_selector,
+            widening_factor=config.widening_factor,
         )
         observed = _observed_actions(tree)
         matched = _maximum_matches(result, observed)

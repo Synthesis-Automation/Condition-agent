@@ -21,6 +21,7 @@ from .generic_models import (
 from .generic_search import disconnect_operator_ladder_detailed
 from .hierarchical_ranking import build_completion_prior_index
 from .multistep_ranking import load_multistep_ranking_policy
+from .search_exploration import load_search_exploration_policy
 from .route_action_policy import RouteActionPolicyModel
 from .route_refinement import RouteCandidateExclusion
 from .route_tree import (
@@ -35,7 +36,7 @@ from cas_tools.molecule_index import (
 )
 
 
-MULTISTEP_SCHEMA_VERSION = "1.8"
+MULTISTEP_SCHEMA_VERSION = "1.9"
 _TERMINAL_STOCK_ROLES = frozenset(
     {
         "reactant",
@@ -313,6 +314,11 @@ class MultistepSearchDiagnostics:
     continuation_quota_selected_states: int = 0
     continuation_lanes_reaching_minimum: int = 0
     continuation_lane_expansions: tuple[tuple[str, str, int], ...] = ()
+    exploration_definition_id: str = "search_exploration.v1"
+    search_guidance_definition_id: Optional[str] = None
+    widening_factor: int = 1
+    widening_revisits: int = 0
+    deferred_widening_states: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Return JSON-compatible diagnostics."""
@@ -417,6 +423,7 @@ class _RouteState:
     steps: tuple[RetrosynthesisRouteStep, ...]
     leaves: tuple[_Leaf, ...]
     cost: float
+    expansion_offset: int = 0
 
 
 def _select_heap_portfolio(
@@ -676,9 +683,12 @@ def _guided_state_priority(
     base = _state_priority(state, max_depth)
     if guidance is None:
         return base
+    band = load_search_exploration_policy().guidance_cost_band
     return (
+        base[0],
+        int(round(state.cost, 8) // band),
         tuple(guidance.state_priority(_guidance_state(target_smiles, state, max_depth))),
-        *base,
+        *base[1:],
     )
 
 
@@ -1146,11 +1156,15 @@ def plan_multistep_routes(
     expander: OneStepExpander | None = None,
     search_guidance: MultistepSearchGuidance | None = None,
     route_action_selector: RouteActionSelector | None = None,
+    widening_factor: int = 1,
 ) -> MultistepRetrosynthesisResult:
     """Find short routes whose leaves pass the explicit terminal predicate."""
 
     if max_depth < 1:
         raise ValueError("maximum route depth must be positive")
+    if type(widening_factor) is not int or widening_factor < 1:
+        raise ValueError("widening factor must be a positive integer")
+    exploration_policy = load_search_exploration_policy()
     if molecular_weight_threshold <= 0:
         raise ValueError("molecular-weight threshold must be positive")
     for value, name in (
@@ -1235,6 +1249,9 @@ def plan_multistep_routes(
     )
     initial = _RouteState(steps=(), leaves=(root,), cost=0.0)
     queue: list[tuple[tuple[Any, ...], int, _RouteState]] = []
+    deferred: list[tuple[tuple[Any, ...], int, _RouteState]] = []
+    widening_revisits = 0
+    last_widening_expansion = 0
     serial = 0
     heapq.heappush(
         queue,
@@ -1286,13 +1303,19 @@ def plan_multistep_routes(
     continuation_active_lanes: dict[str, str] = {}
     continuation_quota_selected_states = 0
 
-    while queue and expanded_states < max_expansions:
-        (_, _, state), quota_selected = _pop_continuation_state(
-            queue,
-            route_action_selector,
-            continuation_lane_expansions,
-            continuation_active_lanes,
-        )
+    while (queue or deferred) and expanded_states < max_expansions:
+        if deferred and (
+            not queue or expanded_states - last_widening_expansion
+            >= exploration_policy.widening_interval
+        ):
+            _, _, state = heapq.heappop(deferred)
+            quota_selected = False
+            last_widening_expansion = expanded_states
+        else:
+            (_, _, state), quota_selected = _pop_continuation_state(
+                queue, route_action_selector, continuation_lane_expansions,
+                continuation_active_lanes,
+            )
         if not _is_retained_state_path(state, best_paths_by_state):
             continue
         if all(leaf.assessment.terminal for leaf in state.leaves):
@@ -1320,13 +1343,14 @@ def plan_multistep_routes(
         product = leaf.assessment.canonical_smiles
         candidates = expansion_cache.get(product)
         if candidates is None:
-            requested_top_k = per_step_top_k
+            requested_top_k = per_step_top_k * widening_factor
             if route_action_selector is not None:
-                requested_top_k = min(
-                    max_candidates_to_validate,
-                    per_step_top_k
+                requested_top_k = max(
+                    requested_top_k, per_step_top_k
                     * route_action_selector.candidate_pool_multiplier,
                 )
+            if widening_factor > 1 or route_action_selector is not None:
+                requested_top_k = min(max_candidates_to_validate, requested_top_k)
             expansion = active_expander(product, requested_top_k)
             if isinstance(expansion, OneStepExpansionBatch):
                 candidates = expansion.candidates
@@ -1390,12 +1414,29 @@ def plan_multistep_routes(
                         "route-action selector must return a bounded subset "
                         "of the validated candidate pool"
                     )
-                candidates = selected_candidates
-                route_action_selected_candidates += len(candidates)
+                route_action_selected_candidates += len(selected_candidates)
+                selected_ids = {id(item) for item in selected_candidates}
+                candidates = selected_candidates + (
+                    tuple(item for item in candidates if id(item) not in selected_ids)
+                    if widening_factor > 1 else ()
+                )
             expansion_cache[product] = candidates
             one_step_calls += 1
         else:
             cache_hits += 1
+        if widening_factor > 1:
+            offset = state.expansion_offset
+            next_offset = offset + per_step_top_k
+            if next_offset < len(candidates):
+                serial += 1
+                revisit = replace(state, expansion_offset=next_offset)
+                heapq.heappush(deferred, (
+                    _guided_state_priority(target.canonical_smiles, revisit,
+                                           max_depth, search_guidance),
+                    serial, revisit,
+                ))
+            candidates = candidates[offset:next_offset]
+            widening_revisits += int(offset > 0)
         expanded_states += 1
         if route_action_selector is not None and state.steps:
             lane = route_action_selector.continuation_lane_key(state)
@@ -1458,7 +1499,7 @@ def plan_multistep_routes(
         else:
             candidate_entries = tuple(
                 (candidate, None, rank, rank)
-                for rank, candidate in enumerate(candidates, 1)
+                for rank, candidate in enumerate(candidates, state.expansion_offset + 1)
             )
 
         for candidate, policy_probability, candidate_rank, original_rank in candidate_entries:
@@ -1620,11 +1661,13 @@ def plan_multistep_routes(
             beam_pruned_states += max(0, queue_size_before_pruning - len(queue))
             heapq.heapify(queue)
 
-    stopped_by_limit = bool(queue and expanded_states >= max_expansions)
+    stopped_by_limit = bool((queue or deferred) and expanded_states >= max_expansions)
     if stopped_by_limit:
         retained_frontier = [
             item
-            for item in queue
+            # A pending root batch is exploration work, not a zero-step route
+            # that should outrank the physical steps already found.
+            for item in queue + [item for item in deferred if item[2].steps]
             if _is_retained_state_path(item[2], best_paths_by_state)
         ]
         for _, _, state in _select_heap_portfolio(
@@ -1754,7 +1797,7 @@ def plan_multistep_routes(
         rejected_invalid_candidates=rejected_invalid,
         duplicate_states=duplicate_states,
         retained_alternative_paths=retained_alternative_paths,
-        frontier_states=len(queue),
+        frontier_states=len(queue) + len(deferred),
         solved_routes_found=len(solved_states),
         partial_routes_found=len(partial_states),
         stopped_by_expansion_limit=stopped_by_limit,
@@ -1764,6 +1807,11 @@ def plan_multistep_routes(
         first_solution_expansion=first_solution_expansion,
         beam_pruned_states=beam_pruned_states,
         dead_end_states=dead_end_states,
+        search_guidance_definition_id=(search_guidance.definition_id
+                                       if search_guidance else None),
+        widening_factor=widening_factor,
+        widening_revisits=widening_revisits,
+        deferred_widening_states=len(deferred),
         expansion_level_calls=tuple(sorted(expansion_level_calls.items())),
         route_policy_scored_actions=route_policy_scored_actions,
         route_policy_reordered_expansions=route_policy_reordered_expansions,

@@ -553,6 +553,10 @@ def _parser() -> argparse.ArgumentParser:
     )
     multistep_dataset_evaluation.add_argument("--beam-width", type=int, default=8)
     multistep_dataset_evaluation.add_argument(
+        "--widening-factor", type=int, default=1,
+        help="validated action pool multiplier; 1 disables deferred widening",
+    )
+    multistep_dataset_evaluation.add_argument(
         "--max-expansions", type=int, default=15
     )
     multistep_dataset_evaluation.add_argument(
@@ -684,15 +688,16 @@ def _parser() -> argparse.ArgumentParser:
 
     route_search = commands.add_parser(
         "plan-routes",
-        help="search deterministic two- or three-depth retrosynthesis routes",
+        help="search deterministic bounded retrosynthesis routes",
     )
     route_search.add_argument("library")
     route_search.add_argument("stock_index")
     route_search.add_argument("target")
-    route_search.add_argument("--max-depth", type=int, choices=(2, 3), default=3)
+    route_search.add_argument("--max-depth", type=int, choices=tuple(range(1, 7)), default=3)
     route_search.add_argument("--molecular-weight-threshold", type=float, default=150.0)
     route_search.add_argument("--top-k-routes", type=int, default=5)
     route_search.add_argument("--per-step-top-k", type=int, default=5)
+    route_search.add_argument("--widening-factor", type=int, default=1)
     route_search.add_argument("--beam-width", type=int, default=20)
     route_search.add_argument("--max-expansions", type=int, default=100)
     route_search.add_argument("--max-templates", type=int, default=300)
@@ -1860,6 +1865,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 else ""
             ),
             route_state_ordering_enabled=arguments.route_state_ordering,
+            widening_factor=arguments.widening_factor,
         )
 
         def report_case(index: int, total: int, target: str) -> None:
@@ -2169,6 +2175,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     if route_state_catalog is not None
                     else None
                 ),
+                widening_factor=arguments.widening_factor,
             )
         print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
         return 0
