@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "combined_recommendation.v1",
+  "source_order": ["generic", "weak_label"],
+  "default_shortlist_size": 3,
+  "candidate_limit_per_source": 12,
+  "evidence_labels": {
+    "verified_signature": "Similar reaction precedent",
+    "structure_review": "Broader structural match",
+    "weak_label": "Screening suggestion"
+  }
+}

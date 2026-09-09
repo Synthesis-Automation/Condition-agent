@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { Ketcher } from 'ketcher-core'
-import { Editor } from 'ketcher-react'
-import { StandaloneStructServiceProvider } from 'ketcher-standalone'
 import { ReactionImage } from './ReactionImage'
+
+const KetcherCanvas = lazy(() => import('./KetcherCanvas'))
 
 const EXAMPLE_REACTION =
   'Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1'
@@ -55,10 +55,10 @@ function DrawingDialog({
 }: DrawingDialogProps) {
   const isStartingMaterials = moleculeOnly && moleculePurpose === 'starting_materials'
   const moleculeLabel = isStartingMaterials ? 'starting materials' : 'target molecule'
-  const provider = useMemo(() => new StandaloneStructServiceProvider(), [])
   const [ketcher, setKetcher] = useState<Ketcher | null>(null)
   const [draftSmiles, setDraftSmiles] = useState(value)
   const [status, setStatus] = useState('Loading editor…')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -78,6 +78,8 @@ function DrawingDialog({
       onError(`Enter ${moleculeOnly ? moleculeLabel : 'a reaction'} SMILES before loading it.`)
       return
     }
+    setLoading(true)
+    setStatus('Loading drawing…')
     try {
       await ketcher.setMolecule(smiles.trim())
       setDraftSmiles(smiles.trim())
@@ -85,6 +87,8 @@ function DrawingDialog({
       onError('')
     } catch {
       onError('Ketcher could not load this reaction SMILES.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -143,11 +147,11 @@ function DrawingDialog({
               className="button quiet"
               type="button"
               onClick={() => void load(isStartingMaterials ? EXAMPLE_STARTING_MATERIALS : moleculeOnly ? EXAMPLE_TARGET : EXAMPLE_REACTION)}
-              disabled={!ketcher}
+              disabled={!ketcher || loading}
             >
               Load example
             </button>
-            <button className="button quiet" type="button" onClick={clear} disabled={!ketcher}>
+            <button className="button quiet" type="button" onClick={clear} disabled={!ketcher || loading}>
               Clear
             </button>
             <button className="icon-button" type="button" onClick={onClose} aria-label="Close drawing editor">×</button>
@@ -156,9 +160,7 @@ function DrawingDialog({
 
         <div className="editor-frame drawing-editor-frame">
           {!ketcher && <div className="editor-loading">Loading editor…</div>}
-          <Editor
-            staticResourcesUrl="/"
-            structServiceProvider={provider}
+          <Suspense fallback={null}><KetcherCanvas
             onInit={(instance) => {
               setKetcher(instance)
               if (
@@ -169,13 +171,14 @@ function DrawingDialog({
                   .setMolecule(value.trim())
                   .then(() => setStatus('Existing reaction loaded.'))
                   .catch(() => onError('Ketcher could not load the existing reaction.'))
+                  .finally(() => setLoading(false))
               } else {
                 setStatus('Editor ready.')
+                setLoading(false)
               }
             }}
-            errorHandler={(error) => onError(String(error))}
-            disableMacromoleculesEditor
-          />
+            onError={onError}
+          /></Suspense>
         </div>
 
         <div className="drawing-smiles-row">
@@ -193,7 +196,7 @@ function DrawingDialog({
             className="button quiet"
             type="button"
             onClick={() => void load(draftSmiles)}
-            disabled={!ketcher || !draftSmiles.trim()}
+            disabled={!ketcher || loading || !draftSmiles.trim()}
           >
             Load SMILES
           </button>
@@ -203,7 +206,7 @@ function DrawingDialog({
           <span>{status}</span>
           <div className="button-row">
             <button className="button quiet" type="button" onClick={onClose}>Cancel</button>
-            <button className="button primary" type="button" onClick={finish} disabled={!ketcher}>
+            <button className="button primary" type="button" onClick={finish} disabled={!ketcher || loading}>
               Use drawing
             </button>
           </div>

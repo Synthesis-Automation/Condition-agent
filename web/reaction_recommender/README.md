@@ -1,5 +1,18 @@
 # Reaction Condition Recommender Web UI
 
+The default page is now **Condition Desk**, focused on combined structural and
+weak-label condition recommendations. Build with `npm run build` and run
+`python -m app.conditions_web` for the restricted recommendation API. The
+existing `python -m app.web_api` also serves the new page and keeps the research
+workbench at `/workbench.html` during validation.
+
+The new UI downloads full result JSON, individual automation protocol handoffs,
+and selected screening sets. Automation exports are explicitly planning drafts:
+they preserve missing quantities and operations and require a robot-specific
+adapter before execution. See
+[`docs/new/recommendation_only_web_ui.md`](../../docs/new/recommendation_only_web_ui.md)
+for the API, environment configuration, evidence policy, and export contract.
+
 Local React/Ketcher client for the repository's canonical structure-first
 condition recommender. The browser only owns interaction and presentation; all
 reaction analysis, chemistry filtering, retrieval, scoring, recipe

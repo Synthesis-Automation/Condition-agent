@@ -31,6 +31,7 @@ from .runtime import (
     WebRuntime,
     error_payload,
 )
+from .conditions import router as conditions_router
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -42,6 +43,7 @@ def create_app(
     runtime: WebRuntime | None = None,
     assistance_service: Any | None = None,
     frontend_dist: str | Path | None = None,
+    recommendation_only: bool = False,
 ) -> FastAPI:
     """Create an injectable local API without importing domain logic into UI code."""
 
@@ -63,6 +65,7 @@ def create_app(
     )
     app.state.runtime = runtime or LocalRecommendationRuntime()
     app.state.assistance_service = assistance_service
+    app.include_router(conditions_router)
 
     def active_runtime(request: Request) -> WebRuntime:
         return request.app.state.runtime
@@ -73,7 +76,19 @@ def create_app(
 
     @app.get("/api/v1/capabilities")
     def capabilities(request: Request) -> dict[str, Any]:
-        return envelope(active_runtime(request).capabilities())
+        data = active_runtime(request).capabilities()
+        if recommendation_only:
+            data = {
+                key: value for key, value in data.items()
+                if key in {
+                    "service", "index_name", "index_available",
+                    "loaded_runtime_variants", "rxnmapper_available",
+                    "recommendation", "weak_label_recommendation",
+                    "weak_label_dataset_name", "reaction_rendering", "local_only",
+                }
+            }
+            data["deployment_profile"] = "recommendation_only"
+        return envelope(data)
 
     @app.get("/api/v1/ranking-profiles")
     def ranking_profiles(request: Request) -> dict[str, Any]:
@@ -294,6 +309,18 @@ def create_app(
             status_code=500,
             content={"detail": error_payload(exc)},
         )
+
+    if recommendation_only:
+        # Explicit allowlist: research capabilities cannot be invoked through
+        # the focused deployment, even when their optional libraries exist.
+        allowed = {
+            "/api/docs", "/docs/oauth2-redirect", "/api/openapi.json",
+            "/api/v1/health", "/api/v1/capabilities",
+            "/api/v1/conditions/recommend", "/api/v1/reactions/prepare",
+            "/api/v1/render/reaction", "/api/v1/render/molecule",
+        }
+        app.router.routes[:] = [route for route in app.routes if route.path in allowed]
+        app.title = "Condition Recommendations"
 
     dist = Path(frontend_dist) if frontend_dist is not None else DEFAULT_FRONTEND_DIST
     if dist.is_dir():

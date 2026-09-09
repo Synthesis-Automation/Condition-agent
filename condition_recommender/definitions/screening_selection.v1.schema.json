@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://condition-agent.local/schemas/screening_selection.v1.schema.json",
+  "title": "Chemist-selected condition screening handoffs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "schema_version", "execution_ready", "query_reaction_smiles", "selection_method", "handoffs"],
+  "properties": {
+    "artifact_type": {"const": "condition_screening_selection"},
+    "schema_version": {"const": "1.0"},
+    "execution_ready": {"const": false},
+    "query_reaction_smiles": {"type": "string", "minLength": 1},
+    "selection_method": {"const": "chemist_selected_intact_recipes"},
+    "handoffs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "https://condition-agent.local/schemas/automation_handoff.v1.schema.json"}
+    }
+  }
+}

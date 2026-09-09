@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  build: {
+    rollupOptions: { input: { conditions: 'index.html', workbench: 'workbench.html' } },
+  },
   define: {
     global: 'globalThis',
     'process.env': {
