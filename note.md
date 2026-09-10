@@ -3,6 +3,8 @@
 python -m pip install --upgrade rdkit
 python -m app.web_api
 
+python -m app.conditions_web
+
 cmd /d /c "cd /d C:\Git-softwares\Condition-agent && C:\Users\xubar\AppData\Local\Programs\Python\Python312\python.exe -m chem_coworker"
 
 ## 2-step tandem reaction
