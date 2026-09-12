@@ -96,6 +96,14 @@ def _center_profiles(
             if environment is None:
                 continue
             profile = environment.reactivity_profile
+            # Unresolved contexts retain molecular observations but cannot
+            # supply numeric template-applicability evidence.
+            if (
+                profile.status not in {"derived", "observed"}
+                or profile.steric.accessibility_score is None
+                or profile.electronic.activation_score is None
+            ):
+                continue
             profiles.append(
                 CenterReactivityContext(
                     role="carbon" if element == "C" else "heteroatom",

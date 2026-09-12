@@ -10,21 +10,63 @@ from reactive_taxonomy import featurize_reaction
 from condition_recommender.conversion.generic import convert_record
 from condition_recommender.conversion.input_schema import adapt_row
 from condition_recommender.generic_api import recommend_indexed_signature
-from condition_recommender.generic_indexing import build_generic_index, build_generic_index_from_rows
-from condition_recommender.molecular_features import build_reaction_molecular_features, validate_molecular_features
-from condition_recommender.signature_features import environment_profile_similarity, environment_tokens
-from condition_recommender.sqlite_indexing import save_sqlite_generic_index, load_sqlite_generic_index
+from condition_recommender.generic_indexing import (
+    build_generic_index,
+    build_generic_index_from_rows,
+)
+from condition_recommender.molecular_features import (
+    build_reaction_molecular_features,
+    validate_molecular_features,
+)
+from condition_recommender.signature_features import (
+    environment_profile_similarity,
+    environment_tokens,
+)
+from condition_recommender.sqlite_indexing import (
+    save_sqlite_generic_index,
+    load_sqlite_generic_index,
+)
+from condition_recommender.similarity import (
+    assess_signature_similarity,
+    load_generic_similarity_rules,
+    validate_generic_similarity_rules,
+)
+
+
+@pytest.mark.parametrize(
+    "weights",
+    [
+        {"molecular": 1.0},
+        {"molecular": 0.8, "substituent": 0.8},
+        {"molecular": float("nan"), "substituent": 0.5},
+    ],
+)
+def test_environment_component_definition_rejects_invalid_weights(weights) -> None:
+    rules = {
+        **load_generic_similarity_rules(),
+        "environment_component_weights": weights,
+    }
+    with pytest.raises(ValueError, match="environment component weights"):
+        validate_generic_similarity_rules(rules)
 
 
 REACTION = "[CH3:1][Br:2].[NH2:3][CH3:4]>>[CH3:1][NH:3][CH3:4]"
 
 
 def _record():
-    raw = adapt_row({
-        "reaction_id": "feature-review", "reaction_smiles": REACTION,
-        "reagent_cas": "584-08-7", "solvent_cas": "64-17-5",
-        "yield_pct": "80", "reference": "feature-review-reference",
-    }, source_dataset="development", source_path="development.csv", source_row_number=2)
+    raw = adapt_row(
+        {
+            "reaction_id": "feature-review",
+            "reaction_smiles": REACTION,
+            "reagent_cas": "584-08-7",
+            "solvent_cas": "64-17-5",
+            "yield_pct": "80",
+            "reference": "feature-review-reference",
+        },
+        source_dataset="development",
+        source_path="development.csv",
+        source_row_number=2,
+    )
     return convert_record(raw)
 
 
@@ -34,14 +76,19 @@ def test_projection_has_edit_provenance_and_does_not_mutate_signature() -> None:
     features = build_reaction_molecular_features(analysis).to_dict()
     validate_molecular_features(features, before)
     assert len(features["partners"]) == 2
-    assert all(partner["edit_indices"] and partner["active_atom_indices"] for partner in features["partners"])
+    assert all(
+        partner["edit_indices"] and partner["active_atom_indices"]
+        for partner in features["partners"]
+    )
     assert environment_tokens(features)
     assert not environment_tokens(before)
     assert asdict(analysis.reaction_signature) == before
 
 
 def test_ambiguous_edit_hypotheses_cannot_create_observed_features() -> None:
-    analysis = featurize_reaction("O=C1CCCCC1.Cl.NNc1ccc(F)cc1>>Fc1ccc2[nH]c3c(c2c1)CCCC3")
+    analysis = featurize_reaction(
+        "O=C1CCCCC1.Cl.NNc1ccc(F)cc1>>Fc1ccc2[nH]c3c(c2c1)CCCC3"
+    )
     assert analysis.edit_hypotheses
     features = build_reaction_molecular_features(analysis)
     assert features.status == "unavailable" and not features.partners
@@ -68,31 +115,109 @@ def test_profiles_survive_conversion_sqlite_and_live_scoring(tmp_path: Path) -> 
     save_sqlite_generic_index(index, path)
     restored = load_sqlite_generic_index(path)
     row = restored.rows[0]
-    assert environment_tokens(row.molecular_features) == environment_tokens(record.molecular_features)
+    assert environment_tokens(row.molecular_features) == environment_tokens(
+        record.molecular_features
+    )
     result = recommend_indexed_signature(
-        row.signature, restored, molecular_features=row.molecular_features,
-        reaction_core=row.reaction_core, query_reaction_smiles=REACTION,
-        minimum_pool_size=1, top_k=1,
+        row.signature,
+        restored,
+        molecular_features=row.molecular_features,
+        reaction_core=row.reaction_core,
+        query_reaction_smiles=REACTION,
+        minimum_pool_size=1,
+        top_k=1,
     )
     assert result.valid and result.recommendations
     assert result.reaction_partners[0]["reactivity_profile"]
-    assert result.recommendations[0].score_trace.similarity_components["environment"] == pytest.approx(1)
+    assert result.recommendations[0].score_trace.similarity_components[
+        "environment"
+    ] == pytest.approx(1)
 
 
 def test_unresolved_profiles_never_receive_similarity_credit() -> None:
     analysis = featurize_reaction("[CH3:1][C:2]#[N:3]>>[CH3:1][CH2:2][NH2:3]")
     features = build_reaction_molecular_features(analysis).to_dict()
     assert features["partners"]
-    assert all(p["reactivity_profile"]["status"] == "unresolved" for p in features["partners"])
+    assert all(
+        p["reactivity_profile"]["status"] == "unresolved" for p in features["partners"]
+    )
     assert environment_profile_similarity(features, features) == 0
+    # Observed nearby motifs do not make missing electronic profiles available
+    # and must not dilute independent structural substituent evidence.
+    features["partners"][0]["nearby_groups"] = [{"motif_id": "nitrile", "distance": 0}]
+    core = {
+        "remote_subgraphs": [
+            {
+                "side": "reactant",
+                "continuity": "conserved",
+                "attachment_ports": [
+                    {
+                        "substituent_profile": {
+                            "feature_tokens": [
+                                "L0:C",
+                                "L1:alkyl",
+                                "L2:primary",
+                                "L3:methyl",
+                            ],
+                        }
+                    }
+                ],
+            }
+        ]
+    }
+    assessment = assess_signature_similarity(
+        {},
+        {},
+        query_reaction_core=core,
+        precedent_reaction_core=core,
+        query_molecular_features=features,
+        precedent_molecular_features=features,
+    )
+    assert assessment.components["environment"] == pytest.approx(1)
 
 
 def test_feature_alignment_is_symmetric_and_partner_order_invariant() -> None:
     features = build_reaction_molecular_features(featurize_reaction(REACTION)).to_dict()
     reversed_features = {**features, "partners": tuple(reversed(features["partners"]))}
-    assert environment_profile_similarity(features, reversed_features) == pytest.approx(1)
-    assert environment_profile_similarity(reversed_features, features) == pytest.approx(1)
+    assert environment_profile_similarity(features, reversed_features) == pytest.approx(
+        1
+    )
+    assert environment_profile_similarity(reversed_features, features) == pytest.approx(
+        1
+    )
     row = build_generic_index([_record().to_dict()]).rows[0]
     stale = {**row.molecular_features, "definition_versions": {}}
     with pytest.raises(ValueError, match="definitions"):
         build_generic_index_from_rows([replace(row, molecular_features=stale)])
+
+
+def test_para_electronics_break_a_structural_tie_without_changing_identity() -> None:
+    analyses = []
+    for prefix in ("[CH3:10][O:11]", "[F:10][C:11]([F:12])([F:13])"):
+        reactants = (
+            prefix + "[c:1]1[cH:2][cH:3][c:4]([Br:7])[cH:5][cH:6]1.[NH2:8][CH3:9]"
+        )
+        product = prefix + "[c:1]1[cH:2][cH:3][c:4]([NH:8][CH3:9])[cH:5][cH:6]1"
+        analyses.append(featurize_reaction(reactants + ">>" + product))
+    query, different = analyses
+    signatures = [asdict(analysis.reaction_signature) for analysis in analyses]
+    assert signatures[0]["signature_id"] == signatures[1]["signature_id"]
+    features = [
+        build_reaction_molecular_features(analysis).to_dict() for analysis in analyses
+    ]
+    baseline = [
+        assess_signature_similarity(signatures[0], signature).score
+        for signature in signatures
+    ]
+    enriched = [
+        assess_signature_similarity(
+            signatures[0],
+            signature,
+            query_molecular_features=features[0],
+            precedent_molecular_features=feature,
+        ).score
+        for signature, feature in zip(signatures, features)
+    ]
+    assert baseline[0] == baseline[1]
+    assert enriched[0] > enriched[1]
+    assert asdict(query.reaction_signature) == signatures[0]

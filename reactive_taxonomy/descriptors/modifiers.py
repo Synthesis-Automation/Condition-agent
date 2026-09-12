@@ -90,9 +90,16 @@ def build_reactivity_modifiers(
                 modifier_type="removable_hydrogen",
                 modifier_id=f"{mol.GetAtomWithIdx(center).GetSymbol()}-H",
                 class_name="explicit_or_schema_level_hydrogen",
-                attributes=(("hydrogen_count", str(
-                    mol.GetAtomWithIdx(center).GetTotalNumHs(includeNeighbors=True)
-                )),),
+                attributes=(
+                    (
+                        "hydrogen_count",
+                        str(
+                            mol.GetAtomWithIdx(center).GetTotalNumHs(
+                                includeNeighbors=True
+                            )
+                        ),
+                    ),
+                ),
                 evidence=DescriptorEvidence(
                     source="reactive_site",
                     method="site_hydrogen_modifier_v1",

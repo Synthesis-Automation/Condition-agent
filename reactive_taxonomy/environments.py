@@ -38,7 +38,9 @@ def build_site_environment(
     rules = _environment_rules()
     radius = int(rules.get("local_group_radius", 3))
     for group in group_values:
-        distance = locus_distance(mol, site_locus_atoms(site, center), group.atom_indices)
+        distance = locus_distance(
+            mol, site_locus_atoms(site, center), group.atom_indices
+        )
         if distance is None:
             continue
         if distance <= radius:

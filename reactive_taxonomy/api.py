@@ -152,8 +152,12 @@ def _render_candidate(candidate: ReactiveSiteCandidate, style: str) -> str:
 
 
 def _candidate_hypothesis(
-    candidate: ReactiveSiteCandidate, number: int, component_index: int,
-    *, label_style: str, include_context_features: bool,
+    candidate: ReactiveSiteCandidate,
+    number: int,
+    component_index: int,
+    *,
+    label_style: str,
+    include_context_features: bool,
 ) -> ReactiveSiteHypothesis:
     """Project a candidate while preserving its graph atom and bond indices."""
     details = dict(candidate.details)
@@ -183,11 +187,7 @@ def _candidate_hypothesis(
         availability=candidate.availability,
         details=details,
         context_features=(
-            {
-                "contexts": [
-                    record.to_dict() for record in candidate.context_records
-                ]
-            }
+            {"contexts": [record.to_dict() for record in candidate.context_records]}
             if include_context_features
             else {}
         ),
@@ -232,14 +232,22 @@ def interpret_molecular_reactivity(
         candidates = resolve_candidates(raw)
         hypotheses = []
         for number, candidate in enumerate(candidates):
-            hypotheses.append(_candidate_hypothesis(
-                candidate, number, component.component_index,
-                label_style=label_style,
-                include_context_features=include_context_features,
-            ))
+            hypotheses.append(
+                _candidate_hypothesis(
+                    candidate,
+                    number,
+                    component.component_index,
+                    label_style=label_style,
+                    include_context_features=include_context_features,
+                )
+            )
         environments = (
-            tuple(build_site_environment(molecule, hypothesis, motifs) for hypothesis in hypotheses)
-            if include_context_features else ()
+            tuple(
+                build_site_environment(molecule, hypothesis, motifs)
+                for hypothesis in hypotheses
+            )
+            if include_context_features
+            else ()
         )
         from .reaction_site_interfaces import normalize_detected_site
 
@@ -309,23 +317,33 @@ def detect_reactive_site_hypotheses(
         raise ValueError(f"UNKNOWN_LABEL_STYLE:{label_style}")
     selected = set(DETECTORS if site_types is None else site_types)
     if selected - set(DETECTORS):
-        raise ValueError(f"UNKNOWN_SITE_TYPES:{','.join(sorted(selected - set(DETECTORS)))}")
+        raise ValueError(
+            f"UNKNOWN_SITE_TYPES:{','.join(sorted(selected - set(DETECTORS)))}"
+        )
     component_by_atom = {
-        atom: component for component, atoms in enumerate(Chem.GetMolFrags(molecule))
+        atom: component
+        for component, atoms in enumerate(Chem.GetMolFrags(molecule))
         for atom in atoms
     }
     matches = MatchIndex(molecule)
-    candidates = resolve_candidates([
-        candidate for name, detector in DETECTORS.items() if name in selected
-        for candidate in detector(molecule, matches)
-    ])
+    candidates = resolve_candidates(
+        [
+            candidate
+            for name, detector in DETECTORS.items()
+            if name in selected
+            for candidate in detector(molecule, matches)
+        ]
+    )
     counts: dict[int, int] = defaultdict(int)
     hypotheses = []
     for candidate in candidates:
         component = component_by_atom[candidate.atom_indices[0]]
         hypothesis = _candidate_hypothesis(
-            candidate, counts[component], component,
-            label_style=label_style, include_context_features=True,
+            candidate,
+            counts[component],
+            component,
+            label_style=label_style,
+            include_context_features=True,
         )
         counts[component] += 1
         hypotheses.append(hypothesis)

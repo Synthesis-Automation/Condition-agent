@@ -10,7 +10,8 @@ from .registry import descriptor_rules
 
 
 def aromatic_substituent_contributions(
-    mol: Any, center: int,
+    mol: Any,
+    center: int,
 ) -> Tuple[ElectronicContribution, ...]:
     """Separate induction and resonance on the same six-membered aromatic ring.
 
@@ -19,8 +20,10 @@ def aromatic_substituent_contributions(
     ring sizes and remote fused-ring pathways remain outside this rule set.
     """
     rings = tuple(
-        tuple(ring) for ring in mol.GetRingInfo().AtomRings()
-        if len(ring) == 6 and center in ring
+        tuple(ring)
+        for ring in mol.GetRingInfo().AtomRings()
+        if len(ring) == 6
+        and center in ring
         and all(mol.GetAtomWithIdx(index).GetIsAromatic() for index in ring)
     )
     rules = descriptor_rules()["electronic"]["aromatic_substituents"]
@@ -48,14 +51,24 @@ def aromatic_substituent_contributions(
                 contribution = float(rule[pathway][relation])
                 if not contribution:
                     continue
-                values.append(ElectronicContribution(
-                    source_id=f"aromatic_substituent:{rule['id']}",
-                    effect="withdrawing" if contribution > 0 else "donating",
-                    pathway=pathway,
-                    positional_relation=relation,
-                    contribution=contribution,
-                    atom_indices=tuple(sorted(match)),
-                ))
-    return tuple(sorted(values, key=lambda item: (
-        item.source_id, item.pathway, item.positional_relation, item.atom_indices,
-    )))
+                values.append(
+                    ElectronicContribution(
+                        source_id=f"aromatic_substituent:{rule['id']}",
+                        effect="withdrawing" if contribution > 0 else "donating",
+                        pathway=pathway,
+                        positional_relation=relation,
+                        contribution=contribution,
+                        atom_indices=tuple(sorted(match)),
+                    )
+                )
+    return tuple(
+        sorted(
+            values,
+            key=lambda item: (
+                item.source_id,
+                item.pathway,
+                item.positional_relation,
+                item.atom_indices,
+            ),
+        )
+    )

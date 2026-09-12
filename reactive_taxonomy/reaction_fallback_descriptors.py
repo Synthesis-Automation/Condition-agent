@@ -201,12 +201,14 @@ def _context_tokens(
                 )
             )
             if profile.status in {"observed", "derived"}:
-                tokens.extend((
-                    f"steric:{profile.steric.accessibility_class}:"
-                    f"{profile.steric.approach_burden_class}",
-                    f"electronic:{profile.electronic.activation_axis}:"
-                    f"{profile.electronic.activation_class}",
-                ))
+                tokens.extend(
+                    (
+                        f"steric:{profile.steric.accessibility_class}:"
+                        f"{profile.steric.approach_burden_class}",
+                        f"electronic:{profile.electronic.activation_axis}:"
+                        f"{profile.electronic.activation_class}",
+                    )
+                )
             tokens.extend(
                 f"nearby:{group.get('motif_id')}:{group.get('distance')}"
                 for group in environment.nearby_motifs

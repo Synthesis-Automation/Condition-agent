@@ -188,8 +188,12 @@ def environment_profile_similarity(
     )
     if not query_partners or not precedent_partners:
         return 0.0
-    left_tokens = [reactivity_profile_tokens(p["reactivity_profile"]) for p in query_partners]
-    right_tokens = [reactivity_profile_tokens(p["reactivity_profile"]) for p in precedent_partners]
+    left_tokens = [
+        reactivity_profile_tokens(p["reactivity_profile"]) for p in query_partners
+    ]
+    right_tokens = [
+        reactivity_profile_tokens(p["reactivity_profile"]) for p in precedent_partners
+    ]
     size = max(len(query_partners), len(precedent_partners))
     matrix = [[0.0] * size for _ in range(size)]
     for i, left in enumerate(query_partners):
@@ -199,7 +203,11 @@ def environment_profile_similarity(
                 continue
             if lp.get("context_kind") != rp.get("context_kind"):
                 continue
-            if left.get("site_type") and right.get("site_type") and left["site_type"] != right["site_type"]:
+            if (
+                left.get("site_type")
+                and right.get("site_type")
+                and left["site_type"] != right["site_type"]
+            ):
                 continue
             le = (lp.get("reactive_center") or {}).get("element")
             re = (rp.get("reactive_center") or {}).get("element")
@@ -250,8 +258,9 @@ def _maximum_assignment_score(matrix: list[list[float]]) -> float:
             prior = previous[column]
             matching[column] = matching[prior]
             column = prior
-    return sum(matrix[matching[column] - 1][column - 1] for column in range(1, size + 1))
-
+    return sum(
+        matrix[matching[column] - 1][column - 1] for column in range(1, size + 1)
+    )
 
 
 __all__ = [

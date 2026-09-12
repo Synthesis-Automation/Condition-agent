@@ -725,7 +725,8 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["condition_stage_status"] == "single_stage"
     assert review_rows[0]["index_eligibility"] == "eligible"
     assert "benzene" in review_rows[0]["reactivity_profile"]
-    assert "access open" in review_rows[0]["reactivity_profile"]
+    assert "ortho burden none (0/2)" in review_rows[0]["reactivity_profile"]
+    assert "electron demand balanced" in review_rows[0]["reactivity_profile"]
 
 
 def test_review_exports_ambiguous_structural_pattern_candidates() -> None:

@@ -235,7 +235,8 @@ def _candidate_levels(
         elif level == "environment_neighbors":
             positions = _environment_neighbor_positions(
                 molecular_features if molecular_features is not None else signature,
-                index, compatible
+                index,
+                compatible,
             )
         elif level == "bond_edit_signature":
             positions = compatible
@@ -489,7 +490,7 @@ def retrieve_generic_pool_with_trace(
         index,
         reaction_core=reaction_core,
         strategy=strategy,
-                 molecular_features=molecular_features,
+        molecular_features=molecular_features,
     )
     fallback: tuple[
         str,
@@ -576,7 +577,7 @@ def retrieve_generic_pool(
         minimum_pool_size=minimum_pool_size,
         reaction_core=reaction_core,
         strategy=strategy,
-                         molecular_features=molecular_features,
+        molecular_features=molecular_features,
     )
     return level, rows
 
@@ -825,7 +826,7 @@ def retrieve_progressive_compatible_pools_with_trace(
             reaction_core=reaction_core,
             strategy="hybrid",
             query_reaction_smiles=query_reaction_smiles,
-                                    molecular_features=molecular_features,
+            molecular_features=molecular_features,
         ):
             target_reached = process_level(level, positions)
             if target_reached:
@@ -863,7 +864,7 @@ def retrieve_compatible_generic_pool_with_trace(
         reaction_core=reaction_core,
         strategy=strategy,
         query_reaction_smiles=query_reaction_smiles,
-                 molecular_features=molecular_features,
+        molecular_features=molecular_features,
     )
     fallback = None
     traces = []
@@ -1012,7 +1013,7 @@ def retrieve_compatible_generic_pool(
         reaction_core=reaction_core,
         strategy=strategy,
         query_reaction_smiles=query_reaction_smiles,
-                 molecular_features=molecular_features,
+        molecular_features=molecular_features,
     )
     return (
         result.level,

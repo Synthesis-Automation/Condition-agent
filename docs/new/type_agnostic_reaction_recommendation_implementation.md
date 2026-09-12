@@ -89,17 +89,18 @@ The current code declares:
 | Reaction-pattern match | `4.1` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
-| Typed reactivity profile | `1.0` |
+| Typed reactivity profile | `1.1` |
+| Recommendation molecular features | `1.0` |
 | Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `10.1` |
-| Generic converter definition | `generic_conversion.v10.1` |
+| Recommendation record | `10.2` |
+| Generic converter definition | `generic_conversion.v10.2` |
 | Core eligibility policy | `core_eligibility.v1@1.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v5.0` |
 | Concise reaction review | `12.0` |
 | Shared chemist review summary | `3.0` |
 | Recommendation artifact workflow | `2.3` |
-| Generic persisted index | `6.3` |
+| Generic persisted index | `6.4` |
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `3.3` |
 | Reaction correspondence definitions | `2.8` |
@@ -574,6 +575,16 @@ additive. This measures site incidence, not verified transformation or
 recommendation coverage. New molecular annotations and reaction patterns
 require their own chemistry validation before they may consume these
 observations.
+
+### 2.9 Molecular featurization review fixes
+
+[The molecular improvement note](molecular_featurization_improvements.md) records
+serialization-invariance fixes, charge-aware activation, explicit missing
+profiles, positional aromatic electronic priors, and a separate observation-aligned
+recommendation-feature projection. Structural signature identity and admission
+remain independent of annotations. Converted records and indexes must be rebuilt;
+controlled development checks do not replace the blind review and untouched
+condition-recovery evaluation gates below.
 
 ## 3. Implemented chemistry contracts
 

@@ -924,7 +924,7 @@ def test_similarity_does_not_treat_missing_features_as_matches() -> None:
     )
     assert assessment.score == score
     assert round(sum(assessment.contributions.values()), 6) == score
-    assert assessment.definition_version == "1.0"
+    assert assessment.definition_version == "1.1"
 
 
 def test_similarity_prefers_matching_reaction_topology() -> None:

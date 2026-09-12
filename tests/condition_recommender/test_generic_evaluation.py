@@ -180,8 +180,14 @@ def test_sqlite_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert integrity["schema_version"] == "1.0"
 
 
-def test_streamed_sqlite_index_matches_in_memory_builder(tmp_path: Path) -> None:
+@pytest.mark.parametrize("mixed_versions", [False, True])
+def test_streamed_sqlite_index_matches_in_memory_builder(
+    tmp_path: Path, mixed_versions: bool
+) -> None:
     records = [_record(2), _record(1)]
+    if mixed_versions:
+        records[0]["schema_version"] = "10.2"
+        records[0]["converter_definition_version"] = "generic_conversion.v10.2"
     expected_index = build_generic_index(records)
     expected_path = tmp_path / "expected.sqlite"
     streamed_path = tmp_path / "streamed.sqlite"
@@ -192,6 +198,13 @@ def test_streamed_sqlite_index_matches_in_memory_builder(tmp_path: Path) -> None
 
     assert streamed_report["index_id"] == expected_report["index_id"]
     assert tuple(streamed_index.rows) == expected_index.rows
+    assert (
+        streamed_index.record_schema_versions == expected_index.record_schema_versions
+    )
+    assert (
+        streamed_index.converter_definition_versions
+        == expected_index.converter_definition_versions
+    )
     for field in (
         "reaction_ids",
         "exact",

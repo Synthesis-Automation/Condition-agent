@@ -126,9 +126,14 @@ class StericProfile:
     evidence: DescriptorEvidence
 
     def __post_init__(self) -> None:
-        if self.accessibility_score is not None and not 0.0 <= float(self.accessibility_score) <= 1.0:
+        if (
+            self.accessibility_score is not None
+            and not 0.0 <= float(self.accessibility_score) <= 1.0
+        ):
             raise ValueError("accessibility score must be between 0 and 1")
-        if (self.accessibility_score is None) != (self.accessibility_class == "unknown"):
+        if (self.accessibility_score is None) != (
+            self.accessibility_class == "unknown"
+        ):
             raise ValueError("unknown accessibility requires a missing score")
         if tuple(sorted(self.context_metrics)) != self.context_metrics:
             raise ValueError("context_metrics must be sorted")
@@ -166,7 +171,9 @@ class AromaticHeteroatom:
     atom_index: int
     element: str
     formal_charge: int
-    aromatic_role: Literal["pyridine_like", "pyrrole_like", "cationic_aromatic", "other"]
+    aromatic_role: Literal[
+        "pyridine_like", "pyrrole_like", "cationic_aromatic", "other"
+    ]
     ring_distance_from_anchor: int
     positional_relation: Literal[
         "anchor",

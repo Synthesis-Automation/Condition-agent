@@ -200,7 +200,9 @@ def build_site_reactivity_profile(
         if atom.GetAtomicNum() in {7, 8, 16}:
             lone_pair_class = aromatic_atom_role(atom)
             lone_pair_availability = (
-                "low" if lone_pair_class in {"pyrrole_like", "cationic_aromatic"} else "medium"
+                "low"
+                if lone_pair_class in {"pyrrole_like", "cationic_aromatic"}
+                else "medium"
             )
             acidity_class = (
                 "moderately_acidic"
@@ -298,10 +300,13 @@ def build_site_reactivity_profile(
             (
                 *intrinsic_electronic,
                 *_formal_charge_contribution(atom),
-                *(aromatic_substituent_contributions(mol, center)
-                  if context_kind == "aromatic" else _functional_group_contributions(
-                    mol, center, groups, locus_atoms=site_locus_atoms(site, center)
-                )),
+                *(
+                    aromatic_substituent_contributions(mol, center)
+                    if context_kind == "aromatic"
+                    else _functional_group_contributions(
+                        mol, center, groups, locus_atoms=site_locus_atoms(site, center)
+                    )
+                ),
             ),
             key=lambda item: (
                 item.source_id,
@@ -377,15 +382,14 @@ def build_site_reactivity_profile(
                 source="molecular_graph",
                 method=f"{context_kind}_steric_graph_v1",
                 confidence=0.0 if context_kind == "other" else 1.0,
-                warnings=("unsupported_center_context",) if context_kind == "other" else (),
+                warnings=("unsupported_center_context",)
+                if context_kind == "other"
+                else (),
                 contributing_atom_indices=tuple(
                     sorted(
                         {
                             center,
-                            *(
-                                item.origin_atom_index
-                                for item in steric_contributions
-                            ),
+                            *(item.origin_atom_index for item in steric_contributions),
                         }
                     )
                 ),
@@ -399,9 +403,7 @@ def build_site_reactivity_profile(
             evidence=DescriptorEvidence(
                 source="molecular_graph_and_motifs",
                 method=f"{context_kind}_electronic_contributions_v1",
-                confidence=(
-                    0.0 if context_kind == "other" else 0.65
-                ),
+                confidence=(0.0 if context_kind == "other" else 0.65),
                 contributing_atom_indices=tuple(
                     sorted(
                         {

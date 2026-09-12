@@ -17,9 +17,11 @@ def _mapping(value: Any) -> Mapping[str, Any]:
 def reactivity_profile_is_usable(profile: Any) -> bool:
     """Whether derived steric/electronic values may participate in similarity."""
     value = _mapping(profile)
-    return bool(value) and value.get("context_kind") != "other" and value.get(
-        "status", "derived"
-    ) in {"observed", "derived"}
+    return (
+        bool(value)
+        and value.get("context_kind") != "other"
+        and value.get("status", "derived") in {"observed", "derived"}
+    )
 
 
 def reactivity_profile_tokens(profile: Any) -> Tuple[str, ...]:

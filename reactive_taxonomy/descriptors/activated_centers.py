@@ -169,7 +169,10 @@ def build_activated_center_context(
         if neighbor.GetAtomicNum() == 6 and not neighbor.GetIsAromatic()
     ]
     enolizable = (
-        any(neighbor.GetTotalNumHs(includeNeighbors=True) > 0 for neighbor in alpha_carbons)
+        any(
+            neighbor.GetTotalNumHs(includeNeighbors=True) > 0
+            for neighbor in alpha_carbons
+        )
         if kind == "acyl"
         else None
     )

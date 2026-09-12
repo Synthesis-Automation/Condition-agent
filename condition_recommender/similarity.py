@@ -9,6 +9,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
+from reactive_taxonomy.descriptors.tokens import reactivity_profile_is_usable
+
 from .signature_features import (
     environment_profile_similarity,
     substituent_profile_similarity,
@@ -47,12 +49,19 @@ def load_generic_similarity_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
     rules["weights"] = _validated_similarity_weights(rules)
-    environment_weights = rules.get("environment_component_weights") or {}
-    if set(environment_weights) != {"molecular", "substituent"} or any(
-        not 0 <= float(value) <= 1 for value in environment_weights.values()
-    ) or abs(sum(float(value) for value in environment_weights.values()) - 1) > 1e-9:
-        raise ValueError("environment component weights must sum to one")
+    _validate_environment_weights(rules)
     return rules
+
+
+def _validate_environment_weights(rules: Mapping[str, Any]) -> None:
+    environment_weights = rules.get("environment_component_weights") or {}
+    if (
+        not isinstance(environment_weights, Mapping)
+        or set(environment_weights) != {"molecular", "substituent"}
+        or any(not 0 <= float(value) <= 1 for value in environment_weights.values())
+        or abs(sum(float(value) for value in environment_weights.values()) - 1) > 1e-9
+    ):
+        raise ValueError("environment component weights must sum to one")
 
 
 def _validated_similarity_weights(
@@ -78,6 +87,7 @@ def _validated_similarity_weights(
 def validate_generic_similarity_rules(rules: Mapping[str, Any]) -> None:
     """Validate a generic-similarity definition without loading global state."""
     _validated_similarity_weights(rules)
+    _validate_environment_weights(rules)
 
 
 def jaccard(left: Iterable[str], right: Iterable[str]) -> float:
@@ -219,12 +229,25 @@ def assess_signature_similarity(
         query_reaction_core,
         precedent_reaction_core,
     )
-    query_features = query if query_molecular_features is None else query_molecular_features
-    precedent_features = precedent if precedent_molecular_features is None else precedent_molecular_features
-    molecular_similarity = environment_profile_similarity(query_features, precedent_features)
-    from .signature_features import environment_tokens
-
-    available_profiles = bool(environment_tokens(query_features) and environment_tokens(precedent_features))
+    query_features = (
+        query if query_molecular_features is None else query_molecular_features
+    )
+    precedent_features = (
+        precedent
+        if precedent_molecular_features is None
+        else precedent_molecular_features
+    )
+    molecular_similarity = environment_profile_similarity(
+        query_features, precedent_features
+    )
+    available_profiles = all(
+        any(
+            reactivity_profile_is_usable(partner.get("reactivity_profile"))
+            for partner in features.get("partners") or ()
+            if isinstance(partner, Mapping)
+        )
+        for features in (query_features, precedent_features)
+    )
     if profile_similarity is None:
         environment_similarity = molecular_similarity
     elif available_profiles:
@@ -249,9 +272,7 @@ def assess_signature_similarity(
             _partner_tokens(precedent, "anchor_contexts"),
         ),
         "environment": environment_similarity,
-        "spectators": jaccard(
-            _spectator_tokens(query), _spectator_tokens(precedent)
-        ),
+        "spectators": jaccard(_spectator_tokens(query), _spectator_tokens(precedent)),
         "reaction_topology": _reaction_topology_similarity(query, precedent),
         "transformation": float(
             bool(query_transformation)
@@ -267,11 +288,11 @@ def assess_signature_similarity(
     return SimilarityAssessment(
         score=round(sum(contributions.values()), 6),
         components={name: round(components[name], 6) for name in _FEATURES},
-        contributions={
-            name: round(contributions[name], 6) for name in _FEATURES
-        },
+        contributions={name: round(contributions[name], 6) for name in _FEATURES},
         definition_id=str(rules["definition_id"]),
-        definition_version=str(rules.get("definition_version", rules["schema_version"])),
+        definition_version=str(
+            rules.get("definition_version", rules["schema_version"])
+        ),
     )
 
 

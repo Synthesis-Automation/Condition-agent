@@ -18,8 +18,10 @@ _DEFINITION_FILES = (
     "reactivity_rendering.v1.json",
 )
 _PROVENANCE_FILES = _DEFINITION_FILES + (
-    "molecular_motifs.v1.json", "site_patterns.v2.json",
-    "context_facets.v2.json", "descriptor_rules.v1.json",
+    "molecular_motifs.v1.json",
+    "site_patterns.v2.json",
+    "context_facets.v2.json",
+    "descriptor_rules.v1.json",
 )
 
 
@@ -57,7 +59,10 @@ def validate_aromatic_substituent_rules(rules: Dict[str, Any]) -> None:
     """Validate the closed positional vocabulary, SMARTS roles and score ranges."""
     if rules.get("relations") != {"1": "ortho", "2": "meta", "3": "para"}:
         raise ValueError("invalid aromatic substituent relations")
-    if rules.get("calibration_status") != "chemistry_prior_not_statistically_calibrated":
+    if (
+        rules.get("calibration_status")
+        != "chemistry_prior_not_statistically_calibrated"
+    ):
         raise ValueError("aromatic substituent priors must disclose calibration status")
     seen = set()
     for rule in rules.get("rules") or ():
@@ -65,8 +70,12 @@ def validate_aromatic_substituent_rules(rules: Dict[str, Any]) -> None:
             raise ValueError("duplicate or missing aromatic substituent rule id")
         seen.add(rule["id"])
         pattern = compile_smarts(str(rule.get("smarts") or ""), validate=True)
-        if pattern is None or not {1, 2} <= {atom.GetAtomMapNum() for atom in pattern.GetAtoms()}:
-            raise ValueError("aromatic substituent SMARTS requires attachment and ipso roles")
+        if pattern is None or not {1, 2} <= {
+            atom.GetAtomMapNum() for atom in pattern.GetAtoms()
+        }:
+            raise ValueError(
+                "aromatic substituent SMARTS requires attachment and ipso roles"
+            )
         for pathway in ("inductive", "resonance"):
             weights = rule.get(pathway) or {}
             if set(weights) != {"ortho", "meta", "para"} or any(

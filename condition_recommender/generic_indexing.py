@@ -563,9 +563,7 @@ def _iter_generic_index_rows(
                 record.get("converter_definition_version") or ""
             ),
             precedent_tier=precedent_tier,
-            core_eligibility_definition_version=(
-                core_eligibility_definition_version
-            ),
+            core_eligibility_definition_version=(core_eligibility_definition_version),
             reaction_label=(
                 dict(record.get("reaction_label") or {})
                 if isinstance(record.get("reaction_label"), Mapping)
@@ -636,7 +634,9 @@ def _indexed_reaction_from_payload(
     row: Mapping[str, Any],
 ) -> GenericIndexedReaction:
     """Deserialize one retrieval row shared by JSON and SQLite storage."""
-    validate_molecular_features(row.get("molecular_features") or {}, row.get("signature"))
+    validate_molecular_features(
+        row.get("molecular_features") or {}, row.get("signature")
+    )
     return GenericIndexedReaction(
         reaction_id=str(row["reaction_id"]),
         observation_id=str(row["observation_id"]),
@@ -656,9 +656,7 @@ def _indexed_reaction_from_payload(
             row.get("reference_condition_series_id") or ""
         ),
         scaffold_key=str(row.get("scaffold_key") or ""),
-        scaffold_tokens=tuple(
-            str(value) for value in row.get("scaffold_tokens") or ()
-        ),
+        scaffold_tokens=tuple(str(value) for value in row.get("scaffold_tokens") or ()),
         signature=dict(row["signature"]),
         molecular_features=dict(row.get("molecular_features") or {}),
         reaction_core=dict(row.get("reaction_core") or {}),
@@ -668,9 +666,7 @@ def _indexed_reaction_from_payload(
         condition_uncertain=bool(row["condition_uncertain"]),
         chemistry_status=str(row.get("chemistry_status") or ""),
         condition_status=str(row.get("condition_status") or ""),
-        condition_stage_status=str(
-            row.get("condition_stage_status") or "single_stage"
-        ),
+        condition_stage_status=str(row.get("condition_stage_status") or "single_stage"),
         outcome_status=str(row.get("outcome_status") or ""),
         record_schema_version=str(row["record_schema_version"]),
         converter_definition_version=str(row["converter_definition_version"]),

@@ -199,9 +199,7 @@ def build_heteroatom_context(
         resonance_class=resonance,
         lone_pair_class=lone_pair_class,
         proton_count=int(atom.GetTotalNumHs(includeNeighbors=True)),
-        alpha_branched_group_count=sum(
-            item.alpha_branched for item in attached_groups
-        ),
+        alpha_branched_group_count=sum(item.alpha_branched for item in attached_groups),
         attached_groups=tuple(
             sorted(attached_groups, key=lambda item: item.atom_index)
         ),

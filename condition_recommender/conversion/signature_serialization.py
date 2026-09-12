@@ -58,12 +58,10 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
             else None
         ),
         "reaction_evidence_candidates": tuple(
-            asdict(candidate)
-            for candidate in analysis.evidence_candidates
+            asdict(candidate) for candidate in analysis.evidence_candidates
         ),
         "reaction_edit_hypotheses": tuple(
-            asdict(hypothesis)
-            for hypothesis in analysis.edit_hypotheses
+            asdict(hypothesis) for hypothesis in analysis.edit_hypotheses
         ),
     }
     if signature is None:

@@ -44,7 +44,9 @@ def test_descriptor_definitions_are_validated_and_content_versioned() -> None:
     }
     versions = dict(descriptor_definition_versions())
     assert set(versions) == set(definitions) | {
-        "molecular_motifs.v1.json", "site_patterns.v2.json",
-        "context_facets.v2.json", "descriptor_rules.v1.json",
+        "molecular_motifs.v1.json",
+        "site_patterns.v2.json",
+        "context_facets.v2.json",
+        "descriptor_rules.v1.json",
     }
     assert all("@sha256:" in value for value in versions.values())

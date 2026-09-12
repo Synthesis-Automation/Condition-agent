@@ -335,12 +335,16 @@ def build_sqlite_generic_index(
         )
         stage_batch = []
         eligible_count = 0
+        record_schemas: set[str] = set()
+        converter_versions: set[str] = set()
         for row in _iter_generic_index_rows(records, include_review=include_review):
             if cancel_check is not None and cancel_check():
                 raise SQLiteIndexBuildCancelled(
                     "Index build cancelled while scanning canonical records"
                 )
             _validate_index_rows((row,))
+            record_schemas.add(row.record_schema_version)
+            converter_versions.add(row.converter_definition_version)
             if scope == PrecedentIndexScope.TRUSTED:
                 if row.precedent_tier != PrecedentTier.TRUSTED:
                     raise ValueError(
@@ -463,7 +467,9 @@ def build_sqlite_generic_index(
                 )
             if row.named_family:
                 lookup_batch.append(("families", row.named_family, position))
-            for token in set(environment_tokens(row.molecular_features or row.signature)):
+            for token in set(
+                environment_tokens(row.molecular_features or row.signature)
+            ):
                 lookup_batch.append(("environment_features", token, position))
             fragment_tokens = set(
                 departing_fragment_tokens(row.reaction_smiles, row.signature)
@@ -625,7 +631,17 @@ def build_sqlite_generic_index(
             (),
             precedent_scope=scope,
         )
-        metadata_index = replace(template_index, rows=range(eligible_count))
+        metadata_index = replace(
+            template_index,
+            rows=range(eligible_count),
+            record_schema_versions=(
+                tuple(sorted(record_schemas)) or template_index.record_schema_versions
+            ),
+            converter_definition_versions=(
+                tuple(sorted(converter_versions))
+                or template_index.converter_definition_versions
+            ),
+        )
         metadata_identity = _metadata_payload(
             metadata_index,
             lookup_counts=lookup_counts,

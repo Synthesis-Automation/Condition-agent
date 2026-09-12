@@ -42,13 +42,16 @@ def shortest_distance(mol: Any, start: int, targets: Iterable[int]) -> int | Non
 def site_locus_atoms(site: Any, center: int) -> Tuple[int, ...]:
     """Use both endpoints for a homogeneous pi-bond environment."""
     if getattr(site, "topology", None) == "bond" and site.canonical_signature in {
-        "PI|Alkene", "PI|Alkyne",
+        "PI|Alkene",
+        "PI|Alkyne",
     }:
         return tuple(sorted(set(int(index) for index in site.atom_indices)))
     return (center,)
 
 
-def locus_distance(mol: Any, starts: Iterable[int], targets: Iterable[int]) -> int | None:
+def locus_distance(
+    mol: Any, starts: Iterable[int], targets: Iterable[int]
+) -> int | None:
     """Return distance from a molecular locus, independent of endpoint order."""
     target_atoms = tuple(targets)
     values = tuple(shortest_distance(mol, start, target_atoms) for start in starts)

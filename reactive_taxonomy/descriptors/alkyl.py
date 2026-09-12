@@ -56,7 +56,8 @@ def build_alkyl_context(
         for neighbor in carbon_neighbors
     )
     beta_hydrogen_count = sum(
-        int(neighbor.GetTotalNumHs(includeNeighbors=True)) for neighbor in carbon_neighbors
+        int(neighbor.GetTotalNumHs(includeNeighbors=True))
+        for neighbor in carbon_neighbors
     )
     benzylic = any(neighbor.GetIsAromatic() for neighbor in carbon_neighbors)
     allylic = _adjacent_pi(atom, "DOUBLE")

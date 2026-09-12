@@ -208,7 +208,14 @@ def test_suzuki_site_descriptors_distinguish_ortho_bulk_and_electronics() -> Non
     assert profile is not None
     assert profile.context.ortho_occupancy_count == 2
     assert profile.context.ortho_burden_class == "high"
-    assert profile.electronic.activation_class == "slightly_poor"
+    assert profile.electronic.activation_class == "electron_poor"
+    assert {
+        (item.source_id, item.pathway, item.positional_relation)
+        for item in profile.electronic.contributions
+    } >= {
+        ("aromatic_substituent:cyano", "inductive", "ortho"),
+        ("aromatic_substituent:cyano", "resonance", "ortho"),
+    }
 
 
 def test_alkyl_attachment_sterics_are_distinct_from_amine_substitution() -> None:
