@@ -210,7 +210,15 @@ export interface Recommendation {
   default_score?: number | null
   similarity_score: number
   compatibility_score: number
-  expected_yield_pct?: number | null
+  compatibility_status?: 'unknown' | 'no_known_conflict' | 'conflict'
+  historical_yield_summary?: {
+    observation_count: number
+    independent_evidence_count: number
+    minimum_pct: number | null
+    maximum_pct: number | null
+    is_prediction: false
+  }
+  historical_yield_pct?: number | null
   support: number
   reference_support: number
   dataset_support: number
@@ -296,7 +304,8 @@ export interface WeakLabelRecommendation {
   signature_similarity: number
   qualifier_similarity: number
   compatibility_score: number
-  expected_yield_pct?: number | null
+  compatibility_status?: 'unknown' | 'no_known_conflict' | 'conflict'
+  historical_yield_pct?: number | null
   mean_z_score?: number | null
   support: number
   source_reaction_types: string[]

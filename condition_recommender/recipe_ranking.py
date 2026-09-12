@@ -40,7 +40,7 @@ from .support import (
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_ranking.v1.json"
 _DEFINITION_ID = "generic_ranking.v1"
-_SCHEMA_VERSION = "1.1"
+_SCHEMA_VERSION = "1.2"
 _RANKING_COMPONENTS = RANKING_COMPONENTS
 
 
@@ -121,13 +121,14 @@ def _validated_ranking_weights(
         )
     if rules.get("missing_yield_policy") != "renormalize_available_components":
         raise ValueError("unsupported generic ranking missing-yield policy")
+    if (
+        rules.get("neighbor_budget_scope") != "per_recipe_independent_evidence"
+        or rules.get("yield_summary_policy")
+        != "equal_reference_mean_within_selected_variant"
+    ):
+        raise ValueError("unsupported recipe evidence aggregation policy")
     if int(rules["maximum_independent_neighbors"]) < 1:
         raise ValueError("maximum_independent_neighbors must be positive")
-    if float(rules["yield_prior_strength"]) < 0.0:
-        raise ValueError("yield_prior_strength must be non-negative")
-    minimum_similarity_weight = float(rules["minimum_similarity_yield_weight"])
-    if not 0.0 < minimum_similarity_weight <= 1.0:
-        raise ValueError("minimum_similarity_yield_weight must be in (0, 1]")
     saturation = rules.get("support_saturation") or {}
     if any(
         int(saturation.get(name) or 0) < 1
@@ -160,7 +161,6 @@ def _best_by_evidence_unit(
         members,
         key=lambda item: (
             -item.similarity.score,
-            -(item.row.yield_pct if item.row.yield_pct is not None else -1.0),
             item.row.reaction_id,
         ),
     ):
@@ -199,39 +199,57 @@ def _mean_similarity_trace(
     return components, contributions
 
 
-def _pool_yield_prior(scored: Iterable[ScoredPrecedent]) -> Optional[float]:
-    known = _best_by_evidence_unit(
-        member for member in scored if member.row.yield_pct is not None
+def _representative_variant(members: list[ScoredPrecedent]) -> list[ScoredPrecedent]:
+    """Select an observed condition variant using similarity and independent support."""
+    variants: Dict[str, list[ScoredPrecedent]] = defaultdict(list)
+    for member in members:
+        variants[member.row.recipe_id].append(member)
+    selected = min(
+        variants,
+        key=lambda key: (
+            -_mean(
+                item.similarity.score for item in _best_by_evidence_unit(variants[key])
+            ),
+            -len(_best_by_evidence_unit(variants[key])),
+            key,
+        ),
     )
-    if not known:
-        return None
-    return _mean(float(member.row.yield_pct) for member in known)
+    return variants[selected] + [
+        item for item in members if item.row.recipe_id != selected
+    ]
 
 
-def _expected_yield(
-    members: Iterable[ScoredPrecedent],
-    *,
-    pool_prior: Optional[float],
-    prior_strength: float,
-    minimum_similarity_weight: float,
-) -> tuple[Optional[float], int]:
-    known = _best_by_evidence_unit(
-        member for member in members if member.row.yield_pct is not None
-    )
-    if not known or pool_prior is None:
-        return None, 0
-    similarity_weight = sum(
-        max(member.similarity.score, minimum_similarity_weight) for member in known
-    )
-    weighted_yield = sum(
-        max(member.similarity.score, minimum_similarity_weight)
-        * float(member.row.yield_pct)
-        for member in known
-    )
-    expected = (weighted_yield + prior_strength * pool_prior) / (
-        similarity_weight + prior_strength
-    )
-    return expected, len(known)
+def _historical_yield_summary(members: Iterable[ScoredPrecedent]) -> Dict[str, Any]:
+    """Summarize reported outcomes with equal weight per independent reference.
+
+    This is descriptive historical evidence, without a predictive prior or a
+    statistical confidence interval. Repeated observation IDs count only once.
+    """
+    units: Dict[str, Dict[str, float]] = defaultdict(dict)
+    variant_ids = set()
+    for member in members:
+        if member.row.yield_pct is None:
+            continue
+        observation = member.row.observation_id or member.row.reaction_id
+        units[evidence_unit(member.row)].setdefault(
+            observation, float(member.row.yield_pct)
+        )
+        variant_ids.add(member.row.recipe_id)
+    values = [
+        value for observations in units.values() for value in observations.values()
+    ]
+    means = [_mean(observations.values()) for observations in units.values()]
+    return {
+        "status": "observed" if values else "unreported",
+        "mean_pct": round(_mean(means), 2) if means else None,
+        "minimum_pct": min(values) if values else None,
+        "maximum_pct": max(values) if values else None,
+        "observation_count": len(values),
+        "independent_evidence_count": len(units),
+        "recipe_variant_ids": tuple(sorted(variant_ids)),
+        "method": "equal_reference_mean_within_selected_variant",
+        "is_prediction": False,
+    }
 
 
 def _weighted_score(
@@ -392,32 +410,28 @@ def rank_condition_recipes(
     scored.sort(
         key=lambda item: (
             -item.similarity.score,
-            -(item.row.yield_pct if item.row.yield_pct is not None else -1.0),
             item.row.reaction_id,
         )
     )
 
     maximum = int(rules["maximum_independent_neighbors"])
     groups: Dict[str, list[ScoredPrecedent]] = defaultdict(list)
-    selected_units = set()
     for item in scored:
-        unit = (item.row.recipe_core_id, evidence_unit(item.row))
-        if unit not in selected_units and len(selected_units) >= maximum:
-            continue
-        selected_units.add(unit)
         groups[item.row.recipe_core_id].append(item)
 
-    pool_prior = _pool_yield_prior(scored)
+    pool_prior = None  # Historical summaries do not borrow unrelated pool yields.
     saturation = rules["support_saturation"]
     ranking_rows = []
     for recipe_core_id, members in groups.items():
-        independent = _best_by_evidence_unit(members)
-        expected_yield, outcome_count = _expected_yield(
-            members,
-            pool_prior=pool_prior,
-            prior_strength=float(rules["yield_prior_strength"]),
-            minimum_similarity_weight=float(rules["minimum_similarity_yield_weight"]),
+        members = _representative_variant(members)
+        independent = _best_by_evidence_unit(members)[:maximum]
+        yield_summary = _historical_yield_summary(
+            member
+            for member in members
+            if member.row.recipe_id == members[0].row.recipe_id
         )
+        expected_yield = yield_summary["mean_pct"]
+        outcome_count = yield_summary["observation_count"]
         similarity_score = _mean(member.similarity.score for member in independent)
         compatibility_score = _mean(
             member.compatibility.score for member in independent
@@ -452,7 +466,7 @@ def rank_condition_recipes(
             "functional_group_tolerance": tolerance_score,
             "yield": expected_yield / 100.0 if expected_yield is not None else None,
             "independent_support": _saturated_log(
-                len(independent),
+                support.independent_count,
                 int(saturation["independent_evidence"]),
             ),
             "reaction_breadth": _saturated_log(
@@ -463,7 +477,9 @@ def rank_condition_recipes(
                 1.0,
                 support.dataset_count / int(saturation["datasets"]),
             ),
-            "compatibility": compatibility_score,
+            "compatibility": compatibility_score
+            if any(member.compatibility.status != "unknown" for member in independent)
+            else None,
             "condition_certainty": condition_certainty,
         }
         score, applied_weights, ranking_contributions = _weighted_score(
@@ -513,9 +529,7 @@ def rank_condition_recipes(
             item[3],
         ),
     )
-    default_ranks = {
-        item[3]: rank for rank, item in enumerate(default_order, start=1)
-    }
+    default_ranks = {item[3]: rank for rank, item in enumerate(default_order, start=1)}
     ranking_rows.sort(
         key=lambda item: (
             -item[0],
@@ -549,10 +563,7 @@ def rank_condition_recipes(
         ) = item
         best = members[0]
         cautions = []
-        if any(
-            member.row.precedent_tier.value == "review_core"
-            for member in members
-        ):
+        if any(member.row.precedent_tier.value == "review_core" for member in members):
             cautions.append(
                 "Recipe support includes core-qualified review precedents; "
                 "expert review is required"
@@ -702,7 +713,7 @@ def rank_condition_recipes(
             },
             ranking_contributions=ranking_contributions,
             applied_ranking_weights=applied_weights,
-            independent_evidence_count=len(independent),
+            independent_evidence_count=support.independent_count,
             observed_outcome_count=outcome_count,
             pool_yield_prior_pct=(
                 round(pool_prior, 6) if pool_prior is not None else None
@@ -740,8 +751,16 @@ def rank_condition_recipes(
                 ).to_dict(),
                 score=round(score, 6),
                 similarity_score=round(similarity_score, 6),
+                compatibility_status="unknown"
+                if any(member.compatibility.status == "unknown" for member in members)
+                else "no_known_conflict",
                 compatibility_score=round(compatibility_score, 6),
-                expected_yield_pct=(
+                historical_yield_summary=_historical_yield_summary(
+                    member
+                    for member in members
+                    if member.row.recipe_id == best.row.recipe_id
+                ),
+                historical_yield_pct=(
                     round(expected_yield, 2) if expected_yield is not None else None
                 ),
                 support=support.reaction_count,

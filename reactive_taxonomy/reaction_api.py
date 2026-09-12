@@ -8,18 +8,18 @@ from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_edits import (
     EditNormalizationResult,
-    normalize_mapped_edits,
     resolve_structural_evidence,
 )
 from .reaction_fallback_descriptors import build_reaction_fallback_descriptor
-from .reaction_models import ReactionAnalysis, ReactionInterpretation
+from .reaction_models import ReactionAnalysis, ReactionInterpretation, ReactionObservation, ReactionComponent
+from .models import MoleculeAnalysis
 from .reaction_interpretation import interpret_reaction
 from .reaction_observation import build_reaction_observation
 from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_rendering import render_reaction
 from .reaction_render_context import build_reaction_render_context
 from .reaction_r_group_context import build_r_group_functional_contexts
-from .reaction_parser import interpret_parsed_molecules, parse_reaction_smiles
+from .reaction_parser import ParsedReaction, interpret_parsed_molecules, parse_reaction_smiles
 from .reaction_stoichiometry import infer_reactant_multiplicity
 from .partial_product_correspondence import (
     infer_partial_product_transformation,
@@ -69,12 +69,6 @@ def featurize_reaction(
                     sorted(set(parsed.warnings + multiplicity.warnings))
                 ),
             )
-    supplied_mapping = (
-        _mapped_edit_override
-        if _mapped_edit_override is not None
-        else normalize_mapped_edits(parsed.reactants, parsed.products)
-    )
-    invalid_supplied_mapping = supplied_mapping.evidence == "invalid_atom_mapping"
     warnings = list(parsed.warnings)
     mapped_changes = tuple(supplied_map_bond_changes(reaction_smiles))
     edit_result = resolve_structural_evidence(
@@ -93,6 +87,37 @@ def featurize_reaction(
         mapped_bond_changes=mapped_changes,
         warnings=warnings,
     )
+    return reanalyze_reaction_observation(observation, label_style=label_style)
+
+
+def reanalyze_reaction_observation(
+    observation: ReactionObservation, *, label_style: str = "unicode"
+) -> ReactionAnalysis:
+    """Rebuild annotations from current, validated graph observations.
+
+    Callers restoring persisted observations must first verify their structural
+    schema and definition contract. No correspondence or bond edits are inferred
+    by this function; it is the common annotation path for fresh analysis too.
+    """
+    if label_style not in available_styles():
+        raise ValueError(f"UNKNOWN_LABEL_STYLE:{label_style}")
+    reaction_smiles = observation.input_reaction_smiles
+    if not observation.valid:
+        return ReactionAnalysis(reaction_smiles, False, error=observation.error)
+    def components(values):
+        return tuple(ReactionComponent(
+            side=value.side, component_index=value.component_index,
+            input_smiles=value.input_smiles, canonical_smiles=value.canonical_smiles,
+            atom_mapped=value.atom_mapped,
+            molecule_analysis=MoleculeAnalysis(structure=value.molecular_structure),
+            inferred_copy_of_component_index=value.inferred_copy_of_component_index,
+        ) for value in values)
+    parsed = ParsedReaction(
+        True, components(observation.reactants), components(observation.agents),
+        components(observation.products), observation.warnings,
+    )
+    mapped_changes = observation.mapped_bond_changes
+    invalid_supplied_mapping = observation.evidence_quality == "invalid_atom_mapping"
     reaction_topology = observation.topology
     reaction_core = observation.core
     reaction_completeness = observation.completeness
@@ -131,7 +156,7 @@ def featurize_reaction(
             completeness=reaction_completeness,
         )
         if (
-            not edit_result.edits
+            not observation.edits
             and not invalid_supplied_mapping
         )
         else None
@@ -171,7 +196,7 @@ def featurize_reaction(
     effective_evidence = (
         partial_product_transformation.evidence
         if partial_product_transformation is not None
-        else edit_result.evidence
+        else observation.evidence_quality
     )
     render_context = build_reaction_render_context(
         observation=observation,

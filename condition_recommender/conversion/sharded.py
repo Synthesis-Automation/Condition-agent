@@ -27,6 +27,8 @@ from typing import (
 )
 
 from condition_registry import condition_registry_definition_versions
+from reactive_taxonomy.descriptors.registry import descriptor_definition_versions
+from reactive_taxonomy.reaction_fallback_descriptors import reaction_fallback_definition_versions
 from reactive_taxonomy import (
     REACTION_SIGNATURE_SCHEMA_VERSION,
     AtomMappingProvider,
@@ -87,6 +89,8 @@ def _definition_contract(
         mapping_provider.metadata if mapping_provider is not None else None
     )
     return {
+        "molecular_definition_versions": dict(descriptor_definition_versions()),
+        "fallback_definition_versions": reaction_fallback_definition_versions(),
         "record_schema_version": RECOMMENDATION_RECORD_SCHEMA_VERSION,
         "converter_definition_version": GENERIC_CONVERTER_DEFINITION_VERSION,
         "reaction_signature_schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
@@ -654,15 +658,16 @@ def validate_sharded_conversion(
     duplicate_observations = 0
     verified_rows = 0
     covered_source_rows = Counter()
+    source_checksums = {}
     for entry in manifest.get("shards") or ():
         covered_source_rows[str(entry["source_path"])] += int(entry["input_row_count"])
         if entry.get("status") != "complete":
             issues.append(f"incomplete_shard:{entry.get('shard_id')}")
             continue
         source_path = Path(entry["source_path"])
-        if not source_path.is_file() or _sha256(source_path) != entry.get(
-            "source_sha256"
-        ):
+        if source_path not in source_checksums:
+            source_checksums[source_path] = _sha256(source_path) if source_path.is_file() else None
+        if source_checksums[source_path] != entry.get("source_sha256"):
             issues.append(f"source_checksum_mismatch:{entry['shard_id']}")
         output = destination / entry["output_path"]
         if not output.is_file() or _sha256(output) != entry.get("output_sha256"):

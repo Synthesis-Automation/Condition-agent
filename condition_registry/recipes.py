@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import asdict
 from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
 
 from .contextual_roles import load_role_resolution_rules, resolve_contextual_component
+from .quantities import merge_quantities, quantity_definition_version
 from .models import (
     ConditionComponentInput,
     ConditionProcessStage,
@@ -21,13 +23,25 @@ def _canonical_json(value: Any) -> str:
 
 
 def _component_token(component: ResolvedConditionComponent) -> Tuple[Any, ...]:
-    identity = component.substance_id or f"raw:{component.raw_identifier.strip().lower()}"
+    identity = (
+        component.substance_id or f"raw:{component.raw_identifier.strip().lower()}"
+    )
     return (
         identity,
         component.role_status,
         component.primary_role,
         component.amount,
         component.amount_unit,
+        tuple(
+            sorted(
+                {
+                    (value["amount"], str(value["unit"]))
+                    for value in component.quantity_observations
+                }
+            )
+        )
+        if component.quantity_status == "conflicting"
+        else (),
     )
 
 
@@ -35,7 +49,9 @@ def _component_core_token(
     component: ResolvedConditionComponent,
 ) -> Tuple[Any, ...]:
     """Identify a role-aware substance without variant-level quantities."""
-    identity = component.substance_id or f"raw:{component.raw_identifier.strip().lower()}"
+    identity = (
+        component.substance_id or f"raw:{component.raw_identifier.strip().lower()}"
+    )
     return (
         identity,
         component.role_status,
@@ -64,9 +80,14 @@ def _merge_duplicate_components(
         primary = sorted(
             candidates,
             key=lambda item: (
-                -(item.primary_role_confidence if item.primary_role_confidence is not None else -1.0),
+                -(
+                    item.primary_role_confidence
+                    if item.primary_role_confidence is not None
+                    else -1.0
+                ),
                 item.primary_role or "",
                 item.source_field,
+                _canonical_json(asdict(item)),
             ),
         )[0]
         roles: Dict[str, ContextualRoleAssignment] = {}
@@ -120,6 +141,11 @@ def _merge_duplicate_components(
             warnings.add("DUPLICATE_SOURCE_IDENTITY_MERGED")
         provenance = dict(primary.provenance)
         provenance["source_fields"] = source_fields
+        amount, amount_unit, quantity_status, quantity_observations = merge_quantities(
+            candidates
+        )
+        if quantity_status == "conflicting":
+            warnings.add("CONFLICTING_QUANTITY_OBSERVATIONS")
         merged.append(
             ResolvedConditionComponent(
                 raw_identifier=primary.raw_identifier,
@@ -132,8 +158,10 @@ def _merge_duplicate_components(
                 primary_role=primary_role,
                 primary_role_confidence=primary_confidence,
                 cas=primary.cas,
-                amount=primary.amount,
-                amount_unit=primary.amount_unit,
+                amount=amount,
+                amount_unit=amount_unit,
+                quantity_status=quantity_status,
+                quantity_observations=quantity_observations,
                 source_role_hint=primary.source_role_hint,
                 warnings=tuple(sorted(warnings)),
                 provenance=provenance,
@@ -170,10 +198,17 @@ def build_resolved_recipe_from_components(
     }
     definition_versions = {
         "role_resolution.v2.json": str(rules["schema_version"]),
+        "quantity_normalization.v1.json": quantity_definition_version(),
     }
     normalized_stages = tuple(sorted(stages, key=lambda item: item.stage_index))
     normalized_absences = tuple(
-        sorted({str(value).strip().lower() for value in declared_absences if str(value).strip()})
+        sorted(
+            {
+                str(value).strip().lower()
+                for value in declared_absences
+                if str(value).strip()
+            }
+        )
     )
     identity_payload = {
         "buckets": {
@@ -205,12 +240,16 @@ def build_resolved_recipe_from_components(
         "definition_versions": definition_versions,
         "schema_version": "2.0",
     }
-    recipe_core_id = "RCORE2:" + hashlib.sha256(
-        _canonical_json(core_identity_payload).encode("utf-8")
-    ).hexdigest()
-    recipe_id = "RCR2:" + hashlib.sha256(
-        _canonical_json(identity_payload).encode("utf-8")
-    ).hexdigest()
+    recipe_core_id = (
+        "RCORE2:"
+        + hashlib.sha256(
+            _canonical_json(core_identity_payload).encode("utf-8")
+        ).hexdigest()
+    )
+    recipe_id = (
+        "RCR2:"
+        + hashlib.sha256(_canonical_json(identity_payload).encode("utf-8")).hexdigest()
+    )
     return ResolvedConditionRecipe(
         recipe_id=recipe_id,
         recipe_core_id=recipe_core_id,

@@ -1133,7 +1133,7 @@ def test_recommendation_can_report_unknown_expected_yield() -> None:
 
     assert result.valid
     recommendation = result.recommendations[0]
-    assert recommendation.expected_yield_pct is None
+    assert recommendation.historical_yield_pct is None
     assert recommendation.score_trace.ranking_components["yield"] is None
     assert recommendation.score_trace.applied_ranking_weights["yield"] == 0.0
     assert (
@@ -1495,7 +1495,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.compatible_candidate_count >= 1
     assert result.compatible_candidate_count <= result.candidate_count
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "3.5"
+    assert result.schema_version == "4.0"
     assert result.retrieval_trace[-1].status == "selected_target_reached"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR2:")

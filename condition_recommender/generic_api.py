@@ -78,10 +78,7 @@ def _fragment_source_artifact_is_current(source: Path) -> bool | None:
             metadata.get("fragment_source_capability_definition_version") or ""
         )
         if stored_version:
-            return (
-                stored_version
-                == FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
-            )
+            return stored_version == FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
     manifest_path = (
         source
         if source.name.casefold() == "shard_manifest.json"
@@ -94,12 +91,13 @@ def _fragment_source_artifact_is_current(source: Path) -> bool | None:
     except (OSError, json.JSONDecodeError):
         return None
     definition_contract = manifest.get("definition_contract") or {}
-    return str(
-        definition_contract.get(
-            "fragment_source_capability_definition_version"
+    return (
+        str(
+            definition_contract.get("fragment_source_capability_definition_version")
+            or ""
         )
-        or ""
-    ) == FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
+        == FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION
+    )
 
 
 def _trusted_review_reuse_row_count(source: Path) -> int | None:
@@ -142,8 +140,7 @@ def _trusted_review_reuse_row_count(source: Path) -> int | None:
         and int(trusted_count) == int(unrestricted_count)
     )
     fast_index_path = str(
-        ((report.get("artifacts") or {}).get("fast_index") or {}).get("path")
-        or ""
+        ((report.get("artifacts") or {}).get("fast_index") or {}).get("path") or ""
     ).replace("\\", "/")
     if (
         report.get("review_index_reuses_trusted")
@@ -158,9 +155,7 @@ def _trusted_review_reuse_row_count(source: Path) -> int | None:
 def _reaction_label_payload(analysis: Any) -> Dict[str, Any]:
     """Serialize the one canonical rendered reaction label."""
     return (
-        asdict(analysis.reaction_label)
-        if analysis.reaction_label is not None
-        else {}
+        asdict(analysis.reaction_label) if analysis.reaction_label is not None else {}
     )
 
 
@@ -179,6 +174,7 @@ def recommend_indexed_signature(
     ranking_weights: Mapping[str, float] | None = None,
     ranking_preferences: ChemistRankingPreferences | None = None,
     preferred_reaction_ids: Tuple[str, ...] = (),
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
     if molecular_features:
@@ -251,6 +247,7 @@ def recommend_indexed_signature(
             reaction_core=reaction_core,
             minimum_pool_size=minimum_pool_size,
             query_reaction_smiles=query_reaction_smiles,
+            condition_constraints=condition_constraints,
         )
         if requested_precedents
         else None
@@ -272,6 +269,7 @@ def recommend_indexed_signature(
             minimum_pool_size=minimum_pool_size,
             query_reaction_smiles=query_reaction_smiles,
             molecular_features=molecular_features,
+            condition_constraints=condition_constraints,
         )
         if retrieval_strategy == "hybrid" and not preferred_selected
         else None
@@ -289,6 +287,7 @@ def recommend_indexed_signature(
             strategy=retrieval_strategy,
             query_reaction_smiles=query_reaction_smiles,
             molecular_features=molecular_features,
+            condition_constraints=condition_constraints,
         )
     )
     if progressive is not None and not progressive.tiers:
@@ -307,11 +306,7 @@ def recommend_indexed_signature(
     level = retrieval.level
     progressive_tiers = progressive.tiers if progressive is not None else ()
     compatible_pool = (
-        tuple(
-            assessed
-            for _, tier_pool in progressive_tiers
-            for assessed in tier_pool
-        )
+        tuple(assessed for _, tier_pool in progressive_tiers for assessed in tier_pool)
         if progressive is not None
         else retrieval.pool
     )
@@ -321,9 +316,7 @@ def recommend_indexed_signature(
             query_reaction_smiles=query_reaction_smiles,
             valid=False,
             query_signature_id=str(signature.get("signature_id") or ""),
-            query_reaction_core_id=str(
-                (reaction_core or {}).get("core_id") or ""
-            )
+            query_reaction_core_id=str((reaction_core or {}).get("core_id") or "")
             or None,
             named_family=signature.get("named_family"),
             transformation_class=signature.get("transformation_class"),
@@ -357,14 +350,14 @@ def recommend_indexed_signature(
     elif requested_precedents:
         warnings.append("RETROSYNTHESIS_PRECEDENT_SEED_REJECTED_OR_MISSING")
     if level.endswith("limited_support") or any(
-        trace.status == "selected_limited_support"
-        for trace in retrieval.trace
+        trace.status == "selected_limited_support" for trace in retrieval.trace
     ):
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     progressive_levels = tuple(value[0] for value in progressive_tiers)
     if (
         not level.startswith("retrosynthesis_precedent")
-        and level not in {
+        and level
+        not in {
             "exact_signature",
             "handle_signature",
             "named_family",
@@ -478,10 +471,7 @@ def recommend_indexed_signature(
         query_reaction_smiles=query_reaction_smiles,
         valid=True,
         query_signature_id=str(signature.get("signature_id") or ""),
-        query_reaction_core_id=str(
-            (reaction_core or {}).get("core_id") or ""
-        )
-        or None,
+        query_reaction_core_id=str((reaction_core or {}).get("core_id") or "") or None,
         named_family=signature.get("named_family"),
         transformation_class=signature.get("transformation_class"),
         **query_context,
@@ -595,8 +585,6 @@ class GenericConditionRecommender:
         """Featurize a query and recommend without reloading the index."""
         resolved_preferences = resolve_ranking_preferences(ranking_preferences)
         requested_top_k = top_k
-        if condition_constraints is not None and condition_constraints.constraints:
-            top_k = min(50, max(top_k + 20, top_k * 3))
         result = _recommend_with_index(
             reaction_smiles,
             self.index,
@@ -607,6 +595,7 @@ class GenericConditionRecommender:
             ranking_preferences=resolved_preferences,
             completion_selections=completion_selections,
             preferred_reaction_ids=preferred_reaction_ids,
+            condition_constraints=condition_constraints,
         )
         result = replace(
             result,
@@ -620,10 +609,7 @@ class GenericConditionRecommender:
                 condition_constraints,
                 top_k=requested_top_k,
             )
-        if (
-            completion_selections
-            and self.fragment_source_artifact_current is False
-        ):
+        if completion_selections and self.fragment_source_artifact_current is False:
             result = replace(
                 result,
                 error=(
@@ -677,6 +663,7 @@ def _recommend_with_index(
     ranking_preferences: ChemistRankingPreferences | None = None,
     completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
     preferred_reaction_ids: Tuple[str, ...] = (),
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> GenericRecommendationResult:
     if top_k < 1:
         return GenericRecommendationResult(
@@ -751,20 +738,16 @@ def _recommend_with_index(
         if completion_proposal is not None and completion_proposal.requirements:
             warnings.append("QUERY_PRODUCT_SOURCE_COMPONENT_MISSING")
             if not completion_selections:
-                warnings.append(
-                    "SYSTEM_PROPOSED_SOURCES_REQUIRE_USER_CONFIRMATION"
-                )
+                warnings.append("SYSTEM_PROPOSED_SOURCES_REQUIRE_USER_CONFIRMATION")
         selection_cautions = []
         for selection in completion_selections:
             if selection.selection_kind == "compatible_source_class":
                 warnings.append(
-                    "QUERY_SOURCE_CLASS_USER_CONFIRMED:"
-                    f"{selection.capability_id}"
+                    f"QUERY_SOURCE_CLASS_USER_CONFIRMED:{selection.capability_id}"
                 )
             elif selection.selection_kind == "registered_substance":
                 warnings.append(
-                    "QUERY_SOURCE_SUBSTANCE_USER_CONFIRMED:"
-                    f"{selection.substance_id}"
+                    f"QUERY_SOURCE_SUBSTANCE_USER_CONFIRMED:{selection.substance_id}"
                 )
             elif selection.selection_kind == "custom_identifier":
                 warnings.append("QUERY_SOURCE_EDIT_UNRESOLVED")
@@ -785,9 +768,7 @@ def _recommend_with_index(
             replace(
                 recommendation,
                 cautions=tuple(
-                    dict.fromkeys(
-                        (*selection_cautions, *recommendation.cautions)
-                    )
+                    dict.fromkeys((*selection_cautions, *recommendation.cautions))
                 ),
             )
             for recommendation in attached.recommendations
@@ -798,8 +779,7 @@ def _recommend_with_index(
             effective_query_reaction_smiles=effective_reaction_smiles,
             completion_proposal=(
                 completion_proposal.to_dict()
-                if completion_proposal is not None
-                and completion_proposal.requirements
+                if completion_proposal is not None and completion_proposal.requirements
                 else None
             ),
             completion_selections=tuple(
@@ -836,6 +816,7 @@ def _recommend_with_index(
             unrestricted=unrestricted_fallback,
             ranking_preferences=ranking_preferences,
             completion_selections=completion_selections,
+            condition_constraints=condition_constraints,
         )
         if partial_completion_result.valid:
             return finalize(partial_completion_result)
@@ -851,6 +832,7 @@ def _recommend_with_index(
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
             ranking_preferences=ranking_preferences,
+            condition_constraints=condition_constraints,
         )
         if mapped_core_result.valid:
             return finalize(
@@ -865,11 +847,11 @@ def _recommend_with_index(
                 top_k=top_k,
                 minimum_pool_size=minimum_pool_size,
                 ranking_preferences=ranking_preferences,
+                condition_constraints=condition_constraints,
             )
             if (
                 hypothesis_result.valid
-                or hypothesis_result.error
-                != "QUERY_EDIT_HYPOTHESES_NOT_RETRIEVABLE"
+                or hypothesis_result.error != "QUERY_EDIT_HYPOTHESES_NOT_RETRIEVABLE"
             ):
                 return finalize(
                     hypothesis_result,
@@ -884,6 +866,7 @@ def _recommend_with_index(
                 top_k=top_k,
                 minimum_pool_size=minimum_pool_size,
                 ranking_preferences=ranking_preferences,
+                condition_constraints=condition_constraints,
             )
             if core_attempt.valid:
                 return finalize(
@@ -897,6 +880,7 @@ def _recommend_with_index(
             unrestricted=unrestricted_fallback,
             ranking_preferences=ranking_preferences,
             completion_selections=completion_selections,
+            condition_constraints=condition_constraints,
         )
         if core_attempt is not None:
             result = replace(
@@ -937,6 +921,7 @@ def _recommend_with_index(
             ranking_preferences=ranking_preferences,
             preferred_reaction_ids=preferred_reaction_ids,
             molecular_features=build_reaction_molecular_features(analysis).to_dict(),
+            condition_constraints=condition_constraints,
         )
         result = replace(
             result,
@@ -954,6 +939,7 @@ def _recommend_core_with_index(
     top_k: int,
     minimum_pool_size: int | None,
     ranking_preferences: ChemistRankingPreferences | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> GenericRecommendationResult:
     """Recommend from a review-qualified core against verified precedents."""
     core_model = analysis.reaction_core
@@ -973,11 +959,10 @@ def _recommend_core_with_index(
         compatibility_signature,
         index,
         minimum_pool_size=minimum_pool_size,
+        condition_constraints=condition_constraints,
     )
     rules = load_reaction_core_retrieval_rules()
-    retrieval_definition_version = (
-        f"{rules['definition_id']}@{rules['schema_version']}"
-    )
+    retrieval_definition_version = f"{rules['definition_id']}@{rules['schema_version']}"
     if not retrieval.pool:
         return GenericRecommendationResult(
             query_reaction_smiles=str(analysis.input_reaction_smiles),
@@ -1003,9 +988,7 @@ def _recommend_core_with_index(
     query = {
         "reaction_core": core,
         "fallback_descriptor": fallback,
-        "spectator_groups": tuple(
-            asdict(group) for group in analysis.spectator_groups
-        ),
+        "spectator_groups": tuple(asdict(group) for group in analysis.spectator_groups),
     }
 
     def core_similarity(
@@ -1038,9 +1021,7 @@ def _recommend_core_with_index(
     recommendations = tuple(
         replace(
             recommendation,
-            cautions=tuple(
-                dict.fromkeys((*cautions, *recommendation.cautions))
-            ),
+            cautions=tuple(dict.fromkeys((*cautions, *recommendation.cautions))),
         )
         for recommendation in recommendations
     )
@@ -1053,8 +1034,7 @@ def _recommend_core_with_index(
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     if retrieval.excluded_candidate_count:
         warnings.append(
-            f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:"
-            f"{retrieval.excluded_candidate_count}"
+            f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"
         )
     return GenericRecommendationResult(
         query_reaction_smiles=str(analysis.input_reaction_smiles),
@@ -1063,9 +1043,7 @@ def _recommend_core_with_index(
         recommendation_mode="reaction_core_review",
         reaction_label=_reaction_label_payload(analysis),
         transformation_class=analysis.transformation_class,
-        spectator_groups=tuple(
-            asdict(group) for group in analysis.spectator_groups
-        ),
+        spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
         retrieval_definition_version=retrieval_definition_version,
         retrieval_strategy="reaction_core_ladder",
         retrieval_level=retrieval.level,
@@ -1117,9 +1095,7 @@ def _attach_external_mapping_assessment(
         tuple(
             replace(
                 recommendation,
-                cautions=tuple(
-                    dict.fromkeys((*cautions, *recommendation.cautions))
-                ),
+                cautions=tuple(dict.fromkeys((*cautions, *recommendation.cautions))),
             )
             for recommendation in result.recommendations
         )
@@ -1150,6 +1126,7 @@ def _recommend_hypotheses_with_index(
     top_k: int,
     minimum_pool_size: int | None,
     ranking_preferences: ChemistRankingPreferences | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> GenericRecommendationResult:
     """Recommend only from precedents robust across every retained edit hypothesis."""
     reaction_smiles = str(analysis.input_reaction_smiles)
@@ -1174,6 +1151,7 @@ def _recommend_hypotheses_with_index(
         query,
         index,
         minimum_pool_size=minimum_pool_size,
+        condition_constraints=condition_constraints,
     )
     base_warnings = [
         "QUERY_TRANSFORMATION_NOT_VERIFIED",
@@ -1181,9 +1159,7 @@ def _recommend_hypotheses_with_index(
         "EDIT_HYPOTHESIS_CONSENSUS_REQUIRED",
     ]
     if not retrieval.pool:
-        compatibility_failure = (
-            retrieval.level == "no_compatible_condition_precedent"
-        )
+        compatibility_failure = retrieval.level == "no_compatible_condition_precedent"
         return GenericRecommendationResult(
             query_reaction_smiles=reaction_smiles,
             valid=False,
@@ -1214,9 +1190,7 @@ def _recommend_hypotheses_with_index(
         )
     query_mapping = {
         **query.to_mapping(),
-        "spectator_groups": tuple(
-            asdict(group) for group in analysis.spectator_groups
-        ),
+        "spectator_groups": tuple(asdict(group) for group in analysis.spectator_groups),
     }
     recommendations = rank_condition_recipes(
         query_mapping,
@@ -1244,9 +1218,7 @@ def _recommend_hypotheses_with_index(
         replace(
             recommendation,
             cautions=tuple(
-                dict.fromkeys(
-                    (*hypothesis_cautions, *recommendation.cautions)
-                )
+                dict.fromkeys((*hypothesis_cautions, *recommendation.cautions))
             ),
         )
         for recommendation in recommendations
@@ -1292,6 +1264,7 @@ def _recommend_fallback_with_index(
     unrestricted: bool = False,
     ranking_preferences: ChemistRankingPreferences | None = None,
     completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> GenericRecommendationResult:
     """Recommend through the gated or explicit unrestricted fallback route."""
     reaction_smiles = str(analysis.input_reaction_smiles)
@@ -1373,6 +1346,7 @@ def _recommend_fallback_with_index(
             if selection.selection_kind == "registered_substance"
             and selection.substance_id
         },
+        condition_constraints=condition_constraints,
     )
     if not retrieval.pool:
         return GenericRecommendationResult(
@@ -1398,9 +1372,7 @@ def _recommend_fallback_with_index(
         )
     ranking_query = {
         **descriptor,
-        "spectator_groups": tuple(
-            asdict(group) for group in analysis.spectator_groups
-        ),
+        "spectator_groups": tuple(asdict(group) for group in analysis.spectator_groups),
     }
     recommendations = rank_condition_recipes(
         ranking_query,
@@ -1526,6 +1498,7 @@ def recommend_generic_conditions(
     mapping_provider: AtomMappingProvider | None = None,
     ranking_preferences: ChemistRankingPreferences | None = None,
     completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> GenericRecommendationResult:
     """Featurize a reaction and recommend canonical resolved recipes."""
     if use_rxnmapper and mapping_provider is None:
@@ -1542,6 +1515,7 @@ def recommend_generic_conditions(
         unrestricted_fallback=unrestricted_fallback,
         ranking_preferences=ranking_preferences,
         completion_selections=completion_selections,
+        condition_constraints=condition_constraints,
     )
 
 

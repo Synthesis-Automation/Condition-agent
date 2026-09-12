@@ -12,6 +12,7 @@ from .loader import load_role_definitions
 
 _DEFINITION_DIR = Path(__file__).with_name("definitions")
 _ACTIVE_DEFINITION_NAMES = {
+    "quantity_normalization.v1.json",
     "recipe_templates.v1.json",
     "role_resolution.v2.json",
     "roles.v2.json",

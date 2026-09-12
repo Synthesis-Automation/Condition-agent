@@ -80,7 +80,7 @@ function Evidence({ option }: { option: ConditionOption }) {
           ? `${item.reference_support ?? 0} independent reference(s) · ${item.support ?? 0} observation(s)`
           : `${item.support ?? 0} source observation(s). Precedent reaction structures are not verified.`}</p>
         {(item.explanation || []).map((line, i) => <p key={i}>{line}</p>)}
-        {item.expected_yield_pct != null && <p className="condition-note">Historical yield summary: {item.expected_yield_pct}%. This aggregates matched source observations; it is not a yield prediction for this reaction.</p>}
+        {item.historical_yield_pct != null && <p className="condition-note">Historical yield summary: {item.historical_yield_pct}%. This aggregates matched source observations; it is not a yield prediction for this reaction.</p>}
         {precedents.slice(0, 3).map((precedent, i) => <div className="condition-precedent" key={i}>
           {precedent.reaction_smiles && <ReactionImage smiles={precedent.reaction_smiles} label={`Precedent reaction ${i + 1}`} compact />}
           <p>{precedent.reference_record?.raw_reference || precedent.reference_record?.normalized_citation || precedent.reference_id || 'Citation not available'}</p>

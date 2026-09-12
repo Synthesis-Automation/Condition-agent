@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import re
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
@@ -125,9 +127,8 @@ def normalize_condition_constraint(
         if resolution.status != "resolved" or resolution.substance is None:
             return ConditionConstraintResolution(
                 status="unresolved",
-                warnings=tuple(resolution.warnings) or (
-                    "CONDITION_SUBSTANCE_UNRESOLVED",
-                ),
+                warnings=tuple(resolution.warnings)
+                or ("CONDITION_SUBSTANCE_UNRESOLVED",),
             )
         normalized = resolution.substance.substance_id
         evidence.extend(
@@ -155,7 +156,11 @@ def normalize_condition_constraint(
                 status="invalid",
                 warnings=("CONDITION_TEMPERATURE_INVALID",),
             )
-        if numeric_value < -273.15 or numeric_value > 1000.0:
+        if (
+            not math.isfinite(numeric_value)
+            or numeric_value < -273.15
+            or numeric_value > 1000.0
+        ):
             return ConditionConstraintResolution(
                 status="invalid",
                 warnings=("CONDITION_TEMPERATURE_OUT_OF_RANGE",),
@@ -192,6 +197,30 @@ def normalize_condition_constraint(
             resolution_evidence=tuple(evidence),
         ),
     )
+
+
+def _operating_values(recipe: Mapping[str, Any], field: str) -> Tuple[Any, ...]:
+    """Collect all reported stages; missing stage values stay explicitly unknown."""
+    protocol = recipe.get("synthesis_protocol") or {}
+    operating = (
+        protocol.get("operating_conditions") or {}
+        if isinstance(protocol, Mapping)
+        else {}
+    )
+    summary = recipe.get(field)
+    if summary is None and isinstance(operating, Mapping):
+        summary = operating.get(field)
+    stages = recipe.get("stages") or ()
+    if not stages and isinstance(protocol, Mapping):
+        stages = protocol.get("operations") or ()
+    if stages:
+        values = tuple(
+            stage.get(field) for stage in stages if isinstance(stage, Mapping)
+        )
+        return ((summary,) if summary is not None else ()) + values
+    if summary is None and isinstance(protocol, Mapping):
+        summary = protocol.get(field)
+    return (summary,)
 
 
 def condition_constraint_conflicts(
@@ -236,8 +265,7 @@ def condition_constraint_conflicts(
                 item
                 for bucket, item in components
                 if bucket == "solvents"
-                or str(item.get("primary_role") or item.get("role") or "")
-                == "solvent"
+                or str(item.get("primary_role") or item.get("role") or "") == "solvent"
             ]
             if not any(
                 str(item.get("substance_id") or "") == constraint.normalized_value
@@ -245,24 +273,28 @@ def condition_constraint_conflicts(
             ):
                 conflicts.append(f"{code}:required_solvent_missing")
         elif constraint.kind == "maximum_temperature_c":
-            temperature = recipe.get("temperature_c")
-            if temperature is None:
-                protocol = recipe.get("synthesis_protocol") or {}
-                if isinstance(protocol, Mapping):
-                    temperature = protocol.get("temperature_c")
-            if temperature is None:
+            temperatures = _operating_values(recipe, "temperature_c")
+            if any(
+                value is None or not math.isfinite(float(value))
+                for value in temperatures
+            ):
                 conflicts.append(f"{code}:temperature_unknown")
-            elif float(temperature) > float(constraint.numeric_value):
+            if any(
+                value is not None and float(value) > float(constraint.numeric_value)
+                for value in temperatures
+            ):
                 conflicts.append(f"{code}:temperature_exceeded")
         elif constraint.kind == "required_atmosphere":
-            atmosphere = str(recipe.get("atmosphere") or "").casefold()
-            aliases = {
-                "nitrogen": ("nitrogen", "n2"),
-                "argon": ("argon", "ar"),
-                "oxygen": ("oxygen", "o2"),
-                "hydrogen": ("hydrogen", "h2"),
-                "air": ("air",),
-            }[constraint.normalized_value]
-            if not any(token in atmosphere for token in aliases):
+            atmospheres = _operating_values(recipe, "atmosphere")
+            if any(
+                {
+                    _ATMOSPHERES[token]
+                    for token in re.findall(r"[a-z0-9]+", str(value or "").casefold())
+                    if token in _ATMOSPHERES
+                }
+                != {constraint.normalized_value}
+                or "free" in re.findall(r"[a-z0-9]+", str(value or "").casefold())
+                for value in atmospheres
+            ):
                 conflicts.append(f"{code}:required_atmosphere_missing")
     return tuple(conflicts)

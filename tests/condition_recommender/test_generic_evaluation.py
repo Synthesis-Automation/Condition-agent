@@ -496,10 +496,10 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert report["metrics"]["hard_incompatible_recommendation_count"] == 0
     assert report["schema_version"] == "1.5"
     assert report["definition_versions"] == {
-        "compatibility": "1.2",
+        "compatibility": "1.3",
         "retrieval": "1.8",
         "similarity": "1.0",
-        "ranking": "1.1",
+        "ranking": "1.2",
         "evidence_support": "1.0",
     }
     assert (output / "evaluation_report.json").is_file()

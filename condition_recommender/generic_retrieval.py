@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from condition_registry.constraints import (
+    ConditionConstraintSet,
+    condition_constraint_conflicts,
+)
+
 import json
 from dataclasses import dataclass, replace
 from functools import lru_cache
@@ -78,9 +83,10 @@ def load_generic_retrieval_rules() -> Dict[str, Any]:
     ):
         raise ValueError("generic retrieval ladder is incomplete or invalid")
     evaluation_ladders = rules.get("evaluation_ladders")
-    if not isinstance(evaluation_ladders, Mapping) or set(
-        evaluation_ladders
-    ) != _EVALUATION_STRATEGIES:
+    if (
+        not isinstance(evaluation_ladders, Mapping)
+        or set(evaluation_ladders) != _EVALUATION_STRATEGIES
+    ):
         raise ValueError("generic retrieval evaluation ladders are incomplete")
     for strategy, values in evaluation_ladders.items():
         strategy_ladder = tuple(str(value) for value in values or ())
@@ -96,16 +102,12 @@ def load_generic_retrieval_rules() -> Dict[str, Any]:
         raise ValueError("environment_neighbor_limit must be positive")
     environment_threshold = float(rules["environment_neighbor_min_similarity"])
     if not 0.0 < environment_threshold <= 1.0:
-        raise ValueError(
-            "environment_neighbor_min_similarity must be in (0, 1]"
-        )
+        raise ValueError("environment_neighbor_min_similarity must be in (0, 1]")
     if int(rules["edit_graph_neighbor_limit"]) < 1:
         raise ValueError("edit_graph_neighbor_limit must be positive")
     edit_threshold = float(rules["edit_graph_neighbor_min_similarity"])
     if not 0.0 < edit_threshold <= 1.0:
-        raise ValueError(
-            "edit_graph_neighbor_min_similarity must be in (0, 1]"
-        )
+        raise ValueError("edit_graph_neighbor_min_similarity must be in (0, 1]")
     return rules
 
 
@@ -185,6 +187,7 @@ def _candidate_levels(
     strategy: RetrievalStrategy = "hybrid",
     query_reaction_smiles: str = "",
     molecular_features: Mapping[str, Any] | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> Iterator[tuple[str, set[int]]]:
     """Yield retrieval tiers in order without computing later fallbacks early."""
     compatible = _compatible_edit_positions(
@@ -202,24 +205,23 @@ def _candidate_levels(
     if not ladder:
         raise ValueError(f"Unsupported generic retrieval strategy: {strategy}")
     core_eligible = bool(
-        reaction_core
-        and reaction_core_query_eligible(reaction_core, index)[0]
+        reaction_core and reaction_core_query_eligible(reaction_core, index)[0]
     )
     for raw_level in ladder:
         level = str(raw_level)
         if level == "exact_signature":
-            positions = _positions(
-                index.exact, signature.get("exact_signature_key")
-            ) & compatible
+            positions = (
+                _positions(index.exact, signature.get("exact_signature_key"))
+                & compatible
+            )
         elif level == "handle_signature":
-            positions = _positions(
-                index.handles, signature.get("handle_signature_key")
-            ) & compatible
+            positions = (
+                _positions(index.handles, signature.get("handle_signature_key"))
+                & compatible
+            )
         elif level == "named_family":
             family = str(signature.get("named_family") or "")
-            family_confidence = float(
-                signature.get("family_confidence") or 0.0
-            )
+            family_confidence = float(signature.get("family_confidence") or 0.0)
             positions = (
                 _positions(index.families, family) & compatible
                 if family
@@ -228,15 +230,19 @@ def _candidate_levels(
                 else set()
             )
         elif level == "transformation_signature":
-            positions = _positions(
-                index.transformations,
-                signature.get("transformation_signature_key"),
-            ) & compatible
+            positions = (
+                _positions(
+                    index.transformations,
+                    signature.get("transformation_signature_key"),
+                )
+                & compatible
+            )
         elif level == "environment_neighbors":
             positions = _environment_neighbor_positions(
                 molecular_features if molecular_features is not None else signature,
                 index,
                 compatible,
+                condition_constraints=condition_constraints,
             )
         elif level == "bond_edit_signature":
             positions = compatible
@@ -262,6 +268,7 @@ def _candidate_levels(
                     index,
                     exclude=compatible,
                     query_reaction_smiles=query_reaction_smiles,
+                    condition_constraints=condition_constraints,
                 ),
                 reaction_core=reaction_core,
                 query_reaction_smiles=query_reaction_smiles,
@@ -320,6 +327,7 @@ def _edit_graph_neighbor_positions(
     *,
     exclude: set[int],
     query_reaction_smiles: str = "",
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> set[int]:
     """Find chemistry-gated approximate edit graphs without family routing."""
     query = anonymous_edit_prototype(signature)
@@ -348,6 +356,10 @@ def _edit_graph_neighbor_positions(
     )
     rows = index.select(included_positions)
     for position, row in zip(included_positions, rows):
+        if condition_constraints and condition_constraint_conflicts(
+            row.resolved_recipe, condition_constraints
+        ):
+            continue
         if not row.signature:
             continue
         candidate = anonymous_edit_prototype(row.signature)
@@ -409,6 +421,7 @@ def _environment_neighbor_positions(
     signature: Mapping[str, Any],
     index: GenericReactionIndex,
     compatible: set[int],
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> set[int]:
     """Narrow edit-compatible rows using interpretable local environments."""
     query_tokens = environment_tokens(signature)
@@ -424,6 +437,10 @@ def _environment_neighbor_positions(
     rows = index.select(positions)
     scored = []
     for position, row in zip(positions, rows):
+        if condition_constraints and condition_constraint_conflicts(
+            row.resolved_recipe, condition_constraints
+        ):
+            continue
         score = environment_profile_similarity(
             signature,
             row.molecular_features or row.signature,
@@ -438,9 +455,7 @@ def _environment_neighbor_positions(
                     position,
                 )
             )
-    scored.sort(
-        key=lambda item: (-item[0],) + item[1:]
-    )
+    scored.sort(key=lambda item: (-item[0],) + item[1:])
     return {item[-1] for item in scored[:limit]}
 
 
@@ -478,6 +493,7 @@ def retrieve_generic_pool_with_trace(
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
     molecular_features: Mapping[str, Any] | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> tuple[
     str,
     Tuple[GenericIndexedReaction, ...],
@@ -491,13 +507,17 @@ def retrieve_generic_pool_with_trace(
         reaction_core=reaction_core,
         strategy=strategy,
         molecular_features=molecular_features,
+        condition_constraints=condition_constraints,
     )
-    fallback: tuple[
-        str,
-        Tuple[GenericIndexedReaction, ...],
-        int,
-        int,
-    ] | None = None
+    fallback: (
+        tuple[
+            str,
+            Tuple[GenericIndexedReaction, ...],
+            int,
+            int,
+        ]
+        | None
+    ) = None
     traces = []
     saw_candidates = False
     for level, positions in levels:
@@ -516,19 +536,31 @@ def retrieve_generic_pool_with_trace(
             )
             continue
         saw_candidates = True
-        rows = index.select(sorted(positions))
+        raw_rows = index.select(sorted(positions))
+        rows = tuple(
+            row
+            for row in raw_rows
+            if not condition_constraints
+            or not condition_constraint_conflicts(
+                row.resolved_recipe, condition_constraints
+            )
+        )
+        raw_support = summarize_evidence_support(raw_rows)
         support = summarize_evidence_support(rows)
         trace = RetrievalLevelTrace(
             level=level,
-            candidate_count=len(rows),
-            independent_candidate_count=support.independent_count,
+            candidate_count=len(raw_rows),
+            independent_candidate_count=raw_support.independent_count,
             compatible_candidate_count=len(rows),
             independent_compatible_candidate_count=support.independent_count,
-            excluded_candidate_count=0,
+            excluded_candidate_count=len(raw_rows) - len(rows),
             minimum_independent_support=minimum,
             status="insufficient_independent_support",
         )
         traces.append(trace)
+        if not rows:
+            traces[-1] = replace(trace, status="no_compatible_recipe")
+            continue
         if fallback is None or (
             support.independent_count,
             len(rows),
@@ -569,6 +601,7 @@ def retrieve_generic_pool(
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
     molecular_features: Mapping[str, Any] | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> Tuple[str, Tuple[GenericIndexedReaction, ...]]:
     """Compatibility wrapper returning the historical two-value result."""
     level, rows, _ = retrieve_generic_pool_with_trace(
@@ -578,6 +611,7 @@ def retrieve_generic_pool(
         reaction_core=reaction_core,
         strategy=strategy,
         molecular_features=molecular_features,
+        condition_constraints=condition_constraints,
     )
     return level, rows
 
@@ -603,6 +637,7 @@ def retrieve_preferred_reaction_pool_with_trace(
     reaction_core: Mapping[str, Any] | None = None,
     minimum_pool_size: int | None = None,
     query_reaction_smiles: str = "",
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> CompatibleRetrievalResult:
     """Resolve exact source IDs, then apply every structural and recipe gate."""
 
@@ -625,11 +660,10 @@ def retrieve_preferred_reaction_pool_with_trace(
     accepted, recipe_excluded = filter_compatible_precedents(
         signature,
         structural_rows,
+        condition_constraints=condition_constraints,
     )
     raw_support = summarize_evidence_support(raw_rows)
-    accepted_support = summarize_evidence_support(
-        tuple(row for row, _ in accepted)
-    )
+    accepted_support = summarize_evidence_support(tuple(row for row, _ in accepted))
     excluded_count = (
         len(raw_positions) - len(structural_positions) + len(recipe_excluded)
     )
@@ -706,6 +740,7 @@ def retrieve_progressive_compatible_pools_with_trace(
     minimum_pool_size: int | None = None,
     query_reaction_smiles: str = "",
     molecular_features: Mapping[str, Any] | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> ProgressiveCompatibleRetrievalResult | None:
     """Collect ordered facet tiers without allowing broad rows to displace exact ones.
 
@@ -756,7 +791,9 @@ def retrieve_progressive_compatible_pools_with_trace(
         ordered_positions = tuple(sorted(positions))
         rows = index.select(ordered_positions)
         raw_rows_by_position.update(zip(ordered_positions, rows))
-        accepted, excluded = filter_compatible_precedents(signature, rows)
+        accepted, excluded = filter_compatible_precedents(
+            signature, rows, condition_constraints=condition_constraints
+        )
         accepted_ids = {id(row) for row, _ in accepted}
         accepted_positions = {
             position
@@ -827,6 +864,7 @@ def retrieve_progressive_compatible_pools_with_trace(
             strategy="hybrid",
             query_reaction_smiles=query_reaction_smiles,
             molecular_features=molecular_features,
+            condition_constraints=condition_constraints,
         ):
             target_reached = process_level(level, positions)
             if target_reached:
@@ -855,6 +893,7 @@ def retrieve_compatible_generic_pool_with_trace(
     strategy: RetrievalStrategy = "hybrid",
     query_reaction_smiles: str = "",
     molecular_features: Mapping[str, Any] | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> CompatibleRetrievalResult:
     """Apply compatibility before independent-support checks at every tier."""
     minimum = _minimum_support(minimum_pool_size)
@@ -865,6 +904,7 @@ def retrieve_compatible_generic_pool_with_trace(
         strategy=strategy,
         query_reaction_smiles=query_reaction_smiles,
         molecular_features=molecular_features,
+        condition_constraints=condition_constraints,
     )
     fallback = None
     traces = []
@@ -886,23 +926,21 @@ def retrieve_compatible_generic_pool_with_trace(
             continue
         saw_candidates = True
         rows = index.select(sorted(positions))
-        accepted, excluded = filter_compatible_precedents(signature, rows)
+        accepted, excluded = filter_compatible_precedents(
+            signature, rows, condition_constraints=condition_constraints
+        )
         raw_support = summarize_evidence_support(rows)
         accepted_rows = tuple(row for row, _ in accepted)
         accepted_support = summarize_evidence_support(accepted_rows)
         status = (
-            "insufficient_independent_support"
-            if accepted
-            else "no_compatible_recipe"
+            "insufficient_independent_support" if accepted else "no_compatible_recipe"
         )
         trace = RetrievalLevelTrace(
             level=level,
             candidate_count=len(rows),
             independent_candidate_count=raw_support.independent_count,
             compatible_candidate_count=len(accepted),
-            independent_compatible_candidate_count=(
-                accepted_support.independent_count
-            ),
+            independent_compatible_candidate_count=(accepted_support.independent_count),
             excluded_candidate_count=len(excluded),
             minimum_independent_support=minimum,
             status=status,
@@ -956,7 +994,9 @@ def retrieve_compatible_generic_pool_with_trace(
                 )
             )
         )
-        _, excluded = filter_compatible_precedents(signature, bond_rows)
+        _, excluded = filter_compatible_precedents(
+            signature, bond_rows, condition_constraints=condition_constraints
+        )
         support = summarize_evidence_support(bond_rows)
         return CompatibleRetrievalResult(
             "no_compatible_condition_precedent",
@@ -999,6 +1039,7 @@ def retrieve_compatible_generic_pool(
     strategy: RetrievalStrategy = "hybrid",
     query_reaction_smiles: str = "",
     molecular_features: Mapping[str, Any] | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> tuple[
     str,
     tuple[tuple[GenericIndexedReaction, CompatibilityAssessment], ...],
@@ -1014,6 +1055,7 @@ def retrieve_compatible_generic_pool(
         strategy=strategy,
         query_reaction_smiles=query_reaction_smiles,
         molecular_features=molecular_features,
+        condition_constraints=condition_constraints,
     )
     return (
         result.level,

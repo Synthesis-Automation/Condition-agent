@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from condition_registry.constraints import ConditionConstraintSet
+
 from dataclasses import dataclass, replace
 from functools import lru_cache
 import json
@@ -20,8 +22,7 @@ from .support import summarize_evidence_support
 
 
 _RULES_PATH = (
-    Path(__file__).with_name("definitions")
-    / "reaction_core_retrieval.v3.json"
+    Path(__file__).with_name("definitions") / "reaction_core_retrieval.v3.json"
 )
 
 
@@ -49,9 +50,21 @@ def load_reaction_core_retrieval_rules() -> dict[str, Any]:
         raise ValueError("unexpected reaction-core retrieval definition ID")
     ladder = tuple(rules.get("retrieval_ladder") or ())
     expected = (
-        {"level": "reaction_core_exact", "key_field": "exact_core_key", "index_map": "core_exact"},
-        {"level": "reaction_core_local", "key_field": "typed_core_key", "index_map": "core_typed"},
-        {"level": "reaction_core_context", "key_field": "shape_core_key", "index_map": "core_shapes"},
+        {
+            "level": "reaction_core_exact",
+            "key_field": "exact_core_key",
+            "index_map": "core_exact",
+        },
+        {
+            "level": "reaction_core_local",
+            "key_field": "typed_core_key",
+            "index_map": "core_typed",
+        },
+        {
+            "level": "reaction_core_context",
+            "key_field": "shape_core_key",
+            "index_map": "core_shapes",
+        },
     )
     if ladder != expected:
         raise ValueError("reaction-core retrieval ladder is invalid")
@@ -79,19 +92,25 @@ def reaction_core_query_eligible(
     rules = load_reaction_core_retrieval_rules()
     if str(core.get("schema_version") or "") != REACTION_CORE_PROJECTION_SCHEMA_VERSION:
         return False, "incompatible_reaction_core_schema"
-    if str(core.get("algorithm_version") or "") != REACTION_CORE_PROJECTION_ALGORITHM_VERSION:
+    if (
+        str(core.get("algorithm_version") or "")
+        != REACTION_CORE_PROJECTION_ALGORITHM_VERSION
+    ):
         return False, "incompatible_reaction_core_algorithm"
     if str(core.get("schema_version") or "") != index.reaction_core_schema_version:
         return False, "incompatible_reaction_core_index_schema"
-    if str(core.get("algorithm_version") or "") != index.reaction_core_algorithm_version:
+    if (
+        str(core.get("algorithm_version") or "")
+        != index.reaction_core_algorithm_version
+    ):
         return False, "incompatible_reaction_core_index_algorithm"
-    if str(core.get("evidence_status") or "") not in set(rules["allowed_query_evidence_statuses"]):
+    if str(core.get("evidence_status") or "") not in set(
+        rules["allowed_query_evidence_statuses"]
+    ):
         return False, "reaction_core_evidence_not_query_eligible"
     quality = core.get("quality")
     quality_status = (
-        str(quality.get("status") or "")
-        if isinstance(quality, Mapping)
-        else ""
+        str(quality.get("status") or "") if isinstance(quality, Mapping) else ""
     )
     if quality_status == "blocked":
         return False, "reaction_core_quality_blocked"
@@ -124,10 +143,7 @@ def _level_positions(
         for position, row in zip(positions, rows)
         if row.precedent_tier.value in allowed_tiers
         and row.reaction_core
-        and (
-            row.signature
-            or row.fallback_descriptor
-        )
+        and (row.signature or row.fallback_descriptor)
         and int(row.reaction_core.get("event_count") or 0) == event_count
     }
 
@@ -138,6 +154,7 @@ def retrieve_core_pool_with_trace(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> CoreRetrievalResult:
     """Retrieve the narrowest adequately supported exact-to-context core pool."""
     rules = load_reaction_core_retrieval_rules()
@@ -174,7 +191,9 @@ def retrieve_core_pool_with_trace(
         )
         rows = index.select(sorted(positions))
         raw_support = summarize_evidence_support(rows)
-        accepted, excluded = filter_compatible_precedents(compatibility_signature, rows)
+        accepted, excluded = filter_compatible_precedents(
+            compatibility_signature, rows, condition_constraints=condition_constraints
+        )
         accepted_support = summarize_evidence_support(tuple(row for row, _ in accepted))
         if not rows:
             status = "empty"

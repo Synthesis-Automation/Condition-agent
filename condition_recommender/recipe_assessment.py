@@ -30,7 +30,7 @@ def assess_reaction_recipe(
             hard_conflicts=("UNRESOLVED_REACTION_FOR_RECIPE_ASSESSMENT",),
             evidence=("The proposed reaction has no verified structural signature.",),
             definition_id="compatibility.v1",
-            definition_version="1.2",
+            definition_version="1.3", status="conflict",
         )
     return assess_recipe_compatibility(
         asdict(analysis.reaction_signature),

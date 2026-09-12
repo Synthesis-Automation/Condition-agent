@@ -7,16 +7,16 @@ from enum import Enum
 from typing import Any, Dict, Literal, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.2"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.2"
-COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS = frozenset({"10.0", "10.1", "10.2"})
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.3"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.3"
+COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS = frozenset({"10.0", "10.1", "10.2", "10.3"})
 COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
-    {"generic_conversion.v10.0", "generic_conversion.v10.1", "generic_conversion.v10.2"}
+    {"generic_conversion.v10.0", "generic_conversion.v10.1", "generic_conversion.v10.2", "generic_conversion.v10.3"}
 )
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
-GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "3.5"
-WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "1.1"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "4.0"
+WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "2.0"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
     "fragment_source_capabilities.v1@1.3"
@@ -345,7 +345,7 @@ class GenericConditionRecommendation:
     score: float
     similarity_score: float
     compatibility_score: float
-    expected_yield_pct: Optional[float]
+    historical_yield_pct: Optional[float]
     support: int
     observation_support: int
     reference_support: int
@@ -365,6 +365,8 @@ class GenericConditionRecommendation:
     precedent_reaction_contexts: Tuple[Dict[str, Any], ...] = ()
     compatibility_evidence: Tuple[str, ...] = ()
     cautions: Tuple[str, ...] = ()
+    historical_yield_summary: Dict[str, Any] = field(default_factory=dict)
+    compatibility_status: str = "no_known_conflict"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -473,7 +475,7 @@ class WeakLabelConditionRecommendation:
     signature_similarity: float
     qualifier_similarity: float
     compatibility_score: float
-    expected_yield_pct: Optional[float]
+    historical_yield_pct: Optional[float]
     mean_z_score: Optional[float]
     support: int
     source_reaction_types: Tuple[str, ...]

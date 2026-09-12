@@ -38,7 +38,7 @@ from .fallback_similarity import fallback_index_tokens
 from .reaction_facets import reaction_facet_keys
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "6.4"
+GENERIC_INDEX_SCHEMA_VERSION = "6.5"
 
 
 @dataclass(frozen=True)

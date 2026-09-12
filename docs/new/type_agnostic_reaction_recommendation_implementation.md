@@ -41,6 +41,11 @@ reactive_taxonomy       condition_registry
 
 ## 2. Current implementation snapshot
 
+The 2026-09-12 recommendation corrections and artifact migration are documented in
+[`condition_recommendation_corrections_20260912.md`](condition_recommendation_corrections_20260912.md).
+These corrections do not constitute independent chemist adjudication or an
+untouched-test release approval.
+
 ### 2.1 What is implemented
 
 | Area | Current state | Principal implementation |
@@ -92,21 +97,21 @@ The current code declares:
 | Typed reactivity profile | `1.1` |
 | Recommendation molecular features | `1.0` |
 | Reaction fallback descriptor | `3.0` / `RFD3` |
-| Resolved condition recipe | `1.2` |
-| Recommendation record | `10.2` |
-| Generic converter definition | `generic_conversion.v10.2` |
+| Resolved condition recipe | `2.2` |
+| Recommendation record | `10.3` |
+| Generic converter definition | `generic_conversion.v10.3` |
 | Core eligibility policy | `core_eligibility.v1@1.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v5.0` |
 | Concise reaction review | `12.0` |
 | Shared chemist review summary | `3.0` |
 | Recommendation artifact workflow | `2.3` |
-| Generic persisted index | `6.4` |
+| Generic persisted index | `6.5` |
 | SQLite index storage | `1.0` |
-| Generic recommendation result | `3.3` |
+| Generic recommendation result | `4.0` |
 | Reaction correspondence definitions | `2.8` |
 | Generic retrieval definition | `1.8` |
 | Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.1` |
-| Generic ranking definition | `1.1` |
+| Generic ranking definition | `1.2` |
 | Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v3@1.0` |
 | Evidence-support policy | `evidence_support.v1@1.0` |

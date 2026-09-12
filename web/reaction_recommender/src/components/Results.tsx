@@ -39,7 +39,7 @@ const FACTOR_LABELS: Record<string, string> = {
   similarity: 'Structural similarity',
   partner_category: 'Reactant category',
   functional_group_tolerance: 'Functional-group tolerance',
-  yield: 'Expected yield',
+  yield: 'Historical yield',
   independent_support: 'Independent support',
   reaction_breadth: 'Reaction breadth',
   dataset_diversity: 'Dataset diversity',
@@ -384,8 +384,13 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
         <section className="recommendation-rationale">
           <h4>Why this recipe</h4>
           <p className="evidence-summary">
-            Similarity {item.similarity_score.toFixed(3)} · compatibility {item.compatibility_score.toFixed(3)} · expected yield {item.expected_yield_pct == null ? 'unreported' : `${item.expected_yield_pct.toFixed(1)}%`}
+            Similarity {item.similarity_score.toFixed(3)} · compatibility {item.compatibility_status === 'unknown' ? 'unknown' : item.compatibility_score.toFixed(3)} · historical yield {item.historical_yield_pct == null ? 'unreported' : `${item.historical_yield_pct.toFixed(1)}%`}
           </p>
+          {item.historical_yield_summary && item.historical_yield_summary.observation_count > 0 && (
+            <p className="support-summary">
+              Historical outcomes for the selected condition variant: {item.historical_yield_summary.minimum_pct} to {item.historical_yield_summary.maximum_pct}% across {item.historical_yield_summary.observation_count} observations and {item.historical_yield_summary.independent_evidence_count} independent evidence units. This is not a yield prediction.
+            </p>
+          )}
           <p className="support-summary">
             {item.support} reaction{item.support === 1 ? '' : 's'} · {item.reference_support} reference{item.reference_support === 1 ? '' : 's'} · {item.dataset_support} dataset{item.dataset_support === 1 ? '' : 's'}
           </p>
@@ -454,7 +459,7 @@ export function RecommendationResults({ result }: { result: RecommendationResult
                   <tr key={item.recipe_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
                     <td><strong>{item.rank}</strong>{item.rank_change !== 0 && <span className="rank-change">{item.rank_change > 0 ? '+' : ''}{item.rank_change}</span>}</td>
                     <td>{item.score.toFixed(3)}</td><td>{item.similarity_score.toFixed(3)}</td>
-                    <td>{item.expected_yield_pct == null ? '—' : `${item.expected_yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(item.resolved_recipe)}</td>
+                    <td>{item.historical_yield_pct == null ? '—' : `${item.historical_yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(item.resolved_recipe)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -508,10 +513,10 @@ function WeakLabelRecommendationDetails({
         <section className="recommendation-rationale">
           <h4>Why this recipe</h4>
           <p className="evidence-summary">
-            Label {item.label_similarity.toFixed(3)} · signatures {item.signature_similarity.toFixed(3)} · compatibility {item.compatibility_score.toFixed(3)}
+            Label {item.label_similarity.toFixed(3)} · signatures {item.signature_similarity.toFixed(3)} · compatibility {item.compatibility_status === 'unknown' ? 'unknown' : item.compatibility_score.toFixed(3)}
           </p>
           <p className="support-summary">
-            {item.support} weak-label observation{item.support === 1 ? '' : 's'} · expected yield {item.expected_yield_pct == null ? 'unreported' : `${item.expected_yield_pct.toFixed(1)}%`}
+            {item.support} weak-label observation{item.support === 1 ? '' : 's'} · historical yield {item.historical_yield_pct == null ? 'unreported' : `${item.historical_yield_pct.toFixed(1)}%`}
           </p>
           {item.explanation.length > 0 && <ul>{item.explanation.map((note) => <li key={note}>{note}</li>)}</ul>}
         </section>
@@ -587,7 +592,7 @@ export function WeakLabelRecommendationResults({ result }: { result: WeakLabelRe
                     <td><strong>{item.rank}</strong></td>
                     <td>{item.score.toFixed(3)}</td>
                     <td>{weakLabelComparisonSummary(item, result.query_participants)}</td>
-                    <td>{item.expected_yield_pct == null ? '—' : `${item.expected_yield_pct.toFixed(1)}%`}</td>
+                    <td>{item.historical_yield_pct == null ? '—' : `${item.historical_yield_pct.toFixed(1)}%`}</td>
                     <td>{compactRecipeSummary(item.resolved_recipe)}</td>
                   </tr>
                 ))}
@@ -709,7 +714,7 @@ function RetrosynthesisDetails({
               <article key={recommendation.recipe_id}>
                 <div className="retrosynthesis-condition-heading">
                   <div><strong>Recipe rank {recommendation.rank}</strong><span>{compactRecipeSummary(recommendation.resolved_recipe)}</span></div>
-                  <small>Score {recommendation.score.toFixed(3)}{recommendation.expected_yield_pct == null ? '' : ` · ${recommendation.expected_yield_pct.toFixed(1)}% expected yield`}</small>
+                  <small>Score {recommendation.score.toFixed(3)}{recommendation.historical_yield_pct == null ? '' : ` · ${recommendation.historical_yield_pct.toFixed(1)}% historical yield`}</small>
                 </div>
                 <Conditions recipe={recommendation.resolved_recipe} />
                 <ConditionPrecedents precedents={recommendation.condition_precedents ?? []} />

@@ -62,7 +62,7 @@ _RANKING_COMPONENT_LABELS = {
     "similarity": "Structural similarity",
     "partner_category": "Reactant category",
     "functional_group_tolerance": "Functional-group tolerance",
-    "yield": "Expected yield",
+    "yield": "Historical yield",
     "independent_support": "Independent support",
     "reaction_breadth": "Reaction breadth",
     "dataset_diversity": "Dataset diversity",
@@ -671,7 +671,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 "Score",
                 "Similarity",
                 "Compatibility",
-                "Expected yield",
+                "Historical yield",
                 "Rxn support",
                 "Ref support",
                 "Conditions",
@@ -1209,8 +1209,8 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 f"{recommendation.similarity_score:.3f}",
                 f"{recommendation.compatibility_score:.3f}",
                 (
-                    f"{recommendation.expected_yield_pct:.1f}%"
-                    if recommendation.expected_yield_pct is not None
+                    f"{recommendation.historical_yield_pct:.1f}%"
+                    if recommendation.historical_yield_pct is not None
                     else "—"
                 ),
                 str(recommendation.support),
@@ -1399,10 +1399,10 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 ),
             )
         )
-        if recommendation.expected_yield_pct is not None:
+        if recommendation.historical_yield_pct is not None:
             lines.append(
-                f"Evidence-weighted expected yield: "
-                f"{recommendation.expected_yield_pct:.1f}%"
+                f"Evidence-weighted historical yield: "
+                f"{recommendation.historical_yield_pct:.1f}%"
             )
         trace = recommendation.score_trace
         lines.extend(("", f"Ranking profile: {trace.ranking_profile}", "Score factors"))

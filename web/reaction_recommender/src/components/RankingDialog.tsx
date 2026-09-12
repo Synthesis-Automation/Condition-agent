@@ -4,7 +4,7 @@ const LABELS: Record<string, string> = {
   similarity: 'Structural similarity',
   partner_category: 'Reactant category',
   functional_group_tolerance: 'Functional-group tolerance',
-  yield: 'Expected yield',
+  yield: 'Historical yield',
   independent_support: 'Independent support',
   reaction_breadth: 'Reaction breadth',
   dataset_diversity: 'Dataset diversity',

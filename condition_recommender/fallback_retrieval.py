@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from condition_registry.constraints import (
+    ConditionConstraintSet,
+    condition_constraint_conflicts,
+)
+
 from collections import Counter
 from typing import Any, Mapping
 
@@ -28,6 +33,7 @@ def retrieve_fallback_pool_with_trace(
     unrestricted: bool = False,
     required_source_capability_ids: Mapping[str, str] | None = None,
     required_source_substance_ids: Mapping[str, str] | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> CompatibleRetrievalResult:
     """Retrieve precedents without asserting query bond edits.
 
@@ -45,9 +51,7 @@ def retrieve_fallback_pool_with_trace(
         descriptor,
         require_eligible=not unrestricted,
     )
-    partial_transformation_key = str(
-        descriptor.get("partial_transformation_key") or ""
-    )
+    partial_transformation_key = str(descriptor.get("partial_transformation_key") or "")
     edit_position_sets = [
         set(index.fallback_features.get(token, ())) for token in edit_tokens
     ]
@@ -91,8 +95,10 @@ def retrieve_fallback_pool_with_trace(
             for value in row.fragment_source_support
             if str(value.get("status") or "") == "supported"
         }
-        if required_source_ids and not unrestricted and not (
-            required_source_ids <= set(supports)
+        if (
+            required_source_ids
+            and not unrestricted
+            and not (required_source_ids <= set(supports))
         ):
             return False
         for requirement_id, capability_id in capability_constraints.items():
@@ -104,8 +110,7 @@ def retrieve_fallback_pool_with_trace(
         for requirement_id, substance_id in substance_constraints.items():
             support = supports.get(requirement_id, {})
             if substance_id not in {
-                str(value)
-                for value in support.get("component_substance_ids") or ()
+                str(value) for value in support.get("component_substance_ids") or ()
             }:
                 return False
         return True
@@ -117,9 +122,7 @@ def retrieve_fallback_pool_with_trace(
         or substance_constraints
     ):
         source_supported_rows = tuple(
-            row
-            for row in raw_rows
-            if supports_selected_sources(row)
+            row for row in raw_rows if supports_selected_sources(row)
         )
         source_excluded_count = len(raw_rows) - len(source_supported_rows)
     else:
@@ -171,7 +174,14 @@ def retrieve_fallback_pool_with_trace(
             independent_compatible_candidate_count=0,
             trace=(candidate_trace,),
         )
-    raw_rows = source_supported_rows
+    raw_rows = tuple(
+        row
+        for row in source_supported_rows
+        if not condition_constraints
+        or not condition_constraint_conflicts(
+            row.resolved_recipe, condition_constraints
+        )
+    )
 
     if unrestricted:
         candidate_limit = int(rules["candidate_limit"])
@@ -202,13 +212,9 @@ def retrieve_fallback_pool_with_trace(
         neutral_compatibility = CompatibilityAssessment(
             compatible=True,
             score=1.0,
-            evidence=(
-                "Condition compatibility gates were explicitly bypassed",
-            ),
+            evidence=("Condition compatibility gates were explicitly bypassed",),
         )
-        accepted = tuple(
-            (row, neutral_compatibility) for row in matched_rows
-        )
+        accepted = tuple((row, neutral_compatibility) for row in matched_rows)
         support = summarize_evidence_support(matched_rows)
         trace = RetrievalLevelTrace(
             level="unrestricted_unverified_structure_similarity",
@@ -271,6 +277,7 @@ def retrieve_fallback_pool_with_trace(
     accepted, compatibility_excluded = filter_compatible_precedents(
         compatibility_signature,
         matched_rows,
+        condition_constraints=condition_constraints,
     )
     excluded_count = len(compatibility_excluded) + source_excluded_count
     accepted_rows = tuple(row for row, _ in accepted)

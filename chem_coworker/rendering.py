@@ -125,8 +125,8 @@ def render_recommendation(
         }
         for display_rank, item in enumerate(ordered_recommendations, start=1):
             yield_text = (
-                f", expected yield {item.expected_yield_pct:.1f}%"
-                if item.expected_yield_pct is not None
+                f", expected yield {item.historical_yield_pct:.1f}%"
+                if item.historical_yield_pct is not None
                 else ""
             )
             lines.append(

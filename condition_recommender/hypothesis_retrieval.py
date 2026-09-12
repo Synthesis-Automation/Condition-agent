@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from condition_registry.constraints import (
+    ConditionConstraintSet,
+    condition_constraint_conflicts,
+)
+
 import json
 from dataclasses import asdict, dataclass
 from functools import lru_cache
@@ -27,8 +32,7 @@ from .support import summarize_evidence_support
 
 
 _RULES_PATH = (
-    Path(__file__).with_name("definitions")
-    / "edit_hypothesis_retrieval.v1.json"
+    Path(__file__).with_name("definitions") / "edit_hypothesis_retrieval.v1.json"
 )
 
 
@@ -39,9 +43,7 @@ def load_edit_hypothesis_retrieval_rules() -> dict[str, Any]:
         rules = dict(json.load(handle))
     if str(rules.get("schema_version") or "") != "1.0":
         raise ValueError("unsupported edit-hypothesis retrieval schema")
-    if str(rules.get("definition_id") or "") != (
-        "edit_hypothesis_retrieval.v1"
-    ):
+    if str(rules.get("definition_id") or "") != ("edit_hypothesis_retrieval.v1"):
         raise ValueError("unexpected edit-hypothesis retrieval definition")
     if not str(rules.get("calibration_status") or ""):
         raise ValueError("edit-hypothesis retrieval requires calibration status")
@@ -100,9 +102,7 @@ def build_hypothesis_retrieval_query(
     prototypes = tuple(
         prototype
         for hypothesis in hypotheses
-        for prototype in (
-            anonymous_edit_prototype_from_hypothesis(hypothesis),
-        )
+        for prototype in (anonymous_edit_prototype_from_hypothesis(hypothesis),)
         if prototype is not None
     )
     if len(prototypes) != len(hypotheses):
@@ -147,6 +147,7 @@ def retrieve_hypothesis_consensus_pool_with_trace(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> CompatibleRetrievalResult:
     """Return only verified precedents compatible with every edit hypothesis."""
     rules = load_edit_hypothesis_retrieval_rules()
@@ -179,12 +180,14 @@ def retrieve_hypothesis_consensus_pool_with_trace(
                 status="scored" if rows else "empty",
             )
         )
-    robust_positions = (
-        set.intersection(*position_sets) if position_sets else set()
-    )
+    robust_positions = set.intersection(*position_sets) if position_sets else set()
     scored = []
     for position in robust_positions:
         row = index.rows[position]
+        if condition_constraints and condition_constraint_conflicts(
+            row.resolved_recipe, condition_constraints
+        ):
+            continue
         precedent = anonymous_edit_prototype(row.signature)
         if precedent is None:
             continue
@@ -212,6 +215,7 @@ def retrieve_hypothesis_consensus_pool_with_trace(
     accepted, excluded = filter_compatible_precedents(
         compatibility_signature,
         rows,
+        condition_constraints=condition_constraints,
     )
     accepted_rows = tuple(row for row, _ in accepted)
     accepted_support = summarize_evidence_support(accepted_rows)
@@ -255,9 +259,7 @@ def retrieve_hypothesis_consensus_pool_with_trace(
             candidate_count=len(rows),
             independent_candidate_count=raw_support.independent_count,
             excluded_candidate_count=len(excluded),
-            independent_compatible_candidate_count=(
-                accepted_support.independent_count
-            ),
+            independent_compatible_candidate_count=(accepted_support.independent_count),
             trace=tuple(traces),
         )
     return CompatibleRetrievalResult(
@@ -281,12 +283,8 @@ def _prototype_from_mapping(
         order_changed_element_pairs=tuple(
             value.get("order_changed_element_pairs") or ()
         ),
-        formed_atom_state_pairs=tuple(
-            value.get("formed_atom_state_pairs") or ()
-        ),
-        broken_atom_state_pairs=tuple(
-            value.get("broken_atom_state_pairs") or ()
-        ),
+        formed_atom_state_pairs=tuple(value.get("formed_atom_state_pairs") or ()),
+        broken_atom_state_pairs=tuple(value.get("broken_atom_state_pairs") or ()),
         ring_count_delta=int(value.get("ring_count_delta") or 0),
         formed_ring_sizes=tuple(
             int(item) for item in value.get("formed_ring_sizes") or ()
@@ -309,10 +307,7 @@ def assess_hypothesis_consensus_similarity(
     )
     precedent = anonymous_edit_prototype(row.signature)
     edit_score = (
-        min(
-            anonymous_edit_similarity(prototype, precedent)
-            for prototype in prototypes
-        )
+        min(anonymous_edit_similarity(prototype, precedent) for prototype in prototypes)
         if prototypes and precedent is not None
         else 0.0
     )
@@ -345,12 +340,8 @@ def assess_hypothesis_consensus_similarity(
     }
     return SimilarityAssessment(
         score=round(sum(contributions.values()), 6),
-        components={
-            name: round(value, 6) for name, value in components.items()
-        },
-        contributions={
-            name: round(value, 6) for name, value in contributions.items()
-        },
+        components={name: round(value, 6) for name, value in components.items()},
+        contributions={name: round(value, 6) for name, value in contributions.items()},
         definition_id=str(rules["definition_id"]),
         definition_version=str(rules["schema_version"]),
     )

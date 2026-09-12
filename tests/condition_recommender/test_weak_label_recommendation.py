@@ -171,7 +171,7 @@ def test_fallback_requires_graph_hint_and_matches_unordered_sites(
         "RCR1:b",
     ]
     assert result.recommendations[0].support == 2
-    assert result.schema_version == "1.1"
+    assert result.schema_version == "2.0"
     assert result.recommendations[0].source_matches[0].source_reaction_type == (
         "CN-Coupling"
     )

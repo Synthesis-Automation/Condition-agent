@@ -1,10 +1,8 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "definition_id": "generic_ranking.v1",
-  "calibration_status": "calibrated_sample_v1",
+  "calibration_status": "prior_weights_pending_current_pipeline_validation",
   "maximum_independent_neighbors": 50,
-  "yield_prior_strength": 3.0,
-  "minimum_similarity_yield_weight": 0.05,
   "support_saturation": {
     "independent_evidence": 5,
     "canonical_reactions": 10,
@@ -13,8 +11,8 @@
   "missing_yield_policy": "renormalize_available_components",
   "weights": {
     "similarity": 0.45,
-    "partner_category": 0.00,
-    "functional_group_tolerance": 0.00,
+    "partner_category": 0.0,
+    "functional_group_tolerance": 0.0,
     "yield": 0.15,
     "independent_support": 0.15,
     "reaction_breadth": 0.08,
@@ -24,31 +22,33 @@
   },
   "evaluation_baseline_weights": {
     "transformation_prior": {
-      "similarity": 0.00,
-      "partner_category": 0.00,
-      "functional_group_tolerance": 0.00,
-      "yield": 0.10,
+      "similarity": 0.0,
+      "partner_category": 0.0,
+      "functional_group_tolerance": 0.0,
+      "yield": 0.1,
       "independent_support": 0.35,
-      "reaction_breadth": 0.20,
-      "dataset_diversity": 0.10,
+      "reaction_breadth": 0.2,
+      "dataset_diversity": 0.1,
       "compatibility": 0.15,
-      "condition_certainty": 0.10
+      "condition_certainty": 0.1
     },
     "legacy_pilot": {
       "similarity": 0.65,
-      "partner_category": 0.00,
-      "functional_group_tolerance": 0.00,
-      "yield": 0.20,
-      "independent_support": 0.10,
-      "reaction_breadth": 0.00,
-      "dataset_diversity": 0.00,
+      "partner_category": 0.0,
+      "functional_group_tolerance": 0.0,
+      "yield": 0.2,
+      "independent_support": 0.1,
+      "reaction_breadth": 0.0,
+      "dataset_diversity": 0.0,
       "compatibility": 0.05,
-      "condition_certainty": 0.00
+      "condition_certainty": 0.0
     }
   },
   "calibrated_minimum_pool_size": 2,
   "calibration_provenance": {
     "definition_id": "generic_calibration.v1",
     "selected_candidate_id": "support_heavy_min2"
-  }
+  },
+  "neighbor_budget_scope": "per_recipe_independent_evidence",
+  "yield_summary_policy": "equal_reference_mean_within_selected_variant"
 }

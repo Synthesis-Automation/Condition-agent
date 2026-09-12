@@ -37,7 +37,7 @@ def _result() -> GenericRecommendationResult:
         score=0.87,
         similarity_score=0.8,
         compatibility_score=1.0,
-        expected_yield_pct=74.0,
+        historical_yield_pct=74.0,
         support=3,
         observation_support=3,
         reference_support=2,

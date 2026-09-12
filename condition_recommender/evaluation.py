@@ -467,7 +467,7 @@ def evaluate_generic_index(
                     and top_recommendation.score_trace.definition_versions
                 )
             )
-            predicted_yield = result.recommendations[0].expected_yield_pct
+            predicted_yield = result.recommendations[0].historical_yield_pct
             if predicted_yield is not None and row.yield_pct is not None:
                 yield_errors.append(abs(predicted_yield - row.yield_pct))
             for recommendation in result.recommendations:
@@ -520,7 +520,7 @@ def evaluate_generic_index(
                 "hard_incompatible_recommendation_count": (
                     case_hard_incompatible
                 ),
-                "predicted_yield_pct": result.recommendations[0].expected_yield_pct
+                "predicted_yield_pct": result.recommendations[0].historical_yield_pct
                 if result.recommendations
                 else None,
                 "top_recommendation_score_trace": (

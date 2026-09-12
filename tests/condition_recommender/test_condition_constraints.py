@@ -36,7 +36,7 @@ def _recommendation(rank: int, substance_id: str) -> GenericConditionRecommendat
         score=1.0 / rank,
         similarity_score=1.0 / rank,
         compatibility_score=1.0,
-        expected_yield_pct=None,
+        historical_yield_pct=None,
         support=1,
         observation_support=1,
         reference_support=1,

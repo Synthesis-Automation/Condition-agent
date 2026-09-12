@@ -75,7 +75,7 @@ def _recommendation() -> GenericConditionRecommendation:
         score=0.82,
         similarity_score=0.91,
         compatibility_score=1.0,
-        expected_yield_pct=78.5,
+        historical_yield_pct=78.5,
         support=3,
         observation_support=4,
         reference_support=2,

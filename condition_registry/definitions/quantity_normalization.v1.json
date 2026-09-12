@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "quantity_normalization.v1",
+  "definition_version": "1.0",
+  "duplicate_policy": "preserve_conflicting_observations",
+  "separate_addition_provenance": "separate_addition",
+  "units": {
+    "l": ["mL", 1000.0], "ml": ["mL", 1.0], "ul": ["mL", 0.001],
+    "g": ["mg", 1000.0], "mg": ["mg", 1.0], "ug": ["mg", 0.001],
+    "mol": ["mmol", 1000.0], "mmol": ["mmol", 1.0], "umol": ["mmol", 0.001],
+    "equiv": ["equiv", 1.0], "eq": ["equiv", 1.0]
+  }
+}

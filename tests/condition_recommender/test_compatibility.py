@@ -158,14 +158,16 @@ def test_mandatory_catalyst_is_hard_unless_identity_is_unresolved() -> None:
         },
     )
     assert unresolved.compatible
-    assert unresolved.score == 0.88
+    assert unresolved.score == 0.0
+    assert unresolved.status == "unknown"
     assert unresolved.penalty_ids == ("metal_coupling_requires_catalyst",)
 
     low_confidence = assess_recipe_compatibility(
         {**query, "family_confidence": 0.5}, {}
     )
     assert low_confidence.compatible
-    assert low_confidence.score == 1.0
+    assert low_confidence.score == 0.0
+    assert low_confidence.status == "unknown"
 
 
 def test_compatibility_definition_has_unique_rule_ids() -> None:

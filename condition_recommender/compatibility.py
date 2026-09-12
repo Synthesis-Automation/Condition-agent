@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from collections import Counter
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
 from condition_registry import (
+    ConditionConstraintSet,
+    condition_constraint_conflicts,
     CONDITION_RECIPE_COMPONENT_BUCKETS,
     load_condition_vocabulary,
 )
@@ -36,7 +40,10 @@ class CompatibilityAssessment:
     penalty_ids: Tuple[str, ...] = ()
     evidence: Tuple[str, ...] = ()
     definition_id: str = "compatibility.v1"
-    definition_version: str = "1.2"
+    definition_version: str = "1.3"
+    status: str = "no_known_conflict"
+    checked_requirements: Tuple[str, ...] = ()
+    unresolved_requirements: Tuple[str, ...] = ()
 
 
 @lru_cache(maxsize=1)
@@ -54,9 +61,7 @@ def _validate_match_vocabulary(
 ) -> None:
     unknown_tags = set(rule.get("query_tags_any") or ()) - query_tags
     if unknown_tags:
-        raise ValueError(
-            f"unknown compatibility query tags: {sorted(unknown_tags)}"
-        )
+        raise ValueError(f"unknown compatibility query tags: {sorted(unknown_tags)}")
     unknown_buckets = set(rule.get("recipe_buckets_any") or ()) - set(
         CONDITION_RECIPE_COMPONENT_BUCKETS
     )
@@ -68,22 +73,34 @@ def _validate_match_vocabulary(
         load_condition_vocabulary().role_ids
     )
     if unknown_roles:
-        raise ValueError(
-            f"unknown compatibility recipe roles: {sorted(unknown_roles)}"
-        )
+        raise ValueError(f"unknown compatibility recipe roles: {sorted(unknown_roles)}")
     for substance_id in rule.get("recipe_substance_ids_any") or ():
         from condition_registry import resolve_substance_id
 
         if resolve_substance_id(str(substance_id)).status != "resolved":
-            raise ValueError(
-                f"unknown compatibility recipe substance: {substance_id}"
-            )
+            raise ValueError(f"unknown compatibility recipe substance: {substance_id}")
 
 
 def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
     """Validate rule structure against taxonomy and registry vocabularies."""
-    if str(rules.get("schema_version") or "") != "1.2":
+    if str(rules.get("schema_version") or "") != "1.3":
         raise ValueError("unsupported compatibility definition schema")
+    policy = rules.get("coverage_policy") or {}
+    if (
+        policy.get("unknown_score") != 0.0
+        or policy.get("unknown_does_not_imply_incompatible") is not True
+    ):
+        raise ValueError("Invalid compatibility uncertainty policy")
+    for requirement in rules.get("structural_capability_requirements") or ():
+        if (
+            not requirement.get("id")
+            or not requirement.get("order_changes")
+            or not requirement.get("hydrogen_changes")
+            or requirement.get("missing_policy") != "unknown_review_required"
+            or set(requirement.get("recipe_buckets_any") or ())
+            - set(CONDITION_RECIPE_COMPONENT_BUCKETS)
+        ):
+            raise ValueError("Invalid structural condition capability requirement")
     query_tags = {
         str(tag)
         for definition in load_molecular_motif_definitions()
@@ -102,12 +119,15 @@ def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
             if not str(rule.get("message") or "").strip():
                 raise ValueError(f"compatibility rule {rule_id} requires a message")
             if section != "regime_requirements":
-                unknown_keys = set(rule) - (_MATCH_KEYS | {
-                    "id",
-                    "message",
-                    "penalty",
-                    "penalty_group",
-                })
+                unknown_keys = set(rule) - (
+                    _MATCH_KEYS
+                    | {
+                        "id",
+                        "message",
+                        "penalty",
+                        "penalty_group",
+                    }
+                )
                 if unknown_keys:
                     raise ValueError(
                         f"unsupported keys for compatibility rule {rule_id}: "
@@ -128,9 +148,7 @@ def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
                     and maximum is not None
                     and float(minimum) > float(maximum)
                 ):
-                    raise ValueError(
-                        f"invalid temperature range in {rule_id}"
-                    )
+                    raise ValueError(f"invalid temperature range in {rule_id}")
             if section == "soft_penalties":
                 penalty = float(rule.get("penalty") or 0.0)
                 if not 0.0 < penalty < 1.0:
@@ -158,23 +176,13 @@ def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
                     )
                 required = set(rule.get("required_all_buckets") or ())
                 if not required <= set(CONDITION_RECIPE_COMPONENT_BUCKETS):
-                    raise ValueError(
-                        f"unknown required recipe bucket in {rule_id}"
-                    )
-                confidence = float(
-                    rule.get("minimum_family_confidence") or 0.0
-                )
+                    raise ValueError(f"unknown required recipe bucket in {rule_id}")
+                confidence = float(rule.get("minimum_family_confidence") or 0.0)
                 if not 0.0 <= confidence <= 1.0:
-                    raise ValueError(
-                        f"invalid family confidence in {rule_id}"
-                    )
-                unresolved_penalty = float(
-                    rule.get("unresolved_penalty") or 0.0
-                )
+                    raise ValueError(f"invalid family confidence in {rule_id}")
+                unresolved_penalty = float(rule.get("unresolved_penalty") or 0.0)
                 if not 0.0 < unresolved_penalty < 1.0:
-                    raise ValueError(
-                        f"invalid unresolved penalty in {rule_id}"
-                    )
+                    raise ValueError(f"invalid unresolved penalty in {rule_id}")
 
 
 def _query_tags(signature: Mapping[str, Any]) -> set[str]:
@@ -207,7 +215,7 @@ def _query_family_evidence(
 
 
 def _recipe_facts(
-    recipe: Mapping[str, Any]
+    recipe: Mapping[str, Any],
 ) -> tuple[set[str], set[str], set[str], bool, str, float | None]:
     buckets = set()
     substance_ids = set()
@@ -222,7 +230,9 @@ def _recipe_facts(
             substance_id = component.get("substance_id")
             if substance_id:
                 substance_ids.add(str(substance_id))
-            if component.get("role_status") == "assigned" and component.get("primary_role"):
+            if component.get("role_status") == "assigned" and component.get(
+                "primary_role"
+            ):
                 role_ids.add(str(component["primary_role"]))
     temperature_value = recipe.get("temperature_c")
     temperature = float(temperature_value) if temperature_value is not None else None
@@ -253,7 +263,9 @@ def _matches(
     if required_buckets and not required_buckets.intersection(recipe_buckets):
         return False
     required_substances = set(rule.get("recipe_substance_ids_any") or ())
-    if required_substances and not required_substances.intersection(recipe_substance_ids):
+    if required_substances and not required_substances.intersection(
+        recipe_substance_ids
+    ):
         return False
     required_roles = set(rule.get("recipe_role_ids_any") or ())
     if required_roles and not required_roles.intersection(recipe_role_ids):
@@ -304,9 +316,38 @@ def assess_recipe_compatibility(
         atmosphere,
         temperature,
     ) = _recipe_facts(recipe)
+    checked_requirements = []
+    unresolved_requirements = []
+    capability_evidence = []
+    for requirement in rules.get("structural_capability_requirements") or ():
+        if (
+            signature.get("formed_bond_types")
+            or signature.get("broken_bond_types")
+            or Counter(signature.get("order_changes") or ())
+            != Counter(requirement["order_changes"])
+            or Counter(signature.get("hydrogen_changes") or ())
+            != Counter(requirement["hydrogen_changes"])
+        ):
+            continue
+        checked_requirements.append(requirement["id"])
+        atmosphere_tokens = set(re.findall(r"[a-z0-9]+", atmosphere.casefold()))
+        supported = bool(set(requirement["recipe_buckets_any"]) & buckets) or (
+            bool(set(requirement["recipe_atmospheres_any"]) & atmosphere_tokens)
+            and "free" not in atmosphere_tokens
+        )
+        if not supported:
+            unresolved_requirements.append(requirement["id"])
+        capability_evidence.append(
+            requirement["message"]
+            + (
+                "; capability reported"
+                if supported
+                else "; supporting condition evidence is missing"
+            )
+        )
     hard = []
     penalties = []
-    evidence = []
+    evidence = list(capability_evidence)
     for rule in rules.get("hard_conflicts") or ():
         if _matches(
             rule,
@@ -348,6 +389,9 @@ def assess_recipe_compatibility(
         return CompatibilityAssessment(
             compatible=False,
             score=0.0,
+            status="conflict",
+            checked_requirements=tuple(checked_requirements),
+            unresolved_requirements=tuple(unresolved_requirements),
             hard_conflicts=tuple(hard),
             evidence=tuple(evidence),
             definition_id=str(rules["definition_id"]),
@@ -366,9 +410,7 @@ def assess_recipe_compatibility(
         ):
             group = str(rule.get("penalty_group") or rule["id"])
             current = matched_penalties.get(group)
-            if current is None or float(rule["penalty"]) > float(
-                current["penalty"]
-            ):
+            if current is None or float(rule["penalty"]) > float(current["penalty"]):
                 matched_penalties[group] = rule
     for rule, message in requirement_penalties:
         matched_penalties[f"requirement:{rule['id']}"] = {
@@ -382,9 +424,19 @@ def assess_recipe_compatibility(
         penalties.append(str(rule["id"]))
         evidence.append(str(rule["message"]))
         total_penalty += float(rule["penalty"])
+    unknown = not buckets or has_unresolved or bool(unresolved_requirements)
+    if unknown:
+        evidence.append(
+            "Condition compatibility coverage is incomplete; no efficacy claim is supported"
+        )
     return CompatibilityAssessment(
         compatible=True,
-        score=round(max(0.0, 1.0 - total_penalty), 6),
+        score=float(rules["coverage_policy"]["unknown_score"])
+        if unknown
+        else round(max(0.0, 1.0 - total_penalty), 6),
+        status="unknown" if unknown else "no_known_conflict",
+        checked_requirements=tuple(checked_requirements),
+        unresolved_requirements=tuple(unresolved_requirements),
         penalty_ids=tuple(penalties),
         evidence=tuple(evidence),
         definition_id=str(rules["definition_id"]),
@@ -393,7 +445,10 @@ def assess_recipe_compatibility(
 
 
 def filter_compatible_precedents(
-    signature: Mapping[str, Any], precedents: Iterable[Any]
+    signature: Mapping[str, Any],
+    precedents: Iterable[Any],
+    *,
+    condition_constraints: ConditionConstraintSet | None = None,
 ) -> tuple[
     tuple[tuple[Any, CompatibilityAssessment], ...],
     tuple[tuple[Any, CompatibilityAssessment], ...],
@@ -402,9 +457,23 @@ def filter_compatible_precedents(
     accepted = []
     excluded = []
     for precedent in precedents:
-        assessment = assess_recipe_compatibility(
-            signature, precedent.resolved_recipe
+        assessment = assess_recipe_compatibility(signature, precedent.resolved_recipe)
+        conflicts = (
+            condition_constraint_conflicts(
+                precedent.resolved_recipe, condition_constraints
+            )
+            if condition_constraints is not None
+            else ()
         )
+        if conflicts:
+            assessment = replace(
+                assessment,
+                status="conflict",
+                compatible=False,
+                score=0.0,
+                hard_conflicts=assessment.hard_conflicts + conflicts,
+                evidence=assessment.evidence + conflicts,
+            )
         target = accepted if assessment.compatible else excluded
         target.append((precedent, assessment))
     return tuple(accepted), tuple(excluded)

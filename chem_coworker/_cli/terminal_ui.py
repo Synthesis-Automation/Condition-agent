@@ -256,8 +256,8 @@ class RichResponseRenderer:
         for display_rank, item in enumerate(ordered, start=1):
             recipe = self._recipe(item.resolved_recipe, item.recipe_core_id)
             expected_yield = (
-                f"{item.expected_yield_pct:.1f}%"
-                if item.expected_yield_pct is not None
+                f"{item.historical_yield_pct:.1f}%"
+                if item.historical_yield_pct is not None
                 else "—"
             )
             candidate_review = review_by_id.get(item.recipe_id)

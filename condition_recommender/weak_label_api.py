@@ -259,8 +259,8 @@ def _diverse_selection(
                         for value in selected
                     ),
                     item.score,
-                    item.expected_yield_pct
-                    if item.expected_yield_pct is not None
+                    item.historical_yield_pct
+                    if item.historical_yield_pct is not None
                     else -1.0,
                     item.recipe_id,
                 ),
@@ -396,7 +396,7 @@ def _rank_recipes(
                 signature_similarity=round(best_signature, 6),
                 qualifier_similarity=round(best_qualifier, 6),
                 compatibility_score=compatibility.score,
-                expected_yield_pct=round(expected_yield, 2),
+                historical_yield_pct=round(expected_yield, 2),
                 mean_z_score=round(mean_z, 3) if mean_z is not None else None,
                 support=len(members),
                 source_reaction_types=tuple(
@@ -447,7 +447,7 @@ def _rank_recipes(
     ranked.sort(
         key=lambda item: (
             -item.score,
-            -(item.expected_yield_pct or -1.0),
+            -(item.historical_yield_pct or -1.0),
             item.recipe_id,
         )
     )
