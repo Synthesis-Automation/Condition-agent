@@ -14,8 +14,8 @@ DescriptorStatus = Literal[
     "not_computed",
 ]
 
-AccessibilityClass = Literal["open", "moderate", "hindered", "severe"]
-BurdenClass = Literal["none", "low", "medium", "high"]
+AccessibilityClass = Literal["open", "moderate", "hindered", "severe", "unknown"]
+BurdenClass = Literal["none", "low", "medium", "high", "unknown"]
 
 
 def _validate_confidence(value: float) -> None:
@@ -119,15 +119,17 @@ class StericProfile:
     """Context-relative graph accessibility and its branch evidence."""
 
     accessibility_class: AccessibilityClass
-    accessibility_score: float
+    accessibility_score: float | None
     approach_burden_class: BurdenClass
     branch_contributions: Tuple[StericContribution, ...]
     context_metrics: Tuple[Tuple[str, str], ...]
     evidence: DescriptorEvidence
 
     def __post_init__(self) -> None:
-        if not 0.0 <= float(self.accessibility_score) <= 1.0:
+        if self.accessibility_score is not None and not 0.0 <= float(self.accessibility_score) <= 1.0:
             raise ValueError("accessibility score must be between 0 and 1")
+        if (self.accessibility_score is None) != (self.accessibility_class == "unknown"):
+            raise ValueError("unknown accessibility requires a missing score")
         if tuple(sorted(self.context_metrics)) != self.context_metrics:
             raise ValueError("context_metrics must be sorted")
         if len({key for key, _ in self.context_metrics}) != len(
@@ -146,12 +148,15 @@ class ElectronicProfile:
 
     activation_axis: str
     activation_class: str
-    activation_score: float
+    activation_score: float | None
     contributions: Tuple[ElectronicContribution, ...]
     evidence: DescriptorEvidence
 
     def __post_init__(self) -> None:
-        _validate_score(self.activation_score)
+        if self.activation_score is not None:
+            _validate_score(self.activation_score)
+        if (self.activation_score is None) != (self.activation_class == "unknown"):
+            raise ValueError("unknown activation requires a missing score")
 
 
 @dataclass(frozen=True)
@@ -161,7 +166,7 @@ class AromaticHeteroatom:
     atom_index: int
     element: str
     formal_charge: int
-    aromatic_role: Literal["pyridine_like", "pyrrole_like", "other"]
+    aromatic_role: Literal["pyridine_like", "pyrrole_like", "cationic_aromatic", "other"]
     ring_distance_from_anchor: int
     positional_relation: Literal[
         "anchor",
@@ -349,7 +354,7 @@ class SiteReactivityProfile:
     flags: Tuple[str, ...]
     status: DescriptorStatus
     definition_versions: Tuple[Tuple[str, str], ...]
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
 
     def __post_init__(self) -> None:
         if self.center_atom_index != self.reactive_center.atom_index:

@@ -31,10 +31,28 @@ def shortest_distance(mol: Any, start: int, targets: Iterable[int]) -> int | Non
             values.append(0)
             continue
         try:
-            values.append(len(Chem.GetShortestPath(mol, int(start), int(target))) - 1)
+            path = Chem.GetShortestPath(mol, int(start), int(target))
+            if path:
+                values.append(len(path) - 1)
         except Exception:
             continue
     return min(values) if values else None
+
+
+def site_locus_atoms(site: Any, center: int) -> Tuple[int, ...]:
+    """Use both endpoints for a homogeneous pi-bond environment."""
+    if getattr(site, "topology", None) == "bond" and site.canonical_signature in {
+        "PI|Alkene", "PI|Alkyne",
+    }:
+        return tuple(sorted(set(int(index) for index in site.atom_indices)))
+    return (center,)
+
+
+def locus_distance(mol: Any, starts: Iterable[int], targets: Iterable[int]) -> int | None:
+    """Return distance from a molecular locus, independent of endpoint order."""
+    target_atoms = tuple(targets)
+    values = tuple(shortest_distance(mol, start, target_atoms) for start in starts)
+    return min((value for value in values if value is not None), default=None)
 
 
 def bounded_branch_atoms(
@@ -168,7 +186,7 @@ def reactive_center_profile(
         hybridization=str(atom.GetHybridization()),
         formal_charge=int(atom.GetFormalCharge()),
         radical_electrons=int(atom.GetNumRadicalElectrons()),
-        hydrogen_count=int(atom.GetTotalNumHs()),
+        hydrogen_count=int(atom.GetTotalNumHs(includeNeighbors=True)),
         heavy_atom_attachment_count=sum(
             neighbor.GetAtomicNum() > 1 for neighbor in atom.GetNeighbors()
         ),

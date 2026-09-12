@@ -67,7 +67,7 @@ def heteroatom_lone_pair(
         return "aryl_delocalized", "medium", "weakly_acidic"
     if atom.GetSymbol() == "N":
         return "amine_like", "high", "weakly_acidic"
-    if atom.GetSymbol() in {"O", "S"} and atom.GetTotalNumHs() > 0:
+    if atom.GetSymbol() in {"O", "S"} and atom.GetTotalNumHs(includeNeighbors=True) > 0:
         return (
             "localized",
             "medium" if atom.GetSymbol() == "O" else "high",
@@ -198,7 +198,7 @@ def build_heteroatom_context(
         attached_contexts=contexts,
         resonance_class=resonance,
         lone_pair_class=lone_pair_class,
-        proton_count=int(atom.GetTotalNumHs()),
+        proton_count=int(atom.GetTotalNumHs(includeNeighbors=True)),
         alpha_branched_group_count=sum(
             item.alpha_branched for item in attached_groups
         ),

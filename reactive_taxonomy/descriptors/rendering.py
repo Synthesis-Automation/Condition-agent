@@ -6,6 +6,7 @@ from dataclasses import asdict, is_dataclass
 from typing import Any, Mapping
 
 from .registry import rendering_rules
+from .tokens import reactivity_profile_is_usable
 
 
 def _mapping(value: Any) -> Mapping[str, Any]:
@@ -186,6 +187,8 @@ def render_reactivity_profile(profile: Any) -> str:
     if not value:
         return "reactivity profile unavailable"
     context = _mapping(value.get("context"))
+    if not reactivity_profile_is_usable(value):
+        return f"{_context_identity(context)}; steric/electronic descriptors unknown"
     steric = _mapping(value.get("steric"))
     electronic = _mapping(value.get("electronic"))
     center = _mapping(value.get("reactive_center"))
@@ -204,6 +207,8 @@ def render_reactivity_profile_expanded(profile: Any) -> str:
     value = _mapping(profile)
     if not value:
         return "reactivity profile unavailable"
+    if not reactivity_profile_is_usable(value):
+        return render_reactivity_profile(value)
     steric = _mapping(value.get("steric"))
     electronic = _mapping(value.get("electronic"))
     steric_evidence = _mapping(steric.get("evidence"))

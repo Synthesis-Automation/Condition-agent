@@ -55,15 +55,18 @@ def render_fragment_notation(notation_id: str, *, style: str = "unicode") -> str
     return format_chemist_text(symbol, style=style)
 
 
-def _template_values(style: str) -> dict[str, str]:
+@lru_cache(maxsize=8)
+def _template_values(style: str) -> Mapping[str, str]:
+    from types import MappingProxyType
+
     styling = notation_style(style)
-    return {
+    return MappingProxyType({
         **styling,
         **{
             notation_id: render_fragment_notation(notation_id, style=style)
             for notation_id in _fragment_symbols()
         },
-    }
+    })
 
 
 def render_context_notation(context_id: str, *, style: str = "unicode") -> str:

@@ -151,6 +151,50 @@ def _render_candidate(candidate: ReactiveSiteCandidate, style: str) -> str:
     return candidate.canonical_signature
 
 
+def _candidate_hypothesis(
+    candidate: ReactiveSiteCandidate, number: int, component_index: int,
+    *, label_style: str, include_context_features: bool,
+) -> ReactiveSiteHypothesis:
+    """Project a candidate while preserving its graph atom and bond indices."""
+    details = dict(candidate.details)
+    details["atom_roles"] = {
+        role: list(indices) for role, indices in candidate.atom_roles.items()
+    }
+    for role, indices in candidate.atom_roles.items():
+        field_name = (
+            f"{role}_atom_index" if len(indices) == 1 else f"{role}_atom_indices"
+        )
+        details.setdefault(
+            field_name,
+            indices[0] if len(indices) == 1 else list(indices),
+        )
+    details["context_records"] = [
+        record.to_dict() for record in candidate.context_records
+    ]
+    return ReactiveSiteHypothesis(
+        hypothesis_id=_hypothesis_id(component_index, number, candidate),
+        site_type=candidate.site_type,
+        topology=candidate.topology,
+        component_index=component_index,
+        atom_indices=tuple(candidate.atom_indices),
+        bond_indices=tuple(index for index in candidate.bond_indices if index >= 0),
+        canonical_signature=candidate.canonical_signature,
+        chemist_label=_render_candidate(candidate, label_style),
+        availability=candidate.availability,
+        details=details,
+        context_features=(
+            {
+                "contexts": [
+                    record.to_dict() for record in candidate.context_records
+                ]
+            }
+            if include_context_features
+            else {}
+        ),
+        warnings=tuple(candidate.warnings),
+    )
+
+
 def interpret_molecular_reactivity(
     structure: MolecularStructureObservation,
     *,
@@ -163,7 +207,7 @@ def interpret_molecular_reactivity(
         return MolecularInterpretation()
     if label_style not in available_styles():
         raise ValueError(f"UNKNOWN_LABEL_STYLE:{label_style}")
-    selected: Set[str] = set(site_types or DETECTORS)
+    selected: Set[str] = set(DETECTORS if site_types is None else site_types)
     unknown = selected - set(DETECTORS)
     if unknown:
         raise ValueError(f"UNKNOWN_SITE_TYPES:{','.join(sorted(unknown))}")
@@ -188,62 +232,15 @@ def interpret_molecular_reactivity(
         candidates = resolve_candidates(raw)
         hypotheses = []
         for number, candidate in enumerate(candidates):
-            details = dict(candidate.details)
-            details["atom_roles"] = {
-                role: list(indices) for role, indices in candidate.atom_roles.items()
-            }
-            for role, indices in candidate.atom_roles.items():
-                field_name = (
-                    f"{role}_atom_index" if len(indices) == 1 else f"{role}_atom_indices"
-                )
-                details.setdefault(
-                    field_name,
-                    indices[0] if len(indices) == 1 else list(indices),
-                )
-            details["context_records"] = [
-                record.to_dict() for record in candidate.context_records
-            ]
-            hypotheses.append(
-                ReactiveSiteHypothesis(
-                    hypothesis_id=_hypothesis_id(component.component_index, number, candidate),
-                    site_type=candidate.site_type,
-                    topology=candidate.topology,
-                    component_index=component.component_index,
-                    atom_indices=tuple(candidate.atom_indices),
-                    bond_indices=tuple(index for index in candidate.bond_indices if index >= 0),
-                    canonical_signature=candidate.canonical_signature,
-                    chemist_label=_render_candidate(candidate, label_style),
-                    availability=candidate.availability,
-                    details=details,
-                    context_features=(
-                        {
-                            "contexts": [
-                                record.to_dict() for record in candidate.context_records
-                            ]
-                        }
-                        if include_context_features
-                        else {}
-                    ),
-                    warnings=tuple(candidate.warnings),
-                )
-            )
-        environments = tuple(
-            build_site_environment(molecule, hypothesis, motifs)
-            for hypothesis in hypotheses
+            hypotheses.append(_candidate_hypothesis(
+                candidate, number, component.component_index,
+                label_style=label_style,
+                include_context_features=include_context_features,
+            ))
+        environments = (
+            tuple(build_site_environment(molecule, hypothesis, motifs) for hypothesis in hypotheses)
+            if include_context_features else ()
         )
-        by_hypothesis = {
-            environment.hypothesis_id: environment for environment in environments
-        }
-        hypotheses = [
-            replace(
-                hypothesis,
-                context_features={
-                    **hypothesis.context_features,
-                    "environment": by_hypothesis[hypothesis.hypothesis_id].to_dict(),
-                },
-            )
-            for hypothesis in hypotheses
-        ]
         from .reaction_site_interfaces import normalize_detected_site
 
         connectivity = tuple(
@@ -303,14 +300,36 @@ def detect_reactive_site_hypotheses(
     label_style: str = "unicode",
 ) -> Tuple[ReactiveSiteHypothesis, ...]:
     """Return optional reactive-site hypotheses for an RDKit molecule."""
-    smiles = mol_to_canonical_smiles(molecule)
-    if not smiles:
+    from collections import defaultdict
+    from rdkit import Chem
+
+    if molecule is None:
         return ()
-    return analyze_molecule(
-        smiles,
-        site_types=site_types,
-        label_style=label_style,
-    ).interpretation.reactive_site_hypotheses
+    if label_style not in available_styles():
+        raise ValueError(f"UNKNOWN_LABEL_STYLE:{label_style}")
+    selected = set(DETECTORS if site_types is None else site_types)
+    if selected - set(DETECTORS):
+        raise ValueError(f"UNKNOWN_SITE_TYPES:{','.join(sorted(selected - set(DETECTORS)))}")
+    component_by_atom = {
+        atom: component for component, atoms in enumerate(Chem.GetMolFrags(molecule))
+        for atom in atoms
+    }
+    matches = MatchIndex(molecule)
+    candidates = resolve_candidates([
+        candidate for name, detector in DETECTORS.items() if name in selected
+        for candidate in detector(molecule, matches)
+    ])
+    counts: dict[int, int] = defaultdict(int)
+    hypotheses = []
+    for candidate in candidates:
+        component = component_by_atom[candidate.atom_indices[0]]
+        hypothesis = _candidate_hypothesis(
+            candidate, counts[component], component,
+            label_style=label_style, include_context_features=True,
+        )
+        counts[component] += 1
+        hypotheses.append(hypothesis)
+    return tuple(hypotheses)
 
 
 __all__ = [

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "definition_id": "reactivity_descriptor_rules.v1",
-  "profile_schema_version": "1.0",
+  "profile_schema_version": "1.1",
   "context_kinds": [
     "aromatic",
     "alkyl",
@@ -50,7 +50,8 @@
       "N:pyrrole_like": -0.3,
       "O:pyrrole_like": -0.35,
       "S:pyrrole_like": -0.2,
-      "other": 0.0
+      "other": 0.0,
+      "N:cationic_aromatic": 0.8
     },
     "functional_group_tag_weights": {
       "electron_withdrawing": 0.55,
@@ -74,6 +75,128 @@
       "phosphoryl": "phosphorus_center_activation",
       "heteroatom": "lone_pair_availability",
       "other": "local_electronic_influence"
+    },
+    "aromatic_substituents": {
+      "calibration_status": "chemistry_prior_not_statistically_calibrated",
+      "relations": {
+        "1": "ortho",
+        "2": "meta",
+        "3": "para"
+      },
+      "rules": [
+        {
+          "id": "alkoxy",
+          "smarts": "[c:2]-[O;X2;+0:1]-[#6;!$(C=O)]",
+          "inductive": {
+            "ortho": 0.2,
+            "meta": 0.12,
+            "para": 0.08
+          },
+          "resonance": {
+            "ortho": -0.55,
+            "meta": 0.0,
+            "para": -0.55
+          }
+        },
+        {
+          "id": "hydroxy",
+          "smarts": "[c:2]-[O;H1;+0:1]",
+          "inductive": {
+            "ortho": 0.2,
+            "meta": 0.12,
+            "para": 0.08
+          },
+          "resonance": {
+            "ortho": -0.55,
+            "meta": 0.0,
+            "para": -0.55
+          }
+        },
+        {
+          "id": "amino",
+          "smarts": "[c:2]-[N;X3;+0;!$(N-[C,S,P]=[O,S,N]):1]",
+          "inductive": {
+            "ortho": 0.12,
+            "meta": 0.08,
+            "para": 0.05
+          },
+          "resonance": {
+            "ortho": -0.65,
+            "meta": 0.0,
+            "para": -0.65
+          }
+        },
+        {
+          "id": "nitro",
+          "smarts": "[c:2]-[N+;X3:1](=[O])-[O-]",
+          "inductive": {
+            "ortho": 0.3,
+            "meta": 0.2,
+            "para": 0.15
+          },
+          "resonance": {
+            "ortho": 0.5,
+            "meta": 0.0,
+            "para": 0.5
+          }
+        },
+        {
+          "id": "cyano",
+          "smarts": "[c:2]-[C:1]#[N]",
+          "inductive": {
+            "ortho": 0.3,
+            "meta": 0.2,
+            "para": 0.15
+          },
+          "resonance": {
+            "ortho": 0.4,
+            "meta": 0.0,
+            "para": 0.4
+          }
+        },
+        {
+          "id": "trifluoromethyl",
+          "smarts": "[c:2]-[C:1](F)(F)F",
+          "inductive": {
+            "ortho": 0.65,
+            "meta": 0.45,
+            "para": 0.35
+          },
+          "resonance": {
+            "ortho": 0.0,
+            "meta": 0.0,
+            "para": 0.0
+          }
+        },
+        {
+          "id": "carbonyl",
+          "smarts": "[c:2]-[C:1]=[O]",
+          "inductive": {
+            "ortho": 0.3,
+            "meta": 0.2,
+            "para": 0.15
+          },
+          "resonance": {
+            "ortho": 0.35,
+            "meta": 0.0,
+            "para": 0.35
+          }
+        },
+        {
+          "id": "halogen",
+          "smarts": "[c:2]-[F,Cl,Br,I:1]",
+          "inductive": {
+            "ortho": 0.2,
+            "meta": 0.15,
+            "para": 0.12
+          },
+          "resonance": {
+            "ortho": -0.1,
+            "meta": 0.0,
+            "para": -0.1
+          }
+        }
+      ]
     }
   },
   "modifier_types": [
@@ -89,5 +212,8 @@
   "signature_bins": {
     "continuous_precision": 3,
     "include_raw_scores": false
-  }
+  },
+  "definition_version": "1.1",
+  "algorithm_version": "molecular_profiles.v1.1",
+  "calibration_status": "chemistry_prior_not_statistically_calibrated"
 }

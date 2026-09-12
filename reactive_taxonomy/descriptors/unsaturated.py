@@ -159,7 +159,7 @@ def build_alkynyl_context(
     steric = _steric_branches(mol, endpoints, excluded_atoms)
     context = AlkynylContextDescriptor(
         context_kind="alkynyl",
-        terminal=bool(atom.GetTotalNumHs() or partner.GetTotalNumHs()),
+        terminal=bool(atom.GetTotalNumHs(includeNeighbors=True) or partner.GetTotalNumHs(includeNeighbors=True)),
         endpoint_substitution=substitutions,
         conjugation_class=_conjugation(atom, partner),
         propargylic_branch_count=sum(item.branch_count for item in steric),

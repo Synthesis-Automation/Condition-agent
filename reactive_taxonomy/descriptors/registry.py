@@ -8,12 +8,18 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Tuple
 
+from ..chemistry.smarts_cache import compile_smarts
+
 
 _DEFINITIONS_DIR = Path(__file__).resolve().parent.parent / "definitions"
 _DEFINITION_FILES = (
     "aromatic_systems.v1.json",
     "reactivity_descriptor_rules.v1.json",
     "reactivity_rendering.v1.json",
+)
+_PROVENANCE_FILES = _DEFINITION_FILES + (
+    "molecular_motifs.v1.json", "site_patterns.v2.json",
+    "context_facets.v2.json", "descriptor_rules.v1.json",
 )
 
 
@@ -43,14 +49,39 @@ def load_reactivity_descriptor_definitions() -> Dict[str, Dict[str, Any]]:
             raise ValueError(f"invalid steric descriptor bins:{key}")
     if not electronic.get("activation_axes"):
         raise ValueError("missing electronic activation axes")
+    validate_aromatic_substituent_rules(electronic.get("aromatic_substituents") or {})
     return payload
+
+
+def validate_aromatic_substituent_rules(rules: Dict[str, Any]) -> None:
+    """Validate the closed positional vocabulary, SMARTS roles and score ranges."""
+    if rules.get("relations") != {"1": "ortho", "2": "meta", "3": "para"}:
+        raise ValueError("invalid aromatic substituent relations")
+    if rules.get("calibration_status") != "chemistry_prior_not_statistically_calibrated":
+        raise ValueError("aromatic substituent priors must disclose calibration status")
+    seen = set()
+    for rule in rules.get("rules") or ():
+        if not rule.get("id") or rule["id"] in seen:
+            raise ValueError("duplicate or missing aromatic substituent rule id")
+        seen.add(rule["id"])
+        pattern = compile_smarts(str(rule.get("smarts") or ""), validate=True)
+        if pattern is None or not {1, 2} <= {atom.GetAtomMapNum() for atom in pattern.GetAtoms()}:
+            raise ValueError("aromatic substituent SMARTS requires attachment and ipso roles")
+        for pathway in ("inductive", "resonance"):
+            weights = rule.get(pathway) or {}
+            if set(weights) != {"ortho", "meta", "para"} or any(
+                not -1 <= float(value) <= 1 for value in weights.values()
+            ):
+                raise ValueError("invalid aromatic substituent weights")
+    if not seen:
+        raise ValueError("missing aromatic substituent rules")
 
 
 @lru_cache(maxsize=1)
 def descriptor_definition_versions() -> Tuple[Tuple[str, str], ...]:
     """Return deterministic schema and content hashes for profile provenance."""
     versions = []
-    for filename in _DEFINITION_FILES:
+    for filename in _PROVENANCE_FILES:
         path = _DEFINITIONS_DIR / filename
         raw = path.read_bytes()
         with path.open("r", encoding="utf-8-sig") as handle:

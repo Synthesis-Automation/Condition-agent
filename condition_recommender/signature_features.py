@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping, Tuple
 
 from reactive_taxonomy.descriptors import reactivity_profile_tokens
+from reactive_taxonomy.descriptors.tokens import reactivity_profile_is_usable
 
 
 _SUBSTITUENT_RULES_PATH = (
@@ -48,7 +49,7 @@ def environment_tokens(signature: Mapping[str, Any]) -> Tuple[str, ...]:
         ):
             tokens.append(f"{role}:{value}")
         for group in partner.get("nearby_groups") or ():
-            group_id = group.get("group_id")
+            group_id = group.get("motif_id") or group.get("group_id")
             if group_id:
                 distance = group.get("distance")
                 distance_token = (
@@ -176,56 +177,81 @@ def environment_profile_similarity(
         for partner in query.get("partners") or ()
         if isinstance(partner, Mapping)
         and isinstance(partner.get("reactivity_profile"), Mapping)
+        and reactivity_profile_is_usable(partner["reactivity_profile"])
     )
     precedent_partners = tuple(
         partner
         for partner in precedent.get("partners") or ()
         if isinstance(partner, Mapping)
         and isinstance(partner.get("reactivity_profile"), Mapping)
+        and reactivity_profile_is_usable(partner["reactivity_profile"])
     )
     if not query_partners or not precedent_partners:
         return 0.0
-    used: set[int] = set()
-    scores = []
-    for query_partner in query_partners:
-        query_profile = query_partner["reactivity_profile"]
-        query_role = str(query_partner.get("role") or "")
-        query_kind = str(query_profile.get("context_kind") or "")
-        candidates = [
-            (index, partner)
-            for index, partner in enumerate(precedent_partners)
-            if index not in used
-            and (
-                (
-                    query_role
-                    and str(partner.get("role") or "") == query_role
-                )
-                or (
-                    not query_role
-                    and str(
-                        partner["reactivity_profile"].get("context_kind") or ""
-                    )
-                    == query_kind
-                )
-            )
-        ]
-        if not candidates:
-            scores.append(0.0)
-            continue
-        query_tokens = reactivity_profile_tokens(query_profile)
-        ranked = []
-        for index, partner in candidates:
-            profile = partner["reactivity_profile"]
-            categorical = _set_similarity(
-                query_tokens, reactivity_profile_tokens(profile)
-            )
-            numeric = _numeric_similarity(query_profile, profile)
-            ranked.append((0.75 * categorical + 0.25 * numeric, index))
-        score, selected = max(ranked, key=lambda item: (item[0], -item[1]))
-        used.add(selected)
-        scores.append(score)
-    denominator = max(len(query_partners), len(precedent_partners))
-    return sum(scores) / denominator if denominator else 0.0
+    left_tokens = [reactivity_profile_tokens(p["reactivity_profile"]) for p in query_partners]
+    right_tokens = [reactivity_profile_tokens(p["reactivity_profile"]) for p in precedent_partners]
+    size = max(len(query_partners), len(precedent_partners))
+    matrix = [[0.0] * size for _ in range(size)]
+    for i, left in enumerate(query_partners):
+        for j, right in enumerate(precedent_partners):
+            lp, rp = left["reactivity_profile"], right["reactivity_profile"]
+            if str(left.get("role") or "") != str(right.get("role") or ""):
+                continue
+            if lp.get("context_kind") != rp.get("context_kind"):
+                continue
+            if left.get("site_type") and right.get("site_type") and left["site_type"] != right["site_type"]:
+                continue
+            le = (lp.get("reactive_center") or {}).get("element")
+            re = (rp.get("reactive_center") or {}).get("element")
+            if le and re and le != re:
+                continue
+            categorical = _set_similarity(left_tokens[i], right_tokens[j])
+            matrix[i][j] = 0.75 * categorical + 0.25 * _numeric_similarity(lp, rp)
+    return _maximum_assignment_score(matrix) / size
+
+
+def _maximum_assignment_score(matrix: list[list[float]]) -> float:
+    """Maximum-weight one-to-one alignment using the cubic Hungarian algorithm.
+
+    Padding represents unmatched sites. Globally optimal alignment avoids the
+    partner-order dependence of greedy matching when several sites share a role.
+    """
+    size = len(matrix)
+    u, v = [0.0] * (size + 1), [0.0] * (size + 1)
+    matching, previous = [0] * (size + 1), [0] * (size + 1)
+    for row in range(1, size + 1):
+        matching[0] = row
+        column = 0
+        minimum = [float("inf")] * (size + 1)
+        used = [False] * (size + 1)
+        while True:
+            used[column] = True
+            current = matching[column]
+            delta, next_column = float("inf"), 0
+            for candidate in range(1, size + 1):
+                if used[candidate]:
+                    continue
+                cost = -matrix[current - 1][candidate - 1] - u[current] - v[candidate]
+                if cost < minimum[candidate]:
+                    minimum[candidate] = cost
+                    previous[candidate] = column
+                if minimum[candidate] < delta:
+                    delta, next_column = minimum[candidate], candidate
+            for candidate in range(size + 1):
+                if used[candidate]:
+                    u[matching[candidate]] += delta
+                    v[candidate] -= delta
+                else:
+                    minimum[candidate] -= delta
+            column = next_column
+            if matching[column] == 0:
+                break
+        while column:
+            prior = previous[column]
+            matching[column] = matching[prior]
+            column = prior
+    return sum(matrix[matching[column] - 1][column - 1] for column in range(1, size + 1))
+
 
 
 __all__ = [

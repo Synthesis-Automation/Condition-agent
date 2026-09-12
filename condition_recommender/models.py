@@ -7,11 +7,11 @@ from enum import Enum
 from typing import Any, Dict, Literal, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.1"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.1"
-COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS = frozenset({"10.0", "10.1"})
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.2"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.2"
+COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS = frozenset({"10.0", "10.1", "10.2"})
 COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
-    {"generic_conversion.v10.0", "generic_conversion.v10.1"}
+    {"generic_conversion.v10.0", "generic_conversion.v10.1", "generic_conversion.v10.2"}
 )
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
@@ -297,6 +297,7 @@ class RecommendationRecord:
     partial_product_transformation: Optional[Dict[str, Any]] = None
     reaction_completeness: Optional[Dict[str, Any]] = None
     reaction_signature: Optional[Dict[str, Any]] = None
+    molecular_features: Optional[Dict[str, Any]] = None
     reaction_core: Optional[Dict[str, Any]] = None
     reaction_evidence_candidates: Tuple[Dict[str, Any], ...] = ()
     reaction_edit_hypotheses: Tuple[Dict[str, Any], ...] = ()

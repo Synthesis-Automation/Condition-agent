@@ -463,7 +463,7 @@ def build_sqlite_generic_index(
                 )
             if row.named_family:
                 lookup_batch.append(("families", row.named_family, position))
-            for token in set(environment_tokens(row.signature)):
+            for token in set(environment_tokens(row.molecular_features or row.signature)):
                 lookup_batch.append(("environment_features", token, position))
             fragment_tokens = set(
                 departing_fragment_tokens(row.reaction_smiles, row.signature)

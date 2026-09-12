@@ -68,8 +68,16 @@ def validate_taxonomy() -> List[str]:
         )
     )
     descriptor_profile_rules = payload["reactivity_descriptor_rules.v1"]
-    if descriptor_profile_rules.get("profile_schema_version") != "1.0":
+    if descriptor_profile_rules.get("profile_schema_version") != "1.1":
         errors.append("invalid_reactivity_profile_schema_version")
+    from .descriptors.registry import validate_aromatic_substituent_rules
+
+    try:
+        validate_aromatic_substituent_rules(
+            descriptor_profile_rules["electronic"].get("aromatic_substituents") or {}
+        )
+    except ValueError as error:
+        errors.append(f"invalid_aromatic_substituent_rules:{error}")
     if not descriptor_profile_rules.get("context_kinds"):
         errors.append("missing_reactivity_context_kinds")
     if not descriptor_profile_rules.get("descriptor_statuses"):

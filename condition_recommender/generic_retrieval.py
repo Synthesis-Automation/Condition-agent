@@ -184,6 +184,7 @@ def _candidate_levels(
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
     query_reaction_smiles: str = "",
+    molecular_features: Mapping[str, Any] | None = None,
 ) -> Iterator[tuple[str, set[int]]]:
     """Yield retrieval tiers in order without computing later fallbacks early."""
     compatible = _compatible_edit_positions(
@@ -233,7 +234,8 @@ def _candidate_levels(
             ) & compatible
         elif level == "environment_neighbors":
             positions = _environment_neighbor_positions(
-                signature, index, compatible
+                molecular_features if molecular_features is not None else signature,
+                index, compatible
             )
         elif level == "bond_edit_signature":
             positions = compatible
@@ -423,7 +425,7 @@ def _environment_neighbor_positions(
     for position, row in zip(positions, rows):
         score = environment_profile_similarity(
             signature,
-            row.signature,
+            row.molecular_features or row.signature,
         )
         if score >= threshold:
             scored.append(
@@ -474,6 +476,7 @@ def retrieve_generic_pool_with_trace(
     minimum_pool_size: int | None = None,
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
+    molecular_features: Mapping[str, Any] | None = None,
 ) -> tuple[
     str,
     Tuple[GenericIndexedReaction, ...],
@@ -486,6 +489,7 @@ def retrieve_generic_pool_with_trace(
         index,
         reaction_core=reaction_core,
         strategy=strategy,
+                 molecular_features=molecular_features,
     )
     fallback: tuple[
         str,
@@ -563,6 +567,7 @@ def retrieve_generic_pool(
     minimum_pool_size: int | None = None,
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
+    molecular_features: Mapping[str, Any] | None = None,
 ) -> Tuple[str, Tuple[GenericIndexedReaction, ...]]:
     """Compatibility wrapper returning the historical two-value result."""
     level, rows, _ = retrieve_generic_pool_with_trace(
@@ -571,6 +576,7 @@ def retrieve_generic_pool(
         minimum_pool_size=minimum_pool_size,
         reaction_core=reaction_core,
         strategy=strategy,
+                         molecular_features=molecular_features,
     )
     return level, rows
 
@@ -698,6 +704,7 @@ def retrieve_progressive_compatible_pools_with_trace(
     target_recipe_count: int,
     minimum_pool_size: int | None = None,
     query_reaction_smiles: str = "",
+    molecular_features: Mapping[str, Any] | None = None,
 ) -> ProgressiveCompatibleRetrievalResult | None:
     """Collect ordered facet tiers without allowing broad rows to displace exact ones.
 
@@ -818,6 +825,7 @@ def retrieve_progressive_compatible_pools_with_trace(
             reaction_core=reaction_core,
             strategy="hybrid",
             query_reaction_smiles=query_reaction_smiles,
+                                    molecular_features=molecular_features,
         ):
             target_reached = process_level(level, positions)
             if target_reached:
@@ -845,6 +853,7 @@ def retrieve_compatible_generic_pool_with_trace(
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
     query_reaction_smiles: str = "",
+    molecular_features: Mapping[str, Any] | None = None,
 ) -> CompatibleRetrievalResult:
     """Apply compatibility before independent-support checks at every tier."""
     minimum = _minimum_support(minimum_pool_size)
@@ -854,6 +863,7 @@ def retrieve_compatible_generic_pool_with_trace(
         reaction_core=reaction_core,
         strategy=strategy,
         query_reaction_smiles=query_reaction_smiles,
+                 molecular_features=molecular_features,
     )
     fallback = None
     traces = []
@@ -987,6 +997,7 @@ def retrieve_compatible_generic_pool(
     reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
     query_reaction_smiles: str = "",
+    molecular_features: Mapping[str, Any] | None = None,
 ) -> tuple[
     str,
     tuple[tuple[GenericIndexedReaction, CompatibilityAssessment], ...],
@@ -1001,6 +1012,7 @@ def retrieve_compatible_generic_pool(
         reaction_core=reaction_core,
         strategy=strategy,
         query_reaction_smiles=query_reaction_smiles,
+                 molecular_features=molecular_features,
     )
     return (
         result.level,

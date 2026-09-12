@@ -14,10 +14,20 @@ def _mapping(value: Any) -> Mapping[str, Any]:
     return {}
 
 
+def reactivity_profile_is_usable(profile: Any) -> bool:
+    """Whether derived steric/electronic values may participate in similarity."""
+    value = _mapping(profile)
+    return bool(value) and value.get("context_kind") != "other" and value.get(
+        "status", "derived"
+    ) in {"observed", "derived"}
+
+
 def reactivity_profile_tokens(profile: Any) -> Tuple[str, ...]:
     """Return identity-safe binned tokens without raw scores or atom indices."""
     value = _mapping(profile)
     if not value:
+        return ()
+    if not reactivity_profile_is_usable(value):
         return ()
     context = _mapping(value.get("context"))
     steric = _mapping(value.get("steric"))
@@ -123,4 +133,4 @@ def reactivity_profile_tokens(profile: Any) -> Tuple[str, ...]:
     return tuple(sorted(set(str(token) for token in tokens if token)))
 
 
-__all__ = ["reactivity_profile_tokens"]
+__all__ = ["reactivity_profile_is_usable", "reactivity_profile_tokens"]

@@ -47,6 +47,11 @@ def load_generic_similarity_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
     rules["weights"] = _validated_similarity_weights(rules)
+    environment_weights = rules.get("environment_component_weights") or {}
+    if set(environment_weights) != {"molecular", "substituent"} or any(
+        not 0 <= float(value) <= 1 for value in environment_weights.values()
+    ) or abs(sum(float(value) for value in environment_weights.values()) - 1) > 1e-9:
+        raise ValueError("environment component weights must sum to one")
     return rules
 
 
@@ -188,6 +193,8 @@ def assess_signature_similarity(
     *,
     query_reaction_core: Mapping[str, Any] | None = None,
     precedent_reaction_core: Mapping[str, Any] | None = None,
+    query_molecular_features: Mapping[str, Any] | None = None,
+    precedent_molecular_features: Mapping[str, Any] | None = None,
 ) -> SimilarityAssessment:
     """Calculate a complete, auditable structural similarity assessment."""
     edit_fields = (
@@ -212,6 +219,22 @@ def assess_signature_similarity(
         query_reaction_core,
         precedent_reaction_core,
     )
+    query_features = query if query_molecular_features is None else query_molecular_features
+    precedent_features = precedent if precedent_molecular_features is None else precedent_molecular_features
+    molecular_similarity = environment_profile_similarity(query_features, precedent_features)
+    from .signature_features import environment_tokens
+
+    available_profiles = bool(environment_tokens(query_features) and environment_tokens(precedent_features))
+    if profile_similarity is None:
+        environment_similarity = molecular_similarity
+    elif available_profiles:
+        weights = load_generic_similarity_rules()["environment_component_weights"]
+        environment_similarity = (
+            float(weights["substituent"]) * profile_similarity
+            + float(weights["molecular"]) * molecular_similarity
+        )
+    else:
+        environment_similarity = profile_similarity
     components = {
         "edit_topology": jaccard(query_edits, precedent_edits),
         "reaction_events": _multiset_jaccard(
@@ -225,11 +248,7 @@ def assess_signature_similarity(
             _partner_tokens(query, "anchor_contexts"),
             _partner_tokens(precedent, "anchor_contexts"),
         ),
-        "environment": (
-            profile_similarity
-            if profile_similarity is not None
-            else environment_profile_similarity(query, precedent)
-        ),
+        "environment": environment_similarity,
         "spectators": jaccard(
             _spectator_tokens(query), _spectator_tokens(precedent)
         ),
@@ -252,7 +271,7 @@ def assess_signature_similarity(
             name: round(contributions[name], 6) for name in _FEATURES
         },
         definition_id=str(rules["definition_id"]),
-        definition_version=str(rules["schema_version"]),
+        definition_version=str(rules.get("definition_version", rules["schema_version"])),
     )
 
 

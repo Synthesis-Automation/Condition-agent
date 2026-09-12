@@ -15,7 +15,9 @@ from .models import (
 def _adjacent_pi(atom: Any, order: str) -> bool:
     return any(
         str(bond.GetBondType()).upper() == order
+        and bond.GetOtherAtom(neighbor).GetAtomicNum() == 6
         for neighbor in atom.GetNeighbors()
+        if neighbor.GetAtomicNum() == 6
         for bond in neighbor.GetBonds()
         if bond.GetOtherAtomIdx(neighbor.GetIdx()) != atom.GetIdx()
     )
@@ -54,7 +56,7 @@ def build_alkyl_context(
         for neighbor in carbon_neighbors
     )
     beta_hydrogen_count = sum(
-        int(neighbor.GetTotalNumHs()) for neighbor in carbon_neighbors
+        int(neighbor.GetTotalNumHs(includeNeighbors=True)) for neighbor in carbon_neighbors
     )
     benzylic = any(neighbor.GetIsAromatic() for neighbor in carbon_neighbors)
     allylic = _adjacent_pi(atom, "DOUBLE")

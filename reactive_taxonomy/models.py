@@ -219,7 +219,7 @@ class MoleculeAnalysis:
     interpretation: MolecularInterpretation = field(
         default_factory=MolecularInterpretation
     )
-    schema_version: str = "3.0"
+    schema_version: str = "3.1"
 
     @property
     def valid(self) -> bool:

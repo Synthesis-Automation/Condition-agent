@@ -33,6 +33,9 @@ def _stereochemistry(bond: Any) -> str:
 
 def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
     """Return localized C=C, C#C, C=N, and C#N bond-capacity sites."""
+    from rdkit import Chem
+
+    ranks = Chem.CanonicalRankAtoms(mol, breakTies=False, includeAtomMaps=False)
     sites: List[ReactiveSiteCandidate] = []
     candidate_endpoint_a = match_index.role_atoms("unsaturated_bond", "endpoint_a")
     candidate_endpoint_b = match_index.role_atoms("unsaturated_bond", "endpoint_b")
@@ -177,6 +180,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
             key=lambda record: (
                 -record["h_count"] if order == 2.0 else record["h_count"],
                 record["heavy_substituents"],
+                ranks[record["atom"].GetIdx()],
                 record["atom"].GetIdx(),
             )
         )

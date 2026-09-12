@@ -33,11 +33,12 @@ from .models import (
 )
 from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
+from .molecular_features import validate_molecular_features
 from .fallback_similarity import fallback_index_tokens
 from .reaction_facets import reaction_facet_keys
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "6.3"
+GENERIC_INDEX_SCHEMA_VERSION = "6.4"
 
 
 @dataclass(frozen=True)
@@ -72,6 +73,7 @@ class GenericIndexedReaction:
     reaction_label: Dict[str, Any] = dataclass_field(default_factory=dict)
     fallback_descriptor: Dict[str, Any] = dataclass_field(default_factory=dict)
     fragment_source_support: Tuple[Dict[str, Any], ...] = ()
+    molecular_features: Dict[str, Any] = dataclass_field(default_factory=dict)
 
     @property
     def named_family(self) -> str:
@@ -159,6 +161,8 @@ def _validate_index_rows(
     Tuple[str, ...],
 ]:
     values = tuple(rows)
+    for row in values:
+        validate_molecular_features(row.molecular_features, row.signature)
     signature_schemas = {
         str(row.signature.get("schema_version") or "")
         for row in values
@@ -342,7 +346,7 @@ def build_generic_index_from_rows(
                 core_maps[name][key].append(position)
         if row.named_family:
             families[row.named_family].append(position)
-        for token in set(environment_tokens(row.signature)):
+        for token in set(environment_tokens(row.molecular_features or row.signature)):
             environment_features[token].append(position)
         fragment_tokens = set(
             departing_fragment_tokens(row.reaction_smiles, row.signature)
@@ -573,6 +577,7 @@ def _iter_generic_index_rows(
                 else {}
             ),
             fragment_source_support=fragment_source_support,
+            molecular_features=dict(record.get("molecular_features") or {}),
         )
 
 
@@ -623,6 +628,7 @@ def _indexed_reaction_payload(row: GenericIndexedReaction) -> Dict[str, Any]:
         "reaction_label": row.reaction_label,
         "fallback_descriptor": row.fallback_descriptor,
         "fragment_source_support": row.fragment_source_support,
+        "molecular_features": row.molecular_features,
     }
 
 
@@ -630,6 +636,7 @@ def _indexed_reaction_from_payload(
     row: Mapping[str, Any],
 ) -> GenericIndexedReaction:
     """Deserialize one retrieval row shared by JSON and SQLite storage."""
+    validate_molecular_features(row.get("molecular_features") or {}, row.get("signature"))
     return GenericIndexedReaction(
         reaction_id=str(row["reaction_id"]),
         observation_id=str(row["observation_id"]),
@@ -653,6 +660,7 @@ def _indexed_reaction_from_payload(
             str(value) for value in row.get("scaffold_tokens") or ()
         ),
         signature=dict(row["signature"]),
+        molecular_features=dict(row.get("molecular_features") or {}),
         reaction_core=dict(row.get("reaction_core") or {}),
         recipe_id=str(row["recipe_id"]),
         recipe_core_id=str(row.get("recipe_core_id") or row["recipe_id"]),

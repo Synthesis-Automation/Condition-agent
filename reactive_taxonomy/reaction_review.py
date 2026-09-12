@@ -121,7 +121,9 @@ def build_reaction_review_summary(
     family_environment = _member(interpretation, "family_environment")
     if family_environment is None:
         family_environment = _member(source, "family_environment")
-    partners = _member(interpretation, "partners")
+    partners = _member(_member(source, "molecular_features"), "partners")
+    if not partners:
+        partners = _member(interpretation, "partners")
     if not partners:
         partners = _member(family_environment, "partners")
     if not partners:

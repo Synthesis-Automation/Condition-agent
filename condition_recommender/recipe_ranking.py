@@ -344,6 +344,7 @@ def rank_condition_recipes(
         ]
     ] = None,
     query_reaction_core: Mapping[str, Any] | None = None,
+    query_molecular_features: Mapping[str, Any] | None = None,
     query_reaction_smiles: str = "",
 ) -> Tuple[GenericConditionRecommendation, ...]:
     """Aggregate recipe cores and rank them with a complete score trace."""
@@ -376,6 +377,8 @@ def rank_condition_recipes(
                 row.signature,
                 query_reaction_core=query_reaction_core,
                 precedent_reaction_core=row.reaction_core,
+                query_molecular_features=query_molecular_features,
+                precedent_molecular_features=row.molecular_features or None,
             )
 
     scored = [

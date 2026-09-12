@@ -350,8 +350,8 @@ def _molecule_summary(result: Any) -> str:
         f"reactive-site hypotheses: {len(result.reactive_site_hypotheses)}",
     ]
     for site in result.reactive_site_hypotheses:
-        environment = (site.context_features or {}).get("environment") or {}
-        profile = environment.get("reactivity_profile")
+        profile = next((env.reactivity_profile for env in result.reactive_site_environments
+                        if env.hypothesis_id == site.hypothesis_id), None)
         lines.append(
             f"  {site.hypothesis_id}: {site.chemist_label} [{site.site_type}; "
             f"availability={site.availability}]"
@@ -425,11 +425,12 @@ def _molecule_concise_summary(result: Any) -> str:
             lines.append(
                 f"  {site.chemist_label} — {site.site_type}, {site.availability}"
             )
-            environment = (site.context_features or {}).get("environment") or {}
+            profile = next((env.reactivity_profile for env in result.reactive_site_environments
+                            if env.hypothesis_id == site.hypothesis_id), None)
             lines.append(
                 "    "
                 + render_reactivity_profile(
-                    environment.get("reactivity_profile")
+                    profile
                 )
             )
     else:

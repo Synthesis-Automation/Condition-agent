@@ -6,6 +6,8 @@ import json
 from dataclasses import asdict
 from typing import Any, Dict
 
+from ..molecular_features import build_reaction_molecular_features
+
 
 def ring_change_summary(change: Dict[str, Any]) -> str:
     """Render compact graph facts for one serialized ring change."""
@@ -49,6 +51,7 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
     """Return RecommendationRecord keyword fields from a reaction analysis."""
     signature = analysis.reaction_signature
     evidence_fields = {
+        "molecular_features": build_reaction_molecular_features(analysis).to_dict(),
         "reaction_core": (
             asdict(analysis.reaction_core)
             if analysis.reaction_core is not None

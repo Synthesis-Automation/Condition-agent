@@ -10,11 +10,13 @@ from .activated_centers import (
 )
 from .alkyl import build_alkyl_context
 from .aromatic import aromatic_atom_role, build_aromatic_context
+from .aromatic_substituents import aromatic_substituent_contributions
 from .common import (
     class_from_upper_bins,
     electronic_class,
     reactive_center_profile,
-    shortest_distance,
+    locus_distance,
+    site_locus_atoms,
 )
 from .heteroatom import build_heteroatom_context
 from .models import (
@@ -45,13 +47,15 @@ def _functional_group_contributions(
     mol: Any,
     center: int,
     groups: Iterable[Any],
+    *,
+    locus_atoms: Tuple[int, ...] = (),
 ) -> Tuple[ElectronicContribution, ...]:
     rules = descriptor_rules()["electronic"]
     radius = int(rules["radius"])
     weights = rules["functional_group_tag_weights"]
     values = []
     for group in groups:
-        distance = shortest_distance(mol, center, group.atom_indices)
+        distance = locus_distance(mol, locus_atoms or (center,), group.atom_indices)
         if distance is None or distance < 1 or distance > radius:
             continue
         for tag in sorted(group.tags):
@@ -196,11 +200,11 @@ def build_site_reactivity_profile(
         if atom.GetAtomicNum() in {7, 8, 16}:
             lone_pair_class = aromatic_atom_role(atom)
             lone_pair_availability = (
-                "low" if lone_pair_class == "pyrrole_like" else "medium"
+                "low" if lone_pair_class in {"pyrrole_like", "cationic_aromatic"} else "medium"
             )
             acidity_class = (
                 "moderately_acidic"
-                if atom.GetTotalNumHs() > 0
+                if atom.GetTotalNumHs(includeNeighbors=True) > 0
                 else "not_applicable"
             )
             lone_pair_score = 0.55 if lone_pair_availability == "low" else 0.0
@@ -294,7 +298,10 @@ def build_site_reactivity_profile(
             (
                 *intrinsic_electronic,
                 *_formal_charge_contribution(atom),
-                *_functional_group_contributions(mol, center, groups),
+                *(aromatic_substituent_contributions(mol, center)
+                  if context_kind == "aromatic" else _functional_group_contributions(
+                    mol, center, groups, locus_atoms=site_locus_atoms(site, center)
+                )),
             ),
             key=lambda item: (
                 item.source_id,
@@ -328,6 +335,10 @@ def build_site_reactivity_profile(
         lone_pair_availability=lone_pair_availability,
         acidity_class=acidity_class,
     )
+    if context_kind == "other":
+        score = None
+        electronic_score = None
+        access = burden = electronic_name = "unknown"
     beta_hydrogen_count = (
         context.beta_hydrogen_count if context_kind == "alkyl" else None
     )
@@ -365,7 +376,8 @@ def build_site_reactivity_profile(
             evidence=DescriptorEvidence(
                 source="molecular_graph",
                 method=f"{context_kind}_steric_graph_v1",
-                confidence=1.0,
+                confidence=0.0 if context_kind == "other" else 1.0,
+                warnings=("unsupported_center_context",) if context_kind == "other" else (),
                 contributing_atom_indices=tuple(
                     sorted(
                         {
@@ -388,7 +400,7 @@ def build_site_reactivity_profile(
                 source="molecular_graph_and_motifs",
                 method=f"{context_kind}_electronic_contributions_v1",
                 confidence=(
-                    1.0 if electronic_contributions else 0.65
+                    0.0 if context_kind == "other" else 0.65
                 ),
                 contributing_atom_indices=tuple(
                     sorted(

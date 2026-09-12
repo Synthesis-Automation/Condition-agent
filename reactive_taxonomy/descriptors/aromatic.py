@@ -50,8 +50,10 @@ def aromatic_ring_system(
 def aromatic_atom_role(atom: Any) -> str:
     """Classify an aromatic heteroatom by lone-pair participation."""
     if atom.GetSymbol() == "N":
+        if atom.GetFormalCharge() > 0:
+            return "cationic_aromatic"
         if (
-            atom.GetTotalNumHs() > 0
+            atom.GetTotalNumHs(includeNeighbors=True) > 0
             or atom.GetDegree() >= 3
             or atom.GetFormalCharge() < 0
         ):

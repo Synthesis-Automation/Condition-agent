@@ -71,7 +71,7 @@ def _acyl_class(atom: Any) -> str:
     if "O" in symbols:
         return "ester_or_acid"
     carbon_count = sum(neighbor.GetAtomicNum() == 6 for neighbor in neighbors)
-    h_count = int(atom.GetTotalNumHs())
+    h_count = int(atom.GetTotalNumHs(includeNeighbors=True))
     if h_count:
         return "aldehyde"
     if carbon_count >= 2:
@@ -169,7 +169,7 @@ def build_activated_center_context(
         if neighbor.GetAtomicNum() == 6 and not neighbor.GetIsAromatic()
     ]
     enolizable = (
-        any(neighbor.GetTotalNumHs() > 0 for neighbor in alpha_carbons)
+        any(neighbor.GetTotalNumHs(includeNeighbors=True) > 0 for neighbor in alpha_carbons)
         if kind == "acyl"
         else None
     )

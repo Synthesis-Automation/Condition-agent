@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
 from .descriptors.profiles import build_site_reactivity_profile
+from .descriptors.common import locus_distance, site_locus_atoms
 from .models import (
     MolecularMotifMatch,
     ReactiveSiteEnvironment,
@@ -21,20 +22,6 @@ _RULES_PATH = Path(__file__).with_name("definitions") / "descriptor_rules.v1.jso
 def _environment_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         return dict((json.load(handle).get("site_environment") or {}))
-
-
-def _distance(mol: Any, start: int, targets: Iterable[int]) -> int | None:
-    from rdkit import Chem
-    values = []
-    for target in targets:
-        if int(start) == int(target):
-            values.append(0)
-            continue
-        try:
-            values.append(len(Chem.GetShortestPath(mol, int(start), int(target))) - 1)
-        except Exception:
-            continue
-    return min(values) if values else None
 
 
 def build_site_environment(
@@ -51,7 +38,7 @@ def build_site_environment(
     rules = _environment_rules()
     radius = int(rules.get("local_group_radius", 3))
     for group in group_values:
-        distance = _distance(mol, center, group.atom_indices)
+        distance = locus_distance(mol, site_locus_atoms(site, center), group.atom_indices)
         if distance is None:
             continue
         if distance <= radius:

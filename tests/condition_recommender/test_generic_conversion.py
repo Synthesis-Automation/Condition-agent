@@ -114,8 +114,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "10.1"
-    assert record.converter_definition_version == "generic_conversion.v10.1"
+    assert record.schema_version == "10.2"
+    assert record.converter_definition_version == "generic_conversion.v10.2"
     assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
@@ -724,7 +724,8 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["chemistry_status"] == "verified"
     assert review_rows[0]["condition_stage_status"] == "single_stage"
     assert review_rows[0]["index_eligibility"] == "eligible"
-    assert review_rows[0]["reactivity_profile"] == ""
+    assert "benzene" in review_rows[0]["reactivity_profile"]
+    assert "access open" in review_rows[0]["reactivity_profile"]
 
 
 def test_review_exports_ambiguous_structural_pattern_candidates() -> None:

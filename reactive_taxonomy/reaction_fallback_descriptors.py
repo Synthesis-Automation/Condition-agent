@@ -22,10 +22,11 @@ from .reaction_models import (
     ReactionSignature,
 )
 from .reaction_signatures import reaction_signature_definition_versions
+from .descriptors.registry import descriptor_definition_versions
 
 
 _DEFINITION_ID = "reaction_fallback_descriptor.v1"
-_DEFINITION_VERSION = "2.0"
+_DEFINITION_VERSION = "2.1"
 _DEFINITIONS = Path(__file__).with_name("definitions")
 _FALLBACK_FRAGMENT_RULES_PATH = _DEFINITIONS / "fallback_fragments.v1.json"
 _REACTION_CENTER_RULES_PATH = _DEFINITIONS / "reaction_center_fallback.v1.json"
@@ -35,6 +36,7 @@ def reaction_fallback_definition_versions() -> dict[str, str]:
     """Return chemistry definitions participating in fallback descriptor identity."""
     versions = {
         **reaction_signature_definition_versions(),
+        **dict(descriptor_definition_versions()),
         _DEFINITION_ID: _DEFINITION_VERSION,
     }
     for path in (
@@ -195,13 +197,16 @@ def _context_tokens(
                     f"{profile.reactive_center.hybridization}:"
                     f"{profile.reactive_center.formal_charge}:"
                     f"{int(profile.reactive_center.aromatic)}",
+                    f"context:{profile.context_kind}",
+                )
+            )
+            if profile.status in {"observed", "derived"}:
+                tokens.extend((
                     f"steric:{profile.steric.accessibility_class}:"
                     f"{profile.steric.approach_burden_class}",
                     f"electronic:{profile.electronic.activation_axis}:"
                     f"{profile.electronic.activation_class}",
-                    f"context:{profile.context_kind}",
-                )
-            )
+                ))
             tokens.extend(
                 f"nearby:{group.get('motif_id')}:{group.get('distance')}"
                 for group in environment.nearby_motifs

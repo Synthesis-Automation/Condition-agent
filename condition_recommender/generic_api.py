@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from .molecular_features import build_reaction_molecular_features
+
 import json
 import sqlite3
 from dataclasses import asdict, dataclass, replace
@@ -167,6 +169,7 @@ def recommend_indexed_signature(
     index: GenericReactionIndex,
     *,
     reaction_core: Mapping[str, Any] | None = None,
+    molecular_features: Mapping[str, Any] | None = None,
     fallback_descriptor: Mapping[str, Any] | None = None,
     query_reaction_smiles: str = "",
     reaction_label: Mapping[str, Any] | None = None,
@@ -178,6 +181,12 @@ def recommend_indexed_signature(
     preferred_reaction_ids: Tuple[str, ...] = (),
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
+    if molecular_features:
+        from .molecular_features import validate_molecular_features
+        try:
+            validate_molecular_features(molecular_features, signature)
+        except ValueError as error:
+            return GenericRecommendationResult(query_reaction_smiles, False, error=str(error))
     resolved_preferences = resolve_ranking_preferences(ranking_preferences)
     query_context = {
         "reaction_label": dict(reaction_label or {}),
@@ -188,7 +197,7 @@ def recommend_indexed_signature(
         ),
         "reaction_partners": tuple(
             dict(partner)
-            for partner in (signature.get("partners") or ())
+            for partner in ((molecular_features if molecular_features is not None else signature).get("partners") or ())
             if isinstance(partner, Mapping)
         ),
         "ranking_preferences": resolved_preferences.to_dict(),
@@ -254,6 +263,7 @@ def recommend_indexed_signature(
             target_recipe_count=top_k,
             minimum_pool_size=minimum_pool_size,
             query_reaction_smiles=query_reaction_smiles,
+            molecular_features=molecular_features,
         )
         if retrieval_strategy == "hybrid" and not preferred_selected
         else None
@@ -270,6 +280,7 @@ def recommend_indexed_signature(
             reaction_core=reaction_core,
             strategy=retrieval_strategy,
             query_reaction_smiles=query_reaction_smiles,
+                 molecular_features=molecular_features,
         )
     )
     if progressive is not None and not progressive.tiers:
@@ -383,6 +394,7 @@ def recommend_indexed_signature(
                 ranking_preferences=resolved_preferences,
                 query_reaction_core=reaction_core,
                 query_reaction_smiles=query_reaction_smiles,
+                         query_molecular_features=molecular_features,
             )
             for recommendation in ranked:
                 if recommendation.recipe_core_id in seen_recipe_cores:
@@ -429,6 +441,7 @@ def recommend_indexed_signature(
             ranking_preferences=resolved_preferences,
             query_reaction_core=reaction_core,
             query_reaction_smiles=query_reaction_smiles,
+                              query_molecular_features=molecular_features,
         )
     if preferred_selected:
         recommendations = tuple(
@@ -915,6 +928,7 @@ def _recommend_with_index(
             minimum_pool_size=minimum_pool_size,
             ranking_preferences=ranking_preferences,
             preferred_reaction_ids=preferred_reaction_ids,
+                     molecular_features=build_reaction_molecular_features(analysis).to_dict(),
         )
         result = replace(
             result,

@@ -91,7 +91,7 @@ def build_reactivity_modifiers(
                 modifier_id=f"{mol.GetAtomWithIdx(center).GetSymbol()}-H",
                 class_name="explicit_or_schema_level_hydrogen",
                 attributes=(("hydrogen_count", str(
-                    mol.GetAtomWithIdx(center).GetTotalNumHs()
+                    mol.GetAtomWithIdx(center).GetTotalNumHs(includeNeighbors=True)
                 )),),
                 evidence=DescriptorEvidence(
                     source="reactive_site",

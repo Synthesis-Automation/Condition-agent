@@ -409,6 +409,8 @@ def evaluate_generic_index(
         result = recommend_indexed_signature(
             row.signature,
             train_index,
+            molecular_features=row.molecular_features,
+            reaction_core=row.reaction_core,
             query_reaction_smiles=row.reaction_smiles,
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
