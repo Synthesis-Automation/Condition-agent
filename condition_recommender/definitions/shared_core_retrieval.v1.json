@@ -1,0 +1,9 @@
+{
+  "definition_id": "shared_core_retrieval.v1",
+  "schema_version": "1.0",
+  "status": "experimental_pending_independent_review",
+  "minimum_independent_support": 2,
+  "candidate_limit": 512,
+  "levels": ["whole_reaction", "observed_local", "retained_local", "retained_typed"],
+  "labels": ["Whole reaction", "L0: detailed local reaction", "L1: shared transformation", "L2: broader core"]
+}

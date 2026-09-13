@@ -265,7 +265,12 @@ class LocalRecommendationRuntime:
         weak_label_records_path: str | Path | None = None,
         coupled_strategy_library_path: str | Path | None = None,
         coupled_strategy_panel_path: str | Path | None = None,
+        shared_core_enabled: bool | None = None,
     ) -> None:
+        self.shared_core_enabled = (
+            os.environ.get("CONDITION_SHARED_CORE_EXPERIMENTAL") == "1"
+            if shared_core_enabled is None else shared_core_enabled
+        )
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
         self._configured_index_path = Path(configured) if configured else None
         configured_library = library_root or os.environ.get(
@@ -628,6 +633,16 @@ class LocalRecommendationRuntime:
             use_rxnmapper=use_rxnmapper,
             include_review=include_review,
         )
+        shared_core_path = None
+        if self.shared_core_enabled:
+            shared_core_path = index_path.with_name(index_path.stem + ".shared_core.sqlite")
+            if not shared_core_path.is_file():
+                raise FileNotFoundError(
+                    "Experimental shared-core artifact is unavailable for this library; "
+                    "build it with python -m condition_recommender.shared_core_cli build"
+                )
+            projection_stat = shared_core_path.stat()
+            key = (*key, projection_stat.st_size, projection_stat.st_mtime_ns)
         with self._lock:
             cached = self._recommenders.get(key)
             if cached is not None:
@@ -639,6 +654,7 @@ class LocalRecommendationRuntime:
                 index_path,
                 mapping_provider=(RxnMapperProvider() if use_rxnmapper else None),
                 include_review=include_review,
+                shared_core_path=shared_core_path,
             )
             self._recommenders[key] = recommender
             return recommender

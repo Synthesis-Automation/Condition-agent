@@ -97,6 +97,20 @@ class SQLiteReactionRows(Sequence[GenericIndexedReaction]):
         self._path = path
         self._row_count = row_count
 
+    @property
+    def source_path(self) -> Path:
+        """Return the immutable artifact location for derived-index builders."""
+        return self._path
+
+    @property
+    def artifact_identity(self) -> str:
+        """Return the content-bound manifest ID without materializing all rows."""
+        with _read_connection(self._path) as connection:
+            payload = connection.execute(
+                "SELECT payload FROM metadata WHERE singleton=1"
+            ).fetchone()[0]
+        return str(json.loads(payload)["index_id"])
+
     def __len__(self) -> int:
         return self._row_count
 

@@ -205,6 +205,16 @@ export interface Recommendation {
   match_level?: number
   match_label?: string
   match_details?: string[]
+  match_namespace?: string
+  evidence_relation?: string
+  candidate_channels?: string[]
+  source_input_requirements?: Array<{
+    reaction_id: string
+    observation_id: string
+    reaction_smiles: string
+    observed_ports: string[]
+    evidence_status: string
+  }>
   default_rank?: number | null
   rank_change: number
   recipe_id: string

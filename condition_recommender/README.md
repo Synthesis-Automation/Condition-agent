@@ -1,5 +1,19 @@
 # Condition Recommender
 
+## Experimental shared reaction cores
+
+An opt-in graph-based retrieval path now builds versioned L0/L1/L2 projections
+from stored observations, combines direct and product-side candidates, and
+qualifies retro precedent seeds through the same original-query checks.
+Source and substrate differences remain explicit analogue evidence.
+
+See the [implementation and local workbench instructions](../docs/new/shared_reaction_core_implementation_20260913.md)
+for building a derived artifact, using the prepared development sample, and
+generating a training-only chemist review packet. Full/Compact cutover remains
+subject to the primary roadmap's independent review and untouched-evaluation
+gates. The current default retrieval path remains active unless a matching
+experimental artifact is explicitly selected.
+
 ## Source-data preprocessing
 
 Heterogeneous raw CSV files can first be normalized into the versioned,

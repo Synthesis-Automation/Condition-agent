@@ -61,6 +61,7 @@ from .reaction_completion import (
 from .ranking_preferences import resolve_ranking_preferences
 from .related_handles import SearchScope, load_related_handle_rules, validate_search_scope
 from .recipe_ranking import rank_condition_recipes
+from .shared_core_index import SharedCoreIndex, load_shared_core_index
 from .reaction_facets import load_reaction_facet_rules
 
 
@@ -177,6 +178,7 @@ def recommend_indexed_signature(
     preferred_reaction_ids: Tuple[str, ...] = (),
     condition_constraints: ConditionConstraintSet | None = None,
     search_scope: SearchScope = "automatic",
+    shared_core_index: SharedCoreIndex | None = None,
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
     validate_search_scope(search_scope)
@@ -240,6 +242,18 @@ def recommend_indexed_signature(
             False,
             error="INCOMPATIBLE_REACTION_TAXONOMY_DEFINITIONS",
         )
+    if shared_core_index is not None:
+        from .shared_core_retrieval import recommend_from_shared_core
+
+        shared_result = recommend_from_shared_core(
+            signature, index, shared_core_index,
+            reaction_core=reaction_core or {}, query_reaction_smiles=query_reaction_smiles,
+            top_k=top_k, minimum_pool_size=minimum_pool_size, search_scope=search_scope,
+            preferred_reaction_ids=preferred_reaction_ids,
+            ranking_preferences=resolved_preferences, ranking_weights=ranking_weights,
+            molecular_features=molecular_features, condition_constraints=condition_constraints,
+        )
+        return replace(shared_result, **query_context)
     requested_precedents = tuple(
         dict.fromkeys(str(value) for value in preferred_reaction_ids if value)
     )
@@ -543,6 +557,7 @@ class GenericConditionRecommender:
     includes_review_precedents: bool = False
     review_index_reuses_trusted: bool = False
     fragment_source_artifact_current: bool | None = None
+    shared_core_index: SharedCoreIndex | None = None
 
     @classmethod
     def from_path(
@@ -551,6 +566,7 @@ class GenericConditionRecommender:
         *,
         mapping_provider: AtomMappingProvider | None = None,
         include_review: bool = False,
+        shared_core_path: str | Path | None = None,
     ) -> "GenericConditionRecommender":
         source = Path(path)
         index_source = source
@@ -599,6 +615,8 @@ class GenericConditionRecommender:
             )
         return cls(
             index=index,
+            shared_core_index=(load_shared_core_index(shared_core_path, index)
+                               if shared_core_path is not None else None),
             source_path=str(source),
             mapping_provider=mapping_provider,
             includes_review_precedents=include_review,
@@ -637,6 +655,7 @@ class GenericConditionRecommender:
             preferred_reaction_ids=preferred_reaction_ids,
             condition_constraints=condition_constraints,
             search_scope=search_scope,
+            shared_core_index=self.shared_core_index,
         )
         result = replace(
             result,
@@ -707,6 +726,7 @@ def _recommend_with_index(
     preferred_reaction_ids: Tuple[str, ...] = (),
     condition_constraints: ConditionConstraintSet | None = None,
     search_scope: SearchScope = "automatic",
+    shared_core_index: SharedCoreIndex | None = None,
 ) -> GenericRecommendationResult:
     if top_k < 1:
         return GenericRecommendationResult(
@@ -839,6 +859,26 @@ def _recommend_with_index(
             False,
             error=analysis.error or "INVALID_REACTION",
         )
+    if shared_core_index is not None:
+        if analysis.reaction_signature is None or analysis.reaction_core is None:
+            return finalize(GenericRecommendationResult(
+                reaction_smiles, False, recommendation_mode="experimental_shared_core",
+                error="SHARED_CORE_QUERY_UNAVAILABLE",
+                warnings=("EXPERIMENTAL_SHARED_CORE_PENDING_INDEPENDENT_REVIEW",),
+            ))
+        # Use exactly the parsed observation whose atom indices the evidence
+        # references, including a qualified external mapping if one was used.
+        return finalize(recommend_indexed_signature(
+            asdict(analysis.reaction_signature), index,
+            reaction_core=asdict(analysis.reaction_core),
+            query_reaction_smiles=analysis.input_reaction_smiles,
+            reaction_label=_reaction_label_payload(analysis), top_k=top_k,
+            minimum_pool_size=minimum_pool_size, ranking_preferences=ranking_preferences,
+            preferred_reaction_ids=preferred_reaction_ids,
+            molecular_features=build_reaction_molecular_features(analysis).to_dict(),
+            condition_constraints=condition_constraints, search_scope=search_scope,
+            shared_core_index=shared_core_index,
+        ))
     if (
         completion_selections
         and effective_reaction_smiles is not None

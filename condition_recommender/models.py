@@ -15,7 +15,7 @@ COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
 )
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
-GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "4.1"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "4.2"
 WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "2.0"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
@@ -370,6 +370,10 @@ class GenericConditionRecommendation:
     match_level: int = 4
     match_label: str = "Broader analogue"
     match_details: Tuple[str, ...] = ()
+    match_namespace: str = "precedent_match_levels.v1"
+    evidence_relation: str = ""
+    candidate_channels: Tuple[str, ...] = ()
+    source_input_requirements: Tuple[Dict[str, Any], ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -441,6 +445,7 @@ class GenericRecommendationResult:
     independent_compatible_candidate_count: int = 0
     excluded_candidate_count: int = 0
     retrieval_trace: Tuple[RetrievalLevelTrace, ...] = ()
+    shared_core_trace: Tuple[Dict[str, Any], ...] = ()
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     condition_constraints: Dict[str, Any] = field(default_factory=dict)
     condition_constraint_trace: Tuple[Dict[str, Any], ...] = ()

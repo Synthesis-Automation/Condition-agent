@@ -57,6 +57,31 @@ def _source_row(reaction_id: str) -> dict[str, str]:
     }
 
 
+def test_canonical_build_can_include_shared_core_projections(tmp_path: Path) -> None:
+    from condition_recommender.shared_core_index import load_shared_core_index
+
+    source = tmp_path / "source.csv"
+    row = _source_row("shared-core")
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(row))
+        writer.writeheader()
+        writer.writerow(row)
+    destination = tmp_path / "converted"
+    report = build_recommendation_artifacts(source, destination, experimental_shared_core=True)
+    index = load_generic_index(destination / "generic_index.sqlite")
+    projections = load_shared_core_index(destination / "generic_index.shared_core.sqlite", index)
+    assert projections.row_count == len(index.rows)
+    assert report["settings"]["experimental_shared_core"] is True
+    assert "shared_core_index" in report["artifacts"]
+    assert report["shared_core_report"]["eligible_counts"]["retained_local"] == 1
+
+
+def test_shared_core_build_requires_canonical_fast_index(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="build_fast_index"):
+        build_recommendation_artifacts(tmp_path / "source.csv", tmp_path / "out",
+                                       build_fast_index=False, experimental_shared_core=True)
+
+
 def test_artifact_workflow_builds_recommendation_data_without_review_csv(
     tmp_path: Path,
     monkeypatch,

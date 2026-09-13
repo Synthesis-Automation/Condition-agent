@@ -221,6 +221,7 @@ def generate_chemist_review_packet(
     seed: int = 17,
     top_k: int = 3,
     minimum_pool_size: int = 1,
+    experimental_shared_core: bool = False,
 ) -> Dict[str, Any]:
     """Generate randomized review candidates and a separate answer key."""
     if max_cases < 1 or top_k < 1:
@@ -238,6 +239,14 @@ def generate_chemist_review_packet(
     destination = Path(output_dir)
     structures = destination / "structures"
     structures.mkdir(parents=True, exist_ok=True)
+    shared_index = None
+    shared_manifest = None
+    if experimental_shared_core:
+        from .shared_core_index import build_shared_core_index, load_shared_core_index
+
+        shared_path = destination / "train.shared_core.sqlite"
+        shared_manifest = build_shared_core_index(train_index, shared_path)
+        shared_index = load_shared_core_index(shared_path, train_index)
     packet_rows = []
     answer_rows = []
     form_rows = []
@@ -254,6 +263,7 @@ def generate_chemist_review_packet(
             query_reaction_smiles=row.reaction_smiles,
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
+            shared_core_index=shared_index,
         )
         candidates = []
         answers = {}
@@ -264,6 +274,8 @@ def generate_chemist_review_packet(
             candidate_id = "CAND1:" + _digest(
                 case_id,
                 recommendation.recipe_core_id,
+                *( (json.dumps(recommendation.source_input_requirements, sort_keys=True),)
+                   if experimental_shared_core else ()),
             )[:20]
             candidates.append(
                 {
@@ -426,6 +438,11 @@ def generate_chemist_review_packet(
         "case_count": len(packet_rows),
         "candidate_count": len(answer_rows),
         "negative_control_count": control_count,
+        "experimental_shared_core": experimental_shared_core,
+        "shared_core_manifest": shared_manifest,
+        "shared_core_artifact_sha256": (
+            _file_sha256(destination / "train.shared_core.sqlite") if experimental_shared_core else None
+        ),
         "split": {
             "train_row_count": len(split.train_rows),
             "test_row_count": len(split.test_rows),

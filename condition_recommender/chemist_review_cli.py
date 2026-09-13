@@ -18,6 +18,8 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--minimum-pool-size", type=int, default=1)
+    parser.add_argument("--experimental-shared-core", action="store_true",
+                        help="Build projections from training observations only and review shared retrieval")
     args = parser.parse_args()
     report = generate_chemist_review_packet(
         args.index_path,
@@ -26,6 +28,7 @@ def main() -> None:
         seed=args.seed,
         top_k=args.top_k,
         minimum_pool_size=args.minimum_pool_size,
+        experimental_shared_core=args.experimental_shared_core,
     )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

@@ -7,6 +7,11 @@
 
 ## 1. Purpose and authority
 
+2026-09-13 update: the [shared-core experimental implementation](shared_reaction_core_implementation_20260913.md)
+adds a versioned projection artifact, direct/product-side candidate union and
+common retro-seed qualification. It remains opt-in pending the release gates
+below; it does not establish Full-corpus cutover or condition-transfer validation.
+
 This document replaces the fragmented status narrative spread across the older
 files in `docs/`. It states what is implemented now, what is still provisional,
 and which gates must pass before production release.
@@ -107,7 +112,7 @@ The current code declares:
 | Recommendation artifact workflow | `2.3` |
 | Generic persisted index | `6.5` |
 | SQLite index storage | `1.0` |
-| Generic recommendation result | `4.1` |
+| Generic recommendation result | `4.2` |
 | Reaction correspondence definitions | `2.8` |
 | Generic retrieval definition | `1.8` |
 | Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.1` |

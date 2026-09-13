@@ -1,7 +1,12 @@
 # Shared graph-based reaction retrieval: design proposal
 
 Date: 2026-09-13  
-Status: **Proposed architecture; not implemented or a release approval**
+Status: **Target architecture; partial experimental implementation; not a release approval**
+
+Implementation update: an [experimental subset is now executable](shared_reaction_core_implementation_20260913.md).
+That report distinguishes the implemented contracts from the remaining
+generalization, evaluation and migration work. This proposal describes the
+complete target architecture and is not a claim that all phases have shipped.
 
 This proposal develops the foundation discussed for condition recommendation
 and single-step retrosynthesis. The primary implementation roadmap remains

@@ -1,0 +1,300 @@
+"""Dataset binding, dual-channel parity and condition qualification tests."""
+
+from dataclasses import asdict
+import json
+import sqlite3
+
+import pytest
+
+from reactive_taxonomy import featurize_reaction
+from condition_registry import ConditionConstraintSet
+from condition_registry.constraints import normalize_condition_constraint
+from condition_recommender import GenericConditionRecommender
+from condition_recommender.generic_indexing import build_generic_index
+from condition_recommender.sqlite_indexing import (
+    save_sqlite_generic_index,
+    load_sqlite_generic_index,
+)
+from condition_recommender.shared_core_index import (
+    build_shared_core_index,
+    load_shared_core_index,
+)
+
+QUERY = "Ic1ccccc1.N#C[Cu]>>N#Cc1ccccc1"
+BROMIDE = "Brc1ccccc1.N#C[Cu]>>N#Cc1ccccc1"
+
+
+def record(number, reaction, *, reference=None, temperature=25):
+    analysis = featurize_reaction(reaction)
+    assert analysis.valid and analysis.reaction_signature and analysis.reaction_core
+    return {
+        "schema_version": "10.3",
+        "converter_definition_version": "generic_conversion.v10.3",
+        "admission_tier": "verified",
+        "index_eligibility": "eligible",
+        "precedent_tier": "trusted",
+        "core_eligibility": "trusted_core",
+        "core_eligibility_definition_version": "core_eligibility.v1@1.0",
+        "chemistry_status": "verified",
+        "condition_status": "resolved_complete",
+        "condition_stage_status": "single_stage",
+        "outcome_status": "usable",
+        "reaction_id": f"reaction-{number}",
+        "observation_id": f"obs-{number}",
+        "reaction_smiles": reaction,
+        "yield_pct": 70,
+        "source_dataset": "controlled-test-fixture",
+        "reference_id": reference or f"REF1:{number}",
+        "reaction_signature": asdict(analysis.reaction_signature),
+        "reaction_core": asdict(analysis.reaction_core),
+        "fallback_descriptor": asdict(analysis.fallback_descriptor),
+        "resolved_recipe_id": f"recipe-{number}",
+        "resolved_recipe_core_id": f"core-{number}",
+        "resolved_recipe": {
+            "recipe_id": f"recipe-{number}",
+            "recipe_core_id": f"core-{number}",
+            "temperature_c": temperature,
+        },
+        "condition_resolution": {"has_uncertainty": False},
+    }
+
+
+def engine(tmp_path, records, *, sqlite=False):
+    index = build_generic_index(records)
+    if sqlite:
+        source = tmp_path / "generic_index.sqlite"
+        save_sqlite_generic_index(index, source)
+        index = load_sqlite_generic_index(source)
+    path = tmp_path / "generic_index.shared_core.sqlite"
+    build_shared_core_index(index, path)
+    return GenericConditionRecommender(
+        index, shared_core_index=load_shared_core_index(path, index)
+    )
+
+
+@pytest.mark.parametrize("sqlite", [False, True])
+def test_generalized_core_retrieves_other_leaving_groups_and_sources(tmp_path, sqlite):
+    recommender = engine(
+        tmp_path,
+        [record(1, BROMIDE), record(2, "CS(=O)(=O)Oc1ccccc1.C#N>>N#Cc1ccccc1")],
+        sqlite=sqlite,
+    )
+    result = recommender.recommend(QUERY, search_scope="broad")
+    assert result.valid and len(result.recommendations) == 2
+    assert result.query_reaction_smiles == QUERY
+    assert all(
+        item.match_label == "L1: shared transformation"
+        for item in result.recommendations
+    )
+    assert all(
+        item.evidence_relation == "analogue_evidence" for item in result.recommendations
+    )
+    assert all(item.source_input_requirements for item in result.recommendations)
+    assert not recommender.recommend(QUERY, search_scope="same_handle").recommendations
+
+
+def test_product_channel_and_retro_seeds_have_identical_qualification(tmp_path):
+    recommender = engine(tmp_path, [record(1, BROMIDE)])
+    normal = recommender.recommend(QUERY)
+    seeded = recommender.recommend(
+        QUERY, preferred_reaction_ids=("reaction-1", "missing-id")
+    )
+    assert normal.valid and seeded.valid
+    first = next(
+        x for x in normal.shared_core_trace if x.get("reaction_id") == "reaction-1"
+    )
+    second = next(
+        x for x in seeded.shared_core_trace if x.get("reaction_id") == "reaction-1"
+    )
+    assert first["comparison"] == second["comparison"]
+    assert first["condition_compatibility"] == second["condition_compatibility"]
+    assert set(first["channels"]) == {"direct", "product_side"}
+    assert set(second["channels"]) == {"direct", "product_side", "retro_precedent"}
+    assert seeded.independent_compatible_candidate_count == 1
+    assert seeded.candidate_count == 1
+    assert any(
+        x.get("reason") == "RETRO_PRECEDENT_NOT_IN_CONDITION_INDEX"
+        for x in seeded.shared_core_trace
+    )
+
+
+def test_same_product_wrong_transformation_is_diagnosed_and_excluded(tmp_path):
+    # Amide dehydration reaches the same nitrile through a different edit graph.
+    recommender = engine(tmp_path, [record(1, "NC(=O)c1ccccc1>>N#Cc1ccccc1")])
+    result = recommender.recommend(QUERY, preferred_reaction_ids=("reaction-1",))
+    assert not result.recommendations
+    assert result.shared_core_trace[0]["comparison"]["reasons"] == (
+        "DIFFERENT_TRANSFORMATION_SAME_PRODUCT",
+    )
+
+
+def test_constraints_filter_before_support_and_seed_cannot_bypass(tmp_path):
+    recommender = engine(tmp_path, [record(1, BROMIDE, temperature=150)])
+    constraint = normalize_condition_constraint(
+        "maximum_temperature_c", "80", provenance="explicit_user"
+    ).constraint
+    result = recommender.recommend(
+        QUERY,
+        preferred_reaction_ids=("reaction-1",),
+        condition_constraints=ConditionConstraintSet((constraint,)),
+    )
+    assert not result.recommendations and result.excluded_candidate_count == 1
+    assert not result.shared_core_trace[0]["condition_compatibility"]["compatible"]
+
+
+def test_duplicate_references_and_retrieval_channels_count_once(tmp_path):
+    recommender = engine(
+        tmp_path,
+        [
+            record(1, BROMIDE, reference="REF1:same"),
+            record(2, BROMIDE, reference="REF1:same"),
+        ],
+    )
+    result = recommender.recommend(
+        QUERY, preferred_reaction_ids=("reaction-1", "reaction-2")
+    )
+    assert (
+        result.candidate_count == 2
+        and result.independent_compatible_candidate_count == 1
+    )
+
+
+def test_whole_reaction_precedes_analogue_and_stops_on_independent_support(tmp_path):
+    recommender = engine(
+        tmp_path, [record(1, QUERY), record(2, QUERY), record(3, BROMIDE)]
+    )
+    result = recommender.recommend(QUERY, top_k=5)
+    assert len(result.recommendations) == 2
+    assert all(item.match_label == "Whole reaction" for item in result.recommendations)
+    assert all(
+        item.candidate_channels == ("direct",) for item in result.recommendations
+    )
+    broad = recommender.recommend(QUERY, top_k=5, search_scope="broad")
+    assert [item.match_level for item in broad.recommendations] == [1, 1, 3]
+
+
+def test_same_recipe_different_required_sources_remains_separate(tmp_path):
+    first, second = record(1, BROMIDE), record(2, "Brc1ccccc1.C#N>>N#Cc1ccccc1")
+    for key in ("resolved_recipe_id", "resolved_recipe_core_id", "resolved_recipe"):
+        second[key] = first[key]
+    recommender = engine(tmp_path, [first, second])
+    result = recommender.recommend(QUERY, search_scope="broad")
+    assert len(result.recommendations) == 2
+    assert all(item.support == 1 for item in result.recommendations)
+
+
+def test_artifact_binding_and_corruption_are_explicit_failures(tmp_path):
+    recommender = engine(tmp_path, [record(1, BROMIDE)])
+    wrong = build_generic_index([record(1, QUERY)])
+    with pytest.raises(ValueError, match="ARTIFACT_MISMATCH"):
+        recommender.shared_core_index.validate_binding(wrong)
+    with sqlite3.connect(recommender.shared_core_index.path) as connection:
+        connection.execute("UPDATE projection SET payload='{}'")
+    with pytest.raises(ValueError, match="OBSERVATION_MISMATCH"):
+        recommender.recommend(QUERY)
+
+
+def test_unknown_projection_version_is_rejected(tmp_path):
+    recommender = engine(tmp_path, [record(1, BROMIDE)])
+    path = recommender.shared_core_index.path
+    with sqlite3.connect(path) as connection:
+        payload = json.loads(
+            connection.execute("SELECT payload FROM metadata").fetchone()[0]
+        )
+        payload["definition_hash"] = "old"
+        connection.execute("UPDATE metadata SET payload=?", (json.dumps(payload),))
+    with pytest.raises(ValueError, match="ARTIFACT_MISMATCH"):
+        load_shared_core_index(path, recommender.index)
+
+
+def test_cannot_overwrite_source_index(tmp_path):
+    recommender = engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
+    with pytest.raises(ValueError, match="overwrite"):
+        build_shared_core_index(recommender.index, tmp_path / "generic_index.sqlite")
+
+
+def test_atomic_failure_preserves_existing_artifact(tmp_path, monkeypatch):
+    import condition_recommender.shared_core_index as module
+
+    recommender = engine(tmp_path, [record(1, BROMIDE)])
+    path = recommender.shared_core_index.path
+    before = path.read_bytes()
+
+    def fail(*args, **kwargs):
+        raise RuntimeError("simulated build interruption")
+
+    monkeypatch.setattr(module, "build_shared_reaction_core", fail)
+    with pytest.raises(RuntimeError, match="interruption"):
+        build_shared_core_index(recommender.index, path)
+    assert path.read_bytes() == before
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_cancelled_build_preserves_existing_artifact(tmp_path):
+    from condition_recommender.shared_core_index import SharedCoreBuildCancelled
+
+    recommender = engine(tmp_path, [record(1, BROMIDE)])
+    path = recommender.shared_core_index.path
+    before = path.read_bytes()
+    with pytest.raises(SharedCoreBuildCancelled):
+        build_shared_core_index(recommender.index, path, cancel_check=lambda: True)
+    assert path.read_bytes() == before
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_candidate_budget_is_bounded_and_reported(tmp_path, monkeypatch):
+    import condition_recommender.shared_core_retrieval as module
+
+    recommender = engine(tmp_path, [record(1, BROMIDE), record(2, BROMIDE)])
+    original = module.load_shared_retrieval_rules()
+    monkeypatch.setattr(
+        module,
+        "load_shared_retrieval_rules",
+        lambda: {**original, "candidate_limit": 1},
+    )
+    result = recommender.recommend(QUERY, search_scope="broad")
+    assert result.candidate_count == 1
+    assert "SHARED_CORE_CANDIDATE_BUDGET_REACHED" in result.warnings
+
+
+def test_web_runtime_explicit_activation_and_response_contract(tmp_path):
+    from fastapi.testclient import TestClient
+    from app.web_api.main import create_app
+    from app.web_api.runtime import LocalRecommendationRuntime
+
+    engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
+    runtime = LocalRecommendationRuntime(
+        index_path=tmp_path / "generic_index.sqlite", shared_core_enabled=True
+    )
+    with TestClient(create_app(runtime=runtime, recommendation_only=False)) as client:
+        response = client.post(
+            "/api/v1/recommendations",
+            json={"reaction_smiles": QUERY, "library_mode": "full"},
+        )
+    assert response.status_code == 200
+    result = response.json()["data"]
+    assert result["recommendation_mode"] == "experimental_shared_core"
+    assert result["recommendations"][0]["match_namespace"] == "shared_reaction_core.v1"
+    assert result["shared_core_trace"]
+
+
+def test_shared_review_builds_projection_artifact_from_training_rows_only(tmp_path):
+    from condition_recommender.chemist_review import generate_chemist_review_packet
+
+    engine(
+        tmp_path,
+        [record(i, BROMIDE if i % 2 else QUERY) for i in range(1, 9)],
+        sqlite=True,
+    )
+    report = generate_chemist_review_packet(
+        tmp_path / "generic_index.sqlite",
+        tmp_path / "review",
+        experimental_shared_core=True,
+        max_cases=3,
+    )
+    assert (
+        report["shared_core_manifest"]["row_count"]
+        == report["split"]["train_row_count"]
+    )
+    assert report["split"]["leakage_group_count"] == 0
+    assert report["shared_core_artifact_sha256"]
