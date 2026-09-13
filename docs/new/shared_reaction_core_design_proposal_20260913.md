@@ -3,6 +3,9 @@
 Date: 2026-09-13  
 Status: **Target architecture; partial experimental implementation; not a release approval**
 
+Latest implementation: [v2 general edit-graph beta](shared_reaction_core_v2_20260913.md),
+including general protected edits, source-qualified aggregation and fresh validation.
+
 Implementation update: an [experimental subset is now executable](shared_reaction_core_implementation_20260913.md).
 That report distinguishes the implemented contracts from the remaining
 generalization, evaluation and migration work. This proposal describes the

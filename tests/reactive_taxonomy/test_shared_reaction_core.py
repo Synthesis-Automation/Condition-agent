@@ -128,10 +128,10 @@ def test_ambiguous_conflicting_and_contradictory_observations_abstain(mutation):
     assert not projection.levels and projection.unavailable_reasons
 
 
-def test_multievent_and_order_change_keep_observed_view_without_broadening():
+def test_order_changes_receive_broad_views_but_conflicting_event_counts_abstain():
     for reaction in ("CC=O>>CCO", "CCBr.CCO>>CCOCC"):
         projection = project(reaction)
-        assert projection.levels
+        assert tuple(p.level for p in projection.levels) == LEVELS
     analysis = featurize_reaction(QUERY)
     signature, core = (
         asdict(analysis.reaction_signature),
@@ -139,8 +139,8 @@ def test_multievent_and_order_change_keep_observed_view_without_broadening():
     )
     signature["event_count"] = 2
     projection = build_shared_reaction_core(QUERY, signature, core)
-    assert [p.level for p in projection.levels] == ["observed_local"]
-    assert projection.unavailable_reasons == ("GENERALIZATION_REQUIRES_SINGLE_EVENT",)
+    assert not projection.levels
+    assert projection.unavailable_reasons == ("EVENT_COUNT_CONTRADICTS_OBSERVATION",)
 
 
 def test_schema_roundtrip_and_version_mismatch():

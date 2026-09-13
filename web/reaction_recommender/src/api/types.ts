@@ -33,6 +33,9 @@ export interface Capabilities {
     label: string
     index_name: string
     index_available: boolean
+    row_count?: number | null
+    index_id?: string | null
+    custom_index?: boolean
   }>
   default_retrosynthesis_library_mode?: 'full' | 'compact'
   retrosynthesis_library_modes?: Record<string, {

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sqlite3
 import time
 from pathlib import Path
 from threading import RLock
@@ -31,6 +32,7 @@ from condition_recommender import (
 from condition_recommender.reaction_completion import (
     validate_completion_selections,
 )
+from condition_recommender.sqlite_indexing import sqlite_generic_index_summary
 from core_retrosynthesis import (
     FrozenV1HeldoutPanel,
     GenericTemplateLibrary,
@@ -663,6 +665,27 @@ class LocalRecommendationRuntime:
         """Report local feature availability without exposing absolute paths."""
 
         mode_paths = {mode: self._index_path(mode) for mode in ("full", "compact")}
+        library_modes = {}
+        for mode, path in mode_paths.items():
+            custom = (
+                mode == "full"
+                and self._configured_index_path is not None
+                and path.resolve()
+                != (self.library_root / "full" / "generic_index.sqlite").resolve()
+            )
+            summary = {"row_count": None, "index_id": None}
+            if path.suffix == ".sqlite" and path.is_file():
+                try:
+                    summary = sqlite_generic_index_summary(path)
+                except (OSError, ValueError, sqlite3.DatabaseError):
+                    pass
+            library_modes[mode] = {
+                "label": "Custom index" if custom else mode.title(),
+                "index_name": path.name,
+                "index_available": path.is_file(),
+                "custom_index": custom,
+                **summary,
+            }
         retrosynthesis_paths = {
             mode: self._retrosynthesis_library_path(mode)
             for mode in ("full", "compact")
@@ -690,14 +713,7 @@ class LocalRecommendationRuntime:
             "index_name": mode_paths["full"].name,
             "index_available": mode_paths["full"].is_file(),
             "default_library_mode": "full",
-            "library_modes": {
-                mode: {
-                    "label": mode.title(),
-                    "index_name": path.name,
-                    "index_available": path.is_file(),
-                }
-                for mode, path in mode_paths.items()
-            },
+            "library_modes": library_modes,
             "loaded_runtime_variants": len(self._recommenders),
             "rxnmapper_available": RxnMapperProvider.is_available(),
             "recommendation": True,

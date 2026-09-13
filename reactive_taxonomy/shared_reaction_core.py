@@ -1,9 +1,8 @@
 """Qualified, versioned graph projections shared by precedent search channels.
 
-The first generalization operator supports one intermolecular single-bond join
-with graph-verified departing or hydrogen ports. Other transformations retain
-their observed-local projection and explicitly abstain from generalization.
-No hypothetical molecules or atom correspondence are generated here.
+All supported observations retain their before/after edit graph. A separately
+qualified operator can relax departure/source ports for single joins. No
+hypothetical molecules or atom correspondence are generated here.
 """
 
 from __future__ import annotations
@@ -19,14 +18,15 @@ from rdkit import Chem, rdBase
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_parser import parse_reaction_smiles
+from .shared_core_graph import observed_edit_graph
 from .reaction_models import (
     REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
     REACTION_CORE_PROJECTION_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
 )
 
-SCHEMA_VERSION = "1.0"
-ALGORITHM_VERSION = "shared_reaction_core.v1"
+SCHEMA_VERSION = "2.0"
+ALGORITHM_VERSION = "shared_reaction_core.v2"
 LEVELS = ("observed_local", "retained_local", "retained_typed")
 
 
@@ -40,7 +40,7 @@ def _digest(namespace: str, value: Any) -> str:
 
 @lru_cache(maxsize=1)
 def _definition_text() -> str:
-    path = Path(__file__).with_name("definitions") / "shared_reaction_core.v1.json"
+    path = Path(__file__).with_name("definitions") / "shared_reaction_core.v2.json"
     return path.read_text(encoding="utf-8")
 
 
@@ -51,8 +51,10 @@ def load_shared_core_rules() -> dict[str, Any]:
         rules.get("definition_id") != ALGORITHM_VERSION
         or rules.get("schema_version") != SCHEMA_VERSION
         or rules.get("levels") != dict(zip(LEVELS, (1, 1, 0)))
-        or rules.get("generalization_operator") != "single_join_with_departing_ports"
+        or rules.get("generalization_operators")
+        != ["protected_edit_graph", "single_join_with_departing_ports"]
         or rules.get("status") != "experimental_pending_independent_review"
+        or rules.get("realization_identity") != "anchored_port_graph"
     ):
         raise ValueError("invalid shared reaction core definition")
     for name in ("departing_root_elements", "hydrogen_port_elements"):
@@ -229,87 +231,135 @@ def _ref(state: Mapping[str, Any]) -> tuple[int, int]:
     return int(state["component_index"]), int(state["atom_index"])
 
 
-def _atom_label(atom: Chem.Atom) -> list[Any]:
-    return [
-        atom.GetSymbol(),
-        atom.GetFormalCharge(),
-        atom.GetIsAromatic(),
-        str(atom.GetHybridization()),
-        atom.GetIsotope(),
-        atom.GetNumRadicalElectrons(),
-        atom.GetTotalNumHs(),
-        atom.GetProp("_CIPCode") if atom.HasProp("_CIPCode") else "",
-    ]
-
-
-def _canonical_graph(labels: list[Any], edges: list[tuple[int, int, Any]]) -> str:
-    """Canonicalize a colored graph through an atom/edge incidence graph.
-
-    Chemical labels become a sorted vocabulary of isotope colors on dummy
-    atoms. Edge nodes preserve bond labels. The vocabulary is included so
-    colors from different graphs cannot accidentally compare equal.
-    """
-    encoded = [_json(["atom", label]) for label in labels]
-    edge_labels = [_json(["edge", edge[2]]) for edge in edges]
-    vocabulary = sorted(set(encoded + edge_labels))
-    colors = {label: i + 1 for i, label in enumerate(vocabulary)}
-    graph = Chem.RWMol()
-    for label in encoded + edge_labels:
-        atom = Chem.Atom(0)
-        atom.SetIsotope(colors[label])
-        graph.AddAtom(atom)
-    for i, (left, right, _) in enumerate(edges, len(labels)):
-        graph.AddBond(left, i, Chem.BondType.SINGLE)
-        graph.AddBond(i, right, Chem.BondType.SINGLE)
-    return _json([vocabulary, Chem.MolToSmiles(graph, canonical=True)])
-
-
-def _local_graph(
-    molecule: Chem.Mol,
-    centers: Mapping[int, Any],
-    radius: int,
-    limit: int,
-) -> str:
-    selected = set(centers)
-    for _ in range(radius):
-        selected |= {
-            n.GetIdx()
-            for i in selected
-            for n in molecule.GetAtomWithIdx(i).GetNeighbors()
-        }
-    # Close complete conjugated multiple-bond units, but not aromatic scaffolds.
-    while True:
-        expanded = selected | {
-            b.GetOtherAtomIdx(i)
-            for i in selected
-            for b in molecule.GetAtomWithIdx(i).GetBonds()
-            if b.GetBondType() in {Chem.BondType.DOUBLE, Chem.BondType.TRIPLE}
-        }
-        if len(expanded) > limit:
-            raise ValueError("CORE_SIZE_LIMIT")
-        if expanded == selected:
-            break
-        selected = expanded
-    order = sorted(selected)
-    positions = {value: i for i, value in enumerate(order)}
-    labels = [[_atom_label(molecule.GetAtomWithIdx(i)), centers.get(i)] for i in order]
-    edges = [
-        (
-            positions[b.GetBeginAtomIdx()],
-            positions[b.GetEndAtomIdx()],
-            [str(b.GetBondType()), str(b.GetStereo())],
-        )
-        for b in molecule.GetBonds()
-        if b.GetBeginAtomIdx() in selected and b.GetEndAtomIdx() in selected
-    ]
-    return _canonical_graph(labels, edges)
-
-
 def _canonical_molecule(molecule: Chem.Mol) -> str:
     copy = Chem.Mol(molecule)
     for atom in copy.GetAtoms():
         atom.SetAtomMapNum(0)
     return Chem.MolToSmiles(copy, canonical=True, isomericSmiles=True)
+
+
+def _qualified_single_join_ports(
+    reactants: Mapping[int, Chem.Mol],
+    products: Mapping[int, Chem.Mol],
+    transitions: Mapping[tuple[int, int], Mapping[str, Any]],
+    edits: tuple[Mapping[str, Any], ...],
+    signature: Mapping[str, Any],
+    core: Mapping[str, Any],
+    rules: Mapping[str, Any],
+) -> (
+    tuple[dict[tuple[int, int], list[str]], frozenset[tuple[int, int]], frozenset[int]]
+    | None
+):
+    """Qualify optional source abstraction; other edits remain protected."""
+    if signature.get("event_count") != 1 or core.get("event_count") != 1:
+        return None
+    formed = [(i, e) for i, e in enumerate(edits) if e["edit_type"] == "formed"]
+    if (
+        len(formed) != 1
+        or formed[0][1].get("new_order") != "SINGLE"
+        or any(
+            e["edit_type"] not in {"formed", "broken", "hydrogen_change"} for e in edits
+        )
+    ):
+        return None
+    # Hybridization transitions are retained in the before/after center
+    # labels (for example amine SP3 -> SP2), rather than discarded.
+    if any(
+        c["change_type"] in set(rules["protected_state_changes"]) - {"hybridization"}
+        for c in core.get("state_changes", ())
+    ):
+        return None
+    if (signature.get("topology") or {}).get("reaction_scope") != "intermolecular":
+        return None
+    endpoints = [_ref(formed[0][1][name]) for name in ("atom_1", "atom_2")]
+    if len(set(endpoints)) != 2 or endpoints[0][0] == endpoints[1][0]:
+        return None
+    after = [transitions[p].get("after_state") for p in endpoints]
+    if any(s is None for s in after) or _ref(after[0])[0] != _ref(after[1])[0]:
+        return None
+    product = products[_ref(after[0])[0]]
+    product_indices = [_ref(s)[1] for s in after]
+    bond = product.GetBondBetweenAtoms(*product_indices)
+    if bond is None or bond.GetBondType() != Chem.BondType.SINGLE:
+        return None
+    ports: dict[tuple[int, int], list[str]] = {p: [] for p in endpoints}
+    generalized = []
+    removed = set()
+    for i, edit in enumerate(edits):
+        if edit["edit_type"] == "formed":
+            continue
+        if edit["edit_type"] == "hydrogen_change":
+            refs = [edit.get("atom_1") or {}, edit.get("atom_2") or {}]
+            heavy = [r for r in refs if r and r.get("element") != "H"]
+            if len(heavy) != 1 or _ref(heavy[0]) not in ports:
+                return None
+            point = _ref(heavy[0])
+            atom = reactants[point[0]].GetAtomWithIdx(point[1])
+            if not (
+                atom.GetSymbol() in rules["hydrogen_port_elements"]
+                or (
+                    atom.GetSymbol() == "C"
+                    and str(atom.GetHybridization())
+                    in rules["hydrogen_port_carbon_hybridizations"]
+                )
+            ):
+                return None
+            before_state = transitions[point]["before_state"]
+            after_state = transitions[point]["after_state"]
+            if before_state["total_hydrogens"] - after_state["total_hydrogens"] != 1:
+                return None
+            ports[point].append("[H]")
+        else:
+            a, b = _ref(edit["atom_1"]), _ref(edit["atom_2"])
+            if edit.get("old_order") != "SINGLE" or (a in ports) == (b in ports):
+                return None
+            point, root = (a, b) if a in ports else (b, a)
+            if point[0] != root[0] or transitions.get(root, {}).get("after_state"):
+                return None
+            mol = reactants[point[0]]
+            root_atom = mol.GetAtomWithIdx(root[1])
+            old_bond = mol.GetBondBetweenAtoms(point[1], root[1])
+            if (
+                old_bond is None
+                or old_bond.GetBondType() != Chem.BondType.SINGLE
+                or root_atom.GetSymbol() not in rules["departing_root_elements"]
+            ):
+                return None
+            fragment, pending = set(), [root[1]]
+            while pending:
+                current = pending.pop()
+                if current in fragment:
+                    continue
+                fragment.add(current)
+                if len(fragment) > rules["maximum_fragment_atoms"]:
+                    return None
+                for neighbor in mol.GetAtomWithIdx(current).GetNeighbors():
+                    neighbor_id = neighbor.GetIdx()
+                    if {current, neighbor_id} == {point[1], root[1]}:
+                        continue
+                    pending.append(neighbor_id)
+            if point[1] in fragment or any(
+                transitions.get((point[0], atom), {}).get("after_state")
+                for atom in fragment
+            ):
+                return None
+            removed.update((point[0], atom) for atom in fragment)
+            copy = Chem.Mol(mol)
+            for atom in copy.GetAtoms():
+                atom.SetAtomMapNum(0)
+            ports[point].append(
+                Chem.MolFragmentToSmiles(copy, sorted(fragment), canonical=True)
+            )
+        generalized.append(i)
+    if any(len(value) != 1 for value in ports.values()):
+        return None
+    # A hydrogen change cannot disappear merely because it was absent from signature edits.
+    hydrogen_changes = [
+        c for c in core.get("state_changes", ()) if c["change_type"] == "hydrogen"
+    ]
+    if len(hydrogen_changes) != sum(e["edit_type"] == "hydrogen_change" for e in edits):
+        return None
+    return ports, frozenset(removed), frozenset(generalized)
 
 
 def build_shared_reaction_core(
@@ -394,6 +444,10 @@ def build_shared_reaction_core(
                 transition.get("before_state"),
                 transition.get("after_state"),
             )
+            if before is None:
+                return unavailable("APPEARING_CENTER_CORRESPONDENCE_UNAVAILABLE")
+            if after and before["element"] != after["element"]:
+                return unavailable("ELEMENT_CORRESPONDENCE_CONTRADICTS_GRAPH")
             if after:
                 if _ref(after) in product_references:
                     return unavailable("AMBIGUOUS_ATOM_CORRESPONDENCE")
@@ -426,6 +480,13 @@ def build_shared_reaction_core(
         if not edits:
             return unavailable("NO_OBSERVED_EDITS")
         for edit in edits:
+            if edit.get("edit_type") not in {
+                "formed",
+                "broken",
+                "order_changed",
+                "hydrogen_change",
+            }:
+                return unavailable("UNSUPPORTED_EDIT_TYPE")
             refs = [edit.get("atom_1"), edit.get("atom_2")]
             for ref in refs:
                 if not ref:
@@ -435,6 +496,21 @@ def build_shared_reaction_core(
                 atom = reactants[_ref(ref)[0]].GetAtomWithIdx(_ref(ref)[1])
                 if atom.GetSymbol() != ref["element"]:
                     return unavailable("EDIT_REFERENCE_CONTRADICTS_GRAPH")
+            if edit["edit_type"] == "hydrogen_change" and refs[0] and not refs[1]:
+                transition = transitions[_ref(refs[0])]
+                before, after = (
+                    transition["before_state"],
+                    transition.get("after_state"),
+                )
+                if not after:
+                    return unavailable("HYDROGEN_CORRESPONDENCE_UNAVAILABLE")
+                delta = after["total_hydrogens"] - before["total_hydrogens"]
+                expected = (None, "SINGLE") if delta > 0 else ("SINGLE", None)
+                if (
+                    not delta
+                    or (edit.get("old_order"), edit.get("new_order")) != expected
+                ):
+                    return unavailable("HYDROGEN_EDIT_CONTRADICTS_GRAPH")
             if all(refs):
                 left, right = map(_ref, refs)
                 old_bond = (
@@ -456,186 +532,77 @@ def build_shared_reaction_core(
                     new_order = str(new_bond.GetBondType()) if new_bond else None
                     if new_order != edit.get("new_order"):
                         return unavailable("EDIT_NEW_BOND_CONTRADICTS_GRAPH")
-        graphs = []
-        for component, mol in products.items():
-            centers = {
-                _ref(t["after_state"])[1]: "observed_center"
-                for t in transitions.values()
-                if t.get("after_state") and _ref(t["after_state"])[0] == component
-            }
-            if centers:
-                graphs.append(
-                    _local_graph(mol, centers, 1, rules["maximum_core_atoms"])
+        if signature.get("event_count") != core.get("event_count") or len(
+            core.get("events", ())
+        ) != core.get("event_count"):
+            return unavailable("EVENT_COUNT_CONTRADICTS_OBSERVATION")
+        qualified = _qualified_single_join_ports(
+            reactants, products, transitions, edits, signature, core, rules
+        )
+        ports, removed, generalized = qualified or ({}, frozenset(), frozenset())
+        product_graphs = {}
+        levels = []
+        for ordinal, name in enumerate(LEVELS):
+            relaxed = ordinal > 0
+            graph = observed_edit_graph(
+                reactants,
+                products,
+                transitions,
+                edits,
+                radius=rules["levels"][name],
+                limit=rules["maximum_core_atoms"],
+                ports=ports if relaxed else {},
+                removed=removed if relaxed else frozenset(),
+                generalized=generalized if relaxed else frozenset(),
+            )
+            radius = rules["levels"][name]
+            if radius not in product_graphs:
+                product_graphs[radius] = observed_edit_graph(
+                    reactants,
+                    products,
+                    transitions,
+                    edits,
+                    radius=radius,
+                    limit=rules["maximum_core_atoms"],
+                    ports={},
+                    removed=frozenset(),
+                    generalized=frozenset(),
+                    product_only=True,
                 )
-        exact_key = core.get("exact_core_key")
-        if not exact_key or not graphs:
-            return unavailable("MISSING_OBSERVED_CORE")
-        payload = _json([exact_key, sorted(graphs)])
-        product_key = _digest("SCPS1", [definition_hash, sorted(graphs)])
-        base["levels"] = (
-            SharedCoreLevel(
-                LEVELS[0],
-                _digest("SCL0", [definition_hash, payload]),
-                payload,
-                product_key,
-            ),
-        )
-        if signature.get("event_count") != 1 or core.get("event_count") != 1:
-            return unavailable("GENERALIZATION_REQUIRES_SINGLE_EVENT")
-        formed = [(i, e) for i, e in enumerate(edits) if e["edit_type"] == "formed"]
-        if (
-            len(formed) != 1
-            or formed[0][1].get("new_order") != "SINGLE"
-            or any(
-                e["edit_type"] not in {"formed", "broken", "hydrogen_change"}
-                for e in edits
-            )
-        ):
-            return unavailable("UNSUPPORTED_EDIT_PATTERN")
-        # Hybridization transitions are retained in the before/after center
-        # labels (for example amine SP3 -> SP2), rather than discarded.
-        if any(
-            c["change_type"]
-            in set(rules["protected_state_changes"]) - {"hybridization"}
-            for c in core.get("state_changes", ())
-        ):
-            return unavailable("PROTECTED_STATE_CHANGE")
-        if (signature.get("topology") or {}).get("reaction_scope") != "intermolecular":
-            return unavailable("GENERALIZATION_REQUIRES_INTERMOLECULAR_JOIN")
-        endpoints = [_ref(formed[0][1][name]) for name in ("atom_1", "atom_2")]
-        if len(set(endpoints)) != 2 or endpoints[0][0] == endpoints[1][0]:
-            return unavailable("CONTRADICTORY_JOIN_TOPOLOGY")
-        after = [transitions[p].get("after_state") for p in endpoints]
-        if any(s is None for s in after) or _ref(after[0])[0] != _ref(after[1])[0]:
-            return unavailable("JOIN_CORRESPONDENCE_UNAVAILABLE")
-        product = products[_ref(after[0])[0]]
-        product_indices = [_ref(s)[1] for s in after]
-        bond = product.GetBondBetweenAtoms(*product_indices)
-        if bond is None or bond.GetBondType() != Chem.BondType.SINGLE:
-            return unavailable("FORMED_BOND_CONTRADICTS_GRAPH")
-        ports: dict[tuple[int, int], list[str]] = {p: [] for p in endpoints}
-        generalized = []
-        for i, edit in enumerate(edits):
-            if edit["edit_type"] == "formed":
-                continue
-            if edit["edit_type"] == "hydrogen_change":
-                refs = [edit.get("atom_1") or {}, edit.get("atom_2") or {}]
-                heavy = [r for r in refs if r and r.get("element") != "H"]
-                if len(heavy) != 1 or _ref(heavy[0]) not in ports:
-                    return unavailable("UNRESOLVED_HYDROGEN_EDIT")
-                point = _ref(heavy[0])
-                atom = reactants[point[0]].GetAtomWithIdx(point[1])
-                if not (
-                    atom.GetSymbol() in rules["hydrogen_port_elements"]
-                    or (
-                        atom.GetSymbol() == "C"
-                        and str(atom.GetHybridization())
-                        in rules["hydrogen_port_carbon_hybridizations"]
-                    )
-                ):
-                    return unavailable("PROTECTED_CARBON_HYDROGEN_EDIT")
-                before_state = transitions[point]["before_state"]
-                after_state = transitions[point]["after_state"]
-                if (
-                    before_state["total_hydrogens"] - after_state["total_hydrogens"]
-                    != 1
-                ):
-                    return unavailable("UNSUPPORTED_HYDROGEN_DELTA")
-                ports[point].append("[H]")
-            else:
-                a, b = _ref(edit["atom_1"]), _ref(edit["atom_2"])
-                if edit.get("old_order") != "SINGLE" or (a in ports) == (b in ports):
-                    return unavailable("PROTECTED_BROKEN_BOND")
-                point, root = (a, b) if a in ports else (b, a)
-                if point[0] != root[0] or transitions.get(root, {}).get("after_state"):
-                    return unavailable("DEPARTING_PORT_NOT_ESTABLISHED")
-                mol = reactants[point[0]]
-                root_atom = mol.GetAtomWithIdx(root[1])
-                old_bond = mol.GetBondBetweenAtoms(point[1], root[1])
-                if (
-                    old_bond is None
-                    or old_bond.GetBondType() != Chem.BondType.SINGLE
-                    or root_atom.GetSymbol() not in rules["departing_root_elements"]
-                ):
-                    return unavailable("UNQUALIFIED_DEPARTING_ROOT")
-                fragment, pending = set(), [root[1]]
-                while pending:
-                    current = pending.pop()
-                    if current in fragment:
-                        continue
-                    fragment.add(current)
-                    if len(fragment) > rules["maximum_fragment_atoms"]:
-                        return unavailable("DEPARTING_FRAGMENT_SIZE_LIMIT")
-                    for neighbor in mol.GetAtomWithIdx(current).GetNeighbors():
-                        neighbor_id = neighbor.GetIdx()
-                        if {current, neighbor_id} == {point[1], root[1]}:
-                            continue
-                        pending.append(neighbor_id)
-                if point[1] in fragment or any(
-                    transitions.get((point[0], atom), {}).get("after_state")
-                    for atom in fragment
-                ):
-                    return unavailable("DEPARTING_FRAGMENT_OVERLAPS_RETAINED_CORE")
-                copy = Chem.Mol(mol)
-                for atom in copy.GetAtoms():
-                    atom.SetAtomMapNum(0)
-                ports[point].append(
-                    Chem.MolFragmentToSmiles(copy, sorted(fragment), canonical=True)
-                )
-            generalized.append(i)
-        if any(len(value) != 1 for value in ports.values()):
-            return unavailable("JOIN_REQUIRES_ONE_QUALIFIED_PORT_PER_ENDPOINT")
-        # A hydrogen change cannot disappear merely because it was absent from signature edits.
-        hydrogen_changes = [
-            c for c in core.get("state_changes", ()) if c["change_type"] == "hydrogen"
-        ]
-        if len(hydrogen_changes) != sum(
-            e["edit_type"] == "hydrogen_change" for e in edits
-        ):
-            return unavailable("UNRECONCILED_HYDROGEN_OBSERVATION")
-        center_labels = {}
-        realization_labels = {}
-        for point, state in zip(endpoints, after):
-            before_atom = reactants[point[0]].GetAtomWithIdx(point[1])
-            # Aromatic C-H remains protected above. On supported centers, the
-            # qualified H/source attachment is recorded separately from identity.
-            label = _atom_label(before_atom)
-            label[6] = "qualified_port"
-            center_labels[_ref(state)[1]] = ["join", label]
-            realization_labels[_ref(state)[1]] = ["join", label, ports[point]]
-        realization = _local_graph(
-            product, realization_labels, 0, rules["maximum_core_atoms"]
-        )
-        base.update(
-            realization_key=_digest("SCRP1", realization),
-            realization_details=tuple(sorted(value[0] for value in ports.values())),
-        )
-        levels = list(base["levels"])
-        for name in LEVELS[1:]:
-            graph = _local_graph(
-                product,
-                center_labels,
-                rules["levels"][name],
-                rules["maximum_core_atoms"],
-            )
-            product_graph = _local_graph(
-                product,
-                dict.fromkeys(product_indices, "join"),
-                rules["levels"][name],
-                rules["maximum_core_atoms"],
-            )
             levels.append(
                 SharedCoreLevel(
                     name,
-                    _digest(
-                        "SCL1" if name == LEVELS[1] else "SCL2",
-                        [definition_hash, graph],
-                    ),
+                    _digest(f"SCL{ordinal}", [definition_hash, graph]),
                     graph,
-                    _digest("SCPS1", [definition_hash, product_graph]),
-                    tuple(generalized),
+                    _digest("SCPS2", [definition_hash, product_graphs[radius]]),
+                    tuple(sorted(generalized)) if relaxed else (),
                 )
             )
-        return SharedReactionCore(**{**base, "levels": tuple(levels)})
+        return SharedReactionCore(
+            **{
+                **base,
+                "levels": tuple(levels),
+                "realization_key": _digest(
+                    "SCRP2",
+                    observed_edit_graph(
+                        reactants,
+                        products,
+                        transitions,
+                        edits,
+                        radius=0,
+                        limit=rules["maximum_core_atoms"],
+                        ports=ports,
+                        removed=removed,
+                        generalized=generalized,
+                        actual_ports=True,
+                    ),
+                )
+                if ports
+                else "",
+                "realization_details": tuple(
+                    sorted(value for values in ports.values() for value in values)
+                ),
+            }
+        )
     except (KeyError, IndexError, TypeError, ValueError, RuntimeError):
         return unavailable("INCONSISTENT_OR_UNSUPPORTED_GRAPH_EVIDENCE")

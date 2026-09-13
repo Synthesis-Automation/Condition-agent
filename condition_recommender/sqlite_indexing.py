@@ -8,6 +8,7 @@ import sqlite3
 import zlib
 from collections import defaultdict
 from collections.abc import Iterator, Mapping, Sequence
+from contextlib import closing
 from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
@@ -86,6 +87,23 @@ def _decompress_json(value: bytes) -> Any:
 def _read_connection(path: Path) -> sqlite3.Connection:
     uri = path.resolve().as_uri() + "?mode=ro"
     return sqlite3.connect(uri, uri=True, timeout=30.0)
+
+
+def sqlite_generic_index_summary(path: str | Path) -> Dict[str, Any]:
+    """Read dataset identity and size from the manifest without loading rows."""
+    with closing(_read_connection(Path(path))) as connection:
+        row = connection.execute(
+            "SELECT payload FROM metadata WHERE singleton=1"
+        ).fetchone()
+    if row is None:
+        raise ValueError("SQLite recommendation index metadata is missing")
+    metadata = json.loads(row[0])
+    if not isinstance(metadata, dict):
+        raise ValueError("Invalid SQLite recommendation index metadata")
+    count = metadata.get("row_count")
+    if type(count) is not int or count < 0 or not metadata.get("index_id"):
+        raise ValueError("Invalid SQLite recommendation index metadata")
+    return {"row_count": count, "index_id": str(metadata["index_id"])}
 
 
 class SQLiteReactionRows(Sequence[GenericIndexedReaction]):

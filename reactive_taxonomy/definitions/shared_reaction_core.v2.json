@@ -1,9 +1,10 @@
 {
-  "definition_id": "shared_reaction_core.v1",
-  "schema_version": "1.0",
+  "definition_id": "shared_reaction_core.v2",
+  "schema_version": "2.0",
   "status": "experimental_pending_independent_review",
   "levels": {"observed_local": 1, "retained_local": 1, "retained_typed": 0},
-  "generalization_operator": "single_join_with_departing_ports",
+  "generalization_operators": ["protected_edit_graph", "single_join_with_departing_ports"],
+  "realization_identity": "anchored_port_graph",
   "departing_root_elements": ["F", "Cl", "Br", "I", "O", "N", "S", "P", "B", "Si", "Cu", "Zn", "Mg", "Sn"],
   "hydrogen_port_elements": ["N", "O", "S"],
   "hydrogen_port_carbon_hybridizations": ["SP"],

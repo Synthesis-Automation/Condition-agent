@@ -520,11 +520,18 @@ function App() {
       ?? capabilities?.index_available
       ?? false
   const libraryKind = isOperatorMode ? 'operator library' : 'index'
+  const libraryLabel = (value: LibraryMode) => {
+    const entry = capabilities?.library_modes?.[value]
+    const label = isOperatorMode ? (value === 'full' ? 'Full' : 'Compact') : entry?.label ?? (value === 'full' ? 'Full' : 'Compact')
+    return !isOperatorMode && entry?.row_count != null
+      ? `${label} · ${entry.row_count.toLocaleString()} records`
+      : label
+  }
   const serviceStatus = mode === 'weak_label'
     ? `Weak-label dataset ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
     : mode === 'coupled_strategy'
     ? `Experimental two-step catalog ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
-    : `${libraryMode === 'full' ? 'Full' : 'Compact'} ${libraryKind} ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
+    : `${libraryLabel(libraryMode)} ${libraryKind} ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
 
   return (
     <main className="app-shell">
@@ -555,7 +562,7 @@ function App() {
 
           <div className="analysis-options">
             <div className={`option-grid ${mode === 'features' || mode === 'coupled_strategy' ? 'feature-options' : ''}`}>
-              {mode !== 'features' && mode !== 'weak_label' && mode !== 'coupled_strategy' && <label className="library-option"><span>{isOperatorMode ? 'Operator library' : 'Precedent library'}</span><select aria-label={isOperatorMode ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">Full — complete</option><option value="compact">Compact — faster</option></select></label>}
+              {mode !== 'features' && mode !== 'weak_label' && mode !== 'coupled_strategy' && <label className="library-option"><span>{isOperatorMode ? 'Operator library' : 'Precedent library'}</span><select aria-label={isOperatorMode ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">{libraryLabel('full')}</option><option value="compact">{libraryLabel('compact')}</option></select></label>}
               {mode !== 'features' && <label><span>{mode === 'multistep_retrosynthesis' ? 'Top routes' : mode === 'coupled_strategy' ? 'Top strategies' : 'Top results'}</span><input type="number" min="1" max={mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50} value={topK} onChange={(event) => setTopK(Math.min(mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50, Math.max(1, Number(event.target.value))))} /></label>}
               {mode === 'recommendation' ? (
                 <>

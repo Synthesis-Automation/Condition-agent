@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from pathlib import Path
 
 from .generic_api import GenericConditionRecommender
@@ -20,6 +21,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     build.add_argument("index", type=Path)
     build.add_argument("output", type=Path)
+    build.add_argument("--workers", type=int, default=1)
+    build.add_argument("--resume", action="store_true")
+    build.add_argument("--progress-file", type=Path)
     audit = commands.add_parser(
         "query", help="Run experimental shared-core recommendation"
     )
@@ -35,7 +39,29 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "build":
         if args.index.resolve() == args.output.resolve():
             parser.error("output must differ from the canonical source index")
-        result = build_shared_core_index(load_generic_index(args.index), args.output)
+        started = time.monotonic()
+
+        def progress(count: int) -> None:
+            if args.progress_file is not None:
+                args.progress_file.parent.mkdir(parents=True, exist_ok=True)
+                with args.progress_file.open("a", encoding="utf-8") as handle:
+                    handle.write(
+                        json.dumps(
+                            {
+                                "completed_rows": count,
+                                "elapsed_seconds": round(time.monotonic() - started, 2),
+                            }
+                        )
+                        + "\n"
+                    )
+
+        result = build_shared_core_index(
+            load_generic_index(args.index),
+            args.output,
+            workers=args.workers,
+            resume=args.resume,
+            progress_callback=progress,
+        )
     else:
         recommender = GenericConditionRecommender.from_path(
             args.index, shared_core_path=args.projections

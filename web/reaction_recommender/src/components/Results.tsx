@@ -375,7 +375,7 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
         <div className="selected-recipe-heading">
           <span className="eyebrow">SELECTED RECIPE</span>
           <h3>Rank {item.rank}</h3>
-          {item.match_level && <p className="match-level" title="Evidence distance, not a success probability">{item.match_namespace === 'shared_reaction_core.v1' ? item.match_label : `Level ${item.match_level} · ${item.match_label}`}</p>}
+          {item.match_level && <p className="match-level" title="Evidence distance, not a success probability">{item.match_namespace === 'shared_reaction_core.v2' ? item.match_label : `Level ${item.match_level} · ${item.match_label}`}</p>}
           {item.evidence_relation === 'analogue_evidence' && <p className="support-summary">Related precedent: its reported inputs differ from this query.</p>}
           {item.candidate_channels?.includes('product_side') && <p className="support-summary">Also found through product-side reaction matching.</p>}
           {item.match_details?.map((detail) => <p key={detail} className="support-summary">{detail}</p>)}
@@ -462,7 +462,7 @@ export function RecommendationResults({ result }: { result: RecommendationResult
                 {result.recommendations.map((item, index) => (
                   <tr key={item.recipe_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
                     <td><strong>{item.rank}</strong>{item.rank_change !== 0 && <span className="rank-change">{item.rank_change > 0 ? '+' : ''}{item.rank_change}</span>}</td>
-                    <td title={item.match_details?.join('; ')}>{item.match_namespace === 'shared_reaction_core.v1' ? item.match_label : item.match_level ? `${item.match_level} · ${item.match_label}` : 'See details'}</td><td>{item.score.toFixed(3)}</td>
+                    <td title={item.match_details?.join('; ')}>{item.match_namespace === 'shared_reaction_core.v2' ? item.match_label : item.match_level ? `${item.match_level} · ${item.match_label}` : 'See details'}</td><td>{item.score.toFixed(3)}</td>
                     <td>{item.historical_yield_pct == null ? '—' : `${item.historical_yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(item.resolved_recipe)}</td>
                   </tr>
                 ))}

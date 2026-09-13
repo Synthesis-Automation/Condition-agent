@@ -20,6 +20,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--minimum-pool-size", type=int)
+    parser.add_argument("--experimental-shared-core", action="store_true")
     parser.add_argument(
         "--split-mode",
         choices=(
@@ -51,6 +52,7 @@ def main() -> None:
         minimum_pool_size=args.minimum_pool_size,
         split_mode=args.split_mode,
         retrieval_strategy=args.retrieval_strategy,
+        experimental_shared_core=args.experimental_shared_core,
     )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

@@ -316,6 +316,22 @@ def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> No
     assert capabilities["library_modes"]["compact"]["index_available"] is True
 
 
+def test_local_runtime_reports_custom_index_size(tmp_path) -> None:
+    from condition_recommender.generic_indexing import build_generic_index_from_rows
+    from condition_recommender.sqlite_indexing import save_sqlite_generic_index
+
+    index_path = tmp_path / "sample.sqlite"
+    save_sqlite_generic_index(build_generic_index_from_rows(()), index_path)
+    entry = LocalRecommendationRuntime(index_path=index_path).capabilities()[
+        "library_modes"
+    ]["full"]
+    assert entry["label"] == "Custom index"
+    assert entry["custom_index"] is True
+    assert entry["row_count"] == 0
+    assert entry["index_id"].startswith("GRIS1:")
+    assert str(tmp_path) not in str(entry)
+
+
 def test_local_runtime_reports_weak_label_dataset_availability(tmp_path) -> None:
     records = tmp_path / "weak_labels.csv"
     records.touch()

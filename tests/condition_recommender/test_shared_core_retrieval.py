@@ -183,6 +183,31 @@ def test_same_recipe_different_required_sources_remains_separate(tmp_path):
     assert all(item.support == 1 for item in result.recommendations)
 
 
+def test_same_recipe_source_context_aggregates_remote_scaffold_variants(tmp_path):
+    first = record(1, "Brc1ncccc1.N#C[Cu]>>N#Cc1ncccc1")
+    second = record(2, "Brc1nccnc1.N#C[Cu]>>N#Cc1nccnc1")
+    for key in ("resolved_recipe_id", "resolved_recipe_core_id", "resolved_recipe"):
+        second[key] = first[key]
+    result = engine(tmp_path, [first, second]).recommend(QUERY, search_scope="broad")
+    assert len(result.recommendations) == 1
+    item = result.recommendations[0]
+    assert item.support == 2
+    assert set(item.precedent_reaction_ids) == {"reaction-1", "reaction-2"}
+    assert len(item.source_input_requirements) == 2
+    assert item.evidence_relation == "analogue_evidence"
+
+
+def test_general_edit_retrieval_and_product_seeds_share_qualification(tmp_path):
+    recommender = engine(tmp_path, [record(1, "CCC=O>>CCCO"), record(2, "CCCO>>CCC=O")])
+    result = recommender.recommend("CC=O>>CCO", preferred_reaction_ids=("reaction-2",))
+    assert result.valid
+    assert result.recommendations[0].precedent_reaction_ids == ("reaction-1",)
+    assert any(
+        entry.get("reaction_id") == "reaction-2" and not entry["comparison"]["eligible"]
+        for entry in result.shared_core_trace
+    )
+
+
 def test_artifact_binding_and_corruption_are_explicit_failures(tmp_path):
     recommender = engine(tmp_path, [record(1, BROMIDE)])
     wrong = build_generic_index([record(1, QUERY)])
@@ -242,6 +267,64 @@ def test_cancelled_build_preserves_existing_artifact(tmp_path):
     assert not list(tmp_path.glob("*.tmp"))
 
 
+def test_parallel_build_matches_serial_payloads_and_lookups(tmp_path):
+    recommender = engine(tmp_path, [record(1, BROMIDE), record(2, QUERY)], sqlite=True)
+    serial = recommender.shared_core_index.path
+    parallel = tmp_path / "parallel.sqlite"
+    build_shared_core_index(recommender.index, parallel, workers=2, batch_size=1)
+    from contextlib import closing
+
+    with (
+        closing(sqlite3.connect(serial)) as left,
+        closing(sqlite3.connect(parallel)) as right,
+    ):
+        for table, order in (
+            ("projection", "position"),
+            ("lookup", "kind,key,position"),
+        ):
+            assert (
+                left.execute(f"SELECT * FROM {table} ORDER BY {order}").fetchall()
+                == right.execute(f"SELECT * FROM {table} ORDER BY {order}").fetchall()
+            )
+
+
+def test_resume_reuses_committed_prefix_and_rejects_wrong_source(tmp_path, monkeypatch):
+    from condition_recommender.shared_core_index import SharedCoreBuildCancelled
+    import condition_recommender.shared_core_index as module
+
+    recommender = engine(tmp_path, [record(1, BROMIDE), record(2, QUERY)], sqlite=True)
+    target = tmp_path / "resumed.sqlite"
+    progress = []
+    with pytest.raises(SharedCoreBuildCancelled):
+        build_shared_core_index(
+            recommender.index,
+            target,
+            batch_size=1,
+            resume=True,
+            progress_callback=progress.append,
+            cancel_check=lambda: bool(progress and progress[-1] >= 1),
+        )
+    assert not target.exists()
+    checkpoint = target.with_name(target.name + ".building")
+    with pytest.raises(ValueError, match="manifest"):
+        load_shared_core_index(checkpoint, recommender.index)
+    wrong = build_generic_index([record(3, BROMIDE)])
+    with pytest.raises(ValueError, match="CHECKPOINT_MISMATCH"):
+        build_shared_core_index(wrong, target, resume=True)
+    projected = []
+    original = module._project_rows
+
+    def tracked(start, rows):
+        projected.append(start)
+        return original(start, rows)
+
+    monkeypatch.setattr(module, "_project_rows", tracked)
+    build_shared_core_index(recommender.index, target, batch_size=1, resume=True)
+    assert projected == [1]
+    assert not checkpoint.exists()
+    assert load_shared_core_index(target, recommender.index).row_count == 2
+
+
 def test_candidate_budget_is_bounded_and_reported(tmp_path, monkeypatch):
     import condition_recommender.shared_core_retrieval as module
 
@@ -274,7 +357,7 @@ def test_web_runtime_explicit_activation_and_response_contract(tmp_path):
     assert response.status_code == 200
     result = response.json()["data"]
     assert result["recommendation_mode"] == "experimental_shared_core"
-    assert result["recommendations"][0]["match_namespace"] == "shared_reaction_core.v1"
+    assert result["recommendations"][0]["match_namespace"] == "shared_reaction_core.v2"
     assert result["shared_core_trace"]
 
 

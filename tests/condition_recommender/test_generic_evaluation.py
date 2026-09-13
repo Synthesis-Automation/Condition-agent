@@ -513,6 +513,28 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert "generic_c_n_coupling" in report["by_transformation_class"]
 
 
+def test_shared_core_evaluation_indexes_only_training_records(tmp_path: Path) -> None:
+    from condition_recommender.shared_core_index import load_shared_core_index
+
+    index_path = tmp_path / "index.sqlite"
+    index = build_generic_index([_record(index) for index in range(10)])
+    save_sqlite_generic_index(index, index_path)
+    split = grouped_holdout_split(index.rows, test_fraction=0.3, seed=11)
+    output = tmp_path / "evaluation"
+    report = evaluate_generic_index(
+        index_path, output, test_fraction=0.3, seed=11,
+        experimental_shared_core=True,
+    )
+    train = load_generic_index(output / "train_index.sqlite")
+    load_shared_core_index(output / "train_index.shared_core.sqlite", train)
+    train_ids = {row.observation_id for row in train.rows}
+    assert train_ids == {row.observation_id for row in split.train_rows}
+    assert train_ids.isdisjoint(row.observation_id for row in split.test_rows)
+    assert report["parameters"]["experimental_shared_core"] is True
+    assert report["shared_core_manifest"]["row_count"] == len(split.train_rows)
+    assert report["split"]["leakage_group_count"] == 0
+
+
 def test_scaffold_disjoint_split_has_no_reactive_scaffold_overlap() -> None:
     reactions = (
         "Brc1ccccc1.N>>Nc1ccccc1",

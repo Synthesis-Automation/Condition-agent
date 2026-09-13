@@ -31,12 +31,13 @@ def load_shared_retrieval_rules() -> dict[str, Any]:
     """Validate explicit candidate budgets and level display semantics."""
     rules = json.loads(
         (
-            Path(__file__).with_name("definitions") / "shared_core_retrieval.v1.json"
+            Path(__file__).with_name("definitions") / "shared_core_retrieval.v2.json"
         ).read_text(encoding="utf-8")
     )
     if (
-        rules.get("definition_id") != "shared_core_retrieval.v1"
-        or rules.get("schema_version") != "1.0"
+        rules.get("definition_id") != "shared_core_retrieval.v2"
+        or rules.get("schema_version") != "2.0"
+        or rules.get("aggregation_context") != "anchored_source_ports_or_exact_inputs"
         or rules.get("levels") != ["whole_reaction", *LEVELS]
         or len(rules.get("labels", [])) != 4
         or rules.get("status") != "experimental_pending_independent_review"
@@ -88,7 +89,7 @@ def recommend_from_shared_core(
         transformation_class=signature.get("transformation_class"),
         recommendation_mode="experimental_shared_core",
         search_scope=search_scope,
-        retrieval_definition_version="shared_core_retrieval.v1@1.0;"
+        retrieval_definition_version="shared_core_retrieval.v2@2.0;"
         + query.definition_hash,
         warnings=(
             "EXPERIMENTAL_SHARED_CORE_PENDING_INDEPENDENT_REVIEW",
@@ -218,12 +219,16 @@ def recommend_from_shared_core(
             {**audited[position], "channels": sorted(channels[position])}
         )
 
-    # Preserve input/source context when aggregating recipes. This conservative
-    # first contract never makes a single recipe out of different required inputs.
+    # Qualified, anchored source attachments may share recipe evidence across
+    # remote substrates. Unqualified source contexts retain exact input identity.
     groups: dict[tuple[str, str], list[int]] = defaultdict(list)
     for position in eligible:
         groups[
-            (comparisons[position].level, projections[position].input_identity)
+            (
+                comparisons[position].level,
+                projections[position].realization_key
+                or projections[position].input_identity,
+            )
         ].append(position)
     recommendations = []
     for (level, _), positions in sorted(groups.items()):
@@ -265,7 +270,7 @@ def recommend_from_shared_core(
                     item,
                     match_level=ordinal,
                     match_label=rules["labels"][ordinal - 1],
-                    match_namespace="shared_reaction_core.v1",
+                    match_namespace="shared_reaction_core.v2",
                     match_details=differences,
                     evidence_relation="same_setup"
                     if level == "whole_reaction"

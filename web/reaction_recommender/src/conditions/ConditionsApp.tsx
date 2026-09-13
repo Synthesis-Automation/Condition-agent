@@ -76,7 +76,7 @@ function Evidence({ option }: { option: ConditionOption }) {
       const precedents = item.condition_precedents || []
       return <section key={index}>
         <h4>{evidence.source === 'generic' ? 'Reaction precedent evidence' : 'Label-based screening evidence'}</h4>
-        {item.match_level && <p>{item.match_namespace === 'shared_reaction_core.v1' ? item.match_label : `Level ${item.match_level} · ${item.match_label}`} — evidence distance, not a success probability.</p>}
+        {item.match_level && <p>{item.match_namespace === 'shared_reaction_core.v2' ? item.match_label : `Level ${item.match_level} · ${item.match_label}`} — evidence distance, not a success probability.</p>}
         {item.evidence_relation === 'analogue_evidence' && <p>Related precedent: inspect its reported source and substrate differences.</p>}
         {item.match_details?.map((detail) => <p key={detail}>{detail}</p>)}
         <p>{evidence.source === 'generic'

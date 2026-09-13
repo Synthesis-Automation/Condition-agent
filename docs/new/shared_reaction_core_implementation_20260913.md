@@ -2,6 +2,10 @@
 
 Date: 2026-09-13
 
+Follow-up: [larger-corpus validation and rollout](shared_reaction_core_rollout_20260913.md)
+records subsequent Full/Compact backfills and holdout results. The development-only
+counts below describe the original implementation baseline.
+
 Status: an executable development implementation of the shared graph contract,
 derived dataset artifact, candidate union and application integration. Independent
 chemist adjudication, untouched evaluation, Full/Compact migration and removal

@@ -2,6 +2,12 @@
 
 ## Experimental shared reaction cores
 
+Current implementation: [shared-core v2 general edit-graph beta](../docs/new/shared_reaction_core_v2_20260913.md).
+Reductions, oxidations, cleavages, cyclizations and multievent observations now
+receive protected edit-graph projections; qualified source-port abstraction is
+optional. V1 derived artifacts must be rebuilt. V2 remains opt-in because the
+fresh evaluation has not passed default-cutover gates.
+
 An opt-in graph-based retrieval path now builds versioned L0/L1/L2 projections
 from stored observations, combines direct and product-side candidates, and
 qualifies retro precedent seeds through the same original-query checks.
@@ -13,6 +19,13 @@ generating a training-only chemist review packet. Full/Compact cutover remains
 subject to the primary roadmap's independent review and untouched-evaluation
 gates. The current default retrieval path remains active unless a matching
 experimental artifact is explicitly selected.
+
+The [larger-corpus validation report](../docs/new/shared_reaction_core_rollout_20260913.md)
+documents Full/Compact projection builds and the fresh holdout comparison.
+The current broad-core contract loses coverage outside supported single joins,
+so it has not replaced default retrieval. Builds support `--workers`, `--resume`
+and `--progress-file`; evaluation supports `--experimental-shared-core` with
+training-only projections.
 
 ## Source-data preprocessing
 

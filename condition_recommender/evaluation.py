@@ -381,6 +381,7 @@ def evaluate_generic_index(
     ] = "grouped_random",
     retrieval_strategy: RetrievalStrategy = "hybrid",
     ranking_weights: Mapping[str, float] | None = None,
+    experimental_shared_core: bool = False,
 ) -> Dict[str, Any]:
     """Evaluate retrieval with canonical-reaction-group holdout protection."""
     if top_k < 1:
@@ -393,6 +394,20 @@ def evaluate_generic_index(
         split_mode=split_mode,
     )
     train_index = build_generic_index_from_rows(split.train_rows)
+    shared_index = None
+    shared_manifest = None
+    if experimental_shared_core:
+        from .shared_core_index import build_shared_core_index, load_shared_core_index
+        from .sqlite_indexing import save_sqlite_generic_index
+
+        destination = Path(output_dir)
+        destination.mkdir(parents=True, exist_ok=True)
+        train_path = destination / "train_index.sqlite"
+        save_sqlite_generic_index(train_index, train_path)
+        train_index = load_generic_index(train_path)
+        shared_path = destination / "train_index.shared_core.sqlite"
+        shared_manifest = build_shared_core_index(train_index, shared_path)
+        shared_index = load_shared_core_index(shared_path, train_index)
     train_recipe_core_ids = {row.recipe_core_id for row in split.train_rows}
     train_recipe_ids = {row.recipe_id for row in split.train_rows}
     retrieval_levels = Counter()
@@ -416,6 +431,7 @@ def evaluate_generic_index(
             minimum_pool_size=minimum_pool_size,
             retrieval_strategy=retrieval_strategy,
             ranking_weights=ranking_weights,
+            shared_core_index=shared_index,
         )
         retrieval_levels[result.retrieval_level or "none"] += 1
         excluded_candidates += result.excluded_candidate_count
@@ -641,6 +657,9 @@ def evaluate_generic_index(
         "error_counts": dict(sorted(errors.items())),
     }
     destination = Path(output_dir)
+    if experimental_shared_core:
+        report["parameters"]["experimental_shared_core"] = True
+        report["shared_core_manifest"] = shared_manifest
     destination.mkdir(parents=True, exist_ok=True)
     (destination / "evaluation_cases.jsonl").write_text(
         "".join(

@@ -137,6 +137,11 @@ the current asset filenames.
 
 ## Research workbench workflow (`--workbench`)
 
+The precedent selector displays the loaded index's actual record count. An
+explicit custom `--index` is labeled “Custom index”, so a development sample
+cannot be mistaken for Full. For the opt-in Full/Compact shared-core artifacts,
+see the [larger-corpus validation report](../../docs/new/shared_reaction_core_rollout_20260913.md).
+
 - Draw, clear, load, paste, and export reaction SMILES with Ketcher.
 - Validate product-fragment source requirements before recommendation.
 - Retrieve and rank chemically compatible canonical condition recipes.

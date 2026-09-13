@@ -1,6 +1,7 @@
 {
-  "definition_id": "shared_core_retrieval.v1",
-  "schema_version": "1.0",
+  "definition_id": "shared_core_retrieval.v2",
+  "schema_version": "2.0",
+  "aggregation_context": "anchored_source_ports_or_exact_inputs",
   "status": "experimental_pending_independent_review",
   "minimum_independent_support": 2,
   "candidate_limit": 512,
