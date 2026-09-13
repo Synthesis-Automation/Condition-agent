@@ -158,12 +158,26 @@ function SelectedRecipeConditions({ recipe }: { recipe: ResolvedRecipe }) {
   )
 }
 
-function MessageList({ title, values, tone = '' }: { title: string; values: string[]; tone?: string }) {
+function MessageList({ title, values, tone = '', collapsible = false }: {
+  title: string
+  values: string[]
+  tone?: string
+  collapsible?: boolean
+}) {
   if (!values.length) return null
+  const messages = <ul>{values.map((value, index) => <li key={`${value}-${index}`}>{value}</li>)}</ul>
+  if (collapsible) {
+    return (
+      <details className={`message-group collapsible-messages ${tone}`}>
+        <summary>{title}</summary>
+        {messages}
+      </details>
+    )
+  }
   return (
     <div className={`message-group ${tone}`}>
       <h4>{title}</h4>
-      <ul>{values.map((value, index) => <li key={`${value}-${index}`}>{value}</li>)}</ul>
+      {messages}
     </div>
   )
 }
@@ -409,7 +423,6 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
       <ExperimentalDetails details={item.precedent_experimental_details ?? []} />
       {protocol && <ProtocolPanel protocol={protocol} rank={item.rank} />}
       <MessageList title="Compatibility evidence" values={item.compatibility_evidence} />
-      <MessageList title="Cautions" values={item.cautions} tone="caution" />
       <details className="trace-panel">
         <summary>Ranking factor trace</summary>
         <div className="factor-grid">
@@ -427,6 +440,7 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
           })}
         </div>
       </details>
+      <MessageList title="Cautions" values={item.cautions} tone="caution" collapsible />
     </article>
   )
 }
@@ -452,12 +466,12 @@ export function RecommendationResults({ result }: { result: RecommendationResult
         </div>
       </div>
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No recommendation')}</div>}
-      <MessageList title="Query warnings" values={result.warnings} tone="caution" />
+      <MessageList title="Query warnings" values={result.warnings} tone="caution" collapsible />
       {result.recommendations.length > 0 && (
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Match level</th><th>Score</th><th>Historical yield</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Match level</th><th>Score</th><th>YIELD</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.recommendations.map((item, index) => (
                   <tr key={item.recipe_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
@@ -548,7 +562,7 @@ function WeakLabelRecommendationDetails({
         </section>
       </div>
       <MessageList title="Compatibility evidence" values={item.compatibility_evidence} />
-      <MessageList title="Cautions" values={item.cautions} tone="caution" />
+      <MessageList title="Cautions" values={item.cautions} tone="caution" collapsible />
     </article>
   )
 }
@@ -575,7 +589,7 @@ export function WeakLabelRecommendationResults({ result }: { result: WeakLabelRe
         Source reactions are not structure-verified. Use these recipes as expert-reviewed fallback or screening hypotheses, not literature-validated precedents.
       </div>
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No weak-label recommendation')}</div>}
-      <MessageList title="Query warnings" values={result.warnings} tone="caution" />
+      <MessageList title="Query warnings" values={result.warnings} tone="caution" collapsible />
       {result.query_participants.length > 0 && (
         <details className="trace-panel weak-label-query">
           <summary>Graph-derived reaction-type hint</summary>

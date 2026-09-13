@@ -267,6 +267,10 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .message-group ul { display: grid; gap: 5px; margin: 0; padding-left: 18px; color: #4c6659; font-size: .71rem; line-height: 1.45; }
 .message-group.caution { border-color: #eadbc0; background: #fdf9f1; }
 .message-group.caution h4, .message-group.caution li::marker { color: #8a612d; }
+.collapsible-messages { padding: 0; }
+.collapsible-messages summary { padding: 11px 12px; cursor: pointer; font-size: .75rem; font-weight: 750; text-transform: uppercase; }
+.collapsible-messages.caution summary { color: #8a612d; }
+.collapsible-messages ul { padding: 0 12px 12px 30px; }
 .trace-panel { margin-top: 11px; border: 1px solid #dce5df; border-radius: 9px; background: #fff; }
 .trace-panel summary { padding: 11px 12px; color: #3b5c4c; }
 .machine-code-panel .detail-list { padding: 0 12px 12px; }
