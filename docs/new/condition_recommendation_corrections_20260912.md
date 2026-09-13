@@ -32,6 +32,16 @@ historical evidence, and the summary does not estimate success probability for
 the submitted query. Existing weights are explicitly marked
 `prior_weights_pending_current_pipeline_validation`.
 
+Profiling the index rebuild also found redundant reactivity annotation in
+`departing_fragment_tokens`. It now requests structural parsing explicitly.
+The extractor consumes graph connectivity and input component SMILES only;
+annotation-parity regressions preserve fragment identities while preventing
+reactivity annotation from re-entering this indexing and retrieval path. This
+performance correction does not change schemas or definition identities.
+On 64 development records, both paths produced identical fragment tokens; the
+structural-only path took 0.253 seconds versus 1.876 seconds (7.42 times faster
+for this extraction step, not an end-to-end recommendation benchmark).
+
 ## Canonical artifact refresh
 
 `python -m condition_recommender.refresh_artifacts_cli SOURCE_LIBRARY OUTPUT
@@ -47,16 +57,55 @@ mapping provenance. Those inputs require ordinary conversion with their original
 mapping provider. Observation IDs and existing signature IDs must remain stable.
 Checkpoints bind source hashes, definitions, the refresh algorithm version, and
 output hashes. Conversion validation checks all rows, source coverage, duplicate
-identities, definitions, and checksums before index building.
+identities, definitions, and checksums before activation. The local full-corpus
+run uses the same validation, catalog, and index builders concurrently after all
+immutable shards exist; no runtime artifact is activated until every check passes.
 
 Local validation evidence is under
 `results/condition_recommendation_improvements/`. Large generated datasets and
 indexes are local artifacts and must not be committed.
 
+The Full rebuild contains 660,190 canonical records across 725 shards and 119
+sources, with 571,157 trusted indexed precedents. All source observations and
+existing signature identities are preserved, with no changes to the frozen
+Full admission tiers, chemistry classifications, condition status, or index
+eligibility. Canonical validation finds no duplicate observations or integrity
+issues.
+
+The refreshed Compact library preserves all 117,232 observation identities and
+uses their frozen Full structural observations. Its trusted index contains
+94,643 precedents, compared with 94,638 previously: 11 additions and six
+removals. The 11 additions already had verified global atom correspondence in
+the frozen Full artifact, while the older Compact artifact was unresolved.
+Five removals have unresolved transformation evidence in frozen Full; the sixth
+has unaccounted product atoms and a suspected missing reactant. All 17 refreshed
+observations exactly match their frozen Full observations. This consolidates
+pre-existing artifact disagreements; it does not establish that either older
+atom-correspondence result was chemically correct. The removed observations
+remain in canonical records, and the old Compact artifact is retained for
+review. Per-record evidence is in `compact_change_provenance.json`.
+
+Both rebuilt libraries passed deep SQLite record and lookup validation with no
+issues and are installed at `datasets/literature/full` and
+`datasets/literature/compact`. Previous artifacts are preserved under
+`datasets/literature/_backup_condition_refresh_20260912`. Installation verifies
+the staged report and index hashes, backs up prior files, and verifies copied
+bytes before replacing each destination atomically. `activation_report.json`
+records installed paths, counts, index identities, and file hashes.
+
+API integration checks passed against both staged and default installed paths:
+health and frontend routes return HTTP 200, and normal and unrestricted
+recommendation requests return nonempty schema `4.0` results with historical
+yield fields. These positive integration checks establish artifact and API
+compatibility; they are not an accuracy or latency benchmark.
+
 ## Release limits
 
 The initial deterministic baseline was 1,323 passing tests. The six reproduced
 failures are development regressions, not a held-out accuracy benchmark.
+The corrected code passes all 1,357 tests, including 34 added regressions. The
+frontend build, Python static checks, and validation of 27,432 registry records
+also pass. Code hashes bind these checks to `code_freeze.json`.
 The local rebuild makes the current application artifacts usable with current
 contracts. Independent chemist adjudication and the untouched evaluation remain
 required before declaring a production release or calibrated recommendation

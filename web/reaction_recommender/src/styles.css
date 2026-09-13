@@ -402,6 +402,8 @@ footer { padding: 4px 4px 0; color: #77877e; font-size: .7rem; text-align: cente
 .drawing-heading > div:first-child p { margin-top: 4px; color: #6b7d73; font-size: .76rem; }
 .drawing-heading > .button-row { align-items: center; }
 .drawing-editor-frame { min-height: 390px; flex: 1 1 auto; height: auto; }
+.editor-load-error { max-width: 560px; margin: 60px auto; padding: 24px; color: #385646; }
+.editor-load-error p { margin: 12px 0; line-height: 1.5; }
 .drawing-smiles-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 9px; margin-top: 10px; }
 .drawing-smiles-row label { display: flex; min-width: 0; flex-direction: column; gap: 5px; color: #385646; font-size: .72rem; font-weight: 750; }
 .drawing-smiles-row textarea { min-height: 54px; }

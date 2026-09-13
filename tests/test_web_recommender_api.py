@@ -286,7 +286,7 @@ class FakeRuntime:
 
 
 def client() -> TestClient:
-    return TestClient(create_app(runtime=FakeRuntime(), frontend_dist="missing"))
+    return TestClient(create_app(runtime=FakeRuntime(), frontend_dist="missing", recommendation_only=False))
 
 
 def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> None:

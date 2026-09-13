@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from .contracts import (
@@ -43,7 +43,7 @@ def create_app(
     runtime: WebRuntime | None = None,
     assistance_service: Any | None = None,
     frontend_dist: str | Path | None = None,
-    recommendation_only: bool = False,
+    recommendation_only: bool = True,
 ) -> FastAPI:
     """Create an injectable local API without importing domain logic into UI code."""
 
@@ -65,6 +65,8 @@ def create_app(
     )
     app.state.runtime = runtime or LocalRecommendationRuntime()
     app.state.assistance_service = assistance_service
+    profile = "recommendation_only" if recommendation_only else "research_workbench"
+    app.state.deployment_profile = profile
     app.include_router(conditions_router)
 
     def active_runtime(request: Request) -> WebRuntime:
@@ -72,22 +74,32 @@ def create_app(
 
     @app.get("/api/v1/health")
     def health() -> dict[str, Any]:
-        return envelope({"status": "ok", "local_only": True})
+        return envelope(
+            {"status": "ok", "local_only": True, "deployment_profile": profile}
+        )
 
     @app.get("/api/v1/capabilities")
     def capabilities(request: Request) -> dict[str, Any]:
         data = active_runtime(request).capabilities()
         if recommendation_only:
             data = {
-                key: value for key, value in data.items()
-                if key in {
-                    "service", "index_name", "index_available",
-                    "loaded_runtime_variants", "rxnmapper_available",
-                    "recommendation", "weak_label_recommendation",
-                    "weak_label_dataset_name", "reaction_rendering", "local_only",
+                key: value
+                for key, value in data.items()
+                if key
+                in {
+                    "service",
+                    "index_name",
+                    "index_available",
+                    "loaded_runtime_variants",
+                    "rxnmapper_available",
+                    "recommendation",
+                    "weak_label_recommendation",
+                    "weak_label_dataset_name",
+                    "reaction_rendering",
+                    "local_only",
                 }
             }
-            data["deployment_profile"] = "recommendation_only"
+        data = {**data, "deployment_profile": profile}
         return envelope(data)
 
     @app.get("/api/v1/ranking-profiles")
@@ -314,17 +326,45 @@ def create_app(
         # Explicit allowlist: research capabilities cannot be invoked through
         # the focused deployment, even when their optional libraries exist.
         allowed = {
-            "/api/docs", "/docs/oauth2-redirect", "/api/openapi.json",
-            "/api/v1/health", "/api/v1/capabilities",
-            "/api/v1/conditions/recommend", "/api/v1/reactions/prepare",
-            "/api/v1/render/reaction", "/api/v1/render/molecule",
+            "/api/docs",
+            "/docs/oauth2-redirect",
+            "/api/openapi.json",
+            "/api/v1/health",
+            "/api/v1/capabilities",
+            "/api/v1/conditions/recommend",
+            "/api/v1/reactions/prepare",
+            "/api/v1/render/reaction",
+            "/api/v1/render/molecule",
         }
         app.router.routes[:] = [route for route in app.routes if route.path in allowed]
         app.title = "Condition Recommendations"
 
     dist = Path(frontend_dist) if frontend_dist is not None else DEFAULT_FRONTEND_DIST
-    if dist.is_dir():
-        app.mount("/", StaticFiles(directory=dist, html=True), name="frontend")
+    entry = dist / ("index.html" if recommendation_only else "workbench.html")
+
+    @app.get("/", include_in_schema=False)
+    def frontend() -> Response:
+        if not entry.is_file():
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "detail": "Frontend build is missing. Run python -m app.web_api --build"
+                },
+                headers={"Cache-Control": "no-store"},
+            )
+        return FileResponse(entry, headers={"Cache-Control": "no-store"})
+
+    @app.get("/index.html", include_in_schema=False)
+    @app.get("/workbench.html", include_in_schema=False)
+    def canonical_frontend() -> Response:
+        return RedirectResponse(
+            "/", status_code=307, headers={"Cache-Control": "no-store"}
+        )
+
+    if (dist / "assets").is_dir():
+        app.mount(
+            "/assets", StaticFiles(directory=dist / "assets"), name="frontend_assets"
+        )
 
     return app
 

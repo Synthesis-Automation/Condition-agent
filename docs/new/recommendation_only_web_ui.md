@@ -13,23 +13,25 @@ cd web/reaction_recommender
 npm ci
 npm run build
 cd ../..
-python -m app.conditions_web
+python -m app.web_api
 ```
 
-Open `http://127.0.0.1:8000/`. The existing `python -m app.web_api` command also
-serves the new default page, while retaining its research API. Its previous
-research UI remains at `/workbench.html` for development and parity review.
+Open `http://127.0.0.1:8000/`. This is the single launcher; `app.conditions_web`
+has been removed. The default CLI and ASGI application both use the explicit
+recommendation route allowlist.
 
-For a recommendation-only deployment, use `app.conditions_web:app`. This
-entry point uses an explicit route allowlist; the research API is unavailable.
-The existing research UI is retained only for the local workbench during the
-validation transition. After chemist acceptance, remove its deployed build
-entry rather than creating a second recommendation implementation.
+For development and parity review, stop the server and restart with
+`python -m app.web_api --workbench`. This selects the research frontend at `/`
+and enables its matching API. Old `/index.html` and `/workbench.html` URLs
+redirect to the selected page. Only compiled `/assets` are mounted as static
+files; the alternate HTML page cannot be opened against an incompatible API.
+HTML responses use `Cache-Control: no-store` to avoid stale entry documents.
+Run `python -m app.web_api --build` when browser assets need rebuilding.
 
 Linux process-manager command (put an HTTPS reverse proxy in front):
 
 ```bash
-python -m uvicorn app.conditions_web:app --host 127.0.0.1 --port 8000 --workers 1
+python -m uvicorn app.web_api.main:app --host 127.0.0.1 --port 8000 --workers 1
 ```
 
 Inside a private container network, bind to `0.0.0.0` instead. Configure the

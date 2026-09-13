@@ -22,7 +22,7 @@ class _Service:
 
 
 def test_assistance_endpoint_is_disabled_unless_explicitly_configured() -> None:
-    client = TestClient(create_app(runtime=object(), frontend_dist="missing"))
+    client = TestClient(create_app(runtime=object(), frontend_dist="missing", recommendation_only=False))
 
     response = client.post(
         "/api/v1/experimental/assistance",
@@ -44,6 +44,7 @@ def test_assistance_endpoint_uses_injected_common_service() -> None:
             runtime=object(),
             assistance_service=service,
             frontend_dist="missing",
+            recommendation_only=False,
         )
     )
 
@@ -69,6 +70,7 @@ def test_confirmation_endpoint_passes_serialized_state_and_raw_answer() -> None:
             runtime=object(),
             assistance_service=service,
             frontend_dist="missing",
+            recommendation_only=False,
         )
     )
 

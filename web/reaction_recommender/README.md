@@ -1,10 +1,15 @@
 # Reaction Condition Recommender Web UI
 
-The default page is now **Condition Desk**, focused on combined structural and
-weak-label condition recommendations. Build with `npm run build` and run
-`python -m app.conditions_web` for the restricted recommendation API. The
-existing `python -m app.web_api` also serves the new page and keeps the research
-workbench at `/workbench.html` during validation.
+Use **one launcher**: `python -m app.web_api`. It serves **Condition Desk** and
+the matching recommendation API at `http://127.0.0.1:8000/`.
+The separate `app.conditions_web` launcher has been removed.
+
+For research tools, stop the running server and use
+`python -m app.web_api --workbench`. The same root URL then serves the research
+workbench with its API enabled. `/index.html` and `/workbench.html` redirect to
+the selected root page, so a restricted server cannot open an incompatible UI.
+Run only one server on port 8000. Use `--build` to rebuild browser assets before
+startup, or `--host` and `--port` to change the listening address.
 
 The new UI downloads full result JSON, individual automation protocol handoffs,
 and selected screening sets. Automation exports are explicitly planning drafts:
@@ -41,7 +46,7 @@ npm run dev
 
 Open `http://127.0.0.1:5173/`. Vite proxies `/api` to the local service on port
 8000. The default recommendation index is
-`datasets/literature/generic_index.sqlite`; override it with
+`datasets/literature/full/generic_index.sqlite`; override it with
 `CONDITION_RECOMMENDER_INDEX` or `python -m app.web_api --index <path>`.
 The weak-label mode uses `datasets/weak_label/v2.1_cleaned.csv` and its
 paired recipe catalog by default. Override the CSV with
@@ -66,7 +71,27 @@ Open `http://127.0.0.1:8000/`. FastAPI serves the compiled client and the
 versioned `/api/v1` routes from the same local process. Interactive API
 documentation is available at `http://127.0.0.1:8000/api/docs`.
 
-## Supported workflow
+## Drawing editor browser checks
+
+After building the frontend and starting `python -m app.web_api`, run from this
+directory:
+
+```powershell
+npx playwright install chromium
+npm run test:e2e
+```
+
+Set `WEBUI_TEST_URL` for a different local server port. For a server started with
+`--workbench`, also set `WEBUI_TEST_PROFILE=research_workbench`. To use an installed Edge
+or Chrome instead of downloading Chromium, set `BROWSER_CHANNEL` to `msedge` or
+`chrome`. The checks cover drawing import/export on both pages and interrupted
+editor downloads or render failures. An editor failure now stays inside the
+dialog, with recovery guidance, while existing SMILES input remains available.
+
+Refresh an already-open browser tab after rebuilding the frontend so it uses
+the current asset filenames.
+
+## Research workbench workflow (`--workbench`)
 
 - Draw, clear, load, paste, and export reaction SMILES with Ketcher.
 - Validate product-fragment source requirements before recommendation.

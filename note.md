@@ -3,7 +3,12 @@
 python -m pip install --upgrade rdkit
 python -m app.web_api
 
-python -m app.conditions_web
+python -m app.web_api --workbench
+
+Open http://127.0.0.1:8000/ (run only one web server).
+
+Optional research tools: python -m app.web_api --workbench
+Rebuild the browser files: python -m app.web_api --build
 
 cmd /d /c "cd /d C:\Git-softwares\Condition-agent && C:\Users\xubar\AppData\Local\Programs\Python\Python312\python.exe -m chem_coworker"
 

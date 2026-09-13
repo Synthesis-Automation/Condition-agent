@@ -133,7 +133,9 @@ def departing_fragment_tokens(
     other leaving groups without reaction names or condition information.
     """
 
-    parsed = parse_reaction_smiles(reaction_smiles)
+    parsed = parse_reaction_smiles(
+        reaction_smiles, include_molecular_interpretation=False
+    )
     if not parsed.valid:
         return ()
     components = {

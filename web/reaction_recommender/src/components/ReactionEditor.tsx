@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import type { Ketcher } from 'ketcher-core'
 import { ReactionImage } from './ReactionImage'
+import { DrawingEditorBoundary } from './DrawingEditorBoundary'
 
 const KetcherCanvas = lazy(() => import('./KetcherCanvas'))
 
@@ -159,6 +160,11 @@ function DrawingDialog({
         </div>
 
         <div className="editor-frame drawing-editor-frame">
+          <DrawingEditorBoundary onClose={onClose} onFailure={() => {
+            setKetcher(null)
+            setLoading(false)
+            setStatus('Editor unavailable. Close this window to keep working with SMILES.')
+          }}>
           {!ketcher && <div className="editor-loading">Loading editor…</div>}
           <Suspense fallback={null}><KetcherCanvas
             onInit={(instance) => {
@@ -179,6 +185,7 @@ function DrawingDialog({
             }}
             onError={onError}
           /></Suspense>
+          </DrawingEditorBoundary>
         </div>
 
         <div className="drawing-smiles-row">
