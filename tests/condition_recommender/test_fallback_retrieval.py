@@ -452,7 +452,7 @@ def test_sqlite_index_records_current_completion_definition(tmp_path) -> None:
         index_path,
     )
 
-    recommender = GenericConditionRecommender.from_path(index_path)
+    recommender = GenericConditionRecommender.from_path(index_path, use_shared_core=False)
 
     assert recommender.fragment_source_artifact_current is True
 

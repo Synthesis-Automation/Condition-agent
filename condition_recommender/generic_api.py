@@ -567,7 +567,17 @@ class GenericConditionRecommender:
         mapping_provider: AtomMappingProvider | None = None,
         include_review: bool = False,
         shared_core_path: str | Path | None = None,
+        use_shared_core: bool = True,
     ) -> "GenericConditionRecommender":
+        """Load v2 projections with their source index; baseline is explicit.
+
+        The companion replaces the source suffix with ``.shared_core.sqlite``.
+        Canonical record files need their own source-bound projection artifact;
+        normal application loads should select the built SQLite index.
+        Missing or stale projections never silently select the baseline engine.
+        """
+        if shared_core_path is not None and not use_shared_core:
+            raise ValueError("shared_core_path requires use_shared_core=True")
         source = Path(path)
         index_source = source
         paired_review_names = {
@@ -612,6 +622,16 @@ class GenericConditionRecommender:
             raise ValueError(
                 "Trusted-index review reuse row count does not match the "
                 "artifact report; rebuild recommendation artifacts"
+            )
+        if use_shared_core and shared_core_path is None:
+            shared_core_path = index_source.with_suffix(".shared_core.sqlite")
+        if shared_core_path is not None and not Path(shared_core_path).is_file():
+            raise FileNotFoundError(
+                f"Shared-core artifact is unavailable: {shared_core_path}. "
+                "Build a matching companion with "
+                "python -m condition_recommender.shared_core_cli build "
+                "<index> <companion>. "
+                "Use use_shared_core=False only for baseline comparison."
             )
         return cls(
             index=index,
@@ -1577,7 +1597,7 @@ def _recommend_fallback_with_index(
 def recommend_generic_conditions(
     reaction_smiles: str,
     *,
-    records_path: str | Path = "results/generic_conversion/records.jsonl",
+    records_path: str | Path = "datasets/literature/full/generic_index.sqlite",
     top_k: int = 5,
     minimum_pool_size: int | None = None,
     unrestricted_fallback: bool = False,
@@ -1587,6 +1607,7 @@ def recommend_generic_conditions(
     completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
     condition_constraints: ConditionConstraintSet | None = None,
     search_scope: SearchScope = "automatic",
+    use_shared_core: bool = True,
 ) -> GenericRecommendationResult:
     """Featurize a reaction and recommend canonical resolved recipes."""
     if use_rxnmapper and mapping_provider is None:
@@ -1595,6 +1616,7 @@ def recommend_generic_conditions(
         records_path,
         mapping_provider=mapping_provider,
         include_review=unrestricted_fallback,
+        use_shared_core=use_shared_core,
     )
     return recommender.recommend(
         reaction_smiles,

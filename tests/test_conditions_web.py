@@ -169,7 +169,8 @@ def test_current_structure_index_produces_a_real_protocol_through_focused_api(
     from app.web_api.runtime import LocalRecommendationRuntime
     from condition_recommender.conversion.generic import convert_record
     from condition_recommender.conversion.input_schema import adapt_row
-    from condition_recommender.generic_indexing import build_generic_index
+    from condition_recommender.generic_indexing import build_generic_index, load_generic_index
+    from condition_recommender.shared_core_index import build_shared_core_index
     from condition_recommender.sqlite_indexing import save_sqlite_generic_index
 
     reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
@@ -193,6 +194,10 @@ def test_current_structure_index_produces_a_real_protocol_through_focused_api(
         records.append(convert_record(raw).to_dict())
     index_path = tmp_path / "generic_index.sqlite"
     save_sqlite_generic_index(build_generic_index(records), index_path)
+    build_shared_core_index(
+        load_generic_index(index_path), index_path.with_suffix(".shared_core.sqlite")
+    )
+    monkeypatch.delenv("CONDITION_SHARED_CORE_EXPERIMENTAL", raising=False)
     runtime = LocalRecommendationRuntime(
         index_path, weak_label_records_path=tmp_path / "absent.csv"
     )
@@ -208,7 +213,9 @@ def test_current_structure_index_produces_a_real_protocol_through_focused_api(
     assert response.status_code == 200
     result = response.json()["data"]
     assert result["sources"][0]["status"] == "ok", result["sources"]
-    assert result["recommendations"][0]["evidence_kind"] == "verified_signature"
+    assert result["sources"][0]["result"]["recommendation_mode"] == "experimental_shared_core"
+    # Selecting v2 by default does not erase its pending-review provenance.
+    assert result["recommendations"][0]["evidence_kind"] == "structure_review"
     protocol = result["recommendations"][0]["synthesis_protocol"]
     assert (
         sum(item["category"] == "reaction_input" for item in protocol["materials"]) == 2

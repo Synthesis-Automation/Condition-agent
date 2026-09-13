@@ -53,6 +53,11 @@ def main() -> None:
         help="Destination SQLite runtime index (for example generic_index.sqlite)",
     )
     parser.add_argument(
+        "--baseline-only",
+        action="store_true",
+        help="Skip the default shared-core companion for baseline evaluation",
+    )
+    parser.add_argument(
         "--include-review-core",
         action="store_true",
         help=(
@@ -80,6 +85,15 @@ def main() -> None:
             _iter_records(source),
             args.output_path,
             include_review=args.include_review_core,
+        )
+    if not args.baseline_only:
+        from .shared_core_index import build_shared_core_index
+
+        index = load_generic_index(
+            args.output_path, include_review=args.include_review_core
+        )
+        report["shared_core_report"] = build_shared_core_index(
+            index, Path(args.output_path).with_suffix(".shared_core.sqlite")
         )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

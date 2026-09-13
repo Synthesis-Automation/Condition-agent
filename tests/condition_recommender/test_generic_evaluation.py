@@ -155,7 +155,7 @@ def _core(token: str = "shared") -> dict:
         "typed_core_key": "RCT2:shared",
         "shape_core_key": "RSH2:shared",
         "center_transition_key": "RCS2:shared",
-        "mapping_equivalence_key": "RME1:shared",
+        "mapping_equivalence_key": f"RME1:{token}",
         "event_count": 1,
         "evidence_status": "verified",
         "quality": {"status": "pass"},
@@ -295,6 +295,7 @@ def test_mapping_equivalence_deduplicates_only_unreferenced_support() -> None:
     replicated = _record(3, canonical_group="CRX1:third-map")
     for index, record in enumerate((first, second, replicated), start=1):
         record["reaction_core"] = _core(str(index))
+        record["reaction_core"]["mapping_equivalence_key"] = "RME1:shared"
     first["reference_id"] = ""
     second["reference_id"] = ""
     index = build_generic_index([first, second, replicated])
@@ -348,7 +349,7 @@ def test_reaction_core_calibration_report_and_blind_review(
     assert report["by_quality_status"]["pass"]["coverage_rate"] == 1.0
     assert report["mapping_equivalence"]["all_rows"][
         "mapping_equivalence_group_count"
-    ] == 1
+    ] == 10
     assert (output / "reaction_core_calibration_report.json").is_file()
     assert (output / "reaction_core_calibration_report.md").is_file()
     assert (output / "reaction_core_calibration_cases.jsonl").is_file()
@@ -456,6 +457,61 @@ def test_grouped_split_keeps_duplicate_reactions_together() -> None:
     assert len(duplicate_locations) == 1
 
 
+def test_evaluation_groups_mapping_equivalence_across_publications() -> None:
+    from condition_recommender.evaluation import _leakage_summary
+
+    records = [_record(i) for i in range(4)]
+    for i, record in enumerate(records):
+        record["reaction_core"] = _core("same" if i < 2 else str(i))
+    index = build_generic_index(records)
+    split = grouped_holdout_split(index.rows, seed=7, test_fraction=0.5)
+    assert (index.rows[0] in split.train_rows) == (index.rows[1] in split.train_rows)
+    assert _leakage_summary(split)["mapping_equivalence_overlap_count"] == 0
+
+
+def test_query_cap_does_not_put_unscored_test_rows_into_training(tmp_path: Path) -> None:
+    path = tmp_path / "index.sqlite"
+    save_sqlite_generic_index(build_generic_index([_record(i) for i in range(20)]), path)
+    reports = []
+    ids = []
+    for number in range(2):
+        out = tmp_path / str(number)
+        progress = []
+        reports.append(evaluate_generic_index(
+            path, out, test_fraction=0.5, seed=7, max_queries=3,
+            progress_callback=lambda count, total: progress.append((count, total)),
+        ))
+        ids.append([json.loads(line)["observation_id"] for line in
+                    (out / "evaluation_cases.jsonl").read_text().splitlines()])
+        assert progress == [(1, 3), (2, 3), (3, 3)]
+    assert ids[0] == ids[1]
+    assert reports[0]["split"]["train_record_count"] == 10
+    assert reports[0]["split"]["test_record_count"] == 10
+    assert reports[0]["split"]["unscored_test_record_count"] == 7
+    assert reports[0]["metrics"]["query_count"] == 3
+
+
+def test_frozen_panel_excludes_prior_evidence_and_cannot_be_overwritten(tmp_path: Path) -> None:
+    from condition_recommender.evaluation_panel import freeze_evaluation_panel
+
+    source, prior = tmp_path / "source.sqlite", tmp_path / "prior.sqlite"
+    save_sqlite_generic_index(build_generic_index([_record(i) for i in range(12)]), source)
+    save_sqlite_generic_index(build_generic_index([_record(0), _record(1)]), prior)
+    output = tmp_path / "frozen"
+    manifest = freeze_evaluation_panel(
+        source, output, size=8, seed=4, exclusion_paths=(prior,),
+        max_queries=2, split_modes=("grouped_random",),
+    )
+    rows = load_generic_index(output / "frozen_panel.sqlite").rows
+    assert not {row.observation_id for row in rows} & {"observation-0", "observation-1"}
+    split = manifest["splits"]["grouped_random"]
+    assert not set(split["train_ids"]) & set(split["test_ids"])
+    assert set(split["query_ids"]) <= set(split["test_ids"])
+    assert manifest["panel_sha256"] and manifest["code_definition_sha256"]
+    with pytest.raises(FileExistsError, match="overwrite"):
+        freeze_evaluation_panel(source, output, size=8, seed=4)
+
+
 def test_grouped_split_keeps_publication_references_together() -> None:
     records = [_record(index) for index in range(1, 5)]
     records[0]["reference_id"] = "REF1:shared"
@@ -494,7 +550,7 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert report["metrics"]["query_count"] == 3
     assert report["metrics"]["coverage_rate"] == 1.0
     assert report["metrics"]["hard_incompatible_recommendation_count"] == 0
-    assert report["schema_version"] == "1.5"
+    assert report["schema_version"] == "1.6"
     assert report["definition_versions"] == {
         "compatibility": "1.3",
         "retrieval": "1.8",

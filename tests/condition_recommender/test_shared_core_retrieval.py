@@ -340,15 +340,17 @@ def test_candidate_budget_is_bounded_and_reported(tmp_path, monkeypatch):
     assert "SHARED_CORE_CANDIDATE_BUDGET_REACHED" in result.warnings
 
 
-def test_web_runtime_explicit_activation_and_response_contract(tmp_path):
+def test_web_runtime_defaults_to_shared_core_and_response_contract(tmp_path, monkeypatch):
     from fastapi.testclient import TestClient
     from app.web_api.main import create_app
     from app.web_api.runtime import LocalRecommendationRuntime
 
+    monkeypatch.delenv("CONDITION_SHARED_CORE_EXPERIMENTAL", raising=False)
     engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
     runtime = LocalRecommendationRuntime(
-        index_path=tmp_path / "generic_index.sqlite", shared_core_enabled=True
+        index_path=tmp_path / "generic_index.sqlite"
     )
+    assert runtime.capabilities()["recommendation_engine"] == "shared_reaction_core.v2"
     with TestClient(create_app(runtime=runtime, recommendation_only=False)) as client:
         response = client.post(
             "/api/v1/recommendations",
@@ -359,6 +361,70 @@ def test_web_runtime_explicit_activation_and_response_contract(tmp_path):
     assert result["recommendation_mode"] == "experimental_shared_core"
     assert result["recommendations"][0]["match_namespace"] == "shared_reaction_core.v2"
     assert result["shared_core_trace"]
+
+
+def test_default_loader_requires_bound_companion_and_baseline_is_explicit(tmp_path):
+    engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
+    source = tmp_path / "generic_index.sqlite"
+    default = GenericConditionRecommender.from_path(source)
+    assert default.recommend(QUERY).recommendations[0].match_namespace == "shared_reaction_core.v2"
+    baseline = GenericConditionRecommender.from_path(source, use_shared_core=False)
+    assert baseline.shared_core_index is None
+    with pytest.raises(ValueError, match="requires use_shared_core"):
+        GenericConditionRecommender.from_path(
+            source, use_shared_core=False,
+            shared_core_path=source.with_suffix(".shared_core.sqlite"),
+        )
+    source.with_suffix(".shared_core.sqlite").unlink()
+    with pytest.raises(FileNotFoundError, match="Shared-core artifact is unavailable"):
+        GenericConditionRecommender.from_path(source)
+    assert GenericConditionRecommender.from_path(source, use_shared_core=False).shared_core_index is None
+
+
+def test_web_runtime_baseline_override_and_constructor_precedence(tmp_path, monkeypatch):
+    from app.web_api.runtime import LocalRecommendationRuntime
+
+    engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
+    source = tmp_path / "generic_index.sqlite"
+    monkeypatch.setenv("CONDITION_SHARED_CORE_EXPERIMENTAL", "0")
+    runtime = LocalRecommendationRuntime(index_path=source)
+    assert runtime.capabilities()["recommendation_engine"] == "baseline"
+    assert runtime._get_recommender(library_mode="full", use_rxnmapper=False, include_review=False).shared_core_index is None
+    explicit = LocalRecommendationRuntime(index_path=source, shared_core_enabled=True)
+    assert explicit._get_recommender(library_mode="full", use_rxnmapper=False, include_review=False).shared_core_index is not None
+
+
+def test_default_review_loader_uses_review_bound_projection(tmp_path, monkeypatch):
+    from app.web_api.runtime import LocalRecommendationRuntime
+
+    monkeypatch.delenv("CONDITION_SHARED_CORE_EXPERIMENTAL", raising=False)
+    engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
+    source = tmp_path / "generic_index.sqlite"
+    review_source = tmp_path / "generic_review_index.sqlite"
+    review_index = build_generic_index(
+        [record(1, BROMIDE), record(2, QUERY)], include_review=True
+    )
+    save_sqlite_generic_index(review_index, review_source)
+    review_index = load_sqlite_generic_index(review_source)
+    companion = review_source.with_suffix(".shared_core.sqlite")
+    build_shared_core_index(review_index, companion)
+    runtime = LocalRecommendationRuntime(index_path=source)
+    recommender = runtime._get_recommender(
+        library_mode="full", use_rxnmapper=False, include_review=True
+    )
+    assert len(recommender.index.rows) == 2
+    assert recommender.shared_core_index.path == companion.resolve()
+    assert GenericConditionRecommender.from_path(
+        source, include_review=True
+    ).shared_core_index.path == companion.resolve()
+
+
+def test_default_loader_rejects_stale_projection(tmp_path):
+    engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
+    source = tmp_path / "generic_index.sqlite"
+    save_sqlite_generic_index(build_generic_index([record(2, QUERY)]), source)
+    with pytest.raises(ValueError, match="SHARED_CORE_ARTIFACT_MISMATCH"):
+        GenericConditionRecommender.from_path(source)
 
 
 def test_shared_review_builds_projection_artifact_from_training_rows_only(tmp_path):

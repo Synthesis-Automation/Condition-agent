@@ -51,10 +51,14 @@ def main() -> None:
     parser.add_argument("reaction_smiles")
     parser.add_argument(
         "--records",
-        default="results/generic_conversion/records.jsonl",
+        default="datasets/literature/full/generic_index.sqlite",
         help="Canonical records/manifest or a persisted SQLite runtime index",
     )
     parser.add_argument("--top-k", type=int, default=5)
+    parser.add_argument(
+        "--baseline", action="store_true",
+        help="Use the earlier engine explicitly for evaluation or rollback",
+    )
     parser.add_argument("--minimum-pool-size", type=int)
     parser.add_argument(
         "--use-rxnmapper",
@@ -108,6 +112,7 @@ def main() -> None:
         use_rxnmapper=args.use_rxnmapper,
         unrestricted_fallback=args.unrestricted,
         ranking_preferences=preferences,
+        use_shared_core=not args.baseline,
     )
     print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
 

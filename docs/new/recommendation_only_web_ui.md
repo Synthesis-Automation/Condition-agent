@@ -44,7 +44,12 @@ export CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS=/srv/conditions/data/weak_label/
 ```
 
 The literature root contains `full/generic_index.sqlite` and optionally
-`compact/generic_index.sqlite`. Keep reference and experimental-detail catalogs
+`compact/generic_index.sqlite`. Shared reaction core v2 is the default in both
+Condition Desk and the workbench; each SQLite index needs its matching
+`generic_index.shared_core.sqlite` companion in the same directory. Normal builds
+generate both files, and the current Full/Compact libraries already contain them.
+See [default selection and validation status](shared_reaction_core_default_20260913.md).
+Keep reference and experimental-detail catalogs
 beside their index. Keep the weak-label catalog
 `v2.1_cleaned.condition_recipes.jsonl.gz` beside its CSV.
 

@@ -1350,7 +1350,7 @@ def test_preloaded_recommender_loads_the_index_once(
         return original_loader(source)
 
     monkeypatch.setattr(generic_api_module, "load_generic_index", counting_loader)
-    recommender = GenericConditionRecommender.from_path(path)
+    recommender = GenericConditionRecommender.from_path(path, use_shared_core=False)
     reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
 
     recommender.recommend(reaction, minimum_pool_size=1)
@@ -1391,7 +1391,7 @@ def test_review_mode_uses_current_conversion_report_when_artifact_report_is_stal
         encoding="utf-8",
     )
 
-    recommender = GenericConditionRecommender.from_path(path, include_review=True)
+    recommender = GenericConditionRecommender.from_path(path, include_review=True, use_shared_core=False)
 
     assert len(recommender.index.rows) == 1
     assert recommender.review_index_reuses_trusted
@@ -1486,6 +1486,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     result = recommend_generic_conditions(
         query_reaction,
         records_path=path,
+        use_shared_core=False,
         top_k=3,
         minimum_pool_size=1,
     )

@@ -571,10 +571,11 @@ def test_sharded_converter_carries_mapping_into_manifest_and_records(
     }
     assert report["integrity"]["valid"]
     manifest_path = tmp_path / "sharded" / "shard_manifest.json"
-    trusted = GenericConditionRecommender.from_path(manifest_path)
+    trusted = GenericConditionRecommender.from_path(manifest_path, use_shared_core=False)
     review = GenericConditionRecommender.from_path(
         manifest_path,
         include_review=True,
+        use_shared_core=False,
     )
     assert trusted.index.rows == ()
     assert len(review.index.rows) == 1

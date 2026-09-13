@@ -270,7 +270,7 @@ class LocalRecommendationRuntime:
         shared_core_enabled: bool | None = None,
     ) -> None:
         self.shared_core_enabled = (
-            os.environ.get("CONDITION_SHARED_CORE_EXPERIMENTAL") == "1"
+            os.environ.get("CONDITION_SHARED_CORE_EXPERIMENTAL", "1") != "0"
             if shared_core_enabled is None else shared_core_enabled
         )
         configured = index_path or os.environ.get("CONDITION_RECOMMENDER_INDEX")
@@ -637,10 +637,15 @@ class LocalRecommendationRuntime:
         )
         shared_core_path = None
         if self.shared_core_enabled:
-            shared_core_path = index_path.with_name(index_path.stem + ".shared_core.sqlite")
+            projection_source = index_path
+            if include_review and index_path.name.casefold() == "generic_index.sqlite":
+                review_source = index_path.with_name("generic_review_index.sqlite")
+                if review_source.is_file():
+                    projection_source = review_source
+            shared_core_path = projection_source.with_suffix(".shared_core.sqlite")
             if not shared_core_path.is_file():
                 raise FileNotFoundError(
-                    "Experimental shared-core artifact is unavailable for this library; "
+                    "Shared-core artifact is unavailable for this library; "
                     "build it with python -m condition_recommender.shared_core_cli build"
                 )
             projection_stat = shared_core_path.stat()
@@ -657,6 +662,7 @@ class LocalRecommendationRuntime:
                 mapping_provider=(RxnMapperProvider() if use_rxnmapper else None),
                 include_review=include_review,
                 shared_core_path=shared_core_path,
+                use_shared_core=self.shared_core_enabled,
             )
             self._recommenders[key] = recommender
             return recommender
@@ -710,6 +716,9 @@ class LocalRecommendationRuntime:
                 coupled_strategy_available = False
         return {
             "service": "reaction-condition-recommender",
+            "recommendation_engine": (
+                "shared_reaction_core.v2" if self.shared_core_enabled else "baseline"
+            ),
             "index_name": mode_paths["full"].name,
             "index_available": mode_paths["full"].is_file(),
             "default_library_mode": "full",

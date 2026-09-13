@@ -4,6 +4,12 @@ Use **one launcher**: `python -m app.web_api`. It serves **Condition Desk** and
 the matching recommendation API at `http://127.0.0.1:8000/`.
 The separate `app.conditions_web` launcher has been removed.
 
+**Shared reaction core v2 is the default** in both interfaces. No experimental
+environment flag is required. The completed Full (571,157 observations) and
+Compact (94,643 observations) libraries already have matching v2 companions;
+restart the server to use them. See the
+[default promotion and next steps](../../docs/new/shared_reaction_core_default_20260913.md).
+
 For research tools, stop the running server and use
 `python -m app.web_api --workbench`. The same root URL then serves the research
 workbench with its API enabled. `/index.html` and `/workbench.html` redirect to
@@ -31,19 +37,18 @@ Node.js 24.14.1+.
 
 In the Workbench, **Search scope** controls retrieval independently of ranking:
 
-- **Same reactive handle** excludes the new related-handle tier and stops the
-  signed search before broad core/edit-graph neighbours.
-- **Automatic broadening** (default) checks permitted related handles when the
-  close same-handle pool has fewer than two independent evidence units.
-- **Broader analogues** checks permitted related handles even when close support
-  is sufficient. It still applies chemistry and condition compatibility gates.
+- **Same reactive handle** searches whole reactions and L0 observed local cores.
+- **Automatic broadening** (default) expands through L1 shared transformations
+  and L2 broader cores when narrower matches lack the requested independent support.
+- **Broader analogues** searches the permitted broader cores even when close
+  support is sufficient. Chemistry and condition compatibility gates still apply.
 
-The initial rule covers a single observed aromatic C-I/C-Br substitution in
-either direction, with a formed C-C, C-N, C-O or C-S bond. The partner chemistry,
-remaining edits, center states and departing fragments must match. It does not
-enable a universal halogen reactivity ladder or substitute a different reagent
-source. Ambiguous/unsigned queries retain their qualified fallback paths; they
-cannot generate these verified related-handle hypotheses.
+The core is a protected before/after molecular edit graph. Qualified source and
+departure ports allow graph-supported leaving-group and reagent-source analogues;
+L2 can relax surrounding substrate context. Reductions, oxidations, cleavages
+and cyclizations also receive general edit-graph projections. This is not a
+Br/I substitution rule. Original input requirements and analogue cautions remain
+visible; missing or conflicting graph evidence cannot authorize broader matches.
 
 **Prioritize** offers Balanced, Closest chemistry and Strongest supporting
 evidence. **Advanced weights** retains detailed relative weights. The advanced
@@ -51,25 +56,25 @@ evidence. **Advanced weights** retains detailed relative weights. The advanced
 of duplicate source rows required. Top results is a maximum: a supported
 analogue tier may return fewer recipes instead of forcing a broader search.
 
-Results show ordinal match levels: **1 Same reaction**, **2 Close precedent**,
-**3 Related handle**, **4 Broader analogue**. These are evidence distances, not
-success probabilities. Level 1 requires the same normalized reactants and
-products; matching reaction facets alone is Level 2. Broader matches remain
-below closer matches regardless of ranking weights. The display limit can hide
-lower-tier recipes; the result JSON retains the attempted retrieval tiers.
+Results show whole-reaction matches and **L0 observed local**, **L1 shared
+transformation**, or **L2 broader core** matches. These describe retained graph
+evidence, not success probabilities. Product-side retrieval and retro precedent
+links help find candidates; every candidate still passes the same original-query
+comparison. The result JSON records retrieval channels and attempted levels.
 
 The request API accepts `search_scope: "same_handle" | "automatic" | "broad"`.
-Recommendation result schema 4.1 adds `search_scope`, `match_level`,
-`match_label`, `match_details`, and broadening provenance in retrieval traces.
-Existing SQLite index schema 6.5 is reused; **no dataset or index rebuild is
-needed**. Restart the server after updating the code and browser assets:
+Results include `match_namespace: "shared_reaction_core.v2"` and a
+`shared_core_trace`. The historical `recommendation_mode` value
+`experimental_shared_core` remains unchanged for API compatibility.
+The current Full/Compact artifacts need **no rebuild for this default switch**.
+Older custom libraries need matching v2 projection companions. Restart after updating:
 
 ```powershell
 python -m app.web_api --workbench --build
 ```
 
 Implementation and validation details:
-[related-handle retrieval and simpler ranking](../../docs/new/related_handle_retrieval_20260913.md).
+[shared-core v2](../../docs/new/shared_reaction_core_v2_20260913.md).
 
 ## Development
 
@@ -139,8 +144,8 @@ the current asset filenames.
 
 The precedent selector displays the loaded index's actual record count. An
 explicit custom `--index` is labeled “Custom index”, so a development sample
-cannot be mistaken for Full. For the opt-in Full/Compact shared-core artifacts,
-see the [larger-corpus validation report](../../docs/new/shared_reaction_core_rollout_20260913.md).
+cannot be mistaken for Full. For the default Full/Compact shared-core artifacts,
+see the [default promotion report](../../docs/new/shared_reaction_core_default_20260913.md).
 
 - Draw, clear, load, paste, and export reaction SMILES with Ketcher.
 - Validate product-fragment source requirements before recommendation.

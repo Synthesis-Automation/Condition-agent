@@ -7,20 +7,26 @@
 
 ## 1. Purpose and authority
 
-Latest shared-core status: the [v2 general edit-graph beta](shared_reaction_core_v2_20260913.md)
-implements generic before/after projections and anchored source-context recipe
-aggregation. Fresh evaluation improves the development foundation but still
-misses the default-cutover thresholds; release-gate consolidation remains pending.
+Next-stage work is recorded in the [shared-core follow-up validation](shared_core_followup_validation_20260913.md):
+diagnostic disagreement review, stricter cross-publication equivalence grouping,
+and a frozen 20,000-observation evaluation panel. Automated diagnostic labels
+remain separate from independent chemist adjudication.
+
+Latest shared-core status: [v2 is the operational default by user decision](shared_reaction_core_default_20260913.md).
+It implements generic before/after projections and anchored source-context recipe
+aggregation. The frozen evaluation still misses the original cutover thresholds;
+this default selection does not mark independent validation or release gates as passed.
 
 2026-09-13 update: the [shared-core experimental implementation](shared_reaction_core_implementation_20260913.md)
 adds a versioned projection artifact, direct/product-side candidate union and
-common retro-seed qualification. It remains opt-in pending the release gates
-below; it does not establish Full-corpus cutover or condition-transfer validation.
+common retro-seed qualification. It initially shipped opt-in; the later user-authorized
+default promotion is recorded above. Condition-transfer validation remains open.
 
 The subsequent [larger-corpus validation](shared_reaction_core_rollout_20260913.md)
 records qualitative review acceptance, derived Full/Compact builds and a fresh
-engineering holdout. Coverage and recipe-recovery regressions block default
-cutover; general edit-graph abstraction remains the next chemistry requirement.
+engineering holdout. Coverage and recipe-recovery regressions originally blocked
+cutover. V2 adds general edit-graph abstraction; remaining disagreements now need
+adjudication and a new evaluation before a stronger release-quality claim.
 
 This document replaces the fragmented status narrative spread across the older
 files in `docs/`. It states what is implemented now, what is still provisional,

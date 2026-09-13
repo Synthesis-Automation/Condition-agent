@@ -57,7 +57,7 @@ def _source_row(reaction_id: str) -> dict[str, str]:
     }
 
 
-def test_canonical_build_can_include_shared_core_projections(tmp_path: Path) -> None:
+def test_canonical_build_includes_shared_core_projections_by_default(tmp_path: Path) -> None:
     from condition_recommender.shared_core_index import load_shared_core_index
 
     source = tmp_path / "source.csv"
@@ -67,7 +67,7 @@ def test_canonical_build_can_include_shared_core_projections(tmp_path: Path) -> 
         writer.writeheader()
         writer.writerow(row)
     destination = tmp_path / "converted"
-    report = build_recommendation_artifacts(source, destination, experimental_shared_core=True)
+    report = build_recommendation_artifacts(source, destination)
     index = load_generic_index(destination / "generic_index.sqlite")
     projections = load_shared_core_index(destination / "generic_index.shared_core.sqlite", index)
     assert projections.row_count == len(index.rows)
@@ -163,9 +163,12 @@ def test_artifact_workflow_builds_recommendation_data_without_review_csv(
     assert "review_csv" not in report["artifacts"]
     assert not (output / "reaction_review.csv").exists()
     manifest_recommender = GenericConditionRecommender.from_path(
-        output / "shard_manifest.json"
+        output / "shard_manifest.json", use_shared_core=False
     )
-    assert trusted_recommender.recommend(rows[0]["reaction_smiles"]) == (
+    baseline_recommender = GenericConditionRecommender.from_path(
+        output / "generic_index.sqlite", use_shared_core=False
+    )
+    assert baseline_recommender.recommend(rows[0]["reaction_smiles"]) == (
         manifest_recommender.recommend(rows[0]["reaction_smiles"])
     )
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 2
@@ -287,6 +290,8 @@ def test_saved_batches_combine_into_one_active_recommender(tmp_path: Path) -> No
     recommender = GenericConditionRecommender.from_path(
         library / "generic_index.sqlite"
     )
+    assert recommender.shared_core_index is not None
+    assert report["shared_core_report"]["row_count"] == 2
     assert len(recommender.index.rows) == 2
     assert report["unrestricted_precedent_count"] is None
     assert not report["review_index_generated"]

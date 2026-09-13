@@ -5,9 +5,10 @@ Date: 2026-09-13
 ## Status and scope
 
 V2 extends the shared-core implementation from a qualified single-join subset
-to general observed before/after edit graphs. It is an integrated, opt-in beta;
-it is not a default replacement or a claim that recommended conditions transfer
-successfully between substrates.
+to general observed before/after edit graphs. It initially shipped as an opt-in
+beta. It is now the [operational default by user decision](shared_reaction_core_default_20260913.md).
+That selection does not establish that recommended conditions transfer successfully
+between substrates or that the numerical evaluation gates below have passed.
 
 The previous [rollout report](shared_reaction_core_rollout_20260913.md) identified
 the main architectural gap: reactions outside single intermolecular joins often
@@ -137,8 +138,9 @@ experimental success prediction.
 The frozen cutover limits were at most five percentage points of coverage loss
 and two points of top-five recovery loss, plus independent review of the new
 chemistry cases. Coverage misses the limit in both splits; scaffold recovery
-also misses its limit. Default cutover therefore remains disabled. No chemistry
-rules were tuned against these outcomes.
+also misses its limit. These results originally kept default cutover disabled;
+the subsequent user-authorized default selection is documented separately.
+No chemistry rules were tuned against these outcomes.
 
 A diagnostic replay inspected the top baseline precedent for the 53 grouped
 queries and 29 scaffold-split queries covered only by the existing path. In
@@ -166,13 +168,13 @@ To use the completed Full/Compact v2 artifacts, stop the previous server in its
 terminal, then launch without a development-sample `--index` argument:
 
 ```powershell
-$env:CONDITION_SHARED_CORE_EXPERIMENTAL = '1'
 python -m app.web_api --workbench
 ```
 
-The workbench displays the actual selected dataset size. The same opt-in backend
-also works with the condition-only UI. Unsetting the environment flag and
-restarting selects the existing default retrieval path.
+The workbench displays the actual selected dataset size. The same default backend
+also works with the condition-only UI. No environment flag is needed. The explicit
+`CONDITION_SHARED_CORE_EXPERIMENTAL=0` override retains the earlier engine for
+comparison; removing that override restores v2 after restart.
 
 The next release work is independent adjudication of broader matches and the
 remaining disagreements, followed by a new frozen evaluation if chemistry is

@@ -7,7 +7,8 @@ import json
 from collections import Counter
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Literal, Mapping, Optional, Tuple
+from time import perf_counter
+from typing import Any, Callable, Dict, Iterable, Literal, Mapping, Optional, Tuple
 
 from .compatibility import assess_recipe_compatibility, load_compatibility_rules
 from .generic_api import recommend_indexed_signature
@@ -66,7 +67,7 @@ def _evaluation_groups(
         if row.canonical_reaction_id:
             tokens.append(f"reaction:{row.canonical_reaction_id}")
         equivalence = mapping_equivalence_key(row)
-        if equivalence and not row.reference_id:
+        if equivalence:
             tokens.append(f"mapping_equivalence:{equivalence}")
         if include_scaffolds:
             tokens.extend(
@@ -276,6 +277,10 @@ def _leakage_summary(split: GroupedHoldoutSplit) -> Dict[str, Any]:
     )
     return {
         "reference_overlap_count": len(train_references & test_references),
+        "mapping_equivalence_overlap_count": len(
+            {mapping_equivalence_key(row) for row in split.train_rows if mapping_equivalence_key(row)}
+            & {mapping_equivalence_key(row) for row in split.test_rows if mapping_equivalence_key(row)}
+        ),
         "canonical_reaction_overlap_count": len(train_reactions & test_reactions),
         "scaffold_overlap_count": len(train_scaffolds & test_scaffolds),
         "source_dataset_overlap_count": len(train_sources & test_sources),
@@ -365,6 +370,20 @@ def _markdown(report: Dict[str, Any]) -> str:
     )
 
 
+def select_evaluation_queries(
+    rows: Tuple[GenericIndexedReaction, ...], *, seed: int, max_queries: int | None
+) -> Tuple[GenericIndexedReaction, ...]:
+    """Sample already held-out observations without changing group assignment."""
+    if max_queries is None:
+        return rows
+    if max_queries < 1:
+        raise ValueError("max_queries must be positive")
+    return tuple(sorted(rows, key=lambda row: (
+        hashlib.sha256(f"{seed}\0{row.observation_id}\0{row.reaction_id}".encode()).hexdigest(),
+        row.observation_id, row.reaction_id,
+    ))[:max_queries])
+
+
 def evaluate_generic_index(
     records_path: str | Path,
     output_dir: str | Path,
@@ -382,10 +401,17 @@ def evaluate_generic_index(
     retrieval_strategy: RetrievalStrategy = "hybrid",
     ranking_weights: Mapping[str, float] | None = None,
     experimental_shared_core: bool = False,
+    max_queries: int | None = None,
+    projection_workers: int = 1,
+    progress_callback: Callable[[int, int], None] | None = None,
 ) -> Dict[str, Any]:
     """Evaluate retrieval with canonical-reaction-group holdout protection."""
     if top_k < 1:
         raise ValueError("top_k must be positive")
+    if max_queries is not None and max_queries < 1:
+        raise ValueError("max_queries must be positive")
+    if projection_workers < 1:
+        raise ValueError("projection_workers must be positive")
     full_index = load_generic_index(records_path)
     split = grouped_holdout_split(
         full_index.rows,
@@ -393,6 +419,9 @@ def evaluate_generic_index(
         seed=seed,
         split_mode=split_mode,
     )
+    # Cap scoring work only after assigning every evidence group. Unscored test
+    # rows remain held out, and both engines select the same queries.
+    query_rows = select_evaluation_queries(split.test_rows, seed=seed, max_queries=max_queries)
     train_index = build_generic_index_from_rows(split.train_rows)
     shared_index = None
     shared_manifest = None
@@ -406,7 +435,9 @@ def evaluate_generic_index(
         save_sqlite_generic_index(train_index, train_path)
         train_index = load_generic_index(train_path)
         shared_path = destination / "train_index.shared_core.sqlite"
-        shared_manifest = build_shared_core_index(train_index, shared_path)
+        shared_manifest = build_shared_core_index(
+            train_index, shared_path, workers=projection_workers
+        )
         shared_index = load_shared_core_index(shared_path, train_index)
     train_recipe_core_ids = {row.recipe_core_id for row in split.train_rows}
     train_recipe_ids = {row.recipe_id for row in split.train_rows}
@@ -420,7 +451,8 @@ def evaluate_generic_index(
     explanation_complete = uncertain_recommendations = 0
     independent_support_values = []
     yield_errors = []
-    for row in split.test_rows:
+    for row in query_rows:
+        started = perf_counter()
         result = recommend_indexed_signature(
             row.signature,
             train_index,
@@ -433,6 +465,7 @@ def evaluate_generic_index(
             ranking_weights=ranking_weights,
             shared_core_index=shared_index,
         )
+        elapsed_seconds = perf_counter() - started
         retrieval_levels[result.retrieval_level or "none"] += 1
         excluded_candidates += result.excluded_candidate_count
         recommended_ids = tuple(item.recipe_id for item in result.recommendations)
@@ -500,6 +533,12 @@ def evaluate_generic_index(
                 "canonical_reaction_id": row.canonical_reaction_id,
                 "reaction_id": row.reaction_id,
                 "observation_id": row.observation_id,
+                "query_seconds": round(elapsed_seconds, 6),
+                "warnings": result.warnings,
+                "shared_core_trace": result.shared_core_trace,
+                "recommended_precedent_ids": tuple(
+                    item.precedent_reaction_ids for item in result.recommendations
+                ),
                 "actual_recipe_id": row.recipe_id,
                 "actual_recipe_core_id": row.recipe_core_id,
                 "actual_yield_pct": row.yield_pct,
@@ -547,12 +586,14 @@ def evaluate_generic_index(
                 "error": result.error,
             }
         )
-    query_count = len(split.test_rows)
+        if progress_callback is not None:
+            progress_callback(len(cases), len(query_rows))
+    query_count = len(query_rows)
     train_groups = set(split.train_group_ids)
     test_groups = set(split.test_group_ids)
     report: Dict[str, Any] = {
-        "schema_version": "1.5",
-        "evaluator_version": "generic_leakage_safe.v1.5",
+        "schema_version": "1.6",
+        "evaluator_version": "generic_leakage_safe.v1.6",
         "records_path": str(Path(records_path)),
         "definition_versions": {
             "compatibility": str(load_compatibility_rules()["schema_version"]),
@@ -567,6 +608,8 @@ def evaluate_generic_index(
             "test_fraction": test_fraction,
             "seed": seed,
             "top_k": top_k,
+            "max_queries": max_queries,
+            "query_sampling": "seeded observation hash after full group assignment",
             "minimum_pool_size": minimum_pool_size,
             "split_mode": split_mode,
             "retrieval_strategy": retrieval_strategy,
@@ -581,6 +624,8 @@ def evaluate_generic_index(
             "canonical_group_count": len(train_groups | test_groups),
             "train_record_count": len(split.train_rows),
             "test_record_count": len(split.test_rows),
+            "evaluated_test_record_count": query_count,
+            "unscored_test_record_count": len(split.test_rows) - query_count,
             "train_group_count": len(train_groups),
             "test_group_count": len(test_groups),
             "leakage_group_count": len(train_groups & test_groups),
@@ -591,6 +636,10 @@ def evaluate_generic_index(
         },
         "metrics": {
             "query_count": query_count,
+            "mean_query_seconds": _mean([case["query_seconds"] for case in cases]),
+            "candidate_budget_reached_query_count": sum(
+                "SHARED_CORE_CANDIDATE_BUDGET_REACHED" in case["warnings"] for case in cases
+            ),
             "covered_query_count": covered,
             "coverage_rate": round(covered / query_count, 6) if query_count else 0.0,
             "top1_recipe_match_count": top1_matches,

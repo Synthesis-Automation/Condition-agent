@@ -1,31 +1,42 @@
 # Condition Recommender
 
-## Experimental shared reaction cores
+## Default shared reaction cores
 
 Current implementation: [shared-core v2 general edit-graph beta](../docs/new/shared_reaction_core_v2_20260913.md).
 Reductions, oxidations, cleavages, cyclizations and multievent observations now
 receive protected edit-graph projections; qualified source-port abstraction is
-optional. V1 derived artifacts must be rebuilt. V2 remains opt-in because the
-fresh evaluation has not passed default-cutover gates.
+optional. V2 is now the default by user decision. The existing Full and Compact
+v2 artifacts are ready; switching defaults does not require reconversion.
+V1 derived artifacts still need rebuilding.
 
-An opt-in graph-based retrieval path now builds versioned L0/L1/L2 projections
+The default graph-based retrieval path builds versioned L0/L1/L2 projections
 from stored observations, combines direct and product-side candidates, and
 qualifies retro precedent seeds through the same original-query checks.
 Source and substrate differences remain explicit analogue evidence.
 
-See the [implementation and local workbench instructions](../docs/new/shared_reaction_core_implementation_20260913.md)
-for building a derived artifact, using the prepared development sample, and
-generating a training-only chemist review packet. Full/Compact cutover remains
-subject to the primary roadmap's independent review and untouched-evaluation
-gates. The current default retrieval path remains active unless a matching
-experimental artifact is explicitly selected.
+See the [default promotion and next steps](../docs/new/shared_reaction_core_default_20260913.md)
+for launch instructions, artifact requirements and remaining validation work.
+The measured holdout coverage gap and pending independent adjudication remain
+open; choosing the operational default does not change those results.
 
-The [larger-corpus validation report](../docs/new/shared_reaction_core_rollout_20260913.md)
-documents Full/Compact projection builds and the fresh holdout comparison.
-The current broad-core contract loses coverage outside supported single joins,
-so it has not replaced default retrieval. Builds support `--workers`, `--resume`
-and `--progress-file`; evaluation supports `--experimental-shared-core` with
-training-only projections.
+`GenericConditionRecommender.from_path(index)` loads the paired
+`<index stem>.shared_core.sqlite` artifact by default and rejects missing or
+stale companions. Prefer the built SQLite runtime index; canonical JSON files
+need projections built against that exact loaded source. Direct artifact builds,
+saved-batch combination and `generic_index_cli` now generate the companion.
+Canonical-only conversion remains available without building indexes.
+
+For explicit baseline comparisons, use `from_path(..., use_shared_core=False)`,
+`generic_recommend_cli --baseline`, or `generic_index_cli --baseline-only`.
+The low-level in-memory constructor still accepts an explicit projection index;
+evaluation keeps the two engines separate with training-only projections.
+Shared-core builds support `--workers`, `--resume` and `--progress-file`.
+
+The [follow-up validation](../docs/new/shared_core_followup_validation_20260913.md)
+adds graph-difference diagnostics, cross-publication mapping-equivalence leakage
+control, immutable evaluation panels, and bounded query evaluation against larger
+training pools. `evaluation_cli` accepts `--max-queries` and
+`--projection-workers`; unscored test observations stay excluded from training.
 
 ## Source-data preprocessing
 
@@ -115,14 +126,12 @@ reactive_taxonomy + condition_registry -> condition_recommender
 `condition_registry` resolves condition identities and canonical recipes, and
 `condition_recommender` retrieves compatible precedents and ranks recipes.
 
-For verified queries with a trustworthy reaction core, the recommender first
-compares generic graph-derived reaction facets: normalized edits, active-atom
-states, reaction topology, retained attachment classes, and unambiguous active
-X-H site classes. It fills the requested `top_k` progressively with distinct
-canonical recipe cores: exact structural-class recipes first, then recipes
-whose retained attachment classes match through the versioned parent
-hierarchy, and only then the broader signature/edit ladder. Each recommendation
-retains its actual retrieval tier and relaxation caution.
+For queries with trustworthy graph observations, the recommender searches whole
+reactions, L0 observed local cores, L1 shared transformations and L2 broader
+protected edit graphs. Direct and product-side candidates, including supplied
+retro precedent IDs, pass the same comparison against the original query and
+condition compatibility checks. `top_k` limits the number of recipes; automatic
+search may stop earlier when the requested independent support is available.
 
 ### 1. Create a small local index
 

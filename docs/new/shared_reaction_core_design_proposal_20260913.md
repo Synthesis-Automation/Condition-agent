@@ -3,6 +3,9 @@
 Date: 2026-09-13  
 Status: **Target architecture; partial experimental implementation; not a release approval**
 
+Operational update: [v2 is now the default by user decision](shared_reaction_core_default_20260913.md).
+The complete target architecture and independent validation work below remain open.
+
 Latest implementation: [v2 general edit-graph beta](shared_reaction_core_v2_20260913.md),
 including general protected edits, source-qualified aggregation and fresh validation.
 
