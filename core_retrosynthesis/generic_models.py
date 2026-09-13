@@ -291,6 +291,9 @@ class GenericSearchDiagnostics:
     invalid_forward_count: int = 0
     unresolved_identity_count: int = 0
     operator_mismatch_count: int = 0
+    duplicate_proposal_count: int = 0
+    template_budget_excluded_count: int = 0
+    validation_budget_excluded_count: int = 0
 
     def to_dict(self) -> Dict[str, int]:
         """Return stage counters as a JSON-compatible mapping."""

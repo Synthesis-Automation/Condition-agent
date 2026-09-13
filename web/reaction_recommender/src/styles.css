@@ -264,6 +264,10 @@ tbody tr.selected { background: #e9f3ed; box-shadow: inset 3px 0 #2b7553; }
 .experimental-detail-list p { max-height: 260px; overflow: auto; color: #3d594b; font-size: .71rem; line-height: 1.55; white-space: pre-wrap; }
 .experimental-detail-list small { display: block; margin-top: 8px; color: #718078; font-size: .65rem; }
 .message-group { margin-top: 11px; }
+.strategy-details { min-width: 0; }
+.strategy-choice { display: grid; gap: 6px; padding: 16px 18px 6px; font-size: .75rem; font-weight: 750; }
+.strategy-choice select { width: 100%; min-width: 0; }
+.strategy-choice-count { padding: 0 18px 10px; font-size: .71rem; color: #4c6659; }
 .message-group ul { display: grid; gap: 5px; margin: 0; padding-left: 18px; color: #4c6659; font-size: .71rem; line-height: 1.45; }
 .message-group.caution { border-color: #eadbc0; background: #fdf9f1; }
 .message-group.caution h4, .message-group.caution li::marker { color: #8a612d; }

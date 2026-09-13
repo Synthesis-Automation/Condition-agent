@@ -35,6 +35,13 @@ Node.js 24.14.1+.
 
 ## Condition search and priorities
 
+Single-step retrosynthesis now returns **strategies**, with alternate precursor
+choices under each row and separate condition evidence for each choice. Open
+**Search coverage** to inspect fallback tiers and budget exclusions. The API
+response is schema 2.0 (`strategies` replaces flat `candidates`). Restart the
+Workbench after updating; existing operator datasets need no rebuild. See the
+[test-stage guide and development comparison](../../docs/new/single_step_strategy_test_stage_20260913.md).
+
 In the Workbench, **Search scope** controls retrieval independently of ranking:
 
 - **Same reactive handle** searches whole reactions and L0 observed local cores.

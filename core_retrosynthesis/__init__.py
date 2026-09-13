@@ -667,7 +667,12 @@ from .selectivity_poc import (
     detect_functional_group_competition,
 )
 from .strategy_identity import STRATEGY_ID_NAMESPACE, build_strategy_id
-from .strategy_search import disconnect_strategies, group_strategy_candidates
+from .strategy_search import (
+    StrategySearchResult,
+    disconnect_strategies,
+    disconnect_strategies_detailed,
+    group_strategy_candidates,
+)
 from .sources import (
     LIBRARY_MODES,
     iter_library_rows,
@@ -981,6 +986,8 @@ __all__ = [
     "POLICY_VERSIONS",
     "STRATEGY_ID_NAMESPACE",
     "StrategyProposal",
+    "StrategySearchResult",
+    "disconnect_strategies_detailed",
     "TemplateContext",
     "V1_ADMITTED_RELATIONSHIPS",
     "V2_ADMITTED_DEPENDENCIES",

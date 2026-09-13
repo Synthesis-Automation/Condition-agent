@@ -27,6 +27,22 @@ import app.web_api.runtime as runtime_module
 from app.web_api.runtime import LocalRecommendationRuntime
 
 
+def _grouped_search_result(candidate):
+    return SimpleNamespace(
+        strategies=(SimpleNamespace(realizations=(candidate,)),),
+        to_dict=lambda: {
+            "strategy_count": 1,
+            "returned_realization_count": 1,
+            "strategies": [{
+                "strategy_id": "STRAT1:test",
+                "representative": candidate.to_dict(),
+                "alternate_realizations": [],
+            }],
+            "search_diagnostics": {"budget_limited": False, "strategy_target_met": True},
+        },
+    )
+
+
 class FakeRuntime:
     def capabilities(self) -> Dict[str, Any]:
         return {
@@ -124,16 +140,16 @@ class FakeRuntime:
             "library_mode": request.library_mode,
             "valid": True,
             "error": None,
-            "schema_version": "1.0",
+            "schema_version": "2.0",
             "precursor_realism_enabled": request.use_precursor_realism,
             "forward_validation_enabled": request.use_forward_validation,
             "forward_validity_counts": {},
-            "candidate_count": 1,
+            "strategy_count": 1,
             "library_operator_count": 12,
             "library_template_count": 34,
             "warnings": [],
-            "candidates": [
-                {
+            "strategies": [
+                {"strategy_id": "STRAT1:test", "alternate_realizations": [], "representative": {
                     "rank": 1,
                     "precursor_smiles": "CCBr.N",
                     "proposed_reaction_smiles": "CCBr.N>>CCN",
@@ -141,7 +157,7 @@ class FakeRuntime:
                     "abstraction_level": "L2",
                     "forward_validation_status": "verified_signature",
                     "forward_assessment": None,
-                }
+                }}
             ],
         }
 
@@ -888,11 +904,11 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
 
     def fake_disconnect(*args, **kwargs):
         search_options.update(kwargs)
-        return (candidate,)
+        return _grouped_search_result(candidate)
 
     monkeypatch.setattr(
         runtime_module,
-        "disconnect_operator_ladder",
+        "disconnect_strategies_detailed",
         fake_disconnect,
     )
 
@@ -904,8 +920,8 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
         )
     )
 
-    result = payload["candidates"][0]
-    assert payload["schema_version"] == "1.8"
+    result = payload["strategies"][0]["representative"]
+    assert payload["schema_version"] == "2.0"
     assert payload["precursor_realism_enabled"] is False
     assert payload["forward_validation_enabled"] is False
     assert result["forward_assessment"] is None
@@ -960,8 +976,8 @@ def test_local_retrosynthesis_attaches_compact_forward_validity_audit(
     monkeypatch.setattr(runtime, "_get_reference_catalog", lambda path: {})
     monkeypatch.setattr(
         runtime_module,
-        "disconnect_operator_ladder",
-        lambda *args, **kwargs: (candidate,),
+        "disconnect_strategies_detailed",
+        lambda *args, **kwargs: _grouped_search_result(candidate),
     )
     captured = {}
 
@@ -1013,7 +1029,7 @@ def test_local_retrosynthesis_attaches_compact_forward_validity_audit(
         RetrosynthesisRequest(target_smiles="CCN", library_mode="compact")
     )
 
-    audit = payload["candidates"][0]["forward_assessment"]
+    audit = payload["strategies"][0]["representative"]["forward_assessment"]
     assert captured["starting_materials"] == "CCBr.N"
     assert captured["intended_product"] == "CCN"
     assert captured["library"] is forward_library
@@ -1368,7 +1384,7 @@ def test_retrosynthesis_contract_forwards_operator_options() -> None:
     assert payload["library_mode"] == "compact"
     assert payload["precursor_realism_enabled"] is True
     assert payload["forward_validation_enabled"] is False
-    assert payload["candidates"][0]["precursor_smiles"] == "CCBr.N"
+    assert payload["strategies"][0]["representative"]["precursor_smiles"] == "CCBr.N"
 
 
 def test_forward_synthesis_contract_supports_blind_prediction_and_step_audit() -> None:

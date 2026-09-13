@@ -894,6 +894,7 @@ export interface RetrosyntheticComplexityReduction {
 }
 
 export interface RetrosynthesisCandidate {
+  strategy_id: string
   rank: number
   target_smiles: string
   precursor_smiles: string
@@ -996,7 +997,23 @@ export interface RetrosynthesisResult {
   valid: boolean
   error?: string | null
   schema_version: string
-  candidate_count: number
+  strategy_count: number
+  requested_strategy_count: number
+  returned_realization_count: number
+  strategies: RetrosynthesisStrategy[]
+  unresolved_candidates: Array<Pick<RetrosynthesisCandidate, 'template_id' | 'precursor_smiles' | 'proposed_reaction_smiles'>>
+  search_diagnostics: {
+    levels_attempted: string[]
+    validation_attempt_count: number
+    proposed_action_count: number
+    valid_action_count: number
+    budget_limited: boolean
+    strategy_target_met: boolean
+    incomplete_strategy_identity_count: number
+    max_templates_per_level: number
+    max_validations_per_level: number
+    level_diagnostics: Record<string, Record<string, number>>
+  }
   library_operator_count: number
   library_template_count: number
   strategic_complexity_definition_id: string
@@ -1010,7 +1027,16 @@ export interface RetrosynthesisResult {
     literature: boolean
   }
   warnings: string[]
-  candidates: RetrosynthesisCandidate[]
+}
+
+export interface RetrosynthesisStrategy {
+  strategy_rank: number
+  strategy_id: string
+  total_realization_count: number
+  returned_realization_count: number
+  independent_reference_support: number
+  representative: RetrosynthesisCandidate
+  alternate_realizations: RetrosynthesisCandidate[]
 }
 
 export interface MoleculeIndexMatch {

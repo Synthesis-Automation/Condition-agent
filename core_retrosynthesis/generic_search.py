@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import io
 import math
+from collections import deque
 from contextlib import redirect_stdout
 from dataclasses import replace
 from functools import lru_cache
-from typing import Callable, Iterable
+from typing import Callable, Iterable, TypeVar
 
 from rdkit import Chem
 from rdchiral.main import rdchiralReactants, rdchiralReaction, rdchiralRun
@@ -118,6 +119,32 @@ def _selectivity_warnings(
     return (warning,) if warning is not None else ()
 
 
+_ScheduledItem = TypeVar("_ScheduledItem")
+
+
+def _interleave_operators(
+    values: Iterable[_ScheduledItem],
+    key: Callable[[_ScheduledItem], str],
+) -> list[_ScheduledItem]:
+    """Share a bounded search across operators, preserving order within each.
+
+    These are scheduling buckets, not validated strategy identities. No item
+    gains chemical admission from sharing a bucket with another proposal.
+    """
+
+    groups: dict[str, deque[_ScheduledItem]] = {}
+    for value in values:
+        groups.setdefault(key(value), deque()).append(value)
+    active = deque(groups.values())
+    ordered = []
+    while active:
+        group = active.popleft()
+        ordered.append(group.popleft())
+        if group:
+            active.append(group)
+    return ordered
+
+
 def disconnect_generic_target_detailed(
     target_smiles: str,
     library: GenericTemplateLibrary,
@@ -131,6 +158,7 @@ def disconnect_generic_target_detailed(
     use_context: bool = True,
     diversify_sites: bool = False,
     stop_after_valid_candidates: int | None = None,
+    balance_operator_budget: bool = False,
 ) -> tuple[
     tuple[GenericDisconnectionCandidate, ...],
     GenericSearchDiagnostics,
@@ -187,7 +215,11 @@ def disconnect_generic_target_detailed(
         )
     )
     seeds = []
-    templates_to_apply = applicable[:max_templates_to_apply]
+    scheduled_templates = (
+        _interleave_operators(applicable, lambda item: item[2].operator_id)
+        if balance_operator_budget else applicable
+    )
+    templates_to_apply = scheduled_templates[:max_templates_to_apply]
     for product_similarity, specificity, template in templates_to_apply:
         for precursors, mapped_proposed in _apply(
             template.reaction_smarts,
@@ -219,7 +251,17 @@ def disconnect_generic_target_detailed(
                 )
             )
     seeds.sort(key=lambda item: (-item[0], item[1], item[5].template_id))
-    candidates: dict[str, GenericDisconnectionCandidate] = {}
+    generated_precursor_count = len(seeds)
+    if balance_operator_budget:
+        # Keep distinct supplied correspondences; only identical mapped
+        # proposals for the same operator share a validation attempt.
+        unique_seeds = {}
+        for seed in seeds:
+            unique_seeds.setdefault((seed[5].operator_id, seed[6]), seed)
+        seeds = _interleave_operators(
+            unique_seeds.values(), lambda item: item[5].operator_id,
+        )
+    candidates: dict[str | tuple[str, str], GenericDisconnectionCandidate] = {}
     invalid_forward_count = 0
     unresolved_identity_count = 0
     operator_mismatch_count = 0
@@ -343,9 +385,13 @@ def disconnect_generic_target_detailed(
                 else False
             ),
         )
-        current = candidates.get(precursors)
+        candidate_key = (
+            (candidate.strategy_id, precursors)
+            if balance_operator_budget else precursors
+        )
+        current = candidates.get(candidate_key)
         if current is None or candidate.score > current.score:
-            candidates[precursors] = candidate
+            candidates[candidate_key] = candidate
         if (
             stop_after_valid_candidates is not None
             and len(candidates) >= stop_after_valid_candidates
@@ -370,12 +416,17 @@ def disconnect_generic_target_detailed(
         metadata_filtered_template_count=metadata_filtered_count,
         product_query_match_count=len(applicable),
         applied_template_count=len(templates_to_apply),
-        generated_precursor_count=len(seeds),
+        generated_precursor_count=generated_precursor_count,
         validation_attempt_count=validation_attempt_count,
         valid_candidate_count=len(candidates),
         invalid_forward_count=invalid_forward_count,
         unresolved_identity_count=unresolved_identity_count,
         operator_mismatch_count=operator_mismatch_count,
+        duplicate_proposal_count=generated_precursor_count - len(seeds),
+        template_budget_excluded_count=max(
+            0, len(applicable) - len(templates_to_apply),
+        ),
+        validation_budget_excluded_count=max(0, len(seeds) - len(validation_seeds)),
     )
 
 
