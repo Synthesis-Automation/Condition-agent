@@ -1,15 +1,15 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "chemist_ranking_profiles.v1",
   "default_profile_id": "default",
   "profiles": {
     "default": {
-      "label": "Balanced (current default)",
-      "description": "Preserves the calibrated generic ranking behavior.",
+      "label": "Balanced",
+      "description": "Balances structural similarity and supporting evidence. Weights are provisional, not statistically calibrated.",
       "weights": {
         "similarity": 0.45,
-        "partner_category": 0.00,
-        "functional_group_tolerance": 0.00,
+        "partner_category": 0.0,
+        "functional_group_tolerance": 0.0,
         "yield": 0.15,
         "independent_support": 0.15,
         "reaction_breadth": 0.08,
@@ -25,7 +25,7 @@
         "similarity": 0.32,
         "partner_category": 0.22,
         "functional_group_tolerance": 0.08,
-        "yield": 0.10,
+        "yield": 0.1,
         "independent_support": 0.12,
         "reaction_breadth": 0.06,
         "dataset_diversity": 0.03,
@@ -34,10 +34,10 @@
       }
     },
     "functional_group_tolerance": {
-      "label": "Functional-group tolerance",
+      "label": "Evidence for your functional groups",
       "description": "Prioritizes direct precedent evidence for unchanged query functional groups.",
       "weights": {
-        "similarity": 0.30,
+        "similarity": 0.3,
         "partner_category": 0.08,
         "functional_group_tolerance": 0.25,
         "yield": 0.08,
@@ -49,28 +49,28 @@
       }
     },
     "evidence": {
-      "label": "Evidence and reproducibility",
+      "label": "Strongest supporting evidence",
       "description": "Prioritizes independent support, reaction breadth, and dataset diversity.",
       "weights": {
-        "similarity": 0.30,
+        "similarity": 0.3,
         "partner_category": 0.05,
-        "functional_group_tolerance": 0.10,
-        "yield": 0.10,
+        "functional_group_tolerance": 0.1,
+        "yield": 0.1,
         "independent_support": 0.22,
-        "reaction_breadth": 0.10,
+        "reaction_breadth": 0.1,
         "dataset_diversity": 0.08,
         "compatibility": 0.03,
         "condition_certainty": 0.02
       }
     },
     "yield": {
-      "label": "Expected yield",
+      "label": "Historical yield",
       "description": "Prioritizes similarity-weighted precedent outcomes while retaining chemistry and compatibility gates.",
       "weights": {
-        "similarity": 0.30,
+        "similarity": 0.3,
         "partner_category": 0.05,
         "functional_group_tolerance": 0.05,
-        "yield": 0.30,
+        "yield": 0.3,
         "independent_support": 0.12,
         "reaction_breadth": 0.05,
         "dataset_diversity": 0.03,
@@ -82,15 +82,30 @@
       "label": "Procedure completeness",
       "description": "Prioritizes resolved condition identities and assigned operating stages.",
       "weights": {
-        "similarity": 0.30,
+        "similarity": 0.3,
         "partner_category": 0.05,
-        "functional_group_tolerance": 0.10,
-        "yield": 0.10,
+        "functional_group_tolerance": 0.1,
+        "yield": 0.1,
         "independent_support": 0.12,
         "reaction_breadth": 0.05,
         "dataset_diversity": 0.03,
         "compatibility": 0.08,
         "condition_certainty": 0.17
+      }
+    },
+    "closest_chemistry": {
+      "label": "Closest chemistry",
+      "description": "Prioritizes structural and reacting-center similarity within each evidence level.",
+      "weights": {
+        "similarity": 0.55,
+        "partner_category": 0.15,
+        "functional_group_tolerance": 0.1,
+        "yield": 0.02,
+        "independent_support": 0.1,
+        "reaction_breadth": 0.02,
+        "dataset_diversity": 0.01,
+        "compatibility": 0.03,
+        "condition_certainty": 0.02
       }
     }
   },

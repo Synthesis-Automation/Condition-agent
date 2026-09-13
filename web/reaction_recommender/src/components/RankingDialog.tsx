@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 const LABELS: Record<string, string> = {
   similarity: 'Structural similarity',
-  partner_category: 'Reactant category',
-  functional_group_tolerance: 'Functional-group tolerance',
+  partner_category: 'Reacting-center similarity',
+  functional_group_tolerance: 'Evidence for your functional groups',
   yield: 'Historical yield',
   independent_support: 'Independent support',
   reaction_breadth: 'Reaction breadth',
@@ -28,12 +28,12 @@ export function RankingDialog({ weights, onCancel, onSave }: RankingDialogProps)
         <div className="modal-heading">
           <div>
             <span className="eyebrow">TRANSPARENT RERANKING</span>
-            <h2 id="ranking-title">Customize priorities</h2>
+            <h2 id="ranking-title">Advanced ranking weights</h2>
           </div>
           <button className="icon-button" type="button" onClick={onCancel} aria-label="Close">×</button>
         </div>
         <p className="modal-intro">
-          Values are normalized automatically. Chemistry admission and hard compatibility gates remain locked.
+          These are relative priorities: larger values give a factor more influence within a match level. They are normalized automatically. Search scope controls which analogues are retrieved. Functional-group evidence means observed precedents, not guaranteed tolerance. Chemistry and compatibility checks always apply.
         </p>
         <div className="weight-grid">
           {Object.entries(values).map(([name, value]) => (

@@ -37,8 +37,8 @@ const ROLE_FIELDS: Array<[keyof ResolvedRecipe, string]> = [
 
 const FACTOR_LABELS: Record<string, string> = {
   similarity: 'Structural similarity',
-  partner_category: 'Reactant category',
-  functional_group_tolerance: 'Functional-group tolerance',
+  partner_category: 'Reacting-center similarity',
+  functional_group_tolerance: 'Evidence for your functional groups',
   yield: 'Historical yield',
   independent_support: 'Independent support',
   reaction_breadth: 'Reaction breadth',
@@ -375,6 +375,8 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
         <div className="selected-recipe-heading">
           <span className="eyebrow">SELECTED RECIPE</span>
           <h3>Rank {item.rank}</h3>
+          {item.match_level && <p className="match-level" title="Evidence distance, not a success probability">Level {item.match_level} · {item.match_label}</p>}
+          {item.match_details?.map((detail) => <p key={detail} className="support-summary">{detail}</p>)}
           <SelectedRecipeConditions recipe={item.resolved_recipe} />
         </div>
         <div className="score-orbit"><strong>{item.score.toFixed(3)}</strong><span>score</span></div>
@@ -453,12 +455,12 @@ export function RecommendationResults({ result }: { result: RecommendationResult
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Similarity</th><th>Yield</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Match level</th><th>Score</th><th>Historical yield</th><th>Conditions</th></tr></thead>
               <tbody>
                 {result.recommendations.map((item, index) => (
                   <tr key={item.recipe_id} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
                     <td><strong>{item.rank}</strong>{item.rank_change !== 0 && <span className="rank-change">{item.rank_change > 0 ? '+' : ''}{item.rank_change}</span>}</td>
-                    <td>{item.score.toFixed(3)}</td><td>{item.similarity_score.toFixed(3)}</td>
+                    <td title={item.match_details?.join('; ')}>{item.match_level ? `${item.match_level} · ${item.match_label}` : 'See details'}</td><td>{item.score.toFixed(3)}</td>
                     <td>{item.historical_yield_pct == null ? '—' : `${item.historical_yield_pct.toFixed(1)}%`}</td><td>{compactRecipeSummary(item.resolved_recipe)}</td>
                   </tr>
                 ))}

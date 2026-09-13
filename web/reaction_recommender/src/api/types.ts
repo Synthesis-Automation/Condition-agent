@@ -202,6 +202,9 @@ export interface ScoreTrace {
 
 export interface Recommendation {
   rank: number
+  match_level?: number
+  match_label?: string
+  match_details?: string[]
   default_rank?: number | null
   rank_change: number
   recipe_id: string
@@ -353,6 +356,7 @@ export interface RecommendationRequest {
   library_mode: 'full' | 'compact'
   top_k: number
   minimum_pool_size: number | null
+  search_scope?: 'same_handle' | 'automatic' | 'broad'
   unrestricted_fallback: boolean
   use_rxnmapper: boolean
   ranking_preferences: {

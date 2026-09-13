@@ -15,7 +15,7 @@ COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
 )
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
-GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "4.0"
+GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "4.1"
 WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "2.0"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
@@ -103,7 +103,7 @@ class ChemistRankingPreferences:
     profile_id: str = "default"
     weights: Dict[str, float] = field(default_factory=dict)
     definition_id: str = "chemist_ranking_profiles.v1"
-    definition_version: str = "1.0"
+    definition_version: str = "1.1"
     customized: bool = False
     schema_version: str = CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION
 
@@ -367,6 +367,9 @@ class GenericConditionRecommendation:
     cautions: Tuple[str, ...] = ()
     historical_yield_summary: Dict[str, Any] = field(default_factory=dict)
     compatibility_status: str = "no_known_conflict"
+    match_level: int = 4
+    match_label: str = "Broader analogue"
+    match_details: Tuple[str, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -384,6 +387,8 @@ class RetrievalLevelTrace:
     excluded_candidate_count: int
     minimum_independent_support: int
     status: str
+    same_handle_independent_support: Optional[int] = None
+    broadening_reason: str = ""
 
 
 @dataclass(frozen=True)
@@ -426,6 +431,7 @@ class GenericRecommendationResult:
     completion_proposal: Optional[Dict[str, Any]] = None
     completion_selections: Tuple[Dict[str, Any], ...] = ()
     ranking_preferences: Dict[str, Any] = field(default_factory=dict)
+    search_scope: str = "automatic"
     retrieval_definition_version: str = ""
     retrieval_strategy: str = "hybrid"
     retrieval_level: Optional[str] = None

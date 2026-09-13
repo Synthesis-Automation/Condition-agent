@@ -163,7 +163,7 @@ def test_broad_fallback_abstains_from_contradictory_nitrogen_centers() -> None:
     )
 
     assert not result.recommendations
-    assert result.retrieval_level == "no_compatible_bond_edit"
+    assert result.retrieval_level == "no_chemically_compatible_precedent"
 
 
 def test_retrosynthesis_precedent_seed_is_structurally_checked_and_ranked() -> None:

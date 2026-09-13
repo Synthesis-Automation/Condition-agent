@@ -832,6 +832,7 @@ class LocalRecommendationRuntime:
             reaction_smiles,
             top_k=request.top_k,
             minimum_pool_size=request.minimum_pool_size,
+            search_scope=request.search_scope,
             unrestricted_fallback=request.unrestricted_fallback,
             ranking_preferences=preferences,
             completion_selections=selections,

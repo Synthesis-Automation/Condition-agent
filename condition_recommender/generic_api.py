@@ -59,6 +59,7 @@ from .reaction_completion import (
     validate_completion_selections,
 )
 from .ranking_preferences import resolve_ranking_preferences
+from .related_handles import SearchScope, load_related_handle_rules, validate_search_scope
 from .recipe_ranking import rank_condition_recipes
 from .reaction_facets import load_reaction_facet_rules
 
@@ -175,8 +176,10 @@ def recommend_indexed_signature(
     ranking_preferences: ChemistRankingPreferences | None = None,
     preferred_reaction_ids: Tuple[str, ...] = (),
     condition_constraints: ConditionConstraintSet | None = None,
+    search_scope: SearchScope = "automatic",
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
+    validate_search_scope(search_scope)
     if molecular_features:
         from .molecular_features import validate_molecular_features
 
@@ -205,6 +208,7 @@ def recommend_indexed_signature(
             if isinstance(partner, Mapping)
         ),
         "ranking_preferences": resolved_preferences.to_dict(),
+        "search_scope": search_scope,
     }
     retrieval_definition_version = str(load_generic_retrieval_rules()["schema_version"])
     if top_k < 1:
@@ -266,6 +270,7 @@ def recommend_indexed_signature(
             reaction_core=reaction_core,
             fallback_descriptor=fallback_descriptor,
             target_recipe_count=top_k,
+            search_scope=search_scope,
             minimum_pool_size=minimum_pool_size,
             query_reaction_smiles=query_reaction_smiles,
             molecular_features=molecular_features,
@@ -278,7 +283,7 @@ def recommend_indexed_signature(
         preferred
         if preferred_selected
         else progressive
-        if progressive is not None and progressive.tiers
+        if progressive is not None
         else retrieve_compatible_generic_pool_with_trace(
             signature,
             index,
@@ -290,8 +295,6 @@ def recommend_indexed_signature(
             condition_constraints=condition_constraints,
         )
     )
-    if progressive is not None and not progressive.tiers:
-        progressive = None
     if progressive is not None:
         facet_rules = load_reaction_facet_rules()
         generic_definition = (
@@ -305,6 +308,13 @@ def recommend_indexed_signature(
         )
     level = retrieval.level
     progressive_tiers = progressive.tiers if progressive is not None else ()
+    if progressive is not None and any(
+        trace.level.startswith("related_handle_") for trace in progressive.trace
+    ):
+        handle_rules = load_related_handle_rules()
+        retrieval_definition_version += (
+            f";{handle_rules['definition_id']}@{handle_rules['schema_version']}"
+        )
     compatible_pool = (
         tuple(assessed for _, tier_pool in progressive_tiers for assessed in tier_pool)
         if progressive is not None
@@ -399,14 +409,21 @@ def recommend_indexed_signature(
             )
             for recommendation in ranked:
                 if recommendation.recipe_core_id in seen_recipe_cores:
-                    continue
+                    previous = next(
+                        item for item in accumulated
+                        if item.recipe_core_id == recommendation.recipe_core_id
+                    )
+                    if recommendation.match_level < previous.match_level:
+                        accumulated.remove(previous)
+                    else:
+                        continue
                 seen_recipe_cores.add(recommendation.recipe_core_id)
                 explanation = recommendation.explanation
                 cautions = recommendation.cautions
                 if tier_level == "reaction_facet_exact":
                     explanation = (
                         *explanation,
-                        "Exact graph-derived reaction-class facets matched",
+                        "Reaction-center facets matched; this does not imply identical reactants and products",
                     )
                 elif tier_level == "reaction_facet_attachment_relaxed":
                     explanation = (
@@ -418,6 +435,27 @@ def recommend_indexed_signature(
                         "A retained reactant attachment class differs from the query",
                         *cautions,
                     )
+                elif tier_level.startswith("related_handle_"):
+                    source, target = tier_level.removeprefix("related_handle_").split("_to_")
+                    handle_trace = next(
+                        trace for trace in retrieval.trace
+                        if trace.level == tier_level
+                    )
+                    reason = (
+                        "Broader analogue search was requested"
+                        if search_scope == "broad"
+                        else f"Same-handle independent support was {handle_trace.same_handle_independent_support}, "
+                        f"below the target of {handle_trace.minimum_independent_support}"
+                    )
+                    explanation = (
+                        *explanation,
+                        f"Related handle: query Ar-{source}; precedent Ar-{target}. {reason}.",
+                        "The alternate handle was used only for index lookup; the submitted reaction is unchanged",
+                    )
+                    cautions = (
+                        f"Ar-{target} conditions are analogue evidence for Ar-{source}, not a validated transfer",
+                        *cautions,
+                    )
                 accumulated.append(
                     replace(
                         recommendation,
@@ -426,11 +464,11 @@ def recommend_indexed_signature(
                         cautions=tuple(dict.fromkeys(cautions)),
                     )
                 )
-                if len(accumulated) >= top_k:
-                    break
-            if len(accumulated) >= top_k:
-                break
-        recommendations = tuple(accumulated)
+        accumulated.sort(key=lambda item: (item.match_level, item.rank))
+        recommendations = tuple(
+            replace(item, rank=rank)
+            for rank, item in enumerate(accumulated[:top_k], start=1)
+        )
     else:
         recommendations = rank_condition_recipes(
             signature,
@@ -581,8 +619,10 @@ class GenericConditionRecommender:
         completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
         preferred_reaction_ids: Tuple[str, ...] = (),
         condition_constraints: "ConditionConstraintSet | None" = None,
+        search_scope: SearchScope = "automatic",
     ) -> GenericRecommendationResult:
         """Featurize a query and recommend without reloading the index."""
+        validate_search_scope(search_scope)
         resolved_preferences = resolve_ranking_preferences(ranking_preferences)
         requested_top_k = top_k
         result = _recommend_with_index(
@@ -596,10 +636,12 @@ class GenericConditionRecommender:
             completion_selections=completion_selections,
             preferred_reaction_ids=preferred_reaction_ids,
             condition_constraints=condition_constraints,
+            search_scope=search_scope,
         )
         result = replace(
             result,
             ranking_preferences=resolved_preferences.to_dict(),
+            search_scope=search_scope,
         )
         if condition_constraints is not None:
             from .constraints import apply_condition_constraints
@@ -664,6 +706,7 @@ def _recommend_with_index(
     completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
     preferred_reaction_ids: Tuple[str, ...] = (),
     condition_constraints: ConditionConstraintSet | None = None,
+    search_scope: SearchScope = "automatic",
 ) -> GenericRecommendationResult:
     if top_k < 1:
         return GenericRecommendationResult(
@@ -820,6 +863,7 @@ def _recommend_with_index(
         )
         if partial_completion_result.valid:
             return finalize(partial_completion_result)
+    mapped_core_result = None
     if (
         assessment is not None
         and assessment.status
@@ -834,7 +878,7 @@ def _recommend_with_index(
             ranking_preferences=ranking_preferences,
             condition_constraints=condition_constraints,
         )
-        if mapped_core_result.valid:
+        if mapped_core_result.valid and analysis.reaction_signature is None:
             return finalize(
                 mapped_core_result,
             )
@@ -917,6 +961,7 @@ def _recommend_with_index(
             query_reaction_smiles=reaction_smiles,
             reaction_label=_reaction_label_payload(analysis),
             top_k=top_k,
+            search_scope=search_scope,
             minimum_pool_size=minimum_pool_size,
             ranking_preferences=ranking_preferences,
             preferred_reaction_ids=preferred_reaction_ids,
@@ -929,6 +974,8 @@ def _recommend_with_index(
                 asdict(group) for group in analysis.spectator_groups
             ),
         )
+    if not result.valid and mapped_core_result is not None and mapped_core_result.valid:
+        result = mapped_core_result
     return finalize(result)
 
 
@@ -1499,6 +1546,7 @@ def recommend_generic_conditions(
     ranking_preferences: ChemistRankingPreferences | None = None,
     completion_selections: Tuple[ReactionCompletionSelection, ...] = (),
     condition_constraints: ConditionConstraintSet | None = None,
+    search_scope: SearchScope = "automatic",
 ) -> GenericRecommendationResult:
     """Featurize a reaction and recommend canonical resolved recipes."""
     if use_rxnmapper and mapping_provider is None:
@@ -1511,6 +1559,7 @@ def recommend_generic_conditions(
     return recommender.recommend(
         reaction_smiles,
         top_k=top_k,
+        search_scope=search_scope,
         minimum_pool_size=minimum_pool_size,
         unrestricted_fallback=unrestricted_fallback,
         ranking_preferences=ranking_preferences,

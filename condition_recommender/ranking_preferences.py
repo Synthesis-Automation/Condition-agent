@@ -14,7 +14,7 @@ _DEFINITION_PATH = (
     Path(__file__).with_name("definitions") / "chemist_ranking_profiles.v1.json"
 )
 _DEFINITION_ID = "chemist_ranking_profiles.v1"
-_SCHEMA_VERSION = "1.0"
+_SCHEMA_VERSION = "1.1"
 RANKING_COMPONENTS = (
     "similarity",
     "partner_category",

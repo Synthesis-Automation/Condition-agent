@@ -27,6 +27,50 @@ versioned FastAPI boundary.
 Prerequisites are Python 3.10+ with the repository chemistry dependencies and
 Node.js 24.14.1+.
 
+## Condition search and priorities
+
+In the Workbench, **Search scope** controls retrieval independently of ranking:
+
+- **Same reactive handle** excludes the new related-handle tier and stops the
+  signed search before broad core/edit-graph neighbours.
+- **Automatic broadening** (default) checks permitted related handles when the
+  close same-handle pool has fewer than two independent evidence units.
+- **Broader analogues** checks permitted related handles even when close support
+  is sufficient. It still applies chemistry and condition compatibility gates.
+
+The initial rule covers a single observed aromatic C-I/C-Br substitution in
+either direction, with a formed C-C, C-N, C-O or C-S bond. The partner chemistry,
+remaining edits, center states and departing fragments must match. It does not
+enable a universal halogen reactivity ladder or substitute a different reagent
+source. Ambiguous/unsigned queries retain their qualified fallback paths; they
+cannot generate these verified related-handle hypotheses.
+
+**Prioritize** offers Balanced, Closest chemistry and Strongest supporting
+evidence. **Advanced weights** retains detailed relative weights. The advanced
+**Independent evidence target** changes the support threshold, not the number
+of duplicate source rows required. Top results is a maximum: a supported
+analogue tier may return fewer recipes instead of forcing a broader search.
+
+Results show ordinal match levels: **1 Same reaction**, **2 Close precedent**,
+**3 Related handle**, **4 Broader analogue**. These are evidence distances, not
+success probabilities. Level 1 requires the same normalized reactants and
+products; matching reaction facets alone is Level 2. Broader matches remain
+below closer matches regardless of ranking weights. The display limit can hide
+lower-tier recipes; the result JSON retains the attempted retrieval tiers.
+
+The request API accepts `search_scope: "same_handle" | "automatic" | "broad"`.
+Recommendation result schema 4.1 adds `search_scope`, `match_level`,
+`match_label`, `match_details`, and broadening provenance in retrieval traces.
+Existing SQLite index schema 6.5 is reused; **no dataset or index rebuild is
+needed**. Restart the server after updating the code and browser assets:
+
+```powershell
+python -m app.web_api --workbench --build
+```
+
+Implementation and validation details:
+[related-handle retrieval and simpler ranking](../../docs/new/related_handle_retrieval_20260913.md).
+
 ## Development
 
 From the repository root, start the API:

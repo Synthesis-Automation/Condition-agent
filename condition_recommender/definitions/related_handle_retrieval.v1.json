@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "related_handle_retrieval.v1",
+  "calibration_status": "chemist_prior_pending_validation",
+  "directions": [["I", "Br"], ["Br", "I"]],
+  "formed_partner_elements": ["C", "N", "O", "S"],
+  "allowed_lookup_levels": ["reaction_facet_exact"],
+  "require_known_departing_fragments": true,
+  "require_equal_departing_fragment_multiset": true,
+  "minimum_independent_support": 2,
+  "match_level": 3,
+  "match_label": "Related handle"
+}

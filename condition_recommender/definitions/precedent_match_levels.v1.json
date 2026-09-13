@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "precedent_match_levels.v1",
+  "is_probability": false,
+  "levels": {
+    "same_reaction": {"level": 1, "label": "Same reaction"},
+    "close_precedent": {"level": 2, "label": "Close precedent"},
+    "related_handle": {"level": 3, "label": "Related handle"},
+    "broader_analogue": {"level": 4, "label": "Broader analogue"}
+  },
+  "close_retrieval_levels": [
+    "reaction_facet_exact", "reaction_facet_attachment_relaxed",
+    "exact_signature", "handle_signature"
+  ]
+}

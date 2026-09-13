@@ -107,12 +107,14 @@ The current code declares:
 | Recommendation artifact workflow | `2.3` |
 | Generic persisted index | `6.5` |
 | SQLite index storage | `1.0` |
-| Generic recommendation result | `4.0` |
+| Generic recommendation result | `4.1` |
 | Reaction correspondence definitions | `2.8` |
 | Generic retrieval definition | `1.8` |
 | Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.1` |
 | Generic ranking definition | `1.2` |
-| Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1` |
+| Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1@1.1` |
+| Ordinal precedent match levels | `precedent_match_levels.v1@1.0` |
+| Related aromatic I/Br handle retrieval | `related_handle_retrieval.v1@1.0` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v3@1.0` |
 | Evidence-support policy | `evidence_support.v1@1.0` |
 | Generic held-out evaluation | `generic_leakage_safe.v1.5` |

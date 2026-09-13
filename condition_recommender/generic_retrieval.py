@@ -35,6 +35,7 @@ from .reaction_facets import (
 )
 from .similarity import generic_signature_similarity, reaction_scope
 from .support import summarize_evidence_support
+from .related_handles import SearchScope, related_handle_positions, validate_search_scope
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_retrieval.v1.json"
 _SUPPORTED_RETRIEVAL_LEVELS = {
@@ -724,10 +725,18 @@ class ProgressiveCompatibleRetrievalResult:
     @property
     def level(self) -> str:
         if not self.tiers:
-            return "no_compatible_condition_precedent"
+            return (
+                "no_compatible_condition_precedent" if self.candidate_count
+                else "no_chemically_compatible_precedent"
+            )
         if len(self.tiers) == 1:
             return self.tiers[0][0]
         return "progressive_reaction_facets"
+
+    @property
+    def pool(self) -> tuple[tuple[GenericIndexedReaction, CompatibilityAssessment], ...]:
+        """Expose even an empty progressive search without losing its trace."""
+        return tuple(assessed for _, pool in self.tiers for assessed in pool)
 
 
 def retrieve_progressive_compatible_pools_with_trace(
@@ -741,6 +750,7 @@ def retrieve_progressive_compatible_pools_with_trace(
     query_reaction_smiles: str = "",
     molecular_features: Mapping[str, Any] | None = None,
     condition_constraints: ConditionConstraintSet | None = None,
+    search_scope: SearchScope = "automatic",
 ) -> ProgressiveCompatibleRetrievalResult | None:
     """Collect ordered facet tiers without allowing broad rows to displace exact ones.
 
@@ -749,6 +759,7 @@ def retrieve_progressive_compatible_pools_with_trace(
     """
     if target_recipe_count < 1:
         raise ValueError("target_recipe_count must be positive")
+    validate_search_scope(search_scope)
     keys = reaction_facet_keys(
         signature,
         reaction_core,
@@ -785,6 +796,13 @@ def retrieve_progressive_compatible_pools_with_trace(
                     excluded_candidate_count=0,
                     minimum_independent_support=minimum,
                     status="empty",
+                    same_handle_independent_support=(
+                        same_handle_support if level.startswith("related_handle_") else None
+                    ),
+                    broadening_reason=(
+                        "explicit_broad_scope" if search_scope == "broad"
+                        else "insufficient_same_handle_support"
+                    ) if level.startswith("related_handle_") else "",
                 )
             )
             return False
@@ -815,9 +833,12 @@ def retrieve_progressive_compatible_pools_with_trace(
         if accepted and new_recipe_cores:
             tiers.append((level, accepted))
             seen_recipe_cores.update(new_recipe_cores)
+            enough_support = summarize_evidence_support(
+                accepted_rows_by_position.values()
+            ).independent_count >= minimum
             status = (
                 "selected_target_reached"
-                if len(seen_recipe_cores) >= target_recipe_count
+                if len(seen_recipe_cores) >= target_recipe_count and enough_support
                 else "selected_progressive"
                 if accepted_support.independent_count >= minimum
                 else "selected_limited_support"
@@ -838,9 +859,21 @@ def retrieve_progressive_compatible_pools_with_trace(
                 excluded_candidate_count=len(excluded),
                 minimum_independent_support=minimum,
                 status=status,
+                same_handle_independent_support=(
+                    same_handle_support if level.startswith("related_handle_") else None
+                ),
+                broadening_reason=(
+                    "explicit_broad_scope" if search_scope == "broad"
+                    else "insufficient_same_handle_support"
+                ) if level.startswith("related_handle_") else "",
             )
         )
-        return len(seen_recipe_cores) >= target_recipe_count
+        return (
+            len(seen_recipe_cores) >= target_recipe_count
+            and summarize_evidence_support(
+                accepted_rows_by_position.values()
+            ).independent_count >= minimum
+        )
 
     target_reached = False
     for level in rules["retrieval_ladder"]:
@@ -856,6 +889,24 @@ def retrieve_progressive_compatible_pools_with_trace(
         )
         if target_reached:
             break
+    same_handle_support = summarize_evidence_support(
+        accepted_rows_by_position.values()
+    ).independent_count
+    if search_scope == "broad" or (
+        search_scope == "automatic" and same_handle_support < minimum
+    ):
+        for level, positions in related_handle_positions(
+            query_reaction_smiles, signature, index
+        ):
+            target_reached = process_level(level, positions) or target_reached
+        if any(level.startswith("related_handle_") for level, _ in tiers):
+            # A requested display limit must not force a still broader search
+            # after the permitted analogue tier has sufficient evidence.
+            target_reached = target_reached or (
+                summarize_evidence_support(
+                    accepted_rows_by_position.values()
+                ).independent_count >= minimum
+            )
     if not target_reached:
         for level, positions in _candidate_levels(
             signature,
@@ -867,7 +918,9 @@ def retrieve_progressive_compatible_pools_with_trace(
             condition_constraints=condition_constraints,
         ):
             target_reached = process_level(level, positions)
-            if target_reached:
+            if target_reached or (
+                search_scope == "same_handle" and level == "bond_edit_signature"
+            ):
                 break
     raw_rows = tuple(raw_rows_by_position.values())
     compatible_rows = tuple(accepted_rows_by_position.values())

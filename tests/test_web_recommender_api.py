@@ -76,6 +76,7 @@ class FakeRuntime:
             "query_reaction_smiles": request.reaction_smiles,
             "recommendation_mode": request.recommendation_mode,
             "library_mode": request.library_mode,
+            "search_scope": request.search_scope,
             "valid": True,
             "recommendations": [
                 {
@@ -287,6 +288,19 @@ class FakeRuntime:
 
 def client() -> TestClient:
     return TestClient(create_app(runtime=FakeRuntime(), frontend_dist="missing", recommendation_only=False))
+
+
+def test_condition_search_scope_is_validated_and_forwarded() -> None:
+    api = client()
+    for scope in ("same_handle", "automatic", "broad"):
+        response = api.post("/api/v1/recommendations", json={
+            "reaction_smiles": "Ic1ccccc1.CN>>CNc1ccccc1", "search_scope": scope,
+        })
+        assert response.status_code == 200
+        assert response.json()["data"]["search_scope"] == scope
+    assert api.post("/api/v1/recommendations", json={
+        "reaction_smiles": "C.N>>CN", "search_scope": "ignore_chemistry",
+    }).status_code == 422
 
 
 def test_local_runtime_reports_isolated_full_and_compact_indexes(tmp_path) -> None:

@@ -12,6 +12,8 @@ from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Tuple
 
 from .compatibility import CompatibilityAssessment
 from .generic_indexing import GenericIndexedReaction
+from .conversion.identities import canonical_reaction_identity
+from .match_levels import load_match_level_rules, precedent_match_level
 from .models import (
     ChemistRankingPreferences,
     GenericConditionRecommendation,
@@ -199,7 +201,9 @@ def _mean_similarity_trace(
     return components, contributions
 
 
-def _representative_variant(members: list[ScoredPrecedent]) -> list[ScoredPrecedent]:
+def _representative_variant(
+    members: list[ScoredPrecedent], *, query_identity: str = "",
+) -> list[ScoredPrecedent]:
     """Select an observed condition variant using similarity and independent support."""
     variants: Dict[str, list[ScoredPrecedent]] = defaultdict(list)
     for member in members:
@@ -207,6 +211,8 @@ def _representative_variant(members: list[ScoredPrecedent]) -> list[ScoredPreced
     selected = min(
         variants,
         key=lambda key: (
+            min(precedent_match_level(query_identity, item.row, "")[0]
+                for item in variants[key]),
             -_mean(
                 item.similarity.score for item in _best_by_evidence_unit(variants[key])
             ),
@@ -310,7 +316,7 @@ def _explanation(
         if score >= 0.999
     ]
     if matches:
-        notes.append("Exact match: " + ", ".join(matches))
+        notes.append("Matching features: " + ", ".join(matches))
     local_scores = [
         (name, score)
         for name, score in similarity_components.items()
@@ -366,6 +372,16 @@ def rank_condition_recipes(
     query_reaction_smiles: str = "",
 ) -> Tuple[GenericConditionRecommendation, ...]:
     """Aggregate recipe cores and rank them with a complete score trace."""
+    canonical_query = canonical_reaction_identity(query_reaction_smiles)
+    query_identity = canonical_query.reaction_id if canonical_query else ""
+    match_cache = {}
+
+    def match(row: GenericIndexedReaction) -> tuple[int, str, tuple[str, ...]]:
+        key = (row.canonical_reaction_id, row.reaction_smiles)
+        if key not in match_cache:
+            match_cache[key] = precedent_match_level(query_identity, row, retrieval_level)
+        return match_cache[key]
+
     rules = load_generic_ranking_rules()
     resolved_preferences = resolve_ranking_preferences(ranking_preferences)
     if ranking_weights is not None:
@@ -409,6 +425,7 @@ def rank_condition_recipes(
     ]
     scored.sort(
         key=lambda item: (
+            match(item.row)[0],
             -item.similarity.score,
             item.row.reaction_id,
         )
@@ -423,7 +440,7 @@ def rank_condition_recipes(
     saturation = rules["support_saturation"]
     ranking_rows = []
     for recipe_core_id, members in groups.items():
-        members = _representative_variant(members)
+        members = _representative_variant(members, query_identity=query_identity)
         independent = _best_by_evidence_unit(members)[:maximum]
         yield_summary = _historical_yield_summary(
             member
@@ -524,6 +541,7 @@ def rank_condition_recipes(
     default_order = sorted(
         ranking_rows,
         key=lambda item: (
+            match(item[4][0].row)[0],
             -item[1],
             -(item[2] if item[2] is not None else -1.0),
             item[3],
@@ -532,6 +550,7 @@ def rank_condition_recipes(
     default_ranks = {item[3]: rank for rank, item in enumerate(default_order, start=1)}
     ranking_rows.sort(
         key=lambda item: (
+            match(item[4][0].row)[0],
             -item[0],
             -(item[2] if item[2] is not None else -1.0),
             item[3],
@@ -719,6 +738,7 @@ def rank_condition_recipes(
                 round(pool_prior, 6) if pool_prior is not None else None
             ),
             definition_versions={
+                "precedent_match_levels.v1": load_match_level_rules()["schema_version"],
                 best.similarity.definition_id: best.similarity.definition_version,
                 str(rules["definition_id"]): str(rules["schema_version"]),
                 str(load_evidence_support_rules()["definition_id"]): str(
@@ -769,6 +789,9 @@ def rank_condition_recipes(
                 condition_series_support=support.condition_series_count,
                 dataset_support=support.dataset_count,
                 retrieval_level=retrieval_level,
+                match_level=match(best.row)[0],
+                match_label=match(best.row)[1],
+                match_details=match(best.row)[2],
                 precedent_reaction_ids=tuple(
                     member.row.reaction_id for member in members[:5]
                 ),

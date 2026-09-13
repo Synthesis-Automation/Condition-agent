@@ -63,6 +63,7 @@ class RecommendationRequest(StrictRequest):
     library_mode: Literal["full", "compact"] = "full"
     top_k: int = Field(default=5, ge=1, le=50)
     minimum_pool_size: Optional[int] = Field(default=None, ge=1, le=100)
+    search_scope: Literal["same_handle", "automatic", "broad"] = "automatic"
     unrestricted_fallback: bool = False
     use_rxnmapper: bool = True
     ranking_preferences: RankingPreferencesRequest = Field(
