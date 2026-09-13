@@ -36,7 +36,7 @@ from condition_recommender.sqlite_indexing import sqlite_generic_index_summary
 from core_retrosynthesis import (
     FrozenV1HeldoutPanel,
     GenericTemplateLibrary,
-    disconnect_operator_ladder,
+    disconnect_strategies_detailed,
     load_frozen_v1_heldout_panel,
     load_generic_library,
     plan_multistep_routes,
@@ -946,10 +946,10 @@ class LocalRecommendationRuntime:
         if request.use_precursor_realism:
             realism_scorer, close_realism_sources = self._precursor_realism_scorer()
         try:
-            candidates = disconnect_operator_ladder(
+            search_result = disconnect_strategies_detailed(
                 request.target_smiles.strip(),
                 library,
-                top_k=request.top_k,
+                top_k_strategies=request.top_k,
                 use_context=request.use_context,
                 include_l0=request.include_l0,
                 diversify=request.diversify,
@@ -959,6 +959,11 @@ class LocalRecommendationRuntime:
             )
         finally:
             close_realism_sources()
+        candidates = tuple(
+            candidate
+            for strategy in search_result.strategies
+            for candidate in strategy.realizations
+        )
         index_path = self._index_path(request.library_mode)
         reference_catalog = self._get_reference_catalog(index_path)
         templates = {template.template_id: template for template in library.templates}
@@ -1080,7 +1085,34 @@ class LocalRecommendationRuntime:
             and not any(assessment.is_strategic for assessment in strategic_assessments)
         ):
             warnings.append("NO_SCAFFOLD_SIMPLIFYING_CANDIDATE_GENERATED")
+        grouped = search_result.to_dict()
+        enriched = {
+            (item["template_id"], item["precursor_smiles"]): item
+            for item in serialized
+        }
+        for strategy in grouped["strategies"]:
+            for field in ("representative", "alternate_realizations"):
+                items = (
+                    [strategy[field]] if field == "representative"
+                    else strategy[field]
+                )
+                items = [
+                    enriched[(item["template_id"], item["precursor_smiles"])]
+                    for item in items
+                ]
+                strategy[field] = items[0] if field == "representative" else items
+        if grouped["search_diagnostics"]["budget_limited"]:
+            warnings.append(
+                "SEARCH_BUDGET_LIMITED: some applicable templates or "
+                "proposals were not examined."
+            )
+        if not grouped["search_diagnostics"]["strategy_target_met"]:
+            warnings.append(
+                "STRATEGY_TARGET_NOT_MET: fewer distinct validated strategies "
+                "were found within the attempted tiers and budgets."
+            )
         return {
+            **grouped,
             "target_smiles": (
                 candidates[0].target_smiles
                 if candidates
@@ -1089,7 +1121,7 @@ class LocalRecommendationRuntime:
             "library_mode": request.library_mode,
             "valid": bool(candidates),
             "error": None if candidates else "NO_RETROSYNTHESIS_CANDIDATES",
-            "schema_version": "1.8",
+            "schema_version": "2.0",
             "forward_validation_enabled": request.use_forward_validation,
             "forward_validity_counts": dict(sorted(forward_validity_counts.items())),
             "precursor_realism_enabled": request.use_precursor_realism,
@@ -1105,11 +1137,9 @@ class LocalRecommendationRuntime:
                 "compound_registry": True,
                 "literature": self.literature_index_path.is_file(),
             },
-            "candidate_count": len(candidates),
             "library_operator_count": len(library.operators),
             "library_template_count": len(library.templates),
             "warnings": warnings,
-            "candidates": serialized,
         }
 
     def forward_synthesize(

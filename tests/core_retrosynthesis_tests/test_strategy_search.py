@@ -7,10 +7,14 @@ from dataclasses import replace
 import pytest
 
 import core_retrosynthesis.strategy_search as strategy_search_module
-from core_retrosynthesis.generic_models import GenericDisconnectionCandidate
+from core_retrosynthesis.generic_models import (
+    GenericDisconnectionCandidate,
+    GenericSearchDiagnostics,
+)
 from core_retrosynthesis.strategy_identity import build_strategy_id
 from core_retrosynthesis.strategy_search import (
     disconnect_strategies,
+    disconnect_strategies_detailed,
     group_strategy_candidates,
 )
 
@@ -58,11 +62,14 @@ def test_strategy_id_is_deterministic_and_handle_independent() -> None:
     assert expected.startswith("STRAT1:")
     assert bromide.strategy_id == expected
     assert iodide.strategy_id == expected
-    assert _candidate(
-        "CCB(O)O",
-        0.7,
-        synthon="SYN1:other",
-    ).strategy_id != expected
+    assert (
+        _candidate(
+            "CCB(O)O",
+            0.7,
+            synthon="SYN1:other",
+        ).strategy_id
+        != expected
+    )
 
 
 def test_candidate_rejects_a_supplied_strategy_id_that_conflicts_with_graph() -> None:
@@ -139,11 +146,11 @@ def test_disconnect_strategies_uses_a_bounded_diverse_candidate_pool(
 
     def search(*args, **kwargs):
         requested.update(kwargs)
-        return first, same, second
+        return (first, same, second), GenericSearchDiagnostics()
 
     monkeypatch.setattr(
         strategy_search_module,
-        "disconnect_operator_ladder",
+        "disconnect_generic_target_detailed",
         search,
     )
 
@@ -153,9 +160,11 @@ def test_disconnect_strategies_uses_a_bounded_diverse_candidate_pool(
         top_k_strategies=3,
         max_realizations_per_strategy=2,
         max_candidates_to_validate=50,
+        diversify=False,
     )
 
-    assert requested["top_k"] == 12
+    assert requested["top_k"] == 50
+    assert requested["balance_operator_budget"] is True
     assert requested["max_candidates_to_validate"] == 50
     assert [proposal.representative.precursor_smiles for proposal in proposals] == [
         "first",
@@ -165,3 +174,165 @@ def test_disconnect_strategies_uses_a_bounded_diverse_candidate_pool(
         "first",
         "same",
     ]
+
+
+def test_strategy_shortfall_broadens_even_when_realizations_fill_top_k(
+    monkeypatch,
+) -> None:
+    calls = []
+
+    def search(*args, **kwargs):
+        level = kwargs["levels"][0]
+        calls.append(level)
+        values = (
+            (_candidate("Br", 0.9), _candidate("I", 0.8))
+            if level == "L2"
+            else (_candidate("other", 0.7, site="SITE1:other"),)
+        )
+        return values, GenericSearchDiagnostics(validation_attempt_count=len(values))
+
+    monkeypatch.setattr(
+        strategy_search_module, "disconnect_generic_target_detailed", search
+    )
+    result = disconnect_strategies_detailed(
+        "CC", object(), top_k_strategies=2, diversify=False
+    )
+    assert calls == ["L2", "L1"]
+    assert len(result.strategies) == 2
+    assert len(result.strategies[0].realizations) == 2
+    assert result.to_dict()["search_diagnostics"]["strategy_target_met"] is True
+    assert result.diagnostics.validation_attempt_count == 3
+
+
+def test_empty_strategy_search_reports_limits_without_claiming_library_absence(
+    monkeypatch,
+) -> None:
+    def search(*args, **kwargs):
+        return (), GenericSearchDiagnostics(
+            product_query_match_count=7,
+            applied_template_count=2,
+            template_budget_excluded_count=5,
+            generated_precursor_count=4,
+            validation_attempt_count=1,
+            validation_budget_excluded_count=3,
+            invalid_forward_count=1,
+        )
+
+    monkeypatch.setattr(
+        strategy_search_module, "disconnect_generic_target_detailed", search
+    )
+    result = disconnect_strategies_detailed(
+        "CC", object(), include_l0=False, diversify=False
+    )
+    diagnostics = result.to_dict()["search_diagnostics"]
+    assert diagnostics["levels_attempted"] == ["L2", "L1"]
+    assert diagnostics["budget_limited"] is True
+    assert diagnostics["strategy_target_met"] is False
+    assert result.strategies == ()
+
+
+def test_operator_scheduler_preserves_order_and_does_not_starve_other_edits() -> None:
+    from core_retrosynthesis.generic_search import _interleave_operators
+
+    values = [("A", 1), ("A", 2), ("A", 3), ("B", 1), ("C", 1), ("B", 2)]
+    ordered = _interleave_operators(values, lambda value: value[0])
+    assert ordered[:3] == [("A", 1), ("B", 1), ("C", 1)]
+    assert [value for value in ordered if value[0] == "A"] == values[:3]
+
+
+def test_incomplete_strategy_preserves_validated_proposal_for_review(
+    monkeypatch,
+) -> None:
+    incomplete = replace(_candidate("CCBr", 0.9), synthon_signature="", strategy_id="")
+    monkeypatch.setattr(
+        strategy_search_module,
+        "disconnect_generic_target_detailed",
+        lambda *args, **kwargs: (
+            (incomplete,),
+            GenericSearchDiagnostics(valid_candidate_count=1),
+        ),
+    )
+    result = disconnect_strategies_detailed("CC", object(), diversify=False)
+    assert result.strategies == ()
+    assert result.unresolved_candidates == (incomplete,)
+    assert (
+        result.to_dict()["search_diagnostics"]["incomplete_strategy_identity_count"]
+        == 1
+    )
+
+
+@pytest.fixture(scope="module")
+def reduction_library():
+    from core_retrosynthesis.generic_library import build_generic_library
+
+    return build_generic_library(
+        [
+            {
+                "reaction_id": "amine",
+                "reference_id": "reference:amine",
+                "reaction_smiles": "O=Cc1ccccc1>>OCc1ccccc1",
+            }
+        ],
+        levels=("L2", "L1", "L0"),
+        admission_mode="data_driven",
+    )
+
+
+def test_grouped_search_reconstructs_real_mapped_chemistry_deterministically(
+    reduction_library,
+) -> None:
+    assert reduction_library.templates
+    first = disconnect_strategies_detailed(
+        "OCc1ccc(F)cc1", reduction_library, top_k_strategies=2
+    )
+    second = disconnect_strategies_detailed(
+        "Fc1ccc(CO)cc1", reduction_library, top_k_strategies=2
+    )
+    assert first.strategies
+    assert first.to_dict() == second.to_dict()
+    assert all(
+        c.forward_validation_status == "verified_signature"
+        for s in first.strategies
+        for c in s.realizations
+    )
+
+
+@pytest.mark.parametrize("failure", ["invalid", "unresolved", "conflicting"])
+def test_balanced_search_cannot_bypass_validation(
+    reduction_library, monkeypatch, failure
+) -> None:
+    from core_retrosynthesis import generic_search
+
+    if failure == "invalid":
+        monkeypatch.setattr(
+            generic_search,
+            "_forward_analysis",
+            lambda *args, **kwargs: ("invalid", None, None, ""),
+        )
+    elif failure == "unresolved":
+        monkeypatch.setattr(
+            generic_search, "analyze_generic_reaction", lambda *args: None
+        )
+    else:
+        from types import SimpleNamespace
+
+        monkeypatch.setattr(
+            generic_search,
+            "analyze_generic_reaction",
+            lambda *args: SimpleNamespace(operator_signature="conflicting-edit"),
+        )
+    result = disconnect_strategies_detailed("OCc1ccc(F)cc1", reduction_library)
+    assert not result.strategies
+    assert result.diagnostics.validation_attempt_count > 0
+    counter = {
+        "invalid": "invalid_forward_count",
+        "unresolved": "unresolved_identity_count",
+        "conflicting": "operator_mismatch_count",
+    }[failure]
+    assert (
+        sum(
+            getattr(diagnostics, counter)
+            for _, diagnostics in result.diagnostics.level_diagnostics
+        )
+        > 0
+    )

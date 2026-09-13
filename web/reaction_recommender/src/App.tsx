@@ -13,6 +13,7 @@ import type {
   RecommendationApiResult,
   RecommendationResult,
   RetrosynthesisResult,
+  RetrosynthesisCandidate,
   WeakLabelRecommendationResult,
 } from './api/types'
 import { CompletionDialog } from './components/CompletionDialog'
@@ -42,6 +43,20 @@ function friendlyError(error: unknown): string {
   if (error instanceof ApiError) return ERROR_MESSAGES[error.code] ?? error.message
   if (error instanceof Error) return error.message
   return 'An unexpected error occurred.'
+}
+
+function mapRealizations(
+  result: RetrosynthesisResult,
+  update: (candidate: RetrosynthesisCandidate) => RetrosynthesisCandidate,
+): RetrosynthesisResult {
+  return {
+    ...result,
+    strategies: result.strategies.map(strategy => ({
+      ...strategy,
+      representative: update(strategy.representative),
+      alternate_realizations: strategy.alternate_realizations.map(update),
+    })),
+  }
 }
 
 function App() {
@@ -124,10 +139,14 @@ function App() {
     runId: number,
     activeLibraryMode: LibraryMode,
   ) => {
-    for (let index = 0; index < baseResult.candidates.length; index += 1) {
+    const candidates = [
+      ...baseResult.strategies.map(strategy => strategy.representative),
+      ...baseResult.strategies.flatMap(strategy => strategy.alternate_realizations),
+    ]
+    for (let index = 0; index < candidates.length; index += 1) {
       if (retrosynthesisRun.current !== runId) return
-      const candidate = baseResult.candidates[index]
-      setStatus(`Loading conditions for hit ${index + 1} of ${baseResult.candidates.length}…`)
+      const candidate = candidates[index]
+      setStatus(`Loading conditions for hit ${index + 1} of ${candidates.length}…`)
       try {
         const conditionEvidence = await api.retrosynthesisConditions({
           reaction_smiles: candidate.condition_query_reaction_smiles
@@ -143,10 +162,8 @@ function App() {
         })
         if (retrosynthesisRun.current !== runId) return
         setResult((current) => {
-          if (!current || !('candidates' in current)) return current
-          return {
-            ...current,
-            candidates: current.candidates.map((value) =>
+          if (!current || !('strategies' in current)) return current
+          return mapRealizations(current, (value) =>
               value.template_id === candidate.template_id
               && value.proposed_reaction_smiles === candidate.proposed_reaction_smiles
                 ? {
@@ -156,16 +173,13 @@ function App() {
                       ?? value.forward_assessment,
                   }
                 : value,
-            ),
-          }
+          )
         })
       } catch (conditionError) {
         if (retrosynthesisRun.current !== runId) return
         setResult((current) => {
-          if (!current || !('candidates' in current)) return current
-          return {
-            ...current,
-            candidates: current.candidates.map((value) =>
+          if (!current || !('strategies' in current)) return current
+          return mapRealizations(current, (value) =>
               value.template_id === candidate.template_id
               && value.proposed_reaction_smiles === candidate.proposed_reaction_smiles
                 ? {
@@ -179,13 +193,12 @@ function App() {
                     },
                   }
                 : value,
-            ),
-          }
+          )
         })
       }
     }
     if (retrosynthesisRun.current === runId) {
-      setStatus(`Done — ${baseResult.candidates.length} disconnection(s), conditions loaded`)
+      setStatus(`Done — ${baseResult.strategy_count} strategies, conditions loaded`)
     }
   }
 
@@ -296,7 +309,7 @@ function App() {
       if (retrosynthesisRun.current !== runId) return
       setResult(next)
       if (next.valid) {
-        setStatus(`Found ${next.candidates.length} disconnection(s); loading conditions…`)
+        setStatus(`Found ${next.strategy_count} strategies; loading conditions…`)
         void loadRetrosynthesisConditions(next, runId, activeLibraryMode)
       } else {
         setStatus('No validated disconnection')
@@ -481,7 +494,7 @@ function App() {
       : mode === 'forward_synthesis'
           ? 'forward_synthesis_products.json'
         : mode === 'retrosynthesis'
-          ? 'retrosynthesis_candidates.json'
+          ? 'retrosynthesis_strategies.json'
           : mode === 'multistep_retrosynthesis'
             ? 'multistep_retrosynthesis_routes.json'
           : mode === 'coupled_strategy'
@@ -498,7 +511,7 @@ function App() {
     ? result as RecommendationResult
     : null
   const forwardSynthesisResult = result && 'prediction' in result ? result : null
-  const retrosynthesisResult = result && 'candidates' in result ? result : null
+  const retrosynthesisResult = result && 'strategies' in result ? result : null
   const multistepRetrosynthesisResult = result && 'routes' in result && 'diagnostics' in result ? result : null
   const coupledStrategyResult = result && 'artifact_type' in result && result.artifact_type === 'v1_coupled_strategy_target_query' ? result : null
   const featureResult = result && 'input_kind' in result ? result : null
@@ -563,7 +576,7 @@ function App() {
           <div className="analysis-options">
             <div className={`option-grid ${mode === 'features' || mode === 'coupled_strategy' ? 'feature-options' : ''}`}>
               {mode !== 'features' && mode !== 'weak_label' && mode !== 'coupled_strategy' && <label className="library-option"><span>{isOperatorMode ? 'Operator library' : 'Precedent library'}</span><select aria-label={isOperatorMode ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">{libraryLabel('full')}</option><option value="compact">{libraryLabel('compact')}</option></select></label>}
-              {mode !== 'features' && <label><span>{mode === 'multistep_retrosynthesis' ? 'Top routes' : mode === 'coupled_strategy' ? 'Top strategies' : 'Top results'}</span><input type="number" min="1" max={mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50} value={topK} onChange={(event) => setTopK(Math.min(mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50, Math.max(1, Number(event.target.value))))} /></label>}
+              {mode !== 'features' && <label><span>{mode === 'multistep_retrosynthesis' ? 'Top routes' : mode === 'coupled_strategy' || mode === 'retrosynthesis' ? 'Top strategies' : 'Top results'}</span><input type="number" min="1" max={mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50} value={topK} onChange={(event) => setTopK(Math.min(mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50, Math.max(1, Number(event.target.value))))} /></label>}
               {mode === 'recommendation' ? (
                 <>
                   <label><span>Search scope</span><select value={searchScope} onChange={(event) => setSearchScope(event.target.value as typeof searchScope)}><option value="same_handle">Same reactive handle</option><option value="automatic">Automatic broadening</option><option value="broad">Broader analogues</option></select><small>Broadens permitted structural matches when independent evidence is sparse.</small></label>

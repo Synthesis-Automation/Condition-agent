@@ -627,9 +627,11 @@ export function WeakLabelRecommendationResults({ result }: { result: WeakLabelRe
 function RetrosynthesisDetails({
   candidate,
   scopeWarnings,
+  strategyRank,
 }: {
   candidate: RetrosynthesisCandidate
   scopeWarnings: string[]
+  strategyRank: number
 }) {
   const conditionRecommendations = candidate.condition_evidence?.recommendations ?? []
   const combinedCautions = Array.from(new Set([
@@ -641,7 +643,7 @@ function RetrosynthesisDetails({
       <div className="detail-title-row">
         <div>
           <span className="eyebrow">SELECTED DISCONNECTION</span>
-          <h3>Rank {candidate.rank} · {displayName(candidate.transformation_kind ?? 'graph operator')}</h3>
+          <h3>Strategy {strategyRank} · {displayName(candidate.transformation_kind ?? 'graph operator')}</h3>
           <p>{candidate.precursor_smiles}</p>
         </div>
         <div className="score-orbit"><strong>{candidate.score.toFixed(3)}</strong><span>score</span></div>
@@ -821,14 +823,18 @@ function RetrosynthesisDetails({
 
 export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult }) {
   const [selected, setSelected] = useState(0)
-  useEffect(() => setSelected(0), [result])
-  const active = result.candidates[selected]
+  const [realization, setRealization] = useState(0)
+  const resultKey = `${result.target_smiles}:${result.strategies.map(strategy => strategy.strategy_id).join('|')}`
+  useEffect(() => { setSelected(0); setRealization(0) }, [resultKey])
+  const strategy = result.strategies[selected]
+  const variants = strategy ? [strategy.representative, ...strategy.alternate_realizations] : []
+  const active = variants[realization] ?? variants[0]
   return (
     <section className="results-card">
       <div className="results-summary">
-        <div><span className="eyebrow">RETROSYNTHESIS RESULT</span><h2>{result.candidates.length} validated disconnection{result.candidates.length === 1 ? '' : 's'}</h2></div>
+        <div><span className="eyebrow">RETROSYNTHESIS RESULT</span><h2>{result.strategy_count} validated {result.strategy_count === 1 ? 'strategy' : 'strategies'}</h2></div>
         <div className="metric-strip">
-          <div><strong>{result.candidate_count}</strong><span>candidates</span></div>
+          <div><strong>{result.returned_realization_count}</strong><span>precursor choices</span></div>
           <div><strong>{result.library_operator_count}</strong><span>operators</span></div>
           <div><strong>{result.library_template_count}</strong><span>templates</span></div>
           <div><strong>{result.strategic_candidate_count}</strong><span>strategic</span></div>
@@ -836,16 +842,41 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
         </div>
       </div>
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No retrosynthesis candidates')}</div>}
-      {result.candidates.length === 0 && <MessageList title="Scope and cautions" values={result.warnings} tone="caution" />}
-      {result.candidates.length > 0 && (
+      <details className="trace-panel">
+        <summary>Search coverage{result.search_diagnostics.budget_limited ? ' — budget limited' : ''}</summary>
+        <dl className="detail-list">
+          <div><dt>Strategies found / requested</dt><dd>{result.strategy_count} / {result.requested_strategy_count}</dd></div>
+          <div><dt>Operator tiers explored</dt><dd>{result.search_diagnostics.levels_attempted.join(' → ')} (L2 specific, L1 broader, L0 broadest)</dd></div>
+          <div><dt>Validation attempts</dt><dd>{result.search_diagnostics.validation_attempt_count}</dd></div>
+          <div><dt>Incomplete strategy identities</dt><dd>{result.search_diagnostics.incomplete_strategy_identity_count} proposals retained for review</dd></div>
+          <div><dt>Limits per tier</dt><dd>{result.search_diagnostics.max_templates_per_level} templates; {result.search_diagnostics.max_validations_per_level} validations</dd></div>
+        </dl>
+        <div className="table-scroll"><table>
+          <thead><tr><th>Tier</th><th>Applicable templates</th><th>Generated</th><th>Validated</th><th>Accepted</th><th>Skipped by budget</th><th>Invalid / unresolved / conflicting</th></tr></thead>
+          <tbody>{Object.entries(result.search_diagnostics.level_diagnostics).map(([level, counts]) => (
+            <tr key={level}><td>{level}</td><td>{counts.product_query_match_count}</td><td>{counts.generated_precursor_count}</td><td>{counts.validation_attempt_count}</td><td>{counts.valid_candidate_count}</td><td>{counts.template_budget_excluded_count} templates / {counts.validation_budget_excluded_count} proposals</td><td>{counts.invalid_forward_count} / {counts.unresolved_identity_count} / {counts.operator_mismatch_count}</td></tr>
+          ))}</tbody>
+        </table></div>
+        <p>Counts describe this bounded search. No result does not establish that a synthesis is impossible.</p>
+      </details>
+      {result.unresolved_candidates.length > 0 && <details className="trace-panel">
+        <summary>Unresolved strategy identities ({result.unresolved_candidates.length})</summary>
+        <p>These proposals passed the signature check but could not receive a complete strategy identity. They are retained for review and are excluded from ranked strategies.</p>
+        {result.unresolved_candidates.map(candidate => <ReactionImage key={`${candidate.template_id}:${candidate.precursor_smiles}`} smiles={candidate.proposed_reaction_smiles} label="Proposal with incomplete strategy identity" compact />)}
+      </details>}
+      {result.strategies.length === 0 && <MessageList title="Scope and cautions" values={result.warnings} tone="caution" />}
+      {result.strategies.length > 0 && (
         <div className="results-layout">
           <div className="table-scroll">
             <table>
-              <thead><tr><th>Rank</th><th>Score</th><th>Strategic</th>{result.precursor_realism_enabled && <th>Realism</th>}<th>Forward audit</th><th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
+              <thead><tr><th>Strategy</th><th>Choices</th><th>Score</th><th>Strategic</th>{result.precursor_realism_enabled && <th>Realism</th>}<th>Forward audit</th><th>Level</th><th>Transformation</th><th>Conditions</th></tr></thead>
               <tbody>
-                {result.candidates.map((candidate, index) => (
-                  <tr key={`${candidate.template_id}:${candidate.precursor_smiles}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
-                    <td><strong>{candidate.rank}</strong></td>
+                {result.strategies.map((item, index) => {
+                  const candidate = item.representative
+                  return (
+                  <tr key={item.strategy_id} className={selected === index ? 'selected' : ''} onClick={() => { setSelected(index); setRealization(0) }}>
+                    <td><strong>{item.strategy_rank}</strong></td>
+                    <td>{item.returned_realization_count}</td>
                     <td>{candidate.score.toFixed(3)}</td>
                     <td>{(100 * candidate.strategic_complexity_score).toFixed(1)} · {displayName(candidate.strategic_class)}</td>
                     {result.precursor_realism_enabled && <td>{candidate.precursor_realism_score?.toFixed(3) ?? '—'}</td>}
@@ -854,11 +885,20 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
                     <td>{displayName(candidate.transformation_kind ?? 'graph operator')}</td>
                     <td>{candidate.condition_evidence?.recommendations?.[0] ? compactRecipeSummary(candidate.condition_evidence.recommendations[0].resolved_recipe) : 'No compatible conditions'}</td>
                   </tr>
-                ))}
+                  )
+                })}
               </tbody>
             </table>
           </div>
-          {active && <RetrosynthesisDetails candidate={active} scopeWarnings={result.warnings} />}
+          {active && <div className="strategy-details">
+            <label className="strategy-choice">Precursor choice
+              <select aria-label="Precursor choice" value={realization} onChange={event => setRealization(Number(event.target.value))}>
+                {variants.map((candidate, index) => <option key={`${candidate.template_id}:${candidate.precursor_smiles}`} value={index}>{index + 1}. {candidate.precursor_smiles}</option>)}
+              </select>
+            </label>
+            <p className="strategy-choice-count">Showing {variants.length} of {strategy.total_realization_count} distinct precursor choices found for this strategy.</p>
+            <RetrosynthesisDetails candidate={active} scopeWarnings={result.warnings} strategyRank={strategy.strategy_rank} />
+          </div>}
         </div>
       )}
     </section>
