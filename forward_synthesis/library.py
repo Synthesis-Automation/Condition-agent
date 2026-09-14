@@ -5,6 +5,8 @@ from __future__ import annotations
 import gzip
 import json
 from collections import Counter
+from concurrent.futures import ProcessPoolExecutor
+from contextlib import nullcontext
 from dataclasses import replace
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional
@@ -19,6 +21,7 @@ from reactive_taxonomy import (
     canonical_molecule_collection,
     reverse_recovers_precursors,
 )
+from reactive_taxonomy.reaction_operators import clear_operator_application_cache
 
 from .models import ForwardOperatorLibrary, ForwardPrecursorIndex
 
@@ -112,6 +115,24 @@ def _source_round_trip(operator: BidirectionalReactionOperator) -> bool:
     return True
 
 
+def _source_round_trip_passes(operator: BidirectionalReactionOperator) -> bool:
+    """Apply the same source-admission gate in serial or worker processes."""
+
+    try:
+        return _source_round_trip(operator)
+    except Exception:
+        return False
+
+
+def _worker_source_round_trip(operator: BidirectionalReactionOperator) -> bool:
+    """Bound compiled-query memory in an independent source-check worker."""
+
+    try:
+        return _source_round_trip_passes(operator)
+    finally:
+        clear_operator_application_cache()
+
+
 def _required_atomic_numbers(
     operator: BidirectionalReactionOperator,
 ) -> tuple[int, ...]:
@@ -156,17 +177,22 @@ def build_forward_library(
     generic_library: Any,
     *,
     require_source_round_trip: bool = True,
+    workers: int = 1,
 ) -> ForwardOperatorLibrary:
     """Project a generic library into independently forward-admitted operators.
 
     The input is deliberately structural: either an object exposing ``templates``
     or its serialized mapping.  This package therefore does not import or own a
-    retrosynthesis model.
+    retrosynthesis model. Offline builds can distribute source checks across
+    workers; result ordering and admission rules are unchanged.
     """
 
+    if workers < 1:
+        raise ValueError("workers must be positive")
     templates = tuple(_value(generic_library, "templates", ()) or ())
     rejection_counts: Counter[str] = Counter()
     admitted: dict[str, BidirectionalReactionOperator] = {}
+    candidates = []
     for template in templates:
         try:
             operator = _as_operator(template)
@@ -174,18 +200,13 @@ def build_forward_library(
         except Exception:
             rejection_counts["invalid_operator_contract"] += 1
             continue
-        if require_source_round_trip:
-            try:
-                accepted = _source_round_trip(operator)
-            except Exception:
-                accepted = False
-            if not accepted:
-                rejection_counts["source_forward_round_trip_failed"] += 1
-                continue
+        candidates.append(operator)
+
+    def admit(operator: BidirectionalReactionOperator) -> None:
         current = admitted.get(operator.forward_operator_id)
         if current is None:
             admitted[operator.forward_operator_id] = operator
-            continue
+            return
         precedents = {
             (
                 item.reaction_id,
@@ -210,6 +231,20 @@ def build_forward_library(
                 sorted(set(current.named_annotations + operator.named_annotations))
             ),
         )
+    parallel = workers > 1 and require_source_round_trip
+    executor = ProcessPoolExecutor(max_workers=workers) if parallel else nullcontext()
+    with executor as pool:
+        if not require_source_round_trip:
+            checks = (True for _ in candidates)
+        elif pool is not None:
+            checks = pool.map(_worker_source_round_trip, candidates, chunksize=16)
+        else:
+            checks = map(_source_round_trip_passes, candidates)
+        for operator, accepted in zip(candidates, checks):
+            if accepted:
+                admit(operator)
+            else:
+                rejection_counts["source_forward_round_trip_failed"] += 1
     operators = tuple(
         sorted(
             admitted.values(),

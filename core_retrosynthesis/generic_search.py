@@ -18,6 +18,7 @@ from cas_tools import (
     aggregate_precursor_realism_trace,
 )
 from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
+from reactive_taxonomy.reaction_identity_graphs import provisional_product_site
 from reactive_taxonomy.strategic_complexity import (
     RetrosyntheticComplexityReduction,
     assess_retrosynthetic_complexity_reduction,
@@ -258,9 +259,22 @@ def disconnect_generic_target_detailed(
         unique_seeds = {}
         for seed in seeds:
             unique_seeds.setdefault((seed[5].operator_id, seed[6]), seed)
-        seeds = _interleave_operators(
-            unique_seeds.values(), lambda item: item[5].operator_id,
-        )
+        operators = {}
+        site_keys = set()
+        unresolved_site_count = 0
+        for seed in unique_seeds.values():
+            site = provisional_product_site(seed[6])
+            if not site:
+                unresolved_site_count += 1
+                site = seed[6]
+            site_keys.add((seed[5].operator_id, site))
+            operators.setdefault(seed[5].operator_id, []).append((site, seed))
+        scheduled = [
+            (operator, item[1])
+            for operator, items in operators.items()
+            for item in _interleave_operators(items, lambda item: item[0])
+        ]
+        seeds = [item[1] for item in _interleave_operators(scheduled, lambda item: item[0])]
     candidates: dict[str | tuple[str, str], GenericDisconnectionCandidate] = {}
     invalid_forward_count = 0
     unresolved_identity_count = 0
@@ -427,6 +441,8 @@ def disconnect_generic_target_detailed(
             0, len(applicable) - len(templates_to_apply),
         ),
         validation_budget_excluded_count=max(0, len(seeds) - len(validation_seeds)),
+        provisional_site_group_count=len(site_keys) if balance_operator_budget else 0,
+        unresolved_provisional_site_count=unresolved_site_count if balance_operator_budget else 0,
     )
 
 

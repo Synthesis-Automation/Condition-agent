@@ -532,9 +532,10 @@ class LocalRecommendationRuntime:
         """Load a prebuilt forward library or derive and cache it once."""
 
         prepared_path = self._forward_library_path(library_mode)
+        prepared_current = self._prepared_forward_library_current(library_mode)
         source_path = (
             prepared_path
-            if prepared_path.is_file()
+            if prepared_current
             else self._retrosynthesis_library_path(library_mode)
         )
         if not source_path.is_file():
@@ -551,7 +552,7 @@ class LocalRecommendationRuntime:
             for old_key in tuple(self._forward_libraries):
                 if old_key[0] == key[0] and old_key[1:] != key[1:]:
                     self._forward_libraries.pop(old_key, None)
-            if prepared_path.is_file():
+            if prepared_current:
                 library = load_forward_library(prepared_path)
             else:
                 library = build_forward_library(
@@ -559,6 +560,16 @@ class LocalRecommendationRuntime:
                 )
             self._forward_libraries[key] = library
             return library
+
+    def _prepared_forward_library_current(self, library_mode: str) -> bool:
+        """Check freshness of the forward artifact paired with a retro build."""
+
+        prepared = self._forward_library_path(library_mode)
+        source = self._retrosynthesis_library_path(library_mode)
+        return prepared.is_file() and (
+            not source.is_file()
+            or prepared.stat().st_mtime_ns >= source.stat().st_mtime_ns
+        )
 
     def _get_reference_catalog(
         self, index_path: str | Path
@@ -775,11 +786,11 @@ class LocalRecommendationRuntime:
                     "label": mode.title(),
                     "library_name": (
                         forward_paths[mode].name
-                        if forward_paths[mode].is_file()
+                        if self._prepared_forward_library_current(mode)
                         else path.name
                     ),
                     "library_available": path.is_file(),
-                    "prepared": forward_paths[mode].is_file(),
+                    "prepared": self._prepared_forward_library_current(mode),
                 }
                 for mode, path in retrosynthesis_paths.items()
             },

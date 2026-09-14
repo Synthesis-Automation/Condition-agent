@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Iterable
 
 from cas_tools import PrecursorRealismAssessment
@@ -15,6 +15,7 @@ from .generic_models import (
 )
 from .generic_search import (
     _attach_precursor_realism,
+    _apply_strategic_candidate_reserve,
     disconnect_generic_target_detailed,
     rank_operator_site_diverse,
     rank_precursor_realism,
@@ -109,7 +110,7 @@ class StrategySearchResult:
     max_validations_per_level: int
     max_realizations_per_strategy: int
     unresolved_candidates: tuple[GenericDisconnectionCandidate, ...] = ()
-    definition_id: str = "single_step_strategy_search.v1"
+    definition_id: str = "single_step_strategy_search.v2"
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the canonical grouped result and its search limits."""
@@ -138,7 +139,7 @@ class StrategySearchResult:
                 "max_templates_per_level": self.max_templates_per_level,
                 "max_validations_per_level": self.max_validations_per_level,
                 "max_realizations_per_strategy": self.max_realizations_per_strategy,
-                "scheduling": "operator_round_robin_then_verified_strategy_grouping",
+                "scheduling": "operator_site_round_robin_then_verified_strategy_grouping",
                 "incomplete_strategy_identity_count": len(self.unresolved_candidates),
             },
         }
@@ -219,11 +220,35 @@ def disconnect_strategies_detailed(
                     (candidate.template_id, candidate.precursor_smiles),
                     candidate,
                 )
-        strategies = group_strategy_candidates(
+        groups = group_strategy_candidates(
             candidates,
-            top_k_strategies=top_k_strategies,
+            top_k_strategies=max(1, len(candidates)),
             max_realizations_per_strategy=max_realizations_per_strategy,
         )
+        strategies = groups[:top_k_strategies]
+        if diversify:
+            representatives = _apply_strategic_candidate_reserve(
+                (group.representative for group in strategies),
+                {
+                    level: tuple(
+                        group.representative
+                        for group in groups
+                        if group.representative.abstraction_level == level
+                    )
+                    for level, _ in level_diagnostics
+                },
+                top_k=top_k_strategies,
+                policy=policy,
+            )
+            by_id = {group.strategy_id: group for group in groups}
+            strategies = tuple(
+                replace(
+                    by_id[candidate.strategy_id],
+                    strategy_rank=rank,
+                    representative=candidate,
+                )
+                for rank, candidate in enumerate(representatives, start=1)
+            )
         if len(strategies) >= top_k_strategies:
             break
     return StrategySearchResult(

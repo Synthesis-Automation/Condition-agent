@@ -19,6 +19,32 @@ from core_retrosynthesis.strategy_search import (
 )
 
 
+@pytest.mark.parametrize("strategic_score, expected", [(0.85, True), (0.1, False)])
+def test_grouped_search_preserves_guarded_scaffold_reservation(
+    monkeypatch, strategic_score, expected
+):
+    candidates = tuple(
+        _candidate(f"choice-{i}", 0.90 - i * 0.01, site=f"SITE1:{i}") for i in range(5)
+    )
+    strategic = replace(
+        _candidate("scaffold", strategic_score, site="SITE1:scaffold"),
+        strategic_candidate=True,
+    )
+    monkeypatch.setattr(
+        strategy_search_module,
+        "disconnect_generic_target_detailed",
+        lambda *args, **kwargs: ((*candidates, strategic), GenericSearchDiagnostics()),
+    )
+    result = disconnect_strategies_detailed(
+        "CC", object(), top_k_strategies=5, use_hierarchical_ranking=False
+    )
+    assert (
+        any(s.representative.strategic_reserve_selected for s in result.strategies)
+        is expected
+    )
+    assert len({s.strategy_id for s in result.strategies}) == 5
+
+
 def _candidate(
     name: str,
     score: float,
@@ -238,6 +264,48 @@ def test_operator_scheduler_preserves_order_and_does_not_starve_other_edits() ->
     ordered = _interleave_operators(values, lambda value: value[0])
     assert ordered[:3] == [("A", 1), ("B", 1), ("C", 1)]
     assert [value for value in ordered if value[0] == "A"] == values[:3]
+
+
+def test_validation_budget_visits_other_operators_and_sites(
+    reduction_library, monkeypatch,
+) -> None:
+    from types import SimpleNamespace
+    from core_retrosynthesis import generic_search
+
+    template = next(
+        t for t in reduction_library.templates if t.abstraction_level == "L2"
+    )
+    library = SimpleNamespace(
+        templates=tuple(
+            replace(template, template_id=key, operator_id=key, reaction_smarts=key)
+            for key in ("A", "B")
+        ),
+        retrieval_index=None,
+    )
+    proposals = {
+        "A": (("C", "A1"), ("CC", "A2"), ("CCC", "A3")),
+        "B": (("C", "B1"),),
+    }
+    sites = {"A1": "site1", "A2": "site1", "A3": "site2", "B1": "site1"}
+    visited = []
+    monkeypatch.setattr(generic_search, "maximum_similarity", lambda *args: 0.9)
+    monkeypatch.setattr(generic_search, "_apply", lambda key, target: proposals[key])
+    monkeypatch.setattr(generic_search, "provisional_product_site", sites.__getitem__)
+
+    def reject(mapped, **kwargs):
+        visited.append(mapped)
+        return "invalid", None, None, ""
+
+    monkeypatch.setattr(generic_search, "_forward_analysis", reject)
+    candidates, diagnostics = generic_search.disconnect_generic_target_detailed(
+        "OCc1ccccc1", library, balance_operator_budget=True,
+        max_candidates_to_validate=3,
+    )
+    assert visited == ["A1", "B1", "A3"]
+    assert candidates == ()
+    assert diagnostics.provisional_site_group_count == 3
+    assert diagnostics.validation_budget_excluded_count == 1
+    assert diagnostics.invalid_forward_count == 3
 
 
 def test_incomplete_strategy_preserves_validated_proposal_for_review(

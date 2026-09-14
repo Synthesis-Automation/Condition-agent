@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import gzip
 import hashlib
 import io
@@ -17,6 +18,7 @@ from typing import Any, Callable, Dict, Iterable, Iterator, Literal, Sequence
 
 from .chemistry import digest
 from .core_admission import CoreAdmissionPolicyName
+from .generic_compiler import clear_generic_compilation_cache
 from .generic_library import (
     build_generic_library,
     load_generic_library,
@@ -641,11 +643,8 @@ def build_full_scale_operator_library(
         newly_completed = 0
         newly_reused = 0
         for ordinal, path in enumerate(files, start=1):
-            manifest = compile_operator_shard(
-                path,
-                output_directory,
-                config=settings,
-                force=force,
+            manifest = _compile_operator_shard_job(
+                (path, Path(output_directory), settings, force),
             )
             completed_manifests.append(manifest)
             newly_completed += 1
@@ -720,12 +719,16 @@ def _compile_operator_shard_job(
     job: tuple[Path, Path, FullScaleBuildConfig, bool],
 ) -> Dict[str, Any]:
     source, output, config, force = job
-    return compile_operator_shard(
-        source,
-        output,
-        config=config,
-        force=force,
-    )
+    try:
+        return compile_operator_shard(
+            source,
+            output,
+            config=config,
+            force=force,
+        )
+    finally:
+        clear_generic_compilation_cache()
+        gc.collect()
 
 
 __all__ = [

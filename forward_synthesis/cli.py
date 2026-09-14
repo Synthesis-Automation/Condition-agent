@@ -88,6 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument("generic_library")
     build.add_argument("output")
     build.add_argument("--skip-source-round-trip", action="store_true")
+    build.add_argument("--workers", type=int, default=1)
 
     predict = commands.add_parser("predict", help="blindly predict products")
     predict.add_argument("library")
@@ -128,6 +129,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         library = build_forward_library(
             source,
             require_source_round_trip=not arguments.skip_source_round_trip,
+            workers=arguments.workers,
         )
         save_forward_library(library, arguments.output)
         print(json.dumps(library.to_dict(), indent=2, sort_keys=True))

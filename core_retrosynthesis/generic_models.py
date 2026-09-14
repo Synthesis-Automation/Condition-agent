@@ -294,6 +294,8 @@ class GenericSearchDiagnostics:
     duplicate_proposal_count: int = 0
     template_budget_excluded_count: int = 0
     validation_budget_excluded_count: int = 0
+    provisional_site_group_count: int = 0
+    unresolved_provisional_site_count: int = 0
 
     def to_dict(self) -> Dict[str, int]:
         """Return stage counters as a JSON-compatible mapping."""

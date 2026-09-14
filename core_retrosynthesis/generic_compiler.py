@@ -15,6 +15,10 @@ from rdchiral.main import rdchiralReactants, rdchiralReaction, rdchiralRun
 from rdchiral.template_extractor import extract_from_reaction
 
 from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy.reaction_identity_graphs import (
+    product_edit_site_graph,
+    retained_precursor_graph,
+)
 
 from .chemistry import (
     canonical_smiles,
@@ -96,6 +100,16 @@ def _materialized_analysis(reaction_smiles: str) -> tuple[Any, Any] | None:
     if materialized is None:
         return None
     return materialized, featurize_reaction(materialized.reaction_smiles)
+
+
+def clear_generic_compilation_cache() -> None:
+    """Release whole source analyses after an independent compilation batch.
+
+    Interactive callers can still reuse the analysis cache within a search.
+    Batch workers must not accumulate thousands of large analyses across shards.
+    """
+
+    _materialized_analysis.cache_clear()
 
 
 def _observation(row: Dict[str, Any]) -> Dict[str, Any]:
@@ -978,9 +992,12 @@ def build_generic_reaction_identity(
         disconnection_site_key=_product_disconnection_site_key(
             observation,
             product,
-        ),
+        ) or product_edit_site_graph(product, tuple(observation.get("edits") or ())),
         operator_signature=signature,
-        synthon_signature=_synthon_signature(reactants, product, signature),
+        synthon_signature=(
+            _synthon_signature(reactants, product, signature)
+            or retained_precursor_graph(reactants, product, signature)
+        ),
     )
 
 
@@ -1037,6 +1054,7 @@ __all__ = [
     "build_generic_reaction_identity",
     "classify_reaction_smiles",
     "classify_reaction_with_site",
+    "clear_generic_compilation_cache",
     "compile_generic_templates",
     "generic_operator_identity_from_observation",
     "generic_rejection_stage",

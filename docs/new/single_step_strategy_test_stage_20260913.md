@@ -1,5 +1,9 @@
 # Single-step strategy search: first testable stage
 
+Follow-up implementation and current validation status:
+[Single-step foundation follow-up](single_step_foundation_20260914.md).
+The measurements and limitations below describe this original test stage.
+
 ## Scope
 
 The Workbench now requests distinct verified strategies, with up to three

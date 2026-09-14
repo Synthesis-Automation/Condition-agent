@@ -205,6 +205,12 @@ def _compiled_reaction(reaction_smarts: str) -> Any:
     return reaction
 
 
+def clear_operator_application_cache() -> None:
+    """Release compiled reactions at an offline worker's batch boundary."""
+
+    _compiled_reaction.cache_clear()
+
+
 def _component_molecules(smiles: str) -> tuple[tuple[str, Any], ...]:
     canonical = _canonical_molecule_collection(smiles)
     if canonical is None:
@@ -508,6 +514,7 @@ __all__ = [
     "apply_forward_operator",
     "apply_reaction_smarts",
     "canonical_molecule_collection",
+    "clear_operator_application_cache",
     "precursor_pattern_tokens",
     "reverse_recovers_precursors",
 ]

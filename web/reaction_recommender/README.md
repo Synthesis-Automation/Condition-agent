@@ -41,6 +41,10 @@ choices under each row and separate condition evidence for each choice. Open
 response is schema 2.0 (`strategies` replaces flat `candidates`). Restart the
 Workbench after updating; existing operator datasets need no rebuild. See the
 [test-stage guide and development comparison](../../docs/new/single_step_strategy_test_stage_20260913.md).
+The [foundation follow-up](../../docs/new/single_step_foundation_20260914.md)
+adds missing graph identities, shares validation work across target sites, and
+restores guarded scaffold reservation. It also documents the frozen evaluation
+and the separate Full operator build and verification status.
 
 In the Workbench, **Search scope** controls retrieval independently of ranking:
 
@@ -194,9 +198,30 @@ see the [default promotion report](../../docs/new/shared_reaction_core_default_2
   operating conditions, observed operations, and execution-readiness gaps.
 
 The forward endpoint uses a prebuilt `forward_operator_library_v1.json.gz` next
-to the selected retrosynthesis library when available. Otherwise the API derives
+to the selected retrosynthesis library when it is at least as recent as that
+library. Otherwise the API derives
 and process-caches a source-round-tripped forward library on first use; that
 first request can take longer than later requests.
+
+Prepare a matching forward library after rebuilding the operator library to
+avoid that first-request cost. Offline source validation supports `--workers`;
+parallel and serial builds use the same admission checks:
+
+```powershell
+python -m forward_synthesis build-library results/operator_retrosynthesis_poc/full_scale_v3/full/operator_library_v3.json.gz results/operator_retrosynthesis_poc/full_scale_v3/full/forward_operator_library_v1.json.gz --workers 12
+```
+
+To check the single-step Workbench with the Full library and its default
+forward audit enabled, start the Workbench server, then run from this directory:
+
+```powershell
+$env:RETRO_STRATEGY_SMOKE = '1'
+$env:RETRO_STRATEGY_LIBRARY_MODE = 'full'
+$env:RETRO_STRATEGY_FORWARD_AUDIT = '1'
+$env:WEBUI_TEST_URL = 'http://127.0.0.1:8000'
+$env:BROWSER_CHANNEL = 'msedge'
+npx playwright test e2e/retrosynthesis-strategies.spec.ts --reporter=line
+```
 
 The UI intentionally exposes no arbitrary file paths or upload endpoints. Local
 dataset identity and access remain server configuration concerns.

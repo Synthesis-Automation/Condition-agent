@@ -782,9 +782,9 @@ function RetrosynthesisDetails({
           {(candidate.precursor_compatibility_band_penalty ?? 0) > 0 && <div><strong>Compatibility action</strong><span>{displayName(candidate.precursor_compatibility_disposition ?? 'demote')} · band +{candidate.precursor_compatibility_band_penalty}</span></div>}
           {candidate.hierarchical_ranking_definition_id && <div><strong>Hierarchical policy</strong><span>{candidate.hierarchical_ranking_definition_id}</span></div>}
           {candidate.hierarchical_rank > 0 && <div><strong>Hierarchical rerank</strong><span>{candidate.pre_hierarchical_rank} → {candidate.hierarchical_rank}</span></div>}
-          {candidate.hierarchical_site_rank > 0 && <div><strong>SITE1 rank / score</strong><span>{candidate.hierarchical_site_rank} / {candidate.hierarchical_site_score.toFixed(3)}</span></div>}
-          {candidate.hierarchical_synthon_rank > 0 && <div><strong>SYN1 rank / score</strong><span>{candidate.hierarchical_synthon_rank} / {candidate.hierarchical_synthon_score.toFixed(3)}</span></div>}
-          {candidate.hierarchical_realization_rank > 0 && <div><strong>REAL1 rank / score</strong><span>{candidate.hierarchical_realization_rank} / {candidate.hierarchical_realization_score.toFixed(3)}</span></div>}
+          {candidate.hierarchical_site_rank > 0 && <div><strong>Reaction site rank / score</strong><span>{candidate.hierarchical_site_rank} / {candidate.hierarchical_site_score.toFixed(3)}</span></div>}
+          {candidate.hierarchical_synthon_rank > 0 && <div><strong>Synthon rank / score</strong><span>{candidate.hierarchical_synthon_rank} / {candidate.hierarchical_synthon_score.toFixed(3)}</span></div>}
+          {candidate.hierarchical_realization_rank > 0 && <div><strong>Precursor choice rank / score</strong><span>{candidate.hierarchical_realization_rank} / {candidate.hierarchical_realization_score.toFixed(3)}</span></div>}
           {candidate.completion_group_id && <div><strong>Completion group</strong><span>{candidate.completion_group_id}</span></div>}
           {candidate.completion_group_id && <div><strong>Completion prior</strong><span>{candidate.completion_prior_probability == null ? 'Unavailable' : candidate.completion_prior_probability.toFixed(3)} ({displayName(candidate.completion_prior_backoff_level)}, {candidate.completion_prior_independent_support}/{candidate.completion_prior_total_support} support)</span></div>}
           {candidate.precursor_realism_score != null && <div><strong>Realism rerank</strong><span>{candidate.pre_realism_rank} → {candidate.precursor_realism_rank}</span></div>}
@@ -848,6 +848,7 @@ export function RetrosynthesisResults({ result }: { result: RetrosynthesisResult
           <div><dt>Strategies found / requested</dt><dd>{result.strategy_count} / {result.requested_strategy_count}</dd></div>
           <div><dt>Operator tiers explored</dt><dd>{result.search_diagnostics.levels_attempted.join(' → ')} (L2 specific, L1 broader, L0 broadest)</dd></div>
           <div><dt>Validation attempts</dt><dd>{result.search_diagnostics.validation_attempt_count}</dd></div>
+          <div><dt>Operator/site groups considered</dt><dd>{Object.values(result.search_diagnostics.level_diagnostics).reduce((sum, counts) => sum + (counts.provisional_site_group_count ?? 0), 0)}</dd></div>
           <div><dt>Incomplete strategy identities</dt><dd>{result.search_diagnostics.incomplete_strategy_identity_count} proposals retained for review</dd></div>
           <div><dt>Limits per tier</dt><dd>{result.search_diagnostics.max_templates_per_level} templates; {result.search_diagnostics.max_validations_per_level} validations</dd></div>
         </dl>
