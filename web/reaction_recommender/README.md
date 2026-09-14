@@ -35,6 +35,13 @@ Node.js 24.14.1+.
 
 ## Condition search and priorities
 
+In the Workbench, open **Reaction context: possible products and alternative
+precursors** below a condition result and click **Explore reaction context**.
+This runs bounded forward and retro graph searches. Proposed precursor changes
+and different routes receive their own condition evidence; the original table
+retains its ranking. The action needs prepared operator libraries but no dataset
+rebuild. See the [behavior, limitations, and API](../../docs/new/reaction_context_planning_20260915.md).
+
 Single-step retrosynthesis now returns **strategies**, with alternate precursor
 choices under each row and separate condition evidence for each choice. Open
 **Search coverage** to inspect fallback tiers and budget exclusions. The API

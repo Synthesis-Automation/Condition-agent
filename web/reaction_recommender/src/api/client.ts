@@ -13,6 +13,7 @@ import type {
   PrepareReactionResult,
   RankingProfile,
   RecommendationRequest,
+  ReactionContextResult,
   RecommendationApiResult,
   RetrosynthesisRequest,
   RetrosynthesisConditionsRequest,
@@ -55,6 +56,11 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  reactionContext: (reactionSmiles: string, libraryMode: 'full' | 'compact') =>
+    jsonRequest<ReactionContextResult>('/recommendations/context', {
+      method: 'POST',
+      body: JSON.stringify({ reaction_smiles: reactionSmiles, library_mode: libraryMode }),
+    }),
   capabilities: () => jsonRequest<Capabilities>('/capabilities'),
 
   rankingProfiles: async () => {

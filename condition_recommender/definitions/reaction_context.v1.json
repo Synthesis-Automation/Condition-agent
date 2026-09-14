@@ -1,0 +1,14 @@
+{
+  "definition_id": "reaction_context.v1",
+  "schema_version": "1.0",
+  "forward_operators": 40,
+  "forward_assignments": 32,
+  "forward_outcomes": 64,
+  "forward_products": 10,
+  "retro_templates_per_tier": 40,
+  "retro_validations_per_tier": 12,
+  "retro_strategies": 4,
+  "retro_realizations": 2,
+  "alternatives": 4,
+  "recipes": 3
+}

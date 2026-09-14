@@ -636,7 +636,7 @@ function App() {
         </div>
       </div>
 
-      {recommendationResult && <RecommendationResults result={recommendationResult} />}
+      {recommendationResult && <RecommendationResults result={recommendationResult} libraryMode={libraryMode} />}
       {weakLabelResult && <WeakLabelRecommendationResults result={weakLabelResult} />}
       {forwardSynthesisResult && <ForwardSynthesisResults result={forwardSynthesisResult} />}
       {retrosynthesisResult && <RetrosynthesisResults result={retrosynthesisResult} />}

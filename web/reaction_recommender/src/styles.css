@@ -8,6 +8,14 @@
 
 * { box-sizing: border-box; }
 
+.reaction-context { margin: 18px; padding: 16px; border: 1px solid #cfddd4; border-radius: 10px; background: #f7faf8; }
+.reaction-context summary { cursor: pointer; line-height: 1.5; font-weight: 600; }
+.reaction-context p { margin: 10px 0; line-height: 1.5; overflow-wrap: anywhere; }
+.reaction-context section { margin-top: 20px; }
+.reaction-context details { margin-top: 10px; padding: 10px 12px; border: 1px solid #dce5df; border-radius: 6px; background: white; }
+.reaction-context pre { max-height: 300px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.reaction-context li { margin: 6px 0; overflow-wrap: anywhere; }
+
 body {
   margin: 0;
   min-width: 320px;

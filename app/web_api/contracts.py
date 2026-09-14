@@ -72,6 +72,13 @@ class RecommendationRequest(StrictRequest):
     completion_choices: tuple[CompletionChoiceRequest, ...] = ()
 
 
+class ReactionContextRequest(StrictRequest):
+    """On-demand graph planning alongside a complete condition query."""
+
+    reaction_smiles: str = Field(min_length=1, max_length=20_000)
+    library_mode: Literal["full", "compact"] = "full"
+
+
 class FeatureAnalysisRequest(StrictRequest):
     """One auto-detected molecule or reaction featurization request."""
 

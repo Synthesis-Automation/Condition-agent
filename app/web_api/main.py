@@ -20,6 +20,7 @@ from .contracts import (
     MultistepRetrosynthesisRequest,
     PrepareReactionRequest,
     RecommendationRequest,
+    ReactionContextRequest,
     RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
     RenderMoleculeRequest,
@@ -124,6 +125,17 @@ def create_app(
     ) -> dict[str, Any]:
         try:
             data = active_runtime(request).recommend(payload)
+        except (ValueError, FileNotFoundError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/recommendations/context")
+    def reaction_context(
+        payload: ReactionContextRequest, request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).reaction_context(payload)
         except (ValueError, FileNotFoundError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(status_code=status, detail=error_payload(exc)) from exc

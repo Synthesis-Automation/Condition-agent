@@ -1232,3 +1232,37 @@ export interface MultistepRetrosynthesisResult {
   diagnostics: MultistepSearchDiagnostics
   warnings: string[]
 }
+export interface ReactionContextResult {
+  schema_version: string
+  definition_id: string
+  query_reaction_smiles: string
+  library_mode: 'full' | 'compact'
+  advisory_only: boolean
+  warnings: string[]
+  reactant_analysis: Partial<ForwardStepAssessment> & {
+    status: string
+    error?: string
+    blind_prediction?: ForwardPrediction
+  }
+  product_analysis: {
+    status: string
+    error?: string
+    display_limit_reached?: boolean
+    search_diagnostics?: { budget_limited: boolean }
+    alternatives: Array<{
+      reaction_smiles: string
+      evidence_kind: string
+      precedent_reaction_ids: string[]
+      operator_id: string
+      relation: {
+        kind: 'supplied_reaction' | 'precursor_alternative' | 'route_alternative' | 'different_product' | 'unresolved'
+        inputs_changed: boolean
+        core_level: string | null
+        differences: string[]
+        reasons: string[]
+      }
+      conditions: RecommendationResult | null
+      condition_error?: string
+    }>
+  }
+}

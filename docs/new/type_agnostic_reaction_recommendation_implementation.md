@@ -7,6 +7,11 @@
 
 ## 1. Purpose and authority
 
+2026-09-15: [advisory reaction-context planning](reaction_context_planning_20260915.md)
+adds an on-demand Workbench forward/retro analysis with separate precursor/route
+condition evidence. It leaves original-query qualification and ranking intact;
+large-library forward coverage remains a measured limitation.
+
 2026-09-14: [three-view condition retrieval](three_view_condition_retrieval_20260914.md)
 adds persisted reactant-side candidate keys alongside direct and product-side
 lookup, with common qualification and bounded candidate scheduling.

@@ -67,6 +67,7 @@ from .contracts import (
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     RecommendationRequest,
+    ReactionContextRequest,
     RetrosynthesisConditionsRequest,
     RetrosynthesisRequest,
 )
@@ -221,6 +222,8 @@ class WebRuntime(Protocol):
     def prepare_reaction(self, reaction_smiles: str) -> Dict[str, Any]: ...
 
     def recommend(self, request: RecommendationRequest) -> Dict[str, Any]: ...
+
+    def reaction_context(self, request: ReactionContextRequest) -> Dict[str, Any]: ...
 
     def analyze_features(self, request: FeatureAnalysisRequest) -> Dict[str, Any]: ...
 
@@ -906,6 +909,30 @@ class LocalRecommendationRuntime:
             reference_catalog,
             experimental_catalog,
         )
+
+    def reaction_context(self, request: ReactionContextRequest) -> Dict[str, Any]:
+        """Compose advisory planning without rebuilding libraries during requests."""
+        from chem_coworker.reaction_context import explore_reaction_context
+
+        def forward_library() -> ForwardOperatorLibrary:
+            if not self._prepared_forward_library_current(request.library_mode):
+                raise FileNotFoundError("PREBUILT_FORWARD_LIBRARY_UNAVAILABLE_OR_STALE")
+            return self._get_forward_library(request.library_mode)
+
+        def recommend(reaction: str, **kwargs: Any) -> Any:
+            return self._get_recommender(
+                library_mode=request.library_mode, use_rxnmapper=False,
+                include_review=False,
+            ).recommend(reaction, **kwargs)
+
+        return {
+            **explore_reaction_context(
+                request.reaction_smiles.strip(), forward_library=forward_library,
+                retro_library=lambda: self._get_retrosynthesis_library(request.library_mode),
+                recommend=recommend,
+            ),
+            "library_mode": request.library_mode,
+        }
 
     def analyze_features(
         self,

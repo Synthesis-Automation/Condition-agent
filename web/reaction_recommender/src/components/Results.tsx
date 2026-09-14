@@ -21,6 +21,7 @@ import type {
   WeakLabelRecommendationResult,
 } from '../api/types'
 import { ReactionImage } from './ReactionImage'
+import { ReactionContext } from './ReactionContext'
 
 const ROLE_FIELDS: Array<[keyof ResolvedRecipe, string]> = [
   ['catalysts', 'Catalyst'],
@@ -446,7 +447,7 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
   )
 }
 
-export function RecommendationResults({ result }: { result: RecommendationResult }) {
+export function RecommendationResults({ result, libraryMode }: { result: RecommendationResult; libraryMode?: 'full' | 'compact' }) {
   const [selected, setSelected] = useState(0)
   useEffect(() => setSelected(0), [result])
   const active = result.recommendations[selected]
@@ -487,6 +488,7 @@ export function RecommendationResults({ result }: { result: RecommendationResult
           {active && <RecommendationDetails item={active} />}
         </div>
       )}
+      {libraryMode && <ReactionContext reaction={result.query_reaction_smiles} libraryMode={libraryMode} summarizeRecipe={recipeSummary} />}
     </section>
   )
 }
