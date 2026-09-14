@@ -13,7 +13,7 @@ from .shared_core_index import build_shared_core_index
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Build derived keys or emit an auditable dual-channel query result."""
+    """Build derived keys or emit an auditable three-view query result."""
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     build = commands.add_parser(

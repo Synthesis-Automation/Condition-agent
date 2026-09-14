@@ -153,6 +153,14 @@ the current asset filenames.
 
 ## Research workbench workflow (`--workbench`)
 
+Condition recommendation uses direct reaction, reactant-side and product-side
+precedent views under one graph-comparison and recipe-ranking pipeline.
+**Automatic broadening** consults the side views when independent direct
+support is sparse; **Broader analogues** explicitly consults all three.
+Recommendation evidence identifies reactant-side matches. See the
+[three-view retrieval report](../../docs/new/three_view_condition_retrieval_20260914.md)
+for the derived-index rebuild and verification details.
+
 The precedent selector displays the loaded index's actual record count. An
 explicit custom `--index` is labeled “Custom index”, so a development sample
 cannot be mistaken for Full. For the default Full/Compact shared-core artifacts,

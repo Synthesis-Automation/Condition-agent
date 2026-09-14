@@ -392,6 +392,7 @@ function RecommendationDetails({ item }: { item: Recommendation }) {
           {item.match_level && <p className="match-level" title="Evidence distance, not a success probability">{item.match_namespace === 'shared_reaction_core.v2' ? item.match_label : `Level ${item.match_level} · ${item.match_label}`}</p>}
           {item.evidence_relation === 'analogue_evidence' && <p className="support-summary">Related precedent: its reported inputs differ from this query.</p>}
           {item.candidate_channels?.includes('product_side') && <p className="support-summary">Also found through product-side reaction matching.</p>}
+          {item.candidate_channels?.includes('reactant_side') && <p className="support-summary">Also found through reactant-side reaction matching.</p>}
           {item.match_details?.map((detail) => <p key={detail} className="support-summary">{detail}</p>)}
           <SelectedRecipeConditions recipe={item.resolved_recipe} />
         </div>

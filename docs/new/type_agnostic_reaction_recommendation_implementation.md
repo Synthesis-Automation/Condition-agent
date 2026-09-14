@@ -7,6 +7,10 @@
 
 ## 1. Purpose and authority
 
+2026-09-14: [three-view condition retrieval](three_view_condition_retrieval_20260914.md)
+adds persisted reactant-side candidate keys alongside direct and product-side
+lookup, with common qualification and bounded candidate scheduling.
+
 Next-stage work is recorded in the [shared-core follow-up validation](shared_core_followup_validation_20260913.md):
 diagnostic disagreement review, stricter cross-publication equivalence grouping,
 and a frozen 20,000-observation evaluation panel. Automated diagnostic labels

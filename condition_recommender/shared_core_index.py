@@ -24,6 +24,10 @@ from reactive_taxonomy.shared_reaction_core import (
     build_shared_reaction_core,
     shared_core_definition_hash,
 )
+from reactive_taxonomy.shared_core_reactants import (
+    reactant_core_key,
+    reactant_projection_definition_hash,
+)
 
 from .generic_indexing import (
     GenericIndexedReaction,
@@ -31,7 +35,7 @@ from .generic_indexing import (
     _indexed_reaction_payload,
 )
 
-STORAGE_VERSION = "1.0"
+STORAGE_VERSION = "2.0"
 
 
 class SharedCoreBuildCancelled(RuntimeError):
@@ -123,6 +127,8 @@ def load_shared_core_index(
         count = connection.execute("SELECT count(*) FROM projection").fetchone()[0]
     if (
         metadata.get("storage_version") != STORAGE_VERSION
+        or metadata.get("reactant_projection_hash")
+        != reactant_projection_definition_hash()
         or count != metadata.get("row_count")
         or metadata.get("build_complete", True) is not True
     ):
@@ -161,11 +167,13 @@ def _project_rows(
                 (
                     ("whole_reaction", projection.reaction_identity),
                     ("product_identity", projection.product_identity),
+                    ("reactant_identity", projection.input_identity),
                 )
             )
         for level in projection.levels:
             keys.add((level.level, level.key))
             keys.add(("product_core", level.product_side_key))
+            keys.add(("reactant_core", reactant_core_key(level.graph_payload)))
         results.append(
             (
                 position,
@@ -271,6 +279,7 @@ def build_shared_core_index(
         storage_version=STORAGE_VERSION,
         source_identity=_index_identity(index),
         definition_hash=shared_core_definition_hash(),
+        reactant_projection_hash=reactant_projection_definition_hash(),
         row_count=len(index.rows),
         status="experimental_pending_independent_review",
         build_complete=False,
@@ -290,6 +299,7 @@ def build_shared_core_index(
                     "storage_version",
                     "source_identity",
                     "definition_hash",
+                    "reactant_projection_hash",
                     "row_count",
                 ):
                     if checkpoint.get(key) != metadata[key]:

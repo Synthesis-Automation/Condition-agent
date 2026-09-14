@@ -1,0 +1,11 @@
+{
+  "definition_id": "shared_core_reactant_projection.v1",
+  "schema_version": "1.0",
+  "source": "shared_reaction_core.v2",
+  "retained_side": "before",
+  "retain_center_anchors": true,
+  "retain_center_distances": true,
+  "include_after_states": false,
+  "include_edit_events": false,
+  "usage": "candidate_retrieval_only"
+}

@@ -1,0 +1,12 @@
+{
+  "definition_id": "shared_core_retrieval.v3",
+  "schema_version": "3.0",
+  "aggregation_context": "anchored_source_ports_or_exact_inputs",
+  "status": "experimental_pending_independent_review",
+  "minimum_independent_support": 2,
+  "candidate_limit": 768,
+  "direct_candidate_limit": 512,
+  "auxiliary_scheduling": "round_robin",
+  "levels": ["whole_reaction", "observed_local", "retained_local", "retained_typed"],
+  "labels": ["Whole reaction", "L0: detailed local reaction", "L1: shared transformation", "L2: broader core"]
+}

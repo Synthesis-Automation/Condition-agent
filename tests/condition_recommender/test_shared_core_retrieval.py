@@ -108,8 +108,13 @@ def test_product_channel_and_retro_seeds_have_identical_qualification(tmp_path):
     )
     assert first["comparison"] == second["comparison"]
     assert first["condition_compatibility"] == second["condition_compatibility"]
-    assert set(first["channels"]) == {"direct", "product_side"}
-    assert set(second["channels"]) == {"direct", "product_side", "retro_precedent"}
+    assert set(first["channels"]) == {"direct", "product_side", "reactant_side"}
+    assert set(second["channels"]) == {
+        "direct",
+        "product_side",
+        "reactant_side",
+        "retro_precedent",
+    }
     assert seeded.independent_compatible_candidate_count == 1
     assert seeded.candidate_count == 1
     assert any(
@@ -340,16 +345,118 @@ def test_candidate_budget_is_bounded_and_reported(tmp_path, monkeypatch):
     assert "SHARED_CORE_CANDIDATE_BUDGET_REACHED" in result.warnings
 
 
-def test_web_runtime_defaults_to_shared_core_and_response_contract(tmp_path, monkeypatch):
+def test_reactant_channel_alone_recovers_qualified_precedents(tmp_path, monkeypatch):
+    from condition_recommender.shared_core_index import SharedCoreIndex
+
+    recommender = engine(tmp_path, [record(1, BROMIDE)])
+    original = SharedCoreIndex.lookup
+
+    def only_reactants(self, kind, key, limit):
+        return (
+            original(self, kind, key, limit)
+            if kind.startswith("reactant_")
+            else ((), False)
+        )
+
+    monkeypatch.setattr(SharedCoreIndex, "lookup", only_reactants)
+    result = recommender.recommend(QUERY)
+    assert result.valid and result.candidate_count == 1
+    assert result.recommendations[0].candidate_channels == ("reactant_side",)
+    assert result.recommendations[0].evidence_relation == "analogue_evidence"
+
+
+def test_same_reactants_wrong_product_cannot_supply_conditions(tmp_path):
+    query = "[CH3:1][CH2:2][Br:3].[NH3:4]>>[CH3:1][CH2:2][NH2:4]"
+    elimination = "[CH3:1][CH2:2][Br:3].[NH3:4]>>[CH2:1]=[CH2:2]"
+    result = engine(tmp_path, [record(1, elimination)]).recommend(query)
+    assert not result.recommendations
+    entry = next(
+        x for x in result.shared_core_trace if x.get("reaction_id") == "reaction-1"
+    )
+    assert "reactant_side" in entry["channels"]
+    assert not entry["comparison"]["eligible"]
+
+
+def test_reactant_seed_cannot_bypass_condition_constraints(tmp_path, monkeypatch):
+    from condition_recommender.shared_core_index import SharedCoreIndex
+
+    recommender = engine(tmp_path, [record(1, BROMIDE, temperature=150)])
+    original = SharedCoreIndex.lookup
+    monkeypatch.setattr(
+        SharedCoreIndex,
+        "lookup",
+        lambda self, kind, key, limit: original(self, kind, key, limit)
+        if kind.startswith("reactant_")
+        else ((), False),
+    )
+    constraint = normalize_condition_constraint(
+        "maximum_temperature_c", "80", provenance="explicit_user"
+    ).constraint
+    result = recommender.recommend(
+        QUERY, condition_constraints=ConditionConstraintSet((constraint,))
+    )
+    assert not result.recommendations and result.excluded_candidate_count == 1
+    assert not result.shared_core_trace[0]["condition_compatibility"]["compatible"]
+
+
+def test_auxiliary_channels_share_reserved_budget(tmp_path, monkeypatch):
+    import condition_recommender.shared_core_retrieval as module
+    from condition_recommender.shared_core_index import SharedCoreIndex
+
+    recommender = engine(tmp_path, [record(i, QUERY) for i in range(6)])
+    rules = module.load_shared_retrieval_rules()
+    monkeypatch.setattr(
+        module,
+        "load_shared_retrieval_rules",
+        lambda: {
+            **rules,
+            "candidate_limit": 4,
+            "direct_candidate_limit": 2,
+        },
+    )
+
+    def lookup(self, kind, key, limit):
+        # Existing direct hits must not consume the product channel's turns.
+        values = {
+            "whole_reaction": (0, 1),
+            "product_identity": (0, 1, 2, 4),
+            "reactant_identity": (3, 5),
+        }
+        return values.get(kind, ()), False
+
+    monkeypatch.setattr(SharedCoreIndex, "lookup", lookup)
+    result = recommender.recommend(QUERY, search_scope="broad", top_k=6)
+    entries = {
+        x["reaction_id"]: x for x in result.shared_core_trace if "reaction_id" in x
+    }
+    assert set(entries) == {"reaction-0", "reaction-1", "reaction-2", "reaction-3"}
+    assert entries["reaction-2"]["channels"] == ["product_side"]
+    assert entries["reaction-3"]["channels"] == ["reactant_side"]
+    assert "SHARED_CORE_CANDIDATE_BUDGET_REACHED" in result.warnings
+
+
+def test_artifact_without_reactant_projection_contract_requires_rebuild(tmp_path):
+    recommender = engine(tmp_path, [record(1, BROMIDE)])
+    with sqlite3.connect(recommender.shared_core_index.path) as connection:
+        metadata = json.loads(
+            connection.execute("SELECT payload FROM metadata").fetchone()[0]
+        )
+        metadata.pop("reactant_projection_hash")
+        connection.execute("UPDATE metadata SET payload=?", (json.dumps(metadata),))
+    with pytest.raises(ValueError, match="artifact manifest"):
+        load_shared_core_index(recommender.shared_core_index.path, recommender.index)
+
+
+def test_web_runtime_defaults_to_shared_core_and_response_contract(
+    tmp_path, monkeypatch
+):
     from fastapi.testclient import TestClient
     from app.web_api.main import create_app
     from app.web_api.runtime import LocalRecommendationRuntime
 
     monkeypatch.delenv("CONDITION_SHARED_CORE_EXPERIMENTAL", raising=False)
     engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
-    runtime = LocalRecommendationRuntime(
-        index_path=tmp_path / "generic_index.sqlite"
-    )
+    runtime = LocalRecommendationRuntime(index_path=tmp_path / "generic_index.sqlite")
     assert runtime.capabilities()["recommendation_engine"] == "shared_reaction_core.v2"
     with TestClient(create_app(runtime=runtime, recommendation_only=False)) as client:
         response = client.post(
@@ -367,21 +474,32 @@ def test_default_loader_requires_bound_companion_and_baseline_is_explicit(tmp_pa
     engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
     source = tmp_path / "generic_index.sqlite"
     default = GenericConditionRecommender.from_path(source)
-    assert default.recommend(QUERY).recommendations[0].match_namespace == "shared_reaction_core.v2"
+    assert (
+        default.recommend(QUERY).recommendations[0].match_namespace
+        == "shared_reaction_core.v2"
+    )
     baseline = GenericConditionRecommender.from_path(source, use_shared_core=False)
     assert baseline.shared_core_index is None
     with pytest.raises(ValueError, match="requires use_shared_core"):
         GenericConditionRecommender.from_path(
-            source, use_shared_core=False,
+            source,
+            use_shared_core=False,
             shared_core_path=source.with_suffix(".shared_core.sqlite"),
         )
     source.with_suffix(".shared_core.sqlite").unlink()
     with pytest.raises(FileNotFoundError, match="Shared-core artifact is unavailable"):
         GenericConditionRecommender.from_path(source)
-    assert GenericConditionRecommender.from_path(source, use_shared_core=False).shared_core_index is None
+    assert (
+        GenericConditionRecommender.from_path(
+            source, use_shared_core=False
+        ).shared_core_index
+        is None
+    )
 
 
-def test_web_runtime_baseline_override_and_constructor_precedence(tmp_path, monkeypatch):
+def test_web_runtime_baseline_override_and_constructor_precedence(
+    tmp_path, monkeypatch
+):
     from app.web_api.runtime import LocalRecommendationRuntime
 
     engine(tmp_path, [record(1, BROMIDE)], sqlite=True)
@@ -389,9 +507,19 @@ def test_web_runtime_baseline_override_and_constructor_precedence(tmp_path, monk
     monkeypatch.setenv("CONDITION_SHARED_CORE_EXPERIMENTAL", "0")
     runtime = LocalRecommendationRuntime(index_path=source)
     assert runtime.capabilities()["recommendation_engine"] == "baseline"
-    assert runtime._get_recommender(library_mode="full", use_rxnmapper=False, include_review=False).shared_core_index is None
+    assert (
+        runtime._get_recommender(
+            library_mode="full", use_rxnmapper=False, include_review=False
+        ).shared_core_index
+        is None
+    )
     explicit = LocalRecommendationRuntime(index_path=source, shared_core_enabled=True)
-    assert explicit._get_recommender(library_mode="full", use_rxnmapper=False, include_review=False).shared_core_index is not None
+    assert (
+        explicit._get_recommender(
+            library_mode="full", use_rxnmapper=False, include_review=False
+        ).shared_core_index
+        is not None
+    )
 
 
 def test_default_review_loader_uses_review_bound_projection(tmp_path, monkeypatch):
@@ -414,9 +542,12 @@ def test_default_review_loader_uses_review_bound_projection(tmp_path, monkeypatc
     )
     assert len(recommender.index.rows) == 2
     assert recommender.shared_core_index.path == companion.resolve()
-    assert GenericConditionRecommender.from_path(
-        source, include_review=True
-    ).shared_core_index.path == companion.resolve()
+    assert (
+        GenericConditionRecommender.from_path(
+            source, include_review=True
+        ).shared_core_index.path
+        == companion.resolve()
+    )
 
 
 def test_default_loader_rejects_stale_projection(tmp_path):

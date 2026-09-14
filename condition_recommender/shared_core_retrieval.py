@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections import defaultdict
+from collections import defaultdict, deque
 from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any, Mapping
@@ -13,6 +13,10 @@ from reactive_taxonomy.shared_reaction_core import (
     LEVELS,
     build_shared_reaction_core,
     compare_reaction_cores,
+)
+from reactive_taxonomy.shared_core_reactants import (
+    reactant_core_key,
+    reactant_projection_definition_hash,
 )
 
 from .compatibility import filter_compatible_precedents
@@ -31,21 +35,28 @@ def load_shared_retrieval_rules() -> dict[str, Any]:
     """Validate explicit candidate budgets and level display semantics."""
     rules = json.loads(
         (
-            Path(__file__).with_name("definitions") / "shared_core_retrieval.v2.json"
+            Path(__file__).with_name("definitions") / "shared_core_retrieval.v3.json"
         ).read_text(encoding="utf-8")
     )
     if (
-        rules.get("definition_id") != "shared_core_retrieval.v2"
-        or rules.get("schema_version") != "2.0"
+        rules.get("definition_id") != "shared_core_retrieval.v3"
+        or rules.get("schema_version") != "3.0"
+        or rules.get("auxiliary_scheduling") != "round_robin"
         or rules.get("aggregation_context") != "anchored_source_ports_or_exact_inputs"
         or rules.get("levels") != ["whole_reaction", *LEVELS]
         or len(rules.get("labels", [])) != 4
         or rules.get("status") != "experimental_pending_independent_review"
     ):
         raise ValueError("invalid shared core retrieval definition")
-    for name in ("minimum_independent_support", "candidate_limit"):
+    for name in (
+        "minimum_independent_support",
+        "candidate_limit",
+        "direct_candidate_limit",
+    ):
         if type(rules.get(name)) is not int or rules[name] < 1:
             raise ValueError(f"invalid {name}")
+    if rules["direct_candidate_limit"] >= rules["candidate_limit"]:
+        raise ValueError("auxiliary channels require reserved candidate capacity")
     return rules
 
 
@@ -65,7 +76,7 @@ def recommend_from_shared_core(
     molecular_features: Mapping[str, Any] | None = None,
     condition_constraints: ConditionConstraintSet | None = None,
 ) -> GenericRecommendationResult:
-    """Union direct and product-side seeds, then compare and filter once.
+    """Union direct, reactant-side and product-side seeds, then qualify once.
 
     Product-side retrieval reuses persisted observed product cores. Explicit
     retro operator precedent IDs enter through the same comparison, with no
@@ -89,8 +100,10 @@ def recommend_from_shared_core(
         transformation_class=signature.get("transformation_class"),
         recommendation_mode="experimental_shared_core",
         search_scope=search_scope,
-        retrieval_definition_version="shared_core_retrieval.v2@2.0;"
-        + query.definition_hash,
+        retrieval_definition_version="shared_core_retrieval.v3@3.0;"
+        + query.definition_hash
+        + ";reactant_projection:"
+        + reactant_projection_definition_hash(),
         warnings=(
             "EXPERIMENTAL_SHARED_CORE_PENDING_INDEPENDENT_REVIEW",
             *query.warnings,
@@ -106,6 +119,7 @@ def recommend_from_shared_core(
             ),
         )
     limit = rules["candidate_limit"]
+    direct_limit = min(limit, rules["direct_candidate_limit"])
     channels: dict[int, set[str]] = defaultdict(set)
     audited: dict[int, dict[str, Any]] = {}
     eligible: dict[int, tuple[Any, Any]] = {}
@@ -120,10 +134,10 @@ def recommend_from_shared_core(
 
     def add(kind: str, key: str, channel: str) -> None:
         nonlocal truncated
-        positions, capped = shared_index.lookup(kind, key, limit)
+        positions, capped = shared_index.lookup(kind, key, direct_limit)
         truncated |= capped
         for position in positions:
-            if position not in channels and len(channels) >= limit:
+            if position not in channels and len(channels) >= direct_limit:
                 truncated = True
                 continue
             channels[position].add(channel)
@@ -193,12 +207,32 @@ def recommend_from_shared_core(
         if count >= minimum and search_scope != "broad":
             break
 
+    auxiliary: dict[str, deque[int]] = {}
     if support() < minimum or search_scope == "broad":
-        add("product_identity", query.product_identity, "product_side")
-        for level in query.levels:
-            add("product_core", level.product_side_key, "product_side")
+        for channel, keys in (
+            (
+                "product_side",
+                [("product_identity", query.product_identity)]
+                + [("product_core", level.product_side_key) for level in query.levels],
+            ),
+            (
+                "reactant_side",
+                [("reactant_identity", query.input_identity)]
+                + [
+                    ("reactant_core", reactant_core_key(level.graph_payload))
+                    for level in query.levels
+                ],
+            ),
+        ):
+            found: dict[int, None] = {}
+            for kind, key in keys:
+                positions, capped = shared_index.lookup(kind, key, direct_limit)
+                truncated |= capped
+                found.update(dict.fromkeys(positions))
+            auxiliary[channel] = deque(found)
     # Retro seeds share the budget and all original-query gates. Missing links
     # stay visible, including operators whose observations have no condition row.
+    seeded: dict[int, None] = {}
     for reaction_id in dict.fromkeys(preferred_reaction_ids):
         positions = index.reaction_ids.get(reaction_id, ())
         if not positions:
@@ -208,11 +242,22 @@ def recommend_from_shared_core(
                     "reason": "RETRO_PRECEDENT_NOT_IN_CONDITION_INDEX",
                 }
             )
-        for position in positions:
-            if position not in channels and len(channels) >= limit:
-                truncated = True
-                continue
-            channels[position].add("retro_precedent")
+        seeded.update(dict.fromkeys(positions))
+    auxiliary["retro_precedent"] = deque(seeded)
+    # Existing direct capacity stays intact. Auxiliary providers share the
+    # reserved capacity fairly; a lookup channel is never an extra evidence vote.
+    while any(auxiliary.values()):
+        for channel, queue in auxiliary.items():
+            while queue:
+                position = queue.popleft()
+                if position in channels:
+                    channels[position].add(channel)
+                    continue
+                if len(channels) >= limit:
+                    truncated = True
+                    continue
+                channels[position].add(channel)
+                break
     qualify()
     for position in sorted(audited):
         diagnostics.append(
