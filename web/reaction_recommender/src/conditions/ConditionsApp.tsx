@@ -15,6 +15,10 @@ const ROLES = [
   ['solvents', 'Solvent'], ['other_components', 'Other material'],
 ] as const
 
+const SOURCES = ['generic', 'weak_label'] as const
+type ConditionSource = typeof SOURCES[number]
+const SOURCE_LABELS = { generic: 'Literature-based', weak_label: 'Screening suggestions' }
+
 function materialName(item: RecipeComponent): string {
   return String(item.canonical_name || item.display_name || item.name || item.raw_identifier || item.cas || item.substance_id || 'Identity not resolved')
 }
@@ -83,7 +87,7 @@ function Procedure({ recipe }: { recipe: ResolvedRecipe }) {
 }
 
 function Evidence({ option }: { option: ConditionOption }) {
-  return <details className="condition-evidence">
+  return <details className="condition-evidence" open>
     <summary>Details & references</summary>
     {option.cautions.length > 0 && <section><h4>Review notes</h4><ul>{option.cautions.map((caution, i) => <li key={i}>{caution.includes(' ') ? caution : readable(caution)}</li>)}</ul></section>}
     {option.evidence.map((evidence, index) => {
@@ -120,9 +124,9 @@ function Evidence({ option }: { option: ConditionOption }) {
   </details>
 }
 
-function ConditionCard({ option, source, number, onDownload, selected, onSelect }: {
-  option: ConditionOption; source: 'generic' | 'weak_label'; number: number
-  onDownload: () => void; selected: boolean; onSelect: () => void
+function ConditionDetails({ option, source, number, onDownload }: {
+  option: ConditionOption; source: ConditionSource; number: number
+  onDownload: () => void
 }) {
   const [copyStatus, setCopyStatus] = useState('Copy conditions')
   const recipe = option.resolved_recipe
@@ -138,8 +142,7 @@ function ConditionCard({ option, source, number, onDownload, selected, onSelect 
   }
   return <article className={`condition-option ${screening ? 'weak_label' : option.evidence_kind}`}>
     <div className="condition-option-heading">
-      <div><span className="condition-rank">{String(number).padStart(2, '0')}</span><h3>{screening ? 'Screen' : 'Precedent'} {number}</h3></div>
-      <label className="condition-select"><input type="checkbox" checked={selected} onChange={onSelect} aria-label={`Select ${screening ? 'screen' : 'precedent'} ${number}`} />Select</label>
+      <h3>{screening ? 'Screen' : 'Precedent'} {number}</h3>
     </div>
     <div className="condition-badges"><span className={`condition-badge ${screening ? 'weak_label' : option.evidence_kind}`}>{screening ? 'Weak-label screening' : primary.match_label || option.evidence_label}</span>
       <span>{!screening ? `${primary.reference_support ?? 0} reference(s)` : `${primary.support ?? 0} source observation(s)`}</span>
@@ -147,12 +150,88 @@ function ConditionCard({ option, source, number, onDownload, selected, onSelect 
       {new Set(option.evidence.map(item => item.source)).size > 1 && <span>Supported by both sources</span>}
     </div>
     <Procedure recipe={recipe} />
-    <Evidence option={option} />
     <div className="condition-card-actions">
       <button className="button secondary" onClick={() => void copy()}>{copyStatus}</button>
       <button className="button quiet" onClick={onDownload}>Export recipe</button>
     </div>
+    <Evidence option={option} />
   </article>
+}
+
+function ConditionResults({ result, selected, onSelect, onDownload }: {
+  result: ConditionsResult; selected: string[]
+  onSelect: (optionId: string) => void; onDownload: (option: ConditionOption) => void
+}) {
+  const optionsFor = (source: ConditionSource) => result.recommendations
+    .filter(option => option.evidence.some(item => item.source === source))
+    .sort((left, right) => (left.evidence.find(item => item.source === source)?.recommendation.rank ?? left.rank)
+      - (right.evidence.find(item => item.source === source)?.recommendation.rank ?? right.rank))
+  const [activeSource, setActiveSource] = useState<ConditionSource>(() => optionsFor('generic').length ? 'generic' : optionsFor('weak_label').length ? 'weak_label' : 'generic')
+  const [viewed, setViewed] = useState<Partial<Record<ConditionSource, string>>>({})
+  const detailRef = useRef<HTMLElement>(null)
+
+  const viewOption = (source: ConditionSource, optionId: string) => {
+    setViewed(current => ({ ...current, [source]: optionId }))
+    if (window.matchMedia('(max-width: 900px)').matches) {
+      window.requestAnimationFrame(() => detailRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
+    }
+  }
+
+  return <>
+    <div className="condition-tabs" role="tablist" aria-label="Condition sources">
+      {SOURCES.map(source => <button key={source} type="button" role="tab"
+        id={`condition-tab-${source}`} aria-controls={`condition-panel-${source}`}
+        aria-selected={activeSource === source} tabIndex={activeSource === source ? 0 : -1}
+        onClick={() => setActiveSource(source)} onKeyDown={event => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+          event.preventDefault()
+          const next = event.key === 'Home' ? SOURCES[0] : event.key === 'End' ? SOURCES[1] : SOURCES.find(item => item !== source)!
+          setActiveSource(next)
+          document.getElementById(`condition-tab-${next}`)?.focus()
+        }}>{SOURCE_LABELS[source]} <span>{optionsFor(source).length}</span></button>)}
+    </div>
+    {result.sources.filter(source => source.status !== 'ok').map(source => <p className="condition-note" key={source.source}>{SOURCE_LABELS[source.source]}: {source.message}</p>)}
+    {SOURCES.map(source => {
+      const options = optionsFor(source)
+      const current = options.find(option => option.option_id === viewed[source]) || options[0]
+      const screening = source === 'weak_label'
+      const noun = screening ? 'screen' : 'precedent'
+      return <section key={source} role="tabpanel" id={`condition-panel-${source}`}
+        aria-labelledby={`condition-tab-${source}`} hidden={activeSource !== source} tabIndex={0}>
+        {activeSource === source && <>
+          <p className="conditions-tab-description">{screening ? 'Weak-label suggestions. Source reaction structures are not verified.' : 'Literature precedents, closest structural matches first.'}</p>
+          {!current ? <div className="conditions-empty">{screening ? 'No supported screening suggestions for this reaction.' : 'No qualifying literature precedents for this search.'}</div> : <div className="conditions-browser">
+            <div className="condition-table-panel">
+              <p className="condition-table-hint">Select a row for details. Check recipes to build a screening set.</p>
+              <div className="condition-table-scroll" role="region" aria-label={`${SOURCE_LABELS[source]} table`} tabIndex={0}>
+                <table className="condition-table" aria-label={`${SOURCE_LABELS[source]} suggestions`}>
+                  <colgroup><col className="condition-check-col" /><col className="condition-number-col" /><col /><col className="condition-solvent-col" /><col className="condition-yield-col" /></colgroup>
+                  <thead><tr><th scope="col"><span className="condition-sr-only">Add to screening set</span></th><th scope="col">No.</th><th scope="col">Catalyst / reagents</th><th scope="col">Solvent</th><th scope="col">Reported yield</th></tr></thead>
+                  <tbody>{options.map((option, index) => {
+                    const materials = groups(option.resolved_recipe)
+                    const reagents = materials.filter(group => group.label !== 'Solvent').map(group => group.values.map(materialName).join(', ')).join(' · ') || 'Not reported'
+                    const solvents = materials.find(group => group.label === 'Solvent')?.values.map(materialName).join(', ') || 'Not reported'
+                    const primary = option.evidence.find(item => item.source === source)!.recommendation
+                    const active = option.option_id === current.option_id
+                    return <tr key={option.option_id} data-active={active} onClick={() => viewOption(source, option.option_id)}>
+                      <td onClick={event => event.stopPropagation()}><input type="checkbox" aria-label={`Select ${noun} ${index + 1}`} checked={selected.includes(option.option_id)} onChange={() => onSelect(option.option_id)} /></td>
+                      <td><button type="button" className="condition-row-link" aria-label={`View ${noun} ${index + 1}`} aria-current={active ? 'true' : undefined} aria-controls={`condition-details-${source}`}>{index + 1}</button></td>
+                      <td><span className="condition-table-material" title={reagents}>{reagents}</span></td>
+                      <td><span className="condition-table-material" title={solvents}>{solvents}</span></td>
+                      <td>{primary.historical_yield_pct != null ? `${primary.historical_yield_pct}%` : <span aria-label="Not reported">—</span>}</td>
+                    </tr>
+                  })}</tbody>
+                </table>
+              </div>
+            </div>
+            <section key={`${source}-${current.option_id}`} ref={detailRef} className="condition-detail-panel" id={`condition-details-${source}`} aria-label="Selected suggestion details" tabIndex={0}>
+              <ConditionDetails option={current} source={source} number={options.indexOf(current) + 1} onDownload={() => onDownload(current)} />
+            </section>
+          </div>}
+        </>}
+      </section>
+    })}
+  </>
 }
 
 export default function ConditionsApp() {
@@ -164,7 +243,6 @@ export default function ConditionsApp() {
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState('')
   const [proposal, setProposal] = useState<CompletionProposal | null>(null)
-  const [visible, setVisible] = useState({ generic: 3, weak_label: 3 })
   const [topK, setTopK] = useState(10)
   const [searchScope, setSearchScope] = useState<ConditionSearchScope>('automatic')
   const [selected, setSelected] = useState<string[]>([])
@@ -209,7 +287,7 @@ export default function ConditionsApp() {
       if (!response.ok) throw new Error(typeof body.detail?.message === 'string' ? body.detail.message : 'The search could not complete. Check the reaction and try again.')
       if (currentId !== requestId.current) return
       const next = body.data as ConditionsResult
-      setResult(next); setVisible({ generic: next.shortlist_size, weak_label: next.shortlist_size }); setStatus('')
+      setResult(next); setStatus('')
       window.setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
     } catch (caught) {
       if (currentId === requestId.current) { setError(caught instanceof Error ? caught.message : 'Search failed.'); setStatus('') }
@@ -229,15 +307,13 @@ export default function ConditionsApp() {
   }
 
   const available = capabilities?.recommendation || capabilities?.weak_label_recommendation
-  const optionsFor = (source: 'generic' | 'weak_label') => (result?.recommendations.filter(option => option.evidence.some(item => item.source === source)) || [])
-    .sort((left, right) => (left.evidence.find(item => item.source === source)?.recommendation.rank ?? left.rank) - (right.evidence.find(item => item.source === source)?.recommendation.rank ?? right.rank))
   return <div className="conditions-app">
     <header className="conditions-header"><a href="/" className="conditions-brand"><span className="conditions-logo" aria-hidden="true">ZBS</span><h1>ZBS chemistry recommender</h1></a><span className="conditions-service"><i className={available ? 'available' : ''} />{capabilities ? result?.sources.some(source => source.status === 'unavailable') ? 'Some libraries unavailable' : available ? 'Connected' : 'Libraries unavailable' : 'Connecting…'}</span></header>
     <main className="conditions-main">
       <section className="conditions-query" aria-label="Reaction search">
         <ReactionEditor value={reaction} onChange={changeReaction} onError={setError} />
         <div className="conditions-search-bar">
-          <label>Max recipes per section<select aria-label="Max recipes per section" value={topK} disabled={busy} onChange={event => setTopK(Number(event.target.value))}><option value={5}>5</option><option value={10}>10</option><option value={20}>20</option><option value={50}>50</option></select></label>
+          <label>Max recipes per tab<select aria-label="Max recipes per tab" value={topK} disabled={busy} onChange={event => setTopK(Number(event.target.value))}><option value={5}>5</option><option value={10}>10</option><option value={20}>20</option><option value={50}>50</option></select></label>
           <label>Reaction matches<select aria-label="Reaction matches" value={searchScope} disabled={busy} onChange={event => setSearchScope(event.target.value as ConditionSearchScope)}><option value="automatic">Automatic broadening</option><option value="same_handle">Same reactive handle</option><option value="broad">Broader analogues</option></select></label>
           <div className="conditions-example"><button className="button quiet" onClick={loadExample}>Try an example</button>{exampleLabel && <span role="status">{exampleLabel}</span>}</div>
           <button className="button primary" disabled={busy || !reaction.trim() || !available} onClick={() => void search()}>{busy ? 'Finding conditions…' : 'Find conditions'}</button>
@@ -248,19 +324,9 @@ export default function ConditionsApp() {
       {result && <section ref={resultsRef} className="conditions-results" aria-label="Recommended conditions">
         <div className="conditions-result-heading"><h2>{result.valid ? 'Recommended conditions' : 'No supported conditions found'}</h2><button className="button quiet" onClick={() => download('condition-recommendations.json', result)}>Export all results</button></div>
         <ChemistrySummary result={result} />
-        <nav className="condition-source-status" aria-label="Condition sources">{result.sources.map(source => <a href={`#condition-lane-${source.source}`} key={source.source} className={source.status === 'ok' ? 'ok' : 'limited'}>{source.source === 'generic' ? 'Reaction library' : 'Screening library'} · {source.status === 'ok' ? `${optionsFor(source.source).length} recipes ↓` : source.status === 'abstained' ? 'no supported matches' : source.status}</a>)}</nav>
-        {result.sources.filter(source => source.status !== 'ok').map(source => <p className="condition-note" key={source.source}>{source.source === 'generic' ? 'Reaction library' : 'Screening library'}: {source.message}</p>)}
-        <div className="conditions-columns">{(['generic', 'weak_label'] as const).map(source => {
-          const options = optionsFor(source)
-          const screening = source === 'weak_label'
-          return <section id={`condition-lane-${source}`} key={source} className={`conditions-lane ${screening ? 'screening' : 'precedents'}`} aria-label={screening ? 'Screening suggestions' : 'Reaction precedents'}>
-            <div className="conditions-lane-heading"><h3>{screening ? 'Screening suggestions' : 'Reaction precedents'} <span>{options.length}</span></h3></div>
-            <p className="conditions-lane-description">{screening ? 'Weak-label suggestions. Source reaction structures are not verified.' : 'Structural matches, closest first.'}</p>
-            {!options.length && <div className="conditions-lane-empty">{screening ? 'No supported screening suggestions for this reaction.' : 'No qualifying reaction precedents for this search.'}</div>}
-            {options.slice(0, visible[source]).map((option, index) => <ConditionCard key={option.option_id} option={option} source={source} number={index + 1} selected={selected.includes(option.option_id)} onSelect={() => setSelected(current => current.includes(option.option_id) ? current.filter(id => id !== option.option_id) : [...current, option.option_id])} onDownload={() => download(`condition-option-${option.rank}-automation.json`, result.automation_exports[option.option_id])} />)}
-            {visible[source] < options.length && <button className="button secondary conditions-more" onClick={() => setVisible(current => ({ ...current, [source]: current[source] + 3 }))}>Show {Math.min(3, options.length - visible[source])} more {screening ? 'screens' : 'precedents'} ({options.length - visible[source]} remaining)</button>}
-          </section>
-        })}</div>
+        <ConditionResults result={result} selected={selected}
+          onSelect={optionId => setSelected(current => current.includes(optionId) ? current.filter(id => id !== optionId) : [...current, optionId])}
+          onDownload={option => download(`condition-option-${option.rank}-automation.json`, result.automation_exports[option.option_id])} />
         {selected.length > 0 && <div className="condition-screen-bar has-selection"><strong>{selected.length} condition{selected.length === 1 ? '' : 's'} selected</strong><button className="button primary" onClick={exportScreen}>Export screening set</button></div>}
       </section>}
     </main>

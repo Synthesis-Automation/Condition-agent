@@ -64,36 +64,43 @@ No model installation or chemistry-free mapping substitute is performed.
    formation involving heteroaryl, protected, or substituted substrates. It avoids
    repeating the current example and displays the selected reaction type.
 2. Confirm missing fragment sources when the existing completion workflow asks.
-3. Choose the maximum recipes per section and the reaction match scope, then
+3. Choose the maximum recipes per tab and the reaction match scope, then
    select **Find conditions**. Automatic broadening uses the same canonical
-   search as Workbench. Three options from each source appear initially in
-   separate **Reaction precedents** and **Screening suggestions** sections;
-   each section can reveal more without rerunning chemistry.
-4. Review materials, reported amounts, temperature, time, atmosphere, and
-   cautions. Multi-stage records remain ordered and are never flattened.
-5. Expand **Details & references** for structures, references, procedures,
+   search as Workbench. Results appear in **Literature-based** and
+   **Screening suggestions** tabs with source-specific recipe counts.
+4. Select a row in the table on the left to view its materials, reported amounts,
+   temperature, time, and atmosphere on the right. All returned recipes are
+   listed in source rank order. Each tab remembers the last viewed row; the first
+   recipe opens initially. Multi-stage records retain their original order.
+5. Review **Details & references**, open by default, for structures, references, procedures,
    compatibility evidence, historical yield summaries, cautions, and missing
    preparation details.
-6. Copy a condition set, download its automation handoff, or select intact
-   recipes for a screening-selection JSON bundle. Download full results JSON
+6. Copy or export the viewed condition set, or use table checkboxes to select
+   intact recipes for a screening-selection JSON bundle. Download full results JSON
    for the complete source audits, including failures and abstentions.
 
 The page uses a light gray background, white cards, subtle borders, and green
 actions, following the restrained style of Google Classroom. The shared
 Workbench drawing editor opens directly below the header; there is no separate
-hero, decorative reaction, or introductory step list. Recipe cards show materials
-and reported operating conditions, with supporting detail in one disclosure.
+hero, decorative reaction, or introductory step list. The results table summarizes
+catalysts/reagents, solvents, and reported historical yields; the detail pane
+shows the complete selected recipe. On narrow screens the table scrolls within
+its panel and details appear below it. Tabs support arrow, Home, and End keys;
+row-number buttons also work with the keyboard.
 The chemistry summary retains the structure-derived reaction equation and
 reactive-group labels; nearby groups can be expanded when available. It does
 not infer a named reaction from the displayed text.
 
 Screening suggestions use the canonical weak-label engine's screening mode,
 including its existing recipe-diversity selection. They remain explicitly
-unverified source-structure evidence. Screening options are visible even when
-structural results fill the initial shortlist. Each section preserves its own
-engine rank; a recipe supported by both sources appears in both sections but
+unverified source-structure evidence. The screening tab remains available even
+when structural results fill their result limit. Each tab preserves its own
+engine rank; a recipe supported by both sources appears in both tabs but
 shares one selection and is exported once. Cross-source selection remains the
 chemist's choice and never generates new reagent combinations.
+If only screening options are available, that tab opens automatically. Empty
+sources retain their status and show no stale recipe details. A new search clears
+the viewed rows and export selection.
 
 ## Source combination contract
 
@@ -191,15 +198,15 @@ the supplied indole chloride/heteroaryl boronic-acid query returns ten structura
 recommendations and ten weak-label screening suggestions. Exact recipe
 coalescing yields nine distinct structural options and ten screening options.
 Desktop and 390-pixel mobile screenshots are saved under
-`results/zbs_ui_refresh/`. Seven Playwright checks cover all three example choices,
-no immediate example repeats, the new page title, real results,
-visible screening despite a full precedent shortlist, per-source ranking,
-selection/export deduplication, partial source failures, and mobile overflow.
+`results/zbs_tabs/`. Browser checks cover all three example choices,
+no immediate example repeats, the page title, real results, tab switching,
+per-source row order and remembered details, selection/export deduplication,
+keyboard controls, search resets, partial source failures, and mobile overflow.
 The focused API/combination/weak-label suite has 26 passing tests.
 All three displayed examples pass structure and completion validation; the
 C–N and amide examples also return both structural and screening results from
 the local libraries. The complete `pytest -q` suite passes (1,546 tests in
-385.36 seconds), as do all seven browser checks, the frontend production build,
+396.09 seconds), as do all eight browser checks, the frontend production build,
 and Python name checks. Browser checks used installed Edge in headless mode;
 no additional browser installation was required.
 
