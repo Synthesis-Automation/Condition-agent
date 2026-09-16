@@ -164,18 +164,111 @@ def test_duplicate_references_and_retrieval_channels_count_once(tmp_path):
     )
 
 
-def test_whole_reaction_precedes_analogue_and_stops_on_independent_support(tmp_path):
+def test_automatic_stops_only_after_recipe_target_and_support_are_met(tmp_path):
     recommender = engine(
         tmp_path, [record(1, QUERY), record(2, QUERY), record(3, BROMIDE)]
     )
-    result = recommender.recommend(QUERY, top_k=5)
+    result = recommender.recommend(QUERY, top_k=2)
     assert len(result.recommendations) == 2
     assert all(item.match_label == "Whole reaction" for item in result.recommendations)
     assert all(
         item.candidate_channels == ("direct",) for item in result.recommendations
     )
-    broad = recommender.recommend(QUERY, top_k=5, search_scope="broad")
+    expanded = recommender.recommend(QUERY, top_k=3)
+    assert [item.match_level for item in expanded.recommendations] == [1, 1, 3]
+    assert expanded.recommendations[:2] == result.recommendations
+    assert expanded.retrieval_trace[-2].level == "shared_core:retained_local"
+    strict = recommender.recommend(QUERY, top_k=3, search_scope="same_handle")
+    assert len(strict.recommendations) == 2
+    assert all(item.match_level == 1 for item in strict.recommendations)
+    broad = recommender.recommend(QUERY, top_k=3, search_scope="broad")
     assert [item.match_level for item in broad.recommendations] == [1, 1, 3]
+
+
+def test_automatic_counts_aggregated_recipes_instead_of_precedents(tmp_path):
+    first, second = record(1, QUERY), record(2, QUERY)
+    for key in ("resolved_recipe_id", "resolved_recipe_core_id", "resolved_recipe"):
+        second[key] = first[key]
+    result = engine(tmp_path, [first, second, record(3, BROMIDE)]).recommend(
+        QUERY, top_k=2
+    )
+    assert [item.match_level for item in result.recommendations] == [1, 3]
+    assert result.recommendations[0].support == 2
+    assert result.retrieval_trace[0].independent_compatible_candidate_count == 2
+
+
+def test_recipe_target_does_not_replace_independent_support_requirement(tmp_path):
+    result = engine(
+        tmp_path,
+        [
+            record(1, QUERY, reference="REF1:same"),
+            record(2, QUERY, reference="REF1:same"),
+            record(3, BROMIDE),
+        ],
+    ).recommend(QUERY, top_k=2)
+    assert len(result.recommendations) == 2
+    assert result.retrieval_trace[0].independent_compatible_candidate_count == 1
+    assert result.candidate_count == 3
+    assert result.independent_compatible_candidate_count == 2
+
+
+@pytest.mark.parametrize("sqlite", [False, True])
+def test_automatic_suzuki_expands_five_local_recipes_to_ten(tmp_path, sqlite):
+    query = "Clc1cccc2c1cc[nH]2.c1ccc(B(O)O)nc1>>c1ccc(-c2cccc3[nH]ccc23)nc1"
+    analogue = query.replace("Cl", "Br", 1)
+    recommender = engine(
+        tmp_path,
+        [record(i, query) for i in range(5)]
+        + [record(i, analogue) for i in range(5, 10)],
+        sqlite=sqlite,
+    )
+    limited = recommender.recommend(query, top_k=5)
+    expanded = recommender.recommend(query, top_k=10)
+    assert len(limited.recommendations) == 5
+    assert len(expanded.recommendations) == 10
+    assert expanded.recommendations[:5] == limited.recommendations
+    assert [item.match_level for item in expanded.recommendations] == [1] * 5 + [3] * 5
+    assert expanded.retrieval_definition_version.startswith(
+        "shared_core_retrieval.v3@3.1;"
+    )
+
+
+def test_automatic_recipe_shortfall_consults_auxiliary_channels(tmp_path, monkeypatch):
+    from condition_recommender.shared_core_index import SharedCoreIndex
+
+    recommender = engine(
+        tmp_path, [record(1, QUERY), record(2, QUERY), record(3, BROMIDE)]
+    )
+    original = SharedCoreIndex.lookup
+
+    def direct_exact_or_reactants(self, kind, key, limit):
+        if kind == "whole_reaction" or kind.startswith("reactant_"):
+            return original(self, kind, key, limit)
+        return (), False
+
+    monkeypatch.setattr(SharedCoreIndex, "lookup", direct_exact_or_reactants)
+    result = recommender.recommend(QUERY, top_k=3)
+    assert len(result.recommendations) == 3
+    assert result.recommendations[-1].candidate_channels == ("reactant_side",)
+
+
+def test_automatic_target_cannot_bypass_condition_constraints(tmp_path):
+    recommender = engine(
+        tmp_path,
+        [record(1, QUERY), record(2, QUERY, temperature=150), record(3, BROMIDE)],
+    )
+    constraint = normalize_condition_constraint(
+        "maximum_temperature_c", "80", provenance="explicit_user"
+    ).constraint
+    result = recommender.recommend(
+        QUERY, top_k=3, condition_constraints=ConditionConstraintSet((constraint,))
+    )
+    assert [item.match_level for item in result.recommendations] == [1, 3]
+    assert result.excluded_candidate_count == 1
+    assert all(
+        "reaction-2" not in item.precedent_reaction_ids
+        for item in result.recommendations
+    )
 
 
 def test_same_recipe_different_required_sources_remains_separate(tmp_path):

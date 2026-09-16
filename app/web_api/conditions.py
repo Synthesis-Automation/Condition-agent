@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Request
 from pydantic import Field, field_validator
@@ -33,6 +33,8 @@ class CombinedConditionsRequest(StrictRequest):
 
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
     completion_choices: tuple[CompletionChoiceRequest, ...] = ()
+    top_k: int | None = Field(default=None, ge=1, le=50)
+    search_scope: Literal["same_handle", "automatic", "broad"] = "automatic"
 
     @field_validator("reaction_smiles")
     @classmethod
@@ -55,7 +57,7 @@ def recommend_conditions(
     sources = []
     for source, mode, capability in (
         ("generic", "generic", "recommendation"),
-        ("weak_label", "weak_label_fallback", "weak_label_recommendation"),
+        ("weak_label", "weak_label_screening", "weak_label_recommendation"),
     ):
         if source == "weak_label" and payload.completion_choices:
             sources.append(
@@ -82,7 +84,8 @@ def recommend_conditions(
                 reaction_smiles=payload.reaction_smiles.strip(),
                 recommendation_mode=mode,
                 library_mode=library_mode,
-                top_k=policy["candidate_limit_per_source"],
+                top_k=payload.top_k or policy["candidate_limit_per_source"],
+                search_scope=payload.search_scope,
                 use_rxnmapper=(
                     bool(capabilities.get("rxnmapper_available"))
                     and os.environ.get(

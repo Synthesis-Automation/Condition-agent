@@ -7,6 +7,10 @@
 
 ## 1. Purpose and authority
 
+2026-09-16: [automatic broadening recipe target](automatic_broadening_recipe_target_20260916.md)
+corrects shared-core early stopping to require the requested recipe count as well
+as independent support, preserving graph qualification and source-context grouping.
+
 2026-09-15: [advisory reaction-context planning](reaction_context_planning_20260915.md)
 adds an on-demand Workbench forward/retro analysis with separate precursor/route
 condition evidence. It leaves original-query qualification and ranking intact;

@@ -1,4 +1,14 @@
-import type { JsonObject, ResolvedRecipe, SynthesisProtocolDraft, Recommendation, WeakLabelRecommendation } from '../api/types'
+import type { JsonObject, ResolvedRecipe, SynthesisProtocolDraft, Recommendation, WeakLabelRecommendation, RecommendationResult, WeakLabelRecommendationResult } from '../api/types'
+
+export type ConditionSearchScope = 'same_handle' | 'automatic' | 'broad'
+
+export interface ConditionQueryChemistry extends Partial<RecommendationResult & WeakLabelRecommendationResult> {
+  reaction_partners?: Array<{
+    component_index: number
+    site_type: string
+    nearby_groups?: Array<{ label: string }>
+  }>
+}
 
 export interface ConditionEvidence {
   source: 'generic' | 'weak_label'
@@ -26,7 +36,7 @@ export interface ConditionsResult {
     source: 'generic' | 'weak_label'
     status: 'ok' | 'abstained' | 'unavailable' | 'skipped'
     message: string
-    result: JsonObject
+    result: ConditionQueryChemistry
   }>
   warnings: string[]
   shortlist_size: number

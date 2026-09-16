@@ -56,7 +56,7 @@ def test_combined_api_queries_both_sources_and_exports_each_recipe(tmp_path):
     data = response.json()["data"]
     assert [request.recommendation_mode for request in runtime.requests] == [
         "generic",
-        "weak_label_fallback",
+        "weak_label_screening",
     ]
     assert not any(request.use_rxnmapper for request in runtime.requests)
     assert len(data["recommendations"]) == 1
@@ -64,6 +64,34 @@ def test_combined_api_queries_both_sources_and_exports_each_recipe(tmp_path):
     export = data["automation_exports"][option["option_id"]]
     assert export["execution_ready"] is False
     assert export["experiments"][0]["protocol"]["reaction_smiles"] == REACTION
+
+
+def test_focused_search_controls_reach_canonical_engines(tmp_path):
+    runtime = ConditionsRuntime()
+    client = TestClient(create_app(runtime=runtime, frontend_dist=tmp_path))
+    response = client.post(
+        "/api/v1/conditions/recommend",
+        json={"reaction_smiles": REACTION, "top_k": 10, "search_scope": "broad"},
+    )
+    assert response.status_code == 200
+    assert len(runtime.requests) == 2
+    assert all(request.top_k == 10 for request in runtime.requests)
+    assert runtime.requests[0].search_scope == "broad"
+    assert runtime.requests[1].recommendation_mode == "weak_label_screening"
+    option = response.json()["data"]["recommendations"][0]
+    assert [item["source"] for item in option["evidence"]] == ["generic", "weak_label"]
+
+
+def test_focused_search_rejects_invalid_limits_and_scopes(tmp_path):
+    runtime = ConditionsRuntime()
+    client = TestClient(create_app(runtime=runtime, frontend_dist=tmp_path))
+    for settings in ({"top_k": 0}, {"top_k": 51}, {"search_scope": "unknown"}):
+        response = client.post(
+            "/api/v1/conditions/recommend",
+            json={"reaction_smiles": REACTION, **settings},
+        )
+        assert response.status_code == 422
+    assert not runtime.requests
 
 
 def test_focused_deployment_has_no_research_routes(tmp_path):

@@ -31,8 +31,11 @@ inputs still require a proposed transformation before condition recommendation.
 
 ## Retrieval and evidence
 
-- Automatic mode retains the existing early stop when direct evidence has
-  sufficient independent support. Otherwise it consults both side views.
+- Automatic mode stops when direct evidence has both sufficient independent
+  support and the requested number of qualified recipe groups. Otherwise it
+  continues through permitted core tiers, then consults both side views. This
+  stopping policy was corrected on 2026-09-16; see the
+  [automatic broadening fix](automatic_broadening_recipe_target_20260916.md).
 - **Broader analogues** explicitly consults all three views. The same permitted
   core levels and original-query chemistry gates apply regardless of channel.
 - Direct retrieval retains its 512-candidate capacity. The qualified union has
@@ -57,7 +60,7 @@ No ranking-profile control or chemistry weight was added. The Workbench shows
   definition and RDKit-bound hash.
 - Derived shared-core storage: `2.0`; its manifest now requires the reactant
   projection hash. Older companion artifacts are rejected explicitly.
-- Retrieval: `shared_core_retrieval.v3@3.0`; traces also carry the reactant
+- Retrieval: `shared_core_retrieval.v3@3.1`; traces also carry the reactant
   projection hash. The earlier v2 definition is retained as historical
   evaluation provenance, not another runtime selection path.
 

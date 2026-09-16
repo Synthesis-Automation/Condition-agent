@@ -1,6 +1,8 @@
 {
   "definition_id": "shared_core_retrieval.v3",
   "schema_version": "3.0",
+  "definition_version": "3.1",
+  "automatic_stopping_policy": "independent_support_and_recipe_target",
   "aggregation_context": "anchored_source_ports_or_exact_inputs",
   "status": "experimental_pending_independent_review",
   "minimum_independent_support": 2,

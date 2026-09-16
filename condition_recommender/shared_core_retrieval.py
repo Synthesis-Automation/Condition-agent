@@ -41,6 +41,9 @@ def load_shared_retrieval_rules() -> dict[str, Any]:
     if (
         rules.get("definition_id") != "shared_core_retrieval.v3"
         or rules.get("schema_version") != "3.0"
+        or rules.get("definition_version") != "3.1"
+        or rules.get("automatic_stopping_policy")
+        != "independent_support_and_recipe_target"
         or rules.get("auxiliary_scheduling") != "round_robin"
         or rules.get("aggregation_context") != "anchored_source_ports_or_exact_inputs"
         or rules.get("levels") != ["whole_reaction", *LEVELS]
@@ -100,7 +103,9 @@ def recommend_from_shared_core(
         transformation_class=signature.get("transformation_class"),
         recommendation_mode="experimental_shared_core",
         search_scope=search_scope,
-        retrieval_definition_version="shared_core_retrieval.v3@3.0;"
+        retrieval_definition_version=(
+            f"{rules['definition_id']}@{rules['definition_version']};"
+        )
         + query.definition_hash
         + ";reactant_projection:"
         + reactant_projection_definition_hash(),
@@ -123,6 +128,7 @@ def recommend_from_shared_core(
     channels: dict[int, set[str]] = defaultdict(set)
     audited: dict[int, dict[str, Any]] = {}
     eligible: dict[int, tuple[Any, Any]] = {}
+    groups: dict[tuple[str, str], list[int]] = defaultdict(list)
     projections = {}
     comparisons = {}
     diagnostics: list[dict[str, Any]] = []
@@ -166,6 +172,12 @@ def recommend_from_shared_core(
                 record["condition_compatibility"] = asdict(assessment)
                 if accepted:
                     eligible[position] = accepted[0]
+                    groups[
+                        (
+                            comparison.level,
+                            projection.realization_key or projection.input_identity,
+                        )
+                    ].append(position)
             audited[position] = record
 
     def support() -> int:
@@ -173,8 +185,19 @@ def recommend_from_shared_core(
             tuple(row for row, _ in eligible.values())
         ).independent_count
 
-    # Lookup each exact/local tier first. Abstraction is independent of recipe
-    # preference and of how many rows the UI can display.
+    def needs_more_candidates() -> bool:
+        # Count the same source-context recipe groups used by final ranking,
+        # after graph and condition qualification, rather than raw precedents.
+        recipe_count = sum(
+            len({eligible[p][0].recipe_core_id for p in positions})
+            for positions in groups.values()
+        )
+        return support() < minimum or (
+            search_scope == "automatic" and recipe_count < top_k
+        )
+
+    # Visit closer tiers first. Automatic mode needs both independent evidence
+    # and enough qualified recipe groups before stopping at a tier.
     direct = [("whole_reaction", query.reaction_identity)]
     direct += [(level.level, level.key) for level in query.levels]
     for kind, key in direct:
@@ -204,11 +227,11 @@ def recommend_from_shared_core(
                 else "empty",
             )
         )
-        if count >= minimum and search_scope != "broad":
+        if not needs_more_candidates() and search_scope != "broad":
             break
 
     auxiliary: dict[str, deque[int]] = {}
-    if support() < minimum or search_scope == "broad":
+    if needs_more_candidates() or search_scope == "broad":
         for channel, keys in (
             (
                 "product_side",
@@ -266,15 +289,6 @@ def recommend_from_shared_core(
 
     # Qualified, anchored source attachments may share recipe evidence across
     # remote substrates. Unqualified source contexts retain exact input identity.
-    groups: dict[tuple[str, str], list[int]] = defaultdict(list)
-    for position in eligible:
-        groups[
-            (
-                comparisons[position].level,
-                projections[position].realization_key
-                or projections[position].input_identity,
-            )
-        ].append(position)
     recommendations = []
     for (level, _), positions in sorted(groups.items()):
         ranked = rank_condition_recipes(
