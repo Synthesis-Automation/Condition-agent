@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Suzuki coupling",
+    "reaction_smiles": "Clc1cccc2c1cc[nH]2.c1ccc(B(O)O)nc1>>c1ccc(-c2cccc3[nH]ccc23)nc1"
+  },
+  {
+    "label": "C–N coupling",
+    "reaction_smiles": "N#Cc1ccc(Br)cc1.CC(C)(C)OC(=O)N1CCNCC1>>CC(C)(C)OC(=O)N1CCN(c2ccc(C#N)cc2)CC1"
+  },
+  {
+    "label": "Amide formation",
+    "reaction_smiles": "COc1ccc(CC(=O)O)cc1.NCc1ccc(F)cc1>>COc1ccc(CC(=O)NCc2ccc(F)cc2)cc1"
+  }
+]

@@ -1,6 +1,6 @@
-# Condition Desk: focused recommendations and automation handoff
+# ZBS chemistry recommender: focused recommendations and automation handoff
 
-Condition Desk is the default browser page. It combines the canonical generic
+ZBS chemistry recommender is the default browser page. It combines the canonical generic
 and weak-label recommenders into one chemist-facing shortlist. Retrosynthesis,
 forward synthesis, and feature-analysis controls are absent from this page.
 
@@ -45,7 +45,7 @@ export CONDITION_RECOMMENDER_WEAK_LABEL_RECORDS=/srv/conditions/data/weak_label/
 
 The literature root contains `full/generic_index.sqlite` and optionally
 `compact/generic_index.sqlite`. Shared reaction core v2 is the default in both
-Condition Desk and the workbench; each SQLite index needs its matching
+the focused page and the workbench; each SQLite index needs its matching
 `generic_index.shared_core.sqlite` companion in the same directory. Normal builds
 generate both files, and the current Full/Compact libraries already contain them.
 See [default selection and validation status](shared_reaction_core_default_20260913.md).
@@ -59,22 +59,41 @@ No model installation or chemistry-free mapping substitute is performed.
 
 ## Chemist workflow
 
-1. Draw or paste a product-specified reaction; use the example to explore.
+1. Draw or paste a product-specified reaction, or select **Try an example**.
+   The example picker randomly chooses a complete Suzuki, C–N coupling, or amide
+   formation involving heteroaryl, protected, or substituted substrates. It avoids
+   repeating the current example and displays the selected reaction type.
 2. Confirm missing fragment sources when the existing completion workflow asks.
-3. Select **Find conditions**. Three options are shown initially; more can be
-   revealed without rerunning chemistry.
+3. Choose the maximum recipes per section and the reaction match scope, then
+   select **Find conditions**. Automatic broadening uses the same canonical
+   search as Workbench. Three options from each source appear initially in
+   separate **Reaction precedents** and **Screening suggestions** sections;
+   each section can reveal more without rerunning chemistry.
 4. Review materials, reported amounts, temperature, time, atmosphere, and
    cautions. Multi-stage records remain ordered and are never flattened.
-5. Expand **Precedents & details** for structures, references, procedures,
-   compatibility evidence, historical yield summaries, and qualifications.
+5. Expand **Details & references** for structures, references, procedures,
+   compatibility evidence, historical yield summaries, cautions, and missing
+   preparation details.
 6. Copy a condition set, download its automation handoff, or select intact
    recipes for a screening-selection JSON bundle. Download full results JSON
    for the complete source audits, including failures and abstentions.
 
-The initial screening feature is a chemist-selected set of retrieved recipes.
-It does not claim to optimize experimental diversity or generate new reagent
-combinations. A cross-source diversity selector is a later, separately
-validated recommendation policy.
+The page uses a light gray background, white cards, subtle borders, and green
+actions, following the restrained style of Google Classroom. The shared
+Workbench drawing editor opens directly below the header; there is no separate
+hero, decorative reaction, or introductory step list. Recipe cards show materials
+and reported operating conditions, with supporting detail in one disclosure.
+The chemistry summary retains the structure-derived reaction equation and
+reactive-group labels; nearby groups can be expanded when available. It does
+not infer a named reaction from the displayed text.
+
+Screening suggestions use the canonical weak-label engine's screening mode,
+including its existing recipe-diversity selection. They remain explicitly
+unverified source-structure evidence. Screening options are visible even when
+structural results fill the initial shortlist. Each section preserves its own
+engine rank; a recipe supported by both sources appears in both sections but
+shares one selection and is exported once. Cross-source selection remains the
+chemist's choice and never generates new reagent combinations.
 
 ## Source combination contract
 
@@ -83,7 +102,9 @@ validated recommendation policy.
 ```json
 {
   "reaction_smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
-  "completion_choices": []
+  "completion_choices": [],
+  "top_k": 10,
+  "search_scope": "automatic"
 }
 ```
 
@@ -92,6 +113,11 @@ and scoring remain owned by their existing packages. Generic results precede
 weak-label results, retaining engine rank. Scores are never averaged or
 compared across engines. Policy bounds and evidence descriptions live in
 `condition_recommender/definitions/combined_recommendation.v1.json`.
+
+`top_k` is optional (1–50 recipes per source, defaulting to the existing policy
+when omitted). `search_scope` accepts `same_handle`, `automatic`, or `broad`
+and defaults to `automatic`; it controls structural retrieval. The weak-label
+request always uses `weak_label_screening`. No research routes are exposed.
 
 Only identical registry-identified full recipe payloads for the same effective
 query are coalesced. Equality includes quantities, stages, and uncertainty;
@@ -114,7 +140,7 @@ definition-version evidence supplied by the canonical engines.
 
 ## Automation JSON: planning input, not robot commands
 
-Each **Download automation JSON** file conforms to
+Each **Export recipe** file conforms to
 `condition_recommender/definitions/automation_handoff.v1.schema.json` and embeds
 the existing registry `synthesis_protocol.v1.schema.json` contract. It contains:
 
@@ -154,9 +180,28 @@ source ordering, exact deduplication, differing operating variants, review and
 conflicting evidence, partial failures, completion choices, protocol fidelity,
 deterministic exports, JSON schema validation, and research-route isolation.
 
-Dataset contents, chemistry definitions, and existing retrieval policies are
-unchanged. This UI does not establish production chemistry validity: the
+Dataset contents and chemistry definitions are unchanged. The focused endpoint
+now selects the existing weak-label screening mode, and forwards the chemist's
+structural scope and result limit to the canonical engines. This UI does not
+establish production chemistry validity: the
 roadmap's independent review and untouched evaluation gates still apply.
+
+The 2026-09-16 refresh was checked with the real Full and weak-label libraries:
+the supplied indole chloride/heteroaryl boronic-acid query returns ten structural
+recommendations and ten weak-label screening suggestions. Exact recipe
+coalescing yields nine distinct structural options and ten screening options.
+Desktop and 390-pixel mobile screenshots are saved under
+`results/zbs_ui_refresh/`. Seven Playwright checks cover all three example choices,
+no immediate example repeats, the new page title, real results,
+visible screening despite a full precedent shortlist, per-source ranking,
+selection/export deduplication, partial source failures, and mobile overflow.
+The focused API/combination/weak-label suite has 26 passing tests.
+All three displayed examples pass structure and completion validation; the
+C–N and amide examples also return both structural and screening results from
+the local libraries. The complete `pytest -q` suite passes (1,546 tests in
+385.36 seconds), as do all seven browser checks, the frontend production build,
+and Python name checks. Browser checks used installed Edge in headless mode;
+no additional browser installation was required.
 
 If the installed SQLite library uses an older schema, the result reports
 `INDEX_REBUILD_REQUIRED`; rebuild recommendation artifacts using the current

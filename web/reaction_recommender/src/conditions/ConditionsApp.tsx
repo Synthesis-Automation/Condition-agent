@@ -4,10 +4,10 @@ import type { Capabilities, CompletionChoice, CompletionProposal, RecipeComponen
 import { ReactionEditor } from '../components/ReactionEditor'
 import { ReactionImage } from '../components/ReactionImage'
 import { CompletionDialog } from '../components/CompletionDialog'
-import type { ConditionOption, ConditionsResult } from './types'
+import type { ConditionOption, ConditionSearchScope, ConditionsResult } from './types'
+import examples from './examples.json'
 import './conditions.css'
 
-const EXAMPLE = 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1'
 const ROLES = [
   ['catalysts', 'Catalyst'], ['ligands', 'Ligand'], ['bases', 'Base'],
   ['condensation_agents', 'Coupling reagent'], ['oxidants', 'Oxidant'],
@@ -49,6 +49,21 @@ function readable(value: string): string {
   return value.replaceAll('_', ' ').replaceAll('.', ' › ').toLowerCase()
 }
 
+function ChemistrySummary({ result }: { result: ConditionsResult }) {
+  const structural = result.sources.find(source => source.source === 'generic')?.result
+  const screening = result.sources.find(source => source.source === 'weak_label')?.result
+  const label = structural?.reaction_label?.text
+  const participants = screening?.query_participants || []
+  const nearby = [...new Set((structural?.reaction_partners || []).flatMap(partner =>
+    (partner.nearby_groups || []).map(group => group.label)))]
+  if (!label && !participants.length && !nearby.length) return null
+  return <section className="condition-chemistry" aria-label="Reaction chemistry">
+    <h3>{label || 'Reactive groups in your drawing'}</h3>
+    {participants.length > 0 && <div className="condition-chemistry-tags" aria-label="Reactive groups">{participants.map((partner, index) => <span key={`${partner.site_id}-${index}`}>{partner.chemist_label}</span>)}</div>}
+    {nearby.length > 0 && <details className="condition-nearby"><summary>Nearby groups</summary><p>{nearby.join(' · ')}</p></details>}
+  </section>
+}
+
 function Procedure({ recipe }: { recipe: ResolvedRecipe }) {
   const stages = Array.isArray(recipe.stages) ? recipe.stages as Array<Record<string, unknown>> : []
   return <>
@@ -56,20 +71,21 @@ function Procedure({ recipe }: { recipe: ResolvedRecipe }) {
       {groups(recipe).map(group => <div key={group.label}>
         <dt>{group.label}</dt><dd>{group.values.map((item, index) => <span key={index}>
           {materialName(item)}
-          <small>{item.amount != null ? ` · ${item.amount} ${item.amount_unit || '(unit not reported)'}` : ' · amount not reported'}</small>
+          {item.amount != null && <small> · {String(item.amount)} {String(item.amount_unit || '(unit not reported)')}</small>}
           {item.identity_status && item.identity_status !== 'resolved' ? <small> · identity unresolved</small> : null}
         </span>)}</dd>
       </div>)}
     </dl>
-    {stages.length > 0 ? <ol className="condition-stages">{stages.map((stage, i) => <li key={i}>
+    {stages.length > 1 ? <ol className="condition-stages">{stages.map((stage, i) => <li key={i}>
       Stage {String(stage.stage_index ?? i + 1)}: {setup(stage as ResolvedRecipe).join(' · ')}
-    </li>)}</ol> : <div className="condition-setpoints">{setup(recipe).map(text => <span key={text}>{text}</span>)}</div>}
+    </li>)}</ol> : <div className="condition-setpoints">{setup(stages.length ? stages[0] as ResolvedRecipe : recipe).map(text => <span key={text}>{text}</span>)}</div>}
   </>
 }
 
 function Evidence({ option }: { option: ConditionOption }) {
   return <details className="condition-evidence">
-    <summary>Precedents & details</summary>
+    <summary>Details & references</summary>
+    {option.cautions.length > 0 && <section><h4>Review notes</h4><ul>{option.cautions.map((caution, i) => <li key={i}>{caution.includes(' ') ? caution : readable(caution)}</li>)}</ul></section>}
     {option.evidence.map((evidence, index) => {
       const item = evidence.recommendation
       const refs = item.precedent_references || []
@@ -91,70 +107,66 @@ function Evidence({ option }: { option: ConditionOption }) {
         </div>)}
         {!precedents.length && refs.map((ref, i) => <p key={i}>{ref.raw_reference || ref.normalized_citation || ref.reference_id}</p>)}
         {evidence.source === 'weak_label' && <p>Source rows: {(item.source_row_numbers || []).join(', ') || 'See full result JSON'}</p>}
+        {evidence.source === 'weak_label' && item.source_matches?.slice(0, 3).map((match, i) => <p className="condition-label-match" key={i}><strong>{match.participant_display_labels.join(' + ')}</strong><br />{match.source_reaction_type} · source row {match.source_row_number}</p>)}
         {(item.compatibility_evidence || []).length > 0 && <details><summary>Compatibility checks</summary><ul>{item.compatibility_evidence?.map((line, i) => <li key={i}>{line}</li>)}</ul></details>}
         {evidence.warnings.length > 0 && <details><summary>Evidence qualifications ({evidence.warnings.length})</summary><ul>{evidence.warnings.map((line, i) => <li key={i}>{readable(line)}</li>)}</ul></details>}
       </section>
     })}
+    <section>
+      <h4>Experiment preparation</h4>
+      <p>Confirm unreported quantities and procedure details before use.</p>
+      <ul>{option.synthesis_protocol.missing_required_fields.map(field => <li key={field}>{readable(field)}</li>)}</ul>
+    </section>
   </details>
 }
 
-function ConditionCard({ option, onDownload, selected, onSelect }: {
-  option: ConditionOption; onDownload: () => void; selected: boolean; onSelect: () => void
+function ConditionCard({ option, source, number, onDownload, selected, onSelect }: {
+  option: ConditionOption; source: 'generic' | 'weak_label'; number: number
+  onDownload: () => void; selected: boolean; onSelect: () => void
 }) {
   const [copyStatus, setCopyStatus] = useState('Copy conditions')
   const recipe = option.resolved_recipe
-  const primary = option.evidence[0].recommendation
-  const specificCautions = option.cautions.filter(caution =>
-    !['Source reactions are not structure-verified', 'Reaction-type labels are weak evidence'].includes(caution))
-  const why = option.evidence_kind === 'weak_label'
-    ? 'Compatible reaction handles in label-based records; use as a screening starting point.'
-    : option.evidence_kind === 'structure_review'
-      ? 'Retrieved through broader structural evidence; inspect the reaction match before use.'
-      : 'Matched reaction changes and compatible conditions from structural precedents.'
+  const primary = option.evidence.find(item => item.source === source)!.recommendation
+  const screening = source === 'weak_label'
   const copy = async () => {
     const lines = groups(recipe).map(group => `${group.label}: ${group.values.map(item => `${materialName(item)}${item.amount != null ? ` (${item.amount} ${item.amount_unit || 'unit not reported'})` : ' (amount not reported)'}`).join(', ')}`)
     const stages = Array.isArray(recipe.stages) ? recipe.stages as ResolvedRecipe[] : []
     lines.push(...(stages.length ? stages.map((stage, i) => `Stage ${i + 1}: ${setup(stage).join(' · ')}`) : [setup(recipe).join(' · ')]))
-    lines.push(option.evidence_label, ...option.cautions, 'Protocol requires preparation and review before execution.')
+    lines.push(screening ? 'Weak-label screening suggestion; source reactions are not structure-verified.' : option.evidence_label, ...option.cautions, 'Protocol requires preparation and review before execution.')
     try { await navigator.clipboard.writeText(lines.join('\n')); setCopyStatus('Copied') }
     catch { setCopyStatus('Copy unavailable — download JSON') }
   }
-  return <article className={`condition-option ${option.evidence_kind}`}>
+  return <article className={`condition-option ${screening ? 'weak_label' : option.evidence_kind}`}>
     <div className="condition-option-heading">
-      <div><span className="condition-rank">{String(option.rank).padStart(2, '0')}</span><h3>Condition option {option.rank}</h3></div>
-      <label className="condition-select"><input type="checkbox" checked={selected} onChange={onSelect} />Select for screen</label>
+      <div><span className="condition-rank">{String(number).padStart(2, '0')}</span><h3>{screening ? 'Screen' : 'Precedent'} {number}</h3></div>
+      <label className="condition-select"><input type="checkbox" checked={selected} onChange={onSelect} aria-label={`Select ${screening ? 'screen' : 'precedent'} ${number}`} />Select</label>
     </div>
-    <div className="condition-badges"><span className={`condition-badge ${option.evidence_kind}`}>{option.evidence_label}</span>
-      <span>{option.evidence[0].source === 'generic' ? `${primary.reference_support ?? 0} reference(s)` : `${primary.support ?? 0} label observation(s)`}</span>
+    <div className="condition-badges"><span className={`condition-badge ${screening ? 'weak_label' : option.evidence_kind}`}>{screening ? 'Weak-label screening' : primary.match_label || option.evidence_label}</span>
+      <span>{!screening ? `${primary.reference_support ?? 0} reference(s)` : `${primary.support ?? 0} source observation(s)`}</span>
+      {primary.historical_yield_pct != null && <span>Reported mean yield {primary.historical_yield_pct}%</span>}
       {new Set(option.evidence.map(item => item.source)).size > 1 && <span>Supported by both sources</span>}
     </div>
     <Procedure recipe={recipe} />
-    <p className="condition-why">{why}</p>
-    {specificCautions.length > 0 && <div className="condition-caution"><strong>Check before use</strong><ul>{specificCautions.map((caution, i) => <li key={i}>{caution}</li>)}</ul></div>}
     <Evidence option={option} />
-    <details className="condition-automation">
-      <summary>Automation preparation · {option.synthesis_protocol.missing_required_fields.length} missing fields</summary>
-      <p>JSON includes material identities, reported amounts and units, ordered source stages, and provenance. A robot adapter must resolve the gaps and validate the setup before execution.</p>
-      <ul>{option.synthesis_protocol.missing_required_fields.map(field => <li key={field}>{readable(field)}</li>)}</ul>
-      <p>No dispensing order, scale, or workup is invented.</p>
-    </details>
     <div className="condition-card-actions">
-      <button className="button secondary" onClick={onDownload}>Download automation JSON</button>
-      <button className="button quiet" onClick={() => void copy()}>{copyStatus}</button>
-      <span>Protocol draft · review required</span>
+      <button className="button secondary" onClick={() => void copy()}>{copyStatus}</button>
+      <button className="button quiet" onClick={onDownload}>Export recipe</button>
     </div>
   </article>
 }
 
 export default function ConditionsApp() {
   const [reaction, setReaction] = useState('')
+  const [exampleLabel, setExampleLabel] = useState('')
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null)
   const [result, setResult] = useState<ConditionsResult | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState('')
   const [proposal, setProposal] = useState<CompletionProposal | null>(null)
-  const [visible, setVisible] = useState(3)
+  const [visible, setVisible] = useState({ generic: 3, weak_label: 3 })
+  const [topK, setTopK] = useState(10)
+  const [searchScope, setSearchScope] = useState<ConditionSearchScope>('automatic')
   const [selected, setSelected] = useState<string[]>([])
   const requestId = useRef(0)
   const resultsRef = useRef<HTMLElement>(null)
@@ -165,7 +177,14 @@ export default function ConditionsApp() {
 
   const changeReaction = (value: string) => {
     requestId.current += 1
-    setReaction(value); setResult(null); setSelected([]); setProposal(null); setStatus(''); setBusy(false); setError('')
+    setReaction(value); setExampleLabel(''); setResult(null); setSelected([]); setProposal(null); setStatus(''); setBusy(false); setError('')
+  }
+
+  const loadExample = () => {
+    const candidates = examples.filter(example => example.reaction_smiles !== reaction.trim())
+    const example = candidates[Math.floor(Math.random() * candidates.length)]
+    changeReaction(example.reaction_smiles)
+    setExampleLabel(example.label)
   }
 
   const search = async (choices?: CompletionChoice[]) => {
@@ -184,13 +203,13 @@ export default function ConditionsApp() {
       }
       const response = await fetch('/api/v1/conditions/recommend', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reaction_smiles: query, completion_choices: choices || [] }),
+        body: JSON.stringify({ reaction_smiles: query, completion_choices: choices || [], top_k: topK, search_scope: searchScope }),
       })
       const body = await response.json()
       if (!response.ok) throw new Error(typeof body.detail?.message === 'string' ? body.detail.message : 'The search could not complete. Check the reaction and try again.')
       if (currentId !== requestId.current) return
       const next = body.data as ConditionsResult
-      setResult(next); setVisible(next.shortlist_size); setStatus('')
+      setResult(next); setVisible({ generic: next.shortlist_size, weak_label: next.shortlist_size }); setStatus('')
       window.setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
     } catch (caught) {
       if (currentId === requestId.current) { setError(caught instanceof Error ? caught.message : 'Search failed.'); setStatus('') }
@@ -210,27 +229,40 @@ export default function ConditionsApp() {
   }
 
   const available = capabilities?.recommendation || capabilities?.weak_label_recommendation
+  const optionsFor = (source: 'generic' | 'weak_label') => (result?.recommendations.filter(option => option.evidence.some(item => item.source === source)) || [])
+    .sort((left, right) => (left.evidence.find(item => item.source === source)?.recommendation.rank ?? left.rank) - (right.evidence.find(item => item.source === source)?.recommendation.rank ?? right.rank))
   return <div className="conditions-app">
-    <header className="conditions-header"><a href="/" className="conditions-brand"><span className="conditions-logo">C</span>Condition Desk</a><span className="conditions-service"><i className={available ? 'available' : ''} />{capabilities ? result?.sources.some(source => source.status === 'unavailable') ? 'Some libraries unavailable' : available ? 'Service connected' : 'Libraries unavailable' : 'Connecting…'}</span></header>
+    <header className="conditions-header"><a href="/" className="conditions-brand"><span className="conditions-logo" aria-hidden="true">ZBS</span><h1>ZBS chemistry recommender</h1></a><span className="conditions-service"><i className={available ? 'available' : ''} />{capabilities ? result?.sources.some(source => source.status === 'unavailable') ? 'Some libraries unavailable' : available ? 'Connected' : 'Libraries unavailable' : 'Connecting…'}</span></header>
     <main className="conditions-main">
-      <section className="conditions-intro"><span className="conditions-kicker">FROM REACTION TO EXPERIMENT</span><h1>Find your starting conditions.</h1><p>Draw your reaction. Compare precedent conditions and screening suggestions in one place.</p></section>
       <section className="conditions-query" aria-label="Reaction search">
         <ReactionEditor value={reaction} onChange={changeReaction} onError={setError} />
-        <div className="conditions-search-bar"><button className="button quiet" onClick={() => changeReaction(EXAMPLE)}>Try a Suzuki example</button><span>Include the intended product.</span><button className="button primary" disabled={busy || !reaction.trim() || !available} onClick={() => void search()}>{busy ? 'Finding conditions…' : 'Find conditions →'}</button></div>
+        <div className="conditions-search-bar">
+          <label>Max recipes per section<select aria-label="Max recipes per section" value={topK} disabled={busy} onChange={event => setTopK(Number(event.target.value))}><option value={5}>5</option><option value={10}>10</option><option value={20}>20</option><option value={50}>50</option></select></label>
+          <label>Reaction matches<select aria-label="Reaction matches" value={searchScope} disabled={busy} onChange={event => setSearchScope(event.target.value as ConditionSearchScope)}><option value="automatic">Automatic broadening</option><option value="same_handle">Same reactive handle</option><option value="broad">Broader analogues</option></select></label>
+          <div className="conditions-example"><button className="button quiet" onClick={loadExample}>Try an example</button>{exampleLabel && <span role="status">{exampleLabel}</span>}</div>
+          <button className="button primary" disabled={busy || !reaction.trim() || !available} onClick={() => void search()}>{busy ? 'Finding conditions…' : 'Find conditions'}</button>
+        </div>
       </section>
       {error && <div className="condition-error" role="alert">{error}</div>}
-      <div className="condition-progress" role="status" aria-live="polite">{busy && <span className="condition-spinner" />}{status}</div>
-      {!result && !busy && <div className="conditions-introduction"><div><b>01</b><h3>Start with precedent</h3><p>Conditions matched to reaction changes and compatible functional groups.</p></div><div><b>02</b><h3>Explore a screen</h3><p>Additional label-based suggestions, with their evidence limits visible.</p></div><div><b>03</b><h3>Prepare the experiment</h3><p>Copy conditions or export a structured protocol for automation planning.</p></div></div>}
+      {(busy || status) && <div className="condition-progress" role="status" aria-live="polite">{busy && <span className="condition-spinner" />}{status}</div>}
       {result && <section ref={resultsRef} className="conditions-results" aria-label="Recommended conditions">
-        <div className="conditions-result-heading"><div><span className="conditions-kicker">YOUR STARTING POINTS</span><h2>{result.valid ? 'Conditions to consider' : 'No supported conditions found'}</h2><p>{result.valid ? 'Reaction precedents first; additional screening suggestions follow. Expand a card to inspect its evidence.' : 'Check the reaction drawing or try a supported transformation. No conditions have been invented.'}</p></div><button className="button secondary" onClick={() => download('condition-recommendations.json', result)}>Download full results JSON</button></div>
-        <div className="condition-source-status">{result.sources.map(source => <span key={source.source} className={source.status === 'ok' ? 'ok' : 'limited'}>{source.source === 'generic' ? 'Reaction library' : 'Screening library'} · {source.status === 'ok' ? 'matches found' : source.status === 'abstained' ? 'no supported matches' : source.status}</span>)}</div>
+        <div className="conditions-result-heading"><h2>{result.valid ? 'Recommended conditions' : 'No supported conditions found'}</h2><button className="button quiet" onClick={() => download('condition-recommendations.json', result)}>Export all results</button></div>
+        <ChemistrySummary result={result} />
+        <nav className="condition-source-status" aria-label="Condition sources">{result.sources.map(source => <a href={`#condition-lane-${source.source}`} key={source.source} className={source.status === 'ok' ? 'ok' : 'limited'}>{source.source === 'generic' ? 'Reaction library' : 'Screening library'} · {source.status === 'ok' ? `${optionsFor(source.source).length} recipes ↓` : source.status === 'abstained' ? 'no supported matches' : source.status}</a>)}</nav>
         {result.sources.filter(source => source.status !== 'ok').map(source => <p className="condition-note" key={source.source}>{source.source === 'generic' ? 'Reaction library' : 'Screening library'}: {source.message}</p>)}
-        {result.recommendations.some(option => option.evidence_kind === 'weak_label') && <p className="condition-note">Screening suggestions use source labels; their precedent reaction structures are not verified.</p>}
-        {result.recommendations.slice(0, visible).map(option => <ConditionCard key={option.option_id} option={option} selected={selected.includes(option.option_id)} onSelect={() => setSelected(current => current.includes(option.option_id) ? current.filter(id => id !== option.option_id) : [...current, option.option_id])} onDownload={() => download(`condition-option-${option.rank}-automation.json`, result.automation_exports[option.option_id])} />)}
-        {visible < result.recommendations.length && <button className="button secondary conditions-more" onClick={() => setVisible(count => count + 3)}>Show 3 more options ({result.recommendations.length - visible} remaining)</button>}
-        {result.recommendations.length > 0 && <div className="condition-screen-bar"><div><strong>{selected.length ? `${selected.length} condition${selected.length === 1 ? '' : 's'} selected` : 'Build your screening set'}</strong><p>Select intact recipes above. Each export retains its own evidence and preparation gaps.</p></div><button className="button primary" disabled={!selected.length} onClick={exportScreen}>Download screening JSON</button></div>}
+        <div className="conditions-columns">{(['generic', 'weak_label'] as const).map(source => {
+          const options = optionsFor(source)
+          const screening = source === 'weak_label'
+          return <section id={`condition-lane-${source}`} key={source} className={`conditions-lane ${screening ? 'screening' : 'precedents'}`} aria-label={screening ? 'Screening suggestions' : 'Reaction precedents'}>
+            <div className="conditions-lane-heading"><h3>{screening ? 'Screening suggestions' : 'Reaction precedents'} <span>{options.length}</span></h3></div>
+            <p className="conditions-lane-description">{screening ? 'Weak-label suggestions. Source reaction structures are not verified.' : 'Structural matches, closest first.'}</p>
+            {!options.length && <div className="conditions-lane-empty">{screening ? 'No supported screening suggestions for this reaction.' : 'No qualifying reaction precedents for this search.'}</div>}
+            {options.slice(0, visible[source]).map((option, index) => <ConditionCard key={option.option_id} option={option} source={source} number={index + 1} selected={selected.includes(option.option_id)} onSelect={() => setSelected(current => current.includes(option.option_id) ? current.filter(id => id !== option.option_id) : [...current, option.option_id])} onDownload={() => download(`condition-option-${option.rank}-automation.json`, result.automation_exports[option.option_id])} />)}
+            {visible[source] < options.length && <button className="button secondary conditions-more" onClick={() => setVisible(current => ({ ...current, [source]: current[source] + 3 }))}>Show {Math.min(3, options.length - visible[source])} more {screening ? 'screens' : 'precedents'} ({options.length - visible[source]} remaining)</button>}
+          </section>
+        })}</div>
+        {selected.length > 0 && <div className="condition-screen-bar has-selection"><strong>{selected.length} condition{selected.length === 1 ? '' : 's'} selected</strong><button className="button primary" onClick={exportScreen}>Export screening set</button></div>}
       </section>}
-      <footer className="conditions-footer">Condition Desk <span>Structure-based recommendations. Explicit uncertainty. Traceable recipes.</span></footer>
     </main>
     {proposal && <CompletionDialog proposal={proposal} onCancel={() => { setProposal(null); setStatus('') }} onConfirm={choices => void search(choices)} />}
   </div>

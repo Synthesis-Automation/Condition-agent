@@ -2,7 +2,9 @@ import type { JsonObject, ResolvedRecipe, SynthesisProtocolDraft, Recommendation
 
 export type ConditionSearchScope = 'same_handle' | 'automatic' | 'broad'
 
-export interface ConditionQueryChemistry extends Partial<RecommendationResult & WeakLabelRecommendationResult> {
+export interface ConditionQueryChemistry {
+  reaction_label?: RecommendationResult['reaction_label']
+  query_participants?: WeakLabelRecommendationResult['query_participants']
   reaction_partners?: Array<{
     component_index: number
     site_type: string
