@@ -181,6 +181,14 @@ criteria and regression tests.
 
 ## Coding Standards
 
+For agent-led scientific investigations, use the local Python/CLI workspace
+described in `docs/AI-native/Scientific_Workspace_Quickstart.md`. It records
+baseline identity, scientific calls, evidence, custom scripts, and resumable
+notes while calling the existing domain packages. Generated investigations
+belong under `results/ai_native/`; do not commit local corpus records or large
+artifacts. Its development pilots do not satisfy independent chemistry-review
+or untouched-evaluation release gates.
+
 - Python 3.10 or newer, PEP 8, four-space indentation.
 - Type hints on all public functions and dataclass fields.
 - Module docstrings and docstrings for public or chemically complex behavior.

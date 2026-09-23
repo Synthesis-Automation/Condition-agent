@@ -43,6 +43,7 @@ def create_app(
     *,
     runtime: WebRuntime | None = None,
     assistance_service: Any | None = None,
+    scientific_service: Any | None = None,
     frontend_dist: str | Path | None = None,
     recommendation_only: bool = True,
 ) -> FastAPI:
@@ -66,6 +67,10 @@ def create_app(
     )
     app.state.runtime = runtime or LocalRecommendationRuntime()
     app.state.assistance_service = assistance_service
+    if scientific_service is not None and not recommendation_only:
+        from .scientific_chat import create_scientific_router
+
+        app.include_router(create_scientific_router(scientific_service))
     profile = "recommendation_only" if recommendation_only else "research_workbench"
     app.state.deployment_profile = profile
     app.include_router(conditions_router)

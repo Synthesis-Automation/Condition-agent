@@ -1,0 +1,42 @@
+{
+  "schema_version": "ai_native_development_cases.v1",
+  "partition": "authored_development_cases_not_heldout",
+  "condition_transfer": {
+    "objective": "Investigate transfer from retrieved precedents to a sterically substituted aryl chloride query, preserving whole recipes and uncertainty.",
+    "reaction_smiles": "Clc1c(C)cccc1C.OB(O)c1ccccc1>>Cc1cccc(C)c1-c1ccccc1",
+    "top_k": 3,
+    "search_scope": "broad"
+  },
+  "route_revision": {
+    "objective": "Inspect a multistep route to an acetamido biaryl, identify an evidenced weak step, and attempt a justified revision without modifying scientific rules.",
+    "settings": {
+      "target_smiles": "CC(=O)Nc1ccc(-c2ccccc2)cc1",
+      "top_k": 3,
+      "max_depth": 3,
+      "molecular_weight_threshold": 90.0,
+      "per_step_top_k": 3,
+      "beam_width": 6,
+      "max_expansions": 6,
+      "max_templates_to_apply": 30,
+      "max_candidates_to_validate": 8,
+      "include_conditions": true,
+      "condition_top_k": 2
+    }
+  },
+  "route_revision_followup": {
+    "objective": "After the initial target yielded only one-step routes, investigate a more substituted authored target and revise a recorded selectivity issue.",
+    "settings": {
+      "target_smiles": "CC(=O)Nc1ccc(-c2ccc(OCCN3CCOCC3)c(C)c2)cc1",
+      "top_k": 3,
+      "max_depth": 3,
+      "molecular_weight_threshold": 90.0,
+      "per_step_top_k": 3,
+      "beam_width": 6,
+      "max_expansions": 8,
+      "max_templates_to_apply": 60,
+      "max_candidates_to_validate": 12,
+      "include_conditions": true,
+      "condition_top_k": 2
+    }
+  }
+}

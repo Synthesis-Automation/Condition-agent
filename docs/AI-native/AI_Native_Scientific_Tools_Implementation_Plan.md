@@ -1,9 +1,17 @@
 # AI-Native Scientific Tools: Phased Implementation Plan
 
-Status: proposed; phases below are not marked as implemented  
+Status: local workspace, development pilots, and user-testable agent chat implemented; scientific release gates pending
 Revision: 2
 
 Date: 2026-09-23
+
+Implementation progress, validation, and outstanding gates are tracked in
+[Scientific_Workspace_Implementation_Status.md](Scientific_Workspace_Implementation_Status.md).
+Use the [workspace quickstart](Scientific_Workspace_Quickstart.md) for the
+implemented Python/CLI interface and optional local browser conversations. Phase
+acceptance gates below are not all met. The user-testable development milestone
+now supports natural-language questions through the installed Codex runtime,
+saved evidence, and follow-ups; this does not waive Phase 6 or release gates.
 
 ## 1. Objective and governing design
 

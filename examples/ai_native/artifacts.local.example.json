@@ -1,0 +1,7 @@
+{
+  "condition_index": "datasets/literature/compact/generic_index.sqlite",
+  "shared_core_index": "datasets/literature/compact/generic_index.shared_core.sqlite",
+  "procedure_catalog": "datasets/literature/compact/experimental_detail_catalog.jsonl.gz",
+  "retro_library": "results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz",
+  "stock_index": "cas_tools/data/stock_portfolio.sqlite"
+}

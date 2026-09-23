@@ -1,9 +1,16 @@
 # AI-Native Scientific Tools and Agentic Scientific Workspace
 
-Status: design proposal, not an implemented capability or validation claim  
+Status: architecture design; development subset implemented, scientific release gates pending
+
 Revision: 2
 
 Date: 2026-09-23
+
+The local workspace and an optional Codex-backed browser conversation interface
+now have development implementations. See
+[implementation status](Scientific_Workspace_Implementation_Status.md) and the
+[quickstart](Scientific_Workspace_Quickstart.md) for the implemented subset and
+remaining scientific-validation gates.
 
 ## 1. Purpose
 
