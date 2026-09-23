@@ -1,13 +1,28 @@
-# AI-Native Scientific Tools and Agent-Assisted Chemistry
+# AI-Native Scientific Tools and Agentic Scientific Workspace
 
 Status: design proposal, not an implemented capability or validation claim  
-Date: 2026-09-22
+Revision: 2
+
+Date: 2026-09-23
 
 ## 1. Purpose
 
 Make reaction analysis, datasets, condition recommendation, and retrosynthesis
 available as modular scientific capabilities that advanced agents can compose
 into an investigation.
+
+The central design is a capable agent working in a prepared scientific
+environment: this codebase, its datasets, executable chemistry tools, searchable
+documentation, and a writable investigation workspace. The agent can use stable
+operations, inspect evidence, write custom analyses, consult external sources,
+and revise its strategy. The scientific environment is the main product asset;
+the agent runtime and user interface are replaceable clients.
+
+The current Codex session already supplies a useful starting point: an agent
+loop, a conversational UI, repository and terminal access, and general tools.
+This establishes access and execution capabilities, not demonstrated improvement
+in chemistry. The next milestone is a recorded scientific investigation with
+this environment, before building a broad MCP catalog or a new agent runtime.
 
 The intended improvement is the ability to choose useful questions, gather
 evidence, propose hypotheses, compare alternatives, and revise a plan as new
@@ -21,20 +36,33 @@ It does not replace the package boundaries or release gates in the
 [current implementation roadmap](../new/type_agnostic_reaction_recommendation_implementation.md).
 Hardware control and autonomous laboratory execution are outside this proposal.
 
+This revision changes implementation priority from interface construction to
+workspace preparation and empirical investigation. The aligned
+[implementation plan](AI_Native_Scientific_Tools_Implementation_Plan.md) gives
+deliverables and acceptance gates.
+
 ## 2. Model, agent runtime, and scientific environment
 
 These are separate architectural responsibilities:
 
 | Part | Responsibility |
 | --- | --- |
+| User interface | Accept structures, questions, and constraints; show progress, alternatives, evidence, and results. |
 | Model | Reason about the available context and propose the next action or response. |
 | Agent runtime | Manage the investigation loop, context, tool execution, progress, failures, stopping, and continuation. |
-| Scientific environment | Supply domain operations, datasets, evidence, persistent artifacts, and explicit checks. |
+| Execution environment | Run Python, shell commands, and jobs against a prepared code and data snapshot, with a writable workspace. |
+| Scientific capabilities | Supply domain operations, datasets, evidence, persistent artifacts, and explicit checks. |
 
 The same model can behave differently when provided with a different runtime,
 tools, context, and execution budget. An advanced agent can decide what evidence
 to acquire and revisit earlier decisions; a fixed sequence of LLM calls exposes
 only the reasoning opportunities anticipated by its author.
+
+Here, an agent means a system that can observe intermediate results, choose its
+next action, recover from failures, and revise earlier choices toward an
+objective. Runtime quality, accessible evidence, feedback, and available actions
+can matter even when the model is identical. More autonomy alone does not
+establish better scientific reasoning.
 
 Codex is a candidate runtime, not a required dependency of the chemistry
 packages. OpenAI describes its harness as managing context, tools, conversation
@@ -48,18 +76,30 @@ agents should be able to use it directly without entering a second internal LLM
 controller. A built-in chemistry assistant can remain another client of the
 same capabilities.
 
+Do not rank clients by whether their UI looks like chat or a coding application.
+OpenAI documents substantial overlap between ChatGPT Work and Codex, with
+different experiences for different tasks. Evaluate the actual configured
+tools, environment, and outcomes. See
+[ChatGPT Work](https://learn.chatgpt.com/docs/get-started-with-work).
+
 ## 3. Architecture and ownership
 
 ```mermaid
 flowchart TD
-    User[Chemist and scientific task] --> Agent[Agent runtime]
-    Agent <--> Workspace[Investigation workspace]
-    Agent <--> Interface[Scientific interfaces: MCP, Python API, CLI]
-    Interface --> Taxonomy[reactive_taxonomy]
-    Interface --> Registry[condition_registry]
-    Interface --> Recommender[condition_recommender]
-    Interface --> Retro[core_retrosynthesis]
-    Interface --> Sources[External evidence and model adapters]
+    User[Chemist and scientific task] <--> UI[Existing agent UI or future web UI]
+    UI <--> Agent[Replaceable agent runtime and model]
+    Agent <--> Structured[Structured operations through Python, CLI, or MCP]
+    Agent <--> Programmable[Python and shell in prepared environment]
+    Structured --> Domain[Canonical scientific packages]
+    Programmable --> Domain
+    Programmable <--> Workspace[Scripts, evidence, route versions, and reports]
+    Structured <--> Workspace
+    Agent <--> Sources[External evidence and model adapters]
+    Domain --> Taxonomy[reactive_taxonomy]
+    Domain --> Registry[condition_registry]
+    Domain --> Recommender[condition_recommender]
+    Domain --> Retro[core_retrosynthesis]
+    Domain <--> Data[Versioned datasets and indices]
     Recommender --> Taxonomy
     Recommender --> Registry
 ```
@@ -77,10 +117,24 @@ flowchart TD
 - External literature and predictive-model adapters remain explicit boundaries;
   deterministic domain libraries remain free of network calls.
 
-MCP is an access mechanism. It is not the reasoning engine, the scientific
-contract, or a reason to deploy every capability as a separate service. Begin
-with a thin interface over existing APIs and separate deployment only when
-operational requirements justify it.
+Support two complementary access paths:
+
+| Access path | Use | Contract |
+| --- | --- | --- |
+| Structured scientific operations | Repeatable analysis, retrieval, recommendation, assessment, and routine workflows. | Typed inputs and outputs; canonical chemistry behavior; evidence and versions. |
+| Programmable scientific workspace | Questions that need custom comparisons, batch calculations, visualization, or a new sequence of operations. | Recorded scripts, inputs, dependencies, outputs, and assumptions; explicit experimental status. |
+
+Both paths call the same owning packages. A custom script may explore raw data,
+but it cannot turn excluded records into eligible recommendations by bypassing
+canonical admission or compatibility. Experimental calculations remain available
+as separately labeled evidence.
+
+MCP (Model Context Protocol) standardizes how a client discovers and calls tools
+and accesses context. It does not provide the model, agent loop, or chemistry
+judgment. It is useful for portable and remote access; direct Python and CLI
+access are sufficient for the first local pilot. Introduce a thin MCP adapter
+when a client needs it, using contracts demonstrated useful in investigations.
+Separate services only when operational requirements justify them.
 
 ## 4. Meaningful atomic operations
 
@@ -110,6 +164,20 @@ may be inspected as counterevidence but remain excluded from eligible rankings.
 
 ## 5. An agent-accessible working environment
 
+### Prepared environment
+
+The environment should include a pinned code revision, Python and RDKit
+dependencies, versioned definitions, identified dataset and index snapshots,
+and a writable directory for each investigation. Begin with the existing local
+environment; a reproducible container or remote worker can follow when needed.
+Record which capabilities actually run and which require unavailable data,
+credentials, models, or services. Repository presence alone is not availability.
+
+Provide a short entry guide listing working invocations, data locations and
+coverage, schemas, evidence rules, and known limitations. An agent should be
+able to perform a first analysis without rediscovering the public API by reading
+large amounts of implementation code.
+
 Useful tools require useful context and feedback. Provide:
 
 - Searchable documentation with preconditions, examples, limitations, and
@@ -125,13 +193,59 @@ Useful tools require useful context and feedback. Provide:
 - Execution limits, cancellation, and resumable job references for expensive
   searches or model calls.
 
+### Custom code and scientific authority
+
 An agent may write a derived analysis script when no predefined operation
-answers a question. Preserve its code, input references, dependencies, and
-outputs. Such an analysis is a derived artifact, not an automatic change to
-production chemistry definitions or trusted datasets.
+answers a question. Distinguish three kinds of execution:
+
+| Kind | Example | Treatment |
+| --- | --- | --- |
+| Existing domain operation | Retrieve eligible precedents or run a registered structural check. | Preserve the authoritative result and its documented validation scope. |
+| Derived exploratory analysis | Compare matched substrate subsets, examine procedure differences, or visualize route alternatives. | Save script, input IDs, dependencies, outputs, assumptions, and limitations as an investigation artifact. |
+| Change to scientific implementation | Add an operator, compatibility rule, identity definition, or scoring behavior. | Make a separate versioned development change with owning-package tests and applicable review gates. |
+
+Exploratory code can generate new evidence or hypotheses. It does not become a
+validated chemistry rule merely because it executes successfully. During a
+fixed-baseline evaluation, an agent must not change the definitions or evaluator
+against which its proposals are judged. A discovered defect becomes a separate
+development issue; a changed baseline requires a separately identified run.
+
+Web research and other tools may supplement the local corpus. Store source
+locations, retrieval dates, relevant passages or permitted artifacts, and the
+claims they support. External reports and model-generated suggestions retain
+their provenance and do not silently enter the trusted index.
 
 The agent's conversation is not the sole scientific record. Domain objects and
 evidence must survive context compaction, runtime changes, and resumed sessions.
+
+Start with a lightweight folder containing a run manifest, inputs, scripts,
+referenced evidence, results, and a report of decisions and open questions.
+Formal investigation storage can grow from these records; it is not a
+prerequisite for the first experiment.
+
+### Deployment choices
+
+| Mode | How the scientific environment is reached | Role in this design |
+| --- | --- | --- |
+| Existing workspace agent, initially Codex | Python, CLI, filesystem, and optionally MCP in the prepared environment. | First development and evaluation client; no new UI or runtime needed. |
+| Hosted ChatGPT with remote tools | A supported plugin or MCP integration calls operations on our server. | Reuse a hosted conversational experience; server capabilities must be explicitly exposed. |
+| Dedicated scientific website | Browser connects to an application backend that runs or connects an agent runtime and provisions scientific workers. | Later product option with route, recipe, evidence, and artifact views. |
+
+Connecting remote tools to ChatGPT does not replace its built-in code sandbox
+with this repository. OpenAI documents managed execution for hosted Work and
+remote MCP-backed tools through plugins. To provide custom Python execution in
+our environment, we must deliberately supply an execution service or choose a
+runtime integration that supports our workers. These are distinct deployment
+choices. See [sandboxing](https://learn.chatgpt.com/docs/sandboxing) and
+[MCP access](https://learn.chatgpt.com/docs/extend/mcp?surface=cli).
+
+For a website, keep the agent runtime and model credentials on the backend.
+Workers use a fixed scientific baseline and separate writable investigation
+directories; shared validated datasets can be mounted read-only. Stream progress
+and artifact references to the UI, support cancellation, and scope access to
+each user's projects. Local and remote clients should use the same scientific
+contracts. Scientific packages and saved investigations must not require a
+particular model provider, although individual runtime adapters may do so.
 
 ## 6. Evidence, hypotheses, and checks
 
@@ -267,53 +381,54 @@ ConditionCore/family routing as a parallel recommender, or move chemistry rules
 into prompts. Agent instructions can explain how to use tools and interpret
 results; executable scientific behavior stays with its owning package.
 
-## 11. Staged implementation
+## 11. Implementation sequence
 
-### Stage A: Inventory and interface specification
+Use the same phases as the
+[implementation plan](AI_Native_Scientific_Tools_Implementation_Plan.md):
 
-Map existing public operations to the capability table. Document current
-contracts, missing capabilities, ownership, and required evidence. Select two
-bounded investigation tasks before adding new abstractions.
+| Phase | Outcome |
+| --- | --- |
+| 0 | Record baseline and limitations, prepare the workspace and entry guide, separate development and untouched cases. |
+| 1 | Run real development investigations using the current agent, existing APIs, and custom scripts; record useful results and obstacles. |
+| 2 | Harden the operations demonstrated useful; add thin MCP access where needed and verify parity with direct calls. |
+| 3 | Formalize persistent, revisioned investigations and resumable jobs from the pilot artifacts. |
+| 4 | Develop and review evidence-backed condition investigations. |
+| 5 | Develop and review iterative retrosynthesis with dependency-aware route revisions. |
+| 6 | Compare scientific outcomes under controlled conditions and complete untouched evaluation. |
+| 7 | Consolidate validated interfaces; deploy remote access or a dedicated website when justified. |
 
-### Stage B: Direct access to existing capabilities
+The first pilot should investigate a condition suggestion with an important
+substrate mismatch. A second pilot should attempt to revise a multistep route
+after identifying a downstream problem. Preserve unsuccessful attempts and
+unsupported checks: they identify missing science or tooling rather than
+justifying a fabricated successful demonstration. Phases 4 and 5 mature these
+capabilities after the early pilots; they can proceed independently.
 
-Implement a thin interface that an external agent can use for reaction analysis,
-precedent inspection, condition recommendation, and existing retro operations.
-Provide examples, structured failures, full-result access, and version metadata.
-Verify parity with direct package calls.
+Promote repeated, useful analysis patterns into public operations only after
+their scientific meaning, ownership, and validation requirements are clear.
+Do not build a new harness, exhaustive tool catalog, service fleet, or dedicated
+UI as a prerequisite for learning from the existing agent environment.
 
-### Stage C: Investigation artifacts and hypothesis assessment
-
-Add persistent route alternatives, hypotheses, evidence references, and
-assessments. Enable an agent to submit a proposed step or recipe for checks
-without modifying trusted observations or production definitions.
-
-### Stage D: Evaluate agent-assisted investigations
-
-Use two initial demonstrations:
-
-1. Revise a multistep route after identifying a problematic downstream step.
-2. Investigate a condition suggestion whose nearest precedents contain an
-   important substrate mismatch.
-
-Compare the deterministic workflow, the workflow plus LLM review, and an
-advanced agent using the same scientific capabilities. Use the same underlying
-model where possible. Report tool/data access and resource budgets, and repeat
-agent runs to measure variation. Use matched-budget comparisons to separate
-runtime effects from additional computation.
-
-### Stage E: Consolidate validated interfaces
-
-Retain the interfaces that improve task outcomes and remove temporary duplicate
-adapters after parity. Keep runtime-specific integration replaceable. Product
-embedding can follow once direct agent use has demonstrated value.
-
-These stages do not waive the roadmap's frozen baseline, blind chemist review,
+These phases do not waive the roadmap's frozen baseline, blind chemist review,
 adjudication, untouched evaluation, corpus validation, or release requirements.
 Experimental interfaces must identify the validation status of the artifacts
 they expose. Do not tune development against the untouched evaluation set.
 
 ## 12. Evaluation and acceptance criteria
+
+Compare the deterministic workflow, the workflow with LLM review, and an
+advanced agent using the scientific environment. Within the agent condition,
+compare structured-tool-only access against structured tools plus programmable
+workspace access. This distinguishes the value of iterative investigation from
+the additional value of custom code. Use the same model where possible,
+matched budgets, recorded runtime settings, and repeated runs.
+
+For the controlled comparison, hold scientific code, data, and available source
+evidence constant. Evaluate open-web research separately, with retrieved sources
+recorded and leakage checks against evaluation answers. A system given more
+evidence may be more useful, but that alone does not show a better runtime.
+Protocol compatibility and a successful tool call likewise do not establish
+equivalent agent quality across providers.
 
 Blind chemistry review should assess:
 

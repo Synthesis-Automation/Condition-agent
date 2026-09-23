@@ -1,7 +1,9 @@
 # AI-Native Scientific Tools: Phased Implementation Plan
 
 Status: proposed; phases below are not marked as implemented  
-Date: 2026-09-22
+Revision: 2
+
+Date: 2026-09-23
 
 ## 1. Objective and governing design
 
@@ -9,9 +11,11 @@ Implement the [AI-native scientific tools design](AI_Native_Scientific_Tools_Des
 as a reusable scientific environment for advanced agents. The initial scope is
 reaction analysis, dataset access, condition recommendation, and retrosynthesis.
 
-The first useful milestone is an external agent independently investigating a
-reaction through existing scientific capabilities. Persistent investigations,
-condition adaptation, and iterative route revision follow.
+The first useful milestone is a recorded scientific investigation using the
+current Codex environment, existing Python and CLI operations, and custom
+analysis where useful. Prepare and exercise that environment before building a
+broad tool interface. This revision moves the pilot ahead of contract expansion
+and MCP implementation; later phases formalize what the pilot demonstrates.
 
 The [current chemistry implementation roadmap](../new/type_agnostic_reaction_recommendation_implementation.md)
 remains authoritative for package boundaries, chemistry validation, dataset
@@ -24,9 +28,10 @@ Hardware execution is out of scope.
   operations and manage artifacts without creating a second scientific path.
 - Reuse `reactive_taxonomy`, `condition_registry`, `condition_recommender`, and
   the existing `core_retrosynthesis` operations. Keep `chem_coworker` thin.
-- Expose a runtime-independent Python interface and a thin MCP interface.
-  Preserve CLI access where useful. Do not require an internal LLM call before
-  an external agent can use a scientific operation.
+- Support both structured operations and a programmable Python/shell workspace.
+  Start with existing APIs and CLI access, then harden demonstrated needs and
+  add thin MCP access for clients that need it. Do not require an internal LLM
+  call before an external agent can use a scientific operation.
 - Treat Codex as the first integration and evaluation client, not a dependency
   of scientific packages. Keep provider configuration in optional adapters.
 - Keep evidence, hypotheses, proposed adaptations, and observed records distinct.
@@ -35,6 +40,9 @@ Hardware execution is out of scope.
   ranking, resolved recipes, provenance, fallback reporting, and abstention.
 - Allow unsupported chemistry to remain investigable without labeling it
   verified or experimentally feasible.
+- Save custom code and its inputs, outputs, and assumptions. Changes to
+  scientific rules belong in separately versioned development work; an agent
+  must not change its own scientific baseline during fixed-baseline evaluation.
 - Use one shared service layer for future web and MCP interfaces. A browser
   application may call that layer directly; MCP is not required internally.
 
@@ -42,20 +50,22 @@ Hardware execution is out of scope.
 
 | Phase | Outcome | Dependency |
 | --- | --- | --- |
-| 0 | Reproducible baseline, capability inventory, and evaluation protocol | Existing code and artifacts |
-| 1 | Independent scientific operation contracts | Phase 0 |
-| 2 | External agent accesses and composes the tools | Phase 1 |
+| 0 | Recorded baseline, prepared workspace, capability inventory, and evaluation protocol | Existing code and artifacts |
+| 1 | Real investigations using the existing agent and environment | Phase 0 development readiness |
+| 2 | Hardened scientific contracts and thin MCP access where needed | Phase 1 findings |
 | 3 | Persistent, resumable investigations | Phase 2 |
 | 4 | Evidence-backed condition investigations | Phase 3 |
 | 5 | Iterative retrosynthesis with route revisions | Phase 3 |
 | 6 | Measured comparison and untouched evaluation | Phases 4 and 5 |
 | 7 | Consolidated interfaces and deployment readiness | Phase 6 and roadmap release gates |
 
-Phases 4 and 5 can proceed independently. An interface prototype is a development
-milestone, not a production chemistry-validation claim. Advance by acceptance
-criteria rather than calendar estimates.
+Phases 4 and 5 can proceed independently and mature the early pilot tasks.
+Initial artifact recording starts in Phase 1; Phase 3 formalizes storage and
+resumption. A pilot or interface prototype is a development milestone, not a
+production chemistry-validation claim. Advance by acceptance criteria rather
+than calendar estimates.
 
-## 4. Phase 0: Baseline, inventory, and evaluation tasks
+## 4. Phase 0: Baseline and workspace preparation
 
 ### Work
 
@@ -75,6 +85,13 @@ criteria rather than calendar estimates.
    problems, and multistep route revision.
 6. Reserve untouched evaluation cases before development. Follow the roadmap's
    reference/reaction-connected partitioning and leakage controls.
+7. Verify the Python/RDKit environment and runnable entry points for the selected
+   tasks. Record unavailable datasets, model adapters, services, and credentials
+   as limitations. Do not assume every module is a usable capability.
+8. Write a short entry guide with working invocations, dataset locations and
+   coverage, result schemas, and evidence rules. Create a per-investigation
+   output directory and a minimal manifest/report convention. Reuse the current
+   environment; containerization is optional at this stage.
 
 ### Deliverables
 
@@ -82,21 +99,67 @@ criteria rather than calendar estimates.
 - A capability inventory mapping operations to existing code and contracts.
 - Development tasks and a predefined evaluation rubric.
 - A separately controlled untouched evaluation partition.
+- A working scientific environment, entry guide, and pilot artifact convention.
 
 ### Acceptance gate
 
-Baseline defects are understood and resolved before freezing a release
-candidate. Artifacts are version-consistent and reproducible. Development cases
-and untouched cases are separated. No expected snapshot is changed merely to
-match current output.
+For development readiness, a fresh session can execute the selected operations,
+locate the intended data, and save inspectable results. Known defects and affected
+operations are recorded; affected outputs cannot be presented as validated.
+Development cases and untouched cases are separated.
 
-## 5. Phase 1: Independent scientific contracts
+Baseline defects must be understood and resolved before freezing a release
+candidate. A pilot on a documented development snapshot does not satisfy that
+release gate. No expected snapshot is changed merely to match current output.
+
+## 5. Phase 1: Investigate with the existing agent
 
 ### Work
 
-Define typed, independently callable operations around existing domain APIs.
-Reuse useful code in `chem_coworker/assistance/` without requiring its controller
-or provider transport.
+1. Run the canonical workflow on a development case with a condition-transfer
+   mismatch. Record the baseline output and unresolved scientific question.
+2. Ask the current agent to investigate using existing APIs, full precedent
+   records, source inspection, and custom Python analysis as needed. Record
+   external research separately from local-corpus evidence.
+3. Attempt a second task requiring reconsideration of an earlier retrosynthetic
+   choice after a downstream problem. Preserve unsupported steps and unsuccessful
+   attempts as explicit findings.
+4. Save inputs, calls, scripts, versions, outputs, evidence links, hypotheses,
+   decisions, and unresolved questions from the start. Use files before building
+   a general investigation database.
+5. Record friction: API discovery, missing procedure fields, misleading statuses,
+   unavailable assessments, slow queries, and repeated custom calculations.
+6. Have a chemist assess whether the investigation added supported insight.
+   Use this feedback to prioritize the next phase; do not tune against untouched
+   cases or require a positive result to preserve the pilot record.
+
+The agent may choose its sequence of actions. This phase needs no new UI,
+internal LLM controller, or MCP server. If a task reveals a scientific defect,
+record it and handle the fix as separate versioned work; preserve the original
+run. Do not edit baseline chemistry or admission rules to obtain a favorable
+pilot outcome.
+
+### Deliverables
+
+- Two investigation records, including useful findings and documented limits.
+- Saved custom analyses with reproducible inputs and outputs.
+- A prioritized backlog linking proposed contracts to observed scientific needs.
+
+### Acceptance gate
+
+The records show what the agent could investigate, which conclusions are
+supported, and where science or access was insufficient. Deterministic
+calculations can be replayed, and observations remain distinct from proposals.
+This is the first reviewable development milestone; it does not claim a
+validated improvement over the baseline.
+
+## 6. Phase 2: Harden scientific contracts and portable access
+
+### Work
+
+Define typed, independently callable operations around existing domain APIs,
+prioritized by Phase 1 findings. Reuse useful code in
+`chem_coworker/assistance/` without requiring its controller or provider transport.
 
 | Area | Initial operation scope |
 | --- | --- |
@@ -105,65 +168,44 @@ or provider transport.
 | Conditions | Resolve a recipe; recommend conditions; assess a supplied recipe. |
 | Retrosynthesis | Generate candidates; retrieve step precedents; verify a step or route. |
 
-Each operation must specify input schema, units, assumptions, result schema,
-provenance, versions, limitations, and an inspectable result reference. Support
-partial observations when interpretation fails.
+Each operation specifies schemas, units, assumptions, provenance, versions,
+limitations, and an inspectable result reference. Support partial observations
+when interpretation fails. Preserve convenient complete workflows and composable
+operations over the same implementation, alongside programmable workspace access.
 
-Audit status semantics before exposing them. In the inspected code,
-`assess_reaction_recipe()` classifies a missing verified signature as a hard
-conflict. Determine whether this represents inability to assess or an actual
-chemistry violation. Correct the owning contract where necessary, with migration
-and regression coverage; do not silently reinterpret the result in MCP.
+Audit status semantics. In the inspected code, `assess_reaction_recipe()`
+classifies a missing verified signature as a hard conflict. Determine whether
+this represents inability to assess or an actual chemistry violation. Correct
+the owning contract where necessary, with migration and regression coverage;
+do not silently reinterpret the result in MCP. Distinguish pass, fail, unknown,
+unsupported, and execution error through explicit domain-status mappings.
 
-Distinguish check outcomes such as pass, fail, unknown, unsupported, and execution
-error. Preserve and explicitly map existing domain statuses. None of these
-outcomes alone establishes experimental success.
+For a selected client that needs portable tool access, implement one thin MCP
+server over the useful contracts. Supply clear descriptions, structured failures,
+pagination, limits, concise summaries, and full-evidence access. Verify parity
+against direct calls on the pilot cases. Keep client-specific configuration in
+optional adapters. If no client yet needs MCP, record its deferral and validate
+the Python/CLI contracts directly; it is not a prerequisite for further science.
 
-### Deliverables
-
-- Public scientific operation contracts and thin application adapters.
-- Focused contract, architecture, and parity tests.
-- Examples covering success, ambiguity, contradiction, unsupported cases, and
-  missing data.
-
-### Acceptance gate
-
-Operations run without an internal LLM controller and match the authoritative
-package behavior. Domain changes have positive, negative, ambiguous, conflict,
-and invariance regressions where applicable. Mandatory chemistry filters remain
-inside the canonical workflow.
-
-## 6. Phase 2: Direct external-agent access
-
-### Work
-
-1. Implement one thin MCP server exposing the Phase 1 operations.
-2. Supply clear tool descriptions, structured failures, pagination, explicit
-   limits, concise summaries, and access to complete records and evidence.
-3. Provide a short chemistry usage guide documenting assumptions and suitable
-   investigation patterns without prescribing every reasoning step.
-4. Connect the first external agent and run a complete development investigation.
-5. Preserve high-level recommendation and planning operations as conveniences
-   built on the same implementations as the composable tools.
-6. Document protocol/transport requirements and optional client configuration.
-   Keep Codex-specific settings separate from the server and domain packages.
-
-Begin with local deployment. Keep the adapter structured so a remote HTTP
-transport can be added without changing scientific contracts. Do not build a new
-agent runtime or split every capability into a separate deployed service.
+Begin locally. A later remote transport must preserve scientific contracts.
+Custom server-side execution, if needed by a remote client, is a separate
+capability with per-investigation workers; publishing ordinary scientific MCP
+tools does not automatically grant Python or filesystem access.
 
 ### Deliverables
 
-- A working MCP toolkit and setup instructions.
-- Tool contract tests and recorded integration smoke results.
-- One complete external-agent investigation with inspectable evidence.
+- Public operation contracts, examples, and an updated environment guide.
+- Contract, architecture, and direct-call parity tests.
+- A thin MCP adapter and integration results if required by the selected client,
+  otherwise a documented deployment deferral.
 
 ### Acceptance gate
 
-An external agent can analyze a reaction, search and inspect precedents, obtain
-conditions, and explain limitations without invoking the built-in assistance
-loop. Tool outputs preserve versions, provenance, admission status, and
-abstention. This is the first development release.
+An external agent can use the selected operations without the built-in
+assistance loop. Interfaces preserve authoritative behavior, versions,
+provenance, admission status, and abstention. Mandatory chemistry filters remain
+inside canonical workflows. Domain changes have positive, negative, ambiguous,
+conflict, and invariance regressions where applicable.
 
 ## 7. Phase 3: Persistent investigation state
 
@@ -173,6 +215,9 @@ Add application-owned, revisioned records for investigations, hypotheses,
 candidate recipes, route alternatives, assessments, decisions, and unresolved
 questions. Reference existing domain objects instead of copying them into a
 universal reaction dictionary.
+
+Evolve these contracts from the pilot's saved files. Preserve and migrate useful
+pilot evidence instead of requiring investigations to restart in a new format.
 
 Persist tool inputs and result references, dataset and definition versions, and
 model metadata when relevant. Store concise decision rationales and evidence
@@ -265,6 +310,12 @@ Compare three systems:
 2. The deterministic workflow with LLM review.
 3. An advanced agent independently using the scientific toolkit.
 
+Within the agent condition, compare structured tools alone against the same
+tools plus programmable workspace access. Separate a controlled comparison
+with fixed scientific code, data, and source evidence from an open-web condition.
+Record external sources and check for leakage of evaluation answers. Additional
+evidence or compute must not be misattributed to runtime quality.
+
 Use the same underlying model where possible, record tool/data access, compare
 matched resource budgets, and repeat agent runs to measure variation. Evaluate
 another compatible client to test portability; do not assume equivalent quality
@@ -302,6 +353,13 @@ Longer answers and more tool calls do not count as improvement by themselves.
   scientific packages and browser code.
 - For remote use, add authenticated access, project isolation, background jobs,
   cancellation, and persistent investigation storage.
+- Package the prepared environment reproducibly, with pinned dependencies and
+  identified code/data snapshots. Use separate writable investigation workers
+  and shared read-only validated data where appropriate.
+- For hosted ChatGPT access, expose supported remote tools. Do not describe this
+  as replacing ChatGPT's built-in sandbox. Programmable execution on our server
+  requires an explicit service or a compatible runtime integration; see the
+  design's deployment choices and official documentation links.
 - If a dedicated website is selected, expose the shared services through a web
   API and provide structure, route, recipe, and evidence views. Run its selected
   agent runtime on the backend. The website and remote MCP endpoint share domain
@@ -321,10 +379,12 @@ does not create a second chemistry implementation.
 
 ## 12. First implementation slice and verification policy
 
-The first slice should contain baseline cleanup, reaction analysis, precedent
-retrieval and full-record inspection, and condition recommendation through one
-independent interface. Demonstrate one evidence-backed investigation before
-expanding the tool catalog or building a larger application.
+The first slice should prepare the existing environment and run one recorded
+condition-transfer investigation with the current agent. Use existing analysis,
+retrieval, full-record inspection, and recommendation operations directly. Save
+any custom scripts and evidence, then attempt the route-revision pilot. Use
+observed obstacles to choose contract improvements. A new MCP server, a custom
+agent runtime, and a dedicated website are not prerequisites for this slice.
 
 For implementation changes, run focused tests and the complete `pytest -q` suite
 before handoff. Validate loaders and schemas when definitions change. Document
