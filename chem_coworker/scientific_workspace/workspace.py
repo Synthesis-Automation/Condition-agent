@@ -63,15 +63,22 @@ class ScientificWorkspace:
         except Exception as exc:
             payload.update(execution_status="error", error={"type": type(exc).__name__, "message": str(exc)})
         payload["duration_seconds"] = round(monotonic() - started, 6)
-        if operation in {"revise_routes", "propose_condition_adaptation"} and isinstance(inputs.get("source_ref"), str):
+        if operation in {
+            "revise_routes", "propose_condition_adaptation", "prepare_route_proposal",
+            "inspect_route_step", "revise_route_branch",
+        } and isinstance(inputs.get("source_ref"), str):
             try:
                 self.store.read_artifact(inputs["source_ref"])
             except (OSError, ValueError):
                 pass
             else:
                 evidence_refs = tuple(dict.fromkeys((*evidence_refs, inputs["source_ref"])))
-        if operation == "propose_condition_adaptation" and isinstance(inputs.get("evidence_refs"), list):
+        if operation in {
+            "propose_condition_adaptation", "assess_route_step", "assess_route_proposal", "revise_route_branch",
+        } and isinstance(inputs.get("evidence_refs"), list):
             evidence_refs = tuple(dict.fromkeys((*evidence_refs, *(ref for ref in inputs["evidence_refs"] if isinstance(ref, str)))))
+        if operation == "compare_route_proposals" and isinstance(inputs.get("source_refs"), list):
+            evidence_refs = tuple(dict.fromkeys((*evidence_refs, *(ref for ref in inputs["source_refs"] if isinstance(ref, str)))))
         # Invalid caller references remain in the saved request/error, not in verified links.
         valid_refs = []
         for reference in evidence_refs:

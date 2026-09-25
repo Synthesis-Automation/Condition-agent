@@ -86,6 +86,26 @@ evidence references, assumptions and risks. The output remains a proposal even w
 normalization/compatibility succeeds. Do not fabricate a change just to call a tool;
 insufficient evidence is a valid investigation result.
 
+For route questions, use assess_route_step for an agent/literature-proposed step,
+and assess_route_proposal for a complete or partial proposed route. A proposal has
+target_smiles and steps; every step has external_step_id, target_smiles (its product)
+and precursor_smiles (dot-separated), with optional mapped_reaction_smiles,
+proposed_conditions (a resolved recipe), and source metadata. Source labels do not
+establish chemical validity. Use include_forward/include_conditions only when needed.
+Alternatively use prepare_route_proposal(source_ref, route_id) on a recorded planner
+result. Inspect weak steps with inspect_route_step before proposing a revision.
+Use revise_route_branch to explicitly remove/replace steps or extend a terminal
+branch. Supply the reason, supporting evidence, assumptions and unresolved risks.
+It preserves the source and reassesses ALL steps and topology, including downstream
+steps. User-declared unavailable_starting_materials are checked against leaves;
+making an unavailable intermediate is different from assuming it can be purchased.
+Actual stock availability is not established by this check. Revised routes inherit
+the original constraints and assessment options. Compare saved alternatives with
+compare_route_proposals; show a concise before/after table with changed steps,
+material constraints, structural gates, selectivity/condition evidence and unknowns.
+A completed revision is NOT automatically an improvement. Unsupported proposals
+remain hypotheses outside verified admission. Do not hide failed or not-run checks.
+
 Rules for this fixed-baseline investigation:
 - Do not edit source, definitions, source datasets, baseline manifests, or existing
   evidence. Do not install packages, run repository tests, or spawn additional agents.

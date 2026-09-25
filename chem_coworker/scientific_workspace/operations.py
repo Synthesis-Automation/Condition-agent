@@ -20,12 +20,15 @@ class ScientificOperations:
         "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
         "inspect_condition_precedents", "propose_condition_adaptation",
         "plan_routes", "revise_routes",
+        "assess_route_step", "assess_route_proposal", "prepare_route_proposal",
+        "inspect_route_step", "revise_route_branch", "compare_route_proposals",
     )
 
     def __init__(self, store: InvestigationStore) -> None:
         self.store = store
         self._recommender: Any = None
         self._planner: Any = None
+        self._proposal_library: Any = None
         self._route_runs: dict[bytes, Any] = {}
 
     def catalog(self) -> list[dict[str, str]]:
@@ -199,6 +202,80 @@ class ScientificOperations:
                 retro, stock_path=self._path("stock_index"),
             )
         return replace(self._planner, condition_recommender=self._conditions() if include_conditions else None)
+
+    def _external_route_library(self) -> Any:
+        """Load the recorded operator library without requiring a stock index."""
+        from core_retrosynthesis import load_generic_library
+
+        if self._proposal_library is None:
+            self._proposal_library = self._planner.library if self._planner is not None else load_generic_library(self._path("retro_library"))
+        return self._proposal_library
+
+    def assess_route_step(
+        self, proposal: dict[str, Any], include_conditions: bool = False,
+        include_forward: bool = False, evidence_refs: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Assess target_smiles/precursor_smiles through canonical external-proposal gates.
+
+        Optional mapped_reaction_smiles, proposed_conditions (resolved recipe),
+        and sources remain untrusted input. Unknown is not impossible. Conditions
+        retrieval and forward challenges are opt-in; supplied recipes are assessed separately.
+        """
+        from .route_investigation import assess_step
+
+        return assess_step(self, proposal, include_conditions, include_forward, evidence_refs)
+
+    def assess_route_proposal(
+        self, proposal: dict[str, Any], unavailable_starting_materials: list[str] | None = None,
+        include_conditions: bool = False, include_forward: bool = False,
+        evidence_refs: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Assess a target_smiles and steps graph; each step needs external_step_id and step proposal fields.
+
+        Preserve unsupported steps as hypotheses. Declared unavailable starting
+        materials are graph-matched against route leaves; this is not a stock lookup.
+        The returned artifact is the source_ref for inspection, revision and comparison.
+        """
+        from .route_investigation import assess_route
+
+        return assess_route(self, proposal, unavailable_starting_materials, include_conditions, include_forward, evidence_refs)
+
+    def prepare_route_proposal(
+        self, source_ref: str, route_id: str, unavailable_starting_materials: list[str] | None = None,
+        include_conditions: bool = False, include_forward: bool = False,
+    ) -> dict[str, Any]:
+        """Convert a selected plan_routes/revise_routes result to a reassessed editable proposal."""
+        from .route_investigation import prepare_planned_route
+
+        return prepare_planned_route(self, source_ref, route_id, unavailable_starting_materials, include_conditions, include_forward)
+
+    def inspect_route_step(self, source_ref: str, step_id: str) -> dict[str, Any]:
+        """Inspect a recorded proposal step's gates, neighboring steps, molecule audits and recipe assessment."""
+        from .route_investigation import inspect_step
+
+        return inspect_step(self, source_ref, step_id)
+
+    def revise_route_branch(
+        self, source_ref: str, remove_step_ids: list[str], replacement_steps: list[dict[str, Any]],
+        reason: str, evidence_refs: list[str] | None = None, assumptions: list[str] | None = None,
+        risks: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Explicitly replace/add steps, preserve the source, and reassess every step and route topology.
+
+        Use a completed proposal assessment/revision source_ref. Reusing an ID
+        requires explicitly removing it; remove_step_ids=[] extends a leaf branch.
+        Supply reason and nonempty risks. Assessment settings and declared material
+        constraints are inherited. Invalid revisions remain inspectable, not accepted.
+        """
+        from .route_investigation import revise_branch
+
+        return revise_branch(self, source_ref, remove_step_ids, replacement_steps, reason, evidence_refs, assumptions, risks)
+
+    def compare_route_proposals(self, source_refs: list[str]) -> dict[str, Any]:
+        """Compare 2–5 recorded alternatives for the same target, checks and constraints; no automatic winner."""
+        from .route_investigation import compare_routes
+
+        return compare_routes(self, source_refs)
 
     def _plan(self, settings: Mapping[str, Any], exclusions: tuple[Any, ...] = ()) -> Any:
         from chem_coworker.contracts import MultistepRetrosynthesisRequest
