@@ -237,6 +237,39 @@ def test_optional_web_profile_origin_token_and_evidence(service: ConversationSer
     assert focused.get("/api/v1/scientific/config").status_code == 404
 
 
+def test_web_activity_finds_and_cancels_the_owned_investigation(service: ConversationService) -> None:
+    service.runtime = RecordedRuntime(wait=True)
+    client = TestClient(create_app(runtime=object(), scientific_service=service, recommendation_only=False),
+                        base_url="http://127.0.0.1")
+    endpoint = "/api/v1/scientific/activity"
+    assert client.get(endpoint).json() == {"active": None}
+    token = client.get("/api/v1/scientific/config").json()["token"]
+    submitted = service.submit("Investigate this reaction")
+    active = client.get(endpoint).json()["active"]
+    assert active["conversation_id"] == submitted["conversation_id"]
+    assert active["id"] == submitted["turn_id"]
+    assert active["status"] in {"queued", "preparing", "running"}
+    assert active["progress"] == []
+    assert "answer" not in active
+    assert client.get(endpoint, headers={"origin": "https://attacker.example"}).status_code == 403
+    response = client.post(f"/api/v1/scientific/conversations/{active['conversation_id']}/cancel",
+                           headers={"x-scientific-token": token})
+    assert response.json() == {"cancellation_requested": True}
+    assert finish(service, active["conversation_id"])["status"] == "cancelled"
+    assert client.get(endpoint).json() == {"active": None}
+
+
+def test_web_activity_does_not_adopt_an_interrupted_turn(service: ConversationService) -> None:
+    identity = service.submit("Question")["conversation_id"]
+    turn = finish(service, identity)
+    path = service.root / identity / "turns" / turn["id"] / "turn.json"
+    turn["status"] = "running"
+    path.write_text(json.dumps(turn), "utf-8")
+    client = TestClient(create_app(runtime=object(), scientific_service=service, recommendation_only=False),
+                        base_url="http://127.0.0.1")
+    assert client.get("/api/v1/scientific/activity").json() == {"active": None}
+
+
 def test_runtime_command_never_uses_shell_or_last_global_session(tmp_path: Path) -> None:
     runtime = object.__new__(CodexRuntime)
     runtime.executable = "codex"

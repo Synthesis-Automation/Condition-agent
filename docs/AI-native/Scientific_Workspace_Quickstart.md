@@ -30,22 +30,32 @@ Then ask:
 
 > Does that evidence prove experimental feasibility?
 
-For conditions, use the **Compare conditions** example. For retrosynthesis,
-use **Investigate a route** or supply a target SMILES with your constraints.
+For conditions, use the **Explore conditions** example. For retrosynthesis,
+use **Plan a synthesis** or supply a target SMILES with your constraints.
 The agent chooses operations, examines results, and can run custom analysis
 scripts. It can ask for missing structures rather than invent a reaction.
 
-The page shows preparation/running state, recent tool activity, the final answer,
-uncertainties, and links to full evidence JSON. Answers render Markdown tables,
+The page has a conversation sidebar and a message composer at the bottom.
+Press **Enter** to send and **Shift+Enter** for a new line. While the agent works,
+the conversation shows its current state and elapsed time; expand **View activity**
+for recent recorded tool events. The final answer appears when ready; the UI
+does not stream intermediate drafts or estimate a completion percentage.
+Structures, scientific details, sources, and uncertainty are expandable beneath
+each answer. Answers render Markdown tables,
 headings, emphasis, lists, code, and links. Wide tables scroll horizontally.
 Raw HTML and remote Markdown images are disabled; evidence links stay scoped
 to their conversation. Install `requirements-web.txt` when setting up a new
 environment (the renderer uses `markdown-it-py`). Select
 a saved conversation to continue it, including after a normal server restart.
-**Stop** cancels the runtime process tree and preserves partial evidence.
+The square **Stop investigation** button replaces Send while work is active.
+It cancels the runtime process tree and preserves partial evidence. Switching
+chats or selecting **New chat** keeps the active investigation visible above the
+composer, with **Open chat** and **Stop** controls. You can write a draft while
+waiting. Reloading the page discovers the active investigation automatically.
 
 Recognized, parseable molecular SMILES in questions and answers also appear as
-SVG structure cards, with their original notation and a **Download SVG** link.
+SVG structure cards under **View structure(s)** or **Structures & scientific
+details**, with their original notation and a **Download SVG** link.
 Inline code, `smiles` code blocks, and recognizable plain-text notation are
 supported. The existing RDKit-based visualization package produces the drawings.
 Invalid strings remain readable in the message but receive no drawing; molecule
@@ -197,6 +207,7 @@ API additions, enabled only with the scientific service in the research profile:
 | --- | --- | --- |
 | GET | `/api/v1/scientific/config` | Runtime/data availability and page session token |
 | GET | `/api/v1/scientific/conversations` | Saved conversations |
+| GET | `/api/v1/scientific/activity` | Worker-owned active turn and recent tool events, across chats |
 | POST | `/api/v1/scientific/turns` | Submit question, optional conversation ID; returns 202 |
 | GET | `/api/v1/scientific/conversations/{id}` | History and current progress |
 | POST | `/api/v1/scientific/conversations/{id}/cancel` | Request cancellation |

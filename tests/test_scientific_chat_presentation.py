@@ -125,5 +125,14 @@ def test_saved_conversation_api_and_page_deliver_new_presentation_without_agent_
     assert len(turn["answer_presentation"]["structures"]) == 2
     assert len(turn["question_presentation"]["structures"]) == 1
     page = client.get("/scientific").text
-    assert "appendStructures(question,turn.question_presentation)" in page
-    assert "Download SVG" in page
+    assert 'id="question"' in page
+    for name, media_type in (("chat.js", "text/javascript"), ("chat.css", "text/css")):
+        url = f"/scientific/assets/{name}"
+        assert url in page
+        asset = client.get(url)
+        assert asset.status_code == 200
+        assert asset.headers["content-type"].startswith(media_type)
+        assert asset.headers["cache-control"] == "no-store"
+        assert client.get(url, headers={"origin": "https://attacker.example"}).status_code == 403
+    assert "Download SVG" in client.get("/scientific/assets/chat.js").text
+    assert client.get("/scientific/assets/scientific_chat.py").status_code == 404

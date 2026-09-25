@@ -33,6 +33,11 @@ See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
 - User conversations: `/scientific`, questions and follow-ups, saved thread
   identity, asynchronous progress, cancellation, runtime deadline, and linked
   evidence inspection. Runtime prompts and event logs are saved per turn.
+- Concise chat interface: responsive history sidebar, bottom composer, inline
+  state/elapsed time and expandable tool activity. Structures, scientific details,
+  sources, and uncertainty are collapsed beneath the answer. Active work remains
+  visible and cancellable from another chat; drafts survive navigation in the page.
+  Progress reports actual recorded events; answers appear after final validation.
 - Optional runtime: native `codex exec` with structured final responses and exact
   thread resumption. Codex supplies the iterative tool loop and programmable
   environment; the scientific packages do not depend on its model service.

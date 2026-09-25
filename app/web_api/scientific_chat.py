@@ -50,6 +50,34 @@ def create_scientific_router(service: ConversationService) -> APIRouter:
         guard(request)
         return FileResponse(Path(__file__).with_name("scientific_chat.html"), headers={"Cache-Control": "no-store"})
 
+    @router.get("/scientific/assets/{name}", include_in_schema=False)
+    def asset(name: str, request: Request) -> FileResponse:
+        guard(request)
+        files = {"chat.js": ("scientific_chat.js", "text/javascript"),
+                 "chat.css": ("scientific_chat.css", "text/css")}
+        if name not in files:
+            raise HTTPException(404, "Unknown chat asset")
+        filename, media_type = files[name]
+        return FileResponse(Path(__file__).with_name(filename), media_type=media_type,
+                            headers={"Cache-Control": "no-store"})
+
+    @router.get("/api/v1/scientific/activity")
+    def activity(request: Request) -> dict[str, Any]:
+        """Expose actual worker-owned activity, even when another chat is selected."""
+        guard(request)
+        for row in service.list_conversations():
+            try:
+                conversation = service.get(row["id"])
+            except FileNotFoundError:
+                continue
+            for turn in reversed(conversation["turns"]):
+                if turn["status"] in {"queued", "preparing", "running"}:
+                    return {"active": {"conversation_id": row["id"], "title": row["title"],
+                                       **{key: turn.get(key) for key in (
+                                           "id", "status", "created_at", "updated_at", "progress", "repair_attempts",
+                                       )}}}
+        return {"active": None}
+
     @router.get("/api/v1/scientific/config")
     def configuration(request: Request) -> dict[str, Any]:
         guard(request)
