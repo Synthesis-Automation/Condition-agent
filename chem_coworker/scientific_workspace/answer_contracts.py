@@ -162,7 +162,7 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
     cited.update(re.findall(r"sha256:[0-9a-f]{64}", answer.model_dump_json()))
     for reference in cited:
         store.read_artifact(reference)
-        if kinds.get(reference) not in {"call", "derived_file", "replay"}:
+        if kinds.get(reference) not in {"call", "derived_file", "replay", "custom_execution"}:
             raise ValueError("Answer must cite scientific evidence, not agent assertions")
     sources = {source.id: source for source in answer.sources}
     for source in answer.sources:
@@ -178,6 +178,8 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
         if not any(isinstance(value, dict) and (
             kind == "call" and value.get("execution_status") == "completed" and "operation" in value
             or kind == "replay" and "source_ref" in value and "matches" in value
+            or kind == "custom_execution" and value.get("execution_status") == "completed"
+            and value.get("returncode") == 0 and "script_sha256" in value and "input_sha256" in value
         ) for kind, value in supports):
             raise ValueError("Computed objects require a completed recorded computation or replay")
     return sorted(cited)

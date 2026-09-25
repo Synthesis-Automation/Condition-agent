@@ -1,6 +1,6 @@
 # Scientific workspace implementation status
 
-Date: 2026-09-24
+Date: 2026-09-25
 
 The local scientific workspace is implemented in
 [`chem_coworker/scientific_workspace`](../../chem_coworker/scientific_workspace).
@@ -43,6 +43,13 @@ See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
   steps, routes, per-condition/yield attribution, claims, and captured sources.
   The UI renders reaction schemes and route dependencies and flags missing target
   products. Legacy saved answers remain readable without inferred route migration.
+- Condition investigations: selected-precedent structural comparisons, canonical
+  recipe assessment, source/procedure links, reference counts and missing fields;
+  attributed recipe adaptations remain unreviewed proposals.
+- Recorded custom Python execution: snapshot code and cited inputs, deadline,
+  JSON output and execution/log provenance. No automatic arbitrary-script replay.
+- Answer correction: one same-thread retry after schema/evidence-reference failure,
+  preserving rejected drafts, traces and usage. Other runtime failures are not retried.
 - Local API: opt-in research profile, loopback launcher, same-origin/token checks,
   server-owned executable/model/data configuration, and one active local turn.
 
@@ -93,6 +100,58 @@ runtime. A browser page is included; this is still a local development preview.
 
 ## Development investigations
 
+### Condition-investigation milestone
+
+The next development phase adds `inspect_condition_precedents` and
+`propose_condition_adaptation` to the existing recorded workspace. Domain comparison
+lives in `condition_recommender`; procedure linkage and proposal history remain
+application composition. The existing recommendation ranking and source data are
+unchanged. Inspection counts apply to selected observations; exact observation IDs
+link procedures, while reaction-only reports remain explicitly unassigned.
+
+Direct recipe assessment now returns `reaction_recipe_assessment.v2`: unresolved
+structure is `unknown`, invalid input is separate, and actual conflicts retain
+their rule evidence. Observed unchanged functional groups now reach the existing
+compatibility engine; previously direct assessment passed only the identity
+signature and could omit spectator conflicts. See the
+[contract/migration note](../new/condition_investigation_assessment_20260925.md).
+
+An adaptation preserves the original and complete proposed recipe, every changed
+field and reason, supporting artifacts, assumptions, risks and compatibility.
+It always reports `transfer_status="not_established"`. Evidence-link validation
+does not decide whether the cited source scientifically justifies the change.
+Stage/declared-absence editing is explicitly unsupported instead of lossy.
+
+Custom scripts can use `run_python` to snapshot code and JSON inputs, capture
+output and exit status, and support a `computed` answer label. This is a trusted
+local runner, not OS isolation or independent validation. Scripts are not
+automatically replayed. Answer validation now allows one correction attempt
+using the same runtime thread; rejected drafts remain visible in the history.
+A second invalid answer fails. Cancellation, baseline drift and runtime failures
+are not repaired; deadlines apply per runtime attempt.
+
+Regression coverage includes observation/procedure separation, recipe attribution,
+missing operating values, independent-reference limitations, recorded custom-code
+success/failure/deadline/cancellation/input mutation, and bounded answer correction.
+Concurrent testing also exposed a Windows transient sharing violation while
+reading replaced state JSON; reads now have a bounded retry, without retrying
+malformed JSON.
+
+A real model-backed local-corpus trial completed on its first attempt in
+conversation `f7c1a62e8a504a37bca7516bcf1ed0ef`. It retrieved two recipes, inspected
+eight selected observations spanning three distinct reference IDs, and ran a
+recorded Python count over the saved inspection. All eight lacked temperature,
+time, concentration and atmosphere; the selected procedure catalog returned no
+matching records. The answer rendered a sourced Markdown comparison table,
+distinguished the selected counts from retrieval aggregates, and declined to
+invent an adaptation. Seven source links were checked through the API. The local
+report is `results/ai_native/condition_investigation_trial_report.json`.
+
+This is an integration/development result, not an independently validated transfer.
+The pilot baseline predates final custom-runner input-copy/non-finite-output
+hardening; its evidence remains readable and a new investigation is required for
+further work with current code. Those edge cases are covered by regression tests.
+
 ### Structured-answer milestone
 
 New turns must return the versioned answer contract from `answer_contracts.py`.
@@ -125,8 +184,8 @@ The first turn was rejected because a derived-file attachment alone supported a
 `computed` claim. An explicit correction in a follow-up produced the accepted
 answer; the rejected turn and evidence remain saved. The prompt now explains this
 boundary and asks the agent to validate its draft with the same contract/evidence
-validators before submission. No automatic server retry or claim-level scientific
-review is claimed. The local API check report is
+validators before submission. At that milestone there was no automatic server
+retry; claim-level scientific review remains pending. The local API check report is
 `results/ai_native/structured_answer_trial_report.json`.
 
 After the prompt update, a fresh live reaction trial in conversation
@@ -222,9 +281,9 @@ remain review questions.
 | --- | --- | --- |
 | 0: baseline and preparation | Runnable development environment, manifest, registry audit, and local data configuration. | Resolve baseline registry defects before a release freeze; establish and control a new untouched scientific evaluation partition. |
 | 1: existing-agent pilots | Recorded condition investigation and multistep route investigation, with original unsuccessful task choice retained. | Independent chemist assessment of usefulness and remaining scientific questions. |
-| 2: scientific contracts/access | Local operations and CLI use the existing packages; direct-call parity covered. | Correct the unresolved-signature assessment semantics as separately reviewed domain work. MCP is deferred until a selected client needs it. |
+| 2: scientific contracts/access | Local operations and CLI use the existing packages; direct-call parity covered; unresolved-signature assessment semantics corrected with regression coverage. | Independent review of the updated assessment contract; MCP is deferred until a selected client needs it. |
 | 3: persistence | Local immutable artifacts, history, replay, saved user conversations, exact runtime thread resumption, cancellable background turns and progress. | Durable queue/crash adoption and remote storage are not implemented. |
-| 4: condition investigations | Evidence inspection, recipe resolution/assessment, and derived comparison usable. | A scientifically reviewed adaptation capability; the pilot lacked sufficient source detail to justify one. |
+| 4: condition investigations | Structured precedent inspection, procedure linkage, missingness, attributed adaptations and recorded custom calculations implemented. | Independent scientific review and source-supported transfer trials; recording a proposal does not validate it. |
 | 5: iterative retrosynthesis | Issue-backed alternate disconnection/realization, lineage, and repeated verification usable. | Broader independent chemistry review, richer agent-proposed step/route assessment, and condition-selectivity integration. |
 | 6: comparative evaluation | Not performed. | Blind comparison, adjudication, matched-budget repeated runs, and untouched evaluation in roadmap order. |
 | 7: release/deployment | A local question-to-answer browser preview is usable for development testing. | Production release is not performed: full scientific gates, multiuser isolation, consolidation, and selected remote/MCP deployment remain. |
@@ -241,11 +300,10 @@ aliases. Deciding whether to merge identities, correct stereochemical names, or
 declare ambiguous aliases requires curation; this implementation does not
 silently change those identities or mark the release baseline clean.
 
-`assess_reaction_recipe()` currently returns a hard-conflict field when a verified
-signature is unavailable. The adapter returns this contract unchanged and
-documents the limitation. This status alone is not evidence of chemical
-impossibility. A domain-level semantic correction needs its own regressions and
-migration note.
+`assess_reaction_recipe()` now preserves unavailable signatures as `unknown`,
+with no invented hard conflict. Its `compatible=False` value alone still must
+not be interpreted as impossibility. Consumers should inspect status, analysis
+warnings and unresolved requirements; rule coverage remains incomplete.
 
 The workspace records explicit data files; callers must configure every external
 input used by custom scripts. Ordinary execution detects file stat changes;
@@ -254,12 +312,12 @@ install old dependencies or restore historical source files automatically.
 
 ## Validation
 
-Workspace, route-replay, conversation, and structured-answer tests: **47 passed**
-in the full suite, including 14 new answer-contract and route-presentation cases.
-The 13 conversation tests cover real recorded chemistry behind a model test double,
+Workspace, route-replay, conversation, structured-answer and condition-investigation
+tests are included in the full suite. The 15 conversation tests cover real recorded chemistry behind a model test double,
 follow-up recovery, invented citations, cancellation, baseline drift, API origin/token
 boundaries, invalid IDs, unowned workers, Windows atomic-write retry, and actual
-subprocess success/failure/missing-output/deadline handling. Model-backed live
+subprocess success/failure/missing-output/deadline handling, bounded answer correction,
+and transient state-reading failures. Model-backed live
 smoke tests are recorded separately above and are not counted as deterministic tests.
 
 The selected Compact index passed the canonical integrity validator with
@@ -268,8 +326,9 @@ not independent scientific validation. A fresh workspace instance replayed the
 reaction analysis after fully rehashing all five selected data artifacts; the
 complete result matched. Ruff checks and documentation link checks passed.
 
-Full suite after the structured-answer update: **1,598 passed, 2 failed** in
-266.00 seconds, including all seven existing Markdown/SMILES presentation tests.
+Full suite after the condition-investigation update: **1,619 passed, 2 failed** in
+285.20 seconds, including 21 additional regression cases and all seven existing
+Markdown/SMILES presentation tests.
 Ruff, JavaScript syntax, and local documentation link checks also passed. The failures are the
 pre-existing registry checks
 `test_validate_reports_current_registry_state` and

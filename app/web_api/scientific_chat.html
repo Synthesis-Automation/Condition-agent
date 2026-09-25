@@ -78,7 +78,7 @@ function appendStructures(container,presentation){
     const download=element('a','Download SVG');download.href=structure.image_url;download.download='structure-'+(index+1)+'.svg';caption.append(download);figure.append(image,caption);gallery.append(figure);
   });container.append(gallery);
 }
-const basisLabels={reported:'Reported · agent attributed',computed:'Computed · local tool',proposed:'Proposed · hypothesis',unknown:'Unknown',input:'User input'};
+const basisLabels={reported:'Reported · agent attributed',computed:'Computed · recorded execution',proposed:'Proposed · hypothesis',unknown:'Unknown',input:'User input'};
 function showStructured(view){
   const section=element('section','','scientific-view');
   if(view.error){section.append(element('p',view.error,'scientific-note'));return section}
@@ -120,7 +120,7 @@ async function refresh(){
     const signature=JSON.stringify(conversation.turns.map(t=>[t.id,t.status,t.answer_ref,t.error]));
     if(signature!==displayed){$('messages').replaceChildren();for(const turn of conversation.turns){const question=element('div','','user');question.append(formattedMessage(turn.question,turn.question_presentation));appendStructures(question,turn.question_presentation);$('messages').append(question,answerCard(turn))}displayed=signature}
     const last=conversation.turns.at(-1);const active=last&&['queued','preparing','running'].includes(last.status);working(!!active,active?(last.status==='preparing'?'Preparing…':'Investigating…'):last?.status==='completed'?'Ready for a follow-up':last?.status||'Ready');
-    const activities=last?.progress||[];$('trace').textContent=active&&activities.length?'Latest activity: '+activities.at(-1).kind.replaceAll('_',' ')+' · '+activities.at(-1).status:'';
+    const activities=last?.progress||[];$('trace').textContent=active&&last?.repair_attempts?'Correcting the answer after a format or evidence-reference check…':active&&activities.length?'Latest activity: '+activities.at(-1).kind.replaceAll('_',' ')+' · '+activities.at(-1).status:'';
     if(active)pollTimer=setTimeout(refresh,1200);
   }catch(error){$('error').textContent=error.message;working(false,'Connection interrupted');pollTimer=setTimeout(refresh,3000)}
 }

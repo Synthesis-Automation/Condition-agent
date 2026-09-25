@@ -6,6 +6,7 @@ from dataclasses import asdict
 import json
 from pathlib import Path
 from time import monotonic
+from threading import Event
 from typing import Any, Mapping
 
 from .baseline import capture_baseline, verify_baseline
@@ -62,13 +63,15 @@ class ScientificWorkspace:
         except Exception as exc:
             payload.update(execution_status="error", error={"type": type(exc).__name__, "message": str(exc)})
         payload["duration_seconds"] = round(monotonic() - started, 6)
-        if operation == "revise_routes" and isinstance(inputs.get("source_ref"), str):
+        if operation in {"revise_routes", "propose_condition_adaptation"} and isinstance(inputs.get("source_ref"), str):
             try:
                 self.store.read_artifact(inputs["source_ref"])
             except (OSError, ValueError):
                 pass
             else:
                 evidence_refs = tuple(dict.fromkeys((*evidence_refs, inputs["source_ref"])))
+        if operation == "propose_condition_adaptation" and isinstance(inputs.get("evidence_refs"), list):
+            evidence_refs = tuple(dict.fromkeys((*evidence_refs, *(ref for ref in inputs["evidence_refs"] if isinstance(ref, str)))))
         # Invalid caller references remain in the saved request/error, not in verified links.
         valid_refs = []
         for reference in evidence_refs:
@@ -94,6 +97,15 @@ class ScientificWorkspace:
             "matches": canonical_bytes(actual) == canonical_bytes(source["result"]),
             "result": actual,
         }, evidence_refs=(reference,))
+
+    def run_python(
+        self, script: str, parameters: dict[str, Any], *,
+        evidence_refs: tuple[str, ...] = (), timeout_seconds: int = 60, cancel: Event | None = None,
+    ) -> InvestigationEvent:
+        """Record a local script's inputs/output and execution; no implicit chemistry validation."""
+        from .execution import run_python
+
+        return run_python(self.store, script, parameters, evidence_refs, timeout_seconds, cancel)
 
     def call_summary(self, event: InvestigationEvent) -> dict[str, Any]:
         """Return a compact pointer while retaining complete scientific output on disk."""

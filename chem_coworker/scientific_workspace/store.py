@@ -39,6 +39,17 @@ def canonical_bytes(value: Any) -> bytes:
     ).encode("utf-8")
 
 
+def _read_json(path: Path) -> Any:
+    """Read state through transient replacement sharing violations on Windows."""
+    for attempt in range(8):
+        try:
+            return json.loads(path.read_text("utf-8"))
+        except PermissionError:
+            if attempt == 7:
+                raise
+            sleep(0.01 * (attempt + 1))
+
+
 def _write_json(path: Path, value: Any) -> None:
     data = canonical_bytes(value)
     descriptor, temporary = tempfile.mkstemp(dir=path.parent, prefix=".writing-")

@@ -48,7 +48,8 @@ from .reaction_completion import (
     build_completed_reaction_smiles,
     propose_reaction_completion,
 )
-from .recipe_assessment import assess_reaction_recipe
+from .recipe_assessment import ReactionRecipeAssessment, assess_reaction_recipe
+from .investigation import ConditionEvidenceComparison, compare_condition_evidence
 from .weak_label_api import (
     DEFAULT_WEAK_LABEL_RECORDS_PATH,
     generate_weak_label_screening_array,
@@ -65,6 +66,9 @@ from .weak_label_indexing import (
 )
 
 __all__ = [
+    "ReactionRecipeAssessment",
+    "ConditionEvidenceComparison",
+    "compare_condition_evidence",
     "AdmissionTier",
     "ChemistRankingPreferences",
     "ChemistryStatus",

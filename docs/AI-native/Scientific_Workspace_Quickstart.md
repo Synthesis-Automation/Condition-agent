@@ -78,13 +78,14 @@ saved source-excerpt attachment; the source panel offers both the capture and
 the original URL. The service verifies reference existence/type, but does not
 automatically prove that the cited text substantiates each claim.
 
-The `computed` label currently requires a completed recorded workspace call or
-replay. Attaching a custom script/output preserves derived analysis, but does not
+The `computed` label requires a completed recorded workspace call, replay, or
+`run_python` execution. Attaching a custom script/output preserves derived analysis, but does not
 by itself establish recorded execution for that label. Such analysis can be
 discussed in prose with its attachment and provenance limitation. The agent is
 instructed to validate its draft before submission; the service repeats the
-checks. A rejected answer remains a failed turn with saved evidence, and a
-follow-up can correct it. There is no automatic server-side repair loop yet.
+checks. A schema/evidence failure receives at most one correction on the same
+agent thread. Rejected drafts and both attempts remain saved. A second invalid
+answer fails visibly; runtime errors, cancellation and baseline drift are not retried.
 
 Route steps refer to explicit reactant/product molecule IDs and preceding step
 IDs. Cycles, missing IDs, disconnected declared dependencies, and omitted route
@@ -128,7 +129,8 @@ Requirements and configuration:
   Missing datasets are recorded, and dependent calls fail explicitly.
 - `--chat-root DIRECTORY` defaults to `results/ai_native/conversations`.
   `--agent-timeout SECONDS` defaults to 900, excluding baseline preparation.
-  This is a wall-clock bound, not a token or spending cap.
+  This is a per-attempt wall-clock bound, not a token or spending cap. A turn with
+  one answer-correction attempt can use up to twice this runtime allowance.
 
 Each question is processed by the actual Codex harness, with Python/shell access
 and its available tools; the application does not implement a fixed LLM action
@@ -268,6 +270,8 @@ is accepted through the operation dispatcher.
 | `recommend_conditions` | `condition_recommender`; `reaction_smiles`, optional `top_k`, `search_scope` | Canonical shared-core results with compatibility, ranking, and provenance unchanged. Requires `condition_index` and `shared_core_index`. |
 | `get_precedents` | Canonical index; `reaction_ids`, optional `offset`, `limit` | All indexed fields, distinct observation IDs, admission/condition status, missing IDs, pagination. Indexed records are reduced representations of source data. |
 | `get_procedures` | Configured `procedure_catalog`; `reaction_ids` | All matching procedure observations, including missing fields. No invented procedure text. |
+| `inspect_condition_precedents` | Canonical condition index, optional procedure catalog; `reaction_smiles`, `reaction_ids`, optional `offset`, `limit` | Selected-observation structural differences, full recipes, compatibility, publication counts, missing fields and exact procedure links. No new ranking or transfer claim. |
+| `propose_condition_adaptation` | Registry and canonical recipe assessment; `source_ref`, `observation_id`, `components`, `operating_conditions`, `change_reasons`, `evidence_refs`, `assumptions`, `risks` | Preserve the inspected recipe and an explicitly proposed replacement, attributed changes and compatibility. See the example below. |
 | `resolve_recipe` | `condition_registry`; typed `components` and optional operating values | Canonical identities, contextual roles, raw identifiers, uncertainty, provenance. |
 | `assess_recipe` | `condition_recommender`; `reaction_smiles`, resolved `recipe` | Existing compatibility result; no yield or experimental-success prediction. |
 | `plan_routes` | Existing multistep coworker and `core_retrosynthesis`; `settings` | Bounded route alternatives, whole-route checks, issues and repair proposals. Requires `retro_library`, `stock_index`, and condition artifacts when conditions are enabled. |
@@ -299,7 +303,80 @@ the owning domain contract. This revision adapter currently supports alternate
 disconnections and realizations; condition-selectivity repair remains a direct
 domain capability, not a supported workspace revision method.
 
+## Investigate and propose condition changes
+
+```python
+inspection = workspace.run("inspect_condition_precedents", {
+    "reaction_smiles": reaction_smiles,
+    "reaction_ids": selected_precedent_ids, "offset": 0, "limit": 10,
+})
+inspection_ref = inspection.artifact_ref
+result = workspace.store.read_artifact(inspection_ref)["result"]
+print(result["distinct_reference_count"], result["page"]["next_offset"])
+```
+
+Follow `next_offset` when needed. Distinct-reference counts describe the selected
+page, not whole-corpus support or independently replicated experiments. Full
+indexed recipes and raw procedure records retain their provenance. Procedures
+without an observation ID remain reaction-level evidence; do not transfer their
+conditions to every observation. Missing data remains missing.
+
+Only after inspecting actual supporting evidence, prepare the complete replacement
+component list and operating values. In the following example, the proposal and
+rationale variables must come from that investigation; no default temperature,
+quantity, time or yield is supplied:
+
+```python
+proposal = workspace.run("propose_condition_adaptation", {
+    "source_ref": inspection_ref, "observation_id": selected_observation_id,
+    "components": proposed_components,  # ConditionComponentInput dictionaries
+    "operating_conditions": proposed_operating_conditions,
+    "change_reasons": reasons_by_changed_field,
+    "evidence_refs": supporting_artifact_refs,
+    "assumptions": explicit_assumptions, "risks": unresolved_risks,
+})
+```
+
+This operation preserves the original recipe, normalizes the replacement through
+the registry, records before/after values for every changed bucket or operating
+field, and assesses compatibility. Reasons must cover exactly those changed
+fields. The proposal is always agent-authored and unreviewed; reference checks do
+not establish that an adaptation is justified. Staged-protocol/declared-absence
+editing is not supported yet. Abstain when evidence cannot support a change.
+
 ## Custom analysis and persistent notes
+
+For **recorded execution**, save a Python script inside the investigation. It
+receives input/output JSON paths in `sys.argv[1:3]`. For example, `count.py`:
+
+```python
+import json
+from pathlib import Path
+import sys
+
+request = json.loads(Path(sys.argv[1]).read_text("utf-8"))
+inspection = request["evidence"][request["parameters"]["inspection_ref"]]["result"]
+count = sum(not row["missing_operating_fields"] for row in inspection["precedents"])
+Path(sys.argv[2]).write_text(json.dumps({"observations_with_all_four_operating_fields": count}), "utf-8")
+```
+
+Run it through the workspace:
+
+```python
+event = workspace.run_python(
+    "count.py", {"inspection_ref": inspection_ref},
+    evidence_refs=(inspection_ref,), timeout_seconds=60,
+)
+print(workspace.call_summary(event))
+```
+
+The CLI equivalent is `run-python WORKSPACE count.py --input parameters.json
+--evidence sha256:REFERENCE --timeout 60`. Parameters are a JSON object. The
+runner snapshots inputs and script text, records output/log hashes, rejects
+nonzero exits and invalid output, and limits execution to 1–120 seconds. Custom
+scripts are trusted local code with your OS permissions, not a security sandbox.
+Keep external dependencies in the baseline and do not mutate source/data.
+Custom execution is not automatically replayed or chemically validated.
 
 Use Python directly when a question requires a new comparison. Call the same
 domain packages and save the script, inputs, outputs, and assumptions. The
@@ -352,8 +429,9 @@ runtime. These are authored development tasks, not untouched evaluation cases.
 No new held-out partition or independent review is claimed.
 
 Current baseline limitations include the two ambiguous BINAP identifiers in the
-registry audit, shared-core results awaiting independent review, and the supplied
-recipe assessor classifying an unresolved reaction signature as a conflict.
+registry audit and shared-core results awaiting independent review. The direct
+recipe assessor now reports unresolved signatures as `unknown` and invalid
+input separately; `compatible=False` alone does not mean a chemical conflict.
 The workspace preserves these contracts and records the limitations. It does
 not treat incomplete validator coverage as proof that a proposed reaction is
 impossible. Scientific fixes must be separately versioned and reviewed.

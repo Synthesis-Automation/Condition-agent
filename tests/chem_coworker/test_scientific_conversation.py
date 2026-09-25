@@ -100,7 +100,26 @@ def test_invented_citation_is_a_failed_turn_not_a_supported_answer(service: Conv
     turn = finish(service, identity)
     assert turn["status"] == "failed"
     assert "answer" not in turn
+    assert len(service.runtime.threads) == 2
     assert any(event.kind == "call" for event in ScientificWorkspace(service.root / identity).store.events())
+
+
+def test_one_repair_uses_same_thread_and_preserves_rejected_answer(service: ConversationService) -> None:
+    class RepairRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            self.missing_reference = not self.threads
+            return super().run(**kwargs)
+
+    service.runtime = RepairRuntime()
+    identity = service.submit("Analyze a reaction")['conversation_id']
+    turn = finish(service, identity)
+    assert turn["status"] == "completed", turn
+    assert turn["repair_attempts"] == 1
+    assert service.runtime.threads == [None, "test-thread"]
+    assert len(turn["answer"]["attempt_usage"]) == 2
+    assert (service.root / identity / "turns" / turn["id"] / "rejected-answer.json").is_file()
+    events = ScientificWorkspace(service.root / identity).store.events()
+    assert sum(event.kind == "agent_answer_rejected" for event in events) == 1
 
 
 def test_cancellation_preserves_conversation_and_prevents_concurrent_turns(service: ConversationService) -> None:
@@ -170,6 +189,29 @@ def test_atomic_json_retries_reader_sharing_violation(tmp_path: Path, monkeypatc
     assert json.loads(path.read_text("utf-8")) == {"status": "completed"}
     assert len(attempts) == 2
     assert not list(tmp_path.glob(".writing-*"))
+
+
+def test_json_reader_retries_sharing_violation_but_not_invalid_json(tmp_path: Path, monkeypatch) -> None:
+    from chem_coworker.scientific_workspace.store import _read_json
+
+    path = tmp_path / "state.json"
+    path.write_text('{"status":"completed"}', "utf-8")
+    original = Path.read_text
+    attempts = []
+
+    def read(instance, *args, **kwargs):
+        attempts.append(instance)
+        if len(attempts) == 1:
+            raise PermissionError("Transient replacement sharing violation")
+        return original(instance, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", read)
+    assert _read_json(path) == {"status": "completed"}
+    assert len(attempts) == 2
+    path.write_text("broken", "utf-8")
+    with pytest.raises(json.JSONDecodeError):
+        _read_json(path)
+    assert len(attempts) == 3
 
 
 def test_optional_web_profile_origin_token_and_evidence(service: ConversationService) -> None:

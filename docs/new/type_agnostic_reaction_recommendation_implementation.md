@@ -7,6 +7,11 @@
 
 ## 1. Purpose and authority
 
+2026-09-25: [condition investigation and recipe assessment](condition_investigation_assessment_20260925.md)
+separates unresolved reaction evidence from recipe conflicts, restores observed
+spectator context in direct assessment, and adds attributed precedent inspection
+and proposal records. Development integration does not satisfy the release gates.
+
 2026-09-16: [automatic broadening recipe target](automatic_broadening_recipe_target_20260916.md)
 corrects shared-core early stopping to require the requested recipe count as well
 as independent support, preserving graph qualification and source-context grouping.

@@ -18,6 +18,7 @@ class ScientificOperations:
     NAMES = (
         "analyze_reaction", "analyze_molecule", "recommend_conditions",
         "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
+        "inspect_condition_precedents", "propose_condition_adaptation",
         "plan_routes", "revise_routes",
     )
 
@@ -136,14 +137,56 @@ class ScientificOperations:
         )
 
     def assess_recipe(self, reaction_smiles: str, recipe: dict[str, Any]) -> Any:
-        """Return the owning compatibility contract unchanged; this does not predict success.
-
-        Known limitation: missing verified signatures currently return conflict.
-        Consult unresolved evidence rather than treating that status as proof of impossibility.
-        """
+        """Assess compatibility; unknown/invalid_input are not chemical conflicts or success."""
         from condition_recommender import assess_reaction_recipe
 
         return assess_reaction_recipe(reaction_smiles, recipe)
+
+    def inspect_condition_precedents(
+        self, reaction_smiles: str, reaction_ids: list[str], offset: int = 0, limit: int = 20,
+    ) -> dict[str, Any]:
+        """Compare selected indexed observations and link source procedures without merging them."""
+        from condition_recommender import compare_condition_evidence
+        from condition_recommender.generic_indexing import GenericIndexedReaction
+
+        page = self.get_precedents(reaction_ids, offset=offset, limit=limit)
+        result = asdict(compare_condition_evidence(
+            reaction_smiles, [GenericIndexedReaction(**row) for row in page["records"]],
+        ))
+        try:
+            procedures = self.get_procedures([row["reaction_id"] for row in page["records"]])
+        except FileNotFoundError:
+            procedures = {"records": [], "availability": "catalog_unavailable"}
+        else:
+            procedures["availability"] = "catalog_available"
+        for item in result["precedents"]:
+            observation = item["observation"]
+            candidates = [record for record in procedures["records"]
+                          if record["reaction_id"] == observation["reaction_id"]]
+            item["procedure_observations"] = [record for record in candidates
+                                               if record.get("observation_id") == observation["observation_id"]]
+            item["reaction_level_procedures"] = [record for record in candidates if not record.get("observation_id")]
+            item["procedure_link_scope"] = "exact_observation_id_or_explicitly_unassigned_reaction_record"
+        result["procedure_catalog"] = procedures
+        result["page"] = {key: value for key, value in page.items() if key != "records"}
+        return result
+
+    def propose_condition_adaptation(
+        self, source_ref: str, observation_id: str, components: list[dict[str, Any]],
+        operating_conditions: dict[str, Any], change_reasons: dict[str, str],
+        evidence_refs: list[str], assumptions: list[str], risks: list[str],
+    ) -> dict[str, Any]:
+        """Record a proposed complete recipe, attributed changes and canonical assessment.
+
+        Use a completed inspect_condition_precedents call. Supply the entire new
+        component list and operating values; omitted operating values remain unknown.
+        Reasons must cover every changed bucket/operating field. This records an
+        agent hypothesis, not a recommendation admitted to a dataset or proof of transfer.
+        """
+        from .adaptation import record_adaptation
+
+        return record_adaptation(self, source_ref, observation_id, components,
+                                 operating_conditions, change_reasons, evidence_refs, assumptions, risks)
 
     def _route_planner(self, include_conditions: bool) -> Any:
         from dataclasses import replace

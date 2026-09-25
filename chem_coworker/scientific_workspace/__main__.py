@@ -20,12 +20,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     create.add_argument("--objective", required=True)
     create.add_argument("--repository", default=str(Path(__file__).resolve().parents[2]))
     create.add_argument("--artifacts", help="JSON file mapping artifact names to local paths")
-    for name in ("catalog", "summary", "run", "show", "replay", "note", "attach", "status"):
+    for name in ("catalog", "summary", "run", "run-python", "show", "replay", "note", "attach", "status"):
         command = sub.add_parser(name)
         command.add_argument("workspace")
         if name == "run":
             command.add_argument("operation")
             command.add_argument("--input", required=True, help="JSON object with operation arguments")
+        elif name == "run-python":
+            command.add_argument("script", help="Python file relative to the investigation")
+            command.add_argument("--input", required=True, help="JSON parameters file")
+            command.add_argument("--evidence", action="append", default=[])
+            command.add_argument("--timeout", type=int, default=60)
         elif name in {"show", "replay"}:
             command.add_argument("reference")
         elif name == "note":
@@ -57,6 +62,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 result = workspace.store.read_artifact(args.reference)
             elif args.command == "run":
                 event = workspace.run(args.operation, json.loads(Path(args.input).read_text("utf-8")))
+                result = workspace.call_summary(event)
+                print(canonical_bytes(result).decode("utf-8"))
+                return 0 if result["execution_status"] == "completed" else 1
+            elif args.command == "run-python":
+                event = workspace.run_python(args.script, json.loads(Path(args.input).read_text("utf-8")),
+                                             evidence_refs=tuple(args.evidence), timeout_seconds=args.timeout)
                 result = workspace.call_summary(event)
                 print(canonical_bytes(result).decode("utf-8"))
                 return 0 if result["execution_status"] == "completed" else 1
