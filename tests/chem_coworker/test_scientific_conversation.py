@@ -44,6 +44,9 @@ class RecordedRuntime:
         event = scientific.run("analyze_reaction", {"reaction_smiles": "CCBr.N>>CCN"})
         reference = "sha256:" + "0" * 64 if self.missing_reference else event.artifact_ref
         return AgentResult({
+            "schema_version": "scientific_answer.v2",
+            "sources": [], "molecules": [], "target_molecule_ids": [],
+            "steps": [], "routes": [], "claims": [],
             "answer_markdown": "Recorded graph interpretation; this is not experimental validation.",
             "evidence_refs": [reference], "uncertainties": ["No experimental outcome verified"],
             "needs_user_input": False,

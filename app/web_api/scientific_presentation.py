@@ -4,15 +4,19 @@ from __future__ import annotations
 
 import base64
 from functools import lru_cache
+import json
 import re
 from typing import Any, Iterable
 from urllib.parse import urlsplit
+import xml.etree.ElementTree as ET
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
 from rdkit import rdBase
 
-from visualization import render_molecule_image_bytes
+from visualization import render_molecule_image_bytes, render_reaction_image_bytes
+
+from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer
 
 
 _SMILES_TOKEN = re.compile(r"[A-Za-z0-9@+\[\]()=#$%./\\*:\-]+")
@@ -110,5 +114,76 @@ def present_conversation(conversation: dict[str, Any]) -> dict[str, Any]:
         view = {**turn, "question_presentation": present_message(turn["question"], identity)}
         if turn.get("answer"):
             view["answer_presentation"] = present_message(turn["answer"]["answer_markdown"], identity)
+            if turn["answer"].get("schema_version") == "scientific_answer.v2":
+                view["structured_presentation"] = _structured_view(
+                    json.dumps(turn["answer"], sort_keys=True), identity,
+                )
         turns.append(view)
     return {**conversation, "turns": turns}
+
+
+def _svg_url(svg: bytes) -> str:
+    return "data:image/svg+xml;base64," + base64.b64encode(svg).decode("ascii")
+
+
+def _route_overview(steps: list[dict[str, Any]]) -> str:
+    """Draw declared step dependencies, without asserting chemical feasibility."""
+    root = ET.Element("svg", {
+        "xmlns": "http://www.w3.org/2000/svg", "viewBox": f"0 0 660 {len(steps) * 90 + 20}",
+        "role": "img", "aria-label": "Declared route step dependencies",
+    })
+    ET.SubElement(root, "title").text = "Declared route dependencies; not a feasibility assessment"
+    positions = {step["id"]: index for index, step in enumerate(steps)}
+    for index, step in enumerate(steps):
+        y = 15 + index * 90
+        for parent in step["after_step_ids"]:
+            parent_y = 15 + positions[parent] * 90 + 48
+            lane = 12 + (index % 3) * 8
+            ET.SubElement(root, "path", {
+                "d": f"M 40 {parent_y} H {lane} V {y + 24} H 37",
+                "fill": "none", "stroke": "#668477", "stroke-width": "2",
+            })
+            ET.SubElement(root, "path", {"d": f"M 32 {y + 19} L 40 {y + 24} L 32 {y + 29}", "fill": "#668477"})
+        ET.SubElement(root, "rect", {"x": "40", "y": str(y), "width": "600", "height": "48", "rx": "7", "fill": "#edf3eb", "stroke": "#a8bfae"})
+        ET.SubElement(root, "text", {"x": "55", "y": str(y + 29), "font-family": "sans-serif", "font-size": "15", "fill": "#16342f"}).text = f"{step['id']}: {step['title'][:55]} · {step['basis']}"
+    return _svg_url(ET.tostring(root, encoding="utf-8"))
+
+
+@lru_cache(maxsize=32)
+def _structured_view(payload: str, identity: str) -> dict[str, Any]:
+    """Produce disposable structure/route SVGs from explicit answer objects."""
+    raw = json.loads(payload)
+    try:
+        answer = ScientificAnswer.model_validate({key: raw[key] for key in ScientificAnswer.model_fields if key in raw})
+    except ValueError:
+        return {"error": "The saved structured answer does not satisfy its schema. Its original explanation remains below."}
+    view = answer.model_dump()
+    molecules = {item["id"]: item for item in view["molecules"]}
+    for molecule in molecules.values():
+        try:
+            with rdBase.BlockLogs():
+                molecule["image_url"] = _svg_url(render_molecule_image_bytes(molecule["smiles"], size=(440, 260), image_format="svg"))
+            molecule["drawing_status"] = "drawn"
+        except (ValueError, RuntimeError):
+            molecule["drawing_status"] = "invalid_or_unsupported_notation"
+    steps = {item["id"]: item for item in view["steps"]}
+    for step in steps.values():
+        step["reaction_smiles"] = (
+            ".".join(molecules[key]["smiles"] for key in step["reactant_ids"])
+            + ">>" + ".".join(molecules[key]["smiles"] for key in step["product_ids"])
+        )
+        try:
+            with rdBase.BlockLogs():
+                step["image_url"] = _svg_url(render_reaction_image_bytes(step["reaction_smiles"], size=(1000, 260), image_format="svg"))
+            step["drawing_status"] = "drawn"
+        except (ValueError, RuntimeError):
+            step["drawing_status"] = "invalid_or_unsupported_notation"
+    for route in view["routes"]:
+        route_steps = [steps[key] for key in route["step_ids"]]
+        route["image_url"] = _route_overview(route_steps)
+        produced = {key for step in route_steps for key in step["product_ids"]}
+        consumed = {key for step in route_steps for key in step["reactant_ids"]}
+        route["unreached_target_ids"] = sorted(set(answer.target_molecule_ids) - (produced - consumed))
+    for source in view["sources"]:
+        source["artifact_url"] = f"/api/v1/scientific/conversations/{identity}/artifacts/{source['artifact_ref']}"
+    return view

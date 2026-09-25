@@ -13,6 +13,13 @@ acceptance gates below are not all met. The user-testable development milestone
 now supports natural-language questions through the installed Codex runtime,
 saved evidence, and follow-ups; this does not waive Phase 6 or release gates.
 
+The next development slice, structured scientific answers, is implemented as
+`scientific_answer.v2`: explicit molecules, steps, routes, attributed conditions
+and yields, and captured source references. Reaction and dependency drawings
+are views of agent-authored objects, not newly verified scientific records.
+Condition-transfer improvement, broader live route revision, independent review,
+and comparative/untouched evaluation remain the subsequent priorities.
+
 ## 1. Objective and governing design
 
 Implement the [AI-native scientific tools design](AI_Native_Scientific_Tools_Design.md)

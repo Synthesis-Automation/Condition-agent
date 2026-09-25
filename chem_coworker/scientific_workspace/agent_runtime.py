@@ -14,17 +14,7 @@ from time import monotonic
 from typing import Any, Callable, Protocol
 
 
-ANSWER_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "answer_markdown": {"type": "string"},
-        "evidence_refs": {"type": "array", "items": {"type": "string"}},
-        "uncertainties": {"type": "array", "items": {"type": "string"}},
-        "needs_user_input": {"type": "boolean"},
-    },
-    "required": ["answer_markdown", "evidence_refs", "uncertainties", "needs_user_input"],
-    "additionalProperties": False,
-}
+from .answer_contracts import ANSWER_SCHEMA
 
 
 @dataclass(frozen=True)

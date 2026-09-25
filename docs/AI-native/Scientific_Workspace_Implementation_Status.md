@@ -39,6 +39,10 @@ See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
 - Answer boundary: strict response schema, citation existence/type checks,
   explicit unreviewed status, and no-local-evidence status where applicable.
   These are traceability checks, not automatic verification of scientific prose.
+- Structured answers: `scientific_answer.v2` links explicit molecules, reaction
+  steps, routes, per-condition/yield attribution, claims, and captured sources.
+  The UI renders reaction schemes and route dependencies and flags missing target
+  products. Legacy saved answers remain readable without inferred route migration.
 - Local API: opt-in research profile, loopback launcher, same-origin/token checks,
   server-owned executable/model/data configuration, and one active local turn.
 
@@ -79,8 +83,7 @@ with `top_k=2` and `search_scope=broad`. It compared the two recipes, distinguis
 references, reported missing temperature/time, and retained review warnings.
 The answer cited the complete call and an attached selected-field comparison.
 This confirms dataset access through the agent runtime; condition-transfer
-validity still requires the independent review described below. The new browser
-runtime has not yet received a live multistep-route trial; the underlying route
+validity still requires the independent review described below. The underlying route
 and revision workspace operations retain their earlier tests and development pilots.
 
 Browser automation could not connect to the local browser in this session, so
@@ -89,6 +92,49 @@ and evidence endpoints were exercised against the running application and real
 runtime. A browser page is included; this is still a local development preview.
 
 ## Development investigations
+
+### Structured-answer milestone
+
+New turns must return the versioned answer contract from `answer_contracts.py`.
+Reported and computed labels require source IDs; computed statements require a
+completed local call or replay. External sources require a saved excerpt attachment,
+URL and locator. References are checked across all structured fields, including
+sources not repeated in prose. Citation validity remains distinct from claim support.
+
+Explicit molecule IDs connect reactants/products and route dependencies. The service
+rejects duplicate/unknown IDs, cycles, missing dependencies and declared dependencies
+without a shared intermediate ID. The interface retains invalid notation as an
+inspectable drawing error and labels computed, reported, proposed, unknown and input
+information separately. It does not present a drawable scheme as chemically verified.
+
+A tafamidis regression fixture based on the user's quoted excerpt depicts the
+acylation and ring-closure steps, with independently attributed conditions/yields.
+Its constructed intermediate SMILES are labeled proposed in the fixture. The route
+stops at the ester, and the UI flags the unproduced free-acid target. This fixture
+tests presentation and provenance contracts, not patent accuracy or synthesis validity.
+
+A live Codex trial in conversation `541e447aa5b4468caef3ee79c742750e` returned
+five molecules, three steps, one route and five sources for the same target.
+The API produced nine valid SVG documents, all five captured-evidence endpoints
+were readable, and the saved answer artifact was unchanged by presentation.
+The agent retained unresolved structural-analysis warnings for two transformations.
+This exercised a source-based multistep answer, not autonomous route revision or
+independent verification of the patent's chemistry.
+
+The first turn was rejected because a derived-file attachment alone supported a
+`computed` claim. An explicit correction in a follow-up produced the accepted
+answer; the rejected turn and evidence remain saved. The prompt now explains this
+boundary and asks the agent to validate its draft with the same contract/evidence
+validators before submission. No automatic server retry or claim-level scientific
+review is claimed. The local API check report is
+`results/ai_native/structured_answer_trial_report.json`.
+
+After the prompt update, a fresh live reaction trial in conversation
+`7ea4d1fb67df40708a7a6f58673c25c7` completed on its first turn. Its runtime trace
+records a successful draft schema/evidence validation before the final answer.
+The API returned three molecule drawings and one reaction scheme for
+`CCBr.N>>CCN`, retaining missing conditions and yield. The compact check report is
+`results/ai_native/structured_reaction_smoke_report.json`.
 
 ### Conversation presentation update
 
@@ -208,7 +254,8 @@ install old dependencies or restore historical source files automatically.
 
 ## Validation
 
-Workspace, route-replay, and conversation tests: **33 passed** in the full suite.
+Workspace, route-replay, conversation, and structured-answer tests: **47 passed**
+in the full suite, including 14 new answer-contract and route-presentation cases.
 The 13 conversation tests cover real recorded chemistry behind a model test double,
 follow-up recovery, invented citations, cancellation, baseline drift, API origin/token
 boundaries, invalid IDs, unowned workers, Windows atomic-write retry, and actual
@@ -221,10 +268,9 @@ not independent scientific validation. A fresh workspace instance replayed the
 reaction analysis after fully rehashing all five selected data artifacts; the
 complete result matched. Ruff checks and documentation link checks passed.
 
-Full suite after the presentation update: **1,584 passed, 2 failed** in
-273.93 seconds, including all seven new presentation tests. Ruff, JavaScript syntax,
-and local documentation link checks also
-passed. The failures are the
+Full suite after the structured-answer update: **1,598 passed, 2 failed** in
+266.00 seconds, including all seven existing Markdown/SMILES presentation tests.
+Ruff, JavaScript syntax, and local documentation link checks also passed. The failures are the
 pre-existing registry checks
 `test_validate_reports_current_registry_state` and
 `test_registry_audit_reconciles_all_rows`, both caused by the two ambiguous

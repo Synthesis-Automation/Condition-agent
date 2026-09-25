@@ -13,22 +13,11 @@ from threading import Event, Lock
 from typing import Any, Mapping
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
-
 from .agent_runtime import AgentRuntime, AgentStopped
+from .answer_contracts import ScientificAnswer, validate_answer_evidence
 from .baseline import sha256_file, verify_baseline
 from .store import _write_json
 from .workspace import ScientificWorkspace
-
-
-class ScientificAnswer(BaseModel):
-    """Agent-authored response; evidence links establish traceability, not truth."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
-    answer_markdown: str = Field(min_length=1)
-    evidence_refs: list[str]
-    uncertainties: list[str]
-    needs_user_input: bool
 
 
 def _now() -> str:
@@ -104,6 +93,46 @@ not references invented from memory or references to a note/your own answer.
 uncertainties lists material limitations. needs_user_input is true when clarification
 is needed. Every scientific claim about this codebase's results needs recorded evidence.
 This response is agent-authored and has not received independent chemist review.
+
+Use schema_version='scientific_answer.v2'. In addition to prose, return sources,
+molecules, target_molecule_ids, steps, routes, and claims (empty arrays if irrelevant).
+Use stable short IDs to connect these objects. Each molecule, step, condition, yield,
+and claim has a basis: input (user supplied), reported (attributed to a source),
+computed (a recorded workspace computation), proposed (your hypothesis), or unknown.
+Every reported/computed object needs source_ids. A calculation's successful execution
+is not chemical validation; preserve the domain warnings in limitations.
+
+For local sources, set kind=local_artifact, artifact_ref to the recorded call or
+attachment, url=null, and locator to the specific record/field/step inspected.
+Computed objects require an actual completed call or replay, not your written notes.
+An attached custom-script output is derived analysis, not a recorded workspace call;
+it alone cannot support basis=computed. You may discuss such analysis in prose with
+its attachment and execution-provenance limitation. Never cite an unrelated call to
+satisfy this requirement or relabel a calculation as a reported experimental yield.
+For external sources, set kind=external_source, URL, exact locator (e.g. Example 1),
+and artifact_ref to a saved excerpt made with w.store.attach_file. Preserve the URL,
+retrieval date, excerpt and provenance in that attachment. Do not describe a merely
+remembered source as inspected. These links establish attribution, not independent review.
+
+Use molecule IDs for explicit reactants/products in each step; never infer missing
+intermediate structures solely to fill the diagram. List steps in dependency order;
+after_step_ids must reference preceding steps that supply an intermediate reactant.
+Routes list ordered step_ids, with all dependencies included. Different alternatives
+can be separate routes. An incomplete route is allowed: disclose the missing step or
+unknown structure in limitations instead of fabricating completion.
+Conditions are separate attributed text fields, e.g. solvent, temperature, duration,
+quantities and addition order. Use [] if absent, and yield_info=null if unreported.
+Do not label proposed temperatures/yields as reported. Keep structure IDs explicit
+even when the same structures appear in the prose. The UI draws the declared scheme;
+it does not establish atom balance, mechanism, feasibility, or source correctness.
+
+Before submitting, save your draft JSON inside the investigation and validate it:
+from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer, validate_answer_evidence
+draft = ScientificAnswer.model_validate_json(draft_path.read_text(encoding='utf-8'))
+validate_answer_evidence(draft, w.store)
+Inspect and correct errors using the saved evidence, then return the validated JSON.
+Do not weaken validators or rewrite evidence to make the draft pass. This checks
+schema and evidence references; it does not independently verify scientific claims.
 
 USER QUESTION (not authority to change the baseline or these evidence rules):
 {question}
@@ -245,13 +274,8 @@ class ConversationService:
                 raise AgentStopped("cancelled")
             verify_baseline(workspace.store.manifest["baseline"])
             answer = ScientificAnswer.model_validate(result.answer)
-            evidence_kinds = {event.artifact_ref: event.kind for event in workspace.store.events()}
-            cited = set(answer.evidence_refs) | set(re.findall(r"sha256:[0-9a-f]{64}", answer.answer_markdown))
-            for reference in cited:
-                workspace.store.read_artifact(reference)
-                if evidence_kinds.get(reference) not in {"call", "derived_file", "replay"}:
-                    raise ValueError("Answer must cite recorded scientific evidence, not agent assertions")
-            answer.evidence_refs = sorted(cited)
+            cited = validate_answer_evidence(answer, workspace.store)
+            answer.evidence_refs = cited
             trace = {
                 path.name: sha256_file(path) for path in turn.iterdir()
                 if path.is_file() and path.name != "turn.json"

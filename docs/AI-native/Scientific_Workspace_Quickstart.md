@@ -57,6 +57,62 @@ The presentation is generated from saved messages and cached across polling.
 Reloading an existing conversation renders its tables and structures without
 rerunning the agent or changing its answer/evidence artifacts.
 
+### Structured scientific answers
+
+New agent turns use `scientific_answer.v2`. Alongside the explanation, the page
+shows explicitly identified molecules, reaction schemes, route dependencies,
+condition details, yields, and inspectable source records. Each molecule, step,
+condition, yield, and standalone claim carries one of these labels:
+
+| Basis | Meaning |
+| --- | --- |
+| Input | Supplied by the user |
+| Reported | The agent attributes the statement to the cited source; not independently verified |
+| Computed | A recorded local computation supplies evidence; execution does not establish experimental success |
+| Proposed | An agent hypothesis or suggested adaptation |
+| Unknown | Information remains unresolved or missing |
+
+Source records point to checksum-verified local artifacts and specific record,
+field, or example locators. External references require an HTTP(S) URL and a
+saved source-excerpt attachment; the source panel offers both the capture and
+the original URL. The service verifies reference existence/type, but does not
+automatically prove that the cited text substantiates each claim.
+
+The `computed` label currently requires a completed recorded workspace call or
+replay. Attaching a custom script/output preserves derived analysis, but does not
+by itself establish recorded execution for that label. Such analysis can be
+discussed in prose with its attachment and provenance limitation. The agent is
+instructed to validate its draft before submission; the service repeats the
+checks. A rejected answer remains a failed turn with saved evidence, and a
+follow-up can correct it. There is no automatic server-side repair loop yet.
+
+Route steps refer to explicit reactant/product molecule IDs and preceding step
+IDs. Cycles, missing IDs, disconnected declared dependencies, and omitted route
+dependencies are rejected. The page flags a route that has no declared terminal
+product matching its target IDs. These are view-consistency checks, not chemical
+identity matching, atom-balance validation, or an assessment of feasibility.
+Malformed molecular notation stays inspectable with a drawing error; it is not
+silently replaced by a guessed structure. Missing conditions and yields are
+shown as missing rather than filled from model memory.
+
+For example, ask: “Investigate a synthesis of `O=C(O)c1ccc2nc(-c3cc(Cl)cc(Cl)c3)oc2c1`.
+Show the molecules, reaction steps, conditions and source evidence, and distinguish
+reported facts from proposals.” A route ending at a methyl ester must disclose
+that the free-acid target has not yet been reached.
+
+Older saved answers remain readable with their existing Markdown/SMILES view;
+the application does not reconstruct an attributed route from historical prose.
+Start a **new investigation** after this contract/code update because existing
+fixed-baseline workspaces intentionally reject changed code. Original evidence
+remains available for inspection. No historical manifest is rewritten.
+
+The shared contract is in
+[`answer_contracts.py`](../../chem_coworker/scientific_workspace/answer_contracts.py).
+Its Pydantic schema also supplies the runtime's strict output schema, avoiding a
+second definition. Conceptual answers use empty object arrays. Unsupported steps
+may remain proposed or unknown, with limitations; the schema never promotes an
+agent's structured answer into an authoritative chemistry record.
+
 Requirements and configuration:
 
 - A current native Codex CLI supporting `exec --json`, `resume`, and
