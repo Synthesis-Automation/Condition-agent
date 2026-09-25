@@ -6,7 +6,7 @@ from dataclasses import fields
 from typing import Any, TYPE_CHECKING
 
 from core_retrosynthesis.external_proposal_assessment import (
-    ExternalRetrosynthesisProposal, assess_external_retrosynthesis_proposal,
+    ExternalRetrosynthesisProposal, assess_external_retrosynthesis_proposal, load_external_proposal_admission_policy,
 )
 from core_retrosynthesis.external_route_admission import (
     ExternalRouteProposal, ExternalRouteStepProposal, assess_external_route_proposal,
@@ -58,8 +58,9 @@ def _proposal(value: dict[str, Any]) -> ExternalRouteProposal:
     _known_fields(value, ExternalRouteProposal)
     if not isinstance(value.get("target_smiles"), str) or not value["target_smiles"].strip():
         raise ValueError("target_smiles must be a nonempty string")
-    if not isinstance(value.get("steps"), list) or len(value["steps"]) > 40:
-        raise ValueError("steps must be a list of at most 40 physical steps")
+    maximum = load_external_proposal_admission_policy().limits.maximum_route_steps
+    if not isinstance(value.get("steps"), list) or len(value["steps"]) > maximum:
+        raise ValueError(f"steps must be a list of at most {maximum} physical steps")
     for step in value["steps"]:
         _step(step, named=True)
     return ExternalRouteProposal.from_dict(value)
@@ -198,8 +199,9 @@ def revise_branch(
     """Record a new proposed branch and recheck the whole route without mutating history."""
     if not isinstance(reason, str) or not reason.strip():
         raise ValueError("A revision requires an explicit reason")
-    if not isinstance(replacement_steps, list) or len(replacement_steps) > 40:
-        raise ValueError("replacement_steps must be a list of at most 40 physical steps")
+    maximum = load_external_proposal_admission_policy().limits.maximum_route_steps
+    if not isinstance(replacement_steps, list) or len(replacement_steps) > maximum:
+        raise ValueError(f"replacement_steps must be a list of at most {maximum} physical steps")
     source = _record(operations, source_ref)
     assumptions = _strings(assumptions, "assumptions")
     risks = _strings(risks, "risks")

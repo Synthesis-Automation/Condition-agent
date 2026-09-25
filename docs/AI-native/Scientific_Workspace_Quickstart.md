@@ -290,6 +290,12 @@ is accepted through the operation dispatcher.
 | `assess_recipe` | `condition_recommender`; `reaction_smiles`, resolved `recipe` | Existing compatibility result; no yield or experimental-success prediction. |
 | `plan_routes` | Existing multistep coworker and `core_retrosynthesis`; `settings` | Bounded route alternatives, whole-route checks, issues and repair proposals. Requires `retro_library`, `stock_index`, and condition artifacts when conditions are enabled. |
 | `revise_routes` | `core_retrosynthesis`; saved `source_ref`, typed `intent` | Issue-backed alternate disconnection/realization, original-result preservation, rerun and verification. Fresh sessions replay the source to recover domain objects. |
+| `assess_route_step` | Canonical external-proposal assessment; `proposal`, optional `include_forward`, `include_conditions`, `evidence_refs` | Structural, operator, precedent, compatibility and selectivity gates. Requires `retro_library`; no stock index required. Supplied resolved recipes are assessed separately from retrieved conditions. |
+| `assess_route_proposal` | Same assessor plus route topology; `proposal`, optional `unavailable_starting_materials` and assessment options | Retains invalid/unsupported proposals for inspection; declared material constraints are checked against graph-matched leaves. |
+| `prepare_route_proposal` | Existing route-tree conversion; planner `source_ref`, `route_id`, optional constraints/options | Strips trusted planner annotations and independently assesses an editable proposal. |
+| `inspect_route_step` | Saved proposal `source_ref`, `step_id` | Step gates, graph-matched upstream/downstream steps, molecular audits and supplied-recipe assessment. |
+| `revise_route_branch` | Core explicit route edit plus complete reassessment; `source_ref`, `remove_step_ids`, `replacement_steps`, `reason`, `risks`, optional `assumptions`, `evidence_refs` | Preserves the source, inherits constraints/options, reassesses all steps and topology. Empty removals can extend a leaf branch. No automatic improvement or admission claim. |
+| `compare_route_proposals` | Recorded results; 2–5 `source_refs` | Same-target comparison with identical settings/constraints; separate gates and missing evidence, no synthetic route score. |
 
 Recipe input example:
 
@@ -316,6 +322,78 @@ An external agent selects a supported repair proposal and supplies its actual
 the owning domain contract. This revision adapter currently supports alternate
 disconnections and realizations; condition-selectivity repair remains a direct
 domain capability, not a supported workspace revision method.
+
+## Investigate an agent-proposed route
+
+Start a **new chat** after upgrading this scientific code. Existing answers and
+artifacts remain readable, but their fixed scientific baseline cannot be resumed
+against changed code. Example question:
+
+> My target is `O=C(NCC)c1ccccc1`. My initial sketch uses benzoic acid and
+> ethylamine for the final amide step, but ethylamine cannot be purchased.
+> Investigate making that intermediate, assess the revised route, and compare it
+> with the original. Use local evidence and keep selectivity and condition gaps explicit.
+> Start with the default structural checks; leave condition retrieval and forward
+> checking for a follow-up and report those checks as not run.
+
+The agent now has the proposal, inspection, branch revision and comparison operations
+above. Route drawings and the before/after explanation use the existing structured
+answer format. A gate may be `unresolved`, `not_run`, or `out_of_scope`; these do not
+mean either experimental success or impossibility. The tool's completed execution
+does not convert a proposed step into a reported experiment.
+
+For direct Python access in an initialized workspace:
+
+```python
+original = workspace.run("assess_route_proposal", {
+    "proposal": {"target_smiles": "O=C(NCC)c1ccccc1", "steps": [{
+        "external_step_id": "amide", "target_smiles": "O=C(NCC)c1ccccc1",
+        "precursor_smiles": "O=C(O)c1ccccc1.NCC",
+    }]},
+    "unavailable_starting_materials": ["NCC"],
+})
+revised = workspace.run("revise_route_branch", {
+    "source_ref": original.artifact_ref,
+    "remove_step_ids": [],
+    "replacement_steps": [{
+        "external_step_id": "amine", "target_smiles": "NCC",
+        "precursor_smiles": "CC=O.N",
+    }],
+    "reason": "Investigate making the unavailable intermediate",
+    "risks": ["Hypothesis: selectivity, actual stock and operating conditions remain unverified"],
+})
+comparison = workspace.run("compare_route_proposals", {
+    "source_refs": [original.artifact_ref, revised.artifact_ref],
+})
+print(workspace.call_summary(comparison))
+```
+
+Each proposed step requires `external_step_id`, `target_smiles` and dot-separated
+`precursor_smiles`. Optional supplied mapping is independently validated. Optional
+`proposed_conditions` is a resolved recipe from `resolve_recipe`; assessment of that
+recipe remains separate from analogue-condition retrieval (`include_conditions`).
+`include_forward` requests the existing forward challenge. Both flags default to
+false and are inherited during revision. To replace an existing step ID, explicitly
+include it in `remove_step_ids`. Disconnected remnants are reported as invalid;
+they are never silently deleted. Unchanged downstream steps are reassessed as well.
+
+Start with the default checks for an interactive trial. Enabling both forward and
+condition checks against the full corpus can take several minutes per assessment;
+the initial combined-check live trial was cancelled before returning a result.
+Optional checks omitted for speed must be reported as not run, not as passed.
+
+The declared material constraint checks route leaves only. Making an intermediate
+can remove the need to purchase it, but does not prove that its new precursors are
+available. Actual stock lookup and experimental validation remain separate.
+
+Reproducible authored development example, including fresh-session replay:
+
+```powershell
+python -m examples.ai_native.route_revision_pilot --output results/ai_native/route_revision_01 --library results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz
+```
+
+This script supplies a predefined hypothesis; it is a contract demonstration, not
+an agent-quality comparison or untouched chemistry evaluation.
 
 ## Investigate and propose condition changes
 

@@ -129,6 +129,10 @@ from .external_route_admission import (
     assess_external_route_proposal,
     external_route_proposal_from_tree,
 )
+from .route_proposal_revision import (
+    DeclaredMaterialAssessment, ExternalRouteRevision, assess_declared_route_materials,
+    external_route_step_neighbors, revise_external_route_proposal,
+)
 from .full_scale import (
     FullScaleBuildConfig,
     build_full_scale_operator_library,
@@ -996,6 +1000,11 @@ __all__ = [
     "assess_external_retrosynthesis_proposal",
     "assess_external_route_proposal",
     "external_route_proposal_from_tree",
+    "DeclaredMaterialAssessment",
+    "ExternalRouteRevision",
+    "assess_declared_route_materials",
+    "external_route_step_neighbors",
+    "revise_external_route_proposal",
     "audit_generic_round_trips",
     "build_generic_reaction_identity",
     "build_frozen_v1_heldout_panel",

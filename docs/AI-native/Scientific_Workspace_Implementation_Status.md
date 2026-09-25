@@ -54,6 +54,11 @@ See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
 - Condition investigations: selected-precedent structural comparisons, canonical
   recipe assessment, source/procedure links, reference counts and missing fields;
   attributed recipe adaptations remain unreviewed proposals.
+- Proposed-route investigations: recorded external step/route assessments, conversion
+  of planner results into editable proposals, step/intermediate inspection, explicit
+  branch replacement/extension, and same-target evidence comparisons. Revisions retain
+  their source, declared unavailable-material constraints and assessment settings,
+  and rerun all step/topology checks. Supplied recipes use canonical assessment.
 - Recorded custom Python execution: snapshot code and cited inputs, deadline,
   JSON output and execution/log provenance. No automatic arbitrary-script replay.
 - Answer correction: one same-thread retry after schema/evidence-reference failure,
@@ -283,6 +288,72 @@ New three-step alternatives had more issues and were not accepted as improvement
 Experimental feasibility and the adequacy of the terminal-material evidence
 remain review questions.
 
+### Agent-proposed route revision milestone
+
+The workspace now exposes the canonical external-step and complete-route assessors
+through `assess_route_step` and `assess_route_proposal`. `prepare_route_proposal`
+converts a selected planner tree without trusting its prior operator annotations.
+`inspect_route_step` provides saved gates, structural neighbors, molecular audits
+and supplied-recipe assessment. `revise_route_branch` explicitly replaces or adds
+steps, preserves the original artifact, and reassesses the entire resulting route.
+`compare_route_proposals` compares the same target under the same assessment options
+and declared material constraints without selecting an automatic winner.
+
+The new application records are `route_step_investigation.v1`,
+`route_investigation.v1`, `route_step_inspection.v1`, and `route_comparison.v1`.
+Core branch edits and declared-material results have their own versioned contracts.
+Existing chemistry gates, signatures, operator admission and source datasets are
+unchanged. No new chemistry rule or recommendation path is introduced. Invalid or
+unsupported proposals remain inspectable; no reviewed/experimental status is granted.
+
+An authored local-corpus pilot under `results/ai_native/route_revision_20260926/`
+assessed an N-ethylbenzamide sketch with ethylamine declared unavailable, then added
+a proposed ethylamine preparation from acetaldehyde and ammonia. The canonical
+assessor returned `admitted_review_only` for both sketches. The declared-material
+check changed from `violated` to `satisfied_for_declared_constraints`; actual stock
+remained `not_assessed`. The unchanged amide step was assessed again, and the revised
+record replayed identically from a fresh workspace instance. This is a predefined
+development example, not autonomous discovery, independent chemistry validation,
+or evidence of experimental feasibility. The executable example is
+[`route_revision_pilot.py`](../../examples/ai_native/route_revision_pilot.py).
+
+Twenty-two new regression cases cover canonical parity, invalid/ambiguous/conflicting
+steps, explicit branch edits, broken topology, source preservation, inherited
+constraints, fresh-session replay, planner-tree conversion, supplied-recipe checks
+and optional forward assessment. The focused workspace/conversation run passed all
+59 cases. The complete suite returned **1,644 passed, 2 existing registry failures**
+in 333.64 seconds. Lint passed for the new modules, workspace, tests and example;
+the package `__init__.py` retains two pre-existing unused evaluation-version imports.
+
+The first live model-backed trial (`989d3225b9f94e8990712871b8945945`) stopped before
+any recorded scientific call because the native Codex runtime reported a missing
+session record. That failure is retained and is not counted as a successful agent
+investigation. Direct operation, persistence and replay checks passed separately.
+
+A fresh trial (`e0c594054adc4a23a33ec3d02c19f128`) selected both optional forward
+and condition checks. Its first combined assessment ran for several minutes without
+producing a completed call; it was cancelled through the API to keep the integration
+trial bounded. Cancellation terminated its Python worker and freed the chat service.
+Full-corpus latency for these combined optional checks remains a limitation; this
+run is not counted as a successful route investigation.
+
+The bounded live retry (`94e6eb9ab8464366ad5c6e79c0ab5564`) completed successfully
+using the default assessment flags (`include_forward=False`, `include_conditions=False`).
+The actual agent performed six recorded calls: original assessment, original step
+inspection, branch revision, both revised-step inspections, and route comparison.
+The original assessment took 4.985 seconds and the revision 5.203 seconds. Its answer
+contained a before/after table and two explicit routes; all six cited artifacts were
+readable through the API and all ten generated SVGs parsed successfully. The answer
+distinguished analogue precedents from exact-substrate experimental evidence and
+retained partial-mapping warnings, unrun checks, unspecified operating conditions and
+unknown stock. No server answer-repair attempt was required. The report is
+`results/ai_native/route_chat_trial_report.json`. This validates the bounded local
+question-to-revision workflow, not independent scientific accuracy or comparative
+agent superiority. Live browser visual acceptance remains pending.
+
+Scientific source changes require a new chat/workspace baseline. Existing saved
+answers remain readable; an old investigation is not silently migrated to new code.
+
 ## Phase and gate accounting
 
 | Phase | Current state | Remaining requirement |
@@ -292,7 +363,7 @@ remain review questions.
 | 2: scientific contracts/access | Local operations and CLI use the existing packages; direct-call parity covered; unresolved-signature assessment semantics corrected with regression coverage. | Independent review of the updated assessment contract; MCP is deferred until a selected client needs it. |
 | 3: persistence | Local immutable artifacts, history, replay, saved user conversations, exact runtime thread resumption, cancellable background turns and progress. | Durable queue/crash adoption and remote storage are not implemented. |
 | 4: condition investigations | Structured precedent inspection, procedure linkage, missingness, attributed adaptations and recorded custom calculations implemented. | Independent scientific review and source-supported transfer trials; recording a proposal does not validate it. |
-| 5: iterative retrosynthesis | Issue-backed alternate disconnection/realization, lineage, and repeated verification usable. | Broader independent chemistry review, richer agent-proposed step/route assessment, and condition-selectivity integration. |
+| 5: iterative retrosynthesis | Issue-backed planner revision plus external proposal assessment, step inspection, branch edits, full reassessment, declared-material checks and recorded alternative comparison implemented. | Independent chemistry review, broader complex-route trials, actual stock/procedure evidence, and automatic condition-selectivity repair remain. No comparative superiority is claimed. |
 | 6: comparative evaluation | Not performed. | Blind comparison, adjudication, matched-budget repeated runs, and untouched evaluation in roadmap order. |
 | 7: release/deployment | A local question-to-answer browser preview is usable for development testing. | Production release is not performed: full scientific gates, multiuser isolation, consolidation, and selected remote/MCP deployment remain. |
 
