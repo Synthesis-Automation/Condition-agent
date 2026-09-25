@@ -6,6 +6,18 @@ let token = '', identity = null, active = null, conversation = null, displayed =
 let loaded = false, submitting = false, polling = false, pollAgain = false;
 let pollTimer = null, navigation = 0, stopping = null, sidebarOpen = false, activityVersion = 0;
 const drafts = new Map();
+function updateThemeButton() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  $('theme').textContent = dark ? 'Light mode' : 'Dark mode';
+  $('theme').title = dark ? 'Switch to light theme' : 'Switch to dark theme';
+}
+$('theme').onclick = () => {
+  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem('scientific-theme', theme); } catch {}
+  updateThemeButton();
+};
+updateThemeButton();
 function element(tag, text = '', className = '') {
   const node = document.createElement(tag);
   node.textContent = text;

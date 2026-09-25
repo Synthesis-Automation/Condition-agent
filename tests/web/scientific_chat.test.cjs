@@ -30,6 +30,7 @@ function harness() {
   const ids = Object.fromEntries([...html.matchAll(/id="([^"]+)"/g)].map(match => [match[1], new Node()]));
   const context = vm.createContext({
     document: {
+      documentElement: {dataset: {theme: 'dark'}},
       getElementById: id => ids[id] || Object.values(ids).flatMap(node => node.descendants()).find(node => node.id === id) || null,
       createElement: tag => new Node(tag), createTextNode: text => { const node = new Node(); node.textContent = text; return node; },
       querySelectorAll: () => [], addEventListener() {},
@@ -167,4 +168,43 @@ test('startup discovers the running chat and exposes Stop', async () => {
   assert.equal(ids.cancel.hidden, false);
   assert.equal(ids.error.textContent, '');
   assert.equal(ids.saved.children[0].attributes['aria-current'], 'page');
+});
+
+test('sending a question opens its chat and replaces Send with live progress and Stop', async () => {
+  const {ids, run, respond} = harness();
+  run('loaded=true'); ids.question.value = 'Analyze CCO';
+  let submitted;
+  respond(async (route, options) => {
+    if (route === '/turns') {
+      submitted = JSON.parse(options.body);
+      return {conversation_id:'created',turn_id:'turn'};
+    }
+    if (route === '/conversations') return [{id:'created',title:'Analyze CCO'}];
+    if (route === '/activity') return {active:{conversation_id:'created',status:'running',progress:[]}};
+    if (route === '/conversations/created') return {title:'Analyze CCO',turns:[{id:'turn',question:'Analyze CCO',status:'running'}]};
+    throw new Error('Unexpected route: ' + route);
+  });
+  await ids.form.onsubmit({preventDefault() {}});
+  assert.deepEqual(submitted, {question:'Analyze CCO',conversation_id:null});
+  assert.equal(ids.question.value, '');
+  assert.equal(run('identity'), 'created');
+  assert.equal(ids.cancel.hidden, false);
+  assert.equal(run("$('progress-label').textContent"), 'Investigating…');
+});
+
+test('a busy response from another tab reveals that investigation and keeps the draft', async () => {
+  const {ids, run, respond} = harness();
+  run('loaded=true'); ids.question.value = 'Keep this draft';
+  respond(async route => {
+    if (route === '/turns') throw new Error('An investigation is running; wait or cancel it first');
+    if (route === '/activity') return {active:{conversation_id:'other-tab',status:'running'}};
+    if (route === '/conversations') return [{id:'other-tab',title:'Already running'}];
+    throw new Error('Unexpected route: ' + route);
+  });
+  await ids.form.onsubmit({preventDefault() {}});
+  assert.equal(ids.question.value, 'Keep this draft');
+  assert.equal(ids['global-activity'].hidden, false);
+  assert.equal(ids.cancel.hidden, false);
+  assert.equal(ids.send.disabled, true);
+  assert.match(ids.error.textContent, /investigation is running/);
 });

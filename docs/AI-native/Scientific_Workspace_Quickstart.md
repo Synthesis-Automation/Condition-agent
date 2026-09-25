@@ -36,6 +36,9 @@ The agent chooses operations, examines results, and can run custom analysis
 scripts. It can ask for missing structures rather than invent a reaction.
 
 The page has a conversation sidebar and a message composer at the bottom.
+It opens in dark mode; use **Light mode / Dark mode** in the top-right corner
+to switch. Your choice is saved in this browser. Scientific drawings retain a
+light canvas so bonds and element colors stay readable in either theme.
 Press **Enter** to send and **Shift+Enter** for a new line. While the agent works,
 the conversation shows its current state and elapsed time; expand **View activity**
 for recent recorded tool events. The final answer appears when ready; the UI

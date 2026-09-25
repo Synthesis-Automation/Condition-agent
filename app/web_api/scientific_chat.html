@@ -1,9 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Scientific workspace</title>
+  <script>
+    // Restore the preference before painting the page; storage may be disabled.
+    try {
+      const theme = localStorage.getItem('scientific-theme');
+      if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+    } catch {}
+  </script>
   <link rel="stylesheet" href="/scientific/assets/chat.css">
   <script src="/scientific/assets/chat.js" defer></script>
 </head>
@@ -25,8 +32,7 @@
         <button id="menu" class="icon-button" type="button" aria-label="Toggle chat history" aria-controls="sidebar" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg>
         </button>
-        <span class="topbar-title">Scientific workspace</span>
-        <span class="topbar-note">Chemistry, with evidence</span>
+        <button id="theme" class="theme-toggle" type="button" title="Switch to light theme">Light mode</button>
       </header>
       <div id="scroll-area" class="scroll-area">
         <section id="intro" class="intro">

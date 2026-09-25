@@ -1,6 +1,6 @@
 # Scientific workspace implementation status
 
-Date: 2026-09-25
+Date: 2026-09-26
 
 The local scientific workspace is implemented in
 [`chem_coworker/scientific_workspace`](../../chem_coworker/scientific_workspace).
@@ -38,6 +38,9 @@ See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
   sources, and uncertainty are collapsed beneath the answer. Active work remains
   visible and cancellable from another chat; drafts survive navigation in the page.
   Progress reports actual recorded events; answers appear after final validation.
+  Dark and light themes are available from the header, with a saved browser
+  preference and dark mode as the default. Chemistry drawings keep their original
+  element colors on light canvases in both themes.
 - Optional runtime: native `codex exec` with structured final responses and exact
   thread resumption. Codex supplies the iterative tool loop and programmable
   environment; the scientific packages do not depend on its model service.
@@ -339,6 +342,20 @@ pre-existing registry checks
 `test_validate_reports_current_registry_state` and
 `test_registry_audit_reconciles_all_rows`, both caused by the two ambiguous
 identifier issues described above. No new test failed.
+
+After the chat interface update: **1,622 passed, 2 failed** in 319.49 seconds,
+with the same two registry failures. The chat checks include 11 JavaScript
+controller cases for submission, cross-chat cancellation, progress, drafts,
+navigation races, and startup recovery, plus API activity/asset regressions.
+JavaScript syntax and Ruff checks passed. The restarted local server served the
+page, CSS, JavaScript, activity endpoint, and saved Markdown/structure answers
+successfully. Browser control remained unavailable, so visual acceptance is still
+pending; these checks do not constitute a live browser rendering test.
+
+The dark/light theme follow-up also completed the full suite: **1,622 passed,
+2 existing registry failures** in 367.86 seconds. Theme switching, preference
+restoration, invalid saved values, and disabled browser storage were checked
+with a JavaScript harness. Updated assets were verified on the running server.
 
 The original pilot's local `review_packet.md` links the evidence needed for development
 review, and `summary.json` provides its investigation context. That pilot's final
