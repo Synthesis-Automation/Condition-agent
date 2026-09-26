@@ -41,26 +41,107 @@ function appendStructures(container,presentation){
     const download=element('a','Download SVG');download.href=structure.image_url;download.download='structure-'+(index+1)+'.svg';caption.append(download);figure.append(image,caption);gallery.append(figure);
   });container.append(gallery);
 }
-const basisLabels={reported:'Reported · agent attributed',computed:'Computed · recorded execution',proposed:'Proposed · hypothesis',unknown:'Unknown',input:'User input'};
-function showStructured(view){
-  const section=element('section','','scientific-view');
-  if(view.error){section.append(element('p',view.error,'scientific-note'));return section}
-  const sources=new Map(view.sources.map(source=>[source.id,source]));const molecules=new Map(view.molecules.map(molecule=>[molecule.id,molecule]));const steps=new Map(view.steps.map(step=>[step.id,step]));
-  function links(container,ids){for(const id of ids){const source=sources.get(id);if(!source)continue;const link=element('a',source.title);link.href=source.artifact_url;link.target='_blank';link.rel='noopener';link.title=source.locator;container.append(link,document.createTextNode(' '))}}
-  function attributed(container,item){container.append(element('span',basisLabels[item.basis]||item.basis,'basis basis-'+item.basis));const citations=element('span','','evidence');links(citations,item.source_ids);container.append(citations);for(const limitation of item.limitations)container.append(element('p',limitation,'scientific-note'))}
-  function claim(item){const box=element('div','','attributed-claim');box.append(element('div',item.text));attributed(box,item);return box}
-  if(view.molecules.length||view.steps.length||view.claims.length)section.append(element('p','Structured scientific view · agent authored, not independently reviewed. Drawings depict declared structures; they do not validate feasibility.','scientific-note'));
-  if(view.molecules.length){section.append(element('h3','Molecules and intermediates'));const gallery=element('div','','structure-gallery');for(const molecule of view.molecules){const card=element('figure','','structure');card.append(element('figcaption',molecule.name+(view.target_molecule_ids.includes(molecule.id)?' · target':'')));if(molecule.image_url){const image=element('img');image.src=molecule.image_url;image.alt=molecule.name+' · '+molecule.smiles;image.loading='lazy';card.append(image);const download=element('a','Download SVG');download.href=molecule.image_url;download.download=molecule.id+'.svg';card.append(download)}else card.append(element('p','Structure could not be drawn. Original notation is retained.','scientific-note'));card.append(element('code',molecule.smiles));attributed(card,molecule);gallery.append(card)}section.append(gallery)}
-  function stepCard(step){const card=element('article','','scientific-step');card.append(element('h4',step.id+' · '+step.title));attributed(card,step);card.append(element('p',step.reactant_ids.map(id=>molecules.get(id).name).join(' + ')+' → '+step.product_ids.map(id=>molecules.get(id).name).join(' + ')));
-    if(step.image_url){const image=element('img','','reaction-scheme');image.src=step.image_url;image.alt='Declared reaction scheme for '+step.title;image.loading='lazy';card.append(image);const download=element('a','Download reaction SVG');download.href=step.image_url;download.download=step.id+'-reaction.svg';card.append(download)}else card.append(element('p','Reaction scheme could not be drawn; inspect the declared SMILES.','scientific-note'));
-    const notation=element('details');notation.append(element('summary','Reaction SMILES'),element('code',step.reaction_smiles));card.append(notation);
-    if(step.after_step_ids.length)card.append(element('p','Depends on: '+step.after_step_ids.join(', '),'muted'));
-    card.append(element('h4','Conditions'));if(step.conditions.length)step.conditions.forEach(item=>card.append(claim(item)));else card.append(element('p','No condition details supplied.','muted'));
-    card.append(element('h4','Yield'));card.append(step.yield_info?claim(step.yield_info):element('p','Not supplied.','muted'));return card;
+const basisLabels = {reported:'Reported', computed:'Computed', proposed:'Proposed', unknown:'Unknown', input:'User input'};
+function showStructured(view, key = 'science') {
+  const section = element('section', '', 'scientific-view');
+  if (view.error) { section.append(element('p', view.error, 'scientific-note')); return section; }
+  const sources = new Map(view.sources.map(source => [source.id, source]));
+  const molecules = new Map(view.molecules.map(molecule => [molecule.id, molecule]));
+  const steps = new Map(view.steps.map(step => [step.id, step]));
+  function badge(item) { return element('span', basisLabels[item.basis] || item.basis, 'basis basis-' + item.basis); }
+  function notes(container, texts) {
+    if (!texts.length) return;
+    const list = element('ul', '', 'scientific-notes');
+    [...new Set(texts)].forEach(text => list.append(element('li', text)));
+    container.append(list);
   }
-  const routed=new Set();for(const route of view.routes){const box=element('section');box.append(element('h3',route.title));const diagram=element('img','','route-overview');diagram.src=route.image_url;diagram.alt='Step dependencies for '+route.title;box.append(diagram);for(const limitation of route.limitations)box.append(element('p',limitation,'scientific-note'));if(route.unreached_target_ids.length)box.append(element('p','Incomplete route: no terminal product with the declared target ID(s) '+route.unreached_target_ids.join(', ')+'.','scientific-note'));for(const id of route.step_ids){box.append(stepCard(steps.get(id)));routed.add(id)}section.append(box)}
-  const standalone=view.steps.filter(step=>!routed.has(step.id));if(standalone.length){section.append(element('h3','Reaction steps'));standalone.forEach(step=>section.append(stepCard(step)))}
-  if(view.claims.length){section.append(element('h3','Findings and proposals'));view.claims.forEach(item=>section.append(claim(item)))}
+  function links(container, ids) {
+    const citations = element('div', '', 'evidence');
+    for (const id of new Set(ids)) {
+      const source = sources.get(id); if (!source) continue;
+      const link = element('a', source.title);
+      link.href = source.url || source.artifact_url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      link.title = source.locator; citations.append(link);
+    }
+    if (citations.children.length) container.append(citations);
+  }
+  function claim(item) {
+    const box = element('div', '', 'attributed-claim');
+    box.append(badge(item), element('span', item.text));
+    links(box, item.source_ids); notes(box, item.limitations); return box;
+  }
+  function stepCard(step, routeKey, number) {
+    const card = element('article', '', 'scientific-step');
+    const heading = element('div', '', 'step-heading');
+    heading.append(element('span', String(number), 'step-number'), element('h4', step.title), badge(step));
+    card.append(heading);
+    if (step.image_url) {
+      const figure = element('figure', '', 'scheme-figure');
+      const scroll = element('div', '', 'scheme-scroll');
+      scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', 'Reaction scheme: ' + step.title);
+      const image = element('img', '', 'reaction-scheme'); image.src = step.image_url;
+      if (step.scheme_width) image.style.minWidth = Math.max(760, Math.round(step.scheme_width * 0.6)) + 'px';
+      image.alt = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ') + '. Conditions and yield in step details.';
+      image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
+      const actions = element('figcaption', '', 'scheme-actions');
+      const download = element('a', 'Download SVG'); download.href = step.image_url; download.download = step.id + '-reaction.svg';
+      actions.append(element('span', 'Synthetic direction'), download); figure.append(actions); card.append(figure);
+    } else card.append(element('p', 'Scheme unavailable for the supplied notation. Structures and conditions are retained in step details.', 'scientific-note'));
+    // Keep scientific cautions visible, but coalesce repeated wording.
+    notes(card, [...step.limitations, ...step.conditions.flatMap(item => item.limitations), ...(step.yield_info?.limitations || [])]);
+    const detail = element('div', '', 'step-detail');
+    detail.append(element('p', step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ')));
+    if (step.after_step_ids.length) detail.append(element('p', 'After: ' + step.after_step_ids.map(id => steps.get(id).title).join('; '), 'muted'));
+    detail.append(element('h4', 'Conditions'));
+    if (step.conditions.length) step.conditions.forEach(item => detail.append(claim(item)));
+    else detail.append(element('p', 'Not supplied', 'muted'));
+    detail.append(element('h4', 'Yield'));
+    detail.append(step.yield_info ? claim(step.yield_info) : element('p', 'Not supplied', 'muted'));
+    links(detail, step.source_ids);
+    detail.append(element('h4', 'Reaction SMILES'), element('code', step.reaction_smiles));
+    card.append(disclosure('Step details & evidence', routeKey + ':' + step.id, detail));
+    return card;
+  }
+  if (view.steps.length) section.append(element('p', 'Reaction schemes · declared structures; feasibility is not established by the drawings.', 'scheme-caption'));
+  const routed = new Set();
+  for (const [index, route] of view.routes.entries()) {
+    const box = element('section', '', 'route-section');
+    const routeKey = key + ':' + route.id;
+    notes(box, route.limitations);
+    if (route.unreached_target_ids.length) box.append(element('p', 'Incomplete route: does not reach ' + route.unreached_target_ids.map(id => molecules.get(id).name).join(', ') + '.', 'scientific-note'));
+    route.step_ids.forEach((id, position) => { box.append(stepCard(steps.get(id), routeKey, position + 1)); routed.add(id); });
+    if (route.step_ids.length > 1) {
+      const diagram = element('img', '', 'route-overview'); diagram.src = route.image_url; diagram.alt = 'Declared dependencies for ' + route.title;
+      box.append(disclosure('Step connections', routeKey + ':connections', diagram));
+    }
+    if (view.routes.length === 1) { section.append(element('h3', route.title), box); }
+    else {
+      const alternative = disclosure(route.title + ' · ' + route.step_ids.length + ' steps', routeKey, box);
+      alternative.className += ' route-choice'; alternative.open = index === 0; section.append(alternative);
+    }
+  }
+  const standalone = view.steps.filter(step => !routed.has(step.id));
+  if (standalone.length) {
+    section.append(element('h3', view.routes.length ? 'Other reaction steps' : 'Reaction schemes'));
+    standalone.forEach((step, index) => section.append(stepCard(step, key, index + 1)));
+  }
+  if (view.molecules.length) {
+    const gallery = element('div', '', 'structure-gallery');
+    for (const molecule of view.molecules) {
+      const card = element('figure', '', 'structure');
+      card.append(element('figcaption', molecule.name + (view.target_molecule_ids.includes(molecule.id) ? ' · target' : '')));
+      if (molecule.image_url) {
+        const image = element('img'); image.src = molecule.image_url; image.alt = molecule.name; image.loading = 'lazy'; card.append(image);
+        const download = element('a', 'Download SVG'); download.href = molecule.image_url; download.download = molecule.id + '.svg'; card.append(download);
+      } else card.append(element('p', 'Structure could not be drawn.', 'muted'));
+      card.append(element('code', molecule.smiles), badge(molecule)); links(card, molecule.source_ids); notes(card, molecule.limitations); gallery.append(card);
+    }
+    section.append(disclosure('Molecules & SMILES · ' + view.molecules.length, key + ':molecules', gallery));
+  }
+  if (view.claims.length) {
+    const claims = element('div'); view.claims.forEach(item => claims.append(claim(item)));
+    section.append(disclosure('Additional scientific details', key + ':claims', claims));
+  }
   return section;
 }
 
@@ -90,9 +171,9 @@ function sourcesPanel(turn) {
   }
   for (const source of sources) {
     const row = element('div', '', 'source-card');
-    row.append(element('strong', source.title), element('p', source.locator, 'muted'));
-    link(row, 'Inspect saved evidence', source.artifact_url);
-    if (source.url) link(row, 'Original source ↗', source.url);
+    link(row, source.title, source.url || source.artifact_url);
+    row.append(element('p', source.locator, 'muted'));
+    if (source.url) link(row, 'Saved excerpt', source.artifact_url);
     container.append(row); linked.add(source.artifact_ref);
   }
   for (const [index, ref] of (turn.answer.evidence_refs || []).entries()) {
@@ -111,9 +192,7 @@ function answerCard(turn) {
     card.append(formattedMessage(answer.answer_markdown, turn.answer_presentation));
     const view = turn.structured_presentation;
     if (view && (view.error || view.molecules?.length || view.steps?.length || view.claims?.length)) {
-      const label = view.error ? 'Scientific details unavailable' : 'Structures & scientific details' +
-        (view.molecules.length ? ' · ' + view.molecules.length + ' molecules' : '');
-      card.append(disclosure(label, turn.id + ':structures', showStructured(view)));
+      card.append(showStructured(view, turn.id + ':science'));
     } else if (turn.answer_presentation?.structures?.length) {
       const structures = element('div'); appendStructures(structures, turn.answer_presentation);
       card.append(disclosure('View structures', turn.id + ':structures', structures));
@@ -169,7 +248,8 @@ function renderConversation(data) {
   const signature = JSON.stringify(data.turns.map(t => [t.id, t.status, t.answer_ref, t.error]));
   if (signature !== displayed) {
     const follow = firstLoad || nearBottom();
-    const open = new Set(Array.from($('messages').querySelectorAll('details[open]')).map(node => node.dataset.key).filter(Boolean));
+    const expanded = new Map(Array.from($('messages').querySelectorAll('details'))
+      .filter(node => node.dataset.key).map(node => [node.dataset.key, Boolean(node.open)]));
     $('messages').replaceChildren();
     for (const turn of data.turns) {
       const question = element('div', '', 'user');
@@ -181,7 +261,9 @@ function renderConversation(data) {
       }
       $('messages').append(question, answerCard(turn));
     }
-    $('messages').querySelectorAll('details').forEach(node => { if (open.has(node.dataset.key)) node.open = true; });
+    $('messages').querySelectorAll('details').forEach(node => {
+      if (expanded.has(node.dataset.key)) node.open = expanded.get(node.dataset.key);
+    });
     displayed = signature;
     if (follow) requestAnimationFrame(toBottom);
   }
@@ -357,6 +439,13 @@ async function initialize() {
     const config = await request('/config'); token = config.token;
     $('environment').replaceChildren(element('p', 'Agent: ' + config.runtime), element('p', 'Model: ' + config.model),
       element('p', 'Questions and tool context may be sent to your configured model provider. Investigation records stay local.'));
+    if (config.research_settings) {
+      const settings = config.research_settings;
+      $('environment').append(element('p', 'Research settings: ' + settings.profile +
+        ' · reasoning ' + (settings.requested.reasoning_effort || 'inherited') +
+        ' · web search ' + (settings.requested.web_search || 'inherited') +
+        ' (requested; access is checked during each investigation).'));
+    }
     active = (await request('/activity')).active; await list(); loaded = true; updateControls();
     const id = location.hash.slice(1);
     if (/^[0-9a-f]{32}$/.test(id)) await openConversation(id);

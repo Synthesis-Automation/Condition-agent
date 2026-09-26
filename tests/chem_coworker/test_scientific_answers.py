@@ -76,6 +76,22 @@ def test_tafamidis_view_renders_steps_and_retains_incomplete_route(example) -> N
         assert root.tag.endswith("svg")
     assert view["steps"][0]["yield_info"]["basis"] == "reported"
     assert view["molecules"][3]["basis"] == "proposed"
+    scheme = ET.fromstring(base64.b64decode(view["steps"][0]["image_url"].split(",", 1)[1]))
+    text = " ".join(scheme.itertext())
+    assert "NaHCO3, dry THF, 16 h" in text and "Yield (reported): 91.8%" in text
+    assert "Aminophenol ester" in text and "Illustrative amide" in text
+
+
+def test_saved_answer_uses_source_title_and_real_url_without_mutation(example) -> None:
+    _, payload = example
+    reference = payload["sources"][0]["artifact_ref"]
+    payload["answer_markdown"] = f"See {reference} for the procedure."
+    original = deepcopy(payload)
+    view = present_conversation({"id": "a" * 32, "turns": [{"question": "Q", "answer": payload}]})
+    html = view["turns"][0]["answer_presentation"]["html"]
+    assert "User-quoted patent examples</a>" in html
+    assert 'href="https://patents.google.com/patent/US12116352B2/en"' in html
+    assert payload == original
 
 
 @pytest.mark.parametrize("mutation,match", [

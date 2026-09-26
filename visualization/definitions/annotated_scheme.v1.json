@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "annotated_scheme.v1",
+  "molecule_preset": "web_consistent",
+  "molecule_width": 260,
+  "molecule_height": 220,
+  "arrow_width": 340,
+  "gap": 32,
+  "padding": 28,
+  "font_size": 20,
+  "line_height": 26,
+  "name_characters": 22,
+  "annotation_characters": 28,
+  "max_annotation_lines": 8
+}

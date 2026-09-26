@@ -48,21 +48,30 @@ class ScientificWorkspace:
             "operation": operation, "arguments": inputs,
             "origin": "deterministic_computation", "review_status": "unreviewed",
         }
+        timings: dict[str, float] = {}
         try:
+            phase_started = monotonic()
             for reference in evidence_refs:
                 self.store.read_artifact(reference)
             if self.store.summary()["status"] != "active":
                 raise ValueError("Investigation is stopped; append an active status to resume")
             verify_baseline(self.store.manifest["baseline"])
-            payload["result"] = json.loads(canonical_bytes(
-                self.operations.invoke(operation, json.loads(canonical_bytes(inputs)))
-            ))
+            timings["baseline_and_evidence_seconds"] = round(monotonic() - phase_started, 6)
+            phase_started = monotonic()
+            result = self.operations.invoke(operation, json.loads(canonical_bytes(inputs)))
+            timings["operation_seconds"] = round(monotonic() - phase_started, 6)
+            phase_started = monotonic()
+            serialized = canonical_bytes(result)
+            payload["result"] = json.loads(serialized)
+            payload["result_bytes"] = len(serialized)
+            timings["serialization_seconds"] = round(monotonic() - phase_started, 6)
             payload["execution_status"] = "completed"
         except KeyboardInterrupt:
             payload.update(execution_status="cancelled", error={"type": "KeyboardInterrupt", "message": "Execution interrupted"})
         except Exception as exc:
             payload.update(execution_status="error", error={"type": type(exc).__name__, "message": str(exc)})
         payload["duration_seconds"] = round(monotonic() - started, 6)
+        payload["timings"] = timings
         if operation in {
             "revise_routes", "propose_condition_adaptation", "prepare_route_proposal",
             "inspect_route_step", "revise_route_branch",
@@ -116,12 +125,54 @@ class ScientificWorkspace:
 
     def call_summary(self, event: InvestigationEvent) -> dict[str, Any]:
         """Return a compact pointer while retaining complete scientific output on disk."""
+        from .call_summaries import summarize_call
+
         value = self.store.read_artifact(event.artifact_ref)
-        result = value.get("result")
-        summary = {"event": asdict(event), "operation": value.get("operation"),
-                   "execution_status": value.get("execution_status"), "error": value.get("error")}
-        if isinstance(result, dict):
-            summary["result_summary"] = {key: result[key] for key in (
-                "valid", "error", "status", "retrieval_level", "candidate_count", "warnings", "total",
-            ) if key in result}
-        return summary
+        return {"event": asdict(event), **summarize_call(value)}
+
+    def capabilities(self) -> dict[str, Any]:
+        """Probe local imports and configured file presence; do not assert web access."""
+        from .capabilities import local_capabilities
+
+        return local_capabilities(self.store.manifest["baseline"])
+
+    def fetch_source(self, url: str, *, title: str | None = None) -> InvestigationEvent:
+        """Save a bounded public source snapshot with extraction and retrieval provenance."""
+        from .literature import fetch_source
+
+        return fetch_source(self.store, url, title=title)
+
+    def capture_source(
+        self, text: str, *, url: str, title: str | None = None, locator: str | None = None,
+    ) -> InvestigationEvent:
+        """Save an agent-supplied passage without claiming independent retrieval."""
+        from .literature import capture_source
+
+        return capture_source(self.store, text, url=url, title=title, locator=locator)
+
+    def inspect_source(
+        self, source_ref: str, *, query: str | None = None, offset: int = 0, limit: int = 4000,
+    ) -> dict[str, Any]:
+        """Read a bounded source passage with exact snapshot locations."""
+        from .literature import inspect_source
+
+        return inspect_source(self.store, source_ref, query=query, offset=offset, limit=limit)
+
+    def record_source_excerpt(
+        self, source_ref: str, *, start: int | None = None, end: int | None = None,
+        excerpt: str | None = None, locator: str | None = None,
+    ) -> InvestigationEvent:
+        """Save an exact passage from an existing snapshot, not a generated quotation."""
+        from .literature import record_source_excerpt
+
+        return record_source_excerpt(
+            self.store, source_ref, start=start, end=end, excerpt=excerpt, locator=locator,
+        )
+
+    def record_evidence_review(
+        self, draft: Mapping[str, Any], findings: list[dict[str, Any]],
+    ) -> InvestigationEvent:
+        """Record the agent's explicit challenge of a draft; this is not independent review."""
+        from .evidence_review import record_evidence_review
+
+        return record_evidence_review(self.store, draft, findings)

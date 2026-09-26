@@ -43,11 +43,26 @@ Press **Enter** to send and **Shift+Enter** for a new line. While the agent work
 the conversation shows its current state and elapsed time; expand **View activity**
 for recent recorded tool events. The final answer appears when ready; the UI
 does not stream intermediate drafts or estimate a completion percentage.
-Structures, scientific details, sources, and uncertainty are expandable beneath
-each answer. Answers render Markdown tables,
+Reaction schemes appear beneath the concise answer, one SVG per step, with named
+reactants/products, conditions above the arrow and yield below. Retrosynthesis
+plans are shown in synthetic direction. Each annotation retains its declared
+reported/proposed/computed status; drawings do not validate feasibility. Download
+individual SVGs from their cards. Wide schemes scroll horizontally on small screens.
+Alternative routes are separate expandable sections; the first is initially open,
+without implying that it is scientifically preferred. Step evidence, molecule
+galleries, SMILES, route connections, and uncertainty remain expandable. Missing
+conditions or yields are marked as missing, and step cautions remain visible.
+Answers render Markdown tables,
 headings, emphasis, lists, code, and links. Wide tables scroll horizontally.
-Raw HTML and remote Markdown images are disabled; evidence links stay scoped
-to their conversation. Install `requirements-web.txt` when setting up a new
+Raw HTML and remote Markdown images are disabled. Artifact hashes in prose become
+readable citations: known external sources link to the original paper/patent URL,
+and local-only results link to saved evidence within the conversation. The Sources
+panel also retains access to captured excerpts. Technical fenced code remains literal.
+Older answers without structured steps are not reconstructed from prose.
+After updating the server code, restart the server and refresh the browser. Saved
+answers acquire the new presentation without rerunning the agent; start a new chat
+for investigations after the runtime prompt changes its recorded baseline.
+Install `requirements-web.txt` when setting up a new
 environment (the renderer uses `markdown-it-py`). Select
 a saved conversation to continue it, including after a normal server restart.
 The square **Stop investigation** button replaces Send while work is active.
@@ -141,14 +156,18 @@ Requirements and configuration:
   [artifacts.local.example.json](../../examples/ai_native/artifacts.local.example.json).
   Missing datasets are recorded, and dependent calls fail explicitly.
 - `--chat-root DIRECTORY` defaults to `results/ai_native/conversations`.
-  `--agent-timeout SECONDS` defaults to 900, excluding baseline preparation.
+  `--agent-timeout SECONDS` overrides the chosen profile, excluding baseline preparation.
   This is a per-attempt wall-clock bound, not a token or spending cap. A turn with
   one answer-correction attempt can use up to twice this runtime allowance.
 
 Each question is processed by the actual Codex harness, with Python/shell access
 and its available tools; the application does not implement a fixed LLM action
 loop. Follow-ups resume the exact stored thread ID, never the globally latest
-Codex session. Questions and tool context can reach the configured model provider;
+Codex session. If the adapter's requested runtime settings change, the next turn
+starts a fresh thread and reads the same saved investigation evidence. Inherited
+Codex configuration is not resolved or fingerprinted, so changes outside this
+adapter require a new conversation for a clean comparison.
+Questions and tool context can reach the configured model provider;
 the browser page is local, but model inference is not necessarily local.
 The default model identifier is inherited, not resolved into a pinned model by
 this adapter. Runtime version, requested configuration, thread ID, usage, prompts,
@@ -180,6 +199,121 @@ The browser API uses the same `ConversationService` that Python applications can
 instantiate. Runtime substitution happens at the `AgentRuntime` protocol;
 Codex is currently the only production-provider adapter implemented here.
 No MCP dependency is introduced.
+
+### Research profiles and capability checks
+
+Scientific chat now defaults to `--agent-profile research`:
+
+| Profile | Requested reasoning | Requested native web search | Per-attempt deadline |
+| --- | --- | --- | --- |
+| `research` | high | live | 1800 seconds |
+| `quick` | medium | cached | 300 seconds |
+| `inherit` | inherited | inherited | 900 seconds |
+
+No profile changes your model. `--agent-model`, `--agent-reasoning-effort`,
+`--agent-web-search` and `--agent-timeout` override individual values. Model/provider
+support varies; unsupported settings fail visibly rather than silently substituting
+a different model. Example:
+
+```powershell
+python -m app.web_api --scientific-chat --agent-profile research --agent-timeout 1200 --port 8013
+```
+
+Open `http://127.0.0.1:8013/scientific` and start a **new chat**. Choose a free port
+if another server is already running. Existing processes do not pick up this update.
+`--agent-web-search disabled` disables that native tool only; it does not block
+network use through Python or other tools.
+
+Native browser/search access and command networking are separate. This adapter
+keeps `workspace-write` and does not enable command network access. Where the
+worker cannot download a URL directly, use an available native web reader and
+save its actual returned passage with `capture_source`, retaining the failed
+download artifact and its limitation. This does not turn an agent-supplied
+passage into an independently fetched snapshot. See the runtime's
+[network access configuration](https://learn.chatgpt.com/docs/agent-approvals-security).
+
+Each attempt saves `runtime-request.json` and `runtime-observations.json`. The
+former records requested settings and their origin; the latter counts observed
+native search, command and MCP items, including completion/failure signals. An
+observed search event does not by itself establish a useful search result. Effective
+model/reasoning values remain unconfirmed when the runtime does not report them.
+Each turn also saves `capabilities.json`: running interpreter, RDKit parsing probe,
+optional PDF parser and configured file presence. File presence does not certify
+index compatibility or corpus validation. Inspect the same local checks with:
+
+```powershell
+python -m chem_coworker.scientific_workspace capabilities results/ai_native/YOUR_INVESTIGATION
+```
+
+### Literature and final evidence review
+
+The agent receives a [chemistry investigation guide](Chemistry_Investigation_Guide.md)
+that connects exact target identity, primary-source experiments, local graph and
+condition checks, and an explicit challenge of the weakest claim. It chooses its
+own tool order. Full-text access remains dependent on the source; no subscription
+service, OCR engine or automatic molecular-image extraction is bundled.
+
+The Python workspace provides recorded source tools:
+
+```python
+source = w.fetch_source("https://patents.google.com/patent/EP0076530A2/en",
+                        title="EP0076530A2")
+passage = w.inspect_source(source.artifact_ref, query="LXVIII", limit=4000)
+print(passage)  # inspect context and continue reading when needed
+if passage["query_found"] and passage["text"].strip():
+    excerpt = w.record_source_excerpt(
+        source.artifact_ref, start=passage["location"]["start"],
+        end=passage["location"]["end"], locator="Captured passage around LXVIII",
+    )
+```
+
+`fetch_source` preserves original bytes, URL/redirects, retrieval date, extracted
+text, checksum, extraction status and explicit failures. Public HTTP(S) downloads
+are bounded to 8 MiB; passages are bounded to 16,000 characters. HTML/text and
+text-based PDFs are supported (`pypdf` in `requirements-web.txt`). PDF page ranges
+are retained; scanned pages, inaccessible documents and missing parsers stay explicit.
+Figures and formula drawings require original-source inspection. An exact excerpt
+check proves membership in the captured text, not correctness of a chemistry claim.
+
+`w.capture_source(text, url=..., title=..., locator=...)` records text obtained
+through another tool as `agent_supplied_excerpt`; it does not claim the workspace
+fetched or authenticated that URL. New external answer sources must match their
+captured original/final URL and contain actual text. Failed fetch artifacts can
+support an access limitation but cannot masquerade as a read source passage.
+Legacy source attachments remain supported with their original limitations.
+
+For recommendations the prompt requests `w.record_evidence_review(draft, findings)`
+covering source identity, structure/stereochemistry, conditions/yields, route
+completeness and counterevidence. Each finding has `area`, `claim`, `assessment`,
+`evidence_refs`, and `reason`; use `not_checked`/`not_applicable` explicitly when
+needed. `supported`, `partial` and `conflicting` require evidence references.
+The record is bound to the exact draft and current turn. Answers record whether
+that self-review exists; absence is not disguised as success. It remains an
+**agent self-review**, not an independent chemist assessment or semantic verifier.
+
+Operation summaries now project relevant fields, preserve scientific statuses,
+and disclose truncation/collection counts. Complete results remain immutable.
+Calls record baseline/evidence checking, operation and serialization timings plus
+serialized result bytes, so later performance changes can target measured costs.
+Failed phases are not reported as successfully timed; artifact persistence is
+outside these timings.
+
+Run the separate bounded real-agent research integration check explicitly:
+
+```powershell
+python -m examples.ai_native.research_smoke --run-live
+```
+
+It uses an isolated conversation and a 300-second outer budget, requests one native
+search, source capture/excerpt, recorded target analysis and final self-review.
+A failed direct download can be followed by one native source open and honest
+capture of returned text; it never replaces missing source text with memory.
+Reports under `results/ai_native/research_smoke/reports/` preserve missing or failed
+capabilities. This uses your configured model account. It does not measure whether
+Codex outperforms ChatGPT. [Development cases](../../examples/ai_native/research_development_cases.json)
+provide review criteria for stereo ambiguity, proposed conditions, unsupported
+chemistry, literature access and conflicting sources. These are known development
+cases, not the untouched chemistry evaluation.
 
 ### Local execution limits
 

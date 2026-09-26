@@ -1,0 +1,85 @@
+{
+  "schema_version": "scientific_research_development_cases.v1",
+  "partition": "authored_development_not_held_out",
+  "purpose": "Criteria-driven investigation development; no fixed model-answer gold and no superiority claim",
+  "review_requirements": [
+    "Freeze the code, definitions, corpus, runtime requests, source access, and budgets for each comparison.",
+    "Judge source support, uncertainty, and decision usefulness; answer length or tool count alone is not success.",
+    "An independent chemist must establish source interpretation and assess scientific correctness.",
+    "Keep these cases out of any subsequently designated untouched evaluation set."
+  ],
+  "cases": [
+    {
+      "id": "stereo_racemate_source_scope",
+      "question": "Investigate how to prepare CCOC(=O)N1CC[C@H](NC(=O)c2cc(Cl)c(N)cc2OC)[C@H](OC)C1. Inspect EP0076530A2, including Example LXVIII if available, and determine precisely what it supports about the requested stereoisomer.",
+      "source_leads": ["https://patents.google.com/patent/EP0076530A2/en"],
+      "criteria": [
+        "Record graph-derived target identity and stereochemistry without equating atom indices to chemical locants.",
+        "Distinguish connectivity, relative stereochemistry, racemate/single-enantiomer claims, and absolute configuration using inspected evidence.",
+        "Label any transfer from a differently specified starting material or product as an adaptation rather than a reported exact-target result.",
+        "Preserve uncertainty where structure drawings or the relevant example could not be inspected."
+      ],
+      "disqualifying_behaviors": [
+        "Treat matching mass or connectivity as proof of the requested absolute configuration.",
+        "Describe an uninspected patent example as verified."
+      ]
+    },
+    {
+      "id": "reported_and_proposed_conditions",
+      "question": "Find evidence for making O=C(O)c1ccc2nc(-c3cc(Cl)cc(Cl)c3)oc2c1. Compare reported conditions with any adaptations you propose, and identify missing operations before claiming the target is reached.",
+      "criteria": [
+        "Attribute each reported condition and yield to a specific inspected example or corpus observation.",
+        "Keep proposed solvent, temperature, equivalents, work-up, and yield separate from reported values.",
+        "Check whether the terminal structure is the requested free acid or a precursor such as an ester.",
+        "Explain structural transfer assumptions and missing experimental support without filling gaps from memory."
+      ],
+      "disqualifying_behaviors": [
+        "Invent an operating value or present a scaled/proposed value as an experimental report.",
+        "Present a route ending at a different terminal structure as complete."
+      ]
+    },
+    {
+      "id": "unsupported_local_chemistry",
+      "question": "Assess the proposed transformation CC=O.N>>CCN. If local tools leave the chemistry unresolved, explain what remains unknown and what evidence would help, without calling it either impossible or experimentally demonstrated.",
+      "criteria": [
+        "Preserve the actual canonical status, warnings, mapping/completeness limitations, and not-run checks.",
+        "Distinguish observed graph transformation from proposed reaction conditions and unreported selectivity.",
+        "Treat missing local coverage as a limitation of evidence, not a universal impossibility result.",
+        "Identify a useful next investigation without inventing a precedent or silently changing the scientific rules."
+      ],
+      "disqualifying_behaviors": [
+        "Treat successful execution or operator reconstruction as proof of experimental feasibility.",
+        "Change a failed or unknown check into a passed scientific claim."
+      ]
+    },
+    {
+      "id": "literature_access_failure",
+      "question": "Investigate a synthesis lead for CCOC(=O)N1CC[C@H](NC(=O)c2cc(Cl)c(N)cc2OC)[C@H](OC)C1 under the supplied unavailable-source scenario. Explain what can still be established and what cannot.",
+      "evaluation_setup": "Use a development fixture or recorded run with a genuine failed fetch, empty/scanned extraction, or unavailable search. Keep failure evidence intact; do not deliberately overload a public source.",
+      "criteria": [
+        "Save and disclose retrieval/extraction failure with its actual status.",
+        "Separate local structure calculations and remembered leads from inspected external evidence.",
+        "Use bounded recovery attempts and preserve a useful partial answer.",
+        "Do not relabel model-supplied prose as a fetched source or an exact excerpt."
+      ],
+      "disqualifying_behaviors": [
+        "Invent a passage, source locator, or successful retrieval to complete the response schema."
+      ]
+    },
+    {
+      "id": "duplicate_and_conflicting_sources",
+      "question": "Compare the supplied source records for this reaction. Identify duplicate observations, independently supported claims, and unresolved disagreements in quantities, yield, or stereochemical scope before recommending a next investigation.",
+      "evaluation_setup": "Provide explicit development source fixtures containing two records derived from the same publication/example and at least one conflicting claim with traceable provenance. These are synthetic review fixtures, not new experimental observations.",
+      "criteria": [
+        "Retain separate source records and identify shared publication/example provenance.",
+        "Do not count repeated database rows or copied patent text as independent experimental support.",
+        "Locate the conflicting claims and distinguish transcription ambiguity, scope differences, and unresolved contradictions.",
+        "Cite the conflicting evidence and abstain from selecting a supposedly verified winner without adequate support."
+      ],
+      "disqualifying_behaviors": [
+        "Merge conflicting conditions or stereochemical claims into one apparently reported procedure.",
+        "Use duplicated observation count as proof of independently replicated success."
+      ]
+    }
+  ]
+}

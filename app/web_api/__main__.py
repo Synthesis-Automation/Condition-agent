@@ -25,7 +25,18 @@ def main() -> None:
     parser.add_argument("--chat-artifacts", default="examples/ai_native/artifacts.local.example.json")
     parser.add_argument("--codex", default=None, help="Native Codex executable; otherwise auto-discover")
     parser.add_argument("--agent-model", default=None, help="Optional model override; otherwise use Codex configuration")
-    parser.add_argument("--agent-timeout", type=float, default=900)
+    from chem_coworker.scientific_workspace.research_profiles import (
+        PROFILE_NAMES, REASONING_EFFORTS, WEB_SEARCH_MODES,
+    )
+
+    parser.add_argument("--agent-profile", choices=PROFILE_NAMES, default="research",
+                        help="Scientific investigation settings; research requests high reasoning and live search")
+    parser.add_argument("--agent-reasoning-effort", choices=REASONING_EFFORTS, default=None,
+                        help="Override the selected profile's reasoning request")
+    parser.add_argument("--agent-web-search", choices=WEB_SEARCH_MODES, default=None,
+                        help="Override the web-search tool mode; not a shell network policy")
+    parser.add_argument("--agent-timeout", type=float, default=None,
+                        help="Per-attempt deadline in seconds; otherwise use the profile (research: 1800)")
     parser.add_argument(
         "--workbench",
         action="store_true",
@@ -45,7 +56,11 @@ def main() -> None:
         try:
             scientific_service = ConversationService(
                 args.chat_root,
-                runtime=CodexRuntime(executable=args.codex, model=args.agent_model, timeout_seconds=args.agent_timeout),
+                runtime=CodexRuntime(
+                    executable=args.codex, model=args.agent_model, profile=args.agent_profile,
+                    reasoning_effort=args.agent_reasoning_effort,
+                    web_search=args.agent_web_search, timeout_seconds=args.agent_timeout,
+                ),
                 artifacts=json.loads(Path(args.chat_artifacts).read_text("utf-8")),
             )
         except (OSError, ValueError, RuntimeError) as exc:

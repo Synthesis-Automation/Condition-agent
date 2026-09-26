@@ -130,6 +130,52 @@ test('saved answer is primary; scientific details and sources start collapsed', 
   assert.ok(card.descendants().some(node => node.tag === 'a' && node.textContent === 'Download SVG'));
 });
 
+test('reaction schemes are visible with details collapsed and references human-readable', () => {
+  const {run, context} = harness();
+  const attribution = {basis:'proposed', source_ids:['paper'], limitations:['Feasibility unverified']};
+  context.fixture = {
+    id:'scheme', answer:{answer_markdown:'A concise conclusion', evidence_refs:[], uncertainties:[]},
+    structured_presentation:{
+      sources:[{id:'paper',title:'Patent Example 2',url:'https://example.org/patent',artifact_url:'/saved/excerpt',locator:'Example 2'}],
+      molecules:[{id:'a',name:'Reactant',smiles:'CCO',...attribution},{id:'b',name:'Product',smiles:'CC=O',...attribution}],
+      target_molecule_ids:['b'], routes:[], claims:[],
+      steps:[{id:'s1',title:'Oxidation hypothesis',reactant_ids:['a'],product_ids:['b'],after_step_ids:[],
+        conditions:[{text:'Unknown oxidant',...attribution}],yield_info:null,reaction_smiles:'CCO>>CC=O',
+        image_url:'data:image/svg+xml;base64,abc',scheme_width:980,...attribution}],
+    },
+  };
+  const card = run('answerCard(fixture)');
+  const view = card.children.find(node => node.className === 'scientific-view');
+  assert.ok(view, 'schemes should not be inside a collapsed details wrapper');
+  assert.equal(card.children[0].textContent, 'A concise conclusion');
+  assert.equal(card.querySelectorAll('details[open]').length, 0);
+  const images = card.querySelectorAll('img');
+  assert.equal(images.length, 1);
+  assert.match(images[0].alt, /Reactant → Product/);
+  assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent' && node.textContent === 'Patent Example 2'));
+  assert.ok(card.querySelectorAll('a').some(node => node.href === '/saved/excerpt' && node.textContent === 'Saved excerpt'));
+  assert.ok(card.descendants().some(node => node.tag === 'code' && node.textContent === 'CCO>>CC=O'));
+  assert.ok(card.descendants().some(node => node.tag === 'li' && node.textContent === 'Feasibility unverified'));
+  context.fixture.structured_presentation.routes = [
+    {id:'r1',title:'First hypothesis',step_ids:['s1'],limitations:[],unreached_target_ids:[]},
+    {id:'r2',title:'Alternative hypothesis',step_ids:['s1'],limitations:[],unreached_target_ids:['b']},
+  ];
+  const alternatives = run('answerCard(fixture)').querySelectorAll('details').filter(node => node.className.includes('route-choice'));
+  assert.equal(alternatives.length, 2);
+  assert.equal(alternatives[0].open, true);
+  assert.equal(alternatives[1].open, false);
+  assert.ok(alternatives[1].descendants().some(node => node.textContent.includes('Incomplete route: does not reach Product')));
+  context.fixture.question = 'Investigate this route';
+  context.fixture.status = 'completed';
+  run("renderConversation({title:'Routes',turns:[fixture]})");
+  const first = run("$('messages').querySelectorAll('details').find(node => node.className.includes('route-choice'))");
+  first.open = false;
+  context.fixture.answer_ref = 'new-presentation';
+  run("renderConversation({title:'Routes',turns:[fixture]})");
+  const retained = run("$('messages').querySelectorAll('details').find(node => node.className.includes('route-choice'))");
+  assert.equal(retained.open, false, 'a user-collapsed route stays closed when the conversation updates');
+});
+
 test('progress uses recorded events, elapsed time, and keeps details open across updates', () => {
   const {ids, run} = harness();
   run("identity='working'; active={conversation_id:'working', status:'running', created_at:new Date(Date.now()-65000).toISOString(),progress:[{kind:'web_search',status:'item.completed',at:new Date().toISOString()}]}; renderConversation({title:'Question',turns:[{id:'t1',question:'Question',status:'running'}]})");

@@ -61,7 +61,7 @@ def artifact_identity(path: Path) -> dict[str, Any]:
 def environment_versions() -> dict[str, str]:
     """Record runtime versions relevant to deterministic calculations."""
     versions = {"python": platform.python_version(), "platform": platform.platform()}
-    for package in ("rdkit", "numpy", "rdchiral"):
+    for package in ("rdkit", "numpy", "rdchiral", "pypdf"):
         try:
             versions[package] = importlib.metadata.version(package)
         except importlib.metadata.PackageNotFoundError:

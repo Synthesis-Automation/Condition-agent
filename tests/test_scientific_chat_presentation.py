@@ -95,6 +95,33 @@ def test_evidence_links_are_scoped_to_the_selected_conversation() -> None:
     )
 
 
+def test_bare_and_inline_hashes_become_readable_repeated_citations() -> None:
+    reference = "sha256:" + "b" * 64
+    view = present_message(f"Evidence: {reference}; again `{reference}` and [{reference}]({reference}).", IDENTITY)
+    assert view["html"].count(">Saved evidence 1</a>") == 3
+    assert len([tag for tag, _ in Tags(view["html"]).tags if tag == "a"]) == 3
+    assert view["structures"] == []
+
+
+def test_known_citation_links_to_real_source_and_escapes_its_title() -> None:
+    reference = "sha256:" + "b" * 64
+    references = ((reference, "Patent <Example 2>", "https://patents.google.com/patent/US12116352B2/en"),)
+    view = present_message(f"See {reference} and [Procedure]({reference}).", IDENTITY, references)
+    links = [attrs for tag, attrs in Tags(view["html"]).tags if tag == "a"]
+    assert [item["href"] for item in links] == [references[0][2]] * 2
+    assert "Patent &lt;Example 2&gt;" in view["html"]
+    assert ">Procedure</a>" in view["html"]
+    assert reference not in view["html"]
+    unsafe = present_message(reference, IDENTITY, ((reference, "Unsafe", "javascript:alert(1)"),))
+    assert 'href="/api/v1/scientific/conversations/' in unsafe["html"]
+
+
+def test_hash_in_fenced_code_stays_literal() -> None:
+    reference = "sha256:" + "c" * 64
+    view = present_message(f"```text\n{reference}\n```", IDENTITY)
+    assert "<a " not in view["html"] and reference in view["html"]
+
+
 def test_projection_preserves_saved_answers_and_scientific_evidence() -> None:
     conversation = {"id": IDENTITY, "turns": [{
         "question": f"how to make {TARGET}?",

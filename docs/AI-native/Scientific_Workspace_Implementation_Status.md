@@ -13,6 +13,47 @@ Neither introduces new chemistry rules or a parallel recommendation engine.
 
 See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
 
+## Research environment milestone (2026-09-26)
+
+The existing Codex harness now has explicit `research`, `quick` and `inherit`
+profiles. Browser scientific chat defaults to high reasoning/live native search
+with a finite 1800-second per-attempt deadline; the selected model is inherited
+unless explicitly overridden. Requested configuration and observed tool events
+are stored separately. Local capability diagnostics check the interpreter, RDKit,
+PDF parser and input-file presence without claiming provider access or corpus validity.
+Changed adapter settings start a new agent thread over saved investigation history;
+inherited external configuration remains unresolved.
+
+New application-layer literature methods save bounded HTML/text/PDF snapshots,
+capture externally obtained passages with honest provenance, inspect bounded text
+with line/page locations, and record exact excerpts. New answer citations check
+captured URL identity and require actual text. Failed retrieval remains a citable
+access limitation. Source text membership is not semantic or chemical verification.
+PDF parser version is recorded; scanned pages require an external OCR workflow.
+
+The [investigation guide](Chemistry_Investigation_Guide.md) emphasizes exact target
+identity, source-to-target stereochemistry/form/protecting-group comparisons, whole
+experimental conditions and challenge of the weakest claim. A structured optional
+author self-review is bound to the exact final draft and current user turn. Missing
+checks remain explicit; no hidden LLM reviewer or independent-review label is added.
+The final-answer schema remains `scientific_answer.v2`.
+
+Scientific call summaries now expose relevant evidence/gates and bounded previews
+with truncation indicators. Full results are unchanged. Per-call timing separates
+baseline/evidence checks, operation execution and serialization, and records result
+size. No speculative cache or alternate chemistry engine has been introduced.
+
+The opt-in [live research smoke script](../../examples/ai_native/research_smoke.py)
+exercises native search, source capture, graph analysis and self-review in an
+isolated conversation. [Development review cases](../../examples/ai_native/research_development_cases.json)
+cover stereo ambiguity, reported versus proposed conditions, unsupported chemistry,
+source access and conflicting precedents. These are development cases and integration
+checks, not an untouched evaluation or evidence of superiority over ChatGPT.
+
+Still outside this milestone: subscription literature connectors, OCR/molecular
+image extraction, automatic source-to-target chemical fact-checking, confirmed vendor
+stock, measured chemistry-quality improvement, and independent chemist review.
+
 ## What is implemented
 
 - Baseline recording: Git revision and worktree status, code/definition hashes,
@@ -34,8 +75,13 @@ See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
   identity, asynchronous progress, cancellation, runtime deadline, and linked
   evidence inspection. Runtime prompts and event logs are saved per turn.
 - Concise chat interface: responsive history sidebar, bottom composer, inline
-  state/elapsed time and expandable tool activity. Structures, scientific details,
-  sources, and uncertainty are collapsed beneath the answer. Active work remains
+  state/elapsed time and expandable tool activity. Named per-step SVG reaction
+  schemes are visible beneath the answer, including attributed conditions and
+  yields. Molecule galleries, step evidence, sources, and uncertainty are expandable.
+  Alternative routes stay separate; dependency diagrams are optional details.
+  Readable citations link to known original sources or conversation-scoped saved
+  evidence, while captured excerpts and immutable artifact IDs are preserved.
+  Active work remains
   visible and cancellable from another chat; drafts survive navigation in the page.
   Progress reports actual recorded events; answers appear after final validation.
   Dark and light themes are available from the header, with a saved browser
@@ -391,8 +437,39 @@ install old dependencies or restore historical source files automatically.
 
 ## Validation
 
+After the research-environment update: **1,724 passed, 2 pre-existing registry
+failures** in 405.28 seconds. All 12 JavaScript controller tests passed, as did
+Ruff and diff checks. New regressions cover profile overrides/runtime observations,
+bounded operation summaries, public-source retrieval failures, exact excerpts,
+real PDF parsing/page locations, source URL attribution, stale self-reviews and
+runtime-setting changes across turns. The two registry failures remain
+`test_validate_reports_current_registry_state` and
+`test_registry_audit_reconciles_all_rows`; no registry identities were changed.
+
+The updated launcher was started on port **8013**; `/scientific` returned HTTP 200,
+and the configuration endpoint reported the research settings and all five
+configured artifact files present. This is an API/startup check, not browser
+visual verification or a corpus-integrity audit.
+
+The first real research trial (`5ccb924437264ddd917420e217e6a5b7`) completed in
+193.3 seconds with an observed native search, recorded target graph audit and
+exact-draft self-review. Its direct patent download failed with Windows socket
+access denied inside the worker; the final answer preserved this limitation.
+A separate outside-worker probe also timed out reaching the patent host. These
+results distinguish native browser/search access from direct Python networking.
+Reports and complete traces are local under `results/ai_native/research_smoke/`.
+
+The browser-fallback trial (`818120562e044a59b7fc63f8c6867fea`) completed in
+250.0 seconds with native search and a native source open, a recorded molecule
+audit, an honest `agent_supplied_excerpt` capture, and a self-review matched to
+the final draft. It retained the failed HTTP download. The native open returned
+only lines 0–242 of the patent, without Example LXVIII or another readable
+experiment; the answer disclosed this and did not invent an experimental excerpt.
+Thus live source capture is demonstrated, while retrieval of the specific
+experiment and a chemically supported synthesis remain unverified by this smoke.
+
 Workspace, route-replay, conversation, structured-answer and condition-investigation
-tests are included in the full suite. The 15 conversation tests cover real recorded chemistry behind a model test double,
+tests are included in the full suite. The conversation tests cover real recorded chemistry behind a model test double,
 follow-up recovery, invented citations, cancellation, baseline drift, API origin/token
 boundaries, invalid IDs, unowned workers, Windows atomic-write retry, and actual
 subprocess success/failure/missing-output/deadline handling, bounded answer correction,

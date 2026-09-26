@@ -1,5 +1,11 @@
 """Standalone molecule and reaction visualization utilities."""
 
+from .annotated_scheme import (
+    SchemeAnnotation,
+    SchemeMolecule,
+    load_annotated_scheme_style,
+    render_annotated_scheme_svg,
+)
 from .rendering import (
     DEFAULT_MOLECULE_SIZE,
     DEFAULT_REACTION_SIZE,
@@ -26,6 +32,10 @@ from .reaction_display_graphic import (
 )
 
 __all__ = [
+    "SchemeAnnotation",
+    "SchemeMolecule",
+    "load_annotated_scheme_style",
+    "render_annotated_scheme_svg",
     "DEFAULT_MOLECULE_SIZE",
     "DEFAULT_REACTION_SIZE",
     "RenderStyle",

@@ -162,12 +162,29 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
     cited.update(re.findall(r"sha256:[0-9a-f]{64}", answer.model_dump_json()))
     for reference in cited:
         store.read_artifact(reference)
-        if kinds.get(reference) not in {"call", "derived_file", "replay", "custom_execution"}:
+        if kinds.get(reference) not in {
+            "call", "derived_file", "replay", "custom_execution", "literature_source", "literature_excerpt",
+        }:
             raise ValueError("Answer must cite scientific evidence, not agent assertions")
     sources = {source.id: source for source in answer.sources}
     for source in answer.sources:
-        if source.kind == "external_source" and kinds[source.artifact_ref] != "derived_file":
-            raise ValueError("External sources require a saved source excerpt attachment")
+        if source.kind != "external_source":
+            continue
+        kind = kinds[source.artifact_ref]
+        if kind not in {"derived_file", "literature_source", "literature_excerpt"}:
+            raise ValueError("External sources require a saved source excerpt attachment or literature snapshot")
+        if kind in {"literature_source", "literature_excerpt"}:
+            value = store.read_artifact(source.artifact_ref)
+            text = value.get("text") if kind == "literature_excerpt" else value.get("extraction", {}).get("text")
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError("External sources require captured text; failed retrieval is not a source passage")
+            def location(url: str) -> str:
+                parsed = urlsplit(url)
+                return parsed._replace(fragment="", path=parsed.path or "/").geturl()
+
+            recorded_urls = {location(url) for url in (value.get("source_url"), value.get("final_url")) if url}
+            if location(source.url or "") not in recorded_urls:
+                raise ValueError("External source URL does not match its captured source")
     for item in answer.attributed_objects():
         if item.basis != "computed":
             continue

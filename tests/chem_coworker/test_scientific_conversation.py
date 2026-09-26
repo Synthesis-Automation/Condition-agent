@@ -104,6 +104,37 @@ def test_invented_citation_is_a_failed_turn_not_a_supported_answer(service: Conv
     assert any(event.kind == "call" for event in ScientificWorkspace(service.root / identity).store.events())
 
 
+def test_explicit_runtime_setting_change_starts_new_thread_with_saved_history(service: ConversationService) -> None:
+    identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
+    first = finish(service, identity)
+    assert first["runtime_requested"]["model"] == "none"
+    assert first["answer"]["self_review_status"] == "not_recorded_for_final_draft"
+    runtime = RecordedRuntime()
+    runtime.describe = lambda: {"runtime": "test_double", "version": "1", "model": "changed"}
+    service.runtime = runtime
+    service.submit("Continue with the saved scientific evidence", identity)
+    second = finish(service, identity)
+    assert second["status"] == "completed", second
+    assert second["thread_resume"] == "configuration_changed_new_thread"
+    assert runtime.threads == [None]
+    assert len(ScientificWorkspace(service.root / identity).store.events()) >= 6
+    assert (service.root / identity / "turns" / second["id"] / "capabilities.json").is_file()
+
+
+def test_call_summary_preserves_result_and_measures_execution_phases(service: ConversationService) -> None:
+    identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
+    finish(service, identity)
+    workspace = ScientificWorkspace(service.root / identity)
+    event = next(event for event in workspace.store.events() if event.kind == "call")
+    payload = workspace.store.read_artifact(event.artifact_ref)
+    summary = workspace.call_summary(event)
+    assert payload["result_bytes"] > 0
+    assert set(payload["timings"]) == {"baseline_and_evidence_seconds", "operation_seconds", "serialization_seconds"}
+    assert all(value >= 0 for value in payload["timings"].values())
+    assert summary["event"]["artifact_ref"] == event.artifact_ref
+    assert workspace.store.read_artifact(event.artifact_ref) == payload
+
+
 def test_one_repair_uses_same_thread_and_preserves_rejected_answer(service: ConversationService) -> None:
     class RepairRuntime(RecordedRuntime):
         def run(self, **kwargs):

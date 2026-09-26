@@ -14,7 +14,10 @@ from markdown_it import MarkdownIt
 from markdown_it.token import Token
 from rdkit import rdBase
 
-from visualization import render_molecule_image_bytes, render_reaction_image_bytes
+from visualization import (
+    SchemeAnnotation, SchemeMolecule, render_annotated_scheme_svg,
+    render_molecule_image_bytes,
+)
 
 from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer
 
@@ -64,7 +67,10 @@ def _candidates(tokens: list[Token]) -> Iterable[str]:
 
 
 @lru_cache(maxsize=64)
-def present_message(text: str, conversation_id: str) -> dict[str, Any]:
+def present_message(
+    text: str, conversation_id: str,
+    references: tuple[tuple[str, str, str], ...] = (),
+) -> dict[str, Any]:
     """Render untrusted Markdown safely and depict explicit parseable SMILES.
 
     This is a disposable view, not scientific evidence. Original messages and
@@ -76,12 +82,70 @@ def present_message(text: str, conversation_id: str) -> dict[str, Any]:
     # Generated answers cannot cause external image loads or inject raw HTML.
     markdown.disable("image")
     tokens = markdown.parse(text)
+    citations = {ref: (title, url) for ref, title, url in references}
+
+    def citation(reference: str) -> tuple[str, str]:
+        if reference not in citations:
+            citations[reference] = (
+                f"Saved evidence {len(citations) + 1}",
+                f"/api/v1/scientific/conversations/{conversation_id}/artifacts/{reference}",
+            )
+        return citations[reference]
+
+    # Hashes in prose or inline code become readable links. Keep fenced code
+    # literal and never nest generated links inside existing Markdown links.
+    for token in tokens:
+        if not token.children:
+            continue
+        children = []
+        current_reference = None
+        in_link = False
+        for child in token.children:
+            if child.type == "link_open":
+                in_link = True
+                href = child.attrGet("href") or ""
+                current_reference = href if _REFERENCE.fullmatch(href) else None
+            elif child.type == "link_close":
+                in_link = False
+                current_reference = None
+            if child.type not in {"text", "code_inline"}:
+                children.append(child)
+                continue
+            if in_link:
+                if current_reference and _REFERENCE.fullmatch(child.content):
+                    child.type, child.tag = "text", ""
+                    child.content = citation(current_reference)[0]
+                children.append(child)
+                continue
+            cursor = 0
+            for match in _REFERENCE.finditer(child.content):
+                if match.start() > cursor:
+                    fragment = Token(child.type, child.tag, 0)
+                    fragment.content = child.content[cursor:match.start()]
+                    children.append(fragment)
+                title, _ = citation(match.group())
+                opening = Token("link_open", "a", 1)
+                opening.attrSet("href", match.group())
+                label = Token("text", "", 0)
+                label.content = title
+                children.extend((opening, label, Token("link_close", "a", -1)))
+                cursor = match.end()
+            if cursor == 0:
+                children.append(child)
+            elif cursor < len(child.content):
+                fragment = Token(child.type, child.tag, 0)
+                fragment.content = child.content[cursor:]
+                children.append(fragment)
+        token.children = children
     for token in _walk(tokens):
         if token.type != "link_open":
             continue
         href = token.attrGet("href") or ""
         if _REFERENCE.fullmatch(href):
-            token.attrSet("href", f"/api/v1/scientific/conversations/{conversation_id}/artifacts/{href}")
+            _, url = citation(href)
+            # Only validated source web URLs or our own scoped artifact path.
+            artifact = f"/api/v1/scientific/conversations/{conversation_id}/artifacts/{href}"
+            token.attrSet("href", url if urlsplit(url).scheme.lower() in {"http", "https"} else artifact)
         elif urlsplit(href).scheme.lower() not in {"https", "http"}:
             token.attrSet("href", "#")
         token.attrSet("target", "_blank")
@@ -113,11 +177,16 @@ def present_conversation(conversation: dict[str, Any]) -> dict[str, Any]:
     for turn in conversation["turns"]:
         view = {**turn, "question_presentation": present_message(turn["question"], identity)}
         if turn.get("answer"):
-            view["answer_presentation"] = present_message(turn["answer"]["answer_markdown"], identity)
+            references = ()
             if turn["answer"].get("schema_version") == "scientific_answer.v2":
                 view["structured_presentation"] = _structured_view(
                     json.dumps(turn["answer"], sort_keys=True), identity,
                 )
+                references = tuple(
+                    (source["artifact_ref"], source["title"], source["url"] or source["artifact_url"])
+                    for source in view["structured_presentation"].get("sources", [])
+                )
+            view["answer_presentation"] = present_message(turn["answer"]["answer_markdown"], identity, references)
         turns.append(view)
     return {**conversation, "turns": turns}
 
@@ -174,7 +243,15 @@ def _structured_view(payload: str, identity: str) -> dict[str, Any]:
         )
         try:
             with rdBase.BlockLogs():
-                step["image_url"] = _svg_url(render_reaction_image_bytes(step["reaction_smiles"], size=(1000, 260), image_format="svg"))
+                svg = render_annotated_scheme_svg(
+                    tuple(SchemeMolecule(molecules[key]["name"], molecules[key]["smiles"]) for key in step["reactant_ids"]),
+                    tuple(SchemeMolecule(molecules[key]["name"], molecules[key]["smiles"]) for key in step["product_ids"]),
+                    title=step["title"], basis=step["basis"],
+                    conditions=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["conditions"]),
+                    yield_info=SchemeAnnotation(step["yield_info"]["text"], step["yield_info"]["basis"]) if step["yield_info"] else None,
+                )
+                step["image_url"] = _svg_url(svg)
+                step["scheme_width"] = float(ET.fromstring(svg).get("width"))
             step["drawing_status"] = "drawn"
         except (ValueError, RuntimeError):
             step["drawing_status"] = "invalid_or_unsupported_notation"
