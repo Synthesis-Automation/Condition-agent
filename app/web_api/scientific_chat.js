@@ -38,7 +38,8 @@ function appendStructures(container,presentation){
   presentation.structures.forEach((structure,index)=>{
     const figure=element('figure','','structure');const image=element('img');image.src=structure.image_url;image.alt='Molecular structure: '+structure.smiles;image.loading='lazy';
     const caption=element('figcaption','Structure '+(index+1));caption.append(element('code',structure.smiles));
-    const download=element('a','Download SVG');download.href=structure.image_url;download.download='structure-'+(index+1)+'.svg';caption.append(download);figure.append(image,caption);gallery.append(figure);
+    const scroll=element('div','','molecule-scroll');scroll.tabIndex=0;scroll.setAttribute('role','region');scroll.setAttribute('aria-label','Molecular structure; scroll for larger drawings');scroll.append(image);
+    const download=element('a','Download SVG');download.href=structure.image_url;download.download='structure-'+(index+1)+'.svg';caption.append(download);figure.append(scroll,caption);gallery.append(figure);
   });container.append(gallery);
 }
 const basisLabels = {reported:'Reported', computed:'Computed', proposed:'Proposed', unknown:'Unknown', input:'User input'};
@@ -80,7 +81,7 @@ function showStructured(view, key = 'science') {
       const scroll = element('div', '', 'scheme-scroll');
       scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', 'Reaction scheme: ' + step.title);
       const image = element('img', '', 'reaction-scheme'); image.src = step.image_url;
-      if (step.scheme_width) image.style.minWidth = Math.max(760, Math.round(step.scheme_width * 0.6)) + 'px';
+      if (step.scheme_width) image.style.width = step.scheme_width + 'px';
       image.alt = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ') + '. Conditions and yield in step details.';
       image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
       const actions = element('figcaption', '', 'scheme-actions');
@@ -222,9 +223,7 @@ function answerCard(turn) {
     const elapsed = element('span', '', 'elapsed'); elapsed.id = 'elapsed';
     const spinner = element('span', '', 'spinner'); spinner.setAttribute('aria-hidden', 'true');
     line.append(spinner, label, elapsed);
-    const detail = element('details'); detail.dataset.key = turn.id + ':activity';
-    detail.append(element('summary', 'View activity'));
-    const events = element('ol', '', 'activity-list'); events.id = 'activity-list'; detail.append(events);
+    const detail = activityPanel(turn, true);
     progress.append(line, element('p', 'The answer will appear here when it is ready.', 'progress-caption'), detail);
     card.append(progress);
   } else {
@@ -233,6 +232,7 @@ function answerCard(turn) {
       'This investigation could not finish.', stopped ? 'muted' : 'error-message'));
     if (turn.error && !stopped) card.append(disclosure('Show details', turn.id + ':error', element('p', turn.error.message)));
   }
+  if (!runningStates.has(turn.status) && turn.progress?.length) card.append(activityPanel(turn));
   return card;
 }
 
@@ -250,6 +250,8 @@ function renderConversation(data) {
     const follow = firstLoad || nearBottom();
     const expanded = new Map(Array.from($('messages').querySelectorAll('details'))
       .filter(node => node.dataset.key).map(node => [node.dataset.key, Boolean(node.open)]));
+    const activityPositions = new Map(Array.from($('messages').querySelectorAll('ol'))
+      .filter(node => node.dataset.turn).map(node => [node.dataset.turn, node.scrollTop]));
     $('messages').replaceChildren();
     for (const turn of data.turns) {
       const question = element('div', '', 'user');
@@ -264,6 +266,9 @@ function renderConversation(data) {
     $('messages').querySelectorAll('details').forEach(node => {
       if (expanded.has(node.dataset.key)) node.open = expanded.get(node.dataset.key);
     });
+    $('messages').querySelectorAll('ol').forEach(node => {
+      if (activityPositions.has(node.dataset.turn)) node.scrollTop = activityPositions.get(node.dataset.turn);
+    });
     displayed = signature;
     if (follow) requestAnimationFrame(toBottom);
   }
@@ -277,11 +282,42 @@ function elapsedText(start) {
   return seconds >= 60 ? Math.floor(seconds / 60) + 'm ' + seconds % 60 + 's' : seconds + 's';
 }
 function activityLabel(event) {
-  const names = {command_execution: 'Analysis tool', web_search: 'Web search', mcp_tool_call: 'Scientific tool',
+  const names = {command_execution: 'Command', web_search: 'Web search', mcp_tool_call: 'Scientific tool',
     file_change: 'Saving investigation files', todo_list: 'Updating the plan'};
   const label = names[event.kind] || 'Agent activity';
-  return label + (['completed', 'item.completed'].includes(event.status) ? ' · finished' :
-    ['failed', 'item.failed'].includes(event.status) ? ' · failed' : ' · running');
+  const failed = ['failed', 'item.failed'].includes(event.status) || (Number.isInteger(event.exit_code) && event.exit_code !== 0);
+  const status = failed ? 'failed' : ['completed', 'item.completed'].includes(event.status) ? 'finished' :
+    ['cancelled', 'canceled'].includes(event.status) ? 'stopped' : 'running';
+  return label + ' · ' + status + (Number.isInteger(event.exit_code) ? ' · exit ' + event.exit_code : '');
+}
+function activityPanel(turn, live = false) {
+  const detail = element('details'); detail.dataset.key = turn.id + ':activity';
+  detail.append(element('summary', 'View activity'));
+  const events = element('ol', '', 'activity-list');
+  events.dataset.turn = turn.id;
+  if (live) events.id = 'activity-list';
+  events.tabIndex = 0; events.setAttribute('aria-label', 'Investigation activity history');
+  detail.append(events); renderActivity(events, turn.progress || []);
+  return detail;
+}
+function renderActivity(events, progress) {
+  const signature = JSON.stringify(progress);
+  if (events.dataset.signature === signature) return;
+  const position = events.scrollTop;
+  // Follow new entries only when the reader was already at the bottom.
+  const follow = events.clientHeight > 0 && events.scrollHeight - position - events.clientHeight < 24;
+  events.replaceChildren();
+  for (const event of progress) {
+    const row = element('li'); const at = new Date(event.at);
+    const content = element('div', '', 'activity-content');
+    content.append(element('span', activityLabel(event), 'activity-status'));
+    if (event.detail) content.append(element('div', event.detail, 'activity-detail'));
+    row.append(element('time', Number.isNaN(at.getTime()) ? '' : at.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})), content);
+    events.append(row);
+  }
+  if (!events.children.length) events.append(element('li', 'Waiting for the first activity update…'));
+  events.dataset.signature = signature;
+  events.scrollTop = follow ? events.scrollHeight : position;
 }
 function updateProgress() {
   const turn = active?.conversation_id === identity ? active : conversation?.turns.at(-1);
@@ -292,17 +328,7 @@ function updateProgress() {
       turn.repair_attempts ? 'Refining the answer…' : 'Investigating…';
     $('elapsed').textContent = elapsedText(turn.created_at);
     const events = $('activity-list');
-    const signature = JSON.stringify(turn.progress || []);
-    if (events.dataset.signature !== signature) {
-      events.replaceChildren();
-      for (const event of (turn.progress || []).slice(-8)) {
-        const row = element('li'); const at = new Date(event.at);
-        row.append(element('time', Number.isNaN(at.getTime()) ? '' : at.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})),
-          element('span', activityLabel(event))); events.append(row);
-      }
-      if (!events.children.length) events.append(element('li', 'Waiting for the first activity update…'));
-      events.dataset.signature = signature;
-    }
+    if (events) renderActivity(events, turn.progress || []);
   }
   if (active) $('active-text').textContent = (stopping ? 'Stopping investigation' : 'An investigation is running') + ' · ' + elapsedText(active.created_at);
 }

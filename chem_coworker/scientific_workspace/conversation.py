@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from html import unescape
 import json
 import os
 from pathlib import Path
@@ -24,6 +25,35 @@ from .workspace import ScientificWorkspace
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _activity_detail(item: Mapping[str, Any]) -> str:
+    """Summarize an observed tool action without including result payloads."""
+    kind = item.get("type")
+    detail = ""
+    if kind == "command_execution":
+        detail = item.get("command", "")
+    elif kind == "web_search":
+        detail = item.get("query", "")
+    elif kind == "mcp_tool_call":
+        detail = " / ".join(str(item[key]) for key in ("server", "tool") if item.get(key))
+    elif kind == "file_change":
+        changes = item.get("changes", [])
+        detail = "; ".join(
+            f"{change.get('kind', 'update')}: {change['path']}"
+            for change in changes if isinstance(change, dict) and change.get("path")
+        )
+    elif kind == "todo_list":
+        items = item.get("items", [])
+        detail = "; ".join(
+            entry["text"] for entry in items
+            if isinstance(entry, dict) and isinstance(entry.get("text"), str)
+            and not entry.get("completed")
+        ) or "Plan updated"
+    if not isinstance(detail, str):
+        return ""
+    detail = " ".join(unescape(detail).split())
+    return detail if len(detail) <= 600 else detail[:597] + "…"
 
 
 def _identifier(value: str) -> str:
@@ -315,13 +345,14 @@ class ConversationService:
             if event.get("type") == "thread.started":
                 state["thread_id"] = event.get("thread_id")
             item = event.get("item", {})
-            if event.get("type") in {"item.started", "item.completed"}:
+            if isinstance(item, dict) and event.get("type") in {"item.started", "item.completed", "item.failed"}:
                 kind = item.get("type", "activity")
                 if kind not in {"reasoning", "agent_message"}:
-                    state["progress"] = (state["progress"] + [{
+                    state["progress"].append({
                         "kind": kind, "status": item.get("status", event["type"]),
-                        "at": _now(),
-                    }])[-30:]
+                        "at": _now(), "detail": _activity_detail(item),
+                        "item_id": item.get("id"), "exit_code": item.get("exit_code"),
+                    })
             save()
 
         try:

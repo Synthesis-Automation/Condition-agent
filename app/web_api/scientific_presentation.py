@@ -155,7 +155,10 @@ def present_message(
         try:
             # Invalid candidates remain in the text, without noisy parser logs.
             with rdBase.BlockLogs():
-                svg = render_molecule_image_bytes(smiles, size=(440, 260), image_format="svg")
+                svg = render_molecule_image_bytes(
+                    smiles, size=(260, 180), image_format="svg",
+                    render_preset="web_consistent", expand_canvas=True,
+                )
         except (ValueError, RuntimeError):
             continue
         drawings.append({
@@ -231,7 +234,10 @@ def _structured_view(payload: str, identity: str) -> dict[str, Any]:
     for molecule in molecules.values():
         try:
             with rdBase.BlockLogs():
-                molecule["image_url"] = _svg_url(render_molecule_image_bytes(molecule["smiles"], size=(440, 260), image_format="svg"))
+                molecule["image_url"] = _svg_url(render_molecule_image_bytes(
+                    molecule["smiles"], size=(260, 180), image_format="svg",
+                    render_preset="web_consistent", expand_canvas=True,
+                ))
             molecule["drawing_status"] = "drawn"
         except (ValueError, RuntimeError):
             molecule["drawing_status"] = "invalid_or_unsupported_notation"

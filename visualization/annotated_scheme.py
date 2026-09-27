@@ -83,6 +83,7 @@ def render_annotated_scheme_svg(
 Retrosynthetic plans are displayed in synthetic direction. No structures,
 conditions, yields, or ordering are inferred. Long annotations have an explicit
 overflow notice and remain complete in the SVG description and answer details.
+Molecule panel dimensions are minimums; larger graphs grow at the preset scale.
 """
     if not reactants or not products:
         raise ValueError("A scheme requires explicit reactants and products")
@@ -108,11 +109,18 @@ overflow notice and remain complete in the SVG description and answer details.
     if len(yield_lines) > cap:
         yield_lines = yield_lines[:cap - 1] + ["More yield details in step details"]
     names = [wrap(item.name, style["name_characters"]) for item in (*reactants, *products)]
-    center_y = max(140, 72 + len(condition_lines) * line)
+    drawings = [ET.fromstring(render_molecule_image_bytes(
+        item.smiles, size=(mw, mh), image_format="svg",
+        render_preset=style["molecule_preset"], expand_canvas=True,
+    )) for item in (*reactants, *products)]
+    widths = [float(drawing.get("width").removesuffix("px")) for drawing in drawings]
+    heights = [float(drawing.get("height").removesuffix("px")) for drawing in drawings]
+    mh = max(heights)
+    center_y = max(pad + mh / 2, 140, 72 + len(condition_lines) * line)
     molecule_top = center_y - mh / 2
     bottom = max(center_y + 38 + len(yield_lines) * line,
                  molecule_top + mh + max(map(len, names)) * line + 18)
-    width = pad * 2 + (len(reactants) + len(products)) * (mw + gap) + aw
+    width = pad * 2 + sum(widths) + len(widths) * gap + aw
     height = bottom + 62
     root = ET.Element("svg", {
         "xmlns": "http://www.w3.org/2000/svg", "width": str(width), "height": str(height),
@@ -137,13 +145,12 @@ overflow notice and remain complete in the SVG description and answer details.
         }).text = text
 
     def side(items: tuple[SchemeMolecule, ...], start: float, offset: int) -> None:
+        x = start
         for index, item in enumerate(items):
-            x = start + index * (mw + gap)
-            drawing = ET.fromstring(render_molecule_image_bytes(
-                item.smiles, size=(mw, mh), image_format="svg", render_preset=style["molecule_preset"],
-            ))
+            drawing = drawings[offset + index]
+            molecule_width = widths[offset + index]
             group = ET.SubElement(root, "g", {
-                "transform": f"translate({x},{molecule_top})", "data-role": "molecule",
+                "transform": f"translate({x},{center_y - heights[offset + index] / 2})", "data-role": "molecule",
             })
             # Embed vector paths rather than nested SVG viewports; this also
             # works with SVG viewers that do not implement nested viewports.
@@ -153,12 +160,13 @@ overflow notice and remain complete in the SVG description and answer details.
                         node.tag = node.tag.split("}", 1)[1]
                 group.append(child)
             for row, text in enumerate(names[offset + index]):
-                label(x + mw / 2, molecule_top + mh + 20 + row * line, text)
+                label(x + molecule_width / 2, molecule_top + mh + 20 + row * line, text)
             if index < len(items) - 1:
-                label(x + mw + gap / 2, center_y + 8, "+", size=28)
+                label(x + molecule_width + gap / 2, center_y + 8, "+", size=28)
+            x += molecule_width + gap
 
     side(reactants, pad, 0)
-    arrow_x = pad + len(reactants) * (mw + gap)
+    arrow_x = pad + sum(widths[:len(reactants)]) + len(reactants) * gap
     side(products, arrow_x + aw + gap, len(reactants))
     for row, text in enumerate(condition_lines):
         label(arrow_x + aw / 2, center_y - 24 - (len(condition_lines) - row - 1) * line, text)

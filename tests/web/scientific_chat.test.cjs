@@ -70,6 +70,57 @@ test('Stop remains available in another chat and cancels the actual owner', asyn
   assert.equal(ids.question.value, 'A follow-up draft');
 });
 
+test('activity retains older entries and preserves reading position as updates arrive', () => {
+  const {run, context} = harness();
+  context.events = new Node('ol');
+  context.progress = Array.from({length: 45}, (_, index) => ({
+    kind:'command_execution', status:'completed', at:'2026-09-27T13:16:59Z',
+    detail:'python analysis_' + index + '.py', exit_code:0,
+  }));
+  run('renderActivity(events, progress)');
+  assert.equal(context.events.children.length, 45);
+  assert.equal(context.events.children[0].children[1].children[1].textContent, 'python analysis_0.py');
+  context.events.scrollHeight = 2200; context.events.clientHeight = 220;
+  context.events.scrollTop = 80;
+  context.progress.push({kind:'web_search', status:'item.started', detail:'Suzuki reaction conditions'});
+  run('renderActivity(events, progress)');
+  assert.equal(context.events.children.length, 46);
+  assert.equal(context.events.scrollTop, 80);
+  const firstRow = context.events.children[0];
+  run('renderActivity(events, progress)');
+  assert.equal(context.events.children[0], firstRow, 'unchanged polling must not rebuild the list');
+  context.events.scrollTop = 1980;
+  context.progress.push({kind:'web_search', status:'completed'});
+  run('renderActivity(events, progress)');
+  assert.equal(context.events.scrollTop, context.events.scrollHeight);
+});
+
+test('activity exposes command failure and retains a completed turn history as plain text', () => {
+  const {run} = harness();
+  const card = run(`answerCard({id:'done',status:'completed',answer:{answer_markdown:'Result'},
+    progress:[{kind:'command_execution',status:'completed',exit_code:1,detail:'<script>alert(1)</script>'}]})`);
+  const panel = card.querySelectorAll('details')[0];
+  assert.equal(panel.dataset.key, 'done:activity');
+  const events = panel.children[1];
+  assert.equal(events.tabIndex, 0);
+  assert.equal(events.children[0].children[1].children[0].textContent, 'Command · failed · exit 1');
+  assert.equal(events.children[0].children[1].children[1].textContent, '<script>alert(1)</script>');
+  assert.equal(card.querySelectorAll('script').length, 0);
+});
+
+test('finishing a turn preserves the expanded activity history and its scroll position', () => {
+  const {run, ids} = harness();
+  run(`identity='chat'; renderConversation({title:'Activity',turns:[{id:'turn',status:'running',
+    question:'Analyze',progress:[{kind:'web_search',status:'completed',detail:'Reaction conditions'}]}]})`);
+  const panel = ids.messages.querySelectorAll('details')[0];
+  panel.open = true; panel.children[1].scrollTop = 90;
+  run(`renderConversation({title:'Activity',turns:[{id:'turn',status:'completed',question:'Analyze',
+    answer:{answer_markdown:'Done'},progress:[{kind:'web_search',status:'completed',detail:'Reaction conditions'}]}]})`);
+  const savedPanel = ids.messages.querySelectorAll('details')[0];
+  assert.equal(savedPanel.open, true);
+  assert.equal(savedPanel.children[1].scrollTop, 90);
+});
+
 test('a rejected cancellation restores Stop and displays the error', async () => {
   const {ids, run, respond} = harness();
   run("loaded=true; active={conversation_id:'working'};");
@@ -127,6 +178,7 @@ test('saved answer is primary; scientific details and sources start collapsed', 
   assert.equal(card.querySelectorAll('details').length, 3);
   assert.equal(card.querySelectorAll('details[open]').length, 0);
   assert.ok(card.descendants().some(node => node.tag === 'img' && node.alt.includes('CCO')));
+  assert.ok(card.descendants().some(node => node.className === 'molecule-scroll' && node.tabIndex === 0));
   assert.ok(card.descendants().some(node => node.tag === 'a' && node.textContent === 'Download SVG'));
 });
 
@@ -151,6 +203,7 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(card.querySelectorAll('details[open]').length, 0);
   const images = card.querySelectorAll('img');
   assert.equal(images.length, 1);
+  assert.equal(images[0].style.width, '980px', 'keep the SVG scale independent of container width');
   assert.match(images[0].alt, /Reactant → Product/);
   assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent' && node.textContent === 'Patent Example 2'));
   assert.ok(card.querySelectorAll('a').some(node => node.href === '/saved/excerpt' && node.textContent === 'Saved excerpt'));

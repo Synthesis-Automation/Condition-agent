@@ -16,7 +16,7 @@ from app.web_api.main import create_app
 from chem_coworker.scientific_workspace import ScientificWorkspace
 from chem_coworker.scientific_workspace.agent_runtime import AgentResult, AgentStopped, CodexRuntime
 from chem_coworker.scientific_workspace.baseline import code_manifest, environment_versions
-from chem_coworker.scientific_workspace.conversation import ConversationService
+from chem_coworker.scientific_workspace.conversation import ConversationService, _activity_detail
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -102,6 +102,43 @@ def test_invented_citation_is_a_failed_turn_not_a_supported_answer(service: Conv
     assert "answer" not in turn
     assert len(service.runtime.threads) == 2
     assert any(event.kind == "call" for event in ScientificWorkspace(service.root / identity).store.events())
+
+
+def test_activity_history_survives_beyond_thirty_events(service: ConversationService) -> None:
+    class ActivityRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            for index in range(40):
+                kwargs["on_event"]({"type": "item.completed", "item": {
+                    "id": str(index), "type": "command_execution", "status": "completed",
+                    "command": f"python&#x20;analysis_{index}.py", "exit_code": 0,
+                    "aggregated_output": "Output must not enter activity summaries",
+                }})
+            kwargs["on_event"]({"type": "item.completed", "item": {
+                "type": "reasoning", "text": "Not an activity entry",
+            }})
+            return super().run(**kwargs)
+
+    service.runtime = ActivityRuntime()
+    identity = service.submit("Analyze a reaction")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "completed", turn
+    progress = service.get(identity)["turns"][0]["progress"]
+    assert len(progress) == 40
+    assert progress[0]["detail"] == "python analysis_0.py"
+    assert progress[-1]["item_id"] == "39"
+    assert progress[-1]["exit_code"] == 0
+    assert all("aggregated_output" not in event for event in progress)
+
+
+@pytest.mark.parametrize(("item", "expected"), [
+    ({"type": "web_search", "query": "coupling &amp; yield"}, "coupling & yield"),
+    ({"type": "mcp_tool_call", "server": "science", "tool": "analyze_reaction"}, "science / analyze_reaction"),
+    ({"type": "file_change", "changes": [{"kind": "add", "path": "analysis.py"}]}, "add: analysis.py"),
+    ({"type": "todo_list", "items": [{"text": "Check evidence", "completed": False}]}, "Check evidence"),
+    ({"type": "command_execution", "command": None}, ""),
+])
+def test_activity_details_describe_observed_action(item: dict[str, Any], expected: str) -> None:
+    assert _activity_detail(item) == expected
 
 
 def test_explicit_runtime_setting_change_starts_new_thread_with_saved_history(service: ConversationService) -> None:

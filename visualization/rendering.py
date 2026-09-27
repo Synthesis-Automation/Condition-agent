@@ -301,6 +301,7 @@ def apply_render_preset(
     target_bond_length = preset.get("target_bond_length_pixels")
     if target_bond_length is not None and hasattr(options, "fixedBondLength"):
         options.fixedBondLength = float(target_bond_length) / mean_bond_length
+        options.scalingFactor = float(target_bond_length) / mean_bond_length
     if hasattr(options, "drawMolsSameScale"):
         options.drawMolsSameScale = bool(
             preset.get("draw_molecules_same_scale", True)
@@ -349,6 +350,7 @@ def _flexible_molecule_svg(
     molecule: Any,
     *,
     render_preset: str,
+    legend: str = "",
 ) -> Tuple[float, float, str]:
     """Render one molecule at its preset bond scale on a minimal SVG canvas."""
 
@@ -358,7 +360,7 @@ def _flexible_molecule_svg(
         render_preset,
         molecules=(molecule,),
     )
-    drawer.DrawMolecule(molecule)
+    drawer.DrawMolecule(molecule, legend=legend)
     drawer.FinishDrawing()
     drawing = str(drawer.GetDrawingText())
     root_start = drawing.find("<svg")
@@ -424,8 +426,12 @@ def _consistent_reaction_svg(
         + arrow_width
         + product_width
     )
-    canvas_height = float(max(height, 100))
-    arrow_y = canvas_height * (0.64 if rendered_agents else 0.5)
+    molecule_height = max(value[1] for value in (*rendered_reactants, *rendered_products))
+    agent_height = max((value[1] for value in rendered_agents), default=0.0)
+    canvas_height = max(float(height), 2 * outer_padding + molecule_height
+                        + (agent_height + 24 if rendered_agents else 0))
+    arrow_y = (canvas_height - outer_padding - molecule_height / 2
+               if rendered_agents else canvas_height / 2)
 
     groups = [
         f"<rect width='{natural_width:.1f}' height='{canvas_height:.1f}' "
@@ -480,7 +486,7 @@ def _consistent_reaction_svg(
         append_row(
             rendered_agents,
             start_x=arrow_x + (arrow_width - agent_width) / 2.0,
-            center_y=max(24.0, arrow_y * 0.37),
+            center_y=outer_padding + agent_height / 2,
         )
     append_row(
         rendered_products,
@@ -506,8 +512,13 @@ def render_molecule_image_bytes(
     kekulize: bool = True,
     legend: str | None = None,
     render_preset: str = "current",
+    expand_canvas: bool = False,
 ) -> bytes:
-    """Render a molecule from SMILES and return PNG or UTF-8 SVG bytes."""
+    """Render PNG or SVG bytes; optionally grow an SVG at its preset bond scale.
+
+    With ``expand_canvas``, size is a minimum canvas, not a fit-to-box target.
+    This requires SVG and a preset with an explicit target bond length.
+    """
     _require_rdkit()
     style = RenderStyle(
         size=size,
@@ -516,6 +527,20 @@ def render_molecule_image_bytes(
         render_preset=render_preset,
     )
     molecule = _prepare_molecule(smiles, kekulize=style.kekulize)
+    if expand_canvas:
+        width, height = style.validated_size()
+        preset = style.validated_preset()
+        if (style.normalized_format() != "svg"
+                or load_render_style_definitions()["presets"][preset].get("target_bond_length_pixels") is None):
+            raise ValueError("expand_canvas requires SVG and a preset with a target bond length")
+        mw, mh, content = _flexible_molecule_svg(molecule, render_preset=preset, legend=legend or "")
+        width, height = max(width, mw), max(height, mh)
+        return (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width:g}px" height="{height:g}px" '
+            f'viewBox="0 0 {width:g} {height:g}"><rect width="{width:g}" height="{height:g}" fill="white"/>'
+            f'<g transform="translate({(width - mw) / 2:g} {(height - mh) / 2:g})">'
+            f'{content}</g></svg>'
+        ).encode("utf-8")
     drawer = _make_molecule_drawer(style, molecule)
     drawer.DrawMolecule(molecule, legend=legend or "")
     drawer.FinishDrawing()
@@ -606,6 +631,7 @@ def render_molecule_image(
     kekulize: bool = True,
     legend: str | None = None,
     render_preset: str = "current",
+    expand_canvas: bool = False,
 ) -> Path:
     """Render a molecule from SMILES to a PNG or SVG file."""
     drawing = render_molecule_image_bytes(
@@ -615,6 +641,7 @@ def render_molecule_image(
         kekulize=kekulize,
         legend=legend,
         render_preset=render_preset,
+        expand_canvas=expand_canvas,
     )
     return _write_image(output_path, drawing)
 
