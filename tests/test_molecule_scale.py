@@ -7,8 +7,12 @@ import re
 import xml.etree.ElementTree as ET
 
 import pytest
+from fastapi.testclient import TestClient
 
+from app.web_api.main import create_app
+from app.web_api.runtime import LocalRecommendationRuntime
 from app.web_api.scientific_presentation import present_message
+from core_retrosynthesis.html_report import molecule_svg, reaction_svg
 from visualization import (
     SchemeMolecule, render_annotated_scheme_svg, render_molecule_image_bytes,
     render_reaction_image_bytes,
@@ -93,3 +97,63 @@ def test_reaction_canvas_grows_to_fit_tall_molecules_and_agents() -> None:
 def test_expanding_canvas_requires_a_vector_drawing_and_defined_scale(options) -> None:
     with pytest.raises(ValueError, match="expand_canvas requires"):
         render_molecule_image_bytes("CCO", expand_canvas=True, **options)
+
+
+def test_html_report_helpers_keep_intrinsic_scale_despite_report_css() -> None:
+    for smiles in (APIXABAN, EMTRICITABINE):
+        for document in (molecule_svg(smiles, width=160, height=100),
+                         reaction_svg(f"{smiles}>>{smiles}")):
+            container = ET.fromstring(document)
+            assert container.get("tabindex") == "0"
+            assert "overflow:auto" in container.get("style")
+            drawing = container.find(NS + "svg")
+            assert longest_bond(drawing) == pytest.approx(30, abs=1.1)
+            assert "max-width:none;max-height:none" in drawing.get("style")
+            assert f"width:{float(drawing.get('width').removesuffix('px')):g}px" in drawing.get("style")
+    assert "drawing failed" in molecule_svg("not-a-smiles")
+
+
+def test_web_molecule_endpoint_expands_small_requested_canvases() -> None:
+    web = TestClient(create_app(runtime=LocalRecommendationRuntime()))
+    for smiles in (APIXABAN, EMTRICITABINE):
+        response = web.post("/api/v1/render/molecule", json={
+            "molecule_smiles": smiles, "width": 160, "height": 100,
+        })
+        assert response.status_code == 200
+        drawing = ET.fromstring(response.content)
+        assert longest_bond(drawing) == pytest.approx(30, abs=1.1)
+        assert float(drawing.get("width").removesuffix("px")) > 160
+
+
+def test_scientific_workspace_api_keeps_scale_in_saved_cards_and_schemes() -> None:
+    attribution = {"basis": "unknown", "source_ids": [], "limitations": []}
+    answer = {
+        "schema_version": "scientific_answer.v2", "answer_markdown": "Rendering fixture only",
+        "evidence_refs": [], "uncertainties": [], "needs_user_input": False,
+        "sources": [], "target_molecule_ids": [], "routes": [], "claims": [],
+        "molecules": [{"id": name, "name": name, "smiles": smiles, **attribution}
+                      for name, smiles in (("apixaban", APIXABAN), ("emtricitabine", EMTRICITABINE))],
+        "steps": [{"id": "layout", "title": "Layout fixture, not a chemical transformation",
+                   "reactant_ids": ["apixaban", "emtricitabine"], "product_ids": ["apixaban"],
+                   "after_step_ids": [], "conditions": [], "yield_info": None, **attribution}],
+    }
+
+    class SavedService:
+        def get(self, identity):
+            return {"id": identity, "turns": [{"question": f"`{EMTRICITABINE}`",
+                                               "status": "completed", "answer": answer}]}
+
+    web = TestClient(create_app(runtime=object(), scientific_service=SavedService(), recommendation_only=False),
+                     base_url="http://127.0.0.1")
+    response = web.get("/api/v1/scientific/conversations/" + "a" * 32)
+    assert response.status_code == 200
+    turn = response.json()["turns"][0]
+    view = turn["structured_presentation"]
+    for item in [*turn["question_presentation"]["structures"], *view["molecules"]]:
+        root = ET.fromstring(base64.b64decode(item["image_url"].split(",", 1)[1]))
+        assert longest_bond(root) == pytest.approx(30, abs=1.1)
+    step = view["steps"][0]
+    root = ET.fromstring(base64.b64decode(step["image_url"].split(",", 1)[1]))
+    assert float(root.get("width")) == step["scheme_width"]
+    for group in root.findall(NS + "g[@data-role='molecule']"):
+        assert longest_bond(group) == pytest.approx(30, abs=1.1)

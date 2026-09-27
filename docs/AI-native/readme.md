@@ -48,6 +48,11 @@ reactants/products, conditions above the arrow and yield below. Retrosynthesis
 plans are shown in synthetic direction. Each annotation retains its declared
 reported/proposed/computed status; drawings do not validate feasibility. Download
 individual SVGs from their cards. Wide schemes scroll horizontally on small screens.
+Molecule cards and reaction schemes use the shared `web_consistent` drawing
+preset (about 30 pixels per bond). Larger molecules expand the SVG canvas;
+the web UI keeps the intrinsic SVG size and provides scrolling instead of
+scaling each structure to fill its card. Restart the server after rendering
+code changes to clear cached saved-answer presentations.
 Alternative routes are separate expandable sections; the first is initially open,
 without implying that it is scientifically preferred. Step evidence, molecule
 galleries, SMILES, route connections, and uncertainty remain expandable. Missing

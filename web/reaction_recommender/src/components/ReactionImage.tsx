@@ -24,7 +24,7 @@ export function ReactionImage({
     setSource(null)
     if (!smiles) return () => undefined
     const render = kind === 'molecule' ? api.renderMolecule : api.renderReaction
-    render(smiles, compact ? 660 : 980, compact ? 260 : 240)
+    render(smiles, kind === 'molecule' ? 260 : compact ? 660 : 980, kind === 'molecule' ? 180 : compact ? 260 : 240)
       .then((blob) => {
         if (!active) return
         objectUrl = URL.createObjectURL(blob)
@@ -41,7 +41,7 @@ export function ReactionImage({
 
   if (!smiles) return null
   return (
-    <div className={`reaction-image ${compact ? 'compact' : ''}`}>
+    <div className={`reaction-image scaled-structure ${compact ? 'compact' : ''}`} tabIndex={0} role="region" aria-label={label}>
       {source ? <img src={source} alt={label} /> : <span>{failed ? 'Preview unavailable' : 'Rendering…'}</span>}
     </div>
   )

@@ -10,6 +10,7 @@ from typing import Any, Iterable, Sequence
 from visualization import (
     render_molecule_image_bytes,
     render_reaction_image_bytes,
+    svg_html,
 )
 
 
@@ -41,8 +42,7 @@ METHOD_LABELS = {
 
 
 def _inline_svg(value: str) -> str:
-    start = value.find("<svg")
-    return value[start:] if start >= 0 else value
+    return svg_html(value)
 
 
 def _placeholder(message: str) -> str:
@@ -50,13 +50,15 @@ def _placeholder(message: str) -> str:
 
 
 def molecule_svg(smiles: str, *, width: int = 320, height: int = 220) -> str:
-    """Render one molecule as an inline SVG or a visible error placeholder."""
+    """Render a molecule at web scale in scrollable HTML, or an error placeholder."""
 
     try:
         drawing = render_molecule_image_bytes(
             smiles,
             size=(width, height),
             image_format="svg",
+            render_preset="web_consistent",
+            expand_canvas=True,
         )
         return _inline_svg(drawing.decode("utf-8"))
     except (RuntimeError, ValueError, UnicodeDecodeError):
@@ -68,7 +70,7 @@ def reaction_svg(
     *,
     sub_image_size: tuple[int, int] = (260, 180),
 ) -> str:
-    """Render one reaction SMILES as an inline SVG or an error placeholder."""
+    """Render a reaction at web scale in scrollable HTML, or an error placeholder."""
 
     try:
         drawing = render_reaction_image_bytes(

@@ -1617,6 +1617,7 @@ class LocalRecommendationRuntime:
             size=(width, height),
             image_format="svg",
             render_preset="web_consistent",
+            expand_canvas=True,
         )
 
 

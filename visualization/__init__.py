@@ -1,5 +1,7 @@
 """Standalone molecule and reaction visualization utilities."""
 
+from .html import svg_html
+
 from .annotated_scheme import (
     SchemeAnnotation,
     SchemeMolecule,
@@ -32,6 +34,7 @@ from .reaction_display_graphic import (
 )
 
 __all__ = [
+    "svg_html",
     "SchemeAnnotation",
     "SchemeMolecule",
     "load_annotated_scheme_style",
