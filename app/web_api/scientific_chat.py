@@ -8,7 +8,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 
 from chem_coworker.scientific_workspace.conversation import ConversationService
@@ -110,6 +110,17 @@ def create_scientific_router(service: ConversationService) -> APIRouter:
         try:
             return {"cancellation_requested": service.cancel(identity)}
         except ValueError as exc:
+            raise failure(exc) from exc
+
+    @router.get("/api/v1/scientific/conversations/{identity}/turns/{turn_id}/debug-log")
+    def debug_log(identity: str, turn_id: str, request: Request) -> Response:
+        """Download a snapshot of timestamped progress and errors for one turn."""
+        guard(request)
+        try:
+            return Response(service.debug_log(identity, turn_id), media_type="application/x-ndjson",
+                            headers={"Content-Disposition": 'attachment; filename="progress.jsonl"',
+                                     "Cache-Control": "no-store"})
+        except (ValueError, FileNotFoundError) as exc:
             raise failure(exc) from exc
 
     @router.get("/api/v1/scientific/conversations/{identity}/artifacts/{reference}")

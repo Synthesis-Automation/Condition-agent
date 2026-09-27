@@ -4,16 +4,17 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
-from html import unescape
 import json
 import os
 from pathlib import Path
 import re
 import sys
+import traceback
 from threading import Event, Lock
 from typing import Any, Mapping
 from uuid import uuid4
 
+from .activity import ACTIVITY_VERSION, ActivityHistory, activity_detail as _activity_detail, recover_activity
 from .agent_runtime import AgentRuntime, AgentStopped
 from .answer_contracts import ScientificAnswer, validate_answer_evidence
 from .baseline import sha256_file, verify_baseline
@@ -25,35 +26,6 @@ from .workspace import ScientificWorkspace
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-def _activity_detail(item: Mapping[str, Any]) -> str:
-    """Summarize an observed tool action without including result payloads."""
-    kind = item.get("type")
-    detail = ""
-    if kind == "command_execution":
-        detail = item.get("command", "")
-    elif kind == "web_search":
-        detail = item.get("query", "")
-    elif kind == "mcp_tool_call":
-        detail = " / ".join(str(item[key]) for key in ("server", "tool") if item.get(key))
-    elif kind == "file_change":
-        changes = item.get("changes", [])
-        detail = "; ".join(
-            f"{change.get('kind', 'update')}: {change['path']}"
-            for change in changes if isinstance(change, dict) and change.get("path")
-        )
-    elif kind == "todo_list":
-        items = item.get("items", [])
-        detail = "; ".join(
-            entry["text"] for entry in items
-            if isinstance(entry, dict) and isinstance(entry.get("text"), str)
-            and not entry.get("completed")
-        ) or "Plan updated"
-    if not isinstance(detail, str):
-        return ""
-    detail = " ".join(unescape(detail).split())
-    return detail if len(detail) <= 600 else detail[:597] + "…"
 
 
 def _identifier(value: str) -> str:
@@ -70,6 +42,14 @@ def investigation_prompt(workspace: ScientificWorkspace, question: str) -> str:
 Answer the user's question in their language. This is a research conversation, not
 a request to implement repository changes. You have a real programmable environment.
 Choose your own tool sequence; inspect results, compare evidence, and revise when useful.
+While working, send concise user-facing progress messages in the commentary channel,
+like a coding assistant: one or two sentences before the first action, then after
+meaningful findings, errors, or a change of direction, and about once a minute during
+long investigations when possible. Explain what you are checking, what you found,
+and the next useful action. Use the user's language. Report material failures and
+how you will recover. These are short status summaries, not private reasoning or
+draft answers. Do not wait until the final answer to communicate. The final answer
+must still be the required structured JSON; commentary is separate from that JSON.
 
 {INVESTIGATION_GUIDE}
 
@@ -94,7 +74,7 @@ Manifest investigation.json lists selected datasets, hashes, versions and limita
 Full prior calls and notes are in events/ and artifacts/. Read w.store.summary() to resume.
 Keep console output compact: print selected fields, not whole reaction analyses, manifests,
 or full route trees. Full results are retained as artifacts and can be inspected in slices.
-Usage and argument examples: {repository / 'docs/AI-native/Scientific_Workspace_Quickstart.md'}
+Usage and argument examples: {repository / 'docs/AI-native/readme.md'}
 You may read source, write and run custom analysis scripts inside this investigation,
 and use configured research tools when relevant. Attach meaningful custom scripts and
 outputs with w.store.attach_file and label derived analysis. Keep raw external sources
@@ -139,14 +119,23 @@ evidence references, assumptions and risks. The output remains a proposal even w
 normalization/compatibility succeeds. Do not fabricate a change just to call a tool;
 insufficient evidence is a valid investigation result.
 
-For route questions, use assess_route_step for an agent/literature-proposed step,
+For retrosynthesis, use disconnect_target(target_smiles=...) for ONE step at a time.
+You own multi-step planning: inspect strategies and their concrete realizations,
+choose a precursor to expand, and call disconnect_target again for that intermediate.
+Record chosen strategy/realization IDs and call evidence, alternatives, branch links,
+constraints and reasons for expanding or stopping in workspace notes. Track canonical
+molecule identities to avoid cycles and repeated searches. Do not assume a terminal
+precursor is purchasable or that an empty search means its synthesis is impossible.
+Do not invoke the built-in multistep planner, including through custom Python scripts.
+Use assess_route_step for an agent/literature-proposed step,
 and assess_route_proposal for a complete or partial proposed route. A proposal has
 target_smiles and steps; every step has external_step_id, target_smiles (its product)
 and precursor_smiles (dot-separated), with optional mapped_reaction_smiles,
 proposed_conditions (a resolved recipe), and source metadata. Source labels do not
 establish chemical validity. Use include_forward/include_conditions only when needed.
-Alternatively use prepare_route_proposal(source_ref, route_id) on a recorded planner
-result. Inspect weak steps with inspect_route_step before proposing a revision.
+Assemble your chosen steps explicitly and record assess_route_proposal with the
+single-step/source call artifacts as evidence_refs. Inspect weak steps with
+inspect_route_step before proposing a revision.
 Use revise_route_branch to explicitly remove/replace steps or extend a terminal
 branch. Supply the reason, supporting evidence, assumptions and unresolved risks.
 It preserves the source and reassesses ALL steps and topology, including downstream
@@ -175,9 +164,11 @@ Rules for this fixed-baseline investigation:
   Distinguish observations, your interpretation, proposals, and missing evidence.
 - If structure is necessary but absent, ask for reaction SMILES or target SMILES.
   You can answer general conceptual questions without pretending local tool evidence exists.
-- Keep searches bounded initially: top_k 3; routes max_depth 3, beam_width 6,
-  max_expansions 6, per_step_top_k 3, max_templates_to_apply 40,
-  max_candidates_to_validate 10. Describe these limits and broaden only when needed.
+- Keep single-step searches bounded initially: top_k 3, max_templates_to_apply 40,
+  max_candidates_to_validate 10. For multi-step work, choose an explicit initial
+  investigation budget (for example six single-step calls), prioritize unresolved
+  branches yourself, and explain any broadening or stopping decision. Report partial
+  routes and unresolved leaves honestly when the evidence or budget is exhausted.
 - Do not mark the investigation completed; the user may ask follow-up questions.
 
 Return the required JSON final answer. answer_markdown should directly answer the
@@ -270,6 +261,7 @@ class ConversationService:
         self.repository = Path(repository or Path(__file__).resolve().parents[2]).resolve()
         self.artifacts = dict(artifacts or {})
         self.runtime = runtime
+        self._activity_cache: dict[Path, tuple[Any, list[dict[str, Any]]]] = {}
         self._mutex = Lock()
         self._active: tuple[str, str, Event] | None = None
         self._pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="scientific-chat")
@@ -336,23 +328,33 @@ class ConversationService:
         turn = directory / "turns" / turn_id
         state = _read_json(turn / "turn.json")
         workspace: ScientificWorkspace | None = None
+        history = ActivityHistory()
+        attempt = 0
+
+        def debug(kind: str, **details: Any) -> None:
+            record = {"schema_version": "scientific_progress_log.v1", "at": _now(),
+                      "turn_id": turn_id, "attempt": attempt, "kind": kind, **details}
+            with (turn / "progress.jsonl").open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps(record, ensure_ascii=False) + "\n")
 
         def save(**updates: Any) -> None:
+            previous_status = state["status"]
             state.update(updates, updated_at=_now())
             _write_json(turn / "turn.json", state)
+            if state["status"] != previous_status:
+                debug("turn_status", status=state["status"])
 
         def progress(event: dict[str, Any]) -> None:
             if event.get("type") == "thread.started":
                 state["thread_id"] = event.get("thread_id")
-            item = event.get("item", {})
-            if isinstance(item, dict) and event.get("type") in {"item.started", "item.completed", "item.failed"}:
-                kind = item.get("type", "activity")
-                if kind not in {"reasoning", "agent_message"}:
-                    state["progress"].append({
-                        "kind": kind, "status": item.get("status", event["type"]),
-                        "at": _now(), "detail": _activity_detail(item),
-                        "item_id": item.get("id"), "exit_code": item.get("exit_code"),
-                    })
+            row = history.observe(event, _now(), scope=str(attempt))
+            if row is not None:
+                debug(row["kind"], event_type=event["type"], activity=row,
+                      runtime_log="runtime.jsonl" if attempt == 0 else "repair-1/runtime.jsonl")
+            elif event.get("type") in {"error", "turn.failed"}:
+                debug("runtime_error", event_type=event["type"], error=event.get("error") or event.get("message"))
+            state["progress"] = history.rows
+            state["activity_version"] = ACTIVITY_VERSION
             save()
 
         try:
@@ -414,6 +416,7 @@ class ConversationService:
                     cited = validate_answer_evidence(answer, workspace.store)
                     break
                 except (ValueError, FileNotFoundError) as exc:
+                    debug("answer_validation_error", error={"type": type(exc).__name__, "message": str(exc)})
                     workspace.store.append("agent_answer_rejected", {
                         "turn_id": turn_id, "attempt": attempt + 1, "answer": result.answer,
                         "error": str(exc), "usage": result.usage,
@@ -434,7 +437,8 @@ class ConversationService:
             review_ref = matching_evidence_review(workspace.store, answer, after_sequence=user_event.sequence)
             trace = {
                 path.relative_to(turn).as_posix(): sha256_file(path) for path in turn.rglob("*")
-                if path.is_file() and path.name != "turn.json"
+                # Operational logs continue through final status persistence.
+                if path.is_file() and path.name not in {"turn.json", "progress.jsonl"}
             }
             event = workspace.store.append("agent_answer", {
                 **answer.model_dump(), "turn_id": turn_id, "thread_id": result.thread_id,
@@ -454,6 +458,7 @@ class ConversationService:
         except Exception as exc:
             status = exc.status if isinstance(exc, AgentStopped) else "failed"
             error = {"type": type(exc).__name__, "message": str(exc)}
+            debug("turn_error", status=status, error=error, traceback=traceback.format_exc())
             if workspace is not None:
                 try:
                     workspace.store.append("agent_turn_error", {"turn_id": turn_id, "status": status, "error": error})
@@ -472,6 +477,20 @@ class ConversationService:
         turns = [_read_json(path) for path in (directory / "turns").glob("*/turn.json")]
         turns.sort(key=lambda item: (item["created_at"], item["id"]))
         for turn in turns:
+            turn_directory = directory / "turns" / _identifier(turn["id"])
+            turn["debug_log_available"] = (turn_directory / "progress.jsonl").is_file()
+            if turn.get("activity_version") != ACTIVITY_VERSION:
+                paths = [turn_directory / "runtime.jsonl", turn_directory / "repair-1" / "runtime.jsonl"]
+                signature = tuple((str(path), path.stat().st_mtime_ns, path.stat().st_size)
+                                  for path in [turn_directory / "turn.json", *paths] if path.is_file())
+                cached = self._activity_cache.get(turn_directory)
+                if cached is None or cached[0] != signature:
+                    rows = recover_activity(paths, turn.get("progress", []))
+                    if len(self._activity_cache) >= 32:
+                        self._activity_cache.clear()
+                    cached = (signature, rows)
+                    self._activity_cache[turn_directory] = cached
+                turn["progress"] = cached[1]
             if turn["status"] in {"queued", "preparing", "running"} and (
                 self._active is None or self._active[:2] != (conversation_id, turn["id"])
             ):
@@ -492,6 +511,15 @@ class ConversationService:
     def artifact(self, conversation_id: str, reference: str) -> Any:
         """Read a checksum-verified evidence artifact scoped to this conversation."""
         return ScientificWorkspace(self._directory(conversation_id)).store.read_artifact(reference)
+
+    def debug_log(self, conversation_id: str, turn_id: str) -> bytes:
+        """Snapshot complete debug-log lines while the worker may still append."""
+        directory = self._directory(conversation_id)
+        path = (directory / "turns" / _identifier(turn_id) / "progress.jsonl").resolve()
+        if not path.is_relative_to(directory):
+            raise ValueError("Debug log path escapes this conversation")
+        data = path.read_bytes()
+        return data[:data.rfind(b"\n") + 1]
 
     def cancel(self, conversation_id: str) -> bool:
         """Signal the active runtime; partial scientific artifacts are preserved."""

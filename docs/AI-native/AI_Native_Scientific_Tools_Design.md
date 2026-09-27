@@ -9,7 +9,7 @@ Date: 2026-09-23
 The local workspace and an optional Codex-backed browser conversation interface
 now have development implementations. See
 [implementation status](Scientific_Workspace_Implementation_Status.md) and the
-[quickstart](Scientific_Workspace_Quickstart.md) for the implemented subset and
+[quickstart](readme.md) for the implemented subset and
 remaining scientific-validation gates.
 
 ## 1. Purpose
@@ -24,6 +24,12 @@ documentation, and a writable investigation workspace. The agent can use stable
 operations, inspect evidence, write custom analyses, consult external sources,
 and revise its strategy. The scientific environment is the main product asset;
 the agent runtime and user interface are replaceable clients.
+
+Retrosynthesis exposes single-step disconnections through `disconnect_target`.
+The agent owns multi-step branch selection and route assembly, records each
+expansion separately, and uses the canonical route assessors to check supplied
+steps and topology. The workspace does not delegate route search to the built-in
+multistep planner. See the [current operation catalog](readme.md) for details.
 
 The current Codex session already supplies a useful starting point: an agent
 loop, a conversational UI, repository and terminal access, and general tools.

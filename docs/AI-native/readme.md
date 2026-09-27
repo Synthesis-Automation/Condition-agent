@@ -40,9 +40,28 @@ It opens in dark mode; use **Light mode / Dark mode** in the top-right corner
 to switch. Your choice is saved in this browser. Scientific drawings retain a
 light canvas so bonds and element colors stay readable in either theme.
 Press **Enter** to send and **Shift+Enter** for a new line. While the agent works,
-the conversation shows its current state and elapsed time; expand **View activity**
-for recent recorded tool events. The final answer appears when ready; the UI
+the conversation shows concise agent-written updates about the current check,
+findings and next action, alongside its state and elapsed time. The prompt asks
+for an opening update and further updates after meaningful findings or failures,
+roughly once a minute during longer work when possible. These are public status
+messages, not private reasoning or a validated final answer. Expand **View activity**
+for recorded actions: the command or script, search queries, web-page targets,
+scientific tool inputs, and bounded failure diagnostics. Each action updates one
+row as it runs and finishes; scrolling back keeps your reading position. Older
+chats recover details from saved runtime logs when available, without changing
+their evidence. Restart the server and refresh the page after updating this code;
+a browser refresh alone cannot update an already-running Python service.
+The final answer appears when ready; the UI
 does not stream intermediate drafts or estimate a completion percentage.
+Updates remain available under **Investigation updates** after the turn ends.
+Use **Download debug log** for timestamped updates, tool lifecycle events, failure
+diagnostics, answer-validation errors and turn exceptions. New turns save this
+append-only log at `turns/<turn-id>/progress.jsonl`; the full runtime event stream
+and process output remain in `runtime.jsonl` and `runtime.stderr.txt` (and
+`repair-1/` for a correction attempt). The debug log is an operational record,
+separate from checksum-verified scientific evidence; its live download contains
+only complete JSONL lines. Old chats can show recovered updates from runtime logs
+but do not acquire a fabricated historical debug log.
 Reaction schemes appear beneath the concise answer, one SVG per step, with named
 reactants/products, conditions above the arrow and yield below. Retrosynthesis
 plans are shown in synthetic direction. Each annotation retains its declared
@@ -354,6 +373,7 @@ API additions, enabled only with the scientific service in the research profile:
 | GET | `/api/v1/scientific/conversations/{id}` | History and current progress |
 | POST | `/api/v1/scientific/conversations/{id}/cancel` | Request cancellation |
 | GET | `/api/v1/scientific/conversations/{id}/artifacts/{ref}` | Read verified artifact JSON |
+| GET | `/api/v1/scientific/conversations/{id}/turns/{turn_id}/debug-log` | Download a snapshot of the turn's timestamped JSONL progress/error log |
 
 ## Start an investigation
 
@@ -427,11 +447,9 @@ is accepted through the operation dispatcher.
 | `propose_condition_adaptation` | Registry and canonical recipe assessment; `source_ref`, `observation_id`, `components`, `operating_conditions`, `change_reasons`, `evidence_refs`, `assumptions`, `risks` | Preserve the inspected recipe and an explicitly proposed replacement, attributed changes and compatibility. See the example below. |
 | `resolve_recipe` | `condition_registry`; typed `components` and optional operating values | Canonical identities, contextual roles, raw identifiers, uncertainty, provenance. |
 | `assess_recipe` | `condition_recommender`; `reaction_smiles`, resolved `recipe` | Existing compatibility result; no yield or experimental-success prediction. |
-| `plan_routes` | Existing multistep coworker and `core_retrosynthesis`; `settings` | Bounded route alternatives, whole-route checks, issues and repair proposals. Requires `retro_library`, `stock_index`, and condition artifacts when conditions are enabled. |
-| `revise_routes` | `core_retrosynthesis`; saved `source_ref`, typed `intent` | Issue-backed alternate disconnection/realization, original-result preservation, rerun and verification. Fresh sessions replay the source to recover domain objects. |
+| `disconnect_target` | Existing single-step coworker and `core_retrosynthesis`; `target_smiles`, optional search limits and `include_conditions` | One target only: validated strategies, concrete precursor realizations, precedent IDs and warnings. Requires `retro_library`; conditions default off and require condition artifacts when enabled. No stock index, recursive expansion or internal LLM review. |
 | `assess_route_step` | Canonical external-proposal assessment; `proposal`, optional `include_forward`, `include_conditions`, `evidence_refs` | Structural, operator, precedent, compatibility and selectivity gates. Requires `retro_library`; no stock index required. Supplied resolved recipes are assessed separately from retrieved conditions. |
 | `assess_route_proposal` | Same assessor plus route topology; `proposal`, optional `unavailable_starting_materials` and assessment options | Retains invalid/unsupported proposals for inspection; declared material constraints are checked against graph-matched leaves. |
-| `prepare_route_proposal` | Existing route-tree conversion; planner `source_ref`, `route_id`, optional constraints/options | Strips trusted planner annotations and independently assesses an editable proposal. |
 | `inspect_route_step` | Saved proposal `source_ref`, `step_id` | Step gates, graph-matched upstream/downstream steps, molecular audits and supplied-recipe assessment. |
 | `revise_route_branch` | Core explicit route edit plus complete reassessment; `source_ref`, `remove_step_ids`, `replacement_steps`, `reason`, `risks`, optional `assumptions`, `evidence_refs` | Preserves the source, inherits constraints/options, reassesses all steps and topology. Empty removals can extend a leaf branch. No automatic improvement or admission claim. |
 | `compare_route_proposals` | Recorded results; 2–5 `source_refs` | Same-target comparison with identical settings/constraints; separate gates and missing evidence, no synthetic route score. |
@@ -450,17 +468,37 @@ Do not fill unreported operating values with defaults. `source_field` preserves
 provenance; the registry decides identity and roles. Proposed recipes remain
 hypotheses even after normalization or compatibility assessment.
 
-Route settings follow `MultistepRetrosynthesisRequest`; see the bounded example
-in [development_cases.json](../../examples/ai_native/development_cases.json).
-Its `route_revision_followup` entry records the more substituted target used
-after the initial target returned only one-step routes. Submit its `settings`
-object through `plan_routes` to reproduce that search against a selected baseline.
-An external agent selects a supported repair proposal and supplies its actual
-`source_route_id`, `source_step_id`, `objective`, `method`, and `issue_ids` in
-`intent`. Fabricated IDs and unsupported method combinations are rejected by
-the owning domain contract. This revision adapter currently supports alternate
-disconnections and realizations; condition-selectivity repair remains a direct
-domain capability, not a supported workspace revision method.
+Retrosynthesis in the scientific workspace uses **single-step calls only**. The
+agent owns multi-step planning: it selects a concrete realization, chooses the next
+intermediate, records alternatives and branch links, avoids cycles, and decides
+when to stop or broaden the investigation. It must not invoke the built-in multistep
+planner through custom scripts. The standalone planner remains available outside
+this workspace; `plan_routes`, `revise_routes`, and `prepare_route_proposal` are no
+longer workspace operations. Historical artifacts remain readable, but retired
+planner calls cannot be replayed through the current operation catalog.
+
+```python
+first = w.run("disconnect_target", {
+    "target_smiles": "CC(=O)Nc1ccc(-c2ccccc2)cc1",
+    "top_k": 3, "max_templates_to_apply": 40, "max_candidates_to_validate": 10,
+})
+print(w.call_summary(first))
+strategies = w.store.read_artifact(first.artifact_ref)["result"]["strategies"]
+# Inspect representatives and alternate_realizations, then explicitly choose an
+# intermediate for another disconnect_target call. No branch is expanded for you.
+```
+
+Record selected strategy/realization IDs, evidence and stopping reasons in notes.
+Assemble chosen steps into `assess_route_proposal`, citing the single-step call
+artifacts in `evidence_refs`. Use `revise_route_branch` for explicit branch edits
+and `compare_route_proposals` for alternatives. Terminal-material availability
+requires separate evidence; no candidates means only that this bounded local
+search found no supported disconnection. It does not prove synthetic impossibility.
+
+The authored targets and single-step `arguments` are in
+[development_cases.json](../../examples/ai_native/development_cases.json).
+`start_pilots.py` records the first disconnection; subsequent planning is left to
+the agent. These development examples do not satisfy independent review gates.
 
 ## Investigate an agent-proposed route
 

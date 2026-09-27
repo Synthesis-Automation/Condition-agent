@@ -7,7 +7,7 @@ Date: 2026-09-23
 
 Implementation progress, validation, and outstanding gates are tracked in
 [Scientific_Workspace_Implementation_Status.md](Scientific_Workspace_Implementation_Status.md).
-Use the [workspace quickstart](Scientific_Workspace_Quickstart.md) for the
+Use the [workspace quickstart](readme.md) for the
 implemented Python/CLI interface and optional local browser conversations. Phase
 acceptance gates below are not all met. The user-testable development milestone
 now supports natural-language questions through the installed Codex runtime,

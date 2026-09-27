@@ -108,6 +108,36 @@ test('activity exposes command failure and retains a completed turn history as p
   assert.equal(card.querySelectorAll('script').length, 0);
 });
 
+test('activity shows the action, failure reason and unknown timestamps without invented dates', () => {
+  const {run, context} = harness();
+  context.events = new Node('ol');
+  run(`renderActivity(events, [{kind:'command_execution',title:'Read old.md',status:'failed',exit_code:1,
+    at:null,detail:'Get-Content old.md',failure_detail:'Cannot find path <old.md>'}])`);
+  const row = context.events.children[0];
+  assert.equal(row.children[0].textContent, '');
+  assert.equal(row.children[1].children[0].textContent, 'Read old.md · failed · exit 1');
+  assert.equal(row.children[1].children[2].textContent, 'Cannot find path <old.md>');
+  assert.equal(row.children[1].children[2].className, 'activity-error');
+  assert.equal(row.querySelectorAll('old.md').length, 0);
+});
+
+test('concise agent updates are visible live and retained separately from tool activity', () => {
+  const {run, context} = harness();
+  context.turn = {id:'t',status:'running',debug_log_available:true,progress:[
+    {kind:'agent_update',detail:'I found a preparation; I’m checking its yield.'},
+    {kind:'web_search',title:'Search the web: patent Example 2',status:'completed',detail:'patent Example 2'},
+  ]};
+  run("identity='chat'");
+  const card = run('answerCard(turn)');
+  assert.ok(card.descendants().some(node => node.className === 'investigation-update' && node.textContent.includes('checking its yield')));
+  const events = card.querySelectorAll('ol')[0];
+  assert.equal(events.children.length, 1);
+  assert.ok(card.querySelectorAll('a').some(node => node.textContent === 'Download debug log' && node.href.endsWith('/chat/turns/t/debug-log')));
+  context.turn.status = 'failed';
+  const saved = run('answerCard(turn)');
+  assert.ok(saved.querySelectorAll('details').some(node => node.dataset.key === 't:updates'));
+});
+
 test('finishing a turn preserves the expanded activity history and its scroll position', () => {
   const {run, ids} = harness();
   run(`identity='chat'; renderConversation({title:'Activity',turns:[{id:'turn',status:'running',

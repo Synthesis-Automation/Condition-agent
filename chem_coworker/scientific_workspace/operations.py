@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-from .store import canonical_bytes, InvestigationStore
+from .store import InvestigationStore
 
 
 class ScientificOperations:
@@ -19,17 +19,15 @@ class ScientificOperations:
         "analyze_reaction", "analyze_molecule", "recommend_conditions",
         "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
         "inspect_condition_precedents", "propose_condition_adaptation",
-        "plan_routes", "revise_routes",
-        "assess_route_step", "assess_route_proposal", "prepare_route_proposal",
+        "disconnect_target",
+        "assess_route_step", "assess_route_proposal",
         "inspect_route_step", "revise_route_branch", "compare_route_proposals",
     )
 
     def __init__(self, store: InvestigationStore) -> None:
         self.store = store
         self._recommender: Any = None
-        self._planner: Any = None
         self._proposal_library: Any = None
-        self._route_runs: dict[bytes, Any] = {}
 
     def catalog(self) -> list[dict[str, str]]:
         """Describe the explicit operations available to a workspace client."""
@@ -191,24 +189,44 @@ class ScientificOperations:
         return record_adaptation(self, source_ref, observation_id, components,
                                  operating_conditions, change_reasons, evidence_refs, assumptions, risks)
 
-    def _route_planner(self, include_conditions: bool) -> Any:
-        from dataclasses import replace
-        from chem_coworker.retrosynthesis import RetrosynthesisCoworker
-        from chem_coworker.multistep import MultistepRetrosynthesisCoworker
+    def disconnect_target(
+        self, target_smiles: str, top_k: int = 3, max_realizations_per_strategy: int = 3,
+        max_templates_to_apply: int = 40, max_candidates_to_validate: int = 10,
+        use_context: bool = True, include_l0: bool = True, include_conditions: bool = False,
+        condition_top_k: int = 3, condition_minimum_pool_size: int | None = None,
+        unrestricted_condition_fallback: bool = False,
+    ) -> Any:
+        """Generate single-step strategies for one target; never expand precursor branches.
 
-        if self._planner is None:
-            retro = RetrosynthesisCoworker.from_path(self._path("retro_library"))
-            self._planner = MultistepRetrosynthesisCoworker.from_retrosynthesis_coworker(
-                retro, stock_path=self._path("stock_index"),
-            )
-        return replace(self._planner, condition_recommender=self._conditions() if include_conditions else None)
+        The agent chooses realizations, subsequent targets and stopping decisions.
+        Requires retro_library only unless conditions are requested. Preserves the
+        existing engine's evidence and warnings; internal LLM review is disabled.
+        """
+        from chem_coworker.contracts import RetrosynthesisRequest
+        from chem_coworker.retrosynthesis import RetrosynthesisCoworker
+
+        request = RetrosynthesisRequest(
+            target_smiles=target_smiles, top_k=top_k,
+            max_realizations_per_strategy=max_realizations_per_strategy,
+            max_templates_to_apply=max_templates_to_apply,
+            max_candidates_to_validate=max_candidates_to_validate,
+            use_context=use_context, include_l0=include_l0,
+            include_conditions=include_conditions, condition_top_k=condition_top_k,
+            condition_minimum_pool_size=condition_minimum_pool_size,
+            unrestricted_condition_fallback=unrestricted_condition_fallback,
+        )
+        coworker = RetrosynthesisCoworker(
+            library=self._external_route_library(), library_path=self._path("retro_library"),
+            condition_recommender=self._conditions() if include_conditions else None,
+        )
+        return coworker.disconnect(request)
 
     def _external_route_library(self) -> Any:
         """Load the recorded operator library without requiring a stock index."""
         from core_retrosynthesis import load_generic_library
 
         if self._proposal_library is None:
-            self._proposal_library = self._planner.library if self._planner is not None else load_generic_library(self._path("retro_library"))
+            self._proposal_library = load_generic_library(self._path("retro_library"))
         return self._proposal_library
 
     def assess_route_step(
@@ -240,15 +258,6 @@ class ScientificOperations:
 
         return assess_route(self, proposal, unavailable_starting_materials, include_conditions, include_forward, evidence_refs)
 
-    def prepare_route_proposal(
-        self, source_ref: str, route_id: str, unavailable_starting_materials: list[str] | None = None,
-        include_conditions: bool = False, include_forward: bool = False,
-    ) -> dict[str, Any]:
-        """Convert a selected plan_routes/revise_routes result to a reassessed editable proposal."""
-        from .route_investigation import prepare_planned_route
-
-        return prepare_planned_route(self, source_ref, route_id, unavailable_starting_materials, include_conditions, include_forward)
-
     def inspect_route_step(self, source_ref: str, step_id: str) -> dict[str, Any]:
         """Inspect a recorded proposal step's gates, neighboring steps, molecule audits and recipe assessment."""
         from .route_investigation import inspect_step
@@ -276,75 +285,3 @@ class ScientificOperations:
         from .route_investigation import compare_routes
 
         return compare_routes(self, source_refs)
-
-    def _plan(self, settings: Mapping[str, Any], exclusions: tuple[Any, ...] = ()) -> Any:
-        from chem_coworker.contracts import MultistepRetrosynthesisRequest
-
-        if "review" in settings:
-            raise ValueError("External workspace operations do not invoke an internal LLM review")
-        request = MultistepRetrosynthesisRequest(**settings)
-        return self._route_planner(request.include_conditions).plan(request, candidate_exclusions=exclusions)
-
-    def _route_payload(self, response: Any) -> dict[str, Any]:
-        from core_retrosynthesis import collect_route_refinement_issues, enumerate_route_repair_proposals, verify_planned_route
-
-        routes = (*response.result.routes, *response.result.partial_routes) if response.result else ()
-        assessments = []
-        for route in routes:
-            issues = collect_route_refinement_issues(route)
-            assessments.append({
-                "route_id": route.route_id, "verification": verify_planned_route(route).to_dict(),
-                "issues": [issue.to_dict() for issue in issues],
-                "repair_proposals": [proposal.to_dict() for issue in issues
-                                     for proposal in enumerate_route_repair_proposals(route, issue)],
-            })
-        return {"response": response.to_dict(), "assessments": assessments}
-
-    def plan_routes(self, settings: dict[str, Any]) -> dict[str, Any]:
-        """Search bounded routes with the existing planner, then expose issues and repair choices."""
-        response = self._plan(settings)
-        payload = self._route_payload(response)
-        self._route_runs[canonical_bytes(payload)] = (response, settings, ())
-        return payload
-
-    def revise_routes(self, source_ref: str, intent: dict[str, Any]) -> dict[str, Any]:
-        """Revise an evidenced route choice; retain the original and recheck the new search.
-
-        A fresh session replays the saved source call to recover typed domain objects,
-        and requires exact result parity before applying the requested revision.
-        """
-        from core_retrosynthesis import (
-            RouteRefinementIntent, build_route_refinement_plan,
-            collect_route_refinement_issues, summarize_route_refinement,
-        )
-
-        source = self.store.read_artifact(source_ref)
-        if source.get("operation") not in {"plan_routes", "revise_routes"} or source.get("execution_status") != "completed":
-            raise ValueError("source_ref must identify a completed route call")
-        key = canonical_bytes(source["result"])
-        if key not in self._route_runs:
-            replay = self.invoke(source["operation"], source["arguments"])
-            if canonical_bytes(replay) != key:
-                raise ValueError("Source route replay differs from saved evidence")
-        response, settings, exclusions = self._route_runs[key]
-        if response.result is None:
-            raise ValueError("Source search has no route result")
-        value = dict(intent)
-        value["issue_ids"] = tuple(value.get("issue_ids", ()))
-        request = RouteRefinementIntent(**value)
-        route = next((item for item in (*response.result.routes, *response.result.partial_routes)
-                      if item.route_id == request.source_route_id), None)
-        if route is None:
-            raise ValueError("Unknown source route ID")
-        plan = build_route_refinement_plan(route, request, collect_route_refinement_issues(route))
-        updated_exclusions = (*exclusions, plan.exclusion)
-        revised = self._plan(settings, updated_exclusions)
-        payload = self._route_payload(revised)
-        payload["source_ref"] = source_ref
-        payload["intent"] = request.to_dict()
-        payload["refinement"] = (
-            summarize_route_refinement(route, request, revised.result).to_dict()
-            if revised.result is not None else None
-        )
-        self._route_runs[canonical_bytes(payload)] = (revised, settings, updated_exclusions)
-        return payload

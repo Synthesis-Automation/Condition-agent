@@ -217,9 +217,36 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         ), path)
     elif operation == "assess_recipe":
         summary.update(view.pick(value, _COMPATIBILITY, path))
+    elif operation == "disconnect_target":
+        view.add_nested(summary, value, "request", (
+            "target_smiles", "top_k", "max_realizations_per_strategy", "max_templates_to_apply",
+            "max_candidates_to_validate", "use_context", "include_l0", "include_conditions",
+        ), path)
+        realization_fields = (
+            "realization_id", "target_smiles", "precursor_smiles", "proposed_reaction_smiles",
+            "forward_validation_status", "precedent_reaction_ids", "selectivity_warnings",
+            "precursor_compatibility_disposition", "reaction_compatibility_disposition",
+        )
+
+        def strategy(item: Any, child: str) -> Any:
+            result = view.pick(item, (
+                "strategy_id", "strategy_rank", "operator_id", "target_smiles",
+                "independent_reference_support", "precedent_reaction_ids",
+                "returned_realization_count", "total_realization_count",
+            ), child)
+            if isinstance(item, Mapping):
+                view.add_nested(result, item, "representative", realization_fields, child)
+                view.add_list(result, item, "alternate_realizations", realization_fields, child, limit=2)
+            return result
+
+        if "strategies" in value:
+            summary["strategies"] = view.preview(value["strategies"], f"{path}.strategies", strategy, limit=3)
+        view.add_list(summary, value, "condition_evidence", (
+            "strategy_id", "evidence", "condition_selectivity_assessment",
+        ), path, limit=3)
     elif operation in {"assess_route_step", "inspect_route_step", "assess_route_proposal",
-                       "prepare_route_proposal", "revise_route_branch"}:
-        route = operation in {"assess_route_proposal", "prepare_route_proposal", "revise_route_branch"}
+                       "revise_route_branch"}:
+        route = operation in {"assess_route_proposal", "revise_route_branch"}
         summary.update(view.pick(value, (
             "source_ref", "step_id", "upstream_step_ids", "downstream_step_ids", "assessment_options", "evidence_refs",
         ), path))

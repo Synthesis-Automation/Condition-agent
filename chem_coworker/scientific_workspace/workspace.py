@@ -73,7 +73,7 @@ class ScientificWorkspace:
         payload["duration_seconds"] = round(monotonic() - started, 6)
         payload["timings"] = timings
         if operation in {
-            "revise_routes", "propose_condition_adaptation", "prepare_route_proposal",
+            "propose_condition_adaptation",
             "inspect_route_step", "revise_route_branch",
         } and isinstance(inputs.get("source_ref"), str):
             try:

@@ -74,5 +74,5 @@ turn can use up to two runtime deadlines plus preparation overhead.
 
 No API route changes are required. Start a new investigation after updating code;
 historical fixed-baseline records remain readable. See the
-[workspace quickstart](../AI-native/Scientific_Workspace_Quickstart.md) and
+[workspace quickstart](../AI-native/readme.md) and
 [implementation status](../AI-native/Scientific_Workspace_Implementation_Status.md).

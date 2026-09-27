@@ -148,27 +148,6 @@ def test_supplied_recipe_is_assessed_separately_and_forward_challenge_is_optiona
     assert next(gate for gate in result["assessment"]["gates"] if gate["gate_id"] == "condition_support")["status"] == "unresolved"
 
 
-def test_prepare_selected_serialized_tree_preserves_source_and_reassesses(workspace, library) -> None:
-    from core_retrosynthesis.external_route_admission import external_route_proposal_from_tree
-
-    # The planner and admission system share the same typed route-tree contract.
-    tree = assess_external_route_proposal(ExternalRouteProposal.from_dict(_route_value()), library).admitted_route_tree
-    assert tree is not None
-    source = workspace.store.append("call", {
-        "operation": "plan_routes", "execution_status": "completed", "arguments": {},
-        "result": {"response": {"result": {"routes": [{"route_id": "selected", "route_tree": tree.to_dict()}], "partial_routes": []}}},
-    })
-    event, record = call(workspace, "prepare_route_proposal", source_ref=source.artifact_ref,
-                         route_id="selected", unavailable_starting_materials=["CC=O"])
-    direct = assess_external_route_proposal(external_route_proposal_from_tree(tree), library)
-    assert canonical_bytes(record["assessment"]) == canonical_bytes(direct.to_dict())
-    assert record["planner_route_id"] == "selected"
-    assert record["material_constraints"]["status"] == "violated"
-    assert event.evidence_refs == (source.artifact_ref,)
-    failed = workspace.run("prepare_route_proposal", {"source_ref": source.artifact_ref, "route_id": "invented"})
-    assert workspace.store.read_artifact(failed.artifact_ref)["execution_status"] == "error"
-
-
 def test_material_constraint_cannot_be_silently_removed_during_revision(workspace) -> None:
     source, _ = call(workspace, "assess_route_proposal", proposal=_route_value(), unavailable_starting_materials=["CC=O"])
     error = workspace.run("revise_route_branch", {
@@ -185,3 +164,94 @@ def test_requested_condition_retrieval_requires_recorded_data(workspace) -> None
     saved = workspace.store.read_artifact(error.artifact_ref)
     assert saved["execution_status"] == "error"
     assert "condition_index" in saved["error"]["message"]
+
+
+@pytest.mark.parametrize("target", ["CCN", "[He]", "invalid"])
+def test_single_step_preserves_engine_evidence_without_stock_or_internal_review(workspace, library, target, monkeypatch) -> None:
+    from chem_coworker.contracts import RetrosynthesisRequest
+    from chem_coworker.retrosynthesis import RetrosynthesisCoworker
+    from chem_coworker.multistep import MultistepRetrosynthesisCoworker
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("Single-step workspace must not invoke a multistep planner or hidden reviewer")
+
+    monkeypatch.setattr(MultistepRetrosynthesisCoworker, "plan", forbidden)
+    event, result = call(workspace, "disconnect_target", target_smiles=target)
+    direct = RetrosynthesisCoworker(
+        library=library, library_path=workspace.operations._path("retro_library"),
+    ).disconnect(RetrosynthesisRequest(
+        target_smiles=target, top_k=3, max_templates_to_apply=40,
+        max_candidates_to_validate=10, include_conditions=False,
+    ))
+    assert canonical_bytes(result) == canonical_bytes(direct.to_dict())
+    assert result["request"]["review"]["mode"] == "off"
+    assert result["review"] is None
+    assert "stock_index" not in workspace.store.manifest["baseline"]["artifacts"]
+    if target == "CCN":
+        assert result["strategies"]
+        summary = workspace.call_summary(event)["result_summary"]
+        candidate = summary["strategies"][0]["representative"]
+        assert candidate["precursor_smiles"] == result["strategies"][0]["representative"]["precursor_smiles"]
+        assert candidate["forward_validation_status"] == "verified_signature"
+        assert summary["warnings"] == result["warnings"]
+    else:
+        assert not result["strategies"]
+    replay = ScientificWorkspace(workspace.store.root).replay(event.artifact_ref)
+    assert workspace.store.read_artifact(replay.artifact_ref)["matches"] is True
+
+
+def test_agent_selects_next_intermediate_and_assesses_assembled_route(workspace) -> None:
+    from rdkit import Chem
+
+    canonical = lambda smiles: Chem.MolToSmiles(Chem.MolFromSmiles(smiles))
+    target = _route_value()["target_smiles"]
+    first, initial = call(workspace, "disconnect_target", target_smiles=target)
+    chosen = next(candidate for strategy in initial["strategies"]
+                  for candidate in [strategy["representative"], *strategy["alternate_realizations"]]
+                  if "CCN" in candidate["precursor_smiles"].split("."))
+    # Caller explicitly chooses a leaf; the first call has not expanded it.
+    second, expanded = call(workspace, "disconnect_target", target_smiles="CCN")
+    amine = next(strategy["representative"] for strategy in expanded["strategies"]
+                 if canonical(strategy["representative"]["precursor_smiles"]) == canonical("CC=O.N"))
+    event, route = call(workspace, "assess_route_proposal", proposal={
+        "target_smiles": target,
+        "steps": [
+            {"external_step_id": "amide", "target_smiles": chosen["target_smiles"],
+             "precursor_smiles": chosen["precursor_smiles"]},
+            {"external_step_id": "amine", "target_smiles": amine["target_smiles"],
+             "precursor_smiles": amine["precursor_smiles"]},
+        ],
+    }, evidence_refs=[first.artifact_ref, second.artifact_ref])
+    assert len(route["assessment"]["step_assessments"]) == 2
+    assert route["assessment"]["status"] == "admitted_review_only"
+    assert event.evidence_refs == (first.artifact_ref, second.artifact_ref)
+
+
+@pytest.mark.parametrize("operation", ["plan_routes", "revise_routes", "prepare_route_proposal"])
+def test_workspace_rejects_automatic_route_operations(workspace, operation) -> None:
+    assert operation not in {item["name"] for item in workspace.operations.catalog()}
+    error = workspace.run(operation, {})
+    assert "Unknown scientific operation" in workspace.store.read_artifact(error.artifact_ref)["error"]["message"]
+
+
+@pytest.mark.parametrize("extra", [{"max_depth": 3}, {"beam_width": 6}, {"review": {"mode": "always"}}, {"top_k": 0}])
+def test_single_step_rejects_planner_review_and_invalid_options(workspace, extra) -> None:
+    error = workspace.run("disconnect_target", {"target_smiles": "CCN", **extra})
+    assert workspace.store.read_artifact(error.artifact_ref)["execution_status"] == "error"
+
+
+def test_single_step_conditions_are_opt_in_and_require_recorded_data(workspace) -> None:
+    error = workspace.run("disconnect_target", {"target_smiles": "CCN", "include_conditions": True})
+    assert "condition_index" in workspace.store.read_artifact(error.artifact_ref)["error"]["message"]
+
+
+def test_prompt_assigns_multistep_decisions_to_agent(workspace) -> None:
+    from chem_coworker.scientific_workspace.conversation import investigation_prompt
+
+    prompt = investigation_prompt(workspace, "Propose a synthesis")
+    assert "disconnect_target(target_smiles=...)" in prompt
+    assert "You own multi-step planning" in prompt
+    assert "Do not invoke the built-in multistep planner, including through custom Python scripts." in prompt
+    assert "assess_route_proposal" in prompt
+    for retired in ("plan_routes", "revise_routes", "prepare_route_proposal", "beam_width"):
+        assert retired not in prompt

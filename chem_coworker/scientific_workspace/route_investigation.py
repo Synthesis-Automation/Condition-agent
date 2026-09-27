@@ -10,7 +10,6 @@ from core_retrosynthesis.external_proposal_assessment import (
 )
 from core_retrosynthesis.external_route_admission import (
     ExternalRouteProposal, ExternalRouteStepProposal, assess_external_route_proposal,
-    external_route_proposal_from_tree,
 )
 from core_retrosynthesis.route_proposal_revision import (
     assess_declared_route_materials, external_route_step_neighbors, revise_external_route_proposal,
@@ -20,7 +19,7 @@ if TYPE_CHECKING:
     from .operations import ScientificOperations
 
 
-ROUTE_RECORD_OPERATIONS = frozenset({"assess_route_proposal", "prepare_route_proposal", "revise_route_branch"})
+ROUTE_RECORD_OPERATIONS = frozenset({"assess_route_proposal", "revise_route_branch"})
 
 
 def _strings(values: list[str] | None, name: str) -> list[str]:
@@ -150,27 +149,6 @@ def _record(operations: ScientificOperations, source_ref: str) -> dict[str, Any]
     if source["result"].get("schema_version") != "route_investigation.v1":
         raise ValueError("Unsupported route investigation schema")
     return source["result"]
-
-
-def prepare_planned_route(
-    operations: ScientificOperations, source_ref: str, route_id: str,
-    unavailable_starting_materials: list[str] | None, include_conditions: bool, include_forward: bool,
-) -> dict[str, Any]:
-    """Strip trusted planner annotations, then independently assess the selected tree."""
-    from core_retrosynthesis.route_contract import ReactionRouteTree
-
-    source = operations.store.read_artifact(source_ref)
-    if source.get("operation") not in {"plan_routes", "revise_routes"} or source.get("execution_status") != "completed":
-        raise ValueError("source_ref must identify a completed planner call")
-    result = source["result"]["response"].get("result") or {}
-    routes = [route for route in (*result.get("routes", []), *result.get("partial_routes", [])) if route["route_id"] == route_id]
-    if len(routes) != 1:
-        raise ValueError("Select exactly one known planner route_id")
-    tree = ReactionRouteTree.from_dict(routes[0]["route_tree"])
-    proposal = external_route_proposal_from_tree(tree)
-    record = assess_route(operations, proposal.to_dict(), unavailable_starting_materials,
-                          include_conditions, include_forward, [source_ref])
-    return {**record, "source_ref": source_ref, "planner_route_id": route_id}
 
 
 def inspect_step(operations: ScientificOperations, source_ref: str, step_id: str) -> dict[str, Any]:

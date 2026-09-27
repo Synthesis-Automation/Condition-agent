@@ -182,7 +182,7 @@ criteria and regression tests.
 ## Coding Standards
 
 For agent-led scientific investigations, use the local Python/CLI workspace
-described in `docs/AI-native/Scientific_Workspace_Quickstart.md`. It records
+described in `docs/AI-native/readme.md`. It records
 baseline identity, scientific calls, evidence, custom scripts, and resumable
 notes while calling the existing domain packages. Generated investigations
 belong under `results/ai_native/`; do not commit local corpus records or large

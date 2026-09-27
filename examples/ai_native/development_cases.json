@@ -1,5 +1,5 @@
 {
-  "schema_version": "ai_native_development_cases.v1",
+  "schema_version": "ai_native_development_cases.v2",
   "partition": "authored_development_cases_not_heldout",
   "condition_transfer": {
     "objective": "Investigate transfer from retrieved precedents to a sterically substituted aryl chloride query, preserving whole recipes and uncertainty.",
@@ -8,15 +8,10 @@
     "search_scope": "broad"
   },
   "route_revision": {
-    "objective": "Inspect a multistep route to an acetamido biaryl, identify an evidenced weak step, and attempt a justified revision without modifying scientific rules.",
-    "settings": {
+    "objective": "Choose single-step disconnections for an acetamido biaryl, expand selected intermediates explicitly, and assess the agent-assembled route without modifying scientific rules.",
+    "arguments": {
       "target_smiles": "CC(=O)Nc1ccc(-c2ccccc2)cc1",
       "top_k": 3,
-      "max_depth": 3,
-      "molecular_weight_threshold": 90.0,
-      "per_step_top_k": 3,
-      "beam_width": 6,
-      "max_expansions": 6,
       "max_templates_to_apply": 30,
       "max_candidates_to_validate": 8,
       "include_conditions": true,
@@ -24,15 +19,10 @@
     }
   },
   "route_revision_followup": {
-    "objective": "After the initial target yielded only one-step routes, investigate a more substituted authored target and revise a recorded selectivity issue.",
-    "settings": {
+    "objective": "Investigate a more substituted authored target through single-step calls; the agent selects branches, revisions and stopping decisions.",
+    "arguments": {
       "target_smiles": "CC(=O)Nc1ccc(-c2ccc(OCCN3CCOCC3)c(C)c2)cc1",
       "top_k": 3,
-      "max_depth": 3,
-      "molecular_weight_threshold": 90.0,
-      "per_step_top_k": 3,
-      "beam_width": 6,
-      "max_expansions": 8,
       "max_templates_to_apply": 60,
       "max_candidates_to_validate": 12,
       "include_conditions": true,

@@ -86,7 +86,7 @@ def test_failed_calls_are_recorded_and_do_not_destroy_previous_results(workspace
     good = workspace.run("analyze_molecule", {"smiles": "CCO"})
     missing = workspace.run("recommend_conditions", {"reaction_smiles": "CCBr.N>>CCN"})
     unsupported = workspace.run("__import__", {"name": "os"})
-    invalid_ref = workspace.run("revise_routes", {"source_ref": "../bad", "intent": {}})
+    invalid_ref = workspace.run("inspect_route_step", {"source_ref": "../bad", "step_id": "missing"})
     assert workspace.store.read_artifact(good.artifact_ref)["execution_status"] == "completed"
     for event in (missing, unsupported, invalid_ref):
         assert workspace.store.read_artifact(event.artifact_ref)["execution_status"] == "error"

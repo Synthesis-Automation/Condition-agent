@@ -141,6 +141,101 @@ def test_activity_details_describe_observed_action(item: dict[str, Any], expecte
     assert _activity_detail(item) == expected
 
 
+def test_live_activity_updates_one_row_and_saved_legacy_logs_are_recovered(service: ConversationService) -> None:
+    started = {"type": "item.started", "item": {
+        "id": "search", "type": "web_search", "query": "", "action": {"type": "other"},
+    }}
+    completed = {"type": "item.completed", "item": {
+        "id": "search", "type": "web_search", "action": {"type": "search", "queries": ["amide synthesis patent"]},
+    }}
+
+    class ActivityRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            kwargs["on_event"](started)
+            kwargs["on_event"](completed)
+            return super().run(**kwargs)
+
+    service.runtime = ActivityRuntime()
+    identity = service.submit("Investigate a route")["conversation_id"]
+    turn = finish(service, identity)
+    assert len(turn["progress"]) == 1
+    assert turn["progress"][0]["title"] == "Search the web: amide synthesis patent"
+    directory = service.root / identity / "turns" / turn["id"]
+    path = directory / "turn.json"
+    saved = json.loads(path.read_text("utf-8"))
+    saved.pop("activity_version")
+    saved["progress"] = [
+        {"kind": "web_search", "status": "item.started", "at": "2026-09-27T14:34:28Z"},
+        {"kind": "web_search", "status": "item.completed", "at": "2026-09-27T14:34:31Z"},
+    ]
+    path.write_text(json.dumps(saved), "utf-8")
+    trace = directory / "runtime.jsonl"
+    trace.write_text(json.dumps(started) + "\n" + json.dumps(completed), "utf-8")
+    original = path.read_bytes()
+    recovered = service.get(identity)["turns"][0]["progress"]
+    assert len(recovered) == 1
+    assert recovered[0]["detail"] == "amide synthesis patent"
+    assert recovered[0]["at"] == "2026-09-27T14:34:28Z"
+    assert service.get(identity)["turns"][0]["progress"] == recovered
+    trace.write_text(trace.read_text("utf-8") + "\n" + json.dumps({
+        "type": "item.completed", "item": {"id": "command", "type": "command_execution", "command": "python inspect.py"},
+    }), "utf-8")
+    assert len(service.get(identity)["turns"][0]["progress"]) == 2
+    assert path.read_bytes() == original
+
+
+def test_live_commentary_and_errors_have_downloadable_timestamped_debug_log(service: ConversationService) -> None:
+    ready, release = Event(), Event()
+
+    class ProgressRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            assert "commentary channel" in kwargs["prompt"]
+            kwargs["on_event"]({"type": "item.completed", "item": {
+                "id": "note", "type": "agent_message", "text": "I’m checking the reported preparation.",
+            }})
+            kwargs["on_event"]({"type": "item.completed", "item": {
+                "id": "cmd", "type": "command_execution", "command": "python inspect.py", "exit_code": 1,
+                "status": "failed", "aggregated_output": "FileNotFoundError: missing source record",
+            }})
+            ready.set()
+            assert release.wait(10)
+            raise RuntimeError("Debug fixture failure")
+
+    service.runtime = ProgressRuntime()
+    submitted = service.submit("Check this synthesis")
+    identity, turn_id = submitted["conversation_id"], submitted["turn_id"]
+    client = TestClient(create_app(runtime=object(), scientific_service=service, recommendation_only=False), base_url="http://127.0.0.1")
+    endpoint = f"/api/v1/scientific/conversations/{identity}/turns/{turn_id}/debug-log"
+    try:
+        assert ready.wait(10)
+        live = service.get(identity)["turns"][0]
+        assert live["status"] == "running"
+        assert live["progress"][0]["kind"] == "agent_update"
+        assert live["debug_log_available"] is True
+        response = client.get(endpoint)
+        assert response.status_code == 200 and "attachment" in response.headers["content-disposition"]
+        entries = [json.loads(line) for line in response.text.splitlines()]
+        assert all(entry["at"] and entry["turn_id"] == turn_id for entry in entries)
+        assert any(entry["kind"] == "agent_update" for entry in entries)
+        assert any(entry.get("activity", {}).get("failure_detail") == "FileNotFoundError: missing source record" for entry in entries)
+    finally:
+        release.set()
+    assert finish(service, identity)["status"] == "failed"
+    entries = [json.loads(line) for line in service.debug_log(identity, turn_id).splitlines()]
+    error = next(entry for entry in entries if entry["kind"] == "turn_error")
+    assert error["error"]["message"] == "Debug fixture failure"
+    assert "RuntimeError" in error["traceback"]
+    assert entries[-1]["status"] == "failed"
+    assert client.get(endpoint.replace(turn_id, "invalid")).status_code == 422
+    assert client.get(endpoint.replace(identity, "0" * 32)).status_code == 404
+    assert client.get(endpoint, headers={"origin": "https://example.org"}).status_code == 403
+    log = service.root / identity / "turns" / turn_id / "progress.jsonl"
+    complete = service.debug_log(identity, turn_id)
+    with log.open("ab") as stream:
+        stream.write(b'{"partial":')
+    assert service.debug_log(identity, turn_id) == complete
+
+
 def test_explicit_runtime_setting_change_starts_new_thread_with_saved_history(service: ConversationService) -> None:
     identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
     first = finish(service, identity)

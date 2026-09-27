@@ -16,6 +16,14 @@ Native Engine / Database / Hardware
 
 For chemistry, the AI should not try to internally replace every specialist tool. Instead, it should act as an **orchestrator** that calls dedicated chemistry engines, databases, models, and laboratory systems.
 
+In the scientific workspace, retrosynthesis follows this split explicitly:
+`disconnect_target` generates single-step disconnections, while the agent selects
+intermediates and manages multi-step routes through separate recorded calls. The
+agent supplies complete or partial routes to the canonical structure and topology
+assessors. The workspace does not expose the built-in automatic multistep planner.
+Branch selection, alternatives, evidence and stopping decisions belong to the agent;
+chemical validation remains in the scientific packages.
+
 A general architecture is:
 
 ```text

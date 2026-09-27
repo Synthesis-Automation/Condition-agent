@@ -11,7 +11,7 @@ model-free. An optional Codex runtime adapter and local browser conversation
 interface now answer natural-language questions using this same workspace.
 Neither introduces new chemistry rules or a parallel recommendation engine.
 
-See the [quickstart](Scientific_Workspace_Quickstart.md) for runnable commands.
+See the [quickstart](readme.md) for runnable commands.
 
 ## Research environment milestone (2026-09-26)
 
@@ -119,7 +119,7 @@ external runtime rather than treating those utilities as an agent.
 ## User-testable conversation milestone
 
 Launch with `python -m app.web_api --scientific-chat --port 8011` and open
-`http://127.0.0.1:8011/scientific`. The [quickstart](Scientific_Workspace_Quickstart.md)
+`http://127.0.0.1:8011/scientific`. The [quickstart](readme.md)
 documents configuration, API routes, evidence inspection, and the live smoke test.
 
 Development testing exercised an actual authenticated Codex runtime, not a mocked
@@ -337,8 +337,9 @@ remain review questions.
 ### Agent-proposed route revision milestone
 
 The workspace now exposes the canonical external-step and complete-route assessors
-through `assess_route_step` and `assess_route_proposal`. `prepare_route_proposal`
-converts a selected planner tree without trusting its prior operator annotations.
+through `assess_route_step` and `assess_route_proposal`. The original milestone
+also provided a planner-tree conversion adapter; that adapter is retired under
+the single-step policy below.
 `inspect_route_step` provides saved gates, structural neighbors, molecular audits
 and supplied-recipe assessment. `revise_route_branch` explicitly replaces or adds
 steps, preserves the original artifact, and reassesses the entire resulting route.
@@ -510,3 +511,20 @@ review, and `summary.json` provides its investigation context. That pilot's fina
 status is `insufficient_evidence`, with missing procedure evidence
 and independent review explicitly outstanding. Automated tests validate software
 behavior, not the scientific quality of the proposed conditions or routes.
+
+
+### Single-step retrosynthesis with agent-owned route planning
+
+The current workspace exposes `disconnect_target`, a recorded adapter over the
+existing single-step engine. Each call returns strategies and concrete realizations
+for exactly one target, with canonical evidence and warnings unchanged. Conditions
+are opt-in; no stock index or internal LLM reviewer is required. The agent selects
+intermediates, expands branches through separate recorded calls, and owns route
+assembly, alternatives, constraints and stopping decisions. Existing route and
+step assessors still check the supplied chemistry and topology.
+
+Workspace automatic-search operations `plan_routes` and `revise_routes`, and the
+planner-tree adapter `prepare_route_proposal`, have been removed. Earlier planner
+pilot results above describe historical experiments, not the current workflow.
+The standalone multistep implementation is unchanged. Restart the workspace server
+and start a new chat after upgrading; old investigation evidence remains readable.

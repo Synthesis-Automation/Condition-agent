@@ -224,7 +224,10 @@ function answerCard(turn) {
     const spinner = element('span', '', 'spinner'); spinner.setAttribute('aria-hidden', 'true');
     line.append(spinner, label, elapsed);
     const detail = activityPanel(turn, true);
-    progress.append(line, element('p', 'The answer will appear here when it is ready.', 'progress-caption'), detail);
+    const updates = element('div', '', 'investigation-updates'); updates.id = 'live-updates';
+    updates.setAttribute('role', 'log'); updates.setAttribute('aria-live', 'polite');
+    renderInvestigationUpdates(updates, turn.progress || []);
+    progress.append(line, updates, element('p', 'The answer will appear here when it is ready.', 'progress-caption'), detail);
     card.append(progress);
   } else {
     const stopped = turn.status === 'cancelled';
@@ -232,7 +235,19 @@ function answerCard(turn) {
       'This investigation could not finish.', stopped ? 'muted' : 'error-message'));
     if (turn.error && !stopped) card.append(disclosure('Show details', turn.id + ':error', element('p', turn.error.message)));
   }
-  if (!runningStates.has(turn.status) && turn.progress?.length) card.append(activityPanel(turn));
+  if (!runningStates.has(turn.status) && turn.progress?.length) {
+    if (turn.progress.some(event => event.kind === 'agent_update')) {
+      const updates = element('div', '', 'investigation-updates');
+      renderInvestigationUpdates(updates, turn.progress);
+      card.append(disclosure('Investigation updates', turn.id + ':updates', updates));
+    }
+    card.append(activityPanel(turn));
+  }
+  if (turn.debug_log_available) {
+    const link = element('a', 'Download debug log', 'debug-log-link');
+    link.href = base + '/conversations/' + encodeURIComponent(identity) + '/turns/' + encodeURIComponent(turn.id) + '/debug-log';
+    link.download = 'progress.jsonl'; card.append(link);
+  }
   return card;
 }
 
@@ -245,7 +260,7 @@ function renderConversation(data) {
   const firstLoad = conversation === null;
   conversation = data;
   document.title = data.title + ' · Scientific workspace';
-  const signature = JSON.stringify(data.turns.map(t => [t.id, t.status, t.answer_ref, t.error]));
+  const signature = JSON.stringify(data.turns.map(t => [t.id, t.status, t.answer_ref, t.error, t.debug_log_available]));
   if (signature !== displayed) {
     const follow = firstLoad || nearBottom();
     const expanded = new Map(Array.from($('messages').querySelectorAll('details'))
@@ -284,7 +299,7 @@ function elapsedText(start) {
 function activityLabel(event) {
   const names = {command_execution: 'Command', web_search: 'Web search', mcp_tool_call: 'Scientific tool',
     file_change: 'Saving investigation files', todo_list: 'Updating the plan'};
-  const label = names[event.kind] || 'Agent activity';
+  const label = event.title || names[event.kind] || 'Agent activity';
   const failed = ['failed', 'item.failed'].includes(event.status) || (Number.isInteger(event.exit_code) && event.exit_code !== 0);
   const status = failed ? 'failed' : ['completed', 'item.completed'].includes(event.status) ? 'finished' :
     ['cancelled', 'canceled'].includes(event.status) ? 'stopped' : 'running';
@@ -301,6 +316,7 @@ function activityPanel(turn, live = false) {
   return detail;
 }
 function renderActivity(events, progress) {
+  progress = progress.filter(event => event.kind !== 'agent_update');
   const signature = JSON.stringify(progress);
   if (events.dataset.signature === signature) return;
   const position = events.scrollTop;
@@ -308,16 +324,27 @@ function renderActivity(events, progress) {
   const follow = events.clientHeight > 0 && events.scrollHeight - position - events.clientHeight < 24;
   events.replaceChildren();
   for (const event of progress) {
-    const row = element('li'); const at = new Date(event.at);
+    const row = element('li'); const at = event.at ? new Date(event.at) : null;
     const content = element('div', '', 'activity-content');
     content.append(element('span', activityLabel(event), 'activity-status'));
     if (event.detail) content.append(element('div', event.detail, 'activity-detail'));
-    row.append(element('time', Number.isNaN(at.getTime()) ? '' : at.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})), content);
+    else if (!event.title) content.append(element('div', 'The runtime did not provide action details.', 'activity-detail'));
+    if (event.failure_detail) content.append(element('div', event.failure_detail, 'activity-error'));
+    row.append(element('time', !at || Number.isNaN(at.getTime()) ? '' : at.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})), content);
     events.append(row);
   }
   if (!events.children.length) events.append(element('li', 'Waiting for the first activity update…'));
   events.dataset.signature = signature;
   events.scrollTop = follow ? events.scrollHeight : position;
+}
+function renderInvestigationUpdates(container, progress) {
+  const updates = progress.filter(event => event.kind === 'agent_update');
+  const signature = JSON.stringify(updates);
+  if (container.dataset.signature === signature) return false;
+  container.replaceChildren();
+  for (const update of updates) container.append(element('p', update.detail, 'investigation-update'));
+  container.dataset.signature = signature;
+  return true;
 }
 function updateProgress() {
   const turn = active?.conversation_id === identity ? active : conversation?.turns.at(-1);
@@ -329,6 +356,9 @@ function updateProgress() {
     $('elapsed').textContent = elapsedText(turn.created_at);
     const events = $('activity-list');
     if (events) renderActivity(events, turn.progress || []);
+    const updates = $('live-updates');
+    const follow = nearBottom();
+    if (updates && renderInvestigationUpdates(updates, turn.progress || []) && follow) requestAnimationFrame(toBottom);
   }
   if (active) $('active-text').textContent = (stopping ? 'Stopping investigation' : 'An investigation is running') + ' · ' + elapsedText(active.created_at);
 }

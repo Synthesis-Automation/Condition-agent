@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def main() -> None:
-    """Prepare one workspace and save condition and route-search starting points."""
+    """Prepare one workspace and save condition and single-step starting points."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True)
     parser.add_argument("--artifacts", default=str(Path(__file__).with_name("artifacts.local.example.json")))
@@ -38,12 +38,12 @@ def main() -> None:
     for operation, arguments in (
         ("analyze_reaction", {"reaction_smiles": condition["reaction_smiles"]}),
         ("recommend_conditions", condition),
-        ("plan_routes", {"settings": cases["route_revision"]["settings"]}),
+        ("disconnect_target", cases["route_revision"]["arguments"]),
     ):
         event = workspace.run(operation, arguments)
         print(json.dumps(workspace.call_summary(event)), flush=True)
     workspace.store.note("question", "Which retrieved substrate differences limit condition transfer?")
-    workspace.store.note("question", "Which route issue warrants revising an earlier choice?")
+    workspace.store.note("question", "Which concrete precursor should be expanded next, and what evidence supports that choice?")
 
 
 if __name__ == "__main__":
