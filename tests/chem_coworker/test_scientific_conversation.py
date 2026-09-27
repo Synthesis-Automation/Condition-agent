@@ -122,7 +122,7 @@ def test_activity_history_survives_beyond_thirty_events(service: ConversationSer
     identity = service.submit("Analyze a reaction")["conversation_id"]
     turn = finish(service, identity)
     assert turn["status"] == "completed", turn
-    progress = service.get(identity)["turns"][0]["progress"]
+    progress = [row for row in service.get(identity)["turns"][0]["progress"] if row["kind"] == "command_execution"]
     assert len(progress) == 40
     assert progress[0]["detail"] == "python analysis_0.py"
     assert progress[-1]["item_id"] == "39"
@@ -158,8 +158,9 @@ def test_live_activity_updates_one_row_and_saved_legacy_logs_are_recovered(servi
     service.runtime = ActivityRuntime()
     identity = service.submit("Investigate a route")["conversation_id"]
     turn = finish(service, identity)
-    assert len(turn["progress"]) == 1
-    assert turn["progress"][0]["title"] == "Search the web: amide synthesis patent"
+    web_activity = [row for row in turn["progress"] if row["kind"] == "web_search"]
+    assert len(web_activity) == 1
+    assert web_activity[0]["title"] == "Search the web: amide synthesis patent"
     directory = service.root / identity / "turns" / turn["id"]
     path = directory / "turn.json"
     saved = json.loads(path.read_text("utf-8"))

@@ -34,6 +34,7 @@
         </button>
         <button id="theme" class="theme-toggle" type="button" title="Switch to light theme">Light mode</button>
       </header>
+      <div class="conversation-area">
       <div id="scroll-area" class="scroll-area">
         <section id="intro" class="intro">
           <h1>Ask a chemistry question.</h1>
@@ -47,6 +48,7 @@
         <div class="conversation"><div id="messages" role="region" aria-label="Conversation"></div></div>
       </div>
       <button id="jump-bottom" class="jump-bottom" type="button" aria-label="Jump to latest message" title="Jump to latest message" hidden>↓</button>
+      </div>
       <div class="composer-area">
         <div class="composer-wrap">
           <div id="global-activity" class="global-activity" hidden>
@@ -57,7 +59,7 @@
           <div id="error" role="alert"></div>
           <form id="form" class="composer">
             <label class="sr-only" for="question">Message the scientific agent</label>
-            <textarea id="question" rows="2" maxlength="20000" placeholder="Ask anything about your chemistry…" required></textarea>
+            <textarea id="question" rows="1" maxlength="20000" placeholder="Ask anything about your chemistry…" required></textarea>
             <div class="composer-actions">
               <span id="composer-hint" class="composer-hint">Connecting…</span>
               <button id="send" class="send-button" type="submit" aria-label="Send message" title="Send message" disabled>
@@ -66,7 +68,6 @@
               <button id="cancel" class="stop-button" type="button" aria-label="Stop investigation" title="Stop investigation" hidden><span class="stop-square" aria-hidden="true"></span></button>
             </div>
           </form>
-          <p class="footnote">AI can make mistakes. Verify chemistry and cited evidence before use.</p>
         </div>
       </div>
     </main>

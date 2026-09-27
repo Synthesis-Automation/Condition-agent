@@ -8,14 +8,34 @@ const root = path.resolve(__dirname, '../..');
 
 class Node {
   constructor(tag = 'div') {
-    this.tag = tag; this.children = []; this.dataset = {}; this.style = {};
+    this.tag = tag; this.children = []; this.parentNode = null; this.dataset = {}; this.style = {};
     this.attributes = {}; this.value = ''; this.hidden = false; this.disabled = false;
     this.classList = {toggle() {}}; this.scrollHeight = 400; this.scrollTop = 0; this.clientHeight = 400;
   }
-  set textContent(value) { this.text = value; this.children = []; }
+  set textContent(value) { this.replaceChildren(); this.text = value; }
   get textContent() { return this.text || ''; }
-  append(...nodes) { this.children.push(...nodes); }
-  replaceChildren(...nodes) { this.children = [...nodes]; }
+  get firstElementChild() { return this.children[0] || null; }
+  get lastElementChild() { return this.children.at(-1) || null; }
+  append(...nodes) { for (const node of nodes) this.insertBefore(node, null); }
+  replaceChildren(...nodes) {
+    for (const child of [...this.children]) child.remove();
+    this.append(...nodes);
+  }
+  insertBefore(node, reference) {
+    if (node === reference) return node;
+    if (reference !== null && !this.children.includes(reference)) throw new Error('Reference is not a child');
+    node.remove();
+    this.children.splice(reference === null ? this.children.length : this.children.indexOf(reference), 0, node);
+    node.parentNode = this;
+    return node;
+  }
+  remove() {
+    if (this.parentNode) {
+      const siblings = this.parentNode.children;
+      siblings.splice(siblings.indexOf(this), 1);
+      this.parentNode = null;
+    }
+  }
   setAttribute(name, value) { this.attributes[name] = value; }
   focus() {}
   requestSubmit() { this.submissions = (this.submissions || 0) + 1; }
@@ -70,85 +90,151 @@ test('Stop remains available in another chat and cancels the actual owner', asyn
   assert.equal(ids.question.value, 'A follow-up draft');
 });
 
-test('activity retains older entries and preserves reading position as updates arrive', () => {
-  const {run, context} = harness();
-  context.events = new Node('ol');
+function byClass(node, name) {
+  return node.descendants().filter(child => (child.className || '').split(/\s+/).includes(name));
+}
+
+test('one timeline retains older entries and the main conversation preserves reading position', () => {
+  const {run, context, ids} = harness();
   context.progress = Array.from({length: 45}, (_, index) => ({
-    kind:'command_execution', status:'completed', at:'2026-09-27T13:16:59Z',
-    detail:'python analysis_' + index + '.py', exit_code:0,
+    activity_id:'action:' + index, kind:'command_execution', status:'completed',
+    at:'2026-09-27T13:16:59Z', detail:'python analysis_' + index + '.py', exit_code:0,
   }));
-  run('renderActivity(events, progress)');
-  assert.equal(context.events.children.length, 45);
-  assert.equal(context.events.children[0].children[1].children[1].textContent, 'python analysis_0.py');
-  context.events.scrollHeight = 2200; context.events.clientHeight = 220;
-  context.events.scrollTop = 80;
-  context.progress.push({kind:'web_search', status:'item.started', detail:'Suzuki reaction conditions'});
-  run('renderActivity(events, progress)');
-  assert.equal(context.events.children.length, 46);
-  assert.equal(context.events.scrollTop, 80);
-  const firstRow = context.events.children[0];
-  run('renderActivity(events, progress)');
-  assert.equal(context.events.children[0], firstRow, 'unchanged polling must not rebuild the list');
-  context.events.scrollTop = 1980;
-  context.progress.push({kind:'web_search', status:'completed'});
-  run('renderActivity(events, progress)');
-  assert.equal(context.events.scrollTop, context.events.scrollHeight);
+  run("identity='chat'; active={conversation_id:'chat',status:'running',progress}; renderConversation({title:'Work',turns:[{id:'t',status:'running',question:'Analyze',progress}]})");
+  const timeline = run("$('live-timeline')");
+  assert.equal(timeline.children.length, 45);
+  assert.ok(timeline.children[0].descendants().some(node => node.textContent === 'python analysis_0.py'));
+  ids['scroll-area'].scrollHeight = 2200; ids['scroll-area'].clientHeight = 220;
+  ids['scroll-area'].scrollTop = 80;
+  context.progress.push({activity_id:'search',kind:'web_search',status:'in_progress',detail:'Suzuki reaction conditions'});
+  run('updateProgress()');
+  assert.equal(timeline.children.length, 46);
+  assert.equal(ids['scroll-area'].scrollTop, 80);
+  const firstRow = timeline.children[0];
+  run('updateProgress()');
+  assert.equal(timeline.children[0], firstRow, 'unchanged polling must not rebuild the timeline');
+  ids['scroll-area'].scrollTop = 1980;
+  context.progress.push({activity_id:'search-2',kind:'web_search',status:'completed',detail:'Published preparation'});
+  run('updateProgress()');
+  assert.equal(ids['scroll-area'].scrollTop, ids['scroll-area'].scrollHeight);
 });
 
-test('activity exposes command failure and retains a completed turn history as plain text', () => {
+test('completed timeline keeps command failures literal without an activity box or debug download', () => {
   const {run} = harness();
-  const card = run(`answerCard({id:'done',status:'completed',answer:{answer_markdown:'Result'},
-    progress:[{kind:'command_execution',status:'completed',exit_code:1,detail:'<script>alert(1)</script>'}]})`);
-  const panel = card.querySelectorAll('details')[0];
-  assert.equal(panel.dataset.key, 'done:activity');
-  const events = panel.children[1];
-  assert.equal(events.tabIndex, 0);
-  assert.equal(events.children[0].children[1].children[0].textContent, 'Command · failed · exit 1');
-  assert.equal(events.children[0].children[1].children[1].textContent, '<script>alert(1)</script>');
+  const card = run(`answerCard({id:'done',status:'completed',debug_log_available:true,answer:{answer_markdown:'Result'},
+    progress:[{activity_id:'cmd',kind:'command_execution',status:'completed',exit_code:1,detail:'<script>alert(1)</script>'}]})`);
+  const timeline = card.children[0];
+  assert.equal(timeline.className, 'investigation-timeline');
+  const action = byClass(timeline, 'timeline-action')[0];
+  assert.equal(action.dataset.key, 'done:action:cmd');
+  assert.equal(Boolean(action.open), false);
+  assert.match(byClass(action, 'tool-summary')[0].textContent, /failed/i);
+  assert.equal(byClass(action, 'activity-detail')[0].textContent, '<script>alert(1)</script>');
   assert.equal(card.querySelectorAll('script').length, 0);
+  assert.ok(card.children.some(node => node.textContent === 'Result'));
+  assert.ok(!card.querySelectorAll('summary').some(node => /View activity|Investigation updates/.test(node.textContent)));
+  assert.ok(!card.querySelectorAll('a').some(node => node.textContent === 'Download debug log'));
 });
 
-test('activity shows the action, failure reason and unknown timestamps without invented dates', () => {
+test('inline action details keep diagnostics and omit unknown timestamps', () => {
   const {run, context} = harness();
-  context.events = new Node('ol');
-  run(`renderActivity(events, [{kind:'command_execution',title:'Read old.md',status:'failed',exit_code:1,
+  context.timeline = new Node('ol'); context.timeline.dataset.turn = 't';
+  run(`renderTimeline(timeline, [{activity_id:'read',kind:'command_execution',title:'Read old.md',status:'failed',exit_code:1,
     at:null,detail:'Get-Content old.md',failure_detail:'Cannot find path <old.md>'}])`);
-  const row = context.events.children[0];
-  assert.equal(row.children[0].textContent, '');
-  assert.equal(row.children[1].children[0].textContent, 'Read old.md · failed · exit 1');
-  assert.equal(row.children[1].children[2].textContent, 'Cannot find path <old.md>');
-  assert.equal(row.children[1].children[2].className, 'activity-error');
-  assert.equal(row.querySelectorAll('old.md').length, 0);
+  const action = byClass(context.timeline, 'timeline-action')[0];
+  assert.equal(action.querySelectorAll('time').length, 0);
+  assert.equal(byClass(action, 'activity-status')[0].textContent, 'Read old.md · failed · exit 1');
+  assert.equal(byClass(action, 'activity-error')[0].textContent, 'Cannot find path <old.md>');
+  assert.equal(action.querySelectorAll('old.md').length, 0);
 });
 
-test('concise agent updates are visible live and retained separately from tool activity', () => {
+test('running commands use one readable summary line while retaining expanded command text', () => {
+  const {run, context} = harness();
+  context.command = 'python -c "\n  import json\n  print(json.dumps({\"ok\": True}))\n"';
+  context.timeline = new Node('ol'); context.timeline.dataset.turn = 't';
+  run("renderTimeline(timeline, [{activity_id:'cmd',kind:'command_execution',status:'in_progress',detail:command}])");
+  const action = byClass(context.timeline, 'timeline-action')[0];
+  const summary = byClass(action, 'tool-summary')[0].textContent;
+  assert.match(summary, /^Running python -c/);
+  assert.doesNotMatch(summary, /\n|\r|\s{2}/);
+  assert.equal(byClass(action, 'activity-detail')[0].textContent, context.command);
+  assert.equal(action.open, false);
+});
+
+test('public prose and collapsed actions are interleaved in their recorded order', () => {
   const {run, context} = harness();
   context.turn = {id:'t',status:'running',debug_log_available:true,progress:[
-    {kind:'agent_update',detail:'I found a preparation; I’m checking its yield.'},
-    {kind:'web_search',title:'Search the web: patent Example 2',status:'completed',detail:'patent Example 2'},
+    {activity_id:'note-1',kind:'agent_update',detail:'I found a preparation; I’m checking its yield.'},
+    {activity_id:'search',kind:'web_search',title:'Search the web: patent Example 2',status:'in_progress',detail:'patent Example 2'},
+    {activity_id:'note-2',kind:'agent_update',detail:'The reported yield applies to a different substrate.'},
   ]};
-  run("identity='chat'");
   const card = run('answerCard(turn)');
-  assert.ok(card.descendants().some(node => node.className === 'investigation-update' && node.textContent.includes('checking its yield')));
-  const events = card.querySelectorAll('ol')[0];
-  assert.equal(events.children.length, 1);
-  assert.ok(card.querySelectorAll('a').some(node => node.textContent === 'Download debug log' && node.href.endsWith('/chat/turns/t/debug-log')));
+  const timeline = byClass(card, 'investigation-timeline')[0];
+  assert.equal(timeline.children.length, 3);
+  assert.equal(byClass(timeline.children[0], 'investigation-update')[0].textContent, context.turn.progress[0].detail);
+  assert.equal(byClass(timeline.children[1], 'timeline-action').length, 1);
+  assert.equal(byClass(timeline.children[2], 'investigation-update')[0].textContent, context.turn.progress[2].detail);
   context.turn.status = 'failed';
   const saved = run('answerCard(turn)');
-  assert.ok(saved.querySelectorAll('details').some(node => node.dataset.key === 't:updates'));
+  const savedTimeline = byClass(saved, 'investigation-timeline')[0];
+  assert.equal(savedTimeline.children.length, 3);
+  assert.equal(byClass(savedTimeline, 'investigation-update').length, 2);
+  assert.ok(!saved.querySelectorAll('details').some(node => /:(activity|updates)$/.test(node.dataset.key || '')));
 });
 
-test('finishing a turn preserves the expanded activity history and its scroll position', () => {
+test('lifecycle and new events retain focused disclosure nodes and expanded diagnostics', () => {
+  const {run, context} = harness();
+  context.timeline = new Node('ol'); context.timeline.dataset.turn = 't';
+  context.progress = [
+    {activity_id:'intro',kind:'agent_update',detail:'I’ll inspect the target.'},
+    {activity_id:'cmd',kind:'command_execution',title:'Run Python script: inspect.py',status:'in_progress',detail:'python inspect.py'},
+    {activity_id:'next',kind:'agent_update',detail:'The target identity is clear.'},
+  ];
+  run('renderTimeline(timeline, progress)');
+  const originalRow = context.timeline.children[1];
+  const originalAction = byClass(originalRow, 'timeline-action')[0];
+  const originalSummary = originalAction.firstElementChild;
+  originalAction.open = true;
+  Object.assign(context.progress[1], {status:'completed',exit_code:0});
+  run('renderTimeline(timeline, progress)');
+  assert.equal(context.timeline.children.length, 3);
+  const action = byClass(context.timeline.children[1], 'timeline-action')[0];
+  assert.equal(context.timeline.children[1], originalRow);
+  assert.equal(action, originalAction);
+  assert.equal(action.firstElementChild, originalSummary, 'status updates must retain the keyboard-focus target');
+  assert.equal(action.open, true);
+  assert.match(byClass(action, 'activity-status')[0].textContent, /finished/);
+  assert.equal(byClass(context.timeline.children[0], 'investigation-update')[0].textContent, context.progress[0].detail);
+  const first = context.timeline.children[0];
+  run('renderTimeline(timeline, progress)');
+  assert.equal(context.timeline.children[0], first);
+  context.progress.push({activity_id:'new',kind:'web_search',status:'in_progress',detail:'Read a primary source'});
+  run('renderTimeline(timeline, progress)');
+  assert.equal(byClass(context.timeline, 'timeline-action')[0].firstElementChild, originalSummary);
+  assert.equal(originalAction.open, true);
+  // Reconciliation moves an existing row without replacing its controls.
+  context.progress = [context.progress[1], context.progress[2], context.progress[3]];
+  run('renderTimeline(timeline, progress)');
+  assert.equal(context.timeline.children.length, 3);
+  assert.equal(context.timeline.children[0], originalRow);
+  assert.equal(originalAction.firstElementChild, originalSummary);
+  assert.equal(originalAction.open, true);
+  assert.equal(first.parentNode, null, 'removed history entries leave the DOM');
+});
+
+test('finishing a turn preserves expanded actions and the main conversation reading position', () => {
   const {run, ids} = harness();
   run(`identity='chat'; renderConversation({title:'Activity',turns:[{id:'turn',status:'running',
-    question:'Analyze',progress:[{kind:'web_search',status:'completed',detail:'Reaction conditions'}]}]})`);
-  const panel = ids.messages.querySelectorAll('details')[0];
-  panel.open = true; panel.children[1].scrollTop = 90;
+    question:'Analyze',progress:[{activity_id:'search',kind:'web_search',status:'completed',detail:'Reaction conditions'}]}]})`);
+  const action = byClass(ids.messages, 'timeline-action')[0];
+  action.open = true;
+  ids['scroll-area'].scrollHeight = 2200; ids['scroll-area'].clientHeight = 220;
+  ids['scroll-area'].scrollTop = 90;
   run(`renderConversation({title:'Activity',turns:[{id:'turn',status:'completed',question:'Analyze',
-    answer:{answer_markdown:'Done'},progress:[{kind:'web_search',status:'completed',detail:'Reaction conditions'}]}]})`);
-  const savedPanel = ids.messages.querySelectorAll('details')[0];
-  assert.equal(savedPanel.open, true);
-  assert.equal(savedPanel.children[1].scrollTop, 90);
+    answer:{answer_markdown:'Done'},progress:[{activity_id:'search',kind:'web_search',status:'completed',detail:'Reaction conditions'}]}]})`);
+  assert.equal(byClass(ids.messages, 'timeline-action')[0].open, true);
+  assert.equal(ids['scroll-area'].scrollTop, 90);
+  assert.equal(byClass(ids.messages, 'investigation-timeline').length, 1);
 });
 
 test('a rejected cancellation restores Stop and displays the error', async () => {
@@ -233,8 +319,18 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(card.querySelectorAll('details[open]').length, 0);
   const images = card.querySelectorAll('img');
   assert.equal(images.length, 1);
-  assert.equal(images[0].style.width, '980px', 'keep the SVG scale independent of container width');
+  assert.equal(images[0].style.width, '588px', 'prefer a compact preview at 60% of native SVG width');
   assert.match(images[0].alt, /Reactant → Product/);
+  const schemeDownload = card.querySelectorAll('a').find(node => node.download === 's1-reaction.svg');
+  assert.equal(schemeDownload.href, context.fixture.structured_presentation.steps[0].image_url,
+    'preview sizing must not replace the native vector download');
+  const stepDetails = card.querySelectorAll('details').find(node => node.dataset.key === 'scheme:science:s1');
+  assert.ok(stepDetails.descendants().some(node => node.textContent === 'Unknown oxidant'));
+  assert.ok(stepDetails.descendants().some(node => node.textContent === 'Reactant → Product'));
+  assert.ok(byClass(card, 'step-heading')[0].descendants().some(node => node.textContent === 'Proposed'),
+    'the actual step attribution remains visible');
+  assert.ok(!card.descendants().some(node => node.textContent === 'Synthetic direction' ||
+    node.textContent.startsWith('Reaction schemes · declared structures')));
   assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent' && node.textContent === 'Patent Example 2'));
   assert.ok(card.querySelectorAll('a').some(node => node.href === '/saved/excerpt' && node.textContent === 'Saved excerpt'));
   assert.ok(card.descendants().some(node => node.tag === 'code' && node.textContent === 'CCO>>CC=O'));
@@ -259,16 +355,27 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(retained.open, false, 'a user-collapsed route stays closed when the conversation updates');
 });
 
-test('progress uses recorded events, elapsed time, and keeps details open across updates', () => {
+test('progress uses recorded events, elapsed time, and keeps action details open across updates', () => {
   const {ids, run} = harness();
   run("identity='working'; active={conversation_id:'working', status:'running', created_at:new Date(Date.now()-65000).toISOString(),progress:[{kind:'web_search',status:'item.completed',at:new Date().toISOString()}]}; renderConversation({title:'Question',turns:[{id:'t1',question:'Question',status:'running'}]})");
   const detail = ids.messages.querySelectorAll('details')[0]; detail.open = true;
   assert.match(run("$('elapsed').textContent"), /1m 5s/);
   assert.equal(run("$('progress-label').textContent"), 'Investigating…');
-  assert.ok(ids.messages.descendants().some(node => node.textContent === 'Web search · finished'));
+  assert.ok(byClass(ids.messages, 'activity-status').some(node => node.textContent === 'Web search · finished'));
   run("active.progress.push({kind:'command_execution',status:'in_progress'}); renderConversation({title:'Question',turns:[{id:'t1',question:'Question',status:'running'}]})");
-  assert.equal(ids.messages.querySelectorAll('details')[0], detail);
-  assert.equal(detail.open, true);
+  const refreshedAction = ids.messages.querySelectorAll('details')[0];
+  assert.equal(refreshedAction.dataset.key, detail.dataset.key);
+  assert.equal(refreshedAction.open, true);
+});
+
+test('quiet runs report the last actual activity without manufacturing agent commentary', () => {
+  const {run} = harness();
+  run("identity='working'; active={conversation_id:'working',status:'running',created_at:new Date(Date.now()-180000).toISOString(),progress:[{kind:'scientific_call',status:'failed',title:'Scientific call: assess_route_proposal',at:new Date(Date.now()-65000).toISOString(),failure_detail:'Invalid evidence reference'}]}; renderConversation({title:'Question',turns:[{id:'t',question:'Question',status:'running'}]})");
+  assert.match(run("$('progress-caption').textContent"), /Last recorded activity 1m 5s ago/);
+  assert.match(run("$('progress-caption').textContent"), /runtime is still running/);
+  assert.equal(byClass(run("$('live-timeline')"), 'investigation-update').length, 0);
+  run("active.progress.push({kind:'scientific_call',status:'completed',title:'Scientific call: disconnect_target',at:new Date().toISOString()}); updateProgress()");
+  assert.doesNotMatch(run("$('progress-caption').textContent"), /Last recorded activity/);
 });
 
 test('an activity response begun before submission cannot hide its Stop button', async () => {

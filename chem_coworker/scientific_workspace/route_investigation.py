@@ -30,14 +30,78 @@ def _strings(values: list[str] | None, name: str) -> list[str]:
     return list(values)
 
 
-def _evidence(operations: ScientificOperations, references: list[str] | None) -> list[str]:
-    refs = _strings(references, "evidence_refs")
+def _literature_context(
+    operations: ScientificOperations, ref: str, kind: str, value: dict[str, Any], kinds: dict[str, str],
+) -> dict[str, Any]:
+    """Describe captured provenance without admitting any of its chemical claims."""
+    from .literature import EXCERPT_SCHEMA, SOURCE_SCHEMA
+
+    source_ref = ref
+    source = value
+    if kind == "literature_excerpt":
+        if value.get("schema_version") != EXCERPT_SCHEMA:
+            raise ValueError("Unsupported literature excerpt schema")
+        source_ref = value.get("source_ref")
+        if kinds.get(source_ref) != "literature_source":
+            raise ValueError("Literature excerpt must link a recorded literature source")
+        source = operations.store.read_artifact(source_ref)
+    if not isinstance(source, dict) or source.get("schema_version") != SOURCE_SCHEMA:
+        raise ValueError("Unsupported literature source schema")
+    extraction = source.get("extraction", {})
+    text = extraction.get("text", "")
+    acquisition = source.get("acquisition")
+    retrieved = acquisition == "http_fetch" and source.get("retrieval_status") == "completed"
+    supplied = acquisition == "agent_supplied_excerpt" and source.get("retrieval_status") == "not_performed"
+    if not (retrieved or supplied) or not isinstance(text, str) or not text.strip():
+        raise ValueError(
+            "Route literature provenance requires captured source text; failed retrievals or empty "
+            "extractions are debugging records. Capture available browser text with capture_source."
+        )
+    if kind == "literature_excerpt":
+        location = value.get("location", {})
+        start, end = location.get("start"), location.get("end")
+        if (type(start) is not int or type(end) is not int or not 0 <= start < end <= len(text)
+                or value.get("text") != text[start:end]
+                or value.get("verification") != "exact_match_to_captured_text"):
+            raise ValueError("Literature excerpt must match its captured source exactly")
+    warnings = [
+        "Literature provenance does not verify chemical claims or override structural and route gates.",
+        *extraction.get("limitations", []),
+    ]
+    if supplied:
+        warnings.append("Agent-supplied source text has not been independently retrieved or verified.")
+    if extraction.get("status") != "completed":
+        warnings.append(f"Source text extraction status: {extraction.get('status', 'unknown')}.")
+    return {
+        "artifact_ref": ref, "kind": kind, "role": "literature_provenance",
+        "source_ref": source_ref, "source_url": source.get("source_url"),
+        "acquisition": acquisition, "retrieval_status": source.get("retrieval_status"),
+        "extraction_status": extraction.get("status"), "claim_support": "not_assessed",
+        "warnings": warnings,
+    }
+
+
+def _evidence(operations: ScientificOperations, references: list[str] | None) -> dict[str, Any]:
+    refs = list(dict.fromkeys(_strings(references, "evidence_refs")))
     kinds = {event.artifact_ref: event.kind for event in operations.store.events()}
+    provenance = []
     for ref in refs:
-        operations.store.read_artifact(ref)
-        if kinds.get(ref) not in {"call", "derived_file", "replay", "custom_execution"}:
-            raise ValueError("Route evidence must reference recorded scientific evidence")
-    return list(dict.fromkeys(refs))
+        value = operations.store.read_artifact(ref)
+        kind = kinds.get(ref)
+        if kind in {"literature_source", "literature_excerpt"}:
+            if not isinstance(value, dict):
+                raise ValueError("Literature provenance must be a recorded source object")
+            provenance.append(_literature_context(operations, ref, kind, value, kinds))
+        elif kind in {"call", "derived_file", "replay", "custom_execution"}:
+            provenance.append({"artifact_ref": ref, "kind": kind, "role": "scientific_context"})
+        else:
+            raise ValueError("Route evidence must reference recorded scientific evidence or captured literature")
+    return {
+        "evidence_refs": refs, "evidence_provenance": provenance,
+        "evidence_warnings": list(dict.fromkeys(
+            warning for item in provenance for warning in item.get("warnings", [])
+        )),
+    }
 
 
 def _known_fields(value: dict[str, Any], contract: type, extra: tuple[str, ...] = ()) -> None:
@@ -98,7 +162,7 @@ def assess_step(
     include_forward: bool, evidence_refs: list[str] | None,
 ) -> dict[str, Any]:
     """Compose canonical single-step assessment and supplied-recipe checks."""
-    refs = _evidence(operations, evidence_refs)
+    evidence = _evidence(operations, evidence_refs)
     step = _step(proposal)
     assessment = assess_external_retrosynthesis_proposal(
         step, **_assessment_arguments(operations, include_conditions, include_forward),
@@ -107,7 +171,7 @@ def assess_step(
         "schema_version": "route_step_investigation.v1", "origin": "agent_proposal",
         "review_status": "unreviewed", "proposal": step.to_dict(),
         "assessment": assessment.to_dict(), "proposed_recipe_assessment": _recipe(operations, step),
-        "evidence_refs": refs, "experimental_feasibility": "not_established",
+        **evidence, "experimental_feasibility": "not_established",
     }
 
 
@@ -116,7 +180,7 @@ def assess_route(
     include_conditions: bool, include_forward: bool, evidence_refs: list[str] | None,
 ) -> dict[str, Any]:
     """Retain the submitted hypothesis and full authoritative assessment side by side."""
-    refs = _evidence(operations, evidence_refs)
+    evidence = _evidence(operations, evidence_refs)
     route = _proposal(proposal)
     unavailable = _strings(unavailable_starting_materials, "unavailable_starting_materials")
     if len(unavailable) > 100:
@@ -132,7 +196,7 @@ def assess_route(
         "proposed_recipe_assessments": {
             step.external_step_id: _recipe(operations, step.proposal) for step in route.steps
         },
-        "evidence_refs": refs, "experimental_feasibility": "not_established",
+        **evidence, "experimental_feasibility": "not_established",
         "limitations": [
             "An assessed proposal remains a hypothesis, not an observed or experimentally validated route.",
             "Unknown, not_run and out_of_scope checks are not evidence of impossibility or success.",
@@ -166,6 +230,9 @@ def inspect_step(operations: ScientificOperations, source_ref: str, step_id: str
         "proposed_recipe_assessment": record["proposed_recipe_assessments"].get(step_id),
         "route_topology_gates": record["assessment"]["topology_gates"],
         "material_constraints": record["material_constraints"],
+        "evidence_refs": record["evidence_refs"],
+        "evidence_provenance": record.get("evidence_provenance", []),
+        "evidence_warnings": record.get("evidence_warnings", []),
     }
 
 
@@ -185,7 +252,7 @@ def revise_branch(
     risks = _strings(risks, "risks")
     if not risks:
         raise ValueError("Revision requires explicit unresolved risks")
-    refs = _evidence(operations, [source_ref, *_strings(evidence_refs, "evidence_refs")])
+    refs = [source_ref, *source["evidence_refs"], *_strings(evidence_refs, "evidence_refs")]
     revision = revise_external_route_proposal(
         _proposal(source["proposal"]), remove_step_ids=tuple(_strings(remove_step_ids, "remove_step_ids")),
         replacement_steps=tuple(_step(value, named=True) for value in replacement_steps),
@@ -233,5 +300,8 @@ def compare_routes(operations: ScientificOperations, source_refs: list[str]) -> 
                       for item in record["assessment"]["step_assessments"]],
             "proposed_recipe_assessments": record["proposed_recipe_assessments"],
             "revision": record.get("revision"), "limitations": record["limitations"],
+            "evidence_refs": record["evidence_refs"],
+            "evidence_provenance": record.get("evidence_provenance", []),
+            "evidence_warnings": record.get("evidence_warnings", []),
         } for ref, record in zip(refs, records)],
     }

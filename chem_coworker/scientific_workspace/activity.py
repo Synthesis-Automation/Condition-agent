@@ -8,6 +8,8 @@ from pathlib import Path
 import re
 from typing import Any, Mapping
 
+from .store import InvestigationStore, SCHEMA_VERSION, _read_json
+
 
 ACTIVITY_VERSION = 3
 _EVENTS = {"item.started", "item.updated", "item.completed", "item.failed"}
@@ -167,6 +169,93 @@ class ActivityHistory:
         # Results can be large; only action fields are needed to merge later updates.
         self._items[key] = {k: v for k, v in merged.items() if k not in {"aggregated_output", "result"}}
         return row
+
+    def observe_scientific(self, event: Mapping[str, Any], payload: Mapping[str, Any]) -> dict[str, Any] | None:
+        """Project recorded scientific outcomes, including errors hidden by a successful shell."""
+        key = f"scientific:{event['sequence']}"
+        if key in self._positions:
+            return None
+        kind = event["kind"]
+        detail: list[str] = []
+        error = payload.get("error")
+        if kind == "call":
+            title = "Scientific call: " + _text(payload.get("operation"), 120)
+            status = payload.get("execution_status")
+            arguments = payload.get("arguments") or {}
+            if isinstance(arguments, Mapping):
+                for name in ("target_smiles", "reaction_smiles", "smiles", "source_ref"):
+                    if isinstance(arguments.get(name), str):
+                        detail.append(f"{name}: {_text(arguments[name], 180)}")
+            result = payload.get("result")
+            if isinstance(result, Mapping):
+                if isinstance(result.get("status"), str):
+                    detail.append("Result: " + _text(result["status"], 100))
+                if result.get("valid") is False:
+                    detail.append("Result valid: false; inspect the recorded result")
+                if isinstance(result.get("strategies"), list):
+                    detail.append(f"{len(result['strategies'])} strategies returned")
+        elif kind == "literature_source":
+            captured = payload.get("retrieval_status") == "not_performed"
+            title = "Save literature excerpt" if captured else "Fetch literature source"
+            status = "completed" if captured else payload.get("retrieval_status")
+            detail.append(_text(payload.get("source_url") or payload.get("final_url") or payload.get("url"), 350))
+            extraction = payload.get("extraction") or {}
+            if isinstance(extraction, Mapping):
+                detail.append("Text extraction: " + _text(extraction.get("status"), 100))
+                if extraction.get("error") and not error:
+                    title = "Extract literature text"
+                    error = extraction["error"]
+                    status = "failed"
+            if captured:
+                detail.append("Agent-supplied text; URL and transcription are not HTTP-verified")
+        elif kind == "custom_execution":
+            title = "Run recorded Python script"
+            status = payload.get("execution_status")
+            detail.append(_text(payload.get("execution_directory"), 250))
+        else:
+            return None
+        if isinstance(payload.get("duration_seconds"), (int, float)):
+            detail.append(f"Duration: {payload['duration_seconds']:.2f}s")
+        if isinstance(error, Mapping):
+            failure = ": ".join(_text(error.get(field), 450) for field in ("type", "message") if error.get(field))
+        else:
+            failure = _text(error, 500)
+        row = {
+            "kind": "scientific_call" if kind == "call" else kind,
+            "status": "failed" if status in {"error", "failed", "timed_out"} else status,
+            "at": event["created_at"], "updated_at": event["created_at"],
+            "detail": _text("; ".join(part for part in detail if part)), "title": title,
+            "activity_id": key, "event_sequence": event["sequence"],
+            "artifact_ref": event["artifact_ref"], "failure_detail": _text(failure, 500),
+        }
+        self._positions[key] = len(self.rows)
+        self.rows.append(row)
+        return row
+
+
+class ScientificActivityCursor:
+    """Read only newly committed events, without rehashing the full history on each poll."""
+
+    def __init__(self, store: InvestigationStore, *, after_sequence: int) -> None:
+        self.store = store
+        self.sequence = after_sequence
+
+    def drain(self, history: ActivityHistory) -> list[dict[str, Any]]:
+        """Return new recorded call/source/script outcomes exactly once per event sequence."""
+        rows = []
+        while True:
+            path = self.store.root / "events" / f"{self.sequence + 1:08d}.json"
+            if not path.is_file():
+                return rows
+            event = _read_json(path)
+            if event.get("sequence") != self.sequence + 1 or event.get("schema_version") != SCHEMA_VERSION:
+                raise ValueError("Invalid scientific activity event")
+            if event.get("kind") in {"call", "literature_source", "custom_execution"}:
+                payload = self.store.read_artifact(event["artifact_ref"])
+                row = history.observe_scientific(event, payload)
+                if row is not None:
+                    rows.append(row)
+            self.sequence += 1
 
 
 def recover_activity(paths: list[Path], saved: list[dict[str, Any]]) -> list[dict[str, Any]]:

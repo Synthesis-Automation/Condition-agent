@@ -1,4 +1,4 @@
-"""Annotated SVG display preserves explicit chemistry and epistemic labels."""
+"""Compact annotated SVGs preserve explicit chemistry and complete provenance."""
 
 import json
 from pathlib import Path
@@ -12,32 +12,40 @@ from visualization import (
 )
 
 
-def test_scheme_has_named_structures_conditions_and_separate_yield_status() -> None:
+def test_scheme_has_compact_visible_labels_and_complete_attributed_description() -> None:
     root = ET.fromstring(render_annotated_scheme_svg(
         (SchemeMolecule("Bromoethane", "CCBr"), SchemeMolecule("Ammonia", "N")),
         (SchemeMolecule("Ethylamine", "CCN"),), title="Illustrative substitution", basis="proposed",
-        conditions=(SchemeAnnotation("Solvent <unknown> & temperature unspecified", "unknown"),),
-        yield_info=SchemeAnnotation("Not established", "unknown"),
+        conditions=(SchemeAnnotation("NaOH, EtOH", "reported"),),
+        yield_info=SchemeAnnotation("81% isolated yield after workup", "reported"),
     ))
-    text = " ".join(root.itertext())
-    assert "Bromoethane" in text and "Ethylamine" in text
-    assert "Unknown: Solvent <unknown>" in text
-    assert "Yield (unknown):" in text
-    assert "Proposed transformation" in text
-    assert "Not a feasibility assessment" in text
     ns = "{http://www.w3.org/2000/svg}"
+    visible = " ".join(node.text or "" for node in root.findall(ns + "text"))
+    description = root.find(ns + "desc").text
+    assert "Bromoethane" in visible and "Ethylamine" in visible
+    assert "NaOH" in visible and "EtOH" in visible and "81%" in visible
+    assert all(text not in visible for text in ("Reported", "Proposed", "Yield", "transformation", "agent-authored"))
+    assert "reported: NaOH, EtOH" in description
+    assert "Yield (reported): 81% isolated yield after workup" in description
+    assert "Proposed transformation" in description
+    assert "Not a feasibility assessment" in description
     assert len(root.findall(ns + "g" + "[@data-role='molecule']")) == 3
     assert len(root.findall(".//" + ns + "path")) > 10
     assert root.get("data-definition") == "annotated_scheme.v1"
+    assert root.get("data-schema-version") == "1.1"
     assert not root.findall(".//" + ns + "unknown")
 
 
 def test_missing_conditions_are_not_invented_and_bad_structures_fail() -> None:
-    text = render_annotated_scheme_svg(
+    root = ET.fromstring(render_annotated_scheme_svg(
         (SchemeMolecule("Input", "CCO"),), (SchemeMolecule("Output", "CC=O"),),
         title="Hypothesis", basis="proposed",
-    ).decode()
-    assert "Conditions not supplied" in text and "Yield not supplied" in text
+    ))
+    ns = "{http://www.w3.org/2000/svg}"
+    description = root.find(ns + "desc").text
+    assert "Conditions not supplied" in description and "Yield not supplied" in description
+    assert not root.findall(ns + "text[@data-role='conditions']")
+    assert not root.findall(ns + "text[@data-role='yield']")
     with pytest.raises(ValueError, match="Invalid SMILES"):
         render_annotated_scheme_svg(
             (SchemeMolecule("Bad", "C1CC"),), (SchemeMolecule("Output", "CC=O"),),
@@ -48,7 +56,7 @@ def test_missing_conditions_are_not_invented_and_bad_structures_fail() -> None:
 
 
 def test_long_annotations_are_bounded_visually_and_complete_in_description() -> None:
-    long = "Long unverified condition annotation. " * 90
+    long = "NaOH, EtOH, DMF, DMSO, THF, K2CO3, Cs2CO3, acetonitrile, triethylamine"
     root = ET.fromstring(render_annotated_scheme_svg(
         (SchemeMolecule("A long molecule name " * 8, "C[C@H](O)Cl"),),
         (SchemeMolecule("Product", "CC(=O)Cl"),), title="Long labels", basis="proposed",
@@ -57,15 +65,67 @@ def test_long_annotations_are_bounded_visually_and_complete_in_description() -> 
     ns = "{http://www.w3.org/2000/svg}"
     assert long in root.find(ns + "desc").text
     assert "C[C@H](O)Cl" in root.find(ns + "desc").text
-    assert "More conditions in step details" in " ".join(root.itertext())
-    assert float(root.get("height")) < 900
+    visible = " ".join(node.text or "" for node in root.findall(ns + "text"))
+    assert "…" in visible
+    assert "More conditions" not in visible
+    assert float(root.get("height")) < 430
+    style = load_annotated_scheme_style()
+    assert len(root.findall(ns + "text[@data-role='conditions']")) <= style["max_annotation_lines"]
+    assert len(root.findall(ns + "text[@data-role='molecule-name']")) <= 2 * style["max_name_lines"]
     width, height = float(root.get("width")), float(root.get("height"))
     for node in root.findall(ns + "text"):
         assert 0 <= float(node.get("x")) <= width
-        assert 0 <= float(node.get("y")) <= height
+        size = float(node.get("font-size"))
+        assert size <= float(node.get("y")) <= height - size / 4
+        # Wrapped labels respect the versioned width estimate and canvas height.
+        if node.get("data-role") == "conditions":
+            assert len(node.text) * size * style["character_width_em"] <= style["arrow_width"]
+        elif node.get("data-role") == "molecule-name":
+            assert len(node.text) * size * style["character_width_em"] <= style["molecule_width"]
 
 
-@pytest.mark.parametrize("key,value", [("font_size", 0), ("gap", True), ("schema_version", "2.0")])
+def test_unknown_annotations_stay_in_metadata_without_visible_placeholders() -> None:
+    root = ET.fromstring(render_annotated_scheme_svg(
+        (SchemeMolecule("Input", "CCO"),), (SchemeMolecule("Output", "CC=O"),),
+        title="Hypothesis", basis="proposed",
+        conditions=(SchemeAnnotation("Conditions not supplied", "unknown"),),
+        yield_info=SchemeAnnotation("Not established", "unknown"),
+    ))
+    ns = "{http://www.w3.org/2000/svg}"
+    assert not root.findall(ns + "text[@data-role='conditions']")
+    assert not root.findall(ns + "text[@data-role='yield']")
+    assert "unknown: Conditions not supplied" in root.find(ns + "desc").text
+    assert "Yield (unknown): Not established" in root.find(ns + "desc").text
+
+
+def test_compact_layout_shortens_arrow_without_scaling_molecule_panels() -> None:
+    root = ET.fromstring(render_annotated_scheme_svg(
+        (SchemeMolecule("Input", "CCO"),), (SchemeMolecule("Output", "CC=O"),),
+        title="Compact", basis="reported",
+    ))
+    style = load_annotated_scheme_style()
+    assert style["arrow_width"] == 240
+    assert style["molecule_preset"] == "web_consistent"
+    assert style["molecule_width"] == 260 and style["molecule_height"] == 220
+    assert float(root.get("width")) == 2 * 28 + 2 * 260 + 2 * 32 + 240
+    assert float(root.get("height")) < 320
+
+
+def test_common_ligand_formula_remains_intact_on_compact_arrow() -> None:
+    root = ET.fromstring(render_annotated_scheme_svg(
+        (SchemeMolecule("Input", "CCO"),), (SchemeMolecule("Output", "CC=O"),),
+        title="Supplied catalyst", basis="reported",
+        conditions=(SchemeAnnotation("Pd[P(t-Bu)3]2, K2CO3, THF", "reported"),),
+    ))
+    labels = root.findall("{http://www.w3.org/2000/svg}text[@data-role='conditions']")
+    assert any("Pd[P(t-Bu)3]2" in (node.text or "") for node in labels)
+
+
+@pytest.mark.parametrize("key,value", [
+    ("font_size", 0), ("gap", True), ("schema_version", "2.0"),
+    ("bottom_padding", 0), ("max_name_lines", False), ("line_height", 1), ("arrow_width", 1),
+    ("character_width_em", True), ("character_width_em", 2),
+])
 def test_scheme_definitions_are_validated(monkeypatch, key, value) -> None:
     definition = load_annotated_scheme_style()
     definition[key] = value

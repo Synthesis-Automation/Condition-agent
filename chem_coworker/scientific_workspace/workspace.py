@@ -176,3 +176,35 @@ class ScientificWorkspace:
         from .evidence_review import record_evidence_review
 
         return record_evidence_review(self.store, draft, findings)
+
+    def task_guide(self, task: str) -> dict[str, Any]:
+        """Read the optional conditions or retrosynthesis guide frozen in this run."""
+        from .learning import task_guide
+
+        return task_guide(self.store, task)
+
+    def recall_lessons(self, task: str, limit: int = 3) -> dict[str, Any]:
+        """Read at most three frozen procedural lessons; these are not scientific evidence."""
+        from .learning import recall_lessons
+
+        return recall_lessons(self.store, task, limit)
+
+    def record_lesson(
+        self, task: str, advice: str, applies_when: str, evidence_refs: list[str], scope: str = "code",
+    ) -> InvestigationEvent:
+        """Save evidence-linked procedural advice for later runs; at most three per turn."""
+        from .learning import record_lesson
+
+        return record_lesson(self.store, task, advice, applies_when, evidence_refs, scope)
+
+    def retire_lesson(self, lesson_id: str, reason: str, evidence_refs: list[str]) -> InvestigationEvent:
+        """Record a correction that retires a recalled lesson for subsequent investigations."""
+        from .learning import retire_lesson
+
+        return retire_lesson(self.store, lesson_id, reason, evidence_refs)
+
+    def publish_lessons(self) -> dict[str, Any]:
+        """Publish pending lessons after a CLI investigation; the conversation service does this itself."""
+        from .learning import publish_lessons
+
+        return publish_lessons(self.store)

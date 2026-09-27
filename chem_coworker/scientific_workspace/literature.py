@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import base64
 from datetime import datetime, timezone
+import errno
 import hashlib
 from html.parser import HTMLParser
 import http.client
@@ -30,6 +31,14 @@ MAX_TEXT_CHARACTERS = 2_000_000
 MAX_PASSAGE_CHARACTERS = 16_000
 FETCH_TIMEOUT_SECONDS = 30.0
 MAX_REDIRECTS = 4
+
+
+def _network_permission_denied(error: BaseException) -> bool:
+    return (
+        isinstance(error, PermissionError)
+        or getattr(error, "winerror", None) == 10013
+        or getattr(error, "errno", None) in {errno.EACCES, errno.EPERM, 10013}
+    )
 
 
 def _url(value: str) -> str:
@@ -95,6 +104,10 @@ def _request(url: str, *, timeout: float) -> dict[str, Any]:
                 return connection
             except OSError as exc:
                 connection.close()
+                if _network_permission_denied(exc):
+                    # A blocked socket is not a DNS-address selection problem.
+                    # Preserve the denial instead of retrying equivalent sockets.
+                    raise
                 last_error = exc
         raise last_error or OSError("No public source address reachable")
 
@@ -299,6 +312,26 @@ def fetch_source(store: InvestigationStore, url: str, *, title: str | None = Non
             break
     except (OSError, ValueError, http.client.HTTPException) as exc:
         record["error"] = {"type": type(exc).__name__, "message": str(exc)[:1000]}
+        permission_denied = _network_permission_denied(exc)
+        record["error"]["category"] = (
+            "network_permission_denied" if permission_denied else "source_retrieval_failed"
+        )
+        record["recovery"] = {
+            "action": "capture_browser_source", "source_url": current,
+            "instructions": (
+                "If an available browser or web tool can open this public source, copy its "
+                "visible text exactly and call w.capture_source(text, url=source_url, "
+                "title=title, locator=locator). Keep this failed artifact as provenance. "
+                "The captured text remains an unverified agent-supplied excerpt. "
+                "If the source cannot be opened, report the evidence gap."
+            ),
+            "retry_guidance": (
+                "Do not repeat direct fetches while this network-permission restriction persists. "
+                "Use the available browser/web tool; do not change sandbox permissions."
+                if permission_denied else
+                "Retry only when there is a concrete reason the source or connection has changed."
+            ),
+        }
     text = record["extraction"]["text"]
     record["text_sha256"] = hashlib.sha256(text.encode("utf-8")).hexdigest()
     record["text_characters"] = len(text)
@@ -379,6 +412,7 @@ def inspect_source(
         "next_offset": end if end < len(text) and found is not False else None,
         "reported_locator": source.get("reported_locator"),
         "limitations": source["extraction"].get("limitations", []), "claim_support": "not_assessed",
+        "error": source.get("error"), "recovery": source.get("recovery"),
     }
 
 

@@ -248,8 +248,12 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
                        "revise_route_branch"}:
         route = operation in {"assess_route_proposal", "revise_route_branch"}
         summary.update(view.pick(value, (
-            "source_ref", "step_id", "upstream_step_ids", "downstream_step_ids", "assessment_options", "evidence_refs",
+            "source_ref", "step_id", "upstream_step_ids", "downstream_step_ids", "assessment_options", "evidence_refs", "evidence_warnings",
         ), path))
+        view.add_list(summary, value, "evidence_provenance", (
+            "artifact_ref", "kind", "role", "source_url", "acquisition", "retrieval_status",
+            "extraction_status", "claim_support", "warnings",
+        ), path)
         if "assessment" in value:
             summary["assessment"] = view.assessment(value["assessment"], f"{path}.assessment", route=route)
         view.add_nested(summary, value, "material_constraints", (

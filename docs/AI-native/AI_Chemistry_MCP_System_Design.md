@@ -24,6 +24,12 @@ assessors. The workspace does not expose the built-in automatic multistep planne
 Branch selection, alternatives, evidence and stopping decisions belong to the agent;
 chemical validation remains in the scientific packages.
 
+The workspace adds two optional task guides and a small procedural lesson store
+to help the agent reuse useful investigation practices. This is implemented in
+the current Python workspace; it does not depend on a future MCP service or a
+workflow engine. The agent retains control of tool order, branch choices and
+stopping decisions.
+
 A general architecture is:
 
 ```text
@@ -96,6 +102,68 @@ Advantages:
 - can combine rules, databases, ML models, and hardware
 - avoids forcing one model to perform every scientific function
 - supports closed-loop autonomous experimentation
+
+### Optional guidance and procedural learning in the workspace
+
+Keep guidance separate from scientific authority:
+
+| Layer | Responsibility |
+| --- | --- |
+| Chemistry tools and validators | Enforce structural, compatibility and evidence contracts. |
+| Optional conditions/retrosynthesis guides | Offer useful questions, examples, failure recovery and stopping considerations. The agent can skip or change the suggested approach. |
+| Procedural lessons | Share concrete, evidence-linked lessons about tool use and investigation practices across development runs. |
+
+The implementation uses two repository Markdown guides and one project JSONL
+store at `results/ai_native/lessons.jsonl`. It does not automatically rewrite
+guides or chemistry rules. At investigation creation, the baseline pins the
+guide contents and up to three applicable lessons per task, including general
+advice when useful. Follow-up turns keep this snapshot; later publications affect
+new investigations. The agent can inspect it with `w.task_guide(task)` and
+`w.recall_lessons(task, limit=3)`.
+
+An agent may record zero to three lessons per turn with `w.record_lesson`, stating
+the advice, when it applies and supporting artifact references from the run.
+Success or failure can yield useful evidence, but a reflection alone is not a
+lesson's evidence. Records remain agent-authored and unreviewed. The default
+`code` scope requires the same scientific code manifest and recorded environment
+versions; `environment` scope allows code changes while retaining the environment
+version match. Contradicted advice can be retired with recorded reasons and evidence.
+
+The conversation service publishes recorded lessons after a turn, including a
+failed turn; Python/CLI users explicitly call `w.publish_lessons()` when finished.
+Publication is idempotent, and later retrieval verifies source artifacts. There
+is no compulsory reflection step, automatic claim promotion or chemistry-model
+training. Lessons cannot override chemistry checks or serve as evidence for a
+reaction. New chemistry definitions and scoring changes still pass the existing
+validation gates. Learning is restricted to declared development investigations;
+untouched evaluation cases must stay outside lesson extraction and retrieval.
+
+### Observable execution and recovery
+
+The workspace displays actual agent updates and tool activity together in the
+conversation timeline. Compact tool rows expand inline for commands, inputs and
+recorded errors; the main conversation scrolls as one stream. Completed activity
+remains above the final answer. Scientific-call, source-fetch/extraction and
+custom-script failures also enter each turn's
+`progress.jsonl`, even when the enclosing shell command succeeds. Each nested
+entry retains its event sequence and original artifact reference; polling and
+finalization collect new committed events once. A quiet running turn shows the
+elapsed time since real activity instead of generating fictitious commentary.
+Debug logs remain on disk and downloadable through the debug-log API; the chat
+interface has no separate debug-log download control. The composer starts at one
+line and grows with the draft.
+
+The runtime discovers and verifies an installed `rg`, including runtime/editor
+bundles, and configures only the worker's PATH. If unavailable or denied, the
+agent can use Python or PowerShell search. Network permission failures retain
+their diagnostics and recommend an available browser reader plus
+`w.capture_source` for the actual returned text. This recovery preserves the
+failed fetch and labels captured text as an unverified agent-supplied excerpt.
+Route assessors accept captured literature references as provenance while leaving
+structural and topology gates unchanged; citations do not validate chemistry.
+
+See the [workspace readme](readme.md#optional-guides-and-lessons-from-previous-runs)
+for the current methods and operating details.
 
 ---
 

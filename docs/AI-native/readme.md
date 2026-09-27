@@ -35,8 +35,9 @@ use **Plan a synthesis** or supply a target SMILES with your constraints.
 The agent chooses operations, examines results, and can run custom analysis
 scripts. It can ask for missing structures rather than invent a reaction.
 
-The page has a conversation sidebar and a message composer at the bottom.
-It opens in dark mode; use **Light mode / Dark mode** in the top-right corner
+The page has a conversation sidebar and a compact message composer at the bottom.
+The composer starts at one line and grows as you type a longer question.
+The page opens in dark mode; use **Light mode / Dark mode** in the top-right corner
 to switch. Your choice is saved in this browser. Scientific drawings retain a
 light canvas so bonds and element colors stay readable in either theme.
 Press **Enter** to send and **Shift+Enter** for a new line. While the agent works,
@@ -44,34 +45,49 @@ the conversation shows concise agent-written updates about the current check,
 findings and next action, alongside its state and elapsed time. The prompt asks
 for an opening update and further updates after meaningful findings or failures,
 roughly once a minute during longer work when possible. These are public status
-messages, not private reasoning or a validated final answer. Expand **View activity**
-for recorded actions: the command or script, search queries, web-page targets,
-scientific tool inputs, and bounded failure diagnostics. Each action updates one
-row as it runs and finishes; scrolling back keeps your reading position. Older
-chats recover details from saved runtime logs when available, without changing
+messages, not private reasoning or a validated final answer. Updates and recorded
+actions appear together in chronological order within the conversation. Tool rows
+show the command or script, search query, web-page target or scientific action;
+expand a row inline for its command, inputs and recorded failure details. Each
+action updates one row as it runs and finishes. The conversation has one main
+scroll area, and scrolling back keeps your reading position. Older chats recover
+details from saved runtime logs when available, without changing
 their evidence. Restart the server and refresh the page after updating this code;
 a browser refresh alone cannot update an already-running Python service.
 The final answer appears when ready; the UI
 does not stream intermediate drafts or estimate a completion percentage.
-Updates remain available under **Investigation updates** after the turn ends.
-Use **Download debug log** for timestamped updates, tool lifecycle events, failure
-diagnostics, answer-validation errors and turn exceptions. New turns save this
-append-only log at `turns/<turn-id>/progress.jsonl`; the full runtime event stream
+The completed timeline remains above the final answer after the turn ends.
+If no new activity arrives for a minute, the page shows the time since the last
+recorded action and reports that the runtime is still running. This status does
+not invent an agent update or imply that a scientific check has succeeded.
+Timestamped updates, tool lifecycle events, failure diagnostics,
+answer-validation errors and turn exceptions remain available in the debug log.
+New turns save this append-only log at `turns/<turn-id>/progress.jsonl`;
+the full runtime event stream
 and process output remain in `runtime.jsonl` and `runtime.stderr.txt` (and
 `repair-1/` for a correction attempt). The debug log is an operational record,
 separate from checksum-verified scientific evidence; its live download contains
-only complete JSONL lines. Old chats can show recovered updates from runtime logs
-but do not acquire a fabricated historical debug log.
-Reaction schemes appear beneath the concise answer, one SVG per step, with named
-reactants/products, conditions above the arrow and yield below. Retrosynthesis
-plans are shown in synthetic direction. Each annotation retains its declared
-reported/proposed/computed status; drawings do not validate feasibility. Download
-individual SVGs from their cards. Wide schemes scroll horizontally on small screens.
-Molecule cards and reaction schemes use the shared `web_consistent` drawing
-preset (about 30 pixels per bond). Larger molecules expand the SVG canvas;
-the web UI keeps the intrinsic SVG size and provides scrolling instead of
-scaling each structure to fill its card. Restart the server after rendering
-code changes to clear cached saved-answer presentations.
+only complete JSONL lines through the
+`GET /api/v1/scientific/conversations/{id}/turns/{turn_id}/debug-log` endpoint.
+The chat interface has no debug-log download button. Old chats can show recovered
+updates from runtime logs but do not acquire a fabricated historical debug log.
+Recorded scientific calls, source fetches/extraction, and custom-script outcomes
+also enter activity and the debug log, including failures inside a command that
+exits successfully. The server collects committed events during runtime polling
+and when the turn ends, retaining their event sequence and original artifact
+reference without duplicating them or changing scientific results.
+Reaction schemes appear beneath the concise answer, one SVG per step, with compact
+compound names, conditions above the arrow and yield below. Retrosynthesis plans
+are shown in synthetic direction. Open **Step details & evidence** for full names,
+condition text and sources. The step heading retains its declared
+reported/proposed/computed status; drawings do not validate feasibility.
+Scheme previews prefer 60% of the native SVG width and shrink further to fit a
+narrow card, keeping the complete reaction visible. **Download SVG** retains the
+native vector drawing. Molecule cards and reaction schemes use the shared
+`web_consistent` drawing preset (about 30 pixels per bond before preview scaling).
+Larger molecules expand the SVG canvas; standalone molecule cards keep their
+intrinsic size and provide scrolling. Restart the server after rendering code
+changes to clear cached saved-answer presentations.
 Alternative routes are separate expandable sections; the first is initially open,
 without implying that it is scientifically preferred. Step evidence, molecule
 galleries, SMILES, route connections, and uncertainty remain expandable. Missing
@@ -255,6 +271,16 @@ save its actual returned passage with `capture_source`, retaining the failed
 download artifact and its limitation. This does not turn an agent-supplied
 passage into an independently fetched snapshot. See the runtime's
 [network access configuration](https://learn.chatgpt.com/docs/agent-approvals-security).
+Permission-denied fetches now carry `network_permission_denied` and explicit
+browser-capture recovery guidance. Do not repeat the same blocked download;
+retain its failed artifact and report a source-access gap if no reader can open it.
+
+The runtime checks for a working `rg` on PATH or in installed runtime/editor
+bundles and adds its directory only to the child process's PATH. It does not
+install software or change the user's PATH. The detected path and version are
+recorded in runtime metadata; if unavailable, use Python `pathlib`/`re` or
+PowerShell `Get-ChildItem`/`Select-String`. Host discovery does not guarantee the
+sandbox can execute the binary, so a denied invocation still requires a fallback.
 
 Each attempt saves `runtime-request.json` and `runtime-observations.json`. The
 former records requested settings and their origin; the latter counts observed
@@ -268,6 +294,55 @@ index compatibility or corpus validation. Inspect the same local checks with:
 ```powershell
 python -m chem_coworker.scientific_workspace capabilities results/ai_native/YOUR_INVESTIGATION
 ```
+
+### Optional guides and lessons from previous runs
+
+Two short versioned guides offer questions, examples, pitfalls and stopping
+considerations: [conditions](../../chem_coworker/scientific_workspace/guides/conditions.md)
+and [retrosynthesis](../../chem_coworker/scientific_workspace/guides/retrosynthesis.md).
+The agent may skip a guide or reorder, repeat or replace its suggestions. The
+guides do not impose a required workflow. Tool contracts still enforce scientific
+inputs, structural checks and evidence requirements.
+
+At investigation creation, the baseline freezes both guides and up to three
+applicable lessons per task (`general`, `conditions`, `retrosynthesis`). Selection
+prefers exact-task advice, then general advice, and newer records within each
+category. It verifies their recorded evidence and removes duplicate advice.
+Follow-up turns read this same snapshot; newly published lessons affect only
+new investigations. The snapshot includes guide contents, lesson records and a
+checksum so an investigation never silently acquires changed guidance.
+
+These are direct workspace methods, separate from chemistry operations:
+
+| Method | Purpose |
+| --- | --- |
+| `w.task_guide("conditions")` | Read the optional frozen conditions or retrosynthesis guide. |
+| `w.recall_lessons("retrosynthesis", limit=3)` | Read up to three pinned lessons for the selected task. |
+| `w.record_lesson(task, advice, applies_when, evidence_refs, scope="code")` | Save concrete procedural advice supported by actual artifact references from this investigation. |
+| `w.retire_lesson(lesson_id, reason, evidence_refs)` | Retire recalled advice for future investigations when recorded evidence contradicts it. |
+| `w.publish_lessons()` | Publish pending records after a Python/CLI investigation; repeated publication does not duplicate them. |
+
+An agent may record **zero to three lessons per turn**. Useful lessons concern
+tool usage, recovery and investigation practices; a successful answer alone is
+not supporting evidence. Records retain applicability, source investigation,
+supporting artifacts and version scope. The default `code` scope requires the
+same scientific code manifest and recorded environment versions. Use
+`environment` only for practices independent of code changes; it still requires
+matching recorded OS/Python/dependency versions. It does not freeze tool availability;
+check current runtime diagnostics before applying advice about an unavailable tool.
+
+The project store is `results/ai_native/lessons.jsonl`. The conversation server
+publishes already-recorded lessons and retirements after the turn, including a
+failed turn with useful evidence. It does not manufacture lessons from logs.
+Python/CLI users call `w.publish_lessons()` explicitly when finished. Keep the
+source investigation and artifacts available: unverifiable records are skipped.
+
+Lessons are **agent-authored, unreviewed advice**, not scientific evidence or
+automatic chemistry learning. They cannot change graph rules, scoring, admission,
+recipes or evidentiary standards; those changes still require the normal code
+and chemistry validation process. The feature is development-only. Do not feed
+untouched evaluation cases into this learning path; lesson retrieval and changes
+are disabled for baselines outside the declared development partition.
 
 ### Literature and final evidence review
 
@@ -305,6 +380,12 @@ fetched or authenticated that URL. New external answer sources must match their
 captured original/final URL and contain actual text. Failed fetch artifacts can
 support an access limitation but cannot masquerade as a read source passage.
 Legacy source attachments remain supported with their original limitations.
+
+Route assessments accept recorded literature sources and exact excerpts through
+`evidence_refs`, retaining them as `literature_provenance` with acquisition and
+extraction limitations. Failed downloads and empty source text cannot serve as
+route literature provenance. Captured text is not proof of a chemical claim:
+source attribution does not override structural, topology or condition gates.
 
 For recommendations the prompt requests `w.record_evidence_review(draft, findings)`
 covering source identity, structure/stereochemistry, conditions/yields, route

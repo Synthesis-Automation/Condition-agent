@@ -81,12 +81,12 @@ function showStructured(view, key = 'science') {
       const scroll = element('div', '', 'scheme-scroll');
       scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', 'Reaction scheme: ' + step.title);
       const image = element('img', '', 'reaction-scheme'); image.src = step.image_url;
-      if (step.scheme_width) image.style.width = step.scheme_width + 'px';
+      if (step.scheme_width) image.style.width = step.scheme_width * 0.6 + 'px';
       image.alt = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ') + '. Conditions and yield in step details.';
       image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
       const actions = element('figcaption', '', 'scheme-actions');
       const download = element('a', 'Download SVG'); download.href = step.image_url; download.download = step.id + '-reaction.svg';
-      actions.append(element('span', 'Synthetic direction'), download); figure.append(actions); card.append(figure);
+      actions.append(download); figure.append(actions); card.append(figure);
     } else card.append(element('p', 'Scheme unavailable for the supplied notation. Structures and conditions are retained in step details.', 'scientific-note'));
     // Keep scientific cautions visible, but coalesce repeated wording.
     notes(card, [...step.limitations, ...step.conditions.flatMap(item => item.limitations), ...(step.yield_info?.limitations || [])]);
@@ -103,7 +103,6 @@ function showStructured(view, key = 'science') {
     card.append(disclosure('Step details & evidence', routeKey + ':' + step.id, detail));
     return card;
   }
-  if (view.steps.length) section.append(element('p', 'Reaction schemes · declared structures; feasibility is not established by the drawings.', 'scheme-caption'));
   const routed = new Set();
   for (const [index, route] of view.routes.entries()) {
     const box = element('section', '', 'route-section');
@@ -188,6 +187,7 @@ function sourcesPanel(turn) {
 
 function answerCard(turn) {
   const card = element('article', '', 'assistant');
+  if (turn.progress?.length || runningStates.has(turn.status)) card.append(investigationTimeline(turn));
   if (turn.answer) {
     const answer = turn.answer;
     card.append(formattedMessage(answer.answer_markdown, turn.answer_presentation));
@@ -223,30 +223,15 @@ function answerCard(turn) {
     const elapsed = element('span', '', 'elapsed'); elapsed.id = 'elapsed';
     const spinner = element('span', '', 'spinner'); spinner.setAttribute('aria-hidden', 'true');
     line.append(spinner, label, elapsed);
-    const detail = activityPanel(turn, true);
-    const updates = element('div', '', 'investigation-updates'); updates.id = 'live-updates';
-    updates.setAttribute('role', 'log'); updates.setAttribute('aria-live', 'polite');
-    renderInvestigationUpdates(updates, turn.progress || []);
-    progress.append(line, updates, element('p', 'The answer will appear here when it is ready.', 'progress-caption'), detail);
+    const caption = element('p', '', 'progress-caption'); caption.hidden = true;
+    caption.id = 'progress-caption';
+    progress.append(line, caption);
     card.append(progress);
   } else {
     const stopped = turn.status === 'cancelled';
     card.append(element('p', stopped ? 'Stopped. Your question and any saved evidence are preserved.' :
       'This investigation could not finish.', stopped ? 'muted' : 'error-message'));
     if (turn.error && !stopped) card.append(disclosure('Show details', turn.id + ':error', element('p', turn.error.message)));
-  }
-  if (!runningStates.has(turn.status) && turn.progress?.length) {
-    if (turn.progress.some(event => event.kind === 'agent_update')) {
-      const updates = element('div', '', 'investigation-updates');
-      renderInvestigationUpdates(updates, turn.progress);
-      card.append(disclosure('Investigation updates', turn.id + ':updates', updates));
-    }
-    card.append(activityPanel(turn));
-  }
-  if (turn.debug_log_available) {
-    const link = element('a', 'Download debug log', 'debug-log-link');
-    link.href = base + '/conversations/' + encodeURIComponent(identity) + '/turns/' + encodeURIComponent(turn.id) + '/debug-log';
-    link.download = 'progress.jsonl'; card.append(link);
   }
   return card;
 }
@@ -260,13 +245,12 @@ function renderConversation(data) {
   const firstLoad = conversation === null;
   conversation = data;
   document.title = data.title + ' · Scientific workspace';
-  const signature = JSON.stringify(data.turns.map(t => [t.id, t.status, t.answer_ref, t.error, t.debug_log_available]));
+  const signature = JSON.stringify(data.turns.map(t => [t.id, t.status, t.answer_ref, t.error]));
   if (signature !== displayed) {
     const follow = firstLoad || nearBottom();
+    const position = $('scroll-area').scrollTop;
     const expanded = new Map(Array.from($('messages').querySelectorAll('details'))
       .filter(node => node.dataset.key).map(node => [node.dataset.key, Boolean(node.open)]));
-    const activityPositions = new Map(Array.from($('messages').querySelectorAll('ol'))
-      .filter(node => node.dataset.turn).map(node => [node.dataset.turn, node.scrollTop]));
     $('messages').replaceChildren();
     for (const turn of data.turns) {
       const question = element('div', '', 'user');
@@ -281,11 +265,9 @@ function renderConversation(data) {
     $('messages').querySelectorAll('details').forEach(node => {
       if (expanded.has(node.dataset.key)) node.open = expanded.get(node.dataset.key);
     });
-    $('messages').querySelectorAll('ol').forEach(node => {
-      if (activityPositions.has(node.dataset.turn)) node.scrollTop = activityPositions.get(node.dataset.turn);
-    });
     displayed = signature;
     if (follow) requestAnimationFrame(toBottom);
+    else $('scroll-area').scrollTop = position;
   }
   updateProgress();
 }
@@ -300,50 +282,113 @@ function activityLabel(event) {
   const names = {command_execution: 'Command', web_search: 'Web search', mcp_tool_call: 'Scientific tool',
     file_change: 'Saving investigation files', todo_list: 'Updating the plan'};
   const label = event.title || names[event.kind] || 'Agent activity';
-  const failed = ['failed', 'item.failed'].includes(event.status) || (Number.isInteger(event.exit_code) && event.exit_code !== 0);
+  const failed = ['failed', 'item.failed', 'error', 'timed_out'].includes(event.status) || (Number.isInteger(event.exit_code) && event.exit_code !== 0);
   const status = failed ? 'failed' : ['completed', 'item.completed'].includes(event.status) ? 'finished' :
     ['cancelled', 'canceled'].includes(event.status) ? 'stopped' : 'running';
   return label + ' · ' + status + (Number.isInteger(event.exit_code) ? ' · exit ' + event.exit_code : '');
 }
-function activityPanel(turn, live = false) {
-  const detail = element('details'); detail.dataset.key = turn.id + ':activity';
-  detail.append(element('summary', 'View activity'));
-  const events = element('ol', '', 'activity-list');
+function investigationTimeline(turn) {
+  const events = element('ol', '', 'investigation-timeline');
   events.dataset.turn = turn.id;
-  if (live) events.id = 'activity-list';
-  events.tabIndex = 0; events.setAttribute('aria-label', 'Investigation activity history');
-  detail.append(events); renderActivity(events, turn.progress || []);
-  return detail;
-}
-function renderActivity(events, progress) {
-  progress = progress.filter(event => event.kind !== 'agent_update');
-  const signature = JSON.stringify(progress);
-  if (events.dataset.signature === signature) return;
-  const position = events.scrollTop;
-  // Follow new entries only when the reader was already at the bottom.
-  const follow = events.clientHeight > 0 && events.scrollHeight - position - events.clientHeight < 24;
-  events.replaceChildren();
-  for (const event of progress) {
-    const row = element('li'); const at = event.at ? new Date(event.at) : null;
-    const content = element('div', '', 'activity-content');
-    content.append(element('span', activityLabel(event), 'activity-status'));
-    if (event.detail) content.append(element('div', event.detail, 'activity-detail'));
-    else if (!event.title) content.append(element('div', 'The runtime did not provide action details.', 'activity-detail'));
-    if (event.failure_detail) content.append(element('div', event.failure_detail, 'activity-error'));
-    row.append(element('time', !at || Number.isNaN(at.getTime()) ? '' : at.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})), content);
-    events.append(row);
+  events.setAttribute('aria-label', 'Investigation progress');
+  if (runningStates.has(turn.status)) {
+    events.id = 'live-timeline';
+    events.setAttribute('role', 'log'); events.setAttribute('aria-live', 'polite');
+    events.setAttribute('aria-relevant', 'additions text');
   }
-  if (!events.children.length) events.append(element('li', 'Waiting for the first activity update…'));
-  events.dataset.signature = signature;
-  events.scrollTop = follow ? events.scrollHeight : position;
+  renderTimeline(events, turn.progress || []);
+  return events;
 }
-function renderInvestigationUpdates(container, progress) {
-  const updates = progress.filter(event => event.kind === 'agent_update');
-  const signature = JSON.stringify(updates);
-  if (container.dataset.signature === signature) return false;
-  container.replaceChildren();
-  for (const update of updates) container.append(element('p', update.detail, 'investigation-update'));
-  container.dataset.signature = signature;
+function actionSummary(event) {
+  const subject = (event.detail || event.title || '').replace(/\s+/g, ' ').trim();
+  const failed = ['failed', 'item.failed', 'error', 'timed_out'].includes(event.status) ||
+    (Number.isInteger(event.exit_code) && event.exit_code !== 0);
+  if (failed) return 'Failed: ' + (subject || 'tool action');
+  if (['cancelled', 'canceled'].includes(event.status)) return 'Stopped: ' + (subject || 'tool action');
+  const finished = ['completed', 'item.completed'].includes(event.status);
+  const verbs = {
+    command_execution: ['Running', 'Ran'], custom_execution: ['Running', 'Ran'],
+    web_search: ['Searching', 'Searched'], file_change: ['Updating', 'Updated'],
+    mcp_tool_call: ['Calling', 'Called'], scientific_call: ['Checking', 'Checked'],
+    literature_source: ['Reading', 'Read'], todo_list: ['Planning', 'Planned'],
+  };
+  return (verbs[event.kind] || ['Working on', 'Finished'])[finished ? 1 : 0] + ' ' + (subject || 'investigation');
+}
+function setTimelineText(node, text) {
+  if (node.textContent !== text) node.textContent = text;
+}
+function createTimelineRow(key, update) {
+  const row = element('li', '', 'timeline-entry');
+  row.dataset.key = key;
+  row.dataset.mode = update ? 'update' : 'action';
+  if (update) {
+    row.append(element('p', '', 'investigation-update'));
+  } else {
+    const action = element('details', '', 'timeline-action');
+    action.dataset.key = key; action.open = false;
+    const summary = element('summary');
+    const icon = element('span', '', 'tool-icon'); icon.setAttribute('aria-hidden', 'true');
+    summary.append(icon, element('span', '', 'tool-summary'));
+    const content = element('div', '', 'action-details');
+    const metadata = element('div', '', 'action-metadata');
+    metadata.append(element('span', '', 'activity-status'));
+    content.append(metadata, element('div', '', 'activity-detail'), element('div', '', 'activity-error'));
+    action.append(summary, content);
+    row.append(action);
+  }
+  return row;
+}
+function updateTimelineRow(row, event) {
+  const signature = JSON.stringify(event);
+  if (row.dataset.signature === signature) return;
+  if (event.kind === 'agent_update') {
+    setTimelineText(row.firstElementChild, event.detail || '');
+  } else {
+    const action = row.firstElementChild;
+    const summary = action.firstElementChild;
+    const content = action.lastElementChild;
+    const metadata = content.firstElementChild;
+    const icons = {command_execution:'›_', custom_execution:'›_', web_search:'⌕', file_change:'✎',
+      mcp_tool_call:'◇', scientific_call:'◇', literature_source:'↗', todo_list:'☷'};
+    const label = actionSummary(event);
+    action.dataset.failed = String(label.startsWith('Failed:'));
+    summary.title = label;
+    setTimelineText(summary.firstElementChild, icons[event.kind] || '·');
+    setTimelineText(summary.lastElementChild, label);
+    setTimelineText(metadata.firstElementChild, activityLabel(event));
+    const at = event.at ? new Date(event.at) : null;
+    let timestamp = metadata.children[1];
+    if (at && !Number.isNaN(at.getTime())) {
+      if (!timestamp) { timestamp = element('time'); metadata.append(timestamp); }
+      setTimelineText(timestamp, at.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'}));
+      timestamp.setAttribute('datetime', at.toISOString());
+    } else if (timestamp) timestamp.remove();
+    const detail = event.detail || (!event.title ? 'The runtime did not provide action details.' : '');
+    setTimelineText(content.children[1], detail);
+    content.children[1].hidden = !detail;
+    setTimelineText(content.children[2], event.failure_detail || '');
+    content.children[2].hidden = !event.failure_detail;
+  }
+  row.dataset.signature = signature;
+}
+function renderTimeline(events, progress) {
+  const signature = JSON.stringify(progress);
+  if (events.dataset.signature === signature) return false;
+  const rows = new Map(Array.from(events.children).map(row => [row.dataset.key, row]));
+  const retained = new Set();
+  for (const [index, event] of progress.entries()) {
+    const key = events.dataset.turn + ':action:' + (event.activity_id || event.item_id || index);
+    const update = event.kind === 'agent_update';
+    let row = rows.get(key);
+    if (row && row.dataset.mode !== (update ? 'update' : 'action')) { row.remove(); row = null; }
+    if (!row) row = createTimelineRow(key, update);
+    updateTimelineRow(row, event);
+    retained.add(row);
+    // Preserve disclosure focus, selection, and live-region history during polling.
+    if (events.children[index] !== row) events.insertBefore(row, events.children[index] || null);
+  }
+  for (const row of Array.from(events.children)) if (!retained.has(row)) row.remove();
+  events.dataset.signature = signature;
   return true;
 }
 function updateProgress() {
@@ -354,16 +399,30 @@ function updateProgress() {
       turn.status === 'preparing' ? 'Preparing your workspace…' : turn.status === 'queued' ? 'Starting investigation…' :
       turn.repair_attempts ? 'Refining the answer…' : 'Investigating…';
     $('elapsed').textContent = elapsedText(turn.created_at);
-    const events = $('activity-list');
-    if (events) renderActivity(events, turn.progress || []);
-    const updates = $('live-updates');
+    const caption = $('progress-caption');
+    if (caption) {
+      const times = (turn.progress || []).map(event => event.updated_at || event.at).filter(value => Number.isFinite(Date.parse(value)));
+      const latest = times.sort((a, b) => Date.parse(a) - Date.parse(b)).at(-1);
+      const since = latest || turn.created_at;
+      const quiet = turn.status === 'running' && Date.now() - Date.parse(since) >= 60000;
+      caption.hidden = !quiet;
+      caption.textContent = quiet ?
+        (latest ? 'Last recorded activity ' : 'No recorded activity for ') + elapsedText(since) +
+          (latest ? ' ago. ' : '. ') + 'The runtime is still running; no new update has arrived.' :
+        '';
+    }
+    const events = $('live-timeline');
     const follow = nearBottom();
-    if (updates && renderInvestigationUpdates(updates, turn.progress || []) && follow) requestAnimationFrame(toBottom);
+    const position = $('scroll-area').scrollTop;
+    if (events && renderTimeline(events, turn.progress || [])) {
+      if (follow) requestAnimationFrame(toBottom);
+      else $('scroll-area').scrollTop = position;
+    }
   }
   if (active) $('active-text').textContent = (stopping ? 'Stopping investigation' : 'An investigation is running') + ' · ' + elapsedText(active.created_at);
 }
 function resizeInput() {
-  $('question').style.height = 'auto'; $('question').style.height = Math.min($('question').scrollHeight, 180) + 'px';
+  $('question').style.height = 'auto'; $('question').style.height = Math.min($('question').scrollHeight, 140) + 'px';
 }
 function updateControls() {
   $('send').disabled = !loaded || submitting || !!active || !$('question').value.trim();

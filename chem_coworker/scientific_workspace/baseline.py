@@ -37,6 +37,9 @@ def code_manifest(repository: Path) -> dict[str, str]:
                 continue
             if path.suffix == ".py" or (
                 "definitions" in path.parts and path.suffix in {".json", ".jsonl"}
+            ) or (
+                path.parent == repository / "chem_coworker" / "scientific_workspace" / "guides"
+                and path.suffix == ".md"
             ):
                 files[path.relative_to(repository).as_posix()] = sha256_file(path)
     return files
@@ -97,7 +100,7 @@ def capture_baseline(
                     columns = {row[1] for row in connection.execute("PRAGMA table_info(metadata)")}
                     if "payload" in columns:
                         value["metadata"] = [json.loads(row[0]) for row in connection.execute("SELECT payload FROM metadata")]
-    return {
+    baseline = {
         "schema_version": "scientific_baseline.v1",
         "repository": str(repository), "git_revision": revision,
         "git_status": dirty, "code_files": code_manifest(repository),
@@ -109,6 +112,10 @@ def capture_baseline(
         "validation_status": "development_snapshot_not_release_validated",
         "evaluation_partition": "development_only_not_an_untouched_evaluation",
     }
+    from .learning import build_learning_context
+
+    baseline["learning_context"] = build_learning_context(baseline)
+    return baseline
 
 
 def verify_baseline(baseline: Mapping[str, Any], *, full_hash: bool = False) -> None:

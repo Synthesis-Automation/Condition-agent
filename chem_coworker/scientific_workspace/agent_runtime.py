@@ -16,6 +16,7 @@ from typing import Any, Callable, Protocol
 
 from .answer_contracts import ANSWER_SCHEMA
 from .research_profiles import resolve_research_profile
+from .runtime_environment import discover_ripgrep, runtime_environment
 
 
 @dataclass(frozen=True)
@@ -121,6 +122,7 @@ class CodexRuntime:
         if model is not None and (not isinstance(model, str) or not model.strip()):
             raise ValueError("model must be a nonempty identifier or None to inherit")
         self.executable, self.version = find_codex(executable)
+        self.search_tool = discover_ripgrep(runtime_executable=self.executable)
         self.model = model
         self.timeout_seconds = self.settings.timeout_seconds
 
@@ -139,6 +141,7 @@ class CodexRuntime:
             "model_request": {"value": model, "source": "override" if model else "inherited"},
             "effective_configuration_status": "unconfirmed",
             "capabilities": {"web_search": "not_checked", "code_execution": "not_checked"},
+            "local_tools": {"rg": getattr(self, "search_tool", {"status": "not_checked"})},
             "limitations": [
                 "Requested settings do not establish provider support or successful tool access.",
                 "The effective model and reasoning effort are not resolved by this adapter.",
@@ -186,12 +189,12 @@ class CodexRuntime:
         prompt_path.write_text(prompt, "utf-8")
         output_path = turn_directory / "runtime.jsonl"
         stderr_path = turn_directory / "runtime.stderr.txt"
-        environment = os.environ.copy()
-        repository = str(Path(__file__).resolve().parents[2])
-        environment["PYTHONPATH"] = repository + os.pathsep + environment.get("PYTHONPATH", "")
-        environment["PYTHONIOENCODING"] = "utf-8"
-        environment["PYTHONDONTWRITEBYTECODE"] = "1"
+        environment = runtime_environment(
+            Path(__file__).resolve().parents[2],
+            search_tool=getattr(self, "search_tool", {}),
+        )
         started = monotonic()
+        last_heartbeat = started
         completed = False
         failed = False
         usage: dict[str, Any] = {}
@@ -246,6 +249,12 @@ class CodexRuntime:
                             failed = True
                     if exit_code is not None:
                         break
+                    if monotonic() - last_heartbeat >= 1:
+                        # An internal polling signal, not an invented agent update.
+                        # Consumers can observe scientific artifacts created by
+                        # a still-running shell command without waiting for exit.
+                        on_event({"type": "runtime.heartbeat"})
+                        last_heartbeat = monotonic()
                     cancel.wait(0.1)
             finally:
                 _stop_process(process)
