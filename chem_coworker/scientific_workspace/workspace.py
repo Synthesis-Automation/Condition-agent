@@ -130,6 +130,23 @@ class ScientificWorkspace:
         value = self.store.read_artifact(event.artifact_ref)
         return {"event": asdict(event), **summarize_call(value)}
 
+    def inspect_artifact(
+        self, artifact_ref: str, path: tuple[str | int, ...] | list[str | int] = (), *,
+        offset: int = 0, limit: int = 5,
+    ) -> dict[str, Any]:
+        """Inspect a bounded saved JSON field without recomputation or mutation.
+
+        Use literal keys/indices, for example ("result", "recommendations", 0).
+        Lists/mappings support pages of 1..20 items; omitted text, nested values,
+        and ancestor context are explicitly disclosed. Full artifacts stay on disk.
+        """
+        from .call_summaries import inspect_artifact_payload
+
+        return inspect_artifact_payload(
+            self.store.read_artifact(artifact_ref), artifact_ref=artifact_ref,
+            path=path, offset=offset, limit=limit,
+        )
+
     def capabilities(self) -> dict[str, Any]:
         """Probe local imports and configured file presence; do not assert web access."""
         from .capabilities import local_capabilities

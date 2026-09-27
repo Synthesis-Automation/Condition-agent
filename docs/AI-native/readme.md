@@ -151,11 +151,29 @@ automatically prove that the cited text substantiates each claim.
 The `computed` label requires a completed recorded workspace call, replay, or
 `run_python` execution. Attaching a custom script/output preserves derived analysis, but does not
 by itself establish recorded execution for that label. Such analysis can be
-discussed in prose with its attachment and provenance limitation. The agent is
-instructed to validate its draft before submission; the service repeats the
-checks. A schema/evidence failure receives at most one correction on the same
-agent thread. Rejected drafts and both attempts remain saved. A second invalid
-answer fails visibly; runtime errors, cancellation and baseline drift are not retried.
+discussed in prose with its attachment and provenance limitation.
+
+The agent writes the complete `scientific_answer.v2` to the current attempt's
+fixed `answer-draft.json`, validates that saved draft and records its evidence
+self-review. It then returns only this small acknowledgment:
+
+```json
+{"schema_version":"scientific_answer_handoff.v1","answer_file":"answer-draft.json"}
+```
+
+The server reads the saved file and repeats the scientific answer schema,
+evidence and baseline checks, including matching any recorded self-review to
+the exact final draft. The handoff does not itself contain or approve scientific
+claims. This avoids generating the full answer JSON again in the final message;
+the public answer and saved scientific answer contract remain unchanged.
+Each attempt has its own draft file; the correction attempt uses `repair-1/`.
+
+A missing or malformed handoff/draft, or a schema/evidence failure, receives at
+most one correction on the same agent thread. Rejected submissions and both
+attempts remain saved. A second invalid submission fails visibly; runtime errors,
+cancellation and baseline drift are not retried. Model and reasoning settings
+are unchanged; this reduces duplicated output rather than promising a particular
+response time.
 
 Route steps refer to explicit reactant/product molecule IDs and preceding step
 IDs. Cycles, missing IDs, disconnected declared dependencies, and omitted route
@@ -173,16 +191,19 @@ that the free-acid target has not yet been reached.
 
 Older saved answers remain readable with their existing Markdown/SMILES view;
 the application does not reconstruct an attributed route from historical prose.
-Start a **new investigation** after this contract/code update because existing
-fixed-baseline workspaces intentionally reject changed code. Original evidence
-remains available for inspection. No historical manifest is rewritten.
+Restart the server and start a **new investigation** after this contract/code
+update because existing fixed-baseline workspaces intentionally reject changed
+code. Saved answers and original evidence remain readable. No historical manifest
+is rewritten.
 
 The shared contract is in
 [`answer_contracts.py`](../../chem_coworker/scientific_workspace/answer_contracts.py).
-Its Pydantic schema also supplies the runtime's strict output schema, avoiding a
-second definition. Conceptual answers use empty object arrays. Unsupported steps
-may remain proposed or unknown, with limitations; the schema never promotes an
-agent's structured answer into an authoritative chemistry record.
+Its Pydantic schema validates the saved scientific answer. The runtime's strict
+final-output schema is the small `scientific_answer_handoff.v1` acknowledgment;
+it does not replace the answer schema or its validation. Conceptual answers use
+empty object arrays. Unsupported steps may remain proposed or unknown, with
+limitations; the schema never promotes an agent's structured answer into an
+authoritative chemistry record.
 
 Requirements and configuration:
 
@@ -220,8 +241,10 @@ describes the execution and resume protocol.
 
 Under `<chat-root>/<conversation-id>/`, the standard scientific manifest,
 `events/`, and `artifacts/` coexist with `conversation.json` and `turns/<turn-id>/`.
-Each turn saves its prompt, schema, runtime JSONL, stderr, final response, progress,
-and terminal state. Successful answers record hashes of their trace files and
+Each turn saves its prompt, schema, runtime JSONL, stderr, `answer-draft.json`,
+final handoff, progress, and terminal state. The runtime's final message is the
+small acknowledgment; the actual answer is read from the saved draft.
+Successful answers record hashes of their trace files and
 links to checksum-verified evidence. Citation validation checks existence and
 artifact type; it does **not** establish that the prose correctly interprets
 the evidence. Independent scientific review remains necessary.
@@ -400,6 +423,31 @@ that self-review exists; absence is not disguised as success. It remains an
 
 Operation summaries now project relevant fields, preserve scientific statuses,
 and disclose truncation/collection counts. Complete results remain immutable.
+Start with `w.call_summary(event)` after a recorded call. When a decision needs
+more detail, inspect the relevant artifact fields or collection slice instead
+of printing the entire result again. For an existing condition-recommendation
+call:
+
+```python
+print(w.call_summary(event))
+print(w.inspect_artifact(
+    event.artifact_ref, path=("result", "recommendations"), offset=0, limit=3,
+))
+# Inspect a selected recommendation only when its full recipe is needed.
+print(w.inspect_artifact(
+    event.artifact_ref, path=("result", "recommendations", 0, "resolved_recipe"),
+))
+```
+
+Paths use literal dictionary keys and list indices. Inspection returns a bounded
+preview with pagination, explicit truncation and relevant surrounding statuses,
+errors and warnings; `limit` is 1–20. Follow the returned path and page information
+when details are missing. The full checksum-verified artifact remains available
+through `w.store.read_artifact(ref)`. The prompt supplies task guidance, an operation
+overview and targeted signature lookup, so reading the whole README or source files is useful
+only when a specific question requires it. Smaller observations do not justify
+skipping evidence checks or hiding uncertainty.
+
 Calls record baseline/evidence checking, operation and serialization timings plus
 serialized result bytes, so later performance changes can target measured costs.
 Failed phases are not reported as successfully timed; artifact persistence is

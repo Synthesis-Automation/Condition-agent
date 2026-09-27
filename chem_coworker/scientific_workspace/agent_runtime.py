@@ -15,6 +15,10 @@ from typing import Any, Callable, Protocol
 
 
 from .answer_contracts import ANSWER_SCHEMA
+from .answer_handoff import (
+    ANSWER_HANDOFF_SCHEMA, ANSWER_HANDOFF_VERSION, AnswerSubmissionError,
+    answer_handoff_prompt, load_answer_handoff, prepare_answer_handoff,
+)
 from .research_profiles import resolve_research_profile
 from .runtime_environment import discover_ripgrep, runtime_environment
 
@@ -142,6 +146,7 @@ class CodexRuntime:
             "effective_configuration_status": "unconfirmed",
             "capabilities": {"web_search": "not_checked", "code_execution": "not_checked"},
             "local_tools": {"rg": getattr(self, "search_tool", {"status": "not_checked"})},
+            "answer_transport": {"schema_version": ANSWER_HANDOFF_VERSION, "answer_file": "answer-draft.json"},
             "limitations": [
                 "Requested settings do not establish provider support or successful tool access.",
                 "The effective model and reasoning effort are not resolved by this adapter.",
@@ -166,7 +171,7 @@ class CodexRuntime:
                     command.extend(["-c", f"{key}={json.dumps(value)}"])
         command.extend([
             "--json", "--skip-git-repo-check", "--output-schema",
-            str(turn_directory / "answer-schema.json"), "--output-last-message",
+            str(turn_directory / "answer-handoff-schema.json"), "--output-last-message",
             str(turn_directory / "agent-final.json"),
         ])
         if self.model:
@@ -180,13 +185,15 @@ class CodexRuntime:
         on_event: Callable[[dict[str, Any]], None],
     ) -> AgentResult:
         """Capture JSONL events, enforce a deadline, and preserve complete local logs."""
+        turn_directory = prepare_answer_handoff(workspace, turn_directory)
         (turn_directory / "answer-schema.json").write_text(json.dumps(ANSWER_SCHEMA), "utf-8")
+        (turn_directory / "answer-handoff-schema.json").write_text(json.dumps(ANSWER_HANDOFF_SCHEMA), "utf-8")
         (turn_directory / "runtime-request.json").write_text(json.dumps({
             "schema_version": "scientific_runtime_request.v1",
             "configuration": self.describe(), "resumed_thread_id": thread_id,
         }, indent=2), "utf-8")
         prompt_path = turn_directory / "prompt.txt"
-        prompt_path.write_text(prompt, "utf-8")
+        prompt_path.write_text(answer_handoff_prompt(prompt, turn_directory), "utf-8")
         output_path = turn_directory / "runtime.jsonl"
         stderr_path = turn_directory / "runtime.stderr.txt"
         environment = runtime_environment(
@@ -283,7 +290,5 @@ class CodexRuntime:
         if process.returncode or failed or not completed or not runtime_thread:
             detail = stderr_path.read_text("utf-8", errors="replace")[-2000:]
             raise RuntimeError(f"Codex turn did not complete (exit {process.returncode}). {detail}")
-        answer_path = turn_directory / "agent-final.json"
-        if not answer_path.is_file():
-            raise RuntimeError("Codex completed without a structured final answer")
-        return AgentResult(json.loads(answer_path.read_text("utf-8")), runtime_thread, usage)
+        answer = load_answer_handoff(workspace, turn_directory, thread_id=runtime_thread, usage=usage)
+        return AgentResult(answer, runtime_thread, usage)

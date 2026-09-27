@@ -100,7 +100,8 @@ def test_runtime_child_receives_search_path_and_emits_idle_poll_signal(tmp_path)
         "prompt = sys.stdin.read()\n"
         "print(json.dumps({'type':'thread.started', 'thread_id':'test-thread'}), flush=True)\n"
         "time.sleep(1.2)\n"
-        "pathlib.Path('agent-final.json').write_text(json.dumps({'path':os.environ['PATH'], 'prompt':prompt}))\n"
+        "pathlib.Path('answer-draft.json').write_text(json.dumps({'path':os.environ['PATH'], 'prompt':prompt}))\n"
+        "pathlib.Path('agent-final.json').write_text(json.dumps({'schema_version':'scientific_answer_handoff.v1', 'answer_file':'answer-draft.json'}))\n"
         "print(json.dumps({'type':'turn.completed'}), flush=True)\n", "utf-8",
     )
     runtime = object.__new__(CodexRuntime)
@@ -112,7 +113,8 @@ def test_runtime_child_receives_search_path_and_emits_idle_poll_signal(tmp_path)
     result = runtime.run(prompt="Original prompt", workspace=tmp_path, turn_directory=tmp_path,
                          thread_id=None, cancel=Event(), on_event=events.append)
     assert result.answer["path"].split(os.pathsep)[0] == str(tmp_path / "tools")
-    assert result.answer["prompt"] == "Original prompt"
+    assert result.answer["prompt"].startswith("Original prompt\n\nANSWER FILE HANDOFF")
+    assert "answer-draft.json" in result.answer["prompt"]
     assert os.environ.get("PATH", "") == parent_path
     assert {"type": "runtime.heartbeat"} in events
     request = json.loads((tmp_path / "runtime-request.json").read_text("utf-8"))

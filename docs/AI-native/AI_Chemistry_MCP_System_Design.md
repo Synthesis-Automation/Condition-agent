@@ -162,6 +162,32 @@ failed fetch and labels captured text as an unverified agent-supplied excerpt.
 Route assessors accept captured literature references as provenance while leaving
 structural and topology gates unchanged; citations do not validate chemistry.
 
+### Avoid repeated output while preserving validation
+
+The agent uses `w.call_summary(event)` first, then `w.inspect_artifact(ref, path=...,
+offset=..., limit=...)` for particular fields or collection slices when a decision
+needs more detail. Bounded previews retain relevant status/warning context and
+declare truncation; complete scientific results remain saved. The supplied task guidance and callable catalog
+provide the starting context; reading the whole workspace README or dumping
+entire artifacts should serve an actual investigative need.
+
+For submission, the agent writes the full `scientific_answer.v2` once to the
+current attempt's fixed `answer-draft.json`, validates it and records its evidence
+self-review. The runtime's final message is only
+`{"schema_version":"scientific_answer_handoff.v1","answer_file":"answer-draft.json"}`.
+The server loads the saved answer and repeats schema, evidence and baseline
+checks, including the existing self-review match against the final draft.
+The saved/public answer remains the full scientific answer, while native runtime
+logs end with the small handoff instead of a second copy of that answer.
+
+Missing or malformed submissions use the same single correction allowance as
+schema/evidence failures; runtime failures, cancellation and baseline drift are
+not retried. A correction has its own attempt directory and draft. These changes
+avoid duplicated output without reducing the model or reasoning settings; they
+do not establish a measured latency improvement. Restart the server and create
+a new investigation to use the new protocol because the baseline is frozen.
+Previously saved answers remain readable.
+
 See the [workspace readme](readme.md#optional-guides-and-lessons-from-previous-runs)
 for the current methods and operating details.
 

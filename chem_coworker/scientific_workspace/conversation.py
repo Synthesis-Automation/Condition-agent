@@ -15,7 +15,7 @@ from typing import Any, Mapping
 from uuid import uuid4
 
 from .activity import ACTIVITY_VERSION, ActivityHistory, activity_detail as _activity_detail, recover_activity
-from .agent_runtime import AgentRuntime, AgentStopped
+from .agent_runtime import AgentRuntime, AgentStopped, AnswerSubmissionError
 from .answer_contracts import ScientificAnswer, validate_answer_evidence
 from .baseline import sha256_file, verify_baseline
 from .evidence_review import matching_evidence_review
@@ -38,6 +38,10 @@ def investigation_prompt(workspace: ScientificWorkspace, question: str) -> str:
     """Give a capable agent scientific context without imposing a fixed tool sequence."""
     root = workspace.store.root
     repository = Path(workspace.store.manifest["baseline"]["repository"])
+    operation_overview = "\n".join(
+        f"- {item['name']}: {item['description'].splitlines()[0]}"
+        for item in workspace.operations.catalog()
+    )
     return f"""You are the scientific investigator in a LOCAL DEVELOPMENT chemistry workspace.
 Answer the user's question in their language. This is a research conversation, not
 a request to implement repository changes. You have a real programmable environment.
@@ -48,8 +52,8 @@ meaningful findings, errors, or a change of direction, and about once a minute d
 long investigations when possible. Explain what you are checking, what you found,
 and the next useful action. Use the user's language. Report material failures and
 how you will recover. These are short status summaries, not private reasoning or
-draft answers. Do not wait until the final answer to communicate. The final answer
-must still be the required structured JSON; commentary is separate from that JSON.
+draft answers. Do not wait until the final answer to communicate. Save the full
+structured answer once; follow the runtime's final handoff instructions below.
 
 {INVESTIGATION_GUIDE}
 
@@ -69,11 +73,18 @@ from chem_coworker.scientific_workspace import ScientificWorkspace
 w = ScientificWorkspace({str(root)!r})
 event = w.run('analyze_reaction', {{'reaction_smiles': 'CCBr.N>>CCN'}})
 print(w.call_summary(event))
-result = w.store.read_artifact(event.artifact_ref)
-# Inspect the full result or selected fields. Cite event.artifact_ref in your answer.
+# Start with this summary. Cite event.artifact_ref in your answer.
+# When a specific detail is needed, inspect only that saved field/page, for example:
+# print(w.inspect_artifact(event.artifact_ref, path=('result', 'warnings'), limit=5))
+# Use actual field names from the result; paths are literal keys/indices, not expressions.
 
-Available operations and exact argument signatures:
-{json.dumps(workspace.operations.catalog(), ensure_ascii=False)}
+Available operations:
+{operation_overview}
+Before using an unfamiliar operation, retrieve just its exact argument signature:
+print([entry for entry in w.operations.catalog() if entry['name'] in
+       {{'disconnect_target', 'assess_route_proposal'}}])
+Choose the relevant names yourself. Batch independent signature lookups together;
+do not read implementation files merely to discover public arguments.
 
 Optional task guides and lessons (application guidance, not chemistry tools):
 - w.task_guide('conditions') or w.task_guide('retrosynthesis') returns the short
@@ -101,9 +112,16 @@ Optional task guides and lessons (application guidance, not chemistry tools):
 
 Manifest investigation.json lists selected datasets, hashes, versions and limitations.
 Full prior calls and notes are in events/ and artifacts/. Read w.store.summary() to resume.
-Keep console output compact: print selected fields, not whole reaction analyses, manifests,
-or full route trees. Full results are retained as artifacts and can be inspected in slices.
-Usage and argument examples: {repository / 'docs/AI-native/readme.md'}
+Use w.call_summary(event) as the default console output. Do not print the full raw
+result alongside that summary. Follow uncertainty/error fields and disclosed truncations
+with w.inspect_artifact(event.artifact_ref, path=(...), offset=0, limit=5) as needed.
+Paths select literal JSON keys and list indices; next_offset continues a selected page.
+Full results remain in artifacts, accessible through w.store.read_artifact. Read selected
+fields for custom analysis; do not dump whole analyses, manifests or route trees to stdout.
+This prompt, operation catalogue and optional task guide are the starting reference.
+For an unresolved usage question, read the relevant section of
+{repository / 'docs/AI-native/readme.md'}; do not routinely load the whole README or schema
+implementation. The runtime supplies answer-schema.json for targeted schema inspection.
 You may read source, write and run custom analysis scripts inside this investigation,
 and use configured research tools when relevant. Attach meaningful custom scripts and
 outputs with w.store.attach_file and label derived analysis. Keep raw external sources
@@ -203,7 +221,7 @@ Rules for this fixed-baseline investigation:
   routes and unresolved leaves honestly when the evidence or budget is exhausted.
 - Do not mark the investigation completed; the user may ask follow-up questions.
 
-Return the required JSON final answer. answer_markdown should directly answer the
+Prepare the required saved JSON answer. answer_markdown should directly answer the
 question, cite relevant sha256:<64 hex> artifact references, and distinguish limitations.
 Lead with a short conclusion and only the reasoning needed to answer the question.
 The web view displays each structured step as a named reaction SVG with conditions
@@ -221,7 +239,7 @@ uncertainties lists material limitations. needs_user_input is true when clarific
 is needed. Every scientific claim about this codebase's results needs recorded evidence.
 This response is agent-authored and has not received independent chemist review.
 
-Use schema_version='scientific_answer.v2'. In addition to prose, return sources,
+Use schema_version='scientific_answer.v2'. In addition to prose, include sources,
 molecules, target_molecule_ids, steps, routes, and claims (empty arrays if irrelevant).
 Use stable short IDs to connect these objects. Each molecule, step, condition, yield,
 and claim has a basis: input (user supplied), reported (attributed to a source),
@@ -257,11 +275,14 @@ Do not label proposed temperatures/yields as reported. Keep structure IDs explic
 even when the same structures appear in the prose. The UI draws the declared scheme;
 it does not establish atom balance, mechanism, feasibility, or source correctness.
 
-Before submitting, save your draft JSON inside the investigation and validate it:
+Before submitting, save your complete draft JSON at the runtime-provided answer-draft.json
+path for this attempt and validate it (draft_path is that exact pathlib.Path):
 from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer, validate_answer_evidence
 draft = ScientificAnswer.model_validate_json(draft_path.read_text(encoding='utf-8'))
 validate_answer_evidence(draft, w.store)
-Inspect and correct errors using the saved evidence, then return the validated JSON.
+Inspect and correct errors using the saved evidence. Keep the validated full answer
+in that file and return only the runtime's small handoff message; do not re-emit the
+answer JSON, print the entire draft, or rewrite an unchanged answer in the final message.
 Do not weaken validators or rewrite evidence to make the draft pass. This checks
 schema and evidence references; it does not independently verify scientific claims.
 
@@ -469,36 +490,54 @@ class ConversationService:
                 if cancel.is_set():
                     raise AgentStopped("cancelled")
                 verify_baseline(workspace.store.manifest["baseline"])
-                result = self.runtime.run(
-                    prompt=prompt, workspace=directory, turn_directory=attempt_directory,
-                    thread_id=thread_id, cancel=cancel, on_event=progress,
-                )
+                submission_error = None
+                try:
+                    result = self.runtime.run(
+                        prompt=prompt, workspace=directory, turn_directory=attempt_directory,
+                        thread_id=thread_id, cancel=cancel, on_event=progress,
+                    )
+                    submitted_answer = result.answer
+                    submitted_thread = result.thread_id
+                    submitted_usage = result.usage
+                except AnswerSubmissionError as exc:
+                    # A completed runtime can submit a missing/malformed answer
+                    # file. Preserve it for the same single correction as an
+                    # invalid scientific answer; execution failures still escape.
+                    submission_error = exc
+                    submitted_answer = exc.payload
+                    submitted_thread = exc.thread_id
+                    submitted_usage = exc.usage
                 if scientific_progress():
                     save()
-                attempt_usage.append(result.usage)
+                attempt_usage.append(submitted_usage)
                 if cancel.is_set():
                     raise AgentStopped("cancelled")
                 verify_baseline(workspace.store.manifest["baseline"])
                 try:
-                    answer = ScientificAnswer.model_validate(result.answer)
+                    if submission_error is not None:
+                        raise submission_error
+                    answer = ScientificAnswer.model_validate(submitted_answer)
                     cited = validate_answer_evidence(answer, workspace.store)
                     break
                 except (ValueError, FileNotFoundError) as exc:
                     debug("answer_validation_error", error={"type": type(exc).__name__, "message": str(exc)})
                     workspace.store.append("agent_answer_rejected", {
-                        "turn_id": turn_id, "attempt": attempt + 1, "answer": result.answer,
-                        "error": str(exc), "usage": result.usage,
+                        "turn_id": turn_id, "attempt": attempt + 1, "answer": submitted_answer,
+                        "error": str(exc), "usage": submitted_usage,
                     })
                     if attempt:
                         raise
                     rejected_path = turn / "rejected-answer.json"
-                    _write_json(rejected_path, result.answer)
-                    thread_id = result.thread_id
+                    _write_json(rejected_path, submitted_answer)
+                    thread_id = submitted_thread
                     save(repair_attempts=1, validation_error=str(exc))
                     prompt = investigation_prompt(workspace, state["question"]) + (
-                        f"\nYour draft at {rejected_path} was rejected by answer validation: {str(exc)[:4000]}\n"
+                        f"\nYour previous submission was rejected: {str(exc)[:4000]}\n"
+                        f"Rejected answer or transport diagnostics: {rejected_path}. "
+                        f"The previous attempt's draft, if created, is at {attempt_directory / 'answer-draft.json'}.\n"
                         "This is the only correction attempt. Inspect saved evidence, correct the draft, "
-                        "and validate it before returning the complete JSON. Never fabricate evidence, "
+                        "and save/validate it at this attempt's runtime-provided path before submitting "
+                        "through the runtime handoff. Diagnostics are not an answer draft. Never fabricate evidence, "
                         "weaken checks, or label a proposal as an observation to make validation pass."
                     )
             answer.evidence_refs = cited

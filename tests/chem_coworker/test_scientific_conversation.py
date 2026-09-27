@@ -14,7 +14,9 @@ import pytest
 
 from app.web_api.main import create_app
 from chem_coworker.scientific_workspace import ScientificWorkspace
-from chem_coworker.scientific_workspace.agent_runtime import AgentResult, AgentStopped, CodexRuntime
+from chem_coworker.scientific_workspace.agent_runtime import (
+    AgentResult, AgentStopped, AnswerSubmissionError, CodexRuntime,
+)
 from chem_coworker.scientific_workspace.baseline import code_manifest, environment_versions
 from chem_coworker.scientific_workspace.conversation import ConversationService, _activity_detail
 
@@ -286,6 +288,80 @@ def test_one_repair_uses_same_thread_and_preserves_rejected_answer(service: Conv
     assert sum(event.kind == "agent_answer_rejected" for event in events) == 1
 
 
+@pytest.mark.parametrize("recover", [True, False])
+def test_submission_errors_receive_only_one_correction(service: ConversationService, recover: bool) -> None:
+    class SubmissionRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            if recover and self.threads:
+                assert "runtime handoff" in kwargs["prompt"]
+                assert kwargs["turn_directory"].name == "repair-1"
+                return super().run(**kwargs)
+            self.threads.append(kwargs["thread_id"])
+            raise AnswerSubmissionError(
+                "Missing answer-draft.json", thread_id="test-thread",
+                usage={"output_tokens": 12}, payload={"submission_error": "draft_missing"},
+            )
+
+    service.runtime = SubmissionRuntime()
+    identity = service.submit("Explain this reaction")['conversation_id']
+    turn = finish(service, identity)
+    assert service.runtime.threads == [None, "test-thread"]
+    assert turn["repair_attempts"] == 1
+    assert turn["status"] == ("completed" if recover else "failed"), turn
+    if recover:
+        assert turn["answer"]["attempt_usage"][0] == {"output_tokens": 12}
+    else:
+        assert turn["error"]["type"] == "AnswerSubmissionError"
+    events = ScientificWorkspace(service.root / identity).store.events()
+    assert sum(event.kind == "agent_answer_rejected" for event in events) == (1 if recover else 2)
+    rejected = service.root / identity / "turns" / turn["id"] / "rejected-answer.json"
+    assert json.loads(rejected.read_text("utf-8")) == {"submission_error": "draft_missing"}
+
+
+def test_native_file_handoff_still_checks_evidence_and_preserves_attempts(service: ConversationService) -> None:
+    script = service.root.parent / "handoff_runtime.py"
+    script.write_text('''import json, pathlib, sys
+attempt = pathlib.Path(sys.argv[1])
+answer = {
+    "schema_version": "scientific_answer.v2", "answer_markdown": "Evidence remains unknown.",
+    "evidence_refs": [] if attempt.name == "repair-1" else ["sha256:" + "0" * 64],
+    "uncertainties": ["No experimental evidence"], "needs_user_input": False,
+    "sources": [], "molecules": [], "target_molecule_ids": [], "steps": [], "routes": [], "claims": [],
+}
+(attempt / "answer-draft.json").write_text(json.dumps(answer), encoding="utf-8")
+handoff = {"schema_version": "scientific_answer_handoff.v1", "answer_file": "answer-draft.json"}
+(attempt / "agent-final.json").write_text(json.dumps(handoff), encoding="utf-8")
+print(json.dumps({"type": "thread.started", "thread_id": "file-thread"}), flush=True)
+print(json.dumps({"type": "item.completed", "item": {"id": "final", "type": "agent_message", "text": json.dumps(handoff)}}), flush=True)
+print(json.dumps({"type": "turn.completed", "usage": {"output_tokens": 20}}), flush=True)
+''', "utf-8")
+    runtime = object.__new__(CodexRuntime)
+    runtime.model = None
+    runtime.timeout_seconds = 10
+    threads = []
+
+    def command(workspace, turn_directory, thread_id):
+        threads.append(thread_id)
+        return [sys.executable, str(script), str(turn_directory)]
+
+    runtime.command = command
+    service.runtime = runtime
+    identity = service.submit("What is established?")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "completed", turn
+    assert threads == [None, "file-thread"]
+    assert turn["repair_attempts"] == 1
+    assert turn["answer"]["answer_markdown"] == "Evidence remains unknown."
+    assert turn["answer"]["evidence_refs"] == []
+    assert turn["progress"] == []  # Transport JSON is never public commentary.
+    directory = service.root / identity / "turns" / turn["id"]
+    assert json.loads((directory / "answer-draft.json").read_text("utf-8"))["evidence_refs"]
+    assert json.loads((directory / "repair-1/answer-draft.json").read_text("utf-8"))["evidence_refs"] == []
+    assert (directory / "agent-final.json").stat().st_size < 150
+    assert "repair-1/answer-draft.json" in turn["answer"]["trace_files_sha256"]
+    assert len(turn["answer"]["attempt_usage"]) == 2
+
+
 def test_cancellation_preserves_conversation_and_prevents_concurrent_turns(service: ConversationService) -> None:
     service.runtime = RecordedRuntime(wait=True)
     identity = service.submit("Wait for additional evidence")["conversation_id"]
@@ -458,7 +534,8 @@ elif mode == "failed":
     print(json.dumps({"type":"turn.failed","error":{"message":"provider unavailable"}}), flush=True)
 else:
     if mode != "no_final":
-        pathlib.Path(output).write_text(json.dumps({"answer_markdown":"Test", "evidence_refs":[], "uncertainties":[], "needs_user_input":False}), encoding="utf-8")
+        pathlib.Path(output).with_name("answer-draft.json").write_text(json.dumps({"answer_markdown":"Test", "evidence_refs":[], "uncertainties":[], "needs_user_input":False}), encoding="utf-8")
+        pathlib.Path(output).write_text(json.dumps({"schema_version":"scientific_answer_handoff.v1", "answer_file":"answer-draft.json"}), encoding="utf-8")
     print(json.dumps({"type":"turn.completed","usage":{"output_tokens":4}}), flush=True)
 ''', "utf-8")
     runtime = object.__new__(CodexRuntime)
@@ -472,9 +549,13 @@ else:
         assert result.thread_id == "native-thread"
         assert result.usage == {"output_tokens": 4}
         assert len(events) == 2
-        assert (tmp_path / "prompt.txt").read_text("utf-8") == kwargs["prompt"]
+        assert (tmp_path / "prompt.txt").read_text("utf-8").startswith(kwargs["prompt"])
+        assert "answer-draft.json" in (tmp_path / "prompt.txt").read_text("utf-8")
     elif mode == "timeout":
         with pytest.raises(AgentStopped, match="timed_out"):
+            runtime.run(**kwargs)
+    elif mode == "no_final":
+        with pytest.raises(AnswerSubmissionError):
             runtime.run(**kwargs)
     else:
         with pytest.raises(RuntimeError):

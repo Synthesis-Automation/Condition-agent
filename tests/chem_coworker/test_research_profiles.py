@@ -109,7 +109,8 @@ def test_runtime_records_requested_configuration_and_unique_observed_events(
     script = tmp_path / "runtime_double.py"
     script.write_text(
         "import json, pathlib, sys\n"
-        "pathlib.Path('agent-final.json').write_text(json.dumps({'answer_markdown': 'test'}))\n"
+        "pathlib.Path('answer-draft.json').write_text(json.dumps({'answer_markdown': 'test'}))\n"
+        "pathlib.Path('agent-final.json').write_text(json.dumps({'schema_version':'scientific_answer_handoff.v1', 'answer_file':'answer-draft.json'}))\n"
         f"events = json.loads({json.dumps(json.dumps(events))})\n"
         "sys.stdout.write('\\n'.join(json.dumps(event) for event in events))\n",
         "utf-8",
