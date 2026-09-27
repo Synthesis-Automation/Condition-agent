@@ -14,12 +14,15 @@ _NUMBER = r"(?:\d+(?:\.\d+)?|\.\d+)"
 _AMOUNT = re.compile(
     rf"(?<![\w]){_NUMBER}\s*(?:mol\s*%|wt\s*%|vol\s*%|"
     r"mmol|[µμu]mol|mol|kg|mg|[µμu]g|g|mL|ml|[µμu]L|L|mM|M|N|"
-    r"equivalents?|equiv\.?|eq\.?)(?![A-Za-z])"
+    r"equivalents?|equiv\.?|eq\.?)(?![A-Za-z0-9])"
 )
 _OPERATING = re.compile(
     rf"(?<![\w])(?:[-−]?{_NUMBER}(?:\s*[–-]\s*{_NUMBER})?\s*"
-    r"(?:°\s*[CF]|℃|K|hours?|hrs?|h|minutes?|mins?|min|seconds?|sec|s|atm|bar))(?![A-Za-z])",
+    r"(?:°\s*[CF]|℃|K|hours?|hrs?|h|minutes?|mins?|min|seconds?|sec|s|atm|bar))(?![A-Za-z0-9])",
     re.IGNORECASE,
+)
+_OPERATING_SUFFIX = re.compile(
+    r"\s+(?:at\s+)?(?:reflux|overnight|room\s+temperature|ambient\s+temperature)\s*\.?$", re.I,
 )
 _LOCANTS = re.compile(r"\b(?:\d+|[NOPS])['′]*(?:,(?:\d+|[NOPS])['′]*)+(?=-)")
 _HEADING = re.compile(r"^(?:initial screen|screening|reagents?|catalysts?|solvents?|conditions?)\s*:\s*", re.I)
@@ -86,12 +89,13 @@ def compact_condition_labels(texts: Iterable[str], reactant_names: Iterable[str]
     for text in texts:
         supplied = _HEADING.sub("", text.strip())
         # Do not detach an ingredient fragment from a negated or tentative sentence.
-        if _PROSE.search(supplied):
+        if _PROSE.search(supplied) or _WORKUP.search(supplied):
             continue
         for raw in _clauses(supplied):
             if _WORKUP.search(raw) or _PROSE.search(raw):
                 continue
             label = _PREFIX.sub("", raw.strip())
+            label = _OPERATING_SUFFIX.sub("", label)
             label = _AMOUNT.sub("", label)
             label = _OPERATING.sub("", label)
             label = re.sub(r"\(\s*[,;]*\s*\)", "", label)

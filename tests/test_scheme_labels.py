@@ -23,6 +23,9 @@ from visualization.scheme_labels import compact_condition_labels, compact_yield_
      (), ("(1,2-bis(diphenylphosphino)ethane)palladium(II) dichloride",)),
     (["Solvent: ethyl acetate", "THF; THF", "dry THF"], (), ("ethyl acetate", "THF")),
     (["H2; N2; O2; Br2; Fe(CO)5"], (), ("H2", "N2", "O2", "Br2", "Fe(CO)5")),
+    (["NiCl2·6H2O 0.1 mmol; CuSO4·5H2O (5 mol%)"], (), ("NiCl2·6H2O", "CuSO4·5H2O")),
+    (["THF at reflux", "EtOH overnight", "MeOH at room temperature", "DMF at ambient temperature"],
+     (), ("THF", "EtOH", "MeOH", "DMF")),
 ])
 def test_explicit_ingredient_labels_and_formula_digits_are_preserved(texts, reactants, expected) -> None:
     assert compact_condition_labels(texts, reactants) == expected
@@ -36,6 +39,9 @@ def test_explicit_ingredient_labels_and_formula_digits_are_preserved(texts, reac
     "No Pd(PPh3)4; avoid THF; without DIPEA",
     "No NaHCO3 in THF",
     "The mixture was heated in THF",
+    "Quench with water",
+    "Extraction with EtOAc",
+    "Wash with brine and dry with MgSO4",
     "1 M; 156 mL; 45 °C; 48 h; 5 mol%",
     "Core; stannane; C14; P6; substrate 12; compound A1",
 ])

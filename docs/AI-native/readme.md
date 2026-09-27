@@ -77,7 +77,9 @@ exits successfully. The server collects committed events during runtime polling
 and when the turn ends, retaining their event sequence and original artifact
 reference without duplicating them or changing scientific results.
 Reaction schemes appear beneath the concise answer, one SVG per step, with compact
-compound names, conditions above the arrow and yield below. Retrosynthesis plans
+compound names, concise reagent/catalyst and solvent names above the arrow and a
+percentage yield below when supplied. Amounts, temperatures, times and workup
+instructions remain in the step details. Retrosynthesis plans
 are shown in synthetic direction. Open **Step details & evidence** for full names,
 condition text and sources. The step heading retains its declared
 reported/proposed/computed status; drawings do not validate feasibility.
@@ -91,7 +93,7 @@ changes to clear cached saved-answer presentations.
 Alternative routes are separate expandable sections; the first is initially open,
 without implying that it is scientifically preferred. Step evidence, molecule
 galleries, SMILES, route connections, and uncertainty remain expandable. Missing
-conditions or yields are marked as missing, and step cautions remain visible.
+conditions or yields are marked as missing in the details, and step cautions remain visible.
 Answers render Markdown tables,
 headings, emphasis, lists, code, and links. Wide tables scroll horizontally.
 Raw HTML and remote Markdown images are disabled. Artifact hashes in prose become
