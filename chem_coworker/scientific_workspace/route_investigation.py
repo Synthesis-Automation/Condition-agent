@@ -132,12 +132,13 @@ def _proposal(value: dict[str, Any]) -> ExternalRouteProposal:
 def _assessment_arguments(operations: ScientificOperations, include_conditions: bool, include_forward: bool) -> dict[str, Any]:
     if type(include_conditions) is not bool or type(include_forward) is not bool:
         raise ValueError("Assessment options must be booleans")
+    if include_forward:
+        raise ValueError(
+            "Assess the route without include_forward first, then use "
+            "assess_route_step_forward for one eligible saved step and an explicit question."
+        )
     library = operations._external_route_library()
     arguments: dict[str, Any] = {"operator_library": library}
-    if include_forward:
-        from core_retrosynthesis.forward_assessment import build_forward_library_from_generic
-
-        arguments["forward_library"] = build_forward_library_from_generic(library)
     if include_conditions:
         from core_retrosynthesis import recommend_retrosynthesis_conditions
 
@@ -259,7 +260,8 @@ def revise_branch(
     )
     record = assess_route(
         operations, revision.proposal.to_dict(), source["material_constraints"]["unavailable_starting_materials"],
-        **source["assessment_options"], evidence_refs=refs,
+        include_conditions=source["assessment_options"]["include_conditions"],
+        include_forward=False, evidence_refs=refs,
     )
     change = revision.to_dict()
     del change["proposal"]

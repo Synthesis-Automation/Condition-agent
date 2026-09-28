@@ -16,6 +16,7 @@ from .library import (
     indexed_forward_operators,
     load_forward_library,
     save_forward_library,
+    validate_forward_library_source,
 )
 from .evaluation import (
     FORWARD_REPLAY_EVALUATION_SCHEMA_VERSION,
@@ -82,4 +83,5 @@ __all__ = [
     "normalize_condition_profile",
     "predict_products",
     "save_forward_library",
+    "validate_forward_library_source",
 ]

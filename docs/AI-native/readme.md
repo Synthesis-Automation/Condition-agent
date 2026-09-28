@@ -423,6 +423,9 @@ that self-review exists; absence is not disguised as success. It remains an
 
 Operation summaries now project relevant fields, preserve scientific statuses,
 and disclose truncation/collection counts. Complete results remain immutable.
+Route summaries show concise per-step status, evidence tier, admission and warnings;
+inspect the selected step for its structures and complete gate evidence. Ordinary
+short warning lists do not repeat a separate collection-metadata record.
 Start with `w.call_summary(event)` after a recorded call. When a decision needs
 more detail, inspect the relevant artifact fields or collection slice instead
 of printing the entire result again. For an existing condition-recommendation
@@ -442,11 +445,23 @@ print(w.inspect_artifact(
 Paths use literal dictionary keys and list indices. Inspection returns a bounded
 preview with pagination, explicit truncation and relevant surrounding statuses,
 errors and warnings; `limit` is 1–20. Follow the returned path and page information
-when details are missing. The full checksum-verified artifact remains available
+when details are missing. Ancestor context uses short cautions and explicit pointers
+for nested details, with its own budget, so a scalar lookup does not print enclosing
+result trees or lose the selected value to surrounding warnings.
+The full checksum-verified artifact remains available
 through `w.store.read_artifact(ref)`. The prompt supplies task guidance, an operation
 overview and targeted signature lookup, so reading the whole README or source files is useful
 only when a specific question requires it. Smaller observations do not justify
 skipping evidence checks or hiding uncertainty.
+
+Reuse saved audits for unchanged structures. Put executable analysis in
+`if __name__ == "__main__":` blocks so importing helper definitions does not rerun
+earlier calls, and prefer saved scripts to deeply nested shell quoting. For an
+unfamiliar operation, inspect only its catalog entry. `w.store.note` accepts
+`hypothesis`, `decision`, `question`, `limitation`, and `review`; use `decision` for
+branch selection. After a recorded environment-wide network denial, use available
+browser research and capture the inspected passages instead of repeating direct
+downloads against different URLs.
 
 Calls record baseline/evidence checking, operation and serialization timings plus
 serialized result bytes, so later performance changes can target measured costs.
@@ -579,10 +594,11 @@ is accepted through the operation dispatcher.
 | `resolve_recipe` | `condition_registry`; typed `components` and optional operating values | Canonical identities, contextual roles, raw identifiers, uncertainty, provenance. |
 | `assess_recipe` | `condition_recommender`; `reaction_smiles`, resolved `recipe` | Existing compatibility result; no yield or experimental-success prediction. |
 | `disconnect_target` | Existing single-step coworker and `core_retrosynthesis`; `target_smiles`, optional search limits and `include_conditions` | One target only: validated strategies, concrete precursor realizations, precedent IDs and warnings. Requires `retro_library`; conditions default off and require condition artifacts when enabled. No stock index, recursive expansion or internal LLM review. |
-| `assess_route_step` | Canonical external-proposal assessment; `proposal`, optional `include_forward`, `include_conditions`, `evidence_refs` | Structural, operator, precedent, compatibility and selectivity gates. Requires `retro_library`; no stock index required. Supplied resolved recipes are assessed separately from retrieved conditions. |
+| `assess_route_step` | Canonical external-proposal assessment; `proposal`, optional `include_conditions`, `evidence_refs` | Structural, operator, precedent and compatibility gates; optional forward challenge is separate. Requires `retro_library`; no stock index required. Supplied resolved recipes are assessed separately from retrieved conditions. |
 | `assess_route_proposal` | Same assessor plus route topology; `proposal`, optional `unavailable_starting_materials` and assessment options | Retains invalid/unsupported proposals for inspection; declared material constraints are checked against graph-matched leaves. |
 | `inspect_route_step` | Saved proposal `source_ref`, `step_id` | Step gates, graph-matched upstream/downstream steps, molecular audits and supplied-recipe assessment. |
-| `revise_route_branch` | Core explicit route edit plus complete reassessment; `source_ref`, `remove_step_ids`, `replacement_steps`, `reason`, `risks`, optional `assumptions`, `evidence_refs` | Preserves the source, inherits constraints/options, reassesses all steps and topology. Empty removals can extend a leaf branch. No automatic improvement or admission claim. |
+| `assess_route_step_forward` | Saved route `source_ref`, eligible `step_id`, decision-changing `question`, optional `timeout_seconds` (1–30; default 30) | Optional single-step product-competition challenge using a prebuilt, baseline-pinned `forward_library`. A killable worker records stages and timeout/error; no route-wide prediction or library rebuilding. Does not upgrade the saved route's admission. |
+| `revise_route_branch` | Core explicit route edit plus complete reassessment; `source_ref`, `remove_step_ids`, `replacement_steps`, `reason`, `risks`, optional `assumptions`, `evidence_refs` | Preserves the source, inherits material constraints and condition settings, reassesses all steps and topology. Optional forward challenges are separate and not inherited. Empty removals can extend a leaf branch. No automatic improvement or admission claim. |
 | `compare_route_proposals` | Recorded results; 2–5 `source_refs` | Same-target comparison with identical settings/constraints; separate gates and missing evidence, no synthetic route score. |
 
 Recipe input example:
@@ -680,15 +696,41 @@ Each proposed step requires `external_step_id`, `target_smiles` and dot-separate
 `precursor_smiles`. Optional supplied mapping is independently validated. Optional
 `proposed_conditions` is a resolved recipe from `resolve_recipe`; assessment of that
 recipe remains separate from analogue-condition retrieval (`include_conditions`).
-`include_forward` requests the existing forward challenge. Both flags default to
-false and are inherited during revision. To replace an existing step ID, explicitly
+Condition retrieval defaults to false and is inherited during revision. To replace an existing step ID, explicitly
 include it in `remove_step_ids`. Disconnected remnants are reported as invalid;
 they are never silently deleted. Unchanged downstream steps are reassessed as well.
 
-Start with the default checks for an interactive trial. Enabling both forward and
-condition checks against the full corpus can take several minutes per assessment;
-the initial combined-check live trial was cancelled before returning a result.
-Optional checks omitted for speed must be reported as not run, not as passed.
+Start with the standard structural assessment, then investigate the gap most likely
+to change the answer. In particular, missing halogen or oxygen contributors require
+source inspection and accurate reactant structures, not broad forward prediction.
+Never invent a donor or mapping merely to pass a gate.
+
+Forward prediction is optional and applies to one eligible step of a saved route
+assessment/revision. Use it when competing products could change a route decision:
+
+```python
+challenge = workspace.run("assess_route_step_forward", {
+    "source_ref": original.artifact_ref,
+    "step_id": "amide",
+    "question": "Could a competing product make this step unsuitable for the proposed route?",
+    "timeout_seconds": 30,
+})
+print(workspace.call_summary(challenge))
+```
+
+The optional `forward_library` artifact is configured in the same artifact JSON as
+`retro_library` and pinned at investigation creation. The example configuration
+selects `results/operator_retrosynthesis_poc/full_scale_v3/compact/forward_operator_library_v1.json.gz`.
+Build the library separately before starting an investigation; scientific chats do
+not build libraries or run forward prediction across the entire route. Missing
+forward data does not prevent standard route assessment or single-step retrosynthesis.
+The worker's 30-second maximum covers loading and prediction, records stage timings,
+and stops unfinished work automatically. Manual process polling is unnecessary.
+Inspect a timeout or error as an unresolved check; do not report it as passed.
+The challenge is separate evidence and does not rewrite the original route assessment.
+Structural validation inside `disconnect_target` and the normal route assessor is
+unchanged. Historical route-wide forward calls remain readable, but the workspace
+no longer permits enabling that expensive path through `include_forward=True`.
 
 The declared material constraint checks route leaves only. Making an intermediate
 can remove the need to purchase it, but does not prove that its new precursors are

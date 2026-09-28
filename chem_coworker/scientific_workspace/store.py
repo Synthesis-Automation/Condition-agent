@@ -178,9 +178,9 @@ class InvestigationStore:
     def note(
         self, kind: str, text: str, *, evidence_refs: tuple[str, ...] = (),
     ) -> InvestigationEvent:
-        """Record agent hypotheses and decisions without labeling them observations."""
+        """Record a hypothesis, decision, question, limitation or review as agent-authored."""
         if kind not in {"hypothesis", "decision", "question", "limitation", "review"}:
-            raise ValueError("Unsupported note kind")
+            raise ValueError("Unsupported note kind; use hypothesis, decision, question, limitation or review")
         if not text.strip():
             raise ValueError("Note text is required")
         return self.append(kind, {

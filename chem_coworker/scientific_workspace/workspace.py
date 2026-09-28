@@ -14,6 +14,21 @@ from .operations import ScientificOperations
 from .store import canonical_bytes, InvestigationEvent, InvestigationStore
 
 
+def _replay_result(operation: str, result: Any) -> Any:
+    """Exclude only per-attempt forward telemetry from scientific replay equality."""
+    if operation != "assess_route_step_forward" or not isinstance(result, dict):
+        return result
+    execution = dict(result.get("execution", {}))
+    execution.pop("diagnostics", None)  # Each attempt has its own log directory.
+    execution["timings"] = {key: value for key, value in execution.get("timings", {}).items()
+                            if key != "elapsed_seconds"}
+    execution["stages"] = [
+        {key: value for key, value in stage.items() if key not in {"elapsed_seconds", "duration_seconds"}}
+        for stage in execution.get("stages", [])
+    ]
+    return {**result, "execution": execution}
+
+
 class ScientificWorkspace:
     """A resumable scientific workspace usable directly from Python or the CLI."""
 
@@ -66,6 +81,15 @@ class ScientificWorkspace:
             payload["result_bytes"] = len(serialized)
             timings["serialization_seconds"] = round(monotonic() - phase_started, 6)
             payload["execution_status"] = "completed"
+            if operation == "assess_route_step_forward" and isinstance(payload["result"], dict):
+                forward_status = payload["result"].get("execution_status")
+                if forward_status in {"timed_out", "error", "cancelled"}:
+                    # Retain the partial result and stages without labeling an
+                    # interrupted optional calculation as a successful call.
+                    payload["execution_status"] = forward_status
+                    payload["error"] = payload["result"].get("error", {
+                        "type": "ForwardCheckIncomplete", "message": "Optional forward check did not finish",
+                    })
         except KeyboardInterrupt:
             payload.update(execution_status="cancelled", error={"type": "KeyboardInterrupt", "message": "Execution interrupted"})
         except Exception as exc:
@@ -74,7 +98,7 @@ class ScientificWorkspace:
         payload["timings"] = timings
         if operation in {
             "propose_condition_adaptation",
-            "inspect_route_step", "revise_route_branch",
+            "inspect_route_step", "revise_route_branch", "assess_route_step_forward",
         } and isinstance(inputs.get("source_ref"), str):
             try:
                 self.store.read_artifact(inputs["source_ref"])
@@ -110,7 +134,10 @@ class ScientificWorkspace:
         actual = self.operations.invoke(source["operation"], source["arguments"])
         return self.store.append("replay", {
             "source_ref": reference,
-            "matches": canonical_bytes(actual) == canonical_bytes(source["result"]),
+            "matches": canonical_bytes(_replay_result(source["operation"], actual))
+            == canonical_bytes(_replay_result(source["operation"], source["result"])),
+            "comparison_scope": "scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry"
+            if source["operation"] == "assess_route_step_forward" else "full_result",
             "result": actual,
         }, evidence_refs=(reference,))
 

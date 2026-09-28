@@ -106,6 +106,37 @@ def test_serialized_cap_reports_omission_even_for_giant_mapping_keys(workspace):
     assert view["inspection"]["truncations"][0]["reason"] == "serialized_preview_budget"
 
 
+def test_scalar_inspection_keeps_compact_ancestor_cautions_without_repeating_trees(workspace):
+    payload = {"operation": "assess_route_proposal", "execution_status": "completed", "result": {
+        "status": "unresolved", "warnings": [{"full_tree": {"rows": ["large" * 500] * 100}}] * 20,
+        "evidence_refs": [f"sha256:{index:064x}" for index in range(20)],
+        "experimental_feasibility": "not_established",
+        "assessment": {"status": "unknown", "warnings": ["Missing source contributor"],
+                       "actionable": False, "detail": "selected value"},
+    }}
+    reference = _save(workspace, payload)
+    view = workspace.inspect_artifact(reference, ("result", "assessment", "detail"))
+    assert view["preview"] == "selected value"
+    assert len(json.dumps(view)) < 6000
+    assert "full_tree" not in json.dumps(view)
+    assert view["context"][1]["fields"]["status"] == "unresolved"
+    assert view["context"][2]["fields"]["actionable"] is False
+    assert view["context"][2]["fields"]["warnings"] == ["Missing source contributor"]
+    assert view["context"][1]["fields"]["evidence_refs"] == payload["result"]["evidence_refs"][:2]
+    assert any(item["reason"] == "ancestor_context_detail" for item in view["inspection"]["truncations"])
+    assert view["inspection"]["truncated"] is True
+    assert workspace.store.read_artifact(reference) == payload
+
+
+def test_requested_text_budget_is_independent_of_large_ancestor_warnings(workspace):
+    reference = _save(workspace, {"result": {"warnings": ["Surrounding warning " * 1000] * 40,
+                                            "finding": "Requested finding " * 100}})
+    view = workspace.inspect_artifact(reference, ("result", "finding"))
+    assert view["preview"].startswith("Requested finding ")
+    assert len(view["preview"]) == 401
+    assert view["inspection"]["context_text_budget_characters"] == 1200
+
+
 @pytest.mark.parametrize(("path", "options"), [
     ("result.rows", {}), ((True,), {}), ((-1,), {}), (("x" * 81,), {}),
     (("result",) * 13, {}), (("result",), {"offset": -1}),

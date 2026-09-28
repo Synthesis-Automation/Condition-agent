@@ -142,9 +142,9 @@ def test_supplied_recipe_is_assessed_separately_and_forward_challenge_is_optiona
     }])
     _, result = call(workspace, "assess_route_step", proposal={
         "target_smiles": "CCN", "precursor_smiles": "CC=O.N", "proposed_conditions": recipe,
-    }, include_forward=True)
+    })
     assert result["proposed_recipe_assessment"]["schema_version"] == "reaction_recipe_assessment.v2"
-    assert result["assessment"]["forward_assessment"] is not None
+    assert result["assessment"]["forward_assessment"] is None
     assert next(gate for gate in result["assessment"]["gates"] if gate["gate_id"] == "condition_support")["status"] == "unresolved"
 
 

@@ -15,7 +15,7 @@ from typing import Any, Mapping
 
 PACKAGE_ROOTS = (
     "reactive_taxonomy", "condition_registry", "condition_recommender",
-    "core_retrosynthesis", "cas_tools", "chem_coworker",
+    "core_retrosynthesis", "forward_synthesis", "cas_tools", "chem_coworker",
 )
 
 

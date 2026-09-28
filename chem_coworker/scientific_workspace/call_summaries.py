@@ -55,6 +55,7 @@ class _Projection:
         self.truncation_count = 0
         self.remaining_nodes = 450
         self.remaining_text = 12000
+        self.text_limit = 400
 
     def truncated(self, path: str, reason: str, **counts: Any) -> None:
         self.truncation_count += 1
@@ -75,7 +76,7 @@ class _Projection:
             self.truncated(path, "summary_node_budget")
             return {"summary_omitted": True}
         if isinstance(value, str):
-            size = min(400, self.remaining_text)
+            size = min(self.text_limit, self.remaining_text)
             shown = value[:size]
             self.remaining_text -= len(shown)
             if len(value) > size:
@@ -99,7 +100,8 @@ class _Projection:
                 projected[key] = self.value(value[key], f"{path}.{key}", depth + 1)
             return projected
         if isinstance(value, (list, tuple)):
-            return self.preview(value, path, lambda item, child: self.value(item, child, depth + 1))
+            return self.preview(value, path, lambda item, child: self.value(item, child, depth + 1),
+                                describe_collection=False)
         self.truncated(path, "unexpected_value_type")
         return {"summary_omitted": True, "value_type": type(value).__name__}
 
@@ -111,11 +113,12 @@ class _Projection:
     def preview(
         self, value: Any, path: str,
         project: Callable[[Any, str], Any] | None = None, *, limit: int = 5,
+        describe_collection: bool = True,
     ) -> Any:
         if not isinstance(value, (list, tuple)):
             return self.value(value, path)
         shown = min(limit, len(value))
-        if len(self.collections) < 40:
+        if (describe_collection or len(value) > shown) and len(self.collections) < 40:
             self.collections.append({"path": path, "total": len(value), "shown": shown,
                                      "omitted": len(value) - shown, "count_scope": "saved_result"})
         if len(value) > shown:
@@ -151,10 +154,14 @@ class _Projection:
             def step(item: Any, child: str) -> Any:
                 result = self.pick(item, ("external_step_id",), child)
                 if isinstance(item, Mapping):
-                    self.add_nested(result, item, "assessment", _STEP, child)
+                    self.add_nested(result, item, "assessment", (
+                        "status", "strongest_evidence_tier", "actionable", "admission_eligible", "warnings",
+                    ), child)
                 return result
             if "step_assessments" in value:
-                summary["step_assessments"] = self.preview(value["step_assessments"], f"{path}.step_assessments", step)
+                summary["step_assessments"] = self.preview(
+                    value["step_assessments"], f"{path}.step_assessments", step, limit=10,
+                )
         else:
             self.add_list(summary, value, "precedent_matches", _PRECEDENT, path)
             self.add_nested(summary, value, "forward_assessment", (
@@ -218,6 +225,28 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         ), path)
     elif operation == "assess_recipe":
         summary.update(view.pick(value, _COMPATIBILITY, path))
+    elif operation == "assess_route_step_forward":
+        summary.update(view.pick(value, (
+            "execution_status", "source_ref", "step_id", "question",
+        ), path))
+        view.add_nested(summary, value, "assessment", (
+            "targeted_replay_status", "intended_match", "intended_product_rank", "best_competitor_product",
+            "score_margin", "disposition", "validity", "advisory_only", "warnings",
+        ), path)
+        execution = value.get("execution")
+        if isinstance(execution, Mapping):
+            compact: dict[str, Any] = {}
+            location = f"{path}.execution"
+            view.add_nested(compact, execution, "timings", ("elapsed_seconds", "timeout_seconds"), location)
+            view.add_list(compact, execution, "stages", (
+                "stage", "status", "elapsed_seconds", "duration_seconds",
+            ), location, limit=16)
+            view.add_nested(compact, execution, "diagnostics", ("stages.jsonl", "stderr.log"), location)
+            summary["execution"] = compact
+        view.add_nested(summary, value, "provenance", (
+            "source_assessment_id", "selected_operator_match_id", "operator_id",
+            "input_hashes_verified", "library_source_verified",
+        ), path)
     elif operation == "disconnect_target":
         view.add_nested(summary, value, "request", (
             "target_smiles", "top_k", "max_realizations_per_strategy", "max_templates_to_apply",
@@ -347,6 +376,30 @@ def summarize_call(payload: Mapping[str, Any]) -> dict[str, Any]:
     return summary
 
 
+def _context_fields(view: _Projection, item: Mapping[str, Any], fields: tuple[str, ...], path: str) -> dict[str, Any]:
+    """Keep ancestor cautions visible without repeating surrounding result trees."""
+    def shallow(value: Any, location: str) -> Any:
+        if isinstance(value, (Mapping, list, tuple)):
+            view.truncated(location, "ancestor_context_detail", total=len(value))
+            return {"summary_omitted": True, "value_type": type(value).__name__, "total": len(value)}
+        return view.value(value, location)
+
+    result = {}
+    for key in fields:
+        if key not in item:
+            continue
+        value, location = item[key], f"{path}.{key}"
+        if isinstance(value, (list, tuple)):
+            result[key] = view.preview(value, location, shallow, limit=2, describe_collection=False)
+        elif isinstance(value, Mapping) and key == "error":
+            result[key] = view.pick(value, ("type", "message"), location)
+            if set(value) - {"type", "message"}:
+                view.truncated(location, "ancestor_context_detail", total_fields=len(value))
+        else:
+            result[key] = shallow(value, location)
+    return result
+
+
 def inspect_artifact_payload(
     payload: Any, *, artifact_ref: str, path: tuple[str | int, ...] | list[str | int] = (),
     offset: int = 0, limit: int = 5,
@@ -380,6 +433,10 @@ def inspect_artifact_payload(
     view = _Projection()
     view.remaining_nodes = 120
     view.remaining_text = 4000
+    context_view = _Projection()
+    context_view.remaining_nodes = 80
+    context_view.remaining_text = 1200
+    context_view.text_limit = 200
     fields = tuple(dict.fromkeys((*_COMMON, "operation", "execution_status", "errors", "uncertainties",
                                  "evidence_refs", "source_ref", "retrieval_status", "acquisition", "claim_support",
                                  "compatible", "actionable", "admission_eligible", "cautions", "risks",
@@ -390,7 +447,7 @@ def inspect_artifact_payload(
         # the context budget as well. Other ancestor cautions stay visible.
         selected_fields = tuple(key for key in fields if index >= len(path) or key != path[index])
         if isinstance(item, Mapping) and any(key in item for key in selected_fields):
-            context.append({"path": location, "fields": view.pick(item, selected_fields, location)})
+            context.append({"path": location, "fields": _context_fields(context_view, item, selected_fields, location)})
     total = len(value) if isinstance(value, (Mapping, list)) else 1
     shown = min(limit, max(0, total - offset)) if isinstance(value, (Mapping, list)) else 1
     page = {"offset": offset, "limit": limit, "total": total, "shown": shown,
@@ -407,12 +464,18 @@ def inspect_artifact_payload(
         preview = view.value(value, selected_path)
     if page["omitted_before"] or page["omitted_after"]:
         view.truncated(selected_path, "collection_page", **page)
+    # Selection and ancestor context have separate budgets, so large surrounding
+    # warnings cannot consume the requested field's preview allowance.
+    view.collections.extend(context_view.collections)
+    view.truncations.extend(context_view.truncations[:max(0, 30 - len(view.truncations))])
+    view.truncation_count += context_view.truncation_count
     result = {
         "inspection_schema_version": "scientific_artifact_inspection.v1", "artifact_ref": artifact_ref,
         "path": list(path), "json_path": selected_path, "preview": preview, "page": page, "context": context,
         "inspection": {"projection_only": True, "collections": view.collections,
                        "truncations": view.truncations, "truncation_count": view.truncation_count,
                        "text_budget_characters": 4000, "serialized_byte_limit": 24000,
+                       "context_text_budget_characters": 1200,
                        "hint": "Inspect a more specific path or the saved artifact for complete evidence and warnings. "
                                "Page counts describe saved collections, not the complete source dataset."},
     }

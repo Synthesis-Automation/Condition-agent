@@ -183,7 +183,7 @@ class ActivityHistory:
             status = payload.get("execution_status")
             arguments = payload.get("arguments") or {}
             if isinstance(arguments, Mapping):
-                for name in ("target_smiles", "reaction_smiles", "smiles", "source_ref"):
+                for name in ("target_smiles", "reaction_smiles", "smiles", "step_id", "question", "source_ref"):
                     if isinstance(arguments.get(name), str):
                         detail.append(f"{name}: {_text(arguments[name], 180)}")
             result = payload.get("result")

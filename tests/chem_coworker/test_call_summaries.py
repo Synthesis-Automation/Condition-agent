@@ -124,6 +124,49 @@ def test_revision_preserves_limits_material_uncertainty_and_step_identities(rout
     assert "admitted_route_tree" not in summary["assessment"]
 
 
+def test_six_step_overview_keeps_each_status_without_repeating_structures(route_record):
+    result = deepcopy(route_record)
+    template = result["assessment"]["step_assessments"][0]
+    result["assessment"]["step_assessments"] = []
+    for index in range(6):
+        step = deepcopy(template)
+        step["external_step_id"] = f"s{index + 1}"
+        step["assessment"].update({"status": "unresolved" if index == 5 else "supported",
+                                   "warnings": ["Inspect the missing atom donor"] if index == 5 else [],
+                                   "canonical_precursor_smiles": "C" * 500})
+        result["assessment"]["step_assessments"].append(step)
+    summary = summarize_call(_call("assess_route_proposal", result))
+    steps = summary["result_summary"]["assessment"]["step_assessments"]
+    assert len(steps) == 6
+    assert steps[-1]["assessment"]["status"] == "unresolved"
+    assert steps[-1]["assessment"]["warnings"] == ["Inspect the missing atom donor"]
+    assert all("canonical_precursor_smiles" not in step["assessment"] for step in steps)
+    assert summary["result_summary"]["assessment"]["topology_gates"]
+    assert not any(row["path"].endswith(".warnings") for row in summary["inspection"]["collections"])
+
+
+def test_forward_timeout_keeps_question_stage_and_unresolved_result():
+    summary = summarize_call({
+        "operation": "assess_route_step_forward", "execution_status": "timed_out",
+        "error": {"type": "TimeoutError", "message": "Forward worker exceeded 30 seconds"},
+        "result": {"schema_version": "route_step_forward_investigation.v1", "execution_status": "timed_out",
+                   "source_ref": "saved-route", "step_id": "s4", "question": "Could regioselectivity change the route?",
+                   "assessment": None, "experimental_feasibility": "not_established",
+                   "execution": {"timings": {"elapsed_seconds": 30.1, "timeout_seconds": 30},
+                                 "stages": [{"stage": "load_forward_library", "status": "running", "elapsed_seconds": 0.2}],
+                                 "diagnostics": {"stderr.log": "diagnostics/forward_checks/run/stderr.log"}}},
+    })
+    assert summary["execution_status"] == "timed_out"
+    projected = summary["result_summary"]
+    assert projected["assessment"] is None
+    assert projected["source_ref"] == "saved-route" and projected["step_id"] == "s4"
+    assert projected["question"] == "Could regioselectivity change the route?"
+    assert projected["execution"]["stages"][0]["status"] == "running"
+    assert projected["execution"]["timings"]["timeout_seconds"] == 30
+    assert projected["execution"]["diagnostics"]["stderr.log"] == "diagnostics/forward_checks/run/stderr.log"
+    assert projected["experimental_feasibility"] == "not_established"
+
+
 def test_comparison_does_not_choose_a_winner_or_merge_different_statuses():
     result = {"ranking": "not_performed", "experimental_feasibility": "not_established", "alternatives": [
         {"source_ref": "before", "route_id": "r1", "status": "invalid", "step_count": 2,

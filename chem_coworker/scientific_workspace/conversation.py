@@ -77,6 +77,9 @@ print(w.call_summary(event))
 # When a specific detail is needed, inspect only that saved field/page, for example:
 # print(w.inspect_artifact(event.artifact_ref, path=('result', 'warnings'), limit=5))
 # Use actual field names from the result; paths are literal keys/indices, not expressions.
+Reuse recorded audits and calls for unchanged structures. Keep script execution in
+an if __name__ == '__main__': block; importing helpers must not rerun earlier calls.
+Prefer a saved Python file for structured inputs over nested shell/Python quoting.
 
 Available operations:
 {operation_overview}
@@ -84,7 +87,10 @@ Before using an unfamiliar operation, retrieve just its exact argument signature
 print([entry for entry in w.operations.catalog() if entry['name'] in
        {{'disconnect_target', 'assess_route_proposal'}}])
 Choose the relevant names yourself. Batch independent signature lookups together;
-do not read implementation files merely to discover public arguments.
+do not print the whole catalogue or read implementation files merely to discover
+public arguments. Notes use w.store.note(kind, text, evidence_refs=(ref,)); valid
+kinds are 'hypothesis', 'decision', 'question', 'limitation', and 'review'. Record
+branch choices as 'decision', not a new note kind.
 
 Optional task guides and lessons (application guidance, not chemistry tools):
 - w.task_guide('conditions') or w.task_guide('retrosynthesis') returns the short
@@ -146,7 +152,8 @@ Literature tools (application layer, independent of deterministic chemistry):
   agent_supplied_excerpt; the workspace has NOT independently fetched that URL.
 - If fetch/inspection reports network_permission_denied, use an available browser
   research tool and capture the passage instead of repeating the denied direct
-  download. Preserve the failure and acquisition scope. Do not relax the sandbox.
+  download, including for other URLs while the same environment denial applies.
+  Preserve the failure and acquisition scope. Do not relax the sandbox.
 - w.capabilities() checks local imports and data file presence. Requested web/model
   settings are not evidence that a tool worked. If search/full text/PDF parsing is
   unavailable, disclose the gap and continue with accessible evidence as appropriate.
@@ -182,17 +189,32 @@ and assess_route_proposal for a complete or partial proposed route. A proposal h
 target_smiles and steps; every step has external_step_id, target_smiles (its product)
 and precursor_smiles (dot-separated), with optional mapped_reaction_smiles,
 proposed_conditions (a resolved recipe), and source metadata. Source labels do not
-establish chemical validity. Use include_forward/include_conditions only when needed.
+establish chemical validity. Start with the standard structural assessment; request
+include_conditions only to resolve a specific condition question. Represent known
+atom-contributing reactants from inspected evidence, including halogen or oxygen
+donors; missing correspondence needs better structural inputs or an honest limitation,
+not broad forward prediction or invented reactants.
 Assemble your chosen steps explicitly and record assess_route_proposal with the
 single-step/source call artifacts as evidence_refs. Inspect weak steps with
 inspect_route_step before proposing a revision.
+Forward prediction is an optional follow-up, never a routine route-wide check.
+Only when competing products could change a route decision, state that question
+and call assess_route_step_forward(source_ref=..., step_id=..., question=...,
+timeout_seconds=30) on one eligible step in a saved route assessment or revision.
+It uses a prebuilt, baseline-pinned forward_library and a killable worker with a
+maximum 30-second deadline. Do not rebuild libraries or invoke a route-wide forward
+challenge in this chat. The tool records stages, timeout and errors; do not manually
+poll processes or read implementation files while waiting. A timed-out, unavailable
+or skipped prediction leaves selectivity unresolved, not passed. The structural
+validation inside disconnect_target and the standard route assessor still applies.
 Use revise_route_branch to explicitly remove/replace steps or extend a terminal
 branch. Supply the reason, supporting evidence, assumptions and unresolved risks.
 It preserves the source and reassesses ALL steps and topology, including downstream
 steps. User-declared unavailable_starting_materials are checked against leaves;
 making an unavailable intermediate is different from assuming it can be purchased.
 Actual stock availability is not established by this check. Revised routes inherit
-the original constraints and assessment options. Compare saved alternatives with
+the original material constraints and condition settings; optional forward challenges
+remain separate and are not inherited. Compare saved alternatives with
 compare_route_proposals; show a concise before/after table with changed steps,
 material constraints, structural gates, selectivity/condition evidence and unknowns.
 A completed revision is NOT automatically an improvement. Unsupported proposals

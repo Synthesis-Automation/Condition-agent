@@ -23,7 +23,11 @@ from reactive_taxonomy import (
 )
 from reactive_taxonomy.reaction_operators import clear_operator_application_cache
 
-from .models import ForwardOperatorLibrary, ForwardPrecursorIndex
+from .models import (
+    FORWARD_LIBRARY_SCHEMA_VERSION,
+    ForwardOperatorLibrary,
+    ForwardPrecursorIndex,
+)
 
 
 def _value(source: Any, name: str, default: Any = None) -> Any:
@@ -113,6 +117,94 @@ def _source_round_trip(operator: BidirectionalReactionOperator) -> bool:
         ):
             return False
     return True
+
+
+def _operator_source_contract(operator: BidirectionalReactionOperator) -> tuple[Any, ...]:
+    """Fields retained from the first admitted source, before support merging."""
+
+    return (
+        operator.operator_id, operator.realization_id, operator.template_id,
+        operator.abstraction_level, operator.forward_smarts, operator.reverse_smarts,
+        operator.precursor_smarts, operator.product_smarts, operator.edit_tokens,
+        operator.operator_signature, operator.stereo_policy, operator.schema_version,
+    )
+
+
+def validate_forward_library_source(
+    forward_library: ForwardOperatorLibrary,
+    generic_library: Any,
+) -> None:
+    """Reject a prepared library whose admitted content contradicts its source.
+
+    This inexpensive metadata check accepts the same structural source contract
+    as :func:`build_forward_library` and performs no reaction execution, SMARTS
+    compilation, or source re-admission. Source chemistry was checked offline.
+    The existing artifact records a source definition and template count, not a
+    digest of rejected templates; this check therefore establishes compatibility
+    of admitted operators rather than byte identity of the whole source artifact.
+
+    Duplicate directional operators may merge support, annotations and source
+    precedents. Some duplicates can independently fail source admission, so the
+    saved projection must match a nonempty subset of their source projections.
+    """
+
+    if (
+        forward_library.schema_version != FORWARD_LIBRARY_SCHEMA_VERSION
+        or forward_library.definition_id != "forward_operator_library.v1"
+    ):
+        raise ValueError("unsupported prepared forward-library schema or definition")
+    source_definition = _value(generic_library, "definition", {}) or {}
+    definition_id = str(_value(source_definition, "definition_id", "") or "")
+    if (
+        not definition_id
+        or forward_library.source_library_definition_id != definition_id
+    ):
+        raise ValueError("prepared forward-library source definition does not match")
+    templates = tuple(_value(generic_library, "templates", ()) or ())
+    if forward_library.source_template_count != len(templates):
+        raise ValueError("prepared forward-library source template count does not match")
+
+    sources: dict[str, list[BidirectionalReactionOperator]] = {}
+    for template in templates:
+        try:
+            source = _as_operator(template)
+        except (TypeError, ValueError):
+            # Invalid source contracts can legitimately have been rejected at build.
+            continue
+        sources.setdefault(source.forward_operator_id, []).append(source)
+
+    for operator in forward_library.operators:
+        precedents = frozenset(operator.precedents)
+        annotations = frozenset(operator.named_annotations)
+        compatible = tuple(
+            source for source in sources.get(operator.forward_operator_id, ())
+            if frozenset(source.precedents) <= precedents
+            and frozenset(source.named_annotations) <= annotations
+            and source.observation_support <= operator.observation_support
+            and source.independent_reference_support <= operator.independent_reference_support
+        )
+        if not compatible or not any(
+            _operator_source_contract(source) == _operator_source_contract(operator)
+            for source in compatible
+        ):
+            raise ValueError(
+                "prepared forward operator does not match its source contract: "
+                + operator.forward_operator_id
+            )
+        if (
+            frozenset(item for source in compatible for item in source.precedents)
+            != precedents
+            or frozenset(item for source in compatible for item in source.named_annotations)
+            != annotations
+            or max(source.observation_support for source in compatible)
+            != operator.observation_support
+            or max(source.independent_reference_support for source in compatible)
+            != operator.independent_reference_support
+        ):
+            raise ValueError(
+                "prepared forward operator provenance or support does not match its source: "
+                + operator.forward_operator_id
+            )
 
 
 def _source_round_trip_passes(operator: BidirectionalReactionOperator) -> bool:
@@ -410,4 +502,5 @@ __all__ = [
     "indexed_forward_operators",
     "load_forward_library",
     "save_forward_library",
+    "validate_forward_library_source",
 ]

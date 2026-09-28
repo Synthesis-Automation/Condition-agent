@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v1
+# Retrosynthesis investigation adviser v2
 
 This is an optional menu, not a required workflow. Skip, reorder, repeat, or replace
 suggestions according to the question and available evidence. Scientific contracts,
@@ -18,26 +18,46 @@ audit = w.run("analyze_molecule", {"smiles": target_smiles})
 cut = w.run("disconnect_target", {"target_smiles": target_smiles, "top_k": 3})
 ```
 
+Reuse an existing audit for the same structure. Keep executable script bodies under
+`if __name__ == "__main__":` so importing a helper does not repeat scientific calls.
+Print `w.call_summary(event)` first; inspect selected fields only when needed.
+
 The agent owns multi-step planning. Select concrete single-step realizations and
 choose the next precursor yourself. Avoid cycles and repeated expansions; record
 branch choices, alternatives, constraints and stopping reasons. An exact literature
 route may make further searches unnecessary. Do not invoke the built-in multistep
 planner, including through custom scripts.
+Use `w.store.note("decision", text, evidence_refs=(ref,))` for branch choices. Other
+valid note kinds are `hypothesis`, `question`, `limitation`, and `review`.
 
 Assemble steps with `external_step_id`, `target_smiles` and dot-separated
 `precursor_smiles`. Use `assess_route_step` or `assess_route_proposal`; extend or
 replace explicit branches with `revise_route_branch`, then compare alternatives
-when useful. Unsupported reconstruction can reflect library coverage, not chemical
+when useful. Start with the standard structural assessment. Inspect its weak steps
+before adding optional computation. Unsupported reconstruction can reflect library coverage, not chemical
 impossibility. Never fabricate atom maps, atom donors, or structural correspondence.
-For bromination, inspect the reported bromine source and represent known contributing
+For bromination or oxidation, inspect the reported bromine or oxygen source and represent known contributing
 reactants accurately; if the donor is missing or ambiguous, retain that limitation
 instead of inventing a reagent to satisfy an atom-source check.
+
+Forward prediction is useful only when competing products could change a route
+decision. For that question, optionally call `assess_route_step_forward` with a saved
+route `source_ref`, one eligible `step_id`, the decision-changing `question`, and
+`timeout_seconds=30` (the maximum). It loads the prebuilt, baseline-pinned
+`forward_library`; it never rebuilds libraries or checks the whole route. The worker
+records its stages and stops at the deadline. No process polling is needed. Missing
+libraries, timeout or failure leave the question unresolved. Skip this check when the
+main gap is missing atom contributors, source evidence, or starting-material supply.
+This optional challenge is separate from the structural validation in single-step
+retrosynthesis and standard route assessment; those checks remain in place.
 
 If direct retrieval fails, inspect the primary source in the browser and preserve
 actual visible text with `w.capture_source(text, url=url, locator=locator)`. Record
 an exact passage with `w.record_source_excerpt`. Pass its artifact reference in
 `evidence_refs` as provenance; citations do not override graph or topology gates.
 Failed downloads remain debugging records, not supporting literature.
+After an environment-wide network denial, use browser capture for subsequent sources
+as well; changing URLs does not justify repeating the same denied download path.
 
 Stop with a supported route or a clearly bounded partial proposal. Identify unresolved
 steps/leaves, availability assumptions, condition gaps and the next useful check.

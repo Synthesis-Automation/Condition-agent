@@ -21,6 +21,7 @@ class ScientificOperations:
         "inspect_condition_precedents", "propose_condition_adaptation",
         "disconnect_target",
         "assess_route_step", "assess_route_proposal",
+        "assess_route_step_forward",
         "inspect_route_step", "revise_route_branch", "compare_route_proposals",
     )
 
@@ -237,7 +238,9 @@ class ScientificOperations:
 
         Optional mapped_reaction_smiles, proposed_conditions (resolved recipe),
         and sources remain untrusted input. Unknown is not impossible. Conditions
-        retrieval and forward challenges are opt-in; supplied recipes are assessed separately.
+        retrieval is opt-in; supplied recipes are assessed separately. Forward
+        prediction is a separate bounded assess_route_step_forward call after
+        a saved route assessment. include_forward must remain False.
         """
         from .route_investigation import assess_step
 
@@ -253,10 +256,27 @@ class ScientificOperations:
         Preserve unsupported steps as hypotheses. Declared unavailable starting
         materials are graph-matched against route leaves; this is not a stock lookup.
         The returned artifact is the source_ref for inspection, revision and comparison.
+        include_forward must remain False; use assess_route_step_forward only
+        for a consequential uncertainty in one eligible saved step.
         """
         from .route_investigation import assess_route
 
         return assess_route(self, proposal, unavailable_starting_materials, include_conditions, include_forward, evidence_refs)
+
+    def assess_route_step_forward(
+        self, source_ref: str, step_id: str, question: str, timeout_seconds: int = 30,
+    ) -> dict[str, Any]:
+        """Optionally challenge one eligible step of a saved route within 1..30 seconds.
+
+        State a question about competing products that could change the route
+        decision. Requires a baseline-pinned prebuilt forward_library. Loading,
+        source compatibility checks and prediction share the deadline; timed-out
+        or failed attempts retain diagnostics without changing the source route.
+        This is separate from the mandatory structural checks in retrosynthesis.
+        """
+        from .forward_check import assess_step_forward
+
+        return assess_step_forward(self, source_ref, step_id, question, timeout_seconds)
 
     def inspect_route_step(self, source_ref: str, step_id: str) -> dict[str, Any]:
         """Inspect a recorded proposal step's gates, neighboring steps, molecule audits and recipe assessment."""
@@ -273,8 +293,9 @@ class ScientificOperations:
 
         Use a completed proposal assessment/revision source_ref. Reusing an ID
         requires explicitly removing it; remove_step_ids=[] extends a leaf branch.
-        Supply reason and nonempty risks. Assessment settings and declared material
-        constraints are inherited. Invalid revisions remain inspectable, not accepted.
+        Supply reason and nonempty risks. Condition settings and declared material
+        constraints are inherited. Optional forward checks remain separate.
+        Invalid revisions remain inspectable, not accepted.
         """
         from .route_investigation import revise_branch
 
