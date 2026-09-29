@@ -135,3 +135,8 @@ avoid duplicating the route in prose, tables or claims.
 Use `w.finalize_answer(draft_path, draft, findings=findings)` to fill empty-field
 boilerplate, validate citations, save the explicit self-review and write the full
 answer. The agent still supplies chemistry, attribution and review findings.
+Before finalization, attach `inspect_step_precedents` artifacts for the final
+step structures whenever saved calls contain support. Earlier alternatives and
+`inspect_route_step` calls do not satisfy this requirement. A rejection names the
+step and supplies inspection arguments or an existing inspection ref; inspect the
+records, reconsider transfer claims, and attach the ref before submitting again.

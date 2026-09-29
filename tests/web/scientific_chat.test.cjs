@@ -305,13 +305,13 @@ test('supporting reactions retain source identity, separate observations and evi
     after_step_ids:[],conditions:[],yield_info:null,source_ids:[],limitations:[]};
   context.supportView = {sources:[],molecules:[{id:'a',name:'A'},{id:'b',name:'B'}],routes:[],steps:[step]};
   let card = run('showStructured(supportView)');
-  assert.ok(card.descendants().some(node => node.textContent === 'Supporting reactions not inspected for this step.'));
+  assert.ok(card.descendants().some(node => node.textContent === 'No supporting-reaction inspection attached to this step.'));
   step.supporting_evidence = [{artifact_ref:'sha256:fixture',artifact_url:'/saved/inspection',status:'precedents_available',
     scope:'selected_template_top_20',saved_match_count:4,distinct_references_on_page:1,page:{next_offset:1},
     precedents:[{match_id:'match1',reaction_id:'reaction-1',reference_title:'Reported patent example',reference_url:'https://example.org/patent',
       reaction_smiles:'CCO>>CC=O',image_url:'data:image/svg+xml;base64,abc',same_recorded_product:false,same_recorded_precursors:false,
       product_similarity:0.4,precursor_similarity:0.3,limitations:['Transfer remains uncertain.'],
-      observations:[{observation_id:'obs1',yield_pct:40,resolved_recipe:{}},{observation_id:'obs2',yield_pct:null}],
+      observations:[{observation_id:'obs1',yield_pct:40,resolved_recipe:{solvents:[{canonical_name:'Ethanol'}]}},{observation_id:'obs2',yield_pct:null}],
       procedures:[{observation_id:'obs1',procedure_text:'Literal source <script>text</script>'}]}]}];
   card = run('showStructured(supportView)');
   assert.equal(card.querySelectorAll('img').length,1);
@@ -319,6 +319,12 @@ test('supporting reactions retain source identity, separate observations and evi
   assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent'));
   assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: 40%'));
   assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: not supplied'));
+  assert.ok(card.querySelectorAll('code').some(node => node.textContent === 'CCO>>CC=O'));
+  const conditions = card.descendants().find(node => node.className === 'precedent-conditions');
+  assert.equal(conditions.parentNode.className, 'precedent-card');
+  assert.ok(conditions.descendants().some(node => node.textContent === 'Reagents & solvents: Ethanol'));
+  const cautions = card.querySelectorAll('summary').find(node => node.textContent === 'Match details & cautions');
+  assert.ok(!cautions.parentNode.open);
   assert.ok(card.descendants().some(node => node.textContent === 'Literal source <script>text</script>'));
   assert.ok(!card.querySelectorAll('a').some(node => node.download));
   step.supporting_evidence = [{status:'no_precedents_retrieved',precedents:[],scope:'saved_assessment_matches',saved_match_count:0,distinct_references_on_page:0}];

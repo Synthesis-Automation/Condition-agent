@@ -34,6 +34,14 @@ uncertainty remain separate. Missing support is visible and does not imply chemi
 impossibility. See [workspace usage and contracts](readme.md) for pagination,
 observation linkage and compatibility with older saved answers.
 
+Supporting reactions are a publication requirement when saved calls contain them
+for the final step's exact reactant/product structures, including specified stereo.
+Both finalization and service validation reject omitted inspection links and give
+the agent concrete instructions to inspect and attach the relevant records.
+Inspections of discarded alternatives do not satisfy this requirement. Historical
+answers can display verified saved assessment matches without rewriting the answer,
+rerunning chemistry or claiming a detailed agent review took place.
+
 For local structure questions, the implemented workspace exposes two optional
 RDKit tools owned by `reactive_taxonomy`: `compare_molecules` compares a target
 with a precedent's common core, substituents and stereo specification;

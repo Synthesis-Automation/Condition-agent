@@ -188,10 +188,123 @@ def load_step_precedent_evidence(
     return record
 
 
+def _structure_key(precursors: str, target: str) -> tuple[str, str] | None:
+    left, right = canonical_smiles(precursors), canonical_smiles(target)
+    return (left, right) if left and right else None
+
+
+def _saved_support(store: InvestigationStore) -> dict[tuple[str, str], list[dict[str, Any]]]:
+    """Index verified saved selections by both sides, retaining stereo and provenance.
+
+    This reads call artifacts only. It does not retrieve from a live corpus, rerun
+    chemistry, or infer that an agent reviewed a retrieved match.
+    """
+    support: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for event in reversed(store.events()):
+        if event.kind != "call":
+            continue
+        try:
+            payload = store.read_artifact(event.artifact_ref)
+            operation = payload.get("operation")
+            if payload.get("execution_status") != "completed":
+                continue
+            result = payload.get("result", {})
+            selections = []
+            if operation == "inspect_step_precedents" and result.get("schema_version") == SCHEMA_VERSION:
+                selections.append((result["selection"], {}, {}, result))
+            elif operation == "disconnect_target":
+                for strategy in result.get("strategies", []):
+                    for selected in [strategy.get("representative"), *strategy.get("alternate_realizations", [])]:
+                        if selected:
+                            selections.append((selected, {}, {"realization_id": selected["realization_id"]}, None))
+            elif operation in SOURCE_OPERATIONS:
+                selectors = [{}] if operation == "assess_route_step" else [
+                    {"step_id": item["external_step_id"]} for item in result.get("proposal", {}).get("steps", [])
+                ]
+                for selector in selectors:
+                    selected, assessment = _selection(payload, selector.get("step_id"), None)
+                    selections.append((selected, assessment, selector, None))
+            for selected, assessment, selector, inspection in selections:
+                key = _structure_key(selected["precursor_smiles"], selected["target_smiles"])
+                if key:
+                    support.setdefault(key, []).append({
+                        "source_ref": event.artifact_ref, "selector": selector,
+                        "assessment": assessment, "inspection": inspection,
+                        "available": bool((inspection or {}).get("precedents") or assessment.get("precedent_matches")
+                                          or selected.get("precedent_reaction_ids")),
+                    })
+        except (OSError, ValueError, KeyError, TypeError):
+            # Unrelated malformed/corrupt calls cannot become inferred support.
+            # Explicitly cited artifacts are validated separately and fail closed.
+            continue
+    return support
+
+
+def require_available_step_precedents(store: InvestigationStore, answer: dict[str, Any]) -> None:
+    """Reject publication that silently omits available evidence for a final step."""
+    if not answer.get("steps"):
+        return
+    support = _saved_support(store)
+    molecules = {item["id"]: item["smiles"] for item in answer["molecules"]}
+    missing = []
+    for step in answer["steps"]:
+        precursors = ".".join(molecules[key] for key in step["reactant_ids"])
+        target = ".".join(molecules[key] for key in step["product_ids"])
+        candidates = [item for item in support.get(_structure_key(precursors, target), []) if item["available"]]
+        if not candidates:
+            continue
+        if any(load_step_precedent_evidence(store, reference, precursors, target).get("precedents")
+               for reference in step.get("precedent_refs", [])):
+            continue
+        existing = next((item for item in candidates if item["inspection"]), None)
+        if existing:
+            action = f"attach existing inspection {existing['source_ref']} in precedent_refs"
+        else:
+            candidate = candidates[0]
+            arguments = {"source_ref": candidate["source_ref"], **candidate["selector"], "limit": 3}
+            action = f"run inspect_step_precedents with {json.dumps(arguments)}, review it, and attach its artifact_ref in precedent_refs"
+        missing.append(f"{step['id']}: {action}")
+    if missing:
+        raise ValueError("Available supporting reactions must accompany the final presented steps. " + "; ".join(missing))
+
+
+def _assessment_preview(candidate: dict[str, Any], key: tuple[str, str]) -> dict[str, Any]:
+    """Expose saved source structures without claiming a detailed inspection occurred."""
+    assessment = candidate["assessment"]
+    unique = {}
+    for item in assessment.get("precedent_matches", []):
+        unique.setdefault((item["reaction_id"], item["reference_id"], item["mapped_reaction_smiles"]), item)
+    matches = list(unique.values())
+    records = [{
+        **item, "reaction_smiles": f"{item['precursor_smiles']}>>{item['product_smiles']}",
+        "same_recorded_precursors": canonical_smiles(item["precursor_smiles"]) == key[0],
+        "same_recorded_product": canonical_smiles(item["product_smiles"]) == key[1],
+        "support_kind": "template_precedent", "observations": [], "procedures": [],
+        "limitations": ["Detailed inspection and experimental conditions were not attached to this answer."],
+    } for item in matches[:3]]
+    return {
+        "artifact_ref": candidate["source_ref"], "source_ref": candidate["source_ref"],
+        "evidence_origin": "saved_assessment", "inspection_status": "not_attached",
+        "selection": {"precursor_smiles": key[0], "target_smiles": key[1], **candidate["selector"]},
+        "status": "precedents_available" if matches else "no_precedents_retrieved",
+        "scope": "saved_assessment_matches", "saved_match_count": len(matches),
+        "assessment_status": assessment.get("status"), "assessment_warnings": assessment.get("warnings", []),
+        "page": {"offset": 0, "returned": len(records), "next_offset": 3 if len(matches) > 3 else None},
+        "distinct_references_on_page": len({item["reference_id"] for item in records if item["reference_id"]}),
+        "precedents": records, "experimental_feasibility": "not_established",
+    }
+
+
 def answer_step_precedents(store: InvestigationStore, answer: dict[str, Any]) -> dict[str, list[dict]]:
     """Resolve saved answer links for display; preserve unavailable evidence explicitly."""
     molecules = {item["id"]: item["smiles"] for item in answer.get("molecules", [])}
     result = {}
+    support, support_error = {}, None
+    try:
+        if any(not step.get("precedent_refs") for step in answer.get("steps", [])):
+            support = _saved_support(store)
+    except (OSError, ValueError, KeyError) as exc:
+        support_error = str(exc)
     for step in answer.get("steps", []):
         records = []
         for reference in dict.fromkeys(step.get("precedent_refs", [])):
@@ -204,5 +317,20 @@ def answer_step_precedents(store: InvestigationStore, answer: dict[str, Any]) ->
             except (OSError, ValueError, KeyError) as exc:
                 records.append({"artifact_ref": reference, "status": "evidence_unavailable",
                                 "error": str(exc), "precedents": []})
+        if not step.get("precedent_refs"):
+            if support_error:
+                result[step["id"]] = [{"status": "evidence_unavailable", "error": support_error, "precedents": []}]
+                continue
+            key = _structure_key(".".join(molecules[item] for item in step["reactant_ids"]),
+                                 ".".join(molecules[item] for item in step["product_ids"]))
+            candidates = support.get(key, [])
+            existing = next((item for item in candidates if item["inspection"] and item["available"]), None)
+            if existing:
+                records.append({"artifact_ref": existing["source_ref"], **existing["inspection"],
+                                "evidence_origin": "recovered_inspection"})
+            else:
+                assessed = next((item for item in candidates if item["assessment"].get("precedent_matches")), None)
+                if assessed:
+                    records.append(_assessment_preview(assessed, key))
         result[step["id"]] = records
     return result

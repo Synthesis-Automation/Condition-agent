@@ -253,6 +253,15 @@ proof of success. An identical structure pair alone is not a verified procedure.
 Link inspection artifact refs in that answer step's precedent_refs, including empty
 search results. The service validates the step structures and renders those saved
 records. Do not copy source reaction SMILES into agent-authored precedent cards.
+Before finalizing, inspect supporting reactions for the ACTUAL final step structures.
+Earlier alternative disconnections do not cover changed precursors or intermediates.
+When saved assessments, disconnections or inspections contain support for a final
+step, publication requires a matching nonempty inspection in that step's
+precedent_refs. Missing links are rejected with exact inspection arguments or an
+existing inspection ref to attach. Inspect the records and revise transfer claims
+before resubmitting. inspect_route_step is not inspect_step_precedents and cannot
+populate this field. Do not remove a presented step or its citations to bypass this
+check. If no matching local support is available, retain the evidence gap honestly.
 For literature-only steps, preserve captured citations; the template panel may remain
 not inspected. Never invent local support or run tools only to fill the panel.
 You own the decisions: inspect strategies and their concrete realizations,

@@ -279,7 +279,8 @@ def _supporting_evidence(records: list[dict[str, Any]], identity: str) -> list[d
     """Render server-resolved inspection records; never accept agent-authored source cards."""
     output = json.loads(json.dumps(records))
     for record in output:
-        record["artifact_url"] = f"/api/v1/scientific/conversations/{identity}/artifacts/{record['artifact_ref']}"
+        if record.get("artifact_ref"):
+            record["artifact_url"] = f"/api/v1/scientific/conversations/{identity}/artifacts/{record['artifact_ref']}"
         for precedent in record.get("precedents", []):
             try:
                 with rdBase.BlockLogs():
@@ -293,6 +294,7 @@ def _supporting_evidence(records: list[dict[str, Any]], identity: str) -> list[d
             reference = precedent.get("reference_record") or {}
             precedent["reference_title"] = (reference.get("normalized_citation") or reference.get("raw_reference")
                                              or reference.get("patent_number") or reference.get("doi")
+                                             or ("Saved reference reaction" if record.get("evidence_origin") == "saved_assessment" else None)
                                              or "Publication details unavailable")
             precedent["reference_url"] = None
             if reference.get("doi"):

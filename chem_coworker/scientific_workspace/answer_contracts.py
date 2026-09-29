@@ -170,7 +170,7 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
             "call", "derived_file", "replay", "custom_execution", "literature_source", "literature_excerpt",
         }:
             raise ValueError("Answer must cite scientific evidence, not agent assertions")
-    from .step_precedents import load_step_precedent_evidence
+    from .step_precedents import load_step_precedent_evidence, require_available_step_precedents
 
     molecules = {item.id: item.smiles for item in answer.molecules}
     for step in answer.steps:
@@ -179,6 +179,7 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
                 store, reference, ".".join(molecules[key] for key in step.reactant_ids),
                 ".".join(molecules[key] for key in step.product_ids),
             )
+    require_available_step_precedents(store, answer.model_dump())
     sources = {source.id: source for source in answer.sources}
     for source in answer.sources:
         if source.kind != "external_source":

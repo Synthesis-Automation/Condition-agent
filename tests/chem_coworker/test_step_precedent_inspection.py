@@ -212,3 +212,81 @@ def test_saved_conversation_api_resolves_precedents_without_running_science(work
         assert path.read_bytes() == original
     finally:
         service.close()
+
+
+def test_final_assessment_requires_inspection_and_preserves_old_answer_preview(workspace, monkeypatch):
+    source, assessed = run(workspace, "assess_route_proposal", proposal={"target_smiles": "CCN", "steps": [
+        {"external_step_id": "chosen", "target_smiles": "CCN", "precursor_smiles": "CC=O.N"},
+    ]})
+    draft = draft_for({"selection": assessed["proposal"]["steps"][0]}, source.artifact_ref)
+    draft["steps"][0]["precedent_refs"] = []
+    draft["evidence_refs"] = [source.artifact_ref]
+    before = deepcopy(draft)
+    path = workspace.store.root / "turns" / "test" / "answer-draft.json"
+    path.parent.mkdir(parents=True)
+    with pytest.raises(ValueError, match='inspect_step_precedents.*chosen'):
+        workspace.finalize_answer(path, draft)
+    assert not path.exists()
+    with pytest.raises(ValueError, match="Available supporting reactions"):
+        validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
+    # A read of old answers must not rerun science or silently claim agent review.
+    with monkeypatch.context() as patch:
+        patch.setattr(ScientificWorkspace, "run", lambda *a, **kw: pytest.fail("Read ran science"))
+        view = answer_step_precedents(workspace.store, draft)["s1"][0]
+    assert view["artifact_ref"] == source.artifact_ref
+    assert view["evidence_origin"] == "saved_assessment"
+    assert view["inspection_status"] == "not_attached"
+    assert view["precedents"][0]["reaction_smiles"] == "CC=O.N>>CCN"
+    assert view["precedents"][0]["observations"] == []
+    assert draft == before
+    inspection, _ = run(workspace, "inspect_step_precedents", source_ref=source.artifact_ref, step_id="chosen")
+    draft["steps"][0]["precedent_refs"] = [inspection.artifact_ref]
+    workspace.finalize_answer(path, draft)
+    assert json.loads(path.read_text("utf-8"))["steps"][0]["precedent_refs"] == [inspection.artifact_ref]
+
+
+def test_available_inspection_must_be_linked_and_can_be_recovered_for_display(workspace):
+    source, selected = disconnection(workspace)
+    event, record = run(workspace, "inspect_step_precedents", source_ref=source.artifact_ref,
+                        realization_id=selected["realization_id"])
+    draft = draft_for(record, event.artifact_ref)
+    draft["steps"][0]["precedent_refs"] = []
+    with pytest.raises(ValueError, match="attach existing inspection"):
+        validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
+    recovered = answer_step_precedents(workspace.store, draft)["s1"][0]
+    assert recovered["artifact_ref"] == event.artifact_ref
+    assert recovered["evidence_origin"] == "recovered_inspection"
+    assert recovered["precedents"] == record["precedents"]
+    # An earlier route to the same product with different reactants is not support.
+    draft["molecules"][0]["smiles"] = "CC.CN"
+    validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
+    assert answer_step_precedents(workspace.store, draft)["s1"] == []
+
+
+def test_empty_inspection_cannot_hide_known_matches(workspace):
+    source, selected = disconnection(workspace)
+    event, record = run(workspace, "inspect_step_precedents", source_ref=source.artifact_ref,
+                        realization_id=selected["realization_id"])
+    empty = deepcopy(record)
+    empty.update(precedents=[], saved_match_count=0, status="no_precedents_retrieved")
+    saved = workspace.store.append("call", {"operation": "inspect_step_precedents", "execution_status": "completed", "result": empty})
+    draft = draft_for(record, saved.artifact_ref)
+    with pytest.raises(ValueError, match="Available supporting reactions"):
+        validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
+
+
+def test_recovery_preserves_stereo_and_does_not_use_corrupt_sources(workspace):
+    source, assessed = run(workspace, "assess_route_step", proposal={"target_smiles": "CCN", "precursor_smiles": "CC=O.N"})
+    # Exercise binding without requiring a new chemistry operator fixture.
+    payload = {"operation": "assess_route_step", "execution_status": "completed", "result": deepcopy(assessed)}
+    payload["result"]["proposal"]["target_smiles"] = "N[C@H](C)C(=O)O"
+    saved = workspace.store.append("call", payload)
+    draft = draft_for({"selection": payload["result"]["proposal"]}, saved.artifact_ref)
+    draft["steps"][0]["precedent_refs"] = []
+    assert answer_step_precedents(workspace.store, draft)["s1"]
+    draft["molecules"][1]["smiles"] = "N[C@@H](C)C(=O)O"
+    assert answer_step_precedents(workspace.store, draft)["s1"] == []
+    validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
+    draft["molecules"][1]["smiles"] = "N[C@H](C)C(=O)O"
+    (workspace.store.root / "artifacts" / (saved.artifact_ref.split(":")[1] + ".json")).write_text("{}", "utf-8")
+    assert answer_step_precedents(workspace.store, draft)["s1"][0]["status"] == "evidence_unavailable"

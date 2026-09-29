@@ -30,11 +30,26 @@ assessment lookup is limited to its saved matches. Neither is a corpus-wide sear
 Attach each inspection artifact to the corresponding answer step using
 `precedent_refs: [event.artifact_ref]`. The service checks canonical reactant and
 product identity, including specified stereo, before publication. The web UI draws
-the same saved source records under **Supporting reactions**. Missing inspection,
+the same saved source records under **Supporting reactions**. Reaction drawings,
+copyable reaction SMILES, reported conditions and yields appear together. Source
+IDs, detailed comparisons and cautions are under **Match details & cautions**;
+procedures and search scope have separate disclosures. Missing inspection,
 no retrieved precedent, and unavailable evidence are separate display states.
 The optional field extends `scientific_answer.v2`; new runtime schemas require an
 explicit list, while older saved answers load with an empty list. Historical
-answers and reviews are not rewritten or given fabricated supporting reactions.
+answers and reviews are not rewritten. For old answers missing links, the display
+recovers an exact-structure saved inspection or previews source reactions already
+present in a saved assessment. The preview is labelled as not having a detailed
+inspection attached; conditions absent from that assessment remain missing. This
+read path does not run scientific tools or claim that the agent reviewed the matches.
+
+Finalization and service publication reject omitted supporting-reaction inspections
+when saved calls contain evidence for the final reactant/product pair (including
+specified stereo). The error gives a matching inspection ref to attach or exact
+`inspect_step_precedents` arguments. Inspecting an earlier alternative or calling
+`inspect_route_step` does not satisfy this check. A matching empty inspection cannot
+hide known nonempty support. Steps without available local support may still be
+presented with their literature citations and limitations.
 
 Add `reference_catalog` to the artifact configuration to resolve publication
 metadata; the local example pins the existing compact reference catalog. Missing
