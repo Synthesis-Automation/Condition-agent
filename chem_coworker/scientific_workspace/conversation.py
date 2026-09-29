@@ -177,6 +177,11 @@ normalization/compatibility succeeds. Do not fabricate a change just to call a t
 insufficient evidence is a valid investigation result.
 
 For retrosynthesis, use disconnect_target(target_smiles=...) for ONE step at a time.
+For an unfamiliar core, optionally call search_fragment_precedents(query=core_smiles)
+when fragment_index is configured. It searches product graphs and labels construction,
+modification, retention, and unresolved evidence. Inspect its source_scope and exact
+observation/procedure links before using a hit. Common fragments may need refinement;
+do not automatically broaden a query, build an index, or run a forward check.
 You own multi-step planning: inspect strategies and their concrete realizations,
 choose a precursor to expand, and call disconnect_target again for that intermediate.
 Record chosen strategy/realization IDs and call evidence, alternatives, branch links,

@@ -1,0 +1,106 @@
+"""Web fragment search uses the standalone index and retains evidence semantics."""
+
+from dataclasses import asdict
+import json
+
+from fastapi.testclient import TestClient
+import pytest
+
+from app.web_api.contracts import FragmentSearchRequest
+from app.web_api.main import create_app
+from app.web_api.runtime import LocalRecommendationRuntime
+from condition_recommender.fragment_index import build_fragment_index
+from reactive_taxonomy import featurize_reaction
+
+
+@pytest.fixture
+def runtime(tmp_path):
+    reaction = "[CH3:1][Br:2].[OH:3][CH3:4]>>[CH3:1][O:3][CH3:4]"
+    source = tmp_path / "records.jsonl"
+    source.write_text(json.dumps({
+        "observation_id": "obs-1", "reaction_id": "rxn-1", "reference_id": "ref-1",
+        "reaction_smiles": reaction, "admission_tier": "review",
+        "reaction_observation": asdict(featurize_reaction(reaction).observation),
+    }) + "\n", encoding="utf-8")
+    index = tmp_path / "fragment.sqlite"
+    build_fragment_index(source, index)
+    return LocalRecommendationRuntime(fragment_index_path=index)
+
+
+def test_workbench_search_and_empty_result(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    assert client.get("/api/v1/capabilities").json()["data"]["fragment_search"]
+    response = client.post("/api/v1/fragments/search", json={"query": "COC"})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["counts"]["observations"] == {"value": 1, "precision": "exact"}
+    assert "constructed" in data["hits"][0]["relationships"]
+    assert data["hits"][0]["reference_id"] == "ref-1"
+    assert data["hits"][0]["admission_tier"] == "review"
+    empty = client.post("/api/v1/fragments/search", json={"query": "P(=O)(O)O"})
+    assert empty.json()["data"]["search_status"] == "complete"
+    assert empty.json()["data"]["hits"] == []
+
+
+@pytest.mark.parametrize("payload", [
+    {"query": "bad smiles"}, {"query": ""}, {"query": "CO", "limit": 11},
+    {"query": "CO", "timeout_seconds": 31}, {"query": "CO", "query_format": "fuzzy"},
+    {"query": "CO", "index_path": "arbitrary.sqlite"},
+])
+def test_invalid_queries_are_422(runtime, payload):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    assert client.post("/api/v1/fragments/search", json=payload).status_code == 422
+
+
+def test_explicit_smarts_and_partial_status_are_preserved(runtime, monkeypatch):
+    import condition_recommender.fragment_search as search
+
+    original = search.search_fragment_precedents
+    def partial(*args, **kwargs):
+        assert kwargs["query_format"] == "smarts"
+        assert kwargs["topology"] == "subgraph"
+        result = original(*args, **kwargs)
+        result.update(search_status="partial", stop_reason="deadline")
+        result["counts"]["observations"]["precision"] = "at_least"
+        return result
+    monkeypatch.setattr(search, "search_fragment_precedents", partial)
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post("/api/v1/fragments/search", json={
+        "query": "C[O,N]C", "query_format": "smarts", "topology": "subgraph",
+    })
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["search_status"] == "partial" and data["hits"]
+    assert data["counts"]["observations"]["precision"] == "at_least"
+
+
+def test_missing_index_and_concurrent_load_are_explicit(runtime, tmp_path):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    runtime._fragment_search_lock.acquire()
+    try:
+        response = client.post("/api/v1/fragments/search", json={"query": "CO"})
+        assert response.status_code == 503
+        assert "already running" in response.json()["detail"]["message"]
+    finally:
+        runtime._fragment_search_lock.release()
+    runtime.fragment_index_path = tmp_path / "missing.sqlite"
+    assert client.post("/api/v1/fragments/search", json={"query": "CO"}).status_code == 503
+    assert not client.get("/api/v1/capabilities").json()["data"]["fragment_search"]
+
+
+def test_failed_query_releases_search_lock(runtime):
+    with pytest.raises(ValueError):
+        runtime.search_fragments(FragmentSearchRequest(query="bad smiles"))
+    assert runtime.search_fragments(FragmentSearchRequest(query="COC"))["hits"]
+
+
+def test_focused_profile_stays_recommendation_only(runtime):
+    client = TestClient(create_app(runtime=runtime))
+    assert client.post("/api/v1/fragments/search", json={"query": "CO"}).status_code == 404
+    assert "fragment_search" not in client.get("/api/v1/capabilities").json()["data"]
+
+
+def test_fragment_index_environment_override(tmp_path, monkeypatch):
+    path = tmp_path / "configured.sqlite"
+    monkeypatch.setenv("FRAGMENT_PRECEDENT_INDEX", str(path))
+    assert LocalRecommendationRuntime().fragment_index_path == path

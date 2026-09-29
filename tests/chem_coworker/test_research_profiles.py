@@ -178,7 +178,7 @@ def test_web_cli_profile_defaults_and_override_precedence(
     artifacts = tmp_path / "artifacts.json"
     artifacts.write_text("{}", "utf-8")
     monkeypatch.setattr("chem_coworker.scientific_workspace.conversation.ConversationService", Service)
-    monkeypatch.setattr(web_main, "LocalRecommendationRuntime", lambda _: object())
+    monkeypatch.setattr(web_main, "LocalRecommendationRuntime", lambda _, **__: object())
     monkeypatch.setattr(web_main, "create_app", lambda **_: object())
     monkeypatch.setattr(web_main.uvicorn, "run", lambda *_, **__: None)
     monkeypatch.setattr(sys, "argv", ["app.web_api", "--scientific-chat", "--chat-artifacts", str(artifacts), *flags])

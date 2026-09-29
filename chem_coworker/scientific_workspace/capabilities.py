@@ -39,6 +39,10 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
             for name, value in baseline.get("artifacts", {}).items()
         },
         "source_fetch": {"status": "implemented", "network_access": "not_checked"},
+        "fragment_search": {
+            "status": "implemented", "required_artifact": "fragment_index",
+            "content_validation": "checked_on_call", "automatic_build": False,
+        },
         "agent_web_search": {"status": "not_checked",
                              "observation_location": "turns/<turn>/runtime-observations.json"},
         "model_and_reasoning": {"status": "not_confirmed",

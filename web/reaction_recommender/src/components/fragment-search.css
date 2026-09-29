@@ -1,0 +1,11 @@
+.fragment-search { display: grid; gap: 11px; min-width: 0; }
+.fragment-fields { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; min-width: 0; }
+.fragment-note { color: #576c60; font-size: .85rem; }
+.fragment-hit { border-top: 1px solid #cfddd4; padding: 16px 0; min-width: 0; }
+.fragment-hit h3 { margin-top: 0; }
+.fragment-results > p, .fragment-results > details, .fragment-hit { margin-right: 19px; margin-left: 19px; }
+.fragment-results p { line-height: 1.5; overflow-wrap: anywhere; font-size: .78rem; }
+.fragment-results details { margin-top: 10px; margin-bottom: 10px; }
+.fragment-results summary { cursor: pointer; font-size: .75rem; font-weight: 600; }
+.fragment-results pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; padding: 12px; background: #f4f7f4; font-size: .8rem; }
+.fragment-results .reaction-image img { max-width: 100%; height: auto; }

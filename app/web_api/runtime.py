@@ -6,7 +6,7 @@ import os
 import sqlite3
 import time
 from pathlib import Path
-from threading import RLock
+from threading import Lock, RLock
 from typing import Any, Dict, Protocol
 
 from cas_tools import (
@@ -64,6 +64,7 @@ from visualization import (
 from .contracts import (
     CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
+    FragmentSearchRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     RecommendationRequest,
@@ -88,6 +89,9 @@ from .references import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LIBRARY_ROOT = PROJECT_ROOT / "datasets" / "literature"
 DEFAULT_INDEX_PATH = DEFAULT_LIBRARY_ROOT / "generic_index.sqlite"
+DEFAULT_FRAGMENT_INDEX_PATH = (
+    PROJECT_ROOT / "results" / "ai_native" / "indexes" / "fragment_precedents.sqlite"
+)
 DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = (
     PROJECT_ROOT / "results" / "operator_retrosynthesis_poc" / "full_scale_v3"
 )
@@ -217,6 +221,8 @@ class WebRuntime(Protocol):
 
     def capabilities(self) -> Dict[str, Any]: ...
 
+    def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]: ...
+
     def ranking_profiles(self) -> tuple[Dict[str, Any], ...]: ...
 
     def prepare_reaction(self, reaction_smiles: str) -> Dict[str, Any]: ...
@@ -271,7 +277,13 @@ class LocalRecommendationRuntime:
         coupled_strategy_library_path: str | Path | None = None,
         coupled_strategy_panel_path: str | Path | None = None,
         shared_core_enabled: bool | None = None,
+        fragment_index_path: str | Path | None = None,
     ) -> None:
+        self.fragment_index_path = Path(
+            fragment_index_path or os.environ.get("FRAGMENT_PRECEDENT_INDEX")
+            or DEFAULT_FRAGMENT_INDEX_PATH
+        )
+        self._fragment_search_lock = Lock()
         self.shared_core_enabled = (
             os.environ.get("CONDITION_SHARED_CORE_EXPERIMENTAL", "1") != "0"
             if shared_core_enabled is None else shared_core_enabled
@@ -355,6 +367,28 @@ class LocalRecommendationRuntime:
         self._compound_registry_identities: (
             tuple[frozenset[str], frozenset[str]] | None
         ) = None
+
+    def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]:
+        """Use the standalone search with one active library load per runtime.
+
+        The domain search checks a cooperative deadline between bounded batches.
+        Reject concurrent calls instead of queueing multiple large index loads.
+        """
+        from condition_recommender.fragment_search import search_fragment_precedents
+
+        if not self.fragment_index_path.is_file():
+            raise FileNotFoundError(
+                "Fragment index unavailable. Configure --fragment-index or "
+                "FRAGMENT_PRECEDENT_INDEX with a prepared fragment index."
+            )
+        if not self._fragment_search_lock.acquire(blocking=False):
+            raise RuntimeError("A fragment search is already running. Try again shortly.")
+        try:
+            return search_fragment_precedents(
+                self.fragment_index_path, **request.model_dump()
+            )
+        finally:
+            self._fragment_search_lock.release()
 
     def _registered_compound_identities(
         self,
@@ -730,6 +764,7 @@ class LocalRecommendationRuntime:
                 coupled_strategy_available = False
         return {
             "service": "reaction-condition-recommender",
+            "fragment_search": self.fragment_index_path.is_file(),
             "recommendation_engine": (
                 "shared_reaction_core.v2" if self.shared_core_enabled else "baseline"
             ),

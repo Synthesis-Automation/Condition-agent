@@ -16,6 +16,7 @@ from .contracts import (
     AssistanceSessionRequest,
     CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
+    FragmentSearchRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     PrepareReactionRequest,
@@ -192,6 +193,17 @@ def create_app(
             )
         except (ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/fragments/search")
+    def search_fragments(
+        payload: FragmentSearchRequest, request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).search_fragments(payload)
+        except (ValueError, OSError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
         return envelope(data)
 
     @app.post("/api/v1/features/analyze")

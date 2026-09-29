@@ -22,6 +22,15 @@ Reuse an existing audit for the same structure. Keep executable script bodies un
 `if __name__ == "__main__":` so importing a helper does not repeat scientific calls.
 Print `w.call_summary(event)` first; inspect selected fields only when needed.
 
+For an unfamiliar core, consider `search_fragment_precedents` with the selected
+core SMILES and `limit=5` when `fragment_index` is configured. It searches product
+substructures and distinguishes core construction from modification or retention.
+Keep distinctive ring topology and heteroatom positions; an unrestricted common
+biphenyl query may be too broad. Inspect returned source evidence, unresolved
+mapping, and corpus scope before transferring an idea. Explicitly refine SMARTS
+only when useful. A zero-hit result covers this index, not all literature.
+This is optional and does not trigger route expansion or forward prediction.
+
 The agent owns multi-step planning. Select concrete single-step realizations and
 choose the next precursor yourself. Avoid cycles and repeated expansions; record
 branch choices, alternatives, constraints and stopping reasons. An exact literature

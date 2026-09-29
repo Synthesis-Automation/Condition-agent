@@ -18,6 +18,7 @@ class ScientificOperations:
     NAMES = (
         "analyze_reaction", "analyze_molecule", "recommend_conditions",
         "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
+        "search_fragment_precedents",
         "inspect_condition_precedents", "propose_condition_adaptation",
         "disconnect_target",
         "assess_route_step", "assess_route_proposal",
@@ -102,6 +103,23 @@ class ScientificOperations:
             "record_scope": "indexed_fields_only",
             "index_scope": index.precedent_scope.value,
         }
+
+    def search_fragment_precedents(
+        self, query: str, query_format: str = "smiles", topology: str = "preserve_rings",
+        limit: int = 5, timeout_seconds: int = 10,
+    ) -> dict[str, Any]:
+        """Find product cores and local construction evidence in a prebuilt fragment_index.
+
+        Supply one connected core. SMILES permits peripheral substitution while
+        preserving rings; explicit SMARTS/subgraph permits deliberate broadening.
+        Inspect saved hits for source records and procedure chunks. No automatic
+        mapping, forward check, route expansion, or index rebuild is performed.
+        """
+        from .fragment_search import run_fragment_search
+
+        return run_fragment_search(self, {"query": query, "query_format": query_format,
+                                         "topology": topology, "limit": limit,
+                                         "timeout_seconds": timeout_seconds})
 
     def get_procedures(self, reaction_ids: list[str]) -> dict[str, Any]:
         """Read all matching observed procedure records; missing text remains missing."""

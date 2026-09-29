@@ -5,6 +5,8 @@ import type {
   CoupledStrategyRetrosynthesisResult,
   FeatureAnalysisRequest,
   FeatureAnalysisResult,
+  FragmentSearchRequest,
+  FragmentSearchResult,
   ForwardSynthesisRequest,
   ForwardSynthesisResult,
   ForwardConditionProfileCatalog,
@@ -56,6 +58,10 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  searchFragments: (request: FragmentSearchRequest, signal?: AbortSignal) =>
+    jsonRequest<FragmentSearchResult>('/fragments/search', {
+      method: 'POST', body: JSON.stringify(request), signal,
+    }),
   reactionContext: (reactionSmiles: string, libraryMode: 'full' | 'compact') =>
     jsonRequest<ReactionContextResult>('/recommendations/context', {
       method: 'POST',

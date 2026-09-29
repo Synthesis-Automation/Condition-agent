@@ -16,6 +16,8 @@ from .store import canonical_bytes, InvestigationEvent, InvestigationStore
 
 def _replay_result(operation: str, result: Any) -> Any:
     """Exclude only per-attempt forward telemetry from scientific replay equality."""
+    if operation == "search_fragment_precedents" and isinstance(result, dict):
+        return {key: value for key, value in result.items() if key != "execution"}
     if operation != "assess_route_step_forward" or not isinstance(result, dict):
         return result
     execution = dict(result.get("execution", {}))
@@ -81,7 +83,7 @@ class ScientificWorkspace:
             payload["result_bytes"] = len(serialized)
             timings["serialization_seconds"] = round(monotonic() - phase_started, 6)
             payload["execution_status"] = "completed"
-            if operation == "assess_route_step_forward" and isinstance(payload["result"], dict):
+            if operation in {"assess_route_step_forward", "search_fragment_precedents"} and isinstance(payload["result"], dict):
                 forward_status = payload["result"].get("execution_status")
                 if forward_status in {"timed_out", "error", "cancelled"}:
                     # Retain the partial result and stages without labeling an
@@ -137,7 +139,9 @@ class ScientificWorkspace:
             "matches": canonical_bytes(_replay_result(source["operation"], actual))
             == canonical_bytes(_replay_result(source["operation"], source["result"])),
             "comparison_scope": "scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry"
-            if source["operation"] == "assess_route_step_forward" else "full_result",
+            if source["operation"] == "assess_route_step_forward" else
+            "scientific_result_excluding_fragment_execution_telemetry"
+            if source["operation"] == "search_fragment_precedents" else "full_result",
             "result": actual,
         }, evidence_refs=(reference,))
 

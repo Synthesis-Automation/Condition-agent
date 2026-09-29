@@ -1,0 +1,13 @@
+{
+  "schema_version": "fragment_search_policy.v1",
+  "definition_version": "fragment_search.v1@1.0",
+  "max_query_characters": 2000,
+  "max_query_atoms": 100,
+  "max_embeddings": 64,
+  "max_matched_products": 500,
+  "max_observations": 3000,
+  "search_batch_size": 2048,
+  "max_result_bytes": 1000000,
+  "max_procedure_characters": 60000,
+  "relationship_order": ["constructed", "modified", "boundary_changed", "carried_through", "unresolved"]
+}

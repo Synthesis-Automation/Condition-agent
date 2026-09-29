@@ -2,6 +2,11 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+[Fragment precedent search](Fragment_Precedent_Search_Design.md) is available as
+an optional workspace operation over a prepared local index. It finds product
+cores, distinguishes supported construction from retention, and preserves
+unresolved evidence. Independent chemistry review remains pending.
+
 Use the existing agent's Python and shell access to investigate chemistry through
 the canonical packages. The workspace adds saved evidence and replay without an
 internal LLM controller. No model API key or MCP server is required for these
@@ -577,6 +582,49 @@ runtime versions, and data size/modification identity; full data hashing occurs
 at initialization and replay. This is a local reproducibility check, not a
 tamper-proof or multi-user security boundary.
 
+## Prepare and search fragment precedents
+
+Build once offline from canonical observations (not the condition-admitted index):
+
+```powershell
+python -m condition_recommender.fragment_search build --source datasets/literature/full/combined_records.jsonl.gz --procedure-catalog datasets/literature/full/experimental_detail_catalog.jsonl.gz --output results/ai_native/indexes/fragment_precedents.sqlite
+```
+
+The example artifact configuration already names this path as `fragment_index`.
+Restart the scientific chat server and begin a new investigation after updating
+code or replacing an index; existing investigations keep their original baseline.
+An absent index produces an explicit capability error and is never built by an
+agent call. `--max-records N` is available for development pilots; results expose
+their restricted `prefix_pilot` coverage.
+
+With an open workspace `w`:
+
+```python
+event = w.run("search_fragment_precedents", {
+    "query": "c1ccc2c(c1)COc1ccccc1-2", "limit": 5,
+})
+print(w.call_summary(event))
+print(w.inspect_artifact(event.artifact_ref, ("result", "hits", 0, "matches")))
+```
+
+SMILES queries allow peripheral substitution and preserve the represented ring
+systems. For deliberate flexibility, supply `query_format="smarts"` and explicit
+constraints; partial ring queries require `topology="subgraph"`. Query a complete
+distinctive core rather than an unrestricted common fragment such as biphenyl.
+
+Inspect `search_status`, `source_scope`, count precision, and the returned hit's
+literal `inspect_paths`. `complete` covers the indexed scope; `too_broad` requests
+refinement; `partial` records a budget limit. Neither missing data nor a timeout
+establishes that a core cannot be synthesized. Construction evidence currently
+uses validated supplied maps; other correspondence remains unresolved. Conditions
+remain reported observations, not recommendations for a new target.
+
+Procedures join by exact observation ID or explicitly unassigned reaction scope.
+Long text is a pageable list of chunks (300 characters each), with hashes and
+offsets; per-procedure truncation at 60,000 characters is explicit. Saved worker
+diagnostics include stage timings, errors, and stderr. The default workspace
+deadline is 10 seconds, with a maximum of 30 seconds including worker startup.
+
 ## Available operations and ownership
 
 `catalog` prints exact callable signatures. No arbitrary import or code execution
@@ -587,6 +635,7 @@ is accepted through the operation dispatcher.
 | `analyze_reaction` | `reactive_taxonomy`; `reaction_smiles` | Complete analysis, versions, edits, interpretations, ambiguity, warnings. |
 | `analyze_molecule` | `reactive_taxonomy`; `smiles` | Graph-derived target audit; reactive sites are hypotheses. |
 | `recommend_conditions` | `condition_recommender`; `reaction_smiles`, optional `top_k`, `search_scope` | Canonical shared-core results with compatibility, ranking, and provenance unchanged. Requires `condition_index` and `shared_core_index`. |
+| `search_fragment_precedents` | `reactive_taxonomy` graph/evidence rules and `condition_recommender` discovery index; `query`, optional `query_format`, `topology`, `limit`, `timeout_seconds` | Bounded product-fragment discovery, per-embedding changes, exact source/procedure joins, and saved inspection paths. Requires prebuilt `fragment_index`; never expands a route or rebuilds data. |
 | `get_precedents` | Canonical index; `reaction_ids`, optional `offset`, `limit` | All indexed fields, distinct observation IDs, admission/condition status, missing IDs, pagination. Indexed records are reduced representations of source data. |
 | `get_procedures` | Configured `procedure_catalog`; `reaction_ids` | All matching procedure observations, including missing fields. No invented procedure text. |
 | `inspect_condition_precedents` | Canonical condition index, optional procedure catalog; `reaction_smiles`, `reaction_ids`, optional `offset`, `limit` | Selected-observation structural differences, full recipes, compatibility, publication counts, missing fields and exact procedure links. No new ranking or transfer claim. |

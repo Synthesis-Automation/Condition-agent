@@ -18,11 +18,12 @@ import type {
 } from './api/types'
 import { CompletionDialog } from './components/CompletionDialog'
 import { FeatureResults } from './components/FeatureResults'
+import { FragmentSearch, FragmentSearchOptions, useFragmentSearch } from './components/FragmentSearch'
 import { RankingDialog } from './components/RankingDialog'
 import { ReactionEditor } from './components/ReactionEditor'
 import { CoupledStrategyResults, ForwardSynthesisResults, MultistepRetrosynthesisResults, RecommendationResults, RetrosynthesisResults, WeakLabelRecommendationResults } from './components/Results'
 
-type Mode = 'recommendation' | 'weak_label' | 'forward_synthesis' | 'retrosynthesis' | 'multistep_retrosynthesis' | 'coupled_strategy' | 'features'
+type Mode = 'recommendation' | 'weak_label' | 'forward_synthesis' | 'retrosynthesis' | 'multistep_retrosynthesis' | 'coupled_strategy' | 'features' | 'fragments'
 type LibraryMode = 'full' | 'compact'
 type WeakLabelOutput = 'weak_label_fallback' | 'weak_label_screening'
 
@@ -65,6 +66,7 @@ function App() {
   const [libraryMode, setLibraryMode] = useState<LibraryMode>('full')
   const [weakLabelOutput, setWeakLabelOutput] = useState<WeakLabelOutput>('weak_label_fallback')
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null)
+  const fragmentSearch = useFragmentSearch(mode === 'fragments')
   const [profiles, setProfiles] = useState<RankingProfile[]>([])
   const [profileId, setProfileId] = useState('default')
   const [searchScope, setSearchScope] = useState<'same_handle' | 'automatic' | 'broad'>('automatic')
@@ -518,7 +520,9 @@ function App() {
   const isRetrosynthesisMode = mode === 'retrosynthesis' || mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy'
   const isForwardMode = mode === 'forward_synthesis'
   const isOperatorMode = isRetrosynthesisMode || isForwardMode
-  const selectedLibraryAvailable = mode === 'weak_label'
+  const selectedLibraryAvailable = mode === 'fragments'
+    ? capabilities?.fragment_search ?? false
+    : mode === 'weak_label'
     ? capabilities?.weak_label_recommendation ?? false
     : isForwardMode
     ? capabilities?.forward_library_modes?.[libraryMode]?.library_available ?? false
@@ -540,7 +544,9 @@ function App() {
       ? `${label} · ${entry.row_count.toLocaleString()} records`
       : label
   }
-  const serviceStatus = mode === 'weak_label'
+  const serviceStatus = mode === 'fragments'
+    ? `Fragment index ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
+    : mode === 'weak_label'
     ? `Weak-label dataset ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
     : mode === 'coupled_strategy'
     ? `Experimental two-step catalog ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
@@ -560,10 +566,11 @@ function App() {
         <section className="control-card" aria-labelledby="analysis-title">
         <div className="section-heading">
           <div><span className="step-number">1</span><h2 id="analysis-title">Analysis mode</h2></div>
-          {result && <button className="button quiet" type="button" onClick={exportResult}>Export JSON</button>}
+          {(result || (mode === 'fragments' && fragmentSearch.result)) && <button className="button quiet" type="button" onClick={mode === 'fragments' ? fragmentSearch.exportResult : exportResult}>Export JSON</button>}
         </div>
         <div className="analysis-control-layout">
           <fieldset className="mode-switch" aria-labelledby="analysis-title">
+            <label className={mode === 'fragments' ? 'active' : ''}><input type="radio" name="analysis-mode" value="fragments" checked={mode === 'fragments'} onChange={() => changeMode('fragments')} /><strong>Fragment search</strong></label>
             <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Analyze reactions</strong></label>
             <label className={mode === 'recommendation' ? 'active' : ''}><input type="radio" name="analysis-mode" value="recommendation" checked={mode === 'recommendation'} onChange={() => changeMode('recommendation')} /><strong>Condition recommendation</strong></label>
             <label className={mode === 'weak_label' ? 'active weak-label-mode' : 'weak-label-mode'}><input type="radio" name="analysis-mode" value="weak_label" checked={mode === 'weak_label'} onChange={() => changeMode('weak_label')} /><strong>Weak-label conditions</strong></label>
@@ -573,7 +580,7 @@ function App() {
             <label className={mode === 'multistep_retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="multistep_retrosynthesis" checked={mode === 'multistep_retrosynthesis'} onChange={() => changeMode('multistep_retrosynthesis')} /><strong>Multi-step retrosynthesis</strong></label>
           </fieldset>
 
-          <div className="analysis-options">
+          {mode === 'fragments' ? <FragmentSearchOptions state={fragmentSearch} available={capabilities?.fragment_search} /> : <div className="analysis-options">
             <div className={`option-grid ${mode === 'features' || mode === 'coupled_strategy' ? 'feature-options' : ''}`}>
               {mode !== 'features' && mode !== 'weak_label' && mode !== 'coupled_strategy' && <label className="library-option"><span>{isOperatorMode ? 'Operator library' : 'Precedent library'}</span><select aria-label={isOperatorMode ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">{libraryLabel('full')}</option><option value="compact">{libraryLabel('compact')}</option></select></label>}
               {mode !== 'features' && <label><span>{mode === 'multistep_retrosynthesis' ? 'Top routes' : mode === 'coupled_strategy' || mode === 'retrosynthesis' ? 'Top strategies' : 'Top results'}</span><input type="number" min="1" max={mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50} value={topK} onChange={(event) => setTopK(Math.min(mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50, Math.max(1, Number(event.target.value))))} /></label>}
@@ -615,11 +622,11 @@ function App() {
               )}
             </div></details>}
             {error && <div className="alert error" role="alert">{error}</div>}
-          </div>
+          </div>}
         </div>
         </section>
 
-        <div className="editor-action-layout">
+        {mode === 'fragments' ? <FragmentSearch state={fragmentSearch} available={capabilities?.fragment_search} /> : <div className="editor-action-layout">
           <ReactionEditor
             value={reactionSmiles}
             onChange={setReactionSmiles}
@@ -633,7 +640,7 @@ function App() {
             <button className="button primary run-button" type="button" onClick={run} disabled={busy || (mode !== 'features' && !selectedLibraryAvailable) || (mode === 'features' && !capabilities)}>{busy ? 'Working…' : mode === 'recommendation' ? 'Recommend conditions' : mode === 'weak_label' ? weakLabelOutput === 'weak_label_screening' ? 'Build screening array' : 'Find weak-label recipes' : mode === 'forward_synthesis' ? 'Predict products' : mode === 'retrosynthesis' ? 'Plan one step' : mode === 'coupled_strategy' ? 'Test two-step strategies' : mode === 'multistep_retrosynthesis' ? 'Plan multi-step routes' : 'Analyze reactions'}</button>
             <span role="status" aria-live="polite">{status}</span>
           </div>
-        </div>
+        </div>}
       </div>
 
       {recommendationResult && <RecommendationResults result={recommendationResult} libraryMode={libraryMode} />}
@@ -644,7 +651,7 @@ function App() {
       {multistepRetrosynthesisResult && <MultistepRetrosynthesisResults result={multistepRetrosynthesisResult} />}
       {featureResult && <FeatureResults result={featureResult} />}
 
-      {!result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'weak_label' ? 'Inspect weak-label condition hypotheses' : mode === 'forward_synthesis' ? 'Inspect possible products and competing pathways' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'coupled_strategy' ? 'Inspect related two-step strategies' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'weak_label' ? 'The graph-derived reaction type, matched reactive sites, label-only support, canonical recipes, and unverified-evidence cautions will appear here.' : mode === 'forward_synthesis' ? 'Validated products, blind ranks, pathway alternatives, operator identities, graph correspondence, and condition compatibility will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'coupled_strategy' ? 'Each logical strategy exposes the intermediate, terminal precursors, both physical reactions, operator support, and ordinary one-step fallbacks.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, supplier-stock provenance, and unresolved stopping reasons.' : 'Recommendations, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
+      {mode !== 'fragments' && !result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'weak_label' ? 'Inspect weak-label condition hypotheses' : mode === 'forward_synthesis' ? 'Inspect possible products and competing pathways' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'coupled_strategy' ? 'Inspect related two-step strategies' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'weak_label' ? 'The graph-derived reaction type, matched reactive sites, label-only support, canonical recipes, and unverified-evidence cautions will appear here.' : mode === 'forward_synthesis' ? 'Validated products, blind ranks, pathway alternatives, operator identities, graph correspondence, and condition compatibility will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'coupled_strategy' ? 'Each logical strategy exposes the intermediate, terminal precursors, both physical reactions, operator support, and ordinary one-step fallbacks.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, supplier-stock provenance, and unresolved stopping reasons.' : 'Recommendations, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
 
       <footer>All chemistry and data remain on this machine. Molecular structure is the source of truth.</footer>
 

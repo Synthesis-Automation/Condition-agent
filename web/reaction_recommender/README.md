@@ -33,6 +33,38 @@ versioned FastAPI boundary.
 Prerequisites are Python 3.10+ with the repository chemistry dependencies and
 Node.js 24.14.1+.
 
+## Fragment precedent search
+
+Run `python -m app.web_api --workbench --build`, open
+`http://127.0.0.1:8000/`, and select **Fragment search**. This is the ordinary
+research workbench; no agent or scientific-chat service is required.
+Use **Cyclic ether example** to try `c1ccc2c(c1)COc1ccccc1-2`, or enter a connected
+core as SMILES/SMARTS. Select ring preservation or explicit subgraph matching.
+In SMILES mode, **Draw** / **Edit drawing** opens the same
+Ketcher editor used for retrosynthesis. Draw one connected core and select
+**Use drawing** to update the query and its preview, then **Search fragments**.
+SMARTS queries remain text input so drawing does not silently discard query features.
+
+The default prepared index is
+`results/ai_native/indexes/fragment_precedents.sqlite`. Override it with
+`--fragment-index PATH` or `FRAGMENT_PRECEDENT_INDEX`. Searches never build an
+index. Preparation instructions are in [the workspace guide](../../docs/AI-native/readme.md).
+
+`POST /api/v1/fragments/search` accepts `query`, `query_format` (`smiles` or
+`smarts`), `topology` (`preserve_rings` or `subgraph`), `limit` (1–10, default 5),
+and `timeout_seconds` (1–30, default 10). It returns the standard API envelope
+with the standalone search result, including exact/lower-bound counts, graph
+witnesses, source records and available procedures. Query errors return 422;
+missing indexes or an already active fragment search return 503. One search
+per runtime prevents overlapping large index loads. The search budget is a
+cooperative deadline checked between domain batches, not a hard process timeout.
+The focused Condition Desk profile keeps this research endpoint disabled.
+
+Results distinguish core construction from modification, boundary changes,
+retention and unresolved correspondence. Broad queries require refinement;
+partial results retain lower-bound counts. Source and procedure details are
+expandable, and **Export JSON** preserves the complete returned evidence.
+
 ## Condition search and priorities
 
 In the Workbench, open **Reaction context: possible products and alternative

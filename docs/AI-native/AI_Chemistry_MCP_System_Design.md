@@ -244,6 +244,14 @@ Example request:
 
 ## 4. Reaction Precedent MCP
 
+The concrete proposal for core-first discovery is the
+[Fragment Precedent Search Design](Fragment_Precedent_Search_Design.md).
+It specifies one agent-facing search operation over canonical product structures,
+with explicit graph constraints, evidence of changes within each matched core,
+and bounded, source-linked results. An initial local Python/workspace operation
+is implemented; no separate MCP server is required. The broader function list
+below remains conceptual.
+
 This service answers:
 
 > Have similar substrates or transformations been reported before?

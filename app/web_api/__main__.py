@@ -20,6 +20,10 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--index", default=None)
+    parser.add_argument(
+        "--fragment-index", default=None,
+        help="Prepared fragment precedent SQLite index for the workbench",
+    )
     parser.add_argument("--scientific-chat", action="store_true", help="Enable local agent conversations at /scientific")
     parser.add_argument("--chat-root", default="results/ai_native/conversations")
     parser.add_argument("--chat-artifacts", default="examples/ai_native/artifacts.local.example.json")
@@ -79,7 +83,9 @@ def main() -> None:
     try:
         uvicorn.run(
             create_app(
-                runtime=LocalRecommendationRuntime(args.index),
+                runtime=LocalRecommendationRuntime(
+                    args.index, fragment_index_path=args.fragment_index,
+                ),
                 recommendation_only=not args.workbench,
                 scientific_service=scientific_service,
             ),

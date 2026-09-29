@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import csv
-import gzip
 import json
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, Mapping, Optional
+from typing import Any, Callable, Dict, Mapping, Optional
 
 from reactive_taxonomy import build_reaction_review_summary
+
+from ..corpus_io import iter_canonical_records
 
 from .flatten import review_reaction_label_text
 from .generic import GenericConversionCache, convert_record
@@ -177,55 +178,6 @@ def _reaction_core_diagnostics(
     if not reasons:
         reasons.add("no_core_eligible_edit_correspondence")
     return "unavailable", tuple(sorted(reasons))
-
-
-def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
-    """Stream records from canonical JSONL or a sharded manifest."""
-    source = Path(path)
-    if source.name.casefold() == "shard_manifest.json":
-        payload = json.loads(source.read_text(encoding="utf-8"))
-        if payload.get("artifact_type") == "saved_recommendation_batch_manifest":
-            references = tuple(payload.get("source_manifests") or ())
-            if not references:
-                raise ValueError(
-                    f"Saved batch has no converted-source references: {source}"
-                )
-            for reference in references:
-                relative = str(reference.get("relative_path") or "").strip()
-                referenced = (
-                    (source.parent / relative).resolve()
-                    if relative
-                    else Path(str(reference.get("path") or "")).resolve()
-                )
-                yield from iter_canonical_records(referenced)
-            return
-        if payload.get("artifact_type") != "generic_sharded_conversion":
-            raise ValueError(f"Not a sharded conversion manifest: {source}")
-        for entry in payload.get("shards") or ():
-            if entry.get("status") != "complete":
-                continue
-            yield from iter_canonical_records(source.parent / str(entry["output_path"]))
-        return
-    handle = (
-        gzip.open(source, mode="rt", encoding="utf-8")
-        if source.suffix.casefold() == ".gz"
-        else source.open(mode="r", encoding="utf-8")
-    )
-    with handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                value = json.loads(line)
-            except json.JSONDecodeError as exc:
-                raise ValueError(
-                    f"Invalid record JSONL at {source}:{line_number}: {exc.msg}"
-                ) from exc
-            if not isinstance(value, dict):
-                raise ValueError(
-                    f"Record is not a JSON object at {source}:{line_number}"
-                )
-            yield value
 
 
 def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:

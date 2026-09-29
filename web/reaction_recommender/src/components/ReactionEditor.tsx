@@ -16,7 +16,9 @@ interface ReactionEditorProps {
   onError: (message: string) => void
   allowMolecule?: boolean
   moleculeOnly?: boolean
-  moleculePurpose?: 'target' | 'starting_materials'
+  moleculePurpose?: 'target' | 'starting_materials' | 'fragment'
+  queryFormat?: 'smiles' | 'smarts'
+  disabled?: boolean
 }
 
 function formatError(smiles: string): string | null {
@@ -43,9 +45,10 @@ function inputFormatError(
 
 interface DrawingDialogProps extends ReactionEditorProps {
   onClose: () => void
+  fragment?: boolean
 }
 
-function DrawingDialog({
+export function DrawingDialog({
   value,
   onChange,
   onError,
@@ -53,9 +56,10 @@ function DrawingDialog({
   moleculeOnly = false,
   moleculePurpose = 'target',
   onClose,
+  fragment = false,
 }: DrawingDialogProps) {
   const isStartingMaterials = moleculeOnly && moleculePurpose === 'starting_materials'
-  const moleculeLabel = isStartingMaterials ? 'starting materials' : 'target molecule'
+  const moleculeLabel = fragment ? 'core fragment' : isStartingMaterials ? 'starting materials' : 'target molecule'
   const [ketcher, setKetcher] = useState<Ketcher | null>(null)
   const [draftSmiles, setDraftSmiles] = useState(value)
   const [status, setStatus] = useState('Loading editor…')
@@ -84,7 +88,7 @@ function DrawingDialog({
     try {
       await ketcher.setMolecule(smiles.trim())
       setDraftSmiles(smiles.trim())
-      setStatus(`${isStartingMaterials ? 'Starting materials' : moleculeOnly ? 'Target' : 'Reaction'} loaded into the drawing canvas.`)
+      setStatus(`${fragment ? 'Fragment' : isStartingMaterials ? 'Starting materials' : moleculeOnly ? 'Target' : 'Reaction'} loaded into the drawing canvas.`)
       onError('')
     } catch {
       onError('Ketcher could not load this reaction SMILES.')
@@ -106,6 +110,7 @@ function DrawingDialog({
     try {
       const smiles = (await ketcher.getSmiles()).trim()
       const error = inputFormatError(smiles, allowMolecule, moleculeOnly)
+        || (fragment && (!smiles || smiles.includes('.')) ? 'Draw one connected core fragment.' : null)
       if (error) {
         onError(error)
         setStatus(error)
@@ -129,12 +134,14 @@ function DrawingDialog({
       >
         <div className="modal-heading drawing-heading">
           <div>
-            <span className="eyebrow">{isStartingMaterials ? 'STARTING MATERIALS' : moleculeOnly ? 'TARGET DRAWING' : 'REACTION DRAWING'}</span>
+            <span className="eyebrow">{fragment ? 'FRAGMENT DRAWING' : isStartingMaterials ? 'STARTING MATERIALS' : moleculeOnly ? 'TARGET DRAWING' : 'REACTION DRAWING'}</span>
             <h2 id="drawing-title">
-              {isStartingMaterials ? 'Draw the starting materials' : moleculeOnly ? 'Draw the target molecule' : allowMolecule ? 'Draw a molecule or reaction' : 'Draw the transformation'}
+              {fragment ? 'Draw the core fragment' : isStartingMaterials ? 'Draw the starting materials' : moleculeOnly ? 'Draw the target molecule' : allowMolecule ? 'Draw a molecule or reaction' : 'Draw the transformation'}
             </h2>
             <p>
-              {isStartingMaterials
+              {fragment
+                ? 'Draw one connected core to search in reaction products. Keep the ring system and important substituents; do not add a reaction arrow.'
+                : isStartingMaterials
                 ? 'Draw every starting material as a separate molecular component. Do not add a reaction arrow or product.'
                 : moleculeOnly
                 ? 'Draw the product structure for single-step precursor generation.'
@@ -147,7 +154,7 @@ function DrawingDialog({
             <button
               className="button quiet"
               type="button"
-              onClick={() => void load(isStartingMaterials ? EXAMPLE_STARTING_MATERIALS : moleculeOnly ? EXAMPLE_TARGET : EXAMPLE_REACTION)}
+              onClick={() => void load(fragment ? 'c1ccc2c(c1)COc1ccccc1-2' : isStartingMaterials ? EXAMPLE_STARTING_MATERIALS : moleculeOnly ? EXAMPLE_TARGET : EXAMPLE_REACTION)}
               disabled={!ketcher || loading}
             >
               Load example
@@ -175,7 +182,7 @@ function DrawingDialog({
               ) {
                 void instance
                   .setMolecule(value.trim())
-                  .then(() => setStatus('Existing reaction loaded.'))
+                  .then(() => setStatus(fragment ? 'Existing fragment loaded.' : 'Existing reaction loaded.'))
                   .catch(() => onError('Ketcher could not load the existing reaction.'))
                   .finally(() => setLoading(false))
               } else {
@@ -190,12 +197,12 @@ function DrawingDialog({
 
         <div className="drawing-smiles-row">
           <label htmlFor="drawing-reaction-smiles">
-            <span>{isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : 'Reaction SMILES'}</span>
+            <span>{fragment ? 'Fragment SMILES' : isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : 'Reaction SMILES'}</span>
             <textarea
               id="drawing-reaction-smiles"
               value={draftSmiles}
               onChange={(event) => setDraftSmiles(event.target.value)}
-              placeholder={isStartingMaterials ? 'starting.materials' : moleculeOnly ? 'target product' : 'reactants>>products'}
+              placeholder={fragment ? 'connected core fragment' : isStartingMaterials ? 'starting.materials' : moleculeOnly ? 'target product' : 'reactants>>products'}
               spellCheck={false}
             />
           </label>
@@ -230,14 +237,18 @@ export function ReactionEditor({
   allowMolecule = false,
   moleculeOnly = false,
   moleculePurpose = 'target',
+  queryFormat = 'smiles',
+  disabled = false,
 }: ReactionEditorProps) {
   const isStartingMaterials = moleculeOnly && moleculePurpose === 'starting_materials'
+  const isFragment = moleculeOnly && moleculePurpose === 'fragment'
+  const textOnly = queryFormat === 'smarts'
   const [open, setOpen] = useState(false)
   const normalizedValue = value.trim()
   const inputError = normalizedValue
     ? inputFormatError(normalizedValue, allowMolecule, moleculeOnly)
     : null
-  const canPreview = Boolean(normalizedValue && inputError === null)
+  const canPreview = Boolean(normalizedValue && inputError === null && !textOnly)
   const detectedKind = normalizedValue && !normalizedValue.includes('>')
     ? 'molecule'
     : 'reaction'
@@ -249,10 +260,12 @@ export function ReactionEditor({
           <span className="step-number">2</span>
           <div>
             <h2 id="editor-title">
-              {isStartingMaterials ? 'Define the starting materials' : moleculeOnly ? 'Define the target' : allowMolecule ? 'Define the structure' : 'Define the reaction'}
+              {isFragment ? 'Define the core fragment' : isStartingMaterials ? 'Define the starting materials' : moleculeOnly ? 'Define the target' : allowMolecule ? 'Define the structure' : 'Define the reaction'}
             </h2>
             <p>
-              {isStartingMaterials
+              {isFragment
+                ? textOnly ? 'Enter a connected SMARTS query; query features are preserved as text.' : 'Enter or draw one connected core to find its synthesis precedents.'
+                : isStartingMaterials
                 ? <>Enter or draw dot-separated starting-material SMILES without a reaction arrow.</>
                 : moleculeOnly
                 ? 'Enter or draw one product molecule for precursor generation.'
@@ -264,11 +277,11 @@ export function ReactionEditor({
         </div>
         <div className="button-row">
           {value && (
-            <button className="button quiet" type="button" onClick={() => onChange('')}>
+            <button className="button quiet" type="button" disabled={disabled} onClick={() => onChange('')}>
               Clear
             </button>
           )}
-          <button className="button secondary draw-button" type="button" onClick={() => setOpen(true)}>
+          <button className="button secondary draw-button" type="button" disabled={disabled || textOnly} onClick={() => setOpen(true)}>
             {value ? 'Edit drawing' : 'Draw'}
           </button>
         </div>
@@ -276,40 +289,47 @@ export function ReactionEditor({
 
       <div className="reaction-main-input">
         <label htmlFor="main-reaction-smiles">
-          <span>{isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : allowMolecule ? 'Molecule or reaction SMILES' : 'Reaction SMILES'}</span>
+          <span>{isFragment ? 'Core fragment' : isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : allowMolecule ? 'Molecule or reaction SMILES' : 'Reaction SMILES'}</span>
           <input
             id="main-reaction-smiles"
             type="text"
             value={value}
+            disabled={disabled}
+            maxLength={isFragment ? 2000 : undefined}
             onChange={(event) => {
               onChange(event.target.value)
               onError('')
             }}
-            placeholder={isStartingMaterials ? 'reactant1.reactant2' : moleculeOnly ? 'target product' : allowMolecule ? 'CCO or reactants>>products' : 'reactants>>products'}
+            placeholder={isFragment ? textOnly ? 'Core SMARTS' : 'Core SMILES' : isStartingMaterials ? 'reactant1.reactant2' : moleculeOnly ? 'target product' : allowMolecule ? 'CCO or reactants>>products' : 'reactants>>products'}
             spellCheck={false}
           />
         </label>
       </div>
 
-      {canPreview ? (
+      {textOnly ? (
+        <div className="reaction-paper-empty">
+          <strong>SMARTS query</strong>
+          <small>Edit SMARTS queries as text. Drawing is available in SMILES mode.</small>
+        </div>
+      ) : canPreview ? (
         <div className="reaction-paper-preview">
           <ReactionImage
             smiles={normalizedValue}
-            label={`Current ${detectedKind} drawing`}
+            label={`Current ${isFragment ? 'fragment' : detectedKind} drawing`}
             kind={detectedKind}
           />
         </div>
       ) : normalizedValue ? (
-        <button className="reaction-paper-empty incomplete" type="button" onClick={() => setOpen(true)}>
+        <button className="reaction-paper-empty incomplete" type="button" disabled={disabled} onClick={() => setOpen(true)}>
           <span className="empty-reaction-mark">!</span>
-          <strong>{isStartingMaterials ? 'Starting-material input is not valid' : moleculeOnly ? 'Target input is not valid' : 'Reaction SMILES is not complete'}</strong>
+          <strong>{isFragment ? 'Fragment input is not valid' : isStartingMaterials ? 'Starting-material input is not valid' : moleculeOnly ? 'Target input is not valid' : 'Reaction SMILES is not complete'}</strong>
           <small>{inputError ?? `Check the ${moleculeOnly ? 'target' : 'reaction'} text, or finish it in the drawing editor.`}</small>
         </button>
       ) : (
-        <button className="reaction-paper-empty" type="button" onClick={() => setOpen(true)}>
-          <span className="empty-reaction-mark">→</span>
-          <strong>{isStartingMaterials ? 'No starting materials drawn yet' : moleculeOnly ? 'No target drawn yet' : 'No reaction drawn yet'}</strong>
-          <small>Click to open the {isStartingMaterials ? 'starting-material' : moleculeOnly ? 'target' : 'reaction'} drawing editor</small>
+        <button className="reaction-paper-empty" type="button" disabled={disabled} onClick={() => setOpen(true)}>
+          <span className="empty-reaction-mark">{moleculeOnly ? '⌬' : '→'}</span>
+          <strong>{isFragment ? 'No fragment drawn yet' : isStartingMaterials ? 'No starting materials drawn yet' : moleculeOnly ? 'No target drawn yet' : 'No reaction drawn yet'}</strong>
+          <small>Click to open the {isFragment ? 'fragment' : isStartingMaterials ? 'starting-material' : moleculeOnly ? 'target' : 'reaction'} drawing editor</small>
         </button>
       )}
 
@@ -321,6 +341,7 @@ export function ReactionEditor({
           allowMolecule={allowMolecule}
           moleculeOnly={moleculeOnly}
           moleculePurpose={moleculePurpose}
+          fragment={isFragment}
           onClose={() => setOpen(false)}
         />
       )}

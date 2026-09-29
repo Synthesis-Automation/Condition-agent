@@ -16,6 +16,7 @@ export interface Capabilities {
   weak_label_dataset_name?: string
   featurization: boolean
   reaction_rendering: boolean
+  fragment_search?: boolean
   retrosynthesis?: boolean
   forward_synthesis?: boolean
   multistep_retrosynthesis?: boolean
@@ -1265,4 +1266,48 @@ export interface ReactionContextResult {
       condition_error?: string
     }>
   }
+}
+
+export interface FragmentSearchRequest {
+  query: string
+  query_format: 'smiles' | 'smarts'
+  topology: 'preserve_rings' | 'subgraph'
+  limit: number
+  timeout_seconds: number
+}
+
+export interface FragmentCount {
+  value: number
+  precision: 'exact' | 'at_least'
+}
+
+export interface FragmentSearchResult {
+  query: { expression: string; query_format: string; topology: string }
+  search_status: 'complete' | 'partial' | 'too_broad'
+  stop_reason: string | null
+  counts: Record<'products' | 'observations' | 'known_references', FragmentCount>
+  relationship_groups: Record<string, FragmentCount>
+  hits: Array<{
+    hit_id: string
+    observation_id: string
+    reference_id: string | null
+    product_smiles: string
+    relationships: string[]
+    citation_availability: string
+    procedure_availability: string
+    procedure_match_scope: string | null
+    procedure_records_truncated: boolean
+    admission_tier: string | null
+    warnings: string[]
+    matches: JsonObject[]
+    record: JsonObject
+    procedures: Array<{ link_scope: string; record: JsonObject }>
+  }>
+  returned_count: number
+  source_scope: string
+  source_coverage_complete: boolean
+  refinement_hints: string[]
+  limitations: string[]
+  output_truncated?: boolean
+  execution: { elapsed_seconds: number }
 }

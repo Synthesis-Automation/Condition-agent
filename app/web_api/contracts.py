@@ -22,6 +22,16 @@ class PrepareReactionRequest(StrictRequest):
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
 
 
+class FragmentSearchRequest(StrictRequest):
+    """Explicit core query against a prepared product precedent index."""
+
+    query: str = Field(min_length=1, max_length=2000)
+    query_format: Literal["smiles", "smarts"] = "smiles"
+    topology: Literal["preserve_rings", "subgraph"] = "preserve_rings"
+    limit: int = Field(default=5, ge=1, le=10, strict=True)
+    timeout_seconds: int = Field(default=10, ge=1, le=30, strict=True)
+
+
 class CompletionChoiceRequest(StrictRequest):
     """One explicit user choice for a proposed missing fragment source."""
 
