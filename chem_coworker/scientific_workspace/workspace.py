@@ -154,12 +154,13 @@ class ScientificWorkspace:
 
         return run_python(self.store, script, parameters, evidence_refs, timeout_seconds, cancel)
 
-    def call_summary(self, event: InvestigationEvent) -> dict[str, Any]:
-        """Return a compact pointer while retaining complete scientific output on disk."""
-        from .call_summaries import summarize_call
+    def call_summary(self, event: InvestigationEvent, *, detailed: bool = False) -> dict[str, Any]:
+        """Return a brief decision view, with an optional detailed projection."""
+        from .call_summaries import summarize_call, summarize_call_brief
 
         value = self.store.read_artifact(event.artifact_ref)
-        return {"event": asdict(event), **summarize_call(value)}
+        project = summarize_call if detailed else summarize_call_brief
+        return {"event": asdict(event), **project(value)}
 
     def inspect_artifact(
         self, artifact_ref: str, path: tuple[str | int, ...] | list[str | int] = (), *,

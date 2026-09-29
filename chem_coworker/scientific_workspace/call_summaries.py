@@ -395,6 +395,193 @@ def summarize_call(payload: Mapping[str, Any]) -> dict[str, Any]:
     return summary
 
 
+def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Return a small decision view; the detailed projection remains available."""
+    detailed = summarize_call(payload)
+    operation = detailed["operation"]
+    source = detailed["result_summary"]
+    result = {"summary_schema_version": "scientific_call_brief.v1"}
+    result.update({
+        key: detailed[key]
+        for key in ("operation", "execution_status", "error", "duration_seconds", "result_bytes")
+        if key in detailed
+    })
+    overview = _brief_fields(source, (
+        "status", "valid", "error", "warnings", "limitations", "review_status",
+        "experimental_feasibility", "ranking", "search_status", "stop_reason",
+        "canonical_smiles", "canonical_target_smiles", "retrieval_level",
+        "candidate_count", "compatible_candidate_count", "returned_count",
+        "definition_version", "selection_mode", "generated_count", "rejected_count",
+        "query", "target_smiles", "source_ref", "step_id",
+        "source_coverage_complete", "group_count_scope", "ranking_scope",
+    ))
+    if operation == "analyze_molecule":
+        overview.update(_brief_fields(source, ("formal_charge", "stereocenters")))
+    elif operation == "analyze_reaction":
+        overview.update(_brief_fields(source, ("evidence_quality", "transformation_class", "named_family")))
+        for key in ("observation", "interpretation", "reaction_completeness"):
+            if isinstance(source.get(key), Mapping):
+                overview[key] = _brief_fields(source[key], ("status", "valid", "evidence_quality", "warnings"))
+    elif operation == "disconnect_target":
+        strategies = source.get("strategies", [])
+        overview["strategy_count"] = _saved_list_count(detailed, "$.result.strategies", strategies)
+        overview["strategies"] = []
+        for strategy in strategies[:3]:
+            item = _brief_fields(strategy, ("strategy_id", "strategy_rank", "independent_reference_support"))
+            if isinstance(strategy.get("representative"), Mapping):
+                item["representative"] = _brief_fields(strategy["representative"], (
+                    "precursor_smiles", "forward_validation_status",
+                    "precursor_compatibility_disposition", "reaction_compatibility_disposition",
+                ))
+                warnings = strategy["representative"].get("selectivity_warnings", [])
+                if warnings:
+                    item["representative"]["selectivity_warnings"] = [
+                        _brief_fields(warning, ("code", "message", "conditions_evaluated"))
+                        for warning in warnings[:2] if isinstance(warning, Mapping)
+                    ]
+                    item["representative"]["selectivity_warning_count"] = len(warnings)
+            overview["strategies"].append(item)
+    elif operation in {"assess_route_step", "inspect_route_step", "assess_route_proposal", "revise_route_branch"}:
+        assessment = source.get("assessment")
+        if isinstance(assessment, Mapping):
+            overview["assessment"] = _brief_fields(assessment, (
+                "status", "actionable", "admission_eligible", "strongest_evidence_tier",
+                "warnings", "unresolved_step_ids", "disconnected_step_ids",
+            ))
+            gate_key = "topology_gates" if operation in {"assess_route_proposal", "revise_route_branch"} else "gates"
+            gates = assessment.get(gate_key, [])
+            non_pass_gates = [
+                gate for gate in gates
+                if isinstance(gate, Mapping) and gate.get("status") != "pass"
+            ]
+            non_pass_gates.sort(key=lambda gate: 0 if gate.get("status") in {
+                "failed", "invalid", "conflicting", "unresolved", "unknown",
+            } else 1)
+            overview["assessment"]["non_pass_gates"] = [
+                _brief_fields(gate, ("gate_id", "status", "summary", "warnings"))
+                for gate in non_pass_gates[:4]
+            ]
+            overview["assessment"]["non_pass_gate_count"] = len(non_pass_gates)
+            if "step_assessments" in assessment:
+                overview["assessment"]["steps"] = [
+                    {"step_id": step.get("external_step_id"),
+                     **(_brief_fields(step["assessment"], ("status", "actionable", "warnings"))
+                        if isinstance(step.get("assessment"), Mapping) else {})}
+                    for step in assessment["step_assessments"][:10] if isinstance(step, Mapping)
+                ]
+        if isinstance(source.get("material_constraints"), Mapping):
+            overview["material_constraints"] = _brief_fields(source["material_constraints"], (
+                "status", "stock_availability", "unavailable_starting_materials",
+            ))
+    elif operation == "recommend_conditions":
+        overview["recommendations"] = [
+            _brief_fields(item, ("rank", "recipe_id", "match_label", "retrieval_level", "cautions"))
+            for item in source.get("recommendations", [])[:3] if isinstance(item, Mapping)
+        ]
+    elif operation == "assess_recipe":
+        overview.update(_brief_fields(source, ("compatible", "hard_conflicts", "unresolved_requirements")))
+    elif operation == "assess_route_step_forward":
+        if isinstance(source.get("assessment"), Mapping):
+            overview["assessment"] = _brief_fields(source["assessment"], (
+                "targeted_replay_status", "intended_match", "disposition", "validity",
+                "advisory_only", "warnings",
+            ))
+        if isinstance(source.get("execution"), Mapping):
+            overview["execution"] = _brief_fields(source["execution"], ("timings", "stages"))
+    elif operation == "compare_route_proposals":
+        alternatives = source.get("alternatives", [])
+        overview["alternative_count"] = _saved_list_count(detailed, "$.result.alternatives", alternatives)
+        overview["alternatives"] = [
+            _brief_fields(item, ("status", "source_ref", "route_id", "step_count",
+                                 "unresolved_step_ids", "limitations"))
+            for item in alternatives[:3] if isinstance(item, Mapping)
+        ]
+    elif operation == "propose_condition_adaptation":
+        overview.update(_brief_fields(source, ("transfer_status", "assumptions", "risks")))
+        if isinstance(source.get("compatibility"), Mapping):
+            overview["compatibility"] = _brief_fields(source["compatibility"], (
+                "status", "compatible", "hard_conflicts", "unresolved_requirements",
+            ))
+        overview["changes"] = [
+            _brief_fields(item, ("field", "basis", "reason"))
+            for item in source.get("changes", [])[:3] if isinstance(item, Mapping)
+        ]
+    elif operation == "search_fragment_precedents":
+        overview.update(_brief_fields(source, ("counts", "refinement_hints", "output_truncated")))
+        overview["hits"] = [
+            _brief_fields(item, ("hit_id", "product_smiles", "relationship_summary",
+                                 "procedure_availability", "warnings"))
+            for item in source.get("hits", [])[:3] if isinstance(item, Mapping)
+        ]
+    elif operation == "suggest_search_fragments":
+        overview["candidates"] = [
+            _brief_fields(item, ("candidate_id", "kind", "query", "reasons", "cautions"))
+            for item in source.get("candidates", [])[:3] if isinstance(item, Mapping)
+        ]
+    elif operation == "inspect_condition_precedents":
+        overview.update(_brief_fields(source, ("observation_count", "distinct_reference_count")))
+        if isinstance(source.get("procedure_catalog"), Mapping):
+            overview["procedure_catalog"] = _brief_fields(source["procedure_catalog"], ("availability",))
+        overview["precedents"] = []
+        for item in source.get("precedents", [])[:2]:
+            if not isinstance(item, Mapping):
+                continue
+            precedent = _brief_fields(item, ("missing_operating_fields", "procedure_link_scope"))
+            for key, fields in (
+                ("observation", ("reaction_id", "reference_id", "status")),
+                ("compatibility", ("status", "compatible", "hard_conflicts")),
+            ):
+                if isinstance(item.get(key), Mapping):
+                    precedent[key] = _brief_fields(item[key], fields)
+            overview["precedents"].append(precedent)
+    else:
+        overview.update(_brief_fields(source, (
+            "compatible", "hard_conflicts", "unresolved_requirements", "total", "next_offset",
+            "observation_count", "distinct_reference_count", "transfer_status", "question",
+        )))
+    result["result_summary"] = overview
+    result["inspection"] = {
+        "result_path": "$.result", "projection_only": True,
+        "result_fields": detailed["inspection"]["result_fields"],
+        "detail_available": True,
+        "hint": "Use inspect_artifact(artifact_ref, path=('result', ...)) for decision-critical detail; the full result remains saved.",
+    }
+    return result
+
+
+def _brief_fields(source: Mapping[str, Any], keys: tuple[str, ...]) -> dict[str, Any]:
+    """Select a few scalar or short-list fields without implying omitted evidence passed."""
+    selected: dict[str, Any] = {}
+    for key in keys:
+        if key not in source:
+            continue
+        value = source[key]
+        if isinstance(value, str):
+            selected[key] = value[:180] + ("…" if len(value) > 180 else "")
+        elif isinstance(value, list):
+            selected[key] = [
+                item[:180] + ("…" if len(item) > 180 else "") if isinstance(item, str) else item
+                for item in value[:3]
+            ]
+            if len(value) > 3:
+                selected[f"{key}_count"] = len(value)
+        elif isinstance(value, Mapping):
+            selected[key] = {name: value[name] for name in list(value)[:5]}
+            if len(value) > 5:
+                selected[f"{key}_field_count"] = len(value)
+        else:
+            selected[key] = value
+    return selected
+
+
+def _saved_list_count(summary: Mapping[str, Any], path: str, preview: Any) -> int:
+    """Use the saved-result collection count when the detailed view was truncated."""
+    for collection in summary["inspection"]["collections"]:
+        if collection["path"] == path:
+            return collection["total"]
+    return len(preview) if isinstance(preview, list) else 0
+
+
 def _context_fields(view: _Projection, item: Mapping[str, Any], fields: tuple[str, ...], path: str) -> dict[str, Any]:
     """Keep ancestor cautions visible without repeating surrounding result trees."""
     def shallow(value: Any, location: str) -> Any:

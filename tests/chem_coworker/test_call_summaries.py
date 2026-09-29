@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from chem_coworker.scientific_workspace.call_summaries import summarize_call
+from chem_coworker.scientific_workspace.call_summaries import summarize_call, summarize_call_brief
 from condition_recommender import assess_reaction_recipe
 from condition_recommender.models import GenericRecommendationResult
 from core_retrosynthesis.external_route_admission import ExternalRouteProposal, assess_external_route_proposal
@@ -145,6 +145,57 @@ def test_six_step_overview_keeps_each_status_without_repeating_structures(route_
     assert not any(row["path"].endswith(".warnings") for row in summary["inspection"]["collections"])
 
 
+def test_brief_route_view_keeps_failed_decisions_and_step_statuses(route_record):
+    result = deepcopy(route_record)
+    result["assessment"]["topology_gates"] = [
+        {"gate_id": "parse", "status": "pass", "summary": "Parsed"},
+        {"gate_id": "admission", "status": "unresolved", "summary": "No exact operator"},
+    ]
+    result["assessment"]["step_assessments"][0]["assessment"]["warnings"] = [
+        "Exact precedent is missing."
+    ]
+    original = deepcopy(result)
+    brief = summarize_call_brief(_call("assess_route_proposal", result))
+    assessment = brief["result_summary"]["assessment"]
+    assert result == original
+    assert assessment["status"] == result["assessment"]["status"]
+    assert assessment["actionable"] is False
+    assert assessment["non_pass_gates"][0]["gate_id"] == "admission"
+    assert assessment["steps"][0]["warnings"] == ["Exact precedent is missing."]
+    assert brief["inspection"]["detail_available"] is True
+    assert "admitted_route_tree" not in json.dumps(brief)
+    assert len(json.dumps(brief)) < 5000
+
+
+def test_brief_disconnection_retains_selectivity_warning_without_large_nested_graph():
+    warning = {"code": "POSSIBLE_FUNCTIONAL_GROUP_COMPETITION",
+               "message": "N and O could compete.", "conditions_evaluated": False,
+               "competing_outcomes": [{"atoms": list(range(1000))}]}
+    result = {"valid": True, "strategies": [{"strategy_id": "s1", "strategy_rank": 1,
+              "representative": {"precursor_smiles": "CC.N", "forward_validation_status": "verified_signature",
+                                 "selectivity_warnings": [warning]}}]}
+    brief = summarize_call_brief(_call("disconnect_target", result))
+    representative = brief["result_summary"]["strategies"][0]["representative"]
+    assert representative["selectivity_warnings"][0]["code"] == warning["code"]
+    assert representative["selectivity_warnings"][0]["conditions_evaluated"] is False
+    assert "competing_outcomes" not in json.dumps(brief)
+    assert len(json.dumps(brief)) < 3000
+
+
+def test_brief_fragment_search_discloses_incomplete_source_coverage():
+    brief = summarize_call_brief(_call("search_fragment_precedents", {
+        "search_status": "partial", "source_coverage_complete": False,
+        "ranking_scope": "returned_hits_only", "output_truncated": True,
+        "hits": [{"hit_id": "h1", "product_smiles": "COC",
+                  "procedure_availability": "unknown"}],
+    }))
+    result = brief["result_summary"]
+    assert result["search_status"] == "partial"
+    assert result["source_coverage_complete"] is False
+    assert result["ranking_scope"] == "returned_hits_only"
+    assert result["output_truncated"] is True
+
+
 def test_forward_timeout_keeps_question_stage_and_unresolved_result():
     summary = summarize_call({
         "operation": "assess_route_step_forward", "execution_status": "timed_out",
@@ -167,6 +218,19 @@ def test_forward_timeout_keeps_question_stage_and_unresolved_result():
     assert projected["experimental_feasibility"] == "not_established"
 
 
+def test_brief_forward_timeout_does_not_hide_execution_failure():
+    brief = summarize_call_brief({
+        "operation": "assess_route_step_forward", "execution_status": "timed_out",
+        "error": {"type": "TimeoutError", "message": "Worker timed out"},
+        "result": {"execution_status": "timed_out", "step_id": "s2",
+                   "assessment": None, "execution": {"stages": [
+                       {"stage": "load_library", "status": "running"}]}}})
+    assert brief["execution_status"] == "timed_out"
+    assert brief["error"]["type"] == "TimeoutError"
+    assert brief["result_summary"]["step_id"] == "s2"
+    assert brief["result_summary"]["execution"]["stages"][0]["status"] == "running"
+
+
 def test_comparison_does_not_choose_a_winner_or_merge_different_statuses():
     result = {"ranking": "not_performed", "experimental_feasibility": "not_established", "alternatives": [
         {"source_ref": "before", "route_id": "r1", "status": "invalid", "step_count": 2,
@@ -178,6 +242,18 @@ def test_comparison_does_not_choose_a_winner_or_merge_different_statuses():
     assert summary["ranking"] == "not_performed"
     assert [item["status"] for item in summary["alternatives"]] == ["invalid", "partially_supported"]
     assert "winner" not in summary
+
+
+def test_brief_comparison_keeps_distinct_alternative_statuses():
+    brief = summarize_call_brief(_call("compare_route_proposals", {
+        "ranking": "not_performed", "alternatives": [
+            {"route_id": "r1", "status": "invalid", "step_count": 2},
+            {"route_id": "r2", "status": "partially_supported", "step_count": 3},
+        ]}))
+    assert brief["result_summary"]["ranking"] == "not_performed"
+    assert [item["status"] for item in brief["result_summary"]["alternatives"]] == [
+        "invalid", "partially_supported",
+    ]
 
 
 def test_pagination_distinguishes_saved_rows_from_total_dataset_records():

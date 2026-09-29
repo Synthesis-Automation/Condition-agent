@@ -12,6 +12,11 @@ For a synthesis or condition recommendation:
 2. Search exact structures/names and close precedents in primary papers, patents and
    supporting information. Open the experiment and linked intermediate preparation;
    do not treat a search snippet, generic patent scope or product listing as a procedure.
+   After an exact-target search and a relevant close-precedent search, pause to state
+   which decision-relevant evidence is still missing. Repeat a search only with a
+   distinct structure, source, or question that could change the route. If the best
+   evidence remains an analogue, assess it and disclose the gap instead of cycling
+   through near-identical queries. This is a relevance check, not a fixed search cap.
 3. Compare the source compound with the target explicitly: connectivity, stereoisomer,
    racemate/mixture/unspecified stereo, protecting groups and chemical form. An analog
    precedent can support a proposal but is not an exact synthesis of the user's target.

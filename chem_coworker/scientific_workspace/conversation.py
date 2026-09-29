@@ -118,16 +118,20 @@ Optional task guides and lessons (application guidance, not chemistry tools):
 
 Manifest investigation.json lists selected datasets, hashes, versions and limitations.
 Full prior calls and notes are in events/ and artifacts/. Read w.store.summary() to resume.
-Use w.call_summary(event) as the default console output. Do not print the full raw
-result alongside that summary. Follow uncertainty/error fields and disclosed truncations
-with w.inspect_artifact(event.artifact_ref, path=(...), offset=0, limit=5) as needed.
+Use w.call_summary(event) as the default brief console output. The full call result
+remains saved; inspect only a decision-critical field with w.inspect_artifact(
+event.artifact_ref, path=(...), offset=0, limit=5) when the brief view is insufficient.
+Do not print the full raw result, a detailed summary, or several step inspections
+just to orient yourself. Read warnings and non-passing gates before relying on
+a result.
 Paths select literal JSON keys and list indices; next_offset continues a selected page.
 Full results remain in artifacts, accessible through w.store.read_artifact. Read selected
 fields for custom analysis; do not dump whole analyses, manifests or route trees to stdout.
 This prompt, operation catalogue and optional task guide are the starting reference.
-For an unresolved usage question, read the relevant section of
-{repository / 'docs/AI-native/readme.md'}; do not routinely load the whole README or schema
-implementation. The runtime supplies answer-schema.json for targeted schema inspection.
+For an unresolved usage question, read only the relevant section of
+{repository / 'docs/AI-native/readme.md'}. Do not read the README or answer-schema.json
+at startup: this prompt already gives the common call and answer instructions.
+The runtime supplies answer-schema.json only for a specific validation issue.
 You may read source, write and run custom analysis scripts inside this investigation,
 and use configured research tools when relevant. Attach meaningful custom scripts and
 outputs with w.store.attach_file and label derived analysis. Keep raw external sources

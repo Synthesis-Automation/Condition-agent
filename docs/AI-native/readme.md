@@ -466,12 +466,12 @@ The record is bound to the exact draft and current turn. Answers record whether
 that self-review exists; absence is not disguised as success. It remains an
 **agent self-review**, not an independent chemist assessment or semantic verifier.
 
-Operation summaries now project relevant fields, preserve scientific statuses,
-and disclose truncation/collection counts. Complete results remain immutable.
-Route summaries show concise per-step status, evidence tier, admission and warnings;
-inspect the selected step for its structures and complete gate evidence. Ordinary
-short warning lists do not repeat a separate collection-metadata record.
-Start with `w.call_summary(event)` after a recorded call. When a decision needs
+`w.call_summary(event)` now prints a brief decision view: execution status,
+key warnings, candidate or step status, and non-passing gates. It gives an
+artifact pointer for inspecting omitted evidence.
+`w.call_summary(event, detailed=True)` retains the larger projected summary with truncation and
+collection counts when needed; neither view replaces the immutable full result.
+Start with the brief view after a recorded call. When a decision needs
 more detail, inspect the relevant artifact fields or collection slice instead
 of printing the entire result again. For an existing condition-recommendation
 call:
