@@ -7,6 +7,7 @@ import type {
   FeatureAnalysisResult,
   FragmentSearchRequest,
   FragmentSearchResult,
+  FragmentSuggestionsResult,
   ForwardSynthesisRequest,
   ForwardSynthesisResult,
   ForwardConditionProfileCatalog,
@@ -58,6 +59,10 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  suggestFragments: (target: string, signal?: AbortSignal) =>
+    jsonRequest<FragmentSuggestionsResult>('/fragments/suggest', {
+      method: 'POST', body: JSON.stringify({ target_smiles: target }), signal,
+    }),
   searchFragments: (request: FragmentSearchRequest, signal?: AbortSignal) =>
     jsonRequest<FragmentSearchResult>('/fragments/search', {
       method: 'POST', body: JSON.stringify(request), signal,

@@ -45,6 +45,19 @@ Ketcher editor used for retrosynthesis. Draw one connected core and select
 **Use drawing** to update the query and its preview, then **Search fragments**.
 SMARTS queries remain text input so drawing does not silently discard query features.
 
+For a whole target, use **Suggest fragments** to inspect up to five overlapping
+regions, with the selected atoms highlighted on the original target. **Use candidate**
+copies that query into the shared editor; **Search fragments** remains a separate
+action. You can also keep using your own core. Suggestions require no prepared index.
+
+`POST /api/v1/fragments/suggest` accepts `target_smiles` (one connected structure,
+at most 200 atoms), optional `limit` (1–5), and optional `selected_atom_ids` (strict
+integers in the returned canonical target's zero-based order). It returns the
+standard API envelope with versioned candidate data, target/input atom provenance,
+boundaries, cautions, truncation/rejection counts, and a highlighted target SVG per
+candidate. Selections that split ring systems or lose required valence/stereo
+context return 422. The focused Condition Desk profile disables this endpoint.
+
 The default prepared index is
 `results/ai_native/indexes/fragment_precedents.sqlite`. Override it with
 `--fragment-index PATH` or `FRAGMENT_PRECEDENT_INDEX`. Searches never build an

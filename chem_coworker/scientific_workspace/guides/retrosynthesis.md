@@ -22,6 +22,13 @@ Reuse an existing audit for the same structure. Keep executable script bodies un
 `if __name__ == "__main__":` so importing a helper does not repeat scientific calls.
 Print `w.call_summary(event)` first; inspect selected fields only when needed.
 
+For an unfamiliar core, optionally use `suggest_search_fragments(target_smiles=...)`
+to inspect complete ring systems, contextual variants and functional regions.
+The returned candidates are graph-validated search queries, not precursors or
+ranked synthesis recommendations. They can overlap; choose your own core when
+more informative. Search only selected candidates and use breadth/construction
+evidence to decide whether to refine. No candidate-generation call needs an index.
+
 For an unfamiliar core, consider `search_fragment_precedents` with the selected
 core SMILES and `limit=5` when `fragment_index` is configured. It searches product
 substructures and distinguishes core construction from modification or retention.

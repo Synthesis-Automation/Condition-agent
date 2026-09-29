@@ -317,6 +317,12 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         summary.update(view.pick(value, ("transfer_status", "source_ref", "observation_id", "assumptions", "risks"), path))
         view.add_nested(summary, value, "compatibility", _COMPATIBILITY, path)
         view.add_list(summary, value, "changes", ("field", "basis", "reason", "evidence_refs"), path)
+    elif operation == "suggest_search_fragments":
+        summary.update(view.pick(value, ("target_id", "target_smiles", "definition_version", "query_compiler_version",
+                                         "selection_mode", "generated_count", "rejected_count",
+                                         "generation_truncated", "output_truncated", "limitations"), path))
+        view.add_list(summary, value, "candidates", ("candidate_id", "kind", "query", "query_format",
+                      "topology", "target_atom_ids", "features", "reasons", "cautions", "matches_target"), path)
     elif operation == "search_fragment_precedents":
         summary.update(view.pick(value, (
             "search_status", "stop_reason", "query", "index_id", "source_scope", "source_coverage_complete",

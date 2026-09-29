@@ -43,6 +43,9 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
             "status": "implemented", "required_artifact": "fragment_index",
             "content_validation": "checked_on_call", "automatic_build": False,
         },
+        "fragment_suggestions": {
+            "status": "implemented", "requires_index": False, "automatic_search": False,
+        },
         "agent_web_search": {"status": "not_checked",
                              "observation_location": "turns/<turn>/runtime-observations.json"},
         "model_and_reasoning": {"status": "not_confirmed",

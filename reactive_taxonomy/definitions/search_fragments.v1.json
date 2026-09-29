@@ -1,0 +1,13 @@
+{
+  "schema_version": "search_fragment_policy.v1",
+  "definition_version": "search_fragments.v1@1.0",
+  "max_target_characters": 5000,
+  "max_target_atoms": 200,
+  "max_candidates": 5,
+  "max_proposals": 64,
+  "min_region_atoms": 4,
+  "context_radius": 1,
+  "region_radius": 2,
+  "kind_order": ["ring_system", "functional_region", "scaffold", "core_with_context", "whole_target"],
+  "feature_weights": {"ring_junctions": 3, "heteroatoms": 2, "stereocenters": 3, "multiple_bonds": 1}
+}

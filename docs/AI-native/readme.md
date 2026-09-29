@@ -584,6 +584,32 @@ tamper-proof or multi-user security boundary.
 
 ## Prepare and search fragment precedents
 
+An optional first step, `suggest_search_fragments`, needs only a target structure,
+with no index or retrosynthesis call. It proposes up to five overlapping search
+regions (complete ring systems, contextual variants, scaffolds and functional
+regions). The agent chooses whether any is useful; it can also supply its own core.
+
+```python
+event = w.run("suggest_search_fragments", {
+    "target_smiles": "CC(=O)c1ccc2c(c1)COc1ccccc1-2", "limit": 5,
+})
+print(w.call_summary(event))
+# Inspect the selected candidate before making a separate precedent-search call.
+print(w.inspect_artifact(event.artifact_ref, ("result", "candidates", 0)))
+```
+
+Each candidate includes its query, target atom IDs, omitted atoms, boundary bonds,
+structural descriptors and cautions. IDs use the returned canonical target;
+`target_atoms[].input_atom_index` links to the original parsed input. To extract
+an agent-chosen region, repeat the call with `selected_atom_ids=[...]`. Selections
+must be connected and preserve full ring systems and required valence/stereo
+context; invalid selections are rejected rather than silently expanded.
+
+Ordering is a transparent structural heuristic, not rarity or synthetic difficulty.
+Boundary bonds describe query extraction, not recommended disconnections. Simple
+cores carry a broad-query caution; only a subsequent search establishes breadth
+in the indexed corpus. Suggestions do not automatically search any candidate.
+
 Build once offline from canonical observations (not the condition-admitted index):
 
 ```powershell
@@ -636,6 +662,7 @@ is accepted through the operation dispatcher.
 | `analyze_molecule` | `reactive_taxonomy`; `smiles` | Graph-derived target audit; reactive sites are hypotheses. |
 | `recommend_conditions` | `condition_recommender`; `reaction_smiles`, optional `top_k`, `search_scope` | Canonical shared-core results with compatibility, ranking, and provenance unchanged. Requires `condition_index` and `shared_core_index`. |
 | `search_fragment_precedents` | `reactive_taxonomy` graph/evidence rules and `condition_recommender` discovery index; `query`, optional `query_format`, `topology`, `limit`, `timeout_seconds` | Bounded product-fragment discovery, per-embedding changes, exact source/procedure joins, and saved inspection paths. Requires prebuilt `fragment_index`; never expands a route or rebuilds data. |
+| `suggest_search_fragments` | `reactive_taxonomy.search_fragments`; `target_smiles`, optional `limit` (1–5), `selected_atom_ids` | Optional, overlapping, target-derived queries with atom provenance and boundaries. No index, corpus call, retro, mapping, forward check or mandatory workflow. |
 | `get_precedents` | Canonical index; `reaction_ids`, optional `offset`, `limit` | All indexed fields, distinct observation IDs, admission/condition status, missing IDs, pagination. Indexed records are reduced representations of source data. |
 | `get_procedures` | Configured `procedure_catalog`; `reaction_ids` | All matching procedure observations, including missing fields. No invented procedure text. |
 | `inspect_condition_precedents` | Canonical condition index, optional procedure catalog; `reaction_smiles`, `reaction_ids`, optional `offset`, `limit` | Selected-observation structural differences, full recipes, compatibility, publication counts, missing fields and exact procedure links. No new ranking or transfer claim. |

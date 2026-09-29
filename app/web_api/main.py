@@ -17,6 +17,7 @@ from .contracts import (
     CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
     FragmentSearchRequest,
+    FragmentSuggestionRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     PrepareReactionRequest,
@@ -194,6 +195,15 @@ def create_app(
         except (ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
         return envelope(data)
+
+    @app.post("/api/v1/fragments/suggest")
+    def suggest_fragments(
+        payload: FragmentSuggestionRequest, request: Request,
+    ) -> dict[str, Any]:
+        try:
+            return envelope(active_runtime(request).suggest_fragments(payload))
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
 
     @app.post("/api/v1/fragments/search")
     def search_fragments(

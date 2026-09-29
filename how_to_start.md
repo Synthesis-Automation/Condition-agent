@@ -73,6 +73,11 @@ In SMILES mode, use **Draw** or **Edit drawing** to draw the
 core in the molecule editor. Click **Use drawing**, then **Search fragments**.
 SMARTS queries are edited as text.
 
+To start from a **whole target**, enter or draw it in SMILES mode, click
+**Suggest fragments**, inspect the highlighted regions, then click **Use candidate**
+and **Search fragments**. Suggestions work without an index and never launch a
+search automatically. You can still enter your own core directly.
+
 On later starts, omit `--build` unless the frontend source has changed:
 
 ```powershell

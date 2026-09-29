@@ -44,9 +44,61 @@ set of inspectable records. No proposed disconnection is required.
 
 Start with substitution-tolerant substructure search over the existing canonical
 corpus. Preserve the selected core's connectivity and ring topology by default.
-Support explicit SMARTS constraints for deliberate broadening. Defer automatic
-core selection, unrestricted graph-edit similarity, new web-search orchestration,
-and an internal route planner.
+Support explicit SMARTS constraints for deliberate broadening. Optional target-derived
+candidate generation is now implemented as described below. Final core selection
+remains with the agent. Unrestricted graph-edit similarity, new web-search
+orchestration and an internal route planner remain deferred.
+
+### Optional fragment suggestions
+
+`reactive_taxonomy.search_fragments.suggest_search_fragments` provides a small
+structural helper beside precedent search. It does not depend on the k-way
+partition pipeline or validated retrosynthetic candidates. The workspace exposes
+the same recorded operation; the regular research workbench exposes
+`POST /api/v1/fragments/suggest` and **Suggest fragments** in the existing editor.
+
+The versioned `search_fragments.v1` definition limits the target to 200 atoms,
+materializes at most 64 proposals and returns at most five distinct queries.
+Candidates include connected ring-bond systems (including fused, bridged and
+spiro systems), one-bond contextual variants, rings with their connecting paths,
+local functional/stereo regions, and the whole target when it fits query limits.
+Candidates overlap and need not cover every target atom. Equivalent query strings
+are deduplicated with one representative embedding; these are not all embeddings.
+
+Extraction retains complete ring systems, multiple-bond context, charged valence
+and specified stereochemistry. Each query is compiled through the precedent-search
+compiler and verified against the exact selected target atom set. Extractions
+that lose specified stereo after capping are rejected. Counts expose rejected
+and truncated generation; no valid candidate is an acceptable result. The query
+compiler now uses atomic-number hydrogen queries for explicit D/T atoms, and
+reports `fragment_query_compiler.v2` in query identity/metadata. Stored product
+graphs and index policy are unchanged, so existing indexes remain usable.
+
+Results contain canonical target identity, source/input atom correspondence,
+query-atom correspondence, omitted atoms, boundary bonds, structural descriptors,
+reasons and cautions. An explicit `selected_atom_ids` request extracts exactly the
+agent's chosen connected region or rejects it; it never silently expands it.
+Boundary bonds do not assert synthetic disconnections or precursor feasibility.
+
+Ordering first separates structurally simple queries, then uses declared candidate
+kind and feature weights (ring junctions, heteroatoms, specified stereo and
+nonaromatic multiple bonds), with diversity across proposal origins. These features
+do not measure synthetic difficulty or corpus rarity. Common/simple motifs carry
+a broad-search caution. Only the existing search can measure actual corpus breadth.
+
+The agent may ignore suggestions, choose a different subgraph, or refine a query.
+Generation invokes no corpus search, mapping, retro or forward prediction. The UI
+shows each selected region on the target and requires a separate search action.
+Development validation covers graph/stereo/provenance contracts and end-to-end
+search compatibility. Whether suggestions improve route quality over agent-only
+selection still requires a controlled agent/chemist evaluation.
+
+The reproducible development panel is
+[`examples/ai_native/fragment_suggestions_pilot.py`](../../examples/ai_native/fragment_suggestions_pilot.py).
+It records 24 targets and optionally searches just the chosen cyclic-ether core
+when an index is supplied. The initial run returned 68 graph-valid candidates;
+the local [validation report](../../results/ai_native/fragment_suggestions_pilot/validation.md)
+records limits, timings, test results and the remaining agent-evaluation gap.
 
 ## 2. What existing systems teach us
 

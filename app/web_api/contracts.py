@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
 
 API_SCHEMA_VERSION = "1.0"
@@ -30,6 +30,14 @@ class FragmentSearchRequest(StrictRequest):
     topology: Literal["preserve_rings", "subgraph"] = "preserve_rings"
     limit: int = Field(default=5, ge=1, le=10, strict=True)
     timeout_seconds: int = Field(default=10, ge=1, le=30, strict=True)
+
+
+class FragmentSuggestionRequest(StrictRequest):
+    """Bounded optional core discovery independent of a corpus index."""
+
+    target_smiles: str = Field(min_length=1, max_length=5000)
+    limit: int = Field(default=5, ge=1, le=5, strict=True)
+    selected_atom_ids: list[StrictInt] | None = Field(default=None, max_length=200)
 
 
 class CompletionChoiceRequest(StrictRequest):

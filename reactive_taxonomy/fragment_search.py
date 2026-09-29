@@ -18,6 +18,9 @@ from .chemistry.smarts_cache import compile_smarts
 from .reaction_models import ReactionAtomReference
 
 
+QUERY_COMPILER_VERSION = "fragment_query_compiler.v2"
+
+
 def fragment_search_policy() -> dict[str, Any]:
     """Load and validate the versioned search limits and evidence vocabulary."""
     value = json.loads((Path(__file__).parent / "definitions/fragment_search.v1.json").read_text("utf-8"))
@@ -44,12 +47,14 @@ class FragmentQuery:
     query_id: str
     definition_version: str
     molecule: Any
+    compiler_version: str = QUERY_COMPILER_VERSION
 
     def describe(self) -> dict[str, Any]:
         """Return portable query semantics without serializing the RDKit object."""
         return {"expression": self.expression, "query_format": self.query_format,
                 "topology": self.topology, "query_id": self.query_id,
                 "definition_version": self.definition_version,
+                "compiler_version": self.compiler_version,
                 "compiled_smarts": Chem.MolToSmarts(self.molecule),
                 "atom_count": self.molecule.GetNumAtoms(), "specified_stereo_required": True,
                 "automatic_relaxations": []}
@@ -89,7 +94,10 @@ def compile_fragment_query(
         # Mol queries do not constrain neutral charge or aliphaticity by default.
         # Convert atoms to explicit query atoms while retaining query-order stereo.
         for atom in list(mol.GetAtoms()):
-            symbol = atom.GetSymbol().lower() if atom.GetIsAromatic() else atom.GetSymbol()
+            # In a decorated SMARTS atom, H can mean hydrogen count rather than
+            # element 1. Use an atomic number for explicit H / D / T atoms.
+            symbol = ("#1" if atom.GetAtomicNum() == 1 else
+                      atom.GetSymbol().lower() if atom.GetIsAromatic() else atom.GetSymbol())
             isotope = str(atom.GetIsotope()) if atom.GetIsotope() else ""
             hydrogen = f";H{atom.GetNumExplicitHs()}" if atom.GetNoImplicit() or atom.GetNumExplicitHs() else ""
             pattern = compile_smarts(f"[{isotope}{symbol}{hydrogen};{atom.GetFormalCharge():+d}]", validate=True)
@@ -99,7 +107,7 @@ def compile_fragment_query(
             editable.ReplaceAtom(atom.GetIdx(), replacement)
             mol = editable.GetMol()
         Chem.GetSymmSSSR(mol)
-    identity = json.dumps([query, query_format, topology, policy["definition_version"]])
+    identity = json.dumps([query, query_format, topology, policy["definition_version"], QUERY_COMPILER_VERSION])
     return FragmentQuery(query, query_format, topology,
                          "FQ1:" + hashlib.sha256(identity.encode()).hexdigest(),
                          policy["definition_version"], mol)

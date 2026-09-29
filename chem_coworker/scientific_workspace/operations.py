@@ -18,7 +18,7 @@ class ScientificOperations:
     NAMES = (
         "analyze_reaction", "analyze_molecule", "recommend_conditions",
         "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
-        "search_fragment_precedents",
+        "search_fragment_precedents", "suggest_search_fragments",
         "inspect_condition_precedents", "propose_condition_adaptation",
         "disconnect_target",
         "assess_route_step", "assess_route_proposal",
@@ -103,6 +103,20 @@ class ScientificOperations:
             "record_scope": "indexed_fields_only",
             "index_scope": index.precedent_scope.value,
         }
+
+    def suggest_search_fragments(
+        self, target_smiles: str, limit: int = 5, selected_atom_ids: list[int] | None = None,
+    ) -> dict[str, Any]:
+        """Optionally suggest up to five target-derived search regions, without searching.
+
+        Candidates overlap and are not precursors or synthesis recommendations.
+        Inspect reasons, boundaries and cautions, then choose your own query for
+        search_fragment_precedents. Explicit selections use the returned canonical
+        target's zero-based atom IDs and are never silently expanded.
+        """
+        from reactive_taxonomy.search_fragments import suggest_search_fragments
+
+        return suggest_search_fragments(target_smiles, limit, selected_atom_ids).to_dict()
 
     def search_fragment_precedents(
         self, query: str, query_format: str = "smiles", topology: str = "preserve_rings",

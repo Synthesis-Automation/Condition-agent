@@ -178,7 +178,12 @@ insufficient evidence is a valid investigation result.
 
 For retrosynthesis, use disconnect_target(target_smiles=...) for ONE step at a time.
 For an unfamiliar core, optionally call search_fragment_precedents(query=core_smiles)
-when fragment_index is configured. It searches product graphs and labels construction,
+or first suggest_search_fragments(target_smiles=target) for a few graph-validated
+search regions. Suggestions are optional and can overlap; their ordering is not
+synthetic difficulty or corpus rarity. You may select your own core. Choose only
+useful candidates to search; do not search every suggestion automatically. The
+suggestion tool does not run retro, mapping, forward checks, or corpus scans.
+Precedent search requires fragment_index. It searches product graphs and labels construction,
 modification, retention, and unresolved evidence. Inspect its source_scope and exact
 observation/procedure links before using a hit. Common fragments may need refinement;
 do not automatically broaden a query, build an index, or run a forward check.

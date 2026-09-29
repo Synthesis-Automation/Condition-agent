@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
-import type { FragmentCount, FragmentSearchRequest, FragmentSearchResult } from '../api/types'
+import type { FragmentCount, FragmentSearchRequest, FragmentSearchResult, FragmentSuggestionsResult, SuggestedSearchFragment } from '../api/types'
 import { ReactionImage } from './ReactionImage'
 import { ReactionEditor } from './ReactionEditor'
 import './fragment-search.css'
@@ -32,6 +32,8 @@ export function useFragmentSearch(active: boolean) {
   const [limit, setLimit] = useState(5)
   const [timeout, setBudget] = useState(10)
   const [busy, setBusy] = useState(false)
+  const [suggesting, setSuggesting] = useState(false)
+  const [suggestions, setSuggestions] = useState<FragmentSuggestionsResult | null>(null)
   const [error, setError] = useState('')
   const [result, setResult] = useState<FragmentSearchResult | null>(null)
   const pending = useRef<AbortController | null>(null)
@@ -40,12 +42,36 @@ export function useFragmentSearch(active: boolean) {
     if (!active) {
       pending.current?.abort()
       setBusy(false)
+      setSuggesting(false)
       setResult(null)
       setError('')
     }
   }, [active])
 
   const reset = () => { setResult(null); setError('') }
+  const changeQuery = (value: string) => { setQuery(value); setSuggestions(null) }
+  const suggest = async () => {
+    const controller = new AbortController()
+    pending.current = controller
+    setBusy(true)
+    setSuggesting(true)
+    setSuggestions(null)
+    reset()
+    try {
+      const next = await api.suggestFragments(query.trim(), controller.signal)
+      if (!controller.signal.aborted) setSuggestions(next)
+    } catch (reason) {
+      if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'Suggestion failed')
+    } finally {
+      if (!controller.signal.aborted) { setBusy(false); setSuggesting(false) }
+    }
+  }
+  const choose = (candidate: SuggestedSearchFragment) => {
+    setQuery(candidate.query)
+    setFormat(candidate.query_format)
+    setTopology(candidate.topology)
+    reset()
+  }
   const search = async () => {
     const controller = new AbortController()
     pending.current = controller
@@ -71,15 +97,16 @@ export function useFragmentSearch(active: boolean) {
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
-  return { query, setQuery, format, setFormat, topology, setTopology, limit, setLimit,
-    timeout, setBudget, busy, error, setError, result, reset, search, exportResult }
+  return { query, setQuery: changeQuery, format, setFormat, topology, setTopology, limit, setLimit,
+    timeout, setBudget, busy, error, setError, result, reset, search, exportResult,
+    suggestions, suggesting, suggest, choose }
 }
 
 type FragmentSearchState = ReturnType<typeof useFragmentSearch>
 
 export function FragmentSearchOptions({ state, available }: { state: FragmentSearchState; available?: boolean }) {
   const { format, setFormat, topology, setTopology, limit, setLimit, timeout, setBudget,
-    busy, error, reset, setQuery } = state
+    busy, error, reset, setQuery, query, suggest, suggesting } = state
   return <div className="analysis-options">
     <fieldset disabled={busy} className="fragment-fields">
       <div className="option-grid">
@@ -92,7 +119,10 @@ export function FragmentSearchOptions({ state, available }: { state: FragmentSea
         <label><span>Top results</span><input type="number" min={1} max={10} value={limit} onChange={event => { setLimit(Math.min(10, Math.max(1, Number(event.target.value)))); reset() }} /></label>
       </div>
       <div className="feature-mode-note"><strong>Fragment precedent search</strong><span>Find reactions containing your core and inspect construction, modification or retention evidence.</span></div>
-      <div className="inline-checks"><button className="button quiet" type="button" onClick={() => { setQuery(CORE); setFormat('smiles'); setTopology('preserve_rings'); reset() }}>Cyclic ether example</button></div>
+      <div className="inline-checks"><button className="button quiet" type="button" onClick={() => { setQuery(CORE); setFormat('smiles'); setTopology('preserve_rings'); reset() }}>Cyclic ether example</button>
+        <button className="button secondary" type="button" disabled={format !== 'smiles' || !query.trim()} onClick={() => void suggest()}>{suggesting ? 'Suggesting…' : 'Suggest fragments'}</button>
+      </div>
+      <small>Enter or draw a whole target, then optionally suggest search fragments. Choose a candidate before searching; no index is needed for suggestions.</small>
       <details className="advanced-options"><summary>Advanced options</summary><div>
         <label><span>Search budget (seconds)</span><input type="number" min={1} max={30} value={timeout} onChange={event => { setBudget(Math.min(30, Math.max(1, Number(event.target.value)))); reset() }} /></label>
         <div className="feature-mode-note"><span>Preserve ring system excludes additional fused, bridged or spiro rings. The search does not broaden automatically.</span></div>
@@ -104,16 +134,33 @@ export function FragmentSearchOptions({ state, available }: { state: FragmentSea
 }
 
 export function FragmentSearch({ state, available }: { state: FragmentSearchState; available?: boolean }) {
-  const { query, setQuery, format, busy, result, reset, search, setError } = state
+  const { query, setQuery, format, busy, result, reset, search, setError, suggestions, suggesting, choose } = state
   return <section className="fragment-search" aria-label="Fragment precedent search">
     <form className="editor-action-layout" onSubmit={event => { event.preventDefault(); void search() }}>
       <ReactionEditor value={query} onChange={value => { setQuery(value); reset() }} onError={setError}
         moleculeOnly moleculePurpose="fragment" queryFormat={format} disabled={busy} />
       <div className="run-control workbench-action-row" aria-label="Analysis action">
-        <button className="button primary run-button" type="submit" disabled={busy || available === false || !query.trim()}>{busy ? 'Searching…' : 'Search fragments'}</button>
-        <span role="status" aria-live="polite">{busy ? 'Searching the local index and checking reaction evidence…' : result ? 'Search finished' : 'Ready'}</span>
+        <button className="button primary run-button" type="submit" disabled={busy || available === false || !query.trim()}>{busy && !suggesting ? 'Searching…' : 'Search fragments'}</button>
+        <span role="status" aria-live="polite">{suggesting ? 'Extracting target-derived search regions…' : busy ? 'Searching the local index and checking reaction evidence…' : result ? 'Search finished' : 'Ready'}</span>
       </div>
     </form>
+    {suggestions && <section className="results-card fragment-results" aria-label="Suggested fragments">
+      <div className="results-summary"><div><span className="eyebrow">OPTIONAL SEARCH REGIONS</span><h2>Suggested search fragments</h2></div></div>
+      <p>Highlighted atoms belong to the original target. These overlapping queries are suggestions, not precursors or a ranked synthesis plan. Choose one, then search.</p>
+      <details><summary>Original target and generation scope</summary><code>{suggestions.target_smiles}</code><p>{suggestions.generated_count} distinct candidates · {suggestions.rejected_count} rejected extractions</p>
+        {(suggestions.generation_truncated || suggestions.output_truncated) && <p>Only a bounded subset is shown; this is not an exhaustive fragmentation.</p>}
+      </details>
+      {!suggestions.candidates.length && <p>No valid candidate within the current limits. You can enter your own connected core.</p>}
+      <div className="fragment-suggestion-grid">{suggestions.candidates.map((candidate, index) => <article key={candidate.candidate_id}>
+        <h3>{index + 1}. {label(candidate.kind)}</h3>
+        {candidate.target_highlight_svg && <img className="fragment-highlight" src={`data:image/svg+xml,${encodeURIComponent(candidate.target_highlight_svg)}`} alt={`Target atoms for candidate ${index + 1}`} />}
+        <ReactionImage smiles={candidate.query} kind="molecule" label={`Suggested fragment ${index + 1}`} />
+        <p>{candidate.reasons.join(' ')}</p>
+        {candidate.cautions.includes('LOW_STRUCTURAL_SPECIFICITY_MAY_BE_BROAD') && <p>Simple core; precedent search may be broad.</p>}
+        <details><summary>Query and boundaries</summary><code>{candidate.query}</code><p>Target atom IDs: {candidate.target_atom_ids.join(', ')}</p><pre>{JSON.stringify(candidate.boundaries, null, 2)}</pre><p>{candidate.cautions.map(label).join('; ')}</p></details>
+        <button className="button secondary" type="button" disabled={busy} onClick={() => choose(candidate)}>Use candidate {index + 1}</button>
+      </article>)}</div>
+    </section>}
     {result && <section className="results-card fragment-results" aria-label="Fragment search results">
       <div className="results-summary"><div><span className="eyebrow">FRAGMENT SEARCH RESULT</span><h2>{result.search_status === 'too_broad' ? 'Query too broad' : result.search_status === 'partial' ? 'Partial search results' : 'Fragment precedents'}</h2></div>
         <div className="metric-strip">

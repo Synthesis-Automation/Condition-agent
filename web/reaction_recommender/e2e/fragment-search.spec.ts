@@ -152,3 +152,58 @@ test('fragment mode shares the workbench layout and keeps its input on mode chan
   await expect(page.getByLabel('Core fragment', { exact: true })).toHaveValue('')
   await expect(page.getByRole('button', { name: 'Search fragments', exact: true })).toBeDisabled()
 })
+
+test('optional suggestions highlight the target and only search after explicit choice', async ({ page }) => {
+  let searches = 0
+  await page.route('**/api/v1/fragments/search', async route => {
+    searches += 1
+    expect(route.request().postDataJSON().query).toBe('COC')
+    await route.fulfill({ json: { data: base } })
+  })
+  await page.route('**/api/v1/fragments/suggest', async route => {
+    expect(route.request().postDataJSON()).toEqual({ target_smiles: 'CCOCC' })
+    await route.fulfill({ json: { data: {
+      target_smiles: 'CCOCC', generated_count: 1, rejected_count: 0,
+      generation_truncated: false, output_truncated: false,
+      candidates: [{ candidate_id: 'sfc-1', kind: 'functional_region', query: 'COC',
+        query_format: 'smiles', topology: 'preserve_rings', target_atom_ids: [1, 2, 3],
+        boundaries: [], reasons: ['Retains the ether region.'], cautions: [],
+        target_highlight_svg: '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><circle cx="50" cy="50" r="30" fill="pink"/></svg>',
+      }],
+    } } })
+  })
+  await page.goto('/')
+  await page.getByRole('radio', { name: 'Fragment search', exact: true }).check()
+  const input = page.getByLabel('Core fragment', { exact: true })
+  await input.fill('CCOCC')
+  await page.getByRole('button', { name: 'Suggest fragments', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Suggested search fragments' })).toBeVisible()
+  await expect(page.getByAltText('Target atoms for candidate 1')).toBeVisible()
+  await expect(input).toHaveValue('CCOCC')
+  expect(searches).toBe(0)
+  await page.getByRole('button', { name: 'Use candidate 1' }).click()
+  await expect(input).toHaveValue('COC')
+  expect(searches).toBe(0)
+  await page.getByRole('button', { name: 'Search fragments', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Fragment precedents', exact: true })).toBeVisible()
+  expect(searches).toBe(1)
+  await input.fill('CO')
+  await expect(page.getByRole('heading', { name: 'Suggested search fragments' })).toBeHidden()
+})
+
+test('live suggestions need no prepared index and reject invalid targets', async ({ page }) => {
+  await page.route('**/api/v1/capabilities', route => route.fulfill({ json: { data: { fragment_search: false, fragment_suggestions: true } } }))
+  await page.goto('/')
+  await page.getByRole('radio', { name: 'Fragment search', exact: true }).check()
+  const input = page.getByLabel('Core fragment', { exact: true })
+  await input.fill('CC(=O)c1ccc2c(c1)COc1ccccc1-2')
+  await expect(page.getByRole('button', { name: 'Search fragments', exact: true })).toBeDisabled()
+  await page.getByRole('button', { name: 'Suggest fragments', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '1. ring system' })).toBeVisible()
+  await page.getByRole('button', { name: 'Use candidate 1' }).click()
+  await expect(input).toHaveValue('c1ccc2c(c1)COc1ccccc1-2')
+  await input.fill('C.O')
+  await page.getByRole('button', { name: 'Suggest fragments', exact: true }).click()
+  await expect(page.getByText('Provide one connected target with at most 200 atoms', { exact: true })).toBeVisible()
+  await expect(input).toBeEnabled()
+})

@@ -87,3 +87,26 @@ def test_changed_index_is_rejected_before_search(workspace):
     payload = workspace.store.read_artifact(event.artifact_ref)
     assert payload["execution_status"] == "error"
     assert "artifact changed" in payload["error"]["message"]
+
+
+def test_suggestion_is_recorded_replayable_and_requires_no_index(tmp_path, monkeypatch):
+    import condition_recommender.fragment_search as search
+
+    monkeypatch.setattr(search, "search_fragment_precedents", lambda *a, **kw: pytest.fail("Unexpected search"))
+    baseline = {"repository": str(ROOT), "code_files": code_manifest(ROOT),
+                "environment": environment_versions(), "artifacts": {}}
+    InvestigationStore.create(tmp_path / "workspace", objective="Choose an unfamiliar core", baseline=baseline)
+    workspace = ScientificWorkspace(tmp_path / "workspace")
+    event = workspace.run("suggest_search_fragments", {"target_smiles": "CC(=O)c1ccc2c(c1)COc1ccccc1-2"})
+    payload = workspace.store.read_artifact(event.artifact_ref)
+    assert payload["execution_status"] == "completed", payload
+    result = payload["result"]
+    assert result["candidates"][0]["query"] == "c1ccc2c(c1)COc1ccccc1-2"
+    assert result["candidates"][0]["boundaries"]
+    summary = workspace.call_summary(event)["result_summary"]
+    assert summary["candidates"][0]["query"] == result["candidates"][0]["query"]
+    assert summary["definition_version"] == "search_fragments.v1@1.0"
+    replay = workspace.replay(event.artifact_ref)
+    assert workspace.store.read_artifact(replay.artifact_ref)["matches"] is True
+    invalid = workspace.run("suggest_search_fragments", {"target_smiles": "C.O"})
+    assert workspace.store.read_artifact(invalid.artifact_ref)["execution_status"] == "error"

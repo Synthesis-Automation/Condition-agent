@@ -513,8 +513,11 @@ def render_molecule_image_bytes(
     legend: str | None = None,
     render_preset: str = "current",
     expand_canvas: bool = False,
+    highlight_atom_indices: tuple[int, ...] = (),
 ) -> bytes:
     """Render PNG or SVG bytes; optionally grow an SVG at its preset bond scale.
+
+    Highlight indices use the parsed input atom order and require a fixed canvas.
 
     With ``expand_canvas``, size is a minimum canvas, not a fit-to-box target.
     This requires SVG and a preset with an explicit target bond length.
@@ -527,6 +530,10 @@ def render_molecule_image_bytes(
         render_preset=render_preset,
     )
     molecule = _prepare_molecule(smiles, kekulize=style.kekulize)
+    if any(type(i) is not int or not 0 <= i < molecule.GetNumAtoms() for i in highlight_atom_indices):
+        raise ValueError("Invalid highlight atom index")
+    if expand_canvas and highlight_atom_indices:
+        raise ValueError("Atom highlighting requires a fixed canvas")
     if expand_canvas:
         width, height = style.validated_size()
         preset = style.validated_preset()
@@ -542,7 +549,11 @@ def render_molecule_image_bytes(
             f'{content}</g></svg>'
         ).encode("utf-8")
     drawer = _make_molecule_drawer(style, molecule)
-    drawer.DrawMolecule(molecule, legend=legend or "")
+    highlighted = set(highlight_atom_indices)
+    bonds = [b.GetIdx() for b in molecule.GetBonds()
+             if b.GetBeginAtomIdx() in highlighted and b.GetEndAtomIdx() in highlighted]
+    drawer.DrawMolecule(molecule, legend=legend or "", highlightAtoms=list(highlight_atom_indices),
+                        highlightBonds=bonds)
     drawer.FinishDrawing()
     return _drawing_bytes(drawer.GetDrawingText())
 

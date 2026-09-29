@@ -65,6 +65,7 @@ from .contracts import (
     CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
     FragmentSearchRequest,
+    FragmentSuggestionRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     RecommendationRequest,
@@ -223,6 +224,8 @@ class WebRuntime(Protocol):
 
     def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]: ...
 
+    def suggest_fragments(self, request: FragmentSuggestionRequest) -> Dict[str, Any]: ...
+
     def ranking_profiles(self) -> tuple[Dict[str, Any], ...]: ...
 
     def prepare_reaction(self, reaction_smiles: str) -> Dict[str, Any]: ...
@@ -367,6 +370,19 @@ class LocalRecommendationRuntime:
         self._compound_registry_identities: (
             tuple[frozenset[str], frozenset[str]] | None
         ) = None
+
+    def suggest_fragments(self, request: FragmentSuggestionRequest) -> Dict[str, Any]:
+        """Generate optional target-derived search regions without loading an index."""
+        from reactive_taxonomy.search_fragments import suggest_search_fragments
+
+        result = suggest_search_fragments(**request.model_dump()).to_dict()
+        for candidate in result["candidates"]:
+            candidate["target_highlight_svg"] = render_molecule_image_bytes(
+                result["target_smiles"], size=(420, 220), image_format="svg",
+                render_preset="web_consistent",
+                highlight_atom_indices=tuple(candidate["target_atom_ids"]),
+            ).decode("utf-8")
+        return result
 
     def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]:
         """Use the standalone search with one active library load per runtime.
@@ -765,6 +781,7 @@ class LocalRecommendationRuntime:
         return {
             "service": "reaction-condition-recommender",
             "fragment_search": self.fragment_index_path.is_file(),
+            "fragment_suggestions": True,
             "recommendation_engine": (
                 "shared_reaction_core.v2" if self.shared_core_enabled else "baseline"
             ),

@@ -104,3 +104,47 @@ def test_fragment_index_environment_override(tmp_path, monkeypatch):
     path = tmp_path / "configured.sqlite"
     monkeypatch.setenv("FRAGMENT_PRECEDENT_INDEX", str(path))
     assert LocalRecommendationRuntime().fragment_index_path == path
+
+
+def test_suggestions_work_without_index_and_then_feed_search(runtime, monkeypatch, tmp_path):
+    import condition_recommender.fragment_search as search
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("Suggestion must not search the corpus")
+
+    monkeypatch.setattr(search, "search_fragment_precedents", forbidden)
+    runtime.fragment_index_path = tmp_path / "missing.sqlite"
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    assert client.get("/api/v1/capabilities").json()["data"]["fragment_suggestions"]
+    response = client.post("/api/v1/fragments/suggest", json={
+        "target_smiles": "CC(=O)c1ccc2c(c1)COc1ccccc1-2", "limit": 2,
+    })
+    assert response.status_code == 200
+    result = response.json()["data"]
+    candidate = result["candidates"][0]
+    assert candidate["query"] == "c1ccc2c(c1)COc1ccccc1-2"
+    assert "<svg" in candidate["target_highlight_svg"]
+    assert "ellipse" in candidate["target_highlight_svg"]
+    selected = client.post("/api/v1/fragments/suggest", json={
+        "target_smiles": result["target_smiles"], "selected_atom_ids": candidate["target_atom_ids"],
+    })
+    assert selected.json()["data"]["candidates"][0]["query"] == candidate["query"]
+
+
+@pytest.mark.parametrize("payload", [
+    {"target_smiles": "C.O"}, {"target_smiles": "bad"}, {"target_smiles": "CO", "limit": True},
+    {"target_smiles": "CO", "selected_atom_ids": [True]},
+    {"target_smiles": "CO", "selected_atom_ids": [0.5]},
+    {"target_smiles": "CO", "selected_atom_ids": ["0"]},
+    {"target_smiles": "CO", "selected_atom_ids": [90]},
+    {"target_smiles": "CO", "auto_search": True},
+])
+def test_invalid_suggestion_requests_are_422(runtime, payload):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    assert client.post("/api/v1/fragments/suggest", json=payload).status_code == 422
+
+
+def test_suggestion_route_respects_focused_profile(runtime):
+    client = TestClient(create_app(runtime=runtime))
+    assert client.post("/api/v1/fragments/suggest", json={"target_smiles": "CO"}).status_code == 404
+    assert "fragment_suggestions" not in client.get("/api/v1/capabilities").json()["data"]

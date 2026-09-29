@@ -17,6 +17,7 @@ export interface Capabilities {
   featurization: boolean
   reaction_rendering: boolean
   fragment_search?: boolean
+  fragment_suggestions?: boolean
   retrosynthesis?: boolean
   forward_synthesis?: boolean
   multistep_retrosynthesis?: boolean
@@ -1274,6 +1275,30 @@ export interface FragmentSearchRequest {
   topology: 'preserve_rings' | 'subgraph'
   limit: number
   timeout_seconds: number
+}
+
+export interface SuggestedSearchFragment {
+  candidate_id: string
+  kind: string
+  query: string
+  query_format: 'smiles'
+  topology: 'preserve_rings'
+  target_atom_ids: number[]
+  boundaries: Array<{ retained_atom_id: number; omitted_atom_id: number; bond_type: string }>
+  reasons: string[]
+  cautions: string[]
+  target_highlight_svg?: string
+}
+
+export interface FragmentSuggestionsResult {
+  target_smiles: string
+  target_id: string
+  candidates: SuggestedSearchFragment[]
+  generated_count: number
+  rejected_count: number
+  generation_truncated: boolean
+  output_truncated: boolean
+  limitations: string[]
 }
 
 export interface FragmentCount {

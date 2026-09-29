@@ -9,3 +9,7 @@
 .fragment-results summary { cursor: pointer; font-size: .75rem; font-weight: 600; }
 .fragment-results pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; padding: 12px; background: #f4f7f4; font-size: .8rem; }
 .fragment-results .reaction-image img { max-width: 100%; height: auto; }
+.fragment-suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; padding: 19px; }
+.fragment-suggestion-grid article { min-width: 0; padding: 12px; border: 1px solid #d7e0da; border-radius: 10px; }
+.fragment-suggestion-grid code, .fragment-results > details code { overflow-wrap: anywhere; }
+.fragment-highlight { display: block; width: 100%; max-width: 420px; height: 220px; object-fit: contain; margin: 0 auto; }
