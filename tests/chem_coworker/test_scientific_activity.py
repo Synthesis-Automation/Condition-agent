@@ -42,6 +42,33 @@ def test_query_arriving_at_completion_replaces_pending_search():
     assert "waiting" not in history.rows[0]["title"]
 
 
+def test_completed_web_action_without_metadata_is_not_still_waiting_or_verified():
+    history = ActivityHistory()
+    for phase in ("started", "completed"):
+        history.observe({"type": "item." + phase, "item": {
+            "id": "web", "type": "web_search", "query": "", "action": {"type": "other"},
+        }}, phase)
+    row = history.rows[0]
+    assert len(history.rows) == 1
+    assert row["status"] == "completed" and "waiting" not in row["title"]
+    assert "unavailable" in row["title"]
+    assert row["result_availability"] == "not_reported" and row["source_url"] is None
+
+
+def test_web_error_and_known_source_are_preserved_even_on_completion():
+    history = ActivityHistory()
+    history.observe({"type": "item.completed", "item": {
+        "id": "web", "type": "web_search", "action": {
+            "type": "screenshot", "url": "https://example.org/paper.pdf", "pageno": 0,
+        }, "error": {"message": "No usable image"},
+    }}, "end")
+    row = history.rows[0]
+    assert row["status"] == "failed" and row["failure_detail"] == "No usable image"
+    assert row["source_url"] == "https://example.org/paper.pdf"
+    assert row["web_action_type"] == "screenshot" and row["result_availability"] == "failed"
+    assert "page 1" in row["detail"]
+
+
 def test_retry_ids_are_distinct_and_success_output_and_reasoning_are_excluded():
     history = ActivityHistory()
     event = {"type": "item.completed", "item": {

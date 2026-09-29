@@ -286,16 +286,17 @@ test('new chat preserves drafts and global running activity', () => {
   assert.equal(ids.cancel.hidden, false);
 });
 
-test('saved answer is primary; scientific details and sources start collapsed', () => {
+test('legacy answers have one compact notes and sources footer without molecule galleries', () => {
   const {run} = harness();
   const card = run(`answerCard({id:'one',status:'completed',answer:{answer_markdown:'A result',evidence_refs:['sha256:abc'],uncertainties:['Unverified']},
     answer_presentation:{structures:[{smiles:'CCO',image_url:'data:image/svg+xml;base64,abc'}]}})`);
   assert.equal(card.children[0].textContent, 'A result');
-  assert.equal(card.querySelectorAll('details').length, 3);
+  assert.equal(card.querySelectorAll('details').length, 1);
   assert.equal(card.querySelectorAll('details[open]').length, 0);
-  assert.ok(card.descendants().some(node => node.tag === 'img' && node.alt.includes('CCO')));
-  assert.ok(card.descendants().some(node => node.className === 'molecule-scroll' && node.tabIndex === 0));
-  assert.ok(card.descendants().some(node => node.tag === 'a' && node.textContent === 'Download SVG'));
+  assert.equal(card.querySelectorAll('summary')[0].textContent, 'Notes & sources');
+  assert.ok(card.descendants().some(node => node.textContent === 'Unverified'));
+  assert.ok(card.querySelectorAll('a').some(node => node.textContent === 'Recorded evidence 1'));
+  assert.equal(card.querySelectorAll('img').length, 0);
 });
 
 test('reaction schemes are visible with details collapsed and references human-readable', () => {
@@ -315,7 +316,8 @@ test('reaction schemes are visible with details collapsed and references human-r
   const card = run('answerCard(fixture)');
   const view = card.children.find(node => node.className === 'scientific-view');
   assert.ok(view, 'schemes should not be inside a collapsed details wrapper');
-  assert.equal(card.children[0].textContent, 'A concise conclusion');
+  assert.equal(card.children[0], view, 'show the explicit route before its concise explanation');
+  assert.equal(card.children[1].textContent, 'A concise conclusion');
   assert.equal(card.querySelectorAll('details[open]').length, 0);
   const images = card.querySelectorAll('img');
   assert.equal(images.length, 1);
@@ -325,6 +327,10 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(schemeDownload.href, context.fixture.structured_presentation.steps[0].image_url,
     'preview sizing must not replace the native vector download');
   const stepDetails = card.querySelectorAll('details').find(node => node.dataset.key === 'scheme:science:s1');
+  assert.equal(stepDetails.firstElementChild.textContent, 'Step details & evidence · 1 caution');
+  assert.ok(stepDetails.descendants().some(node => node.textContent === 'Feasibility unverified'));
+  assert.equal(byClass(view, 'scientific-step')[0].children.filter(node => node.tag === 'ul').length, 0,
+    'detailed cautions should not duplicate the concise explanation below the scheme');
   assert.ok(stepDetails.descendants().some(node => node.textContent === 'Unknown oxidant'));
   assert.ok(stepDetails.descendants().some(node => node.textContent === 'Reactant → Product'));
   assert.ok(byClass(card, 'step-heading')[0].descendants().some(node => node.textContent === 'Proposed'),
@@ -333,17 +339,30 @@ test('reaction schemes are visible with details collapsed and references human-r
     node.textContent.startsWith('Reaction schemes · declared structures')));
   assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent' && node.textContent === 'Patent Example 2'));
   assert.ok(card.querySelectorAll('a').some(node => node.href === '/saved/excerpt' && node.textContent === 'Saved excerpt'));
-  assert.ok(card.descendants().some(node => node.tag === 'code' && node.textContent === 'CCO>>CC=O'));
+  assert.equal(card.querySelectorAll('code').length, 0, 'raw SMILES are retained in data, not duplicated in the answer UI');
   assert.ok(card.descendants().some(node => node.tag === 'li' && node.textContent === 'Feasibility unverified'));
+  context.fixture.structured_presentation.molecules.push({id:'c',name:'Final product',smiles:'CC(=O)O',...attribution});
+  context.fixture.structured_presentation.steps.push({
+    ...context.fixture.structured_presentation.steps[0], id:'s2', title:'Further oxidation',
+    reactant_ids:['b'], product_ids:['c'], after_step_ids:['s1'], reaction_smiles:'CC=O>>CC(=O)O',
+  });
+  context.fixture.structured_presentation.target_molecule_ids = ['c'];
   context.fixture.structured_presentation.routes = [
-    {id:'r1',title:'First hypothesis',step_ids:['s1'],limitations:[],unreached_target_ids:[]},
-    {id:'r2',title:'Alternative hypothesis',step_ids:['s1'],limitations:[],unreached_target_ids:['b']},
+    {id:'r1',title:'First hypothesis',step_ids:['s1','s2'],limitations:['Supply unconfirmed'],unreached_target_ids:[]},
+    {id:'r2',title:'Alternative hypothesis',step_ids:['s1'],limitations:[],unreached_target_ids:['c']},
   ];
-  const alternatives = run('answerCard(fixture)').querySelectorAll('details').filter(node => node.className.includes('route-choice'));
+  const routedCard = run('answerCard(fixture)');
+  const alternatives = routedCard.querySelectorAll('details').filter(node => node.className.includes('route-choice'));
   assert.equal(alternatives.length, 2);
   assert.equal(alternatives[0].open, true);
   assert.equal(alternatives[1].open, false);
-  assert.ok(alternatives[1].descendants().some(node => node.textContent.includes('Incomplete route: does not reach Product')));
+  assert.equal(byClass(alternatives[0], 'scientific-step').length, 2, 'keep both steps of a connected route visible');
+  const footer = byClass(routedCard, 'answer-details')[0];
+  assert.ok(footer.descendants().some(node => node.textContent === 'First hypothesis: Supply unconfirmed'));
+  assert.equal(Boolean(footer.open), false);
+  assert.equal(routedCard.children.filter(node => node.tag === 'details').length, 1);
+  assert.ok(!routedCard.querySelectorAll('summary').some(node => /Step connections|Molecules & SMILES|Route limitations|Uncertainty &|Additional scientific/.test(node.textContent)));
+  assert.ok(alternatives[1].descendants().some(node => node.textContent.includes('Incomplete route: does not reach Final product')));
   context.fixture.question = 'Investigate this route';
   context.fixture.status = 'completed';
   run("renderConversation({title:'Routes',turns:[fixture]})");
@@ -353,6 +372,35 @@ test('reaction schemes are visible with details collapsed and references human-r
   run("renderConversation({title:'Routes',turns:[fixture]})");
   const retained = run("$('messages').querySelectorAll('details').find(node => node.className.includes('route-choice'))");
   assert.equal(retained.open, false, 'a user-collapsed route stays closed when the conversation updates');
+});
+
+test('one footer deduplicates notes while preserving scoped caveats, claims and source links', () => {
+  const {run, context} = harness();
+  context.fixture = {
+    id:'notes', answer:{answer_markdown:'Brief explanation', evidence_refs:[], uncertainties:['Stock unknown', '<script>plain text</script>']},
+    structured_presentation:{
+      sources:[{id:'paper',title:'Example 4',url:'https://example.org/patent',artifact_url:'/saved/source',locator:'Example 4'}],
+      molecules:[{id:'a',name:'Precursor',smiles:'CCO',basis:'proposed',limitations:['Stock  unknown'],source_ids:[]}],
+      routes:[{id:'r1',title:'Route A',step_ids:[],limitations:['Stock unknown', 'Specific precursor needed'],unreached_target_ids:[]}],
+      steps:[], claims:[{text:'Conflicting yield entries',basis:'reported',source_ids:['paper'],limitations:['Yield omitted']}],
+    },
+  };
+  const before = JSON.stringify(context.fixture);
+  const card = run('answerCard(fixture)');
+  assert.equal(card.children[0].textContent, 'Brief explanation');
+  assert.equal(byClass(card, 'scientific-view').length, 0, 'no empty structure section for non-route answers');
+  const footer = card.querySelectorAll('details');
+  assert.equal(footer.length, 1);
+  const list = footer[0].querySelectorAll('li');
+  assert.equal(list.filter(node => node.textContent === 'Stock unknown').length, 1);
+  assert.ok(list.some(node => node.textContent === 'Route A: Specific precursor needed'));
+  assert.ok(list.some(node => node.textContent === '<script>plain text</script>'));
+  assert.equal(card.querySelectorAll('script').length, 0);
+  assert.ok(footer[0].descendants().some(node => node.textContent === 'Reported'));
+  assert.ok(footer[0].descendants().some(node => node.textContent === 'Conflicting yield entries'));
+  assert.ok(footer[0].querySelectorAll('a').some(node => node.href === '/saved/source'));
+  assert.equal(JSON.stringify(context.fixture), before, 'display grouping must not rewrite saved evidence');
+  assert.equal(run("answerCard({id:'empty',answer:{answer_markdown:'Short answer'}})").querySelectorAll('details').length, 0);
 });
 
 test('progress uses recorded events, elapsed time, and keeps action details open across updates', () => {

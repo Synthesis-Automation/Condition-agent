@@ -81,7 +81,11 @@ also enter activity and the debug log, including failures inside a command that
 exits successfully. The server collects committed events during runtime polling
 and when the turn ends, retaining their event sequence and original artifact
 reference without duplicating them or changing scientific results.
-Reaction schemes appear beneath the concise answer, one SVG per step, with compact
+Synthesis answers show the route first, one SVG per step, followed by a concise
+explanation of the choice, strongest evidence and main uncertainty (normally one
+short paragraph of two or three sentences). Detailed procedures and extended analysis are given when
+requested, including in a follow-up; the full source evidence remains saved.
+Schemes use compact
 compound names, concise reagent/catalyst and solvent names above the arrow and a
 percentage yield below when supplied. Amounts, temperatures, times and workup
 instructions remain in the step details. Retrosynthesis plans
@@ -96,9 +100,16 @@ Larger molecules expand the SVG canvas; standalone molecule cards keep their
 intrinsic size and provide scrolling. Restart the server after rendering code
 changes to clear cached saved-answer presentations.
 Alternative routes are separate expandable sections; the first is initially open,
-without implying that it is scientifically preferred. Step evidence, molecule
-galleries, SMILES, route connections, and uncertainty remain expandable. Missing
-conditions or yields are marked as missing in the details, and step cautions remain visible.
+without implying that it is scientifically preferred. The answer has no molecule
+gallery, raw SMILES panel or step-connection diagram. Missing
+conditions or yields are marked as missing in the details. Step cautions remain in
+**Step details & evidence**, with their count shown in the collapsed label. A single
+compact **Notes & sources** disclosure after the explanation combines route and
+molecule limitations, uncertainty, additional findings and references. Repeated
+notes are coalesced while distinct route/molecule context is retained. The molecular
+structures and dependency records remain in the saved answer data.
+Proposed/reported badges and incomplete-route
+notices remain visible. Important qualifications also belong in the brief explanation.
 Answers render Markdown tables,
 headings, emphasis, lists, code, and links. Wide tables scroll horizontally.
 Raw HTML and remote Markdown images are disabled. Artifact hashes in prose become
@@ -118,9 +129,9 @@ chats or selecting **New chat** keeps the active investigation visible above the
 composer, with **Open chat** and **Stop** controls. You can write a draft while
 waiting. Reloading the page discovers the active investigation automatically.
 
-Recognized, parseable molecular SMILES in questions and answers also appear as
-SVG structure cards under **View structure(s)** or **Structures & scientific
-details**, with their original notation and a **Download SVG** link.
+Recognized, parseable molecular SMILES in questions also appear as SVG structure
+cards under **View structure(s)**, with their original notation and a **Download SVG**
+link. Answers use the explicit reaction schemes without a duplicate molecule gallery.
 Inline code, `smiles` code blocks, and recognizable plain-text notation are
 supported. The existing RDKit-based visualization package produces the drawings.
 Invalid strings remain readable in the message but receive no drawing; molecule
@@ -135,8 +146,9 @@ rerunning the agent or changing its answer/evidence artifacts.
 ### Structured scientific answers
 
 New agent turns use `scientific_answer.v2`. Alongside the explanation, the page
-shows explicitly identified molecules, reaction schemes, route dependencies,
-condition details, yields, and inspectable source records. Each molecule, step,
+shows reaction schemes, condition details, yields, and inspectable source records.
+Molecule identities and route dependencies are retained in the saved data without
+extra display panels. Each molecule, step,
 condition, yield, and standalone claim carries one of these labels:
 
 | Basis | Meaning |
@@ -158,9 +170,29 @@ The `computed` label requires a completed recorded workspace call, replay, or
 by itself establish recorded execution for that label. Such analysis can be
 discussed in prose with its attachment and provenance limitation.
 
-The agent writes the complete `scientific_answer.v2` to the current attempt's
-fixed `answer-draft.json`, validates that saved draft and records its evidence
-self-review. It then returns only this small acknowledgment:
+The agent can use `w.finalize_answer(draft_path, draft, findings=findings)` to
+validate, record its explicit evidence self-review and save the current attempt's
+fixed `answer-draft.json`. It fills only authoring boilerplate: empty lists, null
+yield/source URL, the current schema version, and `needs_user_input=False`.
+Scientific basis, structures, source locators, conditions and findings are never
+inferred. Reported/computed objects still require valid source references.
+The saved contract remains the full `scientific_answer.v2`; manually authored
+complete drafts remain accepted under the same validation rules. For example:
+
+```python
+# draft_path is the exact path supplied for this runtime attempt.
+import json
+
+receipt = w.finalize_answer(draft_path, {
+    "answer_markdown": "Please provide the target SMILES so I can draw and assess the route.",
+    "needs_user_input": True,
+})
+print(json.dumps(receipt))
+```
+
+Scientific recommendations also supply concise findings for all five review areas.
+A clarification such as the example has no invented review or chemistry. The helper
+returns only this small acknowledgment for the agent's final message:
 
 ```json
 {"schema_version":"scientific_answer_handoff.v1","answer_file":"answer-draft.json"}
@@ -179,6 +211,14 @@ attempts remain saved. A second invalid submission fails visibly; runtime errors
 cancellation and baseline drift are not retried. Model and reasoning settings
 are unchanged; this reduces duplicated output rather than promising a particular
 response time.
+
+Search advice remains optional: if a full-target query finds no construction
+evidence, consider a deliberate query of the distinctive core with peripheral
+substituents removed. Preserve topology, explain the relaxation and skip it when
+it cannot change the plan. Similarly, stop repeated title/DOI or access searches
+that produce no useful evidence; usually one alternative access path is enough
+before switching sources or reporting a gap. Additional disconnections should
+resolve a real planning question, rather than regenerate an already sourced step.
 
 Route steps refer to explicit reactant/product molecule IDs and preceding step
 IDs. Cycles, missing IDs, disconnected declared dependencies, and omitted route
@@ -650,6 +690,51 @@ Long text is a pageable list of chunks (300 characters each), with hashes and
 offsets; per-procedure truncation at 60,000 characters is explicit. Saved worker
 diagnostics include stage timings, errors, and stderr. The default workspace
 deadline is 10 seconds, with a maximum of 30 seconds including worker startup.
+
+## Evaluate agent use of fragment tools
+
+The optional retrosynthesis guide asks the agent to identify the synthesis
+bottleneck, select an informative core, inspect construction evidence and explain
+transfer to the target. It can skip this advice or choose its own core; one or two
+initial searches are a suggestion rather than a required workflow or hard cap.
+
+For an explicitly live development comparison, use a fresh output directory:
+
+```powershell
+python -m examples.ai_native.fragment_agent_comparison --run-live --output results/ai_native/fragment_agent_comparison_new --timeout 240
+```
+
+This uses the configured agent model with its existing sandbox, two structure-only
+development cases, and the existing artifact configuration in
+`examples/ai_native/artifacts.local.example.json`. It selects `fragment_index`,
+`retro_library`, `condition_index` and `procedure_catalog` when configured so both
+arms can inspect ordinary precedent records and procedures. Supply `--artifacts PATH` to use your own
+mapping, or `--case cyclic_ether` for one pair. Model calls can incur usage.
+
+Each case gets fresh agent-only and fragment-assisted threads with the same
+scientific baseline and budgets, alternating arm order across cases. The former
+is instructed to avoid both fragment tools and their underlying APIs; this is a
+prompt-based ablation, not an access-control boundary. Both arms may use other
+available research tools. Shared lesson recall/publication is disabled, and agents
+are instructed not to inspect other runs or evaluation answers. One runtime
+attempt per arm uses the production investigator prompt and answer validators;
+the chat service's repair loop is not included.
+
+`comparison.md` and `comparison.json` retain every outcome, latency, recorded calls,
+returned construction observations and detected arm violations. Individual runs
+keep `answer.md`, `trial_report.json`, workspace evidence and runtime logs.
+Construction hits are not counted as useful inspected precedents automatically.
+Review the cited source, transfer argument and unsupported steps before filling
+the pending manual-review fields. Timeouts are not zero-quality chemistry scores.
+These cases are neither independently reviewed nor guaranteed absent from model
+training; this comparison does not satisfy untouched-evaluation release gates.
+
+The [initial live validation](../../results/ai_native/fragment_agent_comparison/validation.md)
+exercised core selection, broad-query refinement and source/transfer interpretation,
+but all four 240-second attempts timed out before final submission. A separate
+saved-evidence follow-up completed successfully. Use an explicit larger budget
+(for example `--timeout 600`) for a follow-up comparison; faster or better completed
+answers have not yet been established.
 
 ## Available operations and ownership
 

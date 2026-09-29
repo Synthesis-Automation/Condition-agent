@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v2
+# Retrosynthesis investigation adviser v4
 
 This is an optional menu, not a required workflow. Skip, reorder, repeat, or replace
 suggestions according to the question and available evidence. Scientific contracts,
@@ -22,27 +22,57 @@ Reuse an existing audit for the same structure. Keep executable script bodies un
 `if __name__ == "__main__":` so importing a helper does not repeat scientific calls.
 Print `w.call_summary(event)` first; inspect selected fields only when needed.
 
-For an unfamiliar core, optionally use `suggest_search_fragments(target_smiles=...)`
-to inspect complete ring systems, contextual variants and functional regions.
-The returned candidates are graph-validated search queries, not precursors or
-ranked synthesis recommendations. They can overlap; choose your own core when
-more informative. Search only selected candidates and use breadth/construction
-evidence to decide whether to refine. No candidate-generation call needs an index.
+When an unfamiliar core is the synthesis bottleneck, the following optional
+pattern can help. An exact supported route or a clear disconnection may already
+answer the question; skip fragment discovery when it adds no useful evidence.
 
-For an unfamiliar core, consider `search_fragment_precedents` with the selected
-core SMILES and `limit=5` when `fragment_index` is configured. It searches product
-substructures and distinguishes core construction from modification or retention.
-Keep distinctive ring topology and heteroatom positions; an unrestricted common
-biphenyl query may be too broad. Inspect returned source evidence, unresolved
-mapping, and corpus scope before transferring an idea. Explicitly refine SMARTS
-only when useful. A zero-hit result covers this index, not all literature.
-This is optional and does not trigger route expansion or forward prediction.
+- State the uncertainty first: which core needs a construction precedent, and why?
+  Explain the chemical question in a short progress message. A complex-looking
+  fragment or high structural score is not automatically the difficult part.
+- Select your own connected core, or use `suggest_search_fragments(target_smiles=...)`
+  for graph-validated regions. Candidates overlap and are not precursors. Inspect
+  atom boundaries and cautions; keep distinctive ring topology, junctions and
+  heteroatom positions. Avoid an unrestricted common biphenyl query when the
+  distinctive chemistry lies elsewhere. No suggestion call needs an index or retro.
+- Usually start with one or two informative queries using
+  `search_fragment_precedents(query=..., limit=5)` when `fragment_index` is configured.
+  This is an advisory starting budget, not a mandatory sequence or hard search cap.
+  Search another region only to resolve a remaining question. Reuse unchanged
+  queries and saved results. `too_broad` suggests adding distinctive context;
+  `partial` has incomplete coverage; zero hits apply only to this index.
+  Refinement with explicit SMARTS must state what was relaxed. There is no general
+  graph-edit similarity search, and altered ring topology is not an exact-core hit.
+- If a whole-target query returns only carried-through hits or no construction
+  evidence, consider one core query with peripheral substituents removed. Preserve
+  distinctive ring topology and heteroatom positions; explain the relaxation.
+  This is useful when the bottleneck is building that core, not a reason to search
+  generic rings or every suggested fragment. Skip it when it cannot change the plan.
+- Inspect the selected hit's local bond-change witnesses, observation/reference ID,
+  exact procedure link and source scope. A product containing the core is not
+  evidence that this reaction constructed it. Distinguish construction, modification,
+  boundary changes, retention and unresolved correspondence; groups can overlap.
+  A construction witness can establish only part of a core, not necessarily its
+  entire synthesis. Follow the original source when needed; preserve missing data.
+- Explain transfer to this target: which observed bonds/operation could be reused,
+  which substituents, reactive handles or stereochemistry differ, and what remains
+  a hypothesis. Keep reported chemistry separate from proposed adaptations.
+  Use single-step retrosynthesis for gaps when helpful, then assess explicit steps
+  and route topology through the existing operations. A retrieved hit is not an
+  automatically validated route or a reason to run forward prediction.
+
+Record consequential choices with `w.store.note('decision', text, evidence_refs=(ref,))`.
+When fragment evidence affects the answer, show a concise comparison of selected
+core, inspected construction evidence, proposed transfer and unresolved gap. Cite
+specific records/fields, not just the search call as blanket support. If no useful
+precedent emerges, report the bounded search and continue with another hypothesis.
 
 The agent owns multi-step planning. Select concrete single-step realizations and
 choose the next precursor yourself. Avoid cycles and repeated expansions; record
 branch choices, alternatives, constraints and stopping reasons. An exact literature
 route may make further searches unnecessary. Do not invoke the built-in multistep
 planner, including through custom scripts.
+Expand an intermediate only to resolve a decision-changing gap. Do not repeat a
+disconnection to regenerate an already explicit, source-supported step.
 Use `w.store.note("decision", text, evidence_refs=(ref,))` for branch choices. Other
 valid note kinds are `hypothesis`, `question`, `limitation`, and `review`.
 
@@ -74,8 +104,22 @@ an exact passage with `w.record_source_excerpt`. Pass its artifact reference in
 Failed downloads remain debugging records, not supporting literature.
 After an environment-wide network denial, use browser capture for subsequent sources
 as well; changing URLs does not justify repeating the same denied download path.
+Usually try one alternative access path for an unavailable paper or supplement;
+then switch to accessible primary evidence or state the gap. Continue only with
+a specific reason another search could change the conclusion. Repeated title/DOI
+variants without new evidence are a signal to stop, not a fixed search quota.
 
 Stop with a supported route or a clearly bounded partial proposal. Identify unresolved
 steps/leaves, availability assumptions, condition gaps and the next useful check.
 Structural admission is not experimental feasibility; a claimed published yield or
 stereoisomer needs an inspected source that actually supports it.
+
+Show the route as explicit reaction steps with concise reagent/catalyst labels,
+then explain the choice, strongest source and main uncertainty in one short
+paragraph of two or three sentences (usually 60-90 words). Do not repeat the long
+target name, list the steps again, or append a catalogue of caveats. Detailed procedures and extended analysis wait
+for a user request. Preserve the full evidence and review for that follow-up;
+avoid duplicating the route in prose, tables or claims.
+Use `w.finalize_answer(draft_path, draft, findings=findings)` to fill empty-field
+boilerplate, validate citations, save the explicit self-review and write the full
+answer. The agent still supplies chemistry, attribution and review findings.

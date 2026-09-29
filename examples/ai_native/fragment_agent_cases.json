@@ -1,0 +1,16 @@
+{
+  "schema_version": "fragment_agent_cases.v1",
+  "scope": "Authored development cases; novelty and model-training exclusion are not established.",
+  "cases": [
+    {
+      "case_id": "cyclic_ether",
+      "target_smiles": "CC(=O)c1ccc2c(c1)COc1ccccc1-2",
+      "question": "Identify the core-construction bottleneck and investigate a supported starting strategy for this target."
+    },
+    {
+      "case_id": "fused_heterocycle",
+      "target_smiles": "COc1ccc2c(c1)OCCN2C(=O)C",
+      "question": "Investigate how the fused heterocyclic core could be constructed and what would need adaptation for this target."
+    }
+  ]
+}

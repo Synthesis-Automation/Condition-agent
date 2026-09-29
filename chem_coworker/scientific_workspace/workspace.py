@@ -225,6 +225,19 @@ class ScientificWorkspace:
 
         return record_evidence_review(self.store, draft, findings)
 
+    def finalize_answer(
+        self, draft_path: str | Path, draft: Mapping[str, Any], *,
+        findings: list[dict[str, Any]] | None = None,
+    ) -> dict[str, str]:
+        """Save a validated answer and optional explicit self-review; return its handoff.
+
+        Empty lists, null yields/URLs and schema boilerplate may be omitted from
+        the input. Scientific basis, citations and content must remain explicit.
+        """
+        from .answer_finalization import finalize_answer
+
+        return finalize_answer(self.store, draft_path, draft, findings=findings)
+
     def task_guide(self, task: str) -> dict[str, Any]:
         """Read the optional conditions or retrosynthesis guide frozen in this run."""
         from .learning import task_guide

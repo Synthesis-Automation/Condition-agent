@@ -100,6 +100,21 @@ when an index is supplied. The initial run returned 68 graph-valid candidates;
 the local [validation report](../../results/ai_native/fragment_suggestions_pilot/validation.md)
 records limits, timings, test results and the remaining agent-evaluation gap.
 
+The agent-facing advice now explicitly connects core selection to a synthesis
+bottleneck and asks for construction witnesses, source inspection and a proposed
+transfer with differences/limitations. Its one-or-two-query starting budget remains
+advisory. There is no automatic tool chain or new mandatory chemistry gate.
+
+[`fragment_agent_comparison.py`](../../examples/ai_native/fragment_agent_comparison.py)
+provides an opt-in live paired development runner. Agent-only and fragment-assisted
+arms share the frozen scientific baseline and requested runtime settings, use fresh
+threads, disable shared learning and alternate order. It preserves failed turns,
+flags recorded control-arm fragment calls and scientific-call budget violations,
+and leaves useful inspected precedents and unsupported route steps for manual review.
+Restrictions are prompt-based; unrecorded access and model-training contamination
+cannot be excluded. Runtime completion and returned construction counts alone do
+not establish an improvement. See the [execution instructions](readme.md#evaluate-agent-use-of-fragment-tools).
+
 ## 2. What existing systems teach us
 
 These are design references, not claims that we have their data coverage or

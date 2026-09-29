@@ -11,7 +11,7 @@ from typing import Any, Mapping
 from .store import InvestigationStore, SCHEMA_VERSION, _read_json
 
 
-ACTIVITY_VERSION = 3
+ACTIVITY_VERSION = 4
 _EVENTS = {"item.started", "item.updated", "item.completed", "item.failed"}
 _KINDS = {"command_execution", "web_search", "mcp_tool_call", "file_change", "todo_list", "agent_message"}
 
@@ -41,7 +41,11 @@ def activity_detail(item: Mapping[str, Any]) -> str:
             return _text(f"Open page: {action.get('url', '')}")
         if action.get("type") == "find_in_page":
             return _text(f"Find {action.get('pattern', '')} in {action.get('url', '')}")
-        return _text(item.get("query"))
+        if action.get("type") == "screenshot":
+            page = action.get("pageno")
+            suffix = f", page {page + 1}" if type(page) is int else ""
+            return _text(f"Screenshot: {action.get('url', '')}{suffix}")
+        return _text(action.get("query") or item.get("query") or action.get("url") or item.get("url"))
     if kind == "mcp_tool_call":
         name = " / ".join(str(item[key]) for key in ("server", "tool") if item.get(key))
         arguments = item.get("arguments")
@@ -96,9 +100,12 @@ def _title(item: Mapping[str, Any], detail: str) -> str:
     if kind == "web_search":
         action = item.get("action") or {}
         action_type = action.get("type") if isinstance(action, Mapping) else None
-        label = {"open_page": "Read web page", "find_in_page": "Find text on web page"}.get(action_type, "Search the web")
+        label = {"open_page": "Read web page", "find_in_page": "Find text on web page",
+                 "screenshot": "View source image"}.get(action_type, "Search the web")
         if action_type in {None, "other"} and detail.startswith(("https://", "http://")):
             label = "Web request"
+        if not detail and item.get("status") in {"completed", "failed"}:
+            return "Web request — details unavailable"
         return label + (": " + _text(detail, 150) if detail else " — waiting for query details")
     if kind == "mcp_tool_call":
         return "Call " + _text(item.get("tool") or "scientific tool", 150)
@@ -152,6 +159,8 @@ class ActivityHistory:
             merged["status"] = "failed" if event["type"] == "item.failed" or item.get("status") == "failed" else "completed"
         elif event["type"] == "item.started":
             merged["status"] = item.get("status") or "in_progress"
+        if merged["type"] == "web_search" and merged.get("error"):
+            merged["status"] = "failed"
         detail = activity_detail(merged)
         row = {"kind": merged["type"], "status": merged.get("status", "in_progress"),
                "at": at, "updated_at": at, "detail": detail, "title": _title(merged, detail),
@@ -159,6 +168,16 @@ class ActivityHistory:
                "failure_detail": _failure(merged)}
         if merged["type"] == "agent_message":
             row.update(kind="agent_update", title="Investigation update")
+        elif merged["type"] == "web_search":
+            action = merged.get("action")
+            action = action if isinstance(action, Mapping) else {}
+            url = action.get("url") or merged.get("url") or merged.get("query")
+            row.update(
+                web_action_type=_text(action.get("type")) or "unknown",
+                source_url=_text(url) if isinstance(url, str) and url.startswith(("http://", "https://")) else None,
+                # The CLI can complete an action without providing page/image results.
+                result_availability="failed" if merged["status"] == "failed" else "not_reported",
+            )
         if key in self._positions:
             position = self._positions[key]
             row["at"] = self.rows[position]["at"]
