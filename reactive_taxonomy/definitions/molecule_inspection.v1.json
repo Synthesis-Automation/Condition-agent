@@ -1,0 +1,15 @@
+{
+  "schema_version": "molecule_inspection_policy.v1",
+  "definition_version": "1.0.0",
+  "max_characters": 5000,
+  "max_atoms": 200,
+  "default_timeout_seconds": 2,
+  "max_timeout_seconds": 5,
+  "max_embeddings": 32,
+  "max_alignments": 3,
+  "max_radius": 3,
+  "atom_match_fields": ["element", "isotope", "formal_charge", "aromatic", "ring_degree"],
+  "bond_match": "exact_order_and_ring_membership",
+  "complete_rings_only": true,
+  "stereo_in_automatic_core": false
+}

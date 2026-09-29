@@ -46,6 +46,11 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
         "fragment_suggestions": {
             "status": "implemented", "requires_index": False, "automatic_search": False,
         },
+        "molecular_inspection": {
+            "status": "implemented", "requires_index": False,
+            "operations": ["compare_molecules", "inspect_reactive_sites"],
+            "experimental_selectivity_prediction": False,
+        },
         "agent_web_search": {"status": "not_checked",
                              "observation_location": "turns/<turn>/runtime-observations.json"},
         "model_and_reasoning": {"status": "not_confirmed",

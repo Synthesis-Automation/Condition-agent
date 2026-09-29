@@ -17,6 +17,7 @@ class ScientificOperations:
 
     NAMES = (
         "analyze_reaction", "analyze_molecule", "recommend_conditions",
+        "compare_molecules", "inspect_reactive_sites",
         "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
         "search_fragment_precedents", "suggest_search_fragments",
         "inspect_condition_precedents", "propose_condition_adaptation",
@@ -69,6 +70,33 @@ class ScientificOperations:
         from reactive_taxonomy import audit_target
 
         return audit_target(smiles)
+
+    def compare_molecules(
+        self, left_smiles: str, right_smiles: str, core_smiles: str | None = None,
+        timeout_seconds: int = 2,
+    ) -> Any:
+        """Compare target/precedent cores, substituents and stereo; alignments are not reaction maps.
+
+        Optional core_smiles anchors the comparison; otherwise MCS has a bounded
+        search. Inspect ambiguity, partial coverage and stereo warnings before
+        transferring a precedent. No index, forward model or network is needed.
+        """
+        from reactive_taxonomy import compare_molecules
+
+        return compare_molecules(left_smiles, right_smiles, core_smiles, timeout_seconds)
+
+    def inspect_reactive_sites(
+        self, smiles: str, selected_atom_ids: list[int] | None = None, radius: int = 2,
+    ) -> Any:
+        """Inspect local motifs, site descriptors and other possible sites; no selectivity prediction.
+
+        IDs use returned canonical SMILES, also used by suggest_search_fragments.
+        Omit selection to inspect all sites and get atom IDs; choose a region for
+        focused follow-up. Stereo gaps and descriptor provenance remain explicit.
+        """
+        from reactive_taxonomy import inspect_reactive_sites
+
+        return inspect_reactive_sites(smiles, selected_atom_ids, radius)
 
     def recommend_conditions(
         self, reaction_smiles: str, top_k: int = 5, search_scope: str = "automatic",

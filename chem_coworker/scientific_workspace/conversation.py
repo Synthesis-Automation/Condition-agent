@@ -124,6 +124,11 @@ event.artifact_ref, path=(...), offset=0, limit=5) when the brief view is insuff
 Do not print the full raw result, a detailed summary, or several step inspections
 just to orient yourself. Read warnings and non-passing gates before relying on
 a result.
+Brief condition summaries include ingredients and source IDs; procedure summaries
+give text availability and saved record indices. Inspect the chosen recipe's exact
+amounts/operating fields or one procedure_text field when needed. Collection counts
+refer to saved results; displayed lists may contain only a preview. Avoid printing
+multiple unchanged summaries or re-running a tool just to retrieve its detail.
 Paths select literal JSON keys and list indices; next_offset continues a selected page.
 Full results remain in artifacts, accessible through w.store.read_artifact. Read selected
 fields for custom analysis; do not dump whole analyses, manifests or route trees to stdout.
@@ -185,6 +190,17 @@ complete proposed component list/operating values, reasons for each changed fiel
 evidence references, assumptions and risks. The output remains a proposal even when
 normalization/compatibility succeeds. Do not fabricate a change just to call a tool;
 insufficient evidence is a valid investigation result.
+
+When a structural difference affects precedent transfer, optionally use
+compare_molecules(left_smiles=target, right_smiles=precedent, core_smiles=chosen_core).
+The core is optional. Inspect coverage, ambiguous alignments and stereo gaps;
+structural alignment is not reaction mapping or evidence that conditions transfer.
+For a specific site question, inspect_reactive_sites(smiles=target,
+selected_atom_ids=[...]) returns existing local descriptors and other detected sites.
+Use canonical atom IDs from these tools or suggest_search_fragments, not original
+SMILES positions. These are optional graph checks, not required steps or experimental
+selectivity predictions. Read call_summary first and inspect only the relevant
+saved region/alignment; do not dump the full atom/environment tables.
 
 For retrosynthesis, use disconnect_target(target_smiles=...) for ONE step at a time.
 For an unfamiliar core, optionally call search_fragment_precedents(query=core_smiles)

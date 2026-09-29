@@ -93,6 +93,35 @@ def test_failed_calls_are_recorded_and_do_not_destroy_previous_results(workspace
     assert "condition_index" in workspace.store.read_artifact(missing.artifact_ref)["error"]["message"]
 
 
+@pytest.mark.parametrize("operation,arguments", [
+    ("compare_molecules", {"left_smiles": "Cc1ccccc1", "right_smiles": "Clc1ccccc1"}),
+    ("inspect_reactive_sites", {"smiles": "CCBr", "selected_atom_ids": [2], "radius": 1}),
+])
+def test_molecular_tools_record_domain_results_without_artifacts(
+    workspace: ScientificWorkspace, operation: str, arguments: dict,
+) -> None:
+    import reactive_taxonomy
+
+    assert operation in {item["name"] for item in workspace.operations.catalog()}
+    assert not workspace.store.manifest["baseline"]["artifacts"]
+    event = workspace.run(operation, arguments)
+    recorded = workspace.store.read_artifact(event.artifact_ref)
+    assert recorded["execution_status"] == "completed"
+    expected = getattr(reactive_taxonomy, operation)(**arguments)
+    assert canonical_bytes(recorded["result"]) == canonical_bytes(expected)
+    assert workspace.call_summary(event)["inspection"]["detail_available"]
+    replay = workspace.replay(event.artifact_ref)
+    assert workspace.store.read_artifact(replay.artifact_ref)["matches"] is True
+    assert workspace.capabilities()["molecular_inspection"]["requires_index"] is False
+
+
+def test_molecular_tool_invalid_selection_remains_a_recorded_error(workspace: ScientificWorkspace) -> None:
+    event = workspace.run("inspect_reactive_sites", {"smiles": "CCO", "selected_atom_ids": [99]})
+    result = workspace.store.read_artifact(event.artifact_ref)
+    assert result["execution_status"] == "error"
+    assert "canonical atom IDs" in result["error"]["message"]
+
+
 def test_custom_files_are_snapshotted_without_execution(workspace: ScientificWorkspace, tmp_path: Path) -> None:
     script = tmp_path / "analysis.py"
     script.write_text("raise RuntimeError('must not execute')\n", "utf-8")

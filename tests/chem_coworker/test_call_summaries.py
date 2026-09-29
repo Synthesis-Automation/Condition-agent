@@ -49,6 +49,166 @@ def test_molecule_summary_exposes_identity_and_stereo_without_full_graph():
     assert "atom_indices" not in json.dumps(projected)
 
 
+def test_comparison_brief_keeps_ambiguity_and_timeout_without_atom_tables():
+    from reactive_taxonomy import compare_molecules
+
+    result = replace(compare_molecules('Cc1ccccc1', 'Clc1ccccc1'),
+                     status='partial_timeout', search_timed_out=True).to_dict()
+    brief = summarize_call_brief(_call('compare_molecules', result))
+    summary = brief['result_summary']
+    assert summary['status'] == 'partial_timeout' and summary['search_timed_out']
+    assert summary['alignment_ambiguous'] and summary['alignments_truncated']
+    assert summary['stereo_relationship'] == 'not_compared_different_graphs'
+    assert summary['alignment_count_observed'] == 12
+    assert 'atoms' not in summary['left']
+    assert len(json.dumps(brief)) < 4000
+
+
+def test_focused_brief_keeps_alternative_sites_and_descriptor_provenance():
+    from reactive_taxonomy import inspect_reactive_sites
+
+    result = inspect_reactive_sites('BrCCCCCCO')
+    bromine = next(a.atom_id for a in result.molecule.atoms if a.element == 'Br')
+    focused = inspect_reactive_sites('BrCCCCCCO', [bromine], radius=0)
+    brief = summarize_call_brief(_call('inspect_reactive_sites', focused.to_dict()))
+    summary = brief['result_summary']
+    assert summary['sites_count'] == len(focused.sites)
+    assert summary['other_sites_count'] == len(focused.other_sites) > 0
+    assert summary['other_sites']
+    assert summary['site_profiles'][0]['steric']['evidence']['method']
+    assert summary['site_profiles'][0]['status'] == 'derived'
+    assert 'atoms' not in summary['molecule']
+    assert len(json.dumps(brief)) < 6000
+
+
+def test_inspection_brief_preserves_unspecified_stereo_warning():
+    from reactive_taxonomy import inspect_reactive_sites
+
+    result = inspect_reactive_sites('CC=CC').to_dict()
+    brief = summarize_call_brief(_call('inspect_reactive_sites', result))
+    assert 'UNSPECIFIED_STEREOCHEMISTRY' in brief['result_summary']['warnings']
+
+
+def test_brief_selects_failure_after_long_passing_gate_prefix():
+    result = {"assessment": {"status": "unresolved", "actionable": False,
+              "gates": [{"gate_id": f"g{i}", "status": "pass"} for i in range(25)] + [
+                  {"gate_id": "missing_atom_donor", "status": "failed", "warnings": ["Missing oxygen source"]}
+              ]}}
+    brief = summarize_call_brief(_call("assess_route_step", result))["result_summary"]
+    assert brief["assessment"]["non_pass_gate_count"] == 1
+    assert brief["assessment"]["non_pass_gates"][0]["gate_id"] == "missing_atom_donor"
+    assert "Missing oxygen source" in brief["assessment"]["non_pass_gates"][0]["warnings"]
+
+
+def test_brief_counts_saved_warnings_and_steps_before_previewing():
+    result = {"warnings": [f"warning {i}" for i in range(23)], "assessment": {
+        "status": "unresolved", "step_assessments": [
+            {"external_step_id": f"s{i}", "assessment": {"status": "supported", "actionable": True}}
+            for i in range(12)
+        ] + [{"external_step_id": "late-failure", "assessment": {"status": "unresolved", "actionable": False}}],
+    }}
+    brief = summarize_call_brief(_call("assess_route_proposal", result))["result_summary"]
+    assert len(brief["warnings"]) == 3 and brief["warnings_count"] == 23
+    assert brief["assessment"]["step_count"] == 13
+    assert brief["assessment"]["steps"][0]["step_id"] == "late-failure"
+
+
+def test_brief_recommendation_contains_usable_recipe_and_source_identity():
+    result = {"valid": True, "recommendations": [{
+        "rank": 1, "recipe_id": "recipe-1", "reference_support": 1, "observation_support": 25,
+        "precedent_reaction_ids": ["r1"], "resolved_recipe": {
+            "catalysts": [{"canonical_name": "Pd(OAc)2", "primary_role": "metal_catalyst", "identity_status": "resolved"}],
+            "bases": [{"canonical_name": "Potassium carbonate", "identity_status": "resolved"}],
+            "temperature_c": 80, "time_h": None,
+        },
+    }]}
+    original = deepcopy(result)
+    brief = summarize_call_brief(_call("recommend_conditions", result))["result_summary"]
+    record = brief["recommendations"][0]
+    assert record["recipe"]["components"][0]["name"] == "Pd(OAc)2"
+    assert record["recipe"]["temperature_c"] == 80 and "time_h" not in record["recipe"]
+    assert record["reference_support"] == 1 and record["observation_support"] == 25
+    assert record["precedent_reaction_ids"] == ["r1"]
+    assert result == original
+
+
+def test_unresolved_recipe_component_remains_visible_after_preview_limit():
+    recipe = {"recipe_id": "recipe", "solvents": [
+        {"canonical_name": f"solvent-{i}", "identity_status": "resolved"} for i in range(9)
+    ], "other_components": [{"raw_identifier": "ambiguous raw name", "identity_status": "ambiguous",
+                             "warnings": ["CONDITION_IDENTITY_UNCERTAINTY"]}], "stages": [{}, {}]}
+    result = summarize_call_brief(_call("resolve_recipe", recipe))["result_summary"]["recipe"]
+    assert result["component_count"] == 10 and result["omitted_component_count"] == 4
+    assert result["components"][0]["identity_status"] == "ambiguous"
+    assert result["components"][0]["saved_path"] == ["other_components", 0]
+    assert result["stage_count"] == 2 and result["stage_details_omitted"]
+
+
+def test_procedure_brief_reports_text_availability_without_dumping_text():
+    source = {"records": [
+        {"reaction_id": "r1", "observation_id": "o1", "procedure_text": "reported text " * 5000},
+        {"reaction_id": "r1", "observation_id": "o2", "procedure_text": None},
+    ], "missing_reaction_ids": ["missing"]}
+    result = summarize_call_brief(_call("get_procedures", source))["result_summary"]
+    assert result["saved_record_count"] == 2
+    assert result["records"][0]["procedure_text_present"]
+    assert result["records"][0]["procedure_characters"] == len(source["records"][0]["procedure_text"])
+    assert not result["records"][1]["procedure_text_present"]
+    assert result["missing_reaction_ids"] == ["missing"]
+    assert "reported text" not in json.dumps(result)
+
+
+def test_precedent_brief_keeps_pagination_and_record_status():
+    source = {"records": [{"reaction_id": f"r{i}", "observation_id": f"o{i}",
+                           "condition_status": "unresolved", "huge_graph": [0] * 10000} for i in range(10)],
+              "total": 30, "offset": 10, "next_offset": 20, "missing_reaction_ids": ["missing"]}
+    result = summarize_call_brief(_call("get_precedents", source))["result_summary"]
+    assert result["total"] == 30 and result["next_offset"] == 20 and result["saved_record_count"] == 10
+    assert result["records"][0]["observation_id"] == "o0"
+    assert result["records"][0]["condition_status"] == "unresolved"
+    assert "huge_graph" not in json.dumps(result)
+
+
+def test_brief_preserves_long_smiles_and_flags_extreme_string_truncation():
+    result = {"valid": True, "canonical_smiles": "C" * 240}
+    assert summarize_call_brief(_call("analyze_molecule", result))["result_summary"]["canonical_smiles"] == result["canonical_smiles"]
+    result["canonical_smiles"] = "C" * 5000
+    summary = summarize_call_brief(_call("analyze_molecule", result))["result_summary"]
+    assert summary["canonical_smiles_truncated"] and len(summary["canonical_smiles"]) == 2001
+
+
+def test_brief_nested_values_stay_bounded_and_source_untouched():
+    source = {"valid": False, "warnings": [{"one": {"two": ["x" * 100000] * 50}}] * 25,
+              "recommendations": [{"rank": 1, "cautions": ["risk" * 10000] * 20}] * 100}
+    original = deepcopy(source)
+    summary = summarize_call_brief(_call("recommend_conditions", source))
+    assert source == original and summary["result_summary"]["valid"] is False
+    assert summary["result_summary"]["warnings_count"] == 25
+    assert len(json.dumps(summary)) < 8000
+
+
+def test_failed_brief_does_not_invent_zero_candidates():
+    summary = summarize_call_brief({"operation": "recommend_conditions", "execution_status": "error",
+                                    "error": {"type": "FileNotFoundError", "message": "Missing index"}})
+    assert summary["result_summary"] == {}
+    assert summary["error"]["type"] == "FileNotFoundError"
+
+
+def test_brief_keeps_empty_root_warning_contract_and_unknown_edit_counts():
+    result = {"valid": True, "warnings": [], "reaction_signature": {"formed_bond_types": []}}
+    summary = summarize_call_brief(_call("analyze_reaction", result))["result_summary"]
+    assert summary["warnings"] == []
+    assert "hydrogen_changes_count" not in summary["bond_changes"]
+
+
+def test_brief_forward_execution_shows_latest_stage():
+    stages = [{"stage": f"phase-{i}", "status": "completed"} for i in range(10)]
+    stages.append({"stage": "predict", "status": "running"})
+    summary = summarize_call_brief(_call("assess_route_step_forward", {"execution": {"stages": stages}}))
+    assert summary["result_summary"]["execution"]["stages"][-1]["stage"] == "predict"
+    assert summary["result_summary"]["execution"]["stage_count"] == 11
+
+
 def test_reaction_summary_preserves_independent_observation_and_interpretation():
     result = featurize_reaction(FIRST_REACTION).to_dict()
     summary = summarize_call(_call("analyze_reaction", result))["result_summary"]

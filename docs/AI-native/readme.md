@@ -469,6 +469,17 @@ that self-review exists; absence is not disguised as success. It remains an
 `w.call_summary(event)` now prints a brief decision view: execution status,
 key warnings, candidate or step status, and non-passing gates. It gives an
 artifact pointer for inspecting omitted evidence.
+The `scientific_call_brief.v2` view reads the saved result directly: counts refer
+to the full saved collections, and non-passing gates are selected before any
+preview limit. Large route previews prioritize non-actionable or warned steps.
+Repeated empty cautions and field catalogues are omitted. Structure strings and
+evidence IDs remain usable; exceptionally long strings carry a truncation flag.
+Condition summaries include ingredient names, reported operating fields and
+source IDs. Procedure summaries show which observations have text, with its
+length and saved record index; they do not print entire procedures. Unresolved
+recipe identities stay visible even when a component preview is limited.
+Omitted quantities/operating fields mean they are not displayed, not zero or
+experimentally unnecessary. Inspect the saved recipe/procedure before using it.
 `w.call_summary(event, detailed=True)` retains the larger projected summary with truncation and
 collection counts when needed; neither view replaces the immutable full result.
 Start with the brief view after a recorded call. When a decision needs
@@ -736,6 +747,56 @@ saved-evidence follow-up completed successfully. Use an explicit larger budget
 (for example `--timeout 600`) for a follow-up comparison; faster or better completed
 answers have not yet been established.
 
+## Focused molecular inspection
+
+Two optional, local RDKit tools help answer structural questions without loading
+an index or running forward prediction:
+
+- `compare_molecules`: compare a target and a precedent, returning a strict common
+  core, unmatched atoms, attachment boundaries, coverage and possible alignments.
+  Supply `core_smiles` to inspect your chosen core without an MCS search. Otherwise
+  MCS defaults to a two-second search timeout (maximum five); identical constitution
+  skips the search. Timeout results remain partial, and symmetric alignments are
+  explicitly ambiguous. Automatic search returns one core, not all equivalent cores.
+- `inspect_reactive_sites`: inspect selected atoms and their neighborhood using the
+  existing motifs and steric/electronic descriptors. Other detected sites stay
+  visible, without claiming experimental competition or selectivity. Omit the
+  selection to inspect all sites. Potential unassigned atom and double-bond stereo
+  are included alongside specified stereo.
+
+```python
+comparison = w.run("compare_molecules", {
+    "left_smiles": "Cc1ccccc1", "right_smiles": "Clc1ccccc1",
+    "core_smiles": "c1ccccc1",
+})
+print(w.call_summary(comparison))
+# Complete atom pairs and attachment differences remain in the saved result.
+print(w.inspect_artifact(comparison.artifact_ref,
+                         path=("result", "alignments"), limit=1))
+
+site = w.run("inspect_reactive_sites", {
+    "smiles": "CCBr", "selected_atom_ids": [2], "radius": 1,
+})
+print(w.call_summary(site))
+```
+
+Atom IDs are zero-based positions in each **returned canonical SMILES**, consistent
+with `suggest_search_fragments`; `input_atom_index` links to the parsed original
+SMILES. Inspect `result.molecule.atoms` (or `result.left.atoms` / `result.right.atoms`)
+before selecting unfamiliar structures. Salt mixtures, radicals and wildcards are
+rejected explicitly; nothing is silently stripped, neutralized or tautomerized.
+Charge, isotopes, aromaticity and ring topology remain constrained. Original SMILES
+and warnings are saved, including ignored atom-map labels.
+
+These comparisons are structural evidence, not reaction atom mapping or proof that
+conditions transfer. `core_smarts` is a search pattern; strict checks apply to the
+returned atom pairs. Stereo equivalence is assessed only for otherwise identical
+graphs; differing graphs retain separate stereo inventories and an explicit
+unassessed comparison. A changed CIP label is not interpreted as mechanistic
+inversion. Full descriptors, evidence and version metadata remain in call artifacts;
+the agent sees concise summaries first. These tools do not satisfy chemistry-review
+or untouched-evaluation release gates.
+
 ## Available operations and ownership
 
 `catalog` prints exact callable signatures. No arbitrary import or code execution
@@ -745,6 +806,8 @@ is accepted through the operation dispatcher.
 | --- | --- | --- |
 | `analyze_reaction` | `reactive_taxonomy`; `reaction_smiles` | Complete analysis, versions, edits, interpretations, ambiguity, warnings. |
 | `analyze_molecule` | `reactive_taxonomy`; `smiles` | Graph-derived target audit; reactive sites are hypotheses. |
+| `compare_molecules` | `reactive_taxonomy`; `left_smiles`, `right_smiles`, optional `core_smiles`, `timeout_seconds` | Strict structural cores, differences, coverage, ambiguous alignments and stereo scope. No dataset dependency or reaction-map claim. |
+| `inspect_reactive_sites` | `reactive_taxonomy`; `smiles`, optional canonical `selected_atom_ids`, `radius` (0–3) | Focused motifs and existing descriptors, other sites and assigned/unassigned stereo. No experimental selectivity prediction. |
 | `recommend_conditions` | `condition_recommender`; `reaction_smiles`, optional `top_k`, `search_scope` | Canonical shared-core results with compatibility, ranking, and provenance unchanged. Requires `condition_index` and `shared_core_index`. |
 | `search_fragment_precedents` | `reactive_taxonomy` graph/evidence rules and `condition_recommender` discovery index; `query`, optional `query_format`, `topology`, `limit`, `timeout_seconds` | Bounded product-fragment discovery, per-embedding changes, exact source/procedure joins, and saved inspection paths. Requires prebuilt `fragment_index`; never expands a route or rebuilds data. |
 | `suggest_search_fragments` | `reactive_taxonomy.search_fragments`; `target_smiles`, optional `limit` (1–5), `selected_atom_ids` | Optional, overlapping, target-derived queries with atom provenance and boundaries. No index, corpus call, retro, mapping, forward check or mandatory workflow. |

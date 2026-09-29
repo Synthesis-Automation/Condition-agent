@@ -16,6 +16,8 @@ from .target_audit import (
     audit_target,
 )
 from .reaction_api import featurize_reaction, identify_reaction_patterns
+from .molecule_comparison import MoleculeComparison, compare_molecules
+from .molecule_inspection import SiteInspection, inspect_reactive_sites
 from .departing_fragments import (
     DEPARTING_FRAGMENT_TOKEN_VERSION,
     departing_fragment_tokens,
@@ -254,6 +256,10 @@ from .molecular_feature_evaluation import (
 )
 
 __all__ = [
+    "MoleculeComparison",
+    "SiteInspection",
+    "compare_molecules",
+    "inspect_reactive_sites",
     "TARGET_AUDIT_SCHEMA_VERSION",
     "TargetAudit",
     "TargetDoubleBondStereo",

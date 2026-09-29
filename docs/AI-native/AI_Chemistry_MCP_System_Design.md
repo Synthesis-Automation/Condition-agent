@@ -24,6 +24,17 @@ assessors. The workspace does not expose the built-in automatic multistep planne
 Branch selection, alternatives, evidence and stopping decisions belong to the agent;
 chemical validation remains in the scientific packages.
 
+For local structure questions, the implemented workspace exposes two optional
+RDKit tools owned by `reactive_taxonomy`: `compare_molecules` compares a target
+with a precedent's common core, substituents and stereo specification;
+`inspect_reactive_sites` focuses existing motif and environment descriptors on
+chosen canonical atom IDs. Both preserve original identity, atom provenance and
+uncertainty, need no dataset, and return concise agent summaries with full saved
+evidence. Bounded MCS alignments are structural hypotheses, never reaction atom
+maps; descriptors do not predict experimental selectivity. See
+[focused molecular inspection](readme.md#focused-molecular-inspection) for usage
+and limits. Optional use keeps these checks out of tasks they cannot improve.
+
 The workspace adds two optional task guides and a small procedural lesson store
 to help the agent reuse useful investigation practices. This is implemented in
 the current Python workspace; it does not depend on a future MCP service or a
