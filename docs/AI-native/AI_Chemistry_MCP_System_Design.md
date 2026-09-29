@@ -24,6 +24,16 @@ assessors. The workspace does not expose the built-in automatic multistep planne
 Branch selection, alternatives, evidence and stopping decisions belong to the agent;
 chemical validation remains in the scientific packages.
 
+Route-step precedent inspection is shared between the agent and its web view.
+`inspect_step_precedents` resolves a selected saved realization or assessed step
+through the existing template library and optional baseline-pinned source catalogs.
+The answer carries inspection artifact references, and the service verifies their
+reactant/product identity before exposing the original source reactions in the UI.
+Template support, structural resemblance, experimental observations and transfer
+uncertainty remain separate. Missing support is visible and does not imply chemical
+impossibility. See [workspace usage and contracts](readme.md) for pagination,
+observation linkage and compatibility with older saved answers.
+
 For local structure questions, the implemented workspace exposes two optional
 RDKit tools owned by `reactive_taxonomy`: `compare_molecules` compares a target
 with a precedent's common core, substituents and stereo specification;

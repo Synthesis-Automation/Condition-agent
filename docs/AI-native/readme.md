@@ -7,6 +7,44 @@ an optional workspace operation over a prepared local index. It finds product
 cores, distinguishes supported construction from retention, and preserves
 unresolved evidence. Independent chemistry review remains pending.
 
+For a target-derived fragment query, supply `target_smiles` to
+`search_fragment_precedents`. The canonical matcher checks aromaticity, bonds,
+stereochemistry and the requested ring topology against that target before index
+access. A mismatch is recorded as an error, never a zero-hit result. Successful
+searches retain versioned `target_validation` evidence in the result and summary.
+Omitting the target remains supported for standalone fragment searches; it provides
+no validation of membership in a particular target. Existing index and query
+identities are unchanged; no index rebuild is needed.
+
+Supporting reactions can now be inspected for each proposed route step with
+`inspect_step_precedents(source_ref=..., realization_id=...)` for a saved
+`disconnect_target` result. Use `step_id` for `assess_route_proposal` or
+`revise_route_branch`; use only `source_ref` for `assess_route_step`. The operation
+uses the canonical template lookup or the assessment's saved matches. It returns
+actual source reaction structures, product comparisons, template edit context,
+scoped counts, and available publication, observation and procedure records.
+Pages contain up to five records (`limit=3` by default); follow `page.next_offset`.
+Disconnection lookup retains at most the canonical top 20 template records;
+assessment lookup is limited to its saved matches. Neither is a corpus-wide search.
+
+Attach each inspection artifact to the corresponding answer step using
+`precedent_refs: [event.artifact_ref]`. The service checks canonical reactant and
+product identity, including specified stereo, before publication. The web UI draws
+the same saved source records under **Supporting reactions**. Missing inspection,
+no retrieved precedent, and unavailable evidence are separate display states.
+The optional field extends `scientific_answer.v2`; new runtime schemas require an
+explicit list, while older saved answers load with an empty list. Historical
+answers and reviews are not rewritten or given fabricated supporting reactions.
+
+Add `reference_catalog` to the artifact configuration to resolve publication
+metadata; the local example pins the existing compact reference catalog. Missing
+catalogs remain explicit. Conditions/yields retain observation IDs and source
+uncertainty. Template records have no unique observation ID, so associated
+experiments are labelled as reaction-ID joins, never merged or transferred to the
+proposed step. These are template precedents, not automatic evidence of feasibility;
+the agent must inspect substrate, functional-group and stereo differences before
+claiming transfer support. Route admission and condition ranking are unchanged.
+
 Use the existing agent's Python and shell access to investigate chemistry through
 the canonical packages. The workspace adds saved evidence and replay without an
 internal LLM controller. No model API key or MCP server is required for these
@@ -93,8 +131,8 @@ are shown in synthetic direction. Open **Step details & evidence** for full name
 condition text and sources. The step heading retains its declared
 reported/proposed/computed status; drawings do not validate feasibility.
 Scheme previews prefer 60% of the native SVG width and shrink further to fit a
-narrow card, keeping the complete reaction visible. **Download SVG** retains the
-native vector drawing. Molecule cards and reaction schemes use the shared
+narrow card, keeping the complete reaction visible. Molecule cards and reaction
+schemes use the shared
 `web_consistent` drawing preset (about 30 pixels per bond before preview scaling).
 Larger molecules expand the SVG canvas; standalone molecule cards keep their
 intrinsic size and provide scrolling. Restart the server after rendering code
@@ -130,8 +168,8 @@ composer, with **Open chat** and **Stop** controls. You can write a draft while
 waiting. Reloading the page discovers the active investigation automatically.
 
 Recognized, parseable molecular SMILES in questions also appear as SVG structure
-cards under **View structure(s)**, with their original notation and a **Download SVG**
-link. Answers use the explicit reaction schemes without a duplicate molecule gallery.
+cards under **View structure(s)**, with their original notation.
+Answers use the explicit reaction schemes without a duplicate molecule gallery.
 Inline code, `smiles` code blocks, and recognizable plain-text notation are
 supported. The existing RDKit-based visualization package produces the drawings.
 Invalid strings remain readable in the message but receive no drawing; molecule

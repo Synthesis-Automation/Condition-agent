@@ -2,7 +2,38 @@
 
 import json
 
+import pytest
+
 from chem_coworker.scientific_workspace.activity import ActivityHistory, activity_detail, recover_activity
+
+
+@pytest.mark.parametrize("prefix", [
+    "pydantic_core._pydantic_core.ValidationError: 10 validation errors for ScientificAnswer\n",
+    "pydantic_core.ValidationError: 10 validation errors for ScientificAnswer\n" + "x" * 5000 + "\n",
+])
+def test_validation_failure_preserves_field_and_message_without_documentation_footer(prefix):
+    output = (prefix + "steps.0.conditions.0.text\n"
+              "  Field required [type=missing, input_value={}, input_type=dict]\n"
+              "    For further information visit https://errors.pydantic.dev/2.11/v/missing\n")
+    history = ActivityHistory()
+    row = history.observe({"type": "item.completed", "item": {
+        "id": "validation", "type": "command_execution", "exit_code": 1,
+        "aggregated_output": output,
+    }}, "finish")
+    assert "steps.0.conditions.0.text" in row["failure_detail"]
+    assert "Field required" in row["failure_detail"]
+    assert "https://errors.pydantic.dev" not in row["failure_detail"]
+    assert len(row["failure_detail"]) <= 500
+
+
+def test_regular_traceback_keeps_final_exception_and_success_hides_output():
+    history = ActivityHistory()
+    for code, expected in [(1, "ValueError: invalid input"), (0, "")]:
+        row = history.observe({"type": "item.completed", "item": {
+            "id": str(code), "type": "command_execution", "exit_code": code,
+            "aggregated_output": "Traceback (most recent call last):\nValueError: invalid input\n",
+        }}, "finish")
+        assert row["failure_detail"] == expected
 
 
 def test_command_lifecycle_keeps_action_and_bounded_failure_in_one_row():

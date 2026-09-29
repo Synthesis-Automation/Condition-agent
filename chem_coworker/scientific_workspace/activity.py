@@ -126,6 +126,19 @@ def _failure(item: Mapping[str, Any]) -> str:
     if isinstance(output, str) and output.strip():
         lines = [_text(line, 500).lstrip("| ") for line in output[-4000:].splitlines()]
         lines = [line for line in lines if line and not re.fullmatch(r"[~^\-\s]+", line)]
+        # Pydantic ends each field error with a documentation URL. Keep the
+        # validation heading and field/message pairs instead of that footer.
+        validation = next((i for i, line in enumerate(lines)
+                           if re.search(r"\bValidationError: \d+ validation errors?\b", line)), None)
+        if validation is not None:
+            details = [line for line in lines[validation:]
+                       if not line.startswith("For further information visit ")]
+            return _text("; ".join(details), 500)
+        lines = [line for line in lines
+                 if not line.startswith("For further information visit https://errors.pydantic.dev/")]
+        # A long validation traceback can lose its heading from the bounded tail.
+        if len(lines) >= 2 and "[type=" in lines[-1]:
+            return _text("; ".join(lines[-2:]), 500)
         return lines[-1] if lines else "No failure diagnostic was provided."
     return f"Process exited with code {code}; no diagnostic was provided." if type(code) is int else "No failure diagnostic was provided."
 

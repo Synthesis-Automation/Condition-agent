@@ -299,6 +299,33 @@ test('legacy answers have one compact notes and sources footer without molecule 
   assert.equal(card.querySelectorAll('img').length, 0);
 });
 
+test('supporting reactions retain source identity, separate observations and evidence gaps', () => {
+  const {run, context} = harness();
+  const step = {id:'s1',title:'Proposed step',basis:'proposed',reactant_ids:['a'],product_ids:['b'],
+    after_step_ids:[],conditions:[],yield_info:null,source_ids:[],limitations:[]};
+  context.supportView = {sources:[],molecules:[{id:'a',name:'A'},{id:'b',name:'B'}],routes:[],steps:[step]};
+  let card = run('showStructured(supportView)');
+  assert.ok(card.descendants().some(node => node.textContent === 'Supporting reactions not inspected for this step.'));
+  step.supporting_evidence = [{artifact_ref:'sha256:fixture',artifact_url:'/saved/inspection',status:'precedents_available',
+    scope:'selected_template_top_20',saved_match_count:4,distinct_references_on_page:1,page:{next_offset:1},
+    precedents:[{match_id:'match1',reaction_id:'reaction-1',reference_title:'Reported patent example',reference_url:'https://example.org/patent',
+      reaction_smiles:'CCO>>CC=O',image_url:'data:image/svg+xml;base64,abc',same_recorded_product:false,same_recorded_precursors:false,
+      product_similarity:0.4,precursor_similarity:0.3,limitations:['Transfer remains uncertain.'],
+      observations:[{observation_id:'obs1',yield_pct:40,resolved_recipe:{}},{observation_id:'obs2',yield_pct:null}],
+      procedures:[{observation_id:'obs1',procedure_text:'Literal source <script>text</script>'}]}]}];
+  card = run('showStructured(supportView)');
+  assert.equal(card.querySelectorAll('img').length,1);
+  assert.ok(card.querySelectorAll('summary').some(node => node.textContent === 'Supporting reactions (1)'));
+  assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent'));
+  assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: 40%'));
+  assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: not supplied'));
+  assert.ok(card.descendants().some(node => node.textContent === 'Literal source <script>text</script>'));
+  assert.ok(!card.querySelectorAll('a').some(node => node.download));
+  step.supporting_evidence = [{status:'no_precedents_retrieved',precedents:[],scope:'saved_assessment_matches',saved_match_count:0,distinct_references_on_page:0}];
+  card = run('showStructured(supportView)');
+  assert.ok(card.descendants().some(node => node.textContent === 'No supporting experimental precedent retrieved in this inspection.'));
+});
+
 test('reaction schemes are visible with details collapsed and references human-readable', () => {
   const {run, context} = harness();
   const attribution = {basis:'proposed', source_ids:['paper'], limitations:['Feasibility unverified']};
@@ -323,9 +350,9 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(images.length, 1);
   assert.equal(images[0].style.width, '588px', 'prefer a compact preview at 60% of native SVG width');
   assert.match(images[0].alt, /Reactant → Product/);
-  const schemeDownload = card.querySelectorAll('a').find(node => node.download === 's1-reaction.svg');
-  assert.equal(schemeDownload.href, context.fixture.structured_presentation.steps[0].image_url,
-    'preview sizing must not replace the native vector download');
+  assert.equal(images[0].src, context.fixture.structured_presentation.steps[0].image_url);
+  assert.equal(card.querySelectorAll('a').some(node => node.download), false,
+    'reaction schemes should not show a download button');
   const stepDetails = card.querySelectorAll('details').find(node => node.dataset.key === 'scheme:science:s1');
   assert.equal(stepDetails.firstElementChild.textContent, 'Step details & evidence · 1 caution');
   assert.ok(stepDetails.descendants().some(node => node.textContent === 'Feasibility unverified'));

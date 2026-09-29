@@ -39,7 +39,7 @@ function appendStructures(container,presentation){
     const figure=element('figure','','structure');const image=element('img');image.src=structure.image_url;image.alt='Molecular structure: '+structure.smiles;image.loading='lazy';
     const caption=element('figcaption','Structure '+(index+1));caption.append(element('code',structure.smiles));
     const scroll=element('div','','molecule-scroll');scroll.tabIndex=0;scroll.setAttribute('role','region');scroll.setAttribute('aria-label','Molecular structure; scroll for larger drawings');scroll.append(image);
-    const download=element('a','Download SVG');download.href=structure.image_url;download.download='structure-'+(index+1)+'.svg';caption.append(download);figure.append(scroll,caption);gallery.append(figure);
+    figure.append(scroll,caption);gallery.append(figure);
   });container.append(gallery);
 }
 const basisLabels = {reported:'Reported', computed:'Computed', proposed:'Proposed', unknown:'Unknown', input:'User input'};
@@ -84,10 +84,72 @@ function showStructured(view, key = 'science') {
       if (step.scheme_width) image.style.width = step.scheme_width * 0.6 + 'px';
       image.alt = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ') + '. Conditions and yield in step details.';
       image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
-      const actions = element('figcaption', '', 'scheme-actions');
-      const download = element('a', 'Download SVG'); download.href = step.image_url; download.download = step.id + '-reaction.svg';
-      actions.append(download); figure.append(actions); card.append(figure);
+      card.append(figure);
     } else card.append(element('p', 'Scheme unavailable for the supplied notation. Structures and conditions are retained in step details.', 'scientific-note'));
+    const support = element('div', '', 'step-precedents');
+    const evidence = step.supporting_evidence || [];
+    if (!evidence.length) support.append(element('p', 'Supporting reactions not inspected for this step.', 'scientific-note'));
+    for (const record of evidence) {
+      const group = element('div');
+      if (record.status === 'evidence_unavailable') {
+        group.append(element('p', 'Supporting evidence unavailable: ' + record.error, 'scientific-note'));
+      } else {
+        group.append(element('p', 'Template precedents; experimental feasibility of this proposed step is not established.', 'scientific-note'));
+        const scopeLabel = record.scope === 'selected_template_top_20' ? 'Selected template (up to 20 records)' : 'Saved step assessment';
+        group.append(element('p', scopeLabel + ' · ' + record.saved_match_count + ' selected records · ' + record.distinct_references_on_page + ' distinct references on this page', 'muted'));
+        if (record.status === 'no_precedents_retrieved') group.append(element('p', 'No supporting experimental precedent retrieved in this inspection.', 'scientific-note'));
+        if (record.retrieval_truncated || record.page?.next_offset != null) group.append(element('p', 'This is a bounded selection; more records remain outside this displayed page.', 'scientific-note'));
+        if (record.observation_page?.next_offset != null) group.append(element('p', 'Only the first 20 indexed observations are included. Additional conditions and yields require further inspection.', 'scientific-note'));
+        for (const precedent of record.precedents || []) {
+          const entry = element('article', '', 'precedent-card');
+          entry.append(element('h5', precedent.reference_title || 'Publication details unavailable'));
+          entry.append(element('p', precedent.reaction_id, 'muted'));
+          if (precedent.image_url) {
+            const scroll = element('div', '', 'scheme-scroll'); scroll.tabIndex = 0;
+            const image = element('img', '', 'reaction-scheme'); image.src = precedent.image_url;
+            if (precedent.scheme_width) image.style.width = precedent.scheme_width * 0.6 + 'px';
+            image.alt = 'Supporting source reaction: ' + precedent.reaction_smiles; image.loading = 'lazy';
+            scroll.append(image); entry.append(scroll);
+          } else entry.append(element('code', precedent.reaction_smiles));
+          if (precedent.reference_url) {
+            const link = element('a', 'Open publication'); link.href = precedent.reference_url;
+            link.target = '_blank'; link.rel = 'noopener noreferrer'; entry.append(link);
+          }
+          entry.append(element('p', 'Recorded structures: product ' + (precedent.same_recorded_product ? 'matches' : 'differs') +
+            ', precursors ' + (precedent.same_recorded_precursors ? 'match' : 'differ') + '. Similarity: product ' + precedent.product_similarity + ', precursors ' + precedent.precursor_similarity + '.'));
+          const comparison = precedent.product_comparison || {};
+          if (comparison.stereo_relationship) entry.append(element('p', 'Product stereochemistry: ' + comparison.stereo_relationship +
+            '. Common-core coverage: target ' + Math.round(100 * comparison.left_coverage) + '%, precedent ' + Math.round(100 * comparison.right_coverage) + '%.'));
+          notes(entry, [...(comparison.warnings || []), ...(precedent.limitations || [])]);
+          const observed = element('div');
+          observed.append(element('p', 'Source observations linked by reaction ID; the template does not identify a unique experiment.', 'scientific-note'));
+          for (const observation of precedent.observations || []) {
+            observed.append(element('h5', observation.observation_id || 'Source observation'));
+            observed.append(element('p', 'Reported yield: ' + (observation.yield_pct == null ? 'not supplied' : observation.yield_pct + '%')));
+            const recipe = observation.resolved_recipe || {};
+            const ingredients = Object.values(recipe).filter(Array.isArray).flat().filter(item => item && typeof item === 'object')
+              .map(item => item.canonical_name || item.raw_identifier || item.substance_id).filter(Boolean);
+            observed.append(element('p', 'Indexed conditions: ' + (ingredients.join(', ') || 'not supplied')));
+            for (const [key, label] of [['temperature_c', 'Temperature (°C)'], ['time_h', 'Time (h)'], ['atmosphere', 'Atmosphere']]) {
+              if (recipe[key] != null) observed.append(element('p', label + ': ' + recipe[key]));
+            }
+            if (observation.condition_uncertain) observed.append(element('p', 'Condition identity or assignment remains uncertain.', 'scientific-note'));
+          }
+          if (!precedent.observations?.length) observed.append(element('p', 'Indexed conditions and yield unavailable.'));
+          for (const procedure of precedent.procedures || []) {
+            observed.append(element('p', 'Procedure observation: ' + (procedure.observation_id || 'unassigned reaction-level record'), 'muted'));
+            if (procedure.procedure_text) observed.append(element('p', procedure.procedure_text, 'source-procedure'));
+          }
+          entry.append(disclosure('Reported conditions & procedures', routeKey + ':' + step.id + ':' + precedent.match_id, observed));
+          group.append(entry);
+        }
+      }
+      if (record.artifact_url) { const link = element('a', 'Inspect saved evidence'); link.href = record.artifact_url; group.append(link); }
+      const supportLabel = 'Supporting reactions' + (record.precedents?.length ? ' (' + record.precedents.length + ')' :
+        record.status === 'evidence_unavailable' ? ' · evidence unavailable' : ' · none retrieved');
+      support.append(disclosure(supportLabel, routeKey + ':' + step.id + ':' + record.artifact_ref, group));
+    }
+    card.append(support);
     // Keep the scheme compact; the disclosure advertises retained cautions.
     const cautions = new Set([...step.limitations, ...step.conditions.flatMap(item => item.limitations), ...(step.yield_info?.limitations || [])]);
     const detail = element('div', '', 'step-detail');

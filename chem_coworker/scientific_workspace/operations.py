@@ -24,7 +24,7 @@ class ScientificOperations:
         "disconnect_target",
         "assess_route_step", "assess_route_proposal",
         "assess_route_step_forward",
-        "inspect_route_step", "revise_route_branch", "compare_route_proposals",
+        "inspect_route_step", "inspect_step_precedents", "revise_route_branch", "compare_route_proposals",
     )
 
     def __init__(self, store: InvestigationStore) -> None:
@@ -148,12 +148,14 @@ class ScientificOperations:
 
     def search_fragment_precedents(
         self, query: str, query_format: str = "smiles", topology: str = "preserve_rings",
-        limit: int = 5, timeout_seconds: int = 10,
+        limit: int = 5, timeout_seconds: int = 10, target_smiles: str | None = None,
     ) -> dict[str, Any]:
         """Find product cores and local construction evidence in a prebuilt fragment_index.
 
         Supply one connected core. SMILES permits peripheral substitution while
         preserving rings; explicit SMARTS/subgraph permits deliberate broadening.
+        Supply target_smiles when the query represents a core of that target;
+        mismatches are recorded as errors before scanning, not zero-hit results.
         Inspect saved hits for source records and procedure chunks. No automatic
         mapping, forward check, route expansion, or index rebuild is performed.
         """
@@ -161,7 +163,8 @@ class ScientificOperations:
 
         return run_fragment_search(self, {"query": query, "query_format": query_format,
                                          "topology": topology, "limit": limit,
-                                         "timeout_seconds": timeout_seconds})
+                                         "timeout_seconds": timeout_seconds,
+                                         "target_smiles": target_smiles})
 
     def get_procedures(self, reaction_ids: list[str]) -> dict[str, Any]:
         """Read all matching observed procedure records; missing text remains missing."""
@@ -343,6 +346,21 @@ class ScientificOperations:
         from .route_investigation import inspect_step
 
         return inspect_step(self, source_ref, step_id)
+
+    def inspect_step_precedents(
+        self, source_ref: str, step_id: str | None = None, realization_id: str | None = None,
+        offset: int = 0, limit: int = 3,
+    ) -> dict[str, Any]:
+        """Inspect actual supporting reactions for one saved realization or assessed step.
+
+        Use realization_id for disconnect_target, step_id for a route assessment
+        or revision, and neither for assess_route_step. Follow page.next_offset.
+        Source reactions, product comparison, scoped counts, and available source
+        conditions remain evidence, not proof that the proposed step will work.
+        """
+        from .step_precedents import inspect_step_precedents
+
+        return inspect_step_precedents(self, source_ref, step_id, realization_id, offset, limit)
 
     def revise_route_branch(
         self, source_ref: str, remove_step_ids: list[str], replacement_steps: list[dict[str, Any]],

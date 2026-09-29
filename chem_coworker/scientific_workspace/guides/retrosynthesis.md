@@ -35,7 +35,10 @@ answer the question; skip fragment discovery when it adds no useful evidence.
   heteroatom positions. Avoid an unrestricted common biphenyl query when the
   distinctive chemistry lies elsewhere. No suggestion call needs an index or retro.
 - Usually start with one or two informative queries using
-  `search_fragment_precedents(query=..., limit=5)` when `fragment_index` is configured.
+  `search_fragment_precedents(query=..., target_smiles=target, limit=5)` when
+  `fragment_index` is configured. Supply the target for every target-derived core,
+  including broadened queries: the exact search semantics must still match it.
+  A mismatch fails before scanning and is not evidence of zero precedents.
   This is an advisory starting budget, not a mandatory sequence or hard search cap.
   Search another region only to resolve a remaining question. Reuse unchanged
   queries and saved results. `too_broad` suggests adding distinctive context;
@@ -61,6 +64,15 @@ answer the question; skip fragment discovery when it adds no useful evidence.
   automatically validated route or a reason to run forward prediction.
 
 Record consequential choices with `w.store.note('decision', text, evidence_refs=(ref,))`.
+Before describing a chosen route step as precedent-supported, call
+`inspect_step_precedents(source_ref=..., realization_id=...)` on its saved
+disconnection, or select `step_id` from a saved route assessment/revision. Inspect
+source reactions, comparisons and caveats; follow `page.next_offset` if needed.
+Include the returned inspection refs in that answer step's `precedent_refs` so the
+reader sees the same evidence. Template support and high similarity do not establish
+experimental feasibility. Distinguish uninspected steps from bounded searches that
+retrieved no supporting reactions. Literature-only evidence keeps its captured
+citations; do not invent template support or run an inspection merely to fill a panel.
 When fragment evidence affects the answer, show a concise comparison of selected
 core, inspected construction evidence, proposed transfer and unresolved gap. Cite
 specific records/fields, not just the search call as blanket support. If no useful

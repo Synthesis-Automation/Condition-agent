@@ -9,10 +9,40 @@ from reactive_taxonomy import featurize_reaction
 from reactive_taxonomy.fragment_search import (
     classify_fragment_embedding, compile_fragment_query, fragment_embeddings,
     fragment_search_policy, indexed_product, project_fragment_evidence,
+    validate_fragment_target,
 )
 
 
 ETHER = "[CH3:1][Br:2].[OH:3][CH3:4]>>[CH3:1][O:3][CH3:4]"
+BRIDGED_TARGET = "O=C1c2ccccc2C[C@H]3O[C@@H](C4)CC[C@@H]4N13"
+
+
+@pytest.mark.parametrize("query,target,format,topology,expected", [
+    (BRIDGED_TARGET, BRIDGED_TARGET, "smiles", "preserve_rings", True),
+    ("O=C1CCC2OC3CCC(C3)N12", BRIDGED_TARGET, "smiles", "preserve_rings", False),
+    ("O=C1CCCC2OC3CCC(C3)N12", BRIDGED_TARGET, "smiles", "preserve_rings", False),
+    ("c1ccccc1", "Cc1ccccc1", "smiles", "preserve_rings", True),
+    ("c1ccccc1", "c1ccc2ccccc2c1", "smiles", "preserve_rings", False),
+    ("c1ccccc1", "c1ccc2ccccc2c1", "smarts", "subgraph", True),
+    ("N[C@@H](C)C(=O)O", "N[C@H](C)C(=O)O", "smiles", "subgraph", False),
+    ("N[C@@H](C)C(=O)O", "NC(C)C(=O)O", "smiles", "subgraph", False),
+    ("CO", "COC", "smiles", "preserve_rings", True),
+])
+def test_target_validation_uses_corpus_matching_semantics(query, target, format, topology, expected):
+    compiled = compile_fragment_query(query, format, topology)
+    result = validate_fragment_target(compiled, target)
+    assert result.matches_target is expected
+    assert result.query_id == compiled.query_id
+    assert result.schema_version == "fragment_target_validation.v1"
+    assert result.compiler_version == compiled.compiler_version
+    assert result.definition_version == compiled.definition_version
+    assert result == validate_fragment_target(compiled, Chem.MolToSmiles(Chem.MolFromSmiles(target)))
+
+
+@pytest.mark.parametrize("target", ["", "broken", "C.O", None])
+def test_target_validation_rejects_invalid_targets(target):
+    with pytest.raises(ValueError):
+        validate_fragment_target(compile_fragment_query("C"), target)
 
 
 def classify(reaction: str, query: str, *, topology: str = "preserve_rings") -> list[dict]:

@@ -36,7 +36,7 @@ def workspace(tmp_path):
 
 
 def test_real_worker_compact_summary_evidence_inspection_and_replay(workspace):
-    event = workspace.run("search_fragment_precedents", {"query": "COC"})
+    event = workspace.run("search_fragment_precedents", {"query": "COC", "target_smiles": "CCOC"})
     payload = workspace.store.read_artifact(event.artifact_ref)
     assert payload["execution_status"] == "completed", payload
     result = payload["result"]
@@ -46,6 +46,8 @@ def test_real_worker_compact_summary_evidence_inspection_and_replay(workspace):
     assert summary["search_status"] == "complete"
     assert summary["hits"][0]["product_smiles"] == "COC"
     assert summary["hits"][0]["procedure_availability"] == "linked"
+    assert summary["target_validation"]["matches_target"] is True
+    assert summary["target_validation"]["target_smiles"] == "CCOC"
     path = ("result", "hits", 0, "procedures", 0, "record", "text", "chunks")
     page = workspace.inspect_artifact(event.artifact_ref, path, offset=1, limit=2)
     assert page["preview"][0]["start"] == 300
@@ -62,6 +64,17 @@ def test_invalid_query_is_error_not_zero_hits(workspace):
     assert payload["execution_status"] == "error"
     assert payload["error"]["type"] == "ValueError"
     assert "connected" in payload["error"]["message"]
+
+
+def test_target_mismatch_is_recorded_as_error_not_absence(workspace):
+    event = workspace.run("search_fragment_precedents", {
+        "query": "O=C1CCCC2OC3CCC(C3)N12",
+        "target_smiles": "O=C1c2ccccc2C[C@H]3O[C@@H](C4)CC[C@@H]4N13",
+    })
+    payload = workspace.store.read_artifact(event.artifact_ref)
+    assert payload["execution_status"] == "error"
+    assert "does not match target_smiles" in payload["error"]["message"]
+    assert "counts" not in payload["result"]
 
 
 def test_worker_deadline_stops_child_and_saves_diagnostics(workspace, monkeypatch):

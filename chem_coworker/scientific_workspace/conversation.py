@@ -203,7 +203,8 @@ selectivity predictions. Read call_summary first and inspect only the relevant
 saved region/alignment; do not dump the full atom/environment tables.
 
 For retrosynthesis, use disconnect_target(target_smiles=...) for ONE step at a time.
-For an unfamiliar core, optionally call search_fragment_precedents(query=core_smiles)
+For an unfamiliar core, optionally call
+search_fragment_precedents(query=core_smiles, target_smiles=target)
 or first suggest_search_fragments(target_smiles=target) for a few graph-validated
 search regions. Suggestions are optional and can overlap; their ordering is not
 synthetic difficulty or corpus rarity. You may select your own core. Choose only
@@ -217,6 +218,12 @@ If a whole-target query returns no construction evidence or only carried-through
 hits, consider one deliberate core query before abandoning local precedents:
 remove peripheral substituents while preserving distinctive ring topology and
 heteroatom positions. State what you removed and why; inspect suggestions if useful.
+Always supply target_smiles for a target-derived query, including a broadened core.
+The search checks target membership using its actual aromaticity, bond, stereo and
+topology rules before scanning. A mismatch is an invalid target-core query, not zero
+precedents. Removing part of a fused ring or replacing aromatic atoms with saturated
+atoms is not peripheral substitution. Use a graph-derived suggestion or an explicit
+SMARTS/subgraph relaxation that still matches the target; disclose the relaxation.
 Do not broaden to generic rings or search every fragment. Skip this fallback when
 it would not change the route decision; record the remaining coverage limitation.
 Precedent search requires fragment_index. It searches product graphs and labels construction,
@@ -231,6 +238,24 @@ Common fragments may need refinement; partial/zero results describe indexed scop
 not synthetic impossibility. Explicit SMARTS relaxation is not general fuzzy search;
 do not automatically broaden a query, build an index, or run a forward check.
 You own multi-step planning: inspect strategies and their concrete realizations,
+then inspect supporting reactions before calling a chosen step precedent-supported:
+e = w.run('inspect_step_precedents', {{'source_ref': saved_disconnection_ref,
+    'realization_id': selected_realization_id, 'limit': 3}})
+For assess_route_proposal or revise_route_branch use source_ref and step_id instead;
+for assess_route_step use source_ref alone. These resolve the selected step's actual
+template records, not arbitrary reaction IDs. Inspect the returned source reaction,
+product comparison, similarities, template edits, warnings, observation-specific
+conditions and procedures. Follow page.next_offset if needed; counts are scoped,
+not an exhaustive literature count. Missing catalog data remains missing.
+Explain which observed transformation could transfer and which substrate, functional
+group or stereochemical differences remain consequential. Template support is not
+proof of success. An identical structure pair alone is not a verified procedure.
+Link inspection artifact refs in that answer step's precedent_refs, including empty
+search results. The service validates the step structures and renders those saved
+records. Do not copy source reaction SMILES into agent-authored precedent cards.
+For literature-only steps, preserve captured citations; the template panel may remain
+not inspected. Never invent local support or run tools only to fill the panel.
+You own the decisions: inspect strategies and their concrete realizations,
 choose a precursor to expand, and call disconnect_target again for that intermediate.
 Expand only when the result could change the plan; a sourced, explicit step does
 not need another disconnection merely to reproduce an already chosen precursor.
@@ -368,6 +393,14 @@ can be separate routes. An incomplete route is allowed: disclose the missing ste
 unknown structure in limitations instead of fabricating completion.
 Conditions are separate attributed text fields, e.g. solvent, temperature, duration,
 quantities and addition order. Use [] if absent, and yield_info=null if unreported.
+Minimal nested shapes (replace IDs/text with your actual evidence and proposal):
+"steps": [{{"id": "s1", "title": "Proposed step", "basis": "proposed",
+           "reactant_ids": ["a"], "product_ids": ["b"],
+           "precedent_refs": [],
+           "conditions": [{{"text": "Conditions to develop", "basis": "unknown"}}]}}],
+"routes": [{{"id": "r1", "title": "Proposal", "step_ids": ["s1"]}}]
+Condition objects use text, basis, source_ids and limitations; never label/value.
+Routes have id, title, step_ids and limitations; basis belongs to steps, not routes.
 For an initial route question, keep conditions to concise reagent/catalyst names
 and essential reaction context; do not transcribe amounts, workup, purification or
 full operating instructions. Save their source evidence for a follow-up request.
@@ -725,6 +758,12 @@ class ConversationService:
                     "type": "WorkerUnavailable",
                     "message": "This server does not own the previous worker. Start a new investigation, or inspect the saved worker PID and conversation lock before resuming.",
                 }
+            if (turn.get("answer") or {}).get("schema_version") == "scientific_answer.v2":
+                from .step_precedents import answer_step_precedents
+
+                turn["step_precedent_evidence"] = answer_step_precedents(
+                    ScientificWorkspace(directory).store, turn["answer"],
+                )
         return {**metadata, "turns": turns}
 
     def list_conversations(self) -> list[dict[str, Any]]:

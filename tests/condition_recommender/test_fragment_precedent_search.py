@@ -90,6 +90,21 @@ def test_zero_hits_is_distinct_from_missing_or_stale_index(index, tmp_path):
         open_fragment_index(index)
 
 
+def test_target_mismatch_fails_before_opening_index(monkeypatch):
+    import condition_recommender.fragment_search as search
+
+    monkeypatch.setattr(search, "open_fragment_index", lambda *_: pytest.fail("Index opened"))
+    with pytest.raises(ValueError, match="does not match target_smiles"):
+        search.search_fragment_precedents("unused.sqlite", "C1CCCCC1", target_smiles="c1ccccc1")
+
+
+def test_validated_target_is_retained_even_with_zero_corpus_hits(index):
+    result = search_fragment_precedents(index, "P(=O)(O)O", target_smiles="P(=O)(O)O")
+    assert result["target_validation"]["matches_target"] is True
+    assert result["target_validation"]["query_id"] == result["query"]["query_id"]
+    assert result["counts"]["products"] == {"value": 0, "precision": "exact"}
+
+
 def test_broad_query_reports_lower_bound_without_arbitrary_top_list(index, monkeypatch):
     import condition_recommender.fragment_search as search
     policy = search.fragment_search_policy()

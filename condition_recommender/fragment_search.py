@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import asdict
 import argparse
 from contextlib import closing
 import hashlib
@@ -15,6 +16,7 @@ from rdkit.Chem import rdSubstructLibrary
 
 from reactive_taxonomy.fragment_search import (
     classify_fragment_embedding, compile_fragment_query, fragment_embeddings, fragment_search_policy,
+    validate_fragment_target,
 )
 from .fragment_index import build_fragment_index, open_fragment_index, unpack
 
@@ -41,12 +43,14 @@ def _text_chunks(value: Any, remaining: list[int]) -> Any:
 def search_fragment_precedents(
     index_path: str | Path, query: str, query_format: str = "smiles",
     topology: str = "preserve_rings", limit: int = 5, timeout_seconds: int = 10,
-    *, progress: Callable[[dict[str, Any]], None] | None = None,
+    *, target_smiles: str | None = None,
+    progress: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Search a prepared corpus; only verified graph hits enter result cards.
 
 This library call checks cooperative deadlines between bounded batches. The
 workspace adds a killable subprocess deadline around imports and RDKit calls.
+Supply target_smiles for target-derived queries; mismatches fail before index access.
 """
     if type(limit) is not int or not 1 <= limit <= 10:
         raise ValueError("limit must be an integer between 1 and 10")
@@ -54,6 +58,15 @@ workspace adds a killable subprocess deadline around imports and RDKit calls.
         raise ValueError("timeout_seconds must be an integer between 1 and 30")
     started = monotonic()
     compiled = compile_fragment_query(query, query_format, topology)
+    target_validation = None
+    if target_smiles is not None:
+        target_validation = validate_fragment_target(compiled, target_smiles)
+        if not target_validation.matches_target:
+            raise ValueError(
+                "Fragment query does not match target_smiles under the requested "
+                "aromaticity, bond, stereochemistry and topology constraints; "
+                "revise the query explicitly. No corpus absence claim is supported."
+            )
     policy = fragment_search_policy()
     timings: dict[str, float] = {}
 
@@ -231,6 +244,8 @@ workspace adds a killable subprocess deadline around imports and RDKit calls.
                           "library_products_examined": searched_products, "classified_links": link_count,
                           "distinct_embedding_witnesses": verified_embeddings},
         }
+        if target_validation is not None:
+            result["target_validation"] = asdict(target_validation)
         while len(json.dumps(result).encode()) > policy["max_result_bytes"] and result["hits"]:
             result["hits"].pop()
             result["returned_count"] = len(result["hits"])

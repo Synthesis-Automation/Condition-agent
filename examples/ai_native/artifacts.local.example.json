@@ -2,6 +2,7 @@
   "condition_index": "datasets/literature/compact/generic_index.sqlite",
   "shared_core_index": "datasets/literature/compact/generic_index.shared_core.sqlite",
   "procedure_catalog": "datasets/literature/compact/experimental_detail_catalog.jsonl.gz",
+  "reference_catalog": "datasets/literature/compact/reference_catalog.jsonl.gz",
   "fragment_index": "results/ai_native/indexes/fragment_precedents.sqlite",
   "retro_library": "results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz",
   "forward_library": "results/operator_retrosynthesis_poc/full_scale_v3/compact/forward_operator_library_v1.json.gz",

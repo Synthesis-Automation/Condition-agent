@@ -100,7 +100,7 @@ class ScientificWorkspace:
         payload["timings"] = timings
         if operation in {
             "propose_condition_adaptation",
-            "inspect_route_step", "revise_route_branch", "assess_route_step_forward",
+            "inspect_route_step", "inspect_step_precedents", "revise_route_branch", "assess_route_step_forward",
         } and isinstance(inputs.get("source_ref"), str):
             try:
                 self.store.read_artifact(inputs["source_ref"])

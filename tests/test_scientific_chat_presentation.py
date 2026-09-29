@@ -161,5 +161,5 @@ def test_saved_conversation_api_and_page_deliver_new_presentation_without_agent_
         assert asset.headers["content-type"].startswith(media_type)
         assert asset.headers["cache-control"] == "no-store"
         assert client.get(url, headers={"origin": "https://attacker.example"}).status_code == 403
-    assert "Download SVG" in client.get("/scientific/assets/chat.js").text
+    assert "Download SVG" not in client.get("/scientific/assets/chat.js").text
     assert client.get("/scientific/assets/scientific_chat.py").status_code == 404

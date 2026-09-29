@@ -258,3 +258,23 @@ def test_prompt_assigns_multistep_decisions_to_agent(workspace) -> None:
     assert "Repeat a search only with a" in prompt
     for retired in ("plan_routes", "revise_routes", "prepare_route_proposal", "beam_width"):
         assert retired not in prompt
+
+
+def test_prompt_nested_answer_example_validates_against_real_contract(workspace) -> None:
+    import json
+
+    from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer
+    from chem_coworker.scientific_workspace.answer_finalization import _complete_empty_fields
+    from chem_coworker.scientific_workspace.conversation import investigation_prompt
+
+    prompt = investigation_prompt(workspace, "Propose a synthesis")
+    snippet = prompt.split("Minimal nested shapes (replace IDs/text with your actual evidence and proposal):\n")[1]
+    snippet = snippet.split("\nCondition objects")[0]
+    draft = json.loads("{" + snippet + "}")
+    draft.update(answer_markdown="Schema example only", molecules=[
+        {"id": "a", "smiles": "CCO", "name": "Input", "basis": "input"},
+        {"id": "b", "smiles": "CC=O", "name": "Proposed product", "basis": "proposed"},
+    ])
+    answer = ScientificAnswer.model_validate(_complete_empty_fields(draft))
+    assert answer.steps[0].conditions[0].text == "Conditions to develop"
+    assert answer.routes[0].step_ids == ["s1"]

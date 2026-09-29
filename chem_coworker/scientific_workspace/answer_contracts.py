@@ -80,6 +80,7 @@ class AnswerStep(AttributedObject):
     after_step_ids: list[str] = Field(max_length=20)
     conditions: list[AnswerClaim] = Field(max_length=30)
     yield_info: AnswerClaim | None
+    precedent_refs: list[str] = Field(default_factory=list, max_length=5)
 
 
 class AnswerRoute(AnswerObject):
@@ -153,6 +154,9 @@ class ScientificAnswer(AnswerObject):
 
 
 ANSWER_SCHEMA = ScientificAnswer.model_json_schema()
+# New runtime drafts declare this field explicitly; old saved v2 answers may
+# omit it and receive an empty list when read. No support is backfilled.
+ANSWER_SCHEMA["$defs"]["AnswerStep"]["required"].append("precedent_refs")
 
 
 def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore) -> list[str]:
@@ -166,6 +170,15 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
             "call", "derived_file", "replay", "custom_execution", "literature_source", "literature_excerpt",
         }:
             raise ValueError("Answer must cite scientific evidence, not agent assertions")
+    from .step_precedents import load_step_precedent_evidence
+
+    molecules = {item.id: item.smiles for item in answer.molecules}
+    for step in answer.steps:
+        for reference in step.precedent_refs:
+            load_step_precedent_evidence(
+                store, reference, ".".join(molecules[key] for key in step.reactant_ids),
+                ".".join(molecules[key] for key in step.product_ids),
+            )
     sources = {source.id: source for source in answer.sources}
     for source in answer.sources:
         if source.kind != "external_source":

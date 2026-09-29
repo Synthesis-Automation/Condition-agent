@@ -7,7 +7,7 @@ from functools import lru_cache
 import json
 import re
 from typing import Any, Iterable
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 import xml.etree.ElementTree as ET
 
 from markdown_it import MarkdownIt
@@ -16,7 +16,7 @@ from rdkit import rdBase
 
 from visualization import (
     SchemeAnnotation, SchemeMolecule, render_annotated_scheme_svg,
-    render_molecule_image_bytes,
+    render_molecule_image_bytes, render_reaction_image_bytes,
 )
 
 from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer
@@ -184,6 +184,7 @@ def present_conversation(conversation: dict[str, Any]) -> dict[str, Any]:
             if turn["answer"].get("schema_version") == "scientific_answer.v2":
                 view["structured_presentation"] = _structured_view(
                     json.dumps(turn["answer"], sort_keys=True), identity,
+                    json.dumps(turn.get("step_precedent_evidence", {}), sort_keys=True),
                 )
                 references = tuple(
                     (source["artifact_ref"], source["title"], source["url"] or source["artifact_url"])
@@ -222,7 +223,7 @@ def _route_overview(steps: list[dict[str, Any]]) -> str:
 
 
 @lru_cache(maxsize=32)
-def _structured_view(payload: str, identity: str) -> dict[str, Any]:
+def _structured_view(payload: str, identity: str, precedent_payload: str = "{}") -> dict[str, Any]:
     """Produce disposable structure/route SVGs from explicit answer objects."""
     raw = json.loads(payload)
     try:
@@ -242,7 +243,9 @@ def _structured_view(payload: str, identity: str) -> dict[str, Any]:
         except (ValueError, RuntimeError):
             molecule["drawing_status"] = "invalid_or_unsupported_notation"
     steps = {item["id"]: item for item in view["steps"]}
+    precedent_evidence = json.loads(precedent_payload)
     for step in steps.values():
+        step["supporting_evidence"] = _supporting_evidence(precedent_evidence.get(step["id"], []), identity)
         step["reaction_smiles"] = (
             ".".join(molecules[key]["smiles"] for key in step["reactant_ids"])
             + ">>" + ".".join(molecules[key]["smiles"] for key in step["product_ids"])
@@ -270,3 +273,30 @@ def _structured_view(payload: str, identity: str) -> dict[str, Any]:
     for source in view["sources"]:
         source["artifact_url"] = f"/api/v1/scientific/conversations/{identity}/artifacts/{source['artifact_ref']}"
     return view
+
+
+def _supporting_evidence(records: list[dict[str, Any]], identity: str) -> list[dict[str, Any]]:
+    """Render server-resolved inspection records; never accept agent-authored source cards."""
+    output = json.loads(json.dumps(records))
+    for record in output:
+        record["artifact_url"] = f"/api/v1/scientific/conversations/{identity}/artifacts/{record['artifact_ref']}"
+        for precedent in record.get("precedents", []):
+            try:
+                with rdBase.BlockLogs():
+                    svg = render_reaction_image_bytes(precedent["reaction_smiles"], image_format="svg",
+                                                      render_preset="web_consistent")
+                precedent["image_url"] = _svg_url(svg)
+                precedent["scheme_width"] = float(ET.fromstring(svg).get("width").removesuffix("px"))
+                precedent["drawing_status"] = "drawn"
+            except (ValueError, RuntimeError):
+                precedent["drawing_status"] = "invalid_or_unsupported_notation"
+            reference = precedent.get("reference_record") or {}
+            precedent["reference_title"] = (reference.get("normalized_citation") or reference.get("raw_reference")
+                                             or reference.get("patent_number") or reference.get("doi")
+                                             or "Publication details unavailable")
+            precedent["reference_url"] = None
+            if reference.get("doi"):
+                precedent["reference_url"] = "https://doi.org/" + quote(reference["doi"], safe="/")
+            elif reference.get("patent_number"):
+                precedent["reference_url"] = "https://patents.google.com/patent/" + quote(reference["patent_number"], safe="")
+    return output

@@ -138,6 +138,35 @@ def fragment_embeddings(
     return tuple(matches[:maximum]), len(matches) > maximum
 
 
+@dataclass(frozen=True)
+class FragmentTargetValidation:
+    """Target membership under the exact corpus query semantics, not feasibility."""
+
+    target_smiles: str
+    query_id: str
+    matches_target: bool
+    definition_version: str
+    compiler_version: str
+    schema_version: str = "fragment_target_validation.v1"
+
+
+def validate_fragment_target(query: FragmentQuery, target_smiles: str) -> FragmentTargetValidation:
+    """Check the target with the same stereo and topology rules as corpus hits.
+
+    A mismatch is evidence about the query, not absence from the corpus. No query
+    relaxation or atom correspondence is inferred.
+    """
+    if not isinstance(target_smiles, str) or not target_smiles.strip():
+        raise ValueError("Provide one connected target SMILES")
+    canonical, _ = indexed_product(target_smiles)
+    molecule = Chem.MolFromSmiles(canonical)
+    if len(Chem.GetMolFrags(molecule)) != 1:
+        raise ValueError("Provide one connected target SMILES")
+    matches, _ = fragment_embeddings(query, molecule, maximum=1)
+    return FragmentTargetValidation(canonical, query.query_id, bool(matches),
+                                    query.definition_version, query.compiler_version)
+
+
 def indexed_product(smiles: str) -> tuple[str, tuple[int, ...]]:
     """Normalize maps away, preserving canonical-index -> original-index identity."""
     mol = Chem.MolFromSmiles(smiles)

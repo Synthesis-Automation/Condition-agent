@@ -189,7 +189,14 @@ class _Projection:
 def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection) -> dict[str, Any]:
     path = "$.result"
     summary = view.pick(value, _COMMON, path)
-    if operation == "analyze_molecule":
+    if operation == "inspect_step_precedents":
+        summary.update(view.pick(value, ("selection", "scope", "saved_match_count", "available_template_records",
+                                         "retrieval_truncated", "page", "distinct_references_on_page",
+                                         "assessment_status", "assessment_warnings"), path))
+        view.add_list(summary, value, "precedents", ("match_id", "reaction_id", "reference_id", "reaction_smiles",
+                      "support_kind", "product_similarity", "precursor_similarity", "same_recorded_product",
+                      "same_recorded_precursors", "product_comparison", "limitations"), path)
+    elif operation == "analyze_molecule":
         summary.update(view.pick(value, (
             "canonical_smiles", "component_count", "atom_count", "heavy_atom_count", "formal_charge",
         ), path))
@@ -358,7 +365,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         summary.update(view.pick(value, (
             "search_status", "stop_reason", "query", "index_id", "source_scope", "source_coverage_complete",
             "counts", "relationship_groups", "group_count_scope", "ranking_scope", "returned_count",
-            "refinement_hints", "output_truncated",
+            "refinement_hints", "output_truncated", "target_validation",
         ), path))
         view.add_list(summary, value, "hits", (
             "hit_id", "observation_id", "reaction_id", "reference_id", "relationships",
@@ -452,7 +459,27 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
     if "warnings" in source and source["warnings"] in ([], ()):
         # Keep the existing root-level warning contract for workspace clients.
         overview["warnings"] = []
-    if operation == "analyze_molecule":
+    if operation == "inspect_step_precedents":
+        overview.update(_brief_fields(source, ("scope", "saved_match_count", "available_template_records",
+                                              "retrieval_truncated", "page", "distinct_references_on_page",
+                                              "observation_page", "reference_catalog_status", "procedure_catalog_status",
+                                              "assessment_status", "assessment_warnings")))
+        overview["selection"] = _brief_fields(source.get("selection", {}), (
+            "step_id", "realization_id", "target_smiles", "precursor_smiles",
+        ))
+        overview["precedents"] = [_brief_fields(item, (
+            "match_id", "reaction_id", "reference_id", "reaction_smiles", "support_kind",
+            "product_similarity", "precursor_similarity", "same_recorded_product", "same_recorded_precursors",
+            "limitations",
+        )) for item in source.get("precedents", [])[:3]]
+        for brief, item in zip(overview["precedents"], source.get("precedents", [])):
+            brief["product_comparison"] = _brief_fields(item.get("product_comparison", {}), (
+                "status", "same_constitution", "stereo_relationship", "left_coverage", "right_coverage",
+                "alignment_ambiguous", "search_timed_out", "warnings",
+            ))
+            brief["observation_count"] = len(item.get("observations", []))
+            brief["procedure_count"] = len(item.get("procedures", []))
+    elif operation == "analyze_molecule":
         overview.update(_brief_fields(source, ("formal_charge", "stereocenters")))
         for key, fields in (("motifs", ("motif_id", "chemist_label")),
                             ("reactive_sites", ("chemist_label", "availability", "warnings"))):
@@ -515,6 +542,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                 item["representative"] = _brief_fields(strategy["representative"], (
                     "realization_id", "precursor_smiles", "forward_validation_status",
                     "precursor_compatibility_disposition", "reaction_compatibility_disposition",
+                    "template_id", "operator_id", "precedent_reaction_ids",
                 ))
                 warnings = strategy["representative"].get("selectivity_warnings", [])
                 if warnings:
@@ -637,6 +665,11 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         ]
     elif operation == "search_fragment_precedents":
         overview.update(_brief_fields(source, ("counts", "refinement_hints", "output_truncated")))
+        if isinstance(source.get("target_validation"), Mapping):
+            overview["target_validation"] = _brief_fields(source["target_validation"], (
+                "matches_target", "target_smiles", "query_id", "schema_version",
+                "definition_version", "compiler_version",
+            ))
         if isinstance(source.get("query"), Mapping):
             overview["query"] = _brief_fields(source["query"], ("expression", "query_format", "topology", "query_id"))
         overview["hits"] = [
