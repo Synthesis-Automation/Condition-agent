@@ -132,6 +132,11 @@ multiple unchanged summaries or re-running a tool just to retrieve its detail.
 Paths select literal JSON keys and list indices; next_offset continues a selected page.
 Full results remain in artifacts, accessible through w.store.read_artifact. Read selected
 fields for custom analysis; do not dump whole analyses, manifests or route trees to stdout.
+Route assessment files may use a compact storage envelope with linked evidence
+sections. Use w.store.read_artifact(ref) for the original complete result, or
+w.inspect_artifact for a bounded field; do not assume raw JSON files have the
+expanded result shape. The store verifies and reconstructs linked sections.
+Cite the parent scientific-call ref, not an internal storage-section ref.
 This prompt, operation catalogue and optional task guide are the starting reference.
 For an unresolved usage question, read only the relevant section of
 {repository / 'docs/AI-native/readme.md'}. Do not read the README or answer-schema.json
@@ -780,9 +785,9 @@ class ConversationService:
         items = [json.loads(path.read_text("utf-8")) for path in self.root.glob("*/conversation.json")]
         return sorted(items, key=lambda item: item["created_at"], reverse=True)
 
-    def artifact(self, conversation_id: str, reference: str) -> Any:
-        """Read a checksum-verified evidence artifact scoped to this conversation."""
-        return ScientificWorkspace(self._directory(conversation_id)).store.read_artifact(reference)
+    def artifact(self, conversation_id: str, reference: str, *, expanded: bool = False) -> Any:
+        """Read verified compact evidence, optionally restoring the full payload."""
+        return ScientificWorkspace(self._directory(conversation_id)).store.read_artifact(reference, expanded=expanded)
 
     def debug_log(self, conversation_id: str, turn_id: str) -> bytes:
         """Snapshot complete debug-log lines while the worker may still append."""

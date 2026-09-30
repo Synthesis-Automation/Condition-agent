@@ -2,6 +2,33 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+New route assessments use lossless compact artifact storage when large diagnostic
+sections are present. `scientific_artifact_storage.v1` wraps the call/replay payload
+and identifies linked sections by literal JSON paths. Operator template-ID lists,
+reaction signatures and per-molecule audits of at least 2 KiB move to immutable
+`scientific_evidence_section.v1` artifacts; repeated identical sections share one
+file within the investigation. Small records remain plain JSON. Structures, gates,
+warnings, uncertainty and selected precedent reactions remain in the main payload.
+
+`store.read_artifact(ref)` reconstructs the exact original scientific result and
+verifies both section hashes and the complete expanded-payload hash. Existing
+inspection, route revision, answer validation and replay use this expanded view.
+`store.read_artifact(ref, expanded=False)` returns the stored compact representation
+while still validating its linked evidence. Existing plain artifacts are unchanged
+and readable. Copy the investigation's complete `artifacts/` directory when archiving;
+a compact root file alone does not contain all its evidence. Scientific citations
+continue to reference the parent call, not internal storage sections.
+
+The web artifact endpoint defaults to the stored representation; append
+`?expanded=true` for the original full JSON. A marker's `artifact_ref` can be read
+through the same conversation-scoped endpoint to inspect just that section (its
+data is under `value`). API clients needing the previous expanded response shape
+must request `expanded=true` for new compact records. Scientific result and dataset
+schemas are unchanged. No dataset rebuild or historical-file migration is needed.
+Restart the server and start a new investigation after the code change; existing
+saved conversations remain viewable. Compaction reduces repeated storage and response
+size; it does not skip scientific computation or integrity verification.
+
 [Fragment precedent search](Fragment_Precedent_Search_Design.md) is available as
 an optional workspace operation over a prepared local index. It finds product
 cores, distinguishes supported construction from retention, and preserves

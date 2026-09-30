@@ -127,8 +127,22 @@ class InvestigationStore:
         finally:
             lock.unlink()
 
-    def read_artifact(self, reference: str) -> Any:
-        """Read and verify a content-addressed artifact; reject path-like references."""
+    def read_artifact(self, reference: str, *, expanded: bool = True) -> Any:
+        """Read verified evidence, reconstructing compact route records by default.
+
+        ``expanded=False`` returns the stored representation for compact transport.
+        Existing plain artifacts retain their original representation in both modes.
+        """
+        from .artifact_storage import expand_route_artifact
+
+        stored = self._read_stored_artifact(reference)
+        # Compact reads still verify linked evidence; missing/corrupt sections must
+        # never make a scientifically incomplete assessment appear intact.
+        restored = expand_route_artifact(stored, self._read_stored_artifact)
+        return restored if expanded else stored
+
+    def _read_stored_artifact(self, reference: str) -> Any:
+        """Verify bytes before parsing a single artifact, without following links."""
         if not re.fullmatch(r"sha256:[0-9a-f]{64}", reference):
             raise ValueError("Invalid artifact reference")
         digest = reference.split(":", 1)[1]
@@ -157,12 +171,23 @@ class InvestigationStore:
         self, kind: str, value: Any, *, evidence_refs: tuple[str, ...] = (),
     ) -> InvestigationEvent:
         """Atomically append an event whose evidence and complete payload are retrievable."""
+        from .artifact_storage import compact_route_artifact
+
+        value, sections = compact_route_artifact(kind, json.loads(canonical_bytes(value)))
         data = canonical_bytes(value)
         digest = hashlib.sha256(data).hexdigest()
         with self._writer():
             for reference in evidence_refs:
                 self.read_artifact(reference)
             events = self.events()
+            # Write immutable sections before publishing their root/event. A failed
+            # write may leave an unreferenced section, never a half-published call.
+            for reference, section in sections.items():
+                section_path = self.root / "artifacts" / f"{reference.split(':', 1)[1]}.json"
+                if section_path.exists():
+                    self._read_stored_artifact(reference)
+                else:
+                    _write_json(section_path, section)
             artifact_path = self.root / "artifacts" / f"{digest}.json"
             if not artifact_path.exists():
                 _write_json(artifact_path, value)

@@ -124,10 +124,10 @@ def create_scientific_router(service: ConversationService) -> APIRouter:
             raise failure(exc) from exc
 
     @router.get("/api/v1/scientific/conversations/{identity}/artifacts/{reference}")
-    def artifact(identity: str, reference: str, request: Request) -> Any:
+    def artifact(identity: str, reference: str, request: Request, expanded: bool = False) -> Any:
         guard(request)
         try:
-            return service.artifact(identity, reference)
+            return service.artifact(identity, reference, expanded=expanded)
         except (ValueError, FileNotFoundError) as exc:
             raise failure(exc) from exc
 

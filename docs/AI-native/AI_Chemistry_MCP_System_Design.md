@@ -24,6 +24,14 @@ assessors. The workspace does not expose the built-in automatic multistep planne
 Branch selection, alternatives, evidence and stopping decisions belong to the agent;
 chemical validation remains in the scientific packages.
 
+Large route-assessment results use a versioned, lossless storage projection.
+The main artifact retains decisions, checks, uncertainty and selected precedents;
+large template-membership lists, reaction signatures and molecule audits are stored
+once as hash-addressed evidence sections. The workspace reconstructs and verifies
+the original result for scientific readers and replay. Storage identity and the
+expanded scientific-payload identity are recorded separately, and existing plain
+artifacts remain readable. This keeps file-size optimization outside domain chemistry.
+
 Route-step precedent inspection is shared between the agent and its web view.
 `inspect_step_precedents` resolves a selected saved realization or assessed step
 through the existing template library and optional baseline-pinned source catalogs.
