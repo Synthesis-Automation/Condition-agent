@@ -90,7 +90,16 @@ def capture_baseline(
         ["git", "status", "--porcelain"], cwd=repository, text=True,
         capture_output=True, check=True,
     ).stdout.splitlines()
-    identities = {name: artifact_identity(path) for name, path in artifacts.items()}
+    paths = dict(artifacts)
+    if "weak_label_records" in paths:
+        from condition_recommender import weak_label_recipe_catalog_path
+
+        catalog = weak_label_recipe_catalog_path(paths["weak_label_records"]).resolve()
+        configured = paths.get("weak_label_recipe_catalog", catalog).resolve()
+        if configured != catalog:
+            raise ValueError("weak_label_recipe_catalog must be the catalog beside weak_label_records")
+        paths["weak_label_recipe_catalog"] = catalog
+    identities = {name: artifact_identity(path) for name, path in paths.items()}
     for value in identities.values():
         path = Path(value["path"])
         if value["status"] == "present" and path.suffix == ".sqlite":

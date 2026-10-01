@@ -142,6 +142,26 @@ index is selected by `fragment_index` inside the `--chat-artifacts` JSON file.
 After changing datasets or the configuration, restart the server and start a
 new conversation so its investigation records the new baseline.
 
+Condition screening is available directly in the agent conversation. For example:
+
+> Generate 96 diverse weak-label screening recipes for
+> `Brc1ccccc1.CN>>CNc1ccccc1`. Preserve full recipes, source IDs and missing
+> values, and export JSON plus a CSV review table.
+
+The built-in `generate_weak_label_screening_array` operation supports 1–250
+recipes (default 24), returning fewer when the compatible recipe pool is smaller.
+The default artifact configuration includes
+`"weak_label_records": "datasets/weak_label/v2.1_cleaned.csv"`; custom configurations
+must include this entry to enable screening. Its sibling
+`v2.1_cleaned.condition_recipes.jsonl.gz` is automatically recorded and checked
+in the investigation baseline. Screening works without the structural condition
+indexes. Queries require a graph-supported transformation; source reaction
+structures remain unverified, and historical yields are not yield predictions.
+Keep these suggestions separate from the agent's structural recommendations.
+
+After updating the code or artifact configuration, restart the agent server and
+start a new conversation. Existing investigations retain their frozen baseline.
+
 Conversations, investigation artifacts and per-turn `progress.jsonl` debugging
 logs are saved under `results/ai_native/conversations` by default. The agent
 server supports loopback hosts only; keep the default `127.0.0.1`.

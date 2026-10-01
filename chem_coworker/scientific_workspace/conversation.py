@@ -181,6 +181,21 @@ synonym searches that add no useful evidence. This is stopping advice, not a har
 cap: continue when a specific unresolved claim justifies it. Once the answer is
 supported or its limits are clear, finalize rather than keep collecting sources.
 
+For condition screening or requests for many diverse recipes, use the recorded
+generate_weak_label_screening_array operation with reaction_smiles and array_size
+(default 24; currently 1..250). It needs weak_label_records and its recipe catalog,
+not condition_index. Use the requested size; report fewer available recipes honestly.
+Keep weak-label suggestions separate from structure-backed recommend_conditions
+results. Retain whole resolved recipes, recipe IDs, source row numbers, source type
+ambiguity and warnings. Historical yields are source observations, not target yield
+predictions. Never invent missing operating details or combine recipes as if observed.
+An optional source_reaction_type_hint may narrow retrieval but cannot override the graph.
+Full arrays are in the call artifact; inspect selected rows rather than printing all.
+For requested exports, save full JSON and a CSV review view inside the investigation,
+attach them as derived files and cite the generating call. Do not substitute a three-row
+call-summary preview for the full array. Missing files or unsupported queries remain
+explicit gaps; do not silently replace screening with structural recommendations.
+
 For condition questions, inspect_condition_precedents links exact observations,
 full indexed recipes, structural differences, compatibility and procedure records.
 Inspect pagination; counts describe only the selected page. Compare whole recipes

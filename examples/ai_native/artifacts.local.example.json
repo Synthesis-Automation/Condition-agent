@@ -1,6 +1,7 @@
 {
   "condition_index": "datasets/literature/compact/generic_index.sqlite",
   "shared_core_index": "datasets/literature/compact/generic_index.shared_core.sqlite",
+  "weak_label_records": "datasets/weak_label/v2.1_cleaned.csv",
   "procedure_catalog": "datasets/literature/compact/experimental_detail_catalog.jsonl.gz",
   "reference_catalog": "datasets/literature/compact/reference_catalog.jsonl.gz",
   "fragment_index": "results/ai_native/indexes/fragment_precedents.sqlite",

@@ -29,6 +29,31 @@ Use `resolve_recipe` and `assess_recipe` for identity and compatibility;
 `propose_condition_adaptation` records a complete proposed recipe, changed fields,
 reasons, assumptions and risks separately from its source observation.
 
+For a diverse screening panel, use the built-in recorded operation:
+
+```python
+panel = w.run("generate_weak_label_screening_array", {
+    "reaction_smiles": reaction_smiles, "array_size": 96,
+})
+```
+
+It returns up to the requested number of distinct intact recipes (default 24,
+currently maximum 250) after graph-derived query and compatibility checks. It
+requires `weak_label_records`; baseline capture also pins the sibling recipe
+catalog. It does not require either structural condition index. An optional
+`source_reaction_type_hint` can narrow supported labels, but contradictory labels
+are rejected. Unsupported transformations and missing datasets remain explicit.
+
+These are weak-label screening suggestions: source reaction structures are not
+verified, and historical yields do not predict this query's yield. Cite recipe
+IDs, source row numbers and the call artifact; preserve warnings, ambiguous source
+types, missing values and complete recipes. Do not pass weak-label row numbers to
+`get_precedents` or `get_procedures`, which query the structural corpus. Report
+shortfalls when fewer compatible recipes exist. The full array remains under
+`result.recommendations` in the call artifact; summaries show only a preview.
+For requested JSON/CSV exports, read the full artifact, save inside the
+investigation and attach the files with the generating call as evidence.
+
 If direct source retrieval fails, inspect available primary sources with the browser.
 Preserve actual visible text with `w.capture_source(text, url=url, locator=locator)`
 and exact supporting passages with `w.record_source_excerpt`. This is agent-supplied

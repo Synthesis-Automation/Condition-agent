@@ -250,6 +250,21 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
                                        "suspected_insufficient_reactant_multiplicity", "product_heavy_atom_coverage")),
         ):
             view.add_nested(summary, value, key, fields, path)
+    elif operation == "generate_weak_label_screening_array":
+        summary.update(view.pick(value, (
+            "recommendation_mode", "reaction_type_id", "reaction_type_hint_id",
+            "source_reaction_type_candidates", "candidate_count", "compatible_candidate_count",
+            "excluded_candidate_count", "recipe_count",
+        ), path))
+        summary["recommendation_count"] = len(value.get("recommendations", []))
+        view.add_list(summary, value, "query_participants", (
+            "role", "signature", "display_label",
+        ), path)
+        view.add_list(summary, value, "recommendations", (
+            "rank", "recipe_id", "support", "source_reaction_types", "source_row_numbers",
+            "source_matches", "compatibility_score", "compatibility_evidence",
+            "historical_yield_pct", "cautions", "explanation",
+        ), path, limit=3)
     elif operation == "recommend_conditions":
         summary.update(view.pick(value, (
             "recommendation_mode", "retrieval_level", "search_scope", "candidate_count",
@@ -592,6 +607,24 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             overview["material_constraints"] = _brief_fields(source["material_constraints"], (
                 "status", "stock_availability", "unavailable_starting_materials",
             ))
+    elif operation == "generate_weak_label_screening_array":
+        overview.update(_brief_fields(source, (
+            "recommendation_mode", "reaction_type_id", "source_reaction_type_candidates",
+            "recipe_count", "excluded_candidate_count",
+        )))
+        recommendations = source.get("recommendations", [])
+        overview["recommendation_count"] = len(recommendations)
+        overview["recommendations"] = []
+        for item in recommendations[:3]:
+            if not isinstance(item, Mapping):
+                continue
+            compact = _brief_fields(item, (
+                "rank", "recipe_id", "support", "source_reaction_types", "source_row_numbers",
+                "compatibility_score", "cautions",
+            ))
+            if isinstance(item.get("resolved_recipe"), Mapping):
+                compact["recipe"] = _brief_recipe(item["resolved_recipe"])
+            overview["recommendations"].append(compact)
     elif operation == "recommend_conditions":
         recommendations = source.get("recommendations", [])
         overview["recommendation_count"] = len(recommendations)

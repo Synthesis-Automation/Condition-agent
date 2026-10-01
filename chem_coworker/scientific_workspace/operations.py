@@ -17,6 +17,7 @@ class ScientificOperations:
 
     NAMES = (
         "analyze_reaction", "analyze_molecule", "recommend_conditions",
+        "generate_weak_label_screening_array",
         "compare_molecules", "inspect_reactive_sites",
         "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
         "search_fragment_precedents", "suggest_search_fragments",
@@ -106,6 +107,34 @@ class ScientificOperations:
             raise ValueError("top_k must be an integer between 1 and 50")
         return self._conditions().recommend(
             reaction_smiles, top_k=top_k, search_scope=search_scope,
+        )
+
+    def generate_weak_label_screening_array(
+        self, reaction_smiles: str, array_size: int = 24,
+        source_reaction_type_hint: str | None = None,
+    ) -> Any:
+        """Select diverse intact weak-label recipes for screening, with unverified-source warnings.
+
+        Requires baseline-pinned weak_label_records and weak_label_recipe_catalog,
+        but no structural condition index. The query must have verified graph edits.
+        Returns up to array_size recipes, not predicted yields or invented mixtures.
+        An optional source type may narrow retrieval only when consistent with the graph.
+        """
+        from condition_recommender import (
+            generate_weak_label_screening_array, load_weak_label_retrieval_rules,
+            weak_label_recipe_catalog_path,
+        )
+
+        limit = int(load_weak_label_retrieval_rules()["screening_candidate_limit"])
+        if type(array_size) is not int or not 1 <= array_size <= limit:
+            raise ValueError(f"array_size must be an integer between 1 and {limit}")
+        records = self._path("weak_label_records")
+        catalog = self._path("weak_label_recipe_catalog")
+        if catalog != weak_label_recipe_catalog_path(records).resolve():
+            raise ValueError("weak_label_recipe_catalog must be the catalog beside weak_label_records")
+        return generate_weak_label_screening_array(
+            reaction_smiles, records_path=records, array_size=array_size,
+            source_reaction_type_hint=source_reaction_type_hint,
         )
 
     def get_precedents(

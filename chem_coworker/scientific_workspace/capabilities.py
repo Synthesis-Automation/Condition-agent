@@ -46,6 +46,13 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
         "fragment_suggestions": {
             "status": "implemented", "requires_index": False, "automatic_search": False,
         },
+        "weak_label_screening": {
+            "status": "implemented",
+            "operation": "generate_weak_label_screening_array",
+            "required_artifacts": ["weak_label_records", "weak_label_recipe_catalog"],
+            "content_validation": "checked_on_call", "requires_condition_index": False,
+            "source_structures_verified": False,
+        },
         "molecular_inspection": {
             "status": "implemented", "requires_index": False,
             "operations": ["compare_molecules", "inspect_reactive_sites"],
