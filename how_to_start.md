@@ -179,6 +179,19 @@ Omit `--build` on subsequent starts when the frontend has not changed.
   alone is not the web dependency set.
 - **Agent runtime unavailable:** check the native executable and its
   authentication, or use `--codex` to select it explicitly.
+- **Agent exits with a model rejection:** open the failed turn's details. The
+  runtime now reports the provider error from `runtime.jsonl`, even when stderr
+  is empty. An older CLI can reject a model selected in your desktop Codex
+  configuration. Restart with a current native executable using `--codex`, or
+  explicitly choose a model supported by that CLI's login, for example:
+
+  ```powershell
+  python -m app.web_api --scientific-chat --port 8011 --agent-model gpt-6-sol
+  ```
+
+  Model availability depends on the account and provider. The adapter does not
+  automatically substitute another model. After a code update, start a new
+  investigation to record the current baseline.
 
 List all startup options:
 

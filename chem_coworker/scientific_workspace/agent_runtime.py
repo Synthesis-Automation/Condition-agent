@@ -111,6 +111,24 @@ def _stop_process(process: subprocess.Popen[Any]) -> None:
     process.wait(timeout=15)
 
 
+def _runtime_error_message(value: Any) -> str:
+    """Extract a bounded message from CLI errors, including encoded provider JSON."""
+    for _ in range(6):
+        if isinstance(value, dict):
+            value = value.get("error") or value.get("message")
+        elif isinstance(value, str):
+            try:
+                decoded = json.loads(value)
+            except json.JSONDecodeError:
+                return value.strip()[:2000]
+            if not isinstance(decoded, dict):
+                return value.strip()[:2000]
+            value = decoded
+        else:
+            return ""
+    return value.strip()[:2000] if isinstance(value, str) else ""
+
+
 class CodexRuntime:
     """Use Codex's tool loop and saved thread, rather than implement an LLM planner."""
 
@@ -138,6 +156,7 @@ class CodexRuntime:
             settings = resolve_research_profile(timeout_seconds=self.timeout_seconds)
         return {
             "runtime": "codex_exec", "version": getattr(self, "version", "unreported"),
+            "executable": getattr(self, "executable", None),
             "model": model or "Codex configuration default",
             "sandbox": "workspace-write", "timeout_seconds": self.timeout_seconds,
             "authentication": "existing Codex login; checked when a turn runs",
@@ -208,6 +227,9 @@ class CodexRuntime:
         runtime_thread = thread_id
         pending = ""
         observed_items: dict[str, dict[str, Any]] = {}
+        failure_detail = ""
+        event_error = ""
+        item_error = ""
         process_options = _hidden_process_options()
         if os.name != "nt":
             process_options["start_new_session"] = True
@@ -246,6 +268,8 @@ class CodexRuntime:
                                     **observed_items.get(identity, {}), **item,
                                     "last_event_type": event["type"],
                                 }
+                            if item.get("type") == "error":
+                                item_error = _runtime_error_message(item) or item_error
                         on_event(event)
                         if event.get("type") == "thread.started":
                             runtime_thread = event.get("thread_id")
@@ -254,6 +278,9 @@ class CodexRuntime:
                             usage = event.get("usage", {})
                         elif event.get("type") == "turn.failed":
                             failed = True
+                            failure_detail = _runtime_error_message(event) or failure_detail
+                        elif event.get("type") == "error":
+                            event_error = _runtime_error_message(event) or event_error
                     if exit_code is not None:
                         break
                     if monotonic() - last_heartbeat >= 1:
@@ -279,6 +306,9 @@ class CodexRuntime:
                     "elapsed_seconds": round(monotonic() - started, 3),
                     "process_exit_code": process.returncode,
                     "turn_completed_event": completed, "turn_failed_event": failed,
+                    "runtime_error": failure_detail or event_error or (
+                        item_error if process.returncode or not completed else None
+                    ),
                     "tool_events": counts,
                     "limitations": [
                         "Counts reflect unique tool item IDs in observed JSONL events, not successful scientific checks.",
@@ -288,7 +318,18 @@ class CodexRuntime:
                     ],
                 }, indent=2), "utf-8")
         if process.returncode or failed or not completed or not runtime_thread:
-            detail = stderr_path.read_text("utf-8", errors="replace")[-2000:]
-            raise RuntimeError(f"Codex turn did not complete (exit {process.returncode}). {detail}")
+            detail = failure_detail or event_error or item_error or stderr_path.read_text(
+                "utf-8", errors="replace",
+            )[-2000:].strip()
+            message = f"Codex turn did not complete (exit {process.returncode})."
+            if detail:
+                message += f" {detail}"
+            if "model" in detail.lower() and "not supported" in detail.lower():
+                message += (
+                    " Restart the scientific-chat server with --agent-model MODEL_ID"
+                    " available to this Codex login, or use --codex PATH to select"
+                    " a CLI that supports the requested model."
+                )
+            raise RuntimeError(message)
         answer = load_answer_handoff(workspace, turn_directory, thread_id=runtime_thread, usage=usage)
         return AgentResult(answer, runtime_thread, usage)

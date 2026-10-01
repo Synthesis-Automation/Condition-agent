@@ -180,3 +180,65 @@ def test_real_process_failure_is_not_reclassified_as_answer_correction(tmp_path)
     with pytest.raises(RuntimeError, match="exit 3") as caught:
         submit(runtime, tmp_path, attempt)
     assert not isinstance(caught.value, AnswerSubmissionError)
+
+
+@pytest.mark.parametrize("encoded,exit_code", [(False, 1), (True, 1), (True, 0)])
+def test_failed_turn_surfaces_provider_reason_when_stderr_is_empty(tmp_path, encoded, exit_code):
+    reason = "The 'requested-model' model is not supported when using Codex with a ChatGPT account."
+    provider_error = {"type": "error", "status": 400,
+                      "error": {"type": "invalid_request_error", "message": reason}}
+    detail = json.dumps(provider_error) if encoded else provider_error
+    events = [
+        {"type": "item.completed", "item": {"id": "warning", "type": "error",
+                                             "message": "Model metadata not found."}},
+        {"type": "error", "message": "Earlier connection error"},
+        {"type": "turn.failed", "error": detail},
+    ]
+    # No trailing newline: the final error must still be consumed on process exit.
+    runtime, attempt = fake_runtime(
+        tmp_path, f"sys.stdout.write({''.join(json.dumps(e) + chr(10) for e in events).rstrip()!r})\n"
+        f"sys.exit({exit_code})",
+    )
+    with pytest.raises(RuntimeError) as caught:
+        submit(runtime, tmp_path, attempt)
+    assert not isinstance(caught.value, AnswerSubmissionError)
+    assert reason in str(caught.value)
+    assert "--agent-model MODEL_ID" in str(caught.value)
+    assert "Earlier connection error" not in str(caught.value)
+    assert "Model metadata not found" not in str(caught.value)
+    assert (attempt / "runtime.stderr.txt").read_text("utf-8") == ""
+    observed = json.loads((attempt / "runtime-observations.json").read_text("utf-8"))
+    assert observed["runtime_error"] == reason
+
+
+@pytest.mark.parametrize("event,reason", [
+    ({"type": "error", "message": "Authentication required"}, "Authentication required"),
+    ({"type": "item.completed", "item": {"id": "failure", "type": "error",
+                                          "message": "Invalid configuration"}}, "Invalid configuration"),
+])
+def test_exit_without_failed_turn_uses_jsonl_error(tmp_path, event, reason):
+    runtime, attempt = fake_runtime(
+        tmp_path, f"print({json.dumps(event)!r})\nsys.exit(1)",
+    )
+    with pytest.raises(RuntimeError, match=reason) as caught:
+        submit(runtime, tmp_path, attempt)
+    assert "--agent-model" not in str(caught.value)
+
+
+def test_failure_without_jsonl_reason_keeps_stderr_diagnostic(tmp_path):
+    runtime, attempt = fake_runtime(tmp_path, "sys.stderr.write('Unable to load configuration')\nsys.exit(2)")
+    with pytest.raises(RuntimeError, match="Unable to load configuration"):
+        submit(runtime, tmp_path, attempt)
+
+
+def test_success_with_metadata_warning_remains_successful(tmp_path):
+    warning = {"type": "item.completed", "item": {"id": "warning", "type": "error",
+                                                "message": "Model metadata not found"}}
+    runtime, attempt = fake_runtime(
+        tmp_path, f"print({json.dumps(warning)!r})\n"
+        + write_output("answer-draft.json", json.dumps(ANSWER))
+        + write_output("agent-final.json", json.dumps(HANDOFF)),
+    )
+    assert submit(runtime, tmp_path, attempt).answer == ANSWER
+    observed = json.loads((attempt / "runtime-observations.json").read_text("utf-8"))
+    assert observed["runtime_error"] is None

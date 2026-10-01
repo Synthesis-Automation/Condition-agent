@@ -362,6 +362,31 @@ print(json.dumps({"type": "turn.completed", "usage": {"output_tokens": 20}}), fl
     assert len(turn["answer"]["attempt_usage"]) == 2
 
 
+def test_provider_model_rejection_reaches_conversation_api(service: ConversationService) -> None:
+    reason = "The 'requested-model' model is not supported when using Codex with a ChatGPT account."
+    event = {"type": "turn.failed", "error": {"message": json.dumps({
+        "type": "error", "status": 400, "error": {"message": reason},
+    })}}
+    script = service.root.parent / "rejected_model_runtime.py"
+    script.write_text(
+        f"import sys\nprint({json.dumps(event)!r})\nsys.exit(1)\n", "utf-8",
+    )
+    runtime = object.__new__(CodexRuntime)
+    runtime.model, runtime.timeout_seconds = "requested-model", 10
+    runtime.command = lambda *_: [sys.executable, str(script)]
+    service.runtime = runtime
+    identity = service.submit("Investigate the target")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "failed"
+    assert "answer" not in turn and "repair_attempts" not in turn
+    client = TestClient(create_app(runtime=object(), scientific_service=service,
+                                  recommendation_only=False), base_url="http://127.0.0.1")
+    response = client.get(f"/api/v1/scientific/conversations/{identity}")
+    assert response.status_code == 200
+    error = response.json()["turns"][-1]["error"]["message"]
+    assert reason in error and "--agent-model MODEL_ID" in error
+
+
 def test_cancellation_preserves_conversation_and_prevents_concurrent_turns(service: ConversationService) -> None:
     service.runtime = RecordedRuntime(wait=True)
     identity = service.submit("Wait for additional evidence")["conversation_id"]

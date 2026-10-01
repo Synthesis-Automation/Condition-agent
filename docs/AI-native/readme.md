@@ -340,6 +340,13 @@ Requirements and configuration:
   binary. Windows `.cmd`, `.bat`, and `.ps1` shims are not launched through a shell.
 - The model defaults to local Codex configuration. Override it using
   `--agent-model MODEL_ID` only with a model available to your account/provider.
+  The desktop and a separately installed CLI can have different model support.
+  If the provider rejects the inherited model, restart with a current executable
+  using `--codex`, or specify a supported model with `--agent-model`.
+  Failed turns retain the provider's JSONL error in their public error message
+  and `runtime-observations.json`; stderr is used when no JSONL reason exists.
+  `runtime-request.json` records the selected executable and version. The
+  adapter never retries a provider rejection with a different model.
 - `--chat-artifacts FILE` selects the data configuration. The default is
   [artifacts.local.example.json](../../examples/ai_native/artifacts.local.example.json).
   Missing datasets are recorded, and dependent calls fail explicitly.
