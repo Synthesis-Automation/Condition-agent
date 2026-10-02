@@ -259,7 +259,7 @@ further work with current code. Those edge cases are covered by regression tests
 
 ### Structured-answer milestone
 
-New turns must return the versioned answer contract from `answer_contracts.py`.
+New turns must return the versioned answer contract from `answers/answer_contracts.py`.
 Reported and computed labels require source IDs; computed statements require a
 completed local call or replay. External sources require a saved excerpt attachment,
 URL and locator. References are checked across all structured fields, including

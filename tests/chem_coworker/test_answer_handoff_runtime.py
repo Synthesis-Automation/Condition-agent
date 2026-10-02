@@ -10,9 +10,13 @@ from threading import Event
 
 import pytest
 
-from chem_coworker.scientific_workspace.agent_runtime import AnswerSubmissionError, CodexRuntime
-from chem_coworker.scientific_workspace.answer_contracts import ANSWER_SCHEMA
-from chem_coworker.scientific_workspace.answer_handoff import ANSWER_HANDOFF_SCHEMA, ANSWER_HANDOFF_VERSION
+from chem_coworker.scientific_workspace.answers.answer_handoff import AnswerSubmissionError
+from chem_coworker.scientific_workspace.runtime.agent_runtime import CodexRuntime
+from chem_coworker.scientific_workspace.answers.answer_contracts import ANSWER_SCHEMA
+from chem_coworker.scientific_workspace.answers.answer_handoff import (
+    ANSWER_HANDOFF_SCHEMA,
+    ANSWER_HANDOFF_VERSION,
+)
 
 
 HANDOFF = {"schema_version": ANSWER_HANDOFF_VERSION, "answer_file": "answer-draft.json"}

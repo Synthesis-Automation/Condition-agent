@@ -4,7 +4,11 @@ import json
 
 import pytest
 
-from chem_coworker.scientific_workspace.activity import ActivityHistory, activity_detail, recover_activity
+from chem_coworker.scientific_workspace.runtime.activity import (
+    ActivityHistory,
+    activity_detail,
+    recover_activity,
+)
 
 
 @pytest.mark.parametrize("prefix", [

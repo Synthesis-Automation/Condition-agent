@@ -8,10 +8,10 @@ from time import monotonic
 import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore
-from chem_coworker.scientific_workspace.baseline import artifact_identity
-from chem_coworker.scientific_workspace import forward_check, route_investigation
-from chem_coworker.scientific_workspace.operations import ScientificOperations
-from chem_coworker.scientific_workspace.store import canonical_bytes
+from chem_coworker.scientific_workspace.core.baseline import artifact_identity
+from chem_coworker.scientific_workspace.adapters import forward_check, route_investigation
+from chem_coworker.scientific_workspace.adapters.operations import ScientificOperations
+from chem_coworker.scientific_workspace.core.store import canonical_bytes
 from core_retrosynthesis.external_proposal_assessment import load_external_proposal_admission_policy
 from core_retrosynthesis.generic_library import build_generic_library, save_generic_library
 from forward_synthesis import assess_proposed_step, build_forward_library, save_forward_library
@@ -144,7 +144,7 @@ def test_deadline_kills_worker_during_load_and_retains_stage_without_assessment(
 
 
 def test_platform_cleanup_error_does_not_lose_timeout_or_leave_worker(operations, monkeypatch):
-    from chem_coworker.scientific_workspace import agent_runtime
+    from chem_coworker.scientific_workspace.core import process_utils
 
     source, _ = _source(operations)
     processes = []
@@ -159,7 +159,7 @@ def test_platform_cleanup_error_does_not_lose_timeout_or_leave_worker(operations
         raise ProcessLookupError("Simulated platform cleanup race")
 
     monkeypatch.setattr(forward_check.subprocess, "Popen", spawn)
-    monkeypatch.setattr(agent_runtime, "_stop_process", broken_cleanup)
+    monkeypatch.setattr(process_utils, "stop_process_tree", broken_cleanup)
     monkeypatch.setattr(forward_check, "_worker_command", lambda directory: [sys.executable, "-c", "import time; time.sleep(60)"])
     result = _check(operations, source, timeout_seconds=1)
     assert result["execution_status"] == "timed_out"

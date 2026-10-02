@@ -13,10 +13,10 @@ from threading import Event
 
 import pytest
 
-from chem_coworker.scientific_workspace import literature
-from chem_coworker.scientific_workspace import runtime_environment as environment_tools
-from chem_coworker.scientific_workspace.agent_runtime import CodexRuntime
-from chem_coworker.scientific_workspace.store import InvestigationStore
+from chem_coworker.scientific_workspace.adapters import literature
+from chem_coworker.scientific_workspace.runtime import runtime_environment as environment_tools
+from chem_coworker.scientific_workspace.runtime.agent_runtime import CodexRuntime
+from chem_coworker.scientific_workspace.core.store import InvestigationStore
 
 
 def test_discovers_and_validates_editor_bundled_ripgrep_when_path_is_missing(tmp_path, monkeypatch):

@@ -8,10 +8,17 @@ import pytest
 
 from app.web_api.scientific_presentation import present_conversation
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer, validate_answer_evidence
-from chem_coworker.scientific_workspace.answer_finalization import _complete_empty_fields
-from chem_coworker.scientific_workspace.baseline import artifact_identity, code_manifest, environment_versions
-from chem_coworker.scientific_workspace.step_precedents import answer_step_precedents
+from chem_coworker.scientific_workspace.answers.answer_contracts import (
+    ScientificAnswer,
+    validate_answer_evidence,
+)
+from chem_coworker.scientific_workspace.answers.answer_finalization import _complete_empty_fields
+from chem_coworker.scientific_workspace.core.baseline import (
+    artifact_identity,
+    code_manifest,
+    environment_versions,
+)
+from chem_coworker.scientific_workspace.views.precedents import answer_step_precedents
 from core_retrosynthesis.generic_library import build_generic_library, save_generic_library
 from tests.core_retrosynthesis_tests.test_external_proposal_admission import _row, FIRST_REACTION
 
@@ -158,7 +165,8 @@ def test_unrelated_call_and_wrong_stereochemistry_cannot_support_step(workspace)
     source, _ = run(workspace, "analyze_molecule", smiles="CCO")
     invalid = workspace.run("inspect_step_precedents", {"source_ref": source.artifact_ref})
     assert workspace.store.read_artifact(invalid.artifact_ref)["execution_status"] == "error"
-    from chem_coworker.scientific_workspace.step_precedents import load_step_precedent_evidence, SCHEMA_VERSION
+    from chem_coworker.scientific_workspace.answers.step_precedents import load_step_precedent_evidence
+    from chem_coworker.scientific_workspace.adapters.step_selection import SCHEMA_VERSION
 
     record = workspace.store.append("call", {"operation": "inspect_step_precedents", "execution_status": "completed",
         "result": {"schema_version": SCHEMA_VERSION, "selection": {
@@ -186,7 +194,7 @@ def test_missing_reference_catalog_remains_a_gap(workspace, monkeypatch):
 def test_saved_conversation_api_resolves_precedents_without_running_science(workspace, monkeypatch):
     from fastapi.testclient import TestClient
     from app.web_api.main import create_app
-    from chem_coworker.scientific_workspace.conversation import ConversationService
+    from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
 
     source, selected = disconnection(workspace)
     event, record = run(workspace, "inspect_step_precedents", source_ref=source.artifact_ref,

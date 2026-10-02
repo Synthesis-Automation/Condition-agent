@@ -9,7 +9,11 @@ from time import monotonic
 import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.baseline import artifact_identity, code_manifest, environment_versions
+from chem_coworker.scientific_workspace.core.baseline import (
+    artifact_identity,
+    code_manifest,
+    environment_versions,
+)
 from condition_recommender.fragment_index import build_fragment_index
 from reactive_taxonomy import featurize_reaction
 
@@ -78,7 +82,7 @@ def test_target_mismatch_is_recorded_as_error_not_absence(workspace):
 
 
 def test_worker_deadline_stops_child_and_saves_diagnostics(workspace, monkeypatch):
-    import chem_coworker.scientific_workspace.fragment_search as adapter
+    import chem_coworker.scientific_workspace.adapters.fragment_search as adapter
     monkeypatch.setattr(adapter, "_worker_command", lambda path: [sys.executable, "-c", "import time; time.sleep(60)"])
     started = monotonic()
     event = workspace.run("search_fragment_precedents", {"query": "CO", "timeout_seconds": 1})

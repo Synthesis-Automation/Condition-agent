@@ -145,8 +145,8 @@ def main() -> int:
     if not math.isfinite(args.timeout) or not 1 <= args.timeout <= 300:
         parser.error("--timeout must be a finite number from 1 to 300 seconds")
 
-    from chem_coworker.scientific_workspace.agent_runtime import CodexRuntime
-    from chem_coworker.scientific_workspace.conversation import ConversationService
+    from chem_coworker.scientific_workspace.runtime.agent_runtime import CodexRuntime
+    from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
 
     root = Path(args.root).resolve()
     artifacts = _read_json(Path(args.artifacts)) if args.artifacts else {}

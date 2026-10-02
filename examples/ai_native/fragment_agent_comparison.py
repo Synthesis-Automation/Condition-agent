@@ -23,13 +23,20 @@ from typing import Any
 from rdkit import Chem
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.agent_runtime import AgentRuntime, AgentStopped, CodexRuntime
-from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer, validate_answer_evidence
-from chem_coworker.scientific_workspace.baseline import capture_baseline, verify_baseline
-from chem_coworker.scientific_workspace.conversation import investigation_prompt
-from chem_coworker.scientific_workspace.evidence_review import matching_evidence_review
-from chem_coworker.scientific_workspace.learning import build_learning_context
-from chem_coworker.scientific_workspace.store import canonical_bytes
+from chem_coworker.scientific_workspace.runtime.agent_runtime import (
+    AgentRuntime,
+    AgentStopped,
+    CodexRuntime,
+)
+from chem_coworker.scientific_workspace.answers.answer_contracts import (
+    ScientificAnswer,
+    validate_answer_evidence,
+)
+from chem_coworker.scientific_workspace.core.baseline import capture_baseline, verify_baseline
+from chem_coworker.scientific_workspace.agent_context.prompts import investigation_prompt
+from chem_coworker.scientific_workspace.answers.evidence_review import matching_evidence_review
+from chem_coworker.scientific_workspace.agent_context.learning import build_learning_context
+from chem_coworker.scientific_workspace.core.store import canonical_bytes
 
 
 FRAGMENT_OPERATIONS = frozenset({"suggest_search_fragments", "search_fragment_precedents"})

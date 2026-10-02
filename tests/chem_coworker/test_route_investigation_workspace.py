@@ -6,12 +6,27 @@ from pathlib import Path
 import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.baseline import artifact_identity, code_manifest, environment_versions
-from chem_coworker.scientific_workspace.store import canonical_bytes
-from core_retrosynthesis.external_proposal_assessment import ExternalRetrosynthesisProposal, assess_external_retrosynthesis_proposal
-from core_retrosynthesis.external_route_admission import ExternalRouteProposal, assess_external_route_proposal
+from chem_coworker.scientific_workspace.core.baseline import (
+    artifact_identity,
+    code_manifest,
+    environment_versions,
+)
+from chem_coworker.scientific_workspace.core.store import canonical_bytes
+from core_retrosynthesis.external_proposal_assessment import (
+    ExternalRetrosynthesisProposal,
+    assess_external_retrosynthesis_proposal,
+)
+from core_retrosynthesis.external_route_admission import (
+    ExternalRouteProposal,
+    assess_external_route_proposal,
+)
 from core_retrosynthesis.generic_library import build_generic_library, save_generic_library
-from tests.core_retrosynthesis_tests.test_external_proposal_admission import _row, _route_value, FIRST_REACTION, SECOND_REACTION
+from tests.core_retrosynthesis_tests.test_external_proposal_admission import (
+    _row,
+    _route_value,
+    FIRST_REACTION,
+    SECOND_REACTION,
+)
 
 
 @pytest.fixture(scope="module")
@@ -247,7 +262,7 @@ def test_single_step_conditions_are_opt_in_and_require_recorded_data(workspace) 
 
 
 def test_prompt_assigns_multistep_decisions_to_agent(workspace) -> None:
-    from chem_coworker.scientific_workspace.conversation import investigation_prompt
+    from chem_coworker.scientific_workspace.agent_context.prompts import investigation_prompt
 
     prompt = investigation_prompt(workspace, "Propose a synthesis")
     assert "Do not invoke the built-in multistep planner, including through custom Python scripts." in prompt
@@ -263,9 +278,9 @@ def test_prompt_assigns_multistep_decisions_to_agent(workspace) -> None:
 def test_prompt_nested_answer_example_validates_against_real_contract(workspace) -> None:
     import json
 
-    from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer
-    from chem_coworker.scientific_workspace.answer_finalization import _complete_empty_fields
-    from chem_coworker.scientific_workspace.conversation import investigation_prompt
+    from chem_coworker.scientific_workspace.answers.answer_contracts import ScientificAnswer
+    from chem_coworker.scientific_workspace.answers.answer_finalization import _complete_empty_fields
+    from chem_coworker.scientific_workspace.agent_context.prompts import investigation_prompt
 
     prompt = investigation_prompt(workspace, "Propose a synthesis")
     snippet = prompt.split("Minimal nested shapes (replace IDs/text with your actual evidence and proposal):\n")[1]

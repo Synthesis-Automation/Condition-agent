@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import ast
 import importlib
+import importlib.util
+import subprocess
 import sys
 from pathlib import Path
 
@@ -39,3 +41,41 @@ def test_import_does_not_eagerly_load_legacy_or_llm_modules() -> None:
 
     assert not any(name == "chemtools" or name.startswith("chemtools.") for name in newly_loaded)
     assert not any(name == "llmtools" or name.startswith("llmtools.") for name in newly_loaded)
+
+
+def test_scientific_execution_does_not_depend_on_agent_runtime() -> None:
+    """Scientific process control must not bypass identity through a runtime import."""
+    prefix = "chem_coworker.scientific_workspace"
+    violations = []
+    workspace = ROOT / "chem_coworker" / "scientific_workspace"
+    for folder in ("core", "adapters"):
+        for path in (workspace / folder).glob("*.py"):
+            package = f"{prefix}.{folder}"
+            for node in ast.walk(ast.parse(path.read_text("utf-8"))):
+                if isinstance(node, ast.ImportFrom):
+                    name = importlib.util.resolve_name(
+                        "." * node.level + (node.module or ""), package,
+                    ) if node.level else node.module or ""
+                    names = [name]
+                    if name == prefix:
+                        names.extend(f"{name}.{alias.name}" for alias in node.names)
+                elif isinstance(node, ast.Import):
+                    names = [alias.name for alias in node.names]
+                else:
+                    continue
+                if any(name == f"{prefix}.runtime" or name.startswith(f"{prefix}.runtime.")
+                       for name in names):
+                    violations.append(str(path.relative_to(ROOT)))
+    assert violations == []
+
+
+def test_headless_execution_import_keeps_agent_harness_unloaded() -> None:
+    """Check a fresh interpreter so earlier conversation tests cannot mask coupling."""
+    subprocess.run(
+        [sys.executable, "-c", (
+            "import sys; import chem_coworker.scientific_workspace.core.execution; "
+            "assert not any(name.startswith('chem_coworker.scientific_workspace.runtime') "
+            "for name in sys.modules)"
+        )],
+        cwd=ROOT, check=True, capture_output=True, text=True, timeout=30,
+    )

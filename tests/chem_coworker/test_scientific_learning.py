@@ -6,9 +6,10 @@ import json
 import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.baseline import code_manifest, legacy_code_manifest
-from chem_coworker.scientific_workspace.learning import (
-    DEVELOPMENT_PARTITION, build_learning_context,
+from chem_coworker.scientific_workspace.core.baseline import code_manifest, legacy_code_manifest
+from chem_coworker.scientific_workspace.agent_context.learning import (
+    DEVELOPMENT_PARTITION,
+    build_learning_context,
 )
 
 
@@ -19,7 +20,7 @@ def investigations(tmp_path, monkeypatch):
     source.parent.mkdir(parents=True)
     source.write_text("VERSION = 1\n", encoding="utf-8")
     environment = {"python": "fixture-1"}
-    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.environment_versions", lambda: environment.copy())
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.environment_versions", lambda: environment.copy())
     stores = []
 
     def create(*, partition=DEVELOPMENT_PARTITION, repo=repository):
@@ -235,7 +236,7 @@ def test_guides_are_hashed_and_context_corruption_is_detected(investigations):
     assert "retrosynthesis_fragments" in guide["text"]
     policy = workspace.operations.definition("disconnect_target").usage_policy
     assert "single-step calls" in policy
-    path = investigations.repository / "chem_coworker" / "scientific_workspace" / "guides" / "conditions.md"
+    path = investigations.repository / "chem_coworker" / "scientific_workspace" / "task_playbooks" / "conditions.md"
     path.parent.mkdir(parents=True)
     path.write_text("First guide", encoding="utf-8")
     before = code_manifest(investigations.repository)

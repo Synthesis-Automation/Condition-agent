@@ -2,6 +2,15 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+The workspace is organized into `core/`, `adapters/`, `runtime/`, `agent_context/`,
+`answers/` and `views/`; the public Python exports and root CLI remain the entry
+points. See [package organization](Scientific_Workspace_Core.md#package-organization)
+for ownership and internal import migration. `agent_context/` contains Python
+prompt/context code, `task_playbooks/` contains optional task strategies, and
+`agent_instructions/` contains shared agent rules. Restart the server and create a new
+investigation after this source reorganization; saved evidence remains readable.
+No chemistry definitions, domain schemas or dataset indexes need rebuilding.
+
 The [core boundary](Scientific_Workspace_Core.md) separates execution and evidence
 recording from task advice and presentation. New investigations use
 `scientific_baseline.v2`; each browser turn saves independently identified
@@ -335,7 +344,7 @@ code. Saved answers and original evidence remain readable. No historical manifes
 is rewritten.
 
 The shared contract is in
-[`answer_contracts.py`](../../chem_coworker/scientific_workspace/answer_contracts.py).
+[`answer_contracts.py`](../../chem_coworker/scientific_workspace/answers/answer_contracts.py).
 Its Pydantic schema validates the saved scientific answer. The runtime's strict
 final-output schema is the small `scientific_answer_handoff.v1` acknowledgment;
 it does not replace the answer schema or its validation. Conceptual answers use
@@ -469,8 +478,8 @@ python -m chem_coworker.scientific_workspace capabilities results/ai_native/YOUR
 
 Two short main playbooks describe purpose/context, scientific questions, evidence
 distinctions and stopping criteria:
-[conditions](../../chem_coworker/scientific_workspace/guides/conditions.md) and
-[retrosynthesis](../../chem_coworker/scientific_workspace/guides/retrosynthesis.md).
+[conditions](../../chem_coworker/scientific_workspace/task_playbooks/conditions.md) and
+[retrosynthesis](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis.md).
 The agent chooses which advice to read and may reorder, repeat or replace suggestions.
 Tool contracts own inputs and execution limits; domain validators and the saved-answer
 contract own scientific and attribution checks; presentation owns answer formatting.
@@ -479,12 +488,12 @@ Specialized advice is available on demand:
 
 | Guide name | Read when useful |
 | --- | --- |
-| [`conditions_screening`](../../chem_coworker/scientific_workspace/guides/conditions_screening.md) | Plan a diverse panel with explicitly weak-label evidence. |
-| [`retrosynthesis_fragments`](../../chem_coworker/scientific_workspace/guides/retrosynthesis_fragments.md) | Find construction evidence for a chosen core. |
-| [`retrosynthesis_revision`](../../chem_coworker/scientific_workspace/guides/retrosynthesis_revision.md) | Change a saved branch and compare complete reassessments. |
-| [`retrosynthesis_forward`](../../chem_coworker/scientific_workspace/guides/retrosynthesis_forward.md) | Resolve a consequential product-competition question. |
+| [`conditions_screening`](../../chem_coworker/scientific_workspace/task_playbooks/conditions_screening.md) | Plan a diverse panel with explicitly weak-label evidence. |
+| [`retrosynthesis_fragments`](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis_fragments.md) | Find construction evidence for a chosen core. |
+| [`retrosynthesis_revision`](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis_revision.md) | Change a saved branch and compare complete reassessments. |
+| [`retrosynthesis_forward`](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis_forward.md) | Resolve a consequential product-competition question. |
 
-The existing core discovers `guides/*.md` and advertises their names. It loads guide
+The existing core discovers `task_playbooks/*.md` and advertises their names. It loads guide
 text only on request or explicit inclusion; supporting advice adds no task router,
 required sequence or new memory category. See [task ownership](Scientific_Workspace_Core.md#task-playbooks).
 
@@ -821,7 +830,7 @@ deadline is 10 seconds, with a maximum of 30 seconds including worker startup.
 ## Evaluate agent use of fragment tools
 
 The main retrosynthesis playbook identifies decision-changing gaps; optional
-[fragment advice](../../chem_coworker/scientific_workspace/guides/retrosynthesis_fragments.md)
+[fragment advice](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis_fragments.md)
 helps select a core, inspect construction evidence and explain transfer. The agent
 can skip this advice or choose its own core; suggested initial searches remain flexible.
 

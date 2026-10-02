@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from chem_coworker.scientific_workspace import ScientificWorkspace
-from chem_coworker.scientific_workspace.agent_runtime import AgentResult, AgentStopped
-from chem_coworker.scientific_workspace.baseline import code_manifest, environment_versions
+from chem_coworker.scientific_workspace.runtime.agent_runtime import AgentResult, AgentStopped
+from chem_coworker.scientific_workspace.core.baseline import code_manifest, environment_versions
 from examples.ai_native.fragment_agent_comparison import (
     ComparisonCase, collect_metrics, comparison_question, load_cases, run_comparison,
 )

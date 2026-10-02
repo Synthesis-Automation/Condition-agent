@@ -19,7 +19,7 @@ from visualization import (
     render_molecule_image_bytes, render_reaction_image_bytes,
 )
 
-from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer
+from chem_coworker.scientific_workspace.answers.answer_contracts import ScientificAnswer
 
 
 _SMILES_TOKEN = re.compile(r"[A-Za-z0-9@+\[\]()=#$%./\\*:\-]+")

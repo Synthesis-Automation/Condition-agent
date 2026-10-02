@@ -9,10 +9,13 @@ import pytest
 
 from app.web_api.main import create_app
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.artifact_storage import STORAGE_VERSION, SECTION_VERSION
-from chem_coworker.scientific_workspace.call_summaries import summarize_call_brief
-from chem_coworker.scientific_workspace.conversation import ConversationService
-from chem_coworker.scientific_workspace.store import canonical_bytes, _write_json
+from chem_coworker.scientific_workspace.core.artifact_storage import (
+    STORAGE_VERSION,
+    SECTION_VERSION,
+)
+from chem_coworker.scientific_workspace.views.brief_summaries import summarize_call_brief
+from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
+from chem_coworker.scientific_workspace.core.store import canonical_bytes, _write_json
 
 
 @pytest.fixture
@@ -119,7 +122,7 @@ def test_plain_legacy_records_and_non_route_payloads_remain_readable(store):
 
 
 def test_failed_root_write_does_not_publish_a_partial_event(store, monkeypatch):
-    from chem_coworker.scientific_workspace import store as module
+    from chem_coworker.scientific_workspace.core import store as module
 
     write = module._write_json
 

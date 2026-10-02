@@ -13,10 +13,13 @@ import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
 from chem_coworker.scientific_workspace.__main__ import main
-from chem_coworker.scientific_workspace.baseline import (
-    artifact_identity, code_manifest, environment_versions, verify_baseline,
+from chem_coworker.scientific_workspace.core.baseline import (
+    artifact_identity,
+    code_manifest,
+    environment_versions,
+    verify_baseline,
 )
-from chem_coworker.scientific_workspace.store import canonical_bytes
+from chem_coworker.scientific_workspace.core.store import canonical_bytes
 from reactive_taxonomy import featurize_reaction
 
 

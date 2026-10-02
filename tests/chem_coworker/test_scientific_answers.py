@@ -11,10 +11,12 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from app.web_api.scientific_presentation import present_conversation
-from chem_coworker.scientific_workspace.answer_contracts import (
-    ANSWER_SCHEMA, ScientificAnswer, validate_answer_evidence,
+from chem_coworker.scientific_workspace.answers.answer_contracts import (
+    ANSWER_SCHEMA,
+    ScientificAnswer,
+    validate_answer_evidence,
 )
-from chem_coworker.scientific_workspace.store import InvestigationStore
+from chem_coworker.scientific_workspace.core.store import InvestigationStore
 
 
 def proposed() -> dict:

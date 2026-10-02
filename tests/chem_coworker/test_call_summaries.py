@@ -6,14 +6,23 @@ import json
 
 import pytest
 
-from chem_coworker.scientific_workspace.call_summaries import summarize_call, summarize_call_brief
+from chem_coworker.scientific_workspace.views.call_summaries import summarize_call
+from chem_coworker.scientific_workspace.views.brief_summaries import summarize_call_brief
 from condition_recommender import assess_reaction_recipe
 from condition_recommender.models import GenericRecommendationResult
-from core_retrosynthesis.external_route_admission import ExternalRouteProposal, assess_external_route_proposal
+from core_retrosynthesis.external_route_admission import (
+    ExternalRouteProposal,
+    assess_external_route_proposal,
+)
 from core_retrosynthesis.generic_library import build_generic_library
 from reactive_taxonomy import audit_target, featurize_reaction
 from tests.condition_recommender.test_condition_constraints import _recommendation
-from tests.core_retrosynthesis_tests.test_external_proposal_admission import _row, _route_value, FIRST_REACTION, SECOND_REACTION
+from tests.core_retrosynthesis_tests.test_external_proposal_admission import (
+    _row,
+    _route_value,
+    FIRST_REACTION,
+    SECOND_REACTION,
+)
 
 
 def _call(operation, result):

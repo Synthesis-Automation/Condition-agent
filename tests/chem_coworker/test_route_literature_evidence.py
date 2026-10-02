@@ -6,9 +6,13 @@ from pathlib import Path
 import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace import literature
-from chem_coworker.scientific_workspace.baseline import artifact_identity, code_manifest, environment_versions
-from chem_coworker.scientific_workspace.store import canonical_bytes
+from chem_coworker.scientific_workspace.adapters import literature
+from chem_coworker.scientific_workspace.core.baseline import (
+    artifact_identity,
+    code_manifest,
+    environment_versions,
+)
+from chem_coworker.scientific_workspace.core.store import canonical_bytes
 from core_retrosynthesis.external_proposal_assessment import (
     ExternalRetrosynthesisProposal, assess_external_retrosynthesis_proposal,
 )

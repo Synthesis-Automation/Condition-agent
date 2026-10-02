@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 
-from chem_coworker.scientific_workspace.conversation import ConversationService
+from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
 
 from .scientific_presentation import present_conversation
 

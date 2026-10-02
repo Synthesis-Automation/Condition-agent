@@ -8,10 +8,16 @@ from pathlib import Path
 import pytest
 
 from chem_coworker.scientific_workspace import ScientificWorkspace
-from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer, validate_answer_evidence
-from chem_coworker.scientific_workspace.capabilities import local_capabilities
-from chem_coworker.scientific_workspace.evidence_review import REVIEW_AREAS, matching_evidence_review
-from chem_coworker.scientific_workspace.store import InvestigationStore
+from chem_coworker.scientific_workspace.answers.answer_contracts import (
+    ScientificAnswer,
+    validate_answer_evidence,
+)
+from chem_coworker.scientific_workspace.core.capabilities import local_capabilities
+from chem_coworker.scientific_workspace.answers.evidence_review import (
+    REVIEW_AREAS,
+    matching_evidence_review,
+)
+from chem_coworker.scientific_workspace.core.store import InvestigationStore
 
 
 @pytest.fixture

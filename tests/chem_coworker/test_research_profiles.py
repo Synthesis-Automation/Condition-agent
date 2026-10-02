@@ -9,15 +9,15 @@ from threading import Event
 
 import pytest
 
-from chem_coworker.scientific_workspace.agent_runtime import CodexRuntime
-from chem_coworker.scientific_workspace.research_profiles import resolve_research_profile
+from chem_coworker.scientific_workspace.runtime.agent_runtime import CodexRuntime
+from chem_coworker.scientific_workspace.runtime.research_profiles import resolve_research_profile
 
 
 @pytest.fixture
 def local_runtime(monkeypatch: pytest.MonkeyPatch):
     """Avoid discovering or authenticating a real model runtime in unit tests."""
     monkeypatch.setattr(
-        "chem_coworker.scientific_workspace.agent_runtime.find_codex",
+        "chem_coworker.scientific_workspace.runtime.agent_runtime.find_codex",
         lambda executable: (executable or "codex-test", "test-version"),
     )
     return CodexRuntime
@@ -177,7 +177,7 @@ def test_web_cli_profile_defaults_and_override_precedence(
 
     artifacts = tmp_path / "artifacts.json"
     artifacts.write_text("{}", "utf-8")
-    monkeypatch.setattr("chem_coworker.scientific_workspace.conversation.ConversationService", Service)
+    monkeypatch.setattr("chem_coworker.scientific_workspace.runtime.conversation.ConversationService", Service)
     monkeypatch.setattr(web_main, "LocalRecommendationRuntime", lambda _, **__: object())
     monkeypatch.setattr(web_main, "create_app", lambda **_: object())
     monkeypatch.setattr(web_main.uvicorn, "run", lambda *_, **__: None)

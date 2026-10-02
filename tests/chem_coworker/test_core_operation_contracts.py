@@ -9,9 +9,11 @@ from typing import Any, Mapping
 import pytest
 
 from chem_coworker.scientific_workspace import (
-    InvestigationStore, OperationDefinition, ScientificWorkspace,
+    InvestigationStore,
+    OperationDefinition,
+    ScientificWorkspace,
 )
-from chem_coworker.scientific_workspace.operations import ScientificOperations
+from chem_coworker.scientific_workspace.adapters.operations import ScientificOperations
 
 
 class TrialOperations(ScientificOperations):

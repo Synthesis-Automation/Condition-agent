@@ -7,18 +7,29 @@ from pathlib import Path
 
 import pytest
 
-from chem_coworker.scientific_workspace.baseline import (
-    BASELINE_SCHEMA, LEGACY_BASELINE_SCHEMA, code_manifest, legacy_code_manifest,
-    scientific_identity, verify_baseline,
+from chem_coworker.scientific_workspace.core.baseline import (
+    BASELINE_SCHEMA,
+    LEGACY_BASELINE_SCHEMA,
+    code_manifest,
+    legacy_code_manifest,
+    scientific_identity,
+    verify_baseline,
 )
-from chem_coworker.scientific_workspace.context import (
-    capture_application_context, current_application_context, record_application_context,
+from chem_coworker.scientific_workspace.agent_context.context import (
+    capture_application_context,
+    current_application_context,
+    record_application_context,
 )
-from chem_coworker.scientific_workspace.learning import (
-    DEVELOPMENT_PARTITION, available_task_guides, build_learning_context,
-    publish_lessons, recall_lessons, record_lesson, task_guide,
+from chem_coworker.scientific_workspace.agent_context.learning import (
+    DEVELOPMENT_PARTITION,
+    available_task_guides,
+    build_learning_context,
+    publish_lessons,
+    recall_lessons,
+    record_lesson,
+    task_guide,
 )
-from chem_coworker.scientific_workspace.store import InvestigationStore
+from chem_coworker.scientific_workspace.core.store import InvestigationStore
 
 
 @pytest.fixture
@@ -28,14 +39,15 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "reactive_taxonomy/chemistry/example.py": "CHEMISTRY = 1\n",
         "reactive_taxonomy/definitions/example.json": '{"version": "1"}\n',
         "chem_coworker/scientific_workspace/workspace.py": "EXECUTION = 1\n",
-        "chem_coworker/scientific_workspace/operations.py": "OPERATIONS = 1\n",
-        "chem_coworker/scientific_workspace/answer_contracts.py": "CONTRACT = 1\n",
-        "chem_coworker/scientific_workspace/conversation.py": "RUNTIME = 1\n",
-        "chem_coworker/scientific_workspace/agent_runtime.py": "HARNESS = 1\n",
-        "chem_coworker/scientific_workspace/prompts.py": "PROMPT_COMPOSITION = 1\n",
-        "chem_coworker/scientific_workspace/instructions/core.md": "Core principles\n",
+        "chem_coworker/scientific_workspace/adapters/operations.py": "OPERATIONS = 1\n",
+        "chem_coworker/scientific_workspace/core/process_utils.py": "PROCESS_CONTROL = 1\n",
+        "chem_coworker/scientific_workspace/answers/answer_contracts.py": "CONTRACT = 1\n",
+        "chem_coworker/scientific_workspace/runtime/conversation.py": "RUNTIME = 1\n",
+        "chem_coworker/scientific_workspace/runtime/agent_runtime.py": "HARNESS = 1\n",
+        "chem_coworker/scientific_workspace/agent_context/prompts.py": "PROMPT_COMPOSITION = 1\n",
+        "chem_coworker/scientific_workspace/agent_instructions/core.md": "Core principles\n",
         "chem_coworker/scientific_workspace/presentation/default.md": "Brief output\n",
-        "chem_coworker/scientific_workspace/guides/conditions.md": "Original guide\n",
+        "chem_coworker/scientific_workspace/task_playbooks/conditions.md": "Original guide\n",
         "app/web_api/scientific_chat.js": "const render = 1;\n",
     }
     for relative, text in files.items():
@@ -43,7 +55,7 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8", newline="\n")
     monkeypatch.setattr(
-        "chem_coworker.scientific_workspace.baseline.environment_versions",
+        "chem_coworker.scientific_workspace.core.baseline.environment_versions",
         lambda: {"python": "fixture"},
     )
     return repository
@@ -64,11 +76,11 @@ def baseline(repository: Path, *, legacy: bool = False) -> dict:
 
 
 @pytest.mark.parametrize("relative", [
-    "chem_coworker/scientific_workspace/conversation.py",
-    "chem_coworker/scientific_workspace/agent_runtime.py",
-    "chem_coworker/scientific_workspace/prompts.py",
-    "chem_coworker/scientific_workspace/instructions/core.md",
-    "chem_coworker/scientific_workspace/guides/conditions.md",
+    "chem_coworker/scientific_workspace/runtime/conversation.py",
+    "chem_coworker/scientific_workspace/runtime/agent_runtime.py",
+    "chem_coworker/scientific_workspace/agent_context/prompts.py",
+    "chem_coworker/scientific_workspace/agent_instructions/core.md",
+    "chem_coworker/scientific_workspace/task_playbooks/conditions.md",
     "chem_coworker/scientific_workspace/presentation/default.md",
     "app/web_api/scientific_chat.js",
 ])
@@ -83,8 +95,9 @@ def test_application_changes_leave_scientific_baseline_valid(project: Path, rela
     "reactive_taxonomy/chemistry/example.py",
     "reactive_taxonomy/definitions/example.json",
     "chem_coworker/scientific_workspace/workspace.py",
-    "chem_coworker/scientific_workspace/operations.py",
-    "chem_coworker/scientific_workspace/answer_contracts.py",
+    "chem_coworker/scientific_workspace/adapters/operations.py",
+    "chem_coworker/scientific_workspace/core/process_utils.py",
+    "chem_coworker/scientific_workspace/answers/answer_contracts.py",
 ])
 def test_scientific_or_integrity_changes_require_new_investigation(project: Path, relative: str) -> None:
     frozen = baseline(project)
@@ -96,8 +109,10 @@ def test_scientific_or_integrity_changes_require_new_investigation(project: Path
 
 @pytest.mark.parametrize("relative", [
     "chem_coworker/scientific_workspace/new_adapter.py",
+    "chem_coworker/scientific_workspace/runtime/new_adapter.py",
+    "chem_coworker/scientific_workspace/agent_context/new_adapter.py",
     "chem_coworker/scientific_workspace/new_contract.json",
-    "chem_coworker/scientific_workspace/guides/new_adapter.py",
+    "chem_coworker/scientific_workspace/task_playbooks/new_adapter.py",
 ])
 def test_unclassified_new_adapters_and_contracts_are_scientific(project: Path, relative: str) -> None:
     frozen = baseline(project)
@@ -109,13 +124,25 @@ def test_unclassified_new_adapters_and_contracts_are_scientific(project: Path, r
 def test_legacy_scope_remains_strict_and_is_never_silently_migrated(project: Path) -> None:
     legacy = baseline(project, legacy=True)
     frozen_v2 = baseline(project)
-    guide = project / "chem_coworker/scientific_workspace/guides/conditions.md"
+    guide = project / "chem_coworker/scientific_workspace/task_playbooks/conditions.md"
     guide.write_text("New task guidance\n", encoding="utf-8")
     verify_baseline(frozen_v2)
     with pytest.raises(ValueError, match="Scientific code or definitions changed"):
         verify_baseline(legacy)
     assert legacy["schema_version"] == LEGACY_BASELINE_SCHEMA
     assert legacy["learning_context"]["guides"]["conditions"]["text"] == "Original guide\n"
+
+
+def test_legacy_scope_still_verifies_original_guide_directory(project: Path) -> None:
+    relative = "chem_coworker/scientific_workspace/guides/conditions.md"
+    path = project / relative
+    path.parent.mkdir()
+    path.write_text("Original directory snapshot\n", encoding="utf-8")
+    frozen = baseline(project, legacy=True)
+    assert relative in frozen["code_files"]
+    path.write_text("Changed old resource\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="Scientific code or definitions changed"):
+        verify_baseline(frozen)
 
 
 def test_unknown_baseline_schema_is_rejected(project: Path) -> None:
@@ -135,7 +162,7 @@ def test_turn_context_refresh_is_explicit_and_keeps_earlier_resources(project: P
     runtime["settings"]["profile"] = "mutated after recording"
     assert recorded_first["runtime"]["settings"]["profile"] == "quick"
     assert current_application_context(store)["turn_id"] == "first"
-    guide = project / "chem_coworker/scientific_workspace/guides/conditions.md"
+    guide = project / "chem_coworker/scientific_workspace/task_playbooks/conditions.md"
     guide.write_text("Improved guide\n", encoding="utf-8", newline="\n")
     (guide.parent / "new_task.md").write_text("New task advice\n", encoding="utf-8", newline="\n")
     profile = project / "chem_coworker/scientific_workspace/presentation/default.md"
@@ -208,14 +235,14 @@ def test_turn_refresh_keeps_lessons_pinned_but_future_investigations_can_recall(
 
 
 def test_crlf_guides_have_same_identity_at_creation_and_turn_capture(project: Path, tmp_path: Path) -> None:
-    path = project / "chem_coworker/scientific_workspace/guides/conditions.md"
+    path = project / "chem_coworker/scientific_workspace/task_playbooks/conditions.md"
     path.write_bytes(b"Windows guide\r\n")
     frozen = baseline(project)
     store = InvestigationStore.create(tmp_path / "crlf", objective="Conditions", baseline=frozen)
     record_application_context(store, turn_id="first", runtime={})
     current = current_application_context(store)
     assert current["learning_context"] == frozen["learning_context"]
-    assert current["resources"]["guides/conditions.md"]["text"] == "Windows guide\r\n"
+    assert current["resources"]["task_playbooks/conditions.md"]["text"] == "Windows guide\r\n"
 
 
 def test_captured_context_is_independent_of_nested_baseline_memory(project: Path, tmp_path: Path) -> None:

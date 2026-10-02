@@ -11,11 +11,18 @@ import subprocess
 import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer, validate_answer_evidence
-from chem_coworker.scientific_workspace.answer_finalization import _complete_empty_fields
-from chem_coworker.scientific_workspace.condition_precedents import load_condition_precedent_evidence
-from chem_coworker.scientific_workspace.step_precedents import answer_step_precedents
-from chem_coworker.scientific_workspace.baseline import artifact_identity, code_manifest, environment_versions
+from chem_coworker.scientific_workspace.answers.answer_contracts import (
+    ScientificAnswer,
+    validate_answer_evidence,
+)
+from chem_coworker.scientific_workspace.answers.answer_finalization import _complete_empty_fields
+from chem_coworker.scientific_workspace.answers.condition_precedents import load_condition_precedent_evidence
+from chem_coworker.scientific_workspace.views.precedents import answer_step_precedents
+from chem_coworker.scientific_workspace.core.baseline import (
+    artifact_identity,
+    code_manifest,
+    environment_versions,
+)
 from condition_registry import ConditionComponentInput, build_resolved_recipe_from_inputs
 from tests.condition_recommender.test_condition_investigation import precedent
 

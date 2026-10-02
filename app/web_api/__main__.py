@@ -29,8 +29,10 @@ def main() -> None:
     parser.add_argument("--chat-artifacts", default="examples/ai_native/artifacts.local.example.json")
     parser.add_argument("--codex", default=None, help="Native Codex executable; otherwise auto-discover")
     parser.add_argument("--agent-model", default=None, help="Optional model override; otherwise use Codex configuration")
-    from chem_coworker.scientific_workspace.research_profiles import (
-        PROFILE_NAMES, REASONING_EFFORTS, WEB_SEARCH_MODES,
+    from chem_coworker.scientific_workspace.runtime.research_profiles import (
+        PROFILE_NAMES,
+        REASONING_EFFORTS,
+        WEB_SEARCH_MODES,
     )
 
     parser.add_argument("--agent-profile", choices=PROFILE_NAMES, default="research",
@@ -54,8 +56,8 @@ def main() -> None:
     if args.scientific_chat:
         if args.host not in {"127.0.0.1", "localhost", "::1"}:
             parser.error("Scientific chat currently supports loopback hosts only")
-        from chem_coworker.scientific_workspace.agent_runtime import CodexRuntime
-        from chem_coworker.scientific_workspace.conversation import ConversationService
+        from chem_coworker.scientific_workspace.runtime.agent_runtime import CodexRuntime
+        from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
 
         try:
             scientific_service = ConversationService(

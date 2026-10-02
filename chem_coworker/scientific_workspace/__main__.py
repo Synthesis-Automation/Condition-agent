@@ -7,7 +7,8 @@ import json
 from pathlib import Path
 from typing import Sequence
 
-from .store import canonical_bytes
+from .core.store import canonical_bytes
+from .paths import REPOSITORY_ROOT
 from .workspace import ScientificWorkspace
 
 
@@ -18,7 +19,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     create = sub.add_parser("init")
     create.add_argument("workspace")
     create.add_argument("--objective", required=True)
-    create.add_argument("--repository", default=str(Path(__file__).resolve().parents[2]))
+    create.add_argument("--repository", default=str(REPOSITORY_ROOT))
     create.add_argument("--artifacts", help="JSON file mapping artifact names to local paths")
     for name in ("catalog", "summary", "capabilities", "run", "run-python", "show", "replay", "note", "attach", "status", "fetch-source", "inspect-source"):
         command = sub.add_parser(name)

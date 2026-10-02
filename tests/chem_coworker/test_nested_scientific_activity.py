@@ -10,11 +10,14 @@ from time import monotonic, sleep
 import pytest
 
 from chem_coworker.scientific_workspace import ScientificWorkspace
-from chem_coworker.scientific_workspace.activity import ActivityHistory, ScientificActivityCursor
-from chem_coworker.scientific_workspace.agent_runtime import AgentResult
-from chem_coworker.scientific_workspace.baseline import environment_versions
-from chem_coworker.scientific_workspace.conversation import ConversationService
-from chem_coworker.scientific_workspace.store import InvestigationStore
+from chem_coworker.scientific_workspace.runtime.activity import (
+    ActivityHistory,
+    ScientificActivityCursor,
+)
+from chem_coworker.scientific_workspace.runtime.agent_runtime import AgentResult
+from chem_coworker.scientific_workspace.core.baseline import environment_versions
+from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
+from chem_coworker.scientific_workspace.core.store import InvestigationStore
 
 
 def test_cursor_reads_only_current_turn_and_deduplicates_events(tmp_path: Path) -> None:
@@ -77,11 +80,11 @@ def test_turn_logs_nested_errors_on_heartbeat_and_finalization(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, terminal: str,
 ) -> None:
     ready, release = Event(), Event()
-    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.capture_baseline", lambda *_: {
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_: {
         "repository": str(tmp_path), "artifacts": {}, "code_files": {},
         "environment": environment_versions(),
     })
-    monkeypatch.setattr("chem_coworker.scientific_workspace.conversation.verify_baseline", lambda *_: None)
+    monkeypatch.setattr("chem_coworker.scientific_workspace.runtime.conversation.verify_baseline", lambda *_: None)
 
     class Runtime:
         def describe(self):

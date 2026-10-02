@@ -10,9 +10,9 @@ The agent chooses the content and order; the UI does not rank chemistry.
 | Responsibility | Definition |
 | --- | --- |
 | Default answer content and level of detail | `chem_coworker/scientific_workspace/presentation/default.md` |
-| How the agent authors and cites structured answers | `chem_coworker/scientific_workspace/instructions/answer_authoring.md` |
-| Typed answer fields and attribution checks | `chem_coworker/scientific_workspace/answer_contracts.py` |
-| Saved evidence binding and projection | `step_precedents.py`, `condition_precedents.py` in the workspace package |
+| How the agent authors and cites structured answers | `chem_coworker/scientific_workspace/agent_instructions/answer_authoring.md` |
+| Typed answer fields and attribution checks | `chem_coworker/scientific_workspace/answers/answer_contracts.py` |
+| Saved evidence binding and projection | `answers/step_precedents.py`, `answers/condition_precedents.py` for validation; `views/precedents.py`, `views/condition_precedents.py` for display |
 | SVG generation and safe source links | `app/web_api/scientific_presentation.py` |
 | Card order, expandable details and browser behavior | `app/web_api/scientific_chat.js` |
 | Spacing, type, responsive layout and themes | `app/web_api/scientific_chat.css` |

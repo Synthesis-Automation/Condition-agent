@@ -15,12 +15,15 @@ import pytest
 
 from app.web_api.main import create_app
 from chem_coworker.scientific_workspace import ScientificWorkspace
-from chem_coworker.scientific_workspace.activity import activity_detail
-from chem_coworker.scientific_workspace.agent_runtime import (
-    AgentResult, AgentStopped, AnswerSubmissionError, CodexRuntime,
+from chem_coworker.scientific_workspace.runtime.activity import activity_detail
+from chem_coworker.scientific_workspace.runtime.agent_runtime import (
+    AgentResult,
+    AgentStopped,
+    CodexRuntime,
 )
-from chem_coworker.scientific_workspace.baseline import code_manifest, environment_versions
-from chem_coworker.scientific_workspace.conversation import ConversationService
+from chem_coworker.scientific_workspace.answers.answer_handoff import AnswerSubmissionError
+from chem_coworker.scientific_workspace.core.baseline import code_manifest, environment_versions
+from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -60,7 +63,7 @@ class RecordedRuntime:
 @pytest.fixture
 def service(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # Avoid rehashing GB datasets or repeating registry audit in harness-only tests.
-    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.capture_baseline", lambda *_: {
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_: {
         "repository": str(ROOT), "code_files": code_manifest(ROOT),
         "environment": environment_versions(), "artifacts": {},
         "validation_status": "development_snapshot_not_release_validated",
@@ -106,7 +109,7 @@ def test_turn_records_application_context_and_exact_prompt(service: Conversation
     assert context["turn_id"] == turn["id"]
     assert context["runtime"] == turn["runtime_requested"]
     assert context["scientific_identity"] == turn["scientific_identity"]
-    assert context["resources"]["instructions/core.md"]["text"]
+    assert context["resources"]["agent_instructions/core.md"]["text"]
     assert turn["answer"]["application_context_ref"] == turn["application_context_ref"]
     trace = turn["answer"]["trace_files_sha256"]
     assert trace["investigation-prompt.txt"] == turn["prompt_sha256"]
@@ -117,14 +120,14 @@ def test_turn_records_application_context_and_exact_prompt(service: Conversation
 def test_guide_upgrade_starts_new_thread_and_retains_scientific_evidence(
     service: ConversationService, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from chem_coworker.scientific_workspace.baseline import verify_baseline
+    from chem_coworker.scientific_workspace.core.baseline import verify_baseline
 
     repository = tmp_path / "application_repository"
     resources = repository / "chem_coworker" / "scientific_workspace"
-    for name in ("guides", "instructions", "presentation"):
+    for name in ("task_playbooks", "agent_instructions", "presentation"):
         shutil.copytree(ROOT / "chem_coworker" / "scientific_workspace" / name, resources / name)
     service.repository = repository
-    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.capture_baseline", lambda *_: {
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_: {
         "schema_version": "scientific_baseline.v2", "repository": str(repository),
         "code_files": code_manifest(repository), "environment": environment_versions(),
         "artifacts": {}, "validation_status": "development_snapshot_not_release_validated",
@@ -133,7 +136,7 @@ def test_guide_upgrade_starts_new_thread_and_retains_scientific_evidence(
     first = finish(service, identity)
     assert first["status"] == "completed", first
     initial_context = service.artifact(identity, first["application_context_ref"])
-    guide = resources / "guides" / "conditions.md"
+    guide = resources / "task_playbooks" / "conditions.md"
     guide.write_text(guide.read_text("utf-8") + "\nNew task advice for this test.\n", "utf-8")
     science = ScientificWorkspace(service.root / identity)
     verify_baseline(science.store.manifest["baseline"])
@@ -457,7 +460,7 @@ def test_cancellation_preserves_conversation_and_prevents_concurrent_turns(servi
 def test_baseline_change_blocks_follow_up_before_model_execution(service: ConversationService, monkeypatch) -> None:
     identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
     finish(service, identity)
-    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.code_manifest", lambda _: {})
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.code_manifest", lambda _: {})
     service.submit("Continue", identity)
     turn = finish(service, identity)
     assert turn["status"] == "failed"
@@ -494,7 +497,7 @@ def test_interrupted_worker_is_visible_without_removing_its_lock(service: Conver
 
 
 def test_atomic_json_retries_reader_sharing_violation(tmp_path: Path, monkeypatch) -> None:
-    from chem_coworker.scientific_workspace import store
+    from chem_coworker.scientific_workspace.core import store
 
     original = store.os.replace
     attempts = []
@@ -514,7 +517,7 @@ def test_atomic_json_retries_reader_sharing_violation(tmp_path: Path, monkeypatc
 
 
 def test_json_reader_retries_sharing_violation_but_not_invalid_json(tmp_path: Path, monkeypatch) -> None:
-    from chem_coworker.scientific_workspace.store import _read_json
+    from chem_coworker.scientific_workspace.core.store import _read_json
 
     path = tmp_path / "state.json"
     path.write_text('{"status":"completed"}', "utf-8")

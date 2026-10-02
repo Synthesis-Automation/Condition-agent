@@ -6,9 +6,12 @@ from pathlib import Path
 import pytest
 
 from chem_coworker.scientific_workspace import ScientificWorkspace
-from chem_coworker.scientific_workspace.baseline import environment_versions
-from chem_coworker.scientific_workspace.conversation import ConversationService
-from chem_coworker.scientific_workspace.learning import DEVELOPMENT_PARTITION, build_learning_context
+from chem_coworker.scientific_workspace.core.baseline import environment_versions
+from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
+from chem_coworker.scientific_workspace.agent_context.learning import (
+    DEVELOPMENT_PARTITION,
+    build_learning_context,
+)
 from tests.chem_coworker.test_scientific_conversation import ROOT, RecordedRuntime, finish
 
 
@@ -54,7 +57,7 @@ def service(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     lesson_path = tmp_path / "lessons.jsonl"
     # Isolate conversation lifecycle tests from simultaneous source edits and costly
     # dataset audits. Real chemistry, evidence storage and baseline verification run.
-    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.code_manifest", lambda *_: {})
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.code_manifest", lambda *_: {})
 
     def capture(*_):
         baseline = {
@@ -65,7 +68,7 @@ def service(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         baseline["learning_context"] = build_learning_context(baseline, lesson_path=lesson_path)
         return baseline
 
-    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.capture_baseline", capture)
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", capture)
     instance = ConversationService(tmp_path / "conversations", runtime=LearningRuntime())
     yield instance, lesson_path
     instance.close()

@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
 import json
+from dataclasses import asdict
 from pathlib import Path
-from time import monotonic
 from threading import Event
+from time import monotonic
 from typing import Any, Mapping
 
-from .baseline import capture_baseline, verify_baseline
-from .operation_contracts import OperationDefinition, OperationProvider
-from .operations import ScientificOperations
-from .store import canonical_bytes, InvestigationEvent, InvestigationStore
+from .adapters.operations import ScientificOperations
+from .core.baseline import capture_baseline, verify_baseline
+from .core.operation_contracts import OperationDefinition, OperationProvider
+from .core.store import InvestigationEvent, InvestigationStore, canonical_bytes
 
 
 class ScientificWorkspace:
@@ -133,13 +133,14 @@ class ScientificWorkspace:
         evidence_refs: tuple[str, ...] = (), timeout_seconds: int = 60, cancel: Event | None = None,
     ) -> InvestigationEvent:
         """Record a local script's inputs/output and execution; no implicit chemistry validation."""
-        from .execution import run_python
+        from .core.execution import run_python
 
         return run_python(self.store, script, parameters, evidence_refs, timeout_seconds, cancel)
 
     def call_summary(self, event: InvestigationEvent, *, detailed: bool = False) -> dict[str, Any]:
         """Return a brief decision view, with an optional detailed projection."""
-        from .call_summaries import summarize_call, summarize_call_brief
+        from .views.brief_summaries import summarize_call_brief
+        from .views.call_summaries import summarize_call
 
         value = self.store.read_artifact(event.artifact_ref)
         project = summarize_call if detailed else summarize_call_brief
@@ -155,7 +156,7 @@ class ScientificWorkspace:
         Lists/mappings support pages of 1..20 items; omitted text, nested values,
         and ancestor context are explicitly disclosed. Full artifacts stay on disk.
         """
-        from .call_summaries import inspect_artifact_payload
+        from .views.artifact_inspection import inspect_artifact_payload
 
         return inspect_artifact_payload(
             self.store.read_artifact(artifact_ref), artifact_ref=artifact_ref,
@@ -164,13 +165,13 @@ class ScientificWorkspace:
 
     def capabilities(self) -> dict[str, Any]:
         """Probe local imports and configured file presence; do not assert web access."""
-        from .capabilities import local_capabilities
+        from .core.capabilities import local_capabilities
 
         return local_capabilities(self.store.manifest["baseline"])
 
     def fetch_source(self, url: str, *, title: str | None = None) -> InvestigationEvent:
         """Save a bounded public source snapshot with extraction and retrieval provenance."""
-        from .literature import fetch_source
+        from .adapters.literature import fetch_source
 
         return fetch_source(self.store, url, title=title)
 
@@ -178,7 +179,7 @@ class ScientificWorkspace:
         self, text: str, *, url: str, title: str | None = None, locator: str | None = None,
     ) -> InvestigationEvent:
         """Save an agent-supplied passage without claiming independent retrieval."""
-        from .literature import capture_source
+        from .adapters.literature import capture_source
 
         return capture_source(self.store, text, url=url, title=title, locator=locator)
 
@@ -186,7 +187,7 @@ class ScientificWorkspace:
         self, source_ref: str, *, query: str | None = None, offset: int = 0, limit: int = 4000,
     ) -> dict[str, Any]:
         """Read a bounded source passage with exact snapshot locations."""
-        from .literature import inspect_source
+        from .adapters.literature import inspect_source
 
         return inspect_source(self.store, source_ref, query=query, offset=offset, limit=limit)
 
@@ -195,7 +196,7 @@ class ScientificWorkspace:
         excerpt: str | None = None, locator: str | None = None,
     ) -> InvestigationEvent:
         """Save an exact passage from an existing snapshot, not a generated quotation."""
-        from .literature import record_source_excerpt
+        from .adapters.literature import record_source_excerpt
 
         return record_source_excerpt(
             self.store, source_ref, start=start, end=end, excerpt=excerpt, locator=locator,
@@ -205,7 +206,7 @@ class ScientificWorkspace:
         self, draft: Mapping[str, Any], findings: list[dict[str, Any]],
     ) -> InvestigationEvent:
         """Record the agent's explicit challenge of a draft; this is not independent review."""
-        from .evidence_review import record_evidence_review
+        from .answers.evidence_review import record_evidence_review
 
         return record_evidence_review(self.store, draft, findings)
 
@@ -218,19 +219,19 @@ class ScientificWorkspace:
         Empty lists, null yields/URLs and schema boilerplate may be omitted from
         the input. Scientific basis, citations and content must remain explicit.
         """
-        from .answer_finalization import finalize_answer
+        from .answers.answer_finalization import finalize_answer
 
         return finalize_answer(self.store, draft_path, draft, findings=findings)
 
     def task_guide(self, task: str) -> dict[str, Any]:
         """Read an available optional guide from recorded application context."""
-        from .learning import task_guide
+        from .agent_context.learning import task_guide
 
         return task_guide(self.store, task)
 
     def recall_lessons(self, task: str, limit: int = 3) -> dict[str, Any]:
         """Read at most three frozen procedural lessons; these are not scientific evidence."""
-        from .learning import recall_lessons
+        from .agent_context.learning import recall_lessons
 
         return recall_lessons(self.store, task, limit)
 
@@ -238,18 +239,18 @@ class ScientificWorkspace:
         self, task: str, advice: str, applies_when: str, evidence_refs: list[str], scope: str = "code",
     ) -> InvestigationEvent:
         """Save evidence-linked procedural advice for later runs; at most three per turn."""
-        from .learning import record_lesson
+        from .agent_context.learning import record_lesson
 
         return record_lesson(self.store, task, advice, applies_when, evidence_refs, scope)
 
     def retire_lesson(self, lesson_id: str, reason: str, evidence_refs: list[str]) -> InvestigationEvent:
         """Record a correction that retires a recalled lesson for subsequent investigations."""
-        from .learning import retire_lesson
+        from .agent_context.learning import retire_lesson
 
         return retire_lesson(self.store, lesson_id, reason, evidence_refs)
 
     def publish_lessons(self) -> dict[str, Any]:
         """Publish pending lessons after a CLI investigation; the conversation service does this itself."""
-        from .learning import publish_lessons
+        from .agent_context.learning import publish_lessons
 
         return publish_lessons(self.store)

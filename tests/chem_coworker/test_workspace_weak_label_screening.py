@@ -11,15 +11,19 @@ import pytest
 
 from app.web_api.main import create_app
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.agent_runtime import AgentResult
-from chem_coworker.scientific_workspace.baseline import (
-    artifact_identity, code_manifest, environment_versions,
+from chem_coworker.scientific_workspace.runtime.agent_runtime import AgentResult
+from chem_coworker.scientific_workspace.core.baseline import (
+    artifact_identity,
+    code_manifest,
+    environment_versions,
 )
-from chem_coworker.scientific_workspace.call_summaries import (
-    summarize_call, summarize_call_brief,
+from chem_coworker.scientific_workspace.views.call_summaries import summarize_call
+from chem_coworker.scientific_workspace.views.brief_summaries import summarize_call_brief
+from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
+from condition_recommender import (
+    generate_weak_label_screening_array,
+    weak_label_recipe_catalog_path,
 )
-from chem_coworker.scientific_workspace.conversation import ConversationService
-from condition_recommender import generate_weak_label_screening_array, weak_label_recipe_catalog_path
 from tests.chem_coworker.test_scientific_conversation import finish
 from tests.condition_recommender.test_weak_label_recommendation import QUERY, _dataset
 

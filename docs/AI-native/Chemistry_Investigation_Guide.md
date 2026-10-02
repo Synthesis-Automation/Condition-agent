@@ -7,11 +7,11 @@ the instructions maintained by each layer.
 
 | Responsibility | Instruction owner |
 | --- | --- |
-| Agent autonomy, fixed-baseline rules and uncertainty | [Core instructions](../../chem_coworker/scientific_workspace/instructions/core.md) |
-| Recorded calls, custom scripts and captured primary sources | [Workspace usage](../../chem_coworker/scientific_workspace/instructions/workspace_usage.md) |
-| Condition decisions and optional screening advice | [Conditions playbook](../../chem_coworker/scientific_workspace/guides/conditions.md) |
-| Route decisions and optional specialized investigations | [Retrosynthesis playbook](../../chem_coworker/scientific_workspace/guides/retrosynthesis.md) |
-| Scientific attribution, step evidence and final self-review | [Answer authoring](../../chem_coworker/scientific_workspace/instructions/answer_authoring.md) |
+| Agent autonomy, fixed-baseline rules and uncertainty | [Core instructions](../../chem_coworker/scientific_workspace/agent_instructions/core.md) |
+| Recorded calls, custom scripts and captured primary sources | [Workspace usage](../../chem_coworker/scientific_workspace/agent_instructions/workspace_usage.md) |
+| Condition decisions and optional screening advice | [Conditions playbook](../../chem_coworker/scientific_workspace/task_playbooks/conditions.md) |
+| Route decisions and optional specialized investigations | [Retrosynthesis playbook](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis.md) |
+| Scientific attribution, step evidence and final self-review | [Answer authoring](../../chem_coworker/scientific_workspace/agent_instructions/answer_authoring.md) |
 | Concise default answers and reaction-step display | [Presentation profile](../../chem_coworker/scientific_workspace/presentation/default.md) |
 
 Main task playbooks name their optional supporting guides. The agent can skip,

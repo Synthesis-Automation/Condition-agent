@@ -6,12 +6,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from chem_coworker.scientific_workspace import prompts
+from chem_coworker.scientific_workspace.agent_context import prompts
 
 
 @pytest.fixture
 def prompt_context(tmp_path, monkeypatch):
-    directory = Path(prompts.__file__).parent
+    directory = prompts.WORKSPACE_ROOT
     resources = {
         name: {"text": (directory / name).read_text("utf-8")}
         for name in prompts.PROMPT_RESOURCES
@@ -38,7 +38,7 @@ def prompt_context(tmp_path, monkeypatch):
 
 
 def test_conversation_reexports_single_prompt_implementation():
-    from chem_coworker.scientific_workspace.conversation import investigation_prompt
+    from chem_coworker.scientific_workspace.runtime.conversation import investigation_prompt
 
     assert investigation_prompt is prompts.investigation_prompt
 
@@ -91,11 +91,31 @@ def test_presentation_changes_independently_of_core_or_task_guide(prompt_context
 
 def test_new_context_never_silently_uses_missing_current_resource(prompt_context):
     workspace, context, _ = prompt_context
-    del context["resources"]["instructions/core.md"]
-    with pytest.raises(KeyError, match="instructions/core.md"):
+    del context["resources"]["agent_instructions/core.md"]
+    with pytest.raises(KeyError, match="agent_instructions/core.md"):
         prompts.investigation_prompt(workspace, "Investigate")
     with pytest.raises(ValueError, match="presentation profile"):
         prompts.investigation_prompt(workspace, "Investigate", presentation_profile="../core")
+
+
+def test_original_instruction_snapshots_remain_readable_without_live_files(prompt_context, monkeypatch):
+    workspace, context, _ = prompt_context
+    context["resources"] = {
+        name.replace("agent_instructions/", "instructions/"): resource
+        for name, resource in context["resources"].items()
+    }
+    context["resources"]["instructions/core.md"]["text"] = "Saved investigator rules."
+    monkeypatch.setattr(Path, "read_text", lambda *_, **__: pytest.fail("Unrecorded resource read"))
+    text = prompts.investigation_prompt(workspace, "Investigate")
+    assert text.startswith("Saved investigator rules.")
+    assert "w.run_python" in text
+
+
+def test_current_instruction_snapshot_never_revives_a_legacy_resource(prompt_context):
+    workspace, context, _ = prompt_context
+    context["resources"]["instructions/core.md"] = context["resources"].pop("agent_instructions/core.md")
+    with pytest.raises(KeyError, match="agent_instructions/core.md"):
+        prompts.investigation_prompt(workspace, "Investigate")
 
 
 def test_legacy_investigation_without_guidance_can_still_compose(tmp_path, monkeypatch):

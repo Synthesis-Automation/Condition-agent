@@ -10,8 +10,8 @@ import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
 from chem_coworker.scientific_workspace.__main__ import main
-from chem_coworker.scientific_workspace.activity import ActivityHistory
-from chem_coworker.scientific_workspace.operations import ScientificOperations
+from chem_coworker.scientific_workspace.runtime.activity import ActivityHistory
+from chem_coworker.scientific_workspace.adapters.operations import ScientificOperations
 
 
 @pytest.mark.parametrize("status", ["timed_out", "error"])

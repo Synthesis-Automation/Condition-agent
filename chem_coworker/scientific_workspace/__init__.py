@@ -1,7 +1,7 @@
 """Scientific workspaces for external agents, without an internal LLM controller."""
 
-from .store import InvestigationEvent, InvestigationStore
-from .operation_contracts import OperationDefinition, OperationProvider
+from .core.operation_contracts import OperationDefinition, OperationProvider
+from .core.store import InvestigationEvent, InvestigationStore
 from .workspace import ScientificWorkspace
 
 __all__ = [
