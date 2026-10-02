@@ -2,6 +2,17 @@
 
 Date: 2026-10-02
 
+## Registry audit correction (2026-10-02)
+
+The two previously reported registry failures were resolved by a
+[source-backed BINAP curation correction](../new/binap_registry_identity_correction_20261002.md).
+R and racemate aliases resolve separately, while the unqualified name remains
+explicitly ambiguous. The audit tests are retained and validation is unchanged.
+All 77 registry tests pass. The complete suite returned **2,279 passed, 2 skipped
+and zero failures**; earlier failure counts below describe historical baselines.
+Restart long-running applications to reload cached registry definitions and use
+a new investigation for the changed scientific baseline.
+
 ## Core separation (2026-10-02)
 
 The [core contract](Scientific_Workspace_Core.md) now separates conversation

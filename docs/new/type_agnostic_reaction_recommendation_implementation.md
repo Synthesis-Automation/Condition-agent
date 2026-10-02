@@ -7,6 +7,10 @@
 
 ## 1. Purpose and authority
 
+2026-10-02: [BINAP registry identity correction](binap_registry_identity_correction_20261002.md)
+separates R and racemate aliases and declares the unqualified name ambiguous.
+The two audit regressions are retained; no validation rules or schemas are relaxed.
+
 2026-09-25: [condition investigation and recipe assessment](condition_investigation_assessment_20260925.md)
 separates unresolved reaction evidence from recipe conflicts, restores observed
 spectator context in direct assessment, and adds attributed precedent inspection

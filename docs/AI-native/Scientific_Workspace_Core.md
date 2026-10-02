@@ -158,10 +158,10 @@ checks do not satisfy independent chemistry-review or untouched-evaluation gates
 
 ## Verification on 2026-10-02
 
-The complete `pytest -q` run finished with **2,271 passed, 2 skipped and 2 failed**.
-The remaining failures are `test_validate_reports_current_registry_state` and
+The original core-separation `pytest -q` run finished with **2,271 passed, 2 skipped and 2 failed**.
+At that point, the failures were `test_validate_reports_current_registry_state` and
 `test_registry_audit_reconciles_all_rows` in `tests/condition_registry/`: both
-report two undeclared ambiguous identifiers. Both failures were reproduced using
+reported two undeclared ambiguous identifiers. Both failures were reproduced using
 the original packages and tests from revision
 `2c49cc620a0ef6f152c07fb145c4abb497aff626` in an isolated snapshot. The core changes
 do not change those registry definitions or relax validation.
@@ -170,3 +170,7 @@ Core, conversation, activity, scientific-domain and application regressions pass
 apart from those existing registry checks. Ruff checks passed for the changed
 Python modules and tests. Historical evidence remains readable; start a new
 investigation after this scientific-core upgrade to use the v2 baseline.
+
+The registry defects were subsequently resolved by the separate
+[BINAP curation correction](../new/binap_registry_identity_correction_20261002.md).
+Both audit tests remain in place; see that correction for current validation results.

@@ -98,11 +98,11 @@ than calendar estimates.
    identity, and the validation status of each artifact.
 2. Run the full test suite and taxonomy, registry, conversion, and index checks
    applicable to the selected baseline.
-3. Investigate the two registry failures observed during the preceding design
-   review: `test_validate_reports_current_registry_state` and
-   `test_registry_audit_reconciles_all_rows` reported two undeclared ambiguous
-   identifiers. Recheck current state; this observation is historical and must
-   not be assumed to describe a later checkout.
+3. Validate curated substance identities and explicitly shared aliases. The two
+   registry failures from the preceding review were resolved by the
+   [BINAP identity correction](../new/binap_registry_identity_correction_20261002.md).
+   Retain the audit regressions and recheck each selected baseline; historical
+   results must not be assumed to describe a later checkout.
 4. Classify existing operations as directly reusable, coupled to the assistance
    controller, or missing. Record owners and evidence requirements.
 5. Select development cases spanning straightforward chemistry, ambiguity,

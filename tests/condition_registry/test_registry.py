@@ -1,3 +1,5 @@
+import pytest
+
 from condition_registry import (
     ConditionRegistry,
     Substance,
@@ -70,6 +72,53 @@ def test_registry_audit_reconciles_all_rows() -> None:
     assert report["issue_rows"] == 0
     assert report["identifier_total_rows"] >= 2
     assert report["identifier_issue_rows"] == 0
+
+
+@pytest.mark.parametrize(
+    ("query", "identifier_type", "expected_id"),
+    (
+        ("(R)-BINAP", "name", "cas:76189-55-4"),
+        ("76189-55-4", "cas", "cas:76189-55-4"),
+        ("rac-BINAP", "name", "cas:98327-87-8"),
+        ("98327-87-8", "cas", "cas:98327-87-8"),
+        (
+            "RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL",
+            "common_name",
+            "cas:98327-87-8",
+        ),
+    ),
+)
+def test_binap_enantiomer_and_racemate_resolve_separately(
+    query: str, identifier_type: str, expected_id: str,
+) -> None:
+    result = resolve_identifier(query, identifier_type=identifier_type)
+
+    assert result.status == "resolved"
+    assert result.substance is not None
+    assert result.substance.substance_id == expected_id
+    if expected_id == "cas:76189-55-4":
+        assert result.substance.canonical_name == "(R)-BINAP"
+        assert "rac-BINAP" not in result.substance.aliases
+
+
+def test_unqualified_binap_name_and_structure_preserve_ambiguity() -> None:
+    enantiomer = resolve_substance(cas="76189-55-4").substance
+    assert enantiomer is not None
+    assert enantiomer.smiles is not None
+
+    for query, identifier_type in (
+        ("BINAP", "name"), (enantiomer.smiles, "smiles"),
+    ):
+        result = resolve_identifier(query, identifier_type=identifier_type)
+        assert result.status == "ambiguous"
+        assert result.substance is None
+        if identifier_type == "name":
+            assert result.candidates == ("cas:76189-55-4", "cas:98327-87-8")
+        else:
+            assert {
+                "cas:76189-55-4", "cas:76189-56-5", "cas:98327-87-8",
+            } <= set(result.candidates)
+        assert result.warnings == ("AMBIGUOUS_IDENTIFIER",)
 
 
 def test_condition_vocabulary_is_immutable_and_versioned() -> None:

@@ -52,8 +52,9 @@ def test_validate_reports_current_registry_state(capsys) -> None:
 
     exit_code = main(["validate", "--format", "json"])
     report = json.loads(capsys.readouterr().out)
-    assert exit_code == (1 if report["issue_rows"] else 0)
+    assert exit_code == (1 if report["has_errors"] else 0)
     assert report["accepted_rows"] + report["issue_rows"] == report["total_rows"]
+    assert report["identifier_issue_rows"] == 0
 
 
 def test_audit_writes_outputs(tmp_path, capsys) -> None:
