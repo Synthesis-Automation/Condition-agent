@@ -1,6 +1,25 @@
 # Scientific workspace implementation status
 
-Date: 2026-09-26
+Date: 2026-10-02
+
+## Core separation (2026-10-02)
+
+The [core contract](Scientific_Workspace_Core.md) now separates conversation
+coordination from prompt composition, optional task guides and default presentation.
+Explicit capability definitions own contract versions, evidence inputs, incomplete
+execution status and replay projections. New v2 scientific baselines exclude
+explicit application-layer files while retaining scientific adapters, execution,
+storage and evidence validation. Each turn snapshots application resources and
+runtime settings; changed application context starts a fresh runtime thread over
+saved investigation history. Historical v1 verification remains strict. Chemistry,
+datasets, answer schemas and browser layouts are unchanged. Independent chemistry
+review and untouched evaluation remain pending.
+
+Validation: the full suite returned 2,271 passed, 2 skipped and two pre-existing
+registry failures. An isolated archive of original revision
+`2c49cc620a0ef6f152c07fb145c4abb497aff626` reproduced both failures with two
+undeclared ambiguous identifiers. Core/activity/application regressions and static
+checks passed; registry definitions and chemistry snapshots were not changed.
 
 The local scientific workspace is implemented in
 [`chem_coworker/scientific_workspace`](../../chem_coworker/scientific_workspace).
@@ -12,6 +31,22 @@ interface now answer natural-language questions using this same workspace.
 Neither introduces new chemistry rules or a parallel recommendation engine.
 
 See the [quickstart](readme.md) for runnable commands.
+
+## Task-layer cleanup (2026-10-02)
+
+The two main playbooks now use four sections: purpose/context, scientific questions,
+evidence distinctions and stopping criteria. Screening, fragment discovery, route
+revision and forward challenges have optional supporting guides, loaded through the
+existing recorded discovery mechanism. Tool arguments and limits stay in the catalogue
+and reference; scientific attribution stays in the answer contract; formatting stays
+in presentation. The overview document is an ownership map rather than a duplicate
+workflow. No runtime, scientific implementation, schema or UI layout changes are needed.
+See [task ownership](Scientific_Workspace_Core.md#task-playbooks).
+
+Validation: 112 focused tests passed. The complete suite returned 2,271 passed,
+2 skipped and the same two pre-existing registry identifier failures. Static checks
+passed for changed tests, documentation links resolve, and the scientific code
+manifest fingerprint is identical before and after this task-layer cleanup.
 
 ## Research environment milestone (2026-09-26)
 

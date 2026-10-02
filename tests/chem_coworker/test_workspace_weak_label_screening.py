@@ -170,8 +170,13 @@ def test_agent_web_conversation_records_screening_and_boots(tmp_path: Path) -> N
 
         def run(self, **kwargs: Any) -> AgentResult:
             assert OPERATION in kwargs["prompt"]
-            assert "source row numbers" in kwargs["prompt"]
             scientific = ScientificWorkspace(kwargs["workspace"])
+            assert "w.task_guide('conditions')" in kwargs["prompt"]
+            assert "conditions_screening" in scientific.task_guide("conditions")["text"]
+            guide = scientific.task_guide("conditions_screening")
+            assert "source row" in guide["text"]
+            frozen = scientific.store.manifest["baseline"]["learning_context"]
+            assert guide == frozen["guides"]["conditions_screening"]
             event = scientific.run(OPERATION, {"reaction_smiles": QUERY, "array_size": 96})
             result = scientific.store.read_artifact(event.artifact_ref)
             assert result["result"]["valid"]

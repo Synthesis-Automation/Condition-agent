@@ -2,12 +2,11 @@
 
 from copy import deepcopy
 import json
-from pathlib import Path
 
 import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
-from chem_coworker.scientific_workspace.baseline import code_manifest
+from chem_coworker.scientific_workspace.baseline import code_manifest, legacy_code_manifest
 from chem_coworker.scientific_workspace.learning import (
     DEVELOPMENT_PARTITION, build_learning_context,
 )
@@ -233,13 +232,17 @@ def test_guides_are_hashed_and_context_corruption_is_detected(investigations):
     guide = workspace.task_guide("retrosynthesis")
     assert "optional menu" in guide["text"]
     assert "disconnect_target" in guide["text"]
-    assert "multistep planner" in " ".join(guide["text"].split())
+    assert "retrosynthesis_fragments" in guide["text"]
+    policy = workspace.operations.definition("disconnect_target").usage_policy
+    assert "single-step calls" in policy
     path = investigations.repository / "chem_coworker" / "scientific_workspace" / "guides" / "conditions.md"
     path.parent.mkdir(parents=True)
     path.write_text("First guide", encoding="utf-8")
     before = code_manifest(investigations.repository)
+    legacy_before = legacy_code_manifest(investigations.repository)
     path.write_text("Updated guide", encoding="utf-8")
-    assert before != code_manifest(investigations.repository)
+    assert before == code_manifest(investigations.repository)
+    assert legacy_before != legacy_code_manifest(investigations.repository)
     corrupted = deepcopy(workspace.store.manifest["baseline"]["learning_context"])
     corrupted["guides"]["retrosynthesis"]["text"] = "Unrecorded guide"
     workspace.store.manifest["baseline"]["learning_context"] = corrupted

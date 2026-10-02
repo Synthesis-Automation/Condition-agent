@@ -203,7 +203,8 @@ def test_single_step_preserves_engine_evidence_without_stock_or_internal_review(
 def test_agent_selects_next_intermediate_and_assesses_assembled_route(workspace) -> None:
     from rdkit import Chem
 
-    canonical = lambda smiles: Chem.MolToSmiles(Chem.MolFromSmiles(smiles))
+    def canonical(smiles: str) -> str:
+        return Chem.MolToSmiles(Chem.MolFromSmiles(smiles))
     target = _route_value()["target_smiles"]
     first, initial = call(workspace, "disconnect_target", target_smiles=target)
     chosen = next(candidate for strategy in initial["strategies"]
@@ -249,13 +250,12 @@ def test_prompt_assigns_multistep_decisions_to_agent(workspace) -> None:
     from chem_coworker.scientific_workspace.conversation import investigation_prompt
 
     prompt = investigation_prompt(workspace, "Propose a synthesis")
-    assert "disconnect_target(target_smiles=...)" in prompt
-    assert "You own multi-step planning" in prompt
     assert "Do not invoke the built-in multistep planner, including through custom Python scripts." in prompt
     assert "assess_route_proposal" in prompt
-    assert "Do not read the README or answer-schema.json" in prompt
+    assert "single-step" in prompt
+    assert "or answer-schema.json at startup" in prompt
     assert "decision-critical field" in prompt
-    assert "Repeat a search only with a" in prompt
+    assert "Repeat a search only with a" in " ".join(prompt.split())
     for retired in ("plan_routes", "revise_routes", "prepare_route_proposal", "beam_width"):
         assert retired not in prompt
 

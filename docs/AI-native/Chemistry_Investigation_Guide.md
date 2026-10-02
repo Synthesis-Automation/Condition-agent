@@ -1,38 +1,24 @@
 # Chemistry investigation guide
 
-The investigator uses the existing Codex tool loop and recorded scientific workspace.
-The executable prompt guidance lives in
-[`investigation_guide.py`](../../chem_coworker/scientific_workspace/investigation_guide.py),
-which participates in the code baseline. This guide describes its scientific intent.
+Scientific investigations use the recorded Python/CLI workspace and the existing
+agent tool loop. The agent chooses useful actions from the user's question and
+available evidence. This document is an ownership map; the linked resources are
+the instructions maintained by each layer.
 
-1. **Identify the question and target.** Check connectivity, charge, chemical form,
-   protecting groups and specified stereochemistry. Calculated CIP labels refer to
-   the supplied graph; they do not establish experimental enantiopurity.
-2. **Find the experiment.** Search primary papers, patents and supporting information.
-   Read the relevant example and precursor preparations. Search snippets, broad
-   patent claims and vendor listings are leads; they are not experimental procedures.
-3. **Compare source and target.** State exact versus analog evidence. Compare
-   connectivity, stereochemistry, salt/free form and protecting groups. A cis
-   racemate precedent does not establish a single-enantiomer route. Unspecified
-   stereochemistry does not establish that a sample was racemic.
-4. **Use the appropriate local checks.** Record graph analysis, retrieval, recipe
-   compatibility, route assessment and custom scripts. Unsupported reconstruction
-   means the tool has not established the step, not that the chemistry is impossible.
-5. **Read conditions in context.** Preserve component identities/roles, quantities,
-   addition order, activation, solvent, temperature, duration, atmosphere, workup
-   and isolation. Leave missing information unknown. Separate proposed adaptations
-   from conditions actually reported for that substrate.
-6. **Challenge the weakest claim.** Check yield attribution, stereoisomer identity,
-   missing steps, starting-material availability and conflicting precedents. Do not
-   promote a procurement assumption into confirmed stock or an analog into an exact
-   experimental synthesis. Record an honest self-review of the final draft.
-7. **Present the decision clearly.** Lead with the best-supported conclusion, show
-   attributed reaction steps, link original sources, and retain material limitations
-   in the main answer. Keep detailed calls and raw snapshots available for inspection.
+| Responsibility | Instruction owner |
+| --- | --- |
+| Agent autonomy, fixed-baseline rules and uncertainty | [Core instructions](../../chem_coworker/scientific_workspace/instructions/core.md) |
+| Recorded calls, custom scripts and captured primary sources | [Workspace usage](../../chem_coworker/scientific_workspace/instructions/workspace_usage.md) |
+| Condition decisions and optional screening advice | [Conditions playbook](../../chem_coworker/scientific_workspace/guides/conditions.md) |
+| Route decisions and optional specialized investigations | [Retrosynthesis playbook](../../chem_coworker/scientific_workspace/guides/retrosynthesis.md) |
+| Scientific attribution, step evidence and final self-review | [Answer authoring](../../chem_coworker/scientific_workspace/instructions/answer_authoring.md) |
+| Concise default answers and reaction-step display | [Presentation profile](../../chem_coworker/scientific_workspace/presentation/default.md) |
 
-This is an adaptive guide. A short identity question does not require a full route
-search; a difficult synthesis may need repeated literature/tool cycles. The agent
-chooses actions that resolve uncertainty and can stop with a useful partial result.
+Main task playbooks name their optional supporting guides. The agent can skip,
+reorder or replace suggestions; chemistry and evidence validators still apply.
+Browser turns record the actual instructions independently of scientific identity.
+See [task ownership and extension rules](Scientific_Workspace_Core.md#task-playbooks)
+and the [workspace reference](readme.md) for implementation and tool details.
 
-Evidence capture and deterministic attribution checks preserve traceability. They
-do not replace chemical judgment, independent review or experimental validation.
+Evidence capture and deterministic attribution checks preserve traceability.
+They do not replace chemical judgment, independent review or experimental validation.

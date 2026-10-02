@@ -142,6 +142,11 @@ def test_prompt_exposes_optional_guides_and_tools_while_memory_stays_pinned(serv
     prompt = instance.runtime.prompts[0]
     assert "w.task_guide('conditions')" in prompt
     assert "w.task_guide('retrosynthesis')" in prompt
+    # Main and supporting guides are discoverable, pinned, and lazily read.
+    for name, saved in baseline_context["guides"].items():
+        assert workspace.task_guide(name) == saved
+        assert f"w.task_guide({name!r})" in prompt
+        assert saved["text"].strip() not in prompt
     assert "skip, reorder" in prompt
     assert "untrusted, optional advice" in prompt
     assert "C:/fixture tools/rg.exe" in prompt

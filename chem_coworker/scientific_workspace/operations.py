@@ -9,41 +9,114 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from .operation_contracts import OperationDefinition
 from .store import InvestigationStore
+
+
+def _fragment_replay_result(result: Any) -> Any:
+    """Retain fragment chemistry while excluding per-attempt execution telemetry."""
+    if isinstance(result, dict):
+        return {key: value for key, value in result.items() if key != "execution"}
+    return result
+
+
+def _forward_replay_result(result: Any) -> Any:
+    """Compare forward stage outcomes without attempt-specific logs and timings."""
+    if not isinstance(result, dict):
+        return result
+    execution = dict(result.get("execution", {}))
+    execution.pop("diagnostics", None)
+    execution["timings"] = {
+        key: value for key, value in execution.get("timings", {}).items()
+        if key != "elapsed_seconds"
+    }
+    execution["stages"] = [
+        {key: value for key, value in stage.items()
+         if key not in {"elapsed_seconds", "duration_seconds"}}
+        for stage in execution.get("stages", [])
+    ]
+    return {**result, "execution": execution}
 
 
 class ScientificOperations:
     """Lazy application adapters; no LLM, scientific rule, or network dependency."""
 
-    NAMES = (
-        "analyze_reaction", "analyze_molecule", "recommend_conditions",
-        "generate_weak_label_screening_array",
-        "compare_molecules", "inspect_reactive_sites",
-        "get_precedents", "get_procedures", "resolve_recipe", "assess_recipe",
-        "search_fragment_precedents", "suggest_search_fragments",
-        "inspect_condition_precedents", "propose_condition_adaptation",
-        "disconnect_target",
-        "assess_route_step", "assess_route_proposal",
-        "assess_route_step_forward",
-        "inspect_route_step", "inspect_step_precedents", "revise_route_branch", "compare_route_proposals",
+    DEFINITIONS = (
+        OperationDefinition("analyze_reaction"),
+        OperationDefinition("analyze_molecule"),
+        OperationDefinition("recommend_conditions", required_artifacts=("condition_index", "shared_core_index")),
+        OperationDefinition("generate_weak_label_screening_array",
+                            required_artifacts=("weak_label_records", "weak_label_recipe_catalog")),
+        OperationDefinition("compare_molecules"),
+        OperationDefinition("inspect_reactive_sites"),
+        OperationDefinition("get_precedents", required_artifacts=("condition_index", "shared_core_index")),
+        OperationDefinition("get_procedures", required_artifacts=("procedure_catalog",)),
+        OperationDefinition("resolve_recipe"),
+        OperationDefinition("assess_recipe"),
+        OperationDefinition("search_fragment_precedents", required_artifacts=("fragment_index",),
+                            execution_status_field="execution_status",
+                            replay_comparison="scientific_result_excluding_fragment_execution_telemetry",
+                            replay_projection=_fragment_replay_result),
+        OperationDefinition("suggest_search_fragments"),
+        OperationDefinition("inspect_condition_precedents",
+                            required_artifacts=("condition_index", "shared_core_index")),
+        OperationDefinition("propose_condition_adaptation", evidence_arguments=("source_ref", "evidence_refs")),
+        OperationDefinition(
+            "disconnect_target", required_artifacts=("retro_library",),
+            usage_policy=(
+                "Retrosynthesis in this workspace uses single-step calls; the agent owns "
+                "multi-step planning. Do not invoke the built-in multistep planner, "
+                "including through custom Python scripts."
+            ),
+        ),
+        OperationDefinition("assess_route_step", required_artifacts=("retro_library",),
+                            evidence_arguments=("evidence_refs",)),
+        OperationDefinition("assess_route_proposal", required_artifacts=("retro_library",),
+                            evidence_arguments=("evidence_refs",)),
+        OperationDefinition("assess_route_step_forward", required_artifacts=("forward_library",),
+                            evidence_arguments=("source_ref",), execution_status_field="execution_status",
+                            replay_comparison="scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry",
+                            replay_projection=_forward_replay_result),
+        OperationDefinition("inspect_route_step", evidence_arguments=("source_ref",)),
+        OperationDefinition("inspect_step_precedents", evidence_arguments=("source_ref",)),
+        OperationDefinition("revise_route_branch", required_artifacts=("retro_library",),
+                            evidence_arguments=("source_ref", "evidence_refs")),
+        OperationDefinition("compare_route_proposals", evidence_arguments=("source_refs",)),
     )
 
     def __init__(self, store: InvestigationStore) -> None:
+        names = tuple(item.name for item in self.DEFINITIONS)
+        if len(set(names)) != len(names):
+            raise ValueError("Scientific operation names must be unique")
+        if any(not callable(getattr(self, name, None)) for name in names):
+            raise ValueError("Every scientific operation requires a registered implementation")
         self.store = store
         self._recommender: Any = None
         self._proposal_library: Any = None
 
-    def catalog(self) -> list[dict[str, str]]:
+    def definition(self, operation: str) -> OperationDefinition:
+        """Resolve a reviewed capability declaration without importing caller code."""
+        for definition in self.DEFINITIONS:
+            if definition.name == operation:
+                return definition
+        raise ValueError(f"Unknown scientific operation: {operation}")
+
+    def catalog(self) -> list[dict[str, Any]]:
         """Describe the explicit operations available to a workspace client."""
-        return [{"name": name, "signature": str(inspect.signature(getattr(self, name))),
-                 "description": inspect.getdoc(getattr(self, name)) or ""}
-                for name in self.NAMES]
+        return [{"name": item.name, "contract_version": item.contract_version,
+                 "signature": str(inspect.signature(getattr(self, item.name))),
+                 "description": inspect.getdoc(getattr(self, item.name)) or "",
+                 "required_artifacts": list(item.required_artifacts),
+                 "evidence_arguments": list(item.evidence_arguments),
+                 "usage_policy": item.usage_policy,
+                 "execution_status_field": item.execution_status_field,
+                 "replay_comparison": item.replay_comparison}
+                for item in self.DEFINITIONS]
 
     def invoke(self, operation: str, arguments: Mapping[str, Any]) -> Any:
         """Dispatch only named application operations, never caller-supplied imports."""
-        if operation not in self.NAMES:
-            raise ValueError(f"Unknown scientific operation: {operation}")
-        return getattr(self, operation)(**arguments)
+        definition = self.definition(operation)
+        return getattr(self, definition.name)(**arguments)
 
     def _path(self, name: str) -> Path:
         entry = self.store.manifest["baseline"]["artifacts"].get(name)

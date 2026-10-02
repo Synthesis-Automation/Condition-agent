@@ -2,6 +2,15 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+The [core boundary](Scientific_Workspace_Core.md) separates execution and evidence
+recording from task advice and presentation. New investigations use
+`scientific_baseline.v2`; each browser turn saves independently identified
+application resources and runtime settings. Scientific code/data changes still
+require a new investigation. Task-guide or presentation-instruction edits can enter
+the next recorded turn without invalidating science; older v1 baselines keep their
+original strict verification. The existing answer schema and browser layout remain
+unchanged in this core phase.
+
 New route assessments use lossless compact artifact storage when large diagnostic
 sections are present. `scientific_artifact_storage.v1` wraps the call/replay payload
 and identifies linked sections by literal JSON paths. Operator template-ID lists,
@@ -198,8 +207,10 @@ and local-only results link to saved evidence within the conversation. The Sourc
 panel also retains access to captured excerpts. Technical fenced code remains literal.
 Older answers without structured steps are not reconstructed from prose.
 After updating the server code, restart the server and refresh the browser. Saved
-answers acquire the new presentation without rerunning the agent; start a new chat
-for investigations after the runtime prompt changes its recorded baseline.
+answers acquire the new presentation without rerunning the agent. For v2 baselines,
+changed prompt resources enter the next turn as recorded application context and
+start a new agent thread over saved history. Scientific changes and older v1
+baselines still require a new investigation.
 Install `requirements-web.txt` when setting up a new
 environment (the renderer uses `markdown-it-py`). Select
 a saved conversation to continue it, including after a normal server restart.
@@ -454,26 +465,42 @@ python -m chem_coworker.scientific_workspace capabilities results/ai_native/YOUR
 
 ### Optional guides and lessons from previous runs
 
-Two short versioned guides offer questions, examples, pitfalls and stopping
-considerations: [conditions](../../chem_coworker/scientific_workspace/guides/conditions.md)
-and [retrosynthesis](../../chem_coworker/scientific_workspace/guides/retrosynthesis.md).
-The agent may skip a guide or reorder, repeat or replace its suggestions. The
-guides do not impose a required workflow. Tool contracts still enforce scientific
-inputs, structural checks and evidence requirements.
+Two short main playbooks describe purpose/context, scientific questions, evidence
+distinctions and stopping criteria:
+[conditions](../../chem_coworker/scientific_workspace/guides/conditions.md) and
+[retrosynthesis](../../chem_coworker/scientific_workspace/guides/retrosynthesis.md).
+The agent chooses which advice to read and may reorder, repeat or replace suggestions.
+Tool contracts own inputs and execution limits; domain validators and the saved-answer
+contract own scientific and attribution checks; presentation owns answer formatting.
 
-At investigation creation, the baseline freezes both guides and up to three
+Specialized advice is available on demand:
+
+| Guide name | Read when useful |
+| --- | --- |
+| [`conditions_screening`](../../chem_coworker/scientific_workspace/guides/conditions_screening.md) | Plan a diverse panel with explicitly weak-label evidence. |
+| [`retrosynthesis_fragments`](../../chem_coworker/scientific_workspace/guides/retrosynthesis_fragments.md) | Find construction evidence for a chosen core. |
+| [`retrosynthesis_revision`](../../chem_coworker/scientific_workspace/guides/retrosynthesis_revision.md) | Change a saved branch and compare complete reassessments. |
+| [`retrosynthesis_forward`](../../chem_coworker/scientific_workspace/guides/retrosynthesis_forward.md) | Resolve a consequential product-competition question. |
+
+The existing core discovers `guides/*.md` and advertises their names. It loads guide
+text only on request or explicit inclusion; supporting advice adds no task router,
+required sequence or new memory category. See [task ownership](Scientific_Workspace_Core.md#task-playbooks).
+
+At investigation creation, the baseline freezes all discovered guides and up to three
 applicable lessons per task (`general`, `conditions`, `retrosynthesis`). Selection
 prefers exact-task advice, then general advice, and newer records within each
 category. It verifies their recorded evidence and removes duplicate advice.
-Follow-up turns read this same snapshot; newly published lessons affect only
-new investigations. The snapshot includes guide contents, lesson records and a
-checksum so an investigation never silently acquires changed guidance.
+Procedural lessons stay pinned across follow-ups; newly published lessons affect
+only new investigations. Browser turns explicitly snapshot current guides and
+instruction resources in an immutable application-context event. Within a turn,
+guide reads use that saved text. Headless workspaces retain the initial snapshot
+until application context is explicitly recorded. Both snapshots carry checksums.
 
 These are direct workspace methods, separate from chemistry operations:
 
 | Method | Purpose |
 | --- | --- |
-| `w.task_guide("conditions")` | Read the optional frozen conditions or retrosynthesis guide. |
+| `w.task_guide("conditions")` | Read a main or supporting guide by its advertised name from the recorded context. |
 | `w.recall_lessons("retrosynthesis", limit=3)` | Read up to three pinned lessons for the selected task. |
 | `w.record_lesson(task, advice, applies_when, evidence_refs, scope="code")` | Save concrete procedural advice supported by actual artifact references from this investigation. |
 | `w.retire_lesson(lesson_id, reason, evidence_refs)` | Retire recalled advice for future investigations when recorded evidence contradicts it. |
@@ -503,10 +530,10 @@ are disabled for baselines outside the declared development partition.
 
 ### Literature and final evidence review
 
-The agent receives a [chemistry investigation guide](Chemistry_Investigation_Guide.md)
-that connects exact target identity, primary-source experiments, local graph and
-condition checks, and an explicit challenge of the weakest claim. It chooses its
-own tool order. Full-text access remains dependent on the source; no subscription
+The [chemistry investigation guide](Chemistry_Investigation_Guide.md) maps the owned
+instructions for exact target identity, primary-source experiments, local graph and
+condition checks, and an explicit challenge of the weakest claim. The agent chooses
+its own tool order. Full-text access remains dependent on the source; no subscription
 service, OCR engine or automatic molecular-image extraction is bundled.
 
 The Python workspace provides recorded source tools:
@@ -637,8 +664,8 @@ and data paths are configured on the server, not supplied by browser requests.
 The runtime explicitly uses `workspace-write`, with no sandbox-bypass flags.
 This is not a multiuser isolation boundary or a production hosting setup.
 
-Code/definition changes invalidate an investigation's baseline. Start a **new
-investigation** after implementation changes; do not rewrite a saved manifest to
+Scientific code/definition changes invalidate an investigation's baseline. Start a
+**new investigation** after scientific implementation changes; do not rewrite a saved manifest to
 make an old conversation pass validation. The agent is instructed to keep new
 analysis files inside its investigation, and source/data baseline checks run
 before and after a successful turn. These checks detect drift; they do not
@@ -791,10 +818,10 @@ deadline is 10 seconds, with a maximum of 30 seconds including worker startup.
 
 ## Evaluate agent use of fragment tools
 
-The optional retrosynthesis guide asks the agent to identify the synthesis
-bottleneck, select an informative core, inspect construction evidence and explain
-transfer to the target. It can skip this advice or choose its own core; one or two
-initial searches are a suggestion rather than a required workflow or hard cap.
+The main retrosynthesis playbook identifies decision-changing gaps; optional
+[fragment advice](../../chem_coworker/scientific_workspace/guides/retrosynthesis_fragments.md)
+helps select a core, inspect construction evidence and explain transfer. The agent
+can skip this advice or choose its own core; suggested initial searches remain flexible.
 
 For an explicitly live development comparison, use a fresh output directory:
 
@@ -897,7 +924,7 @@ is accepted through the operation dispatcher.
 | `inspect_reactive_sites` | `reactive_taxonomy`; `smiles`, optional canonical `selected_atom_ids`, `radius` (0–3) | Focused motifs and existing descriptors, other sites and assigned/unassigned stereo. No experimental selectivity prediction. |
 | `recommend_conditions` | `condition_recommender`; `reaction_smiles`, optional `top_k`, `search_scope` | Canonical shared-core results with compatibility, ranking, and provenance unchanged. Requires `condition_index` and `shared_core_index`. |
 | `generate_weak_label_screening_array` | `condition_recommender`; `reaction_smiles`, optional `array_size` (default 24, currently 1–250), `source_reaction_type_hint` | Diverse intact recipes from separate weak-label observations after graph-query and compatibility checks. Requires `weak_label_records`; its sibling recipe catalog is automatically baseline-pinned as `weak_label_recipe_catalog`. No structural condition index required. Preserves unverified-source warnings, recipe IDs and source row numbers; may return fewer recipes. |
-| `search_fragment_precedents` | `reactive_taxonomy` graph/evidence rules and `condition_recommender` discovery index; `query`, optional `query_format`, `topology`, `limit`, `timeout_seconds` | Bounded product-fragment discovery, per-embedding changes, exact source/procedure joins, and saved inspection paths. Requires prebuilt `fragment_index`; never expands a route or rebuilds data. |
+| `search_fragment_precedents` | `reactive_taxonomy` graph/evidence rules and `condition_recommender` discovery index; `query`, optional `query_format`, `topology`, `limit`, `timeout_seconds`, `target_smiles` | Bounded product-fragment discovery, per-embedding changes, exact source/procedure joins, and saved inspection paths. Supply `target_smiles` for target-derived queries to validate their semantics before scanning. Requires prebuilt `fragment_index`; never expands a route or rebuilds data. |
 | `suggest_search_fragments` | `reactive_taxonomy.search_fragments`; `target_smiles`, optional `limit` (1–5), `selected_atom_ids` | Optional, overlapping, target-derived queries with atom provenance and boundaries. No index, corpus call, retro, mapping, forward check or mandatory workflow. |
 | `get_precedents` | Canonical index; `reaction_ids`, optional `offset`, `limit` | All indexed fields, distinct observation IDs, admission/condition status, missing IDs, pagination. Indexed records are reduced representations of source data. |
 | `get_procedures` | Configured `procedure_catalog`; `reaction_ids` | All matching procedure observations, including missing fields. No invented procedure text. |
@@ -909,6 +936,7 @@ is accepted through the operation dispatcher.
 | `assess_route_step` | Canonical external-proposal assessment; `proposal`, optional `include_conditions`, `evidence_refs` | Structural, operator, precedent and compatibility gates; optional forward challenge is separate. Requires `retro_library`; no stock index required. Supplied resolved recipes are assessed separately from retrieved conditions. |
 | `assess_route_proposal` | Same assessor plus route topology; `proposal`, optional `unavailable_starting_materials` and assessment options | Retains invalid/unsupported proposals for inspection; declared material constraints are checked against graph-matched leaves. |
 | `inspect_route_step` | Saved proposal `source_ref`, `step_id` | Step gates, graph-matched upstream/downstream steps, molecular audits and supplied-recipe assessment. |
+| `inspect_step_precedents` | Saved `source_ref`, optional `realization_id` or `step_id`, `offset`, `limit` | Actual supporting reactions for a disconnection realization or assessed step. Use `realization_id` for disconnections, `step_id` for route assessments/revisions, and neither for a single-step assessment. Follow `page.next_offset`; the shared answer contract validates inspection links for final step structures. |
 | `assess_route_step_forward` | Saved route `source_ref`, eligible `step_id`, decision-changing `question`, optional `timeout_seconds` (1–30; default 30) | Optional single-step product-competition challenge using a prebuilt, baseline-pinned `forward_library`. A killable worker records stages and timeout/error; no route-wide prediction or library rebuilding. Does not upgrade the saved route's admission. |
 | `revise_route_branch` | Core explicit route edit plus complete reassessment; `source_ref`, `remove_step_ids`, `replacement_steps`, `reason`, `risks`, optional `assumptions`, `evidence_refs` | Preserves the source, inherits material constraints and condition settings, reassesses all steps and topology. Optional forward challenges are separate and not inherited. Empty removals can extend a leaf branch. No automatic improvement or admission claim. |
 | `compare_route_proposals` | Recorded results; 2–5 `source_refs` | Same-target comparison with identical settings/constraints; separate gates and missing evidence, no synthetic route score. |
@@ -926,6 +954,12 @@ Recipe input example:
 Do not fill unreported operating values with defaults. `source_field` preserves
 provenance; the registry decides identity and roles. Proposed recipes remain
 hypotheses even after normalization or compatibility assessment.
+
+`assess_recipe` distinguishes `conflict`, `unknown` and `invalid_input`. Inspect
+`status`, `hard_conflicts`, `warnings` and `unresolved_requirements`;
+`compatible=False` alone does not establish chemical incompatibility. Precedent
+inspection counts describe the selected indexed scope, not independent publications.
+Procedure links distinguish exact observation IDs from unassigned reaction-level records.
 
 Retrosynthesis in the scientific workspace uses **single-step calls only**. The
 agent owns multi-step planning: it selects a concrete realization, chooses the next

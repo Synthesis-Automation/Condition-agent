@@ -117,13 +117,23 @@ def _verify_published_record(record: Mapping[str, Any], baseline: Mapping[str, A
     _evidence(source, record["evidence_refs"])
 
 
-def build_learning_context(baseline: Mapping[str, Any], *, lesson_path: Path | None = None) -> dict[str, Any]:
-    """Freeze guide contents and up to three applicable lessons per task for a run."""
-    directory = Path(__file__).with_name("guides")
-    guides = {}
-    for task in ("conditions", "retrosynthesis"):
-        content = (directory / f"{task}.md").read_text("utf-8")
-        guides[task] = {"task": task, "sha256": hashlib.sha256(content.encode()).hexdigest(), "text": content}
+def build_learning_context(
+    baseline: Mapping[str, Any], *, lesson_path: Path | None = None,
+    guide_snapshots: Mapping[str, Mapping[str, str]] | None = None,
+) -> dict[str, Any]:
+    """Freeze available guides and up to three applicable advisory lessons per task."""
+    if guide_snapshots is None:
+        directory = Path(baseline["repository"]) / "chem_coworker" / "scientific_workspace" / "guides"
+        if not directory.is_dir():
+            directory = Path(__file__).with_name("guides")
+        guides = {}
+        for path in sorted(directory.glob("*.md")):
+            data = path.read_bytes()
+            guides[path.stem] = {"task": path.stem,
+                                 "sha256": hashlib.sha256(data).hexdigest(),
+                                 "text": data.decode("utf-8")}
+    else:
+        guides = {task: dict(guide) for task, guide in guide_snapshots.items()}
     path = lesson_path or Path(baseline["repository"]) / "results" / "ai_native" / "lessons.jsonl"
     enabled = baseline.get("evaluation_partition") == DEVELOPMENT_PARTITION
     selected: dict[str, list[dict[str, Any]]] = {task: [] for task in TASKS}
@@ -165,7 +175,11 @@ def build_learning_context(baseline: Mapping[str, Any], *, lesson_path: Path | N
 
 
 def _context(store: InvestigationStore) -> dict[str, Any]:
-    context = store.manifest["baseline"].get("learning_context")
+    from .context import current_application_context
+
+    application = current_application_context(store)
+    context = (application["learning_context"] if application is not None
+               else store.manifest["baseline"].get("learning_context"))
     if context is None:
         raise ValueError("This investigation has no frozen guidance; start a new investigation")
     payload = {key: value for key, value in context.items() if key != "sha256"}
@@ -176,9 +190,15 @@ def _context(store: InvestigationStore) -> dict[str, Any]:
 
 def task_guide(store: InvestigationStore, task: str) -> dict[str, Any]:
     """Read a frozen optional guide; reading it imposes no required tool sequence."""
-    if task not in {"conditions", "retrosynthesis"}:
-        raise ValueError("task must be conditions or retrosynthesis")
-    return _context(store)["guides"][task]
+    guides = _context(store)["guides"]
+    if task not in guides:
+        raise ValueError(f"Unknown task guide; available: {', '.join(sorted(guides))}")
+    return guides[task]
+
+
+def available_task_guides(store: InvestigationStore) -> tuple[str, ...]:
+    """List frozen guide names without putting task-specific names in orchestration."""
+    return tuple(sorted(_context(store)["guides"]))
 
 
 def recall_lessons(store: InvestigationStore, task: Task, limit: int = 3) -> dict[str, Any]:

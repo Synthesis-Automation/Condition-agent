@@ -12,6 +12,7 @@ import pytest
 from chem_coworker.scientific_workspace import ScientificWorkspace
 from chem_coworker.scientific_workspace.activity import ActivityHistory, ScientificActivityCursor
 from chem_coworker.scientific_workspace.agent_runtime import AgentResult
+from chem_coworker.scientific_workspace.baseline import environment_versions
 from chem_coworker.scientific_workspace.conversation import ConversationService
 from chem_coworker.scientific_workspace.store import InvestigationStore
 
@@ -78,6 +79,7 @@ def test_turn_logs_nested_errors_on_heartbeat_and_finalization(
     ready, release = Event(), Event()
     monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.capture_baseline", lambda *_: {
         "repository": str(tmp_path), "artifacts": {}, "code_files": {},
+        "environment": environment_versions(),
     })
     monkeypatch.setattr("chem_coworker.scientific_workspace.conversation.verify_baseline", lambda *_: None)
 

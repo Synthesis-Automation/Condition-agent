@@ -1,0 +1,78 @@
+Saved answer contract and handoff:
+
+Prepare scientific_answer.v2 JSON. answer_markdown directly answers the question,
+cites relevant sha256:<64 hex> artifacts and preserves limitations. evidence_refs
+must identify actual call, derived_file, replay, custom_execution, literature_source
+or literature_excerpt artifacts, not a note, your answer or an invented reference.
+Every claim about local scientific results needs recorded evidence. uncertainties
+lists material limitations; needs_user_input is true when clarification is needed.
+
+Use schema_version='scientific_answer.v2'. Include sources, molecules,
+target_molecule_ids, steps, routes and claims (empty arrays when irrelevant). Use
+stable short IDs to connect objects. Every molecule, step, condition, yield and claim
+has a basis: input, reported, computed, proposed or unknown. Reported/computed objects
+need source_ids. Preserve domain warnings in limitations. A proposal recorded by a
+tool remains proposed; its normalization/compatibility computation is computed.
+
+Local sources use kind=local_artifact, artifact_ref of the recorded call/attachment,
+url=null and locator of the inspected record/field/step. Computed objects require a
+completed call, replay or run_python custom_execution, not notes or an attached output
+alone. An attachment can support discussion of derived analysis with its execution
+provenance limitation. Never use an unrelated call to satisfy provenance or relabel a
+calculation as a reported yield.
+External sources use kind=external_source, an original/final captured URL, an exact
+locator (e.g. Example 1), and artifact_ref of literature_source/literature_excerpt
+with captured text. A URL fragment can point to the example. Legacy attached source
+captures retain URL, retrieval date, excerpt and provenance. A remembered source is
+not an inspected source. Citation establishes attribution, not independent review.
+
+Use molecule IDs for explicit reactants/products; do not invent missing structures
+to complete a drawing. List steps in dependency order. after_step_ids identifies
+preceding steps supplying intermediates; routes list ordered step_ids with all
+dependencies. Alternatives can have separate routes. An incomplete route is valid
+when its missing steps/structures remain disclosed.
+Conditions are separate attributed text fields such as solvent, temperature,
+duration, quantities or addition order. Use [] if absent; yield_info=null if unreported.
+Minimal nested shapes (replace IDs/text with your actual evidence and proposal):
+"steps": [{"id": "s1", "title": "Proposed step", "basis": "proposed",
+           "reactant_ids": ["a"], "product_ids": ["b"],
+           "precedent_refs": [],
+           "conditions": [{"text": "Conditions to develop", "basis": "unknown"}]}],
+"routes": [{"id": "r1", "title": "Proposal", "step_ids": ["s1"]}]
+Condition objects use text, basis, source_ids and limitations, never label/value.
+Routes use id, title, step_ids and limitations; basis belongs to steps. Keep proposed
+conditions distinct from reported observations and never label proposed yields as reported.
+
+Each step's precedent_refs must link supporting-reaction inspection artifacts for
+the ACTUAL final structures, including specified stereo. If saved disconnections,
+assessments or inspections contain local support, publication requires a matching
+nonempty inspect_step_precedents inspection. Earlier alternatives, arbitrary source
+reaction IDs and inspect_route_step artifacts do not satisfy this requirement.
+Missing links are rejected with exact inspection arguments or an existing inspection
+ref. Inspect those records, reconsider transfer claims and attach the right ref before
+resubmitting. Do not drop steps/citations to bypass this check. Do not copy source
+reaction SMILES into authored precedent cards. If no local support is available,
+retain literature citations and an honest gap; never invent support or run a tool
+merely to fill a panel. Empty searches and missing/uninspected evidence remain distinct.
+
+Finish with w.finalize_answer(draft_path, draft, findings=findings). draft_path is the
+exact runtime-provided answer-draft.json path for this attempt; draft is a Python dict.
+The helper validates citations, records supplied self-review and saves the complete
+answer. Print only its small JSON runtime handoff result and return the same receipt
+as your final message. A manually written full draft follows the same contract.
+The helper fills only boilerplate: omit empty arrays, null yield_info, null source URLs,
+schema_version and needs_user_input=False. Supply chemistry, basis, attribution,
+uncertainty and review explicitly. Invalid fields/support remain rejected. Keep answer
+and findings in one small script; avoid custom builders, full draft output and full
+schema reads unless validation requires them. Correct errors using saved evidence;
+do not weaken validators or rewrite evidence.
+
+For a scientific recommendation, challenge the final draft and supply brief findings.
+Each finding has area, claim, assessment, evidence_refs and reason. Cover all five
+areas: source_identity, structure_and_stereochemistry, conditions_and_yields,
+route_completeness and counterevidence. assessment is supported, partial, unsupported,
+conflicting, not_checked or not_applicable; explain missing checks. Supported, partial
+and conflicting findings need actual evidence_refs. Correct overclaims and finalize
+again after changes so the review matches the draft. Self-review is agent-authored,
+not independent chemistry validation, and cannot be cited as scientific evidence.
+Non-scientific or clarification-only answers may omit findings; no review is invented.

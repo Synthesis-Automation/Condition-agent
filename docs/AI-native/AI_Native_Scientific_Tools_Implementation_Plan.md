@@ -5,6 +5,13 @@ Revision: 2
 
 Date: 2026-09-23
 
+Core separation update (2026-10-02): the
+[scientific workspace core contract](Scientific_Workspace_Core.md) defines stable
+capability discovery/execution, conservative scientific baseline identity, per-turn
+application context and separate prompt/task/presentation ownership. This slice
+preserves chemistry, answer validation and browser behavior. Task-view simplification
+and user-controlled layouts remain subsequent work; release gates are unchanged.
+
 Implementation progress, validation, and outstanding gates are tracked in
 [Scientific_Workspace_Implementation_Status.md](Scientific_Workspace_Implementation_Status.md).
 Use the [workspace quickstart](readme.md) for the

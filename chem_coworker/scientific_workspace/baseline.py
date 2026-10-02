@@ -10,6 +10,7 @@ import sqlite3
 import subprocess
 from contextlib import closing
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Mapping
 
 
@@ -17,6 +18,40 @@ PACKAGE_ROOTS = (
     "reactive_taxonomy", "condition_registry", "condition_recommender",
     "core_retrosynthesis", "forward_synthesis", "cas_tools", "chem_coworker",
 )
+
+BASELINE_SCHEMA = "scientific_baseline.v2"
+LEGACY_BASELINE_SCHEMA = "scientific_baseline.v1"
+WORKSPACE_PREFIX = "chem_coworker/scientific_workspace/"
+
+# Only these application responsibilities may change without replacing the
+# scientific baseline. Unknown modules, including new tool adapters, are
+# scientific by default. Evidence validators and execution stay scientific.
+APPLICATION_MODULE_LAYERS: Mapping[str, str] = MappingProxyType({
+    "activity.py": "runtime",
+    "agent_runtime.py": "runtime",
+    "answer_handoff.py": "runtime",
+    "conversation.py": "runtime",
+    "research_profiles.py": "runtime",
+    "runtime_environment.py": "runtime",
+    "context.py": "guidance",
+    "learning.py": "guidance",
+    "prompts.py": "guidance",
+})
+APPLICATION_DIRECTORY_LAYERS: Mapping[str, str] = MappingProxyType({
+    "guides": "guidance", "instructions": "guidance", "presentation": "presentation",
+})
+
+
+def application_layer(path: str) -> str | None:
+    """Classify explicitly owned application files; everything else is scientific."""
+    if not path.startswith(WORKSPACE_PREFIX):
+        return None
+    relative = path[len(WORKSPACE_PREFIX):]
+    if "/" not in relative:
+        return APPLICATION_MODULE_LAYERS.get(relative)
+    if Path(relative).suffix != ".md":
+        return None
+    return APPLICATION_DIRECTORY_LAYERS.get(relative.split("/", 1)[0])
 
 
 def sha256_file(path: Path) -> str:
@@ -28,8 +63,8 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def code_manifest(repository: Path) -> dict[str, str]:
-    """Hash code and definitions, including uncommitted implementation changes."""
+def legacy_code_manifest(repository: Path) -> dict[str, str]:
+    """Preserve the original v1 scope when verifying historical investigations."""
     files = {}
     for name in PACKAGE_ROOTS:
         for path in sorted((repository / name).rglob("*")):
@@ -43,6 +78,47 @@ def code_manifest(repository: Path) -> dict[str, str]:
             ):
                 files[path.relative_to(repository).as_posix()] = sha256_file(path)
     return files
+
+
+def code_manifest(repository: Path) -> dict[str, str]:
+    """Hash scientific code and definitions, conservatively including new adapters.
+
+    Runtime configuration, task guidance, and presentation are separately recorded
+    application context. Their explicitly owned files do not govern scientific
+    replay; all other Python modules and workspace JSON contracts do.
+    """
+    files = {}
+    for name in PACKAGE_ROOTS:
+        for path in sorted((repository / name).rglob("*")):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            relative = path.relative_to(repository).as_posix()
+            if application_layer(relative) is not None:
+                continue
+            if path.suffix == ".py" or (
+                path.suffix in {".json", ".jsonl"}
+                and ("definitions" in path.parts or relative.startswith(WORKSPACE_PREFIX))
+            ):
+                files[relative] = sha256_file(path)
+    return files
+
+
+def scientific_identity(baseline: Mapping[str, Any]) -> str:
+    """Identify scientific inputs independently of guidance and display settings."""
+    from .store import canonical_bytes
+
+    identity = {
+        "schema_version": baseline.get("schema_version", BASELINE_SCHEMA),
+        "code_files": baseline["code_files"],
+        "environment": baseline["environment"],
+        "taxonomy_versions": baseline.get("taxonomy_versions", {}),
+        "registry_versions": baseline.get("registry_versions", {}),
+        "artifacts": {
+            name: {key: value for key, value in artifact.items() if key != "mtime_ns"}
+            for name, artifact in baseline["artifacts"].items()
+        },
+    }
+    return "sha256:" + hashlib.sha256(canonical_bytes(identity)).hexdigest()
 
 
 def artifact_identity(path: Path) -> dict[str, Any]:
@@ -110,7 +186,7 @@ def capture_baseline(
                     if "payload" in columns:
                         value["metadata"] = [json.loads(row[0]) for row in connection.execute("SELECT payload FROM metadata")]
     baseline = {
-        "schema_version": "scientific_baseline.v1",
+        "schema_version": BASELINE_SCHEMA,
         "repository": str(repository), "git_revision": revision,
         "git_status": dirty, "code_files": code_manifest(repository),
         "environment": environment_versions(),
@@ -124,6 +200,7 @@ def capture_baseline(
     from .learning import build_learning_context
 
     baseline["learning_context"] = build_learning_context(baseline)
+    baseline["scientific_identity"] = scientific_identity(baseline)
     return baseline
 
 
@@ -133,7 +210,14 @@ def verify_baseline(baseline: Mapping[str, Any], *, full_hash: bool = False) -> 
     Normal calls inspect data stat identity; replay also rehashes large inputs.
     No changed artifact is automatically accepted as a new scientific baseline.
     """
-    if code_manifest(Path(baseline["repository"])) != baseline["code_files"]:
+    schema = baseline.get("schema_version", BASELINE_SCHEMA)
+    if schema not in {BASELINE_SCHEMA, LEGACY_BASELINE_SCHEMA}:
+        raise ValueError("Unsupported scientific baseline schema")
+    if ("scientific_identity" in baseline
+            and scientific_identity(baseline) != baseline["scientific_identity"]):
+        raise ValueError("Scientific baseline identity mismatch")
+    manifest = legacy_code_manifest if schema == LEGACY_BASELINE_SCHEMA else code_manifest
+    if manifest(Path(baseline["repository"])) != baseline["code_files"]:
         raise ValueError("Scientific code or definitions changed; start a new investigation")
     if environment_versions() != baseline["environment"]:
         raise ValueError("Scientific runtime changed; start a new investigation")

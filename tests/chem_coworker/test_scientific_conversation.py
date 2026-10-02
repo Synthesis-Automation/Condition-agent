@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
 import sys
 from threading import Event
 from time import monotonic, sleep
@@ -14,11 +15,12 @@ import pytest
 
 from app.web_api.main import create_app
 from chem_coworker.scientific_workspace import ScientificWorkspace
+from chem_coworker.scientific_workspace.activity import activity_detail
 from chem_coworker.scientific_workspace.agent_runtime import (
     AgentResult, AgentStopped, AnswerSubmissionError, CodexRuntime,
 )
 from chem_coworker.scientific_workspace.baseline import code_manifest, environment_versions
-from chem_coworker.scientific_workspace.conversation import ConversationService, _activity_detail
+from chem_coworker.scientific_workspace.conversation import ConversationService
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -96,6 +98,61 @@ def test_real_evidence_answer_and_follow_up_survive_service_restart(service: Con
         reopened.close()
 
 
+def test_turn_records_application_context_and_exact_prompt(service: ConversationService) -> None:
+    identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "completed", turn
+    context = service.artifact(identity, turn["application_context_ref"])
+    assert context["turn_id"] == turn["id"]
+    assert context["runtime"] == turn["runtime_requested"]
+    assert context["scientific_identity"] == turn["scientific_identity"]
+    assert context["resources"]["instructions/core.md"]["text"]
+    assert turn["answer"]["application_context_ref"] == turn["application_context_ref"]
+    trace = turn["answer"]["trace_files_sha256"]
+    assert trace["investigation-prompt.txt"] == turn["prompt_sha256"]
+    prompt = (service.root / identity / "turns" / turn["id"] / "investigation-prompt.txt").read_text("utf-8")
+    assert "Analyze CCBr.N>>CCN" in prompt
+
+
+def test_guide_upgrade_starts_new_thread_and_retains_scientific_evidence(
+    service: ConversationService, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from chem_coworker.scientific_workspace.baseline import verify_baseline
+
+    repository = tmp_path / "application_repository"
+    resources = repository / "chem_coworker" / "scientific_workspace"
+    for name in ("guides", "instructions", "presentation"):
+        shutil.copytree(ROOT / "chem_coworker" / "scientific_workspace" / name, resources / name)
+    service.repository = repository
+    monkeypatch.setattr("chem_coworker.scientific_workspace.baseline.capture_baseline", lambda *_: {
+        "schema_version": "scientific_baseline.v2", "repository": str(repository),
+        "code_files": code_manifest(repository), "environment": environment_versions(),
+        "artifacts": {}, "validation_status": "development_snapshot_not_release_validated",
+    })
+    identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
+    first = finish(service, identity)
+    assert first["status"] == "completed", first
+    initial_context = service.artifact(identity, first["application_context_ref"])
+    guide = resources / "guides" / "conditions.md"
+    guide.write_text(guide.read_text("utf-8") + "\nNew task advice for this test.\n", "utf-8")
+    science = ScientificWorkspace(service.root / identity)
+    verify_baseline(science.store.manifest["baseline"])
+    # Until a new turn is explicitly recorded, guide access still uses its snapshot.
+    assert "New task advice" not in science.task_guide("conditions")["text"]
+    service.submit("Continue with the same reaction", identity)
+    second = finish(service, identity)
+    assert second["status"] == "completed", second
+    assert second["thread_resume"] == "application_context_changed_new_thread"
+    assert service.runtime.threads == [None, None]
+    assert first["scientific_identity"] == second["scientific_identity"]
+    updated_context = service.artifact(identity, second["application_context_ref"])
+    assert updated_context["guidance_identity"] != initial_context["guidance_identity"]
+    assert "New task advice" in science.task_guide("conditions")["text"]
+    assert service.artifact(identity, first["application_context_ref"]) == initial_context
+    replay = science.replay(first["answer"]["evidence_refs"][0])
+    assert science.store.read_artifact(replay.artifact_ref)["matches"] is True
+
+
 def test_invented_citation_is_a_failed_turn_not_a_supported_answer(service: ConversationService) -> None:
     service.runtime = RecordedRuntime(missing_reference=True)
     identity = service.submit("Analyze a reaction")["conversation_id"]
@@ -140,7 +197,7 @@ def test_activity_history_survives_beyond_thirty_events(service: ConversationSer
     ({"type": "command_execution", "command": None}, ""),
 ])
 def test_activity_details_describe_observed_action(item: dict[str, Any], expected: str) -> None:
-    assert _activity_detail(item) == expected
+    assert activity_detail(item) == expected
 
 
 def test_live_activity_updates_one_row_and_saved_legacy_logs_are_recovered(service: ConversationService) -> None:

@@ -10,33 +10,17 @@ from threading import Event
 from typing import Any, Mapping
 
 from .baseline import capture_baseline, verify_baseline
+from .operation_contracts import OperationDefinition, OperationProvider
 from .operations import ScientificOperations
 from .store import canonical_bytes, InvestigationEvent, InvestigationStore
-
-
-def _replay_result(operation: str, result: Any) -> Any:
-    """Exclude only per-attempt forward telemetry from scientific replay equality."""
-    if operation == "search_fragment_precedents" and isinstance(result, dict):
-        return {key: value for key, value in result.items() if key != "execution"}
-    if operation != "assess_route_step_forward" or not isinstance(result, dict):
-        return result
-    execution = dict(result.get("execution", {}))
-    execution.pop("diagnostics", None)  # Each attempt has its own log directory.
-    execution["timings"] = {key: value for key, value in execution.get("timings", {}).items()
-                            if key != "elapsed_seconds"}
-    execution["stages"] = [
-        {key: value for key, value in stage.items() if key not in {"elapsed_seconds", "duration_seconds"}}
-        for stage in execution.get("stages", [])
-    ]
-    return {**result, "execution": execution}
 
 
 class ScientificWorkspace:
     """A resumable scientific workspace usable directly from Python or the CLI."""
 
-    def __init__(self, root: str | Path) -> None:
+    def __init__(self, root: str | Path, *, operations: OperationProvider | None = None) -> None:
         self.store = InvestigationStore(root)
-        self.operations = ScientificOperations(self.store)
+        self.operations: OperationProvider = operations if operations is not None else ScientificOperations(self.store)
 
     @classmethod
     def create(
@@ -66,7 +50,11 @@ class ScientificWorkspace:
             "origin": "deterministic_computation", "review_status": "unreviewed",
         }
         timings: dict[str, float] = {}
+        definition: OperationDefinition | None = None
         try:
+            definition = self.operations.definition(operation)
+            payload["operation_contract_version"] = definition.contract_version
+            payload["scientific_identity"] = self.store.manifest["baseline"].get("scientific_identity")
             phase_started = monotonic()
             for reference in evidence_refs:
                 self.store.read_artifact(reference)
@@ -83,14 +71,20 @@ class ScientificWorkspace:
             payload["result_bytes"] = len(serialized)
             timings["serialization_seconds"] = round(monotonic() - phase_started, 6)
             payload["execution_status"] = "completed"
-            if operation in {"assess_route_step_forward", "search_fragment_precedents"} and isinstance(payload["result"], dict):
-                forward_status = payload["result"].get("execution_status")
-                if forward_status in {"timed_out", "error", "cancelled"}:
-                    # Retain the partial result and stages without labeling an
-                    # interrupted optional calculation as a successful call.
-                    payload["execution_status"] = forward_status
+            if definition.execution_status_field:
+                operation_status = (
+                    payload["result"].get(definition.execution_status_field)
+                    if isinstance(payload["result"], dict) else None
+                )
+                if operation_status not in ("completed", "timed_out", "error", "cancelled"):
+                    raise ValueError(
+                        f"Operation returned invalid {definition.execution_status_field}; "
+                        "expected completed, error, timed_out or cancelled"
+                    )
+                if operation_status in {"timed_out", "error", "cancelled"}:
+                    payload["execution_status"] = operation_status
                     payload["error"] = payload["result"].get("error", {
-                        "type": "ForwardCheckIncomplete", "message": "Optional forward check did not finish",
+                        "type": "OperationIncomplete", "message": "Scientific operation did not finish",
                     })
         except KeyboardInterrupt:
             payload.update(execution_status="cancelled", error={"type": "KeyboardInterrupt", "message": "Execution interrupted"})
@@ -98,22 +92,8 @@ class ScientificWorkspace:
             payload.update(execution_status="error", error={"type": type(exc).__name__, "message": str(exc)})
         payload["duration_seconds"] = round(monotonic() - started, 6)
         payload["timings"] = timings
-        if operation in {
-            "propose_condition_adaptation",
-            "inspect_route_step", "inspect_step_precedents", "revise_route_branch", "assess_route_step_forward",
-        } and isinstance(inputs.get("source_ref"), str):
-            try:
-                self.store.read_artifact(inputs["source_ref"])
-            except (OSError, ValueError):
-                pass
-            else:
-                evidence_refs = tuple(dict.fromkeys((*evidence_refs, inputs["source_ref"])))
-        if operation in {
-            "propose_condition_adaptation", "assess_route_step", "assess_route_proposal", "revise_route_branch",
-        } and isinstance(inputs.get("evidence_refs"), list):
-            evidence_refs = tuple(dict.fromkeys((*evidence_refs, *(ref for ref in inputs["evidence_refs"] if isinstance(ref, str)))))
-        if operation == "compare_route_proposals" and isinstance(inputs.get("source_refs"), list):
-            evidence_refs = tuple(dict.fromkeys((*evidence_refs, *(ref for ref in inputs["source_refs"] if isinstance(ref, str)))))
+        if definition is not None:
+            evidence_refs = tuple(dict.fromkeys((*evidence_refs, *definition.evidence_references(inputs))))
         # Invalid caller references remain in the saved request/error, not in verified links.
         valid_refs = []
         for reference in evidence_refs:
@@ -133,15 +113,18 @@ class ScientificWorkspace:
         if source.get("execution_status") != "completed" or "operation" not in source:
             raise ValueError("Only completed scientific calls can be replayed")
         verify_baseline(self.store.manifest["baseline"], full_hash=True)
+        definition = self.operations.definition(source["operation"])
+        saved_version = source.get("operation_contract_version")
+        if saved_version is not None and saved_version != definition.contract_version:
+            raise ValueError("Operation contract changed; replay requires the recorded contract version")
         actual = self.operations.invoke(source["operation"], source["arguments"])
         return self.store.append("replay", {
             "source_ref": reference,
-            "matches": canonical_bytes(_replay_result(source["operation"], actual))
-            == canonical_bytes(_replay_result(source["operation"], source["result"])),
-            "comparison_scope": "scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry"
-            if source["operation"] == "assess_route_step_forward" else
-            "scientific_result_excluding_fragment_execution_telemetry"
-            if source["operation"] == "search_fragment_precedents" else "full_result",
+            "operation_contract_version": definition.contract_version,
+            "scientific_identity": self.store.manifest["baseline"].get("scientific_identity"),
+            "matches": canonical_bytes(definition.replay_projection(actual))
+            == canonical_bytes(definition.replay_projection(source["result"])),
+            "comparison_scope": definition.replay_comparison,
             "result": actual,
         }, evidence_refs=(reference,))
 
@@ -240,7 +223,7 @@ class ScientificWorkspace:
         return finalize_answer(self.store, draft_path, draft, findings=findings)
 
     def task_guide(self, task: str) -> dict[str, Any]:
-        """Read the optional conditions or retrosynthesis guide frozen in this run."""
+        """Read an available optional guide from recorded application context."""
         from .learning import task_guide
 
         return task_guide(self.store, task)
