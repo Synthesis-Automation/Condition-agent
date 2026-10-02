@@ -22,7 +22,9 @@ def test_scheme_has_compact_visible_labels_and_complete_attributed_description()
     ns = "{http://www.w3.org/2000/svg}"
     visible = " ".join(node.text or "" for node in root.findall(ns + "text"))
     description = root.find(ns + "desc").text
-    assert "Bromoethane" in visible and "Ethylamine" in visible
+    assert "Bromoethane" not in visible and "Ethylamine" not in visible
+    assert "Bromoethane: CCBr" in description and "Ethylamine: CCN" in description
+    assert not root.findall(ns + "text[@data-role='molecule-name']")
     assert "NaOH" in visible and "EtOH" in visible and "81%" in visible
     assert all(text not in visible for text in ("Reported", "Proposed", "Yield", "transformation", "agent-authored"))
     assert "reported: NaOH, EtOH" in description
@@ -32,7 +34,7 @@ def test_scheme_has_compact_visible_labels_and_complete_attributed_description()
     assert len(root.findall(ns + "g" + "[@data-role='molecule']")) == 3
     assert len(root.findall(".//" + ns + "path")) > 10
     assert root.get("data-definition") == "annotated_scheme.v1"
-    assert root.get("data-schema-version") == "1.1"
+    assert root.get("data-schema-version") == "1.2"
     assert not root.findall(".//" + ns + "unknown")
 
 
@@ -71,7 +73,7 @@ def test_long_annotations_are_bounded_visually_and_complete_in_description() -> 
     assert float(root.get("height")) < 430
     style = load_annotated_scheme_style()
     assert len(root.findall(ns + "text[@data-role='conditions']")) <= style["max_annotation_lines"]
-    assert len(root.findall(ns + "text[@data-role='molecule-name']")) <= 2 * style["max_name_lines"]
+    assert not root.findall(ns + "text[@data-role='molecule-name']")
     width, height = float(root.get("width")), float(root.get("height"))
     for node in root.findall(ns + "text"):
         assert 0 <= float(node.get("x")) <= width
@@ -80,8 +82,6 @@ def test_long_annotations_are_bounded_visually_and_complete_in_description() -> 
         # Wrapped labels respect the versioned width estimate and canvas height.
         if node.get("data-role") == "conditions":
             assert len(node.text) * size * style["character_width_em"] <= style["arrow_width"]
-        elif node.get("data-role") == "molecule-name":
-            assert len(node.text) * size * style["character_width_em"] <= style["molecule_width"]
 
 
 def test_unknown_annotations_stay_in_metadata_without_visible_placeholders() -> None:
@@ -106,9 +106,27 @@ def test_compact_layout_shortens_arrow_without_scaling_molecule_panels() -> None
     style = load_annotated_scheme_style()
     assert style["arrow_width"] == 240
     assert style["molecule_preset"] == "web_consistent"
-    assert style["molecule_width"] == 260 and style["molecule_height"] == 220
-    assert float(root.get("width")) == 2 * 28 + 2 * 260 + 2 * 32 + 240
-    assert float(root.get("height")) < 320
+    assert style["molecule_width"] == 100 and style["molecule_height"] == 100
+    assert float(root.get("width")) == 2 * 12 + 2 * 100 + 2 * 20 + 240
+    assert float(root.get("height")) == 124
+
+
+def test_hydrolysis_scheme_omits_names_substrate_ids_and_operating_details() -> None:
+    root = ET.fromstring(render_annotated_scheme_svg(
+        (SchemeMolecule("B: ethyl 2-acetamido-1,3-oxazole-4-carboxylate", "CCOC(=O)c1coc(NC(C)=O)n1", "B"),
+         SchemeMolecule("Water", "O", "water")),
+        (SchemeMolecule("C: 2-acetamido-1,3-oxazole-4-carboxylic acid", "O=C(O)c1coc(NC(C)=O)n1"),),
+        title="Ester hydrolysis", basis="proposed",
+        conditions=(SchemeAnnotation("B, lithium hydroxide (2 equiv), substrate concentration 0.1 M, 25 °C, 2 h", "proposed"),),
+    ))
+    ns = "{http://www.w3.org/2000/svg}"
+    labels = root.findall(ns + "text[@data-role='conditions']")
+    assert " ".join(node.text for node in labels) == "lithium hydroxide"
+    assert not root.findall(ns + "text[@data-role='molecule-name']")
+    assert "substrate concentration 0.1 M" in root.find(ns + "desc").text
+    assert "ethyl 2-acetamido-1,3-oxazole-4-carboxylate" in root.find(ns + "desc").text
+    assert float(root.get("width")) < 900
+    assert float(root.get("height")) < 200
 
 
 def test_common_ligand_formula_remains_intact_on_compact_arrow() -> None:
@@ -123,7 +141,7 @@ def test_common_ligand_formula_remains_intact_on_compact_arrow() -> None:
 
 @pytest.mark.parametrize("key,value", [
     ("font_size", 0), ("gap", True), ("schema_version", "2.0"),
-    ("bottom_padding", 0), ("max_name_lines", False), ("line_height", 1), ("arrow_width", 1),
+    ("bottom_padding", 0), ("max_annotation_lines", False), ("line_height", 1), ("arrow_width", 1),
     ("character_width_em", True), ("character_width_em", 2),
 ])
 def test_scheme_definitions_are_validated(monkeypatch, key, value) -> None:

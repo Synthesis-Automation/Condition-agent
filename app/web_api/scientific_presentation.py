@@ -265,7 +265,8 @@ def _structured_view(payload: str, identity: str, precedent_payload: str = "{}")
         try:
             with rdBase.BlockLogs():
                 svg = render_annotated_scheme_svg(
-                    tuple(SchemeMolecule(molecules[key]["name"], molecules[key]["smiles"]) for key in step["reactant_ids"]),
+                    tuple(SchemeMolecule(molecules[key]["name"], molecules[key]["smiles"], key)
+                          for key in step["reactant_ids"]),
                     tuple(SchemeMolecule(molecules[key]["name"], molecules[key]["smiles"]) for key in step["product_ids"]),
                     title=step["title"], basis=step["basis"],
                     conditions=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["conditions"]),

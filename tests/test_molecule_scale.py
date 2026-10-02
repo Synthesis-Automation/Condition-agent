@@ -135,7 +135,10 @@ def test_scientific_workspace_api_keeps_scale_in_saved_cards_and_schemes() -> No
                       for name, smiles in (("apixaban", APIXABAN), ("emtricitabine", EMTRICITABINE))],
         "steps": [{"id": "layout", "title": "Layout fixture, not a chemical transformation",
                    "reactant_ids": ["apixaban", "emtricitabine"], "product_ids": ["apixaban"],
-                   "after_step_ids": [], "conditions": [], "yield_info": None, **attribution}],
+                   "after_step_ids": [],
+                   "conditions": [{"text": "apixaban, LiOH (2 equiv), substrate concentration 0.1 M, 25 °C, 2 h",
+                                   **attribution}],
+                   "yield_info": None, **attribution}],
     }
 
     class SavedService:
@@ -155,5 +158,9 @@ def test_scientific_workspace_api_keeps_scale_in_saved_cards_and_schemes() -> No
     step = view["steps"][0]
     root = ET.fromstring(base64.b64decode(step["image_url"].split(",", 1)[1]))
     assert float(root.get("width")) == step["scheme_width"]
+    labels = root.findall(NS + "text[@data-role='conditions']")
+    assert " ".join(node.text for node in labels) == "LiOH"
+    assert not root.findall(NS + "text[@data-role='molecule-name']")
+    assert step["conditions"] == answer["steps"][0]["conditions"]
     for group in root.findall(NS + "g[@data-role='molecule']"):
         assert longest_bond(group) == pytest.approx(30, abs=1.1)
