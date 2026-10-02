@@ -17,6 +17,7 @@ from ..core.baseline import (
 )
 from ..core.store import InvestigationEvent, InvestigationStore, canonical_bytes
 from ..paths import WORKSPACE_ROOT
+from ..runtime.workspace_modes import WorkspaceMode, mode_policy
 
 APPLICATION_CONTEXT_SCHEMA = "scientific_application_context.v1"
 PRESENTATION_FILES = (
@@ -61,10 +62,15 @@ def application_manifest(repository: Path) -> dict[str, dict[str, str]]:
     return layers
 
 
-def _resources(repository: Path, layers: Mapping[str, Mapping[str, str]]) -> dict[str, Any]:
+def _resources(
+    repository: Path, layers: Mapping[str, Mapping[str, str]], *, tools_only: bool = False,
+) -> dict[str, Any]:
     resources = {}
     for name, layer, source in _resource_directories(repository):
         for path in sorted(source.rglob("*.md")):
+            key = name + "/" + path.relative_to(source).as_posix()
+            if tools_only and key != "agent_instructions/tools_only.md":
+                continue
             content = path.read_bytes()
             digest = hashlib.sha256(content).hexdigest()
             key = name + "/" + path.relative_to(source).as_posix()
@@ -105,13 +111,20 @@ def capture_application_context(
     explicit context record. Scientific changes still require a new baseline.
     The final composed prompt is saved separately by conversation orchestration.
     """
-    from .learning import build_learning_context
+    from .learning import build_learning_context, disabled_learning_context
 
     baseline = store.manifest["baseline"]
     verify_baseline(baseline)
     repository = Path(baseline["repository"])
+    mode = WorkspaceMode(store.manifest.get("agent_metadata", {}).get("workspace_mode", "normal"))
     layers = application_manifest(repository)
-    resources = _resources(repository, layers)
+    if mode != WorkspaceMode.NORMAL:
+        # Keep runtime identities, but do not put disabled instruction text in an
+        # agent-readable artifact. The tools-only API reference is the sole guide.
+        for layer in ("guidance", "presentation"):
+            layers[layer] = {key: value for key, value in layers[layer].items()
+                             if not key.endswith(".md") or key.endswith("/agent_instructions/tools_only.md")}
+    resources = _resources(repository, layers, tools_only=mode != WorkspaceMode.NORMAL)
     previous = current_application_context(store)
     pinned = (previous or {}).get("learning_context") or baseline.get("learning_context")
     guides = {
@@ -119,7 +132,9 @@ def capture_application_context(
         for key, resource in resources.items()
         if key.startswith("task_playbooks/") and len(Path(key).parts) == 2
     }
-    if pinned is None:
+    if mode != WorkspaceMode.NORMAL:
+        learning = disabled_learning_context()
+    elif pinned is None:
         learning = build_learning_context(
             baseline,
             guide_snapshots=(guides if (repository / WORKSPACE_PREFIX / "task_playbooks").is_dir()
@@ -139,6 +154,7 @@ def capture_application_context(
     runtime_snapshot = json.loads(canonical_bytes(dict(runtime)))
     payload = {
         "schema_version": APPLICATION_CONTEXT_SCHEMA,
+        "mode_policy": mode_policy(mode),
         "scientific_identity": scientific_identity(baseline),
         "layers": {
             layer: {"code_files": files, "sha256": _digest(files)}

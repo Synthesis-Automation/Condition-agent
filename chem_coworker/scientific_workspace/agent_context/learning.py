@@ -117,6 +117,14 @@ def _verify_published_record(record: Mapping[str, Any], baseline: Mapping[str, A
     _evidence(source, record["evidence_refs"])
 
 
+def disabled_learning_context() -> dict[str, Any]:
+    """An explicit empty snapshot for conversations without the suggestion layer."""
+    payload = {"schema_version": "scientific_learning_context.v1", "enabled": False,
+               "lesson_store": None, "guides": {}, "lessons": {task: [] for task in TASKS},
+               "warnings": [], "authority": "disabled_by_workspace_mode"}
+    return {**payload, "sha256": _digest(payload)}
+
+
 def build_learning_context(
     baseline: Mapping[str, Any], *, lesson_path: Path | None = None,
     guide_snapshots: Mapping[str, Mapping[str, str]] | None = None,

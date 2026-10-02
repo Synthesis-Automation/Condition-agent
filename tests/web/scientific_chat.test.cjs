@@ -66,6 +66,50 @@ function harness() {
   return {ids, context, run, respond};
 }
 
+test('workspace mode is selectable for new chats and locked to a reopened conversation', async () => {
+  const {ids, run, respond} = harness();
+  run('loaded=true; updateControls()');
+  assert.equal(ids['workspace-mode'].value, 'normal');
+  assert.equal(ids['workspace-mode'].disabled, false);
+  ids['workspace-mode'].value = 'pure_agent';
+  ids['workspace-mode'].onchange();
+  run("identity='saved'; renderConversation({title:'Saved',workspace_mode:'tools_only',turns:[]})");
+  assert.equal(ids['workspace-mode'].value, 'tools_only');
+  assert.equal(ids['workspace-mode'].disabled, true);
+  assert.match(ids['workspace-mode'].title, /new chat to change mode/);
+  run("renderConversation({title:'Legacy',turns:[]})");
+  assert.equal(ids['workspace-mode'].value, 'normal');
+  respond(async () => []);
+  run('newChat()');
+  assert.equal(ids['workspace-mode'].value, 'pure_agent');
+  assert.equal(ids['workspace-mode'].disabled, false);
+});
+
+test('submitting includes the selected mode and renders a free-form answer', async () => {
+  const {ids, run, respond} = harness();
+  run("loaded=true; newMode='tools_only'; updateControls()");
+  ids.question.value = 'Compare the chemistry';
+  let sent;
+  respond(async (route, options) => {
+    if (route === '/turns') {
+      sent = JSON.parse(options.body);
+      assert.equal(ids['workspace-mode'].disabled, true);
+      return {conversation_id:'chat',turn_id:'turn'};
+    }
+    if (route === '/conversations/chat') return {id:'chat',title:'Comparison',workspace_mode:'tools_only',turns:[{
+      id:'turn',question:'Compare the chemistry',status:'completed',answer:{schema_version:'agent_text.v1',answer_markdown:'Free text.'},
+    }]};
+    if (route === '/conversations') return [];
+    if (route === '/activity') return {active:null};
+    throw new Error('Unexpected route: ' + route);
+  });
+  await ids.form.onsubmit({preventDefault() {}});
+  assert.deepEqual(sent, {question:'Compare the chemistry',conversation_id:null,mode:'tools_only'});
+  assert.equal(ids['workspace-mode'].value, 'tools_only');
+  assert.equal(ids['workspace-mode'].disabled, true);
+  assert.ok(ids.messages.descendants().some(node => node.textContent === 'Free text.'));
+});
+
 test('Stop remains available in another chat and cancels the actual owner', async () => {
   const {ids, run, respond} = harness();
   run("loaded=true; identity='history'; active={conversation_id:'working',status:'running'}; conversation={turns:[]};");
@@ -502,7 +546,7 @@ test('sending a question opens its chat and replaces Send with live progress and
     throw new Error('Unexpected route: ' + route);
   });
   await ids.form.onsubmit({preventDefault() {}});
-  assert.deepEqual(submitted, {question:'Analyze CCO',conversation_id:null});
+  assert.deepEqual(submitted, {question:'Analyze CCO',conversation_id:null,mode:'normal'});
   assert.equal(ids.question.value, '');
   assert.equal(run('identity'), 'created');
   assert.equal(ids.cancel.hidden, false);

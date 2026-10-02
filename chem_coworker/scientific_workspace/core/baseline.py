@@ -36,6 +36,7 @@ APPLICATION_MODULE_LAYERS: Mapping[str, str] = MappingProxyType({
     "runtime/conversation.py": "runtime",
     "runtime/research_profiles.py": "runtime",
     "runtime/runtime_environment.py": "runtime",
+    "runtime/workspace_modes.py": "runtime",
     "agent_context/context.py": "guidance",
     "agent_context/learning.py": "guidance",
     "agent_context/prompts.py": "guidance",
@@ -155,6 +156,7 @@ def environment_versions() -> dict[str, str]:
 
 def capture_baseline(
     repository: Path, artifacts: Mapping[str, Path],
+    *, include_guidance: bool = True,
 ) -> dict[str, Any]:
     """Record a development snapshot, registry audit, and selected data inputs."""
     from condition_registry import (
@@ -205,9 +207,10 @@ def capture_baseline(
         "validation_status": "development_snapshot_not_release_validated",
         "evaluation_partition": "development_only_not_an_untouched_evaluation",
     }
-    from ..agent_context.learning import build_learning_context
+    from ..agent_context.learning import build_learning_context, disabled_learning_context
 
-    baseline["learning_context"] = build_learning_context(baseline)
+    baseline["learning_context"] = (build_learning_context(baseline) if include_guidance
+                                    else disabled_learning_context())
     baseline["scientific_identity"] = scientific_identity(baseline)
     return baseline
 

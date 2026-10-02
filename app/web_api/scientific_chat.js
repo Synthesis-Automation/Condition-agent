@@ -6,6 +6,17 @@ let token = '', identity = null, active = null, conversation = null, displayed =
 let loaded = false, submitting = false, polling = false, pollAgain = false;
 let pollTimer = null, navigation = 0, stopping = null, sidebarOpen = false, activityVersion = 0;
 const drafts = new Map();
+let workspaceModes = [], newMode = 'normal';
+function updateMode() {
+  const selected = identity ? (conversation?.workspace_mode || 'normal') : newMode;
+  $('workspace-mode').value = selected;
+  $('workspace-mode').disabled = !loaded || submitting || !!identity;
+  const description = workspaceModes.find(item => item.mode === selected)?.description || '';
+  const hint = description + (identity ? ' Start a new chat to change mode.' : ' Mode is fixed when you send the first message.');
+  $('workspace-mode').title = hint;
+  $('mode-description').textContent = hint;
+}
+$('workspace-mode').onchange = () => { newMode = $('workspace-mode').value; updateMode(); };
 function updateThemeButton() {
   const dark = document.documentElement.dataset.theme === 'dark';
   $('theme').textContent = dark ? 'Light mode' : 'Dark mode';
@@ -419,6 +430,7 @@ function toBottom() { $('scroll-area').scrollTop = $('scroll-area').scrollHeight
 function renderConversation(data) {
   const firstLoad = conversation === null;
   conversation = data;
+  updateMode();
   document.title = data.title + ' · Scientific workspace';
   const signature = JSON.stringify(data.turns.map(t => [t.id, t.status, t.answer_ref, t.error]));
   if (signature !== displayed) {
@@ -600,6 +612,7 @@ function resizeInput() {
   $('question').style.height = 'auto'; $('question').style.height = Math.min($('question').scrollHeight, 140) + 'px';
 }
 function updateControls() {
+  updateMode();
   $('send').disabled = !loaded || submitting || !!active || !$('question').value.trim();
   $('send').hidden = !!active; $('cancel').hidden = !active;
   $('cancel').disabled = !!stopping; $('cancel').setAttribute('aria-label', stopping ? 'Stopping investigation' : 'Stop investigation');
@@ -614,7 +627,9 @@ function updateControls() {
 async function list() {
   const rows = await request('/conversations'); $('saved').replaceChildren();
   for (const row of rows) {
-    const button = element('button', '', 'saved'); button.title = row.title;
+    const button = element('button', '', 'saved');
+    const modeLabel = workspaceModes.find(item => item.mode === (row.workspace_mode || 'normal'))?.label || '3. Normal';
+    button.title = row.title + ' — ' + modeLabel;
     button.setAttribute('aria-current', identity === row.id ? 'page' : 'false');
     if (active?.conversation_id === row.id) { const dot = element('span', '', 'running-dot'); dot.setAttribute('aria-label', 'Running'); button.append(dot); }
     button.append(element('span', row.title, 'saved-title'));
@@ -711,7 +726,8 @@ $('form').onsubmit = async event => {
   if (!question || !loaded || active || submitting) return;
   const source = identity; submitting = true; activityVersion++; updateControls(); $('error').textContent = '';
   try {
-    const turn = await request('/turns', {method:'POST', body:JSON.stringify({question, conversation_id:source})});
+    const mode = source ? (conversation?.workspace_mode || 'normal') : newMode;
+    const turn = await request('/turns', {method:'POST', body:JSON.stringify({question, conversation_id:source, mode})});
     $('question').value = ''; drafts.delete(source || 'new');
     activityVersion++;
     active = {conversation_id:turn.conversation_id, id:turn.turn_id, status:'queued', created_at:new Date().toISOString(), progress:[]};
@@ -727,6 +743,7 @@ async function initialize() {
   setSidebar(!matchMedia('(max-width:760px)').matches);
   try {
     const config = await request('/config'); token = config.token;
+    workspaceModes = config.workspace_modes || [];
     $('environment').replaceChildren(element('p', 'Agent: ' + config.runtime), element('p', 'Model: ' + config.model),
       element('p', 'Questions and tool context may be sent to your configured model provider. Investigation records stay local.'));
     if (config.research_settings) {

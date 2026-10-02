@@ -20,6 +20,7 @@ from visualization import (
 )
 
 from chem_coworker.scientific_workspace.answers.answer_contracts import ScientificAnswer
+from chem_coworker.scientific_workspace.runtime.activity import activity_detail
 
 
 _SMILES_TOKEN = re.compile(r"[A-Za-z0-9@+\[\]()=#$%./\\*:\-]+")
@@ -180,6 +181,17 @@ def present_conversation(conversation: dict[str, Any]) -> dict[str, Any]:
     for turn in conversation["turns"]:
         view = {**turn, "question_presentation": present_message(turn["question"], identity)}
         if turn.get("answer"):
+            # Some CLI versions omit the final message's phase, so its text is
+            # also saved as an agent_update. Render the answer once, keeping
+            # genuine commentary and the original runtime history intact.
+            answer_preview = activity_detail({
+                "type": "agent_message", "text": turn["answer"]["answer_markdown"],
+            })
+            if answer_preview and "progress" in turn:
+                view["progress"] = [
+                    row for row in turn["progress"]
+                    if row.get("kind") != "agent_update" or row.get("detail") != answer_preview
+                ]
             references = ()
             if turn["answer"].get("schema_version") == "scientific_answer.v2":
                 view["structured_presentation"] = _structured_view(

@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Event
+from tempfile import TemporaryDirectory
 from time import monotonic
 from typing import Any, Callable, Protocol
 
@@ -18,12 +20,14 @@ from ..answers.answer_handoff import (
     ANSWER_HANDOFF_VERSION,
     answer_handoff_prompt,
     load_answer_handoff,
+    load_text_answer,
     prepare_answer_handoff,
 )
 from ..core.process_utils import hidden_process_options, stop_process_tree
 from ..paths import REPOSITORY_ROOT
 from .research_profiles import resolve_research_profile
 from .runtime_environment import discover_ripgrep, runtime_environment
+from .workspace_modes import WorkspaceMode, mode_policy, runtime_configuration
 
 
 @dataclass(frozen=True)
@@ -45,6 +49,7 @@ class AgentRuntime(Protocol):
         self, *, prompt: str, workspace: Path, turn_directory: Path,
         thread_id: str | None, cancel: Event,
         on_event: Callable[[dict[str, Any]], None],
+        mode: str | WorkspaceMode = WorkspaceMode.NORMAL,
     ) -> AgentResult:
         """Run one complete agent turn with iterative tools and optional conversation memory."""
 
@@ -156,10 +161,14 @@ class CodexRuntime:
             ],
         }
 
-    def command(self, workspace: Path, turn_directory: Path, thread_id: str | None) -> list[str]:
+    def command(
+        self, workspace: Path, turn_directory: Path, thread_id: str | None,
+        mode: str | WorkspaceMode = WorkspaceMode.NORMAL,
+    ) -> list[str]:
         """Build explicit arguments; never interpolate a user's question into a shell."""
+        mode = WorkspaceMode(mode)
         command = [
-            self.executable, "exec", "--sandbox", "workspace-write",
+            self.executable, "exec", "--sandbox", "read-only" if mode == WorkspaceMode.PURE else "workspace-write",
             "-c", 'approval_policy="never"', "--cd", str(workspace),
         ]
         if thread_id:
@@ -171,36 +180,117 @@ class CodexRuntime:
                 if value is not None:
                     # This is a direct argv item, not shell-escaped command text.
                     command.extend(["-c", f"{key}={json.dumps(value)}"])
-        command.extend([
-            "--json", "--skip-git-repo-check", "--output-schema",
-            str(turn_directory / "answer-handoff-schema.json"), "--output-last-message",
-            str(turn_directory / "agent-final.json"),
-        ])
+        if mode != WorkspaceMode.NORMAL:
+            # Prevent implicit repository AGENTS.md or personal memory from
+            # reintroducing removed application instructions.
+            for setting in ('project_doc_max_bytes=0', 'developer_instructions=""',
+                            'features.memories=false', 'features.skip_host_skill_discovery=true',
+                            'features.plugins=false'):
+                command.extend(["-c", setting])
+        if mode == WorkspaceMode.PURE:
+            command.extend(self._pure_tool_overrides(workspace))
+        command.extend(["--json", "--skip-git-repo-check"])
+        if mode == WorkspaceMode.NORMAL:
+            command.extend(["--output-schema", str(turn_directory / "answer-handoff-schema.json")])
+        command.extend(["--output-last-message", str(turn_directory / (
+            "agent-final.json" if mode == WorkspaceMode.NORMAL else "agent-final.txt"))])
         if self.model:
             command.extend(["--model", self.model])
         command.append("-")
         return command
 
+    def _pure_tool_overrides(self, workspace: Path) -> list[str]:
+        """Fail closed unless local tool paths can be disabled on this CLI."""
+        disabled = ("shell_tool", "unified_exec", "apps", "plugins", "multi_agent",
+                    "browser_use", "computer_use", "view_image",
+                    "hooks", "memories", "image_generation", "skill_search",
+                    "in_app_browser", "in_app_local_automation", "browser_use_external",
+                    "multi_agent_v2", "remote_plugin")
+        feature_result = subprocess.run(
+            [self.executable, "features", "list"], cwd=workspace,
+            capture_output=True, text=True, encoding="utf-8", timeout=10,
+            check=True, **hidden_process_options(),
+        )
+        available = {line.split()[0] for line in feature_result.stdout.splitlines() if line.split()}
+        required = {"shell_tool", "apps", "plugins", "skip_host_skill_discovery", "view_image"}
+        if not required.issubset(available):
+            raise RuntimeError("Pure agent mode requires a current Codex CLI with local-tool and skill isolation controls")
+        overrides = []
+        # Code mode dispatches native tools (including web search); it is not
+        # local shell execution. Disabling its host also breaks allowed tools.
+        # Restrict the underlying local-access tools, not their shared router.
+        if "code_mode_host" in available:
+            overrides.extend(["-c", "features.code_mode_host=true"])
+        for feature in disabled:
+            if feature in available:
+                overrides.extend(["-c", f"features.{feature}=false"])
+        # An empty table override can merge with inherited servers. Disable each
+        # resolved server explicitly instead; never log its credentials/config.
+        servers = subprocess.run(
+            [self.executable, *overrides, "mcp", "list", "--json"], cwd=workspace,
+            capture_output=True, text=True, encoding="utf-8", timeout=10,
+            check=True, **hidden_process_options(),
+        )
+        records = json.loads(servers.stdout)
+        if not isinstance(records, list):
+            raise RuntimeError("Cannot establish MCP isolation for pure agent mode")
+        for server in records:
+            name = server["name"]
+            # CLI override keys split on dots; TOML-quoting a component creates
+            # a different key on supported CLI releases. Refuse ambiguous names.
+            if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", name):
+                raise RuntimeError("Cannot isolate an MCP server with an unsupported configuration name")
+            overrides.extend(["-c", f"mcp_servers.{name}.enabled=false"])
+        verified = subprocess.run(
+            [self.executable, *overrides, "mcp", "list", "--json"], cwd=workspace,
+            capture_output=True, text=True, encoding="utf-8", timeout=10,
+            check=True, **hidden_process_options(),
+        )
+        remaining = json.loads(verified.stdout)
+        if not isinstance(remaining, list) or any(server.get("enabled") is not False for server in remaining):
+            raise RuntimeError("Pure agent mode could not disable all configured MCP servers")
+        return overrides
+
     def run(
         self, *, prompt: str, workspace: Path, turn_directory: Path,
         thread_id: str | None, cancel: Event,
         on_event: Callable[[dict[str, Any]], None],
+        mode: str | WorkspaceMode = WorkspaceMode.NORMAL,
+    ) -> AgentResult:
+        """Run one mode without mutating shared runtime configuration."""
+        mode = WorkspaceMode(mode)
+        arguments = dict(prompt=prompt, workspace=workspace, turn_directory=turn_directory,
+                         thread_id=thread_id, cancel=cancel, on_event=on_event, mode=mode)
+        if mode == WorkspaceMode.PURE:
+            # Outside the checkout: no project configuration or ancestor files.
+            with TemporaryDirectory(prefix="scientific-pure-") as scratch:
+                return self._run_turn(**arguments, execution_directory=Path(scratch))
+        return self._run_turn(**arguments, execution_directory=workspace)
+
+    def _run_turn(
+        self, *, prompt: str, workspace: Path, turn_directory: Path,
+        thread_id: str | None, cancel: Event,
+        on_event: Callable[[dict[str, Any]], None], mode: WorkspaceMode,
+        execution_directory: Path,
     ) -> AgentResult:
         """Capture JSONL events, enforce a deadline, and preserve complete local logs."""
         turn_directory = prepare_answer_handoff(workspace, turn_directory)
-        (turn_directory / "answer-schema.json").write_text(json.dumps(ANSWER_SCHEMA), "utf-8")
-        (turn_directory / "answer-handoff-schema.json").write_text(json.dumps(ANSWER_HANDOFF_SCHEMA), "utf-8")
+        if mode == WorkspaceMode.NORMAL:
+            (turn_directory / "answer-schema.json").write_text(json.dumps(ANSWER_SCHEMA), "utf-8")
+            (turn_directory / "answer-handoff-schema.json").write_text(json.dumps(ANSWER_HANDOFF_SCHEMA), "utf-8")
         (turn_directory / "runtime-request.json").write_text(json.dumps({
             "schema_version": "scientific_runtime_request.v1",
-            "configuration": self.describe(), "resumed_thread_id": thread_id,
+            "configuration": runtime_configuration(self.describe(), mode), "resumed_thread_id": thread_id,
+            "mode_policy": mode_policy(mode),
         }, indent=2), "utf-8")
         prompt_path = turn_directory / "prompt.txt"
-        prompt_path.write_text(answer_handoff_prompt(prompt, turn_directory), "utf-8")
+        prompt_path.write_text(answer_handoff_prompt(prompt, turn_directory)
+                               if mode == WorkspaceMode.NORMAL else prompt, "utf-8")
         output_path = turn_directory / "runtime.jsonl"
         stderr_path = turn_directory / "runtime.stderr.txt"
         environment = runtime_environment(
-            REPOSITORY_ROOT,
-            search_tool=getattr(self, "search_tool", {}),
+            None if mode == WorkspaceMode.PURE else REPOSITORY_ROOT,
+            search_tool={} if mode == WorkspaceMode.PURE else getattr(self, "search_tool", {}),
         )
         started = monotonic()
         last_heartbeat = started
@@ -219,7 +309,9 @@ class CodexRuntime:
         with prompt_path.open("rb") as source, output_path.open("wb") as output, \
                 stderr_path.open("wb") as errors, output_path.open("r", encoding="utf-8", errors="replace") as reader:
             process = subprocess.Popen(
-                self.command(workspace, turn_directory, thread_id), cwd=workspace,
+                (self.command(execution_directory, turn_directory, thread_id)
+                 if mode == WorkspaceMode.NORMAL else
+                 self.command(execution_directory, turn_directory, thread_id, mode)), cwd=execution_directory,
                 stdin=source, stdout=output, stderr=errors, env=environment,
                 **process_options,
             )
@@ -314,5 +406,8 @@ class CodexRuntime:
                     " a CLI that supports the requested model."
                 )
             raise RuntimeError(message)
-        answer = load_answer_handoff(workspace, turn_directory, thread_id=runtime_thread, usage=usage)
+        if mode == WorkspaceMode.NORMAL:
+            answer = load_answer_handoff(workspace, turn_directory, thread_id=runtime_thread, usage=usage)
+        else:
+            answer = load_text_answer(workspace, turn_directory)
         return AgentResult(answer, runtime_thread, usage)

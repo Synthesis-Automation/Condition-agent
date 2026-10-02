@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, Mapping
 from ..paths import WORKSPACE_ROOT
 from .context import current_application_context
 from .learning import available_task_guides
+from ..runtime.workspace_modes import WorkspaceMode
 
 if TYPE_CHECKING:
     from ..workspace import ScientificWorkspace
@@ -49,12 +50,16 @@ def investigation_prompt(
     *,
     task_names: tuple[str, ...] = (),
     presentation_profile: str = "default",
+    mode: str | WorkspaceMode = WorkspaceMode.NORMAL,
 ) -> str:
     """Compose core, capabilities, optional guides and a presentation profile.
 
     No task is inferred from the question. The agent can read guides on demand;
     callers can explicitly include guides without imposing a required tool sequence.
     """
+    mode = WorkspaceMode(mode)
+    if mode == WorkspaceMode.PURE:
+        return question
     if not re.fullmatch(r"[a-z][a-z0-9_]*", presentation_profile):
         raise ValueError("Invalid presentation profile name")
     context = current_application_context(workspace.store)
@@ -81,6 +86,12 @@ def investigation_prompt(
         "If rg cannot be found, use its recorded executable (PowerShell: & 'path/rg.exe').\n"
         "If unavailable, use Select-String, Get-ChildItem or Python."
     )
+    if mode == WorkspaceMode.TOOLS:
+        usage = _resource(context, "agent_instructions/tools_only.md").replace(
+            "@INVESTIGATION_ROOT@", repr(str(root)),
+        )
+        return "\n\n".join((usage, environment, f"Available operations:\n{overview}",
+                              "USER QUESTION:\n" + question)) + "\n"
     usage = _resource(context, "agent_instructions/workspace_usage.md").replace(
         "@INVESTIGATION_ROOT@", repr(str(root))
     ).replace("@README@", str(repository / "docs/AI-native/readme.md"))

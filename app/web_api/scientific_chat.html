@@ -32,8 +32,17 @@
         <button id="menu" class="icon-button" type="button" aria-label="Toggle chat history" aria-controls="sidebar" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg>
         </button>
+        <div class="mode-control">
+          <label for="workspace-mode">Workspace mode</label>
+          <select id="workspace-mode" aria-describedby="mode-description" disabled>
+            <option value="pure_agent">1. Pure agent</option>
+            <option value="tools_only">2. Tools and data</option>
+            <option value="normal" selected>3. Normal</option>
+          </select>
+        </div>
         <button id="theme" class="theme-toggle" type="button" title="Switch to light theme">Light mode</button>
       </header>
+      <p id="mode-description" class="mode-description"></p>
       <div class="conversation-area">
       <div id="scroll-area" class="scroll-area">
         <section id="intro" class="intro">

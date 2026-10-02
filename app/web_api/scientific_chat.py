@@ -12,16 +12,18 @@ from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 
 from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
+from chem_coworker.scientific_workspace.runtime.workspace_modes import WorkspaceMode
 
 from .scientific_presentation import present_conversation
 
 
 class ChatRequest(BaseModel):
-    """Only user text and an optional saved conversation ID cross the browser boundary."""
+    """User text, a saved conversation ID and a fixed experiment mode."""
 
     model_config = ConfigDict(extra="forbid")
     question: str = Field(min_length=1, max_length=20000)
     conversation_id: str | None = Field(default=None, pattern=r"^[0-9a-f]{32}$")
+    mode: WorkspaceMode | None = None
 
 
 def create_scientific_router(service: ConversationService) -> APIRouter:
@@ -92,7 +94,7 @@ def create_scientific_router(service: ConversationService) -> APIRouter:
     def submit(payload: ChatRequest, request: Request) -> dict[str, str]:
         guard(request, mutation=True)
         try:
-            return service.submit(payload.question, payload.conversation_id)
+            return service.submit(payload.question, payload.conversation_id, mode=payload.mode)
         except (ValueError, FileNotFoundError, RuntimeError) as exc:
             raise failure(exc) from exc
 

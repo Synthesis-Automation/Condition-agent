@@ -23,7 +23,8 @@ from ..agent_context.prompts import investigation_prompt
 from ..paths import REPOSITORY_ROOT
 from ..workspace import ScientificWorkspace
 from .activity import ACTIVITY_VERSION, ActivityHistory, recover_activity
-from .agent_runtime import AgentRuntime, AgentStopped
+from .agent_runtime import AgentResult, AgentRuntime, AgentStopped
+from .workspace_modes import WorkspaceMode, available_modes, mode_policy, runtime_configuration
 
 
 def _now() -> str:
@@ -60,6 +61,7 @@ class ConversationService:
             **self.runtime.describe(), "local_only": True,
             "validation_status": "development_snapshot_not_release_validated",
             "artifacts": {name: (self.repository / path).is_file() for name, path in self.artifacts.items()},
+            "workspace_modes": available_modes(), "default_workspace_mode": WorkspaceMode.NORMAL.value,
         }
 
     def _directory(self, conversation_id: str) -> Path:
@@ -68,7 +70,10 @@ class ConversationService:
             raise ValueError("Conversation path escapes configured root")
         return directory
 
-    def submit(self, question: str, conversation_id: str | None = None) -> dict[str, str]:
+    def submit(
+        self, question: str, conversation_id: str | None = None,
+        *, mode: str | WorkspaceMode | None = None,
+    ) -> dict[str, str]:
         """Queue a user turn; baseline creation happens in the worker with visible progress."""
         question = question.strip()
         if not question or len(question) > 20000:
@@ -81,13 +86,19 @@ class ConversationService:
             if conversation_id:
                 if not (directory / "conversation.json").is_file():
                     raise FileNotFoundError("Conversation does not exist")
-                if not (directory / "investigation.json").is_file():
+                saved = _read_json(directory / "conversation.json")
+                selected = WorkspaceMode(saved.get("workspace_mode", "normal"))
+                if mode is not None and WorkspaceMode(mode) != selected:
+                    raise ValueError("Workspace mode is fixed per conversation; start a new chat to change it")
+                if selected != WorkspaceMode.PURE and not (directory / "investigation.json").is_file():
                     raise ValueError("Investigation preparation failed; start a new conversation")
             else:
+                selected = WorkspaceMode(WorkspaceMode.NORMAL if mode is None else mode)
                 directory.mkdir(exist_ok=False)
                 _write_json(directory / "conversation.json", {
                     "id": identity, "title": question[:100], "created_at": _now(),
-                    "runtime": self.runtime.describe(),
+                    "runtime": runtime_configuration(self.runtime.describe(), selected),
+                    "workspace_mode": selected.value, "mode_policy": mode_policy(selected),
                 })
                 (directory / "turns").mkdir()
             lock_path = directory / ".conversation.lock"
@@ -104,7 +115,8 @@ class ConversationService:
                 "id": turn_id, "conversation_id": identity, "question": question,
                 "status": "queued", "created_at": _now(), "progress": [],
                 "worker_process_id": os.getpid(),
-                "runtime_requested": self.runtime.describe(),
+                "runtime_requested": runtime_configuration(self.runtime.describe(), selected),
+                "workspace_mode": selected.value, "mode_policy": mode_policy(selected),
             })
             cancel = Event()
             self._active = (identity, turn_id, cancel)
@@ -117,6 +129,7 @@ class ConversationService:
         directory = self._directory(identity)
         turn = directory / "turns" / turn_id
         state = _read_json(turn / "turn.json")
+        mode = WorkspaceMode(state.get("workspace_mode", "normal"))
         workspace: ScientificWorkspace | None = None
         history = ActivityHistory()
         attempt = 0
@@ -180,6 +193,27 @@ class ConversationService:
 
         try:
             save(status="preparing")
+            if mode == WorkspaceMode.PURE:
+                if cancel.is_set():
+                    raise AgentStopped("cancelled")
+                prior = next((item for item in reversed(self.get(identity)["turns"])
+                              if item["id"] != turn_id and item.get("thread_id")), None)
+                same_runtime = prior is not None and prior.get("runtime_requested") == state["runtime_requested"]
+                thread_id = prior["thread_id"] if same_runtime else None
+                prompt = state["question"]
+                prompt_path = turn / "investigation-prompt.txt"
+                prompt_path.write_bytes(prompt.encode("utf-8"))
+                save(status="running", prompt_sha256=sha256_file(prompt_path),
+                     thread_resume="resumed" if thread_id else "new_thread")
+                result = self.runtime.run(
+                    prompt=prompt, workspace=directory, turn_directory=turn,
+                    thread_id=thread_id, cancel=cancel, on_event=progress, mode=mode,
+                )
+                if cancel.is_set():
+                    raise AgentStopped("cancelled")
+                save(status="completed", thread_id=result.thread_id,
+                     answer=self._free_answer(result, mode))
+                return
             if not (directory / "investigation.json").exists():
                 # The conversation envelope already exists. Initialize the scientific
                 # store separately, then move only its newly created files into place.
@@ -187,11 +221,12 @@ class ConversationService:
                 from ..core.store import InvestigationStore
 
                 paths = {name: (self.repository / path).resolve() for name, path in self.artifacts.items()}
-                baseline = capture_baseline(self.repository, paths)
+                baseline = (capture_baseline(self.repository, paths) if mode == WorkspaceMode.NORMAL
+                            else capture_baseline(self.repository, paths, include_guidance=False))
                 staging = directory / "prepared"
                 InvestigationStore.create(
                     staging, objective=state["question"], baseline=baseline,
-                    agent_metadata=self.runtime.describe(),
+                    agent_metadata={**self.runtime.describe(), "workspace_mode": mode.value},
                 )
                 for path in staging.iterdir():
                     path.rename(directory / path.name)
@@ -231,7 +266,7 @@ class ConversationService:
             })
             scientific_cursor = ScientificActivityCursor(workspace.store, after_sequence=user_event.sequence)
             save(status="running", user_ref=user_event.artifact_ref)
-            prompt = investigation_prompt(workspace, state["question"])
+            prompt = investigation_prompt(workspace, state["question"], mode=mode)
             attempt_usage = []
             for attempt in range(2):
                 attempt_directory = turn if attempt == 0 else turn / "repair-1"
@@ -247,6 +282,7 @@ class ConversationService:
                     result = self.runtime.run(
                         prompt=prompt, workspace=directory, turn_directory=attempt_directory,
                         thread_id=thread_id, cancel=cancel, on_event=progress,
+                        **({"mode": mode} if mode != WorkspaceMode.NORMAL else {}),
                     )
                     submitted_answer = result.answer
                     submitted_thread = result.thread_id
@@ -265,6 +301,17 @@ class ConversationService:
                 if cancel.is_set():
                     raise AgentStopped("cancelled")
                 verify_baseline(workspace.store.manifest["baseline"])
+                if mode != WorkspaceMode.NORMAL:
+                    if submission_error is not None:
+                        raise submission_error
+                    event = workspace.store.append("agent_answer", {
+                        **self._free_answer(result, mode), "turn_id": turn_id,
+                        "application_context_ref": context_event.artifact_ref,
+                        "scientific_identity": context["scientific_identity"],
+                    })
+                    save(status="completed", answer_ref=event.artifact_ref,
+                         answer=workspace.store.read_artifact(event.artifact_ref), thread_id=result.thread_id)
+                    return
                 try:
                     if submission_error is not None:
                         raise submission_error
@@ -302,6 +349,7 @@ class ConversationService:
             event = workspace.store.append("agent_answer", {
                 **answer.model_dump(), "turn_id": turn_id, "thread_id": result.thread_id,
                 "origin": "agent_authored", "review_status": "unreviewed",
+                "workspace_mode": mode.value, "mode_policy": mode_policy(mode),
                 "evidence_status": "linked_unreviewed" if cited else "no_local_evidence",
                 "runtime": self.runtime.describe(), "usage": result.usage,
                 "attempt_usage": attempt_usage,
@@ -330,7 +378,7 @@ class ConversationService:
         finally:
             if scientific_progress():
                 save()
-            if workspace is not None and workspace.store.manifest["baseline"].get("learning_context"):
+            if mode == WorkspaceMode.NORMAL and workspace is not None and workspace.store.manifest["baseline"].get("learning_context"):
                 try:
                     published = workspace.publish_lessons()
                     if published["published"]:
@@ -342,6 +390,17 @@ class ConversationService:
             (directory / ".conversation.lock").unlink(missing_ok=True)
             with self._mutex:
                 self._active = None
+
+    def _free_answer(self, result: AgentResult, mode: WorkspaceMode) -> dict[str, Any]:
+        """Wrap verbatim text for storage, without scientific validation or repair."""
+        text = result.answer.get("answer_markdown")
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError("Agent returned no final text")
+        return {"schema_version": "agent_text.v1", "answer_markdown": text,
+                "workspace_mode": mode.value, "mode_policy": mode_policy(mode),
+                "origin": "agent_authored", "review_status": "unreviewed",
+                "evidence_status": "not_validated", "thread_id": result.thread_id,
+                "runtime": runtime_configuration(self.runtime.describe(), mode), "usage": result.usage}
 
     def get(self, conversation_id: str) -> dict[str, Any]:
         """Read persisted conversation and progress; safe to reopen after a normal restart."""
@@ -380,7 +439,7 @@ class ConversationService:
                 turn["step_precedent_evidence"] = answer_step_precedents(
                     ScientificWorkspace(directory).store, turn["answer"],
                 )
-        return {**metadata, "turns": turns}
+        return {"workspace_mode": "normal", **metadata, "turns": turns}
 
     def list_conversations(self) -> list[dict[str, Any]]:
         """List saved conversation titles, newest first."""

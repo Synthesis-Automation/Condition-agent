@@ -75,12 +75,17 @@ def discover_ripgrep(
 
 
 def runtime_environment(
-    repository: Path, *, search_tool: Mapping[str, Any],
+    repository: Path | None, *, search_tool: Mapping[str, Any],
     environment: Mapping[str, str] | None = None,
 ) -> dict[str, str]:
     """Configure only the child process; preserve the caller's environment and sandbox."""
     child = dict(os.environ if environment is None else environment)
-    child["PYTHONPATH"] = str(repository) + os.pathsep + child.get("PYTHONPATH", "")
+    if repository is None:
+        for key in list(child):
+            if key.upper() in {"PYTHONPATH", "PYTHONSTARTUP"}:
+                del child[key]
+    else:
+        child["PYTHONPATH"] = str(repository) + os.pathsep + child.get("PYTHONPATH", "")
     child["PYTHONIOENCODING"] = "utf-8"
     child["PYTHONDONTWRITEBYTECODE"] = "1"
     if search_tool.get("status") == "available" and search_tool.get("path"):

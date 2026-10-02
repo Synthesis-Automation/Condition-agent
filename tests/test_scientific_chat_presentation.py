@@ -8,9 +8,11 @@ from html.parser import HTMLParser
 import xml.etree.ElementTree as ET
 
 from fastapi.testclient import TestClient
+import pytest
 
 from app.web_api.main import create_app
 from app.web_api.scientific_presentation import present_conversation, present_message
+from chem_coworker.scientific_workspace.runtime.activity import ActivityHistory
 
 
 IDENTITY = "a" * 32
@@ -134,11 +136,52 @@ def test_projection_preserves_saved_answers_and_scientific_evidence() -> None:
     assert len(view["turns"][0]["question_presentation"]["structures"]) == 1
 
 
+@pytest.mark.parametrize("answer", [
+    "**Final answer**\n\nUse A &amp; B.\n\n| Choice | Note |\n| --- | --- |\n| A | Proposed |",
+    "**Final answer**\n\n" + "A long answer with preserved uncertainty.\n" * 80,
+])
+def test_final_answer_is_rendered_once_without_losing_real_progress(answer: str) -> None:
+    history = ActivityHistory()
+    for item in (
+        {"id": "comment", "type": "agent_message", "text": "I will check the evidence."},
+        {"id": "search", "type": "web_search", "query": "published preparation"},
+        # The native CLI omits phase, so this enters the activity history too.
+        {"id": "final", "type": "agent_message", "text": answer},
+    ):
+        history.observe({"type": "item.completed", "item": item}, None)
+    conversation = {"id": IDENTITY, "turns": [{
+        "question": "Investigate", "status": "completed", "progress": history.rows,
+        "answer": {"schema_version": "agent_text.v1", "answer_markdown": answer},
+    }]}
+    original = deepcopy(conversation)
+    turn = present_conversation(conversation)["turns"][0]
+    assert [row["item_id"] for row in turn["progress"]] == ["comment", "search"]
+    assert turn["answer_presentation"]["html"].count("<strong>Final answer</strong>") == 1
+    assert turn["answer"]["answer_markdown"] == answer
+    assert conversation == original
+
+
+@pytest.mark.parametrize("status", ["running", "failed", "cancelled"])
+def test_progress_is_preserved_when_there_is_no_rendered_answer(status: str) -> None:
+    conversation = {"id": IDENTITY, "turns": [{
+        "question": "Investigate", "status": status,
+        "progress": [{"kind": "agent_update", "detail": "Partial findings."}],
+    }]}
+    original = deepcopy(conversation)
+    assert present_conversation(conversation)["turns"][0]["progress"] == original["turns"][0]["progress"]
+    assert conversation == original
+
+
 def test_saved_conversation_api_and_page_deliver_new_presentation_without_agent_calls() -> None:
     class SavedService:
         def get(self, identity):
+            history = ActivityHistory()
+            history.observe({"type": "item.completed", "item": {
+                "id": "final", "type": "agent_message", "text": EXAMPLE,
+            }}, None)
             return {"id": identity, "turns": [{
                 "question": f"how to make {TARGET}?", "status": "completed",
+                "progress": history.rows,
                 "answer": {"answer_markdown": EXAMPLE},
             }]}
 
@@ -148,6 +191,7 @@ def test_saved_conversation_api_and_page_deliver_new_presentation_without_agent_
     response = client.get(f"/api/v1/scientific/conversations/{IDENTITY}")
     assert response.status_code == 200
     turn = response.json()["turns"][0]
+    assert turn["progress"] == []
     assert "<table>" in turn["answer_presentation"]["html"]
     assert len(turn["answer_presentation"]["structures"]) == 2
     assert len(turn["question_presentation"]["structures"]) == 1

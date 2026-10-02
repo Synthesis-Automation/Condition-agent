@@ -113,6 +113,53 @@ Open **http://127.0.0.1:8011/scientific** and start a new conversation.
 **This page does not need Node.js or a frontend build.** It is served directly
 by the Python app.
 
+Use **Workspace mode** in the top bar before sending the first message:
+
+| Mode | Project tools/data | Task guidance | Required answer format |
+| --- | --- | --- | --- |
+| 1. Pure agent | Disabled | Disabled | None |
+| 2. Tools and data | Enabled | Disabled | None |
+| 3. Normal (default) | Enabled | Enabled | Existing structured answer |
+
+The mode is saved with the conversation and every turn. Start a **New chat**
+to change it; follow-ups keep the same mode and runtime thread when possible.
+Old conversations remain in normal mode. The turns API accepts an optional
+`mode` value (`pure_agent`, `tools_only`, or `normal`); omitting it uses normal
+for new conversations and the saved mode for follow-ups. A mode change within
+an existing conversation returns HTTP 422.
+
+Pure mode sends only the user question, runs outside the checkout, omits the
+project Python path and disables local shell execution, local image reading,
+MCP servers, plugins, personal memory and computer/browser integrations. Native
+web search still follows the server's research profile. This is a model plus
+native web-search baseline; it does **not** retain a general-purpose local shell.
+The native tool dispatcher stays enabled so web search can execute. Local image
+access uses the CLI's `features.view_image` flag. Mode policy v2 corrects an earlier
+v1 dispatcher setting that prevented native tool calls despite requesting live
+search. Restart the server and use a fresh chat when comparing against a v1 run.
+A current native CLI with the required isolation controls is required; unsupported
+CLIs fail instead of silently running with local access. These controls use the
+[official Codex configuration reference](https://developers.openai.com/codex/config-reference).
+
+Tools-and-data mode keeps deterministic scientific operations, dataset baselines
+and evidence recording. Its prompt contains an API reference, without task
+playbooks, learned advice, answer-authoring or presentation instructions. Saved
+guidance is empty, and lesson recall/publication is disabled. Because this mode
+deliberately has source access, it is an application-guidance ablation, not a
+filesystem security boundary against an agent deliberately reading guide files.
+Both ablation modes save the final text verbatim, without an output schema or
+scientific-answer repair attempt. Their answers are marked as not validated.
+
+For comparisons, use the same questions, explicit model, reasoning/search settings,
+deadline and dataset snapshot in fresh chats, and repeat trials. Mode 1 versus 2
+measures adding project capabilities (including local execution). Mode 2 versus 3
+measures task guidance and structured output **together**; separating those effects
+would need an additional experimental condition. Normal mode can use its existing
+single answer-repair attempt, so compare total usage and elapsed time as well as
+answer quality. These controls enable experiments; they do not establish efficacy.
+Normal mode retains procedural learning, so also record/hold its guidance and
+lesson snapshots fixed when comparing repeated trials.
+
 The agent defaults to the `research` profile, which requests high reasoning,
 live web search and a 1,800-second per-attempt deadline. It inherits the model
 from the local runtime configuration. Example with a shorter deadline:

@@ -65,7 +65,7 @@ def prepare_answer_handoff(workspace: Path, turn_directory: Path) -> Path:
     try:
         directory = _attempt_directory(workspace, turn_directory)
         stale = [name for name in (
-            ANSWER_FILENAME, HANDOFF_FILENAME, "answer-schema.json", "answer-handoff-schema.json",
+            ANSWER_FILENAME, HANDOFF_FILENAME, "agent-final.txt", "answer-schema.json", "answer-handoff-schema.json",
             "runtime-request.json", "runtime.jsonl", "runtime.stderr.txt", "runtime-observations.json", "prompt.txt",
         )
                  if os.path.lexists(directory / name)]
@@ -105,7 +105,7 @@ def _invalid_constant(value: str) -> None:
     raise ValueError(f"Invalid JSON numeric constant: {value}")
 
 
-def _read_json_file(workspace: Path, directory: Path, name: str, limit: int) -> Any:
+def _read_file_bytes(workspace: Path, directory: Path, name: str, limit: int) -> bytes:
     path = directory / name
     information = path.lstat()
     if (_is_link(path, information) or not stat.S_ISREG(information.st_mode)
@@ -122,8 +122,22 @@ def _read_json_file(workspace: Path, directory: Path, name: str, limit: int) -> 
         after = os.fstat(stream.fileno())
     if len(raw) > limit or (after.st_size, after.st_mtime_ns) != (information.st_size, information.st_mtime_ns):
         raise ValueError(f"{name} changed while reading the answer")
+    return raw
+
+
+def _read_json_file(workspace: Path, directory: Path, name: str, limit: int) -> Any:
+    raw = _read_file_bytes(workspace, directory, name, limit)
     # UTF-8 BOM is accepted because Windows text writers commonly emit one.
     return json.loads(raw.decode("utf-8-sig"), object_pairs_hook=_object_pairs, parse_constant=_invalid_constant)
+
+
+def load_text_answer(workspace: Path, turn_directory: Path) -> dict[str, Any]:
+    """Read free-form output with file integrity checks and no answer schema."""
+    directory = _attempt_directory(workspace, turn_directory)
+    text = _read_file_bytes(workspace, directory, "agent-final.txt", _MAX_ANSWER_BYTES).decode("utf-8-sig")
+    if not text.strip():
+        raise ValueError("Agent returned an empty final answer")
+    return {"schema_version": "agent_text.v1", "answer_markdown": text}
 
 
 def load_answer_handoff(
