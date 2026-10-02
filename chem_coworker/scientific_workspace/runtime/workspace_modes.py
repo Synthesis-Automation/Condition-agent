@@ -53,13 +53,24 @@ def available_modes() -> list[dict[str, Any]]:
     """Describe the browser choices without changing the model configuration."""
     labels = {
         WorkspaceMode.PURE: ("1. Pure agent", "No project tools or data; native web search only. Free-form answers."),
-        WorkspaceMode.TOOLS: ("2. Tools and data", "Project tools and data, without task guides, learned advice or answer-format requirements."),
+        WorkspaceMode.TOOLS: ("2. Tools-only", "Use project tools and datasets with free-form answers, without task guides or learned advice."),
         WorkspaceMode.NORMAL: ("3. Normal", "Full workspace with task guidance and structured answers."),
         WorkspaceMode.TOOLS_FORMATTING: ("4. Tools + formatting", "Project tools and data with structured answers and validation, without task guides or learned advice."),
         WorkspaceMode.TOOLS_GUIDANCE: ("5. Tools + guidance", "Project tools and data with task guides and learned advice, without answer-format requirements."),
     }
-    return [{**mode_policy(mode), "label": label, "description": description}
-            for mode, (label, description) in labels.items()]
+    choices = []
+    for mode, (label, description) in labels.items():
+        policy = mode_policy(mode)
+        summary = " | ".join(
+            f"{name}: {'Yes' if policy[key] else 'No'}"
+            for name, key in (
+                ("Project tools/data", "tools_and_data"),
+                ("Task guidance", "task_guidance"),
+                ("Required output format", "structured_answer"),
+            )
+        )
+        choices.append({**policy, "label": label, "description": f"{summary}. {description}"})
+    return choices
 
 
 def runtime_configuration(description: dict[str, Any], mode: str | WorkspaceMode) -> dict[str, Any]:
