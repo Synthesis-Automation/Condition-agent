@@ -63,13 +63,13 @@ def application_manifest(repository: Path) -> dict[str, dict[str, str]]:
 
 
 def _resources(
-    repository: Path, layers: Mapping[str, Mapping[str, str]], *, tools_only: bool = False,
+    repository: Path, layers: Mapping[str, Mapping[str, str]], *, mode: WorkspaceMode,
 ) -> dict[str, Any]:
     resources = {}
     for name, layer, source in _resource_directories(repository):
         for path in sorted(source.rglob("*.md")):
             key = name + "/" + path.relative_to(source).as_posix()
-            if tools_only and key != "agent_instructions/tools_only.md":
+            if not mode.includes_resource(key):
                 continue
             content = path.read_bytes()
             digest = hashlib.sha256(content).hexdigest()
@@ -118,13 +118,13 @@ def capture_application_context(
     repository = Path(baseline["repository"])
     mode = WorkspaceMode(store.manifest.get("agent_metadata", {}).get("workspace_mode", "normal"))
     layers = application_manifest(repository)
-    if mode != WorkspaceMode.NORMAL:
-        # Keep runtime identities, but do not put disabled instruction text in an
-        # agent-readable artifact. The tools-only API reference is the sole guide.
-        for layer in ("guidance", "presentation"):
-            layers[layer] = {key: value for key, value in layers[layer].items()
-                             if not key.endswith(".md") or key.endswith("/agent_instructions/tools_only.md")}
-    resources = _resources(repository, layers, tools_only=mode != WorkspaceMode.NORMAL)
+    # Keep code identities, but exclude disabled instruction text from snapshots.
+    for layer in ("guidance", "presentation"):
+        layers[layer] = {
+            key: value for key, value in layers[layer].items()
+            if not key.endswith(".md") or mode.includes_resource(key.removeprefix(WORKSPACE_PREFIX))
+        }
+    resources = _resources(repository, layers, mode=mode)
     previous = current_application_context(store)
     pinned = (previous or {}).get("learning_context") or baseline.get("learning_context")
     guides = {
@@ -132,7 +132,7 @@ def capture_application_context(
         for key, resource in resources.items()
         if key.startswith("task_playbooks/") and len(Path(key).parts) == 2
     }
-    if mode != WorkspaceMode.NORMAL:
+    if not mode.task_guidance:
         learning = disabled_learning_context()
     elif pinned is None:
         learning = build_learning_context(

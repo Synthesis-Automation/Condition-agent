@@ -35,7 +35,7 @@ Notes use w.store.note(kind, text, evidence_refs=(ref,)); kinds are 'hypothesis'
 'decision', 'question', 'limitation' and 'review'. Record branch choices as 'decision'.
 This prompt, catalogue and optional guides are the starting reference. For unresolved
 usage questions, read only the relevant section of @README@. Do not read the README
-or answer-schema.json at startup. The runtime supplies the schema for validation issues.
+at startup.
 
 Custom analysis is a normal capability. Read repository source, compose public APIs,
 and save scripts and outputs inside this investigation. Attach useful files with

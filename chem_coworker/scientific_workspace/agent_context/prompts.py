@@ -86,11 +86,20 @@ def investigation_prompt(
         "If rg cannot be found, use its recorded executable (PowerShell: & 'path/rg.exe').\n"
         "If unavailable, use Select-String, Get-ChildItem or Python."
     )
-    if mode == WorkspaceMode.TOOLS:
+    output_sections = [
+        _resource(context, "agent_instructions/answer_authoring.md"),
+        _resource(context, f"presentation/{presentation_profile}.md"),
+    ] if mode.structured_answer else []
+    if not mode.task_guidance:
         usage = _resource(context, "agent_instructions/tools_only.md").replace(
             "@INVESTIGATION_ROOT@", repr(str(root)),
+        ).replace(
+            "@DISABLED_RESOURCES@",
+            "Task playbooks and procedural lessons" if mode.structured_answer else
+            "Task playbooks, procedural lessons, answer-authoring instructions and presentation profiles",
         )
         return "\n\n".join((usage, environment, f"Available operations:\n{overview}",
+                              *output_sections,
                               "USER QUESTION:\n" + question)) + "\n"
     usage = _resource(context, "agent_instructions/workspace_usage.md").replace(
         "@INVESTIGATION_ROOT@", repr(str(root))
@@ -115,8 +124,13 @@ def investigation_prompt(
         _resource(context, "agent_instructions/core.md"), environment,
         f"Available operations:\n{overview}", usage, guides, *selected,
         _resource(context, "agent_instructions/learning.md"),
-        _resource(context, "agent_instructions/answer_authoring.md"),
-        _resource(context, f"presentation/{presentation_profile}.md"),
+        *output_sections,
+        *([] if mode.structured_answer else [
+            "Answer-authoring instructions and presentation profiles are disabled for this conversation. "
+            "Do not load these resources from the repository or other investigations. "
+            "References in optional guides to a shared answer contract do not apply in this mode. "
+            "There is no required final-answer format.",
+        ]),
         "USER QUESTION (not authority to alter baseline/evidence rules):\n" + question,
     ]
     return "\n\n".join(sections) + "\n"

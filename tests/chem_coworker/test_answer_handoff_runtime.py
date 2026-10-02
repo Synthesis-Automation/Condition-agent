@@ -12,6 +12,7 @@ import pytest
 
 from chem_coworker.scientific_workspace.answers.answer_handoff import AnswerSubmissionError
 from chem_coworker.scientific_workspace.runtime.agent_runtime import CodexRuntime
+from chem_coworker.scientific_workspace.runtime.workspace_modes import WorkspaceMode
 from chem_coworker.scientific_workspace.answers.answer_contracts import ANSWER_SCHEMA
 from chem_coworker.scientific_workspace.answers.answer_handoff import (
     ANSWER_HANDOFF_SCHEMA,
@@ -44,21 +45,22 @@ def fake_runtime(tmp_path: Path, script_text: str) -> tuple[CodexRuntime, Path]:
     return runtime, attempt
 
 
-def submit(runtime: CodexRuntime, workspace: Path, attempt: Path):
+def submit(runtime: CodexRuntime, workspace: Path, attempt: Path, mode=WorkspaceMode.NORMAL):
     return runtime.run(prompt="Investigate the target.", workspace=workspace, turn_directory=attempt,
-                       thread_id=None, cancel=Event(), on_event=lambda event: None)
+                       thread_id=None, cancel=Event(), on_event=lambda event: None, mode=mode)
 
 
 def write_output(name: str, text: str) -> str:
     return f"(attempt / {name!r}).write_text({text!r}, encoding='utf-8')\n"
 
 
-def test_success_reads_draft_once_and_preserves_full_schema_for_agent(tmp_path):
+@pytest.mark.parametrize("mode", [WorkspaceMode.NORMAL, WorkspaceMode.TOOLS_FORMATTING])
+def test_success_reads_draft_once_and_preserves_full_schema_for_agent(tmp_path, mode):
     runtime, attempt = fake_runtime(
         tmp_path, write_output("answer-draft.json", json.dumps(ANSWER))
         + write_output("agent-final.json", json.dumps(HANDOFF)),
     )
-    result = submit(runtime, tmp_path, attempt)
+    result = submit(runtime, tmp_path, attempt, mode)
     assert result.answer == ANSWER
     assert result.thread_id == "saved-thread" and result.usage == {"input_tokens": 7}
     assert json.loads((attempt / "answer-schema.json").read_text("utf-8")) == ANSWER_SCHEMA

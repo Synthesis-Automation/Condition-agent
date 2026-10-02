@@ -268,7 +268,7 @@ def test_prompt_assigns_multistep_decisions_to_agent(workspace) -> None:
     assert "Do not invoke the built-in multistep planner, including through custom Python scripts." in prompt
     assert "assess_route_proposal" in prompt
     assert "single-step" in prompt
-    assert "or answer-schema.json at startup" in prompt
+    assert "Do not read answer-schema.json at startup" in prompt
     assert "decision-critical field" in prompt
     assert "Repeat a search only with a" in " ".join(prompt.split())
     for retired in ("plan_routes", "revise_routes", "prepare_route_proposal", "beam_width"):

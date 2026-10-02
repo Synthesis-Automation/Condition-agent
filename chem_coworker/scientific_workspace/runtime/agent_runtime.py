@@ -180,7 +180,7 @@ class CodexRuntime:
                 if value is not None:
                     # This is a direct argv item, not shell-escaped command text.
                     command.extend(["-c", f"{key}={json.dumps(value)}"])
-        if mode != WorkspaceMode.NORMAL:
+        if not mode.task_guidance:
             # Prevent implicit repository AGENTS.md or personal memory from
             # reintroducing removed application instructions.
             for setting in ('project_doc_max_bytes=0', 'developer_instructions=""',
@@ -190,10 +190,10 @@ class CodexRuntime:
         if mode == WorkspaceMode.PURE:
             command.extend(self._pure_tool_overrides(workspace))
         command.extend(["--json", "--skip-git-repo-check"])
-        if mode == WorkspaceMode.NORMAL:
+        if mode.structured_answer:
             command.extend(["--output-schema", str(turn_directory / "answer-handoff-schema.json")])
         command.extend(["--output-last-message", str(turn_directory / (
-            "agent-final.json" if mode == WorkspaceMode.NORMAL else "agent-final.txt"))])
+            "agent-final.json" if mode.structured_answer else "agent-final.txt"))])
         if self.model:
             command.extend(["--model", self.model])
         command.append("-")
@@ -275,7 +275,7 @@ class CodexRuntime:
     ) -> AgentResult:
         """Capture JSONL events, enforce a deadline, and preserve complete local logs."""
         turn_directory = prepare_answer_handoff(workspace, turn_directory)
-        if mode == WorkspaceMode.NORMAL:
+        if mode.structured_answer:
             (turn_directory / "answer-schema.json").write_text(json.dumps(ANSWER_SCHEMA), "utf-8")
             (turn_directory / "answer-handoff-schema.json").write_text(json.dumps(ANSWER_HANDOFF_SCHEMA), "utf-8")
         (turn_directory / "runtime-request.json").write_text(json.dumps({
@@ -285,7 +285,7 @@ class CodexRuntime:
         }, indent=2), "utf-8")
         prompt_path = turn_directory / "prompt.txt"
         prompt_path.write_text(answer_handoff_prompt(prompt, turn_directory)
-                               if mode == WorkspaceMode.NORMAL else prompt, "utf-8")
+                               if mode.structured_answer else prompt, "utf-8")
         output_path = turn_directory / "runtime.jsonl"
         stderr_path = turn_directory / "runtime.stderr.txt"
         environment = runtime_environment(
@@ -406,7 +406,7 @@ class CodexRuntime:
                     " a CLI that supports the requested model."
                 )
             raise RuntimeError(message)
-        if mode == WorkspaceMode.NORMAL:
+        if mode.structured_answer:
             answer = load_answer_handoff(workspace, turn_directory, thread_id=runtime_thread, usage=usage)
         else:
             answer = load_text_answer(workspace, turn_directory)

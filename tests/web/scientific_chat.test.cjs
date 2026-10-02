@@ -85,9 +85,10 @@ test('workspace mode is selectable for new chats and locked to a reopened conver
   assert.equal(ids['workspace-mode'].disabled, false);
 });
 
-test('submitting includes the selected mode and renders a free-form answer', async () => {
+for (const mode of ['tools_only', 'tools_formatting', 'tools_guidance']) {
+test(`submitting preserves and locks the selected mode: ${mode}`, async () => {
   const {ids, run, respond} = harness();
-  run("loaded=true; newMode='tools_only'; updateControls()");
+  run(`loaded=true; newMode='${mode}'; updateControls()`);
   ids.question.value = 'Compare the chemistry';
   let sent;
   respond(async (route, options) => {
@@ -96,7 +97,7 @@ test('submitting includes the selected mode and renders a free-form answer', asy
       assert.equal(ids['workspace-mode'].disabled, true);
       return {conversation_id:'chat',turn_id:'turn'};
     }
-    if (route === '/conversations/chat') return {id:'chat',title:'Comparison',workspace_mode:'tools_only',turns:[{
+    if (route === '/conversations/chat') return {id:'chat',title:'Comparison',workspace_mode:mode,turns:[{
       id:'turn',question:'Compare the chemistry',status:'completed',answer:{schema_version:'agent_text.v1',answer_markdown:'Free text.'},
     }]};
     if (route === '/conversations') return [];
@@ -104,11 +105,12 @@ test('submitting includes the selected mode and renders a free-form answer', asy
     throw new Error('Unexpected route: ' + route);
   });
   await ids.form.onsubmit({preventDefault() {}});
-  assert.deepEqual(sent, {question:'Compare the chemistry',conversation_id:null,mode:'tools_only'});
-  assert.equal(ids['workspace-mode'].value, 'tools_only');
+  assert.deepEqual(sent, {question:'Compare the chemistry',conversation_id:null,mode});
+  assert.equal(ids['workspace-mode'].value, mode);
   assert.equal(ids['workspace-mode'].disabled, true);
   assert.ok(ids.messages.descendants().some(node => node.textContent === 'Free text.'));
 });
+}
 
 test('Stop remains available in another chat and cancels the actual owner', async () => {
   const {ids, run, respond} = harness();

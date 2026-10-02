@@ -221,7 +221,7 @@ class ConversationService:
                 from ..core.store import InvestigationStore
 
                 paths = {name: (self.repository / path).resolve() for name, path in self.artifacts.items()}
-                baseline = (capture_baseline(self.repository, paths) if mode == WorkspaceMode.NORMAL
+                baseline = (capture_baseline(self.repository, paths) if mode.task_guidance
                             else capture_baseline(self.repository, paths, include_guidance=False))
                 staging = directory / "prepared"
                 InvestigationStore.create(
@@ -301,7 +301,7 @@ class ConversationService:
                 if cancel.is_set():
                     raise AgentStopped("cancelled")
                 verify_baseline(workspace.store.manifest["baseline"])
-                if mode != WorkspaceMode.NORMAL:
+                if not mode.structured_answer:
                     if submission_error is not None:
                         raise submission_error
                     event = workspace.store.append("agent_answer", {
@@ -330,7 +330,7 @@ class ConversationService:
                     _write_json(rejected_path, submitted_answer)
                     thread_id = submitted_thread
                     save(repair_attempts=1, validation_error=str(exc))
-                    prompt = investigation_prompt(workspace, state["question"]) + (
+                    prompt = investigation_prompt(workspace, state["question"], mode=mode) + (
                         f"\nYour previous submission was rejected: {str(exc)[:4000]}\n"
                         f"Rejected answer or transport diagnostics: {rejected_path}. "
                         f"The previous attempt's draft, if created, is at {attempt_directory / 'answer-draft.json'}.\n"
@@ -351,7 +351,7 @@ class ConversationService:
                 "origin": "agent_authored", "review_status": "unreviewed",
                 "workspace_mode": mode.value, "mode_policy": mode_policy(mode),
                 "evidence_status": "linked_unreviewed" if cited else "no_local_evidence",
-                "runtime": self.runtime.describe(), "usage": result.usage,
+                "runtime": runtime_configuration(self.runtime.describe(), mode), "usage": result.usage,
                 "attempt_usage": attempt_usage,
                 "application_context_ref": context_event.artifact_ref,
                 "scientific_identity": context["scientific_identity"],
@@ -378,7 +378,7 @@ class ConversationService:
         finally:
             if scientific_progress():
                 save()
-            if mode == WorkspaceMode.NORMAL and workspace is not None and workspace.store.manifest["baseline"].get("learning_context"):
+            if mode.task_guidance and workspace is not None and workspace.store.manifest["baseline"].get("learning_context"):
                 try:
                     published = workspace.publish_lessons()
                     if published["published"]:

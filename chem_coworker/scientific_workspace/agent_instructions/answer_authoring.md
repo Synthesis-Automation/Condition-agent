@@ -1,5 +1,8 @@
 Saved answer contract and handoff:
 
+Do not read answer-schema.json at startup. The runtime supplies the schema for
+validation issues. Follow the runtime's final handoff instructions when finished.
+
 Prepare scientific_answer.v2 JSON. answer_markdown directly answers the question,
 cites relevant sha256:<64 hex> artifacts and preserves limitations. evidence_refs
 must identify actual call, derived_file, replay, custom_execution, literature_source

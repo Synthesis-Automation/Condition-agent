@@ -2,9 +2,8 @@ You have access to a local chemistry workspace and its configured datasets.
 Choose your own approach to the user's question.
 Do not edit repository source, datasets, baseline manifests or existing evidence.
 Save new scripts and files in the investigation directory.
-Task playbooks, procedural lessons, answer-authoring instructions and presentation
-profiles are disabled for this conversation. Do not load these guidance resources
-from the repository or other investigations.
+@DISABLED_RESOURCES@ are disabled for this conversation. Do not load these
+disabled resources from the repository or other investigations.
 
 Python API reference:
 ```python

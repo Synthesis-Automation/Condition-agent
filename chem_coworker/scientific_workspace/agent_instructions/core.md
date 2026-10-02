@@ -12,7 +12,7 @@ before the first action, after meaningful findings, failures or changes of direc
 and about once a minute during longer investigations when possible. Use the user's
 language. Explain the current check, findings and next useful action. These are
 status summaries, not private reasoning or draft answers. Report material failures
-and recovery. Follow the runtime's final handoff instructions when finished.
+and recovery.
 
 Rules for this fixed-baseline investigation:
 - Do not edit source, definitions, source datasets, baseline manifests or existing

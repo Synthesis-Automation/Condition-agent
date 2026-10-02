@@ -120,11 +120,14 @@ Use **Workspace mode** in the top bar before sending the first message:
 | 1. Pure agent | Disabled | Disabled | None |
 | 2. Tools and data | Enabled | Disabled | None |
 | 3. Normal (default) | Enabled | Enabled | Existing structured answer |
+| 4. Tools + formatting | Enabled | Disabled | Existing structured answer |
+| 5. Tools + guidance | Enabled | Enabled | None |
 
 The mode is saved with the conversation and every turn. Start a **New chat**
 to change it; follow-ups keep the same mode and runtime thread when possible.
 Old conversations remain in normal mode. The turns API accepts an optional
-`mode` value (`pure_agent`, `tools_only`, or `normal`); omitting it uses normal
+`mode` value (`pure_agent`, `tools_only`, `normal`, `tools_formatting`, or
+`tools_guidance`); omitting it uses normal
 for new conversations and the saved mode for follow-ups. A mode change within
 an existing conversation returns HTTP 422.
 
@@ -147,18 +150,33 @@ playbooks, learned advice, answer-authoring or presentation instructions. Saved
 guidance is empty, and lesson recall/publication is disabled. Because this mode
 deliberately has source access, it is an application-guidance ablation, not a
 filesystem security boundary against an agent deliberately reading guide files.
-Both ablation modes save the final text verbatim, without an output schema or
-scientific-answer repair attempt. Their answers are marked as not validated.
+Tools + formatting adds the same answer-authoring instructions, presentation
+profile, structured handoff, evidence validation and single repair attempt as
+normal mode, while keeping task playbooks and procedural learning disabled.
+The formatting treatment therefore includes the existing evidence and self-review
+requirements; it is more than a cosmetic change to the display.
+
+Tools + guidance enables the same task guides and pinned procedural learning as
+normal mode, without answer-authoring instructions, a presentation profile or a
+required output schema. Pure agent, Tools and data, and Tools + guidance save
+final text verbatim without scientific-answer validation or repair. Their answers
+are marked as not validated. Markdown still renders in the browser in every mode.
+Disabled instruction resources are omitted from each turn's saved context.
+Modes without task guidance suppress inherited project instructions, personal
+memory, skills and plugins; Tools + guidance follows Normal's native configuration.
+Policy v3 records the independent guidance and formatting treatments. Restarting
+on this version starts a new runtime thread when the saved configuration differs.
 
 For comparisons, use the same questions, explicit model, reasoning/search settings,
 deadline and dataset snapshot in fresh chats, and repeat trials. Mode 1 versus 2
-measures adding project capabilities (including local execution). Mode 2 versus 3
-measures task guidance and structured output **together**; separating those effects
-would need an additional experimental condition. Normal mode can use its existing
-single answer-repair attempt, so compare total usage and elapsed time as well as
-answer quality. These controls enable experiments; they do not establish efficacy.
-Normal mode retains procedural learning, so also record/hold its guidance and
-lesson snapshots fixed when comparing repeated trials.
+measures adding project capabilities (including local execution). Modes 2, 4, 5
+and 3 cover all four combinations of task guidance and structured output:
+compare 2 versus 4 or 5 versus 3 for formatting; compare 2 versus 5 or 4 versus 3
+for guidance. Guidance comparisons also include the inherited native configuration
+described above. Modes 3 and 4 allow one answer-repair attempt, so compare total
+usage and elapsed time as well as answer quality. These controls enable experiments;
+they do not establish efficacy. Modes 3 and 5 retain procedural learning, so record
+and hold their guidance and lesson snapshots fixed when comparing repeated trials.
 
 The agent defaults to the `research` profile, which requests high reasoning,
 live web search and a 1,800-second per-attempt deadline. It inherits the model
