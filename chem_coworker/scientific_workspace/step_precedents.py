@@ -6,12 +6,14 @@ saved selections and baseline-pinned source records without upgrading admission.
 
 from __future__ import annotations
 
-import gzip
 import json
 from typing import Any, TYPE_CHECKING
 
 from core_retrosynthesis.chemistry import canonical_smiles
 from core_retrosynthesis.step_precedents import lookup_reaction_precedents
+
+from .source_catalogs import reference_records
+from .condition_precedents import condition_precedent_view, load_condition_precedent_evidence
 
 if TYPE_CHECKING:
     from .operations import ScientificOperations
@@ -56,22 +58,6 @@ def _selection(payload: dict[str, Any], step_id: str | None, realization_id: str
     return proposals[0], assessment
 
 
-def _references(operations: ScientificOperations, identities: set[str]) -> tuple[dict, str]:
-    try:
-        path = operations._path("reference_catalog")
-    except FileNotFoundError:
-        return {}, "catalog_unavailable"
-    found = {}
-    opener = gzip.open if path.suffix == ".gz" else open
-    with opener(path, "rt", encoding="utf-8") as stream:
-        for line in stream:
-            if line.strip():
-                record = json.loads(line)
-                if record.get("reference_id") in identities:
-                    found[record["reference_id"]] = record
-    return found, "catalog_available"
-
-
 def inspect_step_precedents(
     operations: ScientificOperations, source_ref: str, step_id: str | None = None,
     realization_id: str | None = None, offset: int = 0, limit: int = 3,
@@ -111,7 +97,7 @@ def inspect_step_precedents(
     if offset > len(matches):
         raise ValueError("offset exceeds the saved precedent selection")
     page = matches[offset:offset + limit]
-    references, reference_status = _references(operations, {item["reference_id"] for item in page})
+    references, reference_status = reference_records(operations, {item["reference_id"] for item in page})
     ids = list(dict.fromkeys(item["reaction_id"] for item in page))
     observations, procedures = {}, {}
     if ids:
@@ -319,8 +305,7 @@ def answer_step_precedents(store: InvestigationStore, answer: dict[str, Any]) ->
                                 "error": str(exc), "precedents": []})
         if not step.get("precedent_refs"):
             if support_error:
-                result[step["id"]] = [{"status": "evidence_unavailable", "error": support_error, "precedents": []}]
-                continue
+                records.append({"status": "evidence_unavailable", "error": support_error, "precedents": []})
             key = _structure_key(".".join(molecules[item] for item in step["reactant_ids"]),
                                  ".".join(molecules[item] for item in step["product_ids"]))
             candidates = support.get(key, [])
@@ -332,5 +317,15 @@ def answer_step_precedents(store: InvestigationStore, answer: dict[str, Any]) ->
                 assessed = next((item for item in candidates if item["assessment"].get("precedent_matches")), None)
                 if assessed:
                     records.append(_assessment_preview(assessed, key))
+        for reference in dict.fromkeys(step.get("condition_precedent_refs", [])):
+            try:
+                inspected = load_condition_precedent_evidence(
+                    store, reference, ".".join(molecules[key] for key in step["reactant_ids"]),
+                    ".".join(molecules[key] for key in step["product_ids"]),
+                )
+                records.append(condition_precedent_view(inspected, reference))
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                records.append({"artifact_ref": reference, "status": "evidence_unavailable",
+                                "error": str(exc), "precedents": []})
         result[step["id"]] = records
     return result

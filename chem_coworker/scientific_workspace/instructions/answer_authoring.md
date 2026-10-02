@@ -33,10 +33,15 @@ dependencies. Alternatives can have separate routes. An incomplete route is vali
 when its missing steps/structures remain disclosed.
 Conditions are separate attributed text fields such as solvent, temperature,
 duration, quantities or addition order. Use [] if absent; yield_info=null if unreported.
+Each step may have rationale, an attributed claim (text, basis, source_ids,
+limitations) explaining the chemical choice and transfer from evidence. It follows
+the same citation checks as conditions. Older answers may omit it.
 Minimal nested shapes (replace IDs/text with your actual evidence and proposal):
 "steps": [{"id": "s1", "title": "Proposed step", "basis": "proposed",
            "reactant_ids": ["a"], "product_ids": ["b"],
            "precedent_refs": [],
+           "condition_precedent_refs": [],
+           "rationale": {"text": "A development hypothesis; evidence is incomplete", "basis": "proposed"},
            "conditions": [{"text": "Conditions to develop", "basis": "unknown"}]}],
 "routes": [{"id": "r1", "title": "Proposal", "step_ids": ["s1"]}]
 Condition objects use text, basis, source_ids and limitations, never label/value.
@@ -54,6 +59,13 @@ resubmitting. Do not drop steps/citations to bypass this check. Do not copy sour
 reaction SMILES into authored precedent cards. If no local support is available,
 retain literature citations and an honest gap; never invent support or run a tool
 merely to fill a panel. Empty searches and missing/uninspected evidence remain distinct.
+
+For condition evidence, condition_precedent_refs links completed recorded
+inspect_condition_precedents calls for the actual step's reactants and products,
+including specified stereochemistry. The browser reads the saved observations and
+their exact experimental joins; do not author replacement source cards. These links
+do not replace precedent_refs or satisfy an available route-support inspection
+requirement. Both kinds of evidence may support the same step.
 
 Finish with w.finalize_answer(draft_path, draft, findings=findings). draft_path is the
 exact runtime-provided answer-draft.json path for this attempt; draft is a Python dict.

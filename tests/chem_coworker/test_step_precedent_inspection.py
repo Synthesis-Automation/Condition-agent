@@ -275,6 +275,21 @@ def test_empty_inspection_cannot_hide_known_matches(workspace):
         validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
 
 
+def test_condition_inspection_does_not_replace_available_route_support(workspace):
+    _, selected = disconnection(workspace)
+    query = selected["precursor_smiles"] + ">>" + selected["target_smiles"]
+    condition = workspace.store.append("call", {
+        "operation": "inspect_condition_precedents", "execution_status": "completed",
+        "arguments": {"reaction_smiles": query},
+        "result": {"schema_version": "condition_evidence_comparison.v1", "query_reaction_smiles": query,
+                   "precedents": []},
+    })
+    draft = draft_for({"selection": selected}, condition.artifact_ref)
+    draft["steps"][0].update(precedent_refs=[], condition_precedent_refs=[condition.artifact_ref])
+    with pytest.raises(ValueError, match="Available supporting reactions"):
+        validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
+
+
 def test_recovery_preserves_stereo_and_does_not_use_corrupt_sources(workspace):
     source, assessed = run(workspace, "assess_route_step", proposal={"target_smiles": "CCN", "precursor_smiles": "CC=O.N"})
     # Exercise binding without requiring a new chemistry operator fixture.

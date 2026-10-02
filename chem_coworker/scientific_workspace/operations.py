@@ -58,7 +58,7 @@ class ScientificOperations:
                             replay_comparison="scientific_result_excluding_fragment_execution_telemetry",
                             replay_projection=_fragment_replay_result),
         OperationDefinition("suggest_search_fragments"),
-        OperationDefinition("inspect_condition_precedents",
+        OperationDefinition("inspect_condition_precedents", contract_version="2",
                             required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("propose_condition_adaptation", evidence_arguments=("source_ref", "evidence_refs")),
         OperationDefinition(
@@ -315,11 +315,15 @@ class ScientificOperations:
         """Compare selected indexed observations and link source procedures without merging them."""
         from condition_recommender import compare_condition_evidence
         from condition_recommender.generic_indexing import GenericIndexedReaction
+        from .source_catalogs import reference_records
 
         page = self.get_precedents(reaction_ids, offset=offset, limit=limit)
         result = asdict(compare_condition_evidence(
             reaction_smiles, [GenericIndexedReaction(**row) for row in page["records"]],
         ))
+        references, reference_status = reference_records(
+            self, {row["reference_id"] for row in page["records"] if row.get("reference_id")},
+        )
         try:
             procedures = self.get_procedures([row["reaction_id"] for row in page["records"]])
         except FileNotFoundError:
@@ -328,6 +332,7 @@ class ScientificOperations:
             procedures["availability"] = "catalog_available"
         for item in result["precedents"]:
             observation = item["observation"]
+            item["reference_record"] = references.get(observation.get("reference_id"))
             candidates = [record for record in procedures["records"]
                           if record["reaction_id"] == observation["reaction_id"]]
             item["procedure_observations"] = [record for record in candidates
@@ -335,6 +340,7 @@ class ScientificOperations:
             item["reaction_level_procedures"] = [record for record in candidates if not record.get("observation_id")]
             item["procedure_link_scope"] = "exact_observation_id_or_explicitly_unassigned_reaction_record"
         result["procedure_catalog"] = procedures
+        result["reference_catalog_status"] = reference_status
         result["page"] = {key: value for key, value in page.items() if key != "records"}
         return result
 

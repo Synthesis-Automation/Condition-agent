@@ -305,7 +305,7 @@ test('supporting reactions retain source identity, separate observations and evi
     after_step_ids:[],conditions:[],yield_info:null,source_ids:[],limitations:[]};
   context.supportView = {sources:[],molecules:[{id:'a',name:'A'},{id:'b',name:'B'}],routes:[],steps:[step]};
   let card = run('showStructured(supportView)');
-  assert.ok(card.descendants().some(node => node.textContent === 'No supporting-reaction inspection attached to this step.'));
+  assert.ok(card.descendants().some(node => node.textContent === 'No inspected experimental support supplied for this step.'));
   step.supporting_evidence = [{artifact_ref:'sha256:fixture',artifact_url:'/saved/inspection',status:'precedents_available',
     scope:'selected_template_top_20',saved_match_count:4,distinct_references_on_page:1,page:{next_offset:1},
     precedents:[{match_id:'match1',reaction_id:'reaction-1',reference_title:'Reported patent example',reference_url:'https://example.org/patent',
@@ -315,7 +315,8 @@ test('supporting reactions retain source identity, separate observations and evi
       procedures:[{observation_id:'obs1',procedure_text:'Literal source <script>text</script>'}]}]}];
   card = run('showStructured(supportView)');
   assert.equal(card.querySelectorAll('img').length,1);
-  assert.ok(card.querySelectorAll('summary').some(node => node.textContent === 'Supporting reactions (1)'));
+  assert.ok(card.descendants().some(node => node.textContent === 'Precedent support'));
+  assert.equal(byClass(card, 'precedent-card')[0].parentNode.className, 'step-precedents');
   assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent'));
   assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: 40%'));
   assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: not supplied'));
@@ -329,7 +330,7 @@ test('supporting reactions retain source identity, separate observations and evi
   assert.ok(!card.querySelectorAll('a').some(node => node.download));
   step.supporting_evidence = [{status:'no_precedents_retrieved',precedents:[],scope:'saved_assessment_matches',saved_match_count:0,distinct_references_on_page:0}];
   card = run('showStructured(supportView)');
-  assert.ok(card.descendants().some(node => node.textContent === 'No supporting experimental precedent retrieved in this inspection.'));
+  assert.ok(card.descendants().some(node => node.textContent === 'No supporting experiment found in this recorded search.'));
 });
 
 test('reaction schemes are visible with details collapsed and references human-readable', () => {
@@ -354,18 +355,17 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(card.querySelectorAll('details[open]').length, 0);
   const images = card.querySelectorAll('img');
   assert.equal(images.length, 1);
-  assert.equal(images[0].style.width, '588px', 'prefer a compact preview at 60% of native SVG width');
+  assert.equal(images[0].style.width, '735px', 'keep source and target schemes readable at the same scale');
   assert.match(images[0].alt, /Reactant → Product/);
   assert.equal(images[0].src, context.fixture.structured_presentation.steps[0].image_url);
   assert.equal(card.querySelectorAll('a').some(node => node.download), false,
     'reaction schemes should not show a download button');
   const stepDetails = card.querySelectorAll('details').find(node => node.dataset.key === 'scheme:science:s1');
-  assert.equal(stepDetails.firstElementChild.textContent, 'Step details & evidence · 1 caution');
-  assert.ok(stepDetails.descendants().some(node => node.textContent === 'Feasibility unverified'));
-  assert.equal(byClass(view, 'scientific-step')[0].children.filter(node => node.tag === 'ul').length, 0,
-    'detailed cautions should not duplicate the concise explanation below the scheme');
+  assert.equal(stepDetails.firstElementChild.textContent, 'Experimental details & sources');
+  assert.ok(byClass(view, 'scientific-step')[0].children.some(node =>
+    node.tag === 'ul' && node.descendants().some(item => item.textContent === 'Feasibility unverified')),
+    'material cautions must remain visible without opening details');
   assert.ok(stepDetails.descendants().some(node => node.textContent === 'Unknown oxidant'));
-  assert.ok(stepDetails.descendants().some(node => node.textContent === 'Reactant → Product'));
   assert.ok(byClass(card, 'step-heading')[0].descendants().some(node => node.textContent === 'Proposed'),
     'the actual step attribution remains visible');
   assert.ok(!card.descendants().some(node => node.textContent === 'Synthetic direction' ||
@@ -391,7 +391,7 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(alternatives[1].open, false);
   assert.equal(byClass(alternatives[0], 'scientific-step').length, 2, 'keep both steps of a connected route visible');
   const footer = byClass(routedCard, 'answer-details')[0];
-  assert.ok(footer.descendants().some(node => node.textContent === 'First hypothesis: Supply unconfirmed'));
+  assert.ok(alternatives[0].descendants().some(node => node.textContent === 'Supply unconfirmed'));
   assert.equal(Boolean(footer.open), false);
   assert.equal(routedCard.children.filter(node => node.tag === 'details').length, 1);
   assert.ok(!routedCard.querySelectorAll('summary').some(node => /Step connections|Molecules & SMILES|Route limitations|Uncertainty &|Additional scientific/.test(node.textContent)));
@@ -425,9 +425,9 @@ test('one footer deduplicates notes while preserving scoped caveats, claims and 
   const footer = card.querySelectorAll('details');
   assert.equal(footer.length, 1);
   const list = footer[0].querySelectorAll('li');
-  assert.equal(list.filter(node => node.textContent === 'Stock unknown').length, 1);
+  assert.ok(list.some(node => node.textContent.endsWith(': Stock unknown')));
   assert.ok(list.some(node => node.textContent === 'Route A: Specific precursor needed'));
-  assert.ok(list.some(node => node.textContent === '<script>plain text</script>'));
+  assert.ok(byClass(card, 'answer-uncertainties')[0].descendants().some(node => node.textContent === '<script>plain text</script>'));
   assert.equal(card.querySelectorAll('script').length, 0);
   assert.ok(footer[0].descendants().some(node => node.textContent === 'Reported'));
   assert.ok(footer[0].descendants().some(node => node.textContent === 'Conflicting yield entries'));
@@ -524,4 +524,48 @@ test('a busy response from another tab reveals that investigation and keeps the 
   assert.equal(ids.cancel.hidden, false);
   assert.equal(ids.send.disabled, true);
   assert.match(ids.error.textContent, /investigation is running/);
+});
+
+
+test('condition choices share a scheme and expose one precedent with attributed rationale', () => {
+  const {run, context} = harness();
+  const claim = {basis:'proposed',source_ids:['paper'],limitations:[]};
+  const first = {id:'s1',title:'Preferred recipe',...claim,reactant_ids:['a'],product_ids:['b'],
+    after_step_ids:[],reaction_smiles:'CCO>>CC=O',image_url:'data:image/svg+xml;base64,target',scheme_width:980,
+    conditions:[{text:'Recorded recipe adaptation',...claim}],yield_info:null,
+    rationale:{text:'Preserve the sensitive group <script>literal</script>',...claim},
+    supporting_evidence:[{status:'precedents_available',saved_match_count:2,precedents:[
+      {reaction_id:'r1',reference_title:'Experiment one',support_kind:'condition_observation',reaction_smiles:'CCO>>CC=O',
+        image_url:'data:image/svg+xml;base64,source',observations:[{observation_id:'o1',yield_pct:42}],
+        structural_comparison:{environments:{shared:[],query_only:['a'],precedent_only:['b']}},
+        compatibility:{status:'unknown',analysis_warnings:['Structural coverage incomplete'],unresolved_requirements:['Catalyst unresolved']}},
+      {reaction_id:'r2',reference_title:'Experiment two',reaction_smiles:'CCO>>CC=O',observations:[]},
+    ]}]};
+  context.choices={sources:[{id:'paper',kind:'external_source',title:'Captured Example 2',url:'https://example.org/paper',locator:'Example 2'}],
+    molecules:[{id:'a',name:'Alcohol'},{id:'b',name:'Aldehyde'}],routes:[],
+    steps:[first,{...first,id:'s2',title:'Alternative recipe',source_ids:[],conditions:[{text:'Alternative solvent',...claim}],supporting_evidence:[]}]};
+  const card=run('showStructured(choices)');
+  assert.equal(card.querySelectorAll('img').filter(node=>node.src.endsWith('target')).length,1);
+  const alternatives=card.querySelectorAll('summary').find(node=>node.textContent==='Alternative conditions (1)').parentNode;
+  assert.ok(!alternatives.open);
+  assert.ok(alternatives.descendants().some(node=>node.textContent==='Alternative solvent'));
+  assert.ok(!alternatives.descendants().some(node=>node.textContent==='No inspected experimental support supplied for this step.'));
+  const support=byClass(card,'step-precedents')[0];
+  assert.equal(byClass(support,'precedent-card')[0].parentNode,support);
+  assert.ok(!card.querySelectorAll('summary').find(node=>node.textContent==='More precedents (1)').parentNode.open);
+  assert.ok(support.descendants().some(node=>node.textContent==='Recorded differences: environments.'));
+  assert.ok(support.descendants().some(node=>node.textContent==='Structural coverage incomplete'));
+  assert.ok(support.descendants().some(node=>node.textContent==='Catalyst unresolved'));
+  const rationale=byClass(card,'step-rationale')[0];
+  assert.ok(rationale.descendants().some(node=>node.textContent==='Proposed'));
+  assert.ok(rationale.querySelectorAll('a').some(node=>node.href==='https://example.org/paper'));
+  assert.equal(card.querySelectorAll('script').length,0);
+  for(const code of card.querySelectorAll('code')) {
+    let parent=code.parentNode;
+    while(parent && parent.tag!=='details') parent=parent.parentNode;
+    assert.ok(parent && !parent.open,'source notation stays in details');
+  }
+  context.choices.steps[1].reaction_smiles='CCCO>>CCC=O';
+  assert.equal(run('showStructured(choices)').querySelectorAll('img').filter(node=>node.src.endsWith('target')).length,2,
+    'different explicit transformations must not share a target scheme');
 });

@@ -1,6 +1,7 @@
 """Investigation joins, proposals and actual custom execution with immutable evidence."""
 
 from dataclasses import asdict
+from copy import deepcopy
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -11,6 +12,9 @@ import pytest
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
 from chem_coworker.scientific_workspace.answer_contracts import ScientificAnswer, validate_answer_evidence
+from chem_coworker.scientific_workspace.answer_finalization import _complete_empty_fields
+from chem_coworker.scientific_workspace.condition_precedents import load_condition_precedent_evidence
+from chem_coworker.scientific_workspace.step_precedents import answer_step_precedents
 from chem_coworker.scientific_workspace.baseline import artifact_identity, code_manifest, environment_versions
 from condition_registry import ConditionComponentInput, build_resolved_recipe_from_inputs
 from tests.condition_recommender.test_condition_investigation import precedent
@@ -47,6 +51,103 @@ def test_procedure_join_never_borrows_another_observations_conditions(workspace:
     assert row["procedure_observations"] == records[:1]
     assert row["reaction_level_procedures"] == records[2:]
     assert len(result["procedure_catalog"]["records"]) == 3
+    displayed = answer_step_precedents(workspace.store, condition_answer(reference))["s1"][0]["precedents"][0]
+    assert displayed["procedures"] == records[:1]
+    assert displayed["reaction_level_procedures"] == records[2:]
+    assert [row["observation_id"] for row in displayed["observations"]] == ["o1"]
+
+
+def condition_answer(reference: str) -> dict:
+    """A proposed target recipe whose supporting experiment is inspected separately."""
+    return _complete_empty_fields({
+        "answer_markdown": "A proposed experiment; source transfer remains unverified.",
+        "molecules": [{"id": "a", "name": "Reactants", "smiles": "N.CCBr", "basis": "input"},
+                      {"id": "b", "name": "Product", "smiles": "NCC", "basis": "input"}],
+        "sources": [{"id": "experiment", "kind": "local_artifact", "title": "Inspected experiment",
+                     "artifact_ref": reference, "locator": "precedents[0].observation"}],
+        "steps": [{"id": "s1", "title": "Proposed conditions", "basis": "proposed",
+                   "reactant_ids": ["a"], "product_ids": ["b"], "condition_precedent_refs": [reference],
+                   "rationale": {"text": "Transfer from the cited experiment needs testing.",
+                                 "basis": "proposed", "source_ids": ["experiment"]}}],
+    })
+
+
+def test_condition_cards_render_saved_observation_and_reference_without_new_science(workspace: ScientificWorkspace) -> None:
+    from app.web_api.scientific_presentation import present_conversation
+
+    # Save the exact reference belonging to the selected indexed observation.
+    first = prepare_inspection(workspace)
+    reference_id = workspace.store.read_artifact(first)["result"]["precedents"][0]["observation"]["reference_id"]
+    catalog = workspace.store.root / "refs.jsonl"
+    catalog.write_text(json.dumps({"reference_id": reference_id, "doi": "10.1234/fixture",
+                                   "normalized_citation": "Fixture experiment"}), "utf-8")
+    workspace.store.manifest["baseline"]["artifacts"]["reference_catalog"] = artifact_identity(catalog)
+    reference = prepare_inspection(workspace)
+    draft = condition_answer(reference)
+    answer = ScientificAnswer.model_validate(draft)
+    assert reference in validate_answer_evidence(answer, workspace.store)
+    assert answer.steps[0].rationale.limitations == []
+    before = deepcopy(draft)
+    # Display uses saved citation metadata even if a live catalogue goes away.
+    catalog.unlink()
+    evidence = answer_step_precedents(workspace.store, draft)
+    view = present_conversation({"id": "a" * 32, "turns": [{"question": "Suggest conditions", "answer": draft,
+                                                         "step_precedent_evidence": evidence}]})["turns"][0]["structured_presentation"]
+    card = view["steps"][0]["supporting_evidence"][0]["precedents"][0]
+    assert card["drawing_status"] == "drawn"
+    assert card["reference_url"] == "https://doi.org/10.1234/fixture"
+    assert card["reference_title"] == "Fixture experiment"
+    assert card["observations"][0]["observation_id"] == "o1"
+    assert view["steps"][0]["yield_info"] is None
+    assert draft == before
+    # Previously saved inspections with no catalogue metadata remain usable.
+    assert answer_step_precedents(workspace.store, condition_answer(first))["s1"][0]["precedents"]
+
+
+@pytest.mark.parametrize("index,smiles", [(0, "CCCl.N"), (1, "CCO"), (0, "CCBr"), (1, "CC[NH3+]")])
+def test_condition_links_reject_another_reaction(workspace: ScientificWorkspace, index, smiles) -> None:
+    draft = condition_answer(prepare_inspection(workspace))
+    draft["molecules"][index]["smiles"] = smiles
+    with pytest.raises(ValueError, match="does not match"):
+        validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
+    assert answer_step_precedents(workspace.store, draft)["s1"][0]["status"] == "evidence_unavailable"
+
+
+@pytest.mark.parametrize("change", ["operation", "incomplete", "query", "schema", "note", "stereo"])
+def test_condition_links_reject_wrong_evidence(workspace: ScientificWorkspace, change) -> None:
+    payload = workspace.store.read_artifact(prepare_inspection(workspace))
+    if change == "operation":
+        payload["operation"] = "get_precedents"
+    elif change == "incomplete":
+        payload["execution_status"] = "error"
+    elif change == "query":
+        payload["arguments"]["reaction_smiles"] = "CCCl.N>>CCN"
+    elif change == "schema":
+        payload["result"]["schema_version"] = "unknown"
+    elif change == "note":
+        payload["assertion"] = "A note that resembles a completed call, without recorded execution"
+    elif change == "stereo":
+        payload["arguments"]["reaction_smiles"] = payload["result"]["query_reaction_smiles"] = "CCBr.N>>N[C@H](C)C(=O)O"
+    reference = workspace.store.append("note" if change == "note" else "call", payload).artifact_ref
+    with pytest.raises(ValueError):
+        load_condition_precedent_evidence(workspace.store, reference, "CCBr.N",
+                                         "N[C@@H](C)C(=O)O" if change == "stereo" else "CCN")
+
+
+@pytest.mark.parametrize("rationale", [
+    {"text": "Unattributed report", "basis": "reported", "source_ids": [], "limitations": []},
+    {"text": "Unknown citation", "basis": "proposed", "source_ids": ["missing"], "limitations": []},
+])
+def test_step_rationale_requires_valid_attribution(workspace: ScientificWorkspace, rationale) -> None:
+    draft = condition_answer(prepare_inspection(workspace))
+    draft["steps"][0]["rationale"] = rationale
+    with pytest.raises(ValueError):
+        ScientificAnswer.model_validate(draft)
+    del draft["steps"][0]["rationale"]
+    del draft["steps"][0]["condition_precedent_refs"]
+    legacy = ScientificAnswer.model_validate(draft)
+    assert legacy.steps[0].rationale is None
+    assert legacy.steps[0].condition_precedent_refs == []
 
 
 def proposal_arguments(reference: str) -> dict:

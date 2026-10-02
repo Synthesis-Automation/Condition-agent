@@ -81,6 +81,8 @@ class AnswerStep(AttributedObject):
     conditions: list[AnswerClaim] = Field(max_length=30)
     yield_info: AnswerClaim | None
     precedent_refs: list[str] = Field(default_factory=list, max_length=5)
+    condition_precedent_refs: list[str] = Field(default_factory=list, max_length=5)
+    rationale: AnswerClaim | None = None
 
 
 class AnswerRoute(AnswerObject):
@@ -112,6 +114,8 @@ class ScientificAnswer(AnswerObject):
         objects: list[AttributedObject] = [*self.molecules, *self.steps, *self.claims]
         for step in self.steps:
             objects.extend(step.conditions)
+            if step.rationale is not None:
+                objects.append(step.rationale)
             if step.yield_info is not None:
                 objects.append(step.yield_info)
         return objects
@@ -154,9 +158,11 @@ class ScientificAnswer(AnswerObject):
 
 
 ANSWER_SCHEMA = ScientificAnswer.model_json_schema()
-# New runtime drafts declare this field explicitly; old saved v2 answers may
-# omit it and receive an empty list when read. No support is backfilled.
-ANSWER_SCHEMA["$defs"]["AnswerStep"]["required"].append("precedent_refs")
+# Runtime schemas declare every field explicitly (including nullable rationale).
+# Older saved v2 answers still load through model defaults without invented support.
+ANSWER_SCHEMA["$defs"]["AnswerStep"]["required"].extend([
+    "precedent_refs", "condition_precedent_refs", "rationale",
+])
 
 
 def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore) -> list[str]:
@@ -171,11 +177,17 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
         }:
             raise ValueError("Answer must cite scientific evidence, not agent assertions")
     from .step_precedents import load_step_precedent_evidence, require_available_step_precedents
+    from .condition_precedents import load_condition_precedent_evidence
 
     molecules = {item.id: item.smiles for item in answer.molecules}
     for step in answer.steps:
         for reference in step.precedent_refs:
             load_step_precedent_evidence(
+                store, reference, ".".join(molecules[key] for key in step.reactant_ids),
+                ".".join(molecules[key] for key in step.product_ids),
+            )
+        for reference in step.condition_precedent_refs:
+            load_condition_precedent_evidence(
                 store, reference, ".".join(molecules[key] for key in step.reactant_ids),
                 ".".join(molecules[key] for key in step.product_ids),
             )

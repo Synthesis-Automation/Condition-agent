@@ -66,9 +66,9 @@ assessment lookup is limited to its saved matches. Neither is a corpus-wide sear
 Attach each inspection artifact to the corresponding answer step using
 `precedent_refs: [event.artifact_ref]`. The service checks canonical reactant and
 product identity, including specified stereo, before publication. The web UI draws
-the same saved source records under **Supporting reactions**. Reaction drawings,
-copyable reaction SMILES, reported conditions and yields appear together. Source
-IDs, detailed comparisons and cautions are under **Match details & cautions**;
+the same saved source records under **Precedent support**. The first source scheme,
+reported conditions/yield and transfer cautions are visible. Copyable source SMILES,
+IDs and detailed comparisons are under **Match details & cautions**;
 procedures and search scope have separate disclosures. Missing inspection,
 no retrieved precedent, and unavailable evidence are separate display states.
 The optional field extends `scientific_answer.v2`; new runtime schemas require an
@@ -178,27 +178,29 @@ Schemes use compact
 compound names, concise reagent/catalyst and solvent names above the arrow and a
 percentage yield below when supplied. Amounts, temperatures, times and workup
 instructions remain in the step details. Retrosynthesis plans
-are shown in synthetic direction. Open **Step details & evidence** for full names,
-condition text and sources. The step heading retains its declared
-reported/proposed/computed status; drawings do not validate feasibility.
-Scheme previews prefer 60% of the native SVG width and shrink further to fit a
-narrow card, keeping the complete reaction visible. Molecule cards and reaction
-schemes use the shared
-`web_consistent` drawing preset (about 30 pixels per bond before preview scaling).
-Larger molecules expand the SVG canvas; standalone molecule cards keep their
-intrinsic size and provide scrolling. Restart the server after rendering code
-changes to clear cached saved-answer presentations.
-Alternative routes are separate expandable sections; the first is initially open,
-without implying that it is scientifically preferred. The answer has no molecule
-gallery, raw SMILES panel or step-connection diagram. Missing
-conditions or yields are marked as missing in the details. Step cautions remain in
-**Step details & evidence**, with their count shown in the collapsed label. A single
-compact **Notes & sources** disclosure after the explanation combines route and
-molecule limitations, uncertainty, additional findings and references. Repeated
-notes are coalesced while distinct route/molecule context is retained. The molecular
-structures and dependency records remain in the saved answer data.
-Proposed/reported badges and incomplete-route
-notices remain visible. Important qualifications also belong in the brief explanation.
+are shown in synthetic direction. Each step card presents its reaction SVG,
+attributed **Why this choice** rationale, and **Precedent support**. The first source
+experiment is visible with its own scheme, recorded conditions/yield and publication
+link; additional precedents are expandable. Source observations stay separate.
+Material step cautions, route gaps and open questions remain visible. Open
+**Experimental details & sources** for the full proposed recipe and attribution.
+
+For condition recommendations, independent steps with identical explicit reaction
+SMILES share one target scheme; the first recipe is visible and **Alternative
+conditions** is collapsed. Different transformations and dependent route steps are
+never combined. Alternative routes are separate sections, with the first initially
+open. Ordering comes from the agent; rendering adds no ranking.
+
+Both target and precedent schemes use the shared `web_consistent` drawing preset
+and a 75% display scale. Wide schemes scroll horizontally instead of shrinking
+chemical labels to fit. Record IDs, source SMILES, full procedures, comparison data
+and search scope live in details. **Notes & sources** retains additional findings,
+molecule qualifications and captured excerpts. The molecular structures and route
+dependencies remain in the saved answer data.
+
+See [Presentation layer](Scientific_Workspace_Presentation.md) for the ownership map,
+answer fields and evidence path. Restart the server after rendering code changes to
+clear cached saved-answer presentations.
 Answers render Markdown tables,
 headings, emphasis, lists, code, and links. Wide tables scroll horizontally.
 Raw HTML and remote Markdown images are disabled. Artifact hashes in prose become

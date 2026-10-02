@@ -106,9 +106,10 @@ An explicit client can include guides through `task_names=(...)`.
 
 Every substantive instruction has one owner. Task-specific strategy belongs in its
 guide, invocation constraints belong in declared capability policy, and formatting
-belongs in presentation. The existing answer schema, validators and browser layout
-are preserved in this phase. User-controlled UI layout and simpler task views are
-the next presentation phase, not a new scientific API.
+belongs in presentation. The [presentation layer](Scientific_Workspace_Presentation.md)
+owns the chemist-facing cards and default output style. Optional attributed rationale
+and saved condition-inspection links extend the answer view without adding a new
+scientific API or changing the agent execution loop.
 
 ## Task playbooks
 

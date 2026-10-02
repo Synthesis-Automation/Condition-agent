@@ -41,6 +41,7 @@ def _complete_empty_fields(draft: Mapping[str, Any]) -> dict[str, Any]:
             defaults(condition, source_ids=[], limitations=[])
         if isinstance(step, dict):
             defaults(step.get("yield_info"), source_ids=[], limitations=[])
+            defaults(step.get("rationale"), source_ids=[], limitations=[])
     for route in entries(value, "routes"):
         defaults(route, limitations=[])
     return value

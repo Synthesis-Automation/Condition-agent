@@ -43,163 +43,233 @@ function appendStructures(container,presentation){
   });container.append(gallery);
 }
 const basisLabels = {reported:'Reported', computed:'Computed', proposed:'Proposed', unknown:'Unknown', input:'User input'};
+function scientificNotes(container, texts = []) {
+  const unique = [...new Set(texts.filter(Boolean))];
+  if (!unique.length) return;
+  const list = element('ul', '', 'scientific-notes');
+  unique.forEach(text => list.append(element('li', text)));
+  container.append(list);
+}
+function scientificLinks(container, ids, sources) {
+  const citations = element('div', '', 'evidence');
+  for (const id of new Set(ids || [])) {
+    const source = sources.get(id); if (!source) continue;
+    const link = element('a', source.title);
+    link.href = source.url || source.artifact_url;
+    link.target = '_blank'; link.rel = 'noopener noreferrer';
+    link.title = source.locator || ''; citations.append(link);
+  }
+  if (citations.children.length) container.append(citations);
+}
+function scientificClaim(item, sources) {
+  const box = element('div', '', 'attributed-claim');
+  box.append(element('span', basisLabels[item.basis] || item.basis, 'basis basis-' + item.basis), element('span', item.text));
+  scientificLinks(box, item.source_ids, sources);
+  scientificNotes(box, item.limitations); return box;
+}
+function reactionFigure(item, label) {
+  const figure = element('figure', '', 'scheme-figure');
+  const scroll = element('div', '', 'scheme-scroll');
+  scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', label);
+  const image = element('img', '', 'reaction-scheme'); image.src = item.image_url;
+  if (item.scheme_width) image.style.width = item.scheme_width * 0.75 + 'px';
+  image.alt = label; image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
+  return figure;
+}
+function precedentCard(precedent, record, key) {
+  const entry = element('article', '', 'precedent-card');
+  const title = element('h5');
+  const reference = element(precedent.reference_url ? 'a' : 'span', precedent.reference_title || 'Publication details unavailable');
+  if (precedent.reference_url) {
+    reference.href = precedent.reference_url; reference.target = '_blank'; reference.rel = 'noopener noreferrer';
+  }
+  title.append(reference); entry.append(title);
+  if (precedent.image_url) entry.append(reactionFigure(precedent, 'Supporting source reaction'));
+  else entry.append(element('p', 'Source drawing unavailable; notation is available in details.', 'muted'));
+  const isCondition = precedent.support_kind === 'condition_observation';
+  const observed = element('div', '', 'precedent-conditions');
+  observed.append(element('h5', 'Reported conditions & yield'));
+  for (const [index, observation] of (precedent.observations || []).entries()) {
+    const experiment = element('div', '', 'precedent-observation');
+    if (precedent.observations.length > 1) experiment.append(element('h5', 'Experiment ' + (index + 1)));
+    const recipe = observation.resolved_recipe || {};
+    const buckets = ['catalysts','ligands','bases','acids','condensation_agents','oxidants','reductants','additives','solvents','other_components'];
+    const ingredients = buckets.flatMap(name => recipe[name] || []).map(item => item.canonical_name || item.raw_identifier || item.substance_id).filter(Boolean);
+    experiment.append(element('p', 'Reagents & solvents: ' + (ingredients.join(', ') || 'not recorded')));
+    const operating = [];
+    for (const [name, unit] of [['temperature_c', ' °C'], ['time_h', ' h'], ['concentration_m', ' M'], ['atmosphere', '']]) {
+      if (recipe[name] != null) operating.push(recipe[name] + unit);
+    }
+    if (operating.length) experiment.append(element('p', operating.join(' · ')));
+    experiment.append(element('p', 'Reported yield: ' + (observation.yield_pct == null ? 'not supplied' : observation.yield_pct + '%')));
+    if (observation.condition_uncertain) experiment.append(element('p', 'Condition assignment uncertain.', 'scientific-note'));
+    if (recipe.stages?.length) experiment.append(element('p', 'Staged experiment: consult the complete recipe for sequence and stage-specific conditions.', 'scientific-note'));
+    scientificNotes(experiment, recipe.warnings || []);
+    observed.append(experiment);
+  }
+  if (!precedent.observations?.length) observed.append(element('p', 'Conditions and yield not recorded for this source.', 'muted'));
+  entry.append(observed);
+  entry.append(element('p', isCondition ? 'Inspected source experiment; transfer to this target remains a proposal.' :
+    'Related source reaction; its conditions and yield are not predictions for this step.', 'evidence-context'));
+  const comparison = precedent.product_comparison || {};
+  if (comparison.stereo_relationship) entry.append(element('p', 'Stereochemistry: ' + comparison.stereo_relationship.replaceAll('_', ' '), 'muted'));
+  if (!isCondition && typeof precedent.same_recorded_product === 'boolean') {
+    entry.append(element('p', (precedent.same_recorded_product ? 'Same recorded product' : 'Different recorded product') +
+      '; ' + (precedent.same_recorded_precursors ? 'same recorded precursors.' : 'different recorded precursors.'), 'match-summary'));
+  }
+  const compatibility = precedent.compatibility;
+  if (compatibility) {
+    entry.append(element('p', 'Compatibility: ' + (compatibility.status || 'unresolved').replaceAll('_', ' '), 'match-summary'));
+    scientificNotes(entry, compatibility.hard_conflicts || []);
+    scientificNotes(entry, [...(compatibility.analysis_warnings || []), ...(compatibility.unresolved_requirements || [])]);
+  }
+  const structural = precedent.structural_comparison;
+  if (isCondition) {
+    if (!structural) entry.append(element('p', 'Structural comparison unavailable.', 'scientific-note'));
+    else {
+      const differing = Object.entries(structural).filter(([, value]) => value.query_only?.length || value.precedent_only?.length);
+      entry.append(element('p', differing.length ? 'Recorded differences: ' + differing.map(([name]) => name.replaceAll('_', ' ')).join(', ') + '.' :
+        'Recorded bond edits and local environments match; this does not establish experimental transfer.', 'match-summary'));
+    }
+  }
+  scientificNotes(entry, [...(comparison.warnings || []), ...(precedent.limitations || [])]);
+  const detail = element('div');
+  detail.append(element('p', 'Reaction ID: ' + precedent.reaction_id));
+  if (precedent.reference_id) detail.append(element('p', 'Reference ID: ' + precedent.reference_id));
+  detail.append(element('div', 'Reaction SMILES', 'precedent-label'), element('code', precedent.reaction_smiles, 'precedent-smiles'));
+  detail.append(element('p', isCondition ? 'Conditions are linked to the exact indexed observation.' :
+    'Observations are linked by reaction ID; the template does not identify a unique experiment.'));
+  const percentage = value => typeof value === 'number' ? Math.round(100 * value) + '%' : 'unavailable';
+  if (!isCondition) detail.append(element('p', 'Similarity: product ' + percentage(precedent.product_similarity) + ', precursors ' + percentage(precedent.precursor_similarity)));
+  for (const observation of precedent.observations || []) {
+    detail.append(element('p', 'Observation: ' + (observation.observation_id || 'not recorded')));
+    // Keep full quantities, stages, identifiers and missingness available for review.
+    const fullRecipe = element('pre', JSON.stringify(observation.resolved_recipe || {}, null, 2), 'recipe-record');
+    detail.append(disclosure('Complete recorded recipe', key + ':recipe:' + observation.observation_id, fullRecipe));
+  }
+  if (precedent.structural_comparison) detail.append(element('pre', JSON.stringify(precedent.structural_comparison, null, 2), 'recipe-record'));
+  if (precedent.missing_operating_fields?.length) detail.append(element('p', 'Not recorded: ' + precedent.missing_operating_fields.join(', ').replaceAll('_', ' ')));
+  entry.append(disclosure('Match details & cautions', key + ':match', detail));
+  const procedures = [...(precedent.procedures || []), ...(precedent.reaction_level_procedures || [])];
+  if (procedures.length) {
+    const content = element('div');
+    for (const procedure of procedures) {
+      content.append(element('p', procedure.observation_id ? 'Observation: ' + procedure.observation_id : 'Unassigned reaction-level procedure', 'muted'));
+      content.append(element('p', procedure.procedure_text || 'Procedure text not recorded.', 'source-procedure'));
+    }
+    entry.append(disclosure('Experimental procedure', key + ':procedure', content));
+  }
+  if (record.artifact_url) {
+    const link = element('a', 'Saved evidence'); link.href = record.artifact_url; entry.append(link);
+  }
+  return entry;
+}
+function supportingEvidence(step, sources, key) {
+  const support = element('section', '', 'step-precedents');
+  support.append(element('h5', 'Precedent support', 'support-heading'));
+  const records = step.supporting_evidence || [];
+  const cards = [];
+  const scope = element('div');
+  for (const [index, record] of records.entries()) {
+    for (const [position, precedent] of (record.precedents || []).entries()) {
+      cards.push(precedentCard(precedent, record, key + ':support:' + index + ':' + position));
+    }
+    if (record.status === 'evidence_unavailable') support.append(element('p', 'Saved evidence could not be loaded. Its support remains unresolved.', 'scientific-note'));
+    if (record.status === 'no_precedents_retrieved') support.append(element('p', 'No supporting experiment found in this recorded search.', 'scientific-note'));
+    if (record.evidence_origin === 'saved_assessment') support.append(element('p', 'Related reactions were retrieved; detailed source inspection is incomplete.', 'scientific-note'));
+    scope.append(element('p', 'Showing ' + (record.precedents || []).length + ' of ' + (record.saved_match_count ?? 0) + ' saved records. This is not an exhaustive literature search.'));
+    if (record.distinct_references_on_page != null) scope.append(element('p', record.distinct_references_on_page + ' distinct reference(s) on this page.'));
+    if (record.page?.next_offset != null || record.retrieval_truncated) scope.append(element('p', 'Additional records remain outside this saved page.'));
+    if (record.observation_page?.next_offset != null) support.append(element('p', 'Only the first page of source experiments is shown.', 'scientific-note'));
+    scientificNotes(scope, record.limitations || []);
+    if (record.error) scope.append(element('p', record.error));
+  }
+  const attributed = [step, step.rationale, step.yield_info, ...(step.conditions || [])].filter(Boolean);
+  const literature = [...new Set(attributed.flatMap(item => item.source_ids || []))]
+    .filter(id => sources.get(id)?.kind === 'external_source');
+  if (literature.length) {
+    support.append(element('p', 'Literature sources', 'muted'));
+    scientificLinks(support, literature, sources);
+    literature.forEach(id => { if (sources.get(id).locator) support.append(element('p', sources.get(id).locator, 'muted')); });
+  }
+  if (cards.length) {
+    support.append(cards[0]);
+    if (cards.length > 1) {
+      const more = element('div'); more.append(...cards.slice(1));
+      support.append(disclosure('More precedents (' + (cards.length - 1) + ')', key + ':more', more));
+    }
+  } else if (!records.length && !literature.length) support.append(element('p', 'No inspected experimental support supplied for this step.', 'scientific-note'));
+  if (records.length) support.append(disclosure('Search scope', key + ':scope', scope));
+  return support;
+}
+function reactionCard(step, sources, molecules, key, number, showScheme = true) {
+  const card = element('article', '', 'scientific-step');
+  const heading = element('div', '', 'step-heading');
+  heading.append(element('span', String(number), 'step-number'), element('h4', step.title),
+    element('span', basisLabels[step.basis] || step.basis, 'basis basis-' + step.basis));
+  card.append(heading);
+  if (showScheme) {
+    const label = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ');
+    if (step.image_url) card.append(reactionFigure(step, label + '. Conditions and yield in experimental details.'));
+    else card.append(element('p', 'Scheme unavailable for the supplied structures. Conditions remain available below.', 'scientific-note'));
+  }
+  if (!showScheme || !step.image_url) step.conditions.forEach(item => card.append(scientificClaim(item, sources)));
+  if (step.rationale) {
+    const rationale = element('div', '', 'step-rationale');
+    rationale.append(element('h5', 'Why this choice'),
+      element('span', basisLabels[step.rationale.basis] || step.rationale.basis, 'basis basis-' + step.rationale.basis),
+      element('p', step.rationale.text));
+    scientificLinks(rationale, step.rationale.source_ids, sources); card.append(rationale);
+  }
+  scientificNotes(card, [...step.limitations, ...step.conditions.flatMap(item => item.limitations || []),
+    ...(step.yield_info?.limitations || []), ...(step.rationale?.limitations || [])]);
+  card.append(supportingEvidence(step, sources, key));
+  const detail = element('div', '', 'step-detail');
+  detail.append(element('h5', 'Target conditions'));
+  if (step.conditions.length) step.conditions.forEach(item => detail.append(scientificClaim(item, sources)));
+  else detail.append(element('p', 'Not supplied', 'muted'));
+  detail.append(element('h5', 'Target yield'));
+  detail.append(step.yield_info ? scientificClaim(step.yield_info, sources) : element('p', 'Not reported for this target.', 'muted'));
+  scientificLinks(detail, step.source_ids, sources);
+  card.append(disclosure('Experimental details & sources', key, detail));
+  return card;
+}
 function showStructured(view, key = 'science') {
   const section = element('section', '', 'scientific-view');
   if (view.error) { section.append(element('p', view.error, 'scientific-note')); return section; }
   const sources = new Map(view.sources.map(source => [source.id, source]));
   const molecules = new Map(view.molecules.map(molecule => [molecule.id, molecule]));
   const steps = new Map(view.steps.map(step => [step.id, step]));
-  function badge(item) { return element('span', basisLabels[item.basis] || item.basis, 'basis basis-' + item.basis); }
-  function notes(container, texts) {
-    if (!texts.length) return;
-    const list = element('ul', '', 'scientific-notes');
-    [...new Set(texts)].forEach(text => list.append(element('li', text)));
-    container.append(list);
-  }
-  function links(container, ids) {
-    const citations = element('div', '', 'evidence');
-    for (const id of new Set(ids)) {
-      const source = sources.get(id); if (!source) continue;
-      const link = element('a', source.title);
-      link.href = source.url || source.artifact_url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-      link.title = source.locator; citations.append(link);
-    }
-    if (citations.children.length) container.append(citations);
-  }
-  function claim(item) {
-    const box = element('div', '', 'attributed-claim');
-    box.append(badge(item), element('span', item.text));
-    links(box, item.source_ids); notes(box, item.limitations); return box;
-  }
-  function stepCard(step, routeKey, number) {
-    const card = element('article', '', 'scientific-step');
-    const heading = element('div', '', 'step-heading');
-    heading.append(element('span', String(number), 'step-number'), element('h4', step.title), badge(step));
-    card.append(heading);
-    if (step.image_url) {
-      const figure = element('figure', '', 'scheme-figure');
-      const scroll = element('div', '', 'scheme-scroll');
-      scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', 'Reaction scheme: ' + step.title);
-      const image = element('img', '', 'reaction-scheme'); image.src = step.image_url;
-      if (step.scheme_width) image.style.width = step.scheme_width * 0.6 + 'px';
-      image.alt = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ') + '. Conditions and yield in step details.';
-      image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
-      card.append(figure);
-    } else card.append(element('p', 'Scheme unavailable for the supplied notation. Structures and conditions are retained in step details.', 'scientific-note'));
-    const support = element('div', '', 'step-precedents');
-    const evidence = step.supporting_evidence || [];
-    if (!evidence.length) support.append(element('p', 'No supporting-reaction inspection attached to this step.', 'scientific-note'));
-    for (const record of evidence) {
-      const group = element('div');
-      if (record.status === 'evidence_unavailable') {
-        group.append(element('p', 'Supporting evidence unavailable: ' + record.error, 'scientific-note'));
-      } else {
-        const scopeLabel = record.scope === 'selected_template_top_20' ? 'Selected template (up to 20 records)' : 'Saved step assessment';
-        const count = (record.precedents || []).length;
-        group.append(element('p', 'Showing ' + count + ' of ' + record.saved_match_count + ' saved matches · Template support; transfer unverified.', 'muted'));
-        if (record.evidence_origin === 'saved_assessment') group.append(element('p', 'Saved assessment matches; detailed inspection was not attached.', 'muted'));
-        if (record.status === 'no_precedents_retrieved') group.append(element('p', 'No supporting experimental precedent retrieved in this inspection.', 'scientific-note'));
-        const inspection = element('div');
-        inspection.append(element('p', scopeLabel + ' · ' + record.distinct_references_on_page + ' distinct reference(s) on this page.'));
-        if (record.retrieval_truncated || record.page?.next_offset != null) inspection.append(element('p', 'More records remain outside this page; this is not an exhaustive literature search.'));
-        if (record.observation_page?.next_offset != null) group.append(element('p', 'Conditions shown for the first 20 indexed observations only.', 'scientific-note'));
-        for (const precedent of record.precedents || []) {
-          const entry = element('article', '', 'precedent-card');
-          const title = element('h5');
-          const reference = element(precedent.reference_url ? 'a' : 'span', precedent.reference_title || 'Publication details unavailable');
-          if (precedent.reference_url) { reference.href = precedent.reference_url; reference.target = '_blank'; reference.rel = 'noopener noreferrer'; }
-          title.append(reference); entry.append(title);
-          if (precedent.image_url) {
-            const scroll = element('div', '', 'scheme-scroll'); scroll.tabIndex = 0;
-            scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', 'Supporting reaction; scroll to see the complete scheme');
-            const image = element('img', '', 'reaction-scheme'); image.src = precedent.image_url;
-            if (precedent.scheme_width) image.style.width = precedent.scheme_width + 'px';
-            image.alt = 'Supporting source reaction'; image.loading = 'lazy';
-            scroll.append(image); entry.append(scroll);
-          } else entry.append(element('p', 'Drawing unavailable; reaction SMILES retained below.', 'muted'));
-          entry.append(element('div', 'Reaction SMILES', 'precedent-label'), element('code', precedent.reaction_smiles, 'precedent-smiles'));
-          const observed = element('div', '', 'precedent-conditions');
-          observed.append(element('h5', 'Reported conditions'));
-          const sourceDetail = element('div');
-          sourceDetail.append(element('p', 'Reaction ID: ' + precedent.reaction_id));
-          if (precedent.reference_id) sourceDetail.append(element('p', 'Reference ID: ' + precedent.reference_id));
-          sourceDetail.append(element('p', 'Observations are linked by reaction ID; the template does not identify a unique experiment. Conditions and yields belong to the source observations.'));
-          const percentage = value => typeof value === 'number' ? Math.round(100 * value) + '%' : 'unavailable';
-          sourceDetail.append(element('p', 'Similarity: product ' + percentage(precedent.product_similarity) + ', precursors ' + percentage(precedent.precursor_similarity) + '. Recorded product ' +
-            (precedent.same_recorded_product ? 'matches' : 'differs') + '; precursors ' + (precedent.same_recorded_precursors ? 'match.' : 'differ.')));
-          const comparison = precedent.product_comparison || {};
-          if (comparison.stereo_relationship) sourceDetail.append(element('p', 'Product stereochemistry: ' + comparison.stereo_relationship.replaceAll('_', ' ').toLowerCase() +
-            '. Common-core coverage: target ' + percentage(comparison.left_coverage) + ', precedent ' + percentage(comparison.right_coverage) + '.'));
-          notes(sourceDetail, [...(comparison.warnings || []).map(text => text.replaceAll('_', ' ').toLowerCase()), ...(precedent.limitations || [])]);
-          (precedent.observations || []).forEach((observation, index) => {
-            const experiment = element('div', '', 'precedent-observation');
-            if (precedent.observations.length > 1) experiment.append(element('h5', 'Observation ' + (index + 1)));
-            const recipe = observation.resolved_recipe || {};
-            const ingredients = Object.values(recipe).filter(Array.isArray).flat().filter(item => item && typeof item === 'object')
-              .map(item => item.canonical_name || item.raw_identifier || item.substance_id).filter(Boolean);
-            experiment.append(element('p', 'Reagents & solvents: ' + (ingredients.join(', ') || 'not supplied')));
-            const operating = [];
-            for (const [key, unit] of [['temperature_c', ' °C'], ['time_h', ' h'], ['concentration_m', ' M'], ['atmosphere', '']]) {
-              if (recipe[key] != null) operating.push(recipe[key] + unit);
-            }
-            if (operating.length) experiment.append(element('p', operating.join(' · ')));
-            experiment.append(element('p', 'Reported yield: ' + (observation.yield_pct == null ? 'not supplied' : observation.yield_pct + '%')));
-            if (observation.condition_uncertain) experiment.append(element('p', 'Condition assignment uncertain.', 'muted'));
-            observed.append(experiment);
-            sourceDetail.append(element('p', 'Observation ' + (index + 1) + ': ' + (observation.observation_id || 'ID unavailable')));
-          });
-          if (!precedent.observations?.length) observed.append(element('p', record.evidence_origin === 'saved_assessment' ? 'Conditions and yield not captured in this saved assessment.' : 'Conditions and yield unavailable.', 'muted'));
-          entry.append(observed);
-          if (precedent.procedures?.length) {
-            const procedures = element('div');
-            for (const procedure of precedent.procedures) {
-              procedures.append(element('p', 'Observation: ' + (procedure.observation_id || 'unassigned reaction-level record'), 'muted'));
-              if (procedure.procedure_text) procedures.append(element('p', procedure.procedure_text, 'source-procedure'));
-            }
-            entry.append(disclosure('Experimental procedure', routeKey + ':' + step.id + ':' + precedent.match_id + ':procedure', procedures));
-          }
-          entry.append(disclosure('Match details & cautions', routeKey + ':' + step.id + ':' + precedent.match_id, sourceDetail));
-          group.append(entry);
-        }
-        group.append(disclosure('Search scope', routeKey + ':' + step.id + ':' + record.artifact_ref + ':scope', inspection));
-      }
-      if (record.artifact_url) { const link = element('a', 'Inspect saved evidence'); link.href = record.artifact_url; group.append(link); }
-      const supportLabel = 'Supporting reactions' + (record.precedents?.length ? ' (' + record.precedents.length + ')' :
-        record.status === 'evidence_unavailable' ? ' · evidence unavailable' : ' · none retrieved');
-      support.append(disclosure(supportLabel, routeKey + ':' + step.id + ':' + record.artifact_ref, group));
-    }
-    card.append(support);
-    // Keep the scheme compact; the disclosure advertises retained cautions.
-    const cautions = new Set([...step.limitations, ...step.conditions.flatMap(item => item.limitations), ...(step.yield_info?.limitations || [])]);
-    const detail = element('div', '', 'step-detail');
-    notes(detail, step.limitations);
-    detail.append(element('p', step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ')));
-    detail.append(element('h4', 'Conditions'));
-    if (step.conditions.length) step.conditions.forEach(item => detail.append(claim(item)));
-    else detail.append(element('p', 'Not supplied', 'muted'));
-    detail.append(element('h4', 'Yield'));
-    detail.append(step.yield_info ? claim(step.yield_info) : element('p', 'Not supplied', 'muted'));
-    links(detail, step.source_ids);
-    const detailLabel = 'Step details & evidence' + (cautions.size ? ' · ' + cautions.size + (cautions.size === 1 ? ' caution' : ' cautions') : '');
-    card.append(disclosure(detailLabel, routeKey + ':' + step.id, detail));
-    return card;
-  }
   const routed = new Set();
   for (const [index, route] of view.routes.entries()) {
     const box = element('section', '', 'route-section');
     const routeKey = key + ':' + route.id;
     if (route.unreached_target_ids.length) box.append(element('p', 'Incomplete route: does not reach ' + route.unreached_target_ids.map(id => molecules.get(id).name).join(', ') + '.', 'scientific-note'));
-    route.step_ids.forEach((id, position) => { box.append(stepCard(steps.get(id), routeKey, position + 1)); routed.add(id); });
-    if (view.routes.length === 1) { section.append(element('h3', route.title), box); }
+    scientificNotes(box, route.limitations);
+    route.step_ids.forEach((id, position) => { box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1)); routed.add(id); });
+    if (view.routes.length === 1) section.append(element('h3', route.title), box);
     else {
       const alternative = disclosure(route.title + ' · ' + route.step_ids.length + ' steps', routeKey, box);
       alternative.className += ' route-choice'; alternative.open = index === 0; section.append(alternative);
     }
   }
-  const standalone = view.steps.filter(step => !routed.has(step.id));
-  if (standalone.length) {
-    section.append(element('h3', view.routes.length ? 'Other reaction steps' : 'Reaction schemes'));
-    standalone.forEach((step, index) => section.append(stepCard(step, key, index + 1)));
+  const groups = new Map();
+  for (const step of view.steps.filter(step => !routed.has(step.id))) {
+    // Group only identical explicit reactions; do not infer chemical equivalence.
+    const group = step.reaction_smiles && !step.after_step_ids.length ? step.reaction_smiles : step.id;
+    if (!groups.has(group)) groups.set(group, []);
+    groups.get(group).push(step);
+  }
+  if (groups.size) section.append(element('h3', view.routes.length ? 'Other reaction steps' : 'Reaction schemes'));
+  let number = 0;
+  for (const group of groups.values()) {
+    const first = group[0];
+    section.append(reactionCard(first, sources, molecules, key + ':' + first.id, ++number));
+    if (group.length > 1) {
+      const alternatives = element('div', '', 'condition-alternatives');
+      group.slice(1).forEach((step, index) => alternatives.append(reactionCard(step, sources, molecules, key + ':' + step.id, index + 2, false)));
+      section.append(disclosure('Alternative conditions (' + (group.length - 1) + ')', key + ':alternatives:' + first.id, alternatives));
+    }
   }
   return section;
 }
@@ -255,9 +325,9 @@ function answerDetails(turn) {
     const note = notes.get(key);
     if (scope) note.scopes.add(scope); else note.global = true;
   }
-  (answer.uncertainties || []).forEach(text => addNote(text));
-  (view?.routes || []).forEach(route => route.limitations.forEach(text => addNote(text, route.title)));
   (view?.molecules || []).forEach(molecule => molecule.limitations.forEach(text => addNote(text, molecule.name)));
+  // A legacy answer without drawable steps still retains its route qualifications.
+  if (!view?.steps?.length) (view?.routes || []).forEach(route => route.limitations.forEach(text => addNote(text, route.title)));
   if (notes.size) {
     content.append(element('h4', 'Notes'));
     const list = element('ul', '', 'scientific-notes');
@@ -304,6 +374,10 @@ function answerCard(turn) {
       card.append(showStructured(view, turn.id + ':science'));
     }
     if (routeFirst) card.append(formattedMessage(answer.answer_markdown, turn.answer_presentation));
+    if (answer.uncertainties?.length) {
+      const questions = element('section', '', 'answer-uncertainties');
+      questions.append(element('h5', 'Open questions')); scientificNotes(questions, answer.uncertainties); card.append(questions);
+    }
     const details = answerDetails(turn);
     if (details) card.append(details);
     if (answer.needs_user_input) card.append(element('p', 'Add the requested information below to continue.', 'muted'));
