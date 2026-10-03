@@ -384,7 +384,7 @@ test('supporting reactions retain source identity, separate observations and evi
     precedents:[{match_id:'match1',reaction_id:'reaction-1',reference_title:'Reported patent example',reference_url:'https://example.org/patent',
       reaction_smiles:'CCO>>CC=O',image_url:'data:image/svg+xml;base64,abc',same_recorded_product:false,same_recorded_precursors:false,
       product_similarity:0.4,precursor_similarity:0.3,limitations:['Transfer remains uncertain.'],
-      observations:[{observation_id:'obs1',yield_pct:40,resolved_recipe:{solvents:[{canonical_name:'Ethanol'}]}},{observation_id:'obs2',yield_pct:null}],
+      observations:[{observation_id:'obs1',yield_pct:40,resolved_recipe:{solvents:[{canonical_name:'Ethanol'}],warnings:['CONDITION_IDENTITY_UNCERTAINTY']}},{observation_id:'obs2',yield_pct:null}],
       procedures:[{observation_id:'obs1',procedure_text:'Literal source <script>text</script>'}]}]}];
   card = run('showStructured(supportView)');
   assert.equal(card.querySelectorAll('img').length,1);
@@ -392,13 +392,16 @@ test('supporting reactions retain source identity, separate observations and evi
   assert.equal(byClass(card, 'precedent-card')[0].parentNode.className, 'step-precedents');
   assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent'));
   assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: 40%'));
-  assert.ok(card.descendants().some(node => node.textContent === 'Reported yield: not supplied'));
+  assert.ok(card.descendants().some(node => node.textContent === 'Conditions and yield not recorded for this experiment.'));
+  const otherExperiment = card.querySelectorAll('summary').find(node => node.textContent === 'Experiment 2');
+  assert.ok(!otherExperiment.parentNode.open, 'additional experiments remain separate and collapsed');
   assert.ok(card.querySelectorAll('code').some(node => node.textContent === 'CCO>>CC=O'));
   const conditions = card.descendants().find(node => node.className === 'precedent-conditions');
   assert.equal(conditions.parentNode.className, 'precedent-card');
   assert.ok(conditions.descendants().some(node => node.textContent === 'Reagents & solvents: Ethanol'));
   const cautions = card.querySelectorAll('summary').find(node => node.textContent === 'Match details & cautions');
   assert.ok(!cautions.parentNode.open);
+  assert.ok(cautions.parentNode.descendants().some(node=>node.textContent==='CONDITION_IDENTITY_UNCERTAINTY'));
   assert.ok(card.descendants().some(node => node.textContent === 'Literal source <script>text</script>'));
   assert.ok(!card.querySelectorAll('a').some(node => node.download));
   step.supporting_evidence = [{status:'no_precedents_retrieved',precedents:[],scope:'saved_assessment_matches',saved_match_count:0,distinct_references_on_page:0}];
@@ -434,11 +437,10 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(card.querySelectorAll('a').some(node => node.download), false,
     'reaction schemes should not show a download button');
   const stepDetails = card.querySelectorAll('details').find(node => node.dataset.key === 'scheme:science:s1');
-  assert.equal(stepDetails.firstElementChild.textContent, 'Experimental details & sources');
-  assert.ok(byClass(view, 'scientific-step')[0].children.some(node =>
-    node.tag === 'ul' && node.descendants().some(item => item.textContent === 'Feasibility unverified')),
-    'material cautions must remain visible without opening details');
-  assert.ok(stepDetails.descendants().some(node => node.textContent === 'Unknown oxidant'));
+  assert.equal(stepDetails.firstElementChild.textContent, 'Step cautions & assessment details');
+  assert.ok(stepDetails.descendants().some(node => node.textContent === 'Feasibility unverified'),
+    'material cautions remain accessible beside the step');
+  assert.ok(byClass(view, 'step-conditions')[0].descendants().some(node => node.textContent === 'Unknown oxidant'));
   assert.ok(byClass(card, 'step-heading')[0].descendants().some(node => node.textContent === 'Proposed'),
     'the actual step attribution remains visible');
   assert.ok(!card.descendants().some(node => node.textContent === 'Synthetic direction' ||
@@ -466,7 +468,7 @@ test('reaction schemes are visible with details collapsed and references human-r
   const footer = byClass(routedCard, 'answer-details')[0];
   assert.ok(alternatives[0].descendants().some(node => node.textContent === 'Supply unconfirmed'));
   assert.equal(Boolean(footer.open), false);
-  assert.equal(routedCard.children.filter(node => node.tag === 'details').length, 1);
+  assert.equal(routedCard.children.filter(node => node.tag === 'details').length, 2);
   assert.ok(!routedCard.querySelectorAll('summary').some(node => /Step connections|Molecules & SMILES|Route limitations|Uncertainty &|Additional scientific/.test(node.textContent)));
   assert.ok(alternatives[1].descendants().some(node => node.textContent.includes('Incomplete route: does not reach Final product')));
   context.fixture.question = 'Investigate this route';
@@ -600,7 +602,7 @@ test('a busy response from another tab reveals that investigation and keeps the 
 });
 
 
-test('linear routes lead with one target scheme and keep source cautions visible', () => {
+test('linear routes show source SVGs and actual conditions with diagnostics collapsed', () => {
   const {run, context} = harness();
   const attribution = {basis:'proposed',source_ids:[],limitations:['Target feasibility unresolved']};
   const step = {id:'s1',title:'First step',...attribution,reactant_ids:['a'],product_ids:['b'],after_step_ids:[],
@@ -621,27 +623,29 @@ test('linear routes lead with one target scheme and keep source cautions visible
   assert.equal(images.filter(node => node.src.endsWith('route')).length, 1);
   assert.equal(images.filter(node => node.src.endsWith('target-step')).length, 0);
   const sourceFigure = images.find(node => node.src.endsWith('source')).parentNode.parentNode;
-  assert.equal(sourceFigure.parentNode.tag, 'details');
-  assert.ok(!sourceFigure.parentNode.open);
-  assert.equal(sourceFigure.parentNode.firstElementChild.textContent, 'Source reaction scheme');
+  assert.equal(sourceFigure.parentNode.className, 'precedent-card');
   assert.ok(card.querySelectorAll('figcaption').some(node => node.textContent.includes('left to right')));
   const inDetails = node => {
     for (let parent = node.parentNode; parent; parent = parent.parentNode) if (parent.tag === 'details') return true;
     return false;
   };
-  for (const text of ['Transfer remains uncertain','Target feasibility unresolved','No inspected experimental support supplied for this step.',
-    'Conditions: Proposed · Yield: Unknown','Reported yield: 72%']) {
+  assert.ok(!inDetails(sourceFigure), 'source reaction SVG must be visible');
+  for (const text of ['Reason for this step','Target recipe','No inspected experimental support supplied for this step.',
+    'Reported yield: 72%']) {
     const nodes = card.descendants().filter(node => node.textContent === text);
     assert.ok(nodes.some(node => !inDetails(node)), text + ' must remain visible');
   }
-  assert.ok(card.descendants().filter(node => node.textContent === 'Target recipe').every(inDetails));
+  for (const text of ['Transfer remains uncertain','Target feasibility unresolved']) {
+    assert.ok(card.descendants().filter(node => node.textContent === text).every(inDetails), text + ' is retained in cautions');
+  }
+  assert.ok(!card.descendants().some(node => node.textContent.startsWith('Conditions: Proposed')));
   assert.equal(JSON.stringify(context.routeView), original);
   context.routeView.routes[0].drawing_status = 'dependency_overview';
   const fallback = run('showStructured(routeView)');
   assert.equal(fallback.querySelectorAll('img').filter(node => node.src.endsWith('target-step')).length, 2);
 });
 
-test('condition choices share a scheme and expose one precedent with attributed rationale', () => {
+test('condition choices share a scheme and expose two precedents with attributed rationale', () => {
   const {run, context} = harness();
   const claim = {basis:'proposed',source_ids:['paper'],limitations:[]};
   const first = {id:'s1',title:'Preferred recipe',...claim,reactant_ids:['a'],product_ids:['b'],
@@ -653,7 +657,8 @@ test('condition choices share a scheme and expose one precedent with attributed 
         image_url:'data:image/svg+xml;base64,source',observations:[{observation_id:'o1',yield_pct:42}],
         structural_comparison:{environments:{shared:[],query_only:['a'],precedent_only:['b']}},
         compatibility:{status:'unknown',analysis_warnings:['Structural coverage incomplete'],unresolved_requirements:['Catalyst unresolved']}},
-      {reaction_id:'r2',reference_title:'Experiment two',reaction_smiles:'CCO>>CC=O',observations:[]},
+      {reaction_id:'r2',reference_title:'Experiment two',reaction_smiles:'CCO>>CC=O',image_url:'data:image/svg+xml;base64,second-source',observations:[]},
+      {reaction_id:'r3',reference_title:'Experiment three',reaction_smiles:'CCO>>CC=O',image_url:'data:image/svg+xml;base64,third-source',observations:[]},
     ]}]};
   context.choices={sources:[{id:'paper',kind:'external_source',title:'Captured Example 2',url:'https://example.org/paper',locator:'Example 2'}],
     molecules:[{id:'a',name:'Alcohol'},{id:'b',name:'Aldehyde'}],routes:[],
@@ -664,8 +669,10 @@ test('condition choices share a scheme and expose one precedent with attributed 
   assert.ok(!alternatives.open);
   assert.ok(alternatives.descendants().some(node=>node.textContent==='Alternative solvent'));
   assert.ok(!alternatives.descendants().some(node=>node.textContent==='No inspected experimental support supplied for this step.'));
+  assert.ok(alternatives.descendants().some(node=>node.textContent==='Source reaction structures were not supplied for these literature citations.'));
   const support=byClass(card,'step-precedents')[0];
   assert.equal(byClass(support,'precedent-card')[0].parentNode,support);
+  assert.equal(byClass(support,'precedent-card')[1].parentNode,support);
   assert.ok(!card.querySelectorAll('summary').find(node=>node.textContent==='More precedents (1)').parentNode.open);
   assert.ok(support.descendants().some(node=>node.textContent==='Recorded differences: environments.'));
   assert.ok(support.descendants().some(node=>node.textContent==='Structural coverage incomplete'));
@@ -682,4 +689,47 @@ test('condition choices share a scheme and expose one precedent with attributed 
   context.choices.steps[1].reaction_smiles='CCCO>>CCC=O';
   assert.equal(run('showStructured(choices)').querySelectorAll('img').filter(node=>node.src.endsWith('target')).length,2,
     'different explicit transformations must not share a target scheme');
+});
+
+test('retrosynthesis leads with chemistry, retains cautions, and exposes requests for user input', () => {
+  const {run, context} = harness();
+  const claim = {basis:'proposed',source_ids:['paper'],limitations:[]};
+  context.chemistryTurn = {id:'retro',status:'completed',progress:[{kind:'agent_update',detail:'Research log'}],
+    answer:{answer_markdown:'Long written explanation',uncertainties:['Select a solvent'],evidence_refs:[]},
+    structured_presentation:{sources:[{id:'paper',kind:'external_source',title:'Paper Example 3',url:'https://example.org/paper',locator:'Example 3'}],
+      molecules:[{id:'a',name:'A',limitations:[]},{id:'b',name:'B',limitations:[]}],claims:[],
+      routes:[{id:'route',title:'Route',step_ids:['s'],image_url:'route.svg',drawing_status:'linear_scheme',limitations:[],unreached_target_ids:[]}],
+      steps:[{id:'s',title:'Substitution',...claim,reactant_ids:['a'],product_ids:['b'],after_step_ids:[],
+        conditions:[{text:'EtOH, 80 °C, 2 h',...claim}],reagents:[{text:'Base',...claim}],yield_info:null,
+        rationale:{text:'Replace the leaving group',...claim},
+        assessment_evidence:{status:'recorded',structural_assessments:[],recipe_assessments:[{
+          status:'conflicting',hard_conflicts:['Known incompatible condition'],coverage:{capability_status:'not_covered'},
+        }]},
+        supporting_evidence:[{status:'precedents_available',precedents:[{
+          reaction_id:'ref',reference_title:'Paper Example 3',reference_url:'https://example.org/paper',image_url:'source.svg',observations:[],
+        }]}],
+      }],
+    }};
+  const original = JSON.stringify(context.chemistryTurn);
+  const inClosedDetails = node => {
+    for (let parent=node.parentNode;parent;parent=parent.parentNode) if (parent.tag==='details' && !parent.open) return true;
+    return false;
+  };
+  const card = run('answerCard(chemistryTurn)');
+  assert.equal(card.children[0].className, 'scientific-view');
+  for (const text of ['Long written explanation','Select a solvent','Research log','No applicable reaction capability requirement was checked.']) {
+    const nodes = card.descendants().filter(n=>n.textContent===text);
+    assert.ok(nodes.length && nodes.every(inClosedDetails), text + ' stays in details');
+  }
+  for (const text of ['Replace the leaving group','EtOH, 80 °C, 2 h','Known incompatible condition']) {
+    assert.ok(card.descendants().some(n=>n.textContent===text && !inClosedDetails(n)), text + ' must be visible');
+  }
+  assert.ok(card.querySelectorAll('img').some(n=>n.src==='source.svg' && !inClosedDetails(n)));
+  assert.ok(card.querySelectorAll('a').some(n=>n.href==='https://example.org/paper' && !inClosedDetails(n)));
+  assert.equal(byClass(card,'step-conditions')[0].querySelectorAll('a').length, 0, 'source links are collected in support, not repeated per condition');
+  assert.equal(JSON.stringify(context.chemistryTurn), original);
+  context.chemistryTurn.answer.needs_user_input = true;
+  const needsInput = run('answerCard(chemistryTurn)');
+  assert.ok(needsInput.descendants().some(n=>n.textContent==='Select a solvent' && !inClosedDetails(n)));
+  assert.ok(needsInput.children.some(n=>n.textContent==='Long written explanation'));
 });

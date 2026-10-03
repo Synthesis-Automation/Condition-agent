@@ -50,13 +50,23 @@ duration, quantities or addition order. Use [] if absent; yield_info=null if unr
 Each step's reagents is a separate list of attributed claims containing only
 short reagent/catalyst names, e.g. CDI or DIPEA. Route arrows show these names and
 supplied partner structures. Keep solvent, quantities, temperature, time, workup
-and purification in conditions for the experimental details. Do not repeat a
+and purification in conditions, which are visible beside each step. Do not repeat a
 partner already drawn structurally unless its supplied form needs clarification.
 Use [] when no reagent names are explicitly supported; do not infer them from a
 reaction name. Older saved answers may omit reagents.
-Each step may have rationale, an attributed claim (text, basis, source_ids,
-limitations) explaining the chemical choice and transfer from evidence. It follows
-the same citation checks as conditions. Older answers may omit it.
+For a retrosynthesis, give each step a concise rationale: an attributed claim
+(text, basis, source_ids, limitations) explaining the bond change, chemical choice,
+and what the closest inspected source reactions support. Name material substrate,
+selectivity or condition differences that limit transfer. Link the relevant source
+and exact example locator; never describe a distant analogue as an exact precedent.
+The browser leads with the route SVG, then each step's rationale, conditions and
+saved precedent SVGs with publication links. Technical diagnostics, full prose and
+review notes are available in collapsed details. Avoid duplicating every step,
+raw IDs, tool diagnostics or assessment counts in answer_markdown. Keep it to a
+short route explanation and material unresolved questions; preserve detailed
+qualifications in the appropriate structured limitations. Rationale follows the
+same citation checks as conditions. Older answers may omit it; never invent missing
+rationale, structures, conditions or experimental support to complete the display.
 Minimal nested shapes (replace IDs/text with your actual evidence and proposal):
 "steps": [{"id": "s1", "title": "Proposed step", "basis": "proposed",
            "reactant_ids": ["a"], "product_ids": ["b"],

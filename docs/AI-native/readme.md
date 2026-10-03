@@ -23,6 +23,16 @@ retain dependency and individual-step views. The same renderer is available to
 local Python scripts and through `python -m visualization.route_cli`. Restart the
 workspace server to load the presentation update; saved evidence is unchanged.
 
+Retrosynthesis answers lead with the route SVG. Each step shows its rationale,
+attributed reagents and conditions, and the first two saved precedent reactions
+with visible SVGs and publication links. Retrieval order is preserved; the browser
+does not rerank chemistry or invent missing evidence. More precedents, additional
+source experiments, cautions, assessment diagnostics, raw records, full written
+answers and completed investigation logs are collapsed. Missing support and known
+hard conflicts remain visible. Reported source yields stay with their source
+experiments. Refresh the browser for this layout update; existing saved answers
+are supported without rewriting artifacts or rebuilding indexes.
+
 The workspace is organized into `core/`, `adapters/`, `runtime/`, `agent_context/`,
 `answers/` and `views/`; the public Python exports and root CLI remain the entry
 points. See [package organization](Scientific_Workspace_Core.md#package-organization)
@@ -96,9 +106,10 @@ assessment lookup is limited to its saved matches. Neither is a corpus-wide sear
 Attach each inspection artifact to the corresponding answer step using
 `precedent_refs: [event.artifact_ref]`. The service checks canonical reactant and
 product identity, including specified stereo, before publication. The web UI draws
-the same saved source records under **Precedent support**. The first source scheme,
-reported conditions/yield and transfer cautions are visible. Copyable source SMILES,
-IDs and detailed comparisons are under **Match details & cautions**;
+the same saved source records under **Precedent support**. The first two source
+schemes, reported conditions/yield and proposal attribution are visible. Copyable
+source SMILES, IDs, transfer cautions and detailed comparisons are under
+**Match details & cautions**;
 procedures and search scope have separate disclosures. Missing inspection,
 no retrieved precedent, and unavailable evidence are separate display states.
 The optional field extends `scientific_answer.v2`; new runtime schemas require an
