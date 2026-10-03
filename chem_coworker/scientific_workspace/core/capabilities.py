@@ -63,6 +63,13 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
             "operations": ["compare_molecules", "inspect_reactive_sites"],
             "experimental_selectivity_prediction": False,
         },
+        "retro_validity": {
+            "status": "implemented", "operation": "assess_retro_validity",
+            "required_artifact": "retro_library",
+            "optional_artifacts": ["condition_index", "shared_core_index"],
+            "forward_check": "join_saved_bounded_audit",
+            "ranking_influence": "none_advisory_only", "calibrated_success_probability": False,
+        },
         "agent_web_search": {"status": "not_checked",
                              "observation_location": "turns/<turn>/runtime-observations.json"},
         "model_and_reasoning": {"status": "not_confirmed",

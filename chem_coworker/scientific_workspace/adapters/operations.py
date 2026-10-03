@@ -72,6 +72,10 @@ class ScientificOperations:
         ),
         OperationDefinition("assess_route_step", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",)),
+        OperationDefinition("assess_retro_validity", required_artifacts=("retro_library",),
+                            evidence_arguments=("source_ref", "forward_ref", "evidence_refs"),
+                            usage_policy="Assess concrete realizations; ordinal evidence is not success probability. "
+                            "Use a saved bounded forward check only for consequential uncertainties."),
         OperationDefinition(
             "disconnect_composite", required_artifacts=("composite_library", "composite_catalog"),
             usage_policy=(
@@ -504,6 +508,28 @@ class ScientificOperations:
         from .route_investigation import assess_route
 
         return assess_route(self, proposal, unavailable_starting_materials, include_conditions, include_forward, evidence_refs)
+
+    def assess_retro_validity(
+        self, proposal: dict[str, Any] | None = None, source_ref: str | None = None,
+        step_id: str | None = None, realization_id: str | None = None,
+        forward_ref: str | None = None, candidate_limit: int = 128, match_limit: int = 20,
+        evidence_refs: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Grade concrete precursor-to-target evidence and suggest an advisory next action.
+
+        Supply proposal or a saved source_ref: use realization_id for a
+        disconnect_target result, step_id for a route, neither for assess_route_step.
+        Optional pinned condition/shared-core indexes add whole-reaction and L0/L1/L2
+        support. Optional forward_ref joins an existing bounded forward check; no
+        prediction is run here. Inspect validity.status, cautions and unresolved_checks.
+        Ranks 4..0 mean evidence strength, never experimental success probability.
+        """
+        from .retro_validity import assess_validity
+
+        return assess_validity(
+            self, proposal, source_ref, step_id, realization_id, forward_ref,
+            candidate_limit, match_limit, evidence_refs,
+        )
 
     def assess_route_step_forward(
         self, source_ref: str, step_id: str, question: str, timeout_seconds: int = 30,

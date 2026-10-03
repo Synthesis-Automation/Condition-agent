@@ -1,0 +1,26 @@
+{
+  "definition_id": "retro_validity.v1",
+  "schema_version": "1.0",
+  "status": "development_pending_independent_review",
+  "evidence_levels": [
+    {"level": "whole_reaction", "grade": "exact_reaction", "rank": 4},
+    {"level": "observed_local", "grade": "detailed_local_match", "rank": 3},
+    {"level": "retained_local", "grade": "close_transformation_analogue", "rank": 2},
+    {"level": "retained_typed", "grade": "broad_core_analogue", "rank": 1},
+    {"level": "operator_only", "grade": "operator_only", "rank": 0}
+  ],
+  "structural_gates": [
+    "input_structure", "reaction_side_consistency", "atom_correspondence",
+    "reaction_completeness", "reaction_signature"
+  ],
+  "suggested_actions": {
+    "supported": "prioritize_evidence_inspection",
+    "supported_with_cautions": "investigate_cautions",
+    "insufficient_evidence": "seek_evidence",
+    "contradicted": "reject_or_revise_realization",
+    "invalid_input": "correct_input"
+  },
+  "limits": {"candidate_limit": 128, "match_limit": 20},
+  "ranking_influence": "none_advisory_only",
+  "score_semantics": "ordinal_evidence_not_success_probability"
+}

@@ -1,5 +1,11 @@
 # Core retrosynthesis
 
+`assess_retro_validity` provides [precedent-backed validity evidence](../docs/new/retro_validity_tool.md)
+for concrete precursor-to-target proposals. It retains structural gates, scoped
+whole-reaction/local/analogue support, compatibility and optional saved forward
+checks. Evidence ranks are ordinal; experimental feasibility remains unvalidated.
+The scientific agent exposes the same function as a recorded workspace operation.
+
 Common coupled sequences are available as reusable [composite retrosynthetic
 actions](../docs/new/composite_retrosynthetic_actions.md): one logical expansion,
 two explicit physical reactions, target-specific dependency checks and physical

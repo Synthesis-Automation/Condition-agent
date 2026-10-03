@@ -172,6 +172,20 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                     ]
                     item["representative"]["selectivity_warning_count"] = len(warnings)
             overview["strategies"].append(item)
+    elif operation == "assess_retro_validity":
+        overview["validity"] = _brief_fields(source.get("validity", {}), (
+            "status", "structural_status", "precedent_grade", "evidence_rank", "suggested_action",
+            "forward_status", "forward_execution_status", "cautions", "unresolved_checks", "warnings",
+            "score_semantics", "ranking_influence",
+        ))
+        for name in ("operator_precedent_support", "corpus_precedent_support"):
+            support = source.get("validity", {}).get(name)
+            if isinstance(support, Mapping):
+                overview["validity"][name] = _brief_fields(support, (
+                    "status", "strongest_level", "level_counts", "distinct_reference_count",
+                    "candidate_count", "qualified_count", "candidate_truncated", "matches_truncated", "scope",
+                ))
+        overview["artifact_warnings"] = source.get("artifact_warnings", [])
     elif operation in {"assess_route_step", "inspect_route_step", "assess_route_proposal", "revise_route_branch"}:
         assessment = source.get("assessment")
         if isinstance(assessment, Mapping):

@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v9
+# Retrosynthesis investigation adviser v10
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -23,6 +23,24 @@ subsequent targets and stopping decisions under the catalogue's execution polici
 Choose an initial investigation budget suited to the question; broaden it for a
 decision-changing gap. Reuse explicit source-supported steps and unchanged results.
 Keep branch choices, alternatives and stopping reasons in recorded notes; avoid cycles.
+
+Use `assess_retro_validity` when choosing which concrete realization to pursue.
+Select a saved `disconnect_target` realization with `source_ref` and `realization_id`,
+or supply a precursor/target proposal. Its evidence grades distinguish whole-reaction
+precedents from detailed local matches (condition L0), close analogues (L1), broad
+cores (L2), and operator-only support. These are separate from retro-template levels.
+Inspect `structural_status`, `cautions`, `unresolved_checks` and `suggested_action`;
+evidence ranks 4..0 are ordinal support, never success probabilities. Contradictions
+justify rejecting or revising that realization; sparse or unavailable evidence calls
+for investigation, not a claim of impossibility. Alternate precursors need their own
+assessment. The tool is advisory and does not change search ranking or route admission.
+Inspect source reactions before claiming transfer: use `inspect_step_precedents` for
+saved operator support and `inspect_condition_precedents` for retrieved corpus IDs.
+For a consequential competition question, run the existing bounded
+`assess_route_step_forward` on an eligible saved route step and join its artifact via
+`forward_ref`. Timeout, missing-library and inconclusive results remain unresolved.
+Agreement between forward and precedent checks may share data; do not count it as
+independent experimental confirmation.
 
 Use `disconnect_composite` when a common coupled sequence could avoid an unhelpful
 intermediate expansion, such as alcohol activation/substitution or nitration/reduction.

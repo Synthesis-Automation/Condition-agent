@@ -198,6 +198,20 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         view.add_list(summary, value, "condition_evidence", (
             "strategy_id", "evidence", "condition_selectivity_assessment",
         ), path, limit=3)
+    elif operation == "assess_retro_validity":
+        summary.update(view.pick(value, ("source_ref", "selection", "forward_ref", "artifact_warnings"), path))
+        view.add_nested(summary, value, "validity", (
+            "status", "structural_status", "precedent_grade", "evidence_rank", "suggested_action",
+            "forward_status", "forward_execution_status", "cautions", "unresolved_checks", "warnings",
+            "definition_id", "definition_version", "score_semantics", "ranking_influence",
+        ), path)
+        validity = value.get("validity", {})
+        if isinstance(validity, Mapping):
+            for name in ("operator_precedent_support", "corpus_precedent_support"):
+                view.add_nested(summary["validity"], validity, name, (
+                    "status", "strongest_level", "level_counts", "distinct_reference_count",
+                    "candidate_count", "qualified_count", "candidate_truncated", "matches_truncated", "scope",
+                ), f"{path}.validity")
     elif operation in {"assess_route_step", "inspect_route_step", "assess_route_proposal",
                        "revise_route_branch"}:
         route = operation in {"assess_route_proposal", "revise_route_branch"}

@@ -2,6 +2,14 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+The [retro validity tool](../new/retro_validity_tool.md) is available as
+`assess_retro_validity` for a concrete proposal or saved disconnection realization.
+It reports whole-reaction/local/analogue precedent grades, structural gates,
+compatibility cautions and missing evidence; optional `forward_ref` joins a saved
+bounded audit. Evidence ranks are ordinal, not success probabilities. Condition
+and shared-core indexes are optional; ranking and route admission remain unchanged.
+Restart the server and start a new investigation after this scientific code change.
+
 Common two-step transformations can now be proposed with `disconnect_composite`,
 using pinned `composite_library` and `composite_catalog` artifacts. Each logical
 action retains two predicted reactions, target-site dependency evidence and a

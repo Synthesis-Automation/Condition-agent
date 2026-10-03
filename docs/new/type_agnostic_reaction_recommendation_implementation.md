@@ -7,6 +7,12 @@
 
 ## 1. Purpose and authority
 
+2026-10-03: the [retro validity tool](retro_validity_tool.md) reuses canonical
+shared-core graph qualification for whole-reaction and L0/L1/L2 precedent support
+on concrete retrosynthetic proposals. Structural, recipe and separately recorded
+forward evidence remain independent axes. The advisory evidence scale changes no
+source schemas, indexes, ranking or release gates.
+
 2026-10-02: [BINAP registry identity correction](binap_registry_identity_correction_20261002.md)
 separates R and racemate aliases and declares the unqualified name ambiguous.
 The two audit regressions are retained; no validation rules or schemas are relaxed.

@@ -62,7 +62,7 @@ def _saved_support(store: InvestigationStore) -> dict[tuple[str, str], list[dict
                         if selected:
                             selections.append((selected, {}, {"realization_id": selected["realization_id"]}, None))
             elif operation in SOURCE_OPERATIONS:
-                selectors = [{}] if operation == "assess_route_step" else [
+                selectors = [{}] if operation in {"assess_route_step", "assess_retro_validity"} else [
                     {"step_id": item["external_step_id"]} for item in result.get("proposal", {}).get("steps", [])
                 ]
                 for selector in selectors:

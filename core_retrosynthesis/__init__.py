@@ -686,7 +686,14 @@ from .sources import (
     source_shard_files,
 )
 
+from .retro_validity import (
+    RetroForwardEvidence, RetroValidityAssessment, RetroValidityPolicy,
+    assess_retro_validity, load_retro_validity_policy, validate_retro_validity_policy,
+)
+
 __all__ = [
+    "RetroForwardEvidence", "RetroValidityAssessment", "RetroValidityPolicy",
+    "assess_retro_validity", "load_retro_validity_policy", "validate_retro_validity_policy",
     "CompositeStrategyCatalog", "CompositeDependencyAssessment", "CompositePhysicalStep",
     "assess_composite_dependency", "build_composite_route_tree",
     "build_composite_strategy_catalog", "load_composite_action_policy",

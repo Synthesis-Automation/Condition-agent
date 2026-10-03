@@ -71,7 +71,12 @@ from .weak_label_indexing import (
     weak_label_recipe_catalog_path,
 )
 
+from .reaction_precedent_support import (
+    ReactionPrecedentEvidence, ReactionPrecedentSupport, assess_reaction_precedent_support,
+)
+
 __all__ = [
+    "ReactionPrecedentEvidence", "ReactionPrecedentSupport", "assess_reaction_precedent_support",
     "StartingMaterialAssessment",
     "StartingMaterialPolicy",
     "assess_starting_material",
