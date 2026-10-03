@@ -345,6 +345,33 @@ test('legacy answers have one compact notes and sources footer without molecule 
   assert.equal(card.querySelectorAll('img').length, 0);
 });
 
+test('step assessments keep structural support separate from recipe coverage', () => {
+  const {run, context} = harness();
+  context.stepEvidence = {assessment_evidence:{status:'recorded',structural_assessments:[{
+    status:'precedent_supported',artifact_url:'/saved/structure',
+    gates:[{gate_id:'condition_support',status:'not_run',summary:'No condition evaluation requested.'}],
+  }],recipe_assessments:[{status:'no_known_conflict',recipe_id:'recipe-one',artifact_url:'/saved/recipe',
+    coverage:{capability_status:'not_covered',condition_identity_status:'resolved',
+      evaluated_hard_conflict_rule_ids:['a','b'],evaluated_soft_penalty_rule_ids:['c'],
+      evaluated_regime_requirement_ids:[],limitations:['Outcome remains untested.']}}]}};
+  let view = run("stepAssessmentEvidence(stepEvidence, 's1')");
+  let texts = view.descendants().map(node => node.textContent);
+  assert.ok(texts.includes('Structural assessment: precedent supported.'));
+  assert.ok(texts.includes('No applicable reaction capability requirement was checked.'));
+  assert.ok(texts.includes('Rules evaluated: 2 conflict checks, 1 penalty checks, 0 regime requirements.'));
+  assert.ok(texts.includes('condition support: not run — No condition evaluation requested.'));
+  assert.ok(texts.includes('Experimental feasibility is not established by these checks.'));
+  assert.ok(view.querySelectorAll('a').some(node => node.href === '/saved/recipe'));
+  assert.equal(view.querySelectorAll('details[open]').length, 0);
+  delete context.stepEvidence.assessment_evidence.recipe_assessments[0].coverage;
+  view = run("stepAssessmentEvidence(stepEvidence, 's1')");
+  assert.ok(view.descendants().some(node => node.textContent === 'Reaction capability coverage was not recorded.'));
+  context.stepEvidence.assessment_evidence = {status:'evidence_unavailable'};
+  view = run("stepAssessmentEvidence(stepEvidence, 's1')");
+  assert.ok(view.descendants().some(node => node.textContent.includes('support remains unresolved')));
+  assert.ok(!view.descendants().some(node => node.textContent.includes('precedent supported')));
+});
+
 test('supporting reactions retain source identity, separate observations and evidence gaps', () => {
   const {run, context} = harness();
   const step = {id:'s1',title:'Proposed step',basis:'proposed',reactant_ids:['a'],product_ids:['b'],

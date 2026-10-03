@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from collections import Counter
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Tuple
+from typing import Any, Dict, Iterable, Literal, Mapping, Tuple
 
 from condition_registry import (
     ConditionConstraintSet,
@@ -31,6 +31,30 @@ _MATCH_KEYS = {
 
 
 @dataclass(frozen=True)
+class CompatibilityCoverage:
+    """Scope of executed rules, separate from admission and penalty scores.
+
+    A supported requirement establishes only the capability named by that rule.
+    It never establishes reaction success or complete experimental coverage.
+    """
+
+    schema_version: str = "compatibility_coverage.v1"
+    assessment_status: Literal["not_assessed", "assessed"] = "not_assessed"
+    capability_status: Literal[
+        "not_assessed", "not_covered", "supported", "unresolved"
+    ] = "not_assessed"
+    condition_identity_status: Literal[
+        "not_assessed", "no_components", "resolved", "unresolved"
+    ] = "not_assessed"
+    evaluated_hard_conflict_rule_ids: Tuple[str, ...] = ()
+    evaluated_soft_penalty_rule_ids: Tuple[str, ...] = ()
+    evaluated_regime_requirement_ids: Tuple[str, ...] = ()
+    unresolved_components: Tuple[str, ...] = ()
+    limitations: Tuple[str, ...] = ()
+    score_meaning: str = "absence_of_known_conflicts_not_success_probability"
+
+
+@dataclass(frozen=True)
 class CompatibilityAssessment:
     """Hard admission decision plus auditable soft compatibility penalties."""
 
@@ -44,6 +68,7 @@ class CompatibilityAssessment:
     status: str = "no_known_conflict"
     checked_requirements: Tuple[str, ...] = ()
     unresolved_requirements: Tuple[str, ...] = ()
+    coverage: CompatibilityCoverage = field(default_factory=CompatibilityCoverage)
 
 
 @lru_cache(maxsize=1)
@@ -348,7 +373,12 @@ def assess_recipe_compatibility(
     hard = []
     penalties = []
     evidence = list(capability_evidence)
+    evaluated_hard = []
+    evaluated_soft = []
+    evaluated_regime = []
+    missing_regime = []
     for rule in rules.get("hard_conflicts") or ():
+        evaluated_hard.append(str(rule["id"]))
         if _matches(
             rule,
             query_tags=tags,
@@ -370,10 +400,12 @@ def assess_recipe_compatibility(
             for family, confidence in family_evidence
         ):
             continue
+        evaluated_regime.append(str(rule["id"]))
         required = set(rule.get("required_all_buckets") or ())
         missing = sorted(required - buckets)
         if not missing:
             continue
+        missing_regime.append(str(rule["id"]))
         message = f"{rule['message']}: missing {', '.join(missing)}"
         if has_unresolved:
             requirement_penalties.append(
@@ -396,9 +428,14 @@ def assess_recipe_compatibility(
             evidence=tuple(evidence),
             definition_id=str(rules["definition_id"]),
             definition_version=str(rules["schema_version"]),
+            coverage=_compatibility_coverage(
+                recipe, evaluated_hard, evaluated_soft, evaluated_regime,
+                checked_requirements, [*unresolved_requirements, *missing_regime],
+            ),
         )
     matched_penalties: Dict[str, Mapping[str, Any]] = {}
     for rule in rules.get("soft_penalties") or ():
+        evaluated_soft.append(str(rule["id"]))
         if _matches(
             rule,
             query_tags=tags,
@@ -441,6 +478,54 @@ def assess_recipe_compatibility(
         evidence=tuple(evidence),
         definition_id=str(rules["definition_id"]),
         definition_version=str(rules["schema_version"]),
+        coverage=_compatibility_coverage(
+            recipe, evaluated_hard, evaluated_soft, evaluated_regime,
+            checked_requirements, [*unresolved_requirements, *missing_regime],
+        ),
+    )
+
+
+def _compatibility_coverage(
+    recipe: Mapping[str, Any], hard_rules: list[str], soft_rules: list[str],
+    regime_rules: list[str], capability_rules: list[str], missing_rules: list[str],
+) -> CompatibilityCoverage:
+    """Describe only checks that actually ran; retain the existing ranking score."""
+    components = [
+        (f"{bucket}[{index}]", component)
+        for bucket in CONDITION_RECIPE_COMPONENT_BUCKETS
+        for index, component in enumerate(recipe.get(bucket) or ())
+    ]
+    unresolved = tuple(
+        f"{path}: {component.get('raw_identifier') or 'identity unresolved'}"
+        for path, component in components if component.get("identity_status") != "resolved"
+    )
+    capability_status = (
+        "unresolved" if missing_rules else
+        "supported" if capability_rules or regime_rules else "not_covered"
+    )
+    limitations = [
+        "Rule checks do not establish conversion, selectivity, yield "
+        "or complete experimental coverage."
+    ]
+    if capability_status == "not_covered":
+        limitations.append("No applicable reaction capability requirement was checked.")
+    if unresolved:
+        limitations.append("Unresolved condition identities limit the rule assessment.")
+    if not components:
+        limitations.append(
+            "No condition components were supplied; operating settings alone "
+            "do not establish a complete recipe."
+        )
+    return CompatibilityCoverage(
+        assessment_status="assessed", capability_status=capability_status,
+        condition_identity_status=(
+            "unresolved" if unresolved else "resolved" if components else "no_components"
+        ),
+        evaluated_hard_conflict_rule_ids=tuple(hard_rules),
+        evaluated_soft_penalty_rule_ids=tuple(soft_rules),
+        evaluated_regime_requirement_ids=tuple(regime_rules),
+        unresolved_components=unresolved, limitations=tuple(limitations),
+        score_meaning=str(load_compatibility_rules()["coverage_policy"]["score_meaning"]),
     )
 
 
@@ -481,6 +566,7 @@ def filter_compatible_precedents(
 
 __all__ = [
     "CompatibilityAssessment",
+    "CompatibilityCoverage",
     "assess_recipe_compatibility",
     "filter_compatible_precedents",
     "load_compatibility_rules",

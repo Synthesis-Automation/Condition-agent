@@ -8,7 +8,12 @@ from typing import Any, Mapping
 from reactive_taxonomy import featurize_reaction
 from reactive_taxonomy.reaction_models import ReactionAnalysis
 
-from .compatibility import CompatibilityAssessment, assess_recipe_compatibility, load_compatibility_rules
+from .compatibility import (
+    CompatibilityAssessment,
+    CompatibilityCoverage,
+    assess_recipe_compatibility,
+    load_compatibility_rules,
+)
 
 
 @dataclass(frozen=True)
@@ -53,13 +58,19 @@ def _assess_analyzed_recipe(analysis: ReactionAnalysis, recipe: Mapping[str, Any
             analysis_status="unsupported_or_unresolved" if analysis.valid else "invalid_input",
             analysis_warnings=tuple(analysis.warnings),
             unresolved_requirements=("VERIFIED_REACTION_SIGNATURE_REQUIRED",),
+            coverage=CompatibilityCoverage(limitations=(
+                "Recipe rules were not evaluated because the reaction has no verified structural signature.",
+            )),
         )
     assessment = assess_recipe_compatibility(
         {**asdict(analysis.reaction_signature),
          "spectator_groups": tuple(asdict(group) for group in analysis.spectator_groups)},
         recipe,
     )
-    return ReactionRecipeAssessment(**asdict(assessment), analysis_warnings=tuple(analysis.warnings))
+    return ReactionRecipeAssessment(
+        **{**asdict(assessment), "coverage": assessment.coverage},
+        analysis_warnings=tuple(analysis.warnings),
+    )
 
 
 __all__ = ["ReactionRecipeAssessment", "assess_reaction_recipe"]

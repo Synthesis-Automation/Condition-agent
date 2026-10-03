@@ -198,6 +198,7 @@ def present_conversation(conversation: dict[str, Any]) -> dict[str, Any]:
                 view["structured_presentation"] = _structured_view(
                     json.dumps(turn["answer"], sort_keys=True), identity,
                     json.dumps(turn.get("step_precedent_evidence", {}), sort_keys=True),
+                    json.dumps(turn.get("step_assessment_evidence", {}), sort_keys=True),
                 )
                 references = tuple(
                     (source["artifact_ref"], source["title"], source["url"] or source["artifact_url"])
@@ -236,7 +237,9 @@ def _route_overview(steps: list[dict[str, Any]]) -> str:
 
 
 @lru_cache(maxsize=32)
-def _structured_view(payload: str, identity: str, precedent_payload: str = "{}") -> dict[str, Any]:
+def _structured_view(
+    payload: str, identity: str, precedent_payload: str = "{}", assessment_payload: str = "{}",
+) -> dict[str, Any]:
     """Produce disposable structure/route SVGs from explicit answer objects."""
     raw = json.loads(payload)
     try:
@@ -257,7 +260,14 @@ def _structured_view(payload: str, identity: str, precedent_payload: str = "{}")
             molecule["drawing_status"] = "invalid_or_unsupported_notation"
     steps = {item["id"]: item for item in view["steps"]}
     precedent_evidence = json.loads(precedent_payload)
+    assessment_evidence = json.loads(assessment_payload)
     for step in steps.values():
+        step["assessment_evidence"] = assessment_evidence.get(step["id"], {})
+        for section in ("structural_assessments", "recipe_assessments"):
+            for record in step["assessment_evidence"].get(section, []):
+                record["artifact_url"] = (
+                    f"/api/v1/scientific/conversations/{identity}/artifacts/{record['artifact_ref']}"
+                )
         step["supporting_evidence"] = _supporting_evidence(precedent_evidence.get(step["id"], []), identity)
         step["reaction_smiles"] = (
             ".".join(molecules[key]["smiles"] for key in step["reactant_ids"])

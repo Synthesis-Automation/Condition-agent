@@ -283,6 +283,11 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             overview["records"].append(compact)
     elif operation == "assess_recipe":
         overview.update(_brief_fields(source, ("compatible", "hard_conflicts", "unresolved_requirements")))
+        if isinstance(source.get("coverage"), Mapping):
+            overview["coverage"] = _brief_fields(source["coverage"], (
+                "schema_version", "assessment_status", "capability_status",
+                "condition_identity_status", "unresolved_components", "limitations", "score_meaning",
+            ))
     elif operation == "assess_route_step_forward":
         if isinstance(source.get("assessment"), Mapping):
             overview["assessment"] = _brief_fields(source["assessment"], (

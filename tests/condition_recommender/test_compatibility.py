@@ -145,6 +145,13 @@ def test_mandatory_catalyst_is_hard_unless_identity_is_unresolved() -> None:
     missing = assess_recipe_compatibility(query, {})
     assert not missing.compatible
     assert missing.hard_conflicts == ("metal_coupling_requires_catalyst",)
+    assert missing.coverage.evaluated_regime_requirement_ids == ("metal_coupling_requires_catalyst",)
+    assert missing.coverage.capability_status == "unresolved"
+
+    supplied = assess_recipe_compatibility(query, _recipe(catalysts=[_component("metal_catalyst")]))
+    assert supplied.coverage.evaluated_regime_requirement_ids == ("metal_coupling_requires_catalyst",)
+    assert supplied.coverage.capability_status == "supported"
+    assert supplied.compatible and supplied.score == 1.0
 
     unresolved = assess_recipe_compatibility(
         query,

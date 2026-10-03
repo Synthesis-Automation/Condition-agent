@@ -1075,6 +1075,27 @@ hypotheses even after normalization or compatibility assessment.
 inspection counts describe the selected indexed scope, not independent publications.
 Procedure links distinguish exact observation IDs from unassigned reaction-level records.
 
+New compatibility results include `coverage` (`compatibility_coverage.v1`), with
+executed conflict/penalty rule IDs, applicable regime requirements, reaction
+capability status, unresolved condition components, and the score's meaning.
+`checked_requirements` lists structural capability requirements, not all executed
+rules. `not_covered` means no applicable capability requirement was checked;
+`supported` means only the named requirements were satisfied. Neither establishes
+conversion, selectivity or yield. Existing admission decisions and ranking scores
+are unchanged, and chemistry definitions and indexes need no rebuild.
+
+The scientific chat now shows **Assessment evidence** beside each reaction step.
+It resolves cited saved structural assessments and recipe checks by exact complete
+reactant/product identity, including stereo and chemical form. Structural gates
+and condition coverage remain separate. Multiple matching assessments remain
+visible; missing, unavailable and historical unreported coverage are distinguished.
+A same-reaction recipe check applies only to its saved recipe, not automatically
+to the answer's prose conditions. The read path runs no scientific tools and does
+not rewrite saved answers. Conversation responses add `step_assessment_evidence`
+and structured step views add `assessment_evidence`; endpoint paths are unchanged.
+Restart the server and begin a new investigation for new scientific calls after
+this code change. Historical conversations remain readable without invented coverage.
+
 Retrosynthesis in the scientific workspace uses **single-step calls only**. The
 agent owns multi-step planning: it selects a concrete realization, chooses the next
 intermediate, records alternatives and branch links, avoids cycles, and decides

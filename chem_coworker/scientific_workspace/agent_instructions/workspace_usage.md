@@ -31,6 +31,14 @@ Use w.store.read_artifact(ref) for complete data in custom analysis. The store
 verifies and reconstructs linked compact sections; raw JSON may have a storage
 envelope rather than the expanded result. Cite the parent scientific-call ref.
 
+Recipe assessments report a versioned coverage object separately from admission
+and score. Inspect coverage.capability_status and evaluated rule IDs: an empty
+checked_requirements list does not mean conflict rules were skipped. A score of
+one means no encoded penalty, not experimental confidence. No applicable capability
+requirement, unresolved identities, and an unassessed reaction remain explicit.
+Attribute each recipe check to its saved recipe; changing that recipe requires a
+new assessment. Structural precedent support does not establish condition support.
+
 Notes use w.store.note(kind, text, evidence_refs=(ref,)); kinds are 'hypothesis',
 'decision', 'question', 'limitation' and 'review'. Record branch choices as 'decision'.
 This prompt, catalogue and optional guides are the starting reference. For unresolved

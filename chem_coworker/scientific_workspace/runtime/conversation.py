@@ -435,10 +435,13 @@ class ConversationService:
                 }
             if (turn.get("answer") or {}).get("schema_version") == "scientific_answer.v2":
                 from ..views.precedents import answer_step_precedents
+                from ..views.step_assessments import answer_step_assessments
 
+                store = ScientificWorkspace(directory).store
                 turn["step_precedent_evidence"] = answer_step_precedents(
-                    ScientificWorkspace(directory).store, turn["answer"],
+                    store, turn["answer"],
                 )
+                turn["step_assessment_evidence"] = answer_step_assessments(store, turn["answer"])
         return {"workspace_mode": "normal", **metadata, "turns": turns}
 
     def list_conversations(self) -> list[dict[str, Any]]:

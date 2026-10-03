@@ -15,6 +15,7 @@ _COMPATIBILITY = (
     "status", "analysis_status", "compatible", "hard_conflicts",
     "unresolved_requirements", "checked_requirements", "evidence",
     "analysis_warnings", "penalty_ids", "schema_version",
+    "coverage",
 )
 
 _STEP = (

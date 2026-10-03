@@ -134,6 +134,7 @@ function precedentCard(precedent, record, key, compactScheme = false) {
   const compatibility = precedent.compatibility;
   if (compatibility) {
     entry.append(element('p', 'Compatibility: ' + (compatibility.status || 'unresolved').replaceAll('_', ' '), 'match-summary'));
+    compatibilityCoverage(entry, compatibility);
     scientificNotes(entry, compatibility.hard_conflicts || []);
     scientificNotes(entry, [...(compatibility.analysis_warnings || []), ...(compatibility.unresolved_requirements || [])]);
   }
@@ -216,12 +217,66 @@ function supportingEvidence(step, sources, key, compactScheme = false) {
   if (records.length) support.append(disclosure('Search scope', key + ':scope', scope));
   return support;
 }
+function compatibilityCoverage(parent, assessment) {
+  const coverage = assessment.coverage;
+  const labels = {
+    not_assessed: 'Reaction capability requirements were not assessed.',
+    not_covered: 'No applicable reaction capability requirement was checked.',
+    supported: 'Applicable capability requirements were satisfied; the experimental outcome remains untested.',
+    unresolved: 'Required reaction capability evidence is incomplete.',
+  };
+  parent.append(element('p', labels[coverage?.capability_status] || 'Reaction capability coverage was not recorded.', 'scientific-note'));
+  if (!coverage) return;
+  parent.append(element('p', 'Rules evaluated: ' + (coverage.evaluated_hard_conflict_rule_ids || []).length +
+    ' conflict checks, ' + (coverage.evaluated_soft_penalty_rule_ids || []).length + ' penalty checks, ' +
+    (coverage.evaluated_regime_requirement_ids || []).length + ' regime requirements.', 'muted'));
+  parent.append(element('p', 'Condition identities: ' + (coverage.condition_identity_status || 'not assessed').replaceAll('_', ' ') + '.', 'muted'));
+  scientificNotes(parent, [...(coverage.unresolved_components || []), ...(coverage.limitations || [])]);
+}
+function stepAssessmentEvidence(step, key) {
+  const section = element('section', '', 'step-assessment-evidence');
+  section.append(element('h5', 'Assessment evidence'));
+  const evidence = step.assessment_evidence || {};
+  if (evidence.status === 'evidence_unavailable') {
+    section.append(element('p', 'Saved assessment evidence is unavailable; support remains unresolved.', 'scientific-note'));
+    return section;
+  }
+  const structural = evidence.structural_assessments || [];
+  const recipes = evidence.recipe_assessments || [];
+  if (!structural.length) section.append(element('p', 'No matching saved structural assessment linked.', 'muted'));
+  const details = element('div');
+  for (const record of structural) {
+    section.append(element('p', 'Structural assessment: ' + (record.status || 'unresolved').replaceAll('_', ' ') + '.', 'match-summary'));
+    for (const gate of record.gates || []) {
+      details.append(element('p', gate.gate_id.replaceAll('_', ' ') + ': ' + gate.status.replaceAll('_', ' ') + ' — ' + (gate.summary || '')));
+      scientificNotes(details, gate.warnings || []);
+    }
+    scientificNotes(details, record.warnings || []);
+    if (record.artifact_url) { const link = element('a', 'Saved structural assessment'); link.href = record.artifact_url; details.append(link); }
+  }
+  if (!recipes.length) section.append(element('p', 'No matching saved recipe assessment linked.', 'muted'));
+  for (const record of recipes) {
+    const check = element('div', '', 'step-recipe-assessment');
+    check.append(element('p', 'Recipe check: ' + (record.status || 'unresolved').replaceAll('_', ' ') + '.', 'match-summary'));
+    compatibilityCoverage(check, record);
+    scientificNotes(check, [...(record.evidence || []), ...(record.hard_conflicts || []),
+      ...(record.unresolved_requirements || []), ...(record.analysis_warnings || [])]);
+    if (record.recipe_id) check.append(element('p', 'Assessed recipe: ' + record.recipe_id, 'muted'));
+    check.append(element('p', 'This check applies to the saved recipe for the same reaction; changes to the proposed recipe require another assessment.', 'muted'));
+    if (record.artifact_url) { const link = element('a', 'Saved recipe assessment'); link.href = record.artifact_url; check.append(link); }
+    section.append(check);
+  }
+  if (structural.length) section.append(disclosure('Structural gates & sources', key + ':assessment', details));
+  if (structural.length || recipes.length) section.append(element('p', 'Experimental feasibility is not established by these checks.', 'scientific-note'));
+  return section;
+}
 function reactionCard(step, sources, molecules, key, number, showScheme = true, inRouteScheme = false) {
   const card = element('article', '', 'scientific-step');
   const heading = element('div', '', 'step-heading');
   heading.append(element('span', String(number), 'step-number'), element('h4', step.title),
     element('span', basisLabels[step.basis] || step.basis, 'basis basis-' + step.basis));
   card.append(heading);
+  card.append(stepAssessmentEvidence(step, key));
   if (showScheme) {
     const label = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ');
     if (step.image_url) card.append(reactionFigure(step, label + '. Conditions and yield in experimental details.'));

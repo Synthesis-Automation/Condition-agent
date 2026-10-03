@@ -1,6 +1,10 @@
 """Standalone condition-recommendation data and modeling package."""
 
-from .compatibility import CompatibilityAssessment, assess_recipe_compatibility
+from .compatibility import (
+    CompatibilityAssessment,
+    CompatibilityCoverage,
+    assess_recipe_compatibility,
+)
 from .starting_materials import (
     StartingMaterialAssessment,
     StartingMaterialPolicy,
@@ -133,5 +137,6 @@ __all__ = [
     "validate_weak_label_retrieval_rules",
     "weak_label_recipe_catalog_path",
     "assess_recipe_compatibility",
+    "CompatibilityCoverage",
     "assess_core_eligibility",
 ]

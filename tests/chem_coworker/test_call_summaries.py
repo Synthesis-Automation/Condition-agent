@@ -30,6 +30,20 @@ def _call(operation, result):
             "duration_seconds": 1.234, "result_bytes": 9876}
 
 
+def test_recipe_summary_exposes_coverage_without_reading_complete_artifact() -> None:
+    assessment = asdict(assess_reaction_recipe("CCBr.N>>CCN", {
+        "solvents": [{"identity_status": "resolved", "substance_id": "cas:64-17-5"}],
+    }))
+    call = _call("assess_recipe", assessment)
+    full = summarize_call(call)["result_summary"]["coverage"]
+    brief = summarize_call_brief(call)["result_summary"]["coverage"]
+    for coverage in (full, brief):
+        assert coverage["capability_status"] == "not_covered"
+        assert coverage["condition_identity_status"] == "resolved"
+        assert coverage["score_meaning"] == "absence_of_known_conflicts_not_success_probability"
+    assert full["evaluated_hard_conflict_rule_ids"]
+
+
 @pytest.fixture(scope="module")
 def route_record():
     library = build_generic_library((_row(FIRST_REACTION, 1), _row(SECOND_REACTION, 2)), levels=("L0",))
