@@ -288,6 +288,9 @@ def _structured_view(
             step["drawing_status"] = "drawn"
         except (ValueError, RuntimeError):
             step["drawing_status"] = "invalid_or_unsupported_notation"
+        step["literature_reactions"] = [
+            _literature_reaction_view(item) for item in step["literature_reactions"]
+        ]
     for route in view["routes"]:
         route_steps = [steps[key] for key in route["step_ids"]]
         try:
@@ -315,6 +318,31 @@ def _structured_view(
         route["unreached_target_ids"] = sorted(set(answer.target_molecule_ids) - (produced - consumed))
     for source in view["sources"]:
         source["artifact_url"] = f"/api/v1/scientific/conversations/{identity}/artifacts/{source['artifact_ref']}"
+    return view
+
+
+def _literature_reaction_view(reaction: dict[str, Any]) -> dict[str, Any]:
+    """Draw supplied source structures without copying the proposed step graph."""
+    view = json.loads(json.dumps(reaction))
+    view["reaction_smiles"] = (
+        ".".join(item["smiles"] for item in view["reactants"])
+        + ">>" + ".".join(item["smiles"] for item in view["products"])
+    )
+    reconstructed = view["structure_origin"] == "reconstructed_from_description"
+    try:
+        with rdBase.BlockLogs():
+            svg = render_annotated_scheme_svg(
+                tuple(SchemeMolecule(item["name"], item["smiles"]) for item in view["reactants"]),
+                tuple(SchemeMolecule(item["name"], item["smiles"]) for item in view["products"]),
+                title=view["title"], basis="proposed" if reconstructed else "reported",
+                conditions=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in view["conditions"]),
+                yield_info=SchemeAnnotation(view["yield_info"]["text"], "reported") if view["yield_info"] else None,
+            )
+        view["image_url"] = _svg_url(svg)
+        view["scheme_width"] = float(ET.fromstring(svg).get("width"))
+        view["drawing_status"] = "drawn"
+    except (ValueError, RuntimeError):
+        view["drawing_status"] = "invalid_or_unsupported_notation"
     return view
 
 

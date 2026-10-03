@@ -180,11 +180,39 @@ function precedentCard(precedent, record, key) {
   entry.append(disclosure('Match details & cautions', key + ':match', detail));
   return entry;
 }
+function literatureReactionCard(reaction, sources, key) {
+  const card = element('article', '', 'precedent-card literature-reaction-card');
+  const source = sources.get(reaction.source_id);
+  card.append(element('h5', reaction.title));
+  scientificLinks(card, [reaction.source_id], sources);
+  card.append(element('p', reaction.locator, 'muted'));
+  const reconstructed = reaction.structure_origin === 'reconstructed_from_description';
+  card.append(element('span', reconstructed ? 'Literature reconstruction' : 'Source-explicit structures',
+    'basis basis-' + (reconstructed ? 'proposed' : 'reported')));
+  if (reaction.image_url) card.append(reactionFigure(reaction, reaction.title + '. ' + (reconstructed ? 'Reconstructed from literature description.' : 'Structures supplied by the source.')));
+  else card.append(element('p', 'Literature reaction drawing unavailable: supplied structures could not be rendered.', 'scientific-note'));
+  if (reaction.conditions?.length || reaction.yield_info) {
+    const conditions = element('div', '', 'precedent-conditions');
+    conditions.append(element('h5', 'Reported source conditions & yield'));
+    for (const item of reaction.conditions || []) conditions.append(scientificClaim({...item, source_ids:[]}, sources));
+    if (reaction.yield_info) conditions.append(scientificClaim({...reaction.yield_info, source_ids:[]}, sources));
+    card.append(conditions);
+  }
+  if (reconstructed) card.append(element('p', 'Agent reconstruction of the source description; structure interpretation remains unverified.', 'evidence-context'));
+  scientificNotes(card, reaction.limitations || []);
+  const details = element('div');
+  details.append(element('p', 'Captured structure evidence'), element('p', reaction.structure_evidence),
+    element('div', 'Reaction SMILES', 'precedent-label'), element('code', reaction.reaction_smiles, 'precedent-smiles'));
+  if (source?.artifact_url) { const link = element('a', 'Saved source excerpt'); link.href = source.artifact_url; details.append(link); }
+  card.append(disclosure('Source structures & evidence', key, details));
+  return card;
+}
 function supportingEvidence(step, sources, key) {
   const support = element('section', '', 'step-precedents');
   support.append(element('h5', 'Precedent support', 'support-heading'));
   const records = step.supporting_evidence || [];
-  const cards = [];
+  const drawings = step.literature_reactions || [];
+  const cards = drawings.map((reaction, index) => literatureReactionCard(reaction, sources, key + ':literature:' + index));
   const scope = element('div');
   for (const [index, record] of records.entries()) {
     for (const [position, precedent] of (record.precedents || []).entries()) {
@@ -203,10 +231,11 @@ function supportingEvidence(step, sources, key) {
   const attributed = [step, step.rationale, step.yield_info, ...(step.conditions || []), ...(step.reagents || [])].filter(Boolean);
   const literature = [...new Set(attributed.flatMap(item => item.source_ids || []))]
     .filter(id => sources.get(id)?.kind === 'external_source');
-  if (literature.length) {
+  const linkedLiterature = literature.filter(id => !drawings.some(reaction => reaction.source_id === id));
+  if (linkedLiterature.length) {
     support.append(element('p', 'Literature sources', 'muted'));
-    scientificLinks(support, literature, sources);
-    literature.forEach(id => { if (sources.get(id).locator) support.append(element('p', sources.get(id).locator, 'muted')); });
+    scientificLinks(support, linkedLiterature, sources);
+    linkedLiterature.forEach(id => { if (sources.get(id).locator) support.append(element('p', sources.get(id).locator, 'muted')); });
   }
   if (cards.length) {
     // Preserve the scientific retrieval order; presentation does not rerank chemistry.

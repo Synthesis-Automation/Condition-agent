@@ -98,6 +98,39 @@ their exact experimental joins; do not author replacement source cards. These li
 do not replace precedent_refs or satisfy an available route-support inspection
 requirement. Both kinds of evidence may support the same step.
 
+Always supply drawable structures when inspected evidence supports them; the
+browser automatically generates SVGs. For every literature-supported step, add
+literature_reactions when source reactants and products can be identified without
+inventing chemistry. This is separate from indexed precedent_refs and never
+replaces a required local inspection. Never copy a proposed target reaction into
+this field merely because the step cites a paper. Use the actual source reaction,
+including an analogue's different substrates and product.
+Each literature reaction uses schema_version='literature_reaction.v1', title,
+source_id of a captured external source, exact locator, structure_origin,
+structure_evidence (a verbatim passage from that captured source), reactants and
+products (lists of {name, smiles}), conditions, yield_info and limitations.
+Use structure_origin='source_explicit' only when every supplied SMILES appears in
+the captured text. Otherwise use 'reconstructed_from_description': this means
+agent-interpreted structures, displayed as an unverified literature reconstruction.
+Source drawings must retain material-form, tautomer, stereo and interpretation
+uncertainty. If the source only identifies a salt without sufficient structure,
+show a supported neutral parent only with an explicit visible salt-form limitation;
+never invent its protonation or counterion arrangement. If endpoints remain
+ambiguous, omit the drawing and explain the gap in the step limitations.
+Conditions and yield use the usual attributed claims, basis='reported' and
+source_ids including this source_id; leave them absent when unreported. Proposed
+target conditions stay in the step's conditions, not the source drawing.
+Example (replace all structures and evidence with the inspected source):
+"literature_reactions": [{"title": "Source Example 2", "source_id": "lit1",
+  "locator": "Experimental Methods, Example 2",
+  "structure_origin": "reconstructed_from_description",
+  "structure_evidence": "Ethanol was oxidized to acetaldehyde.",
+  "reactants": [{"name": "Ethanol", "smiles": "CCO"}],
+  "products": [{"name": "Acetaldehyde", "smiles": "CC=O"}],
+  "limitations": ["Structures reconstructed from the captured description."]}]
+Use [] when no source reaction can be reconstructed. Do not hand-draw SVG or embed
+image links; SVG generation is the presentation layer's responsibility.
+
 Finish with w.finalize_answer(draft_path, draft, findings=findings). draft_path is the
 exact runtime-provided answer-draft.json path for this attempt; draft is a Python dict.
 The helper validates citations, records supplied self-review and saves the complete

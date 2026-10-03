@@ -33,6 +33,20 @@ hard conflicts remain visible. Reported source yields stay with their source
 experiments. Refresh the browser for this layout update; existing saved answers
 are supported without rewriting artifacts or rebuilding indexes.
 
+Future structured answers also support per-step `literature_reactions`
+(`literature_reaction.v1`). The agent supplies source-specific reactant/product
+structures, an exact source locator and a literal captured-text passage. The
+browser automatically draws these alongside indexed precedents. Source-explicit
+SMILES must occur in the captured text; structures interpreted from names or
+descriptions are labelled **Literature reconstruction**, with visible material-form
+and interpretation limitations. These drawings do not satisfy local precedent
+inspection requirements or establish chemistry validity. Missing/invalid structures
+remain explicit; proposed step structures are never substituted automatically.
+Restart the server to load this optional answer-contract extension. Subsequent
+formatted turns receive the drawing instructions; existing answers retain empty
+literature drawings unless their saved answer already includes them. No index
+rebuild or historical evidence rewrite is needed.
+
 The workspace is organized into `core/`, `adapters/`, `runtime/`, `agent_context/`,
 `answers/` and `views/`; the public Python exports and root CLI remain the entry
 points. See [package organization](Scientific_Workspace_Core.md#package-organization)

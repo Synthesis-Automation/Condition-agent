@@ -41,6 +41,11 @@ def answer_digest(draft: Mapping[str, Any]) -> str:
     """Identify the exact typed draft without depending on citation list ordering."""
     normalized = ScientificAnswer.model_validate(dict(draft)).model_dump()
     normalized["evidence_refs"] = sorted(set(normalized["evidence_refs"]))
+    # The optional display extension must not invalidate pre-extension reviews.
+    # Supplied source reconstructions remain part of the exact reviewed draft.
+    for step in normalized["steps"]:
+        if not step["literature_reactions"]:
+            step.pop("literature_reactions")
     return hashlib.sha256(canonical_bytes(normalized)).hexdigest()
 
 

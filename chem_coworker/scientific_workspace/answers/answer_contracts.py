@@ -69,6 +69,29 @@ class AnswerMolecule(AttributedObject):
     smiles: str = Field(min_length=1, max_length=4000)
 
 
+class LiteratureStructure(AnswerObject):
+    """An explicitly supplied source structure or declared reconstruction."""
+
+    name: str = Field(min_length=1, max_length=300)
+    smiles: str = Field(min_length=1, max_length=4000)
+
+
+class LiteratureReaction(AnswerObject):
+    """Source-linked drawing input, never an admitted or indexed precedent."""
+
+    schema_version: Literal["literature_reaction.v1"] = "literature_reaction.v1"
+    title: str = Field(min_length=1, max_length=300)
+    source_id: str
+    locator: str = Field(min_length=1, max_length=1000)
+    structure_origin: Literal["source_explicit", "reconstructed_from_description"]
+    structure_evidence: str = Field(min_length=1, max_length=2000)
+    reactants: list[LiteratureStructure] = Field(min_length=1, max_length=20)
+    products: list[LiteratureStructure] = Field(min_length=1, max_length=20)
+    conditions: list[AnswerClaim] = Field(default_factory=list, max_length=30)
+    yield_info: AnswerClaim | None = None
+    limitations: list[str] = Field(default_factory=list, max_length=30)
+
+
 class AnswerStep(AttributedObject):
     """A transformation with attributed reagent labels, procedures and yield."""
 
@@ -83,6 +106,7 @@ class AnswerStep(AttributedObject):
     precedent_refs: list[str] = Field(default_factory=list, max_length=5)
     condition_precedent_refs: list[str] = Field(default_factory=list, max_length=5)
     rationale: AnswerClaim | None = None
+    literature_reactions: list[LiteratureReaction] = Field(default_factory=list, max_length=5)
 
 
 class AnswerRoute(AnswerObject):
@@ -119,6 +143,10 @@ class ScientificAnswer(AnswerObject):
                 objects.append(step.rationale)
             if step.yield_info is not None:
                 objects.append(step.yield_info)
+            for reaction in step.literature_reactions:
+                objects.extend(reaction.conditions)
+                if reaction.yield_info is not None:
+                    objects.append(reaction.yield_info)
         return objects
 
     @model_validator(mode="after")
@@ -139,6 +167,13 @@ class ScientificAnswer(AnswerObject):
             raise ValueError("Unknown target molecule ID")
         visited: set[str] = set()
         for step in self.steps:
+            for reaction in step.literature_reactions:
+                source = sources.get(reaction.source_id)
+                if source is None or source.kind != "external_source":
+                    raise ValueError("Literature drawings require a captured external source")
+                for claim in [*reaction.conditions, *([reaction.yield_info] if reaction.yield_info else [])]:
+                    if claim.basis != "reported" or reaction.source_id not in claim.source_ids:
+                        raise ValueError("Literature conditions and yields must be reported by the drawing's source")
             if not set(step.reactant_ids + step.product_ids) <= molecules:
                 raise ValueError("Unknown molecule ID in reaction step")
             if not set(step.after_step_ids) <= visited:
@@ -162,7 +197,7 @@ ANSWER_SCHEMA = ScientificAnswer.model_json_schema()
 # Runtime schemas declare every field explicitly (including nullable rationale).
 # Older saved v2 answers still load through model defaults without invented support.
 ANSWER_SCHEMA["$defs"]["AnswerStep"]["required"].extend([
-    "precedent_refs", "condition_precedent_refs", "rationale", "reagents",
+    "precedent_refs", "condition_precedent_refs", "rationale", "reagents", "literature_reactions",
 ])
 
 
@@ -215,6 +250,19 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
             recorded_urls = {location(url) for url in (value.get("source_url"), value.get("final_url")) if url}
             if location(source.url or "") not in recorded_urls:
                 raise ValueError("External source URL does not match its captured source")
+    for step in answer.steps:
+        for reaction in step.literature_reactions:
+            source = sources[reaction.source_id]
+            kind = kinds[source.artifact_ref]
+            if kind not in {"literature_source", "literature_excerpt"}:
+                raise ValueError("Literature drawings require recorded captured text, not an arbitrary attachment")
+            value = store.read_artifact(source.artifact_ref)
+            text = value.get("text") if kind == "literature_excerpt" else value.get("extraction", {}).get("text", "")
+            if " ".join(reaction.structure_evidence.split()) not in " ".join(text.split()):
+                raise ValueError("Literature drawing structure_evidence must quote its captured source")
+            if reaction.structure_origin == "source_explicit":
+                if any(item.smiles not in text for item in [*reaction.reactants, *reaction.products]):
+                    raise ValueError("Source-explicit SMILES must appear in captured text; otherwise label a reconstruction")
     for item in answer.attributed_objects():
         if item.basis != "computed":
             continue

@@ -36,13 +36,19 @@ def _complete_empty_fields(draft: Mapping[str, Any]) -> dict[str, Any]:
         for item in entries(value, name):
             defaults(item, source_ids=[], limitations=[])
     for step in entries(value, "steps"):
-        defaults(step, after_step_ids=[], conditions=[], reagents=[], yield_info=None)
+        defaults(step, after_step_ids=[], conditions=[], reagents=[], yield_info=None, literature_reactions=[])
         for name in ("conditions", "reagents"):
             for claim in entries(step, name):
                 defaults(claim, source_ids=[], limitations=[])
         if isinstance(step, dict):
             defaults(step.get("yield_info"), source_ids=[], limitations=[])
             defaults(step.get("rationale"), source_ids=[], limitations=[])
+        for reaction in entries(step, "literature_reactions"):
+            defaults(reaction, conditions=[], yield_info=None, limitations=[])
+            for claim in entries(reaction, "conditions"):
+                defaults(claim, source_ids=[], limitations=[])
+            if isinstance(reaction, dict):
+                defaults(reaction.get("yield_info"), source_ids=[], limitations=[])
     for route in entries(value, "routes"):
         defaults(route, limitations=[])
     return value
