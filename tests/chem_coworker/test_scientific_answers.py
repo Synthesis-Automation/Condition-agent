@@ -71,6 +71,9 @@ def test_tafamidis_view_renders_steps_and_retains_incomplete_route(example) -> N
     view = present_conversation(conversation)["turns"][0]["structured_presentation"]
     assert conversation == original
     assert view["routes"][0]["unreached_target_ids"] == ["target"]
+    assert view["routes"][0]["drawing_status"] == "linear_scheme"
+    route_svg = ET.fromstring(base64.b64decode(view["routes"][0]["image_url"].split(",", 1)[1]))
+    assert route_svg.get("data-layout") == "three-column-row-major"
     assert all(step["drawing_status"] == "drawn" for step in view["steps"])
     assert all(molecule["drawing_status"] == "drawn" for molecule in view["molecules"])
     for item in view["routes"] + view["steps"]:
@@ -82,6 +85,30 @@ def test_tafamidis_view_renders_steps_and_retains_incomplete_route(example) -> N
     text = " ".join(scheme.itertext())
     assert "NaHCO3, dry THF, 16 h" in text and "Yield (reported): 91.8%" in text
     assert "Aminophenol ester" in text and "Illustrative amide" in text
+
+
+@pytest.mark.parametrize("case", ["branch", "invalid", "ambiguous_product"])
+def test_route_scheme_fallback_preserves_steps_and_explains_reason(example, case) -> None:
+    _, payload = example
+    if case == "branch":
+        branch = deepcopy(payload["steps"][1])
+        branch["id"] = "s3"
+        payload["steps"].append(branch)
+        payload["routes"][0]["step_ids"].append("s3")
+    elif case == "invalid":
+        payload["molecules"][1]["smiles"] = "C1"
+    else:
+        payload["steps"][1]["product_ids"].append("target")
+    original = deepcopy(payload)
+    view = present_conversation({"id": "a" * 32, "turns": [
+        {"question": "Q", "answer": payload},
+    ]})["turns"][0]["structured_presentation"]
+    route = view["routes"][0]
+    assert route["drawing_status"] == "dependency_overview"
+    assert route["drawing_warning"]
+    assert "scheme_width" not in route
+    assert len(view["steps"]) == len(payload["steps"])
+    assert payload == original
 
 
 def test_saved_answer_uses_source_title_and_real_url_without_mutation(example) -> None:

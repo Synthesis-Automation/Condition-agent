@@ -2,6 +2,12 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+Linear routes in structured answers now use a shared [three-column SVG scheme](../new/linear_route_svg.md),
+with optional conditions and no compound captions. Branched or ambiguous routes
+retain dependency and individual-step views. The same renderer is available to
+local Python scripts and through `python -m visualization.route_cli`. Restart the
+workspace server to load the presentation update; saved evidence is unchanged.
+
 The workspace is organized into `core/`, `adapters/`, `runtime/`, `agent_context/`,
 `answers/` and `views/`; the public Python exports and root CLI remain the entry
 points. See [package organization](Scientific_Workspace_Core.md#package-organization)
@@ -183,11 +189,17 @@ Synthesis answers show the route first, one SVG per step, followed by a concise
 explanation of the choice, strongest evidence and main uncertainty (normally one
 short paragraph of two or three sentences). Detailed procedures and extended analysis are given when
 requested, including in a follow-up; the full source evidence remains saved.
-Schemes use compact
+Linear synthesis routes use one three-column molecular SVG without compound
+captions or numbers, followed by concise per-step rationale and evidence. The
+agent supplies complete ordered `routes` and shared intermediate IDs. Source
+reaction drawings are expandable; their reported observations, source identity,
+and material cautions remain visible. Conditions already on the route arrows are
+not repeated in the step body; their basis is visible and full attribution remains
+in **Experimental details & sources**. Single-step schemes use compact
 compound names, concise reagent/catalyst and solvent names above the arrow and a
 percentage yield below when supplied. Amounts, temperatures, times and workup
 instructions remain in the step details. Retrosynthesis plans
-are shown in synthetic direction. Each step card presents its reaction SVG,
+are shown in synthetic direction. Outside a continuous route, each step card presents its reaction SVG,
 attributed **Why this choice** rationale, and **Precedent support**. The first source
 experiment is visible with its own scheme, recorded conditions/yield and publication
 link; additional precedents are expandable. Source observations stay separate.

@@ -87,7 +87,7 @@ function reactionFigure(item, label) {
   image.alt = label; image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
   return figure;
 }
-function precedentCard(precedent, record, key) {
+function precedentCard(precedent, record, key, compactScheme = false) {
   const entry = element('article', '', 'precedent-card');
   const title = element('h5');
   const reference = element(precedent.reference_url ? 'a' : 'span', precedent.reference_title || 'Publication details unavailable');
@@ -95,7 +95,10 @@ function precedentCard(precedent, record, key) {
     reference.href = precedent.reference_url; reference.target = '_blank'; reference.rel = 'noopener noreferrer';
   }
   title.append(reference); entry.append(title);
-  if (precedent.image_url) entry.append(reactionFigure(precedent, 'Supporting source reaction'));
+  if (precedent.image_url) {
+    const scheme = reactionFigure(precedent, 'Supporting source reaction');
+    entry.append(compactScheme ? disclosure('Source reaction scheme', key + ':scheme', scheme) : scheme);
+  }
   else entry.append(element('p', 'Source drawing unavailable; notation is available in details.', 'muted'));
   const isCondition = precedent.support_kind === 'condition_observation';
   const observed = element('div', '', 'precedent-conditions');
@@ -175,7 +178,7 @@ function precedentCard(precedent, record, key) {
   }
   return entry;
 }
-function supportingEvidence(step, sources, key) {
+function supportingEvidence(step, sources, key, compactScheme = false) {
   const support = element('section', '', 'step-precedents');
   support.append(element('h5', 'Precedent support', 'support-heading'));
   const records = step.supporting_evidence || [];
@@ -183,7 +186,7 @@ function supportingEvidence(step, sources, key) {
   const scope = element('div');
   for (const [index, record] of records.entries()) {
     for (const [position, precedent] of (record.precedents || []).entries()) {
-      cards.push(precedentCard(precedent, record, key + ':support:' + index + ':' + position));
+      cards.push(precedentCard(precedent, record, key + ':support:' + index + ':' + position, compactScheme));
     }
     if (record.status === 'evidence_unavailable') support.append(element('p', 'Saved evidence could not be loaded. Its support remains unresolved.', 'scientific-note'));
     if (record.status === 'no_precedents_retrieved') support.append(element('p', 'No supporting experiment found in this recorded search.', 'scientific-note'));
@@ -213,7 +216,7 @@ function supportingEvidence(step, sources, key) {
   if (records.length) support.append(disclosure('Search scope', key + ':scope', scope));
   return support;
 }
-function reactionCard(step, sources, molecules, key, number, showScheme = true) {
+function reactionCard(step, sources, molecules, key, number, showScheme = true, inRouteScheme = false) {
   const card = element('article', '', 'scientific-step');
   const heading = element('div', '', 'step-heading');
   heading.append(element('span', String(number), 'step-number'), element('h4', step.title),
@@ -224,7 +227,13 @@ function reactionCard(step, sources, molecules, key, number, showScheme = true) 
     if (step.image_url) card.append(reactionFigure(step, label + '. Conditions and yield in experimental details.'));
     else card.append(element('p', 'Scheme unavailable for the supplied structures. Conditions remain available below.', 'scientific-note'));
   }
-  if (!showScheme || !step.image_url) step.conditions.forEach(item => card.append(scientificClaim(item, sources)));
+  if ((!showScheme && !inRouteScheme) || !step.image_url) step.conditions.forEach(item => card.append(scientificClaim(item, sources)));
+  if (inRouteScheme) {
+    const attribution = [];
+    if (step.conditions.length) attribution.push('Conditions: ' + [...new Set(step.conditions.map(item => basisLabels[item.basis] || item.basis))].join(', '));
+    if (step.yield_info) attribution.push('Yield: ' + (basisLabels[step.yield_info.basis] || step.yield_info.basis));
+    if (attribution.length) card.append(element('p', attribution.join(' · '), 'route-attribution'));
+  }
   if (step.rationale) {
     const rationale = element('div', '', 'step-rationale');
     rationale.append(element('h5', 'Why this choice'),
@@ -234,7 +243,7 @@ function reactionCard(step, sources, molecules, key, number, showScheme = true) 
   }
   scientificNotes(card, [...step.limitations, ...step.conditions.flatMap(item => item.limitations || []),
     ...(step.yield_info?.limitations || []), ...(step.rationale?.limitations || [])]);
-  card.append(supportingEvidence(step, sources, key));
+  card.append(supportingEvidence(step, sources, key, inRouteScheme));
   const detail = element('div', '', 'step-detail');
   detail.append(element('h5', 'Target conditions'));
   if (step.conditions.length) step.conditions.forEach(item => detail.append(scientificClaim(item, sources)));
@@ -257,7 +266,17 @@ function showStructured(view, key = 'science') {
     const routeKey = key + ':' + route.id;
     if (route.unreached_target_ids.length) box.append(element('p', 'Incomplete route: does not reach ' + route.unreached_target_ids.map(id => molecules.get(id).name).join(', ') + '.', 'scientific-note'));
     scientificNotes(box, route.limitations);
-    route.step_ids.forEach((id, position) => { box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1)); routed.add(id); });
+    const hasRouteScheme = route.drawing_status === 'linear_scheme';
+    if (route.image_url) {
+      const label = hasRouteScheme
+        ? 'Read left to right, then continue at the left of the next row.'
+        : 'Declared route dependencies. Individual reaction schemes follow below.';
+      const figure = reactionFigure(route, label);
+      if (hasRouteScheme) figure.append(element('figcaption', label, 'route-scheme-caption'));
+      box.append(figure);
+    }
+    if (route.drawing_warning) box.append(element('p', 'Continuous scheme unavailable: ' + route.drawing_warning, 'scientific-note'));
+    route.step_ids.forEach((id, position) => { box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1, !hasRouteScheme, hasRouteScheme)); routed.add(id); });
     if (view.routes.length === 1) section.append(element('h3', route.title), box);
     else {
       const alternative = disclosure(route.title + ' · ' + route.step_ids.length + ' steps', routeKey, box);

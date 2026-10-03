@@ -17,6 +17,7 @@ from rdkit import rdBase
 from visualization import (
     SchemeAnnotation, SchemeMolecule, render_annotated_scheme_svg,
     render_molecule_image_bytes, render_reaction_image_bytes,
+    RouteSchemeStep, render_route_scheme_svg,
 )
 
 from chem_coworker.scientific_workspace.answers.answer_contracts import ScientificAnswer
@@ -278,7 +279,25 @@ def _structured_view(payload: str, identity: str, precedent_payload: str = "{}")
             step["drawing_status"] = "invalid_or_unsupported_notation"
     for route in view["routes"]:
         route_steps = [steps[key] for key in route["step_ids"]]
-        route["image_url"] = _route_overview(route_steps)
+        try:
+            # Declared branches must never be flattened into a linear scheme.
+            for index, step in enumerate(route_steps):
+                expected = {route_steps[index - 1]["id"]} if index else set()
+                if set(step["after_step_ids"]) != expected:
+                    raise ValueError("Route is not a declared linear sequence")
+            with rdBase.BlockLogs():
+                svg = render_route_scheme_svg(tuple(RouteSchemeStep(
+                    step["reaction_smiles"], basis=step["basis"],
+                    above=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["conditions"]),
+                    yield_info=SchemeAnnotation(step["yield_info"]["text"], step["yield_info"]["basis"]) if step["yield_info"] else None,
+                ) for step in route_steps), title=route["title"])
+            route["image_url"] = _svg_url(svg)
+            route["scheme_width"] = float(ET.fromstring(svg).get("width"))
+            route["drawing_status"] = "linear_scheme"
+        except (ValueError, RuntimeError) as exc:
+            route["image_url"] = _route_overview(route_steps)
+            route["drawing_status"] = "dependency_overview"
+            route["drawing_warning"] = str(exc)
         produced = {key for step in route_steps for key in step["product_ids"]}
         consumed = {key for step in route_steps for key in step["reactant_ids"]}
         route["unreached_target_ids"] = sorted(set(answer.target_molecule_ids) - (produced - consumed))

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.1",
+  "definition_id": "route_scheme.v1",
+  "columns": 3,
+  "molecule_preset": "web_consistent",
+  "minimum_column_width": 280,
+  "minimum_row_height": 150,
+  "column_gap": 36,
+  "row_gap": 56,
+  "padding": 24,
+  "block_gap": 16,
+  "font_size": 18,
+  "line_height": 25,
+  "annotation_characters": 28,
+  "character_width_em": 1.0,
+  "arrow_length_scale": 0.8,
+  "arrow_head_length": 13,
+  "arrow_head_half_height": 5,
+  "arrow_stroke_width": 2
+}

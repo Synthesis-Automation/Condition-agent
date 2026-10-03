@@ -1,6 +1,11 @@
 """Standalone molecule and reaction visualization utilities."""
 
 from .html import svg_html
+from .route_scheme import (
+    RouteSchemeStep,
+    load_route_scheme_style,
+    render_route_scheme_svg,
+)
 
 from .annotated_scheme import (
     SchemeAnnotation,
@@ -34,6 +39,9 @@ from .reaction_display_graphic import (
 )
 
 __all__ = [
+    "RouteSchemeStep",
+    "load_route_scheme_style",
+    "render_route_scheme_svg",
     "svg_html",
     "SchemeAnnotation",
     "SchemeMolecule",

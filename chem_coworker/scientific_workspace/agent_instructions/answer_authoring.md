@@ -34,6 +34,17 @@ to complete a drawing. List steps in dependency order. after_step_ids identifies
 preceding steps supplying intermediates; routes list ordered step_ids with all
 dependencies. Alternatives can have separate routes. An incomplete route is valid
 when its missing steps/structures remain disclosed.
+For every multistep synthesis you present, populate routes with its ordered
+step_ids; leaving routes empty produces individual-step views instead of the
+shared route scheme. Reuse the same molecule ID for a carried intermediate and
+declare the actual after_step_ids. Include the complete chosen route in a revised
+answer, not only its changed step. Keep distinct alternatives in separate routes.
+Preserve branches and convergent dependencies: never change chemistry or invent
+intermediates to force a linear layout. The workspace draws supported linear
+routes in the three-column SVG format and retains individual views otherwise.
+Supply structures and attributed annotations; do not hand-draw SVG or embed image
+links in answer_markdown. Keep molecule names in the structured molecule records;
+the route drawing omits compound captions and numbers.
 Conditions are separate attributed text fields such as solvent, temperature,
 duration, quantities or addition order. Use [] if absent; yield_info=null if unreported.
 Each step may have rationale, an attributed claim (text, basis, source_ids,

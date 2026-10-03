@@ -573,6 +573,47 @@ test('a busy response from another tab reveals that investigation and keeps the 
 });
 
 
+test('linear routes lead with one target scheme and keep source cautions visible', () => {
+  const {run, context} = harness();
+  const attribution = {basis:'proposed',source_ids:[],limitations:['Target feasibility unresolved']};
+  const step = {id:'s1',title:'First step',...attribution,reactant_ids:['a'],product_ids:['b'],after_step_ids:[],
+    image_url:'data:image/svg+xml;base64,target-step',conditions:[{text:'Target recipe',...attribution}],
+    yield_info:{text:'Yield not established',basis:'unknown',source_ids:[],limitations:[]},
+    rationale:{text:'Reason for this step',...attribution},
+    supporting_evidence:[{status:'precedents_available',saved_match_count:1,precedents:[{
+      reaction_id:'p1',reference_title:'Source experiment',image_url:'data:image/svg+xml;base64,source',
+      observations:[{yield_pct:72}],compatibility:{status:'unknown',analysis_warnings:['Transfer remains uncertain']},
+    }]}]};
+  context.routeView = {sources:[],molecules:[{id:'a',name:'A'},{id:'b',name:'B'},{id:'c',name:'C'}],
+    steps:[step,{...step,id:'s2',title:'Second step',reactant_ids:['b'],product_ids:['c'],after_step_ids:['s1'],supporting_evidence:[]}],
+    routes:[{id:'r1',title:'Complete route',step_ids:['s1','s2'],limitations:['Route is proposed'],unreached_target_ids:[],
+      image_url:'data:image/svg+xml;base64,route',scheme_width:1100,drawing_status:'linear_scheme'}]};
+  const original = JSON.stringify(context.routeView);
+  const card = run('showStructured(routeView)');
+  const images = card.querySelectorAll('img');
+  assert.equal(images.filter(node => node.src.endsWith('route')).length, 1);
+  assert.equal(images.filter(node => node.src.endsWith('target-step')).length, 0);
+  const sourceFigure = images.find(node => node.src.endsWith('source')).parentNode.parentNode;
+  assert.equal(sourceFigure.parentNode.tag, 'details');
+  assert.ok(!sourceFigure.parentNode.open);
+  assert.equal(sourceFigure.parentNode.firstElementChild.textContent, 'Source reaction scheme');
+  assert.ok(card.querySelectorAll('figcaption').some(node => node.textContent.includes('left to right')));
+  const inDetails = node => {
+    for (let parent = node.parentNode; parent; parent = parent.parentNode) if (parent.tag === 'details') return true;
+    return false;
+  };
+  for (const text of ['Transfer remains uncertain','Target feasibility unresolved','No inspected experimental support supplied for this step.',
+    'Conditions: Proposed · Yield: Unknown','Reported yield: 72%']) {
+    const nodes = card.descendants().filter(node => node.textContent === text);
+    assert.ok(nodes.some(node => !inDetails(node)), text + ' must remain visible');
+  }
+  assert.ok(card.descendants().filter(node => node.textContent === 'Target recipe').every(inDetails));
+  assert.equal(JSON.stringify(context.routeView), original);
+  context.routeView.routes[0].drawing_status = 'dependency_overview';
+  const fallback = run('showStructured(routeView)');
+  assert.equal(fallback.querySelectorAll('img').filter(node => node.src.endsWith('target-step')).length, 2);
+});
+
 test('condition choices share a scheme and expose one precedent with attributed rationale', () => {
   const {run, context} = harness();
   const claim = {basis:'proposed',source_ids:['paper'],limitations:[]};
