@@ -18,7 +18,56 @@ from reactive_taxonomy.fragment_search import (
     classify_fragment_embedding, compile_fragment_query, fragment_embeddings, fragment_search_policy,
     validate_fragment_target,
 )
+from reactive_taxonomy.material_identity import identify_material
 from .fragment_index import build_fragment_index, open_fragment_index, unpack
+
+
+def lookup_exact_product(
+    index_path: str | Path, smiles: str, *, limit: int = 5,
+) -> dict[str, Any]:
+    """Find an identical product component using the existing SQLite unique index.
+
+    Does not deserialize the substructure library or scan for substructures.
+    Source observations establish reported occurrence, not purchasability or an
+    inspected synthesis. Matching preserves unspecified stereo as unspecified.
+    """
+    if type(limit) is not int or not 1 <= limit <= 10:
+        raise ValueError("limit must be an integer between 1 and 10")
+    material = identify_material(smiles)
+    connection, manifest = open_fragment_index(index_path)
+    with closing(connection):
+        product = connection.execute(
+            "SELECT id FROM products WHERE smiles=?", (material.canonical_smiles,),
+        ).fetchone()
+        rows = [] if product is None else connection.execute(
+            """SELECT o.id, o.reaction_id, o.reference_id, l.component_index
+               FROM links l JOIN observations o ON o.id=l.observation_id
+               WHERE l.product_id=? ORDER BY l.rowid LIMIT ?""",
+            (product[0], limit + 1),
+        ).fetchall()
+        if product is not None and not rows:
+            raise ValueError("Exact product has no linked source observations")
+    return {
+        "schema_version": "exact_product_lookup.v1",
+        "status": "matched" if rows else "not_found",
+        "canonical_smiles": material.canonical_smiles,
+        "identity_method": material.identity_method,
+        "index_id": manifest["index_id"],
+        "index_schema_version": manifest["schema_version"],
+        "definition_version": manifest["definition_version"],
+        "source_scope": manifest["source_scope"],
+        "source_coverage_complete": manifest["source_coverage_complete"],
+        "match_scope": "exact_product_component",
+        "precedents": [
+            {"observation_id": oid, "reaction_id": reaction_id,
+             "reference_id": reference_id or None, "product_component_index": component}
+            for oid, reaction_id, reference_id, component in rows[:limit]
+        ],
+        "has_more": len(rows) > limit,
+        "warnings": [
+            "Reported product occurrence does not verify availability or an inspected preparation."
+        ] if rows else ["No exact product in the indexed source scope; this is not a corpus-wide absence claim."],
+    }
 
 
 def _count(value: int, complete: bool) -> dict[str, Any]:

@@ -59,6 +59,17 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                             ("reactive_sites", ("chemist_label", "availability", "warnings"))):
             overview[f"{key}_count"] = len(source.get(key, []))
             overview[key] = [_brief_fields(item, fields) for item in source.get(key, [])[:3]]
+    elif operation == "assess_starting_material":
+        overview.update(_brief_fields(source, (
+            "stop_expansion", "availability", "molecular_weight", "mw_threshold",
+            "unavailable_starting_materials",
+        )))
+        for key in ("registry", "literature"):
+            overview[key] = _brief_fields(source.get(key, {}), (
+                "status", "reason", "candidates", "matched_identifier", "index_id",
+                "source_scope", "source_coverage_complete", "precedents", "has_more",
+                "error_type", "message", "warnings",
+            ))
     elif operation == "compare_molecules":
         overview.update(_brief_fields(source, (
             "same_constitution", "stereo_relationship", "core_method", "core_atom_count",

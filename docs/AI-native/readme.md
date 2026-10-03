@@ -934,6 +934,52 @@ inversion. Full descriptors, evidence and version metadata remain in call artifa
 the agent sees concise summaries first. These tools do not satisfy chemistry-review
 or untouched-evaluation release gates.
 
+## Assess starting materials
+
+`assess_starting_material` helps the agent decide whether to expand a route leaf.
+It tries exact identity in `condition_registry`, exact product-component identity
+in the optional `fragment_index`, then a molecular-weight fallback. It is a
+planning policy, not a confirmation of stock or synthetic accessibility.
+
+```python
+event = w.run("assess_starting_material", {
+    "smiles": "CCO",
+    "mw_threshold": 200.0,
+    "allow_registry_stop": True,
+    "allow_literature_stop": True,
+    "allow_mw_stop": True,
+    "unavailable_starting_materials": [],
+})
+print(w.call_summary(event))
+```
+
+The threshold defaults to 200 g/mol from the validated
+`condition_recommender/definitions/starting_material_policy.v1.json`; equality
+does not pass. MW is RDKit `Descriptors.MolWt` for the complete supplied form.
+Disabled stages are skipped, and later stages are skipped after a stopping
+decision. Explicitly unavailable structures override every stopping rule.
+Invalid structures, query atoms and radicals are rejected. Atom-map labels are
+ignored; specified/unspecified stereo, isotopes, charges, salts and tautomers
+retain distinct identities. No component is silently removed or neutralized.
+
+The exact product lookup uses the existing SQLite unique SMILES index and bounded
+observation joins. It does not load the substructure library and needs no index
+rebuild. Product-component occurrence alone does not establish an isolated
+preparation; returned observation/reaction/reference IDs support further inspection.
+A disconnected salt query is not matched to only its organic product component.
+Missing, incompatible or failed indexes are distinct from a completed no-match
+lookup and remain visible even when the MW fallback permits stopping.
+
+Results use `starting_material_assessment.v1` with a versioned effective policy,
+descriptor provenance, evidence and explicit `stop_expansion` / `stop_reason`.
+All accepted leaves have `status="assumed_terminal"` and `availability="unknown"`.
+Registry stops assume obtainability from curated membership; literature and MW
+stops leave a route partially resolved pending preparation/supply evidence. The
+agent must retain those assumptions in its answer. Route admission is unchanged.
+Restart the workspace server and start a new investigation after installing the
+code; historical investigations and index artifacts are unchanged. This is a
+development capability, not an independent chemistry-review release gate.
+
 ## Available operations and ownership
 
 `catalog` prints exact callable signatures. No arbitrary import or code execution
@@ -945,6 +991,7 @@ is accepted through the operation dispatcher.
 | `analyze_molecule` | `reactive_taxonomy`; `smiles` | Graph-derived target audit; reactive sites are hypotheses. |
 | `compare_molecules` | `reactive_taxonomy`; `left_smiles`, `right_smiles`, optional `core_smiles`, `timeout_seconds` | Strict structural cores, differences, coverage, ambiguous alignments and stereo scope. No dataset dependency or reaction-map claim. |
 | `inspect_reactive_sites` | `reactive_taxonomy`; `smiles`, optional canonical `selected_atom_ids`, `radius` (0–3) | Focused motifs and existing descriptors, other sites and assigned/unassigned stereo. No experimental selectivity prediction. |
+| `assess_starting_material` | `condition_recommender` composes registry identity and taxonomy descriptors; `smiles`, optional `mw_threshold`, three `allow_*_stop` flags, `unavailable_starting_materials` | Ordered registry / exact product / MW stopping policy with evidence and warnings. Optional `fragment_index`; no substructure scan or verified availability claim. |
 | `recommend_conditions` | `condition_recommender`; `reaction_smiles`, optional `top_k`, `search_scope` | Canonical shared-core results with compatibility, ranking, and provenance unchanged. Requires `condition_index` and `shared_core_index`. |
 | `generate_weak_label_screening_array` | `condition_recommender`; `reaction_smiles`, optional `array_size` (default 24, currently 1–250), `source_reaction_type_hint` | Diverse intact recipes from separate weak-label observations after graph-query and compatibility checks. Requires `weak_label_records`; its sibling recipe catalog is automatically baseline-pinned as `weak_label_recipe_catalog`. No structural condition index required. Preserves unverified-source warnings, recipe IDs and source row numbers; may return fewer recipes. |
 | `search_fragment_precedents` | `reactive_taxonomy` graph/evidence rules and `condition_recommender` discovery index; `query`, optional `query_format`, `topology`, `limit`, `timeout_seconds`, `target_smiles` | Bounded product-fragment discovery, per-embedding changes, exact source/procedure joins, and saved inspection paths. Supply `target_smiles` for target-derived queries to validate their semantics before scanning. Requires prebuilt `fragment_index`; never expands a route or rebuilds data. |

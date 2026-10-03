@@ -36,6 +36,20 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             ("reactive_sites", ("site_type", "chemist_label", "availability", "warnings")),
         ):
             view.add_list(summary, value, key, fields, path)
+    elif operation == "assess_starting_material":
+        summary.update(view.pick(value, (
+            "canonical_smiles", "stop_expansion", "stop_reason", "availability",
+            "molecular_weight", "mw_threshold", "definition_version", "policy",
+            "unavailable_starting_materials",
+        ), path))
+        view.add_nested(summary, value, "registry", (
+            "status", "source", "candidates", "matched_identifier", "warnings", "reason",
+            "error_type", "message",
+        ), path)
+        view.add_nested(summary, value, "literature", (
+            "status", "index_id", "match_scope", "source_scope", "source_coverage_complete",
+            "precedents", "has_more", "warnings", "reason", "error_type", "message",
+        ), path)
     elif operation == "compare_molecules":
         summary.update(view.pick(value, (
             "same_constitution", "stereo_relationship", "core_method", "core_atom_count",

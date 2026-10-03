@@ -49,6 +49,7 @@ class ScientificOperations:
                             required_artifacts=("weak_label_records", "weak_label_recipe_catalog")),
         OperationDefinition("compare_molecules"),
         OperationDefinition("inspect_reactive_sites"),
+        OperationDefinition("assess_starting_material"),
         OperationDefinition("get_precedents", required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("get_procedures", required_artifacts=("procedure_catalog",)),
         OperationDefinition("resolve_recipe"),
@@ -144,6 +145,30 @@ class ScientificOperations:
         from reactive_taxonomy import audit_target
 
         return audit_target(smiles)
+
+    def assess_starting_material(
+        self, smiles: str, mw_threshold: float | None = None,
+        allow_registry_stop: bool = True, allow_literature_stop: bool = True,
+        allow_mw_stop: bool = True, unavailable_starting_materials: list[str] | None = None,
+    ) -> Any:
+        """Assess a route leaf through registry, exact product lookup, then MW.
+
+        Default MW cutoff is 200 g/mol (strictly below), from the versioned policy.
+        fragment_index is optional; unavailable/error checks remain explicit.
+        Stops are planning assumptions, never verified commercial availability.
+        Pass explicit unavailable materials; preserve leaf assumptions in answers.
+        """
+        from condition_recommender.starting_materials import assess_starting_material
+
+        entry = self.store.manifest["baseline"]["artifacts"].get("fragment_index")
+        return assess_starting_material(
+            smiles, fragment_index=entry["path"] if entry else None,
+            mw_threshold=mw_threshold, allow_registry_stop=allow_registry_stop,
+            allow_literature_stop=allow_literature_stop, allow_mw_stop=allow_mw_stop,
+            unavailable_starting_materials=(
+                [] if unavailable_starting_materials is None else unavailable_starting_materials
+            ),
+        )
 
     def compare_molecules(
         self, left_smiles: str, right_smiles: str, core_smiles: str | None = None,

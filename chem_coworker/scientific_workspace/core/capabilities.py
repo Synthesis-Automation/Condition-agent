@@ -46,6 +46,11 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
         "fragment_suggestions": {
             "status": "implemented", "requires_index": False, "automatic_search": False,
         },
+        "starting_material_assessment": {
+            "status": "implemented", "operation": "assess_starting_material",
+            "optional_artifact": "fragment_index", "exact_product_lookup": True,
+            "availability_verified": False, "stops_are_planning_assumptions": True,
+        },
         "weak_label_screening": {
             "status": "implemented",
             "operation": "generate_weak_label_screening_array",

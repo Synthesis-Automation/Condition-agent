@@ -1,0 +1,9 @@
+{
+  "schema_version": "starting_material_policy.v1",
+  "definition_version": "starting_material_policy.v1@1.0",
+  "default_mw_threshold": 200.0,
+  "precedent_limit": 5,
+  "check_order": ["registry", "literature", "molecular_weight"],
+  "mw_comparison": "strictly_less_than",
+  "availability": "unknown"
+}

@@ -1,6 +1,12 @@
 """Standalone condition-recommendation data and modeling package."""
 
 from .compatibility import CompatibilityAssessment, assess_recipe_compatibility
+from .starting_materials import (
+    StartingMaterialAssessment,
+    StartingMaterialPolicy,
+    assess_starting_material,
+    load_starting_material_policy,
+)
 from .core_evaluation import evaluate_reaction_core_index
 from .core_eligibility import (
     CoreEligibilityAssessment,
@@ -66,6 +72,10 @@ from .weak_label_indexing import (
 )
 
 __all__ = [
+    "StartingMaterialAssessment",
+    "StartingMaterialPolicy",
+    "assess_starting_material",
+    "load_starting_material_policy",
     "ReactionRecipeAssessment",
     "ConditionEvidenceComparison",
     "compare_condition_evidence",

@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v6
+# Retrosynthesis investigation adviser v7
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -23,6 +23,17 @@ subsequent targets and stopping decisions under the catalogue's execution polici
 Choose an initial investigation budget suited to the question; broaden it for a
 decision-changing gap. Reuse explicit source-supported steps and unchanged results.
 Keep branch choices, alternatives and stopping reasons in recorded notes; avoid cycles.
+
+Use `assess_starting_material` when deciding whether to expand a route leaf. It
+checks exact registry identity, then exact product occurrence in the optional
+fragment index, then a configurable molecular-weight cutoff (default <200 g/mol).
+Pass the user's `unavailable_starting_materials`; exclusions override all stops.
+Registry membership permits assumed obtainability, literature occurrence needs
+preparation inspection, and the MW fallback is only a planning heuristic. Each
+stage can be disabled. Preserve the call ref, stop reason, failed lookups and
+availability assumptions in notes and the final answer. A stopped branch is not
+verified supply; literature/MW leaves leave the route partially resolved. This
+operation does not upgrade route admission or automatically expand any branch.
 
 Read supporting advice only when relevant:
 

@@ -18,6 +18,7 @@ from .target_audit import (
 from .reaction_api import featurize_reaction, identify_reaction_patterns
 from .molecule_comparison import MoleculeComparison, compare_molecules
 from .molecule_inspection import SiteInspection, inspect_reactive_sites
+from .material_identity import MaterialIdentity, identify_material
 from .departing_fragments import (
     DEPARTING_FRAGMENT_TOKEN_VERSION,
     departing_fragment_tokens,
@@ -256,6 +257,8 @@ from .molecular_feature_evaluation import (
 )
 
 __all__ = [
+    "MaterialIdentity",
+    "identify_material",
     "MoleculeComparison",
     "SiteInspection",
     "compare_molecules",
