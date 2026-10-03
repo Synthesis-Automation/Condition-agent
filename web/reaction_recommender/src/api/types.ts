@@ -18,6 +18,7 @@ export interface Capabilities {
   reaction_rendering: boolean
   fragment_search?: boolean
   fragment_suggestions?: boolean
+  fragment_guided_retrosynthesis?: boolean
   retrosynthesis?: boolean
   forward_synthesis?: boolean
   multistep_retrosynthesis?: boolean
@@ -1275,6 +1276,61 @@ export interface FragmentSearchRequest {
   topology: 'preserve_rings' | 'subgraph'
   limit: number
   timeout_seconds: number
+}
+
+export interface FragmentGuidedRetroRequest {
+  target_smiles: string
+  library_mode: 'compact' | 'full'
+  query_limit: number
+  max_focus_bonds: number
+  top_k: number
+}
+
+export interface FragmentRetroCandidate {
+  precursor_smiles: string
+  proposed_reaction_smiles: string
+  forward_validation_status: string
+  abstraction_level: string
+  precedent_reaction_ids: string[]
+  bond_focus_check?: { status: string }
+}
+
+export interface FragmentRetroArm {
+  status: string
+  candidates: FragmentRetroCandidate[]
+  diagnostics: JsonObject | null
+}
+
+export interface FragmentGuidedRetroResult {
+  schema_version: string
+  target_smiles: string
+  library_mode: 'compact' | 'full'
+  policy: JsonObject
+  suggestions: FragmentSuggestionsResult
+  searches: Array<{ candidate_id: string; artifact_ref: string; result: FragmentSearchResult }>
+  guidance: {
+    focus_bonds: Array<{ target_atom_ids: number[]; target_highlight_svg?: string; supports: Array<{ reaction_id: string; reference_id: string | null }> }>
+    eligible_bond_count: number
+    eligible_source_count: number
+    source_records: Array<{ reaction_id: string; reference_id?: string; reaction_smiles: string }>
+    exclusions: JsonObject[]
+    scope: string
+  }
+  transfers: {
+    baseline: FragmentRetroArm
+    guided: Array<{ target_atom_ids: number[]; direct_source_transfer: FragmentRetroArm; witness_directed_library: FragmentRetroArm }>
+    compiled_source_template_count: number
+    source_admissions: Array<{ reaction_id: string; status: string; reason: string; diagnostics?: JsonObject }>
+    comparison: {
+      baseline_unique_precursor_count: number
+      guided_unique_precursor_count: number
+      additional_guided_precursor_sets: string[]
+      baseline_work: { template_applications: number; validation_attempts: number }
+      guided_work: { template_applications: number; validation_attempts: number }
+    }
+  }
+  execution: { elapsed_seconds: number }
+  limitations: string[]
 }
 
 export interface SuggestedSearchFragment {

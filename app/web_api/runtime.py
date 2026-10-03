@@ -66,6 +66,7 @@ from .contracts import (
     FeatureAnalysisRequest,
     FragmentSearchRequest,
     FragmentSuggestionRequest,
+    FragmentGuidedRetrosynthesisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     RecommendationRequest,
@@ -225,6 +226,10 @@ class WebRuntime(Protocol):
     def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]: ...
 
     def suggest_fragments(self, request: FragmentSuggestionRequest) -> Dict[str, Any]: ...
+
+    def fragment_guided_retrosynthesize(
+        self, request: FragmentGuidedRetrosynthesisRequest,
+    ) -> Dict[str, Any]: ...
 
     def ranking_profiles(self) -> tuple[Dict[str, Any], ...]: ...
 
@@ -403,6 +408,87 @@ class LocalRecommendationRuntime:
             return search_fragment_precedents(
                 self.fragment_index_path, **request.model_dump()
             )
+        finally:
+            self._fragment_search_lock.release()
+
+    def fragment_guided_retrosynthesize(
+        self, request: FragmentGuidedRetrosynthesisRequest,
+    ) -> Dict[str, Any]:
+        """Compose bounded discovery and the canonical deterministic experiment."""
+        from condition_recommender.fragment_search import search_fragment_precedents
+        from core_retrosynthesis.fragment_guidance import (
+            DEFAULT_POLICY, evaluate_transfers, load_policy,
+            project_construction_guidance,
+        )
+
+        if not self.fragment_index_path.is_file():
+            raise FileNotFoundError(
+                "Fragment index unavailable. Configure --fragment-index or "
+                "FRAGMENT_PRECEDENT_INDEX with a prepared fragment index."
+            )
+        if not self._fragment_search_lock.acquire(blocking=False):
+            raise RuntimeError("A fragment search is already running. Try again shortly.")
+        started = time.monotonic()
+        try:
+            policy = load_policy(DEFAULT_POLICY)
+            policy.update({key: getattr(request, key) for key in (
+                "query_limit", "max_focus_bonds", "top_k",
+            )})
+            suggestions = self.suggest_fragments(FragmentSuggestionRequest(
+                target_smiles=request.target_smiles, limit=request.query_limit,
+            ))
+            library = self._get_retrosynthesis_library(request.library_mode)
+            searches = []
+            for candidate in suggestions["candidates"]:
+                result = search_fragment_precedents(
+                    self.fragment_index_path, candidate["query"],
+                    query_format=candidate["query_format"], topology=candidate["topology"],
+                    limit=policy["hit_limit"], timeout_seconds=policy["search_timeout_seconds"],
+                    target_smiles=suggestions["target_smiles"],
+                )
+                searches.append({
+                    "candidate_id": candidate["candidate_id"],
+                    "artifact_ref": f"query:{candidate['candidate_id']}",
+                    "execution_status": "completed", "result": result,
+                })
+            guidance = project_construction_guidance(suggestions, searches, policy)
+            for bond in guidance["focus_bonds"]:
+                bond["target_highlight_svg"] = render_molecule_image_bytes(
+                    suggestions["target_smiles"], size=(420, 220), image_format="svg",
+                    render_preset="web_consistent",
+                    highlight_atom_indices=tuple(bond["target_atom_ids"]),
+                ).decode("utf-8")
+            transfers = evaluate_transfers(
+                {"guidance": guidance, "policy": policy}, library=library,
+                repeat=False, source_library_path=None,
+            )
+            resources = {}
+            for name, path in (
+                ("fragment_index", self.fragment_index_path),
+                ("operator_library", self._retrosynthesis_library_path(request.library_mode)),
+            ):
+                stat = path.stat()
+                resources[name] = {
+                    "name": path.name, "size_bytes": stat.st_size,
+                    "mtime_ns": stat.st_mtime_ns,
+                }
+            return {
+                "schema_version": "fragment_guided_retrosynthesis.v1",
+                "target_smiles": suggestions["target_smiles"],
+                "library_mode": request.library_mode, "policy": policy,
+                "suggestions": suggestions, "searches": searches,
+                "guidance": guidance, "transfers": transfers,
+                "resources": resources, "library_definition": library.definition,
+                "execution": {"elapsed_seconds": time.monotonic() - started},
+                "limitations": [
+                    "Experimental single-step proposals; no complete route or stock assessment.",
+                    "Guidance uses returned hit samples; partial searches and unresolved embeddings are excluded.",
+                    "Guided arms receive more total search work than the baseline. Counts do not measure accuracy improvement.",
+                    "No admitted source operator or no proposal is a bounded coverage result, not evidence of impossible synthesis.",
+                    "Forward signature agreement does not establish experimental yield or feasibility.",
+                    "Interactive calls are not independently reviewed or untouched benchmark evaluations; JSON export retains evidence.",
+                ],
+            }
         finally:
             self._fragment_search_lock.release()
 
@@ -782,6 +868,10 @@ class LocalRecommendationRuntime:
             "service": "reaction-condition-recommender",
             "fragment_search": self.fragment_index_path.is_file(),
             "fragment_suggestions": True,
+            "fragment_guided_retrosynthesis": (
+                self.fragment_index_path.is_file()
+                and any(path.is_file() for path in retrosynthesis_paths.values())
+            ),
             "recommendation_engine": (
                 "shared_reaction_core.v2" if self.shared_core_enabled else "baseline"
             ),

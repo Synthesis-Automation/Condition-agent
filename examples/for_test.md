@@ -11,3 +11,6 @@ targets
 CCN(CC)CCNC(C1=COC(NC(C)=O)=N1)=O
 
 Cc1nc2[nH]ccc2c3nc(C4=CC=CC=C4)nn13
+
+
+Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2

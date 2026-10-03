@@ -1,0 +1,16 @@
+{
+  "schema_version": "fragment_guided_retro_poc_policy.v1",
+  "definition_version": "fragment_guided_retro_poc.v1@1.0",
+  "query_selection": "suggestion_order",
+  "query_limit": 3,
+  "hit_limit": 10,
+  "search_timeout_seconds": 30,
+  "require_complete_search": true,
+  "require_resolved_embedding": true,
+  "max_focus_bonds": 3,
+  "max_source_observations": 6,
+  "levels": ["L2", "L1", "L0"],
+  "top_k": 3,
+  "max_templates_to_apply": 40,
+  "max_candidates_to_validate": 10
+}

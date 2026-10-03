@@ -18,6 +18,7 @@ from .contracts import (
     FeatureAnalysisRequest,
     FragmentSearchRequest,
     FragmentSuggestionRequest,
+    FragmentGuidedRetrosynthesisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
     PrepareReactionRequest,
@@ -194,6 +195,17 @@ def create_app(
             )
         except (ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
+        return envelope(data)
+
+    @app.post("/api/v1/retrosynthesis/fragment-guided")
+    def fragment_guided_retrosynthesize(
+        payload: FragmentGuidedRetrosynthesisRequest, request: Request,
+    ) -> dict[str, Any]:
+        try:
+            data = active_runtime(request).fragment_guided_retrosynthesize(payload)
+        except (ValueError, OSError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
         return envelope(data)
 
     @app.post("/api/v1/fragments/suggest")

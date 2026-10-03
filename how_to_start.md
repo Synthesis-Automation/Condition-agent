@@ -78,6 +78,24 @@ To start from a **whole target**, enter or draw it in SMILES mode, click
 and **Search fragments**. Suggestions work without an index and never launch a
 search automatically. You can still enter your own core directly.
 
+To evaluate fragment-guided **single-step retrosynthesis**, select
+**Fragment-guided retro**, enter or draw one target, and click
+**Evaluate fragment-guided retro**. **Fragment retro example** loads
+`Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2`. The controls select the compact/full operator
+library, number of fragment queries, construction bonds and proposals per arm.
+This mode needs both the prepared fragment index and the selected operator library.
+Operator libraries default to `results/operator_retrosynthesis_poc/full_scale_v3`;
+set `RETROSYNTHESIS_LIBRARY_ROOT` to use another directory with `compact/` and
+`full/` subdirectories containing `operator_library_v3.json.gz`.
+
+Results show the baseline, direct source transfers, witness-directed proposals,
+source admission failures, incomplete search exclusions and actual search work.
+**Export JSON** retains the complete result for comparing examples. Guided searches
+use more total work; additional precursor sets are a descriptive coverage result,
+not a validated accuracy gain. See the
+[POC documentation](docs/AI-native/Deterministic_Fragment_Retrosynthesis_POC.md)
+for evidence gates and the CLI for recorded investigations.
+
 On later starts, omit `--build` unless the frontend source has changed:
 
 ```powershell

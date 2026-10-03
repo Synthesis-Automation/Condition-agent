@@ -884,6 +884,30 @@ saved-evidence follow-up completed successfully. Use an explicit larger budget
 (for example `--timeout 600`) for a follow-up comparison; faster or better completed
 answers have not yet been established.
 
+## Deterministic fragment-guided retrosynthesis POC
+
+The [deterministic development POC](Deterministic_Fragment_Retrosynthesis_POC.md)
+connects target-derived fragment queries and observed construction witnesses to
+the canonical single-step retrosynthesis engine. It records source-operator
+compilation, rejection evidence, witness-directed searches and repeat checks,
+without an LLM. Its default example is `Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2`.
+
+```powershell
+python -m examples.ai_native.fragment_guided_retrosynthesis_poc --output results/ai_native/my_fragment_retro_poc
+```
+
+This produces local JSON evidence and an HTML molecular review report. It is a
+bounded single-step investigation, not a complete route or independent evaluation.
+
+The regular research workbench also exposes **Fragment-guided retro**. Start with
+`python -m app.web_api --workbench --build --port 8000`, select the mode, enter or
+draw a target, and click **Evaluate fragment-guided retro**. The example button
+loads the target above. A prepared fragment index and compact/full operator
+library are required. The UI uses the same domain implementation and evidence
+gates, compares baseline and guided proposals, reports actual work, and exports
+the full JSON result. Interactive calls run once; use the CLI for pinned,
+recorded investigations and repeated-run checks.
+
 ## Focused molecular inspection
 
 Two optional, local RDKit tools help answer structural questions without loading

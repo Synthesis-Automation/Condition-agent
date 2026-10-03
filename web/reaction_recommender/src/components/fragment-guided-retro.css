@@ -1,0 +1,17 @@
+.fragment-retro-options > p { font-size: .85rem; line-height: 1.5; }
+.fragment-retro-results { min-width: 0; }
+.fragment-retro-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 20px; background: #f3f7f4; }
+.fragment-retro-summary div { display: grid; gap: 6px; }
+.fragment-retro-summary strong { font-size: 1.7rem; }
+.fragment-retro-summary span { font-size: .8rem; color: #576c60; }
+.fragment-retro-body { padding: 20px; min-width: 0; }
+.fragment-retro-body p, .fragment-retro-body li { line-height: 1.5; overflow-wrap: anywhere; }
+.fragment-retro-body code { font-size: .8rem; overflow-wrap: anywhere; }
+.fragment-retro-body .fragment-suggestion-grid { padding: 12px 0; }
+.fragment-retro-arm, .fragment-retro-branch { border-top: 1px solid #d7e0da; margin-top: 24px; padding-top: 16px; }
+.fragment-retro-candidate { border: 1px solid #d7e0da; border-radius: 10px; padding: 14px; margin-top: 14px; min-width: 0; }
+.fragment-retro-badge { margin-left: 10px; display: inline-block; background: #e6f2e8; color: #245b36; font-size: .72rem; border-radius: 5px; padding: 4px 7px; }
+.fragment-retro-work { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 20px 0; font-size: .8rem; }
+.fragment-retro-work caption { text-align: left; font-weight: 600; margin-bottom: 10px; }
+.fragment-retro-work th, .fragment-retro-work td { text-align: left; white-space: normal; overflow-wrap: anywhere; padding: 10px; border-bottom: 1px solid #d7e0da; }
+@media (max-width: 650px) { .fragment-retro-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fragment-retro-body { padding: 12px; } }

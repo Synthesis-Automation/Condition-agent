@@ -8,6 +8,8 @@ import type {
   FragmentSearchRequest,
   FragmentSearchResult,
   FragmentSuggestionsResult,
+  FragmentGuidedRetroRequest,
+  FragmentGuidedRetroResult,
   ForwardSynthesisRequest,
   ForwardSynthesisResult,
   ForwardConditionProfileCatalog,
@@ -59,6 +61,10 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  fragmentGuidedRetro: (request: FragmentGuidedRetroRequest, signal?: AbortSignal) =>
+    jsonRequest<FragmentGuidedRetroResult>('/retrosynthesis/fragment-guided', {
+      method: 'POST', body: JSON.stringify(request), signal,
+    }),
   suggestFragments: (target: string, signal?: AbortSignal) =>
     jsonRequest<FragmentSuggestionsResult>('/fragments/suggest', {
       method: 'POST', body: JSON.stringify({ target_smiles: target }), signal,

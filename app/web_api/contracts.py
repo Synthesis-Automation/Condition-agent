@@ -40,6 +40,16 @@ class FragmentSuggestionRequest(StrictRequest):
     selected_atom_ids: list[StrictInt] | None = Field(default=None, max_length=200)
 
 
+class FragmentGuidedRetrosynthesisRequest(StrictRequest):
+    """Bounded single-step experiment with mandatory chemistry evidence gates."""
+
+    target_smiles: str = Field(min_length=1, max_length=5000)
+    library_mode: Literal["full", "compact"] = "compact"
+    query_limit: int = Field(default=3, ge=1, le=5, strict=True)
+    max_focus_bonds: int = Field(default=3, ge=1, le=5, strict=True)
+    top_k: int = Field(default=3, ge=1, le=10, strict=True)
+
+
 class CompletionChoiceRequest(StrictRequest):
     """One explicit user choice for a proposed missing fragment source."""
 
