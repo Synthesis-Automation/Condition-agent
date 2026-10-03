@@ -34,10 +34,15 @@ from .coupled_strategy_search import (
 from .coupled_strategy_evaluation import (
     CoupledStrategyEvaluationConfig,
     build_frozen_v1_heldout_panel,
+    build_v1_operator_pair_inventory,
     load_frozen_v1_heldout_panel,
     run_v1_coupled_strategy_evaluation,
     write_frozen_v1_heldout_panel,
     write_v1_coupled_strategy_evaluation,
+)
+from .composite_actions import (
+    build_composite_strategy_catalog, load_composite_strategy_catalog,
+    save_composite_strategy_catalog, search_composite_actions,
 )
 from .coupled_strategy_evaluation_review import (
     write_v1_coupled_strategy_evaluation_html,
@@ -1043,6 +1048,33 @@ def _parser() -> argparse.ArgumentParser:
         "--title", default="Literature route-state learning review"
     )
 
+    composite_build = commands.add_parser(
+        "build-composite-catalog", help="catalogue every recurrent training pair covered by a library",
+    )
+    composite_build.add_argument("source_route_cores")
+    composite_build.add_argument("library")
+    composite_build.add_argument("output_json")
+    composite_build.add_argument("--minimum-training-patents", type=int, default=2)
+
+    composite_catalog = commands.add_parser(
+        "export-composite-catalog", help="export reusable operator pairs without evaluation cases",
+    )
+    composite_catalog.add_argument("source_panel")
+    composite_catalog.add_argument("output_json")
+
+    composite_search = commands.add_parser(
+        "disconnect-composite", help="expand validated two-step composite actions for a target",
+    )
+    composite_search.add_argument("library")
+    composite_search.add_argument("catalog")
+    composite_search.add_argument("target_smiles")
+    composite_search.add_argument("--top-k", type=int, default=5)
+    composite_search.add_argument("--max-templates", type=int, default=50)
+    composite_search.add_argument("--max-candidates-to-validate", type=int, default=12)
+    composite_search.add_argument("--no-context", action="store_true")
+    composite_search.add_argument("--no-l0", action="store_true")
+    composite_search.add_argument("--no-one-step-fallbacks", action="store_true")
+
     coupled_replay = commands.add_parser(
         "replay-coupled-route-strategies",
         help="compare v1/v2 exact two-step strategy replay for one target",
@@ -1128,6 +1160,15 @@ def _selected_rows(
     else:
         values = iter_library_rows(source, include=includes)
     return islice(values, max_rows) if max_rows is not None else values
+
+
+def _sha256_file(path: Path) -> str:
+    """Fingerprint a catalogue source without loading corpus bytes into memory."""
+    checksum = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            checksum.update(chunk)
+    return checksum.hexdigest()
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -1393,6 +1434,38 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 sort_keys=True,
             )
         )
+        return 0
+    if arguments.command == "build-composite-catalog":
+        definitions, _, gaps = build_v1_operator_pair_inventory(
+            arguments.source_route_cores, load_generic_library(arguments.library),
+            minimum_training_patents=arguments.minimum_training_patents,
+        )
+        catalog = build_composite_strategy_catalog(definitions, provenance={
+            "route_core_sha256": _sha256_file(Path(arguments.source_route_cores)),
+        })
+        save_composite_strategy_catalog(catalog, arguments.output_json)
+        print(json.dumps({"catalog_id": catalog.catalog_id, "strategy_count": len(catalog.strategies),
+                          "capability_gap_count": len(gaps), "output_json": str(Path(arguments.output_json).resolve())}, indent=2))
+        return 0
+    if arguments.command == "export-composite-catalog":
+        panel = load_frozen_v1_heldout_panel(arguments.source_panel)
+        catalog = build_composite_strategy_catalog(panel.strategies, provenance={
+            "source_panel_id": panel.panel_id, "route_core_sha256": panel.route_core_sha256,
+        })
+        save_composite_strategy_catalog(catalog, arguments.output_json)
+        print(json.dumps({"catalog_id": catalog.catalog_id, "strategy_count": len(catalog.strategies),
+                          "output_json": str(Path(arguments.output_json).resolve())}, indent=2))
+        return 0
+    if arguments.command == "disconnect-composite":
+        catalog = load_composite_strategy_catalog(arguments.catalog)
+        result = search_composite_actions(
+            arguments.target_smiles, load_generic_library(arguments.library), catalog.strategies,
+            top_k=arguments.top_k, max_templates_to_apply=arguments.max_templates,
+            max_candidates_to_validate=arguments.max_candidates_to_validate,
+            include_l0=not arguments.no_l0, use_context=not arguments.no_context,
+            include_one_step_fallbacks=not arguments.no_one_step_fallbacks,
+        )
+        print(json.dumps({**result.to_dict(), "catalog_id": catalog.catalog_id}, indent=2, sort_keys=True))
         return 0
     if arguments.command == "replay-coupled-route-strategies":
         report = load_coupled_route_strategy_report(arguments.source_report)

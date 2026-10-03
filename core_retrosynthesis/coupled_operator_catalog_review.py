@@ -6,11 +6,11 @@ import html
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
+from .composite_actions import CompositeStrategyDefinition
 from typing import Iterable, Mapping, Sequence
 
 from .coupled_strategy_evaluation import (
     CoupledStrategyEvaluationCase,
-    PromotedV1OperatorPair,
 )
 from .generic_models import GenericGraphOperator, GenericTemplateLibrary
 from .html_report import reaction_svg
@@ -91,7 +91,7 @@ def _step_graphic(
 
 
 def _pair_card(
-    strategy: PromotedV1OperatorPair,
+    strategy: CompositeStrategyDefinition,
     cases: Sequence[CoupledStrategyEvaluationCase],
     operators: Mapping[str, GenericGraphOperator],
     index: int,
@@ -187,7 +187,7 @@ def _pair_card(
 
 
 def render_v1_operator_pair_catalog_html(
-    strategies: Sequence[PromotedV1OperatorPair],
+    strategies: Sequence[CompositeStrategyDefinition],
     cases: Sequence[CoupledStrategyEvaluationCase],
     library: GenericTemplateLibrary,
     *,
@@ -313,7 +313,7 @@ search.addEventListener('input',filterCards); relationship.addEventListener('cha
 
 
 def write_v1_operator_pair_catalog_html(
-    strategies: Sequence[PromotedV1OperatorPair],
+    strategies: Sequence[CompositeStrategyDefinition],
     cases: Sequence[CoupledStrategyEvaluationCase],
     library: GenericTemplateLibrary,
     output_path: str | Path,

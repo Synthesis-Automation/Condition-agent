@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from core_retrosynthesis.composite_actions import CompositeStrategyDefinition
 
 from core_retrosynthesis.coupled_operator_catalog_review import (
     render_v1_operator_pair_catalog_html,
@@ -10,7 +11,6 @@ from core_retrosynthesis.coupled_operator_catalog_review import (
 )
 from core_retrosynthesis.coupled_strategy_evaluation import (
     CoupledStrategyEvaluationCase,
-    PromotedV1OperatorPair,
 )
 from core_retrosynthesis.generic_models import (
     GenericGraphOperator,
@@ -18,8 +18,8 @@ from core_retrosynthesis.generic_models import (
 )
 
 
-def _strategy() -> PromotedV1OperatorPair:
-    return PromotedV1OperatorPair(
+def _strategy() -> CompositeStrategyDefinition:
+    return CompositeStrategyDefinition(
         strategy_id="CRV1OP1:test",
         relationship_class="handle_progression",
         first_operator_id="OP1:first",

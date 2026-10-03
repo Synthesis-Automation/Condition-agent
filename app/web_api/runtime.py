@@ -34,14 +34,14 @@ from condition_recommender.reaction_completion import (
 )
 from condition_recommender.sqlite_indexing import sqlite_generic_index_summary
 from core_retrosynthesis import (
-    FrozenV1HeldoutPanel,
+    CompositeStrategyCatalog,
     GenericTemplateLibrary,
     disconnect_strategies_detailed,
-    load_frozen_v1_heldout_panel,
+    load_composite_strategy_catalog,
     load_generic_library,
     plan_multistep_routes,
     recommend_retrosynthesis_conditions,
-    search_promoted_v1_strategies,
+    search_composite_actions,
 )
 from forward_synthesis import (
     ForwardOperatorLibrary,
@@ -107,12 +107,12 @@ DEFAULT_COUPLED_STRATEGY_LIBRARY_PATH = (
     / "operators_validated_departures"
     / "operator_library_v3.json.gz"
 )
-DEFAULT_COUPLED_STRATEGY_PANEL_PATH = (
+DEFAULT_COMPOSITE_STRATEGY_CATALOG_PATH = (
     PROJECT_ROOT
     / "results"
     / "core_retrosynthesis"
     / "coupled_strategy_evaluation"
-    / "route_only_fixed_panel.v1.json"
+    / "composite_strategy_catalog.v1.json"
 )
 DEFAULT_LITERATURE_MOLECULE_INDEX = (
     PROJECT_ROOT / "results" / "literature_molecule_index.sqlite"
@@ -286,7 +286,7 @@ class LocalRecommendationRuntime:
         stock_portfolio_path: str | Path | None = None,
         weak_label_records_path: str | Path | None = None,
         coupled_strategy_library_path: str | Path | None = None,
-        coupled_strategy_panel_path: str | Path | None = None,
+        coupled_strategy_catalog_path: str | Path | None = None,
         shared_core_enabled: bool | None = None,
         fragment_index_path: str | Path | None = None,
     ) -> None:
@@ -346,11 +346,11 @@ class LocalRecommendationRuntime:
         self.coupled_strategy_library_path = Path(
             configured_coupled_library or DEFAULT_COUPLED_STRATEGY_LIBRARY_PATH
         )
-        configured_coupled_panel = coupled_strategy_panel_path or os.environ.get(
-            "CORE_RETROSYNTHESIS_COUPLED_PANEL"
+        configured_coupled_catalog = coupled_strategy_catalog_path or os.environ.get(
+            "CORE_RETROSYNTHESIS_COMPOSITE_CATALOG"
         )
-        self.coupled_strategy_panel_path = Path(
-            configured_coupled_panel or DEFAULT_COUPLED_STRATEGY_PANEL_PATH
+        self.coupled_strategy_catalog_path = Path(
+            configured_coupled_catalog or DEFAULT_COMPOSITE_STRATEGY_CATALOG_PATH
         )
         # An explicitly supplied legacy index is an intentional test/runtime
         # override unless a stock portfolio was also explicitly configured.
@@ -372,8 +372,8 @@ class LocalRecommendationRuntime:
             tuple[str, int, int], GenericTemplateLibrary
         ] = {}
         self._forward_libraries: Dict[tuple[str, int, int], ForwardOperatorLibrary] = {}
-        self._coupled_strategy_panels: Dict[
-            tuple[str, int, int], FrozenV1HeldoutPanel
+        self._composite_strategy_catalogs: Dict[
+            tuple[str, int, int], CompositeStrategyCatalog
         ] = {}
         self._compound_registry_identities: (
             tuple[frozenset[str], frozenset[str]] | None
@@ -713,22 +713,22 @@ class LocalRecommendationRuntime:
             self._retrosynthesis_libraries[key] = library
             return library
 
-    def _get_coupled_strategy_panel(self) -> FrozenV1HeldoutPanel:
-        """Load the frozen, library-independent promoted-pair catalog."""
+    def _get_composite_strategy_catalog(self) -> CompositeStrategyCatalog:
+        """Load reusable operator pairs independently of evaluation cases."""
 
-        path = self.coupled_strategy_panel_path
+        path = self.coupled_strategy_catalog_path
         if not path.is_file():
             raise FileNotFoundError(
-                "experimental coupled-strategy panel is unavailable"
+                "experimental composite-strategy catalogue is unavailable"
             )
         stat = path.stat()
         key = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
         with self._lock:
-            cached = self._coupled_strategy_panels.get(key)
+            cached = self._composite_strategy_catalogs.get(key)
             if cached is not None:
                 return cached
-            panel = load_frozen_v1_heldout_panel(path)
-            self._coupled_strategy_panels[key] = panel
+            panel = load_composite_strategy_catalog(path)
+            self._composite_strategy_catalogs[key] = panel
             return panel
 
     def _forward_library_path(self, library_mode: str) -> Path:
@@ -930,13 +930,13 @@ class LocalRecommendationRuntime:
         )
         coupled_strategy_available = (
             self.coupled_strategy_library_path.is_file()
-            and self.coupled_strategy_panel_path.is_file()
+            and self.coupled_strategy_catalog_path.is_file()
         )
         coupled_strategy_count = 0
         if coupled_strategy_available:
             try:
                 coupled_strategy_count = len(
-                    self._get_coupled_strategy_panel().strategies
+                    self._get_composite_strategy_catalog().strategies
                 )
             except (OSError, ValueError):
                 coupled_strategy_available = False
@@ -986,7 +986,7 @@ class LocalRecommendationRuntime:
             "coupled_strategy_retrosynthesis": coupled_strategy_available,
             "coupled_strategy_catalog_size": coupled_strategy_count,
             "coupled_strategy_library_name": (self.coupled_strategy_library_path.name),
-            "coupled_strategy_panel_name": self.coupled_strategy_panel_path.name,
+            "coupled_strategy_catalog_name": self.coupled_strategy_catalog_path.name,
             "literature_molecule_index_available": self.literature_index_path.is_file(),
             "literature_molecule_index_name": self.literature_index_path.name,
             "stock_portfolio_available": (
@@ -1768,9 +1768,9 @@ class LocalRecommendationRuntime:
         """Search reusable v1 two-step operator pairs for one target."""
 
         library = self._get_coupled_strategy_library()
-        panel = self._get_coupled_strategy_panel()
+        panel = self._get_composite_strategy_catalog()
         started_at = time.perf_counter()
-        result = search_promoted_v1_strategies(
+        result = search_composite_actions(
             request.target_smiles.strip(),
             library,
             panel.strategies,
@@ -1785,7 +1785,7 @@ class LocalRecommendationRuntime:
         payload.update(
             {
                 "experimental": True,
-                "panel_id": panel.panel_id,
+                "catalog_id": panel.catalog_id,
                 "strategy_catalog_size": len(panel.strategies),
                 "library_operator_count": len(library.operators),
                 "library_template_count": len(library.templates),

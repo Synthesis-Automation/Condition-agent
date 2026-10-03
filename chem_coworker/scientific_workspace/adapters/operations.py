@@ -72,6 +72,14 @@ class ScientificOperations:
         ),
         OperationDefinition("assess_route_step", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",)),
+        OperationDefinition(
+            "disconnect_composite", required_artifacts=("composite_library", "composite_catalog"),
+            usage_policy=(
+                "Return bounded composite actions, each retaining two physical reactions. "
+                "The agent owns route expansion and stopping decisions. Count two physical "
+                "steps; inspect both reactions and conditions before selecting a route."
+            ),
+        ),
         OperationDefinition("assess_route_proposal", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",)),
         OperationDefinition("assess_route_step_forward", required_artifacts=("forward_library",),
@@ -438,6 +446,31 @@ class ScientificOperations:
         if self._proposal_library is None:
             self._proposal_library = load_generic_library(self._path("retro_library"))
         return self._proposal_library
+
+    def disconnect_composite(
+        self, target_smiles: str, top_k: int = 5, max_templates_to_apply: int = 50,
+        max_candidates_to_validate: int = 12, use_context: bool = True,
+        include_l0: bool = True, include_one_step_fallbacks: bool = True,
+    ) -> dict[str, Any]:
+        """Propose common coupled transformations as one action with two physical steps.
+
+        Uses separately pinned composite_library and composite_catalog artifacts.
+        Target-specific site coupling and both graph transformations are checked.
+        Conditions, one-pot execution and material supply remain unassessed; these
+        are predicted proposals with source precedents, not observed target routes.
+        """
+        from core_retrosynthesis import (
+            load_composite_strategy_catalog, load_generic_library, search_composite_actions,
+        )
+
+        catalog = load_composite_strategy_catalog(self._path("composite_catalog"))
+        result = search_composite_actions(
+            target_smiles, load_generic_library(self._path("composite_library")), catalog.strategies,
+            top_k=top_k, max_templates_to_apply=max_templates_to_apply,
+            max_candidates_to_validate=max_candidates_to_validate, use_context=use_context,
+            include_l0=include_l0, include_one_step_fallbacks=include_one_step_fallbacks,
+        )
+        return {**result.to_dict(), "catalog_id": catalog.catalog_id}
 
     def assess_route_step(
         self, proposal: dict[str, Any], include_conditions: bool = False,

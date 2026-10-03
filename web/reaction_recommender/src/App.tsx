@@ -585,7 +585,7 @@ function App() {
             <label className={mode === 'weak_label' ? 'active weak-label-mode' : 'weak-label-mode'}><input type="radio" name="analysis-mode" value="weak_label" checked={mode === 'weak_label'} onChange={() => changeMode('weak_label')} /><strong>Weak-label conditions</strong></label>
             <label className={mode === 'forward_synthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="forward_synthesis" checked={mode === 'forward_synthesis'} onChange={() => changeMode('forward_synthesis')} /><strong>Forward synthesis</strong></label>
             <label className={mode === 'retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="retrosynthesis" checked={mode === 'retrosynthesis'} onChange={() => changeMode('retrosynthesis')} /><strong>Single-step retrosynthesis</strong></label>
-            <label className={mode === 'coupled_strategy' ? 'active experimental-mode' : 'experimental-mode'}><input type="radio" name="analysis-mode" value="coupled_strategy" checked={mode === 'coupled_strategy'} onChange={() => changeMode('coupled_strategy')} /><strong>Coupled two-step strategies</strong></label>
+            <label className={mode === 'coupled_strategy' ? 'active experimental-mode' : 'experimental-mode'}><input type="radio" name="analysis-mode" value="coupled_strategy" checked={mode === 'coupled_strategy'} onChange={() => changeMode('coupled_strategy')} /><strong>Composite two-step strategies</strong></label>
             <label className={mode === 'multistep_retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="multistep_retrosynthesis" checked={mode === 'multistep_retrosynthesis'} onChange={() => changeMode('multistep_retrosynthesis')} /><strong>Multi-step retrosynthesis</strong></label>
           </fieldset>
 
@@ -607,7 +607,7 @@ function App() {
               ) : mode === 'multistep_retrosynthesis' ? (
                 <div className="multistep-primary-options"><label><span>Maximum depth</span><select value={multistepDepth} onChange={(event) => setMultistepDepth(Number(event.target.value) as 2 | 3)}><option value={2}>2 steps</option><option value={3}>3 steps</option></select></label><label><span>Terminal MW threshold</span><input type="number" min="1" max="500" value={molecularWeightThreshold} onChange={(event) => setMolecularWeightThreshold(Math.min(500, Math.max(1, Number(event.target.value))))} /></label></div>
               ) : mode === 'coupled_strategy' ? (
-                <div className="feature-mode-note"><strong>Experimental v1 operator-pair search</strong><span>Tests structurally related route-step pairs as one logical strategy while retaining both validated reactions and ordinary one-step fallbacks. {capabilities?.coupled_strategy_catalog_size ?? 0} promoted pairs are loaded.</span></div>
+                <div className="feature-mode-note"><strong>Experimental composite-action search</strong><span>Returns one planning action with two physical steps, checked target-site dependency, and ordinary one-step fallbacks. {capabilities?.coupled_strategy_catalog_size ?? 0} promoted pairs are loaded.</span></div>
               ) : (
                 <div className="feature-mode-note"><strong>Automatic input detection</strong><span>Molecules show motifs and sites; reactions also include edits and mapping.</span></div>
               )}

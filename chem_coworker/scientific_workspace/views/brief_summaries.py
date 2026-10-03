@@ -117,6 +117,26 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                 for key in ("order_changes", "hydrogen_changes", "stereo_changes")
                 if key in signature
             })
+    elif operation == "disconnect_composite":
+        overview.update(_brief_fields(source, ("catalog_id", "diagnostics")))
+        overview["actions"] = []
+        for item in source.get("actions", [])[:3]:
+            if not isinstance(item, Mapping):
+                continue
+            action = _brief_fields(item, (
+                "action_id", "strategy_id", "intermediate_smiles", "terminal_precursor_smiles",
+                "physical_step_count", "physical_step_cost", "condition_compatibility_status", "one_pot_status",
+            ))
+            action["dependency"] = _brief_fields(item.get("dependency", {}), (
+                "admitted", "status", "relationship_class", "dependency_class", "lineage_status", "warnings",
+            ))
+            action["physical_steps"] = [_brief_fields(step, (
+                "forward_step_number", "reaction_smiles", "operator_id", "precedent_reaction_ids",
+                "forward_validation_status", "condition_status", "evidence_kind",
+                "precursor_compatibility_disposition", "reaction_compatibility_disposition",
+            )) for step in item.get("physical_steps", [])]
+            overview["actions"].append(action)
+        overview["dependency_reviews"] = source.get("dependency_reviews", [])[:3]
     elif operation == "disconnect_target":
         overview.update(_brief_fields(source, ("bond_focus",)))
         if source.get("search_diagnostics"):

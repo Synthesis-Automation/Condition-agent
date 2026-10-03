@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v8
+# Retrosynthesis investigation adviser v9
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -23,6 +23,17 @@ subsequent targets and stopping decisions under the catalogue's execution polici
 Choose an initial investigation budget suited to the question; broaden it for a
 decision-changing gap. Reuse explicit source-supported steps and unchanged results.
 Keep branch choices, alternatives and stopping reasons in recorded notes; avoid cycles.
+
+Use `disconnect_composite` when a common coupled sequence could avoid an unhelpful
+intermediate expansion, such as alcohol activation/substitution or nitration/reduction.
+It requires separately pinned `composite_library` and `composite_catalog` artifacts.
+Each result is one logical action containing two predicted physical steps; count both
+steps in route cost and expand `physical_steps` or `route_tree` in the final route.
+Inspect target-specific `dependency`, precedents and compatibility warnings on both
+steps. `dependency_reviews` retains conflicts and unresolved lineage; catalogue support
+does not override these observations. Conditions, supply and one-pot compatibility
+remain unassessed. The agent still selects branches and stopping decisions; this
+operation performs a bounded pair expansion, not autonomous multistep planning.
 
 For a decision-changing bond-construction question, `disconnect_target` accepts
 `required_disconnection_bond=[atom_a, atom_b]` with `focus_target_smiles` from a

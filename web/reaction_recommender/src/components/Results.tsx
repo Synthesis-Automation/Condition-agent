@@ -1081,6 +1081,9 @@ function CoupledStrategyDetails({ action }: { action: CoupledStrategyAction }) {
       </div>
 
       <dl className="detail-list">
+        <div><dt>Planning cost</dt><dd>1 logical action · {action.physical_step_count} physical steps</dd></div>
+        <div><dt>Target-site dependency</dt><dd>{displayName(action.dependency?.status ?? 'not_assessed')} · {displayName(action.dependency?.dependency_class ?? 'unresolved')}</dd></div>
+        <div><dt>Conditions / one-pot execution</dt><dd>{displayName(action.condition_compatibility_status ?? 'not_assessed')} / {displayName(action.one_pot_status ?? 'not_assessed')}</dd></div>
         <div><dt>Target</dt><dd className="mono-value">{action.second_reaction_smiles.split('>>').at(-1) ?? '—'}</dd></div>
         <div><dt>Intermediate</dt><dd className="mono-value">{action.intermediate_smiles}</dd></div>
         <div><dt>Terminal precursors</dt><dd className="mono-value">{action.terminal_precursor_smiles}</dd></div>
@@ -1103,6 +1106,9 @@ function CoupledStrategyDetails({ action }: { action: CoupledStrategyAction }) {
       <details className="trace-panel">
         <summary>Strategy evidence</summary>
         <dl className="detail-list">
+          {(action.physical_steps ?? []).map(step => (
+            <div key={step.forward_step_number}><dt>Step {step.forward_step_number} precedents</dt><dd>{step.precedent_reaction_ids.join(', ') || 'None retained'} · precursor compatibility: {displayName(step.precursor_compatibility_disposition)} · reaction compatibility: {displayName(step.reaction_compatibility_disposition)}</dd></div>
+          ))}
           <div><dt>Strategy ID</dt><dd className="mono-value">{action.strategy_id}</dd></div>
           <div><dt>V2 review labels</dt><dd>{Object.entries(action.v2_dependency_counts).map(([name, count]) => `${displayName(name)} (${count})`).join(' · ') || 'None'}</dd></div>
         </dl>
@@ -1119,7 +1125,7 @@ export function CoupledStrategyResults({ result }: { result: CoupledStrategyRetr
   return (
     <section className="results-card">
       <div className="results-summary">
-        <div><span className="eyebrow">EXPERIMENTAL COUPLED TWO-STEP SEARCH</span><h2>{result.actions.length} promoted strateg{result.actions.length === 1 ? 'y' : 'ies'}</h2></div>
+        <div><span className="eyebrow">EXPERIMENTAL COMPOSITE TWO-STEP SEARCH</span><h2>{result.actions.length} composite strateg{result.actions.length === 1 ? 'y' : 'ies'}</h2></div>
         <div className="metric-strip">
           <div><strong>{result.actions.length}</strong><span>strategies</span></div>
           <div><strong>{result.one_step_fallbacks.length}</strong><span>fallbacks</span></div>
@@ -1129,6 +1135,13 @@ export function CoupledStrategyResults({ result }: { result: CoupledStrategyRetr
         </div>
       </div>
       <div className="alert caution"><strong>Experimental strategy prior.</strong> The operator pair is learned from related route steps; review site selectivity, intermediate stability, and condition compatibility before use.</div>
+      {(result.dependency_reviews ?? []).length > 0 && (
+        <details className="trace-panel"><summary>Dependency review: {result.diagnostics.dependency_rejected_count} pairs withheld</summary>
+          <ul>{result.dependency_reviews.map((review, index) => (
+            <li key={`${review.strategy_id}:${index}`}>{review.intermediate_smiles}: {displayName(review.dependency.status)} · {displayName(review.dependency.relationship_class)}</li>
+          ))}</ul>
+        </details>
+      )}
       {!result.valid && <div className="alert error">{displayName(result.error ?? 'No coupled strategy results')}</div>}
       {result.actions.length > 0 && (
         <div className="results-layout multistep-results-layout">

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "composite_actions.v1",
+  "definition_version": "1.0",
+  "allowed_relationships": ["handle_progression", "same_site_coupled"],
+  "allowed_forward_validation_statuses": ["verified_signature", "verified"],
+  "blocked_compatibility_dispositions": ["reject", "block", "blocked", "incompatible"],
+  "score_weights": {"first_step": 0.45, "second_step": 0.45, "support": 0.10},
+  "support_saturation_patents": 10,
+  "physical_step_cost": 2,
+  "dependency_review_limit": 20
+}

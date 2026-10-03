@@ -2,6 +2,13 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+Common two-step transformations can now be proposed with `disconnect_composite`,
+using pinned `composite_library` and `composite_catalog` artifacts. Each logical
+action retains two predicted reactions, target-site dependency evidence and a
+physical cost of two. See [composite actions](../new/composite_retrosynthetic_actions.md)
+for catalogue setup, Python/CLI usage and Workbench migration. Restart the server
+and begin a new investigation after this scientific code change.
+
 Linear routes in structured answers now use a shared [three-column SVG scheme](../new/linear_route_svg.md),
 with optional conditions and no compound captions. Branched or ambiguous routes
 retain dependency and individual-step views. The same renderer is available to

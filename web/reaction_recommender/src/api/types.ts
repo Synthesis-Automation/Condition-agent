@@ -25,7 +25,7 @@ export interface Capabilities {
   coupled_strategy_retrosynthesis?: boolean
   coupled_strategy_catalog_size?: number
   coupled_strategy_library_name?: string
-  coupled_strategy_panel_name?: string
+  coupled_strategy_catalog_name?: string
   literature_molecule_index_available?: boolean
   literature_molecule_index_name?: string
   stock_portfolio_available?: boolean
@@ -481,6 +481,26 @@ export interface CoupledStrategyRetrosynthesisRequest {
 }
 
 export interface CoupledStrategyAction {
+  action_id: string
+  physical_step_count: number
+  physical_step_cost: number
+  condition_compatibility_status: string
+  one_pot_status: string
+  dependency: {
+    admitted: boolean
+    status: string
+    relationship_class: string
+    dependency_class: string
+    lineage_status: string
+    warnings: string[]
+  }
+  physical_steps: {
+    forward_step_number: number
+    precedent_reaction_ids: string[]
+    precursor_compatibility_disposition: string
+    reaction_compatibility_disposition: string
+    condition_status: string
+  }[]
   rank: number
   strategy_id: string
   relationship_class: string
@@ -511,6 +531,7 @@ export interface CoupledStrategyOneStepFallback {
 }
 
 export interface CoupledStrategyDiagnostics {
+  dependency_rejected_count: number
   strategy_count: number
   capable_strategy_count: number
   capability_gap_count: number
@@ -530,7 +551,7 @@ export interface CoupledStrategyRetrosynthesisResult {
   valid: boolean
   error?: string | null
   experimental: true
-  panel_id: string
+  catalog_id: string
   strategy_catalog_size: number
   library_operator_count: number
   library_template_count: number
@@ -540,6 +561,11 @@ export interface CoupledStrategyRetrosynthesisResult {
   one_step_fallbacks: CoupledStrategyOneStepFallback[]
   diagnostics: CoupledStrategyDiagnostics
   warnings: string[]
+  dependency_reviews: {
+    strategy_id: string
+    intermediate_smiles: string
+    dependency: CoupledStrategyAction['dependency']
+  }[]
   search_budget: {
     top_k: number
     max_templates_to_apply: number

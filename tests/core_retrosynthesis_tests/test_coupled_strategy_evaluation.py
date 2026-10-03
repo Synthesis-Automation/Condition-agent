@@ -4,19 +4,20 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
+from core_retrosynthesis.composite_actions import CompositeStrategyDefinition
 
 import core_retrosynthesis.coupled_strategy_evaluation as evaluation_module
 from core_retrosynthesis.cli import _parser
+from core_retrosynthesis.composite_actions import CompositeDependencyAssessment, search_composite_actions
+import core_retrosynthesis.composite_actions as composite_module
 from core_retrosynthesis.coupled_strategy_evaluation import (
     CoupledStrategyEvaluationCase,
     CoupledStrategyEvaluationConfig,
     FrozenV1HeldoutPanel,
-    PromotedV1OperatorPair,
     build_v1_operator_pair_inventory,
     evaluate_v1_case,
     load_frozen_v1_heldout_panel,
     run_v1_coupled_strategy_evaluation,
-    search_promoted_v1_strategies,
     write_frozen_v1_heldout_panel,
 )
 from core_retrosynthesis.coupled_strategy_evaluation_review import (
@@ -31,6 +32,25 @@ from core_retrosynthesis.generic_models import (
     GenericSearchDiagnostics,
     GenericTemplateLibrary,
 )
+
+
+def _stub_dependency_for_search_mechanics(monkeypatch) -> None:
+    # These synthetic candidates isolate budgets and ranking, not chemistry.
+    # Real mapped positive/negative/ambiguous/conflicting pairs are tested in
+    # test_composite_actions.py with the canonical dependency assessor.
+    def assess(_first, _second, _intermediate, relationship):
+        return CompositeDependencyAssessment(
+            True, "verified", relationship, "continued_site_transformation", "unique", {},
+        ), None
+    monkeypatch.setattr(composite_module, "assess_composite_dependency", assess)
+
+
+def _test_operator_library(*operator_ids) -> GenericTemplateLibrary:
+    operators = tuple(GenericGraphOperator(
+        operator_id=identity, operator_signature=identity, edit_tokens=(), realization_ids=(),
+        abstraction_levels=("L1",), observation_support=4, independent_reference_support=2,
+    ) for identity in operator_ids)
+    return GenericTemplateLibrary((), 0, 0, {}, {}, operators=operators)
 
 
 def _candidate(
@@ -99,8 +119,9 @@ def test_operator_identity_reuses_route_core_observation() -> None:
     assert two_part.operator_id.startswith("OP1:")
 
 
-def test_promoted_v1_pair_executes_two_validated_steps_with_fallback() -> None:
-    strategy = PromotedV1OperatorPair(
+def test_promoted_v1_pair_executes_two_validated_steps_with_fallback(monkeypatch) -> None:
+    _stub_dependency_for_search_mechanics(monkeypatch)
+    strategy = CompositeStrategyDefinition(
         strategy_id="strategy:1",
         relationship_class="handle_progression",
         first_operator_id="op:first",
@@ -144,7 +165,7 @@ def test_promoted_v1_pair_executes_two_validated_steps_with_fallback() -> None:
     result = evaluate_v1_case(
         case,
         strategy,
-        GenericTemplateLibrary((), 0, 0, {}, {}),
+        _test_operator_library("op:first", "op:second"),
         config=CoupledStrategyEvaluationConfig(
             panel_size=1,
             top_k=3,
@@ -181,8 +202,9 @@ def test_promoted_v1_pair_executes_two_validated_steps_with_fallback() -> None:
     assert "Promoted logical actions" in page
 
 
-def test_promoted_v1_target_query_preserves_physical_steps_and_fallback() -> None:
-    strategy = PromotedV1OperatorPair(
+def test_promoted_v1_target_query_preserves_physical_steps_and_fallback(monkeypatch) -> None:
+    _stub_dependency_for_search_mechanics(monkeypatch)
+    strategy = CompositeStrategyDefinition(
         strategy_id="strategy:query",
         relationship_class="same_site_coupled",
         first_operator_id="op:first",
@@ -219,7 +241,7 @@ def test_promoted_v1_target_query_preserves_physical_steps_and_fallback() -> Non
         )
         for operator_id in ("op:first", "op:second")
     )
-    result = search_promoted_v1_strategies(
+    result = search_composite_actions(
         "CN",
         GenericTemplateLibrary((), 0, 0, {}, {}, operators=operators),
         (strategy,),
@@ -238,9 +260,10 @@ def test_promoted_v1_target_query_preserves_physical_steps_and_fallback() -> Non
     assert result.to_dict()["valid"] is True
 
 
-def test_promoted_query_diversifies_strategy_pairs_before_variants() -> None:
-    def strategy(name: str) -> PromotedV1OperatorPair:
-        return PromotedV1OperatorPair(
+def test_promoted_query_diversifies_strategy_pairs_before_variants(monkeypatch) -> None:
+    _stub_dependency_for_search_mechanics(monkeypatch)
+    def strategy(name: str) -> CompositeStrategyDefinition:
+        return CompositeStrategyDefinition(
             strategy_id=f"strategy:{name}",
             relationship_class="same_site_coupled",
             first_operator_id=f"op:first:{name}",
@@ -296,7 +319,7 @@ def test_promoted_query_diversifies_strategy_pairs_before_variants() -> None:
         )
         for operator_id in operator_ids
     )
-    result = search_promoted_v1_strategies(
+    result = search_composite_actions(
         "CN",
         GenericTemplateLibrary((), 0, 0, {}, {}, operators=operators),
         strategies,
@@ -316,7 +339,7 @@ def test_promoted_query_diversifies_strategy_pairs_before_variants() -> None:
 
 def test_v1_promotion_rejects_independent_steps() -> None:
     try:
-        PromotedV1OperatorPair(
+        CompositeStrategyDefinition(
             strategy_id="strategy:bad",
             relationship_class="independent_sites",
             first_operator_id="one",
@@ -350,7 +373,7 @@ def test_frozen_panel_evaluates_missing_library_without_reselection(
 ) -> None:
     route_source = tmp_path / "routes.core.jsonl.gz"
     route_source.write_bytes(b"fixed-route-source")
-    strategy = PromotedV1OperatorPair(
+    strategy = CompositeStrategyDefinition(
         strategy_id="strategy:frozen",
         relationship_class="handle_progression",
         first_operator_id="op:first",
@@ -436,7 +459,7 @@ def test_cli_exposes_library_independent_panel() -> None:
 
 
 def test_complete_pair_inventory_excludes_only_library_gaps(monkeypatch) -> None:
-    eligible = PromotedV1OperatorPair(
+    eligible = CompositeStrategyDefinition(
         strategy_id="strategy:eligible",
         relationship_class="handle_progression",
         first_operator_id="op:first",
@@ -445,7 +468,7 @@ def test_complete_pair_inventory_excludes_only_library_gaps(monkeypatch) -> None
         training_occurrence_count=3,
         v2_dependency_counts=(("created_handle_consumed", 3),),
     )
-    gap = PromotedV1OperatorPair(
+    gap = CompositeStrategyDefinition(
         strategy_id="strategy:gap",
         relationship_class="same_site_coupled",
         first_operator_id="op:missing",

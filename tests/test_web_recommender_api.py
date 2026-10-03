@@ -255,7 +255,7 @@ class FakeRuntime:
             "valid": True,
             "error": None,
             "experimental": True,
-            "panel_id": "CRV1PANEL2:test",
+            "catalog_id": "COMPOSITECATALOG1:test",
             "strategy_catalog_size": 1,
             "library_operator_count": 2,
             "library_template_count": 2,

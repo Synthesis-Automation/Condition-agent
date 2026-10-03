@@ -143,6 +143,31 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "source_assessment_id", "selected_operator_match_id", "operator_id",
             "input_hashes_verified", "library_source_verified",
         ), path)
+    elif operation == "disconnect_composite":
+        summary.update(view.pick(value, ("target_smiles", "catalog_id", "diagnostics"), path))
+        def composite(item: Any, child: str) -> Any:
+            result = view.pick(item, (
+                "action_id", "strategy_id", "intermediate_smiles", "terminal_precursor_smiles",
+                "physical_step_count", "physical_step_cost", "condition_compatibility_status",
+                "one_pot_status", "score",
+            ), child)
+            if isinstance(item, Mapping):
+                view.add_nested(result, item, "dependency", (
+                    "admitted", "status", "relationship_class", "dependency_class", "lineage_status", "warnings",
+                ), child)
+                view.add_list(result, item, "physical_steps", (
+                    "forward_step_number", "reaction_smiles", "operator_id", "template_id", "precedent_reaction_ids",
+                    "forward_validation_status", "precursor_compatibility_disposition", "reaction_compatibility_disposition",
+                    "condition_status", "evidence_kind", "selectivity_warnings",
+                ), child, limit=2)
+            return result
+        summary["actions"] = view.preview(value.get("actions", []), f"{path}.actions", composite, limit=3)
+        view.add_list(summary, value, "dependency_reviews", (
+            "strategy_id", "intermediate_smiles", "dependency",
+        ), path, limit=3)
+        view.add_list(summary, value, "one_step_fallbacks", (
+            "precursor_smiles", "proposed_reaction_smiles", "forward_validation_status",
+        ), path, limit=3)
     elif operation == "disconnect_target":
         summary.update(view.pick(value, ("bond_focus", "search_diagnostics"), path))
         view.add_nested(summary, value, "request", (

@@ -1,5 +1,11 @@
 # Core retrosynthesis
 
+Common coupled sequences are available as reusable [composite retrosynthetic
+actions](../docs/new/composite_retrosynthetic_actions.md): one logical expansion,
+two explicit physical reactions, target-specific dependency checks and physical
+cost of two. Python, `disconnect-composite`, the scientific agent and Workbench
+share the same implementation and a standalone versioned strategy catalogue.
+
 `core_retrosynthesis` is the canonical chemistry-first retrosynthesis package.
 Its primary path compiles type-agnostic graph operators from structure-derived
 reaction observations, admits them by source round trip, and forward-validates
