@@ -1058,6 +1058,67 @@ and `compare_route_proposals` for alternatives. Terminal-material availability
 requires separate evidence; no candidates means only that this bounded local
 search found no supported disconnection. It does not prove synthetic impossibility.
 
+### Focus a single-step search on one bond
+
+`disconnect_target` contract v2 adds an optional required disconnection bond.
+It uses the existing operator library and chemistry validation. First inspect
+the target using `inspect_reactive_sites` or `compare_molecules`; use the returned
+canonical SMILES and its zero-based atom IDs. Atom-map labels and input SMILES
+positions are not these IDs. `focus_target_smiles` binds the selection to the
+inspected target and is required when supplying a bond. A stale target, invalid
+atom IDs, or a nonexistent bond produces an explicit invalid request result.
+
+```python
+# For canonical CCNC, IDs 2 and 3 are the N-methyl bond.
+event = w.run("disconnect_target", {
+    "target_smiles": "CCNC",
+    "required_disconnection_bond": [2, 3],
+    "focus_target_smiles": "CCNC",
+    "top_k": 3,
+    "max_templates_to_apply": 40,
+    "max_candidates_to_validate": 10,
+})
+print(w.call_summary(event))
+```
+
+The selected bond must be absent in precursors and present as a validated formed
+bond in the forward reaction. Both selected atoms must have precursor contributors.
+Ring closure can qualify without splitting the molecule; bond-order changes alone
+do not qualify. The policy is `disconnection_bond_focus.v1@1.0`, with target and
+check contracts `disconnection_bond_focus.v1` / `disconnection_bond_check.v1`.
+Final ambiguous/conflicting mapping evidence cannot satisfy the constraint.
+
+Focused generation preserves RDChiral mapped outcomes until the constraint has
+been checked, including symmetric outcomes that otherwise share precursor SMILES.
+The check runs before the validation-budget cutoff and is confirmed against the
+final reaction observation after existing forward/signature checks. Every returned
+focused candidate carries `bond_focus_check.status="verified"` and a typed formed
+edit witness. No family name is required. This is structural evidence, not proof
+of experimental feasibility. Existing selectivity and compatibility cautions remain.
+
+`bond_focus` echoes the target and selected bond. `search_diagnostics` records
+per-level template/validation counts, focus rejections, unresolved checks, budget
+exclusions and bounded rejection examples. A zero-result search retains its focus
+and diagnostics; it is not silently relaxed. Template retrieval is unchanged, so
+the desired operator can still fall outside the template budget. Limits remain
+per specificity level; focused calls can try more levels than unrestricted calls.
+Ordinary calls retain their generation and ranking behavior. No preserved-core
+constraints, automatic precursor expansion or automatic focus selection are added.
+
+For a recorded development comparison against an existing library:
+
+```powershell
+python -m examples.ai_native.focused_retrosynthesis_pilot --output results/ai_native/focused_retro_dev --library results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz
+```
+
+The ten authored probes compare a fixed single template pool under identical total
+template and validation limits, independently check selected-bond compliance, and
+report target-specific recovery, candidate counts and observational timings.
+The runner uses recorded workspace Python execution; reports and corpus-derived
+structures stay under `results/ai_native/`. It does not measure autonomous-agent
+route quality or satisfy independent chemistry-review / untouched-evaluation gates.
+Restart the server and start a new investigation; existing libraries need no rebuild.
+
 The authored targets and single-step `arguments` are in
 [development_cases.json](../../examples/ai_native/development_cases.json).
 `start_pilots.py` records the first disconnection; subsequent planning is left to

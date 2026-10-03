@@ -63,7 +63,7 @@ class ScientificOperations:
                             required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("propose_condition_adaptation", evidence_arguments=("source_ref", "evidence_refs")),
         OperationDefinition(
-            "disconnect_target", required_artifacts=("retro_library",),
+            "disconnect_target", contract_version="2", required_artifacts=("retro_library",),
             usage_policy=(
                 "Retrosynthesis in this workspace uses single-step calls; the agent owns "
                 "multi-step planning. Do not invoke the built-in multistep planner, "
@@ -397,12 +397,18 @@ class ScientificOperations:
         use_context: bool = True, include_l0: bool = True, include_conditions: bool = False,
         condition_top_k: int = 3, condition_minimum_pool_size: int | None = None,
         unrestricted_condition_fallback: bool = False,
+        required_disconnection_bond: list[int] | None = None,
+        focus_target_smiles: str | None = None,
     ) -> Any:
         """Generate single-step strategies for one target; never expand precursor branches.
 
         The agent chooses realizations, subsequent targets and stopping decisions.
         Requires retro_library only unless conditions are requested. Preserves the
         existing engine's evidence and warnings; internal LLM review is disabled.
+        Optional required_disconnection_bond selects two zero-based canonical
+        atom IDs. Supply focus_target_smiles from molecular inspection to bind
+        the selection to that target. Only verified forward formation of that
+        bond qualifies; bond-order changes alone do not. Search remains bounded.
         """
         from chem_coworker.contracts import RetrosynthesisRequest
         from chem_coworker.retrosynthesis import RetrosynthesisCoworker
@@ -416,6 +422,8 @@ class ScientificOperations:
             include_conditions=include_conditions, condition_top_k=condition_top_k,
             condition_minimum_pool_size=condition_minimum_pool_size,
             unrestricted_condition_fallback=unrestricted_condition_fallback,
+            required_disconnection_bond=required_disconnection_bond,
+            focus_target_smiles=focus_target_smiles,
         )
         coworker = RetrosynthesisCoworker(
             library=self._external_route_library(), library_path=self._path("retro_library"),

@@ -18,6 +18,10 @@ from cas_tools import (
     aggregate_precursor_realism_trace,
 )
 from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
+from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy.disconnection_focus import (
+    check_disconnection_bond, disconnection_focus_policy, prepare_disconnection_focus,
+)
 from reactive_taxonomy.reaction_identity_graphs import provisional_product_site
 from reactive_taxonomy.strategic_complexity import (
     RetrosyntheticComplexityReduction,
@@ -73,7 +77,9 @@ def _strategic_complexity(
         return None
 
 
-def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
+def _apply(
+    smarts: str, target_smiles: str, *, preserve_correspondences: bool = False,
+) -> tuple[tuple[str, str], ...]:
     """Return canonical precursors and RDChiral-preserved mapped reactions."""
 
     try:
@@ -84,6 +90,7 @@ def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
                 reactants,
                 combine_enantiomers=False,
                 return_mapped=True,
+                keep_mapnums=preserve_correspondences,
             )
     except Exception:
         return ()
@@ -93,6 +100,7 @@ def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
         isomericSmiles=True,
     )
     values = {}
+    mapped_values = set()
     for outcome in outcomes:
         canonical = canonical_smiles(str(outcome))
         mapped = mapped_outcomes.get(outcome)
@@ -100,10 +108,13 @@ def _apply(smarts: str, target_smiles: str) -> tuple[tuple[str, str], ...]:
             continue
         mapped_precursors = str(mapped[0])
         mapped_reaction = f"{mapped_precursors}>>{mapped_target}"
+        if preserve_correspondences:
+            mapped_values.add((canonical, mapped_reaction))
+            continue
         current = values.get(canonical)
         if current is None or mapped_reaction < current:
             values[canonical] = mapped_reaction
-    return tuple(sorted(values.items()))
+    return tuple(sorted(mapped_values)) if preserve_correspondences else tuple(sorted(values.items()))
 
 
 def _selectivity_warnings(
@@ -160,6 +171,8 @@ def disconnect_generic_target_detailed(
     diversify_sites: bool = False,
     stop_after_valid_candidates: int | None = None,
     balance_operator_budget: bool = False,
+    required_disconnection_bond: tuple[int, int] | list[int] | None = None,
+    focus_target_smiles: str | None = None,
 ) -> tuple[
     tuple[GenericDisconnectionCandidate, ...],
     GenericSearchDiagnostics,
@@ -176,6 +189,20 @@ def disconnect_generic_target_detailed(
     target = Chem.MolFromSmiles(canonical_target)
     if target is None:
         raise ValueError("target could not be parsed")
+    if required_disconnection_bond is None and focus_target_smiles is not None:
+        raise ValueError("focus_target_smiles requires required_disconnection_bond")
+    focus = (
+        prepare_disconnection_focus(canonical_target, required_disconnection_bond, focus_target_smiles)
+        if required_disconnection_bond is not None else None
+    )
+    target_maps = ()
+    if focus is not None:
+        generated_target = rdchiralReactants(canonical_target)
+        target_maps = tuple(generated_target.idx_to_mapnum(i) for i in range(target.GetNumAtoms()))
+    focus_counts = {"matched": 0, "not_matched": 0, "unresolved": 0}
+    focus_examples = []
+    example_limit = disconnection_focus_policy()["diagnostic_example_limit"] if focus else 0
+    generated_precursor_count = 0
     allowed_transformations = set(transformations)
     allowed_operators = set(operator_ids)
     allowed_levels = set(levels)
@@ -222,10 +249,19 @@ def disconnect_generic_target_detailed(
     )
     templates_to_apply = scheduled_templates[:max_templates_to_apply]
     for product_similarity, specificity, template in templates_to_apply:
-        for precursors, mapped_proposed in _apply(
-            template.reaction_smarts,
-            canonical_target,
-        ):
+        outcomes = (
+            _apply(template.reaction_smarts, canonical_target, preserve_correspondences=True)
+            if focus is not None else _apply(template.reaction_smarts, canonical_target)
+        )
+        for precursors, mapped_proposed in outcomes:
+            generated_precursor_count += 1
+            if focus is not None:
+                check = check_disconnection_bond(focus, mapped_proposed, target_maps)
+                focus_counts[check.status] += 1
+                if check.status != "matched":
+                    if len(focus_examples) < example_limit:
+                        focus_examples.append(check)
+                    continue
             precursor_similarity = maximum_similarity(
                 precursors,
                 (precedent.precursor_smiles for precedent in template.precedents),
@@ -252,7 +288,7 @@ def disconnect_generic_target_detailed(
                 )
             )
     seeds.sort(key=lambda item: (-item[0], item[1], item[5].template_id))
-    generated_precursor_count = len(seeds)
+    eligible_precursor_count = len(seeds)
     if balance_operator_budget:
         # Keep distinct supplied correspondences; only identical mapped
         # proposals for the same operator share a validation attempt.
@@ -279,6 +315,7 @@ def disconnect_generic_target_detailed(
     invalid_forward_count = 0
     unresolved_identity_count = 0
     operator_mismatch_count = 0
+    focus_validation_rejected_count = 0
     validation_seeds = seeds[:max_candidates_to_validate]
     validation_attempt_count = 0
     for (
@@ -310,6 +347,17 @@ def disconnect_generic_target_detailed(
         elif identity.named_annotation != template.transformation_kind:
             operator_mismatch_count += 1
             continue
+        focus_check = None
+        if focus is not None:
+            focus_check = check_disconnection_bond(
+                focus, mapped_proposed, target_maps,
+                observation=featurize_reaction(mapped_proposed).observation,
+            )
+            if focus_check.status != "verified":
+                focus_validation_rejected_count += 1
+                if len(focus_examples) < example_limit:
+                    focus_examples.append(focus_check)
+                continue
         context_score = max(
             (
                 context_similarity(query_context, precedent.context)
@@ -356,6 +404,7 @@ def disconnect_generic_target_detailed(
             realization_id=template.realization_id,
             operator_signature=identity.operator_signature,
             synthon_signature=identity.synthon_signature,
+            bond_focus_check=focus_check,
             condition_query_reaction_smiles=mapped_proposed,
             selectivity_warnings=_selectivity_warnings(mapped_proposed),
             precursor_compatibility_assessments=compatibility.assessments,
@@ -436,13 +485,18 @@ def disconnect_generic_target_detailed(
         invalid_forward_count=invalid_forward_count,
         unresolved_identity_count=unresolved_identity_count,
         operator_mismatch_count=operator_mismatch_count,
-        duplicate_proposal_count=generated_precursor_count - len(seeds),
+        duplicate_proposal_count=eligible_precursor_count - len(seeds),
         template_budget_excluded_count=max(
             0, len(applicable) - len(templates_to_apply),
         ),
         validation_budget_excluded_count=max(0, len(seeds) - len(validation_seeds)),
         provisional_site_group_count=len(site_keys) if balance_operator_budget else 0,
         unresolved_provisional_site_count=unresolved_site_count if balance_operator_budget else 0,
+        focus_matched_count=focus_counts["matched"],
+        focus_rejected_count=focus_counts["not_matched"],
+        focus_unresolved_count=focus_counts["unresolved"],
+        focus_validation_rejected_count=focus_validation_rejected_count,
+        focus_rejection_examples=tuple(focus_examples),
     )
 
 
@@ -458,6 +512,8 @@ def disconnect_generic_target(
     max_candidates_to_validate: int = 50,
     use_context: bool = True,
     diversify_sites: bool = False,
+    required_disconnection_bond: tuple[int, int] | list[int] | None = None,
+    focus_target_smiles: str | None = None,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
     """Generate structurally validated candidates using the product index."""
 
@@ -472,6 +528,8 @@ def disconnect_generic_target(
         max_candidates_to_validate=max_candidates_to_validate,
         use_context=use_context,
         diversify_sites=diversify_sites,
+        required_disconnection_bond=required_disconnection_bond,
+        focus_target_smiles=focus_target_smiles,
     )
     return candidates
 
@@ -838,6 +896,8 @@ def disconnect_operator_ladder(
         Callable[[str], tuple[PrecursorRealismAssessment, ...]] | None
     ) = None,
     completion_prior_index: CompletionPriorIndex | None = None,
+    required_disconnection_bond: tuple[int, int] | list[int] | None = None,
+    focus_target_smiles: str | None = None,
 ) -> tuple[GenericDisconnectionCandidate, ...]:
     """Fill specificity tiers with general operator/site-diverse candidates.
 
@@ -877,6 +937,9 @@ def disconnect_operator_ladder(
             max_templates_to_apply=max_templates_to_apply,
             max_candidates_to_validate=max_candidates_to_validate,
             use_context=use_context,
+            **({"required_disconnection_bond": required_disconnection_bond,
+                "focus_target_smiles": focus_target_smiles}
+               if required_disconnection_bond is not None or focus_target_smiles is not None else {}),
         )
         if precursor_realism_scorer is not None:
             candidates = _attach_precursor_realism(
@@ -958,6 +1021,8 @@ def disconnect_operator_ladder_detailed(
         Callable[[str], tuple[PrecursorRealismAssessment, ...]] | None
     ) = None,
     completion_prior_index: CompletionPriorIndex | None = None,
+    required_disconnection_bond: tuple[int, int] | list[int] | None = None,
+    focus_target_smiles: str | None = None,
 ) -> tuple[
     tuple[GenericDisconnectionCandidate, ...],
     OperatorLadderDiagnostics,
@@ -1000,6 +1065,9 @@ def disconnect_operator_ladder_detailed(
             max_templates_to_apply=max_templates_to_apply,
             max_candidates_to_validate=max_candidates_to_validate,
             use_context=use_context,
+            **({"required_disconnection_bond": required_disconnection_bond,
+                "focus_target_smiles": focus_target_smiles}
+               if required_disconnection_bond is not None or focus_target_smiles is not None else {}),
             # Diversification needs a small verified reservoir; stopping at
             # the final top-k can erase distinct operator/site alternatives.
             # The bounded pool still avoids exhausting large validation

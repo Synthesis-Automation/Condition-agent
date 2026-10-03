@@ -118,6 +118,20 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                 if key in signature
             })
     elif operation == "disconnect_target":
+        overview.update(_brief_fields(source, ("bond_focus",)))
+        if source.get("search_diagnostics"):
+            diagnostics = source["search_diagnostics"]
+            overview["search_diagnostics"] = _brief_fields(diagnostics, (
+                "levels_attempted", "proposed_action_count", "validation_attempt_count", "valid_action_count",
+            ))
+            overview["search_diagnostics"]["level_diagnostics"] = {
+                level: _brief_fields(item, (
+                    "applied_template_count", "validation_attempt_count", "valid_candidate_count",
+                    "focus_matched_count", "focus_rejected_count", "focus_unresolved_count",
+                    "focus_validation_rejected_count", "template_budget_excluded_count",
+                    "validation_budget_excluded_count",
+                )) for level, item in diagnostics.get("level_diagnostics", {}).items()
+            }
         strategies = source.get("strategies", [])
         overview["strategy_count"] = len(strategies)
         overview["strategies"] = []
@@ -128,6 +142,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                     "realization_id", "precursor_smiles", "forward_validation_status",
                     "precursor_compatibility_disposition", "reaction_compatibility_disposition",
                     "template_id", "operator_id", "precedent_reaction_ids",
+                    "bond_focus_check",
                 ))
                 warnings = strategy["representative"].get("selectivity_warnings", [])
                 if warnings:

@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Dict, Literal, Optional, Tuple
 
 from cas_tools import PrecursorRealismAggregation, PrecursorRealismAssessment
+from reactive_taxonomy.disconnection_focus import DisconnectionBondCheck
 from reactive_taxonomy.reactive_pair_interactions import (
     ReactivePairInteractionAssessment,
 )
@@ -296,11 +297,17 @@ class GenericSearchDiagnostics:
     validation_budget_excluded_count: int = 0
     provisional_site_group_count: int = 0
     unresolved_provisional_site_count: int = 0
+    focus_matched_count: int = 0
+    focus_rejected_count: int = 0
+    focus_unresolved_count: int = 0
+    focus_validation_rejected_count: int = 0
+    focus_rejection_examples: Tuple[DisconnectionBondCheck, ...] = ()
 
     def to_dict(self) -> Dict[str, int]:
-        """Return stage counters as a JSON-compatible mapping."""
+        """Return integer stage counters; detailed witnesses are exposed separately."""
 
-        return asdict(self)
+        return {key: value for key, value in asdict(self).items()
+                if key != "focus_rejection_examples"}
 
 
 @dataclass(frozen=True)
@@ -349,6 +356,10 @@ class OperatorLadderDiagnostics:
             "proposed_action_count": self.proposed_action_count,
             "validation_attempt_count": self.validation_attempt_count,
             "valid_action_count": self.valid_action_count,
+            **({"focus_rejection_examples_by_level": {
+                level: [asdict(check) for check in diagnostics.focus_rejection_examples]
+                for level, diagnostics in self.level_diagnostics if diagnostics.focus_rejection_examples
+            }} if any(item.focus_rejection_examples for _, item in self.level_diagnostics) else {}),
         }
 
 
@@ -427,6 +438,7 @@ class GenericDisconnectionCandidate:
     pre_hierarchical_rank: int = 0
     hierarchical_rank: int = 0
     hierarchical_ranking_definition_id: str = ""
+    bond_focus_check: DisconnectionBondCheck | None = None
 
     def __post_init__(self) -> None:
         """Materialize and validate the handle-independent strategy identity."""

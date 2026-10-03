@@ -7,6 +7,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 
 from condition_recommender import GenericRecommendationResult
 from condition_registry import ConditionConstraintSet
+from reactive_taxonomy.disconnection_focus import DisconnectionBondFocus
 from core_retrosynthesis import (
     ConditionSelectivityRepairAssessment,
     MultistepRetrosynthesisResult,
@@ -210,6 +211,8 @@ class RetrosynthesisRequest:
     condition_minimum_pool_size: Optional[int] = None
     unrestricted_condition_fallback: bool = False
     review: ConditionReviewSettings = field(default_factory=ConditionReviewSettings)
+    required_disconnection_bond: Optional[Tuple[int, int]] = None
+    focus_target_smiles: Optional[str] = None
 
     def __post_init__(self) -> None:
         if not self.target_smiles.strip():
@@ -309,6 +312,8 @@ class RetrosynthesisResponse:
     error: Optional[str] = None
     library_path: Optional[str] = None
     system: str = "chem_coworker.retrosynthesis.v1"
+    bond_focus: Optional[DisconnectionBondFocus] = None
+    search_diagnostics: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize all strategies, evidence, and model annotations."""
@@ -328,6 +333,9 @@ class RetrosynthesisResponse:
             "warnings": list(self.warnings),
             "error": self.error,
             "library_path": self.library_path,
+            **({"bond_focus": self.bond_focus.to_dict(),
+                "search_diagnostics": self.search_diagnostics}
+               if self.bond_focus is not None else {}),
         }
 
 

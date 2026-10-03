@@ -1,0 +1,8 @@
+{
+  "schema_version": "disconnection_bond_focus_policy.v1",
+  "definition_version": "disconnection_bond_focus.v1@1.0",
+  "atom_id_scope": "zero_based_canonical_smiles",
+  "required_forward_edit": "formed",
+  "require_both_precursor_atoms": true,
+  "diagnostic_example_limit": 3
+}

@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v7
+# Retrosynthesis investigation adviser v8
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -23,6 +23,20 @@ subsequent targets and stopping decisions under the catalogue's execution polici
 Choose an initial investigation budget suited to the question; broaden it for a
 decision-changing gap. Reuse explicit source-supported steps and unchanged results.
 Keep branch choices, alternatives and stopping reasons in recorded notes; avoid cycles.
+
+For a decision-changing bond-construction question, `disconnect_target` accepts
+`required_disconnection_bond=[atom_a, atom_b]` with `focus_target_smiles` from a
+saved `inspect_reactive_sites` or `compare_molecules` canonical molecule. IDs are
+zero-based in that canonical SMILES, not in the input string or atom-map labels.
+Inspect the atom inventory before selecting a bond. The bond must be absent in
+the proposed precursors and verified as formed in the forward transformation;
+ring closure is allowed, but bond-order changes alone do not qualify. Focus is
+checked before validation-budget selection and again against final observations.
+Inspect `bond_focus`, candidate `bond_focus_check`, and `search_diagnostics` for
+scope, rejection counts and budget exclusions. An empty focused search must not
+be presented as impossibility or silently broadened. Broaden explicitly only
+when another question could change the plan. Template retrieval is unchanged;
+the ladder keeps per-level budgets and may try more levels when focus is narrow.
 
 Use `assess_starting_material` when deciding whether to expand a route leaf. It
 checks exact registry identity, then exact product occurrence in the optional

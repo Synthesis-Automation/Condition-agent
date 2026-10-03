@@ -10,6 +10,7 @@ from core_retrosynthesis import (
     GenericTemplateLibrary,
     StrategyProposal,
     disconnect_operator_ladder,
+    disconnect_operator_ladder_detailed,
     group_strategy_candidates,
     load_generic_library,
     load_retrosynthesis_ranking_policy,
@@ -23,6 +24,7 @@ from .contracts import (
     RetrosynthesisStrategyCondition,
 )
 from .retrosynthesis_rendering import render_retrosynthesis
+from reactive_taxonomy.disconnection_focus import prepare_disconnection_focus
 
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -130,6 +132,14 @@ class RetrosynthesisCoworker:
                 max(request.top_k * 2, request.review.max_candidates),
             )
         try:
+            focus = None
+            search_diagnostics = None
+            if request.required_disconnection_bond is not None:
+                focus = prepare_disconnection_focus(
+                    target, request.required_disconnection_bond, request.focus_target_smiles,
+                )
+            elif request.focus_target_smiles is not None:
+                raise ValueError("focus_target_smiles requires required_disconnection_bond")
             policy = load_retrosynthesis_ranking_policy()
             flat_pool_size = min(
                 request.max_candidates_to_validate,
@@ -139,15 +149,19 @@ class RetrosynthesisCoworker:
                     pool_size * request.max_realizations_per_strategy,
                 ),
             )
-            candidates = disconnect_operator_ladder(
-                target,
-                self.library,
-                top_k=flat_pool_size,
-                max_templates_to_apply=request.max_templates_to_apply,
-                max_candidates_to_validate=request.max_candidates_to_validate,
-                use_context=request.use_context,
-                include_l0=request.include_l0,
-            )
+            options = dict(top_k=flat_pool_size,
+                           max_templates_to_apply=request.max_templates_to_apply,
+                           max_candidates_to_validate=request.max_candidates_to_validate,
+                           use_context=request.use_context, include_l0=request.include_l0)
+            if focus is not None:
+                candidates, diagnostics = disconnect_operator_ladder_detailed(
+                    target, self.library, **options,
+                    required_disconnection_bond=focus.atom_ids,
+                    focus_target_smiles=focus.canonical_target_smiles,
+                )
+                search_diagnostics = diagnostics.to_dict()
+            else:
+                candidates = disconnect_operator_ladder(target, self.library, **options)
             identity_candidates = tuple(
                 candidate for candidate in candidates if candidate.strategy_id
             )
@@ -168,6 +182,11 @@ class RetrosynthesisCoworker:
         condition_evidence = self._condition_evidence(strategies, request)
         review = self._review(strategies, condition_evidence, request)
         warnings = []
+        if focus is not None:
+            warnings.append(
+                "Focused search retains ordinary template retrieval and per-level budgets; "
+                "no qualifying result is a bounded search outcome, not synthetic impossibility."
+            )
         omitted_identity_count = len(candidates) - len(identity_candidates)
         if omitted_identity_count:
             warnings.append(
@@ -191,6 +210,8 @@ class RetrosynthesisCoworker:
             strategies=tuple(strategies),
             condition_evidence=condition_evidence,
             review=review,
+            bond_focus=focus,
+            search_diagnostics=search_diagnostics,
             warnings=tuple(warnings),
             library_path=str(self.library_path) if self.library_path else None,
         )

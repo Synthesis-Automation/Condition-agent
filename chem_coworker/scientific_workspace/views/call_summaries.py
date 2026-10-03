@@ -144,14 +144,17 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "input_hashes_verified", "library_source_verified",
         ), path)
     elif operation == "disconnect_target":
+        summary.update(view.pick(value, ("bond_focus", "search_diagnostics"), path))
         view.add_nested(summary, value, "request", (
             "target_smiles", "top_k", "max_realizations_per_strategy", "max_templates_to_apply",
             "max_candidates_to_validate", "use_context", "include_l0", "include_conditions",
+            "required_disconnection_bond", "focus_target_smiles",
         ), path)
         realization_fields = (
             "realization_id", "target_smiles", "precursor_smiles", "proposed_reaction_smiles",
             "forward_validation_status", "precedent_reaction_ids", "selectivity_warnings",
             "precursor_compatibility_disposition", "reaction_compatibility_disposition",
+            "bond_focus_check",
         )
 
         def strategy(item: Any, child: str) -> Any:
