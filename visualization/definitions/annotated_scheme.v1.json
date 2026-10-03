@@ -1,18 +1,16 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "definition_id": "annotated_scheme.v1",
   "molecule_preset": "web_consistent",
-  "molecule_width": 260,
-  "molecule_height": 220,
+  "molecule_width": 100,
+  "molecule_height": 100,
   "arrow_width": 240,
-  "gap": 32,
-  "padding": 28,
-  "bottom_padding": 16,
+  "gap": 20,
+  "padding": 12,
+  "bottom_padding": 12,
   "font_size": 20,
   "line_height": 26,
-  "name_characters": 22,
   "annotation_characters": 20,
   "character_width_em": 0.65,
-  "max_annotation_lines": 4,
-  "max_name_lines": 3
+  "max_annotation_lines": 4
 }

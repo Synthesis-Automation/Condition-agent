@@ -43,6 +43,7 @@ _PROSE = re.compile(
 _GENERIC = re.compile(
     r"(?:core|stannane|substrate|starting material|compound|product|intermediate|"
     r"reagent|catalyst|solvent)(?:\s*[-#]?\s*[A-Za-z]?\d+(?:\.\d+)?)?|"
+    r"(?:substrate\s+|reaction\s+)?(?:concentration|temperature|pressure|time)|"
     r"[CP]\d+(?:\.\d+)?|room temperature|ambient temperature|r\.?t\.?|"
     r"reflux|overnight|n/?a|tbd", re.I,
 )
@@ -83,7 +84,15 @@ def compact_condition_labels(texts: Iterable[str], reactant_names: Iterable[str]
     retained text is a display label, not a recognized or validated chemical identity.
     This intentionally does not extract names from arbitrary narrative procedures.
     """
-    reactants = {" ".join(name.split()).casefold() for name in reactant_names}
+    reactants: set[str] = set()
+    for name in reactant_names:
+        normalized = " ".join(name.split()).casefold()
+        reactants.add(normalized)
+        # A supplied caption such as "B: ethyl ester" declares its own alias;
+        # exclude that exact identifier without guessing chemical synonyms.
+        alias = re.fullmatch(r"([a-z]\d*):\s*(.+)", normalized)
+        if alias:
+            reactants.update(alias.groups())
     labels: list[str] = []
     seen: set[str] = set()
     for text in texts:

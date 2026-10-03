@@ -1,4 +1,4 @@
-"""Named reaction schemes composed from declared structures, without inference.
+"""Compact reaction schemes composed from declared structures, without inference.
 
 This is a display contract, not a reaction assessment. Annotations retain their
 supplied attribution; drawing an arrow does not establish a feasible synthesis.
@@ -31,19 +31,18 @@ class AnnotatedSchemeStyle(TypedDict):
     bottom_padding: int
     font_size: int
     line_height: int
-    name_characters: int
     annotation_characters: int
     character_width_em: float
     max_annotation_lines: int
-    max_name_lines: int
 
 
 @dataclass(frozen=True)
 class SchemeMolecule:
-    """An explicitly supplied name and structure to depict unchanged."""
+    """A supplied structure with a metadata name and optional source identifier."""
 
     name: str
     smiles: str
+    identifier: str | None = None
 
 
 @dataclass(frozen=True)
@@ -58,15 +57,16 @@ def load_annotated_scheme_style() -> AnnotatedSchemeStyle:
     """Load validated, versioned scheme layout parameters."""
     path = Path(__file__).with_name("definitions") / "annotated_scheme.v1.json"
     values = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(values, dict) or values.get("schema_version") != "1.1" or values.get("definition_id") != "annotated_scheme.v1":
+    if (not isinstance(values, dict)
+            or values.get("schema_version") != "1.2"
+            or values.get("definition_id") != "annotated_scheme.v1"):
         raise ValueError("Unsupported annotated scheme definition")
     preset = values.get("molecule_preset")
     if not isinstance(preset, str) or preset not in load_render_style_definitions()["presets"]:
         raise ValueError("Invalid scheme molecule preset")
     for key in (
         "molecule_width", "molecule_height", "arrow_width", "gap", "padding", "bottom_padding",
-        "font_size", "line_height", "name_characters", "annotation_characters",
-        "max_annotation_lines", "max_name_lines",
+        "font_size", "line_height", "annotation_characters", "max_annotation_lines",
     ):
         if type(values.get(key)) is not int or not 1 <= values[key] <= 2000:
             raise ValueError(f"Invalid scheme layout parameter: {key}")
@@ -91,7 +91,8 @@ def render_annotated_scheme_svg(
 
     Retrosynthetic plans are displayed in synthetic direction. No structures,
     conditions, yields, or ordering are inferred. Long labels use an ellipsis;
-    complete original annotations and attribution remain in the SVG description.
+    complete original annotations, molecule names and attribution remain in the
+    SVG description. Structures have no visible name captions.
     Molecule panels are minimums; larger graphs grow at the preset bond scale.
     """
     if not reactants or not products:
@@ -112,7 +113,8 @@ def render_annotated_scheme_svg(
         return rows
 
     condition_text = ", ".join(compact_condition_labels(
-        (item.text for item in conditions), (item.name for item in reactants),
+        (item.text for item in conditions),
+        (label for item in reactants for label in (item.name, item.identifier) if label),
     ))
     # Estimate Arial label width while keeping ordinary ligand formulas intact;
     # only overlong individual tokens are split. Full text remains in metadata.
@@ -129,15 +131,10 @@ def render_annotated_scheme_svg(
     )) for item in (*reactants, *products)]
     widths = [float(drawing.get("width").removesuffix("px")) for drawing in drawings]
     heights = [float(drawing.get("height").removesuffix("px")) for drawing in drawings]
-    names = [bounded_lines(
-        item.name, min(style["name_characters"], max(1, int(widths[index] / character_width))),
-        style["max_name_lines"],
-    ) for index, item in enumerate((*reactants, *products))]
     mh = max(heights)
     center_y = max(pad + mh / 2, pad + font + 24 + max(0, len(condition_lines) - 1) * line)
     molecule_top = center_y - mh / 2
-    bottom = max(center_y + 38 + len(yield_lines) * line,
-                 molecule_top + mh + max(map(len, names)) * line + 18)
+    bottom = max(center_y + (34 + font / 4 if yield_lines else 6), molecule_top + mh)
     width = pad * 2 + sum(widths) + len(widths) * gap + aw
     height = bottom + style["bottom_padding"]
     root = ET.Element("svg", {
@@ -171,7 +168,7 @@ def render_annotated_scheme_svg(
 
     def side(items: tuple[SchemeMolecule, ...], start: float, offset: int) -> None:
         x = start
-        for index, item in enumerate(items):
+        for index in range(len(items)):
             drawing = drawings[offset + index]
             molecule_width = widths[offset + index]
             group = ET.SubElement(root, "g", {
@@ -184,8 +181,6 @@ def render_annotated_scheme_svg(
                     if node.tag.startswith("{http://www.w3.org/2000/svg}"):
                         node.tag = node.tag.split("}", 1)[1]
                 group.append(child)
-            for row, text in enumerate(names[offset + index]):
-                label(x + molecule_width / 2, molecule_top + mh + 20 + row * line, text, role="molecule-name")
             if index < len(items) - 1:
                 label(x + molecule_width + gap / 2, center_y + 8, "+", size=28)
             x += molecule_width + gap

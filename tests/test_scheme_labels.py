@@ -26,6 +26,11 @@ from visualization.scheme_labels import compact_condition_labels, compact_yield_
     (["NiCl2·6H2O 0.1 mmol; CuSO4·5H2O (5 mol%)"], (), ("NiCl2·6H2O", "CuSO4·5H2O")),
     (["THF at reflux", "EtOH overnight", "MeOH at room temperature", "DMF at ambient temperature"],
      (), ("THF", "EtOH", "MeOH", "DMF")),
+    (["B, lithium hydroxide, substrate concentration"],
+     ("B: ethyl ester",), ("lithium hydroxide",)),
+    (["B 1 mmol, lithium hydroxide (2 equiv), substrate concentration 0.1 M, 25 °C, 2 h"],
+     ("B", "ethyl ester"), ("lithium hydroxide",)),
+    (["concentration 0.1 M; temperature 25 °C; pressure 1 atm; time 2 h"], (), ()),
 ])
 def test_explicit_ingredient_labels_and_formula_digits_are_preserved(texts, reactants, expected) -> None:
     assert compact_condition_labels(texts, reactants) == expected

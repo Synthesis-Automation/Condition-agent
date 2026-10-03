@@ -71,6 +71,13 @@ Target and source schemes share a readable display scale, with horizontal scroll
 on narrow screens. Important caveats are outside collapsed details. All source text
 uses text nodes; the existing server sanitization owns rendered Markdown and URLs.
 
+Annotated schemes use layout schema **1.2**, with smaller minimum molecule panels
+and margins at the same bond scale. Structure-name captions are omitted. Arrow
+annotations show compact supplied ingredient names, stripping amounts, substrate
+identifiers and operating details. This is display cleanup, not substance or role
+resolution. Full names, conditions, attribution and yields remain in SVG metadata
+and the saved answer details. No answer schema change or dataset rebuild is needed.
+
 Restart the web server and refresh after upgrading. Saved answers receive the new
 layout without another agent run. Existing scientific baselines detect the changed
 adapter code; start a new investigation to generate new scientific calls. Later
