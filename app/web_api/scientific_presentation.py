@@ -290,8 +290,9 @@ def _structured_view(payload: str, identity: str, precedent_payload: str = "{}")
                 svg = render_route_scheme_svg(tuple(RouteSchemeStep(
                     step["reaction_smiles"], basis=step["basis"],
                     above=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["conditions"]),
+                    reagents=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["reagents"]),
                     yield_info=SchemeAnnotation(step["yield_info"]["text"], step["yield_info"]["basis"]) if step["yield_info"] else None,
-                ) for step in route_steps), title=route["title"])
+                ) for step in route_steps), title=route["title"], reagents_only=True)
             route["image_url"] = _svg_url(svg)
             route["scheme_width"] = float(ET.fromstring(svg).get("width"))
             route["drawing_status"] = "linear_scheme"

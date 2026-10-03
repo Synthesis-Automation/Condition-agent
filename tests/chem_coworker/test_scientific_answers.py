@@ -123,6 +123,35 @@ def test_saved_answer_uses_source_title_and_real_url_without_mutation(example) -
     assert payload == original
 
 
+def test_route_labels_use_explicit_reagents_and_keep_full_conditions(example) -> None:
+    _, payload = example
+    step = payload["steps"][0]
+    step["reagents"] = [{**step["conditions"][0], "text": "NaHCO3"}]
+    original = deepcopy(payload)
+    view = present_conversation({"id": "a" * 32, "turns": [
+        {"question": "Q", "answer": payload},
+    ]})["turns"][0]["structured_presentation"]
+    root = ET.fromstring(base64.b64decode(view["routes"][0]["image_url"].split(",", 1)[1]))
+    ns = "{http://www.w3.org/2000/svg}"
+    visible = " ".join(node.text or "" for node in root.iter(ns + "text"))
+    assert "NaHCO3" in visible
+    assert "THF" not in visible and "16 h" not in visible and "91.8%" not in visible
+    assert "p-TsOH" not in visible  # No reagent names guessed from old procedure text.
+    assert view["steps"][0]["conditions"] == step["conditions"]
+    assert view["steps"][0]["yield_info"] == step["yield_info"]
+    assert payload == original
+
+
+@pytest.mark.parametrize("source_ids,match", [([], "require source_ids"), (["absent"], "Unknown source_id")])
+def test_reagent_claims_require_valid_attribution(example, source_ids, match) -> None:
+    _, payload = example
+    payload["steps"][0]["reagents"] = [{
+        "text": "NaHCO3", "basis": "reported", "source_ids": source_ids, "limitations": [],
+    }]
+    with pytest.raises(ValueError, match=match):
+        ScientificAnswer.model_validate(payload)
+
+
 @pytest.mark.parametrize("mutation,match", [
     (lambda a: a["steps"][0].update(source_ids=[]), "require source_ids"),
     (lambda a: a["steps"][0].update(source_ids=["absent"]), "Unknown source_id"),

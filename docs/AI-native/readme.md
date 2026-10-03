@@ -900,13 +900,18 @@ This produces local JSON evidence and an HTML molecular review report. It is a
 bounded single-step investigation, not a complete route or independent evaluation.
 
 The regular research workbench also exposes **Fragment-guided retro**. Start with
-`python -m app.web_api --workbench --build --port 8000`, select the mode, enter or
-draw a target, and click **Evaluate fragment-guided retro**. The example button
-loads the target above. A prepared fragment index and compact/full operator
-library are required. The UI uses the same domain implementation and evidence
-gates, compares baseline and guided proposals, reports actual work, and exports
-the full JSON result. Interactive calls run once; use the CLI for pinned,
-recorded investigations and repeated-run checks.
+`python -m app.web_api --workbench --build --port 8000`, select the mode and use
+the default **Assisted fragment research** workflow: keep a full target, choose
+or edit a separate fragment query, search, revise deliberately, inspect procedures,
+select source observations and assess transfer. Query revisions, notes, results
+and errors remain in bounded browser history and can be exported. The baseline
+is optional. Discovery requires the prepared fragment index; transfer also needs
+the selected compact/full operator library. **Automatic POC comparison** retains
+the earlier automatic selection and baseline experiment. Both workflows share
+the domain implementation and chemistry gates. See the
+[POC documentation](Deterministic_Fragment_Retrosynthesis_POC.md) for limits and
+HTTP contracts. Interactive calls run once; use the CLI for pinned, recorded
+investigations and repeated-run checks.
 
 ## Focused molecular inspection
 

@@ -1,0 +1,6 @@
+{
+  "schema_version": "fragment_transfer_policy.v1",
+  "definition_version": "fragment_transfer.v1@1.0",
+  "max_target_alignments": 64,
+  "max_projection_witnesses": 2048
+}

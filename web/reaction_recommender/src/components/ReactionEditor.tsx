@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useId, useState } from 'react'
 import type { Ketcher } from 'ketcher-core'
 import { ReactionImage } from './ReactionImage'
 import { DrawingEditorBoundary } from './DrawingEditorBoundary'
@@ -240,6 +240,7 @@ export function ReactionEditor({
   queryFormat = 'smiles',
   disabled = false,
 }: ReactionEditorProps) {
+  const editorId = useId()
   const isStartingMaterials = moleculeOnly && moleculePurpose === 'starting_materials'
   const isFragment = moleculeOnly && moleculePurpose === 'fragment'
   const textOnly = queryFormat === 'smarts'
@@ -254,12 +255,12 @@ export function ReactionEditor({
     : 'reaction'
 
   return (
-    <section className="editor-card reaction-paper" aria-labelledby="editor-title">
+    <section className="editor-card reaction-paper" aria-labelledby={`${editorId}-title`}>
       <div className="section-heading reaction-paper-heading">
         <div>
           <span className="step-number">2</span>
           <div>
-            <h2 id="editor-title">
+            <h2 id={`${editorId}-title`}>
               {isFragment ? 'Define the core fragment' : isStartingMaterials ? 'Define the starting materials' : moleculeOnly ? 'Define the target' : allowMolecule ? 'Define the structure' : 'Define the reaction'}
             </h2>
             <p>
@@ -288,10 +289,10 @@ export function ReactionEditor({
       </div>
 
       <div className="reaction-main-input">
-        <label htmlFor="main-reaction-smiles">
+        <label htmlFor={`${editorId}-smiles`}>
           <span>{isFragment ? 'Core fragment' : isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : allowMolecule ? 'Molecule or reaction SMILES' : 'Reaction SMILES'}</span>
           <input
-            id="main-reaction-smiles"
+            id={`${editorId}-smiles`}
             type="text"
             value={value}
             disabled={disabled}

@@ -18,6 +18,22 @@ from .generic_library import GenericTemplateLibrary
 DEFAULT_POLICY = Path(__file__).with_name("definitions") / "fragment_guided_retro_policy.v1.json"
 
 
+def load_transfer_policy(path: str | Path | None = None) -> dict[str, Any]:
+    """Validate bounded alignment-projection work for explicit query transfer."""
+    path = Path(path) if path is not None else Path(__file__).with_name("definitions") / "fragment_transfer.v1.json"
+    value = json.loads(path.read_text("utf-8"))
+    if (not isinstance(value, dict)
+            or set(value) != {"schema_version", "definition_version", "max_target_alignments",
+                      "max_projection_witnesses"}
+            or value["schema_version"] != "fragment_transfer_policy.v1"
+            or value["definition_version"] != "fragment_transfer.v1@1.0"):
+        raise ValueError("Unsupported fragment transfer policy")
+    for key, maximum in (("max_target_alignments", 64), ("max_projection_witnesses", 2048)):
+        if type(value[key]) is not int or not 1 <= value[key] <= maximum:
+            raise ValueError(f"Invalid transfer policy field: {key}")
+    return value
+
+
 def restore_source_smiles(value: Any) -> str:
     """Restore complete index text chunks, checking offsets, length and source hash."""
     if isinstance(value, str) and value:
@@ -159,6 +175,78 @@ def scientific_projection(value: dict[str, Any]) -> dict[str, Any]:
     return {key: item for key, item in value.items() if key != "execution"}
 
 
+def project_selected_query_guidance(
+    target_smiles: str, result: dict[str, Any], selected_observation_ids: list[str],
+    policy: dict[str, Any],
+) -> dict[str, Any]:
+    """Project selected construction witnesses through every bounded target alignment.
+
+    Inputs are canonical search results, not user-provided source reactions.
+    Target-query symmetries remain alternative hypotheses; truncated target
+    enumeration cannot seed guidance. Query edits never weaken source admission.
+    """
+    from reactive_taxonomy.fragment_search import (
+        compile_fragment_query, fragment_embeddings,
+        indexed_product, validate_fragment_target,
+    )
+
+    description = result["query"]
+    query = compile_fragment_query(
+        description["expression"], description["query_format"], description["topology"],
+    )
+    target, _ = indexed_product(target_smiles)
+    validation = validate_fragment_target(query, target)
+    supplied = result.get("target_validation") or {}
+    if (not validation.matches_target or supplied.get("matches_target") is not True
+            or supplied.get("target_smiles") != target
+            or supplied.get("query_id") != query.query_id
+            or description.get("query_id") != query.query_id):
+        raise ValueError("Selected search evidence does not validate this target and query")
+    available_ids = {hit["observation_id"] for hit in result["hits"]}
+    if not selected_observation_ids or len(set(selected_observation_ids)) != len(selected_observation_ids):
+        raise ValueError("Select unique source observation IDs")
+    if any(identity not in available_ids for identity in selected_observation_ids):
+        raise ValueError("Selected source is absent from the freshly returned search sample; search again")
+    transfer_policy = load_transfer_policy()
+    alignments, truncated = fragment_embeddings(
+        query, Chem.MolFromSmiles(target),
+        maximum=transfer_policy["max_target_alignments"],
+    )
+    candidates = [{
+        "candidate_id": f"{query.query_id}:target:{number}",
+        "kind": "chosen_query", "query": query.expression,
+        "query_format": query.query_format, "topology": query.topology,
+        "query_atom_target_ids": list(alignment), "target_atom_ids": sorted(alignment),
+        "reasons": ["User-chosen query matched to the complete canonical target."],
+        "cautions": ["TARGET_ALIGNMENTS_ARE_ANALOGUE_HYPOTHESES"],
+    } for number, alignment in enumerate(alignments)]
+    suggestions = {"target_smiles": target, "candidates": candidates}
+    selected_result = {**result, "hits": [
+        hit for hit in result["hits"] if hit["observation_id"] in selected_observation_ids
+    ]}
+    witness_count = len(alignments) * sum(
+        witness["kind"] == "formed" and witness["relationship"] == "constructed"
+        for hit in selected_result["hits"] for match in hit["matches"]
+        for witness in match["witnesses"]
+    )
+    projection_limited = witness_count > transfer_policy["max_projection_witnesses"]
+    searches = [{
+        "candidate_id": candidate["candidate_id"], "artifact_ref": f"query:{query.query_id}",
+        "execution_status": "completed", "result": selected_result,
+    } for candidate in candidates] if not truncated and not projection_limited else []
+    guidance = project_construction_guidance(suggestions, searches, policy)
+    if truncated:
+        guidance["exclusions"].append({"reason": "target_alignment_enumeration_truncated"})
+    if projection_limited:
+        guidance["exclusions"].append({"reason": "projection_witness_budget_exceeded"})
+    guidance["target_alignment_count"] = len(alignments)
+    guidance["target_alignments_truncated"] = truncated
+    guidance["selected_observation_ids"] = list(selected_observation_ids)
+    guidance["transfer_policy"] = transfer_policy
+    guidance["estimated_projection_witness_count"] = witness_count
+    return {"suggestions": suggestions, "guidance": guidance}
+
+
 def evaluate_transfers(
     parameters: dict[str, Any], *, library: GenericTemplateLibrary | None = None,
     repeat: bool = True, source_library_path: str | Path | None = "selected_source_operators.json",
@@ -204,7 +292,9 @@ def evaluate_transfers(
 
     def run_searches() -> dict[str, Any]:
         return {
-            "baseline": search(library, None),
+            "baseline": search(library, None) if parameters.get("include_baseline", True) else {
+                "status": "not_requested", "candidates": [], "diagnostics": None,
+            },
             "guided": [{"target_atom_ids": b["target_atom_ids"],
                         "direct_source_transfer": search(source_library, b["target_atom_ids"]),
                         "witness_directed_library": search(library, b["target_atom_ids"])}
@@ -246,7 +336,10 @@ def summarize_transfers(transfers: dict[str, Any]) -> dict[str, Any]:
     return {
         "baseline_unique_precursor_count": len(baseline_sets),
         "guided_unique_precursor_count": len(guided_sets),
-        "additional_guided_precursor_sets": sorted(guided_sets - baseline_sets),
+        "baseline_requested": baseline.get("status") != "not_requested",
+        "additional_guided_precursor_sets": (
+            sorted(guided_sets - baseline_sets) if baseline.get("status") != "not_requested" else []
+        ),
         "baseline_work": work([baseline]), "guided_work": work(guided),
         "interpretation": "descriptive_coverage_under_unequal_total_work_not_accuracy",
     }

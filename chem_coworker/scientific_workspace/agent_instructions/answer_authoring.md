@@ -47,6 +47,13 @@ links in answer_markdown. Keep molecule names in the structured molecule records
 the route drawing omits compound captions and numbers.
 Conditions are separate attributed text fields such as solvent, temperature,
 duration, quantities or addition order. Use [] if absent; yield_info=null if unreported.
+Each step's reagents is a separate list of attributed claims containing only
+short reagent/catalyst names, e.g. CDI or DIPEA. Route arrows show these names and
+supplied partner structures. Keep solvent, quantities, temperature, time, workup
+and purification in conditions for the experimental details. Do not repeat a
+partner already drawn structurally unless its supplied form needs clarification.
+Use [] when no reagent names are explicitly supported; do not infer them from a
+reaction name. Older saved answers may omit reagents.
 Each step may have rationale, an attributed claim (text, basis, source_ids,
 limitations) explaining the chemical choice and transfer from evidence. It follows
 the same citation checks as conditions. Older answers may omit it.

@@ -18,6 +18,7 @@ from .contracts import (
     FeatureAnalysisRequest,
     FragmentSearchRequest,
     FragmentSuggestionRequest,
+    FragmentTransferRequest,
     FragmentGuidedRetrosynthesisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -207,6 +208,16 @@ def create_app(
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
         return envelope(data)
+
+    @app.post("/api/v1/retrosynthesis/fragment-transfer")
+    def transfer_fragment_precedents(
+        payload: FragmentTransferRequest, request: Request,
+    ) -> dict[str, Any]:
+        try:
+            return envelope(active_runtime(request).transfer_fragment_precedents(payload))
+        except (ValueError, OSError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
 
     @app.post("/api/v1/fragments/suggest")
     def suggest_fragments(

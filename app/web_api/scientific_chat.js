@@ -198,7 +198,7 @@ function supportingEvidence(step, sources, key, compactScheme = false) {
     scientificNotes(scope, record.limitations || []);
     if (record.error) scope.append(element('p', record.error));
   }
-  const attributed = [step, step.rationale, step.yield_info, ...(step.conditions || [])].filter(Boolean);
+  const attributed = [step, step.rationale, step.yield_info, ...(step.conditions || []), ...(step.reagents || [])].filter(Boolean);
   const literature = [...new Set(attributed.flatMap(item => item.source_ids || []))]
     .filter(id => sources.get(id)?.kind === 'external_source');
   if (literature.length) {
@@ -230,6 +230,7 @@ function reactionCard(step, sources, molecules, key, number, showScheme = true, 
   if ((!showScheme && !inRouteScheme) || !step.image_url) step.conditions.forEach(item => card.append(scientificClaim(item, sources)));
   if (inRouteScheme) {
     const attribution = [];
+    if (step.reagents?.length) attribution.push('Reagents: ' + [...new Set(step.reagents.map(item => basisLabels[item.basis] || item.basis))].join(', '));
     if (step.conditions.length) attribution.push('Conditions: ' + [...new Set(step.conditions.map(item => basisLabels[item.basis] || item.basis))].join(', '));
     if (step.yield_info) attribution.push('Yield: ' + (basisLabels[step.yield_info.basis] || step.yield_info.basis));
     if (attribution.length) card.append(element('p', attribution.join(' · '), 'route-attribution'));
@@ -242,9 +243,14 @@ function reactionCard(step, sources, molecules, key, number, showScheme = true, 
     scientificLinks(rationale, step.rationale.source_ids, sources); card.append(rationale);
   }
   scientificNotes(card, [...step.limitations, ...step.conditions.flatMap(item => item.limitations || []),
+    ...(step.reagents || []).flatMap(item => item.limitations || []),
     ...(step.yield_info?.limitations || []), ...(step.rationale?.limitations || [])]);
   card.append(supportingEvidence(step, sources, key, inRouteScheme));
   const detail = element('div', '', 'step-detail');
+  if (step.reagents?.length) {
+    detail.append(element('h5', 'Target reagents'));
+    step.reagents.forEach(item => detail.append(scientificClaim(item, sources)));
+  }
   detail.append(element('h5', 'Target conditions'));
   if (step.conditions.length) step.conditions.forEach(item => detail.append(scientificClaim(item, sources)));
   else detail.append(element('p', 'Not supplied', 'muted'));

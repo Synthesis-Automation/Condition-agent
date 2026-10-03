@@ -6,6 +6,7 @@ import type {
   FeatureAnalysisRequest,
   FeatureAnalysisResult,
   FragmentSearchRequest,
+  FragmentTransferRequest,
   FragmentSearchResult,
   FragmentSuggestionsResult,
   FragmentGuidedRetroRequest,
@@ -61,6 +62,10 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  transferFragmentPrecedents: (request: FragmentTransferRequest, signal?: AbortSignal) =>
+    jsonRequest<FragmentGuidedRetroResult>('/retrosynthesis/fragment-transfer', {
+      method: 'POST', body: JSON.stringify(request), signal,
+    }),
   fragmentGuidedRetro: (request: FragmentGuidedRetroRequest, signal?: AbortSignal) =>
     jsonRequest<FragmentGuidedRetroResult>('/retrosynthesis/fragment-guided', {
       method: 'POST', body: JSON.stringify(request), signal,

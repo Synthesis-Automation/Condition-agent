@@ -20,7 +20,8 @@ class RouteSchemeStep:
     """One supplied reaction; annotations are displayed without inference.
 
     product_index selects a zero-based dot-separated product occurrence when
-    necessary. Conditions, yields and evidence basis are retained in metadata.
+    necessary. Reagent labels are separate from procedure annotations.
+    Conditions, yields and evidence basis are retained in metadata.
     """
 
     reaction_smiles: str
@@ -29,17 +30,19 @@ class RouteSchemeStep:
     yield_info: SchemeAnnotation | None = None
     basis: str = "supplied"
     product_index: int | None = None
+    reagents: tuple[SchemeAnnotation, ...] = ()
 
 
 @dataclass(frozen=True)
 class RouteSchemeStyle:
-    """Validated versioned geometry for a three-column route."""
+    """Validated versioned geometry for a route with three slots per row."""
 
     schema_version: str
     definition_id: str
     columns: int
     molecule_preset: str
     minimum_column_width: int
+    minimum_arrow_width: int
     minimum_row_height: int
     column_gap: int
     row_gap: int
@@ -56,14 +59,14 @@ class RouteSchemeStyle:
 
 
 def load_route_scheme_style() -> RouteSchemeStyle:
-    """Load the fixed-grid style, rejecting unsupported or unsafe geometry."""
+    """Load the route style, rejecting unsupported or unsafe geometry."""
     path = Path(__file__).with_name("definitions") / "route_scheme.v1.json"
     raw = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict) or set(raw) != set(
         RouteSchemeStyle.__dataclass_fields__
     ):
         raise ValueError("Invalid route scheme definition fields")
-    if raw["schema_version"] != "1.1" or raw["definition_id"] != "route_scheme.v1":
+    if raw["schema_version"] != "1.2" or raw["definition_id"] != "route_scheme.v1":
         raise ValueError("Unsupported route scheme definition")
     for key in RouteSchemeStyle.__dataclass_fields__:
         if key not in {
@@ -100,7 +103,8 @@ def load_route_scheme_style() -> RouteSchemeStyle:
     ):
         raise ValueError("Invalid route scheme arrow length scale")
     if (
-        raw["minimum_column_width"] * raw["arrow_length_scale"]
+        min(raw["minimum_column_width"], raw["minimum_arrow_width"])
+        * raw["arrow_length_scale"]
         < 4 * raw["arrow_head_length"]
     ):
         raise ValueError("Route scheme arrow is too short")
@@ -211,7 +215,7 @@ def _arrow(
 ) -> _Block:
     node = _group("arrow-block")
     top, bottom = _stack(upper, style), _stack(lower, style)
-    width = max(style.minimum_column_width, top.width, bottom.width)
+    width = max(style.minimum_arrow_width, top.width, bottom.width)
     head, half = style.arrow_head_length, style.arrow_head_half_height
     left = width * (1 - style.arrow_length_scale) / 2
     right = width - left
@@ -249,6 +253,7 @@ def render_route_scheme_svg(
     *,
     title: str = "Reaction route",
     main_reactant_index: int | None = None,
+    reagents_only: bool = False,
 ) -> bytes:
     """Draw a linear route in three columns, reading left-to-right then down.
 
@@ -256,6 +261,8 @@ def render_route_scheme_svg(
     partners and agents above arrows, unselected products below. The first
     reactants share one block unless a main reactant is explicitly selected.
     This is a depiction of supplied chemistry, not a feasibility assessment.
+    With reagents_only, display explicit reagent annotations and structures;
+    procedure annotations and yield remain in metadata rather than on arrows.
     """
     if isinstance(steps, str) or not steps:
         raise ValueError("Supply a nonempty ordered sequence of route steps")
@@ -291,16 +298,21 @@ def render_route_scheme_svg(
         if connection.agents:
             upper.append(_molecules(connection.agents, style, "agents"))
         upper.extend(
+            _text(item.text, style, "reagents")
+            for item in step.reagents
+            if item.text.strip()
+        )
+        upper.extend(
             _text(item.text, style, "conditions-above")
             for item in step.above
-            if item.text.strip()
+            if not reagents_only and item.text.strip()
         )
         lower = [
             _text(item.text, style, "conditions-below")
             for item in step.below
-            if item.text.strip()
+            if not reagents_only and item.text.strip()
         ]
-        if step.yield_info and step.yield_info.text.strip():
+        if not reagents_only and step.yield_info and step.yield_info.text.strip():
             lower.append(_text(step.yield_info.text, style, "yield"))
         other = tuple(
             value
@@ -326,8 +338,19 @@ def render_route_scheme_svg(
                 ),
             )
         )
-    column_width = max(style.minimum_column_width, *(block.width for block in blocks))
     rows = [blocks[i : i + style.columns] for i in range(0, len(blocks), style.columns)]
+    # A wrapped route puts arrows in different columns on successive rows.
+    # Size each slot by its content, so a large molecule cannot widen an arrow.
+    row_widths = [
+        [
+            block.width
+            if block.node.get("data-role") == "arrow-block"
+            else max(style.minimum_column_width, block.width)
+            for block in row
+        ]
+        for row in rows
+    ]
+    column_width = max(value for row in row_widths for value in row)
     extents = [
         (
             max(style.minimum_row_height / 2, *(b.above for b in row)),
@@ -337,8 +360,10 @@ def render_route_scheme_svg(
     ]
     width = (
         2 * style.padding
-        + style.columns * column_width
-        + (style.columns - 1) * style.column_gap
+        + max(
+            sum(widths) + (len(widths) - 1) * style.column_gap
+            for widths in row_widths
+        )
     )
     height = (
         2 * style.padding
@@ -358,14 +383,20 @@ def render_route_scheme_svg(
             "data-schema-version": style.schema_version,
             "data-layout": "three-column-row-major",
             "data-column-width": f"{column_width:g}",
+            "data-spacing": "content-sized",
         },
     )
     ET.SubElement(root, "title").text = title
-    ET.SubElement(root, "desc").text = (
+    description = (
         "Read left to right, then continue at the left of the next row. "
         "Supplied transformations; not a feasibility assessment. "
         "No conditions or yields are inferred. See metadata for attribution."
     )
+    if reagents_only:
+        description += (
+            " Only reagents label arrows; full procedures and yields are in metadata."
+        )
+    ET.SubElement(root, "desc").text = description
     ET.SubElement(root, "metadata").text = json.dumps(
         {
             "schema_version": "route_scheme.v1",
@@ -373,6 +404,7 @@ def render_route_scheme_svg(
             "steps": [asdict(step) for step in supplied],
             "connections": [asdict(step) for step in connected],
             "main_reactant_index": main_reactant_index,
+            "reagents_only": reagents_only,
         },
         ensure_ascii=False,
         sort_keys=True,
@@ -380,13 +412,15 @@ def render_route_scheme_svg(
     ET.SubElement(root, "rect", {"width": "100%", "height": "100%", "fill": "white"})
     y = float(style.padding)
     for row_index, (row, (above, below)) in enumerate(zip(rows, extents)):
+        x = float(style.padding)
         for column, block in enumerate(row):
             block.node.set("data-row", str(row_index))
             block.node.set("data-column", str(column))
             block.node.set("data-width", f"{block.width:g}")
             block.node.set("data-above", f"{block.above:g}")
             block.node.set("data-below", f"{block.below:g}")
-            x = style.padding + column * (column_width + style.column_gap)
-            _place(root, block, x + (column_width - block.width) / 2, y + above)
+            slot_width = row_widths[row_index][column]
+            _place(root, block, x + (slot_width - block.width) / 2, y + above)
+            x += slot_width + style.column_gap
         y += above + below + style.row_gap
     return ET.tostring(root, encoding="utf-8", xml_declaration=True)

@@ -36,9 +36,10 @@ def _complete_empty_fields(draft: Mapping[str, Any]) -> dict[str, Any]:
         for item in entries(value, name):
             defaults(item, source_ids=[], limitations=[])
     for step in entries(value, "steps"):
-        defaults(step, after_step_ids=[], conditions=[], yield_info=None)
-        for condition in entries(step, "conditions"):
-            defaults(condition, source_ids=[], limitations=[])
+        defaults(step, after_step_ids=[], conditions=[], reagents=[], yield_info=None)
+        for name in ("conditions", "reagents"):
+            for claim in entries(step, name):
+                defaults(claim, source_ids=[], limitations=[])
         if isinstance(step, dict):
             defaults(step.get("yield_info"), source_ids=[], limitations=[])
             defaults(step.get("rationale"), source_ids=[], limitations=[])

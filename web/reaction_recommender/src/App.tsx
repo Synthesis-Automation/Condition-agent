@@ -549,7 +549,9 @@ function App() {
       : label
   }
   const serviceStatus = mode === 'fragment_guided_retro'
-    ? `Fragment-guided retro ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
+    ? fragmentRetro.workflow === 'manual'
+      ? `Fragment discovery ${capabilities?.fragment_search ? 'ready' : 'unavailable'} · transfer ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
+      : `Fragment-guided retro ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
     : mode === 'fragments'
     ? `Fragment index ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
     : mode === 'weak_label'
@@ -572,7 +574,7 @@ function App() {
         <section className="control-card" aria-labelledby="analysis-title">
         <div className="section-heading">
           <div><span className="step-number">1</span><h2 id="analysis-title">Analysis mode</h2></div>
-          {(result || (mode === 'fragments' && fragmentSearch.result) || (mode === 'fragment_guided_retro' && fragmentRetro.result)) && <button className="button quiet" type="button" onClick={mode === 'fragment_guided_retro' ? fragmentRetro.exportResult : mode === 'fragments' ? fragmentSearch.exportResult : exportResult}>Export JSON</button>}
+          {(result || (mode === 'fragments' && fragmentSearch.result) || (mode === 'fragment_guided_retro' && (fragmentRetro.result || (fragmentRetro.workflow === 'manual' && fragmentRetro.research.history.length > 0)))) && <button className="button quiet" type="button" onClick={mode === 'fragment_guided_retro' ? fragmentRetro.exportResult : mode === 'fragments' ? fragmentSearch.exportResult : exportResult}>Export JSON</button>}
         </div>
         <div className="analysis-control-layout">
           <fieldset className="mode-switch" aria-labelledby="analysis-title">
@@ -633,7 +635,7 @@ function App() {
         </div>
         </section>
 
-        {mode === 'fragment_guided_retro' ? <FragmentGuidedRetro state={fragmentRetro} available={selectedLibraryAvailable} /> : mode === 'fragments' ? <FragmentSearch state={fragmentSearch} available={capabilities?.fragment_search} /> : <div className="editor-action-layout">
+        {mode === 'fragment_guided_retro' ? <FragmentGuidedRetro state={fragmentRetro} available={selectedLibraryAvailable} searchAvailable={capabilities?.fragment_search ?? false} /> : mode === 'fragments' ? <FragmentSearch state={fragmentSearch} available={capabilities?.fragment_search} /> : <div className="editor-action-layout">
           <ReactionEditor
             value={reactionSmiles}
             onChange={setReactionSmiles}

@@ -14,6 +14,7 @@ from core_retrosynthesis import build_generic_library, save_generic_library
 from core_retrosynthesis.fragment_guidance import (
     DEFAULT_POLICY, evaluate_transfers, load_policy, project_construction_guidance,
     restore_source_smiles, scientific_projection, summarize_transfers,
+    project_selected_query_guidance, load_transfer_policy,
 )
 from examples.ai_native.fragment_guided_retrosynthesis_poc import render_report
 from reactive_taxonomy import featurize_reaction
@@ -226,3 +227,87 @@ def test_coverage_counts_deduplicate_precursor_sets_and_sum_actual_work():
     assert result["guided_unique_precursor_count"] == 3
     assert result["additional_guided_precursor_sets"] == ["CN", "CO"]
     assert result["guided_work"] == {"template_applications": 25, "validation_attempts": 6}
+
+
+def test_chosen_query_preserves_multiple_target_regions(tmp_path):
+    reaction = "[CH2:1]=[CH2:2].[CH2:3]=[CH2:4]>>[CH2:1]1[CH2:2][CH2:3][CH2:4]1"
+    row, _, _ = search_evidence(tmp_path, reaction, "C1CCC1")
+    target = "C1CCC1CC1CCC1"
+    result = search_fragment_precedents(tmp_path / "fragments.sqlite", "C1CCC1", target_smiles=target)
+    projected = project_selected_query_guidance(target, result, [row["observation_id"]], load_policy(DEFAULT_POLICY))
+    assert projected["guidance"]["target_alignment_count"] > 8
+    assert projected["guidance"]["eligible_bond_count"] == 8
+    assert len(projected["guidance"]["source_records"]) == 1
+
+
+def test_truncated_target_alignments_cannot_seed_chosen_query_transfer(evidence, monkeypatch):
+    import reactive_taxonomy.fragment_search as chemistry
+    _, suggestions, searches = evidence
+    result = searches[0]["result"]
+    original = chemistry.fragment_embeddings
+
+    def truncated(query, molecule, **kwargs):
+        matches, flag = original(query, molecule, **kwargs)
+        return matches, kwargs.get("maximum") != 1 or flag
+
+    monkeypatch.setattr(chemistry, "fragment_embeddings", truncated)
+    projected = project_selected_query_guidance(suggestions["target_smiles"], result, ["obs-1"], load_policy(DEFAULT_POLICY))
+    assert not projected["guidance"]["focus_bonds"]
+    assert projected["guidance"]["exclusions"][0]["reason"] == "target_alignment_enumeration_truncated"
+
+
+def test_query_provenance_conflict_is_rejected(evidence):
+    _, suggestions, searches = deepcopy(evidence)
+    searches[0]["result"]["query"]["query_id"] = "conflicting"
+    with pytest.raises(ValueError, match="validate this target"):
+        project_selected_query_guidance(suggestions["target_smiles"], searches[0]["result"], ["obs-1"], load_policy(DEFAULT_POLICY))
+
+
+def test_chosen_query_projection_work_is_bounded(evidence, monkeypatch):
+    import core_retrosynthesis.fragment_guidance as guidance
+    _, suggestions, searches = evidence
+    original = guidance.load_transfer_policy
+    monkeypatch.setattr(guidance, "load_transfer_policy", lambda: {**original(), "max_projection_witnesses": 1})
+    result = deepcopy(searches[0]["result"])
+    result["hits"][0]["matches"] *= 3
+    projected = project_selected_query_guidance(suggestions["target_smiles"], result, ["obs-1"], load_policy(DEFAULT_POLICY))
+    assert not projected["guidance"]["focus_bonds"]
+    assert projected["guidance"]["exclusions"][0]["reason"] == "projection_witness_budget_exceeded"
+
+
+@pytest.mark.parametrize("change", [None, {"max_target_alignments": True},
+                                    {"max_projection_witnesses": 2049},
+                                    {"schema_version": "unknown"}, {"extra": 1}])
+def test_transfer_definition_validation(tmp_path, change):
+    value = [] if change is None else {**load_transfer_policy(), **change}
+    path = tmp_path / "policy.json"
+    path.write_text(json.dumps(value), "utf-8")
+    with pytest.raises(ValueError, match="policy"):
+        load_transfer_policy(path)
+
+
+@pytest.mark.parametrize("query_format, query", [("smiles", "CNC"), ("smarts", "C[N,O]C")])
+def test_chosen_query_supports_substructure_and_explicit_smarts(evidence, tmp_path, query_format, query):
+    result = search_fragment_precedents(tmp_path / "fragments.sqlite", query,
+                                       query_format=query_format, topology="subgraph", target_smiles="CCNC")
+    projected = project_selected_query_guidance("CCNC", result, ["obs-1"], load_policy(DEFAULT_POLICY))
+    assert projected["guidance"]["focus_bonds"]
+    assert projected["guidance"]["focus_bonds"][0]["target_atom_ids"] == [1, 2]
+
+
+@pytest.mark.parametrize("case", ["retention", "unresolved", "truncated", "conflicting"])
+def test_chosen_source_cannot_override_uncertain_or_nonconstruction_evidence(evidence, case):
+    _, suggestions, searches = deepcopy(evidence)
+    result = searches[0]["result"]
+    match = result["hits"][0]["matches"][0]
+    if case == "retention":
+        match["witnesses"] = []
+        match["relationships"] = ["retained"]
+    elif case == "unresolved":
+        match["relationships"].append("unresolved")
+    elif case == "truncated":
+        match["embedding_truncated"] = True
+    else:
+        match["evidence_status"] = "conflicting_mapping"
+    projected = project_selected_query_guidance(suggestions["target_smiles"], result, ["obs-1"], load_policy(DEFAULT_POLICY))
+    assert not projected["guidance"]["focus_bonds"]

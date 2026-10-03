@@ -161,7 +161,13 @@ export function FragmentSearch({ state, available }: { state: FragmentSearchStat
         <button className="button secondary" type="button" disabled={busy} onClick={() => choose(candidate)}>Use candidate {index + 1}</button>
       </article>)}</div>
     </section>}
-    {result && <section className="results-card fragment-results" aria-label="Fragment search results">
+    {result && <FragmentSearchResults result={result} />}
+    {!result && <section className="empty-state"><span>3</span><div><h2>Inspect fragment precedents</h2><p>Matching reactions, source references and graph evidence will appear here.</p></div></section>}
+  </section>
+}
+
+export function FragmentSearchResults({ result }: { result: FragmentSearchResult }) {
+  return <section className="results-card fragment-results" aria-label="Fragment search results">
       <div className="results-summary"><div><span className="eyebrow">FRAGMENT SEARCH RESULT</span><h2>{result.search_status === 'too_broad' ? 'Query too broad' : result.search_status === 'partial' ? 'Partial search results' : 'Fragment precedents'}</h2></div>
         <div className="metric-strip">
           <div><strong>{count(result.counts.products)}</strong><span>products</span></div>
@@ -197,7 +203,5 @@ export function FragmentSearch({ state, available }: { state: FragmentSearchStat
         </article>
       })}
       <details><summary>Search limitations</summary>{result.limitations.map(text => <p key={text}>{text}</p>)}</details>
-    </section>}
-    {!result && <section className="empty-state"><span>3</span><div><h2>Inspect fragment precedents</h2><p>Matching reactions, source references and graph evidence will appear here.</p></div></section>}
   </section>
 }

@@ -54,6 +54,7 @@ def test_compact_draft_roundtrips_through_existing_handoff_and_exact_review(work
     answer = ScientificAnswer.model_validate(saved)
     assert draft == before
     assert answer.steps[0].yield_info is None
+    assert answer.steps[0].reagents == []
     assert answer.steps[0].basis == "proposed"
     assert answer.evidence_refs == validate_answer_evidence(answer, w.store) == [source.artifact_ref]
     assert answer.claims == [] and answer.uncertainties == []

@@ -70,7 +70,7 @@ class AnswerMolecule(AttributedObject):
 
 
 class AnswerStep(AttributedObject):
-    """One declared transformation with separately attributed conditions and yield."""
+    """A transformation with attributed reagent labels, procedures and yield."""
 
     id: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_-]{0,63}$")
     title: str = Field(min_length=1, max_length=300)
@@ -78,6 +78,7 @@ class AnswerStep(AttributedObject):
     product_ids: list[str] = Field(min_length=1, max_length=20)
     after_step_ids: list[str] = Field(max_length=20)
     conditions: list[AnswerClaim] = Field(max_length=30)
+    reagents: list[AnswerClaim] = Field(default_factory=list, max_length=30)
     yield_info: AnswerClaim | None
     precedent_refs: list[str] = Field(default_factory=list, max_length=5)
     condition_precedent_refs: list[str] = Field(default_factory=list, max_length=5)
@@ -113,6 +114,7 @@ class ScientificAnswer(AnswerObject):
         objects: list[AttributedObject] = [*self.molecules, *self.steps, *self.claims]
         for step in self.steps:
             objects.extend(step.conditions)
+            objects.extend(step.reagents)
             if step.rationale is not None:
                 objects.append(step.rationale)
             if step.yield_info is not None:
@@ -160,7 +162,7 @@ ANSWER_SCHEMA = ScientificAnswer.model_json_schema()
 # Runtime schemas declare every field explicitly (including nullable rationale).
 # Older saved v2 answers still load through model defaults without invented support.
 ANSWER_SCHEMA["$defs"]["AnswerStep"]["required"].extend([
-    "precedent_refs", "condition_precedent_refs", "rationale",
+    "precedent_refs", "condition_precedent_refs", "rationale", "reagents",
 ])
 
 

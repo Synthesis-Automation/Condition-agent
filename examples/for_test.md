@@ -14,3 +14,6 @@ Cc1nc2[nH]ccc2c3nc(C4=CC=CC=C4)nn13
 
 
 Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2
+
+
+CC(N(CCn1cc(C)c(O)c(C(NCc2ccccc2)=O)c1=O)C)=O

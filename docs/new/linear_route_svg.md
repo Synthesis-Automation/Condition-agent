@@ -29,13 +29,15 @@ python -m visualization.route_cli examples/linear_route_scheme.json results/rout
 ```
 
 CLI input is either a JSON list of reaction SMILES or an object with `steps`,
-optional `title` and optional zero-based `main_reactant_index`. Each step is a
+optional `title`, optional zero-based `main_reactant_index`, and optional boolean
+`reagents_only` (default false for explicitly annotated CLI schemes). Each step is a
 string or an object:
 
 ```json
 {
   "reaction_smiles": "CC=O.N>>CCN",
   "basis": "proposed",
+  "reagents": [{"text": "Supplied reagent name", "basis": "proposed"}],
   "above": [{"text": "Supplied reagent text", "basis": "proposed"}],
   "below": [{"text": "Supplied solvent, temperature and time", "basis": "proposed"}],
   "yield_info": null,
@@ -50,10 +52,12 @@ reaction SMILES and annotation attribution are retained in SVG JSON metadata.
 
 ## Geometry and component policy
 
-- Versioned geometry: `visualization/definitions/route_scheme.v1.json`, schema 1.1.
+- Versioned geometry: `visualization/definitions/route_scheme.v1.json`, schema 1.2.
 - Arrows occupy 80% of their block width, centered under the annotations. This
-  shortens their visible span without changing molecular scale or grid spacing.
-- Three equal-width columns, wide enough for the largest block. Row heights adapt
+  shortens their visible span without changing molecular scale. Arrow blocks start
+  at 160 px; adjacent blocks have a 24 px gap. Long reagent names wrap at 20 characters.
+- Three content-sized slots per row. Each slot fits its own block, so a large
+  molecule does not widen an adjacent arrow. Row heights adapt
   to their contents. Structures reuse the existing `web_consistent` bond scale
   and colors; large structures increase canvas dimensions rather than shrink.
 - The first block contains all first-step reactants with plus signs. Supply
@@ -61,6 +65,9 @@ reaction SMILES and annotation attribution are retained in SVG JSON metadata.
   Subsequent carried intermediates are determined by exact connectivity.
 - Additional reactants and supplied middle-section agents are drawn above the
   arrow. Text above/below and yield are optional. No annotation is truncated.
+  With `reagents_only=True`, only explicit `reagents` annotations are displayed;
+  above/below procedure text and yield remain in SVG metadata. No reagent names
+  are extracted or guessed from prose.
 - Additional products are retained below their arrow under “Other products.”
   A unique next-step match selects the route product. Ambiguous selections,
   including a multiproduct last step, require `product_index`.
@@ -79,10 +86,13 @@ reaction edits, or chemical feasibility. It never forces a disconnected link.
 
 Structured scientific answers use this renderer for declared linear routes.
 The complete scheme precedes per-step evidence, rationale, limitations, and
-experimental details. A visible caption explains the row reading order. Conditions
-are shown on the arrows, with their attribution basis beside the step explanation
-and full sources in experimental details. Supporting source reaction drawings are
-expandable while observed conditions, source identity and cautions remain visible.
+experimental details. A visible caption explains the row reading order. Only
+explicit reagent names and supplied partner structures appear on route arrows.
+Full conditions and yields remain in experimental details; reagent attribution
+is shown beside the step explanation and citations in the details. Structured
+answer steps add an attributed `reagents` list (default empty for saved v2 answers).
+Supporting source reaction drawings are expandable while observed conditions,
+source identity and cautions remain visible.
 Individual step drawings remain available in the response. Agent presentation
 instructions request complete route objects rather than repeated target schemes
 or prose-only SMILES sequences.
@@ -91,7 +101,9 @@ dependency overview and individual reaction drawings, with a display warning.
 The browser preserves the scheme scale using horizontal scrolling when needed.
 
 Restart the workspace server and reload saved conversations to use the updated
-presentation. Saved answer/evidence schemas and API routes are unchanged; route
+presentation. Old procedure paragraphs no longer appear on route arrows; reagent
+names must be supplied explicitly in new or revised answers. Existing saved answers
+remain readable without inferred reagent labels. API routes are unchanged; route
 presentation objects add `drawing_status`, `scheme_width` when drawn, and
 `drawing_warning` on fallback. No corpus conversion or index rebuild is required.
 

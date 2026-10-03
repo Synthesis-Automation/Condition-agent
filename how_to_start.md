@@ -78,19 +78,33 @@ To start from a **whole target**, enter or draw it in SMILES mode, click
 and **Search fragments**. Suggestions work without an index and never launch a
 search automatically. You can still enter your own core directly.
 
-To evaluate fragment-guided **single-step retrosynthesis**, select
-**Fragment-guided retro**, enter or draw one target, and click
-**Evaluate fragment-guided retro**. **Fragment retro example** loads
-`Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2`. The controls select the compact/full operator
-library, number of fragment queries, construction bonds and proposals per arm.
-This mode needs both the prepared fragment index and the selected operator library.
+To combine fragment discovery with **single-step retrosynthesis**, select
+**Fragment-guided retro**. **Assisted fragment research** is the default workflow:
+
+1. Enter or draw the full target, or load **Fragment research example**.
+2. Click **Suggest strategic regions**, choose a region, or draw/type your own
+   query in the separate core editor. The full target remains unchanged.
+3. Click **Search chosen fragment** and inspect source reactions and procedures.
+   If useful hits are missing, edit the query or choose **Suggest simpler queries**,
+   record your reason, and search again. Searches never broaden automatically.
+4. Select up to six source observations and click **Assess selected precedents on
+   target**. Results distinguish local construction evidence, whole-source
+   admission, structural differences and verified single-step proposals.
+5. Export **research JSON** to retain query revisions, notes, source choices,
+   results and errors. History holds 20 attempts in browser memory; export before
+   closing or refreshing the page.
+
+Discovery needs the prepared fragment index; transfer also needs the selected
+operator library. The unrestricted baseline is optional in this workflow.
+Choose **Automatic POC comparison** in the Workflow control to run the existing
+automatic fragment selection and baseline comparison.
 Operator libraries default to `results/operator_retrosynthesis_poc/full_scale_v3`;
-set `RETROSYNTHESIS_LIBRARY_ROOT` to use another directory with `compact/` and
+set `CORE_RETROSYNTHESIS_LIBRARY_ROOT` to use another directory with `compact/` and
 `full/` subdirectories containing `operator_library_v3.json.gz`.
 
 Results show the baseline, direct source transfers, witness-directed proposals,
 source admission failures, incomplete search exclusions and actual search work.
-**Export JSON** retains the complete result for comparing examples. Guided searches
+JSON export retains the complete result for comparing examples. Guided searches
 use more total work; additional precursor sets are a descriptive coverage result,
 not a validated accuracy gain. See the
 [POC documentation](docs/AI-native/Deterministic_Fragment_Retrosynthesis_POC.md)

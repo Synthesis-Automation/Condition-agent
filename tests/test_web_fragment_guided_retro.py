@@ -15,6 +15,7 @@ from reactive_taxonomy import featurize_reaction
 
 
 ENDPOINT = "/api/v1/retrosynthesis/fragment-guided"
+TRANSFER = "/api/v1/retrosynthesis/fragment-transfer"
 RING_REACTION = (
     "[CH2:1]=[CH2:2].[CH2:3]=[CH2:4]>>[CH2:1]1[CH2:2][CH2:3][CH2:4]1"
 )
@@ -168,3 +169,86 @@ def test_focused_deployment_hides_research_endpoint(runtime):
     client = TestClient(create_app(runtime=runtime, recommendation_only=True))
     assert client.post(ENDPOINT, json={"target_smiles": "C1CCC1"}).status_code == 404
     assert "fragment_guided_retrosynthesis" not in client.get("/api/v1/capabilities").json()["data"]
+
+
+def transfer_request(**overrides):
+    return {"target_smiles": "C1CCC1", "query": "C1CCC1",
+            "selected_observation_ids": ["obs-1"], **overrides}
+
+
+def test_manual_transfer_selects_indexed_source_and_preserves_target_alignment_alternatives(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post(TRANSFER, json=transfer_request())
+    assert response.status_code == 200, response.text
+    data = response.json()["data"]
+    assert data["guidance"]["selected_observation_ids"] == ["obs-1"]
+    assert data["guidance"]["target_alignment_count"] > 1
+    assert data["guidance"]["focus_bonds"]
+    assert data["transfers"]["baseline"]["status"] == "not_requested"
+    assert data["transfers"]["comparison"]["baseline_requested"] is False
+    assert data["transfers"]["comparison"]["additional_guided_precursor_sets"] == []
+    assert data["source_comparisons"][0]["comparison"]["same_constitution"]
+    assert data["query_search"]["target_validation"]["matches_target"]
+    assert data["transfers"]["guided"][0]["direct_source_transfer"]["candidates"]
+    assert not runtime._fragment_search_lock.locked()
+
+
+def test_manual_transfer_optional_baseline_is_explicit(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    data = client.post(TRANSFER, json=transfer_request(include_baseline=True)).json()["data"]
+    assert data["transfers"]["baseline"]["status"] == "completed"
+    assert data["transfers"]["baseline"]["candidates"]
+    assert data["transfers"]["comparison"]["baseline_requested"]
+
+
+def test_selected_source_rejection_does_not_erase_local_observations(tmp_path):
+    reaction = "[CH3:1][CH2:2][Br:5].[NH2:3][CH3:4]>>[CH3:1][CH2:2][NH:3][CH3:4]"
+    runtime = make_runtime(tmp_path, reaction, reaction.replace("[Br:5]", "Br"))
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    data = client.post(TRANSFER, json=transfer_request(target_smiles="CCNC", query="CCNC")).json()["data"]
+    assert data["guidance"]["focus_bonds"]
+    assert data["transfers"]["source_admissions"][0]["reason"] == "materialized_core_not_verified"
+    assert data["transfers"]["compiled_source_template_count"] == 0
+    assert data["transfers"]["guided"][0]["witness_directed_library"]["candidates"]
+
+
+@pytest.mark.parametrize("changes", [
+    {"selected_observation_ids": []}, {"selected_observation_ids": ["missing"]},
+    {"selected_observation_ids": ["obs-1", "obs-1"]},
+    {"query": "COC"}, {"include_baseline": "false"},
+    {"source_records": [{"reaction_smiles": "fake>>fake"}]},
+])
+def test_manual_transfer_rejects_unbound_queries_and_untrusted_sources(runtime, changes):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    assert client.post(TRANSFER, json=transfer_request(**changes)).status_code == 422
+    assert not runtime._fragment_search_lock.locked()
+
+
+def test_incomplete_selected_search_cannot_seed_transfer(runtime, monkeypatch):
+    import condition_recommender.fragment_search as search
+    original = search.search_fragment_precedents
+
+    def partial(*args, **kwargs):
+        result = original(*args, **kwargs)
+        result["search_status"] = "partial"
+        return result
+
+    monkeypatch.setattr(search, "search_fragment_precedents", partial)
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    data = client.post(TRANSFER, json=transfer_request()).json()["data"]
+    assert data["query_search"]["search_status"] == "partial"
+    assert not data["guidance"]["focus_bonds"]
+    assert data["guidance"]["exclusions"]
+
+
+def test_target_bound_fragment_search_checks_membership(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post("/api/v1/fragments/search", json={"target_smiles": "C1CCC1", "query": "C1CCC1"})
+    assert response.status_code == 200
+    assert response.json()["data"]["target_validation"]["matches_target"]
+    assert client.post("/api/v1/fragments/search", json={"target_smiles": "C1CCC1", "query": "COC"}).status_code == 422
+
+
+def test_focused_deployment_hides_transfer_endpoint(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=True))
+    assert client.post(TRANSFER, json=transfer_request()).status_code == 404

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import type { Capabilities, FragmentGuidedRetroRequest, FragmentGuidedRetroResult, FragmentRetroArm } from '../api/types'
+import { FragmentResearch, FragmentResearchOptions, useFragmentResearch } from './FragmentResearch'
 import { ReactionEditor } from './ReactionEditor'
 import { ReactionImage } from './ReactionImage'
 import './fragment-guided-retro.css'
@@ -9,6 +10,8 @@ const EXAMPLE = 'Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2'
 const readable = (value: string) => value.replaceAll('_', ' ').toLowerCase()
 
 export function useFragmentGuidedRetro(active: boolean) {
+  const [workflow, setWorkflow] = useState<'manual' | 'automatic'>('manual')
+  const research = useFragmentResearch(active && workflow === 'manual')
   const [target, setTarget] = useState('')
   const [library, setLibrary] = useState<FragmentGuidedRetroRequest['library_mode']>('compact')
   const [queryLimit, setQueryLimit] = useState(3)
@@ -27,7 +30,7 @@ export function useFragmentGuidedRetro(active: boolean) {
       setError('')
     }
   }, [active])
-  const reset = () => { setResult(null); setError('') }
+  const reset = () => { setResult(null); setError(''); research.invalidateTransfer() }
   const changeTarget = (value: string) => {
     pending.current?.abort()
     setBusy(false)
@@ -52,6 +55,7 @@ export function useFragmentGuidedRetro(active: boolean) {
     }
   }
   const exportResult = () => {
+    if (workflow === 'manual') { research.exportHistory(); return }
     if (!result) return
     const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }))
     const link = document.createElement('a')
@@ -60,7 +64,7 @@ export function useFragmentGuidedRetro(active: boolean) {
     link.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
-  return { target, changeTarget, library, setLibrary, queryLimit, setQueryLimit,
+  return { workflow, setWorkflow, research, target, changeTarget, library, setLibrary, queryLimit, setQueryLimit,
     focusLimit, setFocusLimit, topK, setTopK, busy, error, setError, result, reset, run, exportResult }
 }
 
@@ -69,6 +73,16 @@ type State = ReturnType<typeof useFragmentGuidedRetro>
 export function FragmentGuidedRetroOptions({ state, capabilities }: { state: State; capabilities: Capabilities | null }) {
   const available = capabilities?.fragment_search && capabilities.retrosynthesis_library_modes?.[state.library]?.library_available
   return <div className="analysis-options fragment-retro-options">
+    <label><span>Workflow</span><select aria-label="Workflow" value={state.workflow} disabled={state.busy || state.research.busy} onChange={event => { state.setWorkflow(event.target.value as State['workflow']); state.reset() }}><option value="manual">Assisted fragment research</option><option value="automatic">Automatic POC comparison</option></select></label>
+    {state.workflow === 'manual' ? <>
+      <FragmentResearchOptions state={state.research} />
+      <fieldset className="fragment-fields" disabled={state.research.busy}>
+        <label><span>Operator library</span><select aria-label="Operator library" value={state.library} onChange={event => { state.setLibrary(event.target.value as State['library']); state.reset() }}><option value="compact">Compact</option><option value="full">Full</option></select></label>
+        <label><span>Construction bonds</span><select value={state.focusLimit} onChange={event => { state.setFocusLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
+        <label><span>Proposals per search arm</span><select value={state.topK} onChange={event => { state.setTopK(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 5, 10].map(value => <option key={value}>{value}</option>)}</select></label>
+      </fieldset>
+      {capabilities && !capabilities.fragment_search && <p className="alert caution">Fragment index unavailable; suggestions and query editing remain available.</p>}
+    </> : <>
     <p><strong>Experimental single-step comparison</strong><br />Generate target fragments, retrieve construction evidence, then compare source transfers and guided proposals with an unrestricted baseline.</p>
     <fieldset disabled={state.busy} className="fragment-fields">
       <label><span>Operator library</span><select aria-label="Operator library" value={state.library} onChange={event => { state.setLibrary(event.target.value as State['library']); state.reset() }}><option value="compact">Compact</option><option value="full">Full</option></select></label>
@@ -78,8 +92,9 @@ export function FragmentGuidedRetroOptions({ state, capabilities }: { state: Sta
       <button className="button quiet" type="button" onClick={() => state.changeTarget(EXAMPLE)}>Fragment retro example</button>
     </fieldset>
     <p className="fragment-note">Queries follow deterministic fragment suggestion order. Bonds rank by independent reference support, with atom IDs breaking ties. Chemistry validation is mandatory.</p>
-    {capabilities && !available && <div className="alert warning">Requires a prepared fragment index and the selected operator library. Configure the fragment index with --fragment-index or FRAGMENT_PRECEDENT_INDEX; configure operator libraries with RETROSYNTHESIS_LIBRARY_ROOT.</div>}
+    {capabilities && !available && <div className="alert warning">Requires a prepared fragment index and the selected operator library. Configure the fragment index with --fragment-index or FRAGMENT_PRECEDENT_INDEX; configure operator libraries with CORE_RETROSYNTHESIS_LIBRARY_ROOT.</div>}
     {state.error && <div className="alert error" role="alert">{state.error}</div>}
+    </>}
   </div>
 }
 
@@ -98,21 +113,22 @@ function Arm({ title, result, additional }: { title: string; result: FragmentRet
   </section>
 }
 
-function Evidence({ result }: { result: FragmentGuidedRetroResult }) {
+function Evidence({ result, showQueries = true }: { result: FragmentGuidedRetroResult; showQueries?: boolean }) {
   const comparison = result.transfers.comparison
   const additional = new Set(comparison.additional_guided_precursor_sets)
+  const baselineRequested = comparison.baseline_requested !== false
   return <section className="results-card fragment-results fragment-retro-results" aria-label="Fragment-guided results">
-    <div className="section-heading"><h2>Fragment-guided comparison</h2><span>{result.execution.elapsed_seconds.toFixed(1)} s</span></div>
+    <div className="section-heading"><h2>{showQueries ? 'Fragment-guided comparison' : 'Selected precedent transfer assessment'}</h2><span>{result.execution.elapsed_seconds.toFixed(1)} s</span></div>
     <div className="fragment-retro-summary">
-      <div><strong>{comparison.baseline_unique_precursor_count}</strong><span>Baseline precursor sets</span></div>
+      <div><strong>{baselineRequested ? comparison.baseline_unique_precursor_count : '—'}</strong><span>Baseline precursor sets</span></div>
       <div><strong>{comparison.guided_unique_precursor_count}</strong><span>Guided precursor sets</span></div>
-      <div><strong>{additional.size}</strong><span>Additional to baseline</span></div>
+      <div><strong>{baselineRequested ? additional.size : '—'}</strong><span>Additional to baseline</span></div>
       <div><strong>{result.transfers.compiled_source_template_count}</strong><span>Admitted source templates</span></div>
     </div>
     <div className="fragment-retro-body">
-      <p className="alert warning">Guided arms use more total search work. Additional proposals indicate coverage in this bounded experiment, not improved accuracy or experimental feasibility.</p>
-      <table className="fragment-retro-work"><caption>Actual search work across all context levels</caption><thead><tr><th>Search</th><th>Template applications</th><th>Forward validations</th></tr></thead><tbody><tr><th>Baseline</th><td>{comparison.baseline_work.template_applications}</td><td>{comparison.baseline_work.validation_attempts}</td></tr><tr><th>Guided total</th><td>{comparison.guided_work.template_applications}</td><td>{comparison.guided_work.validation_attempts}</td></tr></tbody></table>
-      <details open><summary>Selected fragments and search coverage</summary><div className="fragment-suggestion-grid">
+      {baselineRequested ? <p className="alert warning">Guided arms use more total search work. Additional proposals indicate coverage in this bounded experiment, not improved accuracy or experimental feasibility.</p> : <p>Baseline comparison was not requested. Guided results are single-step hypotheses; no additional-coverage claim is made.</p>}
+      <table className="fragment-retro-work"><caption>Actual search work across all context levels</caption><thead><tr><th>Search</th><th>Template applications</th><th>Forward validations</th></tr></thead><tbody><tr><th>Baseline</th><td>{baselineRequested ? comparison.baseline_work.template_applications : 'Not requested'}</td><td>{baselineRequested ? comparison.baseline_work.validation_attempts : '—'}</td></tr><tr><th>Guided total</th><td>{comparison.guided_work.template_applications}</td><td>{comparison.guided_work.validation_attempts}</td></tr></tbody></table>
+      {showQueries && <details open><summary>Selected fragments and search coverage</summary><div className="fragment-suggestion-grid">
         {result.suggestions.candidates.map((candidate, index) => {
           const search = result.searches.find(item => item.candidate_id === candidate.candidate_id)?.result
           return <article key={candidate.candidate_id}><h3>{index + 1}. {candidate.kind.replaceAll('_', ' ')}</h3>
@@ -127,9 +143,9 @@ function Evidence({ result }: { result: FragmentGuidedRetroResult }) {
             <details><summary>Fragment search evidence</summary><pre>{JSON.stringify(search, null, 2)}</pre></details>
           </article>
         })}
-      </div></details>
-      {!result.guidance.focus_bonds.length && <p className="alert warning">No eligible construction guidance. Complete searches with resolved internal formed-bond witnesses are required; the baseline remains available.</p>}
-      <Arm title="Unrestricted baseline" result={result.transfers.baseline} additional={new Set()} />
+      </div></details>}
+      {!result.guidance.focus_bonds.length && <p className="alert warning">No eligible construction guidance. Complete searches with resolved internal formed-bond witnesses are required; inspect the exclusions below.</p>}
+      {baselineRequested && <Arm title="Unrestricted baseline" result={result.transfers.baseline} additional={new Set()} />}
       {result.transfers.guided.map(branch => {
         const evidence = result.guidance.focus_bonds.find(bond => bond.target_atom_ids.join(',') === branch.target_atom_ids.join(','))
         return <section key={branch.target_atom_ids.join(',')} className="fragment-retro-branch">
@@ -141,6 +157,10 @@ function Evidence({ result }: { result: FragmentGuidedRetroResult }) {
           <Arm title="Witness-directed library" result={branch.witness_directed_library} additional={additional} />
         </section>
       })}
+      {result.source_comparisons && <details open><summary>Source products versus complete target</summary>
+        <p>Structural differences help assess transfer; they do not establish functional-group tolerance or conditions. Query alignments retained: {result.guidance.target_alignment_count ?? 'not recorded'}{result.guidance.target_alignments_truncated ? ' (truncated; excluded from guidance)' : ''}.</p>
+        {result.source_comparisons.map((item, index) => <article key={index}><h3>{item.reaction_id}</h3><p>Comparison: {item.comparison.status}{item.comparison.core_atom_count !== undefined && <> · Common core: {item.comparison.core_atom_count} atoms · Target coverage: {((item.comparison.right_coverage ?? 0) * 100).toFixed(0)}%</>}{item.comparison.alignment_ambiguous && ' · Ambiguous alignment'}</p><pre>{JSON.stringify(item.comparison, null, 2)}</pre></article>)}
+      </details>}
       <details open><summary>Source admission and rejection evidence</summary>
         <p>A local construction witness can remain valid even when its complete source reaction fails operator admission.</p>
         {result.transfers.source_admissions.length === 0 && <p>No eligible source observations were selected.</p>}
@@ -156,7 +176,11 @@ function Evidence({ result }: { result: FragmentGuidedRetroResult }) {
   </section>
 }
 
-export function FragmentGuidedRetro({ state, available }: { state: State; available: boolean }) {
+export function FragmentGuidedRetro({ state, available, searchAvailable }: { state: State; available: boolean; searchAvailable: boolean }) {
+  if (state.workflow === 'manual') return <FragmentResearch state={state.research} searchAvailable={searchAvailable}
+    transferAvailable={available} library={state.library} focusLimit={state.focusLimit} topK={state.topK}
+    onRestoreSettings={request => { state.setLibrary(request.library_mode); state.setFocusLimit(request.max_focus_bonds); state.setTopK(request.top_k) }}
+    transferView={state.research.transfer && <Evidence result={state.research.transfer} showQueries={false} />} />
   return <div className="fragment-search fragment-retro">
     <div className="editor-action-layout">
       <ReactionEditor value={state.target} onChange={state.changeTarget} onError={state.setError} moleculeOnly moleculePurpose="target" disabled={state.busy} />

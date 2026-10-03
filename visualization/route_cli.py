@@ -37,7 +37,7 @@ def _step(value: Any) -> str | RouteSchemeStep:
         raise ValueError(
             "Each step requires reaction_smiles and an optional text basis"
         )
-    for side in ("above", "below"):
+    for side in ("above", "below", "reagents"):
         if not isinstance(value.get(side, []), list):
             raise ValueError(f"{side} must be an annotation list")
     return RouteSchemeStep(
@@ -49,6 +49,7 @@ def _step(value: Any) -> str | RouteSchemeStep:
         else None,
         basis=value.get("basis", "supplied"),
         product_index=value.get("product_index"),
+        reagents=tuple(_annotation(item) for item in value.get("reagents", [])),
     )
 
 
@@ -66,18 +67,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             "steps",
             "title",
             "main_reactant_index",
+            "reagents_only",
         }:
             raise ValueError(
-                "Expected a step list or route object with steps, title, main_reactant_index"
+                "Expected a route object with steps, title, main_reactant_index, reagents_only"
             )
         if not isinstance(payload.get("steps"), list) or not isinstance(
             payload.get("title", "Reaction route"), str
         ):
             raise ValueError("Route requires a steps list and an optional text title")
+        if type(payload.get("reagents_only", False)) is not bool:
+            raise ValueError("reagents_only must be a boolean")
         svg = render_route_scheme_svg(
             tuple(_step(value) for value in payload["steps"]),
             title=payload.get("title", "Reaction route"),
             main_reactant_index=payload.get("main_reactant_index"),
+            reagents_only=payload.get("reagents_only", False),
         )
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_bytes(svg)

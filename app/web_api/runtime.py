@@ -66,6 +66,7 @@ from .contracts import (
     FeatureAnalysisRequest,
     FragmentSearchRequest,
     FragmentSuggestionRequest,
+    FragmentTransferRequest,
     FragmentGuidedRetrosynthesisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -230,6 +231,8 @@ class WebRuntime(Protocol):
     def fragment_guided_retrosynthesize(
         self, request: FragmentGuidedRetrosynthesisRequest,
     ) -> Dict[str, Any]: ...
+
+    def transfer_fragment_precedents(self, request: FragmentTransferRequest) -> Dict[str, Any]: ...
 
     def ranking_profiles(self) -> tuple[Dict[str, Any], ...]: ...
 
@@ -406,7 +409,7 @@ class LocalRecommendationRuntime:
             raise RuntimeError("A fragment search is already running. Try again shortly.")
         try:
             return search_fragment_precedents(
-                self.fragment_index_path, **request.model_dump()
+                self.fragment_index_path, **request.model_dump(exclude_none=True)
             )
         finally:
             self._fragment_search_lock.release()
@@ -417,7 +420,7 @@ class LocalRecommendationRuntime:
         """Compose bounded discovery and the canonical deterministic experiment."""
         from condition_recommender.fragment_search import search_fragment_precedents
         from core_retrosynthesis.fragment_guidance import (
-            DEFAULT_POLICY, evaluate_transfers, load_policy,
+            DEFAULT_POLICY, load_policy,
             project_construction_guidance,
         )
 
@@ -452,45 +455,118 @@ class LocalRecommendationRuntime:
                     "execution_status": "completed", "result": result,
                 })
             guidance = project_construction_guidance(suggestions, searches, policy)
-            for bond in guidance["focus_bonds"]:
-                bond["target_highlight_svg"] = render_molecule_image_bytes(
-                    suggestions["target_smiles"], size=(420, 220), image_format="svg",
-                    render_preset="web_consistent",
-                    highlight_atom_indices=tuple(bond["target_atom_ids"]),
-                ).decode("utf-8")
-            transfers = evaluate_transfers(
-                {"guidance": guidance, "policy": policy}, library=library,
-                repeat=False, source_library_path=None,
+            return self._finish_fragment_transfer(
+                suggestions, guidance, searches, policy, request.library_mode,
+                started, library=library,
             )
-            resources = {}
-            for name, path in (
-                ("fragment_index", self.fragment_index_path),
-                ("operator_library", self._retrosynthesis_library_path(request.library_mode)),
-            ):
-                stat = path.stat()
-                resources[name] = {
-                    "name": path.name, "size_bytes": stat.st_size,
-                    "mtime_ns": stat.st_mtime_ns,
-                }
-            return {
-                "schema_version": "fragment_guided_retrosynthesis.v1",
-                "target_smiles": suggestions["target_smiles"],
-                "library_mode": request.library_mode, "policy": policy,
-                "suggestions": suggestions, "searches": searches,
-                "guidance": guidance, "transfers": transfers,
-                "resources": resources, "library_definition": library.definition,
-                "execution": {"elapsed_seconds": time.monotonic() - started},
-                "limitations": [
-                    "Experimental single-step proposals; no complete route or stock assessment.",
-                    "Guidance uses returned hit samples; partial searches and unresolved embeddings are excluded.",
-                    "Guided arms receive more total search work than the baseline. Counts do not measure accuracy improvement.",
-                    "No admitted source operator or no proposal is a bounded coverage result, not evidence of impossible synthesis.",
-                    "Forward signature agreement does not establish experimental yield or feasibility.",
-                    "Interactive calls are not independently reviewed or untouched benchmark evaluations; JSON export retains evidence.",
-                ],
-            }
         finally:
             self._fragment_search_lock.release()
+
+    def transfer_fragment_precedents(self, request: FragmentTransferRequest) -> Dict[str, Any]:
+        """Recheck the edited query and selected indexed sources before transfer."""
+        from condition_recommender.fragment_search import search_fragment_precedents
+        from core_retrosynthesis.fragment_guidance import (
+            DEFAULT_POLICY, load_policy, project_selected_query_guidance,
+        )
+        from reactive_taxonomy.molecule_comparison import compare_molecules
+
+        if not self.fragment_index_path.is_file():
+            raise FileNotFoundError("Fragment index unavailable; configure --fragment-index")
+        if not self._fragment_search_lock.acquire(blocking=False):
+            raise RuntimeError("A fragment search is already running. Try again shortly.")
+        started = time.monotonic()
+        try:
+            search = search_fragment_precedents(self.fragment_index_path, **{
+                key: getattr(request, key) for key in (
+                    "query", "query_format", "topology", "limit", "timeout_seconds", "target_smiles",
+                )
+            })
+            policy = load_policy(DEFAULT_POLICY)
+            policy.update(top_k=request.top_k, max_focus_bonds=request.max_focus_bonds)
+            projected = project_selected_query_guidance(
+                request.target_smiles, search, request.selected_observation_ids, policy,
+            )
+            result = self._finish_fragment_transfer(
+                projected["suggestions"], projected["guidance"], [], policy,
+                request.library_mode, started, include_baseline=request.include_baseline,
+            )
+            result["query_search"] = search
+            comparisons = []
+            for hit in search["hits"]:
+                if hit["observation_id"] not in request.selected_observation_ids:
+                    continue
+                try:
+                    comparison = compare_molecules(
+                        hit["product_smiles"], result["target_smiles"],
+                        core_smiles=(request.query if request.query_format == "smiles"
+                                     and request.topology == "preserve_rings" else None),
+                        timeout_seconds=2,
+                    ).to_dict()
+                except ValueError as exc:
+                    comparison = {"status": "unavailable", "error": str(exc)}
+                comparisons.append({
+                    "observation_id": hit["observation_id"], "reaction_id": hit["reaction_id"],
+                    "comparison": comparison,
+                })
+            result["source_comparisons"] = comparisons
+            result["limitations"].extend([
+                "Transfer rechecks the query and selected IDs against the current local index.",
+                "All bounded target alignments are alternative hypotheses; truncated enumeration cannot seed guidance.",
+                "An edited query is recorded as an edit; logical broadening is not inferred from text changes.",
+                "Molecular differences are structural comparisons, not validated condition transfer or experimental feasibility.",
+            ])
+            result["execution"]["elapsed_seconds"] = time.monotonic() - started
+            return result
+        finally:
+            self._fragment_search_lock.release()
+
+    def _finish_fragment_transfer(
+        self, suggestions: Dict[str, Any], guidance: Dict[str, Any],
+        searches: list[Dict[str, Any]], policy: Dict[str, Any], library_mode: str,
+        started: float, *, library: GenericTemplateLibrary | None = None,
+        include_baseline: bool = True,
+    ) -> Dict[str, Any]:
+        """Render and serialize the shared single-step evaluation contract."""
+        from core_retrosynthesis.fragment_guidance import evaluate_transfers
+
+        library = library if library is not None else self._get_retrosynthesis_library(library_mode)
+        for bond in guidance["focus_bonds"]:
+            bond["target_highlight_svg"] = render_molecule_image_bytes(
+                suggestions["target_smiles"], size=(420, 220), image_format="svg",
+                render_preset="web_consistent",
+                highlight_atom_indices=tuple(bond["target_atom_ids"]),
+            ).decode("utf-8")
+        transfers = evaluate_transfers(
+            {"guidance": guidance, "policy": policy, "include_baseline": include_baseline}, library=library,
+            repeat=False, source_library_path=None,
+        )
+        resources = {}
+        for name, path in (
+            ("fragment_index", self.fragment_index_path),
+            ("operator_library", self._retrosynthesis_library_path(library_mode)),
+        ):
+            stat = path.stat()
+            resources[name] = {
+                "name": path.name, "size_bytes": stat.st_size,
+                "mtime_ns": stat.st_mtime_ns,
+            }
+        return {
+            "schema_version": "fragment_guided_retrosynthesis.v1",
+            "target_smiles": suggestions["target_smiles"],
+            "library_mode": library_mode, "policy": policy,
+            "suggestions": suggestions, "searches": searches,
+            "guidance": guidance, "transfers": transfers,
+            "resources": resources, "library_definition": library.definition,
+            "execution": {"elapsed_seconds": time.monotonic() - started},
+            "limitations": [
+                "Experimental single-step proposals; no complete route or stock assessment.",
+                "Guidance uses returned hit samples; partial searches and unresolved embeddings are excluded.",
+                "Guided arms receive more total search work than the baseline. Counts do not measure accuracy improvement.",
+                "No admitted source operator or no proposal is a bounded coverage result, not evidence of impossible synthesis.",
+                "Forward signature agreement does not establish experimental yield or feasibility.",
+                "Interactive calls are not independently reviewed or untouched benchmark evaluations; JSON export retains evidence.",
+            ],
+        }
 
     def _registered_compound_identities(
         self,

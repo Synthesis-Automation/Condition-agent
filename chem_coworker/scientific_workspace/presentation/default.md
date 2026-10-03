@@ -8,8 +8,9 @@ For a multistep synthesis, lead with one complete route scheme using the shared
 three-column presentation: starting material, arrow, intermediate; then arrow,
 intermediate, arrow; continuing left to right on each row. Supply structured
 molecules, steps and routes so the workspace can draw the scheme. Structures have
-no compound names or numbers beneath them. Put supplied conditions and yields on
-their corresponding arrows. A single reaction still uses the single-step view.
+no compound names or numbers beneath them. Put only supplied reagent/catalyst names
+and partner structures on route arrows. Keep full conditions, workup and yields in
+the step's experimental details. A single reaction still uses the single-step view.
 
 Follow the route with short step titles, brief chemical rationales and the most
 relevant supporting experiments. Source reaction drawings and full procedures are

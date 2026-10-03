@@ -134,6 +134,8 @@ def test_large_structures_long_annotations_and_attribution_fit_without_truncatio
         ("row_gap", 0),
         ("line_height", 1),
         ("minimum_column_width", 1),
+        ("minimum_arrow_width", 1),
+        ("minimum_arrow_width", True),
         ("molecule_preset", "current"),
         ("molecule_preset", []),
         ("character_width_em", False),
@@ -176,3 +178,56 @@ def test_cli_round_trip_and_invalid_input_does_not_overwrite(tmp_path) -> None:
     with pytest.raises(SystemExit):
         main([str(source), str(output)])
     assert output.read_bytes() == original
+
+
+def test_reagents_only_preserves_procedures_in_metadata() -> None:
+    step = RouteSchemeStep(
+        "CCBr.N>O>CCN",
+        above=(SchemeAnnotation("Add slowly; heat for 16 h", "reported"),),
+        below=(SchemeAnnotation("Extract and purify", "reported"),),
+        yield_info=SchemeAnnotation("70%", "reported"),
+        reagents=(SchemeAnnotation("K2CO3", "proposed"),),
+    )
+    root = ET.fromstring(render_route_scheme_svg((step,), reagents_only=True))
+    visible = " ".join(node.text or "" for node in root.iter(NS + "text"))
+    assert visible == "+ K2CO3"
+    assert root.findall(f".//{NS}g[@data-role='agents']")
+    metadata = json.loads(root.find(NS + "metadata").text)
+    assert metadata["steps"][0]["above"][0]["text"] == step.above[0].text
+    assert metadata["steps"][0]["below"][0]["text"] == step.below[0].text
+    assert metadata["steps"][0]["yield_info"]["text"] == "70%"
+    assert metadata["steps"][0]["reagents"][0]["basis"] == "proposed"
+
+
+def test_arrow_spacing_does_not_inherit_large_molecule_width() -> None:
+    large = "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCO"
+    root = ET.fromstring(render_route_scheme_svg((f"CCO>>{large}",)))
+    start, arrow, product = root.findall(NS + "g")
+    style = load_route_scheme_style()
+    assert float(arrow.get("data-width")) == style.minimum_arrow_width
+    assert float(product.get("data-width")) > 700
+
+    def left(node):
+        return float(node.get("transform").split("(")[1].split(",")[0])
+
+    assert left(product) - left(arrow) == pytest.approx(
+        style.minimum_arrow_width + style.column_gap
+    )
+    expected = (
+        2 * style.padding + style.minimum_column_width
+        + style.minimum_arrow_width + float(product.get("data-width"))
+        + 2 * style.column_gap
+    )
+    assert float(root.get("width")) == expected
+
+
+def test_cli_accepts_explicit_reagent_labels(tmp_path) -> None:
+    source, output = tmp_path / "route.json", tmp_path / "scheme.svg"
+    source.write_text(json.dumps({
+        "reagents_only": True,
+        "steps": [{"reaction_smiles": "CCO>>CC=O", "reagents": ["PCC"],
+                   "above": ["Procedure retained in metadata"]}],
+    }), encoding="utf-8")
+    assert main([str(source), str(output)]) == 0
+    root = ET.fromstring(output.read_bytes())
+    assert [node.text for node in root.iter(NS + "text")] == ["PCC"]

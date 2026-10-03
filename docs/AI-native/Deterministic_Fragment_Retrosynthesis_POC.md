@@ -12,11 +12,50 @@ from [`fragment_guided_retro_policy.v1.json`](../../core_retrosynthesis/definiti
 ## Regular research web UI
 
 Start or restart with `python -m app.web_api --workbench --build --port 8000`.
-Select **Fragment-guided retro**, paste or draw a connected target, or use
-**Fragment retro example**, then click **Evaluate fragment-guided retro**.
-The prepared fragment index and selected compact/full operator library are required.
+Select **Fragment-guided retro**. The default **Assisted fragment research**
+workflow keeps the full target separate from the editable search query. Paste or
+draw a connected target, optionally suggest strategic regions, then choose or
+edit a core and click **Search chosen fragment**. Inspect source reactions,
+construction/retention evidence and linked procedures. Revise the query explicitly
+or request smaller target-derived suggestions; searches never broaden themselves.
+Record why you changed the query, choose up to six observations and click
+**Assess selected precedents on target**. Discovery needs the prepared fragment
+index; assessment also needs the selected compact/full operator library.
+
+The assessment rechecks query membership and selected observation IDs against the
+current index. IDs outside the fresh returned-hit sample are rejected. Complete
+searches, validated mapping and resolved internal formed-bond evidence are
+required for guidance. Partial results remain inspectable. All bounded target
+embeddings are preserved as alternative hypotheses; symmetry is not silently
+resolved. Truncated alignment enumeration or excessive projection work cannot
+seed guidance. These limits are validated from
+[`fragment_transfer.v1.json`](../../core_retrosynthesis/definitions/fragment_transfer.v1.json)
+(`fragment_transfer_policy.v1`, definition `fragment_transfer.v1@1.0`): at most
+64 target alignments and 2,048 projected witness combinations. Focus bonds still
+rank by independent reference support, with atom IDs breaking ties.
+
+Selected-source operators and witness-directed library proposals use the same
+compiler admission and forward signature/formed-bond gates as the automatic POC.
+Source-product/target comparisons retain unmatched regions, attachments, stereo
+and alignment uncertainty in exported evidence. They do not validate conditions
+or experimental feasibility. SMILES queries permit extra substitution unless
+constrained: omitting a substituent stops requiring it, rather than requiring its
+absence. SMARTS edits are explicit and are not automatically certified as logical
+generalizations. The tool uses the local index and its procedures, without a CAS
+search integration or automatic literature-method adaptation.
+
+The bounded unrestricted baseline is optional, disabled by default for manual
+assessment. Without it, no additional-coverage claim is made. Browser history
+retains up to 20 completed search/assessment attempts or errors, parent links,
+queries, notes and source choices. Restore earlier attempts or export research
+JSON before refreshing/closing the page. This is browser memory, not durable
+storage or a pinned investigation.
+
+For the existing automatic experiment, choose **Automatic POC comparison**, then
+enter/draw a target or use **Fragment retro example**, and click **Evaluate
+fragment-guided retro**. It requires both index and operator library.
 `--fragment-index` or `FRAGMENT_PRECEDENT_INDEX` chooses the discovery index;
-`RETROSYNTHESIS_LIBRARY_ROOT` chooses the directory containing `compact/` and `full/` libraries.
+`CORE_RETROSYNTHESIS_LIBRARY_ROOT` chooses the directory containing `compact/` and `full/` libraries.
 
 The UI shows selected fragment regions, complete/partial search status, source
 compiler admissions, baseline and guided proposals, extra precursor sets and
@@ -33,6 +72,41 @@ The graph projection and transfer evaluation now live in
 [`core_retrosynthesis.fragment_guidance`](../../core_retrosynthesis/fragment_guidance.py).
 The CLI and HTTP runtime compose that same implementation; no duplicate chemistry
 path or corpus rebuild was introduced.
+
+### HTTP contracts
+
+`POST /api/v1/fragments/search` accepts an optional `target_smiles` alongside
+the existing `query`, `query_format`, `topology`, `limit` and `timeout_seconds`.
+Supplying a target requires the compiled query to match it before index search.
+Existing standalone searches remain supported without a target.
+
+`POST /api/v1/retrosynthesis/fragment-transfer` requires that target and query,
+plus `selected_observation_ids` (one to six distinct IDs). It accepts
+`library_mode`, `max_focus_bonds`, `top_k` and `include_baseline` (default false).
+The server loads authoritative source records; client-supplied source chemistry
+is rejected. Responses retain `query_search`, projection policy/alignment
+evidence, `source_comparisons`, source admissions and transfer arms. Both routes
+are research-workbench capabilities; the focused condition-only profile hides
+the transfer route.
+
+### Authored manual development check
+
+For the example target above, an explicit query revision from
+`Fc1cnc2cn[nH]c2c1` to `c1cnc2cn[nH]c2c1` stops requiring fluorine while retaining
+the fused core. In the current local index, complete searches found 5 versus 55
+observations, including 5 versus 14 with construction evidence. Groups overlap;
+more hits alone do not establish more useful or transferable precedents.
+
+Selecting `US09073918B2:1639626_0` and `US09029536B2:1615846_0` from the relaxed
+query produced four distinct verified precursor sets through witness-directed
+library searches. Both complete source reactions failed operator admission with
+`materialized_core_not_verified`, so direct-source transfer returned no proposals.
+No baseline was requested. The recorded calculation repeated identically; the
+live HTTP/browser assessment returned the same precursor count and rejections.
+This is one authored development case, without experimental or benchmark
+effectiveness claims. Local records are under
+`results/ai_native/fragment_research_20261003/`; browser evidence and exported
+session are under `results/ai_native/fragment_research_web_20261003/`.
 
 ## Run
 

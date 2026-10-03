@@ -30,6 +30,25 @@ class FragmentSearchRequest(StrictRequest):
     topology: Literal["preserve_rings", "subgraph"] = "preserve_rings"
     limit: int = Field(default=5, ge=1, le=10, strict=True)
     timeout_seconds: int = Field(default=10, ge=1, le=30, strict=True)
+    target_smiles: str | None = Field(default=None, min_length=1, max_length=5000)
+
+
+class FragmentTransferRequest(FragmentSearchRequest):
+    """Recheck a chosen target query and selected indexed source observations."""
+
+    target_smiles: str = Field(min_length=1, max_length=5000)
+    selected_observation_ids: list[str] = Field(min_length=1, max_length=6)
+    library_mode: Literal["full", "compact"] = "compact"
+    max_focus_bonds: int = Field(default=3, ge=1, le=5, strict=True)
+    top_k: int = Field(default=3, ge=1, le=10, strict=True)
+    include_baseline: bool = Field(default=False, strict=True)
+
+    @model_validator(mode="after")
+    def unique_selected_sources(self) -> "FragmentTransferRequest":
+        ids = self.selected_observation_ids
+        if len(set(ids)) != len(ids) or any(not value or len(value) > 300 for value in ids):
+            raise ValueError("Select unique, nonempty indexed observation IDs")
+        return self
 
 
 class FragmentSuggestionRequest(StrictRequest):

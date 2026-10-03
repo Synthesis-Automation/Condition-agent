@@ -1276,6 +1276,16 @@ export interface FragmentSearchRequest {
   topology: 'preserve_rings' | 'subgraph'
   limit: number
   timeout_seconds: number
+  target_smiles?: string
+}
+
+export interface FragmentTransferRequest extends FragmentSearchRequest {
+  target_smiles: string
+  selected_observation_ids: string[]
+  library_mode: 'compact' | 'full'
+  max_focus_bonds: number
+  top_k: number
+  include_baseline: boolean
 }
 
 export interface FragmentGuidedRetroRequest {
@@ -1306,12 +1316,19 @@ export interface FragmentGuidedRetroResult {
   target_smiles: string
   library_mode: 'compact' | 'full'
   policy: JsonObject
+  query_search?: FragmentSearchResult
+  source_comparisons?: Array<{ observation_id: string; reaction_id: string; comparison: {
+    status: string; core_atom_count?: number; left_coverage?: number; right_coverage?: number;
+    alignment_ambiguous?: boolean; search_timed_out?: boolean; warnings?: string[]; error?: string
+  } }>
   suggestions: FragmentSuggestionsResult
   searches: Array<{ candidate_id: string; artifact_ref: string; result: FragmentSearchResult }>
   guidance: {
     focus_bonds: Array<{ target_atom_ids: number[]; target_highlight_svg?: string; supports: Array<{ reaction_id: string; reference_id: string | null }> }>
     eligible_bond_count: number
     eligible_source_count: number
+    target_alignment_count?: number
+    target_alignments_truncated?: boolean
     source_records: Array<{ reaction_id: string; reference_id?: string; reaction_smiles: string }>
     exclusions: JsonObject[]
     scope: string
@@ -1322,6 +1339,7 @@ export interface FragmentGuidedRetroResult {
     compiled_source_template_count: number
     source_admissions: Array<{ reaction_id: string; status: string; reason: string; diagnostics?: JsonObject }>
     comparison: {
+      baseline_requested?: boolean
       baseline_unique_precursor_count: number
       guided_unique_precursor_count: number
       additional_guided_precursor_sets: string[]
