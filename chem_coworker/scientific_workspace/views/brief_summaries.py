@@ -76,6 +76,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         overview["proposed_recipe"] = _brief_recipe(source.get("proposed_recipe", {}))
         overview["compatibility"] = _brief_fields(source.get("compatibility", {}), (
             "status", "compatible", "hard_conflicts", "coverage", "analysis_warnings", "unresolved_requirements",
+            "reaction_completeness",
         ))
         overview["hint"] = "Attach with w.attach_recipe_check(draft, step_id, ref); inspect full coverage/stages before relying on it."
     elif operation == "inspect_step_precedents":
@@ -395,6 +396,17 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         overview.update(_brief_fields(source, ("structure_origin", "participant_count", "source_provenance",
                                                "source_conflicts", "structure_checks", "limitations",
                                                "scheme_refs", "assignment_verification")))
+        quantities = source.get("quantity_checks", [])
+        overview["quantity_check_count"] = len(quantities)
+        overview["quantity_conflict_count"] = sum(item.get("status") == "conflicting" for item in quantities)
+        overview["quantity_check_scope"] = source.get("quantity_check_scope")
+        # Put discrepancies first so a bounded preview cannot hide them behind
+        # consistent reports; never reorder or alter the saved evidence.
+        overview["quantity_checks"] = [_brief_fields(item, (
+            "side", "component_index", "evidence_ref", "status", "source_text",
+            "reported_mass", "mass_unit", "reported_amount", "amount_unit", "expected_mass_g", "reason",
+        )) for item in sorted(quantities, key=lambda item: item.get("status") != "conflicting")[:3]]
+        overview["quantity_checks_omitted"] = max(0, len(quantities) - 3)
         overview["hint"] = "Use w.attach_literature_reaction(draft, step_id, ref); do not print the full block."
     elif operation == "suggest_search_fragments":
         overview.update(_brief_fields(source, ("generation_truncated", "output_truncated")))

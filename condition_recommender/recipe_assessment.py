@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Mapping
 
 from reactive_taxonomy import featurize_reaction
-from reactive_taxonomy.reaction_models import ReactionAnalysis
+from reactive_taxonomy.reaction_models import ReactionAnalysis, ReactionCompletenessAssessment
 
 from .compatibility import (
     CompatibilityAssessment,
@@ -26,7 +26,8 @@ class ReactionRecipeAssessment(CompatibilityAssessment):
 
     analysis_status: str = "supported"
     analysis_warnings: tuple[str, ...] = ()
-    schema_version: str = "reaction_recipe_assessment.v2"
+    reaction_completeness: ReactionCompletenessAssessment | None = None
+    schema_version: str = "reaction_recipe_assessment.v3"
 
 
 def assess_reaction_recipe(
@@ -57,6 +58,7 @@ def _assess_analyzed_recipe(analysis: ReactionAnalysis, recipe: Mapping[str, Any
             status="unknown" if analysis.valid else "invalid_input",
             analysis_status="unsupported_or_unresolved" if analysis.valid else "invalid_input",
             analysis_warnings=tuple(analysis.warnings),
+            reaction_completeness=analysis.reaction_completeness,
             unresolved_requirements=("VERIFIED_REACTION_SIGNATURE_REQUIRED",),
             coverage=CompatibilityCoverage(limitations=(
                 "Recipe rules were not evaluated because the reaction has no verified structural signature.",
@@ -70,6 +72,7 @@ def _assess_analyzed_recipe(analysis: ReactionAnalysis, recipe: Mapping[str, Any
     return ReactionRecipeAssessment(
         **{**asdict(assessment), "coverage": assessment.coverage},
         analysis_warnings=tuple(analysis.warnings),
+        reaction_completeness=analysis.reaction_completeness,
     )
 
 

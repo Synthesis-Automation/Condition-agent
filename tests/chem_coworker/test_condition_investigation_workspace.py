@@ -177,7 +177,7 @@ def test_adaptation_is_separate_proposal_preserving_original_and_canonical_asses
     assert proposal["changes"][0]["basis"] == "proposed"
     assert proposal["original_recipe"]["temperature_c"] is None
     assert proposal["proposed_recipe"]["temperature_c"] == 30.0
-    assert proposal["compatibility"]["schema_version"] == "reaction_recipe_assessment.v2"
+    assert proposal["compatibility"]["schema_version"] == "reaction_recipe_assessment.v3"
     assert workspace.store.read_artifact(reference) == before
     assert reference in event.evidence_refs
 

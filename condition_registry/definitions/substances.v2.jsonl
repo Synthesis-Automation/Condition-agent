@@ -14,7 +14,7 @@
 {"aliases":[{"type":"abbreviation","value":"18C6"}],"cas":"17455-13-9","id":"cas:17455-13-9","name":"18-Crown-6","roles":["additive"],"smiles":"C1COCCOCCOCCOCCOCCO1"}
 {"aliases":[{"type":"abbreviation","value":"MesCO2H"}],"cas":"576-26-1","id":"cas:576-26-1","name":"2,4,6-Trimethylbenzoic acid","roles":["additive"],"smiles":"Cc1cccc(C)c1O"}
 {"cas":"557-91-5","id":"cas:557-91-5","name":"2-dibromoethane","roles":["additive"]}
-{"aliases":[{"type":"abbreviation","value":"AcOH"}],"cas":"64-19-7","id":"cas:64-19-7","name":"AcOH","roles":["additive","solvent"],"smiles":"CC(=O)O"}
+{"aliases":[{"type":"abbreviation","value":"AcOH"},{"type":"common_name","value":"Acetic acid"}],"cas":"64-19-7","id":"cas:64-19-7","name":"AcOH","roles":["additive","solvent"],"smiles":"CC(=O)O"}
 {"aliases":[{"type":"abbreviation","value":"Al(HCO3)3"}],"cas":"1066-33-7","id":"cas:1066-33-7","name":"Ammonium Bicarbonate","roles":["additive"],"smiles":"C(=O)(O)[O-].[NH4+]"}
 {"aliases":[{"type":"abbreviation","value":"NH4Cl"}],"cas":"12125-02-9","id":"cas:12125-02-9","name":"Ammonium Chloride","roles":["additive"]}
 {"aliases":[{"type":"abbreviation","value":"NH4-PF6"}],"cas":"16941-11-0","id":"cas:16941-11-0","name":"Ammonium hexafluorophosphate","roles":["additive"]}
@@ -20649,7 +20649,7 @@
 {"cas":"75-03-6","id":"cas:75-03-6","name":"Iodoethane,,stab.withcopper","smiles":"CCI"}
 {"cas":"624-76-0","id":"cas:624-76-0","name":"Iodoethanol,,stab.withcopper","smiles":"C(CI)O"}
 {"cas":"75-47-8","id":"cas:75-47-8","name":"Iodoform","smiles":"IC(I)I"}
-{"cas":"74-88-4","id":"cas:74-88-4","name":"Iodomethane","smiles":"CI"}
+{"aliases":[{"type":"common_name","value":"Methyl iodide"}],"cas":"74-88-4","id":"cas:74-88-4","name":"Iodomethane","smiles":"CI"}
 {"cas":"27935-87-1","id":"cas:27935-87-1","name":"Iodomethylcyclopentane","smiles":"ICC1CCCC1"}
 {"cas":"39741-91-8","id":"cas:39741-91-8","name":"iodomethyltrimethylammonium iodide","smiles":"C[N+](C)(C)CI"}
 {"cas":"146-68-9","id":"cas:146-68-9","name":"Iodonitrotetrazolium chloride","smiles":"O=[N+]([O-])c1ccc(-[n+]2nc(-c3ccccc3)nn2-c2ccc(I)cc2)cc1"}

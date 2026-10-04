@@ -2,6 +2,12 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+The [agent log review fixes](../new/agent_log_review_fixes_20261004.md) preserve
+source mass/amount contradictions and expose missing product-element counts in
+recipe assessments and answer preflight. Use `w.help('assess_proposed_recipe')`
+or `w.help('prepare_literature_reaction')` for actual nested input schemas.
+Restart the server and start a new investigation after this scientific change.
+
 New investigations can use [prepared literature reactions and bounded console
 inspection](../new/literature_preparation_and_console_efficiency.md). Use
 `w.run_summary(...)`, `w.call_summary(saved_ref)` and `w.describe()` instead of

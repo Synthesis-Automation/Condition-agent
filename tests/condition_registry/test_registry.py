@@ -46,6 +46,18 @@ def test_invalid_cas_is_not_silently_resolved() -> None:
     assert result.status == "invalid_identifier"
 
 
+@pytest.mark.parametrize("query,expected_id", [("acetic acid", "cas:64-19-7"),
+                                                ("AcOH", "cas:64-19-7"),
+                                                ("methyl iodide", "cas:74-88-4"),
+                                                ("iodomethane", "cas:74-88-4")])
+def test_source_names_resolve_to_existing_substances(query: str, expected_id: str) -> None:
+    result = resolve_identifier(query, identifier_type="name")
+    assert result.status == "resolved"
+    assert result.substance.substance_id == expected_id
+    if expected_id == "cas:74-88-4":
+        assert result.substance.roles == ()  # Identity alias does not invent a contextual role.
+
+
 def test_exact_substance_id_resolution_is_available_to_definitions() -> None:
     result = resolve_substance_id("cas:1536473-72-9")
 

@@ -7,6 +7,12 @@
 
 ## 1. Purpose and authority
 
+2026-10-04: [scientific workspace log review fixes](agent_log_review_fixes_20261004.md)
+preserve conditional source quantity conflicts and expose canonical reaction
+completeness in recipe assessments. Explicit condition aliases and nested input
+help improve evidence inspection; chemistry admission and release gates remain
+unchanged.
+
 2026-10-03: the [retro validity tool](retro_validity_tool.md) reuses canonical
 shared-core graph qualification for whole-reaction and L0/L1/L2 precedent support
 on concrete retrosynthetic proposals. Structural, recipe and separately recorded

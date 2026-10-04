@@ -132,6 +132,50 @@ def test_preparation_preserves_exact_evidence_and_replays(workspace):
     assert workspace.store.read_artifact(replay.artifact_ref)["matches"]
 
 
+def test_source_quantity_conflict_survives_preparation_attachment_and_preflight(workspace):
+    text = "Methyl iodide (162 g, 2.60 mol). Product P: ethane."
+    source = workspace.capture_source(text, url="https://example.org/quantity")
+    excerpt = workspace.record_source_excerpt(source.artifact_ref, excerpt=text)
+    event, block = prepare(workspace, {
+        "source_ref": source.artifact_ref, "source_id": "paper", "title": "Quantity discrepancy",
+        "locator": "Example", "structure_evidence": "Product P: ethane.",
+        "reactants": [{"name": "Methyl iodide", "compound_id": "Methyl iodide", "smiles": "CI",
+                       "evidence_ref": excerpt.artifact_ref, "material_form": "Named reagent; assignment unverified"}],
+        "products": [{"name": "Ethane", "compound_id": "P", "smiles": "CC",
+                      "evidence_ref": excerpt.artifact_ref, "material_form": "Named product"}],
+        "conditions": [{"text": "Methyl iodide (162 g, 2.60 mol).", "basis": "reported", "source_ids": ["paper"]}],
+    })
+    saved = workspace.store.read_artifact(event.artifact_ref)["result"]
+    assert saved["schema_version"] == "literature_reaction_preparation.v2"
+    assert saved["quantity_checks"][0]["status"] == "conflicting"
+    assert saved["quantity_checks"][0]["evidence_ref"] == excerpt.artifact_ref
+    assert any("mass/amount conflict" in note for note in block["limitations"])
+    assert block["conditions"][0]["limitations"] == []
+    brief = workspace.call_summary(event)["result_summary"]
+    assert brief["quantity_conflict_count"] == 1
+    draft = answer(source, block).model_dump()
+    draft["sources"][0]["url"] = "https://example.org/quantity"
+    preflight = workspace.answer_preflight(draft)
+    assert preflight["valid"]
+    assert any(item["gap"] == "source_quantity_conflict" for item in preflight["warnings"])
+    assert workspace.store.read_artifact(workspace.replay(event.artifact_ref).artifact_ref)["matches"]
+
+
+def test_help_exposes_existing_fetch_helper_and_actual_nested_contracts(workspace):
+    entries = {item["name"]: item for item in workspace.help([
+        "fetch_source", "assess_proposed_recipe", "prepare_literature_reaction", "finalize_answer",
+    ])}
+    assert "retry_network" in entries["fetch_source"]["signature"]
+    schema = entries["assess_proposed_recipe"]["nested_inputs"]["components[]"]
+    assert schema["properties"]["provenance"]["type"] == "object"
+    example = entries["assess_proposed_recipe"]["example_arguments"]
+    event = workspace.run("assess_proposed_recipe", example)
+    assert workspace.store.read_artifact(event.artifact_ref)["execution_status"] == "completed"
+    assert "compound_id" in entries["prepare_literature_reaction"]["nested_inputs"]["reactants[] / products[]"]["required"]
+    claims = entries["finalize_answer"]["nested_inputs"]["claims[]"]
+    assert "id" not in claims["properties"] and claims["additionalProperties"] is False
+
+
 @pytest.mark.parametrize("case", ["compound", "formula", "other_source", "fake_explicit", "missing_evidence"])
 def test_unsupported_attribution_is_rejected(workspace, case):
     _, arguments = setup(workspace)

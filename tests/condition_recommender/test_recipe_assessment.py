@@ -3,6 +3,7 @@
 from condition_recommender import assess_reaction_recipe
 from condition_recommender import CompatibilityCoverage
 from condition_recommender.compatibility import load_compatibility_rules
+import pytest
 
 
 def test_assess_reaction_recipe_uses_structural_signature() -> None:
@@ -26,7 +27,7 @@ def test_assess_reaction_recipe_retains_unresolved_without_inventing_conflict() 
     assert assessment.status == "unknown"
     assert assessment.analysis_status == "unsupported_or_unresolved"
     assert assessment.unresolved_requirements == ("VERIFIED_REACTION_SIGNATURE_REQUIRED",)
-    assert assessment.schema_version == "reaction_recipe_assessment.v2"
+    assert assessment.schema_version == "reaction_recipe_assessment.v3"
     assert assessment.coverage.assessment_status == "not_assessed"
     assert not assessment.coverage.evaluated_hard_conflict_rule_ids
 
@@ -37,6 +38,30 @@ def test_invalid_reaction_is_not_a_recipe_conflict() -> None:
     assert not assessment.hard_conflicts
     assert not assessment.compatible
     assert assessment.coverage.assessment_status == "not_assessed"
+    assert assessment.reaction_completeness is None
+
+
+@pytest.mark.parametrize("reaction,excess", [
+    ("O=C1CCc2ccccc2C1.CI>>CC1(C)C(=O)CCc2ccccc21", {"C": 1}),
+    ("CC1(C)c2ccccc2Cc2c1[nH]c1ccccc21>>CC1(C)c2ccccc2C(=O)c2c1[nH]c1ccccc21", {"O": 1}),
+])
+def test_incomplete_input_graph_exposes_missing_elements_without_guessing_donors(reaction, excess) -> None:
+    assessment = assess_reaction_recipe(reaction, {"other_components": [{"raw_identifier": "water", "amount": 2}]})
+    assert assessment.reaction_completeness.status == "incomplete"
+    assert assessment.reaction_completeness.product_element_excess == excess
+    assert assessment.status == "unknown" and assessment.hard_conflicts == ()
+    assert assessment.coverage.assessment_status == "not_assessed"
+    assert assessment == assess_reaction_recipe(reaction, {"other_components": [{"raw_identifier": "water", "amount": 2}]})
+
+
+def test_complete_supported_inputs_keep_atom_accounting_and_recipe_results_separate() -> None:
+    recipe = {"solvents": [{"identity_status": "resolved", "substance_id": "cas:64-17-5",
+                           "role_status": "assigned", "primary_role": "solvent"}]}
+    first = assess_reaction_recipe("CCBr.N>>CCN", recipe)
+    second = assess_reaction_recipe("N.CCBr>>CCN", recipe)
+    assert first.reaction_completeness == second.reaction_completeness
+    assert first.reaction_completeness.product_element_excess == {}
+    assert first.status == second.status == "no_known_conflict"
 
 
 def test_conflicting_mapping_keeps_warnings_and_does_not_force_recipe_conflict() -> None:
