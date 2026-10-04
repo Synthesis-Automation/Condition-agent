@@ -239,10 +239,15 @@ class ActivityHistory:
                     status = "failed"
             if captured:
                 detail.append("Agent-supplied text; URL and transcription are not HTTP-verified")
+            if payload.get("network_request_skipped"):
+                detail.append("Direct request skipped after a recorded network-permission denial")
         elif kind == "custom_execution":
             title = "Run recorded Python script"
             status = payload.get("execution_status")
             detail.append(_text(payload.get("execution_directory"), 250))
+        elif kind == "answer_validation":
+            title = "Validate answer draft"
+            status = payload.get("execution_status")
         else:
             return None
         if isinstance(payload.get("duration_seconds"), (int, float)):
@@ -281,7 +286,7 @@ class ScientificActivityCursor:
             event = _read_json(path)
             if event.get("sequence") != self.sequence + 1 or event.get("schema_version") != SCHEMA_VERSION:
                 raise ValueError("Invalid scientific activity event")
-            if event.get("kind") in {"call", "literature_source", "custom_execution"}:
+            if event.get("kind") in {"call", "literature_source", "custom_execution", "answer_validation"}:
                 payload = self.store.read_artifact(event["artifact_ref"])
                 row = history.observe_scientific(event, payload)
                 if row is not None:

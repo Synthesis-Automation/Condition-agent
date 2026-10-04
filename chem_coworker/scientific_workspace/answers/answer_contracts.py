@@ -74,22 +74,51 @@ class LiteratureStructure(AnswerObject):
 
     name: str = Field(min_length=1, max_length=300)
     smiles: str = Field(min_length=1, max_length=4000)
+    compound_id: str | None = Field(default=None, min_length=1, max_length=100)
+    evidence_ref: str | None = Field(default=None, pattern=r"^sha256:[0-9a-f]{64}$")
+    material_form: str | None = Field(default=None, min_length=1, max_length=500)
+    graph_status: Literal["invalid", "conflicting", "graph_checked_assignment_unverified"] | None = None
+    formula: str | None = None
+
+
+class LiteratureAcquisition(AnswerObject):
+    """Recorded acquisition, independent of the origin of displayed structures."""
+
+    acquisition: str
+    retrieval_status: str
+    extraction_status: str
+    claim_support: Literal["not_assessed"] = "not_assessed"
+    limitations: list[str] = Field(default_factory=list, max_length=30)
 
 
 class LiteratureReaction(AnswerObject):
     """Source-linked drawing input, never an admitted or indexed precedent."""
 
-    schema_version: Literal["literature_reaction.v1"] = "literature_reaction.v1"
+    schema_version: Literal["literature_reaction.v1", "literature_reaction.v2"] = "literature_reaction.v1"
     title: str = Field(min_length=1, max_length=300)
     source_id: str
     locator: str = Field(min_length=1, max_length=1000)
-    structure_origin: Literal["source_explicit", "reconstructed_from_description"]
+    structure_origin: Literal["source_explicit", "reconstructed_from_description", "indexed_record"]
     structure_evidence: str = Field(min_length=1, max_length=2000)
     reactants: list[LiteratureStructure] = Field(min_length=1, max_length=20)
     products: list[LiteratureStructure] = Field(min_length=1, max_length=20)
     conditions: list[AnswerClaim] = Field(default_factory=list, max_length=30)
     yield_info: AnswerClaim | None = None
     limitations: list[str] = Field(default_factory=list, max_length=30)
+    preparation_ref: str | None = Field(default=None, pattern=r"^sha256:[0-9a-f]{64}$")
+    source_provenance: LiteratureAcquisition | None = None
+
+    @model_validator(mode="after")
+    def check_prepared_fields(self) -> "LiteratureReaction":
+        """Indexed structures are available only in the prepared, provenance-bearing contract."""
+        if self.schema_version == "literature_reaction.v1" and self.structure_origin == "indexed_record":
+            raise ValueError("Indexed structures require literature_reaction.v2")
+        if self.schema_version == "literature_reaction.v2":
+            if self.source_provenance is None or any(
+                    item.compound_id is None or item.evidence_ref is None or item.material_form is None
+                    or item.graph_status is None for item in [*self.reactants, *self.products]):
+                raise ValueError("Prepared literature structures require per-participant evidence and graph status")
+        return self
 
 
 class AnswerStep(AttributedObject):
@@ -196,9 +225,9 @@ class ScientificAnswer(AnswerObject):
 ANSWER_SCHEMA = ScientificAnswer.model_json_schema()
 # Runtime schemas declare every field explicitly (including nullable rationale).
 # Older saved v2 answers still load through model defaults without invented support.
-ANSWER_SCHEMA["$defs"]["AnswerStep"]["required"].extend([
-    "precedent_refs", "condition_precedent_refs", "rationale", "reagents", "literature_reactions",
-])
+for _schema in (ANSWER_SCHEMA, *ANSWER_SCHEMA["$defs"].values()):
+    if _schema.get("type") == "object":
+        _schema["required"] = list(_schema["properties"])
 
 
 def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore) -> list[str]:
@@ -256,6 +285,20 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
             kind = kinds[source.artifact_ref]
             if kind not in {"literature_source", "literature_excerpt"}:
                 raise ValueError("Literature drawings require recorded captured text, not an arbitrary attachment")
+            if reaction.schema_version == "literature_reaction.v2":
+                from ..adapters.literature_reactions import prepared_literature_reaction
+
+                if reaction.preparation_ref is None:
+                    raise ValueError("Prepared literature drawings require preparation_ref")
+                prepared = prepared_literature_reaction(store, reaction.preparation_ref)
+                if LiteratureReaction.model_validate(prepared).model_dump() != reaction.model_dump():
+                    raise ValueError("Literature drawing differs from its recorded preparation; prepare the revision")
+                payload = store.read_artifact(reaction.preparation_ref)["result"]
+                if payload["source_ref"] != source.artifact_ref:
+                    raise ValueError("Prepared drawing must cite the same captured source")
+                # Verify all linked evidence on every publication, not only the parent hash.
+                for reference in payload["evidence_refs"]:
+                    store.read_artifact(reference)
             value = store.read_artifact(source.artifact_ref)
             text = value.get("text") if kind == "literature_excerpt" else value.get("extraction", {}).get("text", "")
             if " ".join(reaction.structure_evidence.split()) not in " ".join(text.split()):

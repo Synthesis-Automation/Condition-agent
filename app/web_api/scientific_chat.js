@@ -187,7 +187,8 @@ function literatureReactionCard(reaction, sources, key) {
   scientificLinks(card, [reaction.source_id], sources);
   card.append(element('p', reaction.locator, 'muted'));
   const reconstructed = reaction.structure_origin === 'reconstructed_from_description';
-  card.append(element('span', reconstructed ? 'Literature reconstruction' : 'Source-explicit structures',
+  const indexed = reaction.structure_origin === 'indexed_record';
+  card.append(element('span', indexed ? 'Indexed source structures' : reconstructed ? 'Literature reconstruction' : 'Source-explicit structures',
     'basis basis-' + (reconstructed ? 'proposed' : 'reported')));
   if (reaction.image_url) card.append(reactionFigure(reaction, reaction.title + '. ' + (reconstructed ? 'Reconstructed from literature description.' : 'Structures supplied by the source.')));
   else card.append(element('p', 'Literature reaction drawing unavailable: supplied structures could not be rendered.', 'scientific-note'));
@@ -199,10 +200,38 @@ function literatureReactionCard(reaction, sources, key) {
     card.append(conditions);
   }
   if (reconstructed) card.append(element('p', 'Agent reconstruction of the source description; structure interpretation remains unverified.', 'evidence-context'));
+  if (indexed) card.append(element('p', 'Graphs reused from a saved corpus reaction. Their association with the captured publication remains agent-attributed.', 'evidence-context'));
+  if (reaction.source_provenance) {
+    const provenance = reaction.source_provenance;
+    const acquisition = provenance.acquisition === 'agent_supplied_excerpt'
+      ? 'Agent-supplied source text; acquisition and transcription are not independently verified.'
+      : 'Recorded source retrieval; structure assignment remains unverified.';
+    card.append(element('p', acquisition + ' Extraction: ' + provenance.extraction_status + '.', 'evidence-context'));
+    scientificNotes(card, provenance.limitations || []);
+  }
+  for (const participant of [...(reaction.reactants || []), ...(reaction.products || [])]) {
+    if (participant.material_form) card.append(element('p', participant.name + ': ' + participant.material_form, 'evidence-context'));
+    if (participant.graph_status === 'conflicting' || participant.graph_status === 'invalid') {
+      card.append(element('p', participant.name + ': ' + (participant.graph_status === 'conflicting'
+        ? 'Source and graph evidence conflict; inspect the recorded preparation.'
+        : 'Structure graph is invalid or unresolved.'), 'scientific-note'));
+    }
+  }
   scientificNotes(card, reaction.limitations || []);
   const details = element('div');
   details.append(element('p', 'Captured structure evidence'), element('p', reaction.structure_evidence),
     element('div', 'Reaction SMILES', 'precedent-label'), element('code', reaction.reaction_smiles, 'precedent-smiles'));
+  for (const participant of [...(reaction.reactants || []), ...(reaction.products || [])]) {
+    if (participant.evidence_artifact_url) {
+      const link = element('a', participant.name + ' · source compound ' + participant.compound_id + ' · exact passage');
+      link.href = participant.evidence_artifact_url; details.append(link);
+    }
+    if (participant.formula) details.append(element('p', participant.name + ' · graph formula: ' + participant.formula, 'muted'));
+  }
+  if (reaction.preparation_artifact_url) {
+    const link = element('a', 'Recorded structure checks & source discrepancies');
+    link.href = reaction.preparation_artifact_url; details.append(link);
+  }
   if (source?.artifact_url) { const link = element('a', 'Saved source excerpt'); link.href = source.artifact_url; details.append(link); }
   card.append(disclosure('Source structures & evidence', key, details));
   return card;

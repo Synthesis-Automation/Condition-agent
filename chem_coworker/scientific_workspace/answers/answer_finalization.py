@@ -54,7 +54,7 @@ def _complete_empty_fields(draft: Mapping[str, Any]) -> dict[str, Any]:
     return value
 
 
-def finalize_answer(
+def _finalize_answer(
     store: InvestigationStore, draft_path: str | Path, draft: Mapping[str, Any], *,
     findings: list[dict[str, Any]] | None = None,
 ) -> dict[str, str]:
@@ -78,3 +78,23 @@ def finalize_answer(
         record_evidence_review(store, payload, findings)
     _write_json(directory / ANSWER_FILENAME, payload)
     return {"schema_version": ANSWER_HANDOFF_VERSION, "answer_file": ANSWER_FILENAME}
+
+
+def finalize_answer(
+    store: InvestigationStore, draft_path: str | Path, draft: Mapping[str, Any], *,
+    findings: list[dict[str, Any]] | None = None,
+) -> dict[str, str]:
+    """Finalize a draft and record validation failures even when a caller catches them.
+
+    Failed drafts are not saved or published. The operational event is not
+    citable scientific evidence and contains no full draft or fabricated review.
+    """
+    try:
+        return _finalize_answer(store, draft_path, draft, findings=findings)
+    except (ValueError, TypeError, OSError) as exc:
+        store.append("answer_validation", {
+            "schema_version": "scientific_answer_validation.v1", "execution_status": "error",
+            "origin": "application_validation", "review_status": "not_applicable",
+            "error": {"type": type(exc).__name__, "message": str(exc)[:3000]},
+        })
+        raise

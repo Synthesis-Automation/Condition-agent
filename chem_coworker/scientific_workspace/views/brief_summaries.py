@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from itertools import islice
+import json
 from typing import Any
 
 
@@ -16,6 +17,18 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
     result.update(_brief_fields(payload, (
         "operation", "execution_status", "error", "duration_seconds", "result_bytes",
     )))
+    if payload.get("schema_version") in {"literature_source.v1", "literature_excerpt.v1"}:
+        result["result_summary"] = _brief_fields(payload, (
+            "source_url", "title", "acquisition", "retrieval_status", "text_characters",
+            "text_sha256", "reported_locator", "reported_reference_id", "capture_file",
+            "error", "recovery", "claim_support", "review_status", "network_request_skipped", "blocked_by_ref",
+        ))
+        result["result_summary"]["extraction"] = _brief_fields(payload.get("extraction", {}), (
+            "status", "method", "limitations", "error",
+        ))
+        result["inspection"] = {"projection_only": True, "detail_available": True,
+                                "hint": "Use inspect_source for exact bounded source passages."}
+        return result
     if not isinstance(payload.get("result"), Mapping):
         result["result_summary"] = {}
         result["inspection"] = {"result_path": "$.result", "projection_only": True,
@@ -329,11 +342,27 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             ))
         if isinstance(source.get("query"), Mapping):
             overview["query"] = _brief_fields(source["query"], ("expression", "query_format", "topology", "query_id"))
-        overview["hits"] = [
-            _brief_fields(item, ("hit_id", "product_smiles", "relationship_summary",
-                                 "procedure_availability", "warnings"))
-            for item in source.get("hits", [])[:3] if isinstance(item, Mapping)
-        ]
+        hits = source.get("hits", [])
+        overview["saved_hit_count"] = len(hits)
+        overview["hits"] = []
+        for index, item in enumerate(hits[:3]):
+            if not isinstance(item, Mapping):
+                continue
+            compact = _brief_fields(item, ("hit_id", "reaction_id", "observation_id", "reference_id",
+                                          "product_smiles", "relationship_summary",
+                                          "procedure_availability", "warnings"))
+            record = item.get("record", {})
+            compact.update(_brief_fields(record, ("reaction_smiles", "yield_pct", "temperature_c", "time_h")))
+            compact["publication"] = _publication(record)
+            compact["record_path"] = ["result", "hits", index, "record"]
+            overview["hits"].append(compact)
+        overview["hit_page"] = {"shown": len(overview["hits"]), "total": len(hits),
+                                "next_offset": 3 if len(hits) > 3 else None,
+                                "path": ["result", "hits"], "count_scope": "saved_result"}
+    elif operation == "prepare_literature_reaction":
+        overview.update(_brief_fields(source, ("structure_origin", "participant_count", "source_provenance",
+                                               "source_conflicts", "structure_checks", "limitations")))
+        overview["hint"] = "Use w.prepared_literature_reaction(ref) in the answer; do not print the full block."
     elif operation == "suggest_search_fragments":
         overview.update(_brief_fields(source, ("generation_truncated", "output_truncated")))
         overview["candidate_count"] = len(source.get("candidates", []))
@@ -375,6 +404,61 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
     }
     if not overview and source:
         result["inspection"]["result_fields"] = [str(key)[:80] for key in islice(source, 20)]
+    return result
+
+
+def _publication(record: Mapping[str, Any]) -> dict[str, Any]:
+    """Project explicit source bibliography only; never infer it from reaction names."""
+    identity = record.get("reference_identity", {})
+    identity = identity if isinstance(identity, Mapping) else {}
+    result = _brief_fields(identity, ("reference_id", "doi", "url", "title", "authors", "citation", "year"))
+    raw = record
+    for key in ("source", "raw_fields", "source_observation", "raw_fields"):
+        raw = raw.get(key, {}) if isinstance(raw, Mapping) else {}
+    if isinstance(raw, Mapping):
+        for key in ("authors", "citation", "doi", "title", "url"):
+            if key not in result and raw.get(key):
+                result.update(_brief_fields(raw, (key,)))
+    return result
+
+
+def bound_call_summary(summary: dict[str, Any], payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Cap console JSON at 16 KiB and explicitly require detail when a view is too large."""
+    def size(value: dict[str, Any]) -> int:
+        return len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+
+    if size(summary) <= 16000:
+        return summary
+    source = payload.get("result", {})
+    source = source if isinstance(source, Mapping) else {}
+    result = {key: value for key, value in summary.items() if key not in {"result_summary", "inspection"}}
+    event = dict(result.get("event", {}))
+    refs = event.get("evidence_refs", [])
+    event["evidence_refs"] = refs[:5]
+    event["evidence_ref_count"] = len(refs)
+    event["evidence_refs_omitted"] = max(0, len(refs) - 5)
+    result["event"] = event
+    result["result_summary"] = _brief_fields(source, (
+        "status", "valid", "error", "compatible", "hard_conflicts", "warnings", "limitations",
+        "execution_status", "experimental_feasibility", "coverage",
+    ))
+    result["inspection"] = {
+        "projection_only": True, "detail_available": True, "summary_omitted": True,
+        "serialized_byte_limit": 16000, "reason": "console_summary_budget",
+        "hint": "Large result omitted. Inspect decision-critical gates, warnings and saved structures before relying on it.",
+    }
+    if size(result) > 16000:
+        result["result_summary"] = {
+            key: value for key in ("status", "valid", "compatible", "execution_status")
+            if (value := source.get(key)) is None or isinstance(value, bool)
+            or isinstance(value, str) and len(value) <= 80
+        }
+        result["result_summary"].update({
+            f"{key}_count": len(source[key]) for key in ("warnings", "hard_conflicts", "limitations")
+            if isinstance(source.get(key), (list, tuple))
+        })
+        if isinstance(payload.get("error"), Mapping):
+            result["error"] = {key: str(payload["error"].get(key, ""))[:500] for key in ("type", "message")}
     return result
 
 def _brief_fields(

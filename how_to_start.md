@@ -10,6 +10,11 @@ Set-Location "C:\Git-softwares\Condition-agent"
 
 ## Quick start
 
+After updating scientific tools, restart the agent server and create a new
+investigation. The [literature preparation and compact inspection
+workflow](docs/new/literature_preparation_and_console_efficiency.md) preserves
+source evidence while reducing large console dumps and one-off summary scripts.
+
 Choose one server command. The separate ports below let both interfaces run at
 the same time in different PowerShell terminals.
 

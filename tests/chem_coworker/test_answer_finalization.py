@@ -81,7 +81,10 @@ def test_defaults_do_not_relax_validation_or_overwrite_valid_draft(workspace, ch
     with pytest.raises(ValueError):
         w.finalize_answer(path, {"answer_markdown": "Invalid draft", **change})
     assert path.read_bytes() == original
-    assert w.store.events() == ()  # No fabricated computation or self-review.
+    events = w.store.events()
+    assert len(events) == 1
+    assert events[0].kind == "answer_validation"  # Operational failure, not fabricated science or review.
+    assert w.store.read_artifact(events[0].artifact_ref)["execution_status"] == "error"
 
 
 def test_failed_source_and_bad_review_are_rejected_before_saving(workspace):
@@ -96,7 +99,9 @@ def test_failed_source_and_bad_review_are_rejected_before_saving(workspace):
     with pytest.raises(ValueError, match="explicit review findings"):
         w.finalize_answer(path, {"answer_markdown": "Unreviewed"}, findings=[])
     assert not path.exists()
-    assert len(w.store.events()) == 1
+    events = w.store.events()
+    assert len(events) == 3
+    assert [event.kind for event in events] == ["call", "answer_validation", "answer_validation"]
 
 
 @pytest.mark.parametrize("destination", ["outside", "evidence"])

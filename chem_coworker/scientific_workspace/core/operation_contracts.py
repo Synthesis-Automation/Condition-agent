@@ -29,6 +29,7 @@ class OperationDefinition:
     execution_status_field: str | None = None
     replay_comparison: str = "full_result"
     replay_projection: Callable[[Any], Any] = field(default=_identity, repr=False)
+    result_evidence_field: str | None = None
 
     def __post_init__(self) -> None:
         """Reject invalid declarations before a capability can be used."""
@@ -42,6 +43,8 @@ class OperationDefinition:
                 raise ValueError(f"Operation {name} must be an immutable tuple of nonempty names")
         if not callable(self.replay_projection):
             raise ValueError("Replay projection must be registered Python code")
+        if self.result_evidence_field is not None and not self.result_evidence_field.isidentifier():
+            raise ValueError("Result evidence field must be a literal JSON key")
 
     def evidence_references(self, arguments: Mapping[str, Any]) -> tuple[str, ...]:
         """Find declared reference inputs; the store verifies their actual contents."""

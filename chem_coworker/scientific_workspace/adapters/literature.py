@@ -258,21 +258,49 @@ def _extract_pdf(body: bytes) -> dict[str, Any]:
                 "error": f"{type(exc).__name__}: {str(exc)[:500]}"}
 
 
-def _source_record(url: str, title: str | None, acquisition: str) -> dict[str, Any]:
-    return {
+def _source_record(
+    url: str, title: str | None, acquisition: str, reference_id: str | None = None,
+) -> dict[str, Any]:
+    record = {
         "schema_version": SOURCE_SCHEMA, "source_url": url, "title": title,
         "captured_at": datetime.now(timezone.utc).isoformat(), "acquisition": acquisition,
         "origin": "external_literature", "review_status": "unreviewed",
         "claim_support": "not_assessed", "experimental_verification": "not_performed",
     }
+    if reference_id is not None:
+        if not isinstance(reference_id, str) or not re.fullmatch(r"REF1:[0-9a-f]{64}", reference_id):
+            raise ValueError("reference_id must be an explicit REF1 publication identity")
+        record["reported_reference_id"] = reference_id
+        record["bibliography_attribution"] = "agent_supplied_not_independently_verified"
+    return record
 
 
-def fetch_source(store: InvestigationStore, url: str, *, title: str | None = None) -> InvestigationEvent:
+def fetch_source(
+    store: InvestigationStore, url: str, *, title: str | None = None, retry_network: bool = False,
+    reference_id: str | None = None,
+) -> InvestigationEvent:
     """Record a bounded public HTTP(S) snapshot, extracted text, and explicit failures."""
     current = _url(url)
-    record = _source_record(current, _label(title, "title"), "http_fetch")
+    record = _source_record(current, _label(title, "title"), "http_fetch", reference_id)
     record.update({"retrieval_status": "failed", "redirects": [], "snapshot": None, "final_url": current,
                    "extraction": {"status": "not_attempted", "text": "", "pages": []}})
+    if type(retry_network) is not bool:
+        raise ValueError("retry_network must be a boolean")
+    if not retry_network:
+        for event in reversed(store.events()):
+            if event.kind != "literature_source":
+                continue
+            previous = store.read_artifact(event.artifact_ref)
+            if previous.get("acquisition") != "http_fetch":
+                continue
+            if previous.get("retrieval_status") == "completed":
+                break
+            if previous.get("error", {}).get("category") == "network_permission_denied":
+                record.update({"error": dict(previous["error"]), "network_request_skipped": True,
+                               "blocked_by_ref": event.artifact_ref,
+                               "recovery": {**previous.get("recovery", {}), "source_url": current},
+                               "text_sha256": hashlib.sha256(b"").hexdigest(), "text_characters": 0})
+                return store.append("literature_source", record, evidence_refs=(event.artifact_ref,))
     deadline = monotonic() + FETCH_TIMEOUT_SECONDS
     try:
         for hop in range(MAX_REDIRECTS + 1):
@@ -337,15 +365,15 @@ def fetch_source(store: InvestigationStore, url: str, *, title: str | None = Non
     return store.append("literature_source", record)
 
 
-def capture_source(
+def _captured_record(
     store: InvestigationStore, text: str, *, url: str, title: str | None = None,
-    locator: str | None = None,
-) -> InvestigationEvent:
+    locator: str | None = None, reference_id: str | None = None,
+) -> dict[str, Any]:
     """Save browser-obtained text honestly as an unverified agent-supplied excerpt."""
     url = _url(url)
     if not isinstance(text, str) or not text.strip() or len(text) > MAX_TEXT_CHARACTERS:
         raise ValueError("Captured source text must be nonempty and at most 2000000 characters")
-    record = _source_record(url, _label(title, "title"), "agent_supplied_excerpt")
+    record = _source_record(url, _label(title, "title"), "agent_supplied_excerpt", reference_id)
     record.update({
         "retrieval_status": "not_performed", "final_url": None,
         "reported_locator": _label(locator, "locator"), "snapshot": None,
@@ -356,6 +384,67 @@ def capture_source(
                            "URL, completeness, transcription, and reported locator have not been HTTP-verified.",
                        ]},
     })
+    if reference_id is not None:
+        record["extraction"]["limitations"].append(
+            "Publication identity is agent-attributed; independent bibliographic verification is absent."
+        )
+    return record
+
+
+def capture_source(
+    store: InvestigationStore, text: str, *, url: str, title: str | None = None,
+    locator: str | None = None, reference_id: str | None = None,
+) -> InvestigationEvent:
+    """Save exact browser text with optional explicit, unverified publication attribution."""
+    record = _captured_record(store, text, url=url, title=title, locator=locator, reference_id=reference_id)
+    return store.append("literature_source", record)
+
+
+def capture_source_file(
+    store: InvestigationStore, file: str, *, url: str, title: str | None = None,
+    locator: str | None = None, reference_id: str | None = None,
+    text_path: list[str | int] | None = None,
+) -> InvestigationEvent:
+    """Import a bounded UTF-8 text or JSON browser export without console transcription.
+
+    Files must be inside this investigation. A JSON string needs text_path=[];
+    structured JSON needs literal keys/indices. Bytes and selected path are hashed
+    as acquisition provenance, never promoted to an independently fetched source.
+    """
+    from pathlib import Path
+    import json
+
+    path = (store.root / file).resolve()
+    if not path.is_relative_to(store.root) or not path.is_file():
+        raise ValueError("Source export must be a file inside this investigation")
+    if path.stat().st_size > MAX_SOURCE_BYTES:
+        raise ValueError("Source export exceeds the 8 MiB limit")
+    body = path.read_bytes()
+    if len(body) > MAX_SOURCE_BYTES:
+        raise ValueError("Source export exceeds the 8 MiB limit")
+    text = body.decode("utf-8-sig")
+    if text_path is None and path.suffix.lower() == ".json":
+        decoded = json.loads(text)
+        if not isinstance(decoded, str):
+            raise ValueError("Structured JSON exports require an explicit text_path")
+        text_path = []
+    if text_path is not None:
+        if (not isinstance(text_path, list) or len(text_path) > 12 or any(
+                not (isinstance(part, str) and len(part) <= 80 or type(part) is int and part >= 0)
+                for part in text_path)):
+            raise ValueError("text_path must contain at most 12 literal keys or nonnegative indices")
+        text = json.loads(text)
+        for part in text_path:
+            if isinstance(text, dict) and isinstance(part, str):
+                text = text[part]
+            elif isinstance(text, list) and type(part) is int:
+                text = text[part]
+            else:
+                raise ValueError("text_path does not select a JSON text field")
+    record = _captured_record(store, text, url=url, title=title, locator=locator, reference_id=reference_id)
+    record["capture_file"] = {"path": path.relative_to(store.root).as_posix(),
+                              "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body),
+                              "text_path": text_path}
     return store.append("literature_source", record)
 
 
@@ -366,6 +455,31 @@ def _load_source(store: InvestigationStore, reference: str) -> dict[str, Any]:
     ):
         raise ValueError("Expected a recorded literature source reference")
     return source
+
+
+def load_source_passage(store: InvestigationStore, reference: str) -> tuple[dict[str, Any], str, str]:
+    """Verify source/excerpt lineage and return its literal captured text and root reference."""
+    kinds = {event.artifact_ref: event.kind for event in store.events()}
+    kind = kinds.get(reference)
+    if kind not in {"literature_source", "literature_excerpt"}:
+        raise ValueError("Expected a recorded literature source or exact excerpt")
+    value = store.read_artifact(reference)
+    root_ref = reference if kind == "literature_source" else value.get("source_ref")
+    source = _load_source(store, root_ref)
+    text = source.get("extraction", {}).get("text")
+    if (not isinstance(text, str) or not text.strip() or not (
+            source.get("acquisition") == "http_fetch" and source.get("retrieval_status") == "completed"
+            or source.get("acquisition") == "agent_supplied_excerpt" and source.get("retrieval_status") == "not_performed")):
+        raise ValueError("Captured source text is required; failed fetches are debugging records. Use capture_source.")
+    if kind == "literature_excerpt":
+        start, end = value.get("location", {}).get("start"), value.get("location", {}).get("end")
+        if (value.get("schema_version") != EXCERPT_SCHEMA
+                or type(start) is not int or type(end) is not int or not 0 <= start < end <= len(text)
+                or value.get("text") != text[start:end]
+                or value.get("verification") != "exact_match_to_captured_text"):
+            raise ValueError("Literature excerpt must match its captured source exactly")
+        text = text[start:end]
+    return source, text, root_ref
 
 
 def _location(source: dict[str, Any], start: int, end: int) -> dict[str, Any]:
