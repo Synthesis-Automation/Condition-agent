@@ -13,6 +13,10 @@ print(w.describe())  # Selected inputs and baseline identity; no full manifest d
 print([item for item in w.operations.catalog() if item['name'] in selected_names])
 print(w.run_summary(operation_name, parameters))  # Full evidence saved; bounded stdout.
 ```
+For public workspace helpers, use w.help(['capture_source_file', 'finalize_answer'])
+to read signatures and examples; they are separate from the scientific catalogue.
+When running several calls in one script, collect their artifact refs and print
+w.batch_summary(refs) once instead of concatenating many individually bounded views.
 
 Reuse saved calls for unchanged inputs: `w.call_summary(ref)` reads their brief
 decision views. `w.inspect_artifact(ref, path=('result', 'hits'), offset=0, limit=3)`

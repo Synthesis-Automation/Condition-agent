@@ -130,6 +130,126 @@ Answer-finalization failures now enter the activity/debug log even if an outer
 script catches the exception and exits with code zero. Failed drafts are not
 published, and operational failure events are not citable scientific evidence.
 
+## Follow-up improvements from the two latest investigations
+
+The October 4 evening investigations used the prepared-drawing and brief-output
+paths. Their remaining gaps motivated the following additions. These do not
+change chemistry definitions, rank external literature as verified structures,
+or establish experimental feasibility.
+
+### Select a concrete candidate
+
+`realization_id` identifies a template realization; it can repeat for different
+precursor sets. Inspection and retro-validity calls now reject ambiguous IDs.
+Use the selected saved strategy and complete precursor SMILES:
+
+```python
+candidate = saved_strategy['representative']
+inspection = w.run('inspect_step_precedents', {
+    'source_ref': disconnection_ref,
+    'realization_id': candidate['realization_id'],
+    'strategy_id': saved_strategy['strategy_id'],
+    'precursor_smiles': candidate['precursor_smiles'],
+})
+```
+
+The same selectors are accepted by `assess_retro_validity`. Reactant ordering and
+atom-map labels do not change graph identity; specified stereo and salt components
+remain significant. Shared IDs for identical concrete candidates are supported.
+No template or corpus IDs are rewritten. These two operation contracts are now v2;
+old evidence remains readable, while replay requires its recorded implementation.
+
+### Check unresolved route inputs against captured sources
+
+```python
+inputs = w.run('inspect_route_inputs', {
+    'source_ref': route_assessment_ref,
+    'leaf_queries': [{'smiles': actual_leaf_smiles, 'terms': [literal_source_name]}],
+})
+search = w.run('search_captured_sources', {
+    'queries': [literal_source_name], 'limit': 3,
+})
+```
+
+Searches cover recorded roots, including upstream sections omitted from a cited
+excerpt. Matches retain exact source offsets for `record_source_excerpt`; follow
+`next_offset`. Failed fetches are skipped by default. Searches are literal leads,
+not name-to-structure assignments. The input inspection reports every actual leaf,
+reuses saved starting-material assessments when available, and retains missing
+terms as unsearched. Molecular-weight stops remain assumptions about planning,
+not evidence of supply. Inspect and assess source-supported upstream reactions
+before extending a route with `revise_route_branch`; otherwise disclose the route
+as beginning with advanced inputs. This tool does not automatically expand routes.
+
+### Assess and attach the actual proposed recipe
+
+```python
+check = w.run('assess_proposed_recipe', {
+    'reaction_smiles': proposed_reaction_smiles,
+    'components': [{'raw_identifier': 'ethanol', 'source_field': 'proposal',
+                    'identifier_type': 'name', 'source_role_hint': 'solvent'}],
+    'operating_conditions': {
+        'stages': [{'stage_index': 0, 'temperature_c': 0, 'time_h': 0.25},
+                   {'stage_index': 1, 'temperature_c': 25, 'time_h': 2}],
+    },
+    'evidence_refs': [source_excerpt_ref],
+})
+draft = w.attach_recipe_check(draft, 's1', check.artifact_ref)
+```
+
+Supply the complete actual proposed condition components, not only the solvent
+in this API example. Registry identity resolution and canonical compatibility
+rules remain authoritative. Unknown identities/signatures, missing capability
+coverage and hard conflicts stay explicit. Quantities and stage provenance are
+supported; numerical conditions are not inferred from prose. Preserve reported
+activation/addition/workup order in the attributed procedure. Stage rules do not
+constitute simulation of that procedure. The current canonical rules assess the
+recipe's top-level operating fields; stage-specific mixtures and temperatures
+remain explicitly `stages_recorded_not_evaluated`. This gap appears in preflight
+and the browser. `recipe_assessment_refs` is an optional
+answer-step field, with exact structure/stereo binding and browser coverage views.
+It refers to the saved recipe; altered prose is not automatically reconciled.
+Historical answers/review hashes without this field remain supported.
+
+### Preserve source images separately from reconstructed graphs
+
+```python
+image = w.capture_source_image('scheme.png', source_ref=source_ref,
+                               locator='Scheme 1, page 2')
+# Include scheme_refs=[image.artifact_ref] in prepare_literature_reaction.
+```
+
+PNG/JPEG files must be inside the investigation, at most 2 MiB and 20 million
+pixels. Bytes and source lineage are preserved. The browser shows captured images
+inside source-evidence details, with a shared six-image/4 MiB source-byte display
+budget and explicit omissions. Image capture does not verify the page attribution
+or chemical assignment. The preparation remains assignment-unverified. Literal
+compound names now permit 300 characters; ambiguous name suffixes are unnecessary.
+Preparation's operation contract is v2; the saved literature drawing remains v2.
+
+### Discover helpers and avoid assembly retries
+
+```python
+print(w.help(['capture_source_file', 'attach_literature_reaction', 'finalize_answer']))
+print(w.batch_summary(saved_event_refs))  # One shared 16 KiB budget, 1..30 refs.
+draft = w.answer_template(answer_markdown)
+# Populate scientific content, explicit molecule/step IDs and attribution.
+draft = w.attach_literature_reaction(draft, 's1', preparation_ref)
+print(w.answer_preflight(draft))
+receipt = w.finalize_answer(draft_path, draft, findings=findings)
+```
+
+`help` describes named public helpers as well as registered scientific operations.
+`capture_source_file` documents the distinction between a corpus REF1 identity and
+a DOI; put a DOI in URL/title or omit the optional corpus join. Drawing attachment
+adds its exact required source reference and immutable block together. Conflicting
+source IDs are rejected. Preflight validates the draft and reports missing recipe
+or route-input checks without rerunning scientific operations; follow `next_offset`
+to inspect additional warnings. Those warnings are
+advisory; unresolved scientific work must remain disclosed. Historical answers
+are not invalidated by new authoring advice. Use literal strings/f-strings for
+scientific prose containing `%`, rather than percent interpolation.
+
 ## Deployment and validation scope
 
 Restart the scientific-chat server and start a new investigation after updating

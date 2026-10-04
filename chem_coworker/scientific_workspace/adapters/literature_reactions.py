@@ -24,7 +24,7 @@ class ParticipantInput(BaseModel):
 
     model_config = ConfigDict(extra="forbid", strict=True)
     name: str = Field(min_length=1, max_length=300)
-    compound_id: str = Field(min_length=1, max_length=100)
+    compound_id: str = Field(min_length=1, max_length=300)
     evidence_ref: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
     material_form: str = Field(min_length=1, max_length=500)
     smiles: str | None = Field(default=None, min_length=1, max_length=4000)
@@ -69,6 +69,7 @@ def prepare_literature_reaction(
     conditions: list[dict[str, Any]] | None = None, yield_info: dict[str, Any] | None = None,
     source_conflicts: list[dict[str, Any]] | None = None,
     limitations: list[str] | None = None,
+    scheme_refs: list[str] | None = None,
 ) -> dict[str, Any]:
     """Prepare a literature_reaction.v2 block; every participant needs an exact excerpt.
 
@@ -110,6 +111,13 @@ def prepare_literature_reaction(
         structure_origin = "indexed_record"
     checks, participants = [], {"reactants": [], "products": []}
     refs = [source_ref]
+    if not isinstance(scheme_refs or [], list) or len(scheme_refs or []) > 5:
+        raise ValueError("scheme_refs must contain at most five captured source images")
+    from .source_images import load_source_image
+
+    for reference in scheme_refs or []:
+        load_source_image(store, reference, root_ref)
+        refs.append(reference)
     notes = list(limitations or [])
     notes.append("Graph checks do not verify the paper's structure assignment, tautomer, or experimental feasibility.")
     for side, items in inputs.items():
@@ -176,6 +184,7 @@ def prepare_literature_reaction(
                                   "reference_id": record["reference_id"]} if record else None,
             "structure_origin": structure_origin, "participant_count": len(checks),
             "structure_checks": checks, "source_conflicts": conflicts, "limitations": notes,
+            "scheme_refs": scheme_refs or [], "assignment_verification": "not_performed",
             "evidence_refs": list(dict.fromkeys(refs))}
 
 

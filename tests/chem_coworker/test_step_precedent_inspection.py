@@ -111,6 +111,23 @@ def test_assessed_step_and_route_preserve_support_and_unknown(workspace):
     assert gap["experimental_feasibility"] == "not_established"
 
 
+def test_strategy_and_precursor_selectors_propagate_to_inspection(workspace):
+    source, selected = disconnection(workspace)
+    payload = workspace.store.read_artifact(source.artifact_ref)
+    strategy = payload["result"]["strategies"][0]
+    alternative = deepcopy(strategy)
+    alternative["strategy_id"] = "STRAT1:alternative"
+    alternative["representative"]["precursor_smiles"] = "CCCl.N"
+    payload["result"]["strategies"].append(alternative)
+    ambiguous = workspace.store.append("call", payload)
+    event, record = run(workspace, "inspect_step_precedents", source_ref=ambiguous.artifact_ref,
+                        realization_id=selected["realization_id"], strategy_id=alternative["strategy_id"],
+                        precursor_smiles="N.CCCl")
+    assert record["selection"]["precursor_smiles"] == "CCCl.N"
+    assert record["selection"]["strategy_id"] == alternative["strategy_id"]
+    assert workspace.store.read_artifact(workspace.replay(event.artifact_ref).artifact_ref)["matches"]
+
+
 @pytest.mark.parametrize("arguments", [{"realization_id": "invented"}, {"step_id": "invented"},
                                        {"offset": -1}, {"limit": 100}])
 def test_invalid_selection_is_recorded_as_error(workspace, arguments):

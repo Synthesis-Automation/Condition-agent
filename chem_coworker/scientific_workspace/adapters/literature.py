@@ -269,7 +269,7 @@ def _source_record(
     }
     if reference_id is not None:
         if not isinstance(reference_id, str) or not re.fullmatch(r"REF1:[0-9a-f]{64}", reference_id):
-            raise ValueError("reference_id must be an explicit REF1 publication identity")
+            raise ValueError("reference_id must be REF1:<64 lowercase hex> from an indexed publication; put a DOI in url/title or omit reference_id")
         record["reported_reference_id"] = reference_id
         record["bibliography_attribution"] = "agent_supplied_not_independently_verified"
     return record

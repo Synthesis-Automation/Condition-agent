@@ -15,6 +15,11 @@ whole catalogue or read implementation files solely to discover public arguments
 Reuse saved calls for unchanged inputs. Put executable script bodies inside
 `if __name__ == '__main__':` so importing helpers does not repeat scientific calls.
 Prefer saved Python files for structured inputs over nested shell quoting.
+Use w.help(['capture_source_file', 'attach_literature_reaction']) for public helper
+signatures and callable examples. Helpers are not in w.operations.catalog().
+Do not guess old module paths or read implementation files to learn these APIs.
+For several results, collect event.artifact_ref and print w.batch_summary(refs)
+once. Its 16 KiB budget applies to the entire batch, with every omitted ref retained.
 
 Manifest investigation.json identifies selected datasets, versions and limitations.
 Events and artifacts retain complete calls and notes. Start with w.run_summary(...)
@@ -40,6 +45,27 @@ one means no encoded penalty, not experimental confidence. No applicable capabil
 requirement, unresolved identities, and an unassessed reaction remain explicit.
 Attribute each recipe check to its saved recipe; changing that recipe requires a
 new assessment. Structural precedent support does not establish condition support.
+Before recommending concrete operating conditions, use assess_proposed_recipe
+with the actual complete condition components and operating_conditions, citing the
+source evidence. It resolves identities through condition_registry and checks the
+actual recipe. Preserve temperature/time stages and atmosphere when reported;
+do not replace an addition/activation/workup sequence with an invented single stage.
+If the signature or recipe is unresolved, retain that status; never invent mapping
+or use an unrelated analogue check as the target recipe's validation.
+
+Saved disconnect_target realization_id identifies a template realization and can
+repeat across different concrete precursor sets. Select with strategy_id AND
+precursor_smiles from the chosen saved candidate for inspect_step_precedents or
+assess_retro_validity. Ambiguous IDs are rejected, not silently selected.
+
+Before stopping at advanced route inputs, use inspect_route_inputs on the saved
+route assessment, supplying leaf_queries=[{'smiles': leaf, 'terms': [source_name]}].
+Search captured sources for preparation of unresolved/assumed-terminal inputs.
+Literal matches are leads: inspect exact passages, assign explicit structures and
+assess any upstream reactions before extending with revise_route_branch. Do not
+promote a molecular-weight stop to availability or let a reaction name override
+contradictory graphs. If upstream work remains unresolved, describe the answer as
+a route from advanced inputs and compare alternatives on that same starting scope.
 
 Notes use w.store.note(kind, text, evidence_refs=(ref,)); kinds are 'hypothesis',
 'decision', 'question', 'limitation' and 'review'. Record branch choices as 'decision'.
@@ -72,6 +98,15 @@ Literature access is an application capability, independent of deterministic che
   imports an exact saved UTF-8 browser export without retyping it or printing it.
   JSON strings are supported; structured JSON requires text_path=[literal keys].
   reference_id is optional agent-attributed publication identity, not verification.
+  reference_id must be REF1:<64 lowercase hex> from an indexed record, not a DOI;
+  put a DOI in url/title or omit reference_id for a new external publication.
+- w.search_captured_sources is not a helper: use w.run('search_captured_sources',
+  {'queries': [literal_name], 'limit': 3}). Read matches, record exact offsets, and
+  follow next_offset. It searches captured roots, including earlier upstream text.
+- w.capture_source_image('scheme.png', source_ref=source_ref, locator='Scheme 1, p. 2')
+  preserves a local PNG/JPEG inside the investigation. Pass its artifact_ref as
+  scheme_refs when preparing a literature drawing. A stored screenshot supports
+  visual comparison; it does not certify graph assignment or experimental stereo.
 - If direct access reports network_permission_denied, use an available browser and
   capture passages for subsequent URLs while the same denial applies. Preserve the
   failure/acquisition scope. Do not repeatedly retry or relax the sandbox.

@@ -44,6 +44,8 @@ def answer_digest(draft: Mapping[str, Any]) -> str:
     # The optional display extension must not invalidate pre-extension reviews.
     # Supplied source reconstructions remain part of the exact reviewed draft.
     for step in normalized["steps"]:
+        if not step["recipe_assessment_refs"]:
+            step.pop("recipe_assessment_refs")
         if not step["literature_reactions"]:
             step.pop("literature_reactions")
             continue

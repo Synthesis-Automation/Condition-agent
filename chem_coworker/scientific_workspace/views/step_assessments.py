@@ -36,6 +36,7 @@ def answer_step_assessments(
     references = set(answer.get("evidence_refs", []))
     references.update(source["artifact_ref"] for source in answer.get("sources", []))
     references.update(ref for step in answer.get("steps", []) for ref in step.get("precedent_refs", []))
+    references.update(ref for step in answer.get("steps", []) for ref in step.get("recipe_assessment_refs", []))
     try:
         recorded_calls = {event.artifact_ref for event in store.events() if event.kind == "call"}
         calls = {reference: store.read_artifact(reference)
@@ -51,12 +52,13 @@ def answer_step_assessments(
             operation = payload.get("operation")
             saved = payload.get("result", {})
             selections = []
-            if operation == "assess_recipe":
+            if operation in {"assess_recipe", "assess_proposed_recipe"}:
                 sides = payload.get("arguments", {}).get("reaction_smiles", "").split(">")
                 if len(sides) == 3:
                     selections.append((
-                        {"precursor_smiles": sides[0], "target_smiles": sides[2]}, {}, saved,
-                        payload.get("arguments", {}).get("recipe", {}).get("recipe_id"),
+                        {"precursor_smiles": sides[0], "target_smiles": sides[2]}, {},
+                        saved.get("compatibility", saved),
+                        saved.get("proposed_recipe", payload.get("arguments", {}).get("recipe", {})).get("recipe_id"),
                     ))
             elif operation in SOURCE_OPERATIONS and operation != "disconnect_target":
                 selectors = [None] if operation in {"assess_route_step", "assess_retro_validity"} else [
@@ -88,6 +90,8 @@ def answer_step_assessments(
                     if recipe:
                         view["recipe_assessments"].append({
                             "artifact_ref": reference, "recipe_id": recipe_id,
+                            **({"process_coverage": saved.get("process_coverage")}
+                               if operation == "assess_proposed_recipe" else {}),
                             **{name: recipe.get(name) for name in (
                                 "status", "hard_conflicts", "checked_requirements",
                                 "unresolved_requirements", "analysis_warnings", "coverage",

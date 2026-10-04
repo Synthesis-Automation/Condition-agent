@@ -1,10 +1,12 @@
 """Exact participant evidence, indexed reuse, conflicts and immutable answer preparation."""
 
 from copy import deepcopy
+import base64
 import json
 from pathlib import Path
 
 import pytest
+from PIL import Image
 
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
 from chem_coworker.scientific_workspace.answers.answer_contracts import ScientificAnswer, validate_answer_evidence
@@ -17,6 +19,51 @@ from app.web_api.scientific_presentation import present_conversation
 ROOT = Path(__file__).resolve().parents[2]
 PUBLICATION = "REF1:" + "a" * 64
 TEXT = "Compound 8: bromoethane C2H5Br; ammonia N. Compound 9: ethylamine C2H7N.\nDiscussion: DCM.\nExperimental: DCE."
+
+
+def test_source_image_is_preserved_bound_and_presented_without_verifying_assignment(workspace):
+    from chem_coworker.scientific_workspace.views.literature_images import answer_literature_images
+
+    source, args = setup(workspace)
+    path = workspace.store.root / "scheme.png"
+    Image.new("RGB", (10, 10), "white").save(path)
+    original = path.read_bytes()
+    image = workspace.capture_source_image("scheme.png", source_ref=source.artifact_ref, locator="Scheme 1")
+    assert "image_base64" not in str(workspace.call_summary(image))
+    args["scheme_refs"] = [image.artifact_ref]
+    preparation, block = prepare(workspace, args)
+    draft = answer(source, block).model_dump()
+    evidence = answer_literature_images(workspace.store, draft)
+    captured = evidence[preparation.artifact_ref]["images"][0]
+    assert base64.b64decode(captured["image_url"].split(",", 1)[1]) == original
+    assert captured["assignment_verification"] == "not_performed"
+    before = deepcopy(draft)
+    shown = present_conversation({"id": "a" * 32, "turns": [{"id": "t", "question": "prepare",
+        "answer": draft, "literature_image_evidence": evidence}]})["turns"][0]["structured_presentation"]
+    assert shown["steps"][0]["literature_reactions"][0]["captured_images"][0] == captured
+    assert draft == before
+    other = workspace.capture_source("Other source", url="https://example.org/other")
+    image2 = workspace.capture_source_image("scheme.png", source_ref=other.artifact_ref, locator="Other scheme")
+    args["scheme_refs"] = [image2.artifact_ref]
+    failed = workspace.run("prepare_literature_reaction", args)
+    assert workspace.store.read_artifact(failed.artifact_ref)["execution_status"] == "error"
+
+
+def test_attachment_helper_uses_exact_preparation_source_and_preserves_draft(workspace):
+    source, args = setup(workspace)
+    event, block = prepare(workspace, args)
+    draft = answer(source, block).model_dump()
+    draft["steps"][0]["literature_reactions"] = []
+    draft["sources"] = []
+    before = deepcopy(draft)
+    attached = workspace.attach_literature_reaction(draft, "s", event.artifact_ref)
+    assert attached["sources"][0]["artifact_ref"] == source.artifact_ref
+    validate_answer_evidence(ScientificAnswer.model_validate(attached), workspace.store)
+    assert draft == before
+    conflicting = deepcopy(attached)
+    conflicting["sources"][0]["artifact_ref"] = args["reactants"][0]["evidence_ref"]
+    with pytest.raises(ValueError, match="conflicts"):
+        workspace.attach_literature_reaction(conflicting, "s", event.artifact_ref)
 
 
 @pytest.fixture

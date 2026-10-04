@@ -55,6 +55,23 @@ def test_oversized_summary_cannot_dump_large_structures_or_hide_omissions(tmp_pa
         assert summary["result_summary"]["assessment"]["status"] == "partially_supported"
 
 
+def test_batch_budget_is_shared_and_omitted_references_remain_inspectable(tmp_path):
+    store = InvestigationStore.create(tmp_path / "study", objective="Batch inspection", baseline={})
+    events = [store.append("call", {"operation": "analyze_molecule", "execution_status": "completed",
+        "result": {"valid": True, "canonical_smiles": "C" * 2000, "warnings": ["x" * 180] * 30,
+                   "motifs": [{"motif_id": str(i), "chemist_label": "z" * 180}] * 30}}) for i in range(30)]
+    workspace = ScientificWorkspace(store.root)
+    before = len(store.events())
+    summary = workspace.batch_summary([e.artifact_ref for e in events])
+    assert len(canonical_bytes(summary)) <= 16000
+    assert any(item.get("summary_omitted") for item in summary["items"])
+    assert {item.get("artifact_ref", item.get("event", {}).get("artifact_ref")) for item in summary["items"]} == {e.artifact_ref for e in events}
+    assert len(store.events()) == before
+    help_entries = workspace.help(["capture_source_file", "assess_proposed_recipe"])
+    assert "never a DOI" in help_entries[0]["description"]
+    assert "operating_conditions" in help_entries[1]["signature"]
+
+
 def test_network_denial_is_not_repeated_without_explicit_transport_change(tmp_path, monkeypatch):
     store = InvestigationStore.create(tmp_path / "study", objective="Capture paper", baseline={})
     calls = []

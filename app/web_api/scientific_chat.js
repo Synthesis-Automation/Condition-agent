@@ -232,6 +232,13 @@ function literatureReactionCard(reaction, sources, key) {
     const link = element('a', 'Recorded structure checks & source discrepancies');
     link.href = reaction.preparation_artifact_url; details.append(link);
   }
+  for (const captured of reaction.captured_images || []) {
+    details.append(element('p', 'Captured source image: ' + captured.locator + '. Compound assignments remain unverified.', 'muted'));
+    const img = element('img'); img.src = captured.image_url; img.alt = 'Captured source scheme or page: ' + captured.locator;
+    img.loading = 'lazy'; img.style.maxWidth = '100%'; details.append(img);
+  }
+  if (reaction.captured_images_omitted) details.append(element('p', reaction.captured_images_omitted + ' source images omitted from this view; inspect the preparation artifact.', 'muted'));
+  if (reaction.captured_image_status === 'evidence_unavailable') details.append(element('p', 'Captured source-image evidence is unavailable.', 'scientific-note'));
   if (source?.artifact_url) { const link = element('a', 'Saved source excerpt'); link.href = source.artifact_url; details.append(link); }
   card.append(disclosure('Source structures & evidence', key, details));
   return card;
@@ -320,6 +327,7 @@ function stepAssessmentEvidence(step, key) {
     const check = element('div', '', 'step-recipe-assessment');
     check.append(element('p', 'Recipe check: ' + (record.status || 'unresolved').replaceAll('_', ' ') + '.', 'match-summary'));
     compatibilityCoverage(check, record);
+    if (record.process_coverage === 'stages_recorded_not_evaluated') check.append(element('p', 'Process stages are preserved; stage-specific mixtures, addition order and workup chemistry were not evaluated.', 'scientific-note'));
     scientificNotes(check, [...(record.evidence || []), ...(record.hard_conflicts || []),
       ...(record.unresolved_requirements || []), ...(record.analysis_warnings || [])]);
     if (record.recipe_id) check.append(element('p', 'Assessed recipe: ' + record.recipe_id, 'muted'));

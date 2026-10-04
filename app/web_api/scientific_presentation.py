@@ -199,6 +199,7 @@ def present_conversation(conversation: dict[str, Any]) -> dict[str, Any]:
                     json.dumps(turn["answer"], sort_keys=True), identity,
                     json.dumps(turn.get("step_precedent_evidence", {}), sort_keys=True),
                     json.dumps(turn.get("step_assessment_evidence", {}), sort_keys=True),
+                    json.dumps(turn.get("literature_image_evidence", {}), sort_keys=True),
                 )
                 references = tuple(
                     (source["artifact_ref"], source["title"], source["url"] or source["artifact_url"])
@@ -239,6 +240,7 @@ def _route_overview(steps: list[dict[str, Any]]) -> str:
 @lru_cache(maxsize=32)
 def _structured_view(
     payload: str, identity: str, precedent_payload: str = "{}", assessment_payload: str = "{}",
+    literature_image_payload: str = "{}",
 ) -> dict[str, Any]:
     """Produce disposable structure/route SVGs from explicit answer objects."""
     raw = json.loads(payload)
@@ -261,6 +263,7 @@ def _structured_view(
     steps = {item["id"]: item for item in view["steps"]}
     precedent_evidence = json.loads(precedent_payload)
     assessment_evidence = json.loads(assessment_payload)
+    literature_image_evidence = json.loads(literature_image_payload)
     for step in steps.values():
         step["assessment_evidence"] = assessment_evidence.get(step["id"], {})
         for section in ("structural_assessments", "recipe_assessments"):
@@ -295,6 +298,10 @@ def _structured_view(
             prefix = f"/api/v1/scientific/conversations/{identity}/artifacts/"
             if reaction.get("preparation_ref"):
                 reaction["preparation_artifact_url"] = prefix + reaction["preparation_ref"]
+                image_evidence = literature_image_evidence.get(reaction["preparation_ref"], {})
+                reaction["captured_images"] = image_evidence.get("images", [])
+                reaction["captured_images_omitted"] = image_evidence.get("omitted_count", 0)
+                reaction["captured_image_status"] = image_evidence.get("status", "not_recorded")
             for participant in [*reaction["reactants"], *reaction["products"]]:
                 if participant.get("evidence_ref"):
                     participant["evidence_artifact_url"] = prefix + participant["evidence_ref"]

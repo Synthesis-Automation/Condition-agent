@@ -442,6 +442,9 @@ class ConversationService:
                     store, turn["answer"],
                 )
                 turn["step_assessment_evidence"] = answer_step_assessments(store, turn["answer"])
+                from ..views.literature_images import answer_literature_images
+
+                turn["literature_image_evidence"] = answer_literature_images(store, turn["answer"])
         return {"workspace_mode": "normal", **metadata, "turns": turns}
 
     def list_conversations(self) -> list[dict[str, Any]]:
