@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 from copy import deepcopy
 import json
+import hashlib
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -17,6 +18,9 @@ from chem_coworker.scientific_workspace.answers.answer_contracts import (
     validate_answer_evidence,
 )
 from chem_coworker.scientific_workspace.core.store import InvestigationStore
+from chem_coworker.scientific_workspace.core.store import canonical_bytes
+from chem_coworker.scientific_workspace.adapters.literature import capture_source
+from chem_coworker.scientific_workspace.answers.evidence_review import answer_digest
 
 
 def proposed() -> dict:
@@ -215,3 +219,74 @@ def test_runtime_schema_requires_closed_explicit_objects_and_nulls() -> None:
             assert schema["additionalProperties"] is False
             assert set(schema["required"]) == set(schema["properties"])
     assert json.loads(json.dumps(ANSWER_SCHEMA))["properties"]["schema_version"]["const"] == "scientific_answer.v2"
+
+
+def literature_example(example):
+    """Attach a distinct source reaction, rather than copy the target proposal."""
+    store, payload = example
+    source = payload["sources"][0]
+    event = capture_source(store, "Example 9: ethanol was oxidized to acetaldehyde. CCO>>CC=O.", url=source["url"])
+    source["artifact_ref"] = event.artifact_ref
+    drawing = {
+        "title": "Source oxidation", "source_id": "patent", "locator": "Example 9",
+        "structure_origin": "reconstructed_from_description",
+        "structure_evidence": "ethanol was oxidized to acetaldehyde.",
+        "reactants": [{"name": "Ethanol", "smiles": "CCO"}],
+        "products": [{"name": "Acetaldehyde", "smiles": "CC=O"}],
+        "limitations": ["Source structure interpretation remains unverified."],
+    }
+    payload["steps"][0]["literature_reactions"] = [drawing]
+    return store, payload, drawing
+
+
+@pytest.mark.parametrize("origin", ["source_explicit", "reconstructed_from_description"])
+def test_source_reactions_render_automatically_without_copying_target(example, origin):
+    store, payload, drawing = literature_example(example)
+    drawing["structure_origin"] = origin
+    validate_answer_evidence(ScientificAnswer.model_validate(payload), store)
+    original = deepcopy(payload)
+    view = present_conversation({"id": "a" * 32, "turns": [{"question": "Q", "answer": payload}]})["turns"][0]["structured_presentation"]
+    source = view["steps"][0]["literature_reactions"][0]
+    assert source["reaction_smiles"] == "CCO>>CC=O"
+    assert source["drawing_status"] == "drawn"
+    assert source["reaction_smiles"] != view["steps"][0]["reaction_smiles"]
+    assert source["limitations"] == drawing["limitations"]
+    ET.fromstring(base64.b64decode(source["image_url"].split(",", 1)[1]))
+    assert payload == original
+
+
+@pytest.mark.parametrize("change,match", [
+    ({"source_id": "missing"}, "captured external"),
+    ({"structure_evidence": "Invented passage"}, "quote its captured source"),
+    ({"structure_evidence": "  "}, "must not be blank"),
+    ({"structure_origin": "source_explicit", "products": [{"name": "Different product", "smiles": "CCN"}]}, "SMILES must appear"),
+    ({"conditions": [{"text": "Target adaptation", "basis": "proposed", "source_ids": ["patent"], "limitations": []}]}, "must be reported"),
+])
+def test_literature_drawing_rejects_missing_and_conflicting_provenance(example, change, match):
+    store, payload, drawing = literature_example(example)
+    drawing.update(change)
+    with pytest.raises(ValueError, match=match):
+        validate_answer_evidence(ScientificAnswer.model_validate(payload), store)
+
+
+def test_invalid_source_structure_is_retained_without_a_drawing(example):
+    _, payload, drawing = literature_example(example)
+    drawing["products"][0]["smiles"] = "INVALID"
+    view = present_conversation({"id": "a" * 32, "turns": [{"question": "Q", "answer": payload}]})["turns"][0]["structured_presentation"]
+    source = view["steps"][0]["literature_reactions"][0]
+    assert source["drawing_status"] == "invalid_or_unsupported_notation"
+    assert "image_url" not in source
+    assert source["products"][0]["smiles"] == "INVALID"
+
+
+def test_optional_source_drawings_preserve_old_review_hashes_and_bind_new_drawings(example):
+    _, payload = example
+    old = ScientificAnswer.model_validate(payload).model_dump()
+    old["evidence_refs"] = sorted(set(old["evidence_refs"]))
+    for step in old["steps"]:
+        step.pop("literature_reactions")
+    assert answer_digest(payload) == hashlib.sha256(canonical_bytes(old)).hexdigest()
+    _, payload, drawing = literature_example(example)
+    initial = answer_digest(payload)
+    drawing["products"][0]["smiles"] = "CCN"
+    assert answer_digest(payload) != initial

@@ -91,6 +91,13 @@ class LiteratureReaction(AnswerObject):
     yield_info: AnswerClaim | None = None
     limitations: list[str] = Field(default_factory=list, max_length=30)
 
+    @model_validator(mode="after")
+    def check_passage(self) -> "LiteratureReaction":
+        """Reject an empty quote before source-membership validation."""
+        if not self.structure_evidence.strip():
+            raise ValueError("Literature structure evidence must not be blank")
+        return self
+
 
 class AnswerStep(AttributedObject):
     """A transformation with attributed reagent labels, procedures and yield."""
@@ -199,6 +206,9 @@ ANSWER_SCHEMA = ScientificAnswer.model_json_schema()
 ANSWER_SCHEMA["$defs"]["AnswerStep"]["required"].extend([
     "precedent_refs", "condition_precedent_refs", "rationale", "reagents", "literature_reactions",
 ])
+ANSWER_SCHEMA["$defs"]["LiteratureReaction"]["required"] = list(
+    ANSWER_SCHEMA["$defs"]["LiteratureReaction"]["properties"]
+)
 
 
 def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore) -> list[str]:
