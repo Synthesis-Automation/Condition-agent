@@ -285,6 +285,8 @@ def test_optional_source_drawings_preserve_old_review_hashes_and_bind_new_drawin
     old["evidence_refs"] = sorted(set(old["evidence_refs"]))
     for step in old["steps"]:
         step.pop("literature_reactions")
+        # Historical drafts predate both optional evidence extensions.
+        step.pop("recipe_assessment_refs")
     assert answer_digest(payload) == hashlib.sha256(canonical_bytes(old)).hexdigest()
     _, payload, drawing = literature_example(example)
     initial = answer_digest(payload)
