@@ -291,6 +291,13 @@ def _structured_view(
         step["literature_reactions"] = [
             _literature_reaction_view(item) for item in step["literature_reactions"]
         ]
+        for reaction in step["literature_reactions"]:
+            prefix = f"/api/v1/scientific/conversations/{identity}/artifacts/"
+            if reaction.get("preparation_ref"):
+                reaction["preparation_artifact_url"] = prefix + reaction["preparation_ref"]
+            for participant in [*reaction["reactants"], *reaction["products"]]:
+                if participant.get("evidence_ref"):
+                    participant["evidence_artifact_url"] = prefix + participant["evidence_ref"]
     for route in view["routes"]:
         route_steps = [steps[key] for key in route["step_ids"]]
         try:

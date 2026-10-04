@@ -46,6 +46,17 @@ def answer_digest(draft: Mapping[str, Any]) -> str:
     for step in normalized["steps"]:
         if not step["literature_reactions"]:
             step.pop("literature_reactions")
+            continue
+        for reaction in step["literature_reactions"]:
+            if reaction["schema_version"] == "literature_reaction.v1":
+                # Keep pre-v2 self-review identities exact; new preparations are fully hashed.
+                for key in ("preparation_ref", "source_provenance"):
+                    if reaction.get(key) is None:
+                        reaction.pop(key, None)
+                for participant in [*reaction["reactants"], *reaction["products"]]:
+                    for key in ("compound_id", "evidence_ref", "material_form", "graph_status", "formula"):
+                        if participant.get(key) is None:
+                            participant.pop(key, None)
     return hashlib.sha256(canonical_bytes(normalized)).hexdigest()
 
 

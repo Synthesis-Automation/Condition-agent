@@ -113,7 +113,7 @@ def test_tools_prompt_and_saved_context_exclude_suggestion_and_output_layers(ser
     turn = finish(service, identity)
     assert turn["status"] == "completed", turn.get("error")
     prompt = service.runtime.calls[0]["prompt"]
-    assert "analyze_reaction" in prompt and "w.run(operation_name, parameters)" in prompt
+    assert "analyze_reaction" in prompt and "w.run_summary(operation_name, parameters)" in prompt
     for forbidden in ("w.task_guide(", "w.recall_lessons(", "scientific_answer.v2",
                       "ANSWER FILE HANDOFF", "Default answer presentation", "optional menus"):
         assert forbidden not in prompt

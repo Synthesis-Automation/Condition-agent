@@ -21,15 +21,29 @@ def main(argv: Sequence[str] | None = None) -> int:
     create.add_argument("--objective", required=True)
     create.add_argument("--repository", default=str(REPOSITORY_ROOT))
     create.add_argument("--artifacts", help="JSON file mapping artifact names to local paths")
-    for name in ("catalog", "summary", "capabilities", "run", "run-python", "show", "replay", "note", "attach", "status", "fetch-source", "inspect-source"):
+    for name in ("catalog", "summary", "describe", "call-summary", "capabilities", "run", "run-python", "show", "replay", "note", "attach", "status", "fetch-source", "inspect-source", "capture-source"):
         command = sub.add_parser(name)
         command.add_argument("workspace")
-        if name == "run":
+        if name == "catalog":
+            command.add_argument("--operation", action="append", default=[])
+        elif name == "call-summary":
+            command.add_argument("reference")
+            command.add_argument("--detailed", action="store_true")
+        elif name == "capture-source":
+            command.add_argument("file", help="UTF-8 text or JSON export inside the investigation")
+            command.add_argument("--url", required=True)
+            command.add_argument("--title")
+            command.add_argument("--locator")
+            command.add_argument("--reference-id")
+            command.add_argument("--text-path", help="JSON list of literal keys/indices; [] for a JSON string")
+        elif name == "run":
             command.add_argument("operation")
             command.add_argument("--input", required=True, help="JSON object with operation arguments")
         elif name == "fetch-source":
             command.add_argument("url")
             command.add_argument("--title")
+            command.add_argument("--retry-network", action="store_true", help="Retry after a known permission change")
+            command.add_argument("--reference-id", help="Agent-attributed corpus publication identity")
         elif name == "inspect-source":
             command.add_argument("reference")
             command.add_argument("--query")
@@ -42,6 +56,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             command.add_argument("--timeout", type=int, default=60)
         elif name in {"show", "replay"}:
             command.add_argument("reference")
+            if name == "show":
+                command.add_argument("--full", action="store_true", help="Explicit full artifact export")
+                command.add_argument("--path", default="[]", help="JSON list of literal keys/indices")
+                command.add_argument("--offset", type=int, default=0)
+                command.add_argument("--limit", type=int, default=5)
         elif name == "note":
             command.add_argument("kind", choices=("hypothesis", "decision", "question", "limitation", "review"))
             command.add_argument("--text", required=True)
@@ -65,12 +84,28 @@ def main(argv: Sequence[str] | None = None) -> int:
             workspace = ScientificWorkspace(args.workspace)
             if args.command == "catalog":
                 result = workspace.operations.catalog()
+                if args.operation:
+                    for name in args.operation:
+                        workspace.operations.definition(name)
+                    result = [item for item in result if item["name"] in args.operation]
             elif args.command == "summary":
                 result = workspace.store.summary()
+            elif args.command == "describe":
+                result = workspace.describe()
+            elif args.command == "call-summary":
+                result = workspace.call_summary(args.reference, detailed=args.detailed)
+            elif args.command == "capture-source":
+                event = workspace.capture_source_file(
+                    args.file, url=args.url, title=args.title, locator=args.locator,
+                    reference_id=args.reference_id,
+                    text_path=json.loads(args.text_path) if args.text_path is not None else None,
+                )
+                result = workspace.call_summary(event)
             elif args.command == "capabilities":
                 result = workspace.capabilities()
             elif args.command == "fetch-source":
-                event = workspace.fetch_source(args.url, title=args.title)
+                event = workspace.fetch_source(args.url, title=args.title, retry_network=args.retry_network,
+                                               reference_id=args.reference_id)
                 value = workspace.store.read_artifact(event.artifact_ref)
                 result = {"event": event, "retrieval_status": value["retrieval_status"],
                           "extraction_status": value["extraction"]["status"], "error": value.get("error")}
@@ -79,7 +114,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             elif args.command == "inspect-source":
                 result = workspace.inspect_source(args.reference, query=args.query, offset=args.offset, limit=args.limit)
             elif args.command == "show":
-                result = workspace.store.read_artifact(args.reference)
+                if args.full and (args.path != "[]" or args.offset or args.limit != 5):
+                    raise ValueError("Choose --full or paged inspection arguments")
+                result = (workspace.store.read_artifact(args.reference) if args.full else
+                          workspace.inspect_artifact(args.reference, path=json.loads(args.path),
+                                                     offset=args.offset, limit=args.limit))
             elif args.command == "run":
                 event = workspace.run(args.operation, json.loads(Path(args.input).read_text("utf-8")))
                 result = workspace.call_summary(event)

@@ -105,29 +105,34 @@ inventing chemistry. This is separate from indexed precedent_refs and never
 replaces a required local inspection. Never copy a proposed target reaction into
 this field merely because the step cites a paper. Use the actual source reaction,
 including an analogue's different substrates and product.
-Each literature reaction uses schema_version='literature_reaction.v1', title,
-source_id of a captured external source, exact locator, structure_origin,
-structure_evidence (a verbatim passage from that captured source), reactants and
-products (lists of {name, smiles}), conditions, yield_info and limitations.
-Use structure_origin='source_explicit' only when every supplied SMILES appears in
-the captured text. Otherwise use 'reconstructed_from_description': this means
-agent-interpreted structures, displayed as an unverified literature reconstruction.
-Source drawings must retain material-form, tautomer, stereo and interpretation
-uncertainty. If the source only identifies a salt without sufficient structure,
-show a supported neutral parent only with an explicit visible salt-form limitation;
-never invent its protonation or counterion arrangement. If endpoints remain
-ambiguous, omit the drawing and explain the gap in the step limitations.
-Conditions and yield use the usual attributed claims, basis='reported' and
-source_ids including this source_id; leave them absent when unreported. Proposed
-target conditions stay in the step's conditions, not the source drawing.
-Example (replace all structures and evidence with the inspected source):
-"literature_reactions": [{"title": "Source Example 2", "source_id": "lit1",
-  "locator": "Experimental Methods, Example 2",
-  "structure_origin": "reconstructed_from_description",
-  "structure_evidence": "Ethanol was oxidized to acetaldehyde.",
-  "reactants": [{"name": "Ethanol", "smiles": "CCO"}],
-  "products": [{"name": "Acetaldehyde", "smiles": "CC=O"}],
-  "limitations": ["Structures reconstructed from the captured description."]}]
+Prepare new source drawings with w.run('prepare_literature_reaction', parameters)
+and attach w.prepared_literature_reaction(event.artifact_ref). It returns the
+literature_reaction.v2 block, bound to recorded preparation; do not edit that block.
+Each participant requires name, compound_id (literal source label or name),
+evidence_ref of an exact w.record_source_excerpt passage, and material_form
+(including unknown salt/concentration/tautomer/stereo details). Prefer existing
+indexed graphs: supply indexed_ref of a saved fragment search/get_precedents call
+and reaction_id; omit participant SMILES. Participant sides and counts must match
+that source reaction, including salt components. Capture the publication with its
+reference_id to retain an explicit, agent-attributed bibliography join.
+
+When an indexed graph is unavailable, explicitly supply participant SMILES and
+structure_origin='reconstructed_from_description'. The tool audits graph syntax,
+formula, charge, salts, rings and stereo gaps; it does not translate names or verify
+scheme images. Optional reported_formula must occur in the participant's passage;
+conflicting formulas and invalid graphs stay visible and are not repaired.
+Use source_explicit only when SMILES occur in each participant's captured passage.
+If endpoints remain ambiguous, omit the drawing and explain the evidence gap.
+Source acquisition remains separate from graph origin; neither indexed identity
+nor successful drawing proves the paper's assignment or experimental feasibility.
+
+Supply source_ref, source_id, title, locator, structure_evidence (literal captured
+text), reactants and products to the preparation tool. Optional conditions and
+yield_info must be reported claims citing source_id and quoting captured text;
+leave them absent when unavailable. Put normalized/adapted target conditions on
+the proposed step. Source discrepancies use source_conflicts=[{description,
+excerpt_refs:[first_exact_passage, second_exact_passage]}]; preserve both passages
+and explain the unresolved difference. Use the catalogue for the complete signature.
 Use [] when no source reaction can be reconstructed. Do not hand-draw SVG or embed
 image links; SVG generation is the presentation layer's responsibility.
 

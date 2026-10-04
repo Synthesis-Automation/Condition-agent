@@ -4,10 +4,9 @@ Use a saved Python script with the recorded workspace:
 ```python
 from chem_coworker.scientific_workspace import ScientificWorkspace
 w = ScientificWorkspace(@INVESTIGATION_ROOT@)
-print(w.store.summary())  # Prior calls and notes for continuation.
+print(w.describe())  # Selected inputs, baseline identity and recent event references.
 print([entry for entry in w.operations.catalog() if entry['name'] in selected_names])
-event = w.run(operation_name, parameters)
-print(w.call_summary(event))
+print(w.run_summary(operation_name, parameters))
 ```
 
 Discover exact arguments for unfamiliar operations from the catalogue, choosing
@@ -18,7 +17,10 @@ Reuse saved calls for unchanged inputs. Put executable script bodies inside
 Prefer saved Python files for structured inputs over nested shell quoting.
 
 Manifest investigation.json identifies selected datasets, versions and limitations.
-Events and artifacts retain complete calls and notes. Start with w.call_summary(event).
+Events and artifacts retain complete calls and notes. Start with w.run_summary(...)
+or w.call_summary(ref) for a saved result. No custom summary script is needed.
+Console summaries are bounded to 16 KiB; any omitted decision detail is explicit.
+Fragment summaries retain publication metadata and source reaction structures.
 Inspect only a decision-critical field when needed:
 ```python
 print(w.inspect_artifact(event.artifact_ref, path=('result', 'warnings'), limit=5))
@@ -66,9 +68,15 @@ Literature access is an application capability, independent of deterministic che
 - w.capture_source(text, url=url, title=title, locator=locator) preserves text already
   inspected with browser/search tools. It is agent_supplied_excerpt, not an independent
   fetch of the URL. Keep raw external sources separate from local-corpus evidence.
+- w.capture_source_file('browser.txt', url=url, locator=locator, reference_id=REF1)
+  imports an exact saved UTF-8 browser export without retyping it or printing it.
+  JSON strings are supported; structured JSON requires text_path=[literal keys].
+  reference_id is optional agent-attributed publication identity, not verification.
 - If direct access reports network_permission_denied, use an available browser and
   capture passages for subsequent URLs while the same denial applies. Preserve the
   failure/acquisition scope. Do not repeatedly retry or relax the sandbox.
+  Subsequent direct fetches are skipped after a recorded permission denial.
+  Use retry_network=True only after a concrete network-permission change.
 - w.capabilities() checks local imports and data presence. Requested web/model settings
   do not establish working tools; disclose unavailable search, full text or PDF parsing.
 

@@ -7,7 +7,7 @@ import inspect
 import json
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Literal, Mapping
 
 from ..core.operation_contracts import OperationDefinition
 from ..core.store import InvestigationStore
@@ -44,6 +44,8 @@ class ScientificOperations:
     DEFINITIONS = (
         OperationDefinition("analyze_reaction"),
         OperationDefinition("analyze_molecule"),
+        OperationDefinition("prepare_literature_reaction", evidence_arguments=("source_ref", "indexed_ref"),
+                            result_evidence_field="evidence_refs"),
         OperationDefinition("recommend_conditions", required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("generate_weak_label_screening_array",
                             required_artifacts=("weak_label_records", "weak_label_recipe_catalog")),
@@ -130,6 +132,32 @@ class ScientificOperations:
         """Dispatch only named application operations, never caller-supplied imports."""
         definition = self.definition(operation)
         return getattr(self, definition.name)(**arguments)
+
+    def prepare_literature_reaction(
+        self, source_ref: str, source_id: str, title: str, locator: str, structure_evidence: str,
+        reactants: list[dict[str, Any]], products: list[dict[str, Any]],
+        structure_origin: Literal["source_explicit", "reconstructed_from_description"] = "reconstructed_from_description",
+        indexed_ref: str | None = None,
+        reaction_id: str | None = None, conditions: list[dict[str, Any]] | None = None,
+        yield_info: dict[str, Any] | None = None, source_conflicts: list[dict[str, Any]] | None = None,
+        limitations: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Prepare source drawings with exact participant passages and optional indexed graph reuse.
+
+        Each side has 1..20 participants with name, compound_id, evidence_ref and
+        material_form. Supply smiles for reconstructions/source-explicit graphs;
+        omit smiles with indexed_ref/reaction_id. reported_formula is optional.
+        Source discrepancies use description and at least two exact excerpt_refs.
+        Read w.prepared_literature_reaction(ref) into the answer without dumping it.
+        """
+        from .literature_reactions import prepare_literature_reaction
+
+        return prepare_literature_reaction(
+            self.store, source_ref=source_ref, source_id=source_id, title=title, locator=locator,
+            structure_evidence=structure_evidence, reactants=reactants, products=products,
+            structure_origin=structure_origin, indexed_ref=indexed_ref, reaction_id=reaction_id,
+            conditions=conditions, yield_info=yield_info, source_conflicts=source_conflicts, limitations=limitations,
+        )
 
     def _path(self, name: str) -> Path:
         entry = self.store.manifest["baseline"]["artifacts"].get(name)
@@ -560,6 +588,7 @@ class ScientificOperations:
 
         Use realization_id for disconnect_target, step_id for a route assessment
         or revision, and neither for assess_route_step. Follow page.next_offset.
+        offset must be nonnegative; limit is 1..5 (default 3).
         Source reactions, product comparison, scoped counts, and available source
         conditions remain evidence, not proof that the proposed step will work.
         """

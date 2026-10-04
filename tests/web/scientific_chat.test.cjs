@@ -6,6 +6,31 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../..');
 
+test('prepared literature cards distinguish indexed graphs, acquisition and conflicting evidence', () => {
+  const {run, context} = harness();
+  context.prepared = {
+    title:'Source reaction', source_id:'paper', locator:'Example 8', structure_origin:'indexed_record',
+    image_url:'data:image/svg+xml;base64,source', reaction_smiles:'CCBr.N>>CCN',
+    structure_evidence:'Compound 8 gave compound 9.', conditions:[], limitations:['Unresolved source discrepancy: DCM versus DCE.'],
+    source_provenance:{acquisition:'agent_supplied_excerpt',extraction_status:'agent_supplied',limitations:[]},
+    reactants:[{name:'Bromoethane',compound_id:'8',material_form:'Neutral parent; concentration unknown',
+      evidence_artifact_url:'/saved/reactant',graph_status:'graph_checked_assignment_unverified',formula:'C2H5Br'}],
+    products:[{name:'Product',compound_id:'9',material_form:'Salt form unknown',graph_status:'conflicting',
+      evidence_artifact_url:'/saved/product',formula:'C2H7N'}],
+    preparation_artifact_url:'/saved/preparation'
+  };
+  const before=JSON.stringify(context.prepared);
+  const card=run("literatureReactionCard(prepared, new Map([['paper',{title:'Paper',url:'https://example.org/paper'}]]), 'lit')");
+  const texts=card.descendants().map(node=>node.textContent);
+  assert.ok(texts.includes('Indexed source structures'));
+  assert.ok(texts.some(text=>text.includes('acquisition and transcription are not independently verified')));
+  assert.ok(texts.some(text=>text.includes('Source and graph evidence conflict')));
+  assert.ok(texts.includes('Unresolved source discrepancy: DCM versus DCE.'));
+  assert.ok(card.querySelectorAll('a').some(node=>node.href==='/saved/product'));
+  assert.ok(card.querySelectorAll('a').some(node=>node.href==='/saved/preparation'));
+  assert.equal(JSON.stringify(context.prepared),before);
+});
+
 class Node {
   constructor(tag = 'div') {
     this.tag = tag; this.children = []; this.parentNode = null; this.dataset = {}; this.style = {};

@@ -2,6 +2,16 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+New investigations can use [prepared literature reactions and bounded console
+inspection](../new/literature_preparation_and_console_efficiency.md). Use
+`w.run_summary(...)`, `w.call_summary(saved_ref)` and `w.describe()` instead of
+dumping full JSON. Fragment summaries include publication leads. Exact browser
+text exports can be imported with `capture_source_file`; participant excerpts and
+indexed source graphs can be composed with `prepare_literature_reaction` into an
+immutable v2 drawing block. Acquisition, graph validity, formula conflicts and
+material-form uncertainty remain separate. CLI `show` defaults to paged inspection;
+use `--full` for complete export. Restart the server and start a new investigation.
+
 The [retro validity tool](../new/retro_validity_tool.md) is available as
 `assess_retro_validity` for a concrete proposal or saved disconnection realization.
 It reports whole-reaction/local/analogue precedent grades, structural gates,
@@ -33,8 +43,9 @@ hard conflicts remain visible. Reported source yields stay with their source
 experiments. Refresh the browser for this layout update; existing saved answers
 are supported without rewriting artifacts or rebuilding indexes.
 
-Future structured answers also support per-step `literature_reactions`
-(`literature_reaction.v1`). The agent supplies source-specific reactant/product
+Structured answers support per-step `literature_reactions`. New drawings use the
+prepared `literature_reaction.v2` contract described above; historical v1 remains
+readable. The agent supplies source-specific reactant/product
 structures, an exact source locator and a literal captured-text passage. The
 browser automatically draws these alongside indexed precedents. Source-explicit
 SMILES must occur in the captured text; structures interpreted from names or
