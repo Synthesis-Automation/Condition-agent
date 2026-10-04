@@ -44,7 +44,7 @@ class ScientificOperations:
     DEFINITIONS = (
         OperationDefinition("analyze_reaction"),
         OperationDefinition("analyze_molecule"),
-        OperationDefinition("prepare_literature_reaction", evidence_arguments=("source_ref", "indexed_ref"),
+        OperationDefinition("prepare_literature_reaction", contract_version="2", evidence_arguments=("source_ref", "indexed_ref"),
                             result_evidence_field="evidence_refs"),
         OperationDefinition("recommend_conditions", required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("generate_weak_label_screening_array",
@@ -56,6 +56,11 @@ class ScientificOperations:
         OperationDefinition("get_procedures", required_artifacts=("procedure_catalog",)),
         OperationDefinition("resolve_recipe"),
         OperationDefinition("assess_recipe"),
+        OperationDefinition("assess_proposed_recipe", evidence_arguments=("evidence_refs",)),
+        OperationDefinition("search_captured_sources", evidence_arguments=("source_refs",),
+                            result_evidence_field="evidence_refs"),
+        OperationDefinition("inspect_route_inputs", evidence_arguments=("source_ref", "source_refs"),
+                            result_evidence_field="evidence_refs"),
         OperationDefinition("search_fragment_precedents", required_artifacts=("fragment_index",),
                             execution_status_field="execution_status",
                             replay_comparison="scientific_result_excluding_fragment_execution_telemetry",
@@ -74,7 +79,7 @@ class ScientificOperations:
         ),
         OperationDefinition("assess_route_step", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",)),
-        OperationDefinition("assess_retro_validity", required_artifacts=("retro_library",),
+        OperationDefinition("assess_retro_validity", contract_version="2", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "forward_ref", "evidence_refs"),
                             usage_policy="Assess concrete realizations; ordinal evidence is not success probability. "
                             "Use a saved bounded forward check only for consequential uncertainties."),
@@ -93,7 +98,7 @@ class ScientificOperations:
                             replay_comparison="scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry",
                             replay_projection=_forward_replay_result),
         OperationDefinition("inspect_route_step", evidence_arguments=("source_ref",)),
-        OperationDefinition("inspect_step_precedents", evidence_arguments=("source_ref",)),
+        OperationDefinition("inspect_step_precedents", contract_version="2", evidence_arguments=("source_ref",)),
         OperationDefinition("revise_route_branch", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "evidence_refs")),
         OperationDefinition("compare_route_proposals", evidence_arguments=("source_refs",)),
@@ -141,6 +146,7 @@ class ScientificOperations:
         reaction_id: str | None = None, conditions: list[dict[str, Any]] | None = None,
         yield_info: dict[str, Any] | None = None, source_conflicts: list[dict[str, Any]] | None = None,
         limitations: list[str] | None = None,
+        scheme_refs: list[str] | None = None,
     ) -> dict[str, Any]:
         """Prepare source drawings with exact participant passages and optional indexed graph reuse.
 
@@ -148,6 +154,8 @@ class ScientificOperations:
         material_form. Supply smiles for reconstructions/source-explicit graphs;
         omit smiles with indexed_ref/reaction_id. reported_formula is optional.
         Source discrepancies use description and at least two exact excerpt_refs.
+        compound_id permits a literal name up to 300 characters. scheme_refs may
+        cite up to five w.capture_source_image records from the same source.
         Read w.prepared_literature_reaction(ref) into the answer without dumping it.
         """
         from .literature_reactions import prepare_literature_reaction
@@ -157,6 +165,7 @@ class ScientificOperations:
             structure_evidence=structure_evidence, reactants=reactants, products=products,
             structure_origin=structure_origin, indexed_ref=indexed_ref, reaction_id=reaction_id,
             conditions=conditions, yield_info=yield_info, source_conflicts=source_conflicts, limitations=limitations,
+            scheme_refs=scheme_refs,
         )
 
     def _path(self, name: str) -> Path:
@@ -378,6 +387,48 @@ class ScientificOperations:
 
         return assess_reaction_recipe(reaction_smiles, recipe)
 
+    def assess_proposed_recipe(
+        self, reaction_smiles: str, components: list[dict[str, Any]],
+        operating_conditions: dict[str, Any], evidence_refs: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Normalize and check the actual proposed recipe, with explicit process stages.
+
+        Components use raw_identifier, source_field, identifier_type='name', optional
+        source_role_hint, amount, amount_unit and provenance. Operating fields are
+        temperature_c, time_h, concentration_m, atmosphere, stages and declared_absences.
+        Stages use stage_index, temperature_c, time_h, atmosphere and provenance.
+        Cite evidence_refs; an unknown check is not evidence of incompatibility.
+        """
+        from .investigation_checks import assess_proposed_recipe
+
+        return assess_proposed_recipe(self, reaction_smiles, components, operating_conditions, evidence_refs)
+
+    def search_captured_sources(
+        self, queries: list[str], source_refs: list[str] | None = None, offset: int = 0, limit: int = 5,
+    ) -> dict[str, Any]:
+        """Search 1..10 literal names/labels in captured roots; page matches using next_offset.
+
+        By default search all recorded source text, skipping failed fetches. Matches
+        retain exact offsets for record_source_excerpt, not verified chemical claims.
+        """
+        from .investigation_checks import search_captured_sources
+
+        return search_captured_sources(self, queries, source_refs, offset, limit)
+
+    def inspect_route_inputs(
+        self, source_ref: str, leaf_queries: list[dict[str, Any]], source_refs: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Inspect all route leaves and search saved sources before deciding to stop.
+
+        Use source_ref from assess_route_proposal/revise_route_branch. leaf_queries
+        uses {smiles: actual_leaf, terms: [literal_source_name_or_label]}. Missing
+        terms remain unsearched; stock assumptions are retained, not promoted.
+        Follow source-search next_offset using search_captured_sources for details.
+        """
+        from .investigation_checks import inspect_route_inputs
+
+        return inspect_route_inputs(self, source_ref, leaf_queries, source_refs)
+
     def inspect_condition_precedents(
         self, reaction_smiles: str, reaction_ids: list[str], offset: int = 0, limit: int = 20,
     ) -> dict[str, Any]:
@@ -542,6 +593,7 @@ class ScientificOperations:
         step_id: str | None = None, realization_id: str | None = None,
         forward_ref: str | None = None, candidate_limit: int = 128, match_limit: int = 20,
         evidence_refs: list[str] | None = None,
+        strategy_id: str | None = None, precursor_smiles: str | None = None,
     ) -> dict[str, Any]:
         """Grade concrete precursor-to-target evidence and suggest an advisory next action.
 
@@ -551,12 +603,15 @@ class ScientificOperations:
         support. Optional forward_ref joins an existing bounded forward check; no
         prediction is run here. Inspect validity.status, cautions and unresolved_checks.
         Ranks 4..0 mean evidence strength, never experimental success probability.
+        Template realization IDs can repeat. Supply strategy_id and precursor_smiles
+        from the selected saved candidate; ambiguous IDs are rejected.
         """
         from .retro_validity import assess_validity
 
         return assess_validity(
             self, proposal, source_ref, step_id, realization_id, forward_ref,
             candidate_limit, match_limit, evidence_refs,
+            strategy_id, precursor_smiles,
         )
 
     def assess_route_step_forward(
@@ -583,18 +638,22 @@ class ScientificOperations:
     def inspect_step_precedents(
         self, source_ref: str, step_id: str | None = None, realization_id: str | None = None,
         offset: int = 0, limit: int = 3,
+        strategy_id: str | None = None, precursor_smiles: str | None = None,
     ) -> dict[str, Any]:
         """Inspect actual supporting reactions for one saved realization or assessed step.
 
         Use realization_id for disconnect_target, step_id for a route assessment
         or revision, and neither for assess_route_step. Follow page.next_offset.
         offset must be nonnegative; limit is 1..5 (default 3).
+        Template realization IDs can repeat. Supply strategy_id and precursor_smiles
+        from the selected saved candidate; ambiguous IDs are rejected.
         Source reactions, product comparison, scoped counts, and available source
         conditions remain evidence, not proof that the proposed step will work.
         """
         from .step_precedents import inspect_step_precedents
 
-        return inspect_step_precedents(self, source_ref, step_id, realization_id, offset, limit)
+        return inspect_step_precedents(self, source_ref, step_id, realization_id, offset, limit,
+                                       strategy_id, precursor_smiles)
 
     def revise_route_branch(
         self, source_ref: str, remove_step_ids: list[str], replacement_steps: list[dict[str, Any]],

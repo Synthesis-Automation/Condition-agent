@@ -19,17 +19,18 @@ def assess_validity(
     source_ref: str | None, step_id: str | None, realization_id: str | None,
     forward_ref: str | None, candidate_limit: int, match_limit: int,
     evidence_refs: list[str] | None,
+    strategy_id: str | None = None, precursor_smiles: str | None = None,
 ) -> dict[str, Any]:
     """Resolve saved inputs and pinned artifacts; delegate all chemistry to packages."""
     if (proposal is None) == (source_ref is None):
         raise ValueError("Supply exactly one of proposal or source_ref")
     if source_ref:
         payload = _call(operations.store, source_ref, SOURCE_OPERATIONS)
-        selected, _ = _selection(payload, step_id, realization_id)
+        selected, _ = _selection(payload, step_id, realization_id, strategy_id, precursor_smiles)
         proposal = {key: selected[key] for key in (
             "target_smiles", "precursor_smiles", "mapped_reaction_smiles", "proposed_conditions",
         ) if key in selected}
-    elif step_id is not None or realization_id is not None:
+    elif any(value is not None for value in (step_id, realization_id, strategy_id, precursor_smiles)):
         raise ValueError("step_id and realization_id require a saved source_ref")
     step = _step(proposal)
     refs = [*_strings(evidence_refs, "evidence_refs"), *([source_ref] if source_ref else []),
@@ -90,7 +91,7 @@ def assess_validity(
     return {
         "schema_version": "retro_validity_investigation.v1", "proposal": step.to_dict(),
         "validity": result.to_dict(), "source_ref": source_ref,
-        "selection": {"step_id": step_id, "realization_id": realization_id},
+        "selection": {"step_id": step_id, "realization_id": realization_id, "strategy_id": strategy_id},
         "forward_ref": forward_ref,
         "artifact_warnings": (["CORPUS_ARTIFACT_PAIR_INCOMPLETE"]
                               if any(available) and not all(available) else []),

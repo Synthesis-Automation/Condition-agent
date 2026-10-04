@@ -74,7 +74,7 @@ class LiteratureStructure(AnswerObject):
 
     name: str = Field(min_length=1, max_length=300)
     smiles: str = Field(min_length=1, max_length=4000)
-    compound_id: str | None = Field(default=None, min_length=1, max_length=100)
+    compound_id: str | None = Field(default=None, min_length=1, max_length=300)
     evidence_ref: str | None = Field(default=None, pattern=r"^sha256:[0-9a-f]{64}$")
     material_form: str | None = Field(default=None, min_length=1, max_length=500)
     graph_status: Literal["invalid", "conflicting", "graph_checked_assignment_unverified"] | None = None
@@ -141,6 +141,7 @@ class AnswerStep(AttributedObject):
     yield_info: AnswerClaim | None
     precedent_refs: list[str] = Field(default_factory=list, max_length=5)
     condition_precedent_refs: list[str] = Field(default_factory=list, max_length=5)
+    recipe_assessment_refs: list[str] = Field(default_factory=list, max_length=5)
     rationale: AnswerClaim | None = None
     literature_reactions: list[LiteratureReaction] = Field(default_factory=list, max_length=5)
 
@@ -256,6 +257,13 @@ def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore
 
     molecules = {item.id: item.smiles for item in answer.molecules}
     for step in answer.steps:
+        from ..adapters.investigation_checks import load_proposed_recipe_check
+
+        for reference in step.recipe_assessment_refs:
+            load_proposed_recipe_check(
+                store, reference, ".".join(molecules[key] for key in step.reactant_ids),
+                ".".join(molecules[key] for key in step.product_ids),
+            )
         for reference in step.precedent_refs:
             load_step_precedent_evidence(
                 store, reference, ".".join(molecules[key] for key in step.reactant_ids),

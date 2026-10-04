@@ -181,6 +181,73 @@ class ScientificWorkspace:
             "history_omitted": max(0, len(events) - 5),
         }
 
+    def help(self, names: str | list[str]) -> list[dict[str, Any]]:
+        """Return signatures/examples for 1..10 named public helpers or scientific operations."""
+        import inspect
+        from .views.helper_help import HELPER_EXAMPLES
+
+        selected = [names] if isinstance(names, str) else names
+        if not isinstance(selected, list) or not 1 <= len(selected) <= 10:
+            raise ValueError("Select 1..10 public names")
+        operations = {entry["name"]: entry for entry in self.operations.catalog()}
+        entries = []
+        for name in selected:
+            if name in HELPER_EXAMPLES:
+                method = getattr(self, name)
+                entries.append({"name": name, "signature": str(inspect.signature(method)),
+                                "description": inspect.getdoc(method), "example": HELPER_EXAMPLES[name]})
+            elif name in operations:
+                entries.append(operations[name])
+            else:
+                raise ValueError(f"Unknown public helper or operation: {name}")
+        return entries
+
+    def batch_summary(self, references: list[str]) -> dict[str, Any]:
+        """Read 1..30 saved events under one shared 16 KiB console budget; never rerun calls."""
+        if not isinstance(references, list) or not 1 <= len(references) <= 30:
+            raise ValueError("Supply 1..30 saved references")
+        summaries = [self.call_summary(ref) for ref in references]
+        items = [{"artifact_ref": item["event"]["artifact_ref"], "operation": item.get("operation"),
+                  "execution_status": item.get("execution_status"), "summary_omitted": True}
+                 for item in summaries]
+        result = {"schema_version": "scientific_batch_summary.v1", "items": items,
+                  "serialized_byte_limit": 16000,
+                  "hint": "Inspect omitted calls by reference with call_summary or inspect_artifact; full evidence remains saved."}
+        for index, summary in enumerate(summaries):
+            original = items[index]
+            items[index] = summary
+            if len(canonical_bytes(result)) > 16000:
+                items[index] = original
+        return result
+
+    def answer_template(self, answer_markdown: str) -> dict[str, Any]:
+        """Return empty answer boilerplate; supply all chemistry, claims and attribution yourself."""
+        from .answers.answer_finalization import _complete_empty_fields
+
+        return _complete_empty_fields({"answer_markdown": answer_markdown})
+
+    def attach_literature_reaction(
+        self, draft: Mapping[str, Any], step_id: str, preparation_ref: str,
+    ) -> dict[str, Any]:
+        """Copy a draft and attach the immutable source drawing plus its exact required citation."""
+        from .answers.authoring import attach_literature_reaction
+
+        return attach_literature_reaction(self.store, draft, step_id, preparation_ref)
+
+    def attach_recipe_check(
+        self, draft: Mapping[str, Any], step_id: str, reference: str,
+    ) -> dict[str, Any]:
+        """Copy a draft and bind a completed proposed-recipe check to the exact step graphs."""
+        from .answers.authoring import attach_recipe_check
+
+        return attach_recipe_check(self.store, draft, step_id, reference)
+
+    def answer_preflight(self, draft: Mapping[str, Any], *, offset: int = 0, limit: int = 10) -> dict[str, Any]:
+        """Validate without rerunning science; page recipe/input warnings via next_offset, limit 1..10."""
+        from .answers.authoring import answer_preflight
+
+        return answer_preflight(self.store, draft, offset, limit)
+
     def inspect_artifact(
         self, artifact_ref: str, path: tuple[str | int, ...] | list[str | int] = (), *,
         offset: int = 0, limit: int = 5,
@@ -226,11 +293,28 @@ class ScientificWorkspace:
         self, file: str, *, url: str, title: str | None = None, locator: str | None = None,
         reference_id: str | None = None, text_path: list[str | int] | None = None,
     ) -> InvestigationEvent:
-        """Import a saved browser export with exact byte/path provenance, without stdout."""
+        """Import UTF-8 text/JSON inside the investigation with exact byte/path provenance.
+
+        JSON strings unwrap automatically; JSON objects need text_path=['text']
+        or their actual literal path. reference_id is optional REF1:<64 lowercase
+        hex> from the corpus, never a DOI. Put a DOI in url/title or omit reference_id.
+        Captures remain agent-supplied, not independently verified.
+        """
         from .adapters.literature import capture_source_file
 
         return capture_source_file(self.store, file, url=url, title=title, locator=locator,
                                    reference_id=reference_id, text_path=text_path)
+
+    def capture_source_image(self, file: str, *, source_ref: str, locator: str) -> InvestigationEvent:
+        """Save a PNG/JPEG source page or scheme inside the investigation, linked to captured text.
+
+        Maximum 2 MiB/20 million pixels. This preserves bytes and page attribution;
+        it does not verify chemical assignments. Pass its artifact_ref as scheme_refs
+        to prepare_literature_reaction.
+        """
+        from .adapters.source_images import capture_source_image
+
+        return capture_source_image(self.store, file, source_ref, locator)
 
     def prepared_literature_reaction(self, reference: str) -> dict[str, Any]:
         """Read an answer-ready block from a completed recorded preparation; never recompute."""

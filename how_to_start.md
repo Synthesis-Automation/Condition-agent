@@ -14,6 +14,8 @@ After updating scientific tools, restart the agent server and create a new
 investigation. The [literature preparation and compact inspection
 workflow](docs/new/literature_preparation_and_console_efficiency.md) preserves
 source evidence while reducing large console dumps and one-off summary scripts.
+It also covers concrete-candidate selection, upstream source searches, proposed
+recipe checks, captured scheme images and the new answer-attachment helpers.
 
 Choose one server command. The separate ports below let both interfaces run at
 the same time in different PowerShell terminals.

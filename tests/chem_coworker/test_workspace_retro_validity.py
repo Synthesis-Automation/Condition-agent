@@ -1,6 +1,7 @@
 """Recorded validity discovery, source selection, bounded audits and replay."""
 
 from dataclasses import asdict
+from copy import deepcopy
 
 import pytest
 
@@ -18,6 +19,22 @@ from tests.core_retrosynthesis_tests.test_external_proposal_admission import _ro
 
 
 PROPOSAL = {"target_smiles": "CCN", "precursor_smiles": "CC=O.N"}
+
+
+def test_concrete_candidate_selectors_propagate_to_validity(workspace):
+    source, result = call(workspace, "disconnect_target", target_smiles="CCN")
+    payload = workspace.store.read_artifact(source.artifact_ref)
+    strategy = result["strategies"][0]
+    duplicate = deepcopy(strategy)
+    duplicate["strategy_id"] = "STRAT1:alternative"
+    duplicate["representative"]["precursor_smiles"] = "CCCl.N"
+    payload["result"]["strategies"].append(duplicate)
+    saved = workspace.store.append("call", payload)
+    _, validity = call(workspace, "assess_retro_validity", source_ref=saved.artifact_ref,
+                       realization_id=strategy["representative"]["realization_id"],
+                       strategy_id=duplicate["strategy_id"], precursor_smiles="N.CCCl")
+    assert validity["proposal"]["precursor_smiles"] == "CCCl.N"
+    assert validity["selection"]["strategy_id"] == duplicate["strategy_id"]
 
 
 def test_tool_is_discoverable_and_records_canonical_axes(workspace, library):

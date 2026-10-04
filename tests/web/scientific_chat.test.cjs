@@ -17,7 +17,9 @@ test('prepared literature cards distinguish indexed graphs, acquisition and conf
       evidence_artifact_url:'/saved/reactant',graph_status:'graph_checked_assignment_unverified',formula:'C2H5Br'}],
     products:[{name:'Product',compound_id:'9',material_form:'Salt form unknown',graph_status:'conflicting',
       evidence_artifact_url:'/saved/product',formula:'C2H7N'}],
-    preparation_artifact_url:'/saved/preparation'
+    preparation_artifact_url:'/saved/preparation',
+    captured_images:[{locator:'Scheme 1, page 2',image_url:'data:image/png;base64,captured'}],
+    captured_images_omitted:1,
   };
   const before=JSON.stringify(context.prepared);
   const card=run("literatureReactionCard(prepared, new Map([['paper',{title:'Paper',url:'https://example.org/paper'}]]), 'lit')");
@@ -28,6 +30,9 @@ test('prepared literature cards distinguish indexed graphs, acquisition and conf
   assert.ok(texts.includes('Unresolved source discrepancy: DCM versus DCE.'));
   assert.ok(card.querySelectorAll('a').some(node=>node.href==='/saved/product'));
   assert.ok(card.querySelectorAll('a').some(node=>node.href==='/saved/preparation'));
+  assert.ok(card.querySelectorAll('img').some(node=>node.src==='data:image/png;base64,captured'));
+  assert.ok(texts.some(text=>text.includes('Compound assignments remain unverified')));
+  assert.ok(texts.some(text=>text.includes('source images omitted')));
   assert.equal(JSON.stringify(context.prepared),before);
 });
 

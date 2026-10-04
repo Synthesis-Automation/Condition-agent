@@ -17,6 +17,14 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
     result.update(_brief_fields(payload, (
         "operation", "execution_status", "error", "duration_seconds", "result_bytes",
     )))
+    if payload.get("schema_version") == "captured_source_image.v1":
+        result["result_summary"] = _brief_fields(payload, (
+            "source_ref", "locator", "mime_type", "width", "height", "source_bytes",
+            "source_sha256", "assignment_verification", "limitations",
+        ))
+        result["inspection"] = {"projection_only": True, "detail_available": True,
+                                "hint": "Captured image bytes remain saved; link this ref with scheme_refs."}
+        return result
     if payload.get("schema_version") in {"literature_source.v1", "literature_excerpt.v1"}:
         result["result_summary"] = _brief_fields(payload, (
             "source_url", "title", "acquisition", "retrieval_status", "text_characters",
@@ -46,13 +54,37 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
     if "warnings" in source and source["warnings"] in ([], ()):
         # Keep the existing root-level warning contract for workspace clients.
         overview["warnings"] = []
-    if operation == "inspect_step_precedents":
+    if operation == "search_captured_sources":
+        overview.update({key: source.get(key) for key in ("total", "offset", "next_offset", "scope")})
+        overview["matches"] = [{**_brief_fields(item, ("source_ref", "query", "start", "end", "claim_support")),
+                                "text": item["text"][:800], "text_truncated": len(item["text"]) > 800}
+                               for item in source.get("matches", [])[:3]]
+        overview["returned_match_count"] = len(source.get("matches", []))
+        overview["matches_omitted"] = max(0, len(source.get("matches", [])) - 3)
+    elif operation == "inspect_route_inputs":
+        overview["scope"] = source.get("scope")
+        overview["leaves"] = [{"smiles": item["smiles"],
+                               "starting_material_status": item["starting_material_assessment"].get("status"),
+                               "warnings": item["starting_material_assessment"].get("warnings", []),
+                               "source_search_status": item["source_search_status"],
+                               "source_match_count": (item.get("captured_source_search") or {}).get("total"),
+                               "source_search_next_offset": (item.get("captured_source_search") or {}).get("next_offset")}
+                              for item in source.get("leaves", [])]
+    elif operation == "assess_proposed_recipe":
+        overview["reaction_smiles"] = source.get("reaction_smiles")
+        overview["process_coverage"] = source.get("process_coverage")
+        overview["proposed_recipe"] = _brief_recipe(source.get("proposed_recipe", {}))
+        overview["compatibility"] = _brief_fields(source.get("compatibility", {}), (
+            "status", "compatible", "hard_conflicts", "coverage", "analysis_warnings", "unresolved_requirements",
+        ))
+        overview["hint"] = "Attach with w.attach_recipe_check(draft, step_id, ref); inspect full coverage/stages before relying on it."
+    elif operation == "inspect_step_precedents":
         overview.update(_brief_fields(source, ("scope", "saved_match_count", "available_template_records",
                                               "retrieval_truncated", "page", "distinct_references_on_page",
                                               "observation_page", "reference_catalog_status", "procedure_catalog_status",
                                               "assessment_status", "assessment_warnings")))
         overview["selection"] = _brief_fields(source.get("selection", {}), (
-            "step_id", "realization_id", "target_smiles", "precursor_smiles",
+            "step_id", "realization_id", "strategy_id", "target_smiles", "precursor_smiles",
         ))
         overview["precedents"] = [_brief_fields(item, (
             "match_id", "reaction_id", "reference_id", "reaction_smiles", "support_kind",
@@ -361,8 +393,9 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                                 "path": ["result", "hits"], "count_scope": "saved_result"}
     elif operation == "prepare_literature_reaction":
         overview.update(_brief_fields(source, ("structure_origin", "participant_count", "source_provenance",
-                                               "source_conflicts", "structure_checks", "limitations")))
-        overview["hint"] = "Use w.prepared_literature_reaction(ref) in the answer; do not print the full block."
+                                               "source_conflicts", "structure_checks", "limitations",
+                                               "scheme_refs", "assignment_verification")))
+        overview["hint"] = "Use w.attach_literature_reaction(draft, step_id, ref); do not print the full block."
     elif operation == "suggest_search_fragments":
         overview.update(_brief_fields(source, ("generation_truncated", "output_truncated")))
         overview["candidate_count"] = len(source.get("candidates", []))

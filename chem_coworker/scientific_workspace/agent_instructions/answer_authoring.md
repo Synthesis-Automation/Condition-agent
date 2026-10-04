@@ -67,6 +67,9 @@ short route explanation and material unresolved questions; preserve detailed
 qualifications in the appropriate structured limitations. Rationale follows the
 same citation checks as conditions. Older answers may omit it; never invent missing
 rationale, structures, conditions or experimental support to complete the display.
+Start with w.answer_template(answer_markdown) to obtain empty answer boilerplate;
+then supply explicit scientific content. Build strings using f-strings or literal
+text; avoid percent interpolation of scientific prose containing yield percentages.
 Minimal nested shapes (replace IDs/text with your actual evidence and proposal):
 "steps": [{"id": "s1", "title": "Proposed step", "basis": "proposed",
            "reactant_ids": ["a"], "product_ids": ["b"],
@@ -97,6 +100,14 @@ including specified stereochemistry. The browser reads the saved observations an
 their exact experimental joins; do not author replacement source cards. These links
 do not replace precedent_refs or satisfy an available route-support inspection
 requirement. Both kinds of evidence may support the same step.
+Use recipe_assessment_refs for assess_proposed_recipe checks of the actual proposed
+step recipe. draft = w.attach_recipe_check(draft, step_id, recipe_check_ref) validates
+the exact structures and stereo. Inspect the saved recipe and coverage; this link
+does not prove that prose conditions or a later edited recipe were assessed.
+Before choosing a route, disclose missing recipe checks, structural gates that are
+unresolved/not_run, and upstream starting-material gaps. Literature-supported
+preference and local structural admission are separate judgments; do not silently
+turn a source yield into an overall route yield or an unresolved step into a pass.
 
 Always supply drawable structures when inspected evidence supports them; the
 browser automatically generates SVGs. For every literature-supported step, add
@@ -106,7 +117,11 @@ replaces a required local inspection. Never copy a proposed target reaction into
 this field merely because the step cites a paper. Use the actual source reaction,
 including an analogue's different substrates and product.
 Prepare new source drawings with w.run('prepare_literature_reaction', parameters)
-and attach w.prepared_literature_reaction(event.artifact_ref). It returns the
+and use draft = w.attach_literature_reaction(draft, step_id, event.artifact_ref).
+This attaches the immutable block AND its exact required source_ref together,
+avoiding root/excerpt citation mismatches. Existing conflicting source IDs are
+rejected; choose a distinct source_id during preparation. Alternatively attach
+w.prepared_literature_reaction(event.artifact_ref). It returns the
 literature_reaction.v2 block, bound to recorded preparation; do not edit that block.
 Each participant requires name, compound_id (literal source label or name),
 evidence_ref of an exact w.record_source_excerpt passage, and material_form
@@ -125,6 +140,11 @@ Use source_explicit only when SMILES occur in each participant's captured passag
 If endpoints remain ambiguous, omit the drawing and explain the evidence gap.
 Source acquisition remains separate from graph origin; neither indexed identity
 nor successful drawing proves the paper's assignment or experimental feasibility.
+Preserve scheme/page images with capture_source_image and preparation scheme_refs
+when images support the assignment. If images are inaccessible or unclear, keep
+the graph assignment unverified and disclose the missing visual evidence. Source
+compound names up to 300 characters are supported; do not truncate a name into an
+ambiguous suffix just to satisfy a length limit.
 
 Supply source_ref, source_id, title, locator, structure_evidence (literal captured
 text), reactants and products to the preparation tool. Optional conditions and
@@ -138,6 +158,9 @@ image links; SVG generation is the presentation layer's responsibility.
 
 Finish with w.finalize_answer(draft_path, draft, findings=findings). draft_path is the
 exact runtime-provided answer-draft.json path for this attempt; draft is a Python dict.
+First print w.answer_preflight(draft), correct citation/selection errors, and address
+its missing-recipe/input-check warnings or explicitly retain those scientific gaps.
+Preflight reads saved evidence; it does not run science or verify semantic claims.
 The helper validates citations, records supplied self-review and saves the complete
 answer. Print only its small JSON runtime handoff result and return the same receipt
 as your final message. A manually written full draft follows the same contract.

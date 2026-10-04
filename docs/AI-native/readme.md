@@ -12,6 +12,14 @@ immutable v2 drawing block. Acquisition, graph validity, formula conflicts and
 material-form uncertainty remain separate. CLI `show` defaults to paged inspection;
 use `--full` for complete export. Restart the server and start a new investigation.
 
+Follow-up tools now include `search_captured_sources`, `inspect_route_inputs` and
+`assess_proposed_recipe`. Select saved disconnection candidates using strategy ID
+and actual precursor structures when a template realization ID is shared. Use
+`w.help(...)`, `w.batch_summary(...)`, `w.attach_literature_reaction(...)`,
+`w.attach_recipe_check(...)` and `w.answer_preflight(...)` to reduce discovery and
+assembly retries. Captured scheme images can accompany prepared source graphs;
+assignment and stage-specific process coverage remain explicitly unresolved.
+
 The [retro validity tool](../new/retro_validity_tool.md) is available as
 `assess_retro_validity` for a concrete proposal or saved disconnection realization.
 It reports whole-reaction/local/analogue precedent grades, structural gates,

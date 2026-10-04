@@ -18,6 +18,7 @@ from .step_selection import SCHEMA_VERSION, SOURCE_OPERATIONS, _call, _selection
 def inspect_step_precedents(
     operations: ScientificOperations, source_ref: str, step_id: str | None = None,
     realization_id: str | None = None, offset: int = 0, limit: int = 3,
+    strategy_id: str | None = None, precursor_smiles: str | None = None,
 ) -> dict[str, Any]:
     """Inspect at most five reactions on a page from one saved step's support.
 
@@ -27,7 +28,7 @@ def inspect_step_precedents(
     if type(offset) is not int or offset < 0 or type(limit) is not int or not 1 <= limit <= 5:
         raise ValueError("offset must be nonnegative and limit must be between one and five")
     payload = _call(operations.store, source_ref, SOURCE_OPERATIONS)
-    selected, assessment = _selection(payload, step_id, realization_id)
+    selected, assessment = _selection(payload, step_id, realization_id, strategy_id, precursor_smiles)
     target = canonical_smiles(selected["target_smiles"])
     precursors = canonical_smiles(selected["precursor_smiles"])
     if not target or not precursors:
@@ -97,6 +98,7 @@ def inspect_step_precedents(
     return {
         "schema_version": SCHEMA_VERSION, "source_ref": source_ref,
         "selection": {"step_id": step_id, "realization_id": realization_id,
+                      "strategy_id": strategy_id,
                       "target_smiles": target, "precursor_smiles": precursors},
         "status": "precedents_available" if matches else "no_precedents_retrieved",
         "assessment_status": assessment.get("status"), "assessment_warnings": assessment.get("warnings", []),
