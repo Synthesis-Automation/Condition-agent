@@ -7,6 +7,12 @@
 
 ## 1. Purpose and authority
 
+2026-10-05: the [unified processed dataset migration plan](processed_dataset_migration_plan.md)
+specifies one complete corpus under `datasets/processed_datasets`, shared evidence
+storage, integrated index/operator builds, and fragment discovery with explicit
+starting-material/product side labels. This is planned work; implementation,
+corpus regeneration, and scientific release gates are not marked complete.
+
 2026-10-04: [scientific workspace log review fixes](agent_log_review_fixes_20261004.md)
 preserve conditional source quantity conflicts and expose canonical reaction
 completeness in recipe assessments. Explicit condition aliases and nested input
