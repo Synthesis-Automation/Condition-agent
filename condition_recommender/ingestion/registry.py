@@ -12,7 +12,10 @@ from .adapters import (
     WeakLabelCsvAdapter,
 )
 from .adapters.base import SourceAdapter, read_headers
-
+from .adapters.reaction_smiles import (
+    HigherLevelAbstractionCsvAdapter,
+    ReactionSmilesCsvAdapter,
+)
 
 _ADAPTERS: Dict[str, SourceAdapter] = {
     adapter.adapter_id: adapter
@@ -21,6 +24,8 @@ _ADAPTERS: Dict[str, SourceAdapter] = {
         HiTeaCsvAdapter(),
         UsptoConditionCsvAdapter(),
         WeakLabelCsvAdapter(),
+        ReactionSmilesCsvAdapter(),
+        HigherLevelAbstractionCsvAdapter(),
     )
 }
 
@@ -42,6 +47,14 @@ def detect_adapter(path: str | Path) -> SourceAdapter:
     """Select the unique adapter whose required columns are all present."""
     source = Path(path)
     headers = set(read_headers(source))
+    if {"id", "rxn_smiles"}.issubset(headers):
+        # These exports share a header but have explicitly different source
+        # semantics. Unknown exports require an explicit adapter selection.
+        if source.name == "uspto_higher-level.csv":
+            return get_adapter("higher_level_abstraction_csv.v1")
+        if source.name == "uspto_original.csv":
+            return get_adapter("reaction_smiles_csv.v1")
+        raise ValueError("Select an explicit reaction CSV adapter for this export")
     matches = tuple(
         adapter
         for adapter in _ADAPTERS.values()

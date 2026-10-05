@@ -90,3 +90,15 @@ def test_preprocessor_worker_forwards_progress_and_result(monkeypatch) -> None:
     assert results == [
         (True, {"file_count": 1, "row_count": 10, "output_dir": "output"}, "")
     ]
+
+
+def test_preprocessor_folder_includes_released_route_jsonl(
+    qtbot, tmp_path: Path
+) -> None:
+    source = tmp_path / "uspto.higher-level.routes.jsonl.gz"
+    source.write_bytes(b"placeholder")
+    window = gui.SourceDataPreprocessorWindow()
+    qtbot.addWidget(window)
+    window.add_source_folder(str(tmp_path))
+    assert window.source_files() == (str(source.resolve()),)
+    assert "higher_level_route_source.v1" in window.source_summary.text()

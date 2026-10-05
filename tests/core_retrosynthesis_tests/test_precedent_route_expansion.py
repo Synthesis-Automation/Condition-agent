@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -40,6 +41,8 @@ def amine_result(definition):
 
 @pytest.fixture(scope="module")
 def observed_report():
+    if not Path(ROUTE_CORE_SOURCE).is_file() or not Path(STOCK_INDEX).is_file():
+        pytest.skip("Optional curated route-core corpus and stock index are required")
     return run_precedent_route_expansion_poc(
         OBSERVED_DEFINITION,
         stock_index_path=STOCK_INDEX,

@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterable, Optional
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_OUTPUT_FOLDER = PROJECT_ROOT / "datasets" / "intermediate"
+DEFAULT_OUTPUT_FOLDER = PROJECT_ROOT / "datasets" / "intermediate_datasets"
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -60,6 +60,13 @@ class DataPreprocessingWorker(QtCore.QObject):
     def run(self) -> None:
         """Run preprocessing and emit a terminal result."""
         try:
+            raw_root = PROJECT_ROOT / "raw_datasets"
+            options: Dict[str, Any] = {}
+            if all(
+                Path(path).resolve().is_relative_to(raw_root)
+                for path in self.source_files
+            ):
+                options["source_root"] = raw_root
             report = preprocess_files(
                 self.source_files,
                 self.output_folder,
@@ -67,6 +74,7 @@ class DataPreprocessingWorker(QtCore.QObject):
                 force=self.force,
                 progress_callback=self.progress.emit,
                 cancel_check=lambda: self._cancel_requested,
+                **options,
             )
         except PreprocessingCancelled as exc:
             self.finished.emit(False, {}, str(exc))
@@ -155,15 +163,17 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         title.setStyleSheet("font-size: 20px; font-weight: 600;")
         layout.addWidget(title)
         description = QtWidgets.QLabel(
-            "Normalize each raw source CSV into one reusable, chemistry-free "
-            "intermediate file. Molecular analysis and condition-registry "
+            "Normalize raw CSVs and released route JSONL into reusable source "
+            "observations. Route steps retain agent structures and membership; "
+            "higher-level abstractions are archived separately. Molecular "
+            "analysis and condition-registry "
             "resolution are deliberately deferred to the downstream converter."
         )
         description.setWordWrap(True)
         layout.addWidget(description)
 
         file_buttons = QtWidgets.QHBoxLayout()
-        add_button = QtWidgets.QPushButton("Add CSV Files…")
+        add_button = QtWidgets.QPushButton("Add Source Files…")
         add_button.setObjectName("addFilesButton")
         add_button.clicked.connect(self.choose_source_files)
         add_folder_button = QtWidgets.QPushButton("Add Folder…")
@@ -199,9 +209,10 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         layout.addLayout(form)
 
         outputs = QtWidgets.QLabel(
-            "Per source: <name>.observations.jsonl.gz. No separate JSON log is "
-            "created. Unchanged artifacts are validated from their embedded "
-            "provenance before reuse."
+            "CSV observations: <name>.observations.jsonl.gz; abstractions: "
+            "<name>.abstractions.jsonl.gz. Routes produce a source archive, "
+            "unique step observations and a coverage manifest. Unchanged "
+            "artifacts are validated before reuse."
         )
         outputs.setWordWrap(True)
         outputs.setStyleSheet(
@@ -246,9 +257,9 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
     def choose_source_files(self) -> None:
         files, _ = QtWidgets.QFileDialog.getOpenFileNames(
             self,
-            "Choose source CSV files",
-            str(PROJECT_ROOT / "raw_dataset"),
-            "CSV files (*.csv *.CSV)",
+            "Choose source datasets",
+            str(PROJECT_ROOT / "raw_datasets"),
+            "Source datasets (*.csv *.CSV *.jsonl.gz)",
         )
         if files:
             self.add_source_files(files)
@@ -257,20 +268,24 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
     def choose_source_folder(self) -> None:
         folder = QtWidgets.QFileDialog.getExistingDirectory(
             self,
-            "Choose source CSV folder",
-            str(PROJECT_ROOT / "raw_dataset"),
+            "Choose raw source folder",
+            str(PROJECT_ROOT / "raw_datasets"),
         )
         if folder:
             self.add_source_folder(folder)
 
     def add_source_folder(self, value: str) -> None:
-        """Recursively add a folder's CSV files in deterministic order."""
+        """Recursively add supported CSVs and released routes in stable order."""
         root = Path(value)
         files = sorted(
             (
                 path
                 for path in root.rglob("*")
-                if path.is_file() and path.suffix.casefold() == ".csv"
+                if path.is_file()
+                and (
+                    path.suffix.casefold() == ".csv"
+                    or path.name == "uspto.higher-level.routes.jsonl.gz"
+                )
             ),
             key=lambda path: path.relative_to(root).as_posix().casefold(),
         )
@@ -305,6 +320,9 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         detected = []
         failures = 0
         for value in paths:
+            if Path(value).name == "uspto.higher-level.routes.jsonl.gz":
+                detected.append("higher_level_route_source.v1")
+                continue
             try:
                 detected.append(detect_adapter(value).adapter_id)
             except (OSError, ValueError):

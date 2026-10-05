@@ -1,4 +1,5 @@
 from dataclasses import asdict, replace
+import csv
 import json
 from pathlib import Path
 
@@ -1477,8 +1478,29 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
         "COc1ccc(-n2cnc3ccccc32)cc1"
     )
     output = tmp_path / "generic_conversion_chan_lam_pilot"
+    source = Path(
+        "raw_datasets/reaction_dataset_from_rdf/"
+        "original_dataset_combined_deduplicated.csv"
+    )
+    if not source.is_file():
+        pytest.skip("The local literature corpus is not installed")
+    pilot_source = tmp_path / "chan_lam_pilot.csv"
+    with source.open(encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        with pilot_source.open("w", encoding="utf-8", newline="") as output_handle:
+            writer = csv.DictWriter(output_handle, fieldnames=reader.fieldnames)
+            writer.writeheader()
+            count = 0
+            for row in reader:
+                if "Chan" not in row["reaction_type"]:
+                    continue
+                writer.writerow(row)
+                count += 1
+                if count == 100:
+                    break
+    assert count == 100
     convert_datasets(
-        "raw_dataset/literature_reaction_dataset/ChanLam_Narylation.csv",
+        pilot_source,
         output,
         max_rows=100,
     )

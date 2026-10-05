@@ -11,6 +11,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUTPUT_FOLDER = PROJECT_ROOT / "datasets" / "literature"
+DEFAULT_INPUT_FOLDER = PROJECT_ROOT / "datasets" / "intermediate_datasets"
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -682,7 +683,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         folder = QtWidgets.QFileDialog.getExistingDirectory(
             self,
             "Choose raw or preprocessed dataset folder",
-            str(PROJECT_ROOT),
+            str(DEFAULT_INPUT_FOLDER),
         )
         if folder:
             self.add_source_inputs((folder,))
@@ -692,7 +693,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         files, _ = QtWidgets.QFileDialog.getOpenFileNames(
             self,
             "Choose raw or preprocessed reaction files",
-            str(PROJECT_ROOT),
+            str(DEFAULT_INPUT_FOLDER),
             (
                 "Conversion inputs (*.csv *.CSV *.observations.jsonl.gz);;"
                 "CSV files (*.csv *.CSV);;All files (*)"

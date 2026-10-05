@@ -14,8 +14,7 @@ from typing import Any, Callable, Dict, Iterable, Mapping, Optional
 from .models import INTERMEDIATE_OBSERVATION_SCHEMA_VERSION
 from .registry import detect_adapter, get_adapter
 
-
-PREPROCESSOR_DEFINITION_VERSION = "source_preprocessor.v1.1"
+PREPROCESSOR_DEFINITION_VERSION = "source_preprocessor.v1.2"
 
 
 @dataclass(frozen=True)
@@ -42,8 +41,8 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _output_path(source: Path, output_dir: Path) -> Path:
-    return output_dir / f"{source.name}.observations.jsonl.gz"
+def _output_path(source: Path, output_dir: Path, suffix: str) -> Path:
+    return output_dir / f"{source.name}{suffix}"
 
 
 def _cached_report(
@@ -139,7 +138,16 @@ def preprocess_file(
         detect_adapter(source) if adapter_id == "auto" else get_adapter(adapter_id)
     )
     source_sha256 = _sha256(source)
-    output_path = _output_path(source, destination)
+    if (
+        source.name == "uspto_higher-level.csv"
+        and adapter.adapter_id != "higher_level_abstraction_csv.v1"
+    ):
+        raise ValueError("The higher-level CSV requires the abstraction adapter")
+    output_path = _output_path(
+        source,
+        destination,
+        getattr(adapter, "artifact_suffix", ".observations.jsonl.gz"),
+    )
     if not force:
         cached = _cached_report(
             output_path=output_path,
@@ -271,11 +279,17 @@ def preprocess_files(
     force: bool = False,
     progress_callback: Optional[Callable[[PreprocessingProgress], None]] = None,
     cancel_check: Optional[Callable[[], bool]] = None,
+    source_root: str | Path | None = None,
 ) -> Dict[str, Any]:
-    """Preprocess selected files independently and return a batch summary."""
+    """Prepare CSVs and released routes without duplicating their CSV step export."""
     sources = tuple(Path(path) for path in source_paths)
     if not sources:
         raise ValueError("At least one source file is required")
+    root = Path(source_root).resolve() if source_root is not None else None
+    if root is not None and any(
+        not path.resolve().is_relative_to(root) for path in sources
+    ):
+        raise ValueError("Selected files must be inside the declared raw source root")
     duplicate_names = [
         name
         for name, count in Counter(path.name.casefold() for path in sources).items()
@@ -286,14 +300,77 @@ def preprocess_files(
             "Selected source files have colliding names: "
             + ", ".join(sorted(duplicate_names))
         )
+    route_sources = tuple(
+        path for path in sources if path.name == "uspto.higher-level.routes.jsonl.gz"
+    )
+    original_exports = {
+        (path.parent.parent / "reactions" / "uspto_original.csv").resolve()
+        for path in route_sources
+    }
+    sources = tuple(path for path in sources if path.resolve() not in original_exports)
     reports = []
     for file_number, source in enumerate(sources, start=1):
         if cancel_check is not None and cancel_check():
             raise PreprocessingCancelled("Preprocessing cancelled between files")
+        if source in route_sources:
+            if adapter_id != "auto":
+                raise ValueError(
+                    "Route preparation requires automatic adapter selection"
+                )
+            from .route_release import prepare_route_release
+
+            route_relative = (
+                source.resolve().parent.parent.relative_to(root / "routes")
+                if root is not None
+                else Path(source.parent.parent.name)
+            )
+            route_output = Path(output_dir) / "routes" / route_relative
+            route_report = prepare_route_release(
+                source,
+                source.parent.parent / "reactions" / "uspto_original.csv",
+                route_output,
+                force=force,
+                progress_callback=progress_callback,
+                cancel_check=cancel_check,
+            )
+            reports.append(
+                {
+                    **route_report,
+                    "source_file": source.name,
+                    "input_row_count": route_report["counts"]["route_count"],
+                    "output_row_count": route_report["counts"][
+                        "output_step_observations"
+                    ],
+                    "output_path": str(
+                        (route_output / "route_steps.observations.jsonl.gz").resolve()
+                    ),
+                    "output_size_bytes": (
+                        route_output / "route_steps.observations.jsonl.gz"
+                    )
+                    .stat()
+                    .st_size,
+                }
+            )
+            continue
+        file_output = Path(output_dir)
+        if root is not None:
+            adapter = (
+                detect_adapter(source)
+                if adapter_id == "auto"
+                else get_adapter(adapter_id)
+            )
+            category = (
+                "abstractions"
+                if adapter.adapter_id == "higher_level_abstraction_csv.v1"
+                else "single_step"
+            )
+            file_output = (
+                file_output / category / source.resolve().parent.relative_to(root)
+            )
         reports.append(
             preprocess_file(
                 source,
-                output_dir,
+                file_output,
                 adapter_id=adapter_id,
                 force=force,
                 progress_callback=progress_callback,
