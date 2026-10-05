@@ -1,0 +1,8 @@
+{
+  "schema_version": "quantity_consistency.v1",
+  "definition_version": "1.0",
+  "relative_tolerance": 0.05,
+  "mass_units_g": {"g": 1.0, "mg": 0.001, "ug": 0.000001},
+  "amount_units_mol": {"mol": 1.0, "mmol": 0.001, "umol": 0.000001},
+  "policy": "retain_reports_without_selecting_or_correcting_values"
+}

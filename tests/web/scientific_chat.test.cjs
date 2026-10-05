@@ -763,3 +763,34 @@ test('retrosynthesis leads with chemistry, retains cautions, and exposes request
   assert.ok(needsInput.descendants().some(n=>n.textContent==='Select a solvent' && !inClosedDetails(n)));
   assert.ok(needsInput.children.some(n=>n.textContent==='Long written explanation'));
 });
+
+test('literature SVGs show their own source structures and retain reconstruction uncertainty', () => {
+  const {run, context} = harness();
+  const reported = {basis:'reported',source_ids:['paper'],limitations:[]};
+  context.sourceMap = new Map([['paper',{id:'paper',kind:'external_source',title:'Paper Example 41',url:'https://example.org/paper',artifact_url:'/saved/text',locator:'Example 41'}]]);
+  context.literatureStep = {source_ids:['paper'],conditions:[],reagents:[],supporting_evidence:[],literature_reactions:[{
+    source_id:'paper',title:'Source nitration',locator:'Experimental Methods, compound 41',
+    structure_origin:'reconstructed_from_description',structure_evidence:'Nitro compound isolated as a nitrate salt.',
+    reaction_smiles:'source>>product',image_url:'source.svg',conditions:[{text:'HNO3, 75 °C',...reported}],
+    yield_info:{text:'95%, nitrate salt',...reported},limitations:['Neutral parent drawn; nitrate salt was isolated.'],
+  }]};
+  const original = JSON.stringify(context.literatureStep);
+  const card = run("supportingEvidence(literatureStep, sourceMap, 's1')");
+  const drawing = byClass(card,'literature-reaction-card')[0];
+  assert.equal(drawing.parentNode,card);
+  assert.ok(drawing.descendants().some(n=>n.textContent==='Literature reconstruction'));
+  assert.ok(drawing.querySelectorAll('img').some(n=>n.src==='source.svg'));
+  assert.ok(drawing.querySelectorAll('a').some(n=>n.href==='https://example.org/paper'));
+  assert.ok(drawing.descendants().some(n=>n.textContent==='Neutral parent drawn; nitrate salt was isolated.'));
+  assert.ok(drawing.descendants().some(n=>n.textContent==='95%, nitrate salt'));
+  assert.ok(!card.descendants().some(n=>n.textContent==='Source reaction structures were not supplied for these literature citations.'));
+  const detail=drawing.querySelectorAll('details')[0];
+  assert.ok(!detail.open);
+  assert.ok(detail.querySelectorAll('code').some(n=>n.textContent==='source>>product'));
+  assert.ok(detail.querySelectorAll('a').some(n=>n.href==='/saved/text'));
+  assert.equal(JSON.stringify(context.literatureStep),original);
+  delete context.literatureStep.literature_reactions[0].image_url;
+  const invalid=run("supportingEvidence(literatureStep, sourceMap, 's1')");
+  assert.equal(invalid.querySelectorAll('img').length,0);
+  assert.ok(invalid.descendants().some(n=>n.textContent.includes('supplied structures could not be rendered')));
+});

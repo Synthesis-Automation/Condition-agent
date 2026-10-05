@@ -188,7 +188,7 @@ function literatureReactionCard(reaction, sources, key) {
   card.append(element('p', reaction.locator, 'muted'));
   const reconstructed = reaction.structure_origin === 'reconstructed_from_description';
   const indexed = reaction.structure_origin === 'indexed_record';
-  card.append(element('span', indexed ? 'Indexed source structures' : reconstructed ? 'Literature reconstruction' : 'Source-explicit structures',
+  card.append(element('span', indexed ? 'Indexed source structures' : reconstructed ? 'Literature reconstruction' : 'Structures supplied by source',
     'basis basis-' + (reconstructed ? 'proposed' : 'reported')));
   if (reaction.image_url) card.append(reactionFigure(reaction, reaction.title + '. ' + (reconstructed ? 'Reconstructed from literature description.' : 'Structures supplied by the source.')));
   else card.append(element('p', 'Literature reaction drawing unavailable: supplied structures could not be rendered.', 'scientific-note'));

@@ -147,13 +147,18 @@ def assess_proposed_recipe(
         raise ValueError("operating_conditions supports temperature_c, time_h, concentration_m, atmosphere, stages, declared_absences")
     if not isinstance(components, list) or not 1 <= len(components) <= 100:
         raise ValueError("Supply 1..100 explicit complete condition components")
-    for item in components:
+    for index, item in enumerate(components):
         if not isinstance(item, dict) or not isinstance(item.get("raw_identifier"), str) or not item["raw_identifier"].strip():
             raise ValueError("Every condition component needs a nonempty raw_identifier")
+        if not isinstance(item.get("provenance", {}), dict):
+            raise ValueError(f"components[{index}].provenance must be a JSON object, e.g. {{'description': 'Source or proposal'}}")
     values = dict(operating_conditions)
     stages = values.get("stages", [])
     if not isinstance(stages, list) or len(stages) > 30:
         raise ValueError("stages must contain at most 30 explicit process stages")
+    for index, stage in enumerate(stages):
+        if isinstance(stage, dict) and not isinstance(stage.get("provenance", {}), dict):
+            raise ValueError(f"stages[{index}].provenance must be a JSON object, e.g. {{'description': 'Proposed stage'}}")
     for item in [values, *stages]:
         if not isinstance(item, dict):
             raise ValueError("Process stages must be objects")

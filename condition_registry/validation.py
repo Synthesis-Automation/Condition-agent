@@ -22,8 +22,10 @@ def validate_registry(
 ) -> Dict[str, Any]:
     """Validate unified records, identifiers, and role capabilities."""
     from .quantities import quantity_rules
+    from .quantity_audit import quantity_consistency_rules
 
     quantity_rules()
+    quantity_consistency_rules()
     known_roles = {
         str(item["id"]) for item in load_role_definitions().get("roles", ())
     }

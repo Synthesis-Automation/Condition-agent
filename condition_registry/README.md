@@ -10,6 +10,7 @@ and does not import `condition_recommender`.
 - `definitions/roles.v2.json`: the small allowed-role vocabulary
 - `definitions/role_resolution.v2.json`: contextual role and recipe-bucket rules
 - `definitions/recipe_templates.v1.json`: expert recipe templates
+- `definitions/quantity_consistency.v1.json`: conditional source mass/amount checks
 - `definitions/synthesis_protocol.v1.schema.json`: canonical protocol JSON schema
 
 `definitions/substances.v1.csv` remains only for the older SciFinder data

@@ -141,6 +141,38 @@ def test_unresolved_recipe_check_cannot_claim_conflict_or_feasibility(workspace)
     assert not result["compatibility"]["hard_conflicts"]
 
 
+def test_incomplete_reaction_diagnostics_are_visible_in_summary_and_preflight(workspace):
+    reaction = "CC>>CCO"
+    event, result = call(workspace, "assess_proposed_recipe", reaction_smiles=reaction,
+                         components=[{"raw_identifier": "water", "source_field": "proposal"}], operating_conditions={})
+    assert result["compatibility"]["reaction_completeness"]["product_element_excess"] == {"O": 1}
+    brief = workspace.call_summary(event)["result_summary"]
+    assert brief["compatibility"]["reaction_completeness"]["product_element_excess"] == {"O": 1}
+    draft = proposed_draft()
+    draft["molecules"][0]["smiles"], draft["molecules"][1]["smiles"] = "CC", "CCO"
+    attached = workspace.attach_recipe_check(draft, "s1", event.artifact_ref)
+    result = workspace.answer_preflight(attached)
+    assert result["valid"]
+    assert any(item["gap"] == "reaction_inputs_incomplete" and item["product_element_excess"] == {"O": 1}
+               for item in result["warnings"])
+
+
+@pytest.mark.parametrize("location", ["component", "stage"])
+def test_recipe_provenance_errors_identify_nested_path_before_resolution(workspace, location):
+    arguments = {"reaction_smiles": "CCBr.N>>CCN",
+                 "components": [{"raw_identifier": "water", "source_field": "proposal"}],
+                 "operating_conditions": {}}
+    if location == "component":
+        arguments["components"][0]["provenance"] = "Wrong text type"
+    else:
+        arguments["operating_conditions"]["stages"] = [{"stage_index": 0, "provenance": "Wrong text type"}]
+    event = workspace.run("assess_proposed_recipe", arguments)
+    saved = workspace.store.read_artifact(event.artifact_ref)
+    assert saved["execution_status"] == "error"
+    assert ("components[0].provenance" if location == "component" else "stages[0].provenance") in saved["error"]["message"]
+    assert "JSON object" in saved["error"]["message"]
+
+
 def test_preflight_keeps_leaf_assumptions_visible_after_input_inspection(workspace):
     route, _ = call(workspace, "assess_route_proposal", proposal={"target_smiles": "CCN", "steps": [
         {"external_step_id": "s1", "target_smiles": "CCN", "precursor_smiles": "CCBr.N"}]})

@@ -8,11 +8,13 @@ experimental feasibility. Source acquisition and structure origin remain separat
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import asdict
 import re
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from condition_registry.quantity_audit import audit_source_quantities
 from reactive_taxonomy.structure_audit import audit_structure
 
 from ..core.store import InvestigationStore
@@ -109,7 +111,7 @@ def prepare_literature_reaction(
         if any(len(inputs[side]) != len(structures[side]) for side in inputs):
             raise ValueError("Participant counts must match the saved source reaction; salts are not stripped")
         structure_origin = "indexed_record"
-    checks, participants = [], {"reactants": [], "products": []}
+    checks, quantity_checks, participants = [], [], {"reactants": [], "products": []}
     refs = [source_ref]
     if not isinstance(scheme_refs or [], list) or len(scheme_refs or []) > 5:
         raise ValueError("scheme_refs must contain at most five captured source images")
@@ -138,6 +140,15 @@ def prepare_literature_reaction(
             if structure_origin == "source_explicit" and smiles not in passage:
                 raise ValueError("Source-explicit SMILES must occur in that participant's passage")
             audit = audit_structure(smiles).to_dict()
+            quantities = audit_source_quantities(smiles, passage, (item.name, item.compound_id))
+            for quantity in quantities:
+                quantity_checks.append({"side": side, "component_index": index,
+                                        "evidence_ref": item.evidence_ref, **asdict(quantity)})
+                if quantity.status == "conflicting":
+                    notes.append(
+                        f"{side}[{index}] source mass/amount conflict in {quantity.source_text!r}; "
+                        "neither reported value is selected or corrected."
+                    )
             status = "invalid" if not audit["valid"] else "graph_checked_assignment_unverified"
             if item.reported_formula and audit["formula"] != item.reported_formula:
                 if audit["valid"]:
@@ -170,7 +181,10 @@ def prepare_literature_reaction(
     block = LiteratureReaction.model_validate({
         "schema_version": "literature_reaction.v2", "title": title, "source_id": source_id,
         "locator": locator, "structure_origin": structure_origin, "structure_evidence": structure_evidence,
-        **participants, "conditions": conditions or [], "yield_info": yield_info, "limitations": notes,
+        **participants,
+        "conditions": [{"limitations": [], **claim} for claim in conditions or []],
+        "yield_info": {"limitations": [], **yield_info} if yield_info is not None else None,
+        "limitations": notes,
         "source_provenance": provenance,
     }).model_dump()
     for claim in [*block["conditions"], *([block["yield_info"]] if block["yield_info"] else [])]:
@@ -178,12 +192,14 @@ def prepare_literature_reaction(
             raise ValueError("Source conditions/yield require reported attribution to source_id")
         if claim["text"] not in text:
             raise ValueError("Prepared source conditions/yields must quote the captured text; adaptations belong on the proposed step")
-    return {"schema_version": "literature_reaction_preparation.v1", "literature_reaction": block,
+    return {"schema_version": "literature_reaction_preparation.v2", "literature_reaction": block,
             "source_ref": source_ref, "source_provenance": provenance,
             "indexed_record": {"artifact_ref": indexed_ref, "reaction_id": reaction_id,
                                   "reference_id": record["reference_id"]} if record else None,
             "structure_origin": structure_origin, "participant_count": len(checks),
             "structure_checks": checks, "source_conflicts": conflicts, "limitations": notes,
+            "quantity_checks": quantity_checks,
+            "quantity_check_scope": "explicit_adjacent_mass_amount_pairs_only",
             "scheme_refs": scheme_refs or [], "assignment_verification": "not_performed",
             "evidence_refs": list(dict.fromkeys(refs))}
 

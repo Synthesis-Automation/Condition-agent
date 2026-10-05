@@ -16,6 +16,9 @@ workflow](docs/new/literature_preparation_and_console_efficiency.md) preserves
 source evidence while reducing large console dumps and one-off summary scripts.
 It also covers concrete-candidate selection, upstream source searches, proposed
 recipe checks, captured scheme images and the new answer-attachment helpers.
+The [agent log review fixes](docs/new/agent_log_review_fixes_20261004.md) add
+source quantity-conflict checks, visible missing-atom diagnostics, nested input
+help and explicit aliases for methyl iodide and acetic acid.
 
 Choose one server command. The separate ports below let both interfaces run at
 the same time in different PowerShell terminals.

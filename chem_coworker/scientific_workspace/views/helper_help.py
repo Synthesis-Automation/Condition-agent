@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 HELPER_EXAMPLES = {
+    "fetch_source": "source = w.fetch_source(paper_url); print(w.call_summary(source))",
     "capture_source_file": "source = w.capture_source_file('browser.json', url=paper_url, text_path=['text'])",
     "capture_source": "source = w.capture_source(text, url=paper_url, locator='Example 1')",
     "capture_source_image": "image = w.capture_source_image('scheme.png', source_ref=source_ref, locator='Scheme 1, page 2')",
@@ -17,3 +20,46 @@ HELPER_EXAMPLES = {
     "finalize_answer": "receipt = w.finalize_answer(draft_path, draft, findings=findings)",
     "run_python": "event = w.run_python('audit.py', parameters, evidence_refs=(source_ref,))",
 }
+
+
+def nested_input_help(name: str) -> dict[str, Any]:
+    """Expose actual nested contracts only when their operation is requested."""
+    if name == "assess_proposed_recipe":
+        from pydantic import TypeAdapter
+        from condition_registry.models import ConditionComponentInput, ConditionProcessStage
+
+        return {
+            "nested_inputs": {
+                "components[]": TypeAdapter(ConditionComponentInput).json_schema(),
+                "operating_conditions.stages[]": TypeAdapter(ConditionProcessStage).json_schema(),
+            },
+            "example_arguments": {
+                "reaction_smiles": "CCBr.N>>CCN",
+                "components": [{"raw_identifier": "ethanol", "source_field": "proposal",
+                                "source_role_hint": "solvent", "provenance": {"description": "Proposed medium"}}],
+                "operating_conditions": {},
+            },
+            "input_notes": ["provenance is a JSON object, not text.",
+                            "Represent all evidence-backed atom contributors and required multiplicity in reaction_smiles. "
+                            "Recipe amounts do not add atoms to that graph; never invent a donor or mapping.",
+                            "Try one input before batching the same new nested format."],
+        }
+    if name == "prepare_literature_reaction":
+        from ..adapters.literature_reactions import ParticipantInput, SourceConflict
+        from ..answers.answer_contracts import AnswerClaim
+
+        return {"nested_inputs": {"reactants[] / products[]": ParticipantInput.model_json_schema(),
+                                  "conditions[] / yield_info": AnswerClaim.model_json_schema(),
+                                  "source_conflicts[]": SourceConflict.model_json_schema()},
+                "input_notes": ["conditions and yield_info require reported basis, source_ids and literal captured text; "
+                                "omitted limitations default to an empty list.",
+                                "Adjacent mass/amount pairs are checked conditionally against supplied graphs. "
+                                "Empty quantity_checks means no eligible pair was found, not consistency."]}
+    if name in {"answer_template", "answer_preflight", "finalize_answer"}:
+        from ..answers.answer_contracts import AnswerClaim
+
+        return {"nested_inputs": {"claims[]": AnswerClaim.model_json_schema()},
+                "input_notes": ["Claims have text, basis, source_ids and limitations; no id field.",
+                                "Correct a failed answer_preflight before calling finalize_answer; "
+                                "a valid draft can still have unresolved scientific warnings."]}
+    return {}

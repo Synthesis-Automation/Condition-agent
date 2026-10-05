@@ -121,6 +121,15 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         ), path)
     elif operation == "assess_recipe":
         summary.update(view.pick(value, _COMPATIBILITY, path))
+    elif operation == "assess_proposed_recipe":
+        summary.update(view.pick(value, ("reaction_smiles", "process_coverage"), path))
+        view.add_nested(summary, value, "compatibility", _COMPATIBILITY, path)
+    elif operation == "prepare_literature_reaction":
+        summary.update(view.pick(value, ("structure_origin", "participant_count", "quantity_check_scope"), path))
+        summary["quantity_conflict_count"] = sum(item.get("status") == "conflicting" for item in value.get("quantity_checks", []))
+        view.add_list(summary, value, "quantity_checks", (
+            "side", "component_index", "status", "source_text", "evidence_ref", "expected_mass_g", "reason",
+        ), path)
     elif operation == "assess_route_step_forward":
         summary.update(view.pick(value, (
             "execution_status", "source_ref", "step_id", "question",

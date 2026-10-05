@@ -72,12 +72,26 @@ def answer_preflight(
         return {"schema_version": "answer_preflight.v1", "valid": False,
                 "error": str(exc)[:3000], "warnings": [], "science_rerun": False}
     for step in answer.steps:
+        for reaction in step.literature_reactions:
+            if reaction.preparation_ref:
+                preparation = store.read_artifact(reaction.preparation_ref)["result"]
+                conflicts = [item for item in preparation.get("quantity_checks", []) if item["status"] == "conflicting"]
+                if conflicts:
+                    warnings.append({"step_id": step.id, "gap": "source_quantity_conflict",
+                                     "artifact_ref": reaction.preparation_ref, "conflict_count": len(conflicts),
+                                     "action": "Inspect both reported quantities; disclose the discrepancy and do not silently derive a recipe from one value."})
         if step.conditions and not step.recipe_assessment_refs:
             warnings.append({"step_id": step.id, "gap": "actual_recipe_check_not_attached",
                              "action": "Normalize the actual recipe with assess_proposed_recipe and attach_recipe_check; disclose unresolved coverage."})
         for ref in step.recipe_assessment_refs:
             saved = store.read_artifact(ref)["result"]
             assessment = saved["compatibility"]
+            completeness = assessment.get("reaction_completeness") or {}
+            if completeness.get("product_element_excess"):
+                warnings.append({"step_id": step.id, "gap": "reaction_inputs_incomplete",
+                                 "artifact_ref": ref, "product_element_excess": completeness["product_element_excess"],
+                                 "action": "Inspect evidence-backed atom contributors and stoichiometric multiplicity in the reaction graph. "
+                                 "Recipe quantities do not supply graph atoms. Do not invent donors or mapping."})
             if (assessment.get("status") != "no_known_conflict"
                     or assessment.get("coverage", {}).get("capability_status") != "supported"
                     or saved.get("process_coverage") == "stages_recorded_not_evaluated"):

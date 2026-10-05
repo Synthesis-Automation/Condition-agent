@@ -136,6 +136,10 @@ structure_origin='reconstructed_from_description'. The tool audits graph syntax,
 formula, charge, salts, rings and stereo gaps; it does not translate names or verify
 scheme images. Optional reported_formula must occur in the participant's passage;
 conflicting formulas and invalid graphs stay visible and are not repaired.
+Preparation also preserves quantity_checks for complete adjacent mass/amount
+pairs in the participant passage. A conflicting pair is conditional on the
+supplied graph/material assignment; disclose both reports instead of choosing
+one for recipe equivalents. Empty checks do not mean the quantities agree.
 Use source_explicit only when SMILES occur in each participant's captured passage.
 If endpoints remain ambiguous, omit the drawing and explain the evidence gap.
 Source acquisition remains separate from graph origin; neither indexed identity
@@ -160,6 +164,11 @@ Finish with w.finalize_answer(draft_path, draft, findings=findings). draft_path 
 exact runtime-provided answer-draft.json path for this attempt; draft is a Python dict.
 First print w.answer_preflight(draft), correct citation/selection errors, and address
 its missing-recipe/input-check warnings or explicitly retain those scientific gaps.
+If valid=False, correct the draft before calling finalize_answer. Claims have no
+id field; use w.help('finalize_answer') for the actual nested claim schema.
+For reaction_inputs_incomplete, inspect the saved product_element_excess and
+source-backed contributors/multiplicity. Condition amounts do not add graph
+atoms. Never invent a donor, duplicate contributor or mapping to pass the check.
 Preflight reads saved evidence; it does not run science or verify semantic claims.
 The helper validates citations, records supplied self-review and saves the complete
 answer. Print only its small JSON runtime handoff result and return the same receipt

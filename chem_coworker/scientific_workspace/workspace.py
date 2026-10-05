@@ -184,7 +184,7 @@ class ScientificWorkspace:
     def help(self, names: str | list[str]) -> list[dict[str, Any]]:
         """Return signatures/examples for 1..10 named public helpers or scientific operations."""
         import inspect
-        from .views.helper_help import HELPER_EXAMPLES
+        from .views.helper_help import HELPER_EXAMPLES, nested_input_help
 
         selected = [names] if isinstance(names, str) else names
         if not isinstance(selected, list) or not 1 <= len(selected) <= 10:
@@ -200,6 +200,7 @@ class ScientificWorkspace:
                 entries.append(operations[name])
             else:
                 raise ValueError(f"Unknown public helper or operation: {name}")
+            entries[-1].update(nested_input_help(name))
         return entries
 
     def batch_summary(self, references: list[str]) -> dict[str, Any]:

@@ -2,6 +2,12 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+The [agent log review fixes](../new/agent_log_review_fixes_20261004.md) preserve
+source mass/amount contradictions and expose missing product-element counts in
+recipe assessments and answer preflight. Use `w.help('assess_proposed_recipe')`
+or `w.help('prepare_literature_reaction')` for actual nested input schemas.
+Restart the server and start a new investigation after this scientific change.
+
 New investigations can use [prepared literature reactions and bounded console
 inspection](../new/literature_preparation_and_console_efficiency.md). Use
 `w.run_summary(...)`, `w.call_summary(saved_ref)` and `w.describe()` instead of
@@ -61,8 +67,9 @@ descriptions are labelled **Literature reconstruction**, with visible material-f
 and interpretation limitations. These drawings do not satisfy local precedent
 inspection requirements or establish chemistry validity. Missing/invalid structures
 remain explicit; proposed step structures are never substituted automatically.
-Restart the server to load this optional answer-contract extension. Subsequent
-formatted turns receive the drawing instructions; existing answers retain empty
+Restart the server and start a new investigation to load this optional
+answer-contract extension and its evidence validators. New formatted turns receive
+the drawing instructions; existing answers retain empty
 literature drawings unless their saved answer already includes them. No index
 rebuild or historical evidence rewrite is needed.
 

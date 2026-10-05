@@ -120,6 +120,13 @@ class LiteratureReaction(AnswerObject):
                 raise ValueError("Prepared literature structures require per-participant evidence and graph status")
         return self
 
+    @model_validator(mode="after")
+    def check_passage(self) -> "LiteratureReaction":
+        """Reject an empty quote before source-membership validation."""
+        if not self.structure_evidence.strip():
+            raise ValueError("Literature structure evidence must not be blank")
+        return self
+
 
 class AnswerStep(AttributedObject):
     """A transformation with attributed reagent labels, procedures and yield."""
