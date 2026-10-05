@@ -157,8 +157,10 @@ npm run dev
 ```
 
 Open `http://127.0.0.1:5173/`. Vite proxies `/api` to the local service on port
-8000. The default recommendation index is
-`datasets/literature/full/generic_index.sqlite`; override it with
+8000. The default corpus is resolved through
+`datasets/processed_datasets/manifest.json`. Conditions, shared-core retrieval,
+fragment search and operator libraries use the same pinned release. Override a
+particular index explicitly with
 `CONDITION_RECOMMENDER_INDEX` or `python -m app.web_api --index <path>`.
 The weak-label mode uses `datasets/weak_label/v2.1_cleaned.csv` and its
 paired recipe catalog by default. Override the CSV with

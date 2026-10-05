@@ -8,6 +8,7 @@ import json
 import platform
 import sqlite3
 import subprocess
+import sys
 from contextlib import closing
 from pathlib import Path
 from types import MappingProxyType
@@ -145,7 +146,15 @@ def artifact_identity(path: Path) -> dict[str, Any]:
 
 def environment_versions() -> dict[str, str]:
     """Record runtime versions relevant to deterministic calculations."""
-    versions = {"python": platform.python_version(), "platform": platform.platform()}
+    # platform.platform() probes the processor through WMI on Windows. Under
+    # concurrent scientific workers that COM probe can terminate the interpreter.
+    # The native OS version and architecture provide the required runtime identity.
+    if sys.platform == "win32":
+        native = sys.getwindowsversion()
+        os_identity = f"Windows-{native.major}.{native.minor}.{native.build}-{platform.machine()}"
+    else:
+        os_identity = platform.platform()
+    versions = {"python": platform.python_version(), "platform": os_identity}
     for package in ("rdkit", "numpy", "rdchiral", "pypdf"):
         try:
             versions[package] = importlib.metadata.version(package)
@@ -177,6 +186,22 @@ def capture_baseline(
         capture_output=True, check=True,
     ).stdout.splitlines()
     paths = dict(artifacts)
+    if "processed_dataset" in paths:
+        from condition_recommender.processed_release import resolve_processed_release
+        release = resolve_processed_release(paths["processed_dataset"])
+        paths["processed_dataset"] = release.root / "manifest.json"
+        for name in ("condition_index", "shared_core_index", "fragment_index", "retro_library",
+                     "forward_library", "evidence_catalog", "route_catalog", "composite_library", "composite_catalog"):
+            if name in release.manifest["artifacts"]:
+                selected = release.artifact(name)
+                if name in paths and paths[name].resolve() != selected:
+                    raise ValueError(f"Artifact {name} conflicts with the selected processed release")
+                paths[name] = selected
+        for alias in ("procedure_catalog", "reference_catalog"):
+            selected = release.artifact("evidence_catalog")
+            if alias in paths and paths[alias].resolve() != selected:
+                raise ValueError(f"Artifact {alias} conflicts with the selected processed release")
+            paths[alias] = selected
     if "weak_label_records" in paths:
         from condition_recommender import weak_label_recipe_catalog_path
 
@@ -185,7 +210,13 @@ def capture_baseline(
         if configured != catalog:
             raise ValueError("weak_label_recipe_catalog must be the catalog beside weak_label_records")
         paths["weak_label_recipe_catalog"] = catalog
-    identities = {name: artifact_identity(path) for name, path in paths.items()}
+    fingerprints: dict[Path, dict[str, Any]] = {}
+    identities = {}
+    for name, path in paths.items():
+        resolved = path.expanduser().resolve()
+        if resolved not in fingerprints:
+            fingerprints[resolved] = artifact_identity(resolved)
+        identities[name] = dict(fingerprints[resolved])
     for value in identities.values():
         path = Path(value["path"])
         if value["status"] == "present" and path.suffix == ".sqlite":
@@ -232,6 +263,7 @@ def verify_baseline(baseline: Mapping[str, Any], *, full_hash: bool = False) -> 
         raise ValueError("Scientific code or definitions changed; start a new investigation")
     if environment_versions() != baseline["environment"]:
         raise ValueError("Scientific runtime changed; start a new investigation")
+    hashes: dict[Path, str] = {}
     for value in baseline["artifacts"].values():
         path = Path(value["path"])
         if value["status"] == "missing":
@@ -243,5 +275,8 @@ def verify_baseline(baseline: Mapping[str, Any], *, full_hash: bool = False) -> 
         stat = path.stat()
         if (stat.st_size, stat.st_mtime_ns) != (value["size_bytes"], value["mtime_ns"]):
             raise ValueError(f"Baseline artifact changed: {path}")
-        if full_hash and sha256_file(path) != value["sha256"]:
-            raise ValueError(f"Baseline artifact content changed: {path}")
+        if full_hash:
+            if path not in hashes:
+                hashes[path] = sha256_file(path)
+            if hashes[path] != value["sha256"]:
+                raise ValueError(f"Baseline artifact content changed: {path}")

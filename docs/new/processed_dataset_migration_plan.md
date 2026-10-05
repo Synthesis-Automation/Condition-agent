@@ -404,3 +404,44 @@ corpus, every required app/agent capability uses the same manifest, starting-mat
 hits are visibly and structurally distinguished from product hits, concise responses
 can retrieve full evidence by ID, all required validation is recorded, and active
 runtime paths no longer depend on Full/Compact or `datasets/literature`.
+
+
+## Implementation and execution (2026-10-05)
+
+The production workflow is `python -m app.processed_dataset_builder build
+--workers 10 --shard-size 500`; the converter GUI delegates to this same workflow.
+The build is resumable and publishes the active pointer only after all requested
+artifacts and complete-source counts pass validation. Run
+`python -m app.processed_dataset_builder validate` for a complete checksum check.
+The current build log is `results/dataset_builds/processed_build.log`.
+
+The release contains `records/shard_manifest.json`, compressed shared-object
+shards, `indexes/catalogs.sqlite`, `indexes/generic_index.sqlite`,
+`indexes/generic_index.shared_core.sqlite`, `indexes/fragment_index.sqlite`,
+`indexes/route_catalog.sqlite`, forward/retro operator libraries and coverage
+reports. The canonical reader hydrates complete original record values. The
+catalog uses a self-contained Zstandard dictionary; a 5,000-observation storage
+pilot reduced catalog size by approximately 54% compared with separate zlib
+payloads, with no chemistry or field changes.
+
+Workspace `get_precedents` defaults to summaries; `view="full"` retrieves complete
+indexed fields. `get_observations` supports exact IDs, selected canonical fields,
+pagination and a byte budget. `get_routes` returns exact step memberships and
+explicit unresolved statuses; source wrappers and typed trees are fetched
+explicitly. Existing `iter_route_trees` can stream qualified trees from the route
+catalog. Full source wrappers are retained even where topology, mapping or joins
+are unresolved. Starting-material fragment hits carry `matched_side="reactant"`
+and `match_extent`, and are blocked from product-construction transfer.
+
+Composite promotion is explicitly unavailable for this release because no
+training scope or independent support review has been declared. Route conversion
+is not a substitute for that gate. The old 20-row Organic Syntheses example is
+retired from the declared production corpus and retained in its original location.
+Algorithmic abstractions remain upstream and outside physical observation counts.
+No old intermediate or literature corpus is deleted by this build.
+
+The final production counts and artifact checksums are authoritative in the
+published release manifest and its coverage report. A development pilot is not
+full-corpus validation. Compatibility arguments in historical CLI/API fixtures
+remain explicit overrides; the production builder and default interfaces expose
+one complete corpus and do not automatically select the old literature datasets.

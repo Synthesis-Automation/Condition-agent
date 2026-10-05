@@ -17,6 +17,10 @@ def load_experimental_detail_catalog(
     """Load experimental records indexed by observation and reaction identity."""
 
     catalog_path = Path(index_path).parent / EXPERIMENTAL_DETAIL_CATALOG_FILENAME
+    sqlite_catalog = Path(index_path).parent / "catalogs.sqlite"
+    if sqlite_catalog.is_file():
+        from condition_recommender.processed_catalog import ProcedureCatalogView
+        return ProcedureCatalogView(sqlite_catalog)
     if not catalog_path.is_file():
         return {}
 

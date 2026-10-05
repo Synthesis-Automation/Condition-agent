@@ -19,6 +19,9 @@ def reference_records(
     except FileNotFoundError:
         return {}, "catalog_unavailable"
     found = {}
+    if path.suffix == ".sqlite":
+        from condition_recommender.processed_catalog import ProcessedCatalog
+        return ProcessedCatalog(path).references(identities), "catalog_available"
     opener = gzip.open if path.suffix == ".gz" else open
     with opener(path, "rt", encoding="utf-8") as stream:
         for line in stream:

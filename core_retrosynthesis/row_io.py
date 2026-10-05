@@ -6,6 +6,7 @@ import gzip
 import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, TextIO
+from condition_recommender.record_storage import iter_record_shard
 
 
 def _open_text(path: Path) -> TextIO:
@@ -44,16 +45,7 @@ def iter_rows(
     """Yield JSON object rows from one file or a directory tree."""
 
     for path in _row_files(source, include):
-        with _open_text(path) as handle:
-            for line_number, line in enumerate(handle, start=1):
-                if not line.strip():
-                    continue
-                value = json.loads(line)
-                if not isinstance(value, dict):
-                    raise ValueError(
-                        f"{path}:{line_number}: row is not an object"
-                    )
-                yield value
+        yield from iter_record_shard(path)
 
 
 __all__ = ["iter_rows"]

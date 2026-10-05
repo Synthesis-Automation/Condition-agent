@@ -32,7 +32,7 @@ def fragment_search_policy() -> dict[str, Any]:
         if type(value.get(key)) is not int or value[key] < 1:
             raise ValueError(f"Invalid fragment search policy: {key}")
     if value["relationship_order"] != ["constructed", "modified", "boundary_changed",
-                                        "carried_through", "unresolved"]:
+                                        "carried_through", "reported_use", "unresolved"]:
         raise ValueError("Invalid fragment relationship vocabulary")
     return value
 

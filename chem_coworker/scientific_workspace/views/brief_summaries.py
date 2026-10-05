@@ -382,6 +382,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             if not isinstance(item, Mapping):
                 continue
             compact = _brief_fields(item, ("hit_id", "reaction_id", "observation_id", "reference_id",
+                                          "matched_side", "matched_sides", "match_extents", "matched_molecule_smiles",
                                           "product_smiles", "relationship_summary",
                                           "procedure_availability", "warnings"))
             record = item.get("record", {})

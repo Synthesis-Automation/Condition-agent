@@ -177,7 +177,9 @@ def build_observed_route_tree(
             ),
             abstracted_reaction_smiles=abstracted,
             abstraction_status=(
-                "algorithm_generated"
+                "archived_algorithmic_annotation"
+                if step.get("abstraction_archived") is True
+                else "algorithm_generated"
                 if abstracted
                 else "absorbed_by_algorithmic_abstraction"
             ),
@@ -436,7 +438,12 @@ def convert_observed_route_corpus(
 
 
 def iter_route_trees(source: str | Path) -> Iterator[ReactionRouteTree]:
-    """Yield validated typed trees from canonical route-tree JSONL."""
+    """Yield validated typed trees from canonical JSONL or a processed route catalog."""
+
+    if Path(source).suffix == ".sqlite":
+        from .processed_routes import ProcessedRouteCatalog
+        yield from ProcessedRouteCatalog(source).iter_trees()
+        return
 
     for row in iter_rows(source):
         yield ReactionRouteTree.from_dict(row)

@@ -51,7 +51,7 @@ def main() -> None:
     parser.add_argument("reaction_smiles")
     parser.add_argument(
         "--records",
-        default="datasets/literature/full/generic_index.sqlite",
+        default="datasets/processed_datasets",
         help="Canonical records/manifest or a persisted SQLite runtime index",
     )
     parser.add_argument("--top-k", type=int, default=5)

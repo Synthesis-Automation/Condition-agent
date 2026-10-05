@@ -37,6 +37,7 @@ from reactive_taxonomy import (
     reaction_signature_definition_versions,
 )
 from rdkit import RDLogger
+from reactive_taxonomy.chemistry.rdkit_utils import MoleculeParseCache, molecule_parse_scope
 
 from ..models import (
     FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION,
@@ -45,6 +46,7 @@ from ..models import (
 )
 from .atomic import atomic_json, atomic_output_path
 from .generic import GenericConversionCache, convert_record
+from ..record_storage import iter_record_shard, write_object_records, STORAGE_SCHEMA_VERSION
 from .input_schema import (
     ConversionDatasetInput,
     RawReactionRecord,
@@ -53,7 +55,7 @@ from .input_schema import (
 )
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v5.2"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v6.0"
 COMPACT_ALWAYS_KEEP_ROWS = 200
 COMPACT_REMAINDER_FRACTION = 0.15
 COMPACT_SAMPLING_DEFINITION_VERSION = "compact_random_sampling.v1"
@@ -129,7 +131,7 @@ def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
     atomic_json(path, payload)
 
 
-def _write_gzip_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> int:
+def _write_gzip_jsonl(path: Path, rows: Iterable[Mapping[str, Any]], *, normalized: bool = False) -> int:
     count = 0
     with atomic_output_path(path) as temporary:
         with temporary.open("wb") as raw:
@@ -141,6 +143,8 @@ def _write_gzip_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> int:
                 mtime=0,
             ) as compressed:
                 with io.TextIOWrapper(compressed, encoding="utf-8") as text:
+                    if normalized:
+                        return write_object_records(text, rows)
                     for row in rows:
                         text.write(
                             json.dumps(
@@ -157,19 +161,7 @@ def _write_gzip_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> int:
 
 def iter_gzip_jsonl(path: str | Path) -> Iterator[Dict[str, Any]]:
     """Stream canonical objects from one deterministic compressed shard."""
-    with gzip.open(Path(path), mode="rt", encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                value = json.loads(line)
-            except json.JSONDecodeError as exc:
-                raise ValueError(
-                    f"Invalid shard JSONL at {path}:{line_number}: {exc.msg}"
-                ) from exc
-            if not isinstance(value, dict):
-                raise ValueError(f"Shard row is not an object at {path}:{line_number}")
-            yield value
+    yield from iter_record_shard(path)
 
 
 def _chunks(
@@ -393,15 +385,16 @@ def _convert_shard_task(
         max_entries=max(1_000, len(raw_records) * 2)
     )
     try:
-        payloads = [
-            convert_record(
-                raw_record,
-                cache=conversion_cache,
-                mapping_provider=mapping_provider,
-            ).to_dict()
-            for raw_record in raw_records
-        ]
-        output_count = _write_gzip_jsonl(output, payloads)
+        with molecule_parse_scope(MoleculeParseCache()):
+            payloads = [
+                convert_record(
+                    raw_record,
+                    cache=conversion_cache,
+                    mapping_provider=mapping_provider,
+                ).to_dict()
+                for raw_record in raw_records
+            ]
+        output_count = _write_gzip_jsonl(output, payloads, normalized=True)
         return {
             **expected,
             "status": "complete",
@@ -452,6 +445,8 @@ def _manifest_payload(
     return {
         "schema_version": SHARD_MANIFEST_SCHEMA_VERSION,
         "artifact_type": "generic_sharded_conversion",
+        "storage_schema": STORAGE_SCHEMA_VERSION,
+        "coverage_complete": coverage_complete,
         "dataset_path": (
             str(selected_paths[0].resolve()) if len(selected_paths) == 1 else None
         ),
@@ -728,6 +723,7 @@ def convert_datasets_sharded(
     workers: int = 1,
     checkpoint_interval: int = 10,
     merge_records: bool = True,
+    build_catalogs: bool = True,
     use_rxnmapper: bool = False,
     progress: bool = False,
     progress_callback: Optional[Callable[[ShardedConversionProgress], None]] = None,
@@ -1024,7 +1020,8 @@ def convert_datasets_sharded(
             shard_count=len(entries),
             row_count=sum(int(entry.get("input_row_count") or 0) for entry in entries),
         )
-        catalogs = _write_catalogs(manifest, destination)
+        if build_catalogs:
+            catalogs = _write_catalogs(manifest, destination)
         if merge_records:
             notify(
                 "merging",

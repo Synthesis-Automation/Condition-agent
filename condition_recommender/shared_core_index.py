@@ -12,6 +12,7 @@ import json
 import os
 import sqlite3
 import tempfile
+import zlib
 from collections import Counter, deque
 from concurrent.futures import ProcessPoolExecutor
 from contextlib import closing
@@ -35,7 +36,7 @@ from .generic_indexing import (
     _indexed_reaction_payload,
 )
 
-STORAGE_VERSION = "2.0"
+STORAGE_VERSION = "3.0"
 
 
 class SharedCoreBuildCancelled(RuntimeError):
@@ -46,8 +47,15 @@ def _encode(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
-def _hash(text: str) -> str:
-    return hashlib.sha256(text.encode()).hexdigest()
+def _payload_text(value: str | bytes) -> str:
+    try:
+        return zlib.decompress(value).decode("utf-8") if isinstance(value, bytes) else value
+    except (zlib.error, UnicodeError) as exc:
+        raise ValueError("Corrupt shared-core compressed payload") from exc
+
+
+def _hash(text: str | bytes) -> str:
+    return hashlib.sha256(_payload_text(text).encode()).hexdigest()
 
 
 def _row_digest(row: GenericIndexedReaction) -> str:
@@ -112,7 +120,7 @@ class SharedCoreIndex:
             raise ValueError(
                 "SHARED_CORE_OBSERVATION_MISMATCH: rebuild projection artifact"
             )
-        return SharedReactionCore.from_dict(json.loads(value[1]))
+        return SharedReactionCore.from_dict(json.loads(_payload_text(value[1])))
 
 
 def load_shared_core_index(
@@ -126,7 +134,7 @@ def load_shared_core_index(
         )
         count = connection.execute("SELECT count(*) FROM projection").fetchone()[0]
     if (
-        metadata.get("storage_version") != STORAGE_VERSION
+        metadata.get("storage_version") not in {"2.0", STORAGE_VERSION}
         or metadata.get("reactant_projection_hash")
         != reactant_projection_definition_hash()
         or count != metadata.get("row_count")
@@ -178,7 +186,7 @@ def _project_rows(
             (
                 position,
                 _row_digest(row),
-                payload,
+                zlib.compress(payload.encode("utf-8"), level=6),
                 _hash(payload),
                 tuple(sorted(keys)),
                 tuple(level.level for level in projection.levels),
@@ -319,7 +327,7 @@ def build_shared_core_index(
                 connection.executescript("""
                 CREATE TABLE metadata (payload TEXT NOT NULL);
                 CREATE TABLE projection (position INTEGER PRIMARY KEY, row_hash TEXT NOT NULL,
-                    payload TEXT NOT NULL, payload_hash TEXT NOT NULL);
+                    payload BLOB NOT NULL, payload_hash TEXT NOT NULL);
                 CREATE TABLE lookup (kind TEXT NOT NULL, key TEXT NOT NULL, position INTEGER NOT NULL,
                     PRIMARY KEY (kind, key, position), FOREIGN KEY(position) REFERENCES projection(position))
                     WITHOUT ROWID;

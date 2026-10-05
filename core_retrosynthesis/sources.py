@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Literal
 
 from .row_io import iter_rows
+from condition_recommender.corpus_io import canonical_source_files, iter_canonical_records
 
 
 LibraryMode = Literal["full", "compact"]
@@ -65,6 +66,14 @@ def iter_library_rows(
 
     selected = combined_records_source(source)
     patterns = tuple(include)
+    if selected.is_file() and selected.suffix == ".json":
+        for row in iter_canonical_records(selected, strict=True):
+            if _matches_include(row, patterns):
+                yield row
+        return
+    if selected.is_dir() and (selected / "shard_manifest.json").is_file():
+        yield from iter_library_rows(selected / "shard_manifest.json", include=include)
+        return
     if selected.is_file() and selected.name == COMBINED_RECORDS_FILENAME:
         for row in iter_rows(selected):
             if _matches_include(row, patterns):
@@ -160,7 +169,11 @@ def source_shard_files(source: str | Path) -> tuple[Path, ...]:
 
     root = Path(source)
     if root.is_file():
+        if root.suffix == ".json":
+            return canonical_source_files(root, strict=True)
         return (root,)
+    if (root / "shard_manifest.json").is_file():
+        return canonical_source_files(root / "shard_manifest.json", strict=True)
     manifests = _combined_batch_manifests(root)
     if manifests:
         files: list[Path] = []

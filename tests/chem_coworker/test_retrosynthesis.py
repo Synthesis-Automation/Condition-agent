@@ -4,14 +4,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from io import StringIO
+import json
+
+import pytest
 
 from rich.console import Console
+
+from condition_recommender.corpus_io import file_sha256
 
 from core_retrosynthesis import (
     GenericDisconnectionCandidate,
     GenericTemplateLibrary,
     StrategyProposal,
     group_strategy_candidates,
+    save_generic_library,
 )
 
 from chem_coworker._cli.interactive import InteractiveSession
@@ -29,6 +35,55 @@ from chem_coworker.retrosynthesis_review import (
     RetrosynthesisReviewPayload,
     RetrosynthesisReviewTransportResult,
 )
+
+
+def _published_retro_release(tmp_path):
+    release = tmp_path / "releases" / "complete"
+    release.mkdir(parents=True)
+    artifact = release / "operator_library_v3.json.gz"
+    save_generic_library(GenericTemplateLibrary(
+        templates=(), source_row_count=7, accepted_observation_count=0,
+        rejection_counts={}, definition={},
+    ), artifact)
+    manifest = {
+        "schema_version": "processed_reaction_release.v1",
+        "release_id": "complete", "build_complete": True,
+        "artifacts": {"retro_library": {
+            "relative_path": artifact.name,
+            "size_bytes": artifact.stat().st_size,
+            "sha256": file_sha256(artifact),
+        }},
+    }
+    immutable = release / "manifest.json"
+    immutable.write_text(json.dumps(manifest), encoding="utf-8")
+    active = tmp_path / "manifest.json"
+    active.write_text(json.dumps({
+        "schema_version": "processed_reaction_active.v1",
+        "release_manifest": "releases/complete/manifest.json",
+        "sha256": file_sha256(immutable),
+    }), encoding="utf-8")
+    return active, immutable, artifact
+
+
+def test_retrosynthesis_default_pins_declared_processed_library(tmp_path, monkeypatch):
+    active, _, artifact = _published_retro_release(tmp_path)
+    monkeypatch.setattr("chem_coworker.retrosynthesis.DEFAULT_RETROSYNTHESIS_LIBRARY_PATH", active)
+    coworker = RetrosynthesisCoworker.from_default()
+    assert coworker.library_path == artifact.resolve()
+    assert coworker.library.source_row_count == 7
+    active.write_text("{}", encoding="utf-8")
+    assert coworker.library_path == artifact.resolve()
+    assert coworker.library.source_row_count == 7
+
+
+def test_retrosynthesis_default_rejects_unfinished_processed_release(tmp_path, monkeypatch):
+    _, immutable, _ = _published_retro_release(tmp_path)
+    manifest = json.loads(immutable.read_text(encoding="utf-8"))
+    manifest["build_complete"] = False
+    immutable.write_text(json.dumps(manifest), encoding="utf-8")
+    monkeypatch.setattr("chem_coworker.retrosynthesis.DEFAULT_RETROSYNTHESIS_LIBRARY_PATH", immutable)
+    with pytest.raises(ValueError, match="unfinished"):
+        RetrosynthesisCoworker.from_default()
 
 
 def _candidate(

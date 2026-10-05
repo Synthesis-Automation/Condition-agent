@@ -13,7 +13,7 @@ export function useFragmentGuidedRetro(active: boolean) {
   const [workflow, setWorkflow] = useState<'manual' | 'automatic'>('manual')
   const research = useFragmentResearch(active && workflow === 'manual')
   const [target, setTarget] = useState('')
-  const [library, setLibrary] = useState<FragmentGuidedRetroRequest['library_mode']>('compact')
+  const [library, setLibrary] = useState<FragmentGuidedRetroRequest['library_mode']>('full')
   const [queryLimit, setQueryLimit] = useState(3)
   const [focusLimit, setFocusLimit] = useState(3)
   const [topK, setTopK] = useState(3)
@@ -77,7 +77,6 @@ export function FragmentGuidedRetroOptions({ state, capabilities }: { state: Sta
     {state.workflow === 'manual' ? <>
       <FragmentResearchOptions state={state.research} />
       <fieldset className="fragment-fields" disabled={state.research.busy}>
-        <label><span>Operator library</span><select aria-label="Operator library" value={state.library} onChange={event => { state.setLibrary(event.target.value as State['library']); state.reset() }}><option value="compact">Compact</option><option value="full">Full</option></select></label>
         <label><span>Construction bonds</span><select value={state.focusLimit} onChange={event => { state.setFocusLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
         <label><span>Proposals per search arm</span><select value={state.topK} onChange={event => { state.setTopK(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 5, 10].map(value => <option key={value}>{value}</option>)}</select></label>
       </fieldset>
@@ -85,7 +84,6 @@ export function FragmentGuidedRetroOptions({ state, capabilities }: { state: Sta
     </> : <>
     <p><strong>Experimental single-step comparison</strong><br />Generate target fragments, retrieve construction evidence, then compare source transfers and guided proposals with an unrestricted baseline.</p>
     <fieldset disabled={state.busy} className="fragment-fields">
-      <label><span>Operator library</span><select aria-label="Operator library" value={state.library} onChange={event => { state.setLibrary(event.target.value as State['library']); state.reset() }}><option value="compact">Compact</option><option value="full">Full</option></select></label>
       <label><span>Fragment queries</span><select value={state.queryLimit} onChange={event => { state.setQueryLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
       <label><span>Construction bonds</span><select value={state.focusLimit} onChange={event => { state.setFocusLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
       <label><span>Proposals per search arm</span><select value={state.topK} onChange={event => { state.setTopK(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 5, 10].map(value => <option key={value}>{value}</option>)}</select></label>

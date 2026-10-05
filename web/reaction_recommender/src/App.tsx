@@ -131,7 +131,7 @@ function App() {
     setResult(null)
     setError('')
     if ((nextMode === 'forward_synthesis' || nextMode === 'retrosynthesis' || nextMode === 'multistep_retrosynthesis') && capabilities) {
-      setLibraryMode(capabilities.default_retrosynthesis_library_mode ?? 'compact')
+      setLibraryMode(capabilities.default_retrosynthesis_library_mode ?? 'full')
     }
     if (nextMode === 'multistep_retrosynthesis' || nextMode === 'coupled_strategy') {
       setTopK((current) => Math.min(10, current))
@@ -591,7 +591,6 @@ function App() {
 
           {mode === 'fragment_guided_retro' ? <FragmentGuidedRetroOptions state={fragmentRetro} capabilities={capabilities} /> : mode === 'fragments' ? <FragmentSearchOptions state={fragmentSearch} available={capabilities?.fragment_search} /> : <div className="analysis-options">
             <div className={`option-grid ${mode === 'features' || mode === 'coupled_strategy' ? 'feature-options' : ''}`}>
-              {mode !== 'features' && mode !== 'weak_label' && mode !== 'coupled_strategy' && <label className="library-option"><span>{isOperatorMode ? 'Operator library' : 'Precedent library'}</span><select aria-label={isOperatorMode ? 'Operator library' : 'Precedent library'} value={libraryMode} onChange={(event) => { retrosynthesisRun.current += 1; setBusy(false); setLibraryMode(event.target.value as LibraryMode); setResult(null) }}><option value="full">{libraryLabel('full')}</option><option value="compact">{libraryLabel('compact')}</option></select></label>}
               {mode !== 'features' && <label><span>{mode === 'multistep_retrosynthesis' ? 'Top routes' : mode === 'coupled_strategy' || mode === 'retrosynthesis' ? 'Top strategies' : 'Top results'}</span><input type="number" min="1" max={mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50} value={topK} onChange={(event) => setTopK(Math.min(mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50, Math.max(1, Number(event.target.value))))} /></label>}
               {mode === 'recommendation' ? (
                 <>

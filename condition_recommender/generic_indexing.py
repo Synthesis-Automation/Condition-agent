@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import gzip
 from collections import defaultdict
 from dataclasses import dataclass, field as dataclass_field
 from enum import Enum
@@ -822,29 +821,10 @@ def load_generic_index(
             "Only shard_manifest.json is accepted as canonical JSON input; "
             "persisted runtime indexes must use SQLite"
         )
-    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
-    open_arguments = (
-        {"mode": "rt", "encoding": "utf-8"}
-        if source.suffix.casefold() == ".gz"
-        else {"mode": "r", "encoding": "utf-8"}
-    )
+    from .record_storage import iter_record_shard
 
-    def records() -> Iterable[Dict[str, Any]]:
-        with opener(source, **open_arguments) as handle:
-            for line_number, line in enumerate(handle, start=1):
-                if not line.strip():
-                    continue
-                try:
-                    value = json.loads(line)
-                except json.JSONDecodeError as exc:
-                    raise ValueError(
-                        f"Invalid JSONL at line {line_number}: {exc.msg}"
-                    ) from exc
-                if not isinstance(value, dict):
-                    raise ValueError(f"JSONL line {line_number} is not an object")
-                yield value
+    return build_generic_index(iter_record_shard(source), include_review=include_review)
 
-    return build_generic_index(records(), include_review=include_review)
 
 
 def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:

@@ -67,8 +67,8 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help=(
-            "Recommendation index; by default the largest compatible full/compact "
-            "artifact is selected"
+            "Recommendation index or processed release manifest; defaults to "
+            "the published complete corpus"
         ),
     )
     parser.add_argument("--top-k", type=int, default=5)

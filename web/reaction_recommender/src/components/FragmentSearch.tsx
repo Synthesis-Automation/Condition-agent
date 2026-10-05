@@ -29,6 +29,7 @@ export function useFragmentSearch(active: boolean) {
   const [query, setQuery] = useState('')
   const [format, setFormat] = useState<FragmentSearchRequest['query_format']>('smiles')
   const [topology, setTopology] = useState<FragmentSearchRequest['topology']>('preserve_rings')
+  const [searchSide, setSearchSide] = useState<NonNullable<FragmentSearchRequest['search_side']>>('product')
   const [limit, setLimit] = useState(5)
   const [timeout, setBudget] = useState(10)
   const [busy, setBusy] = useState(false)
@@ -79,7 +80,7 @@ export function useFragmentSearch(active: boolean) {
     reset()
     try {
       const next = await api.searchFragments({ query: query.trim(), query_format: format,
-        topology, limit, timeout_seconds: timeout }, controller.signal)
+        topology, search_side: searchSide, limit, timeout_seconds: timeout }, controller.signal)
       if (!controller.signal.aborted) setResult(next)
     } catch (reason) {
       if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'Search failed')
@@ -97,7 +98,7 @@ export function useFragmentSearch(active: boolean) {
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
-  return { query, setQuery: changeQuery, format, setFormat, topology, setTopology, limit, setLimit,
+  return { query, setQuery: changeQuery, format, setFormat, topology, setTopology, searchSide, setSearchSide, limit, setLimit,
     timeout, setBudget, busy, error, setError, result, reset, search, exportResult,
     suggestions, suggesting, suggest, choose }
 }
@@ -106,12 +107,15 @@ type FragmentSearchState = ReturnType<typeof useFragmentSearch>
 
 export function FragmentSearchOptions({ state, available }: { state: FragmentSearchState; available?: boolean }) {
   const { format, setFormat, topology, setTopology, limit, setLimit, timeout, setBudget,
-    busy, error, reset, setQuery, query, suggest, suggesting } = state
+    busy, error, reset, setQuery, query, suggest, suggesting, searchSide, setSearchSide } = state
   return <div className="analysis-options">
     <fieldset disabled={busy} className="fragment-fields">
       <div className="option-grid">
         <label><span>Query format</span><select aria-label="Query format" value={format} onChange={event => { setFormat(event.target.value as typeof format); reset() }}>
           <option value="smiles">SMILES</option><option value="smarts">SMARTS</option>
+        </select></label>
+        <label><span>Reaction side</span><select aria-label="Reaction side" value={searchSide} onChange={event => { setSearchSide(event.target.value as typeof searchSide); reset() }}>
+          <option value="product">Products</option><option value="reactant">Starting materials</option><option value="either">Either side</option>
         </select></label>
         <label><span>Topology</span><select aria-label="Topology" value={topology} onChange={event => { setTopology(event.target.value as typeof topology); reset() }}>
           <option value="preserve_rings">Preserve ring system</option><option value="subgraph">Subgraph (allow extra rings)</option>
@@ -170,7 +174,7 @@ export function FragmentSearchResults({ result }: { result: FragmentSearchResult
   return <section className="results-card fragment-results" aria-label="Fragment search results">
       <div className="results-summary"><div><span className="eyebrow">FRAGMENT SEARCH RESULT</span><h2>{result.search_status === 'too_broad' ? 'Query too broad' : result.search_status === 'partial' ? 'Partial search results' : 'Fragment precedents'}</h2></div>
         <div className="metric-strip">
-          <div><strong>{count(result.counts.products)}</strong><span>products</span></div>
+          <div><strong>{count(result.counts.molecules ?? result.counts.products)}</strong><span>matching compounds</span></div>
           <div><strong>{count(result.counts.observations)}</strong><span>observations</span></div>
           <div><strong>{count(result.counts.known_references)}</strong><span>references</span></div>
         </div>
@@ -179,7 +183,7 @@ export function FragmentSearchResults({ result }: { result: FragmentSearchResult
       <p className="fragment-note">{result.source_scope === 'prefix_pilot' ? 'Prefix pilot corpus' : 'Indexed corpus'} · {result.source_coverage_complete ? 'Source coverage complete' : 'Source coverage incomplete'}</p>
       {result.stop_reason && <p>Search stopped: {label(result.stop_reason)}. Counts marked ≥ are lower bounds; evidence may not yet have been examined.</p>}
       {result.refinement_hints.map(hint => <p key={hint}>{hint}</p>)}
-      {result.search_status === 'complete' && result.counts.products.value === 0 && <p>No matching products in this index.</p>}
+      {result.search_status === 'complete' && (result.counts.molecules ?? result.counts.products).value === 0 && <p>No matching compounds on the selected reaction side.</p>}
       {result.output_truncated && <p>Some hits were omitted to keep the response within its size limit.</p>}
       <p className="fragment-note">{Object.entries(result.relationship_groups).map(([name, value]) => `${label(name)}: ${count(value)}`).join(' · ')}. Groups can overlap.</p>
       {result.hits.map((hit, index) => {
@@ -191,7 +195,8 @@ export function FragmentSearchResults({ result }: { result: FragmentSearchResult
           : ''
         return <article className="fragment-hit" key={hit.hit_id}>
           <h3>{index + 1}. {hit.relationships.map(label).join(' · ')}</h3>
-          <ReactionImage smiles={reaction || hit.product_smiles} kind={reaction ? 'reaction' : 'molecule'} compact label={`Precedent ${index + 1}`} />
+          <ReactionImage smiles={reaction || hit.matched_molecule_smiles || hit.product_smiles || ''} kind={reaction ? 'reaction' : 'molecule'} compact label={`Precedent ${index + 1}`} />
+          {hit.matches.map((match, i) => <p key={i}><strong>{match.matched_side === 'reactant' ? 'Reported as starting material' : 'Reported product'}</strong> · {match.match_extent === 'whole_molecule' ? 'Exact compound match' : 'Substructure match'}</p>)}
           <p><strong>Reference:</strong> {citation || hit.reference_id || 'Not recorded'} · {label(hit.citation_availability)}</p>
           <p><strong>Procedure:</strong> {label(hit.procedure_availability)}{hit.procedure_match_scope ? ` · ${label(hit.procedure_match_scope)}` : ''}</p>
           <p className="fragment-note">Observation: {hit.observation_id} · Admission: {hit.admission_tier ?? 'not recorded'}</p>

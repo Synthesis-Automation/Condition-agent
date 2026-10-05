@@ -1297,6 +1297,7 @@ export interface ReactionContextResult {
 }
 
 export interface FragmentSearchRequest {
+  search_side?: 'product' | 'reactant' | 'either'
   query: string
   query_format: 'smiles' | 'smarts'
   topology: 'preserve_rings' | 'subgraph'
@@ -1410,13 +1411,15 @@ export interface FragmentSearchResult {
   query: { expression: string; query_format: string; topology: string }
   search_status: 'complete' | 'partial' | 'too_broad'
   stop_reason: string | null
-  counts: Record<'products' | 'observations' | 'known_references', FragmentCount>
+  counts: Record<'products' | 'observations' | 'known_references', FragmentCount> & { molecules?: FragmentCount; occurrences?: FragmentCount }
   relationship_groups: Record<string, FragmentCount>
   hits: Array<{
     hit_id: string
     observation_id: string
     reference_id: string | null
-    product_smiles: string
+    product_smiles?: string
+    matched_molecule_smiles?: string
+    matched_sides?: Array<'product' | 'reactant'>
     relationships: string[]
     citation_availability: string
     procedure_availability: string

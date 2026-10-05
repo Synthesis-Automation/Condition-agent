@@ -37,6 +37,19 @@ def _query_map_positions(pattern: Any) -> Dict[int, int]:
     }
 
 
+@lru_cache(maxsize=512)
+def _mapped_query_positions(smarts: str) -> Tuple[Tuple[int, int], ...]:
+    """Cache immutable query metadata alongside the centralized SMARTS cache."""
+    query = compile_smarts(smarts, validate=False)
+    return tuple(_query_map_positions(query).items()) if query is not None else ()
+
+
+@lru_cache(maxsize=1)
+def _context_patterns() -> Tuple[Dict[str, Any], ...]:
+    with _CONTEXTS_PATH.open("r", encoding="utf-8") as handle:
+        return tuple(json.load(handle).get("contexts") or ())
+
+
 class MatchIndex:
     """All taxonomy SMARTS matches for one molecule, calculated once."""
 
@@ -55,17 +68,15 @@ class MatchIndex:
                     uniquify=not bool(definition.get("activation_token")),
                 )
             )
-            self._handle_matches.append((definition, _query_map_positions(query), matches))
-        with _CONTEXTS_PATH.open("r", encoding="utf-8") as handle:
-            contexts = json.load(handle).get("contexts") or []
-        for definition in contexts:
+            self._handle_matches.append((definition, dict(_mapped_query_positions(str(definition.get("smarts") or ""))), matches))
+        for definition in _context_patterns():
             if definition.get("classification_method") != "mapped_smarts":
                 continue
             query = compile_smarts(str(definition.get("smarts") or ""), validate=False)
             if query is None:
                 continue
             matches = tuple(tuple(int(i) for i in match) for match in mol.GetSubstructMatches(query, uniquify=True))
-            self._context_matches[str(definition["id"])] = (_query_map_positions(query), matches)
+            self._context_matches[str(definition["id"])] = (dict(_mapped_query_positions(str(definition.get("smarts") or ""))), matches)
 
     def role_atoms(self, site_type: str, role: str) -> Set[int]:
         indices: Set[int] = set()

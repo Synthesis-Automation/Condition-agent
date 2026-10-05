@@ -111,6 +111,8 @@ def project_construction_guidance(
             continue
         for hit in result.get("hits", []):
             for match_index, match in enumerate(hit["matches"]):
+                if match.get("matched_side", "product") != "product":
+                    continue
                 if (match.get("evidence_status") != "validated_supplied_mapping"
                         or "unresolved" in match["relationships"]
                         or match.get("embedding_truncated")):
@@ -203,6 +205,8 @@ def project_selected_query_guidance(
             or description.get("query_id") != query.query_id):
         raise ValueError("Selected search evidence does not validate this target and query")
     available_ids = {hit["observation_id"] for hit in result["hits"]}
+    if result.get("search_side", "product") != "product":
+        raise ValueError("Fragment transfer requires a product-side search")
     if not selected_observation_ids or len(set(selected_observation_ids)) != len(selected_observation_ids):
         raise ValueError("Select unique source observation IDs")
     if any(identity not in available_ids for identity in selected_observation_ids):

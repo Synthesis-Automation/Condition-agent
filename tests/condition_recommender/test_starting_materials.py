@@ -58,6 +58,7 @@ def test_exact_literature_match_precedes_mass_and_preserves_ids(index):
     assert result.literature["precedents"][0] == {
         "observation_id": "obs-0", "reaction_id": "rxn-0", "reference_id": "ref-0",
         "product_component_index": 0,
+        "matched_side": "product", "match_extent": "whole_molecule",
     }
     assert result.literature["index_id"].startswith("FPI1:")
     assert result.availability == "unknown"

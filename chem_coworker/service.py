@@ -20,11 +20,8 @@ from .contracts import ConditionRequest, ConditionResponse, ConditionReview
 from .rendering import render_recommendation
 
 
-DEFAULT_INDEX_PATH = Path("datasets/literature/compact/generic_index.sqlite")
-DEFAULT_INDEX_CANDIDATES = (
-    Path("datasets/literature/full/generic_index.sqlite"),
-    DEFAULT_INDEX_PATH,
-)
+DEFAULT_INDEX_PATH = Path("datasets/processed_datasets")
+DEFAULT_INDEX_CANDIDATES = (DEFAULT_INDEX_PATH,)
 
 
 class _Recommender(Protocol):
@@ -55,11 +52,11 @@ class ConditionCoworker:
         include_review: bool = False,
         reviewer: Optional[_ConditionReviewer] = None,
     ) -> "ConditionCoworker":
-        """Select the largest compatible default index without hiding staleness."""
+        """Load the published complete corpus without an automatic old-data fallback."""
 
         failures = []
         for candidate in DEFAULT_INDEX_CANDIDATES:
-            if not candidate.is_file():
+            if not candidate.exists():
                 failures.append(f"{candidate}: not found")
                 continue
             try:

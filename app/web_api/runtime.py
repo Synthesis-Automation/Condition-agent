@@ -90,30 +90,12 @@ from .references import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_LIBRARY_ROOT = PROJECT_ROOT / "datasets" / "literature"
+DEFAULT_LIBRARY_ROOT = PROJECT_ROOT / "datasets" / "processed_datasets"
 DEFAULT_INDEX_PATH = DEFAULT_LIBRARY_ROOT / "generic_index.sqlite"
-DEFAULT_FRAGMENT_INDEX_PATH = (
-    PROJECT_ROOT / "results" / "ai_native" / "indexes" / "fragment_precedents.sqlite"
-)
-DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = (
-    PROJECT_ROOT / "results" / "operator_retrosynthesis_poc" / "full_scale_v3"
-)
-DEFAULT_COUPLED_STRATEGY_LIBRARY_PATH = (
-    PROJECT_ROOT
-    / "results"
-    / "core_retrosynthesis"
-    / "route_step_operator_library"
-    / "v1"
-    / "operators_validated_departures"
-    / "operator_library_v3.json.gz"
-)
-DEFAULT_COMPOSITE_STRATEGY_CATALOG_PATH = (
-    PROJECT_ROOT
-    / "results"
-    / "core_retrosynthesis"
-    / "coupled_strategy_evaluation"
-    / "composite_strategy_catalog.v1.json"
-)
+DEFAULT_FRAGMENT_INDEX_PATH = DEFAULT_LIBRARY_ROOT / "indexes" / "fragment_index.sqlite"
+DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT = DEFAULT_LIBRARY_ROOT / "operators" / "retrosynthesis"
+DEFAULT_COUPLED_STRATEGY_LIBRARY_PATH = DEFAULT_LIBRARY_ROOT / "operators" / "composite_library.json.gz"
+DEFAULT_COMPOSITE_STRATEGY_CATALOG_PATH = DEFAULT_LIBRARY_ROOT / "operators" / "composite_catalog.json"
 DEFAULT_LITERATURE_MOLECULE_INDEX = (
     PROJECT_ROOT / "results" / "literature_molecule_index.sqlite"
 )
@@ -315,6 +297,12 @@ class LocalRecommendationRuntime:
             )
         else:
             self.library_root = DEFAULT_LIBRARY_ROOT
+        self._processed_release = None
+        if (self.library_root / "manifest.json").is_file():
+            from condition_recommender.processed_release import resolve_processed_release
+            self._processed_release = resolve_processed_release(self.library_root)
+            if fragment_index_path is None and not os.environ.get("FRAGMENT_PRECEDENT_INDEX"):
+                self.fragment_index_path = self._processed_release.artifact("fragment_index")
         self.index_path = self._index_path("full")
         configured_retrosynthesis = retrosynthesis_library_root or os.environ.get(
             "CORE_RETROSYNTHESIS_LIBRARY_ROOT"
@@ -352,6 +340,12 @@ class LocalRecommendationRuntime:
         self.coupled_strategy_catalog_path = Path(
             configured_coupled_catalog or DEFAULT_COMPOSITE_STRATEGY_CATALOG_PATH
         )
+        if self._processed_release is not None:
+            declared = self._processed_release.manifest["artifacts"]
+            if not configured_coupled_library and "composite_library" in declared:
+                self.coupled_strategy_library_path = self._processed_release.artifact("composite_library")
+            if not configured_coupled_catalog and "composite_catalog" in declared:
+                self.coupled_strategy_catalog_path = self._processed_release.artifact("composite_catalog")
         # An explicitly supplied legacy index is an intentional test/runtime
         # override unless a stock portfolio was also explicitly configured.
         self._prefer_stock_portfolio = bool(configured_stock_portfolio) or (
@@ -653,6 +647,8 @@ class LocalRecommendationRuntime:
         mode = library_mode.strip().casefold()
         if mode not in {"full", "compact"}:
             raise ValueError(f"unsupported library mode: {library_mode}")
+        if self._processed_release is not None:
+            return self._processed_release.artifact("condition_index") if mode == "full" else self.library_root / "compact_mode_removed.sqlite"
         if self._configured_index_path is not None and mode == "full":
             return self._configured_index_path
         candidate = self.library_root / mode / "generic_index.sqlite"
@@ -668,6 +664,8 @@ class LocalRecommendationRuntime:
         mode = library_mode.strip().casefold()
         if mode not in {"full", "compact"}:
             raise ValueError(f"unsupported library mode: {library_mode}")
+        if self._processed_release is not None:
+            return self._processed_release.artifact("retro_library") if mode == "full" else self.library_root / "compact_mode_removed.json.gz"
         return self.retrosynthesis_library_root / mode / "operator_library_v3.json.gz"
 
     def _get_retrosynthesis_library(
@@ -737,6 +735,8 @@ class LocalRecommendationRuntime:
         mode = library_mode.strip().casefold()
         if mode not in {"full", "compact"}:
             raise ValueError(f"unsupported library mode: {library_mode}")
+        if self._processed_release is not None:
+            return self._processed_release.artifact("forward_library") if mode == "full" else self.library_root / "compact_mode_removed.json.gz"
         return (
             self.retrosynthesis_library_root
             / mode
@@ -792,6 +792,8 @@ class LocalRecommendationRuntime:
         """Load and cache the reference artifact paired with the active index."""
 
         normalized_index_path = Path(index_path)
+        if (normalized_index_path.parent / "catalogs.sqlite").is_file():
+            return load_reference_catalog(normalized_index_path)
         catalog_path = normalized_index_path.parent / REFERENCE_CATALOG_FILENAME
         if not catalog_path.is_file():
             return {}
@@ -810,6 +812,8 @@ class LocalRecommendationRuntime:
         """Load and cache observed procedures paired with the active index."""
 
         normalized_index_path = Path(index_path)
+        if (normalized_index_path.parent / "catalogs.sqlite").is_file():
+            return load_experimental_detail_catalog(normalized_index_path)
         catalog_path = (
             normalized_index_path.parent / EXPERIMENTAL_DETAIL_CATALOG_FILENAME
         )
@@ -912,7 +916,7 @@ class LocalRecommendationRuntime:
                 except (OSError, ValueError, sqlite3.DatabaseError):
                     pass
             library_modes[mode] = {
-                "label": "Custom index" if custom else mode.title(),
+                "label": "Complete dataset" if self._processed_release is not None and mode == "full" else "Custom index" if custom else mode.title(),
                 "index_name": path.name,
                 "index_available": path.is_file(),
                 "custom_index": custom,
@@ -926,7 +930,7 @@ class LocalRecommendationRuntime:
             mode: self._forward_library_path(mode) for mode in ("full", "compact")
         }
         default_retrosynthesis_mode = (
-            "full" if retrosynthesis_paths["full"].is_file() else "compact"
+            "full" if self._processed_release is not None or retrosynthesis_paths["full"].is_file() else "compact"
         )
         coupled_strategy_available = (
             self.coupled_strategy_library_path.is_file()

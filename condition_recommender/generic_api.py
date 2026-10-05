@@ -579,6 +579,9 @@ class GenericConditionRecommender:
         if shared_core_path is not None and not use_shared_core:
             raise ValueError("shared_core_path requires use_shared_core=True")
         source = Path(path)
+        if source.is_dir() or (source.suffix == ".json" and source.name == "manifest.json"):
+            from .processed_release import processed_artifact
+            source = processed_artifact("condition_index", source)
         index_source = source
         paired_review_names = {
             "generic_index.sqlite": "generic_review_index.sqlite",
@@ -1597,7 +1600,7 @@ def _recommend_fallback_with_index(
 def recommend_generic_conditions(
     reaction_smiles: str,
     *,
-    records_path: str | Path = "datasets/literature/full/generic_index.sqlite",
+    records_path: str | Path = "datasets/processed_datasets",
     top_k: int = 5,
     minimum_pool_size: int | None = None,
     unrestricted_fallback: bool = False,

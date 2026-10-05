@@ -34,7 +34,7 @@ def make_runtime(tmp_path, reaction=RING_REACTION, library_reaction=None):
     library_row = {**row, "reaction_smiles": library_reaction or reaction}
     library = build_generic_library([library_row], admission_mode="data_driven")
     root = tmp_path / "operators"
-    path = root / "compact" / "operator_library_v3.json.gz"
+    path = root / "full" / "operator_library_v3.json.gz"
     path.parent.mkdir(parents=True)
     save_generic_library(library, path)
     return LocalRecommendationRuntime(
@@ -60,7 +60,7 @@ def test_single_step_endpoint_uses_shared_core_and_does_not_write_library(runtim
     assert data["searches"][0]["result"]["target_validation"]["matches_target"]
     shared = evaluate_transfers(
         {"guidance": data["guidance"], "policy": data["policy"]},
-        library=runtime._get_retrosynthesis_library("compact"), repeat=False,
+        library=runtime._get_retrosynthesis_library("full"), repeat=False,
         source_library_path=None,
     )
     assert data["transfers"] == json.loads(json.dumps(shared))
@@ -144,7 +144,7 @@ def test_concurrent_fragment_search_rejected(runtime):
 
 def test_missing_library_and_index_are_unavailable(runtime):
     client = TestClient(create_app(runtime=runtime, recommendation_only=False))
-    assert client.post(ENDPOINT, json={"target_smiles": "C1CCC1", "library_mode": "full"}).status_code == 503
+    assert client.post(ENDPOINT, json={"target_smiles": "C1CCC1", "library_mode": "compact"}).status_code == 503
     assert not runtime._fragment_search_lock.locked()
     runtime.fragment_index_path.unlink()
     assert not client.get("/api/v1/capabilities").json()["data"]["fragment_guided_retrosynthesis"]

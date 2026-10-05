@@ -15,6 +15,10 @@ def load_reference_catalog(index_path: str | Path) -> Dict[str, Dict[str, Any]]:
     """Load the reference catalog stored beside a recommendation index."""
 
     catalog_path = Path(index_path).parent / REFERENCE_CATALOG_FILENAME
+    sqlite_catalog = Path(index_path).parent / "catalogs.sqlite"
+    if sqlite_catalog.is_file():
+        from condition_recommender.processed_catalog import ReferenceCatalogView
+        return ReferenceCatalogView(sqlite_catalog)
     if not catalog_path.is_file():
         return {}
 

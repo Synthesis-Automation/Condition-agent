@@ -5,3 +5,4 @@ orjson>=3.10,<4
 markdown-it-py>=4,<5
 pypdf>=5,<7
 Pillow>=10,<13
+-r requirements-processing.txt

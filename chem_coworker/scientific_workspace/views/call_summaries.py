@@ -278,6 +278,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         ), path))
         view.add_list(summary, value, "hits", (
             "hit_id", "observation_id", "reaction_id", "reference_id", "relationships",
+            "matched_side", "matched_sides", "match_extents", "matched_molecule_smiles",
             "product_smiles", "relationship_summary",
             "citation_availability",
             "warnings", "admission_tier", "admission_reasons", "procedure_availability",

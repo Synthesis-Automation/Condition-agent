@@ -531,78 +531,37 @@ review CSV:
 python -m app.reaction_converter_gui
 ```
 
-Choose any mixture of source files and folders. The output defaults to
-`datasets/literature`, but it remains editable. Select **Full** to convert every
-record or **Compact** for a faster development library. Compact retains every
-record in files with at most 200 records; for larger files it retains the first
-200 plus a content-seeded random 15% sample of the remainder, rounded up. The
-seed makes reruns and resumes deterministic. Full and Compact artifacts are
-isolated under `full/` and `compact/`, respectively. If the selected output
-already contains a root-level pre-mode library, that location remains the Full
-library so its expensive completed batches do not need to be rebuilt; Compact
-still uses `compact/`.
+The desktop builder reads `datasets/intermediate_datasets` and publishes one
+complete release under `datasets/processed_datasets`. There is no production
+sampling or Full/Compact selector. **Build / Resume All Datasets** converts all
+physical observations, preserves route context, builds the condition/shared-core
+and both-side fragment indexes, and compiles eligible forward/retro libraries.
+Completed compatible stages are reused; an active manifest is published only
+after coverage and artifact validation.
 
-**Convert & Save Batch** converts each distinct source version once under the
-selected mode's shared `converted_sources/` store. The lightweight batch under
-`batches/` records only the selected source-artifact references. Overlapping
-batches therefore reuse the same physical shards instead of converting and
-storing a source again. You can repeat this for later groups of files.
-**Combine Saved Batches / Build Index** then streams every saved batch in the
-selected mode, removes identical duplicate observations, and rebuilds that
-mode's active recommender artifacts. If two saved
-records have the same observation ID but different content, combining stops
-instead of silently choosing one. Combining also refuses any cancelled or
-otherwise incomplete batch, so partial source coverage cannot replace a
-previously complete recommender index. In the desktop converter, the combine
-button offers to resume those stored source selections first, reusing valid
-checkpointed shards, and proceeds to indexing only after coverage is complete.
+```powershell
+pip install -r requirements-processing.txt
+python -m app.processed_dataset_builder build --workers 10 --shard-size 500
+python -m app.processed_dataset_builder validate
+```
 
-Each mode-specific batch library creates:
+`datasets/processed_datasets/manifest.json` points to an immutable release under
+`releases/<release_id>/`. Its manifest declares canonical shards, indexed source
+and procedure evidence, route records, and derived artifacts. Use
+`condition_recommender.corpus_io.iter_canonical_records(manifest_path)` to hydrate
+the lossless shared-object shards; they are storage events rather than flat JSONL.
+CSV remains an explicit review/export artifact.
 
-- `converted_sources/<source>/<version>/shard_manifest.json` and compressed
-  shards: canonical data shared by every batch that selects the same source
-  path, content checksum, conversion mode, settings, and definition version.
-- `batches/<batch-name>/shard_manifest.json`: a small manifest referencing the
-  converted sources selected for that batch. A blank batch name produces a
-  stable, order-independent name from the discovered files, so selecting the
-  same files in a different order reuses the same logical batch.
-- `combined_records.jsonl.gz`: the deduplicated canonical corpus represented by
-  the active index.
-- `generic_index.sqlite`: the trusted-precedent runtime index used by default.
-  Rows and lookup values are materialized lazily for fast application startup.
-- `combined_batch_manifest.json` and `combined_recommendation_report.json`:
-  included batches, checksums, duplicate counts, output paths, and index counts.
+Fragment search supports Products, Starting materials and Either side. Exact
+starting-material matches mean reported use, not evidence of preparation. Side
+and whole-molecule/substructure scope are retained in every match. Only qualified
+product evidence can support fragment-guided transfer. Source detail and route
+memberships are available by stable observation/route ID.
 
-The converter intentionally does not build `generic_review_index.sqlite`, which
-avoids a second full canonical-corpus scan. Build that optional expert-use index
-separately with `condition_recommender.generic_index_cli --include-review-core`
-only when review-core retrieval is required. A successful converter index build
-removes an older paired review index so it cannot be mistaken for a current one.
-
-The converter does not generate a review CSV. When a human-review export is
-needed, create it explicitly with the standalone concise-review CLI; it is not
-part of conversion or index construction.
-
-The checkbox beside the conversion settings refreshes the combined index
-automatically after a batch is saved. It is unchecked by default; enable it for
-a one-step save-and-refresh, or use the combine button after saving all batches.
-
-The default settings are intended for large datasets:
-
-- `1,000` rows per shard gives useful restart points without creating too many
-  small files.
-- `Use RXNMapper` is unchecked by default, leaving parallel workers available.
-  Enabling it uses one conversion worker so only one model copy is loaded.
-- Mapper-only or conflicting records never become precedents. Full-coverage
-  external mappings that agree with an internal hypothesis may enter only the
-  expert review-core index. The mapper setting and model hash participate in
-  shard reuse identity.
-- Automatic combining is unchecked by default. Save all intended batches, then
-  combine once to avoid repeated index builds.
-
-Cancellation is safe: the active shard finishes, the manifest is checkpointed,
-and choosing the same source and output folders later resumes by reusing valid
-completed shards.
+Scientific review remains separate from corpus conversion. Composite promotion
+is unavailable until a training scope and independent support review are declared.
+Old literature artifacts remain available for rollback and historical investigations;
+new default app/agent queries resolve the processed release.
 
 ### Build an index and recommend
 
@@ -638,12 +597,12 @@ For output made by the desktop app, use the fast index directly:
 ```powershell
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records datasets/literature/full/generic_index.sqlite
+  --records datasets/processed_datasets/manifest.json
 
 # Expert mode requires a separately built paired generic_review_index.sqlite.
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
-  --records datasets/literature/full/generic_index.sqlite `
+  --records datasets/processed_datasets/manifest.json `
   --unrestricted
 ```
 

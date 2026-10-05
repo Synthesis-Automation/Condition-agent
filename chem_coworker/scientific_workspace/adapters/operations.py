@@ -52,7 +52,9 @@ class ScientificOperations:
         OperationDefinition("compare_molecules"),
         OperationDefinition("inspect_reactive_sites"),
         OperationDefinition("assess_starting_material"),
-        OperationDefinition("get_precedents", required_artifacts=("condition_index", "shared_core_index")),
+        OperationDefinition("get_precedents", contract_version="2", required_artifacts=("condition_index", "shared_core_index")),
+        OperationDefinition("get_observations", required_artifacts=("evidence_catalog",)),
+        OperationDefinition("get_routes", required_artifacts=("route_catalog",)),
         OperationDefinition("get_procedures", required_artifacts=("procedure_catalog",)),
         OperationDefinition("resolve_recipe"),
         OperationDefinition("assess_recipe", contract_version="2"),
@@ -287,8 +289,11 @@ class ScientificOperations:
 
     def get_precedents(
         self, reaction_ids: list[str], offset: int = 0, limit: int = 20,
+        view: Literal["summary", "full"] = "summary",
     ) -> dict[str, Any]:
-        """Retrieve complete indexed records by ID; these are reduced records, not raw source files."""
+        """Page precedent summaries; request view='full' for complete indexed chemistry."""
+        if view not in {"summary", "full"}:
+            raise ValueError("view must be summary or full")
         if not isinstance(reaction_ids, list) or not all(isinstance(item, str) for item in reaction_ids):
             raise ValueError("reaction_ids must be a list of strings")
         if len(reaction_ids) > 100 or type(limit) is not int or not 1 <= limit <= 100:
@@ -300,14 +305,90 @@ class ScientificOperations:
             position for identity in reaction_ids
             for position in index.reaction_ids.get(identity, ())
         ))
+        records = [asdict(row) for row in index.select(positions[offset:offset + limit])]
+        if view == "summary":
+            keys = ("reaction_id", "observation_id", "canonical_reaction_id", "reaction_smiles",
+                    "yield_pct", "source_dataset", "reference_id", "publication_year", "recipe_id",
+                    "resolved_recipe", "condition_uncertain", "chemistry_status", "condition_status",
+                    "condition_stage_status", "outcome_status", "precedent_tier", "reaction_label")
+            records = [{**{key: row[key] for key in keys if key in row},
+                        "chemistry_warnings": (row.get("reaction_core") or {}).get("warnings", []),
+                        "details": {"operation": "get_observations", "observation_ids": [row["observation_id"]]},
+                        "omitted_sections": ["signature", "reaction_core", "molecular_features", "fallback_descriptor"]}
+                       for row in records]
         return {
-            "records": [asdict(row) for row in index.select(positions[offset:offset + limit])],
+            "records": records,
             "missing_reaction_ids": [identity for identity in reaction_ids if not index.reaction_ids.get(identity)],
             "total": len(positions), "offset": offset,
             "next_offset": offset + limit if offset + limit < len(positions) else None,
-            "record_scope": "indexed_fields_only",
+            "record_scope": "indexed_summary" if view == "summary" else "indexed_fields_only",
             "index_scope": index.precedent_scope.value,
         }
+
+    def get_observations(
+        self, observation_ids: list[str], fields: list[str] | None = None,
+        offset: int = 0, limit: int = 10, max_bytes: int = 524288,
+    ) -> dict[str, Any]:
+        """Fetch canonical evidence by exact observation ID, with field selection and a byte budget.
+
+        Default fields expose structures, conditions, outcome and admission status.
+        Request source, signature or reaction_core explicitly for detailed evidence.
+        Oversized records retain identity and list omitted fields for a narrower query.
+        """
+        from condition_recommender.processed_catalog import ProcessedCatalog
+        if not isinstance(observation_ids, list) or len(observation_ids) > 100 or not all(isinstance(i, str) for i in observation_ids):
+            raise ValueError("Supply at most 100 observation IDs")
+        if offset < 0 or not 1 <= limit <= 20 or not 1024 <= max_bytes <= 4 * 1024 * 1024:
+            raise ValueError("Invalid observation page or byte budget")
+        if fields is not None and (len(fields) > 100 or not all(isinstance(i, str) for i in fields)):
+            raise ValueError("fields must contain at most 100 field names")
+        selected = fields if fields is not None else ["reaction_smiles", "source_dataset", "reference_id",
+                    "resolved_recipe", "yield_pct", "chemistry_status", "condition_status", "admission_tier",
+                    "admission_reasons", "warnings"]
+        ids = list(dict.fromkeys(observation_ids))
+        catalog = ProcessedCatalog(self._path("evidence_catalog"))
+        records, missing, consumed, size = [], [], 0, 0
+        for identity in ids[offset:offset + limit]:
+            try:
+                row = catalog.observation(identity, selected)
+            except KeyError:
+                missing.append(identity)
+                consumed += 1
+                continue
+            encoded_size = len(json.dumps(row, ensure_ascii=False).encode("utf-8"))
+            if encoded_size > max_bytes:
+                row = {"observation_id": identity, "reaction_id": row.get("reaction_id"),
+                       "omitted_fields": sorted(set(row) - {"observation_id", "reaction_id"}),
+                       "status": "record_exceeds_budget_select_fewer_fields", "requested_bytes": encoded_size}
+                encoded_size = len(json.dumps(row).encode())
+            if records and size + encoded_size > max_bytes:
+                break
+            records.append(row)
+            consumed += 1
+            size += encoded_size
+        next_offset = offset + consumed
+        return {"records": records, "missing_observation_ids": missing, "total": len(ids),
+                "offset": offset, "next_offset": next_offset if next_offset < len(ids) else None,
+                "returned_bytes": size, "selected_fields": selected, "record_scope": "canonical_evidence"}
+
+    def get_routes(self, route_ids: list[str], offset: int = 0, limit: int = 10,
+                   include_tree: bool = False, include_source: bool = False) -> dict[str, Any]:
+        """Page route summaries and step-observation joins; fetch source or typed tree explicitly."""
+        from core_retrosynthesis.processed_routes import ProcessedRouteCatalog
+        if not isinstance(route_ids, list) or len(route_ids) > 100 or not all(isinstance(i, str) for i in route_ids):
+            raise ValueError("Supply at most 100 route IDs")
+        if offset < 0 or not 1 <= limit <= 20:
+            raise ValueError("Invalid route page")
+        catalog = ProcessedRouteCatalog(self._path("route_catalog"))
+        ids = list(dict.fromkeys(route_ids))
+        records, missing = [], []
+        for identity in ids[offset:offset + limit]:
+            try:
+                records.append(catalog.route(identity, include_tree=include_tree, include_source=include_source))
+            except KeyError:
+                missing.append(identity)
+        return {"records": records, "missing_route_ids": missing, "total": len(ids), "offset": offset,
+                "next_offset": offset + limit if offset + limit < len(ids) else None}
 
     def suggest_search_fragments(
         self, target_smiles: str, limit: int = 5, selected_atom_ids: list[int] | None = None,
@@ -326,6 +407,7 @@ class ScientificOperations:
     def search_fragment_precedents(
         self, query: str, query_format: str = "smiles", topology: str = "preserve_rings",
         limit: int = 5, timeout_seconds: int = 10, target_smiles: str | None = None,
+        search_side: str = "product",
     ) -> dict[str, Any]:
         """Find product cores and local construction evidence in a prebuilt fragment_index.
 
@@ -341,9 +423,9 @@ class ScientificOperations:
         return run_fragment_search(self, {"query": query, "query_format": query_format,
                                          "topology": topology, "limit": limit,
                                          "timeout_seconds": timeout_seconds,
-                                         "target_smiles": target_smiles})
+                                         "target_smiles": target_smiles, "search_side": search_side})
 
-    def get_procedures(self, reaction_ids: list[str]) -> dict[str, Any]:
+    def get_procedures(self, reaction_ids: list[str], offset: int = 0, limit: int = 100) -> dict[str, Any]:
         """Read all matching observed procedure records; missing text remains missing."""
         if not isinstance(reaction_ids, list) or not all(isinstance(item, str) for item in reaction_ids):
             raise ValueError("reaction_ids must be a list of strings")
@@ -351,6 +433,10 @@ class ScientificOperations:
             raise ValueError("At most 100 reaction IDs are supported")
         selected = set(reaction_ids)
         path = self._path("procedure_catalog")
+        if path.suffix == ".sqlite":
+            from condition_recommender.processed_catalog import ProcessedCatalog
+            result = ProcessedCatalog(path).procedures(reaction_ids, offset=offset, limit=limit)
+            return {**result, "source_path": str(path), "origin": "source_report"}
         records = []
         opener = gzip.open if path.suffix == ".gz" else open
         with opener(path, "rt", encoding="utf-8") as handle:
@@ -438,7 +524,7 @@ class ScientificOperations:
 
         from .source_catalogs import reference_records
 
-        page = self.get_precedents(reaction_ids, offset=offset, limit=limit)
+        page = self.get_precedents(reaction_ids, offset=offset, limit=limit, view="full")
         result = asdict(compare_condition_evidence(
             reaction_smiles, [GenericIndexedReaction(**row) for row in page["records"]],
         ))

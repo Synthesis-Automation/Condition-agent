@@ -24,6 +24,18 @@ REACTIONS = [
 ]
 
 
+def test_long_structure_strings_are_not_replaced_by_procedure_chunks(tmp_path):
+    chain = "".join(f"[CH2:{i}]" for i in range(4, 48)) + "[CH3:48]"
+    reaction = f"[CH3:1][Br:2].[NH2:3]{chain}>>[CH3:1][NH:3]{chain}"
+    assert len(reaction) > 300
+    source, output = tmp_path / "records.jsonl", tmp_path / "fragments.sqlite"
+    write_records(source, [reaction])
+    build_fragment_index(source, output)
+    hit = search_fragment_precedents(output, "CN")["hits"][0]
+    assert hit["record"]["reaction_smiles"] == reaction
+    assert isinstance(hit["record"]["reaction_smiles"], str)
+
+
 def write_records(path: Path, reactions: list[str] = REACTIONS) -> None:
     rows = [{"observation_id": f"obs-{i}", "reaction_id": "rxn-shared" if i < 2 else f"rxn-{i}",
              "reference_id": f"ref-{i}", "reaction_smiles": r, "admission_tier": "review",
@@ -71,7 +83,8 @@ def test_search_review_records_with_distinct_evidence_and_exact_procedure_join(i
 def test_screened_hits_equal_exhaustive_graph_search(index, query, format, topology):
     compiled = compile_fragment_query(query, format, topology)
     with sqlite3.connect(index) as db:
-        expected = {s for (s,) in db.execute("SELECT smiles FROM products")
+        expected = {s for (s,) in db.execute("SELECT smiles FROM products p WHERE EXISTS "
+                                            "(SELECT 1 FROM links l WHERE l.product_id=p.id AND l.side='product')")
                     if fragment_embeddings(compiled, Chem.MolFromSmiles(s))[0]}
     result = search_fragment_precedents(index, query, format, topology, limit=10)
     actual = {m["product_smiles"] for h in result["hits"] for m in h["matches"]}
@@ -88,6 +101,37 @@ def test_zero_hits_is_distinct_from_missing_or_stale_index(index, tmp_path):
         db.execute("UPDATE metadata SET payload=?", (json.dumps(metadata),))
     with pytest.raises(ValueError, match="incompatible"):
         open_fragment_index(index)
+
+
+def test_starting_material_search_is_labeled_and_does_not_claim_construction(index):
+    assert search_fragment_precedents(index, "CCBr")["hits"] == []
+    result = search_fragment_precedents(index, "CCBr", search_side="reactant")
+    hit = result["hits"][0]
+    assert hit["matched_sides"] == ["reactant"]
+    match = hit["matches"][0]
+    assert match["matched_side"] == "reactant"
+    assert match["match_extent"] == "whole_molecule"
+    assert match["relationships"] == ["reported_use"]
+    assert "query_to_original_product_atoms" not in match
+    assert match["side_label"] == "Reported as starting material"
+    partial = search_fragment_precedents(index, "CBr", search_side="reactant")
+    partial_hit = next(h for h in partial["hits"] if h["observation_id"] == "obs-2")
+    assert partial_hit["matches"][0]["match_extent"] == "substructure"
+
+
+def test_same_compound_on_both_sides_preserves_occurrences(index):
+    result = search_fragment_precedents(index, "COC", search_side="either")
+    hit = next(h for h in result["hits"] if h["observation_id"] == "obs-1")
+    assert set(hit["matched_sides"]) == {"product", "reactant"}
+    assert {m["matched_side"] for m in hit["matches"]} == {"product", "reactant"}
+    assert result["counts"]["occurrences"]["value"] > result["counts"]["observations"]["value"]
+
+
+def test_agents_are_not_indexed_as_starting_materials(tmp_path):
+    source, output = tmp_path / "rows.jsonl", tmp_path / "index.sqlite"
+    write_records(source, ["CCBr>P(=O)(O)O>CCO"])
+    build_fragment_index(source, output)
+    assert search_fragment_precedents(output, "P(=O)(O)O", search_side="either")["hits"] == []
 
 
 def test_target_mismatch_fails_before_opening_index(monkeypatch):

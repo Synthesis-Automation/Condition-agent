@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import gzip
 import json
 from pathlib import Path
 from typing import Any, Dict, Iterable
@@ -17,30 +16,10 @@ from .sqlite_indexing import (
 
 def _iter_records(path: Path) -> Iterable[Dict[str, Any]]:
     """Stream canonical JSONL records without materializing the corpus."""
-    if path.name == "shard_manifest.json":
-        from .conversion.sharded import iter_gzip_jsonl, validate_sharded_conversion
+    from .corpus_io import iter_canonical_records
 
-        integrity = validate_sharded_conversion(path, verify_rows=False)
-        if not integrity["valid"]:
-            raise ValueError("Sharded conversion integrity check failed")
-        manifest = json.loads(path.read_text(encoding="utf-8"))
-        for entry in manifest.get("shards") or ():
-            yield from iter_gzip_jsonl(path.parent / entry["output_path"])
-        return
-    opener = gzip.open if path.suffix.casefold() == ".gz" else Path.open
-    arguments = (
-        {"mode": "rt", "encoding": "utf-8"}
-        if path.suffix.casefold() == ".gz"
-        else {"mode": "r", "encoding": "utf-8"}
-    )
-    with opener(path, **arguments) as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            value = json.loads(line)
-            if not isinstance(value, dict):
-                raise ValueError(f"JSONL line {line_number} is not an object")
-            yield value
+    yield from iter_canonical_records(path, strict=True)
+
 
 
 def main() -> None:

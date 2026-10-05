@@ -20,6 +20,7 @@ from reactive_taxonomy.fragment_search import (
 )
 from reactive_taxonomy.material_identity import identify_material
 from .fragment_index import build_fragment_index, open_fragment_index, unpack
+from .processed_catalog import ProcessedCatalog
 
 
 def lookup_exact_product(
@@ -42,11 +43,9 @@ def lookup_exact_product(
         rows = [] if product is None else connection.execute(
             """SELECT o.id, o.reaction_id, o.reference_id, l.component_index
                FROM links l JOIN observations o ON o.id=l.observation_id
-               WHERE l.product_id=? ORDER BY l.rowid LIMIT ?""",
+               WHERE l.product_id=? AND l.side='product' ORDER BY l.rowid LIMIT ?""",
             (product[0], limit + 1),
         ).fetchall()
-        if product is not None and not rows:
-            raise ValueError("Exact product has no linked source observations")
     return {
         "schema_version": "exact_product_lookup.v1",
         "status": "matched" if rows else "not_found",
@@ -60,7 +59,8 @@ def lookup_exact_product(
         "match_scope": "exact_product_component",
         "precedents": [
             {"observation_id": oid, "reaction_id": reaction_id,
-             "reference_id": reference_id or None, "product_component_index": component}
+             "reference_id": reference_id or None, "product_component_index": component,
+             "matched_side": "product", "match_extent": "whole_molecule"}
             for oid, reaction_id, reference_id, component in rows[:limit]
         ],
         "has_more": len(rows) > limit,
@@ -83,7 +83,11 @@ def _text_chunks(value: Any, remaining: list[int]) -> Any:
                 "chunks": [{"start": i, "end": min(i + 300, len(shown)), "text": shown[i:i + 300]}
                            for i in range(0, len(shown), 300)]}
     if isinstance(value, dict):
-        return {k: _text_chunks(v, remaining) for k, v in value.items()}
+        identifier_is_structure = str(value.get("identifier_type") or "").casefold() in {"smiles", "smarts"}
+        return {k: v if (str(k).casefold() in {"smiles", "smarts"}
+                         or str(k).casefold().endswith(("_smiles", "_smarts"))
+                         or identifier_is_structure and k in {"value", "raw_identifier"})
+                else _text_chunks(v, remaining) for k, v in value.items()}
     if isinstance(value, list):
         return [_text_chunks(v, remaining) for v in value]
     return value
@@ -93,6 +97,7 @@ def search_fragment_precedents(
     index_path: str | Path, query: str, query_format: str = "smiles",
     topology: str = "preserve_rings", limit: int = 5, timeout_seconds: int = 10,
     *, target_smiles: str | None = None,
+    search_side: str = "product",
     progress: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Search a prepared corpus; only verified graph hits enter result cards.
@@ -103,6 +108,8 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
 """
     if type(limit) is not int or not 1 <= limit <= 10:
         raise ValueError("limit must be an integer between 1 and 10")
+    if search_side not in {"product", "reactant", "either"}:
+        raise ValueError("search_side must be product, reactant, or either")
     if type(timeout_seconds) is not int or not 1 <= timeout_seconds <= 30:
         raise ValueError("timeout_seconds must be an integer between 1 and 30")
     started = monotonic()
@@ -128,6 +135,8 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
     connection, manifest = open_fragment_index(index_path)
     with closing(connection):
         stage("index_opened")
+        dependency = manifest.get("evidence_catalog")
+        catalog = ProcessedCatalog(Path(index_path).parent / dependency["relative_path"]) if dependency else None
         library = rdSubstructLibrary.SubstructLibrary(connection.execute("SELECT payload FROM library").fetchone()[0])
         stage("library_loaded")
         status, reason = "complete", None
@@ -148,6 +157,11 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
             candidates = library.GetMatches(compiled.molecule, start, end,
                                             useChirality=True, numThreads=1, maxResults=batch)
             for product_id in sorted(candidates):
+                if search_side != "either" and not connection.execute(
+                    "SELECT 1 FROM links WHERE product_id=? AND side=? LIMIT 1",
+                    (product_id, search_side),
+                ).fetchone():
+                    continue
                 if monotonic() - started >= timeout_seconds:
                     status, reason = "partial", "deadline"
                     break
@@ -169,9 +183,11 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
             embedding_truncated |= capped
             smiles = connection.execute("SELECT smiles FROM products WHERE id=?", (product_id,)).fetchone()[0]
             links = connection.execute("""SELECT l.observation_id,l.component_index,l.atom_order,l.evidence,
+                l.side,
                 o.reaction_id,o.reference_id FROM links l JOIN observations o ON o.id=l.observation_id
-                WHERE l.product_id=? ORDER BY l.observation_id,l.component_index""", (product_id,))
-            for oid, ci, order, evidence_blob, reaction_id, reference_id in links:
+                WHERE l.product_id=? AND (?='either' OR l.side=?)
+                ORDER BY l.observation_id,l.side,l.component_index""", (product_id, search_side, search_side))
+            for oid, ci, order, evidence_blob, side, reaction_id, reference_id in links:
                 if link_count >= policy["max_observations"] or monotonic() - started >= timeout_seconds:
                     status = "partial"
                     reason = "observation_limit" if link_count >= policy["max_observations"] else "deadline"
@@ -185,20 +201,39 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
                     "hit_id": "FH1:" + hashlib.sha256((compiled.query_id + oid).encode()).hexdigest(),
                     "observation_id": oid, "reaction_id": reaction_id, "reference_id": reference_id or None,
                     "relationships": [], "matches": [], "warnings": [],
-                    "product_smiles": smiles,
+                    "matched_molecule_smiles": smiles, "matched_sides": [],
                     "citation_availability": "identifier_present" if reference_id else "missing",
                 })
+                if side not in hit["matched_sides"]:
+                    hit["matched_sides"].append(side)
+                if side == "product":
+                    hit.setdefault("product_smiles", smiles)
                 distinct = set()
                 for match in matches:
-                    result = classify_fragment_embedding(compiled, match, atom_order, evidence)
-                    key = json.dumps([sorted(result["query_to_original_product_atoms"]), result["relationships"],
+                    if side == "product":
+                        result = classify_fragment_embedding(compiled, match, atom_order, evidence)
+                        result["query_to_original_atoms"] = result["query_to_original_product_atoms"]
+                    else:
+                        result = {"query_to_original_atoms": [atom_order[i] for i in match],
+                                  "relationships": ["reported_use"], "witnesses": [],
+                                  "atom_origins": [], "evidence_status": "reported_reactant_occurrence"}
+                    key = json.dumps([sorted(result["query_to_original_atoms"]), result["relationships"],
                                       result["witnesses"]], sort_keys=True)
                     if key in distinct:
                         continue
                     distinct.add(key)
                     verified_embeddings += 1
-                    hit["matches"].append({"product_component_index": ci, "product_smiles": smiles,
-                                           "embedding_truncated": capped, **result})
+                    extent = "substructure"
+                    if query_format == "smiles" and identify_material(query).canonical_smiles == smiles:
+                        extent = "whole_molecule"
+                    match_result = {"matched_side": side, "component_index": ci,
+                                    "matched_molecule_smiles": smiles, "match_extent": extent,
+                                    "occurrence_id": f"{oid}:{side}:{ci}",
+                                    "side_label": "Reported as starting material" if side == "reactant" else "Reported product",
+                                    "embedding_truncated": capped, **result}
+                    if side == "product":
+                        match_result.update(product_component_index=ci, product_smiles=smiles)
+                    hit["matches"].append(match_result)
                     for relationship in result["relationships"]:
                         groups[relationship].add(oid)
                         if relationship not in hit["relationships"]:
@@ -221,7 +256,7 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
         def transformation(hit: dict[str, Any]) -> str:
             signatures = set()
             for match in hit["matches"]:
-                positions = {a: i for i, a in enumerate(match["query_to_original_product_atoms"])}
+                positions = {a: i for i, a in enumerate(match["query_to_original_atoms"])}
                 for witness in match["witnesses"]:
                     signature = [witness["kind"],
                                  sorted(positions.get(a, -1) for a in witness["product_atoms"]),
@@ -246,10 +281,15 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
         selected.sort(key=lambda hit: rank(hit)[0])
         selected = [] if status == "too_broad" else selected[:limit]
         for hit in selected:
+            hit["matched_side"] = hit["matched_sides"][0] if len(hit["matched_sides"]) == 1 else "both"
+            hit["match_extents"] = sorted({m["match_extent"] for m in hit["matches"]})
             hit["relationship_summary"] = ", ".join(hit["relationships"])
             hit["transformation_key"] = "FT1:" + hashlib.sha256(transformation(hit).encode()).hexdigest()
             details = unpack(connection.execute("SELECT payload FROM observations WHERE id=?",
                                                  (hit["observation_id"],)).fetchone()[0])
+            if catalog:
+                from .fragment_index import _RECORD_FIELDS
+                details = catalog.observation(hit["observation_id"], _RECORD_FIELDS)
             hit["admission_tier"] = details.get("admission_tier")
             hit["admission_reasons"] = details.get("admission_reasons")
             hit["record"] = _text_chunks(details, [policy["max_procedure_characters"]])
@@ -261,6 +301,11 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
             for oid, blob in rows:
                 procedures.append({"link_scope": "exact_observation" if oid else "unassigned_reaction",
                                    "record": _text_chunks(unpack(blob), [policy["max_procedure_characters"]])})
+            if catalog:
+                procedure = catalog.observation_procedure(hit["observation_id"])
+                if procedure:
+                    procedures.append({"link_scope": "exact_observation",
+                                       "record": _text_chunks(procedure, [policy["max_procedure_characters"]])})
             hit["procedure_records_truncated"] = len(procedures) > 20
             hit["procedures"] = procedures[:20]
             hit["procedure_match_scope"] = (
@@ -275,11 +320,14 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
             status, reason = "partial", "deadline"
         complete = status == "complete"
         result = {
-            "schema_version": "fragment_precedent_search.v1", "query": compiled.describe(),
+            "schema_version": "fragment_precedent_search.v2", "query": compiled.describe(),
+            "search_side": search_side,
             "search_status": status, "stop_reason": reason, "index_id": manifest["index_id"],
             "source_scope": manifest["source_scope"], "source_coverage_complete": manifest["source_coverage_complete"],
             "indexed_counts": manifest["counts"],
-            "counts": {"products": _count(len(product_ids), product_search_complete), "observations": _count(len(observations), complete),
+            "counts": {"molecules": _count(len(product_ids), product_search_complete),
+                       "products": _count(len(product_ids), product_search_complete) if search_side == "product" else _count(0, False),
+                       "occurrences": _count(link_count, complete), "observations": _count(len(observations), complete),
                        "known_references": _count(len(references), complete)},
             "relationship_groups": {key: _count(len(groups[key]), complete) for key in precedence},
             "group_count_scope": "distinct_observations_per_group_nonadditive",
@@ -287,6 +335,8 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
             "hits": selected, "returned_count": len(selected),
             "refinement_hints": ["Retain the complete ring system, heteroatom positions, or a specific functional handle"] if status == "too_broad" else [],
             "limitations": ["Product presence is not evidence of core construction or target feasibility.",
+                            "Starting-material occurrence establishes reported use, not its preparation or purchasability.",
+                            "A substructure match does not establish occurrence of the standalone query compound.",
                             "Relationship projection currently uses validated supplied maps; other correspondence remains unresolved.",
                             "Missing citations, procedures, and yields remain missing."],
             "execution": {"timings": timings, "elapsed_seconds": round(monotonic() - started, 6),
@@ -315,6 +365,7 @@ def main(argv: list[str] | None = None) -> int:
     search.add_argument("--index", required=True)
     search.add_argument("--query", required=True)
     search.add_argument("--query-format", choices=("smiles", "smarts"), default="smiles")
+    search.add_argument("--search-side", choices=("product", "reactant", "either"), default="product")
     search.add_argument("--topology", choices=("preserve_rings", "subgraph"), default="preserve_rings")
     search.add_argument("--limit", type=int, default=5)
     search.add_argument("--timeout-seconds", type=int, default=10)
@@ -326,7 +377,8 @@ def main(argv: list[str] | None = None) -> int:
                                       progress=lambda item: print(json.dumps(item), flush=True))
     else:
         result = search_fragment_precedents(args.index, args.query, args.query_format,
-                                            args.topology, args.limit, args.timeout_seconds)
+                                            args.topology, args.limit, args.timeout_seconds,
+                                            search_side=args.search_side)
         if args.output:
             Path(args.output).write_text(json.dumps(result, indent=2), "utf-8")
     print(json.dumps(result, indent=2))

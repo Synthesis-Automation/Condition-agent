@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 from typing import Any, Iterator
+from .record_storage import iter_record_shard
 
 
 def file_sha256(path: Path) -> str:
@@ -34,6 +35,10 @@ def canonical_source_files(path: str | Path, *, strict: bool = False) -> tuple[P
         )):
             raise ValueError(f"Incomplete canonical source coverage: {source}")
         kind = payload.get("artifact_type")
+        if payload.get("schema_version") in {"processed_reaction_active.v1", "processed_reaction_release.v1"}:
+            from .processed_release import resolve_processed_release
+            release = resolve_processed_release(source)
+            return resolve(release.artifact("canonical_records"), ancestors | {source})
         if kind == "saved_recommendation_batch_manifest":
             entries = payload.get("source_manifests") or ()
             if not entries:
@@ -64,15 +69,4 @@ def canonical_source_files(path: str | Path, *, strict: bool = False) -> tuple[P
 def iter_canonical_records(path: str | Path, *, strict: bool = False) -> Iterator[dict[str, Any]]:
     """Stream canonical JSONL/gzip or manifests without converting source chemistry."""
     for source in canonical_source_files(path, strict=strict):
-        opener = gzip.open if source.suffix.casefold() == ".gz" else open
-        with opener(source, "rt", encoding="utf-8") as handle:
-            for line_number, line in enumerate(handle, 1):
-                if not line.strip():
-                    continue
-                try:
-                    value = json.loads(line)
-                except json.JSONDecodeError as exc:
-                    raise ValueError(f"Invalid record JSONL at {source}:{line_number}: {exc.msg}") from exc
-                if not isinstance(value, dict):
-                    raise ValueError(f"Record is not a JSON object at {source}:{line_number}")
-                yield value
+        yield from iter_record_shard(source)

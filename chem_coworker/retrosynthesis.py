@@ -6,6 +6,8 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Optional, Protocol, Sequence
 
+from condition_recommender.processed_release import resolve_processed_release
+
 from core_retrosynthesis import (
     GenericTemplateLibrary,
     StrategyProposal,
@@ -29,17 +31,7 @@ from reactive_taxonomy.disconnection_focus import prepare_disconnection_focus
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RETROSYNTHESIS_LIBRARY_PATH = _REPOSITORY_ROOT / Path(
-    "results/operator_retrosynthesis_poc/full_scale_v3/compact/"
-    "operator_library_v3.json.gz"
-)
-DEFAULT_RETROSYNTHESIS_LIBRARY_CANDIDATES = (
-    DEFAULT_RETROSYNTHESIS_LIBRARY_PATH,
-    _REPOSITORY_ROOT
-    / "results/core_retrosynthesis/route_step_operator_library/v1/"
-    "operators_validated_departures/operator_library_v3.json.gz",
-    _REPOSITORY_ROOT
-    / "results/core_retrosynthesis_comparison/balanced_500_hydrogen_normalized/"
-    "core_templates.json.gz",
+    "datasets/processed_datasets/manifest.json"
 )
 
 
@@ -75,33 +67,12 @@ class RetrosynthesisCoworker:
         condition_recommender: Optional[_ConditionRecommender] = None,
         reviewer: Optional[_RetrosynthesisReviewer] = None,
     ) -> "RetrosynthesisCoworker":
-        """Load the strongest available validated operator library."""
-
-        failures = []
-        for candidate in DEFAULT_RETROSYNTHESIS_LIBRARY_CANDIDATES:
-            if not candidate.is_file():
-                failures.append(f"{candidate}: not found")
-                continue
-            try:
-                coworker = cls.from_path(
-                    candidate,
-                    condition_recommender=condition_recommender,
-                    reviewer=reviewer,
-                )
-            except (OSError, ValueError) as exc:
-                failures.append(f"{candidate}: {exc}")
-                continue
-            if failures:
-                return replace(
-                    coworker,
-                    startup_warnings=(
-                        "Retrosynthesis library fallback selected "
-                        f"{candidate}; skipped " + "; ".join(failures),
-                    ),
-                )
-            return coworker
-        detail = "; ".join(failures) or "no default candidates configured"
-        raise ValueError(f"No compatible retrosynthesis library: {detail}")
+        """Pin the published complete corpus's validated operator library."""
+        return cls.from_path(
+            DEFAULT_RETROSYNTHESIS_LIBRARY_PATH,
+            condition_recommender=condition_recommender,
+            reviewer=reviewer,
+        )
 
     @classmethod
     def from_path(
@@ -114,6 +85,8 @@ class RetrosynthesisCoworker:
         """Load one validated generic operator library."""
 
         resolved = Path(path).expanduser().resolve()
+        if resolved.is_dir() or resolved.name == "manifest.json":
+            resolved = resolve_processed_release(resolved).artifact("retro_library")
         return cls(
             library=load_generic_library(resolved),
             library_path=resolved,
@@ -280,7 +253,6 @@ class RetrosynthesisCoworker:
 
 
 __all__ = [
-    "DEFAULT_RETROSYNTHESIS_LIBRARY_CANDIDATES",
     "DEFAULT_RETROSYNTHESIS_LIBRARY_PATH",
     "RetrosynthesisCoworker",
 ]

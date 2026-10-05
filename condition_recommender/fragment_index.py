@@ -28,7 +28,7 @@ from .corpus_io import canonical_source_files, file_sha256, iter_canonical_recor
 
 import sqlite3
 
-SCHEMA_VERSION = "fragment_precedent_index.v1"
+SCHEMA_VERSION = "fragment_precedent_index.v2"
 _RECORD_FIELDS = (
     "observation_id", "reaction_id", "reaction_smiles", "canonical_reaction_smiles",
     "reference_id", "reference_identity", "source_dataset", "source_path", "source_row_number",
@@ -50,6 +50,7 @@ def unpack(value: bytes) -> Any:
 
 def build_fragment_index(
     source: str | Path, destination: str | Path, *, procedure_catalog: str | Path | None = None,
+    evidence_catalog: str | Path | None = None,
     max_records: int | None = None, progress: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Build atomically; optional prefix pilots are explicitly marked in the manifest."""
@@ -57,7 +58,8 @@ def build_fragment_index(
         raise ValueError("max_records must be positive or omitted for full coverage")
     source, destination = Path(source).resolve(), Path(destination).resolve()
     sources = canonical_source_files(source, strict=True)
-    inputs = list(dict.fromkeys((source, *sources, *([Path(procedure_catalog).resolve()] if procedure_catalog else []))))
+    inputs = list(dict.fromkeys((source, *sources, *([Path(procedure_catalog).resolve()] if procedure_catalog else []),
+                                *([Path(evidence_catalog).resolve()] if evidence_catalog else []))))
     if destination in inputs:
         raise ValueError("Index destination cannot overwrite a source")
     identities = []
@@ -93,8 +95,10 @@ def build_fragment_index(
                 CREATE TABLE products (id INTEGER PRIMARY KEY, smiles TEXT UNIQUE NOT NULL);
                 CREATE TABLE observations (id TEXT PRIMARY KEY, reaction_id TEXT, reference_id TEXT, payload BLOB);
                 CREATE TABLE links (product_id INTEGER, observation_id TEXT, component_index INTEGER,
-                    atom_order TEXT, evidence BLOB, PRIMARY KEY(observation_id, component_index));
+                    atom_order TEXT, evidence BLOB, side TEXT NOT NULL,
+                    PRIMARY KEY(observation_id, side, component_index));
                 CREATE INDEX links_product ON links(product_id);
+                CREATE INDEX links_side_product ON links(side,product_id);
                 CREATE TABLE procedures (observation_id TEXT, reaction_id TEXT, payload BLOB);
                 CREATE INDEX procedures_observation ON procedures(observation_id);
                 CREATE INDEX procedures_reaction ON procedures(reaction_id);
@@ -122,26 +126,35 @@ def build_fragment_index(
                     {"status": c.get("status")} for c in
                     (observation.get("evidence_candidates") or record.get("reaction_evidence_candidates") or ())]
                 projected = evidence_for(raw, json.dumps(projection_inputs, sort_keys=True))
-                details = {key: record.get(key) for key in _RECORD_FIELDS}
+                fields = ("observation_id", "reaction_id", "reference_id", "reaction_smiles",
+                          "admission_tier", "admission_reasons", "evidence_quality") if evidence_catalog else _RECORD_FIELDS
+                details = {key: record.get(key) for key in fields}
                 details["discovery_projection_sha256"] = hashlib.sha256(json.dumps(details, sort_keys=True).encode()).hexdigest()
                 details["warnings"] = list((record.get("reaction_observation") or {}).get("warnings") or ())
                 connection.execute("INSERT INTO observations VALUES (?,?,?,?)", (
                     identity, record.get("reaction_id", ""), record.get("reference_id", ""), pack(details)))
-                for ci, smiles in enumerate(parts[2].split(".")):
+                for side, ci, smiles in (
+                    (side, ci, smiles)
+                    for side, index in (("product", 2), ("reactant", 0))
+                    for ci, smiles in enumerate(parts[index].split(".")) if smiles
+                ):
                     try:
                         canonical, order = normalize_product(smiles)
                     except ValueError:
-                        counts["invalid_product_components"] += 1
+                        counts[f"invalid_{side}_components"] += 1
                         continue
                     product_id = products.get(canonical)
                     if product_id is None:
                         product_id = library.AddMol(Chem.MolFromSmiles(canonical))
                         products[canonical] = product_id
                         connection.execute("INSERT INTO products VALUES (?,?)", (product_id, canonical))
-                    evidence = projected[ci] if ci < len(projected) else {"evidence_status": "unresolved"}
-                    connection.execute("INSERT INTO links VALUES (?,?,?,?,?)", (
-                        product_id, identity, ci, json.dumps(order), pack(evidence)))
-                    counts["indexed_product_components"] += 1
+                    evidence = (projected[ci] if ci < len(projected) else {"evidence_status": "unresolved"}) if side == "product" else {
+                        "evidence_status": "reported_reactant_occurrence",
+                        "warnings": list(observation.get("warnings") or ()),
+                    }
+                    connection.execute("INSERT INTO links VALUES (?,?,?,?,?,?)", (
+                        product_id, identity, ci, json.dumps(order), pack(evidence), side))
+                    counts[f"indexed_{side}_components"] += 1
                     counts["evidence_" + evidence["evidence_status"]] += 1
                 if counts["source_observations"] % 1000 == 0:
                     connection.commit()
@@ -165,6 +178,21 @@ def build_fragment_index(
                         "counts": dict(counts), "sources": identities,
                         "record_scope": "discovery_fields_not_complete_canonical_record",
                         "correspondence_scope": "validated_supplied_maps_only"}
+            manifest["search_sides"] = ["product", "reactant"]
+            manifest["counts"]["distinct_molecules"] = len(products)
+            manifest["counts"]["distinct_products"] = connection.execute(
+                "SELECT count(DISTINCT product_id) FROM links WHERE side='product'").fetchone()[0]
+            if evidence_catalog:
+                catalog_path = Path(evidence_catalog).resolve()
+                with closing(sqlite3.connect(catalog_path.as_uri() + "?mode=ro", uri=True)) as catalog_db:
+                    catalog_metadata = json.loads(catalog_db.execute("SELECT payload FROM metadata").fetchone()[0])
+                manifest["evidence_catalog"] = {
+                    "relative_path": os.path.relpath(catalog_path, destination.parent),
+                    "sha256": next(i["sha256"] for i in identities if i["path"] == str(catalog_path)),
+                    "size_bytes": catalog_path.stat().st_size,
+                    "catalog_id": catalog_metadata["catalog_id"],
+                }
+                manifest["counts"]["procedures"] = catalog_metadata["counts"]["procedures"]
             manifest["index_id"] = "FPI1:" + hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
             connection.execute("INSERT INTO metadata VALUES (?)", (json.dumps(manifest, sort_keys=True),))
             connection.execute("INSERT INTO library VALUES (?)", (library.Serialize(),))
@@ -187,6 +215,15 @@ def open_fragment_index(path: str | Path) -> tuple[sqlite3.Connection, dict[str,
                 or manifest.get("rdkit_version") != rdBase.rdkitVersion
                 or manifest.get("policy") != fragment_search_policy()):
             raise ValueError("Fragment index is incompatible or incomplete; rebuild offline")
+        dependency = manifest.get("evidence_catalog")
+        if dependency:
+            catalog_path = (path.parent / dependency["relative_path"]).resolve()
+            if not catalog_path.is_file() or catalog_path.stat().st_size != dependency["size_bytes"]:
+                raise ValueError("Fragment evidence catalog is missing or incompatible")
+            with closing(sqlite3.connect(catalog_path.as_uri() + "?mode=ro", uri=True)) as catalog_db:
+                catalog_metadata = json.loads(catalog_db.execute("SELECT payload FROM metadata").fetchone()[0])
+            if not catalog_metadata.get("build_complete") or catalog_metadata.get("catalog_id") != dependency["catalog_id"]:
+                raise ValueError("Fragment evidence catalog binding mismatch")
         return connection, manifest
     except BaseException:
         connection.close()

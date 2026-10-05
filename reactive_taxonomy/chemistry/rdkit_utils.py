@@ -8,7 +8,30 @@ the public analysis models.
 from __future__ import annotations
 
 from contextlib import contextmanager
+from contextvars import ContextVar
+from dataclasses import dataclass, field
 from typing import Any, Iterable, Iterator, Optional
+
+
+@dataclass
+class MoleculeParseCache:
+    """Invocation-owned immutable binary parses; every consumer gets a fresh Mol."""
+
+    max_entries: int = 512
+    entries: dict[str, bytes | None] = field(default_factory=dict)
+
+
+_PARSE_SCOPE: ContextVar[MoleculeParseCache | None] = ContextVar("taxonomy_parse_scope", default=None)
+
+
+@contextmanager
+def molecule_parse_scope(cache: MoleculeParseCache) -> Iterator[None]:
+    """Reuse parsing within an explicit invocation, isolated by context."""
+    token = _PARSE_SCOPE.set(cache)
+    try:
+        yield
+    finally:
+        _PARSE_SCOPE.reset(token)
 
 
 def _chem_module() -> Any:
@@ -45,8 +68,18 @@ def parse_smiles(smiles: str) -> Any:
     if chem is None:
         return None
     try:
+        key = str(smiles or "")
+        cache = _PARSE_SCOPE.get()
+        if cache is not None and key in cache.entries:
+            stored = cache.entries[key]
+            return chem.Mol(stored) if stored is not None else None
         with _suppress_parse_logging():
-            return chem.MolFromSmiles(str(smiles or ""))
+            molecule = chem.MolFromSmiles(key)
+        if cache is not None:
+            if len(cache.entries) >= cache.max_entries:
+                cache.entries.pop(next(iter(cache.entries)))
+            cache.entries[key] = molecule.ToBinary(chem.PropertyPickleOptions.AllProps) if molecule is not None else None
+        return molecule
     except Exception:
         return None
 

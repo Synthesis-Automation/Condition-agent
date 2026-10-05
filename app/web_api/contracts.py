@@ -27,6 +27,7 @@ class FragmentSearchRequest(StrictRequest):
 
     query: str = Field(min_length=1, max_length=2000)
     query_format: Literal["smiles", "smarts"] = "smiles"
+    search_side: Literal["product", "reactant", "either"] = "product"
     topology: Literal["preserve_rings", "subgraph"] = "preserve_rings"
     limit: int = Field(default=5, ge=1, le=10, strict=True)
     timeout_seconds: int = Field(default=10, ge=1, le=30, strict=True)
@@ -38,13 +39,15 @@ class FragmentTransferRequest(FragmentSearchRequest):
 
     target_smiles: str = Field(min_length=1, max_length=5000)
     selected_observation_ids: list[str] = Field(min_length=1, max_length=6)
-    library_mode: Literal["full", "compact"] = "compact"
+    library_mode: Literal["full", "compact"] = "full"
     max_focus_bonds: int = Field(default=3, ge=1, le=5, strict=True)
     top_k: int = Field(default=3, ge=1, le=10, strict=True)
     include_baseline: bool = Field(default=False, strict=True)
 
     @model_validator(mode="after")
     def unique_selected_sources(self) -> "FragmentTransferRequest":
+        if self.search_side != "product":
+            raise ValueError("Fragment transfer requires product-side construction evidence")
         ids = self.selected_observation_ids
         if len(set(ids)) != len(ids) or any(not value or len(value) > 300 for value in ids):
             raise ValueError("Select unique, nonempty indexed observation IDs")
@@ -63,7 +66,7 @@ class FragmentGuidedRetrosynthesisRequest(StrictRequest):
     """Bounded single-step experiment with mandatory chemistry evidence gates."""
 
     target_smiles: str = Field(min_length=1, max_length=5000)
-    library_mode: Literal["full", "compact"] = "compact"
+    library_mode: Literal["full", "compact"] = "full"
     query_limit: int = Field(default=3, ge=1, le=5, strict=True)
     max_focus_bonds: int = Field(default=3, ge=1, le=5, strict=True)
     top_k: int = Field(default=3, ge=1, le=10, strict=True)
@@ -144,7 +147,7 @@ class RetrosynthesisRequest(StrictRequest):
     """One structure-derived, single-step retrosynthesis request."""
 
     target_smiles: str = Field(min_length=1, max_length=20_000)
-    library_mode: Literal["full", "compact"] = "compact"
+    library_mode: Literal["full", "compact"] = "full"
     top_k: int = Field(default=10, ge=1, le=50)
     include_l0: bool = True
     use_context: bool = True
@@ -199,7 +202,7 @@ class ForwardSynthesisRequest(StrictRequest):
     operator_hint: Optional[str] = Field(default=None, max_length=500)
     recipe: Optional[Dict[str, Any]] = None
     condition_profile: Optional[ForwardConditionProfileRequest] = None
-    library_mode: Literal["full", "compact"] = "compact"
+    library_mode: Literal["full", "compact"] = "full"
     top_k: int = Field(default=10, ge=1, le=50)
     include_l0: bool = True
     include_self_reactions: bool = True
@@ -221,7 +224,7 @@ class MultistepRetrosynthesisRequest(StrictRequest):
     """One bounded, structure-derived multistep retrosynthesis request."""
 
     target_smiles: str = Field(min_length=1, max_length=20_000)
-    library_mode: Literal["full", "compact"] = "compact"
+    library_mode: Literal["full", "compact"] = "full"
     top_k_routes: int = Field(default=5, ge=1, le=10)
     max_depth: Literal[2, 3] = 3
     molecular_weight_threshold: float = Field(default=150.0, gt=0, le=500)
@@ -247,7 +250,7 @@ class RetrosynthesisConditionsRequest(StrictRequest):
     """Progressive condition lookup for one retrosynthesis hit."""
 
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
-    library_mode: Literal["full", "compact"] = "compact"
+    library_mode: Literal["full", "compact"] = "full"
     top_k: int = Field(default=3, ge=1, le=5)
     preferred_reaction_ids: list[str] = Field(default_factory=list, max_length=32)
     starting_materials: Optional[str] = Field(default=None, max_length=20_000)
