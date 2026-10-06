@@ -43,3 +43,45 @@ def test_ordinary_jsonl_remains_readable(tmp_path):
     path = tmp_path / "source.jsonl"
     path.write_text('{"reaction_id":"one","warnings":["unresolved"]}\n')
     assert list(iter_record_shard(path))[0]["warnings"] == ["unresolved"]
+
+
+def test_selected_fields_keep_object_and_reference_validation(tmp_path, monkeypatch):
+    import condition_recommender.record_storage as storage
+
+    path = tmp_path / "records.jsonl"
+    rows = [{"observation_id": "one", "evidence": {"atoms": list(range(500))}}]
+    handle = io.StringIO()
+    write_object_records(handle, rows)
+    path.write_text(handle.getvalue(), encoding="utf-8")
+    original = storage.hydrate
+
+    def guarded_hydrate(value, objects):
+        assert not (isinstance(value, dict) and "evidence" in value)
+        return original(value, objects)
+
+    monkeypatch.setattr(storage, "hydrate", guarded_hydrate)
+    assert list(iter_record_shard(path, fields=("observation_id",))) == [{"observation_id": "one"}]
+
+    path.write_text('{"storage_schema":"reaction_object_shard.v1"}\n'
+                    '{"record":{"observation_id":"one","omitted":{"$reaction_object":"missing"}}}\n')
+    with pytest.raises(ValueError, match="missing reaction object reference"):
+        list(iter_record_shard(path, fields=("observation_id",)))
+
+    path.write_text('{"storage_schema":"reaction_object_shard.v1"}\n'
+                    '{"object_id":"wrong","value":{"evidence":"unchanged"}}\n'
+                    '{"record":{"observation_id":"one"}}\n')
+    with pytest.raises(ValueError, match="checksum"):
+        list(iter_record_shard(path, fields=("observation_id",)))
+
+
+def test_selected_fields_resolve_references_and_reset_between_members(tmp_path):
+    import gzip
+
+    path = tmp_path / "records.jsonl.gz"
+    evidence = {"atoms": list(range(500))}
+    for mode, identity in (("wt", "one"), ("at", "two")):
+        with gzip.open(path, mode, encoding="utf-8") as handle:
+            write_object_records(handle, [{"observation_id": identity, "evidence": evidence}])
+    assert list(iter_record_shard(path, fields=("evidence",))) == [
+        {"evidence": evidence}, {"evidence": evidence},
+    ]

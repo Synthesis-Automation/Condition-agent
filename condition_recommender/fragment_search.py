@@ -19,7 +19,7 @@ from reactive_taxonomy.fragment_search import (
     validate_fragment_target,
 )
 from reactive_taxonomy.material_identity import identify_material
-from .fragment_index import build_fragment_index, open_fragment_index, unpack
+from .fragment_index import build_fragment_index, open_fragment_index, unpack, load_fragment_library
 from .processed_catalog import ProcessedCatalog
 
 
@@ -137,7 +137,7 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
         stage("index_opened")
         dependency = manifest.get("evidence_catalog")
         catalog = ProcessedCatalog(Path(index_path).parent / dependency["relative_path"]) if dependency else None
-        library = rdSubstructLibrary.SubstructLibrary(connection.execute("SELECT payload FROM library").fetchone()[0])
+        library = load_fragment_library(connection, manifest)
         stage("library_loaded")
         status, reason = "complete", None
         records: dict[str, dict[str, Any]] = {}

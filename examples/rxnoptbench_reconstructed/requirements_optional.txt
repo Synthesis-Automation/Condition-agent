@@ -1,0 +1,2 @@
+# Optional; exact RDKit build used for this reconstruction.
+rdkit==2025.9.4

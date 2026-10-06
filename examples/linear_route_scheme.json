@@ -1,9 +1,0 @@
-{
-  "title": "Four-step layout demonstration (illustrative, not experimental evidence)",
-  "steps": [
-    {"reaction_smiles": "COc1ccc(CO)cc1>>COc1ccc(C=O)cc1", "basis": "proposed"},
-    {"reaction_smiles": "COc1ccc(C=O)cc1.N>>COc1ccc(CN)cc1", "basis": "proposed", "below": [{"text": "Reductive amination", "basis": "proposed"}]},
-    {"reaction_smiles": "COc1ccc(CN)cc1.CC(=O)Cl>>COc1ccc(CNC(C)=O)cc1", "basis": "proposed"},
-    {"reaction_smiles": "COc1ccc(CNC(C)=O)cc1>>Oc1ccc(CNC(C)=O)cc1", "basis": "proposed"}
-  ]
-}

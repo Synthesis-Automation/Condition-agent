@@ -43,7 +43,7 @@ def prepare_release(
                 "definition_contract": contract, "storage_schema": STORAGE_SCHEMA_VERSION,
                 "definition_files": definition_files,
                 "route_sources": [entry["sha256"] for entry in route_inventory],
-                "pipeline_generation": "processed_pipeline.v3", "release_schema": RELEASE_SCHEMA_VERSION}
+                "pipeline_generation": "processed_pipeline.v4", "release_schema": RELEASE_SCHEMA_VERSION}
     release_id = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()[:24]
     release = Path(output_root).resolve() / "releases" / release_id
     release.mkdir(parents=True, exist_ok=True)
@@ -51,7 +51,7 @@ def prepare_release(
                 "build_complete": False, "source_coverage": "all_physical_observations",
                 "sources": inventory, "definition_contract": contract,
                 "definition_files": definition_files,
-                "route_sources": route_inventory, "pipeline_generation": "processed_pipeline.v3",
+                "route_sources": route_inventory, "pipeline_generation": "processed_pipeline.v4",
                 "storage_schema": STORAGE_SCHEMA_VERSION,
                 "independent_chemistry_review": "pending",
                 "conversion_authorization": "user_requested_full_corpus_conversion_2026-10-05"}

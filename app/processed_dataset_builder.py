@@ -17,7 +17,7 @@ from condition_recommender.processed_build import (
     DEFAULT_INPUT_ROOT, DEFAULT_OUTPUT_ROOT, convert_release, prepare_release,
 )
 from condition_recommender.processed_catalog import build_processed_catalog
-from condition_recommender.processed_release import resolve_processed_release
+from condition_recommender.processed_release import publish_processed_release, resolve_processed_release
 from condition_recommender.shared_core_index import build_shared_core_index, load_shared_core_index
 from condition_recommender.sqlite_indexing import build_sqlite_generic_index
 from core_retrosynthesis.full_scale import build_full_scale_operator_library
@@ -40,8 +40,8 @@ def build_processed_datasets(
     state = json.loads(state_path.read_text()) if state_path.exists() else {}
     if (release / "manifest.json").exists():
         previous = json.loads((release / "manifest.json").read_text())
-        if previous.get("build_complete") and previous.get("builder_version") == "processed_pipeline.v3":
-            return resolve_processed_release(release, verify_artifacts=True).manifest
+        if previous.get("build_complete") and previous.get("builder_version") == "processed_pipeline.v4":
+            return publish_processed_release(release, output_root).manifest
 
     def emit(phase: str, **values: Any) -> None:
         if cancel_check and cancel_check():
@@ -117,7 +117,7 @@ def build_processed_datasets(
     fragment_report = stage("fragments", {"fragment_index": indexes / "fragment_index.sqlite"},
           lambda: build_fragment_index(canonical, indexes / "fragment_index.sqlite",
                                         evidence_catalog=indexes / "catalogs.sqlite",
-                                        progress=lambda event: emit("fragment_rows", **event)), "fragments.v2", ("evidence_catalog",))
+                                        progress=lambda event: emit("fragment_rows", **event)), "fragments.v3", ("evidence_catalog",))
 
     def operators() -> dict[str, Any]:
         library, report = build_full_scale_operator_library(
@@ -159,15 +159,11 @@ def build_processed_datasets(
     atomic_json(reports / "coverage.json", coverage)
     artifacts["canonical_records"] = entry(canonical)
     artifacts["coverage_report"] = entry(reports / "coverage.json")
-    manifest.update(build_complete=True, builder_version="processed_pipeline.v3", artifacts=artifacts, coverage=coverage,
+    manifest.update(build_complete=True, builder_version="processed_pipeline.v4", artifacts=artifacts, coverage=coverage,
                     capabilities={**{name: True for name in artifacts}, "composite_promotion": False},
                     capability_limits={"composite_promotion": "Requires declared training scope and independent support review; source routes remain accessible."})
     atomic_json(release / "manifest.json", manifest)
-    resolve_processed_release(release, verify_artifacts=True)
-    active = {"schema_version": "processed_reaction_active.v1", "release_id": manifest["release_id"],
-              "release_manifest": (release / "manifest.json").relative_to(Path(output_root).resolve()).as_posix(),
-              "sha256": file_sha256(release / "manifest.json")}
-    atomic_json(Path(output_root).resolve() / "manifest.json", active)
+    publish_processed_release(release, output_root)
     emit("published", release_id=manifest["release_id"], observations=total)
     return manifest
 

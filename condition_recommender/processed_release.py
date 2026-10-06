@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .corpus_io import file_sha256
+from .conversion.atomic import atomic_json
 
 DEFAULT_PROCESSED_ROOT = Path(__file__).resolve().parents[1] / "datasets" / "processed_datasets"
 
@@ -59,3 +60,20 @@ def resolve_processed_release(root: str | Path = DEFAULT_PROCESSED_ROOT,
 def processed_artifact(name: str, root: str | Path = DEFAULT_PROCESSED_ROOT) -> Path:
     """Return a declared artifact from the active complete release."""
     return resolve_processed_release(root).artifact(name)
+
+
+def publish_processed_release(
+    release_root: str | Path,
+    output_root: str | Path = DEFAULT_PROCESSED_ROOT,
+) -> ProcessedRelease:
+    """Verify a complete release and atomically select it for app/agent readers."""
+    release = resolve_processed_release(release_root, verify_artifacts=True)
+    destination = Path(output_root).resolve()
+    active = {
+        "schema_version": "processed_reaction_active.v1",
+        "release_id": release.manifest["release_id"],
+        "release_manifest": (release.root / "manifest.json").relative_to(destination).as_posix(),
+        "sha256": file_sha256(release.root / "manifest.json"),
+    }
+    atomic_json(destination / "manifest.json", active)
+    return release

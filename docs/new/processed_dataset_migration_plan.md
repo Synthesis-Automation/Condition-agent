@@ -413,7 +413,20 @@ The production workflow is `python -m app.processed_dataset_builder build
 The build is resumable and publishes the active pointer only after all requested
 artifacts and complete-source counts pass validation. Run
 `python -m app.processed_dataset_builder validate` for a complete checksum check.
-The current build log is `results/dataset_builds/processed_build.log`.
+The canonical conversion log is `results/dataset_builds/processed_build.log`.
+Current artifact progress is recorded in `processed_finish.log`,
+`parallel_conditions.log`, and `parallel_operators.log` under
+`results/dataset_builds/`. The local finish supervisor schedules fragment indexing
+after the catalog, verifies independent artifact checkpoints, and invokes the same
+tested builder for final validation and publication.
+
+As of 2026-10-06, canonical conversion has completed: 2,054,437 input and output
+observations, 4,111 completed shards, and zero failed shards. All 976,597 source
+routes are preserved (901,419 validated trees; 75,178 unresolved routes), with no
+missing observation joins. Catalog, index and operator construction is still in
+progress; the production release is not yet published. The latest full test run
+passed with 2,739 tests passed and four skipped. Final integrity validation and
+full-corpus app/agent smoke checks remain required before handoff.
 
 The release contains `records/shard_manifest.json`, compressed shared-object
 shards, `indexes/catalogs.sqlite`, `indexes/generic_index.sqlite`,

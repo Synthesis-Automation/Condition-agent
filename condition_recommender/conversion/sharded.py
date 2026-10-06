@@ -670,7 +670,9 @@ def validate_sharded_conversion(
             continue
         if verify_rows:
             row_count = 0
-            for record in iter_gzip_jsonl(output):
+            for record in iter_record_shard(output, fields=(
+                "schema_version", "converter_definition_version", "observation_id",
+            )):
                 row_count += 1
                 if record.get("schema_version") != RECOMMENDATION_RECORD_SCHEMA_VERSION:
                     issues.append(f"record_schema_mismatch:{entry['shard_id']}")

@@ -54,7 +54,7 @@ def test_workspace_and_example_drugs_use_the_same_bond_scale() -> None:
     for item in view["structures"]:
         root = ET.fromstring(base64.b64decode(item["image_url"].split(",", 1)[1]))
         assert longest_bond(root) == pytest.approx(30, abs=1.1)
-    gallery = (Path(__file__).resolve().parents[1] / "examples" /
+    gallery = (Path(__file__).resolve().parents[1] / "examples" / "common" /
                "top_20_selling_small_molecule_drugs_smiles.html").read_text("utf-8")
     for name in ("Apixaban", "Emtricitabine"):
         svg = re.search(rf'aria-label="2D molecular structure of {name}">\s*(<svg.*?</svg>)', gallery, re.S)

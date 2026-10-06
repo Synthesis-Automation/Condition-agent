@@ -1,0 +1,110 @@
+{
+  "name": "RxnOptBench reconstructed screening records",
+  "reconstruction_version": "2.0-source-preserving-offline",
+  "input_filename": "multiple_choice_all_varying.jsonl",
+  "input_sha256": "252cd2bca895fe0b0d2d1a1fd47da2ca69d478da53774cd8977f6a2d28853d58",
+  "counts": {
+    "screening_rows": 4768,
+    "released_table_records": 552,
+    "case_normalized_reference_groups": 232
+  },
+  "verification": "Full input-option and table-record round-trip checks passed; original publications not checked.",
+  "workbook": "Compact 17-field review view; full row dataset contains 139 fields.",
+  "files": [
+    {
+      "path": "DATA_DICTIONARY.md",
+      "bytes": 26654,
+      "sha256": "f5e0c3ce996a9f3369e3c1967ffef84cfc08811c4923d081b3dec308a8eb3ee0"
+    },
+    {
+      "path": "QUALITY_REPORT.md",
+      "bytes": 4549,
+      "sha256": "00610daf6f4688c370b7a550d652f80030a96bc9ce27468960d76c4cdc2e513a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10058,
+      "sha256": "191531ae8dfe9a26b851e5914114bfc1164fa1ac6665cb80cbe08707ee3d0c0a"
+    },
+    {
+      "path": "RxnOptBench_screening_review.xlsx",
+      "bytes": 454419,
+      "sha256": "e709e00249f7990dba14a6d642d89500b66252b3d4362bf3374e9a80f15277f5"
+    },
+    {
+      "path": "raw/multiple_choice_all_varying.jsonl",
+      "bytes": 2637997,
+      "sha256": "252cd2bca895fe0b0d2d1a1fd47da2ca69d478da53774cd8977f6a2d28853d58"
+    },
+    {
+      "path": "reconstruct_rxnoptbench.py",
+      "bytes": 31563,
+      "sha256": "bd4b3cfaded6cf8b5a79d36e8c7f087b29dfe2f179ac1956bca6e336c9ae7541"
+    },
+    {
+      "path": "requirements_optional.txt",
+      "bytes": 76,
+      "sha256": "8c2a8d478c3ee6bc1d2acbc3363986d17d5183d3bde8fde65d062330bd8b6d58"
+    },
+    {
+      "path": "rxnoptbench_condition_items.csv",
+      "bytes": 2768698,
+      "sha256": "2dff44b009bc8ead12dfa39686ce74306725cccd517ffe9b96484aa94ab05c09"
+    },
+    {
+      "path": "rxnoptbench_condition_key_map.json",
+      "bytes": 992,
+      "sha256": "2c978edd23c66772a15ed26ece9ff0ea03e6b587e6cd18c6f190fcc2e98d544e"
+    },
+    {
+      "path": "rxnoptbench_quality_issues.csv",
+      "bytes": 132578,
+      "sha256": "b6e8306404a491ce73ba68eb52292a9bdb0f2cbe2738297aed8f8c61a878e09b"
+    },
+    {
+      "path": "rxnoptbench_quality_report.json",
+      "bytes": 6722,
+      "sha256": "857860539b4515b8325d303a56863ae3707bf8be8cb3bfbe20241d6fd24bedd4"
+    },
+    {
+      "path": "rxnoptbench_reaction_molecules.csv",
+      "bytes": 261251,
+      "sha256": "f5d84273624b7a5701fa13c678464c6ebd283ce01afe44bf347a07d09b2b25ea"
+    },
+    {
+      "path": "rxnoptbench_references.csv",
+      "bytes": 90849,
+      "sha256": "56c913ee8cb4adf80fecf00b10149450f1aaf2c31198af0ee7e5de05eacfa67f"
+    },
+    {
+      "path": "rxnoptbench_references.jsonl",
+      "bytes": 161423,
+      "sha256": "73fb5ee86b58d374f64ae90a4669740be1f99e6f17df565e218f686882238579"
+    },
+    {
+      "path": "rxnoptbench_screening_rows.csv",
+      "bytes": 15718506,
+      "sha256": "a3b5ae29d32cc0c668c8801c62128da5a8b0a8cbfa43f6ca5df7aa61451bf3fe"
+    },
+    {
+      "path": "rxnoptbench_screening_rows.jsonl",
+      "bytes": 29425274,
+      "sha256": "3cd7fd6c6aa72466fe641e6316ec8ef4636e045631545d3b36fbc6a93ef11074"
+    },
+    {
+      "path": "rxnoptbench_screening_tables.csv",
+      "bytes": 871112,
+      "sha256": "a8dc42f8a34d1e4f3d7f5e1f4379c04c3b8c0b893e3cec6a32415b677523f6a0"
+    },
+    {
+      "path": "rxnoptbench_screening_tables.jsonl",
+      "bytes": 3866916,
+      "sha256": "2e3fcd52a222c9645a4cb96aff409d376e008a7451b354fd38d4c76caf673ab6"
+    },
+    {
+      "path": "rxnoptbench_smiles_validation.csv",
+      "bytes": 557326,
+      "sha256": "1d96e3467c9e3e556365c79b700bbed85f3d7b150bb8024fbfab4a65725884c1"
+    }
+  ]
+}

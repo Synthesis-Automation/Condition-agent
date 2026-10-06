@@ -103,9 +103,16 @@ def iter_record_events(path: str | Path) -> Iterator[dict[str, Any]]:
                 raise ValueError(f"Invalid storage event at {source}:{number}")
 
 
-def iter_record_shard(path: str | Path) -> Iterator[dict[str, Any]]:
-    """Hydrate canonical records from an ordinary or object-normalized shard."""
+def iter_record_shard(
+    path: str | Path, *, fields: Iterable[str] | None = None,
+) -> Iterator[dict[str, Any]]:
+    """Read records, optionally hydrating selected top-level fields only.
+
+    Selection still checks every stored object checksum and every reference,
+    including references in omitted fields. It changes no stored evidence.
+    """
     objects: dict[str, Any] = {}
+    selected = None if fields is None else frozenset(fields)
     for event in iter_record_events(path):
         if "reset_objects" in event:
             objects.clear()
@@ -115,7 +122,11 @@ def iter_record_shard(path: str | Path) -> Iterator[dict[str, Any]]:
             _check_references(value, objects)
             objects[event["object_id"]] = value
         else:
-            yield hydrate(event["record"], objects)
+            record = event["record"]
+            if selected is not None:
+                _check_references(record, objects)
+                record = {key: value for key, value in record.items() if key in selected}
+            yield hydrate(record, objects)
 
 
 def _check_references(value: Any, objects: Mapping[str, Any]) -> None:

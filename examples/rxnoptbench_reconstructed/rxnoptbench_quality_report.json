@@ -1,0 +1,247 @@
+{
+  "input_file": "multiple_choice_all_varying.jsonl",
+  "input_sha256": "252cd2bca895fe0b0d2d1a1fd47da2ca69d478da53774cd8977f6a2d28853d58",
+  "input_bytes": 2637997,
+  "input_source_url_context_only": "https://huggingface.co/datasets/songjhPKU/RxnOptBench/blob/main/data/jsonl/multiple_choice_all_varying.jsonl",
+  "paper_url_context_only": "https://arxiv.org/html/2610.02242v1",
+  "external_sources_fetched": false,
+  "rdkit_version": "2025.09.4",
+  "n_table_records": 552,
+  "n_screening_rows": 4768,
+  "n_source_identifiers_exact": 236,
+  "n_source_identifiers_case_insensitive": 232,
+  "n_table_identifiers_exact": 552,
+  "n_table_identifiers_case_insensitive": 551,
+  "source_identifier_case_variant_groups": [
+    [
+      "10_1039_D4GC06293K",
+      "10_1039_d4gc06293k"
+    ],
+    [
+      "10_1039_D5GC03495G",
+      "10_1039_d5gc03495g"
+    ],
+    [
+      "10_1039_D5SC01073J",
+      "10_1039_d5sc01073j"
+    ],
+    [
+      "10_1039_D5SC05212B",
+      "10_1039_d5sc05212b"
+    ]
+  ],
+  "case_colliding_table_records": [
+    "T0464",
+    "T0495"
+  ],
+  "sum_source_table_entry_counts": 5451,
+  "n_source_entries_not_retained": 683,
+  "n_tables_with_unretained_source_entries": 254,
+  "fraction_of_source_entry_counts_retained": 0.8747018895615484,
+  "n_source_condition_keys": 26,
+  "source_condition_keys": [
+    "Alternating_Constant_Forward_V",
+    "Alternating_Constant_Frequency",
+    "Anode(+)",
+    "Cathode(-)",
+    "Constant_Cell_Voltage",
+    "Constant_Current",
+    "Constant_Potential",
+    "Constant_Quantity",
+    "Current_Density",
+    "Electrolyte",
+    "Main_Mode",
+    "PH",
+    "Reaction_Type",
+    "atmosphere",
+    "catalysts",
+    "cooling_heating_condition",
+    "is_variable_current",
+    "ligand",
+    "light_condition",
+    "pressure",
+    "reaction_temperature",
+    "reaction_time",
+    "reagents",
+    "solvents",
+    "speed",
+    "vacuum_condition"
+  ],
+  "n_condition_item_records": 33527,
+  "n_reaction_molecule_occurrences": 1441,
+  "n_unique_source_reaction_molecule_smiles": 786,
+  "n_tables_with_valid_reaction_smiles": 552,
+  "n_rows_with_valid_reaction_smiles": 4768,
+  "n_canonical_reaction_groups": 358,
+  "n_unique_nonempty_condition_smiles": 1025,
+  "n_unique_invalid_nonempty_condition_smiles": 58,
+  "n_invalid_condition_smiles_occurrences": 436,
+  "n_rows_with_invalid_condition_smiles": 436,
+  "n_tables_with_invalid_condition_smiles": 93,
+  "n_condition_items_with_wildcard": 2,
+  "outcome_non_null_row_counts": {
+    "yield": 4768,
+    "ee": 149,
+    "dr": 337,
+    "er": 159,
+    "rr": 152
+  },
+  "n_zero_yield_rows": 828,
+  "n_rows_yield_le_10": 1479,
+  "n_rows_with_explicit_numeric_temperature_C": 2548,
+  "n_rows_with_explicit_numeric_time_h": 4114,
+  "n_identical_released_content_groups": 30,
+  "n_extra_rows_with_identical_released_content": 32,
+  "n_rows_in_identical_released_content_groups": 62,
+  "n_dois_decoded_but_not_resolver_verified": 232,
+  "condition_key_coverage_rows": {
+    "Alternating_Constant_Forward_V": {
+      "key_present": 8,
+      "nonempty_list": 8,
+      "explicit_empty_list": 0
+    },
+    "Alternating_Constant_Frequency": {
+      "key_present": 8,
+      "nonempty_list": 8,
+      "explicit_empty_list": 0
+    },
+    "Anode(+)": {
+      "key_present": 687,
+      "nonempty_list": 685,
+      "explicit_empty_list": 2
+    },
+    "Cathode(-)": {
+      "key_present": 687,
+      "nonempty_list": 684,
+      "explicit_empty_list": 3
+    },
+    "Constant_Cell_Voltage": {
+      "key_present": 36,
+      "nonempty_list": 35,
+      "explicit_empty_list": 1
+    },
+    "Constant_Current": {
+      "key_present": 472,
+      "nonempty_list": 420,
+      "explicit_empty_list": 52
+    },
+    "Constant_Potential": {
+      "key_present": 14,
+      "nonempty_list": 13,
+      "explicit_empty_list": 1
+    },
+    "Constant_Quantity": {
+      "key_present": 411,
+      "nonempty_list": 397,
+      "explicit_empty_list": 14
+    },
+    "Current_Density": {
+      "key_present": 325,
+      "nonempty_list": 284,
+      "explicit_empty_list": 41
+    },
+    "Electrolyte": {
+      "key_present": 609,
+      "nonempty_list": 538,
+      "explicit_empty_list": 71
+    },
+    "Main_Mode": {
+      "key_present": 701,
+      "nonempty_list": 695,
+      "explicit_empty_list": 6
+    },
+    "PH": {
+      "key_present": 36,
+      "nonempty_list": 17,
+      "explicit_empty_list": 19
+    },
+    "Reaction_Type": {
+      "key_present": 575,
+      "nonempty_list": 406,
+      "explicit_empty_list": 169
+    },
+    "atmosphere": {
+      "key_present": 2804,
+      "nonempty_list": 2553,
+      "explicit_empty_list": 251
+    },
+    "catalysts": {
+      "key_present": 3477,
+      "nonempty_list": 3317,
+      "explicit_empty_list": 160
+    },
+    "cooling_heating_condition": {
+      "key_present": 386,
+      "nonempty_list": 213,
+      "explicit_empty_list": 173
+    },
+    "is_variable_current": {
+      "key_present": 8,
+      "nonempty_list": 7,
+      "explicit_empty_list": 1
+    },
+    "ligand": {
+      "key_present": 1201,
+      "nonempty_list": 998,
+      "explicit_empty_list": 203
+    },
+    "light_condition": {
+      "key_present": 1605,
+      "nonempty_list": 1588,
+      "explicit_empty_list": 17
+    },
+    "pressure": {
+      "key_present": 457,
+      "nonempty_list": 418,
+      "explicit_empty_list": 39
+    },
+    "reaction_temperature": {
+      "key_present": 4549,
+      "nonempty_list": 4498,
+      "explicit_empty_list": 51
+    },
+    "reaction_time": {
+      "key_present": 4390,
+      "nonempty_list": 4324,
+      "explicit_empty_list": 66
+    },
+    "reagents": {
+      "key_present": 4183,
+      "nonempty_list": 3657,
+      "explicit_empty_list": 526
+    },
+    "solvents": {
+      "key_present": 4739,
+      "nonempty_list": 4721,
+      "explicit_empty_list": 18
+    },
+    "speed": {
+      "key_present": 221,
+      "nonempty_list": 185,
+      "explicit_empty_list": 36
+    },
+    "vacuum_condition": {
+      "key_present": 86,
+      "nonempty_list": 27,
+      "explicit_empty_list": 59
+    }
+  },
+  "quality_issue_counts": {
+    "source_entries_not_retained": 254,
+    "condition_smiles_parse_failure": 436,
+    "condition_smiles_contains_wildcard": 2,
+    "case_colliding_table_identifier_retained": 2,
+    "identical_released_content_retained": 30
+  },
+  "round_trip_validation": {
+    "options_checked": 4768,
+    "table_source_records_checked": 552,
+    "all_reactants_products_conditions_scores_provenance_and_answers_match_input": true
+  },
+  "validation_not_performed": [
+    "Original article / supporting information verification",
+    "Public reference-subset cross-validation (not uploaded)",
+    "DOI resolver / Crossref verification",
+    "Chemical identity, atom balance, atom mapping, or mechanistic validation"
+  ]
+}
