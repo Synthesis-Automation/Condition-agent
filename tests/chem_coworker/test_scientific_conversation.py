@@ -63,7 +63,7 @@ class RecordedRuntime:
 @pytest.fixture
 def service(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # Avoid rehashing GB datasets or repeating registry audit in harness-only tests.
-    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_: {
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_, **kwargs: {
         "repository": str(ROOT), "code_files": code_manifest(ROOT),
         "environment": environment_versions(), "artifacts": {},
         "validation_status": "development_snapshot_not_release_validated",
@@ -81,6 +81,53 @@ def finish(service: ConversationService, identity: str) -> dict[str, Any]:
             return result
         sleep(0.02)
     raise AssertionError("Conversation did not finish")
+
+
+def test_preparation_progress_is_visible_and_cancellable_before_agent_start(
+    service: ConversationService, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reported = Event()
+    resume = Event()
+
+    def capture(*args, on_progress, **kwargs):
+        assert kwargs["fingerprint_cache"] == service.root / ".fingerprint-cache"
+        on_progress({"stage": "fingerprinting", "artifact": "condition_index",
+                     "bytes_read": 1024, "size_bytes": 4096,
+                     "file_index": 1, "file_count": 2})
+        reported.set()
+        assert resume.wait(10)
+        # Cancellation is checked before throttling the next byte update.
+        on_progress({"stage": "fingerprinting", "artifact": "condition_index",
+                     "bytes_read": 2048, "size_bytes": 4096,
+                     "file_index": 1, "file_count": 2})
+        pytest.fail("Cancelled preparation must not finish or start the model")
+
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", capture)
+    identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
+    try:
+        assert reported.wait(10)
+        client = TestClient(create_app(runtime=object(), scientific_service=service,
+                                      recommendation_only=False), base_url="http://127.0.0.1")
+        with monkeypatch.context() as isolated:
+            isolated.setattr(service, "get", lambda *_: pytest.fail("Polling must not hydrate answers"))
+            isolated.setattr(service, "list_conversations", lambda: pytest.fail("Polling must not scan history"))
+            active = client.get("/api/v1/scientific/activity").json()["active"]
+        assert active["status"] == "preparing"
+        assert active["preparation"]["bytes_read"] == 1024
+        assert active["preparation"]["artifact"] == "condition_index"
+        assert service.cancel(identity)
+    finally:
+        resume.set()
+    turn = finish(service, identity)
+    assert turn["status"] == "cancelled"
+    assert service.runtime.threads == []
+    assert not (service.root / identity / "investigation.json").exists()
+    debug_log = service.debug_log(identity, turn["id"])
+    assert b"preparation_progress" in debug_log
+    with monkeypatch.context() as isolated:
+        isolated.setattr(service, "get", lambda *_: pytest.fail("Idle polling must not hydrate answers"))
+        isolated.setattr(service, "list_conversations", lambda: pytest.fail("Idle polling must not scan history"))
+        assert client.get("/api/v1/scientific/activity").json() == {"active": None}
 
 
 def test_real_evidence_answer_and_follow_up_survive_service_restart(service: ConversationService) -> None:
@@ -127,7 +174,7 @@ def test_guide_upgrade_starts_new_thread_and_retains_scientific_evidence(
     for name in ("task_playbooks", "agent_instructions", "presentation"):
         shutil.copytree(ROOT / "chem_coworker" / "scientific_workspace" / name, resources / name)
     service.repository = repository
-    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_: {
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_, **kwargs: {
         "schema_version": "scientific_baseline.v2", "repository": str(repository),
         "code_files": code_manifest(repository), "environment": environment_versions(),
         "artifacts": {}, "validation_status": "development_snapshot_not_release_validated",

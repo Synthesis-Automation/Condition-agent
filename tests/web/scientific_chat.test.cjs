@@ -554,6 +554,23 @@ test('progress uses recorded events, elapsed time, and keeps action details open
   assert.equal(refreshedAction.open, true);
 });
 
+test('preparation shows dataset byte progress before the runtime starts', () => {
+  const {run, context} = harness();
+  context.preparation = {stage:'fingerprinting',artifact:'condition_index',file_index:1,file_count:3,
+    bytes_read:2 * 1024 ** 3,size_bytes:8 * 1024 ** 3};
+  run("identity='chat'; active={conversation_id:'chat',id:'turn',status:'preparing',created_at:new Date().toISOString(),preparation}; renderConversation({id:'chat',turns:[active]}); updateProgress()");
+  assert.equal(run("$('progress-caption').hidden"), false);
+  assert.match(run("$('progress-caption').textContent"), /Checking dataset 1 of 3: condition_index/);
+  assert.match(run("$('progress-caption').textContent"), /25% \(2.00 \/ 8.00 GiB read\)/);
+  assert.match(run("$('progress-caption').textContent"), /agent has not started yet/);
+  run("active.preparation={stage:'fingerprint_reused',artifact:'condition_index',file_index:1,file_count:3}; updateProgress()");
+  assert.match(run("$('progress-caption').textContent"), /unchanged.*reusing its verified checksum/);
+  assert.doesNotMatch(run("$('progress-caption').textContent"), /GiB read/);
+  run("active.preparation={stage:'validating'}; updateProgress()");
+  assert.match(run("$('progress-caption').textContent"), /condition registry/);
+  assert.doesNotMatch(run("$('progress-caption').textContent"), /25%/);
+});
+
 test('quiet runs report the last actual activity without manufacturing agent commentary', () => {
   const {run} = harness();
   run("identity='working'; active={conversation_id:'working',status:'running',created_at:new Date(Date.now()-180000).toISOString(),progress:[{kind:'scientific_call',status:'failed',title:'Scientific call: assess_route_proposal',at:new Date(Date.now()-65000).toISOString(),failure_detail:'Invalid evidence reference'}]}; renderConversation({title:'Question',turns:[{id:'t',question:'Question',status:'running'}]})");

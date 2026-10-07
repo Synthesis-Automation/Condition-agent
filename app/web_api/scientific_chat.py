@@ -67,18 +67,7 @@ def create_scientific_router(service: ConversationService) -> APIRouter:
     def activity(request: Request) -> dict[str, Any]:
         """Expose actual worker-owned activity, even when another chat is selected."""
         guard(request)
-        for row in service.list_conversations():
-            try:
-                conversation = service.get(row["id"])
-            except FileNotFoundError:
-                continue
-            for turn in reversed(conversation["turns"]):
-                if turn["status"] in {"queued", "preparing", "running"}:
-                    return {"active": {"conversation_id": row["id"], "title": row["title"],
-                                       **{key: turn.get(key) for key in (
-                                           "id", "status", "created_at", "updated_at", "progress", "repair_attempts",
-                                       )}}}
-        return {"active": None}
+        return {"active": service.active_turn()}
 
     @router.get("/api/v1/scientific/config")
     def configuration(request: Request) -> dict[str, Any]:

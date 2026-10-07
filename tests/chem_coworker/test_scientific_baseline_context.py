@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,9 +13,12 @@ from chem_coworker.scientific_workspace.core.baseline import (
     BASELINE_SCHEMA,
     LEGACY_BASELINE_SCHEMA,
     code_manifest,
+    capture_baseline,
+    artifact_identity,
     legacy_code_manifest,
     scientific_identity,
     verify_baseline,
+    sha256_file,
 )
 from chem_coworker.scientific_workspace.agent_context.context import (
     capture_application_context,
@@ -116,6 +120,38 @@ def test_runtime_mismatch_identifies_all_changed_fields(
     assert "python: recorded='fixture', current='different'" in str(failure.value)
     assert "rdkit: recorded=None, current='new'" in str(failure.value)
     assert frozen["environment"] == {"python": "fixture"}
+
+
+def test_file_hash_reports_real_bytes_and_can_abort(tmp_path: Path) -> None:
+    path = tmp_path / "artifact.bin"
+    payload = b"x" * (2 * 1024 * 1024 + 13)
+    path.write_bytes(payload)
+    counts = []
+    assert sha256_file(path, on_progress=counts.append) == hashlib.sha256(payload).hexdigest()
+    assert counts == [0, 1024 * 1024, 2 * 1024 * 1024, len(payload)]
+
+    def stop_after_first_chunk(count: int) -> None:
+        if count:
+            raise InterruptedError("stop requested")
+
+    with pytest.raises(InterruptedError, match="stop requested"):
+        artifact_identity(path, on_progress=stop_after_first_chunk)
+
+
+def test_preparation_progress_preserves_identity_and_hashes_aliases_once(tmp_path: Path) -> None:
+    repository = Path(__file__).resolve().parents[2]
+    path = tmp_path / "source.bin"
+    path.write_bytes(b"source evidence")
+    artifacts = {"source": path, "alias": path}
+    original = capture_baseline(repository, artifacts, include_guidance=False)
+    events = []
+    observed = capture_baseline(repository, artifacts, include_guidance=False, on_progress=events.append)
+    assert observed == original
+    reads = [event for event in events if event["stage"] == "fingerprinting"]
+    assert {event["artifact"] for event in reads} == {"source"}
+    assert reads[-1]["bytes_read"] == path.stat().st_size
+    assert reads[-1]["file_count"] == 1
+    assert events[-1] == {"stage": "complete"}
 
 
 @pytest.mark.parametrize("relative", [

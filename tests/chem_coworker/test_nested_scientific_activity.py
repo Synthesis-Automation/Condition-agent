@@ -80,7 +80,7 @@ def test_turn_logs_nested_errors_on_heartbeat_and_finalization(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, terminal: str,
 ) -> None:
     ready, release = Event(), Event()
-    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_: {
+    monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.capture_baseline", lambda *_, **kwargs: {
         "repository": str(tmp_path), "artifacts": {}, "code_files": {},
         "environment": environment_versions(),
     })

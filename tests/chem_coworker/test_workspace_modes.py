@@ -55,7 +55,7 @@ def service(tmp_path, monkeypatch):
     repository = tmp_path / "repository"
     repository.mkdir()
 
-    def baseline(repo, artifacts, *, include_guidance=True):
+    def baseline(repo, artifacts, *, include_guidance=True, on_progress=None, fingerprint_cache=None):
         result = {"repository": str(repo), "code_files": {}, "environment": {}, "artifacts": {},
                   "evaluation_partition": DEVELOPMENT_PARTITION}
         result["learning_context"] = (build_learning_context(result) if include_guidance

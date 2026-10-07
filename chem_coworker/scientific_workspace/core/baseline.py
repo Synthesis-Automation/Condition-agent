@@ -13,9 +13,10 @@ import sysconfig
 from contextlib import closing
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from ..paths import REPOSITORY_ROOT
+from .fingerprint_cache import FingerprintCache, stat_token
 
 PACKAGE_ROOTS = (
     "reactive_taxonomy", "condition_registry", "condition_recommender",
@@ -60,12 +61,18 @@ def application_layer(path: str) -> str | None:
     return APPLICATION_DIRECTORY_LAYERS.get(relative.split("/", 1)[0])
 
 
-def sha256_file(path: Path) -> str:
-    """Hash an artifact in bounded memory."""
+def sha256_file(path: Path, *, on_progress: Callable[[int], None] | None = None) -> str:
+    """Hash in bounded memory; the optional byte callback may abort the read."""
     digest = hashlib.sha256()
+    bytes_read = 0
+    if on_progress is not None:
+        on_progress(bytes_read)
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
+            bytes_read += len(chunk)
+            if on_progress is not None:
+                on_progress(bytes_read)
     return digest.hexdigest()
 
 
@@ -129,16 +136,32 @@ def scientific_identity(baseline: Mapping[str, Any]) -> str:
     return "sha256:" + hashlib.sha256(canonical_bytes(identity)).hexdigest()
 
 
-def artifact_identity(path: Path) -> dict[str, Any]:
-    """Capture full content identity; report missing inputs explicitly."""
+def artifact_identity(
+    path: Path, *, on_progress: Callable[[int], None] | None = None,
+    cache: FingerprintCache | None = None,
+    on_reuse: Callable[[], None] | None = None,
+    expected_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Capture content identity, optionally reusing a stat-validated local hash."""
     path = path.expanduser().resolve()
     if not path.is_file():
         return {"path": str(path), "status": "missing"}
     before = path.stat()
-    digest = sha256_file(path)
+    digest = cache.get(path, before) if cache is not None else None
+    if expected_sha256 is not None and digest != expected_sha256:
+        digest = None
+    reused = digest is not None
+    if digest is None:
+        digest = sha256_file(path, on_progress=on_progress)
+    elif on_reuse is not None:
+        on_reuse()
     after = path.stat()
-    if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+    if stat_token(before) != stat_token(after):
         raise ValueError(f"Artifact changed during fingerprinting: {path}")
+    if expected_sha256 is not None and digest != expected_sha256:
+        raise ValueError(f"Processed artifact checksum mismatch: {path}")
+    if cache is not None and not reused:
+        cache.put(path, after, digest)
     return {
         "path": str(path), "status": "present", "sha256": digest,
         "size_bytes": after.st_size, "mtime_ns": after.st_mtime_ns,
@@ -173,8 +196,20 @@ def environment_versions() -> dict[str, str]:
 def capture_baseline(
     repository: Path, artifacts: Mapping[str, Path],
     *, include_guidance: bool = True,
+    on_progress: Callable[[dict[str, Any]], None] | None = None,
+    fingerprint_cache: Path | None = None,
 ) -> dict[str, Any]:
-    """Record a development snapshot, registry audit, and selected data inputs."""
+    """Record a snapshot with optional preparation telemetry and cancellation.
+
+    Callback exceptions abort capture. Telemetry is never part of the baseline
+    identity. A configured cache reuses hashes only for unchanged file snapshots;
+    omitting it performs full content hashing. Replay always bypasses the cache.
+    """
+    def report(stage: str, **details: Any) -> None:
+        if on_progress is not None:
+            on_progress({"stage": stage, **details})
+
+    report("resolving")
     from condition_registry import (
         condition_registry_definition_versions,
         validate_registry,
@@ -193,6 +228,7 @@ def capture_baseline(
         capture_output=True, check=True,
     ).stdout.splitlines()
     paths = dict(artifacts)
+    expected_hashes: dict[Path, str] = {}
     if "processed_dataset" in paths:
         from condition_recommender.processed_release import resolve_processed_release
         release = resolve_processed_release(paths["processed_dataset"])
@@ -204,11 +240,13 @@ def capture_baseline(
                 if name in paths and paths[name].resolve() != selected:
                     raise ValueError(f"Artifact {name} conflicts with the selected processed release")
                 paths[name] = selected
+                expected_hashes[selected] = release.manifest["artifacts"][name]["sha256"]
         for alias in ("procedure_catalog", "reference_catalog"):
             selected = release.artifact("evidence_catalog")
             if alias in paths and paths[alias].resolve() != selected:
                 raise ValueError(f"Artifact {alias} conflicts with the selected processed release")
             paths[alias] = selected
+            expected_hashes[selected] = release.manifest["artifacts"]["evidence_catalog"]["sha256"]
     if "weak_label_records" in paths:
         from condition_recommender import weak_label_recipe_catalog_path
 
@@ -218,12 +256,27 @@ def capture_baseline(
             raise ValueError("weak_label_recipe_catalog must be the catalog beside weak_label_records")
         paths["weak_label_recipe_catalog"] = catalog
     fingerprints: dict[Path, dict[str, Any]] = {}
+    cache = FingerprintCache(fingerprint_cache) if fingerprint_cache is not None else None
     identities = {}
+    file_count = len({path.expanduser().resolve() for path in paths.values()})
     for name, path in paths.items():
         resolved = path.expanduser().resolve()
         if resolved not in fingerprints:
-            fingerprints[resolved] = artifact_identity(resolved)
+            size = resolved.stat().st_size if resolved.is_file() else 0
+
+            def file_progress(bytes_read: int) -> None:
+                report("fingerprinting", artifact=name, bytes_read=bytes_read,
+                       size_bytes=size, file_index=len(fingerprints) + 1, file_count=file_count)
+
+            file_progress(0)
+            fingerprints[resolved] = artifact_identity(
+                resolved, on_progress=file_progress if on_progress is not None else None,
+                cache=cache, expected_sha256=expected_hashes.get(resolved),
+                on_reuse=lambda: report("fingerprint_reused", artifact=name,
+                                        file_index=len(fingerprints) + 1, file_count=file_count),
+            )
         identities[name] = dict(fingerprints[resolved])
+    report("metadata")
     for value in identities.values():
         path = Path(value["path"])
         if value["status"] == "present" and path.suffix == ".sqlite":
@@ -233,6 +286,7 @@ def capture_baseline(
                     columns = {row[1] for row in connection.execute("PRAGMA table_info(metadata)")}
                     if "payload" in columns:
                         value["metadata"] = [json.loads(row[0]) for row in connection.execute("SELECT payload FROM metadata")]
+    report("validating")
     baseline = {
         "schema_version": BASELINE_SCHEMA,
         "repository": str(repository), "git_revision": revision,
@@ -247,9 +301,11 @@ def capture_baseline(
     }
     from ..agent_context.learning import build_learning_context, disabled_learning_context
 
+    report("guidance")
     baseline["learning_context"] = (build_learning_context(baseline) if include_guidance
                                     else disabled_learning_context())
     baseline["scientific_identity"] = scientific_identity(baseline)
+    report("complete")
     return baseline
 
 

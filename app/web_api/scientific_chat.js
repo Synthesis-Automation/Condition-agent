@@ -751,15 +751,40 @@ function updateProgress() {
     $('elapsed').textContent = elapsedText(turn.created_at);
     const caption = $('progress-caption');
     if (caption) {
-      const times = (turn.progress || []).map(event => event.updated_at || event.at).filter(value => Number.isFinite(Date.parse(value)));
-      const latest = times.sort((a, b) => Date.parse(a) - Date.parse(b)).at(-1);
-      const since = latest || turn.created_at;
-      const quiet = turn.status === 'running' && Date.now() - Date.parse(since) >= 60000;
-      caption.hidden = !quiet;
-      caption.textContent = quiet ?
-        (latest ? 'Last recorded activity ' : 'No recorded activity for ') + elapsedText(since) +
-          (latest ? ' ago. ' : '. ') + 'The runtime is still running; no new update has arrived.' :
-        '';
+      if (turn.status === 'preparing') {
+        const preparation = turn.preparation || {};
+        const stages = {
+          resolving: 'Locating the configured datasets…',
+          metadata: 'Reading dataset metadata…',
+          validating: 'Checking scientific code, dependencies and condition registry…',
+          guidance: 'Preparing investigation context…',
+          complete: 'Dataset checks complete. Starting the agent…',
+        };
+        let detail = stages[preparation.stage] || 'Preparing the scientific baseline before the agent starts…';
+        if (preparation.stage === 'fingerprint_reused') {
+          detail = `Dataset ${preparation.file_index} of ${preparation.file_count}: ${preparation.artifact} unchanged — reusing its verified checksum.`;
+        }
+        if (preparation.stage === 'fingerprinting') {
+          const read = Number(preparation.bytes_read) || 0;
+          const size = Number(preparation.size_bytes) || 0;
+          const percent = size > 0 ? Math.min(100, Math.floor(100 * read / size)) : 0;
+          detail = `Checking dataset ${preparation.file_index} of ${preparation.file_count}: ${preparation.artifact} — ` +
+            `${percent}% (${(read / 1024 ** 3).toFixed(2)} / ${(size / 1024 ** 3).toFixed(2)} GiB read). ` +
+            'Large datasets can take several minutes; the agent has not started yet.';
+        }
+        caption.hidden = false;
+        caption.textContent = detail;
+      } else {
+        const times = (turn.progress || []).map(event => event.updated_at || event.at).filter(value => Number.isFinite(Date.parse(value)));
+        const latest = times.sort((a, b) => Date.parse(a) - Date.parse(b)).at(-1);
+        const since = latest || turn.created_at;
+        const quiet = turn.status === 'running' && Date.now() - Date.parse(since) >= 60000;
+        caption.hidden = !quiet;
+        caption.textContent = quiet ?
+          (latest ? 'Last recorded activity ' : 'No recorded activity for ') + elapsedText(since) +
+            (latest ? ' ago. ' : '. ') + 'The runtime is still running; no new update has arrived.' :
+          '';
+      }
     }
     const events = $('live-timeline');
     const follow = nearBottom();

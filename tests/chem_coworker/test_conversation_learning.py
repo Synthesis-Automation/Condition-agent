@@ -59,7 +59,7 @@ def service(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # dataset audits. Real chemistry, evidence storage and baseline verification run.
     monkeypatch.setattr("chem_coworker.scientific_workspace.core.baseline.code_manifest", lambda *_: {})
 
-    def capture(*_):
+    def capture(*_, **kwargs):
         baseline = {
             "repository": str(ROOT), "code_files": {}, "environment": environment_versions(),
             "artifacts": {}, "validation_status": "development_snapshot_not_release_validated",

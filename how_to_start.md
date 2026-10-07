@@ -292,6 +292,22 @@ Omit `--build` on subsequent starts when the frontend has not changed.
 
 - **Stop/restart:** press Ctrl+C in the server terminal, then rerun the selected
   command. These launch commands do not enable automatic Python reload.
+- **Preparing your workspace:** scientific conversations reuse verified file
+  checksums from `.fingerprint-cache` under the configured chat root. The cache
+  survives server restarts. New, replaced or changed files are read in full; the
+  initial uncached preparation reads about 63 GiB with the current configuration.
+  The page shows checksum reuse or the dataset, bytes read and percentage while
+  scanning. Stop interrupts between file-read chunks. A missing or corrupt cache
+  entry triggers a fresh read; it never supplies a partial checksum.
+  Restart the server and refresh the page after updating to load this progress
+  display. Follow-ups reuse their existing baseline and check it for changes.
+  Live activity polling reads only the server's active turn, so opening the page
+  does not reconstruct old answers just to discover whether an agent is running.
+  Cache reuse checks resolved path, file identity, size and timestamps, and
+  checksums for processed artifacts must match the release manifest.
+  It is not a content audit against edits preserving all metadata. Replay and
+  `verify_baseline(..., full_hash=True)` always reread data; headless
+  `capture_baseline` also hashes fully unless a cache is explicitly supplied.
 - **Port already in use:** stop the server you started on that port, or choose
   another port, for example `--port 8012`, and update the browser URL.
 - **Fragment search is missing:** restart with `--workbench` (or

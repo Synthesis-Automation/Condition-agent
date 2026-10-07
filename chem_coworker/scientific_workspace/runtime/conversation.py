@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import Event, Lock
+from time import monotonic
 from typing import Any, Mapping
 from uuid import uuid4
 
@@ -135,6 +136,23 @@ class ConversationService:
         attempt = 0
         scientific_cursor: ScientificActivityCursor | None = None
         last_activity_error: str | None = None
+        last_preparation_update = 0.0
+
+        def preparation_progress(event: dict[str, Any]) -> None:
+            nonlocal last_preparation_update
+            if cancel.is_set():
+                raise AgentStopped("cancelled")
+            now = monotonic()
+            previous = state.get("preparation", {})
+            changed_stage = (event.get("stage"), event.get("artifact")) != (
+                previous.get("stage"), previous.get("artifact"),
+            )
+            if not changed_stage and now - last_preparation_update < 1.0:
+                return
+            last_preparation_update = now
+            preparation = {**event, "updated_at": _now()}
+            debug("preparation_progress", preparation=preparation)
+            save(preparation=preparation)
 
         def debug(kind: str, **details: Any) -> None:
             record = {"schema_version": "scientific_progress_log.v1", "at": _now(),
@@ -221,8 +239,11 @@ class ConversationService:
                 from ..core.store import InvestigationStore
 
                 paths = {name: (self.repository / path).resolve() for name, path in self.artifacts.items()}
-                baseline = (capture_baseline(self.repository, paths) if mode.task_guidance
-                            else capture_baseline(self.repository, paths, include_guidance=False))
+                baseline = capture_baseline(
+                    self.repository, paths, include_guidance=mode.task_guidance,
+                    on_progress=preparation_progress,
+                    fingerprint_cache=self.root / ".fingerprint-cache",
+                )
                 staging = directory / "prepared"
                 InvestigationStore.create(
                     staging, objective=state["question"], baseline=baseline,
@@ -401,6 +422,29 @@ class ConversationService:
                 "origin": "agent_authored", "review_status": "unreviewed",
                 "evidence_status": "not_validated", "thread_id": result.thread_id,
                 "runtime": runtime_configuration(self.runtime.describe(), mode), "usage": result.usage}
+
+    def active_turn(self) -> dict[str, Any] | None:
+        """Read worker-owned progress without loading historical answer evidence."""
+        with self._mutex:
+            active = self._active
+        if active is None:
+            return None
+        identity, turn_id, _ = active
+        directory = self._directory(identity)
+        turn = _read_json(directory / "turns" / turn_id / "turn.json")
+        if turn["status"] not in {"queued", "preparing", "running"}:
+            return None
+        metadata = _read_json(directory / "conversation.json")
+        with self._mutex:
+            if self._active is not active:
+                return None
+        return {
+            "conversation_id": identity, "title": metadata["title"],
+            **{key: turn.get(key) for key in (
+                "id", "status", "created_at", "updated_at", "progress",
+                "repair_attempts", "preparation",
+            )},
+        }
 
     def get(self, conversation_id: str) -> dict[str, Any]:
         """Read persisted conversation and progress; safe to reopen after a normal restart."""
