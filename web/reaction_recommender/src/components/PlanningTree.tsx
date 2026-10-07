@@ -73,7 +73,7 @@ export function PlanningTree(props: TreeProps) {
   }, [focus, props.selectedId])
   return <section className="planner-tree-panel" aria-label="Route alternatives">
     <div className="planner-tree-heading"><h2>Route alternatives</h2><span className="planner-tree-legend">Green path: selected route · Blue outline: selected molecule</span></div>
-    <p className="planner-note" id="planner-tree-help">Each numbered reaction is an alternative route. Its precursors are all required. Select any molecule to explore it, or a reaction to choose its route. Other branches stay saved.</p>
+    <p className="planner-note" id="planner-tree-help">Select a molecule to find candidates, then use Add to tree for the reaction you want. Each numbered reaction is an added alternative; its precursors are all required. Other added branches stay saved.</p>
     <div className="planner-tree-tools" aria-label="Tree view controls">
       <span className="planner-note">Fixed molecule size · Scroll to explore branches</span>
       <button className="button quiet" type="button" onClick={focus}>Focus molecule</button>

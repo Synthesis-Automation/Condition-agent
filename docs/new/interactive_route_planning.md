@@ -9,13 +9,14 @@ definitions, ranking, and independent evaluation release gates are unchanged.
 Launch `python -m app.web_api --workbench --build`, then select **Interactive
 route planning**, the last analysis mode. Draw or paste one connected target and
 click **Start planning**.
-Select a molecule in the tree and click **Find disconnections**. Each viable
-reaction proposal appears as a numbered reaction node beneath that molecule;
-its required precursor molecules appear beneath it. Strategies and their
-alternate precursor choices are separate reaction alternatives. Search adds
-alternatives without selecting a route. Select any precursor, including one on
-an unselected branch, to continue exploring it. Equal molecules on separate
-branches remain independently editable.
+Select a molecule in the tree and click **Find disconnections**. Search shows
+candidates in the side panel without adding branches. Review a strategy and
+its precursor choice, then click **Add to tree** to add just that reaction and
+all of its required precursors. To explore another alternative, explicitly add
+that candidate as well; previously added branches remain saved. Changing the
+precursor-choice dropdown alone does not edit the tree. Select any added
+precursor, including one on an unselected branch, to continue exploring it.
+Equal molecules on separate branches remain independently editable.
 
 Click a numbered reaction node or **Use this step** to select that reaction
 and its connecting path back to the target. Green edges and reaction nodes
@@ -27,7 +28,7 @@ validation, conditions, and stock evidence for the inspected molecule.
 **Clear route choice** deselects the molecule's reaction while keeping every
 alternative. **Remove selected alternative** deletes only that reaction and its
 precursor subtrees; other alternatives remain. **Undo** and **Redo** recover
-search expansions and route edits, including starting-material designations.
+explicit branch additions and route edits, including starting-material designations.
 A new edit clears redo history. **Use as starting material** is an explicit
 decision after clearing a route choice; it retains explored alternatives but
 ends the selected route at that molecule. **Reopen for planning** reverses it.
@@ -71,8 +72,10 @@ or stock checks. The UI discloses this and offers explicit refresh actions.
 
 Search results are retained with normalized settings and can supply choices for
 an identical molecule elsewhere in the session. **Search again** explicitly
-reruns the engine and adds new alternatives, retaining existing branches.
-An identical result does not duplicate alternatives or erase their edits.
+reruns the engine and updates the candidate list without changing the tree,
+selected route, or undo/redo history. Only **Add to tree** inserts a new branch;
+**Use this step** selects an alternative already in the tree. An identical
+result does not duplicate alternatives or erase their edits.
 Changing search settings does not erase chosen steps or their original
 evidence. Mode changes, molecule selection, and cancellation discard late browser
 responses. Cancelling a request stops waiting; an already-running synchronous
@@ -100,7 +103,8 @@ restricted deployment.
 Sessions now use `interactive_planning.v2` and browser exports use
 `interactive_planning_browser.v2`. Each molecule stores `alternatives` (choice
 reference plus children), one optional selected `choice`, and
-`expansion_warnings`. There is no duplicate selected-children field in JSON.
+`expansion_warnings` (retained notes from earlier saved sessions). No automatic
+expansion path remains. There is no duplicate selected-children field in JSON.
 Canonical route export projects only the selected alternatives. The `clear`
 action is new; `select` preserves alternatives and activates the connecting
 ancestor choices; `remove` deletes only the selected alternative.
@@ -115,9 +119,10 @@ APIs are unchanged.
 
 Limits remain 200 molecule occurrences across **all** alternatives, 20 reaction
 levels, 30 undo and redo states, and 100 retained searches. Search retains all
-candidate evidence but does not attach an alternative that would create an
-ancestor cycle or exceed tree limits. The inspector lists these omissions;
-no incomplete precursor set is attached. Session responses are limited to
+candidate evidence. Adding a candidate that would create an ancestor cycle or
+exceed tree limits is rejected without changing the tree; no incomplete
+precursor set is attached. Existing saved branches remain on restore, including
+those added by earlier versions. Session responses are limited to
 18 MB and imports to 20 MB; a rejected action leaves the previous session intact.
 Browser storage may impose a smaller limit, reported by the autosave notice.
 

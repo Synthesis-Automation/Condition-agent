@@ -124,22 +124,24 @@ def test_api_preserves_alternative_subtrees_and_exports_only_the_selected_route(
 
     act("search")
     assert data["session"]["schema_version"] == "interactive_planning.v2"
-    options = data["session"]["root"]["alternatives"]
-    assert len(options) == 3  # Two strategies, one alternate realization.
+    assert data["session"]["root"]["alternatives"] == []
+    assert data["session"]["past"] == []
     assert data["summary"]["reaction_count"] == 0
-    act("select", **options[0]["choice"])
-    branch = options[0]["children"][0]
+    root_search = data["session"]["searches"][-1]["search_id"]
+    act("select", search_id=root_search)
+    assert len(data["session"]["root"]["alternatives"]) == 1
+    branch = data["session"]["root"]["alternatives"][0]["children"][0]
     act("search", node_id=branch["node_id"])
-    branch_choice = data["session"]["root"]["alternatives"][0]["children"][0]["alternatives"][0]["choice"]
-    act("select", node_id=branch["node_id"], **branch_choice)
+    assert data["session"]["root"]["alternatives"][0]["children"][0]["alternatives"] == []
+    act("select", node_id=branch["node_id"], search_id=data["session"]["searches"][-1]["search_id"])
     saved_branch = data["session"]["root"]["alternatives"][0]
-    act("select", **options[2]["choice"])
+    act("select", search_id=root_search, strategy_index=1)
     assert data["session"]["root"]["alternatives"][0] == saved_branch
     assert data["summary"]["reaction_count"] == 1
-    act("select", **options[0]["choice"])
+    act("select", search_id=root_search)
     assert data["summary"]["reaction_count"] == 2
     act("clear")
-    assert len(data["session"]["root"]["alternatives"]) == 3
+    assert len(data["session"]["root"]["alternatives"]) == 2
     assert data["summary"]["reaction_count"] == 0
     act("restore")
     act("undo")

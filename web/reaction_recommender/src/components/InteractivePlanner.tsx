@@ -148,7 +148,7 @@ export function InteractivePlannerOptions({ state }: { state: State }) {
   return <div className="analysis-options planner-options">
     <div className="option-grid feature-options">
       <label><span>Strategies per expansion</span><input aria-label="Strategies per expansion" type="number" min={1} max={50} value={state.settings.top_k} disabled={Boolean(state.busy)} onChange={event => state.updateSettings({ top_k: Math.min(50, Math.max(1, Number(event.target.value))) })} /></label>
-      <div className="feature-mode-note"><strong>Explore alternative synthesis routes</strong><span>Find disconnections for any molecule. Explore several reaction branches, then select a route while keeping the alternatives.</span></div>
+      <div className="feature-mode-note"><strong>Explore alternative synthesis routes</strong><span>Find disconnections, review a precursor choice, then click Add to tree. Add alternatives individually to build the routes you want to explore.</span></div>
     </div>
     <details className="advanced-options"><summary>Advanced options</summary><div>
       <label><span>Operator library</span><select value={state.settings.library_mode} disabled={Boolean(state.busy)} onChange={event => state.updateSettings({ library_mode: event.target.value as 'full' | 'compact' })}><option value="full">Full</option><option value="compact">Compact</option></select></label>
@@ -179,12 +179,13 @@ function StrategyCard({ search, index, state }: { search: PlanningSearch; index:
   const candidate = variants[variant] ?? variants[0]
   const choice: PlanningChoice = { search_id: search.search_id, strategy_index: index, realization_index: variant }
   const chosen = state.selected?.choice && choiceKey(state.selected.choice) === choiceKey(choice)
+  const added = state.selected?.alternatives.some(option => choiceKey(option.choice) === choiceKey(choice))
   return <article className={`planner-candidate ${chosen ? 'chosen' : ''}`}>
     <div className="planner-candidate-heading"><h3>Strategy {index + 1}</h3><span>{displayName(candidate.transformation_kind ?? 'graph transformation')}</span></div>
     {variants.length > 1 && <label className="planner-variant">Precursor choice<select aria-label={`Strategy ${index + 1} precursor choice`} value={variant} onChange={event => setVariant(Number(event.target.value))}>{variants.map((item, number) => <option key={number} value={number}>{number + 1}. {item.precursor_smiles}</option>)}</select></label>}
     <ReactionImage smiles={candidate.proposed_reaction_smiles} label={`Strategy ${index + 1} reaction`} />
     <CandidateEvidence candidate={candidate} />
-    <button className="button primary" type="button" disabled={Boolean(state.busy || (chosen && state.selectedOnRoute))} onClick={() => void state.act('select', choice)}>{chosen && state.selectedOnRoute ? 'Step selected' : 'Use this step'}</button>
+    <button className="button primary" type="button" disabled={Boolean(state.busy || (chosen && state.selectedOnRoute))} onClick={() => void state.act('select', choice)}>{chosen && state.selectedOnRoute ? 'Step selected' : added ? 'Use this step' : 'Add to tree'}</button>
   </article>
 }
 
@@ -231,7 +232,7 @@ export function InteractivePlanner({ state, capabilities }: { state: State; capa
           {!available && capabilities && <p className="alert caution">The selected operator library is unavailable. You can inspect, save, and revise existing choices.</p>}
           {(capabilities?.stock_portfolio_available || stock) && <div className="planner-stock"><button className="button quiet" type="button" disabled={Boolean(busy)} onClick={() => void state.act('stock')}>{stock ? 'Refresh stock check' : 'Check supplier stock'}</button>{stock && <details className="planner-evidence"><summary>{displayName(stock.status)} · last check</summary><p>{stock.status === 'verified_stock_match' ? 'Exact match in the local supplier snapshot. See dates and availability evidence below; a saved check is not live inventory.' : 'No verified availability established by this lookup. See the retained source evidence below.'}</p><pre>{JSON.stringify(stock, null, 2)}</pre></details>}</div>}
           {selected.stopped && <p className="planner-note">You designated this molecule as a starting material. This is not a verified stock match. Reopen it to search further.</p>}
-          {selected.expansion_warnings.length > 0 && <details className="planner-evidence planner-expansion-warnings" open><summary>Alternatives not added to the tree</summary><ul>{selected.expansion_warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details>}
+          {selected.expansion_warnings.length > 0 && <details className="planner-evidence planner-expansion-warnings"><summary>Earlier expansion notes</summary><ul>{selected.expansion_warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details>}
           {candidate && <details className="planner-chosen" open><summary>Chosen step and conditions</summary>
             <ReactionImage smiles={candidate.proposed_reaction_smiles} label="Chosen route step" />
             <CandidateEvidence candidate={candidate} />
@@ -239,7 +240,7 @@ export function InteractivePlanner({ state, capabilities }: { state: State; capa
             {conditions && <div className="planner-conditions"><p>{displayName(conditions.status)}</p>{conditions.recommendations?.map((recipe, index) => <p key={index}><strong>{index + 1}.</strong> {compactRecipeSummary(recipe.resolved_recipe)}</p>)}{conditions.warnings?.map((warning, index) => <p key={index}>{displayName(warning)}</p>)}<details className="planner-evidence"><summary>Condition evidence and precedents</summary><pre>{JSON.stringify(conditions, null, 2)}</pre></details></div>}
           </details>}
           {!selected.stopped && <>
-            {search ? <><div className="planner-search-heading"><h3>{search.result.strategies.length} candidate strategies</h3><p className="planner-note">{displayName(search.settings.library_mode)} library · up to {search.settings.top_k} strategies requested. Saved results are retained until you search again.</p></div>
+            {search ? <><div className="planner-search-heading"><h3>{search.result.strategies.length} candidate strategies</h3><p className="planner-note">{displayName(search.settings.library_mode)} library · up to {search.settings.top_k} strategies requested. Review a precursor choice and click Add to tree to include only that reaction and its required precursors.</p></div>
               {selected.alternatives.length > 0 && <p className="planner-note">Choosing a reaction selects its path to the target. All other alternatives and their explored branches stay saved.</p>}
               {!search.result.strategies.length && <p className="alert caution">No candidates found within this search scope. This molecule remains unresolved; try a different scope or designate it as a starting material.</p>}
               {search.result.warnings?.length > 0 && <details className="planner-evidence"><summary>Search coverage and cautions</summary><ul>{search.result.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul><pre>{JSON.stringify(search.result.search_diagnostics, null, 2)}</pre></details>}

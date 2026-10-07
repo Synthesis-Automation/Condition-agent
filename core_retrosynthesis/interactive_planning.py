@@ -464,7 +464,7 @@ def record_search(
     settings: Mapping[str, Any],
     result: Mapping[str, Any],
 ) -> PlanningSession:
-    """Retain a search without treating empty results as route completion."""
+    """Retain candidate evidence without changing the tree or edit history."""
     node = find_node(session.root, node_id)
     settings = normalize_settings(settings)
     if _molecule(result.get("target_smiles")) != node.smiles:
@@ -479,8 +479,7 @@ def record_search(
     if len(records) >= MAX_SEARCHES:
         raise ValueError("Session has 100 searches; export it and start a new plan")
     search = PlanningSearch(search_id, node.smiles, settings, result)
-    session = restore_session(replace(session, searches=(*records, search)).to_dict())
-    return _expand_search(session, node_id, search)
+    return restore_session(replace(session, searches=(*records, search)).to_dict())
 
 
 def _new_alternative(
@@ -499,49 +498,6 @@ def _commit_root(session: PlanningSession, root: PlanningNode) -> PlanningSessio
     return replace(
         session, root=root, past=(*session.past, session.root)[-MAX_HISTORY:], future=()
     )
-
-
-def _expand_search(
-    session: PlanningSession, node_id: str, search: PlanningSearch
-) -> PlanningSession:
-    """Add complete viable options, reporting cycles and bounded-tree omissions."""
-    count = 0
-    ancestors: tuple[str, ...] = ()
-
-    def inspect(node: PlanningNode, path: tuple[str, ...]) -> None:
-        nonlocal count, ancestors
-        count += 1
-        if node.node_id == node_id:
-            ancestors = (*path, node.smiles)
-        for option in node.alternatives:
-            for child in option.children:
-                inspect(child, (*path, node.smiles))
-
-    inspect(session.root, ())
-    node = find_node(session.root, node_id)
-    alternatives = list(node.alternatives)
-    existing = {option.choice for option in alternatives}
-    warnings = []
-    for index, strategy in enumerate(search.result["strategies"]):
-        for variant in range(1 + len(strategy["alternate_realizations"])):
-            choice = PlanningChoice(search.search_id, index, variant)
-            if choice in existing:
-                continue
-            _, _, precursors = candidate_for_choice(session, choice)
-            reason = None
-            if any(smiles in ancestors for smiles in precursors):
-                reason = "would create a cycle back to an ancestor molecule"
-            elif len(ancestors) > MAX_DEPTH:
-                reason = "would exceed 20 reaction levels"
-            elif count + len(precursors) > MAX_NODES:
-                reason = "would exceed the 200-molecule tree limit"
-            if reason:
-                warnings.append(f"Strategy {index + 1}, choice {variant + 1}: not added; {reason}.")
-                continue
-            alternatives.append(_new_alternative(node_id, choice, precursors))
-            count += len(precursors)
-    updated = replace(node, alternatives=tuple(alternatives), expansion_warnings=tuple(warnings))
-    return _commit_root(session, _replace_node(session.root, node_id, updated))
 
 
 def edit_session(
