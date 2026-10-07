@@ -11,12 +11,11 @@
 .planner-tree-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
 .planner-tree-legend { font-size: .7rem; color: #526c5b; }
 .planner-tree-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 12px 0; }
-.planner-tree-tools output { min-width: 40px; text-align: center; font-size: .75rem; }
 .planner-tree { overflow: auto; height: 70vh; min-height: 400px; padding: 12px; border: 1px solid #e0e7e2; border-radius: 9px; background: radial-gradient(#d9e2dc .7px, transparent .7px) 0 0 / 16px 16px #f8faf9; }
 .planner-tree:focus-visible { outline: 2px solid #277b54; outline-offset: 2px; }
 .planner-tree ul { list-style: none; margin: 0; padding: 0; }
-.planner-tree-canvas { position: relative; min-width: 100%; overflow: hidden; }
-.planner-tree .planner-tree-content { position: absolute; top: 0; left: 50%; width: max-content; padding: 6px; transform-origin: top center; }
+.planner-tree-canvas { width: max-content; min-width: 100%; }
+.planner-tree .planner-tree-content { width: max-content; margin: 0 auto; padding: 6px; }
 .planner-branch { --edge: #a1b2a9; position: relative; display: flex; flex-direction: column; align-items: center; flex: 1 0 auto; padding: 26px 12px 0; }
 .planner-branch.on-route { --edge: #277b54; }
 .planner-tree-content > .planner-branch { padding-top: 0; }

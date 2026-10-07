@@ -23,6 +23,8 @@ test('builds three steps, revises a branch, restores history and exports the can
   page.on('pageerror', error => errors.push(error.message))
   await start(page)
   await expect(page.getByRole('radio').last()).toHaveAccessibleName('Interactive route planning')
+  const initialCard = (await page.locator('.planner-molecule').boundingBox())!
+  const initialPreview = (await page.getByRole('region', { name: 'Target structure', exact: true }).boundingBox())!
   await expand(page, 'target')
   await expand(page, 'molecule 1.1')
   await expand(page, 'molecule 1.1/1.1')
@@ -33,6 +35,10 @@ test('builds three steps, revises a branch, restores history and exports the can
   const children = alternatives.first().locator(':scope > .planner-precursors > .molecule-branch')
   await expect(children).toHaveCount(2)
   const rootBox = (await rootBranch.locator(':scope > .planner-molecule').boundingBox())!
+  expect(rootBox.width).toBeCloseTo(initialCard.width, 0)
+  const expandedPreview = (await page.getByRole('region', { name: 'Target structure', exact: true }).boundingBox())!
+  expect(expandedPreview.width).toBeCloseTo(initialPreview.width, 0)
+  expect(expandedPreview.height).toBeCloseTo(initialPreview.height, 0)
   const firstBox = (await children.nth(0).locator(':scope > .planner-molecule').boundingBox())!
   const secondBox = (await children.nth(1).locator(':scope > .planner-molecule').boundingBox())!
   expect(firstBox.y).toBeGreaterThan(rootBox.y + rootBox.height)
@@ -173,12 +179,23 @@ test('explores multiple routes independently and retains them through switching 
   await expect(page.locator('.planner-reaction.on-route')).toHaveCount(2)
   await page.getByLabel('Import planning session').setInputFiles(filename)
   await expect(page.locator('.planner-reaction')).toHaveCount(5)
-  await page.getByRole('button', { name: 'Zoom in', exact: true }).click()
-  await expect(page.getByRole('button', { name: 'Fit tree', exact: true })).toHaveAttribute('aria-pressed', 'false')
   await page.getByRole('button', { name: 'Focus molecule', exact: true }).click()
-  await expect(page.getByLabel('Tree zoom', { exact: true })).toHaveText('100%')
-  await page.getByRole('button', { name: 'Fit tree', exact: true }).click()
+  const card = page.locator('.planner-molecule.selected')
+  const desktopBox = (await card.boundingBox())!
+  expect(desktopBox.width).toBe(170)
+  const tree = page.getByRole('region', { name: 'Route tree', exact: true })
+  expect(await tree.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true)
   await page.locator('.planner-tree-panel').screenshot({ path: '../../results/planner-alternative-routes.png' })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.getByRole('button', { name: 'Focus molecule', exact: true }).click()
+  const mobileBox = (await card.boundingBox())!
+  expect(mobileBox.width).toBe(desktopBox.width)
+  const preview = (await card.locator('.reaction-image').boundingBox())!
+  expect(preview.height).toBe(94)
+  const viewportBox = (await tree.boundingBox())!
+  expect(mobileBox.x).toBeGreaterThanOrEqual(viewportBox.x)
+  expect(mobileBox.x + mobileBox.width).toBeLessThanOrEqual(viewportBox.x + viewportBox.width)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
 test('cancels stale searches on mode changes and permits recovery after failure', async ({ page }) => {

@@ -53,57 +53,33 @@ function MoleculeNode({ node, path, active, ...props }: TreeProps & {
 export function PlanningTree(props: TreeProps) {
   const viewport = useRef<HTMLDivElement>(null)
   const content = useRef<HTMLUListElement>(null)
-  const [zoom, setZoom] = useState(1)
-  const [autoFit, setAutoFit] = useState(true)
-  const [size, setSize] = useState({ width: 0, height: 0 })
-  const fit = useCallback(() => {
-    if (!viewport.current || !content.current) return
-    const width = content.current.offsetWidth
-    const height = content.current.offsetHeight
-    setZoom(Math.max(.15, Math.floor(Math.min(1, (viewport.current.clientWidth - 24) / width, (viewport.current.clientHeight - 24) / height) * 100) / 100))
-    viewport.current.scrollTo(0, 0)
+  const focus = useCallback(() => {
+    const selected = content.current?.querySelector<HTMLElement>('.planner-molecule.selected')
+    const panel = viewport.current
+    if (!selected || !panel) return
+    const box = selected.getBoundingClientRect()
+    const bounds = panel.getBoundingClientRect()
+    panel.scrollBy({ left: box.left - bounds.left - (panel.clientWidth - box.width) / 2,
+      top: box.top - bounds.top - (panel.clientHeight - box.height) / 2 })
   }, [])
   useEffect(() => {
     if (!viewport.current || !content.current) return
-    const measure = () => {
-      if (!content.current) return
-      const width = content.current.offsetWidth
-      const height = content.current.offsetHeight
-      setSize(previous => previous.width === width && previous.height === height ? previous : { width, height })
-      if (autoFit) fit()
-    }
-    const observer = new ResizeObserver(measure)
+    // Keep the current molecule in view as branches grow, without shrinking it.
+    const observer = new ResizeObserver(focus)
     observer.observe(viewport.current)
     observer.observe(content.current)
-    measure()
+    focus()
     return () => observer.disconnect()
-  }, [autoFit, fit])
-  const resize = (value: number) => { setAutoFit(false); setZoom(Math.max(.15, Math.min(1.5, value))) }
-  const focus = () => {
-    setAutoFit(false)
-    setZoom(1)
-    requestAnimationFrame(() => {
-      const selected = content.current?.querySelector<HTMLElement>('.planner-molecule.selected')
-      const panel = viewport.current
-      if (!selected || !panel) return
-      const box = selected.getBoundingClientRect()
-      const bounds = panel.getBoundingClientRect()
-      panel.scrollBy({ left: box.left - bounds.left - (panel.clientWidth - box.width) / 2,
-        top: box.top - bounds.top - (panel.clientHeight - box.height) / 2 })
-    })
-  }
+  }, [focus, props.selectedId])
   return <section className="planner-tree-panel" aria-label="Route alternatives">
     <div className="planner-tree-heading"><h2>Route alternatives</h2><span className="planner-tree-legend">Green path: selected route · Blue outline: selected molecule</span></div>
     <p className="planner-note" id="planner-tree-help">Each numbered reaction is an alternative route. Its precursors are all required. Select any molecule to explore it, or a reaction to choose its route. Other branches stay saved.</p>
     <div className="planner-tree-tools" aria-label="Tree view controls">
-      <button className="button quiet" type="button" onClick={() => { setAutoFit(true); fit() }} aria-pressed={autoFit}>Fit tree</button>
-      <button className="button quiet" type="button" aria-label="Zoom out" disabled={zoom <= .15} onClick={() => resize(zoom - .15)}>−</button>
-      <output aria-label="Tree zoom">{Math.round(zoom * 100)}%</output>
-      <button className="button quiet" type="button" aria-label="Zoom in" disabled={zoom >= 1.5} onClick={() => resize(zoom + .15)}>+</button>
+      <span className="planner-note">Fixed molecule size · Scroll to explore branches</span>
       <button className="button quiet" type="button" onClick={focus}>Focus molecule</button>
     </div>
     <div ref={viewport} className="planner-tree" role="region" aria-label="Route tree" aria-describedby="planner-tree-help" tabIndex={0}>
-      <div className="planner-tree-canvas" style={{ width: size.width * zoom, height: size.height * zoom }}><ul ref={content} className="planner-tree-content" style={{ transform: `translateX(-50%) scale(${zoom})` }}>
+      <div className="planner-tree-canvas"><ul ref={content} className="planner-tree-content">
         <MoleculeNode {...props} node={props.session.root} path="" active />
       </ul></div>
     </div>

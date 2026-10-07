@@ -41,10 +41,11 @@ are not live inventory. Stock matches do not automatically change the route.
 
 The tree runs from top to bottom, alternating molecule and reaction nodes.
 Reaction alternatives are choices; precursors under one reaction are all
-required. Collapse a molecule's alternatives, use **Fit tree** or zoom controls,
-or choose **Focus molecule** to inspect the current molecule at 100%. The tree
-scrolls horizontally and vertically. On narrow screens the candidate panel
-appears below it.
+required. Molecule cards and structure previews keep a fixed size as branches
+grow or the window narrows. Scroll horizontally and vertically to explore the
+tree, collapse alternatives to reduce its extent, or choose **Focus molecule**
+to return to the current molecule. The view keeps that molecule visible after
+layout changes. On narrow screens the candidate panel appears below the tree.
 
 ## Persistence and evidence
 
