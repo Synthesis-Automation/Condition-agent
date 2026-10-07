@@ -196,8 +196,13 @@ filesystem security boundary against an agent deliberately reading guide files.
 Tools + formatting adds the same answer-authoring instructions, presentation
 profile, structured handoff, evidence validation and single repair attempt as
 normal mode, while keeping task playbooks and procedural learning disabled.
-The formatting treatment therefore includes the existing evidence and self-review
-requirements; it is more than a cosmetic change to the display.
+For route answers, the agent now supplies compact reaction SMILES, conditions and
+saved source references through `w.route_answer(...)`. The application assembles
+the canonical answer and draws the SVG; each step exposes its reaction SMILES.
+Separate step rationales, reconstructed literature drawings and a five-area
+self-review are optional. Evidence validation and exact-step inspection requirements
+still apply. Restart the server, refresh the browser and start a new chat after
+updating; existing saved answers remain readable and no index rebuild is needed.
 
 Tools + guidance enables the same task guides and pinned procedural learning as
 normal mode, without answer-authoring instructions, a presentation profile or a

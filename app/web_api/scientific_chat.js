@@ -368,6 +368,8 @@ function reactionCard(step, sources, molecules, key, number, showScheme = true) 
   if (!step.conditions.length && !step.reagents?.length) conditions.append(element('p', 'Conditions not supplied.', 'muted'));
   if (step.yield_info?.basis === 'reported') conditions.append(scientificClaim({...step.yield_info, source_ids:[], limitations:[]}, sources));
   card.append(conditions);
+  if (step.reaction_smiles) card.append(disclosure('Reaction SMILES', key + ':smiles',
+    element('code', step.reaction_smiles, 'precedent-smiles')));
   const detail = element('div', '', 'step-detail');
   scientificNotes(detail, [...step.limitations, ...step.conditions.flatMap(item => item.limitations || []),
     ...(step.reagents || []).flatMap(item => item.limitations || []),

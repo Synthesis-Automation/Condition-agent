@@ -84,7 +84,8 @@ def answer_handoff_prompt(prompt: str, turn_directory: Path) -> str:
         f"Save the complete ScientificAnswer JSON at {json.dumps(str(turn_directory / ANSWER_FILENAME))}.\n"
         f"The full answer schema is available at {json.dumps(str(turn_directory / 'answer-schema.json'))}; "
         "read it only if needed.\n"
-        "Validate and review that exact draft, then finish with only this JSON object:\n"
+        "Validate that exact draft with finalize_answer; a separate self-review is optional. "
+        "Then finish with only this JSON object:\n"
         + json.dumps(_EXPECTED_HANDOFF)
         + "\nDo not repeat the full answer in your final message or print it through a shell. "
         "The service reads the saved draft once and validates it before publication. "

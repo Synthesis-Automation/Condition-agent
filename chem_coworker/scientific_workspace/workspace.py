@@ -227,6 +227,18 @@ class ScientificWorkspace:
 
         return _complete_empty_fields({"answer_markdown": answer_markdown})
 
+    def route_answer(self, proposal: Mapping[str, Any]) -> dict[str, Any]:
+        """Build a canonical answer from target/step SMILES, conditions and saved support.
+
+        IDs, shared intermediates and source metadata are assembled automatically.
+        Steps and conditions default to proposed; literature drawings and self-review
+        are optional. Finalize the result with finalize_answer; no science runs here.
+        Use help('route_answer') for the compact input schema and example.
+        """
+        from .answers.route_authoring import route_answer
+
+        return route_answer(self.store, proposal)
+
     def attach_literature_reaction(
         self, draft: Mapping[str, Any], step_id: str, preparation_ref: str,
     ) -> dict[str, Any]:

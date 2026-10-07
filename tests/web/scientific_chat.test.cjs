@@ -501,7 +501,8 @@ test('reaction schemes are visible with details collapsed and references human-r
     node.textContent.startsWith('Reaction schemes · declared structures')));
   assert.ok(card.querySelectorAll('a').some(node => node.href === 'https://example.org/patent' && node.textContent === 'Patent Example 2'));
   assert.ok(card.querySelectorAll('a').some(node => node.href === '/saved/excerpt' && node.textContent === 'Saved excerpt'));
-  assert.equal(card.querySelectorAll('code').length, 0, 'raw SMILES are retained in data, not duplicated in the answer UI');
+  assert.equal(card.querySelectorAll('code').length, 1, 'reaction SMILES are available in a collapsed disclosure');
+  assert.equal(card.querySelectorAll('code')[0].textContent, 'CCO>>CC=O');
   assert.ok(card.descendants().some(node => node.tag === 'li' && node.textContent === 'Feasibility unverified'));
   context.fixture.structured_presentation.molecules.push({id:'c',name:'Final product',smiles:'CC(=O)O',...attribution});
   context.fixture.structured_presentation.steps.push({
@@ -677,6 +678,7 @@ test('linear routes show source SVGs and actual conditions with diagnostics coll
   const {run, context} = harness();
   const attribution = {basis:'proposed',source_ids:[],limitations:['Target feasibility unresolved']};
   const step = {id:'s1',title:'First step',...attribution,reactant_ids:['a'],product_ids:['b'],after_step_ids:[],
+    reaction_smiles:'CCO>>CC=O',
     image_url:'data:image/svg+xml;base64,target-step',conditions:[{text:'Target recipe',...attribution}],
     yield_info:{text:'Yield not established',basis:'unknown',source_ids:[],limitations:[]},
     rationale:{text:'Reason for this step',...attribution},
@@ -690,6 +692,10 @@ test('linear routes show source SVGs and actual conditions with diagnostics coll
       image_url:'data:image/svg+xml;base64,route',scheme_width:1100,drawing_status:'linear_scheme'}]};
   const original = JSON.stringify(context.routeView);
   const card = run('showStructured(routeView)');
+  const smiles = card.querySelectorAll('code').find(node => node.textContent === 'CCO>>CC=O');
+  assert.ok(smiles, 'route steps expose reaction SMILES without agent-authored prose');
+  assert.equal(smiles.parentNode.tag, 'details');
+  assert.equal(Boolean(smiles.parentNode.open), false);
   const images = card.querySelectorAll('img');
   assert.equal(images.filter(node => node.src.endsWith('route')).length, 1);
   assert.equal(images.filter(node => node.src.endsWith('target-step')).length, 0);

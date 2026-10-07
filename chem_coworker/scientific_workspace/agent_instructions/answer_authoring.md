@@ -1,191 +1,67 @@
 Saved answer contract and handoff:
 
-Do not read answer-schema.json at startup. The runtime supplies the schema for
-validation issues. Follow the runtime's final handoff instructions when finished.
+For synthesis routes, use w.route_answer with compact input. Supply only the target,
+ordered reaction SMILES, conditions and inspected support. The application assembles
+molecule/source/step IDs, exact shared intermediates, citations and the existing
+scientific_answer.v2 view. The browser generates the route SVG and exposes reaction
+SMILES. Do not write SVG, a custom answer builder or a second prose route.
 
-Prepare scientific_answer.v2 JSON. answer_markdown directly answers the question,
-cites relevant sha256:<64 hex> artifacts and preserves limitations. evidence_refs
-must identify actual call, derived_file, replay, custom_execution, literature_source
-or literature_excerpt artifacts, not a note, your answer or an invented reference.
-Every claim about local scientific results needs recorded evidence. uncertainties
-lists material limitations; needs_user_input is true when clarification is needed.
+```python
+draft = w.route_answer({
+    'target_smiles': target_smiles,
+    'routes': [{'title': 'Proposed route', 'steps': [
+        {'reaction_smiles': reactants + '>>' + product,
+         'conditions': 'Conditions to develop', 'conditions_basis': 'unknown',
+         'support': [{'ref': captured_source_ref, 'locator': 'Example 1',
+                      'note': 'Analogue only; explain the relevant substrate difference.'}],
+         'limitations': ['Retain any material unresolved chemistry.']}
+    ]}]
+})
+receipt = w.finalize_answer(draft_path, draft)
+print(receipt)
+```
 
-Use schema_version='scientific_answer.v2'. Include sources, molecules,
-target_molecule_ids, steps, routes and claims (empty arrays when irrelevant). Use
-stable short IDs to connect objects. Every molecule, step, condition, yield and claim
-has a basis: input, reported, computed, proposed or unknown. Reported/computed objects
-need source_ids. Preserve domain warnings in limitations. A proposal recorded by a
-tool remains proposed; its normalization/compatibility computation is computed.
+Steps and conditions default to proposed. Use basis='reported' or
+conditions_basis='reported' only for the actual inspected experiment, with support.
+Missing conditions and support may be omitted; their absence remains visible.
+Optional reagents lists concise reagent names for route arrows. Do not invent
+conditions, yields, atom contributors, source identities or reaction structures.
+Do not transfer an analogue's yield to the proposed reaction. Keep conditions for
+the proposal separate from the reported source experiment.
 
-Local sources use kind=local_artifact, artifact_ref of the recorded call/attachment,
-url=null and locator of the inspected record/field/step. Computed objects require a
-completed call, replay or run_python custom_execution, not notes or an attached output
-alone. An attachment can support discussion of derived analysis with its execution
-provenance limitation. Never use an unrelated call to satisfy provenance or relabel a
-calculation as a reported yield.
-External sources use kind=external_source, an original/final captured URL, an exact
-locator (e.g. Example 1), and artifact_ref of literature_source/literature_excerpt
-with captured text. A URL fragment can point to the example. Legacy attached source
-captures retain URL, retrieval date, excerpt and provenance. A remembered source is
-not an inspected source. Citation establishes attribution, not independent review.
+Support entries need only ref, locator and an optional note about relevance or
+limitations. External refs must be saved literature_source/literature_excerpt
+artifacts: use an exact captured passage with w.capture_source or import an existing
+browser export with w.capture_source_file. A bare URL or remembered citation is not
+inspected support. Title and URL are read from the saved source. A captured passage
+is enough; do not copy entire pages just to produce the answer. Local refs may cite
+completed scientific calls. Saved inspect_step_precedents, inspect_condition_precedents
+and assess_proposed_recipe refs are attached to their corresponding step evidence
+fields automatically. These references must match the actual final structures and
+stereochemistry. If local support exists, publication still requires a matching
+nonempty inspect_step_precedents inspection. Inspect and attach the records named
+by the validation error; no new search or chemistry check is required for formatting.
 
-Use molecule IDs for explicit reactants/products; do not invent missing structures
-to complete a drawing. List steps in dependency order. after_step_ids identifies
-preceding steps supplying intermediates; routes list ordered step_ids with all
-dependencies. Alternatives can have separate routes. An incomplete route is valid
-when its missing steps/structures remain disclosed.
-For every multistep synthesis you present, populate routes with its ordered
-step_ids; leaving routes empty produces individual-step views instead of the
-shared route scheme. Reuse the same molecule ID for a carried intermediate and
-declare the actual after_step_ids. Include the complete chosen route in a revised
-answer, not only its changed step. Keep distinct alternatives in separate routes.
-Preserve branches and convergent dependencies: never change chemistry or invent
-intermediates to force a linear layout. The workspace draws supported linear
-routes in the three-column SVG format and retains individual views otherwise.
-Supply structures and attributed annotations; do not hand-draw SVG or embed image
-links in answer_markdown. Keep molecule names in the structured molecule records;
-the route drawing omits compound captions and numbers.
-Conditions are separate attributed text fields such as solvent, temperature,
-duration, quantities or addition order. Use [] if absent; yield_info=null if unreported.
-Each step's reagents is a separate list of attributed claims containing only
-short reagent/catalyst names, e.g. CDI or DIPEA. Route arrows show these names and
-supplied partner structures. Keep solvent, quantities, temperature, time, workup
-and purification in conditions, which are visible beside each step. Do not repeat a
-partner already drawn structurally unless its supplied form needs clarification.
-Use [] when no reagent names are explicitly supported; do not infer them from a
-reaction name. Older saved answers may omit reagents.
-For a retrosynthesis, give each step a concise rationale: an attributed claim
-(text, basis, source_ids, limitations) explaining the bond change, chemical choice,
-and what the closest inspected source reactions support. Name material substrate,
-selectivity or condition differences that limit transfer. Link the relevant source
-and exact example locator; never describe a distant analogue as an exact precedent.
-The browser leads with the route SVG, then each step's rationale, conditions and
-saved precedent SVGs with publication links. Technical diagnostics, full prose and
-review notes are available in collapsed details. Avoid duplicating every step,
-raw IDs, tool diagnostics or assessment counts in answer_markdown. Keep it to a
-short route explanation and material unresolved questions; preserve detailed
-qualifications in the appropriate structured limitations. Rationale follows the
-same citation checks as conditions. Older answers may omit it; never invent missing
-rationale, structures, conditions or experimental support to complete the display.
-Start with w.answer_template(answer_markdown) to obtain empty answer boilerplate;
-then supply explicit scientific content. Build strings using f-strings or literal
-text; avoid percent interpolation of scientific prose containing yield percentages.
-Minimal nested shapes (replace IDs/text with your actual evidence and proposal):
-"steps": [{"id": "s1", "title": "Proposed step", "basis": "proposed",
-           "reactant_ids": ["a"], "product_ids": ["b"],
-           "precedent_refs": [],
-           "condition_precedent_refs": [],
-           "rationale": {"text": "A development hypothesis; evidence is incomplete", "basis": "proposed"},
-           "conditions": [{"text": "Conditions to develop", "basis": "unknown"}]}],
-"routes": [{"id": "r1", "title": "Proposal", "step_ids": ["s1"]}]
-Condition objects use text, basis, source_ids and limitations, never label/value.
-Routes use id, title, step_ids and limitations; basis belongs to steps. Keep proposed
-conditions distinct from reported observations and never label proposed yields as reported.
+Put steps in synthetic order. Unique exact intermediate links are assembled only
+within each route, preserving stereochemistry and component multiplicity. For an
+ambiguous producer, supply after_steps as one-based earlier step positions in that
+route; [] declares an independent step. Missing steps remain gaps. No feasibility,
+atom mapping, source interpretation or experimental validation is inferred.
 
-Each step's precedent_refs must link supporting-reaction inspection artifacts for
-the ACTUAL final structures, including specified stereo. If saved disconnections,
-assessments or inspections contain local support, publication requires a matching
-nonempty inspect_step_precedents inspection. Earlier alternatives, arbitrary source
-reaction IDs and inspect_route_step artifacts do not satisfy this requirement.
-Missing links are rejected with exact inspection arguments or an existing inspection
-ref. Inspect those records, reconsider transfer claims and attach the right ref before
-resubmitting. Do not drop steps/citations to bypass this check. Do not copy source
-reaction SMILES into authored precedent cards. If no local support is available,
-retain literature citations and an honest gap; never invent support or run a tool
-merely to fill a panel. Empty searches and missing/uninspected evidence remain distinct.
+No separate rationale, five-area self-review, reconstructed literature drawing or
+full experimental procedure is required. Retain material counterevidence, uncertain
+conditions and missing starting-material preparation in limitations. Detailed source
+drawings and explicit review remain optional when requested or decision-relevant;
+use w.help for their existing helpers. Do not run tools just to fill answer panels.
 
-For condition evidence, condition_precedent_refs links completed recorded
-inspect_condition_precedents calls for the actual step's reactants and products,
-including specified stereochemistry. The browser reads the saved observations and
-their exact experimental joins; do not author replacement source cards. These links
-do not replace precedent_refs or satisfy an available route-support inspection
-requirement. Both kinds of evidence may support the same step.
-Use recipe_assessment_refs for assess_proposed_recipe checks of the actual proposed
-step recipe. draft = w.attach_recipe_check(draft, step_id, recipe_check_ref) validates
-the exact structures and stereo. Inspect the saved recipe and coverage; this link
-does not prove that prose conditions or a later edited recipe were assessed.
-Before choosing a route, disclose missing recipe checks, structural gates that are
-unresolved/not_run, and upstream starting-material gaps. Literature-supported
-preference and local structural admission are separate judgments; do not silently
-turn a source yield into an overall route yield or an unresolved step into a pass.
+For other answers, w.answer_template(answer_markdown) creates the same canonical
+answer with empty optional collections. Supply only relevant attributed objects;
+reported/computed objects require source_ids. w.help('finalize_answer') exposes claim
+shapes. Do not read or reproduce the full schema unless a validation error requires it.
 
-Always supply drawable structures when inspected evidence supports them; the
-browser automatically generates SVGs. For every literature-supported step, add
-literature_reactions when source reactants and products can be identified without
-inventing chemistry. This is separate from indexed precedent_refs and never
-replaces a required local inspection. Never copy a proposed target reaction into
-this field merely because the step cites a paper. Use the actual source reaction,
-including an analogue's different substrates and product.
-Prepare new source drawings with w.run('prepare_literature_reaction', parameters)
-and use draft = w.attach_literature_reaction(draft, step_id, event.artifact_ref).
-This attaches the immutable block AND its exact required source_ref together,
-avoiding root/excerpt citation mismatches. Existing conflicting source IDs are
-rejected; choose a distinct source_id during preparation. Alternatively attach
-w.prepared_literature_reaction(event.artifact_ref). It returns the
-literature_reaction.v2 block, bound to recorded preparation; do not edit that block.
-Each participant requires name, compound_id (literal source label or name),
-evidence_ref of an exact w.record_source_excerpt passage, and material_form
-(including unknown salt/concentration/tautomer/stereo details). Prefer existing
-indexed graphs: supply indexed_ref of a saved fragment search/get_precedents call
-and reaction_id; omit participant SMILES. Participant sides and counts must match
-that source reaction, including salt components. Capture the publication with its
-reference_id to retain an explicit, agent-attributed bibliography join.
-
-When an indexed graph is unavailable, explicitly supply participant SMILES and
-structure_origin='reconstructed_from_description'. The tool audits graph syntax,
-formula, charge, salts, rings and stereo gaps; it does not translate names or verify
-scheme images. Optional reported_formula must occur in the participant's passage;
-conflicting formulas and invalid graphs stay visible and are not repaired.
-Preparation also preserves quantity_checks for complete adjacent mass/amount
-pairs in the participant passage. A conflicting pair is conditional on the
-supplied graph/material assignment; disclose both reports instead of choosing
-one for recipe equivalents. Empty checks do not mean the quantities agree.
-Use source_explicit only when SMILES occur in each participant's captured passage.
-If endpoints remain ambiguous, omit the drawing and explain the evidence gap.
-Source acquisition remains separate from graph origin; neither indexed identity
-nor successful drawing proves the paper's assignment or experimental feasibility.
-Preserve scheme/page images with capture_source_image and preparation scheme_refs
-when images support the assignment. If images are inaccessible or unclear, keep
-the graph assignment unverified and disclose the missing visual evidence. Source
-compound names up to 300 characters are supported; do not truncate a name into an
-ambiguous suffix just to satisfy a length limit.
-
-Supply source_ref, source_id, title, locator, structure_evidence (literal captured
-text), reactants and products to the preparation tool. Optional conditions and
-yield_info must be reported claims citing source_id and quoting captured text;
-leave them absent when unavailable. Put normalized/adapted target conditions on
-the proposed step. Source discrepancies use source_conflicts=[{description,
-excerpt_refs:[first_exact_passage, second_exact_passage]}]; preserve both passages
-and explain the unresolved difference. Use the catalogue for the complete signature.
-Use [] when no source reaction can be reconstructed. Do not hand-draw SVG or embed
-image links; SVG generation is the presentation layer's responsibility.
-
-Finish with w.finalize_answer(draft_path, draft, findings=findings). draft_path is the
-exact runtime-provided answer-draft.json path for this attempt; draft is a Python dict.
-First print w.answer_preflight(draft), correct citation/selection errors, and address
-its missing-recipe/input-check warnings or explicitly retain those scientific gaps.
-If valid=False, correct the draft before calling finalize_answer. Claims have no
-id field; use w.help('finalize_answer') for the actual nested claim schema.
-For reaction_inputs_incomplete, inspect the saved product_element_excess and
-source-backed contributors/multiplicity. Condition amounts do not add graph
-atoms. Never invent a donor, duplicate contributor or mapping to pass the check.
-Preflight reads saved evidence; it does not run science or verify semantic claims.
-The helper validates citations, records supplied self-review and saves the complete
-answer. Print only its small JSON runtime handoff result and return the same receipt
-as your final message. A manually written full draft follows the same contract.
-The helper fills only boilerplate: omit empty arrays, null yield_info, null source URLs,
-schema_version and needs_user_input=False. Supply chemistry, basis, attribution,
-uncertainty and review explicitly. Invalid fields/support remain rejected. Keep answer
-and findings in one small script; avoid custom builders, full draft output and full
-schema reads unless validation requires them. Correct errors using saved evidence;
-do not weaken validators or rewrite evidence.
-
-For a scientific recommendation, challenge the final draft and supply brief findings.
-Each finding has area, claim, assessment, evidence_refs and reason. Cover all five
-areas: source_identity, structure_and_stereochemistry, conditions_and_yields,
-route_completeness and counterevidence. assessment is supported, partial, unsupported,
-conflicting, not_checked or not_applicable; explain missing checks. Supported, partial
-and conflicting findings need actual evidence_refs. Correct overclaims and finalize
-again after changes so the review matches the draft. Self-review is agent-authored,
-not independent chemistry validation, and cannot be cited as scientific evidence.
-Non-scientific or clarification-only answers may omit findings; no review is invented.
+Finish once with w.finalize_answer using this attempt's exact runtime-provided
+answer-draft.json path. It validates evidence and saves the answer. Return only its
+small handoff receipt; do not print the full draft. On failure, correct the indicated
+fields using saved evidence and retry. w.answer_preflight is optional for debugging;
+its missing-check warnings do not require new scientific calls merely to publish a
+clearly qualified proposal. Do not weaken validators or rewrite saved evidence.

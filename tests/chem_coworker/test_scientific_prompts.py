@@ -87,6 +87,8 @@ def test_presentation_changes_independently_of_core_or_task_guide(prompt_context
     )[0]
     assert "scientific_answer.v2" in second
     assert "matching\nnonempty inspect_step_precedents inspection" in second
+    assert "w.route_answer" in second
+    assert "No separate rationale, five-area self-review" in second
 
 
 def test_new_context_never_silently_uses_missing_current_resource(prompt_context):

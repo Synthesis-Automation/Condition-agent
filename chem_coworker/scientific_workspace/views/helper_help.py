@@ -16,6 +16,8 @@ HELPER_EXAMPLES = {
     "attach_literature_reaction": "draft = w.attach_literature_reaction(draft, 's1', preparation_ref)",
     "attach_recipe_check": "draft = w.attach_recipe_check(draft, 's1', recipe_check_ref)",
     "answer_template": "draft = w.answer_template('An evidence-linked proposal with explicit gaps.')",
+    "route_answer": "draft = w.route_answer({'target_smiles': 'CC=O', 'routes': [{'steps': [{'reaction_smiles': 'CCO>>CC=O', 'conditions': 'Conditions to develop', 'conditions_basis': 'unknown'}]}]})",
+    "inspect_artifact": "print(w.inspect_artifact(ref, path=('result',), offset=0, limit=3))",
     "answer_preflight": "print(w.answer_preflight(draft))",
     "finalize_answer": "receipt = w.finalize_answer(draft_path, draft, findings=findings)",
     "run_python": "event = w.run_python('audit.py', parameters, evidence_refs=(source_ref,))",
@@ -24,6 +26,15 @@ HELPER_EXAMPLES = {
 
 def nested_input_help(name: str) -> dict[str, Any]:
     """Expose actual nested contracts only when their operation is requested."""
+    if name == "route_answer":
+        from ..answers.route_authoring import RouteAnswerInput
+
+        return {"input_schema": RouteAnswerInput.model_json_schema(), "input_notes": [
+            "Use reactants>>products; supply conditions as text and support as ref/locator/optional note.",
+            "Steps and conditions default to proposed. Reported labels require support; missing conditions stay missing.",
+            "after_steps optionally names earlier steps by one-based route-local position; otherwise unique exact intermediate links are assembled.",
+            "No science or source drawings run. finalize_answer still checks citations and required exact-step inspections.",
+        ]}
     if name == "assess_proposed_recipe":
         from pydantic import TypeAdapter
         from condition_registry.models import ConditionComponentInput, ConditionProcessStage
