@@ -22,10 +22,29 @@ test('builds three steps, revises a branch, restores history and exports the can
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   await start(page)
+  await expect(page.getByRole('radio').last()).toHaveAccessibleName('Interactive route planning')
   await expand(page, 'target')
   await expand(page, 'molecule 1')
   await expand(page, 'molecule 1.1')
   await expect(page.getByText('3 selected steps', { exact: true })).toBeVisible()
+  const rootBranch = page.locator('.planner-tree > ul > .planner-branch')
+  const children = rootBranch.locator(':scope > .planner-children > .planner-branch')
+  await expect(children).toHaveCount(2)
+  const rootBox = (await rootBranch.locator(':scope > .planner-molecule').boundingBox())!
+  const firstBox = (await children.nth(0).locator(':scope > .planner-molecule').boundingBox())!
+  const secondBox = (await children.nth(1).locator(':scope > .planner-molecule').boundingBox())!
+  expect(firstBox.x).toBeGreaterThan(rootBox.x + rootBox.width)
+  expect(secondBox.x).toBeCloseTo(firstBox.x, 0)
+  expect(secondBox.y).toBeGreaterThan(firstBox.y + firstBox.height)
+  const grandchildren = children.nth(0).locator(':scope > .planner-children > .planner-branch')
+  await expect(grandchildren).toHaveCount(2)
+  const grandchildBox = (await grandchildren.nth(0).locator(':scope > .planner-molecule').boundingBox())!
+  expect(grandchildBox.x).toBeGreaterThan(firstBox.x + firstBox.width)
+  await children.nth(0).locator(':scope > .planner-molecule').getByRole('button', { name: 'Collapse branch' }).click()
+  await expect(page.getByRole('button', { name: 'Select molecule 1.1', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Select molecule 2', exact: true })).toBeVisible()
+  await children.nth(0).locator(':scope > .planner-molecule').getByRole('button', { name: 'Expand branch' }).click()
+  await expect(page.getByRole('button', { name: 'Select molecule 1.1', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Select molecule 2', exact: true }).click()
   await page.getByRole('button', { name: 'Check supplier stock' }).click()
   await expect(page.getByText('Verified Stock Match · last check', { exact: true })).toBeVisible()

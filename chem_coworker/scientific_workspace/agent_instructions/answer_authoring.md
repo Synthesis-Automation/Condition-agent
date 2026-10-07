@@ -1,5 +1,7 @@
 Saved answer contract and handoff:
 
+Do not read answer-schema.json at startup. Use w.help('route_answer') if needed.
+
 For synthesis routes, use w.route_answer with compact input. Supply only the target,
 ordered reaction SMILES, conditions and inspected support. The application assembles
 molecule/source/step IDs, exact shared intermediates, citations and the existing

@@ -168,7 +168,7 @@ function RouteNode({ node, path, selectedId, onSelect, stock }: { node: Planning
       </button>
       {node.children.length > 0 && <button className="button quiet" type="button" aria-expanded={!collapsed} onClick={() => setCollapsed(value => !value)}>{collapsed ? 'Expand branch' : 'Collapse branch'}</button>}
     </div>
-    {node.children.length > 0 && !collapsed && <><p className="planner-connector">Chosen reaction · all {node.children.length} precursors required</p><ul>
+    {node.children.length > 0 && !collapsed && <><div className="planner-connector"><span>Chosen reaction<br />All {node.children.length} precursors required</span></div><ul className="planner-children">
       {node.children.map((child, index) => <RouteNode key={child.node_id} node={child} path={path === '0' ? `${index + 1}` : `${path}.${index + 1}`} selectedId={selectedId} onSelect={onSelect} stock={stock} />)}
     </ul></>}
   </li>
@@ -232,7 +232,7 @@ export function InteractivePlanner({ state, capabilities }: { state: State; capa
       <div className="planner-summary"><strong>{data.summary.reaction_count} selected steps</strong><span>{data.summary.unresolved_count} unresolved molecules</span><span>{data.summary.starting_material_count} user-designated starting materials</span><span>Depth {data.summary.maximum_depth}</span><small>{state.saveError ? 'Autosave unavailable' : 'Saved in this browser'}</small></div>
       {!data.summary.unresolved_count && <p className="planner-note">All branches end at user-designated starting materials. Stock availability and route feasibility are not established by these choices.</p>}
       <div className="planner-layout">
-        <section className="planner-tree-panel" aria-label="Selected route"><h2>Selected route</h2><p className="planner-note">Select a molecule to continue or revise its step.</p><div className="planner-tree"><ul><RouteNode node={data.session.root} path="0" selectedId={selected.node_id} onSelect={state.select} stock={data.session.stock} /></ul></div></section>
+        <section className="planner-tree-panel" aria-label="Selected route"><h2>Selected route</h2><p className="planner-note" id="planner-tree-help">Target → precursor branches. Select any molecule to continue or revise its step. Scroll to explore the tree.</p><div className="planner-tree" role="region" aria-label="Route tree" aria-describedby="planner-tree-help" tabIndex={0}><ul><RouteNode node={data.session.root} path="0" selectedId={selected.node_id} onSelect={state.select} stock={data.session.stock} /></ul></div></section>
         <section className="planner-inspector" aria-label="Selected molecule planning">
           <div className="planner-inspector-heading"><h2>{selected.node_id === 'root' ? 'Plan the target' : 'Plan this precursor'}</h2><code>{selected.smiles}</code></div>
           <div className="planner-actions"><button className="button primary" type="button" disabled={Boolean(busy || !available || selected.stopped)} onClick={() => void state.act('search')}>{search ? 'Search again' : 'Find disconnections'}</button>

@@ -275,21 +275,26 @@ def test_prompt_assigns_multistep_decisions_to_agent(workspace) -> None:
         assert retired not in prompt
 
 
-def test_prompt_nested_answer_example_validates_against_real_contract(workspace) -> None:
-    import json
+def test_prompt_compact_route_example_validates_against_real_contract(workspace) -> None:
+    import ast
 
     from chem_coworker.scientific_workspace.answers.answer_contracts import ScientificAnswer
-    from chem_coworker.scientific_workspace.answers.answer_finalization import _complete_empty_fields
     from chem_coworker.scientific_workspace.agent_context.prompts import investigation_prompt
 
     prompt = investigation_prompt(workspace, "Propose a synthesis")
-    snippet = prompt.split("Minimal nested shapes (replace IDs/text with your actual evidence and proposal):\n")[1]
-    snippet = snippet.split("\nCondition objects")[0]
-    draft = json.loads("{" + snippet + "}")
-    draft.update(answer_markdown="Schema example only", molecules=[
-        {"id": "a", "smiles": "CCO", "name": "Input", "basis": "input"},
-        {"id": "b", "smiles": "CC=O", "name": "Proposed product", "basis": "proposed"},
-    ])
-    answer = ScientificAnswer.model_validate(_complete_empty_fields(draft))
+    snippet = next(block.split("\n```", 1)[0] for block in prompt.split("```python\n")
+                   if block.startswith("draft = w.route_answer("))
+    source = workspace.capture_source("Example 1: test illustration only.",
+                                      url="https://example.org/paper", locator="Example 1")
+    # Evaluate only the trusted documentation's input expression, not its file handoff.
+    expression = ast.Expression(ast.parse(snippet).body[0].value.args[0])
+    request = eval(compile(expression, "prompt-example", "eval"), {"__builtins__": {}}, {
+        "target_smiles": "CC=O", "reactants": "CCO", "product": "CC=O",
+        "captured_source_ref": source.artifact_ref,
+    })
+    answer = ScientificAnswer.model_validate(workspace.route_answer(request))
     assert answer.steps[0].conditions[0].text == "Conditions to develop"
-    assert answer.routes[0].step_ids == ["s1"]
+    assert answer.steps[0].conditions[0].basis == "unknown"
+    assert answer.routes[0].step_ids == [answer.steps[0].id]
+    assert answer.sources[0].artifact_ref == source.artifact_ref
+    assert not answer.steps[0].literature_reactions

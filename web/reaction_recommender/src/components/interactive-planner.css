@@ -6,13 +6,21 @@
 .planner-progress { padding: 10px 14px; background: #f3f7f4; border-radius: 10px; font-size: .8rem; }
 .planner-note { margin: 8px 0; color: #62766a; font-size: .75rem; line-height: 1.5; }
 .planner-target { display: grid; gap: 10px; }
-.planner-layout { display: grid; grid-template-columns: minmax(280px,.85fr) minmax(0,1.15fr); gap: 14px; align-items: start; }
+.planner-layout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(320px,1fr); gap: 14px; align-items: start; }
 .planner-tree-panel, .planner-inspector { min-width: 0; padding: 16px; border: 1px solid #d1ddd5; border-radius: 13px; background: #fff; }
-.planner-tree { overflow: auto; max-height: 78vh; padding: 4px; }
+.planner-tree { overflow: auto; max-height: 78vh; padding: 16px 4px; }
+.planner-tree:focus-visible { outline: 2px solid #277b54; outline-offset: 2px; }
 .planner-tree ul { list-style: none; margin: 0; padding: 0; }
-.planner-branch > ul { border-left: 2px solid #cadbd0; margin-left: 14px; padding-left: 16px; }
-.planner-branch { margin: 10px 0; }
-.planner-molecule { width: 240px; max-width: 100%; padding: 8px; border: 1px solid #d1ddd5; border-radius: 10px; background: #fff; }
+.planner-tree > ul { width: max-content; min-width: 100%; }
+.planner-branch { position: relative; display: flex; align-items: center; padding: 12px 0; }
+.planner-children { flex: 0 0 auto; }
+.planner-children > .planner-branch { padding-left: 24px; }
+/* Each child contributes half of the shared trunk and its own horizontal edge. */
+.planner-children > .planner-branch::before, .planner-children > .planner-branch::after { content: ''; position: absolute; left: 0; width: 24px; height: 50%; border-left: 2px solid #91b39c; pointer-events: none; }
+.planner-children > .planner-branch::before { top: 0; border-bottom: 2px solid #91b39c; }
+.planner-children > .planner-branch::after { top: 50%; }
+.planner-children > .planner-branch:first-child::before, .planner-children > .planner-branch:last-child::after { border-left: 0; }
+.planner-molecule { position: relative; flex: 0 0 210px; width: 210px; padding: 8px; border: 1px solid #d1ddd5; border-radius: 10px; background: #fff; }
 .planner-molecule.selected { border-color: #277b54; box-shadow: 0 0 0 2px #dbeee1; background: #f6faf7; }
 .planner-molecule-select { display: grid; gap: 6px; width: 100%; padding: 0; border: 0; background: transparent; color: #294d3a; text-align: left; cursor: pointer; }
 .planner-molecule-select strong { font-size: .78rem; }
@@ -22,7 +30,9 @@
 .planner-molecule > .button { margin-top: 8px; font-size: .68rem; }
 .planner-status { color: #7b6540; font-size: .67rem; }
 .planner-status.stopped { color: #426b58; }
-.planner-connector { margin: 9px 0 4px 14px; color: #6b7e70; font-size: .66rem; }
+.planner-connector { position: relative; flex: 0 0 108px; align-self: stretch; color: #526c5b; font-size: .66rem; text-align: center; }
+.planner-connector::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; border-top: 2px solid #91b39c; }
+.planner-connector span { position: absolute; left: 6px; right: 6px; bottom: calc(50% + 8px); line-height: 1.5; }
 .planner-inspector-heading code { display: block; margin-top: 7px; font-size: .76rem; overflow-wrap: anywhere; }
 .planner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .planner-chosen { padding: 12px; border: 1px solid #c8dacd; border-radius: 10px; background: #f7faf8; margin: 14px 0; }
@@ -41,5 +51,5 @@
 .planner-evidence pre { max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 10px; margin-top: 7px; background: #f4f7f4; font-size: .66rem; }
 .planner-conditions { font-size: .76rem; line-height: 1.5; overflow-wrap: anywhere; }
 @media (max-width: 900px) { .planner-layout { grid-template-columns: 1fr; } .planner-tree { max-height: 450px; } }
-@media (max-width: 460px) { .planner-tree-panel, .planner-inspector { padding: 10px; } .planner-molecule { width: 205px; } .planner-toolbar .button { flex: 1; } }
+@media (max-width: 460px) { .planner-tree-panel, .planner-inspector { padding: 10px; } .planner-toolbar .button { flex: 1; } }
 @media (max-width: 720px) { .analysis-workbench .planner-options .option-grid.feature-options { grid-template-columns: 1fr; } }

@@ -578,7 +578,6 @@ function App() {
         </div>
         <div className="analysis-control-layout">
           <fieldset className="mode-switch" aria-labelledby="analysis-title">
-            <label className={mode === 'interactive_planning' ? 'active' : ''}><input type="radio" name="analysis-mode" value="interactive_planning" checked={mode === 'interactive_planning'} onChange={() => changeMode('interactive_planning')} /><strong>Interactive route planning</strong></label>
             <label className={mode === 'fragment_guided_retro' ? 'active experimental-mode' : 'experimental-mode'}><input type="radio" name="analysis-mode" value="fragment_guided_retro" checked={mode === 'fragment_guided_retro'} onChange={() => changeMode('fragment_guided_retro')} /><strong>Fragment-guided retro</strong></label>
             <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Analyze reactions</strong></label>
             <label className={mode === 'recommendation' ? 'active' : ''}><input type="radio" name="analysis-mode" value="recommendation" checked={mode === 'recommendation'} onChange={() => changeMode('recommendation')} /><strong>Condition recommendation</strong></label>
@@ -587,6 +586,7 @@ function App() {
             <label className={mode === 'retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="retrosynthesis" checked={mode === 'retrosynthesis'} onChange={() => changeMode('retrosynthesis')} /><strong>Single-step retrosynthesis</strong></label>
             <label className={mode === 'coupled_strategy' ? 'active experimental-mode' : 'experimental-mode'}><input type="radio" name="analysis-mode" value="coupled_strategy" checked={mode === 'coupled_strategy'} onChange={() => changeMode('coupled_strategy')} /><strong>Composite two-step strategies</strong></label>
             <label className={mode === 'multistep_retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="multistep_retrosynthesis" checked={mode === 'multistep_retrosynthesis'} onChange={() => changeMode('multistep_retrosynthesis')} /><strong>Multi-step retrosynthesis</strong></label>
+            <label className={mode === 'interactive_planning' ? 'active' : ''}><input type="radio" name="analysis-mode" value="interactive_planning" checked={mode === 'interactive_planning'} onChange={() => changeMode('interactive_planning')} /><strong>Interactive route planning</strong></label>
           </fieldset>
 
           {mode === 'interactive_planning' ? <InteractivePlannerOptions state={planner} /> : mode === 'fragment_guided_retro' ? <FragmentGuidedRetroOptions state={fragmentRetro} capabilities={capabilities} /> : <div className="analysis-options">

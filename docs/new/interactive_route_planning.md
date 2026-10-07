@@ -7,7 +7,8 @@ definitions, ranking, and independent evaluation release gates are unchanged.
 ## Use
 
 Launch `python -m app.web_api --workbench --build`, then select **Interactive
-route planning**. Draw or paste one connected target and click **Start planning**.
+route planning**, the last analysis mode. Draw or paste one connected target and
+click **Start planning**.
 Select a molecule in the route tree, click **Find disconnections**, inspect the
 strategies and their alternate precursor choices, and click **Use this step**.
 Every precursor is added as a separate molecule occurrence. Select any precursor
@@ -26,8 +27,11 @@ portfolio is configured. It retains exact matches, source snapshot provenance,
 and check time separately from the user's stopping choice. Saved stock checks
 are not live inventory. Stock matches do not automatically change the route.
 
-The tree collapses by branch and scrolls normally over molecule drawings. On
-narrow screens the candidate panel appears below the route tree.
+The selected route is a connected tree from left to right: the target branches
+into the required precursors, and each precursor can have its own branches.
+The tree collapses by branch and scrolls horizontally and vertically over
+molecule drawings. On narrow screens the candidate panel appears below the
+route tree.
 
 ## Persistence and evidence
 
