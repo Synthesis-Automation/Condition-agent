@@ -306,6 +306,20 @@ Omit `--build` on subsequent starts when the frontend has not changed.
   alone is not the web dependency set.
 - **Agent runtime unavailable:** check the native executable and its
   authentication, or use `--codex` to select it explicitly.
+- **`helper_unknown_error: setup refresh had errors`:** inspect the newest
+  `%USERPROFILE%\.codex\.sandbox\sandbox.*.log` for the underlying Windows
+  error. The 2026-10-07 conversations failed because a running process locked
+  `node_repl.exe` during runtime read/execute permission validation (OS error 32).
+  Finish active Codex tasks, close unused Codex sessions/apps holding that runtime,
+  and restart the agent server before retrying. A new chat alone does not release
+  the lock; do not disable sandboxing to hide this failure.
+- **`Scientific runtime changed` in a fresh chat:** compare the recorded/current
+  fields in the error and ensure the server and worker use the same Python and
+  installed dependencies. Windows baseline identity now uses Python's build
+  architecture, avoiding WMI and missing `PROCESSOR_*` variables in restricted
+  workers. Restart the server and start a new investigation after this fix;
+  existing baselines remain frozen. Older errors omit the differing fields and
+  cannot establish which dependency or platform field differed.
 - **Agent exits with a model rejection:** open the failed turn's details. The
   runtime now reports the provider error from `runtime.jsonl`, even when stderr
   is empty. An older CLI can reject a model selected in your desktop Codex

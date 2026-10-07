@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -73,6 +74,48 @@ def baseline(repository: Path, *, legacy: bool = False) -> dict:
     if not legacy:
         result["scientific_identity"] = scientific_identity(result)
     return result
+
+
+@pytest.mark.parametrize("build_platform,architecture", [
+    ("win-amd64", "AMD64"), ("win32", "x86"),
+    ("win-arm64", "ARM64"), ("win-arm32", "ARM"),
+])
+def test_windows_identity_does_not_depend_on_wmi_or_processor_environment(
+    monkeypatch: pytest.MonkeyPatch, build_platform: str, architecture: str,
+) -> None:
+    from chem_coworker.scientific_workspace.core import baseline as module
+
+    monkeypatch.setattr(module.sys, "platform", "win32")
+    monkeypatch.setattr(module.sys, "getwindowsversion", lambda: SimpleNamespace(
+        major=10, minor=0, build=26300,
+    ), raising=False)
+    monkeypatch.setattr(module.sysconfig, "get_platform", lambda: build_platform)
+
+    def forbidden_probe() -> str:
+        raise AssertionError("Windows identity must not probe WMI")
+
+    monkeypatch.setattr(module.platform, "machine", forbidden_probe)
+    monkeypatch.setattr(module.platform, "platform", forbidden_probe)
+    original = module.environment_versions()
+    monkeypatch.delenv("PROCESSOR_ARCHITECTURE", raising=False)
+    monkeypatch.delenv("PROCESSOR_ARCHITEW6432", raising=False)
+    assert module.environment_versions() == original
+    assert original["platform"] == f"Windows-10.0.26300-{architecture}"
+
+
+def test_runtime_mismatch_identifies_all_changed_fields(
+    project: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    frozen = baseline(project)
+    monkeypatch.setattr(
+        "chem_coworker.scientific_workspace.core.baseline.environment_versions",
+        lambda: {"python": "different", "rdkit": "new"},
+    )
+    with pytest.raises(ValueError, match="Scientific runtime changed") as failure:
+        verify_baseline(frozen)
+    assert "python: recorded='fixture', current='different'" in str(failure.value)
+    assert "rdkit: recorded=None, current='new'" in str(failure.value)
+    assert frozen["environment"] == {"python": "fixture"}
 
 
 @pytest.mark.parametrize("relative", [

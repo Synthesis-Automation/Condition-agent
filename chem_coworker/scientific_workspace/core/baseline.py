@@ -9,6 +9,7 @@ import platform
 import sqlite3
 import subprocess
 import sys
+import sysconfig
 from contextlib import closing
 from pathlib import Path
 from types import MappingProxyType
@@ -146,12 +147,18 @@ def artifact_identity(path: Path) -> dict[str, Any]:
 
 def environment_versions() -> dict[str, str]:
     """Record runtime versions relevant to deterministic calculations."""
-    # platform.platform() probes the processor through WMI on Windows. Under
-    # concurrent scientific workers that COM probe can terminate the interpreter.
-    # The native OS version and architecture provide the required runtime identity.
+    # Both platform.platform() and platform.machine() can probe WMI on Windows.
+    # Restricted workers may lack WMI and PROCESSOR_* variables; concurrent COM
+    # probes can also terminate the interpreter. Use the OS version and Python's
+    # build architecture, which do not depend on the worker's account/environment.
     if sys.platform == "win32":
         native = sys.getwindowsversion()
-        os_identity = f"Windows-{native.major}.{native.minor}.{native.build}-{platform.machine()}"
+        build_platform = sysconfig.get_platform()
+        architecture = {
+            "win-amd64": "AMD64", "win32": "x86",
+            "win-arm64": "ARM64", "win-arm32": "ARM",
+        }.get(build_platform, build_platform)
+        os_identity = f"Windows-{native.major}.{native.minor}.{native.build}-{architecture}"
     else:
         os_identity = platform.platform()
     versions = {"python": platform.python_version(), "platform": os_identity}
@@ -261,8 +268,19 @@ def verify_baseline(baseline: Mapping[str, Any], *, full_hash: bool = False) -> 
     manifest = legacy_code_manifest if schema == LEGACY_BASELINE_SCHEMA else code_manifest
     if manifest(Path(baseline["repository"])) != baseline["code_files"]:
         raise ValueError("Scientific code or definitions changed; start a new investigation")
-    if environment_versions() != baseline["environment"]:
-        raise ValueError("Scientific runtime changed; start a new investigation")
+    current_environment = environment_versions()
+    recorded_environment = baseline["environment"]
+    if current_environment != recorded_environment:
+        differences = "; ".join(
+            f"{key}: recorded={recorded_environment.get(key)!r}, "
+            f"current={current_environment.get(key)!r}"
+            for key in sorted(recorded_environment.keys() | current_environment.keys())
+            if recorded_environment.get(key) != current_environment.get(key)
+        )
+        raise ValueError(
+            "Scientific runtime changed; align the worker environment and start "
+            f"a new investigation ({differences})"
+        )
     hashes: dict[Path, str] = {}
     for value in baseline["artifacts"].values():
         path = Path(value["path"])
