@@ -57,16 +57,16 @@ Or preprocess explicitly selected files from the command line:
 
 ```powershell
 python -m condition_recommender.preprocess_cli `
-  raw_dataset/HiTEA/8_SEPT_APPROVED_full_dataset.csv `
-  --output-dir datasets/intermediate
+  raw_datasets/HiTEA/8_SEPT_APPROVED_full_dataset.csv `
+  --output-dir datasets/intermediate_datasets
 ```
 
 For the cleaned USPTO dataset (automatic detection selects the USPTO adapter):
 
 ```powershell
 python -m condition_recommender.preprocess_cli `
-  raw_dataset/USPTO/USPTO_condition_reactions_cleaned.csv `
-  --output-dir datasets/intermediate
+  raw_datasets/USPTO/USPTO_condition_reactions_cleaned.csv `
+  --output-dir datasets/intermediate_datasets
 ```
 
 Available adapters cover the literature CSV contract, the HiTEA approved CSV,
@@ -560,8 +560,10 @@ memberships are available by stable observation/route ID.
 
 Scientific review remains separate from corpus conversion. Composite promotion
 is unavailable until a training scope and independent support review are declared.
-Old literature artifacts remain available for rollback and historical investigations;
-new default app/agent queries resolve the processed release.
+Default app/agent queries resolve the processed release. The obsolete
+`datasets/intermediate` and `datasets/literature` directories were removed on
+2026-10-07; preprocessing inputs remain under `datasets/intermediate_datasets`.
+Historical investigations pinned to removed artifacts require a new baseline.
 
 ### Build an index and recommend
 
@@ -606,13 +608,8 @@ python -m condition_recommender.generic_recommend_cli `
   --unrestricted
 ```
 
-If the fast index was not built, use the canonical manifest instead:
-
-```powershell
-python -m condition_recommender.generic_recommend_cli `
-  "<reaction_smiles>" `
-  --records datasets/literature/full/shard_manifest.json
-```
+The active manifest selects a complete processed release, including its condition
+index. Publish a complete release before using the default app/agent paths.
 
 ### Desktop recommender
 
@@ -622,12 +619,10 @@ Launch the simpler Qt6 interface:
 python -m app.reaction_recommender_gui
 ```
 
-Use the **Full / Compact** selector to switch between
-`datasets/literature/full/` and `datasets/literature/compact/`. Existing
-root-level artifacts remain a temporary Full fallback until a new Full library
-is built. The app prefers `generic_index.sqlite`, then `shard_manifest.json` as
-the rebuild fallback. Persisted JSON runtime indexes are no longer accepted. Paste a complete
-`reactants>>product` reaction SMILES and choose how many recipes to return.
+The app resolves the condition index from `datasets/processed_datasets/manifest.json`.
+There is one complete production corpus. Persisted JSON runtime indexes are no
+longer accepted. Paste a complete `reactants>>product` reaction SMILES and choose
+how many recipes to return.
 `Use RXNMapper` is checked by default; it is invoked only when supplied mapping
 and ordinary internal analysis do not already resolve the query. Clear the
 checkbox to use internal evidence alone.

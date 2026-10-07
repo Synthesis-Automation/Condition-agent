@@ -900,13 +900,11 @@ Boundary bonds describe query extraction, not recommended disconnections. Simple
 cores carry a broad-query caution; only a subsequent search establishes breadth
 in the indexed corpus. Suggestions do not automatically search any candidate.
 
-Build once offline from canonical observations (not the condition-admitted index):
-
-```powershell
-python -m condition_recommender.fragment_search build --source datasets/literature/full/combined_records.jsonl.gz --procedure-catalog datasets/literature/full/experimental_detail_catalog.jsonl.gz --output results/ai_native/indexes/fragment_precedents.sqlite
-```
-
-The example artifact configuration already names this path as `fragment_index`.
+The processed dataset builder publishes the fragment index alongside canonical
+observations and the evidence catalog. Default workspaces resolve `fragment_index`
+from `datasets/processed_datasets/manifest.json`; no separate local build is needed.
+See the [processed dataset migration](../new/processed_dataset_migration_plan.md)
+for the build workflow. Explicit custom artifact configurations override defaults.
 Restart the scientific chat server and begin a new investigation after updating
 code or replacing an index; existing investigations keep their original baseline.
 An absent index produces an explicit capability error and is never built by an

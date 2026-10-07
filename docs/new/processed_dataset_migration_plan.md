@@ -536,3 +536,12 @@ arguments remain explicit overrides; the production builder and default interfac
 expose one complete corpus and do not automatically select the old literature
 datasets. Technical migration completion does not satisfy the independent
 chemistry-review or untouched-evaluation release gates.
+
+### Post-migration cleanup (2026-10-07)
+
+After the rebuild, the obsolete `datasets/intermediate` and `datasets/literature`
+directories were removed. Raw sources, `datasets/intermediate_datasets`, and the
+published `datasets/processed_datasets` release remain available. Earlier mentions
+of retained literature artifacts describe the migration-time state; those local
+rollback artifacts are no longer available. Historical investigations pinned to
+them must start a new baseline against the processed release.

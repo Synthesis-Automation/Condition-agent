@@ -13,11 +13,13 @@ with branch revision, undo/redo, resumable sessions, and canonical route export.
 Condition and exact-stock evidence remain separate from user stopping decisions.
 Chemistry definitions and independent evaluation release gates are unchanged.
 
-2026-10-05: the [unified processed dataset migration plan](processed_dataset_migration_plan.md)
-specifies one complete corpus under `datasets/processed_datasets`, shared evidence
-storage, integrated index/operator builds, and fragment discovery with explicit
-starting-material/product side labels. This is planned work; implementation,
-corpus regeneration, and scientific release gates are not marked complete.
+2026-10-07: the [unified processed dataset migration](processed_dataset_migration_plan.md)
+records the completed technical rebuild under `datasets/processed_datasets`, shared
+evidence storage, integrated index/operator builds, and fragment discovery with
+explicit starting-material/product side labels. The obsolete `datasets/intermediate`
+and `datasets/literature` directories have been removed; current preprocessing
+inputs remain under `datasets/intermediate_datasets`. Independent chemistry review
+and untouched-evaluation release gates remain pending.
 
 2026-10-04: [scientific workspace log review fixes](agent_log_review_fixes_20261004.md)
 preserve conditional source quantity conflicts and expose canonical reaction
@@ -209,7 +211,11 @@ row must still pass net-edit, active-atom, departing-fragment, and recipe
 compatibility gates. Missing or rejected IDs fall through to the normal generic
 retrieval ladder.
 
-### 2.3 Current local literature artifact
+### 2.3 Historical local literature artifact
+
+This section records the 2026-08-04 development snapshot. Its local artifacts
+were removed on 2026-10-07 after the processed corpus rebuild. For current corpus
+counts and validation, use the [processed dataset completion record](processed_dataset_migration_plan.md).
 
 > Rebuild required after the `reaction_correspondence=2.8`, reaction-facet
 > `1.1`, condition-registry structure correction, and generic-index `6.3`
@@ -1200,14 +1206,17 @@ python -m reactive_taxonomy.cli validate
 python -m condition_registry.cli validate
 ```
 
-Validate current persisted artifacts:
+Resolve the active release before validating current persisted artifacts:
 
 ```powershell
+$records = python -c "from condition_recommender.processed_release import processed_artifact; print(processed_artifact('canonical_records'))"
+$conditionIndex = python -c "from condition_recommender.processed_release import processed_artifact; print(processed_artifact('condition_index'))"
+
 python -m condition_recommender.conversion_integrity_cli `
-  datasets/literature/shard_manifest.json
+  $records
 
 python -m condition_recommender.generic_index_integrity_cli `
-  datasets/literature/generic_index.sqlite
+  $conditionIndex
 ```
 
 For a new release candidate, generate and adjudicate the chemist packet using

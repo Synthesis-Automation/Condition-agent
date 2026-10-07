@@ -137,15 +137,17 @@ need to reproduce the structure index.
 
 ## 3. Corpus and ownership
 
-The current [conversion report](../../datasets/literature/full/conversion_report.json)
-contains 660,190 canonical observations, including
-132,160 admitted verified records, 445,784 review records, and 82,246 rejected
-records. These are observation counts, not distinct molecules or publications.
-Only 21,518 procedure records are currently available. Counts are a local snapshot
-and must be recomputed for each build.
+The historical literature conversion report contained 660,190 canonical
+observations, including 132,160 admitted verified records, 445,784 review records,
+and 82,246 rejected records. These are observation counts, not distinct molecules
+or publications.
+Only 21,518 procedure records were available in that snapshot. The old literature
+directory was removed on 2026-10-07. Current counts and artifacts come from the
+published [processed dataset release](../new/processed_dataset_migration_plan.md).
 
-Build the discovery index from `datasets/literature/full/combined_records.jsonl.gz`
-or its canonical shard manifest. The condition-recommendation index excludes
+The processed dataset builder builds the discovery index from canonical
+observations and publishes it as the release's `fragment_index` artifact.
+The condition-recommendation index excludes
 records for reasons such as unresolved recipes that need not prevent product
 substructure discovery. Index every valid product component, preserving source
 admission status and exclusion reasons. A product with unresolved reactants or

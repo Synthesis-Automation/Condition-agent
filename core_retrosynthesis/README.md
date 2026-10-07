@@ -176,7 +176,20 @@ valence-correct X-H precursor, including adjacent aromatic tautomer carriers.
 Every admitted SMARTS must reproduce its recorded contributing precursors when
 applied to its source product.
 
-## Full and Compact input libraries
+## Input libraries
+
+The current corpus is selected by `datasets/processed_datasets/manifest.json`.
+The production builder already publishes the retrosynthesis and forward operator
+libraries with this release; see the [processed dataset workflow](../docs/new/processed_dataset_migration_plan.md).
+
+The Full/Compact examples below document historical development experiments.
+Their `datasets/literature` and `datasets/intermediate` inputs were removed on
+2026-10-07. To repeat an experiment, supply an explicit canonical dataset and
+declare its training/held-out split; the complete processed corpus is not an
+independent held-out set. The condition-evidence example below resolves the
+current published artifacts.
+
+### Historical Full and Compact inputs
 
 Commands that consume converted reactions accept the recommendation-library
 root and a mode selector:
@@ -746,8 +759,8 @@ operator ladder. Supply a condition index to recommend recipes for every
 candidate whose forward validation status is `verified_signature`:
 
 ```powershell
-$operatorLibrary = "results/operator_retrosynthesis_poc/full_scale_v3/compact/operator_library_v3.json.gz"
-$conditionIndex = "datasets/literature/compact/generic_index.sqlite"
+$operatorLibrary = python -c "from condition_recommender.processed_release import processed_artifact; print(processed_artifact('retro_library'))"
+$conditionIndex = python -c "from condition_recommender.processed_release import processed_artifact; print(processed_artifact('condition_index'))"
 
 python -m core_retrosynthesis disconnect-operators `
   $operatorLibrary `
