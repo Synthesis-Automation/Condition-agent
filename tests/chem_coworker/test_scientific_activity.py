@@ -133,6 +133,65 @@ def test_web_page_and_scientific_tool_details_use_observed_inputs():
     assert "unrelated" not in detail
 
 
+@pytest.mark.parametrize("encoded", [False, True])
+def test_node_repl_title_code_output_and_duration_survive_lifecycle_and_recovery(tmp_path, encoded):
+    arguments = {"title": "Inspect scientific workspace", "code": 'const x = "<tag>&amp;";\nnodeRepl.write(x);'}
+    events = [
+        {"type": "item.started", "item": {"id": "node", "type": "mcp_tool_call",
+         "server": "node_repl", "tool": "js", "arguments": json.dumps(arguments) if encoded else arguments}},
+        {"type": "item.completed", "item": {"id": "node", "type": "mcp_tool_call", "result": {
+            "content": [{"type": "text", "text": "start\n" + "x" * 9000 + "\nValueError: nested process failed"},
+                        {"type": "image", "data": "image bytes excluded"}],
+            "_meta": {"codex/nodeReplExecutionDurationMs": 54335}}}},
+    ]
+    history = ActivityHistory()
+    for event in events:
+        history.observe(event, "now")
+    row = history.rows[0]
+    assert len(history.rows) == 1
+    assert row["action_title"] == row["title"] == arguments["title"]
+    assert row["code_preview"] == arguments["code"]
+    assert row["detail"] == "node_repl / js"
+    assert row["duration_ms"] == 54335
+    assert len(row["output_preview"]) <= 2400
+    assert row["output_preview"].startswith("start\n")
+    assert row["output_preview"].endswith("ValueError: nested process failed")
+    assert "truncated" in row["output_preview"]
+    assert "image bytes" not in json.dumps(row)
+    # Output may describe a nested failure; do not guess the outer tool's status.
+    assert row["status"] == "completed" and not row["failure_detail"]
+    path = tmp_path / "runtime.jsonl"
+    path.write_text("\n".join(json.dumps(event) for event in events), encoding="utf-8")
+    original = path.read_bytes()
+    recovered = recover_activity([path], [])
+    assert recovered[0]["action_title"] == arguments["title"]
+    assert recovered[0]["output_preview"] == row["output_preview"]
+    assert path.read_bytes() == original
+    row = history.observe({"type": "item.completed", "item": {"id": "node"}}, "later")
+    assert row["duration_ms"] == 54335 and row["output_preview"] == recovered[0]["output_preview"]
+
+
+@pytest.mark.parametrize("arguments", [None, "{invalid", "[]", {"title": 123}, {"title": "  "}])
+def test_mcp_without_valid_title_keeps_tool_fallback(arguments):
+    row = ActivityHistory().observe({"type": "item.completed", "item": {
+        "id": "tool", "type": "mcp_tool_call", "server": "node_repl", "tool": "js",
+        "arguments": arguments,
+    }}, "now")
+    assert row["action_title"] == ""
+    assert row["detail"] == "node_repl / js"
+
+
+def test_mcp_error_result_is_failure_and_successful_other_tools_do_not_expose_output():
+    for failed in (False, True):
+        row = ActivityHistory().observe({"type": "item.completed", "item": {
+            "id": "tool", "type": "mcp_tool_call", "server": "chemistry", "tool": "analyze",
+            "result": {"isError": failed, "content": [{"type": "text", "text": "Diagnostic text"}]},
+        }}, "now")
+        assert row["status"] == ("failed" if failed else "completed")
+        assert row["failure_detail"] == ("Diagnostic text" if failed else "")
+        assert "output_preview" not in row
+
+
 def test_recovery_restores_dropped_history_without_rewriting_logs(tmp_path):
     path = tmp_path / "runtime.jsonl"
     events = [{"type": "item.completed", "item": {
@@ -149,6 +208,23 @@ def test_recovery_restores_dropped_history_without_rewriting_logs(tmp_path):
     assert rows[10]["at"] == "10" and rows[-1]["at"] == "39"
     assert path.read_bytes() == before
     assert recover_activity([tmp_path / "missing.jsonl"], saved) == saved
+
+
+def test_recovery_keeps_scientific_outcomes_between_runtime_actions(tmp_path):
+    path = tmp_path / "runtime.jsonl"
+    events = [{"type": "item.completed", "item": {
+        "id": str(i), "type": "mcp_tool_call", "status": "completed", "server": "node_repl",
+        "tool": "js", "arguments": {"title": f"Action {i}"},
+    }} for i in (1, 3)]
+    path.write_text("\n".join(json.dumps(event) for event in events), encoding="utf-8")
+    scientific = {"kind": "scientific_call", "activity_id": "scientific:4", "at": "2",
+                  "status": "failed", "failure_detail": "Invalid input", "event_sequence": 4}
+    saved = [{"kind": "mcp_tool_call", "status": "completed", "at": "1"}, scientific,
+             {"kind": "mcp_tool_call", "status": "completed", "at": "3"}]
+    rows = recover_activity([path], saved)
+    assert [row["at"] for row in rows] == ["1", "2", "3"]
+    assert rows[1] == scientific
+    assert rows[0]["action_title"] == "Action 1" and rows[2]["action_title"] == "Action 3"
 
 
 def test_only_public_commentary_is_shown_and_recovered(tmp_path):

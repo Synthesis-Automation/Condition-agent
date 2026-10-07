@@ -40,7 +40,7 @@ class RecordedRuntime:
     def describe(self) -> dict[str, Any]:
         return {"runtime": "test_double", "version": "1", "model": "none"}
 
-    def run(self, *, prompt, workspace, turn_directory, thread_id, cancel, on_event):
+    def run(self, *, prompt, workspace, turn_directory, thread_id, cancel, on_event, mode=None):
         self.threads.append(thread_id)
         assert "Do not invent" in prompt
         on_event({"type": "thread.started", "thread_id": "test-thread"})
@@ -149,7 +149,7 @@ def test_real_evidence_answer_and_follow_up_survive_service_restart(service: Con
 
 
 def test_turn_records_application_context_and_exact_prompt(service: ConversationService) -> None:
-    identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
+    identity = service.submit("Analyze CCBr.N>>CCN", mode="normal")["conversation_id"]
     turn = finish(service, identity)
     assert turn["status"] == "completed", turn
     context = service.artifact(identity, turn["application_context_ref"])
@@ -179,7 +179,7 @@ def test_guide_upgrade_starts_new_thread_and_retains_scientific_evidence(
         "code_files": code_manifest(repository), "environment": environment_versions(),
         "artifacts": {}, "validation_status": "development_snapshot_not_release_validated",
     })
-    identity = service.submit("Analyze CCBr.N>>CCN")["conversation_id"]
+    identity = service.submit("Analyze CCBr.N>>CCN", mode="normal")["conversation_id"]
     first = finish(service, identity)
     assert first["status"] == "completed", first
     initial_context = service.artifact(identity, first["application_context_ref"])
@@ -312,7 +312,7 @@ def test_live_commentary_and_errors_have_downloadable_timestamped_debug_log(serv
             raise RuntimeError("Debug fixture failure")
 
     service.runtime = ProgressRuntime()
-    submitted = service.submit("Check this synthesis")
+    submitted = service.submit("Check this synthesis", mode="normal")
     identity, turn_id = submitted["conversation_id"], submitted["turn_id"]
     client = TestClient(create_app(runtime=object(), scientific_service=service, recommendation_only=False), base_url="http://127.0.0.1")
     endpoint = f"/api/v1/scientific/conversations/{identity}/turns/{turn_id}/debug-log"
@@ -447,7 +447,7 @@ print(json.dumps({"type": "turn.completed", "usage": {"output_tokens": 20}}), fl
     runtime.timeout_seconds = 10
     threads = []
 
-    def command(workspace, turn_directory, thread_id):
+    def command(workspace, turn_directory, thread_id, mode=None):
         threads.append(thread_id)
         return [sys.executable, str(script), str(turn_directory)]
 

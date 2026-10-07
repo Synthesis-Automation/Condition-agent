@@ -10,7 +10,7 @@ from typing import Any, Mapping
 
 from ..core.store import SCHEMA_VERSION, InvestigationStore, _read_json
 
-ACTIVITY_VERSION = 4
+ACTIVITY_VERSION = 5
 _EVENTS = {"item.started", "item.updated", "item.completed", "item.failed"}
 _KINDS = {"command_execution", "web_search", "mcp_tool_call", "file_change", "todo_list", "agent_message"}
 
@@ -21,6 +21,28 @@ def _text(value: Any, limit: int = 600) -> str:
     value = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", unescape(value))
     value = " ".join(value.split())
     return value if len(value) <= limit else value[:limit - 1] + "…"
+
+
+def _arguments(item: Mapping[str, Any]) -> Mapping[str, Any]:
+    arguments = item.get("arguments")
+    if isinstance(arguments, str):
+        try:
+            arguments = json.loads(arguments)
+        except ValueError:
+            return {}
+    return arguments if isinstance(arguments, Mapping) else {}
+
+
+def _preview(value: Any, limit: int = 2400) -> str:
+    """Keep literal code/output and its diagnostic tail in a bounded preview."""
+    if not isinstance(value, str):
+        return ""
+    value = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", value).strip()
+    if len(value) <= limit:
+        return value
+    marker = "\n… [preview truncated; full text in runtime.jsonl] …\n"
+    remaining = limit - len(marker)
+    return value[:remaining // 2] + marker + value[-(remaining - remaining // 2):]
 
 
 def activity_detail(item: Mapping[str, Any]) -> str:
@@ -47,12 +69,7 @@ def activity_detail(item: Mapping[str, Any]) -> str:
         return _text(action.get("query") or item.get("query") or action.get("url") or item.get("url"))
     if kind == "mcp_tool_call":
         name = " / ".join(str(item[key]) for key in ("server", "tool") if item.get(key))
-        arguments = item.get("arguments")
-        if isinstance(arguments, str):
-            try:
-                arguments = json.loads(arguments)
-            except ValueError:
-                arguments = {}
+        arguments = _arguments(item)
         if isinstance(arguments, Mapping):
             selected = [f"{key}: {_text(arguments[key], 160)}" for key in (
                 "target_smiles", "reaction_smiles", "smiles", "query", "url", "operation", "source_ref",
@@ -107,7 +124,7 @@ def _title(item: Mapping[str, Any], detail: str) -> str:
             return "Web request — details unavailable"
         return label + (": " + _text(detail, 150) if detail else " — waiting for query details")
     if kind == "mcp_tool_call":
-        return "Call " + _text(item.get("tool") or "scientific tool", 150)
+        return _text(_arguments(item).get("title"), 200) or "Call " + _text(item.get("tool") or "scientific tool", 150)
     return {"file_change": "Update investigation files", "todo_list": "Update investigation plan"}.get(kind, "Agent activity")
 
 
@@ -120,6 +137,15 @@ def _failure(item: Mapping[str, Any]) -> str:
         error = error.get("message")
     if _text(error):
         return _text(error, 500)
+    result = item.get("result")
+    if item.get("type") == "mcp_tool_call" and isinstance(result, Mapping):
+        content = result.get("content")
+        if isinstance(content, list):
+            diagnostic = "\n".join(block["text"] for block in content
+                                   if isinstance(block, Mapping) and block.get("type") == "text"
+                                   and isinstance(block.get("text"), str))
+            if diagnostic.strip():
+                return _preview(diagnostic, 500)
     # Only failed actions expose a bounded diagnostic tail, never successful output.
     output = item.get("aggregated_output")
     if isinstance(output, str) and output.strip():
@@ -173,6 +199,10 @@ class ActivityHistory:
             merged["status"] = item.get("status") or "in_progress"
         if merged["type"] == "web_search" and merged.get("error"):
             merged["status"] = "failed"
+        result = merged.get("result")
+        result = result if isinstance(result, Mapping) else {}
+        if merged["type"] == "mcp_tool_call" and (merged.get("error") or result.get("isError") is True):
+            merged["status"] = "failed"
         detail = activity_detail(merged)
         row = {"kind": merged["type"], "status": merged.get("status", "in_progress"),
                "at": at, "updated_at": at, "detail": detail, "title": _title(merged, detail),
@@ -180,6 +210,20 @@ class ActivityHistory:
                "failure_detail": _failure(merged)}
         if merged["type"] == "agent_message":
             row.update(kind="agent_update", title="Investigation update")
+        elif merged["type"] == "mcp_tool_call":
+            row["action_title"] = _text(_arguments(merged).get("title"), 200)
+            if merged.get("server") == "node_repl" and merged.get("tool") == "js":
+                row["code_preview"] = _preview(_arguments(merged).get("code"))
+                content = result.get("content")
+                if isinstance(content, list):
+                    row["output_preview"] = _preview("\n".join(
+                        block["text"] for block in content if isinstance(block, Mapping)
+                        and block.get("type") == "text" and isinstance(block.get("text"), str)
+                    ))
+                metadata = result.get("_meta")
+                duration = metadata.get("codex/nodeReplExecutionDurationMs") if isinstance(metadata, Mapping) else None
+                if type(duration) in {int, float} and 0 <= duration < float("inf"):
+                    row["duration_ms"] = duration
         elif merged["type"] == "web_search":
             action = merged.get("action")
             action = action if isinstance(action, Mapping) else {}
@@ -193,6 +237,9 @@ class ActivityHistory:
         if key in self._positions:
             position = self._positions[key]
             row["at"] = self.rows[position]["at"]
+            for field in ("output_preview", "duration_ms"):
+                if field not in row and field in self.rows[position]:
+                    row[field] = self.rows[position][field]
             self.rows[position] = row
         else:
             self._positions[key] = len(self.rows)
@@ -328,4 +375,13 @@ def recover_activity(paths: list[Path], saved: list[dict[str, Any]]) -> list[dic
     history = ActivityHistory()
     for index, (scope, event) in enumerate(events):
         history.observe(event, times.get(index), scope=scope)
+    # Scientific outcomes originate in investigation events, not runtime.jsonl.
+    # Keep them when upgrading the display of an existing conversation.
+    for row in saved:
+        if row.get("kind") not in {"scientific_call", "literature_source", "custom_execution", "answer_validation"}:
+            continue
+        at = row.get("at")
+        position = next((index for index, current in enumerate(history.rows)
+                         if at and current.get("at") and current["at"] > at), len(history.rows))
+        history.rows.insert(position, dict(row))
     return history.rows

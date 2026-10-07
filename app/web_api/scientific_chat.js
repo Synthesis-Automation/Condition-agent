@@ -6,7 +6,7 @@ let token = '', identity = null, active = null, conversation = null, displayed =
 let loaded = false, submitting = false, polling = false, pollAgain = false;
 let pollTimer = null, navigation = 0, stopping = null, sidebarOpen = false, activityVersion = 0;
 const drafts = new Map();
-let workspaceModes = [], newMode = 'normal';
+let workspaceModes = [], newMode = 'tools_formatting';
 function updateMode() {
   const selected = identity ? (conversation?.workspace_mode || 'normal') : newMode;
   $('workspace-mode').value = selected;
@@ -650,12 +650,13 @@ function investigationTimeline(turn) {
   return events;
 }
 function actionSummary(event) {
-  const subject = (event.detail || event.title || '').replace(/\s+/g, ' ').trim();
+  const subject = (event.action_title || event.detail || event.title || '').replace(/\s+/g, ' ').trim();
   const failed = ['failed', 'item.failed', 'error', 'timed_out'].includes(event.status) ||
     (Number.isInteger(event.exit_code) && event.exit_code !== 0);
   if (failed) return 'Failed: ' + (subject || 'tool action');
   if (['cancelled', 'canceled'].includes(event.status)) return 'Stopped: ' + (subject || 'tool action');
   const finished = ['completed', 'item.completed'].includes(event.status);
+  if (event.action_title) return (finished ? 'Completed: ' : 'Running: ') + subject;
   const verbs = {
     command_execution: ['Running', 'Ran'], custom_execution: ['Running', 'Ran'],
     web_search: ['Searching', 'Searched'], file_change: ['Updating', 'Updated'],
@@ -683,6 +684,7 @@ function createTimelineRow(key, update) {
     const metadata = element('div', '', 'action-metadata');
     metadata.append(element('span', '', 'activity-status'));
     content.append(metadata, element('div', '', 'activity-detail'), element('div', '', 'activity-error'));
+    content.append(element('pre', '', 'activity-detail activity-code'), element('pre', '', 'activity-detail activity-output'));
     action.append(summary, content);
     row.append(action);
   }
@@ -713,11 +715,19 @@ function updateTimelineRow(row, event) {
       setTimelineText(timestamp, at.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'}));
       timestamp.setAttribute('datetime', at.toISOString());
     } else if (timestamp) timestamp.remove();
-    const detail = event.detail || (!event.title ? 'The runtime did not provide action details.' : '');
+    let detail = event.detail || (!event.title ? 'The runtime did not provide action details.' : '');
+    if (event.kind === 'mcp_tool_call') {
+      if (event.item_id) detail += '\nCall ID: ' + event.item_id;
+      if (Number.isFinite(event.duration_ms)) detail += '\nTool duration: ' + (event.duration_ms / 1000).toFixed(2) + 's';
+    }
     setTimelineText(content.children[1], detail);
     content.children[1].hidden = !detail;
     setTimelineText(content.children[2], event.failure_detail || '');
     content.children[2].hidden = !event.failure_detail;
+    setTimelineText(content.children[3], event.code_preview ? 'Executed code (preview):\n' + event.code_preview : '');
+    content.children[3].hidden = !event.code_preview;
+    setTimelineText(content.children[4], event.output_preview ? 'Recorded output (preview):\n' + event.output_preview : '');
+    content.children[4].hidden = !event.output_preview;
   }
   row.dataset.signature = signature;
 }

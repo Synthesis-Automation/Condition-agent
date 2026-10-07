@@ -200,7 +200,7 @@ def test_agent_web_conversation_records_screening_and_boots(tmp_path: Path) -> N
         client = TestClient(create_app(runtime=object(), scientific_service=service, recommendation_only=False),
                             base_url="http://127.0.0.1")
         assert client.get("/scientific").status_code == 200
-        identity = service.submit("Generate 96 diverse screening recipes")["conversation_id"]
+        identity = service.submit("Generate 96 diverse screening recipes", mode="normal")["conversation_id"]
         turn = finish(service, identity)
         assert turn["status"] == "completed", turn
         evidence = service.artifact(identity, turn["answer"]["evidence_refs"][0])

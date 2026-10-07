@@ -99,7 +99,7 @@ function harness() {
 test('workspace mode is selectable for new chats and locked to a reopened conversation', async () => {
   const {ids, run, respond} = harness();
   run('loaded=true; updateControls()');
-  assert.equal(ids['workspace-mode'].value, 'normal');
+  assert.equal(ids['workspace-mode'].value, 'tools_formatting');
   assert.equal(ids['workspace-mode'].disabled, false);
   ids['workspace-mode'].value = 'pure_agent';
   ids['workspace-mode'].onchange();
@@ -235,6 +235,30 @@ test('running commands use one readable summary line while retaining expanded co
   assert.doesNotMatch(summary, /\n|\r|\s{2}/);
   assert.equal(byClass(action, 'activity-detail')[0].textContent, context.command);
   assert.equal(action.open, false);
+});
+
+test('tool titles replace generic calls and expandable previews stay literal through completion', () => {
+  const {run, context} = harness();
+  context.timeline = new Node('ol'); context.timeline.dataset.turn = 't';
+  context.progress = [{activity_id:'node',item_id:'item_3',kind:'mcp_tool_call',status:'in_progress',
+    action_title:'Inspect scientific workspace',detail:'node_repl / js',code_preview:'const x = "<tag>&amp;";\n'}];
+  run('renderTimeline(timeline, progress)');
+  const action = byClass(context.timeline, 'timeline-action')[0];
+  assert.equal(byClass(action, 'tool-summary')[0].textContent, 'Running: Inspect scientific workspace');
+  assert.equal(action.open, false);
+  action.open = true;
+  Object.assign(context.progress[0], {status:'completed',duration_ms:54335,output_preview:'<error>nested process failed</error>'});
+  run('renderTimeline(timeline, progress)');
+  assert.equal(byClass(action, 'tool-summary')[0].textContent, 'Completed: Inspect scientific workspace');
+  assert.match(byClass(action, 'activity-detail')[0].textContent, /node_repl \/ js\nCall ID: item_3\nTool duration: 54.34s/);
+  assert.equal(byClass(action, 'activity-code')[0].textContent, 'Executed code (preview):\n' + context.progress[0].code_preview);
+  assert.equal(byClass(action, 'activity-output')[0].textContent, 'Recorded output (preview):\n<error>nested process failed</error>');
+  assert.equal(action.querySelectorAll('error').length, 0);
+  assert.equal(action.open, true);
+  context.progress[0].status = 'failed';
+  run('renderTimeline(timeline, progress)');
+  assert.equal(byClass(action, 'tool-summary')[0].textContent, 'Failed: Inspect scientific workspace');
+  assert.equal(run("actionSummary({kind:'mcp_tool_call',status:'completed',detail:'node_repl / js'})"), 'Called node_repl / js');
 });
 
 test('public prose and collapsed actions are interleaved in their recorded order', () => {
@@ -624,7 +648,7 @@ test('sending a question opens its chat and replaces Send with live progress and
     throw new Error('Unexpected route: ' + route);
   });
   await ids.form.onsubmit({preventDefault() {}});
-  assert.deepEqual(submitted, {question:'Analyze CCO',conversation_id:null,mode:'normal'});
+  assert.deepEqual(submitted, {question:'Analyze CCO',conversation_id:null,mode:'tools_formatting'});
   assert.equal(ids.question.value, '');
   assert.equal(run('identity'), 'created');
   assert.equal(ids.cancel.hidden, false);

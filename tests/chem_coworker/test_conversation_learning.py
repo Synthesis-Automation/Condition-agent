@@ -82,7 +82,7 @@ def _debug(service, identity, turn):
 def test_service_publishes_recorded_lessons_after_successful_and_failed_turns(service, failed):
     instance, lesson_path = service
     instance.runtime = LearningRuntime(fail=failed)
-    identity = instance.submit("Interpret this reaction")['conversation_id']
+    identity = instance.submit("Interpret this reaction", mode="normal")['conversation_id']
     turn = finish(instance, identity)
     assert turn["status"] == ("failed" if failed else "completed"), turn
     rows = [json.loads(line) for line in lesson_path.read_text("utf-8").splitlines()]
@@ -111,7 +111,7 @@ def test_publication_failure_keeps_answer_and_releases_worker_and_conversation_l
         raise OSError("Fixture lesson store is temporarily unavailable")
 
     monkeypatch.setattr(ScientificWorkspace, "publish_lessons", unavailable)
-    identity = instance.submit("Interpret this reaction")["conversation_id"]
+    identity = instance.submit("Interpret this reaction", mode="normal")["conversation_id"]
     turn = finish(instance, identity)
     assert turn["status"] == "completed", turn
     assert turn["answer"]["answer_markdown"] == (
@@ -133,7 +133,7 @@ def test_publication_failure_keeps_answer_and_releases_worker_and_conversation_l
 
 def test_prompt_exposes_optional_guides_and_tools_while_memory_stays_pinned(service):
     instance, lesson_path = service
-    identity = instance.submit("Interpret this reaction")["conversation_id"]
+    identity = instance.submit("Interpret this reaction", mode="normal")["conversation_id"]
     assert finish(instance, identity)["status"] == "completed"
     workspace = ScientificWorkspace(instance.root / identity)
     baseline_context = workspace.store.manifest["baseline"]["learning_context"]
@@ -161,7 +161,7 @@ def test_prompt_exposes_optional_guides_and_tools_while_memory_stays_pinned(serv
     assert instance.runtime.recalled[-1]["context_sha256"] == frozen_hash
     assert instance.runtime.recalled[-1]["lessons"] == []
     # A new investigation can recall the published advice; an existing one cannot drift.
-    fresh = instance.submit("Start another investigation")["conversation_id"]
+    fresh = instance.submit("Start another investigation", mode="normal")["conversation_id"]
     assert finish(instance, fresh)["status"] == "completed"
     recalled = instance.runtime.recalled[-1]
     assert len(recalled["lessons"]) == 1

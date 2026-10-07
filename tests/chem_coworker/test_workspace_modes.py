@@ -135,7 +135,7 @@ def test_api_validates_modes_and_serves_free_answers(service):
         assert [item["mode"] for item in config["workspace_modes"]] == [
             "pure_agent", "tools_only", "normal", "tools_formatting", "tools_guidance",
         ]
-        assert config["default_workspace_mode"] == "normal"
+        assert config["default_workspace_mode"] == "tools_formatting"
         assert 'id="workspace-mode"' in client.get("/scientific").text
         headers = {"x-scientific-token": config["token"]}
         endpoint = "/api/v1/scientific/turns"
@@ -338,7 +338,7 @@ def test_formatting_repair_does_not_enable_task_guidance(service, recover):
             return result
 
     service.runtime = RepairRuntime()
-    identity = service.submit("Explain", mode="tools_formatting")["conversation_id"]
+    identity = service.submit("Explain")["conversation_id"]
     turn = finish(service, identity)
     assert turn["status"] == ("completed" if recover else "failed"), turn.get("error")
     assert turn["repair_attempts"] == 1

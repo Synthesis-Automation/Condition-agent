@@ -161,15 +161,16 @@ Use **Workspace mode** in the top bar before sending the first message:
 | --- | --- | --- | --- |
 | 1. Pure agent | Disabled | Disabled | None |
 | 2. Tools and data | Enabled | Disabled | None |
-| 3. Normal (default) | Enabled | Enabled | Existing structured answer |
-| 4. Tools + formatting | Enabled | Disabled | Existing structured answer |
+| 3. Normal | Enabled | Enabled | Existing structured answer |
+| 4. Tools + formatting (default) | Enabled | Disabled | Existing structured answer |
 | 5. Tools + guidance | Enabled | Enabled | None |
 
 The mode is saved with the conversation and every turn. Start a **New chat**
 to change it; follow-ups keep the same mode and runtime thread when possible.
-Old conversations remain in normal mode. The turns API accepts an optional
+Existing conversations keep their saved mode; legacy conversations without a
+saved mode remain in Normal. The turns API accepts an optional
 `mode` value (`pure_agent`, `tools_only`, `normal`, `tools_formatting`, or
-`tools_guidance`); omitting it uses normal
+`tools_guidance`); omitting it uses Tools + formatting
 for new conversations and the saved mode for follow-ups. A mode change within
 an existing conversation returns HTTP 422.
 
@@ -272,6 +273,14 @@ start a new conversation. Existing investigations retain their frozen baseline.
 Conversations, investigation artifacts and per-turn `progress.jsonl` debugging
 logs are saved under `results/ai_native/conversations` by default. The agent
 server supports loopback hosts only; keep the default `127.0.0.1`.
+
+Tool activity uses the recorded action title when available. Expand a
+`node_repl / js` action to inspect its call ID, tool execution time, and bounded
+code/output previews. A completed tool call can still contain a nested process
+error; inspect the output and scientific call records. Full code and results
+remain in the turn's `runtime.jsonl`. Existing conversation timelines recover
+these details from their saved logs after restarting the server and refreshing
+the page; the original logs are preserved.
 
 ## Both interfaces from one server
 
