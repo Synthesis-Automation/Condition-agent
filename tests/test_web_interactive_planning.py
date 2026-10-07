@@ -109,6 +109,43 @@ def test_invalid_requests_are_actionable_and_profile_boundary_is_preserved():
     )
 
 
+def test_api_preserves_alternative_subtrees_and_exports_only_the_selected_route():
+    from tests.interactive_planner_server import BrowserPlanningRuntime
+
+    client = TestClient(create_app(runtime=BrowserPlanningRuntime(), recommendation_only=False))
+    url = "/api/v1/retrosynthesis/planner"
+    data = client.post(url, json={"action": "start", "target_smiles": "CCOC"}).json()["data"]
+
+    def act(action, **arguments):
+        nonlocal data
+        response = client.post(url, json={"action": action, "session": data["session"], **arguments})
+        assert response.status_code == 200, response.text
+        data = response.json()["data"]
+
+    act("search")
+    assert data["session"]["schema_version"] == "interactive_planning.v2"
+    options = data["session"]["root"]["alternatives"]
+    assert len(options) == 3  # Two strategies, one alternate realization.
+    assert data["summary"]["reaction_count"] == 0
+    act("select", **options[0]["choice"])
+    branch = options[0]["children"][0]
+    act("search", node_id=branch["node_id"])
+    branch_choice = data["session"]["root"]["alternatives"][0]["children"][0]["alternatives"][0]["choice"]
+    act("select", node_id=branch["node_id"], **branch_choice)
+    saved_branch = data["session"]["root"]["alternatives"][0]
+    act("select", **options[2]["choice"])
+    assert data["session"]["root"]["alternatives"][0] == saved_branch
+    assert data["summary"]["reaction_count"] == 1
+    act("select", **options[0]["choice"])
+    assert data["summary"]["reaction_count"] == 2
+    act("clear")
+    assert len(data["session"]["root"]["alternatives"]) == 3
+    assert data["summary"]["reaction_count"] == 0
+    act("restore")
+    act("undo")
+    assert data["summary"]["reaction_count"] == 2
+
+
 def test_stock_check_uses_exact_supplier_evidence_without_automatically_stopping(
     tmp_path,
 ):

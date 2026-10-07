@@ -2,12 +2,17 @@ import type { CanonicalRouteTree, RetrosynthesisConditionEvidence, Retrosynthesi
 
 export type PlanningSettings = Omit<RetrosynthesisRequest, 'target_smiles'>
 export interface PlanningChoice { search_id: string; strategy_index: number; realization_index: number }
+export interface PlanningAlternative {
+  choice: PlanningChoice
+  children: PlanningNode[]
+}
 export interface PlanningNode {
   node_id: string
   smiles: string
   stopped: boolean
   choice: PlanningChoice | null
-  children: PlanningNode[]
+  alternatives: PlanningAlternative[]
+  expansion_warnings: string[]
 }
 export interface PlanningSearch {
   search_id: string
@@ -16,7 +21,7 @@ export interface PlanningSearch {
   result: RetrosynthesisResult
 }
 export interface PlanningSession {
-  schema_version: 'interactive_planning.v1'
+  schema_version: 'interactive_planning.v2'
   root: PlanningNode
   past: PlanningNode[]
   future: PlanningNode[]
@@ -30,7 +35,7 @@ export interface PlanningResponse {
   summary: { reaction_count: number; unresolved_count: number; starting_material_count: number; maximum_depth: number }
 }
 export interface PlanningRequest {
-  action: 'start' | 'restore' | 'search' | 'select' | 'remove' | 'stop' | 'reopen' | 'undo' | 'redo' | 'conditions' | 'stock'
+  action: 'start' | 'restore' | 'search' | 'select' | 'clear' | 'remove' | 'stop' | 'reopen' | 'undo' | 'redo' | 'conditions' | 'stock'
   session?: PlanningSession
   target_smiles?: string
   node_id?: string

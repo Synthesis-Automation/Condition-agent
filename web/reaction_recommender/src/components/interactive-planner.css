@@ -6,33 +6,47 @@
 .planner-progress { padding: 10px 14px; background: #f3f7f4; border-radius: 10px; font-size: .8rem; }
 .planner-note { margin: 8px 0; color: #62766a; font-size: .75rem; line-height: 1.5; }
 .planner-target { display: grid; gap: 10px; }
-.planner-layout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(320px,1fr); gap: 14px; align-items: start; }
+.planner-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,380px); gap: 14px; align-items: start; }
 .planner-tree-panel, .planner-inspector { min-width: 0; padding: 16px; border: 1px solid #d1ddd5; border-radius: 13px; background: #fff; }
-.planner-tree { overflow: auto; max-height: 78vh; padding: 16px 4px; }
+.planner-tree-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.planner-tree-legend { font-size: .7rem; color: #526c5b; }
+.planner-tree-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 12px 0; }
+.planner-tree-tools output { min-width: 40px; text-align: center; font-size: .75rem; }
+.planner-tree { overflow: auto; height: 70vh; min-height: 400px; padding: 12px; border: 1px solid #e0e7e2; border-radius: 9px; background: radial-gradient(#d9e2dc .7px, transparent .7px) 0 0 / 16px 16px #f8faf9; }
 .planner-tree:focus-visible { outline: 2px solid #277b54; outline-offset: 2px; }
 .planner-tree ul { list-style: none; margin: 0; padding: 0; }
-.planner-tree > ul { width: max-content; min-width: 100%; }
-.planner-branch { position: relative; display: flex; align-items: center; padding: 12px 0; }
-.planner-children { flex: 0 0 auto; }
-.planner-children > .planner-branch { padding-left: 24px; }
-/* Each child contributes half of the shared trunk and its own horizontal edge. */
-.planner-children > .planner-branch::before, .planner-children > .planner-branch::after { content: ''; position: absolute; left: 0; width: 24px; height: 50%; border-left: 2px solid #91b39c; pointer-events: none; }
-.planner-children > .planner-branch::before { top: 0; border-bottom: 2px solid #91b39c; }
-.planner-children > .planner-branch::after { top: 50%; }
-.planner-children > .planner-branch:first-child::before, .planner-children > .planner-branch:last-child::after { border-left: 0; }
-.planner-molecule { position: relative; flex: 0 0 210px; width: 210px; padding: 8px; border: 1px solid #d1ddd5; border-radius: 10px; background: #fff; }
-.planner-molecule.selected { border-color: #277b54; box-shadow: 0 0 0 2px #dbeee1; background: #f6faf7; }
+.planner-tree-canvas { position: relative; min-width: 100%; overflow: hidden; }
+.planner-tree .planner-tree-content { position: absolute; top: 0; left: 50%; width: max-content; padding: 6px; transform-origin: top center; }
+.planner-branch { --edge: #a1b2a9; position: relative; display: flex; flex-direction: column; align-items: center; flex: 1 0 auto; padding: 26px 12px 0; }
+.planner-branch.on-route { --edge: #277b54; }
+.planner-tree-content > .planner-branch { padding-top: 0; }
+.planner-branch > ul { position: relative; display: flex; align-items: flex-start; padding-top: 26px; }
+/* Molecules choose one reaction; each reaction requires every precursor below it. */
+.planner-branch > ul::before { content: ''; position: absolute; top: 0; left: 50%; height: 26px; border-left: 2px solid var(--edge); }
+.planner-branch > ul > .planner-branch::before, .planner-branch > ul > .planner-branch::after { content: ''; position: absolute; top: 0; width: 50%; height: 26px; border-top: 2px solid var(--edge); pointer-events: none; }
+.planner-branch > ul > .planner-branch::before { right: 50%; border-right: 2px solid var(--edge); }
+.planner-branch > ul > .planner-branch::after { left: 50%; }
+.planner-branch > ul > .planner-branch:first-child::before, .planner-branch > ul > .planner-branch:last-child::after { border-top: 0; }
+.planner-molecule { position: relative; width: 170px; padding: 8px; border: 2px solid #bdccc2; border-radius: 9px; background: #fff; }
+.on-route > .planner-molecule { border-color: #277b54; }
+.planner-molecule.stopped { background: #f0f7ee; }
+.planner-molecule.selected { border-color: #2569ab; box-shadow: 0 0 0 3px #d7e8f8; }
 .planner-molecule-select { display: grid; gap: 6px; width: 100%; padding: 0; border: 0; background: transparent; color: #294d3a; text-align: left; cursor: pointer; }
 .planner-molecule-select strong { font-size: .78rem; }
-.planner-molecule-select .reaction-image { min-height: 80px; pointer-events: none; }
-.planner-molecule-select .reaction-image img { width: 180px; max-width: 100%; }
+.planner-molecule-select .reaction-image { height: 94px; min-height: 94px; pointer-events: none; padding: 3px; }
+.planner-molecule-select .reaction-image img { width: 140px; max-width: 100%; max-height: 86px; object-fit: contain; }
 .planner-molecule-select code { font-size: .63rem; overflow-wrap: anywhere; }
 .planner-molecule > .button { margin-top: 8px; font-size: .68rem; }
 .planner-status { color: #7b6540; font-size: .67rem; }
 .planner-status.stopped { color: #426b58; }
-.planner-connector { position: relative; flex: 0 0 108px; align-self: stretch; color: #526c5b; font-size: .66rem; text-align: center; }
-.planner-connector::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; border-top: 2px solid #91b39c; }
-.planner-connector span { position: absolute; left: 6px; right: 6px; bottom: calc(50% + 8px); line-height: 1.5; }
+.planner-reaction { display: grid; justify-items: center; gap: 3px; width: 124px; padding: 9px; border: 2px solid #a1b2a9; border-radius: 24px; background: #fff; color: #50645a; font: inherit; cursor: pointer; }
+.planner-reaction strong { font-size: .95rem; }
+.planner-reaction span, .planner-reaction small { font-size: .65rem; }
+.planner-reaction.on-route { background: #e6f4ec; border-color: #277b54; color: #1e6041; }
+.planner-reaction:hover { border-color: #2569ab; }
+.planner-reaction:focus-visible, .planner-molecule-select:focus-visible { outline: 3px solid #2569ab; outline-offset: 3px; }
+.planner-reaction:disabled { cursor: wait; opacity: .65; }
+.planner-expansion-warnings { padding: 10px; background: #fff7e8; border-radius: 8px; }
 .planner-inspector-heading code { display: block; margin-top: 7px; font-size: .76rem; overflow-wrap: anywhere; }
 .planner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .planner-chosen { padding: 12px; border: 1px solid #c8dacd; border-radius: 10px; background: #f7faf8; margin: 14px 0; }
@@ -50,6 +64,6 @@
 .planner-evidence summary { cursor: pointer; color: #476854; font-weight: 650; }
 .planner-evidence pre { max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 10px; margin-top: 7px; background: #f4f7f4; font-size: .66rem; }
 .planner-conditions { font-size: .76rem; line-height: 1.5; overflow-wrap: anywhere; }
-@media (max-width: 900px) { .planner-layout { grid-template-columns: 1fr; } .planner-tree { max-height: 450px; } }
+@media (max-width: 900px) { .planner-layout { grid-template-columns: 1fr; } .planner-tree { height: 55vh; min-height: 320px; } }
 @media (max-width: 460px) { .planner-tree-panel, .planner-inspector { padding: 10px; } .planner-toolbar .button { flex: 1; } }
 @media (max-width: 720px) { .analysis-workbench .planner-options .option-grid.feature-options { grid-template-columns: 1fr; } }

@@ -106,6 +106,150 @@ def test_repeated_molecules_are_independent_occurrences_with_shared_search():
     assert selected.root.children[1].choice
 
 
+def test_search_adds_alternatives_without_selecting_a_route():
+    plan = searched(start_session("CCOC"), "root", "CCO.CI", "CCBr.CO")
+    assert len(plan.root.alternatives) == 2
+    assert plan.root.choice is None
+    assert export_route(plan).reaction_count == 0
+    assert session_response(plan)["summary"]["unresolved_count"] == 1
+    assert len(plan.past) == 1
+    assert not edit_session(plan, "undo").root.alternatives
+    assert edit_session(edit_session(plan, "undo"), "redo").root == plan.root
+    assert restore_session(plan.to_dict()) == plan
+
+
+def test_alternative_routes_keep_independent_expansions_when_switching():
+    from core_retrosynthesis.interactive_planning import find_node
+
+    plan = choose(searched(start_session("CCOC"), "root", "CCO.CI", "CCBr.CO"))
+    first, second = plan.root.alternatives
+    branch_a = first.children[0]
+    branch_b = second.children[0]
+    plan = choose(searched(plan, branch_a.node_id, "CCCl.O"), branch_a.node_id)
+    saved_a = plan.root.alternatives[0]
+    # Expanding a molecule in another option must not change the selected route.
+    plan = searched(plan, branch_b.node_id, "C.CBr")
+    assert plan.root.choice == first.choice
+    assert find_node(plan.root, branch_b.node_id).alternatives
+    assert export_route(plan).reaction_count == 2
+    # Choosing its reaction selects the connecting path to the target.
+    plan = choose(plan, branch_b.node_id)
+    assert plan.root.choice == second.choice
+    assert plan.root.alternatives[0] == saved_a
+    assert export_route(plan).root.reaction.children[0].smiles == branch_b.smiles
+    saved_b = plan.root.alternatives[1]
+    plan = edit_session(plan, "select", "root", first.choice)
+    assert plan.root.alternatives[1] == saved_b
+    assert plan.root.alternatives[0] == saved_a
+    assert export_route(plan).reaction_count == 2
+    restored = restore_session(plan.to_dict())
+    assert restored == plan
+    # An already-chosen local step in an inactive branch can reactivate its path.
+    plan = edit_session(restored, "select", branch_b.node_id,
+                        find_node(restored.root, branch_b.node_id).choice)
+    assert plan.root.choice == second.choice
+
+
+def test_clear_stop_and_remove_preserve_unrelated_alternatives():
+    plan = choose(searched(start_session("CCOC"), "root", "CCO.CI", "CCBr.CO"))
+    before = plan.root.alternatives
+    cleared = edit_session(plan, "clear")
+    assert cleared.root.alternatives == before
+    assert cleared.root.choice is None
+    stopped = edit_session(cleared, "stop")
+    assert stopped.root.alternatives == before
+    assert export_route(stopped).reaction_count == 0
+    assert export_route(stopped).root.terminal
+    selected = edit_session(stopped, "select", "root", before[1].choice)
+    assert not selected.root.stopped
+    removed = edit_session(selected, "remove")
+    assert removed.root.alternatives == before[:1]
+    assert removed.root.choice is None
+    assert edit_session(removed, "undo").root == selected.root
+
+
+def test_alternate_realizations_and_duplicate_molecules_are_independent():
+    plan = start_session("CCOC")
+    result = search_result("CCOC", "CCO.CI")
+    result["strategies"][0]["alternate_realizations"] = [
+        search_result("CCOC", "CCO.CBr")["strategies"][0]["representative"]
+    ]
+    plan = record_search(plan, "root", {}, result)
+    first, second = plan.root.alternatives
+    # CI/CBr sort first, so compare the shared ethanol occurrences explicitly.
+    first_ethanol = next(n for n in first.children if n.smiles == "CCO")
+    second_ethanol = next(n for n in second.children if n.smiles == "CCO")
+    assert first_ethanol.node_id != second_ethanol.node_id
+    plan = edit_session(plan, "stop", first_ethanol.node_id)
+    from core_retrosynthesis.interactive_planning import find_node
+
+    assert not find_node(plan.root, second_ethanol.node_id).stopped
+    # Identical repeated search does not erase edits or duplicate options.
+    repeated = record_search(plan, "root", {}, result)
+    assert repeated.root == plan.root
+    assert len(repeated.root.alternatives) == 2
+
+
+def test_all_alternatives_are_validated_even_when_not_selected():
+    plan = choose(searched(start_session("CCOC"), "root", "CCO.CI", "CCBr.CO"))
+    raw = plan.to_dict()
+    inactive = raw["root"]["alternatives"][1]
+    inactive["children"].pop()
+    with pytest.raises(ValueError, match="every precursor"):
+        restore_session(raw)
+    raw = plan.to_dict()
+    raw["root"]["alternatives"].append(deepcopy(raw["root"]["alternatives"][0]))
+    with pytest.raises(ValueError, match="Duplicate reaction"):
+        restore_session(raw)
+    raw = plan.to_dict()
+    raw["root"]["choice"]["strategy_index"] = 20
+    with pytest.raises(ValueError, match="retained alternative"):
+        restore_session(raw)
+
+
+def test_cycles_in_unselected_search_options_are_reported_and_not_attached():
+    plan = searched(start_session("CCO"), "root", "CCBr.O", "OCC")
+    assert len(plan.root.alternatives) == 1
+    assert "cycle" in plan.root.expansion_warnings[0]
+    with pytest.raises(ValueError, match="cycle"):
+        choose(plan, index=1)
+    assert restore_session(plan.to_dict()) == plan
+
+
+def test_alternative_expansion_limits_preserve_complete_options_and_evidence():
+    # 201 precursor occurrences cannot fit; retain the evidence, not a partial step.
+    plan = searched(start_session("CC"), "root", ".".join(["C"] * 201), "C.C")
+    assert len(plan.root.alternatives) == 1
+    assert len(plan.root.alternatives[0].children) == 2
+    assert "200-molecule" in plan.root.expansion_warnings[0]
+    assert len(plan.searches[0].result["strategies"]) == 2
+    with pytest.raises(ValueError, match="200 molecules"):
+        choose(plan)
+
+
+def test_v1_sessions_migrate_once_to_alternatives_without_losing_history():
+    plan = choose(searched(start_session("CCO"), "root", "CCBr.O"))
+    plan = edit_session(plan, "stop", plan.root.children[1].node_id)
+    raw = plan.to_dict()
+
+    def legacy_node(node):
+        selected = next((a for a in node["alternatives"] if a["choice"] == node["choice"]), None)
+        return {key: node[key] for key in ("node_id", "smiles", "stopped", "choice")} | {
+            "children": [legacy_node(child) for child in selected["children"]] if selected else []
+        }
+
+    raw["schema_version"] = "interactive_planning.v1"
+    raw["root"] = legacy_node(raw["root"])
+    raw["past"] = [legacy_node(node) for node in raw["past"]]
+    migrated = restore_session(raw)
+    assert migrated.schema_version == "interactive_planning.v2"
+    assert migrated.root.children[1].stopped
+    assert export_route(migrated).tree_id == export_route(plan).tree_id
+    assert len(migrated.past) == len(plan.past)
+    assert "children" not in migrated.to_dict()["root"]
+    assert restore_session(migrated.to_dict()) == migrated
+
+
 def test_cycle_rejected_by_graph_identity_and_siblings_preserved():
     plan = choose(searched(start_session("CCO"), "root", "CCBr.O"))
     branch = plan.root.children[0]
@@ -140,11 +284,12 @@ def test_conflicting_candidate_evidence_is_rejected(field, value):
 def test_import_rejects_missing_precursors_duplicates_and_invalid_history():
     plan = choose(searched(start_session("CCO"), "root", "CCBr.O"))
     raw = plan.to_dict()
-    raw["root"]["children"].pop()
+    raw["root"]["alternatives"][0]["children"].pop()
     with pytest.raises(ValueError, match="every precursor"):
         restore_session(raw)
     raw = plan.to_dict()
-    raw["root"]["children"][1]["node_id"] = raw["root"]["children"][0]["node_id"]
+    children = raw["root"]["alternatives"][0]["children"]
+    children[1]["node_id"] = children[0]["node_id"]
     with pytest.raises(ValueError, match="Duplicate molecule"):
         restore_session(raw)
     raw = deepcopy(plan.to_dict())

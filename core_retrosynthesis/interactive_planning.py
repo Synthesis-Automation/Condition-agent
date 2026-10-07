@@ -24,7 +24,7 @@ from .route_contract import (
     assert_valid_route_tree,
 )
 
-SCHEMA_VERSION = "interactive_planning.v1"
+SCHEMA_VERSION = "interactive_planning.v2"
 MAX_NODES = 200
 MAX_DEPTH = 20
 MAX_HISTORY = 30
@@ -108,23 +108,48 @@ class PlanningChoice:
 
 
 @dataclass(frozen=True)
+class PlanningAlternative:
+    """One reaction option and its independently editable precursor occurrences."""
+
+    choice: PlanningChoice
+    children: tuple[PlanningNode, ...]
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize a reaction option without duplicating selected-route state."""
+        return dict(
+            choice=self.choice.to_dict(),
+            children=[child.to_dict() for child in self.children],
+        )
+
+
+@dataclass(frozen=True)
 class PlanningNode:
-    """One molecule occurrence with an optional selected precursor set."""
+    """A molecule with alternative reactions and an optional route choice."""
 
     node_id: str
     smiles: str
     stopped: bool = False
     choice: PlanningChoice | None = None
-    children: tuple[PlanningNode, ...] = ()
+    alternatives: tuple[PlanningAlternative, ...] = ()
+    expansion_warnings: tuple[str, ...] = ()
+
+    @property
+    def children(self) -> tuple[PlanningNode, ...]:
+        """Project only the selected reaction's precursors for route export."""
+        return next(
+            (option.children for option in self.alternatives if option.choice == self.choice),
+            (),
+        )
 
     def to_dict(self) -> dict[str, Any]:
-        """Serialize this molecule occurrence and its selected branch."""
+        """Serialize every explored alternative, including inactive branches."""
         return dict(
             node_id=self.node_id,
             smiles=self.smiles,
             stopped=self.stopped,
             choice=self.choice.to_dict() if self.choice else None,
-            children=[child.to_dict() for child in self.children],
+            alternatives=[option.to_dict() for option in self.alternatives],
+            expansion_warnings=list(self.expansion_warnings),
         )
 
 
@@ -231,25 +256,37 @@ def find_node(root: PlanningNode, node_id: str) -> PlanningNode:
     """Find one occurrence without conflating identical molecules."""
     if root.node_id == node_id:
         return root
-    for child in root.children:
-        try:
-            return find_node(child, node_id)
-        except LookupError:
-            pass
+    for option in root.alternatives:
+        for child in option.children:
+            try:
+                return find_node(child, node_id)
+            except LookupError:
+                pass
     raise LookupError("Selected molecule is no longer in this route")
 
 
 def _replace_node(
-    root: PlanningNode, node_id: str, replacement: PlanningNode
+    root: PlanningNode, node_id: str, replacement: PlanningNode, *, activate: bool = False
 ) -> PlanningNode:
     if root.node_id == node_id:
         return replacement
-    return replace(
-        root,
-        children=tuple(
-            _replace_node(child, node_id, replacement) for child in root.children
-        ),
-    )
+    for index, option in enumerate(root.alternatives):
+        for child_index, child in enumerate(option.children):
+            try:
+                updated = _replace_node(child, node_id, replacement, activate=activate)
+            except LookupError:
+                continue
+            children = list(option.children)
+            children[child_index] = updated
+            alternatives = list(root.alternatives)
+            alternatives[index] = replace(option, children=tuple(children))
+            return replace(
+                root,
+                alternatives=tuple(alternatives),
+                choice=option.choice if activate else root.choice,
+                stopped=False if activate else root.stopped,
+            )
+    raise LookupError("Selected molecule is no longer in this route")
 
 
 def _validate_root(session: PlanningSession, root: PlanningNode) -> None:
@@ -263,27 +300,29 @@ def _validate_root(session: PlanningSession, root: PlanningNode) -> None:
         seen.add(node.node_id)
         if node.smiles in ancestors:
             raise ValueError("This step creates a cycle back to an ancestor molecule")
-        if node.choice:
-            if node.stopped:
-                raise ValueError(
-                    "An expanded molecule cannot also be a starting material"
-                )
-            search, _, precursors = candidate_for_choice(session, node.choice)
+        if node.choice and node.stopped:
+            raise ValueError("An expanded molecule cannot also be a starting material")
+        choices = [option.choice for option in node.alternatives]
+        if len(set(choices)) != len(choices):
+            raise ValueError("Duplicate reaction alternative")
+        if node.choice and node.choice not in choices:
+            raise ValueError("Selected reaction must reference a retained alternative")
+        for option in node.alternatives:
+            search, _, precursors = candidate_for_choice(session, option.choice)
             if search.target_smiles != node.smiles:
                 raise ValueError("Chosen reaction does not produce this molecule")
-            if tuple(child.smiles for child in node.children) != precursors:
+            if tuple(child.smiles for child in option.children) != precursors:
                 raise ValueError("A chosen step must retain every precursor occurrence")
-        elif node.children:
-            raise ValueError("Children require a chosen reaction")
-        for child in node.children:
-            visit(child, (*ancestors, node.smiles))
+            for child in option.children:
+                visit(child, (*ancestors, node.smiles))
 
     visit(root, ())
 
 
 def restore_session(value: Mapping[str, Any]) -> PlanningSession:
     """Validate saved structures and topology, retaining evidence as reported."""
-    if value.get("schema_version") != SCHEMA_VERSION:
+    version = value.get("schema_version")
+    if version not in ("interactive_planning.v1", SCHEMA_VERSION):
         raise ValueError("Unsupported planning session version")
     searches = value.get("searches", [])
     past, future = value.get("past", []), value.get("future", [])
@@ -316,21 +355,52 @@ def restore_session(value: Mapping[str, Any]) -> PlanningSession:
     if len({s.search_id for s in records}) != len(records):
         raise ValueError("Duplicate search ID")
 
+    def read_choice(raw: Any) -> PlanningChoice:
+        item = _object(raw)
+        return PlanningChoice(
+            _text(item.get("search_id")),
+            _integer(item.get("strategy_index")),
+            _integer(item.get("realization_index")),
+        )
+
+    parsed_nodes = 0
+
     def read_node(raw: Any, depth: int = 0) -> PlanningNode:
+        nonlocal parsed_nodes
+        if depth == 0:
+            parsed_nodes = 0
+        parsed_nodes += 1
+        if parsed_nodes > MAX_NODES:
+            raise ValueError("Saved plan exceeds 200 molecules across alternatives")
         if depth > MAX_DEPTH:
             raise ValueError("Saved route exceeds maximum depth")
         item = _object(raw)
         choice = item.get("choice")
-        if choice is not None:
-            choice = _object(choice)
-            choice = PlanningChoice(
-                _text(choice.get("search_id")),
-                _integer(choice.get("strategy_index")),
-                _integer(choice.get("realization_index")),
-            )
-        children = item.get("children")
-        if not isinstance(children, list) or len(children) > MAX_NODES:
-            raise ValueError("Invalid precursor occurrence list")
+        choice = read_choice(choice) if choice is not None else None
+        if version == "interactive_planning.v1":
+            children = item.get("children")
+            if not isinstance(children, list) or len(children) > MAX_NODES:
+                raise ValueError("Invalid precursor occurrence list")
+            if not choice and children:
+                raise ValueError("Children require a chosen reaction")
+            alternatives = [dict(choice=choice.to_dict(), children=children)] if choice else []
+        else:
+            if "children" in item:
+                raise ValueError("Version 2 stores children only within reaction alternatives")
+            alternatives = item.get("alternatives")
+        if not isinstance(alternatives, list) or len(alternatives) > MAX_NODES:
+            raise ValueError("Invalid reaction alternative list")
+        options = []
+        for raw_option in alternatives:
+            option = _object(raw_option)
+            children = option.get("children")
+            if not isinstance(children, list) or not children or len(children) > MAX_NODES:
+                raise ValueError("A reaction alternative must retain every precursor occurrence")
+            options.append(PlanningAlternative(
+                read_choice(option.get("choice")),
+                tuple(read_node(child, depth + 1) for child in children),
+            ))
+        _messages(item.get("expansion_warnings", []))
         if type(item.get("stopped")) is not bool:
             raise ValueError("Starting-material designation must be a boolean")
         return PlanningNode(
@@ -338,7 +408,8 @@ def restore_session(value: Mapping[str, Any]) -> PlanningSession:
             _molecule(item.get("smiles")),
             item["stopped"],
             choice,
-            tuple(read_node(c, depth + 1) for c in children),
+            tuple(options),
+            tuple(item.get("expansion_warnings", [])),
         )
 
     session = PlanningSession(
@@ -408,7 +479,69 @@ def record_search(
     if len(records) >= MAX_SEARCHES:
         raise ValueError("Session has 100 searches; export it and start a new plan")
     search = PlanningSearch(search_id, node.smiles, settings, result)
-    return restore_session(replace(session, searches=(*records, search)).to_dict())
+    session = restore_session(replace(session, searches=(*records, search)).to_dict())
+    return _expand_search(session, node_id, search)
+
+
+def _new_alternative(
+    node_id: str, choice: PlanningChoice, precursors: tuple[str, ...]
+) -> PlanningAlternative:
+    return PlanningAlternative(choice, tuple(
+        PlanningNode(digest("PLANNODE1", node_id, choice.choice_id, str(index)), smiles)
+        for index, smiles in enumerate(precursors)
+    ))
+
+
+def _commit_root(session: PlanningSession, root: PlanningNode) -> PlanningSession:
+    if root == session.root:
+        return session
+    _validate_root(session, root)
+    return replace(
+        session, root=root, past=(*session.past, session.root)[-MAX_HISTORY:], future=()
+    )
+
+
+def _expand_search(
+    session: PlanningSession, node_id: str, search: PlanningSearch
+) -> PlanningSession:
+    """Add complete viable options, reporting cycles and bounded-tree omissions."""
+    count = 0
+    ancestors: tuple[str, ...] = ()
+
+    def inspect(node: PlanningNode, path: tuple[str, ...]) -> None:
+        nonlocal count, ancestors
+        count += 1
+        if node.node_id == node_id:
+            ancestors = (*path, node.smiles)
+        for option in node.alternatives:
+            for child in option.children:
+                inspect(child, (*path, node.smiles))
+
+    inspect(session.root, ())
+    node = find_node(session.root, node_id)
+    alternatives = list(node.alternatives)
+    existing = {option.choice for option in alternatives}
+    warnings = []
+    for index, strategy in enumerate(search.result["strategies"]):
+        for variant in range(1 + len(strategy["alternate_realizations"])):
+            choice = PlanningChoice(search.search_id, index, variant)
+            if choice in existing:
+                continue
+            _, _, precursors = candidate_for_choice(session, choice)
+            reason = None
+            if any(smiles in ancestors for smiles in precursors):
+                reason = "would create a cycle back to an ancestor molecule"
+            elif len(ancestors) > MAX_DEPTH:
+                reason = "would exceed 20 reaction levels"
+            elif count + len(precursors) > MAX_NODES:
+                reason = "would exceed the 200-molecule tree limit"
+            if reason:
+                warnings.append(f"Strategy {index + 1}, choice {variant + 1}: not added; {reason}.")
+                continue
+            alternatives.append(_new_alternative(node_id, choice, precursors))
+            count += len(precursors)
+    updated = replace(node, alternatives=tuple(alternatives), expansion_warnings=tuple(warnings))
+    return _commit_root(session, _replace_node(session.root, node_id, updated))
 
 
 def edit_session(
@@ -417,7 +550,7 @@ def edit_session(
     node_id: str = "root",
     choice: PlanningChoice | None = None,
 ) -> PlanningSession:
-    """Choose, remove, stop, reopen, undo, or redo a branch atomically."""
+    """Edit an alternative atomically; selection preserves all other branches."""
     if action == "undo":
         if not session.past:
             raise ValueError("Nothing to undo")
@@ -438,19 +571,18 @@ def edit_session(
         )
     node = find_node(session.root, node_id)
     if action == "select" and choice is not None:
-        if node.choice == choice:
-            return session
-        _, _, precursors = candidate_for_choice(session, choice)
-        children = tuple(
-            PlanningNode(
-                digest("PLANNODE1", node_id, choice.choice_id, str(index)),
-                smiles,
-            )
-            for index, smiles in enumerate(precursors)
-        )
-        updated = replace(node, choice=choice, children=children, stopped=False)
+        alternatives = node.alternatives
+        if not any(option.choice == choice for option in alternatives):
+            _, _, precursors = candidate_for_choice(session, choice)
+            alternatives = (*alternatives, _new_alternative(node_id, choice, precursors))
+        updated = replace(node, choice=choice, alternatives=alternatives, stopped=False)
     elif action == "remove":
-        updated = replace(node, choice=None, children=(), stopped=False)
+        updated = replace(
+            node, choice=None, stopped=False,
+            alternatives=tuple(option for option in node.alternatives if option.choice != node.choice),
+        )
+    elif action == "clear":
+        updated = replace(node, choice=None)
     elif action in ("stop", "reopen"):
         if node.choice:
             raise ValueError(
@@ -459,13 +591,8 @@ def edit_session(
         updated = replace(node, stopped=action == "stop")
     else:
         raise ValueError("Unknown planning edit")
-    root = _replace_node(session.root, node_id, updated)
-    if root == session.root:
-        return session
-    _validate_root(session, root)
-    return replace(
-        session, root=root, past=(*session.past, session.root)[-MAX_HISTORY:], future=()
-    )
+    root = _replace_node(session.root, node_id, updated, activate=action == "select")
+    return _commit_root(session, root)
 
 
 def record_conditions(

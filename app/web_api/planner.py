@@ -40,6 +40,7 @@ class PlanningRequest(StrictRequest):
         "restore",
         "search",
         "select",
+        "clear",
         "remove",
         "stop",
         "reopen",

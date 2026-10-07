@@ -4,6 +4,7 @@ import type { Capabilities, RetrosynthesisCandidate } from '../api/types'
 import type { PlanningChoice, PlanningNode, PlanningRequest, PlanningResponse, PlanningSearch, PlanningSession, PlanningSettings } from '../api/planning'
 import { ReactionEditor } from './ReactionEditor'
 import { ReactionImage } from './ReactionImage'
+import { PlanningTree, planningChoiceKey as choiceKey } from './PlanningTree'
 import { compactRecipeSummary, displayName } from './Results'
 import './interactive-planner.css'
 
@@ -14,11 +15,12 @@ const DEFAULT_SETTINGS: PlanningSettings = {
 }
 
 function nodes(root: PlanningNode): PlanningNode[] {
-  return [root, ...root.children.flatMap(nodes)]
+  return [root, ...root.alternatives.flatMap(option => option.children.flatMap(nodes))]
 }
 
-function choiceKey(choice: PlanningChoice): string {
-  return `${choice.search_id}:${choice.strategy_index}:${choice.realization_index}`
+function selectedRouteNodes(root: PlanningNode): PlanningNode[] {
+  const selected = root.alternatives.find(option => root.choice && choiceKey(option.choice) === choiceKey(root.choice))
+  return [root, ...(selected?.children.flatMap(selectedRouteNodes) ?? [])]
 }
 
 function selectedCandidate(session: PlanningSession, choice: PlanningChoice | null): RetrosynthesisCandidate | undefined {
@@ -62,6 +64,7 @@ export function useInteractivePlanner(active: boolean) {
   const started = useRef(false)
   const session = data?.session
   const selected = session ? nodes(session.root).find(node => node.node_id === selectedId) ?? session.root : null
+  const selectedOnRoute = Boolean(session && selectedRouteNodes(session.root).some(node => node.node_id === selected?.node_id))
 
   const cancel = () => { pending.current?.abort(); pending.current = null; setBusy('') }
   const run = async (request: PlanningRequest, message: string): Promise<PlanningResponse | null> => {
@@ -88,7 +91,7 @@ export function useInteractivePlanner(active: boolean) {
   const restore = async (raw: unknown) => {
     if (!raw || typeof raw !== 'object') { setError('Choose a planning session JSON file.'); return }
     const saved = raw as { schema_version?: string; session?: PlanningSession; settings?: unknown; selected_id?: string }
-    if (saved.schema_version !== 'interactive_planning_browser.v1' || !saved.session) {
+    if (!['interactive_planning_browser.v1', 'interactive_planning_browser.v2'].includes(saved.schema_version ?? '') || !saved.session) {
       setError('Unsupported session file. Import an exported planning session, not a route-only export.')
       return
     }
@@ -114,7 +117,7 @@ export function useInteractivePlanner(active: boolean) {
     if (!data) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        schema_version: 'interactive_planning_browser.v1', session: data.session, settings, selected_id: selectedId,
+        schema_version: 'interactive_planning_browser.v2', session: data.session, settings, selected_id: selectedId,
       }))
       setSaveError('')
     } catch { setSaveError('Browser autosave is unavailable or full. Export the session to keep your work.') }
@@ -133,9 +136,9 @@ export function useInteractivePlanner(active: boolean) {
     if (file.size > 20_000_000) { setError('Session files must be smaller than 20 MB.'); return }
     try { await restore(JSON.parse(await file.text())) } catch { setError('The file is not valid JSON.') }
   }
-  const exportSession = () => data && download({ schema_version: 'interactive_planning_browser.v1',
+  const exportSession = () => data && download({ schema_version: 'interactive_planning_browser.v2',
     session: data.session, settings, selected_id: selectedId }, 'interactive_planning_session.json')
-  return { data, settings, target, setTarget, editingTarget, setEditingTarget, selected, busy,
+  return { data, settings, target, setTarget, editingTarget, setEditingTarget, selected, selectedOnRoute, busy,
     error, setError, notice, saveError, cancel, act, start, select, updateSettings, importFile, exportSession }
 }
 
@@ -145,33 +148,13 @@ export function InteractivePlannerOptions({ state }: { state: State }) {
   return <div className="analysis-options planner-options">
     <div className="option-grid feature-options">
       <label><span>Strategies per expansion</span><input aria-label="Strategies per expansion" type="number" min={1} max={50} value={state.settings.top_k} disabled={Boolean(state.busy)} onChange={event => state.updateSettings({ top_k: Math.min(50, Math.max(1, Number(event.target.value))) })} /></label>
-      <div className="feature-mode-note"><strong>Build a route one choice at a time</strong><span>Select a molecule, find disconnections, and choose the precursor set to continue. Every precursor becomes its own branch.</span></div>
+      <div className="feature-mode-note"><strong>Explore alternative synthesis routes</strong><span>Find disconnections for any molecule. Explore several reaction branches, then select a route while keeping the alternatives.</span></div>
     </div>
     <details className="advanced-options"><summary>Advanced options</summary><div>
       <label><span>Operator library</span><select value={state.settings.library_mode} disabled={Boolean(state.busy)} onChange={event => state.updateSettings({ library_mode: event.target.value as 'full' | 'compact' })}><option value="full">Full</option><option value="compact">Compact</option></select></label>
       {([['use_context', 'Rank with local reaction context'], ['diversify', 'Prioritize distinct disconnections'], ['use_precursor_realism', 'Consider precursor realism'], ['use_forward_validation', 'Audit forward products and competing pathways'], ['include_l0', 'Include broad L0 fallback operators']] as const).map(([key, label]) => <label className="check-option" key={key}><input type="checkbox" checked={state.settings[key]} disabled={Boolean(state.busy)} onChange={event => state.updateSettings({ [key]: event.target.checked })} /><span>{label}</span></label>)}
     </div></details>
   </div>
-}
-
-function RouteNode({ node, path, selectedId, onSelect, stock }: { node: PlanningNode; path: string; selectedId: string; onSelect: (id: string) => void; stock: PlanningSession['stock'] }) {
-  const [collapsed, setCollapsed] = useState(false)
-  const title = path === '0' ? 'Target' : `Molecule ${path}`
-  return <li className="planner-branch">
-    <div className={`planner-molecule ${node.node_id === selectedId ? 'selected' : ''}`}>
-      <button className="planner-molecule-select" type="button" aria-label={`Select ${title.toLowerCase()}`} aria-pressed={node.node_id === selectedId} onClick={() => onSelect(node.node_id)}>
-        <strong>{title}</strong>
-        <ReactionImage smiles={node.smiles} kind="molecule" label={`${title} structure`} focusable={false} />
-        <span className={`planner-status ${node.stopped ? 'stopped' : ''}`}>{node.stopped ? 'User-designated starting material' : node.choice ? 'Step selected' : 'Needs expansion'}</span>
-        {stock[node.smiles]?.status === 'verified_stock_match' && <span className="planner-status stopped">Stock match · last check</span>}
-        <code>{node.smiles}</code>
-      </button>
-      {node.children.length > 0 && <button className="button quiet" type="button" aria-expanded={!collapsed} onClick={() => setCollapsed(value => !value)}>{collapsed ? 'Expand branch' : 'Collapse branch'}</button>}
-    </div>
-    {node.children.length > 0 && !collapsed && <><div className="planner-connector"><span>Chosen reaction<br />All {node.children.length} precursors required</span></div><ul className="planner-children">
-      {node.children.map((child, index) => <RouteNode key={child.node_id} node={child} path={path === '0' ? `${index + 1}` : `${path}.${index + 1}`} selectedId={selectedId} onSelect={onSelect} stock={stock} />)}
-    </ul></>}
-  </li>
 }
 
 function CandidateEvidence({ candidate }: { candidate: RetrosynthesisCandidate }) {
@@ -186,6 +169,12 @@ function CandidateEvidence({ candidate }: { candidate: RetrosynthesisCandidate }
 function StrategyCard({ search, index, state }: { search: PlanningSearch; index: number; state: State }) {
   const strategy = search.result.strategies[index]
   const [variant, setVariant] = useState(() => state.selected?.choice?.search_id === search.search_id && state.selected.choice.strategy_index === index ? state.selected.choice.realization_index : 0)
+  const selectedChoice = state.selected?.choice
+  useEffect(() => {
+    if (selectedChoice?.search_id === search.search_id && selectedChoice.strategy_index === index) {
+      setVariant(selectedChoice.realization_index)
+    }
+  }, [selectedChoice?.search_id, selectedChoice?.strategy_index, selectedChoice?.realization_index, search.search_id, index])
   const variants = [strategy.representative, ...strategy.alternate_realizations]
   const candidate = variants[variant] ?? variants[0]
   const choice: PlanningChoice = { search_id: search.search_id, strategy_index: index, realization_index: variant }
@@ -195,7 +184,7 @@ function StrategyCard({ search, index, state }: { search: PlanningSearch; index:
     {variants.length > 1 && <label className="planner-variant">Precursor choice<select aria-label={`Strategy ${index + 1} precursor choice`} value={variant} onChange={event => setVariant(Number(event.target.value))}>{variants.map((item, number) => <option key={number} value={number}>{number + 1}. {item.precursor_smiles}</option>)}</select></label>}
     <ReactionImage smiles={candidate.proposed_reaction_smiles} label={`Strategy ${index + 1} reaction`} />
     <CandidateEvidence candidate={candidate} />
-    <button className="button primary" type="button" disabled={Boolean(state.busy || chosen)} onClick={() => void state.act('select', choice)}>{chosen ? 'Step selected' : 'Use this step'}</button>
+    <button className="button primary" type="button" disabled={Boolean(state.busy || (chosen && state.selectedOnRoute))} onClick={() => void state.act('select', choice)}>{chosen && state.selectedOnRoute ? 'Step selected' : 'Use this step'}</button>
   </article>
 }
 
@@ -232,15 +221,17 @@ export function InteractivePlanner({ state, capabilities }: { state: State; capa
       <div className="planner-summary"><strong>{data.summary.reaction_count} selected steps</strong><span>{data.summary.unresolved_count} unresolved molecules</span><span>{data.summary.starting_material_count} user-designated starting materials</span><span>Depth {data.summary.maximum_depth}</span><small>{state.saveError ? 'Autosave unavailable' : 'Saved in this browser'}</small></div>
       {!data.summary.unresolved_count && <p className="planner-note">All branches end at user-designated starting materials. Stock availability and route feasibility are not established by these choices.</p>}
       <div className="planner-layout">
-        <section className="planner-tree-panel" aria-label="Selected route"><h2>Selected route</h2><p className="planner-note" id="planner-tree-help">Target → precursor branches. Select any molecule to continue or revise its step. Scroll to explore the tree.</p><div className="planner-tree" role="region" aria-label="Route tree" aria-describedby="planner-tree-help" tabIndex={0}><ul><RouteNode node={data.session.root} path="0" selectedId={selected.node_id} onSelect={state.select} stock={data.session.stock} /></ul></div></section>
+        <PlanningTree session={data.session} selectedId={selected.node_id} busy={Boolean(busy)} onSelect={state.select} onChoose={(nodeId, choice) => { state.select(nodeId); void state.act('select', { node_id: nodeId, ...choice }) }} />
         <section className="planner-inspector" aria-label="Selected molecule planning">
           <div className="planner-inspector-heading"><h2>{selected.node_id === 'root' ? 'Plan the target' : 'Plan this precursor'}</h2><code>{selected.smiles}</code></div>
+          {!state.selectedOnRoute && <p className="planner-note">You are exploring an alternative branch. Choose a reaction here to select its path back to the target.</p>}
           <div className="planner-actions"><button className="button primary" type="button" disabled={Boolean(busy || !available || selected.stopped)} onClick={() => void state.act('search')}>{search ? 'Search again' : 'Find disconnections'}</button>
-            {selected.choice ? <button className="button quiet" type="button" disabled={Boolean(busy)} onClick={() => void state.act('remove')}>Remove step and its branches</button> : <button className="button quiet" type="button" disabled={Boolean(busy)} onClick={() => void state.act(selected.stopped ? 'reopen' : 'stop')}>{selected.stopped ? 'Reopen for planning' : 'Use as starting material'}</button>}
+            {selected.choice ? <><button className="button quiet" type="button" disabled={Boolean(busy)} onClick={() => void state.act('clear')}>Clear route choice</button><button className="button quiet" type="button" disabled={Boolean(busy)} onClick={() => void state.act('remove')}>Remove selected alternative</button></> : <button className="button quiet" type="button" disabled={Boolean(busy)} onClick={() => void state.act(selected.stopped ? 'reopen' : 'stop')}>{selected.stopped ? 'Reopen for planning' : 'Use as starting material'}</button>}
           </div>
           {!available && capabilities && <p className="alert caution">The selected operator library is unavailable. You can inspect, save, and revise existing choices.</p>}
           {(capabilities?.stock_portfolio_available || stock) && <div className="planner-stock"><button className="button quiet" type="button" disabled={Boolean(busy)} onClick={() => void state.act('stock')}>{stock ? 'Refresh stock check' : 'Check supplier stock'}</button>{stock && <details className="planner-evidence"><summary>{displayName(stock.status)} · last check</summary><p>{stock.status === 'verified_stock_match' ? 'Exact match in the local supplier snapshot. See dates and availability evidence below; a saved check is not live inventory.' : 'No verified availability established by this lookup. See the retained source evidence below.'}</p><pre>{JSON.stringify(stock, null, 2)}</pre></details>}</div>}
           {selected.stopped && <p className="planner-note">You designated this molecule as a starting material. This is not a verified stock match. Reopen it to search further.</p>}
+          {selected.expansion_warnings.length > 0 && <details className="planner-evidence planner-expansion-warnings" open><summary>Alternatives not added to the tree</summary><ul>{selected.expansion_warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details>}
           {candidate && <details className="planner-chosen" open><summary>Chosen step and conditions</summary>
             <ReactionImage smiles={candidate.proposed_reaction_smiles} label="Chosen route step" />
             <CandidateEvidence candidate={candidate} />
@@ -249,7 +240,7 @@ export function InteractivePlanner({ state, capabilities }: { state: State; capa
           </details>}
           {!selected.stopped && <>
             {search ? <><div className="planner-search-heading"><h3>{search.result.strategies.length} candidate strategies</h3><p className="planner-note">{displayName(search.settings.library_mode)} library · up to {search.settings.top_k} strategies requested. Saved results are retained until you search again.</p></div>
-              {selected.children.length > 0 && <p className="planner-note">Choosing another step replaces this molecule’s downstream branches. Undo restores them.</p>}
+              {selected.alternatives.length > 0 && <p className="planner-note">Choosing a reaction selects its path to the target. All other alternatives and their explored branches stay saved.</p>}
               {!search.result.strategies.length && <p className="alert caution">No candidates found within this search scope. This molecule remains unresolved; try a different scope or designate it as a starting material.</p>}
               {search.result.warnings?.length > 0 && <details className="planner-evidence"><summary>Search coverage and cautions</summary><ul>{search.result.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul><pre>{JSON.stringify(search.result.search_diagnostics, null, 2)}</pre></details>}
               {search.result.strategies.map((_, index) => <StrategyCard key={`${selected.node_id}:${search.search_id}:${index}`} search={search} index={index} state={state} />)}
