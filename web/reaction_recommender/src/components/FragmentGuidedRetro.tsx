@@ -73,23 +73,24 @@ type State = ReturnType<typeof useFragmentGuidedRetro>
 export function FragmentGuidedRetroOptions({ state, capabilities }: { state: State; capabilities: Capabilities | null }) {
   const available = capabilities?.fragment_search && capabilities.retrosynthesis_library_modes?.[state.library]?.library_available
   return <div className="analysis-options fragment-retro-options">
+    <div className="option-grid fragment-retro-primary">
     <label><span>Workflow</span><select aria-label="Workflow" value={state.workflow} disabled={state.busy || state.research.busy} onChange={event => { state.setWorkflow(event.target.value as State['workflow']); state.reset() }}><option value="manual">Assisted fragment research</option><option value="automatic">Automatic POC comparison</option></select></label>
+    <div className="feature-mode-note"><strong>{state.workflow === 'manual' ? 'Assisted fragment research' : 'Experimental single-step comparison'}</strong><span>{state.workflow === 'manual' ? 'Search a chosen core, inspect source reactions, and assess construction precedents against your target.' : 'Compare source transfers and fragment-guided proposals with an unrestricted baseline.'}</span></div>
+    </div>
     {state.workflow === 'manual' ? <>
-      <FragmentResearchOptions state={state.research} />
-      <fieldset className="fragment-fields" disabled={state.research.busy}>
+      <FragmentResearchOptions state={state.research}>
         <label><span>Construction bonds</span><select value={state.focusLimit} onChange={event => { state.setFocusLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
         <label><span>Proposals per search arm</span><select value={state.topK} onChange={event => { state.setTopK(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 5, 10].map(value => <option key={value}>{value}</option>)}</select></label>
-      </fieldset>
+      </FragmentResearchOptions>
       {capabilities && !capabilities.fragment_search && <p className="alert caution">Fragment index unavailable; suggestions and query editing remain available.</p>}
     </> : <>
-    <p><strong>Experimental single-step comparison</strong><br />Generate target fragments, retrieve construction evidence, then compare source transfers and guided proposals with an unrestricted baseline.</p>
-    <fieldset disabled={state.busy} className="fragment-fields">
+    <fieldset disabled={state.busy} className="fragment-fields option-grid fragment-retro-grid">
       <label><span>Fragment queries</span><select value={state.queryLimit} onChange={event => { state.setQueryLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
       <label><span>Construction bonds</span><select value={state.focusLimit} onChange={event => { state.setFocusLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
       <label><span>Proposals per search arm</span><select value={state.topK} onChange={event => { state.setTopK(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 5, 10].map(value => <option key={value}>{value}</option>)}</select></label>
       <button className="button quiet" type="button" onClick={() => state.changeTarget(EXAMPLE)}>Fragment retro example</button>
     </fieldset>
-    <p className="fragment-note">Queries follow deterministic fragment suggestion order. Bonds rank by independent reference support, with atom IDs breaking ties. Chemistry validation is mandatory.</p>
+    <details className="advanced-options"><summary>Search details</summary><div><p className="fragment-note fragment-retro-wide">Queries follow deterministic fragment suggestion order. Bonds rank by independent reference support, with atom IDs breaking ties. Chemistry validation is mandatory.</p></div></details>
     {capabilities && !available && <div className="alert warning">Requires a prepared fragment index and the selected operator library. Configure the fragment index with --fragment-index or FRAGMENT_PRECEDENT_INDEX; configure operator libraries with CORE_RETROSYNTHESIS_LIBRARY_ROOT.</div>}
     {state.error && <div className="alert error" role="alert">{state.error}</div>}
     </>}

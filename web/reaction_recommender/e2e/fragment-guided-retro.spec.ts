@@ -8,7 +8,7 @@ const arm = (precursor: string, focus = false) => ({
 })
 
 const result = {
-  schema_version: 'fragment_guided_retrosynthesis.v1', target_smiles: 'COC', library_mode: 'compact',
+  schema_version: 'fragment_guided_retrosynthesis.v1', target_smiles: 'COC', library_mode: 'full',
   policy: { query_limit: 3, max_focus_bonds: 3, require_complete_search: true },
   suggestions: { candidates: [{ candidate_id: 'fragment-1', kind: 'whole_target', query: 'COC',
     reasons: ['whole target'], cautions: [], target_highlight_svg: '<svg xmlns="http://www.w3.org/2000/svg" width="260" height="120"><text x="10" y="30">Target region</text></svg>' }] },
@@ -30,7 +30,7 @@ const result = {
 test.beforeEach(async ({ page }) => {
   await page.route('**/api/v1/capabilities', route => route.fulfill({ json: { data: {
     fragment_search: true, fragment_guided_retrosynthesis: true,
-    retrosynthesis_library_modes: { compact: { library_available: true }, full: { library_available: false } },
+    retrosynthesis_library_modes: { compact: { library_available: true }, full: { library_available: true } },
   } } }))
   await page.route('**/api/v1/ranking-profiles', route => route.fulfill({ json: { data: { profiles: [] } } }))
   await page.route('**/api/v1/forward-synthesis/condition-profiles', route => route.fulfill({ json: { data: {} } }))
@@ -43,7 +43,7 @@ test('compares baseline and guided evidence, exports JSON, and resets on edits',
   page.on('pageerror', error => errors.push(error.message))
   await page.route('**/api/v1/retrosynthesis/fragment-guided', async route => {
     expect(route.request().postDataJSON()).toEqual({
-      target_smiles: 'Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2', library_mode: 'compact',
+      target_smiles: 'Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2', library_mode: 'full',
       query_limit: 3, max_focus_bonds: 3, top_k: 3,
     })
     await route.fulfill({ json: { data: result } })
@@ -96,7 +96,13 @@ test('reports unavailable libraries and server errors while allowing recovery', 
   await page.getByRole('button', { name: 'Evaluate fragment-guided retro' }).click()
   await expect(page.getByRole('alert')).toContainText('one connected molecule')
   await expect(page.getByLabel('Target molecule SMILES', { exact: true })).toBeEnabled()
-  await page.getByLabel('Operator library', { exact: true }).selectOption('full')
+  await page.route('**/api/v1/capabilities', route => route.fulfill({ json: { data: {
+    fragment_search: true, retrosynthesis_library_modes: { full: { library_available: false } },
+  } } }))
+  await page.reload()
+  await page.getByRole('radio', { name: 'Fragment-guided retro', exact: true }).check()
+  await page.getByLabel('Workflow', { exact: true }).selectOption('automatic')
+  await page.getByLabel('Target molecule SMILES', { exact: true }).fill('COC')
   await expect(page.getByRole('button', { name: 'Evaluate fragment-guided retro' })).toBeDisabled()
   await expect(page.getByText(/Requires a prepared fragment index/)).toBeVisible()
 })
@@ -117,7 +123,7 @@ test('changing modes clears results and ignores an in-flight response', async ({
   const requested = page.waitForRequest('**/api/v1/retrosynthesis/fragment-guided')
   await page.getByRole('button', { name: 'Evaluate fragment-guided retro' }).click()
   await requested
-  await page.getByRole('radio', { name: 'Fragment search', exact: true }).check()
+  await page.getByRole('radio', { name: 'Analyze reactions', exact: true }).check()
   release()
   await delivered
   await page.getByRole('radio', { name: 'Fragment-guided retro', exact: true }).check()

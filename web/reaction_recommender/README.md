@@ -36,19 +36,16 @@ Node.js 24.14.1+.
 ## Fragment precedent search
 
 Run `python -m app.web_api --workbench --build`, open
-`http://127.0.0.1:8000/`, and select **Fragment search**. This is the ordinary
-research workbench; no agent or scientific-chat service is required.
-Use **Cyclic ether example** to try `c1ccc2c(c1)COc1ccccc1-2`, or enter a connected
-core as SMILES/SMARTS. Select ring preservation or explicit subgraph matching.
-In SMILES mode, **Draw** / **Edit drawing** opens the same
-Ketcher editor used for retrosynthesis. Draw one connected core and select
-**Use drawing** to update the query and its preview, then **Search fragments**.
-SMARTS queries remain text input so drawing does not silently discard query features.
+`http://127.0.0.1:8000/`, and select **Fragment-guided retro** with the
+**Assisted fragment research** workflow. Enter or draw a target, then use
+**Suggest strategic regions** or **Use full target as query** to define a core.
+You can also edit the core directly as SMILES/SMARTS and select ring preservation
+or explicit subgraph matching. **Search chosen fragment** retrieves precedents
+for inspection and transfer assessment against the target.
 
-For a whole target, use **Suggest fragments** to inspect up to five overlapping
-regions, with the selected atoms highlighted on the original target. **Use candidate**
-copies that query into the shared editor; **Search fragments** remains a separate
-action. You can also keep using your own core. Suggestions require no prepared index.
+The right-hand options use a compact grid. **Advanced options** contains the
+optional baseline comparison and query-matching guidance. Suggestions require
+no prepared index; precedent searches require the index described below.
 
 `POST /api/v1/fragments/suggest` accepts `target_smiles` (one connected structure,
 at most 200 atoms), optional `limit` (1–5), and optional `selected_atom_ids` (strict

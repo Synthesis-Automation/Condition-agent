@@ -18,7 +18,7 @@ const search = {
   limitations: ['Presence does not establish construction.'], execution: { elapsed_seconds: 0.1 },
 }
 const transfer = {
-  schema_version: 'fragment_guided_retrosynthesis.v1', target_smiles: 'CCOCC', library_mode: 'compact',
+  schema_version: 'fragment_guided_retrosynthesis.v1', target_smiles: 'CCOCC', library_mode: 'full',
   policy: {}, suggestions: { candidates: [] }, searches: [], query_search: search,
   guidance: { focus_bonds: [], eligible_bond_count: 0, eligible_source_count: 0, source_records: [], exclusions: [] },
   transfers: { baseline: { status: 'not_requested', candidates: [], diagnostics: null }, guided: [],
@@ -34,7 +34,7 @@ const transfer = {
 test.beforeEach(async ({ page }) => {
   await page.route('**/api/v1/capabilities', route => route.fulfill({ json: { data: {
     fragment_search: true, fragment_guided_retrosynthesis: true,
-    retrosynthesis_library_modes: { compact: { library_available: true }, full: { library_available: false } },
+    retrosynthesis_library_modes: { compact: { library_available: true }, full: { library_available: true } },
   } } }))
   await page.route('**/api/v1/ranking-profiles', route => route.fulfill({ json: { data: { profiles: [] } } }))
   await page.route('**/api/v1/forward-synthesis/condition-profiles', route => route.fulfill({ json: { data: {} } }))
@@ -68,13 +68,13 @@ test('revises queries independently, selects sources, assesses and exports linke
   await page.route('**/api/v1/retrosynthesis/fragment-transfer', async route => {
     expect(route.request().postDataJSON()).toEqual({ target_smiles: 'CCOCC', query: 'COC',
       query_format: 'smiles', topology: 'preserve_rings', limit: 10, timeout_seconds: 30,
-      selected_observation_ids: ['obs-1'], library_mode: 'compact', max_focus_bonds: 3, top_k: 3,
+      selected_observation_ids: ['obs-1'], library_mode: 'full', max_focus_bonds: 3, top_k: 3,
       include_baseline: false })
     await route.fulfill({ json: { data: transfer } })
   })
   await page.getByRole('button', { name: 'Use full target as query' }).click()
   await page.getByRole('button', { name: 'Search chosen fragment' }).click()
-  await expect(page.getByText('No matching products in this index.')).toBeVisible()
+  await expect(page.getByText('No matching compounds on the selected reaction side.')).toBeVisible()
   await page.getByRole('button', { name: 'Suggest simpler queries' }).click()
   await page.getByRole('button', { name: 'Use region 1' }).click()
   await expect(page.getByLabel('Target molecule SMILES', { exact: true })).toHaveValue('CCOCC')
@@ -101,11 +101,9 @@ test('revises queries independently, selects sources, assesses and exports linke
   await page.getByLabel('Core fragment', { exact: true }).fill('CO')
   await expect(page.getByRole('heading', { name: 'Selected precedent transfer assessment' })).toBeHidden()
   await expect(page.getByRole('heading', { name: 'Research history (3/20)' })).toBeVisible()
-  await page.getByLabel('Operator library', { exact: true }).selectOption('full')
   await page.getByRole('combobox', { name: 'Construction bonds', exact: true }).selectOption('5')
   await page.getByText(/attempt-3 .* transfer .* assessed/).click()
   await page.getByRole('button', { name: 'Restore attempt-3' }).click()
-  await expect(page.getByLabel('Operator library', { exact: true })).toHaveValue('compact')
   await expect(page.getByRole('combobox', { name: 'Construction bonds', exact: true })).toHaveValue('3')
   await expect(page.getByRole('checkbox', { name: /source-1/ })).toBeChecked()
   await expect(page.getByLabel('Core fragment', { exact: true })).toHaveValue('COC')
@@ -133,7 +131,7 @@ test('records query errors, restores an attempt, and blocks partial evidence fro
   await expect(page.getByRole('heading', { name: 'Research history (2/20)' })).toBeVisible()
 })
 
-test('SMARTS stays explicit, optional baseline is sent, and operator availability does not block discovery', async ({ page }) => {
+test('SMARTS stays explicit and optional baseline is sent', async ({ page }) => {
   await page.getByLabel('Query format', { exact: true }).selectOption('smarts')
   await page.getByLabel('Query topology', { exact: true }).selectOption('subgraph')
   await page.getByLabel('Core fragment', { exact: true }).fill('C[O,N]C')
@@ -145,10 +143,7 @@ test('SMARTS stays explicit, optional baseline is sent, and operator availabilit
   })
   await page.getByRole('button', { name: 'Search chosen fragment' }).click()
   await page.getByRole('checkbox', { name: /source-1/ }).check()
-  await page.getByLabel('Operator library', { exact: true }).selectOption('full')
-  await expect(page.getByRole('button', { name: 'Assess selected precedents on target' })).toBeDisabled()
-  await expect(page.getByRole('button', { name: 'Search chosen fragment' })).toBeEnabled()
-  await page.getByLabel('Operator library', { exact: true }).selectOption('compact')
+  await page.getByText('Advanced options', { exact: true }).click()
   await page.getByRole('checkbox', { name: /Include bounded unrestricted baseline/ }).check()
   await page.route('**/api/v1/retrosynthesis/fragment-transfer', async route => {
     expect(route.request().postDataJSON().include_baseline).toBe(true)
@@ -176,7 +171,7 @@ test('leaving the mode aborts a pending revision and preserves completed history
   const requested = page.waitForRequest('**/api/v1/fragments/search')
   await page.getByRole('button', { name: 'Search chosen fragment' }).click()
   await requested
-  await page.getByRole('radio', { name: 'Fragment search', exact: true }).check()
+  await page.getByRole('radio', { name: 'Analyze reactions', exact: true }).check()
   release(); await completed
   await page.getByRole('radio', { name: 'Fragment-guided retro', exact: true }).check()
   await expect(page.getByLabel('Core fragment', { exact: true })).toHaveValue('CO')

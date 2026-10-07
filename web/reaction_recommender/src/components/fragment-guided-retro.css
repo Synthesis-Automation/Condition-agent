@@ -1,4 +1,10 @@
-.fragment-retro-options > p { font-size: .85rem; line-height: 1.5; }
+.analysis-workbench .fragment-retro-primary { grid-template-columns: minmax(230px,.8fr) minmax(0,1.2fr); margin-bottom: 12px; }
+.analysis-workbench .fragment-retro-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.fragment-retro-grid > button { align-self: end; min-height: 39px; }
+.fragment-retro-options .fragment-note { margin: 0; font-size: .7rem; line-height: 1.5; }
+.fragment-retro-wide { grid-column: 1 / -1; }
+@media (max-width: 1120px) { .analysis-workbench .fragment-retro-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 720px) { .analysis-workbench .fragment-retro-primary, .analysis-workbench .fragment-retro-grid { grid-template-columns: 1fr; } }
 .fragment-retro-results { min-width: 0; }
 .fragment-retro-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 20px; background: #f3f7f4; }
 .fragment-retro-summary div { display: grid; gap: 6px; }

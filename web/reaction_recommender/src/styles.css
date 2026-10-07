@@ -201,7 +201,7 @@ input::placeholder, textarea::placeholder { color: #94a198; }
 .reaction-image { display: grid; min-height: 110px; place-items: center; overflow: hidden; border: 1px solid #d7e0da; border-radius: 10px; background: #fff; }
 .reaction-image.compact { min-height: 95px; margin: 15px 19px; }
 .reaction-image img { display: block; max-width: 100%; height: auto; }
-.reaction-image.scaled-structure { min-width: 0; place-items: safe center; overflow: auto; overscroll-behavior: contain; }
+.reaction-image.scaled-structure { min-width: 0; place-items: safe center; overflow: auto; overscroll-behavior-x: contain; }
 .reaction-image.scaled-structure img { width: auto; height: auto; min-width: 0; max-width: none; }
 .reaction-image span { color: #7a8a80; font-size: .75rem; }
 .results-layout { display: grid; grid-template-columns: minmax(430px,.72fr) minmax(620px,1.28fr); min-height: 440px; border-top: 1px solid #e0e7e2; }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { api } from '../api/client'
 import type { FragmentGuidedRetroResult, FragmentSearchRequest, FragmentSearchResult, FragmentSuggestionsResult, FragmentTransferRequest, SuggestedSearchFragment } from '../api/types'
-import { FragmentSearchResults } from './FragmentSearch'
+import { FragmentSearchResults } from './FragmentSearchResults'
 import { ReactionEditor } from './ReactionEditor'
 
 interface Attempt {
@@ -134,17 +134,19 @@ export function useFragmentResearch(active: boolean) {
 
 type State = ReturnType<typeof useFragmentResearch>
 
-export function FragmentResearchOptions({ state }: { state: State }) {
+export function FragmentResearchOptions({ state, children }: { state: State; children: ReactNode }) {
   return <>
-    <p><strong>Assisted fragment research</strong><br />Keep the target fixed. Search a chosen core, revise the query, inspect source reactions, and assess selected construction precedents.</p>
-    <fieldset className="fragment-fields" disabled={state.busy}>
+    <fieldset className="fragment-fields option-grid fragment-retro-grid" disabled={state.busy}>
       <label><span>Query format</span><select aria-label="Query format" value={state.format} onChange={event => { state.setFormat(event.target.value as State['format']); state.reset() }}><option value="smiles">SMILES</option><option value="smarts">SMARTS</option></select></label>
       <label><span>Query topology</span><select aria-label="Query topology" value={state.topology} onChange={event => { state.setTopology(event.target.value as State['topology']); state.reset() }}><option value="preserve_rings">Preserve ring system</option><option value="subgraph">Subgraph: allow extra rings</option></select></label>
       <label><span>Search budget (seconds)</span><input type="number" min={1} max={30} value={state.timeout} onChange={event => { state.setTimeoutBudget(Math.min(30, Math.max(1, Number(event.target.value)))); state.reset() }} /></label>
-      <label className="check-option"><input type="checkbox" checked={state.includeBaseline} onChange={event => { state.setIncludeBaseline(event.target.checked); state.invalidateTransfer() }} /><span>Include bounded unrestricted baseline when assessing transfer</span></label>
+      {children}
       <button type="button" className="button quiet" onClick={state.example}>Fragment research example</button>
     </fieldset>
-    <p className="fragment-note">SMILES searches allow extra substitution unless constrained. Removing a substituent from the query stops requiring it; it does not require its absence. SMARTS changes are explicit. Up to 10 source hits are shown.</p>
+    <details className="advanced-options"><summary>Advanced options</summary><div>
+      <label className="check-option fragment-retro-wide"><input type="checkbox" disabled={state.busy} checked={state.includeBaseline} onChange={event => { state.setIncludeBaseline(event.target.checked); state.invalidateTransfer() }} /><span>Include bounded unrestricted baseline when assessing transfer</span></label>
+      <p className="fragment-note fragment-retro-wide">SMILES searches allow extra substitution unless constrained. Removing a substituent from the query stops requiring it; it does not require its absence. SMARTS changes are explicit. Up to 10 source hits are shown.</p>
+    </div></details>
     {state.error && <div className="alert error" role="alert">{state.error}</div>}
   </>
 }
