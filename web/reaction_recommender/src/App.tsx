@@ -19,11 +19,12 @@ import type {
 import { CompletionDialog } from './components/CompletionDialog'
 import { FeatureResults } from './components/FeatureResults'
 import { FragmentGuidedRetro, FragmentGuidedRetroOptions, useFragmentGuidedRetro } from './components/FragmentGuidedRetro'
+import { InteractivePlanner, InteractivePlannerOptions, useInteractivePlanner } from './components/InteractivePlanner'
 import { RankingDialog } from './components/RankingDialog'
 import { ReactionEditor } from './components/ReactionEditor'
 import { CoupledStrategyResults, ForwardSynthesisResults, MultistepRetrosynthesisResults, RecommendationResults, RetrosynthesisResults, WeakLabelRecommendationResults } from './components/Results'
 
-type Mode = 'recommendation' | 'weak_label' | 'forward_synthesis' | 'retrosynthesis' | 'multistep_retrosynthesis' | 'coupled_strategy' | 'features' | 'fragment_guided_retro'
+type Mode = 'recommendation' | 'weak_label' | 'forward_synthesis' | 'retrosynthesis' | 'multistep_retrosynthesis' | 'coupled_strategy' | 'features' | 'fragment_guided_retro' | 'interactive_planning'
 type LibraryMode = 'full' | 'compact'
 type WeakLabelOutput = 'weak_label_fallback' | 'weak_label_screening'
 
@@ -67,6 +68,7 @@ function App() {
   const [weakLabelOutput, setWeakLabelOutput] = useState<WeakLabelOutput>('weak_label_fallback')
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null)
   const fragmentRetro = useFragmentGuidedRetro(mode === 'fragment_guided_retro')
+  const planner = useInteractivePlanner(mode === 'interactive_planning')
   const [profiles, setProfiles] = useState<RankingProfile[]>([])
   const [profileId, setProfileId] = useState('default')
   const [searchScope, setSearchScope] = useState<'same_handle' | 'automatic' | 'broad'>('automatic')
@@ -520,7 +522,9 @@ function App() {
   const isRetrosynthesisMode = mode === 'retrosynthesis' || mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy'
   const isForwardMode = mode === 'forward_synthesis'
   const isOperatorMode = isRetrosynthesisMode || isForwardMode
-  const selectedLibraryAvailable = mode === 'fragment_guided_retro'
+  const selectedLibraryAvailable = mode === 'interactive_planning'
+    ? Boolean(capabilities?.retrosynthesis_library_modes?.[planner.settings.library_mode]?.library_available)
+    : mode === 'fragment_guided_retro'
     ? Boolean(capabilities?.fragment_search && capabilities.retrosynthesis_library_modes?.[fragmentRetro.library]?.library_available)
     : mode === 'weak_label'
     ? capabilities?.weak_label_recommendation ?? false
@@ -544,7 +548,9 @@ function App() {
       ? `${label} · ${entry.row_count.toLocaleString()} records`
       : label
   }
-  const serviceStatus = mode === 'fragment_guided_retro'
+  const serviceStatus = mode === 'interactive_planning'
+    ? `Interactive planning ${selectedLibraryAvailable ? 'ready' : 'library unavailable'}`
+    : mode === 'fragment_guided_retro'
     ? fragmentRetro.workflow === 'manual'
       ? `Fragment discovery ${capabilities?.fragment_search ? 'ready' : 'unavailable'} · transfer ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
       : `Fragment-guided retro ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
@@ -572,6 +578,7 @@ function App() {
         </div>
         <div className="analysis-control-layout">
           <fieldset className="mode-switch" aria-labelledby="analysis-title">
+            <label className={mode === 'interactive_planning' ? 'active' : ''}><input type="radio" name="analysis-mode" value="interactive_planning" checked={mode === 'interactive_planning'} onChange={() => changeMode('interactive_planning')} /><strong>Interactive route planning</strong></label>
             <label className={mode === 'fragment_guided_retro' ? 'active experimental-mode' : 'experimental-mode'}><input type="radio" name="analysis-mode" value="fragment_guided_retro" checked={mode === 'fragment_guided_retro'} onChange={() => changeMode('fragment_guided_retro')} /><strong>Fragment-guided retro</strong></label>
             <label className={mode === 'features' ? 'active' : ''}><input type="radio" name="analysis-mode" value="features" checked={mode === 'features'} onChange={() => changeMode('features')} /><strong>Analyze reactions</strong></label>
             <label className={mode === 'recommendation' ? 'active' : ''}><input type="radio" name="analysis-mode" value="recommendation" checked={mode === 'recommendation'} onChange={() => changeMode('recommendation')} /><strong>Condition recommendation</strong></label>
@@ -582,7 +589,7 @@ function App() {
             <label className={mode === 'multistep_retrosynthesis' ? 'active' : ''}><input type="radio" name="analysis-mode" value="multistep_retrosynthesis" checked={mode === 'multistep_retrosynthesis'} onChange={() => changeMode('multistep_retrosynthesis')} /><strong>Multi-step retrosynthesis</strong></label>
           </fieldset>
 
-          {mode === 'fragment_guided_retro' ? <FragmentGuidedRetroOptions state={fragmentRetro} capabilities={capabilities} /> : <div className="analysis-options">
+          {mode === 'interactive_planning' ? <InteractivePlannerOptions state={planner} /> : mode === 'fragment_guided_retro' ? <FragmentGuidedRetroOptions state={fragmentRetro} capabilities={capabilities} /> : <div className="analysis-options">
             <div className={`option-grid ${mode === 'features' || mode === 'coupled_strategy' ? 'feature-options' : ''}`}>
               {mode !== 'features' && <label><span>{mode === 'multistep_retrosynthesis' ? 'Top routes' : mode === 'coupled_strategy' || mode === 'retrosynthesis' ? 'Top strategies' : 'Top results'}</span><input type="number" min="1" max={mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50} value={topK} onChange={(event) => setTopK(Math.min(mode === 'multistep_retrosynthesis' || mode === 'coupled_strategy' ? 10 : 50, Math.max(1, Number(event.target.value))))} /></label>}
               {mode === 'recommendation' ? (
@@ -627,7 +634,7 @@ function App() {
         </div>
         </section>
 
-        {mode === 'fragment_guided_retro' ? <FragmentGuidedRetro state={fragmentRetro} available={selectedLibraryAvailable} searchAvailable={capabilities?.fragment_search ?? false} /> : <div className="editor-action-layout">
+        {mode === 'interactive_planning' ? <InteractivePlanner state={planner} capabilities={capabilities} /> : mode === 'fragment_guided_retro' ? <FragmentGuidedRetro state={fragmentRetro} available={selectedLibraryAvailable} searchAvailable={capabilities?.fragment_search ?? false} /> : <div className="editor-action-layout">
           <ReactionEditor
             value={reactionSmiles}
             onChange={setReactionSmiles}
@@ -652,7 +659,7 @@ function App() {
       {multistepRetrosynthesisResult && <MultistepRetrosynthesisResults result={multistepRetrosynthesisResult} />}
       {featureResult && <FeatureResults result={featureResult} />}
 
-      {mode !== 'fragment_guided_retro' && !result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'weak_label' ? 'Inspect weak-label condition hypotheses' : mode === 'forward_synthesis' ? 'Inspect possible products and competing pathways' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'coupled_strategy' ? 'Inspect related two-step strategies' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'weak_label' ? 'The graph-derived reaction type, matched reactive sites, label-only support, canonical recipes, and unverified-evidence cautions will appear here.' : mode === 'forward_synthesis' ? 'Validated products, blind ranks, pathway alternatives, operator identities, graph correspondence, and condition compatibility will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'coupled_strategy' ? 'Each logical strategy exposes the intermediate, terminal precursors, both physical reactions, operator support, and ordinary one-step fallbacks.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, supplier-stock provenance, and unresolved stopping reasons.' : 'Recommendations, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
+      {mode !== 'interactive_planning' && mode !== 'fragment_guided_retro' && !result && <section className="empty-state"><span>3</span><div><h2>{mode === 'features' ? 'Inspect graph-derived features' : mode === 'weak_label' ? 'Inspect weak-label condition hypotheses' : mode === 'forward_synthesis' ? 'Inspect possible products and competing pathways' : mode === 'retrosynthesis' ? 'Inspect proposed disconnections' : mode === 'coupled_strategy' ? 'Inspect related two-step strategies' : mode === 'multistep_retrosynthesis' ? 'Inspect solved and partial routes' : 'Inspect ranked evidence'}</h2><p>{mode === 'features' ? 'Structure summaries, motifs, reactive sites, reaction-core events, mapping evidence, and the canonical analysis will appear here.' : mode === 'weak_label' ? 'The graph-derived reaction type, matched reactive sites, label-only support, canonical recipes, and unverified-evidence cautions will appear here.' : mode === 'forward_synthesis' ? 'Validated products, blind ranks, pathway alternatives, operator identities, graph correspondence, and condition compatibility will appear here.' : mode === 'retrosynthesis' ? 'Validated precursor proposals, operator identities, structural scores, support, and ranking traces will appear here.' : mode === 'coupled_strategy' ? 'Each logical strategy exposes the intermediate, terminal precursors, both physical reactions, operator support, and ordinary one-step fallbacks.' : mode === 'multistep_retrosynthesis' ? 'Each route shows validated reaction steps, terminal starting materials, supplier-stock provenance, and unresolved stopping reasons.' : 'Recommendations, reaction drawings, conditions, score traces, cautions, and precedent provenance will appear here.'}</p></div></section>}
 
       <footer>All chemistry and data remain on this machine. Molecular structure is the source of truth.</footer>
 

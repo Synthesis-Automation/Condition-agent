@@ -234,6 +234,8 @@ class WebRuntime(Protocol):
 
     def retrosynthesize(self, request: RetrosynthesisRequest) -> Dict[str, Any]: ...
 
+    def planning_stock(self, smiles: str) -> Dict[str, Any]: ...
+
     def multistep_retrosynthesize(
         self, request: MultistepRetrosynthesisRequest
     ) -> Dict[str, Any]: ...
@@ -604,6 +606,34 @@ class LocalRecommendationRuntime:
             str(record.get("terminal_eligible") or "").casefold() == "true"
             for record in match.source_records
         )
+
+    def planning_stock(self, smiles: str) -> Dict[str, Any]:
+        """Look up exact local supplier evidence without deciding to stop a route."""
+        from datetime import datetime, timezone
+
+        identity = molecule_identity(smiles)
+        if identity is None:
+            raise ValueError("Invalid molecule for stock lookup")
+        result = {
+            "smiles": identity.canonical_smiles,
+            "status": "unavailable",
+            "checked_at": datetime.now(timezone.utc).isoformat(),
+            "source_records": [],
+        }
+        if not (self._prefer_stock_portfolio and self.stock_portfolio_path.is_file()):
+            return result
+        portfolio = StockPortfolio(self.stock_portfolio_path)
+        try:
+            match = portfolio.lookup(identity)
+            result.update(
+                status="verified_stock_match" if self._is_terminal_stock_match(match) else "no_verified_match",
+                source_records=list(match.source_records) if match else [],
+                occurrence_count=match.occurrence_count if match else 0,
+                portfolio_name=self.stock_portfolio_path.name,
+            )
+            return result
+        finally:
+            portfolio.close()
 
     def _precursor_realism_scorer(self):
         """Open configured evidence stores and return a scorer plus close hook."""

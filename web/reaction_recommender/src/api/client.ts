@@ -27,6 +27,8 @@ import type {
   RetrosynthesisResult,
 } from './types'
 
+import type { PlanningRequest, PlanningResponse } from './planning'
+
 const API_ROOT = '/api/v1'
 
 export class ApiError extends Error {
@@ -62,6 +64,10 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  planningAction: (request: PlanningRequest, signal?: AbortSignal) =>
+    jsonRequest<PlanningResponse>('/retrosynthesis/planner', {
+      method: 'POST', body: JSON.stringify(request), signal,
+    }),
   transferFragmentPrecedents: (request: FragmentTransferRequest, signal?: AbortSignal) =>
     jsonRequest<FragmentGuidedRetroResult>('/retrosynthesis/fragment-transfer', {
       method: 'POST', body: JSON.stringify(request), signal,

@@ -78,6 +78,10 @@ def create_app(
     profile = "recommendation_only" if recommendation_only else "research_workbench"
     app.state.deployment_profile = profile
     app.include_router(conditions_router)
+    if not recommendation_only:
+        from .planner import router as planning_router
+
+        app.include_router(planning_router)
 
     def active_runtime(request: Request) -> WebRuntime:
         return request.app.state.runtime

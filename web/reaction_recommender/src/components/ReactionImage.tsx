@@ -6,6 +6,7 @@ interface ReactionImageProps {
   label: string
   compact?: boolean
   kind?: 'molecule' | 'reaction'
+  focusable?: boolean
 }
 
 export function ReactionImage({
@@ -13,6 +14,7 @@ export function ReactionImage({
   label,
   compact = false,
   kind = 'reaction',
+  focusable = true,
 }: ReactionImageProps) {
   const [source, setSource] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
@@ -41,7 +43,7 @@ export function ReactionImage({
 
   if (!smiles) return null
   return (
-    <div className={`reaction-image scaled-structure ${compact ? 'compact' : ''}`} tabIndex={0} role="region" aria-label={label}>
+    <div className={`reaction-image scaled-structure ${compact ? 'compact' : ''}`} tabIndex={focusable ? 0 : undefined} role="region" aria-label={label}>
       {source ? <img src={source} alt={label} /> : <span>{failed ? 'Preview unavailable' : 'Rendering…'}</span>}
     </div>
   )

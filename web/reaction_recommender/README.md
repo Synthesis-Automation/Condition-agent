@@ -33,6 +33,19 @@ versioned FastAPI boundary.
 Prerequisites are Python 3.10+ with the repository chemistry dependencies and
 Node.js 24.14.1+.
 
+## Interactive route planning
+
+Select **Interactive route planning**, enter a target, and click **Start planning**.
+Choose a molecule in the route tree, **Find disconnections**, then **Use this step**
+on a candidate. Each precursor becomes a separate branch you can expand or designate
+as a starting material. Alternatives, undo/redo, step conditions, supplier checks,
+browser autosave, and session import/export are available in the same view.
+
+**Export session** keeps alternatives and history; **Export route** keeps the selected
+canonical route. Starting-material choices do not certify supplier availability.
+See [workflow, API, evidence scope, and limits](../../docs/new/interactive_route_planning.md).
+Run `npm run test:planner` after building for the dedicated browser checks.
+
 ## Fragment precedent search
 
 Run `python -m app.web_api --workbench --build`, open

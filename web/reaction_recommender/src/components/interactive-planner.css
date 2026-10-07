@@ -1,0 +1,45 @@
+.interactive-planner { min-width: 0; display: grid; gap: 12px; }
+.planner-toolbar, .planner-progress, .planner-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.planner-toolbar .button-row, .planner-target .button-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.planner-summary { padding: 12px 16px; border: 1px solid #cbdacf; border-radius: 10px; background: #f4f8f5; color: #385646; font-size: .78rem; }
+.planner-summary small { color: #62786a; }
+.planner-progress { padding: 10px 14px; background: #f3f7f4; border-radius: 10px; font-size: .8rem; }
+.planner-note { margin: 8px 0; color: #62766a; font-size: .75rem; line-height: 1.5; }
+.planner-target { display: grid; gap: 10px; }
+.planner-layout { display: grid; grid-template-columns: minmax(280px,.85fr) minmax(0,1.15fr); gap: 14px; align-items: start; }
+.planner-tree-panel, .planner-inspector { min-width: 0; padding: 16px; border: 1px solid #d1ddd5; border-radius: 13px; background: #fff; }
+.planner-tree { overflow: auto; max-height: 78vh; padding: 4px; }
+.planner-tree ul { list-style: none; margin: 0; padding: 0; }
+.planner-branch > ul { border-left: 2px solid #cadbd0; margin-left: 14px; padding-left: 16px; }
+.planner-branch { margin: 10px 0; }
+.planner-molecule { width: 240px; max-width: 100%; padding: 8px; border: 1px solid #d1ddd5; border-radius: 10px; background: #fff; }
+.planner-molecule.selected { border-color: #277b54; box-shadow: 0 0 0 2px #dbeee1; background: #f6faf7; }
+.planner-molecule-select { display: grid; gap: 6px; width: 100%; padding: 0; border: 0; background: transparent; color: #294d3a; text-align: left; cursor: pointer; }
+.planner-molecule-select strong { font-size: .78rem; }
+.planner-molecule-select .reaction-image { min-height: 80px; pointer-events: none; }
+.planner-molecule-select .reaction-image img { width: 180px; max-width: 100%; }
+.planner-molecule-select code { font-size: .63rem; overflow-wrap: anywhere; }
+.planner-molecule > .button { margin-top: 8px; font-size: .68rem; }
+.planner-status { color: #7b6540; font-size: .67rem; }
+.planner-status.stopped { color: #426b58; }
+.planner-connector { margin: 9px 0 4px 14px; color: #6b7e70; font-size: .66rem; }
+.planner-inspector-heading code { display: block; margin-top: 7px; font-size: .76rem; overflow-wrap: anywhere; }
+.planner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.planner-chosen { padding: 12px; border: 1px solid #c8dacd; border-radius: 10px; background: #f7faf8; margin: 14px 0; }
+.planner-chosen > summary { cursor: pointer; font-size: .8rem; font-weight: 750; margin-bottom: 10px; }
+.planner-search-heading { margin: 18px 0 10px; }
+.planner-candidate { padding: 12px; margin-top: 12px; border: 1px solid #d7e1da; border-radius: 10px; }
+.planner-candidate.chosen { border-color: #32875b; }
+.planner-candidate .reaction-image img, .planner-chosen .reaction-image img { max-width: 100%; }
+.planner-candidate-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px; margin-bottom: 10px; }
+.planner-candidate-heading h3, .planner-search-heading h3 { font-size: .9rem; }
+.planner-candidate-heading span { color: #6d7d72; font-size: .7rem; }
+.planner-variant { display: grid; gap: 5px; margin: 10px 0; font-size: .75rem; color: #385646; font-weight: 650; }
+.planner-metrics { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; font-size: .73rem; color: #506b5b; }
+.planner-evidence { margin: 10px 0; font-size: .73rem; overflow-wrap: anywhere; }
+.planner-evidence summary { cursor: pointer; color: #476854; font-weight: 650; }
+.planner-evidence pre { max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 10px; margin-top: 7px; background: #f4f7f4; font-size: .66rem; }
+.planner-conditions { font-size: .76rem; line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 900px) { .planner-layout { grid-template-columns: 1fr; } .planner-tree { max-height: 450px; } }
+@media (max-width: 460px) { .planner-tree-panel, .planner-inspector { padding: 10px; } .planner-molecule { width: 205px; } .planner-toolbar .button { flex: 1; } }
+@media (max-width: 720px) { .analysis-workbench .planner-options .option-grid.feature-options { grid-template-columns: 1fr; } }

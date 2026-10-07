@@ -7,6 +7,12 @@
 
 ## 1. Purpose and authority
 
+2026-10-07: [interactive route planning](interactive_route_planning.md) adds a
+human-selected Workbench route tree over the existing single-step engine,
+with branch revision, undo/redo, resumable sessions, and canonical route export.
+Condition and exact-stock evidence remain separate from user stopping decisions.
+Chemistry definitions and independent evaluation release gates are unchanged.
+
 2026-10-05: the [unified processed dataset migration plan](processed_dataset_migration_plan.md)
 specifies one complete corpus under `datasets/processed_datasets`, shared evidence
 storage, integrated index/operator builds, and fragment discovery with explicit
