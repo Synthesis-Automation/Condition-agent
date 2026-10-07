@@ -31,7 +31,7 @@ export function useFragmentSearch(active: boolean) {
   const [topology, setTopology] = useState<FragmentSearchRequest['topology']>('preserve_rings')
   const [searchSide, setSearchSide] = useState<NonNullable<FragmentSearchRequest['search_side']>>('product')
   const [limit, setLimit] = useState(5)
-  const [timeout, setBudget] = useState(10)
+  const [timeout, setBudget] = useState(30)
   const [busy, setBusy] = useState(false)
   const [suggesting, setSuggesting] = useState(false)
   const [suggestions, setSuggestions] = useState<FragmentSuggestionsResult | null>(null)

@@ -181,7 +181,7 @@ search_fragment_precedents(
     query_format: Literal["smiles", "smarts"] = "smiles",
     topology: Literal["preserve_rings", "subgraph"] = "preserve_rings",
     limit: int = 5,
-    timeout_seconds: int = 10,
+    timeout_seconds: int = 30,
 )
 ```
 

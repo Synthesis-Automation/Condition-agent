@@ -1,10 +1,58 @@
 """Prepared forward artifacts must not mask a newer paired retro library."""
 
 import os
+import json
 
 import pytest
 
 import app.web_api.runtime as runtime_module
+from condition_recommender.corpus_io import file_sha256
+from condition_recommender.processed_release import publish_processed_release
+
+
+def _published_root(root):
+    directory = root / "releases" / "test"
+    directory.mkdir(parents=True)
+    artifacts = {}
+    for name in ("condition_index", "fragment_index", "retro_library", "forward_library"):
+        path = directory / name
+        path.write_bytes(name.encode())
+        artifacts[name] = {"relative_path": name, "sha256": file_sha256(path), "size_bytes": path.stat().st_size}
+    (directory / "manifest.json").write_text(json.dumps({
+        "schema_version": "processed_reaction_release.v1", "release_id": "test",
+        "build_complete": True, "artifacts": artifacts,
+    }))
+    publish_processed_release(directory, root)
+    return directory
+
+
+@pytest.mark.parametrize("use_environment", [False, True])
+def test_custom_operator_root_overrides_published_condition_defaults(tmp_path, monkeypatch, use_environment):
+    root = tmp_path / "processed"
+    published = _published_root(root)
+    monkeypatch.setattr(runtime_module, "DEFAULT_LIBRARY_ROOT", root)
+    custom = tmp_path / "custom"
+    kwargs = {}
+    if use_environment:
+        monkeypatch.setenv("CORE_RETROSYNTHESIS_LIBRARY_ROOT", str(custom))
+    else:
+        kwargs["retrosynthesis_library_root"] = custom
+    runtime = runtime_module.LocalRecommendationRuntime(**kwargs)
+    assert runtime.index_path == published / "condition_index"
+    assert runtime.fragment_index_path == published / "fragment_index"
+    assert runtime._retrosynthesis_library_path("full") == custom / "full/operator_library_v3.json.gz"
+    assert runtime._forward_library_path("full") == custom / "full/forward_operator_library_v1.json.gz"
+
+
+def test_explicit_processed_operator_root_is_pinned(tmp_path, monkeypatch):
+    root = tmp_path / "processed"
+    _published_root(root)
+    monkeypatch.setattr(runtime_module, "DEFAULT_LIBRARY_ROOT", root)
+    custom = tmp_path / "custom"
+    published = _published_root(custom)
+    runtime = runtime_module.LocalRecommendationRuntime(retrosynthesis_library_root=custom)
+    assert runtime._retrosynthesis_library_path("full") == published / "retro_library"
+    assert runtime._forward_library_path("full") == published / "forward_library"
 
 
 def test_stale_forward_artifact_rebuilds_and_tracks_source_changes(

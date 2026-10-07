@@ -30,7 +30,7 @@ class FragmentSearchRequest(StrictRequest):
     search_side: Literal["product", "reactant", "either"] = "product"
     topology: Literal["preserve_rings", "subgraph"] = "preserve_rings"
     limit: int = Field(default=5, ge=1, le=10, strict=True)
-    timeout_seconds: int = Field(default=10, ge=1, le=30, strict=True)
+    timeout_seconds: int = Field(default=30, ge=1, le=30, strict=True)
     target_smiles: str | None = Field(default=None, min_length=1, max_length=5000)
 
 

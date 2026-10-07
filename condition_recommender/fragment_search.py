@@ -95,7 +95,7 @@ def _text_chunks(value: Any, remaining: list[int]) -> Any:
 
 def search_fragment_precedents(
     index_path: str | Path, query: str, query_format: str = "smiles",
-    topology: str = "preserve_rings", limit: int = 5, timeout_seconds: int = 10,
+    topology: str = "preserve_rings", limit: int = 5, timeout_seconds: int = 30,
     *, target_smiles: str | None = None,
     search_side: str = "product",
     progress: Callable[[dict[str, Any]], None] | None = None,
@@ -368,7 +368,7 @@ def main(argv: list[str] | None = None) -> int:
     search.add_argument("--search-side", choices=("product", "reactant", "either"), default="product")
     search.add_argument("--topology", choices=("preserve_rings", "subgraph"), default="preserve_rings")
     search.add_argument("--limit", type=int, default=5)
-    search.add_argument("--timeout-seconds", type=int, default=10)
+    search.add_argument("--timeout-seconds", type=int, default=30)
     search.add_argument("--output")
     args = parser.parse_args(argv)
     if args.command == "build":

@@ -406,7 +406,7 @@ class ScientificOperations:
 
     def search_fragment_precedents(
         self, query: str, query_format: str = "smiles", topology: str = "preserve_rings",
-        limit: int = 5, timeout_seconds: int = 10, target_smiles: str | None = None,
+        limit: int = 5, timeout_seconds: int = 30, target_smiles: str | None = None,
         search_side: str = "product",
     ) -> dict[str, Any]:
         """Find product cores and local construction evidence in a prebuilt fragment_index.

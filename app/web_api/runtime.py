@@ -310,6 +310,12 @@ class LocalRecommendationRuntime:
         self.retrosynthesis_library_root = Path(
             configured_retrosynthesis or DEFAULT_RETROSYNTHESIS_LIBRARY_ROOT
         )
+        self._operator_release = self._processed_release
+        if configured_retrosynthesis is not None:
+            self._operator_release = None
+            if (self.retrosynthesis_library_root / "manifest.json").is_file():
+                from condition_recommender.processed_release import resolve_processed_release
+                self._operator_release = resolve_processed_release(self.retrosynthesis_library_root)
         configured_literature_index = literature_index_path or os.environ.get(
             "CORE_RETROSYNTHESIS_LITERATURE_INDEX"
         )
@@ -664,8 +670,8 @@ class LocalRecommendationRuntime:
         mode = library_mode.strip().casefold()
         if mode not in {"full", "compact"}:
             raise ValueError(f"unsupported library mode: {library_mode}")
-        if self._processed_release is not None:
-            return self._processed_release.artifact("retro_library") if mode == "full" else self.library_root / "compact_mode_removed.json.gz"
+        if self._operator_release is not None:
+            return self._operator_release.artifact("retro_library") if mode == "full" else self.retrosynthesis_library_root / "compact_mode_removed.json.gz"
         return self.retrosynthesis_library_root / mode / "operator_library_v3.json.gz"
 
     def _get_retrosynthesis_library(
@@ -735,8 +741,8 @@ class LocalRecommendationRuntime:
         mode = library_mode.strip().casefold()
         if mode not in {"full", "compact"}:
             raise ValueError(f"unsupported library mode: {library_mode}")
-        if self._processed_release is not None:
-            return self._processed_release.artifact("forward_library") if mode == "full" else self.library_root / "compact_mode_removed.json.gz"
+        if self._operator_release is not None:
+            return self._operator_release.artifact("forward_library") if mode == "full" else self.retrosynthesis_library_root / "compact_mode_removed.json.gz"
         return (
             self.retrosynthesis_library_root
             / mode
@@ -930,7 +936,7 @@ class LocalRecommendationRuntime:
             mode: self._forward_library_path(mode) for mode in ("full", "compact")
         }
         default_retrosynthesis_mode = (
-            "full" if self._processed_release is not None or retrosynthesis_paths["full"].is_file() else "compact"
+            "full" if self._operator_release is not None or retrosynthesis_paths["full"].is_file() else "compact"
         )
         coupled_strategy_available = (
             self.coupled_strategy_library_path.is_file()

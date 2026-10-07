@@ -406,55 +406,133 @@ can retrieve full evidence by ID, all required validation is recorded, and activ
 runtime paths no longer depend on Full/Compact or `datasets/literature`.
 
 
-## Implementation and execution (2026-10-05)
+## Implementation and execution completed (2026-10-07)
 
-The production workflow is `python -m app.processed_dataset_builder build
---workers 10 --shard-size 500`; the converter GUI delegates to this same workflow.
-The build is resumable and publishes the active pointer only after all requested
-artifacts and complete-source counts pass validation. Run
-`python -m app.processed_dataset_builder validate` for a complete checksum check.
-The canonical conversion log is `results/dataset_builds/processed_build.log`.
-Current artifact progress is recorded in `processed_finish.log`,
-`parallel_conditions.log`, and `parallel_operators.log` under
-`results/dataset_builds/`. The local finish supervisor schedules fragment indexing
-after the catalog, verifies independent artifact checkpoints, and invokes the same
-tested builder for final validation and publication.
+The technical migration is complete. The active pointer is
+[datasets/processed_datasets/manifest.json](../../datasets/processed_datasets/manifest.json),
+which pins release `bd7a78d653af3156ba57d2d2`, built with `processed_pipeline.v4`.
+Default app and agent readers use this complete corpus. Existing running apps
+should be restarted to load it; create a new scientific-workspace baseline for
+new investigations. Historical investigations keep their pinned artifacts.
 
-As of 2026-10-06, canonical conversion has completed: 2,054,437 input and output
-observations, 4,111 completed shards, and zero failed shards. All 976,597 source
-routes are preserved (901,419 validated trees; 75,178 unresolved routes), with no
-missing observation joins. Catalog, index and operator construction is still in
-progress; the production release is not yet published. The latest full test run
-passed with 2,739 tests passed and four skipped. Final integrity validation and
-full-corpus app/agent smoke checks remain required before handoff.
+The converter GUI delegates to the same resumable production workflow:
 
-The release contains `records/shard_manifest.json`, compressed shared-object
-shards, `indexes/catalogs.sqlite`, `indexes/generic_index.sqlite`,
-`indexes/generic_index.shared_core.sqlite`, `indexes/fragment_index.sqlite`,
-`indexes/route_catalog.sqlite`, forward/retro operator libraries and coverage
-reports. The canonical reader hydrates complete original record values. The
-catalog uses a self-contained Zstandard dictionary; a 5,000-observation storage
-pilot reduced catalog size by approximately 54% compared with separate zlib
-payloads, with no chemistry or field changes.
+```powershell
+python -m app.processed_dataset_builder build --workers 10 --shard-size 500
+python -m app.processed_dataset_builder validate
+```
+
+The completed corpus reconciles every declared physical observation:
+
+| Source stream | Observations |
+|---|---:|
+| Extracted route steps | 1,414,143 |
+| HiTEA | 39,546 |
+| Consolidated RDF literature | 257,499 |
+| USPTO conditions | 343,249 |
+| Total | **2,054,437** |
+
+These are observation counts, not counts of unique reactions. All 4,111 canonical
+shards completed, with zero failed shards. Final validation checked all 2,054,437
+rows, found zero duplicate observation IDs and no integrity issues, and independently
+recounted the complete source streams. Publication and the separate published-release
+checksum validation both passed.
+
+Paths below are relative to the immutable release directory:
+
+| Artifact | Contents |
+|---|---|
+| `records/shard_manifest.json`, `records/shards/*.jsonl.gz` | Complete canonical observations, with compressed shared-object storage and lossless hydration |
+| `indexes/catalogs.sqlite` | Exact observation, procedure, reference and recipe lookups; 2,054,437 observations, 21,285 procedure-bearing observations, 188,888 reference records and 227,101 stored recipes |
+| `indexes/generic_index.sqlite` | 1,726,473 qualified condition precedents |
+| `indexes/generic_index.shared_core.sqlite` | Shared-core projections for the same indexed rows; 1,699,527 usable projections at each stored projection level |
+| `indexes/fragment_index.sqlite` | 1,464,489 distinct molecules; 2,073,605 product-component links and 4,748,386 reactant-component links |
+| `indexes/route_catalog.sqlite` | All 976,597 original multistep route records and 1,761,206 step memberships |
+| `operators/retrosynthesis/operator_library_v3.json.gz` | 11,060 base operators and 101,669 templates from 559,626 admitted observations |
+| `operators/forward/forward_operator_library_v1.json.gz` | 83,024 forward operator variants |
+| `reports/coverage.json`, `records/conversion_report.json` | Coverage, qualification, uncertainty and exclusion counts |
+
+All canonical observations are retained, while each capability applies its own
+qualification rules. Admission tiers are 131,495 verified, 1,609,067 review and
+313,875 rejected. Condition identities are fully resolved for 253,120 observations;
+1,603,337 retain unresolved identifiers. These statuses remain visible in outputs.
+Operator compilation examined all source rows and admitted 559,626; its main
+exclusion was `materialized_core_not_verified` for 1,388,834 observations. Excluded
+operator observations remain available as canonical evidence. Base operators,
+templates and forward variants are different counting units.
+
+Route source wrappers are preserved even when reconstruction is unresolved.
+There are 901,419 structurally validated trees and 75,178 unresolved routes, with
+zero missing or ambiguous observation joins. Most unresolved routes have product
+atoms without reactant sources (75,159); the other reasons are reaction parsing
+(3) and reagent parsing (16). Structural tree validation is not independent
+chemist review.
 
 Workspace `get_precedents` defaults to summaries; `view="full"` retrieves complete
 indexed fields. `get_observations` supports exact IDs, selected canonical fields,
-pagination and a byte budget. `get_routes` returns exact step memberships and
-explicit unresolved statuses; source wrappers and typed trees are fetched
-explicitly. Existing `iter_route_trees` can stream qualified trees from the route
-catalog. Full source wrappers are retained even where topology, mapping or joins
-are unresolved. Starting-material fragment hits carry `matched_side="reactant"`
-and `match_extent`, and are blocked from product-construction transfer.
+pagination and a byte budget. `get_routes` supplies step memberships and explicit
+unresolved statuses; source wrappers and typed trees are fetched explicitly.
+`iter_route_trees` can stream qualified trees from the route catalog. Procedure
+and reference lookups are indexed, with missing evidence reported explicitly.
 
-Composite promotion is explicitly unavailable for this release because no
-training scope or independent support review has been declared. Route conversion
-is not a substitute for that gate. The old 20-row Organic Syntheses example is
-retired from the declared production corpus and retained in its original location.
-Algorithmic abstractions remain upstream and outside physical observation counts.
-No old intermediate or literature corpus is deleted by this build.
+Fragment search supports `product`, `reactant` and `either`. Starting-material
+hits carry `matched_side="reactant"`, component identity, `match_extent`, the
+visible label "Reported as starting material", and `reported_use` evidence.
+They do not carry construction witnesses and cannot seed product-construction
+transfer. Reported use provides a source to investigate; it does not itself prove
+that a compound was prepared or is purchasable. Middle-field agents are excluded.
 
-The final production counts and artifact checksums are authoritative in the
-published release manifest and its coverage report. A development pilot is not
-full-corpus validation. Compatibility arguments in historical CLI/API fixtures
-remain explicit overrides; the production builder and default interfaces expose
-one complete corpus and do not automatically select the old literature datasets.
+The initial fragment build exceeded SQLite's single-blob size limit. The completed
+`fragment_precedent_index.v3` stores the 1,150,317,186-byte serialized RDKit library
+as 18 compressed chunks, with chunk and whole-library hashes. A completed source
+scan is checkpointed before packing, so a later packing failure can recover
+without rescanning the corpus. No chemistry rules were changed by this storage
+fix. Full-corpus library loading took approximately 23 seconds in integration
+checks; the app, CLI and agent default search budget is now 30 seconds. A search
+with no budget override completed successfully. Explicit custom operator roots
+also retain precedence over defaults, including when a condition release is active.
+
+The release occupies 92,891,120,419 bytes (92.89 GB), including 27,209,398,257 bytes
+of canonical shards. The evidence catalog uses a self-contained Zstandard
+dictionary. A controlled 5,000-observation pilot was approximately 54% smaller
+than separate zlib payloads, with no chemistry or field changes. That pilot result
+is not an aggregate reduction claim for the expanded production corpus.
+
+Final verification passed:
+
+- `pytest -q`: **2,748 passed, 4 skipped**, after publication and the final runtime fixes.
+- Frontend `npm run build` passed.
+- SQLite `quick_check` returned `ok` for all five databases.
+- Thirty-two exact canonical/catalog round-trips covered all four source streams.
+- API startup, capability reporting, an actual condition recommendation, and both operator-library loads passed.
+- New scientific-workspace baselines pinned the published artifacts. Precedent summaries, bounded observation retrieval, procedures, routes, and product/reactant/either searches passed.
+- Actual starting-material hits had the expected visible label, `reported_use` relationship and zero construction witnesses. Actual procedure and citation joins also passed.
+
+Measured development checks returned a 4.9 KB precedent summary and a 3.8 KB
+observation response. Exact observation and route operations took about 0.45
+seconds; three fragment queries completed in about 26 seconds each. A condition
+query returned one recommendation without an error. These are small integration
+samples, not an untouched performance or chemistry evaluation.
+
+The local
+[completion report](../../results/dataset_builds/processed_dataset_completion_report.json)
+records artifact sizes/checksums, qualification counts, recorded stage times,
+resource samples and the actual smoke results. Resource figures are 10-second
+samples for the recorded builder processes, not continuous peaks or measurements
+of the entire initial build. The principal logs are `processed_finalization.log`,
+`published_validation.log`, `published_smoke_*.log`, and
+`pytest_processed_published_final.log` under `results/dataset_builds/`.
+
+Independent chemistry review and untouched evaluation remain pending. Composite
+promotion is unavailable because no training scope or independent support review
+was declared. All 1,549,008 algorithmic abstractions remain upstream, outside the
+physical observation corpus. The old 20-row Organic Syntheses example remains
+retained outside the declared production inventory. Raw sources, intermediate
+datasets and old literature artifacts were preserved; only an owned orphan build
+stage was moved to the local build archive, with its checksum verified.
+
+The published manifest and coverage report are authoritative. Historical CLI/API
+arguments remain explicit overrides; the production builder and default interfaces
+expose one complete corpus and do not automatically select the old literature
+datasets. Technical migration completion does not satisfy the independent
+chemistry-review or untouched-evaluation release gates.
