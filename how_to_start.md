@@ -387,6 +387,11 @@ Omit `--build` on subsequent starts when the frontend has not changed.
   Finish active Codex tasks, close unused Codex sessions/apps holding that runtime,
   and restart the agent server before retrying. A new chat alone does not release
   the lock; do not disable sandboxing to hide this failure.
+  A confirmed sandbox setup failure with missing answer output now stops the
+  turn directly instead of requesting an answer-format correction and reporting
+  a secondary missing-file error. Restart the server to load this handling.
+  If the lock returns after restarting Codex, collect the sandbox log and follow
+  the [official Windows troubleshooting steps](https://learn.chatgpt.com/docs/windows/windows-sandbox#troubleshooting-and-faq).
 - **`Scientific runtime changed` in a fresh chat:** compare the recorded/current
   fields in the error and ensure the server and worker use the same Python and
   installed dependencies. Windows baseline identity now uses Python's build

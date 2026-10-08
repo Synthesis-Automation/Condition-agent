@@ -188,6 +188,58 @@ def test_real_process_failure_is_not_reclassified_as_answer_correction(tmp_path)
     assert not isinstance(caught.value, AnswerSubmissionError)
 
 
+SETUP_FAILURE = {
+    "type": "item.completed", "item": {
+        "id": "shell", "type": "command_execution", "status": "failed", "exit_code": -1,
+        "aggregated_output": "Failed to create unified exec process: "
+                             "helper_unknown_error: setup refresh had errors",
+    },
+}
+
+
+@pytest.mark.parametrize("receipt", [False, True])
+def test_completed_turn_with_setup_failure_and_missing_answer_is_not_repairable(tmp_path, receipt):
+    script = f"print({json.dumps(SETUP_FAILURE)!r})\n"
+    if receipt:
+        script += write_output("agent-final.json", json.dumps(HANDOFF))
+    runtime, attempt = fake_runtime(tmp_path, script)
+    with pytest.raises(RuntimeError, match="Windows sandbox setup") as caught:
+        submit(runtime, tmp_path, attempt)
+    assert not isinstance(caught.value, AnswerSubmissionError)
+    assert "helper_unknown_error" in str(caught.value)
+    observed = json.loads((attempt / "runtime-observations.json").read_text("utf-8"))
+    assert observed["turn_completed_event"] and observed["process_exit_code"] == 0
+    assert "setup refresh" in observed["execution_setup_error"]
+
+
+@pytest.mark.parametrize("draft,receipt", [(json.dumps(ANSWER), True), ("{", True), (json.dumps(ANSWER), False)])
+def test_setup_failure_does_not_override_subsequently_written_answer(tmp_path, draft, receipt):
+    runtime, attempt = fake_runtime(
+        tmp_path, f"print({json.dumps(SETUP_FAILURE)!r})\n"
+        + (write_output("agent-final.json", json.dumps(HANDOFF)) if receipt else "")
+        + write_output("answer-draft.json", draft),
+    )
+    if draft == "{" or not receipt:
+        with pytest.raises(AnswerSubmissionError):
+            submit(runtime, tmp_path, attempt)
+    else:
+        assert submit(runtime, tmp_path, attempt).answer == ANSWER
+
+
+@pytest.mark.parametrize("recovery", [True, False])
+def test_recovered_execution_or_quoted_agent_text_does_not_block_answer_correction(tmp_path, recovery):
+    events = [SETUP_FAILURE, {"type": "item.completed", "item": {
+        "id": "recovered", "type": "command_execution", "status": "completed",
+        "exit_code": 0, "aggregated_output": "Python works",
+    }}] if recovery else [{"type": "item.completed", "item": {
+        "id": "prose", "type": "agent_message", "status": "failed",
+        "text": SETUP_FAILURE["item"]["aggregated_output"],
+    }}]
+    runtime, attempt = fake_runtime(tmp_path, "".join(f"print({json.dumps(e)!r})\n" for e in events))
+    with pytest.raises(AnswerSubmissionError):
+        submit(runtime, tmp_path, attempt)
+
+
 @pytest.mark.parametrize("encoded,exit_code", [(False, 1), (True, 1), (True, 0)])
 def test_failed_turn_surfaces_provider_reason_when_stderr_is_empty(tmp_path, encoded, exit_code):
     reason = "The 'requested-model' model is not supported when using Codex with a ChatGPT account."

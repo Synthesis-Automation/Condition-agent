@@ -469,6 +469,34 @@ print(json.dumps({"type": "turn.completed", "usage": {"output_tokens": 20}}), fl
     assert len(turn["answer"]["attempt_usage"]) == 2
 
 
+def test_sandbox_failure_skips_answer_repair(service: ConversationService) -> None:
+    events = [
+        {"type": "thread.started", "thread_id": "blocked-thread"},
+        {"type": "item.completed", "item": {
+            "id": "shell", "type": "command_execution", "status": "failed", "exit_code": -1,
+            "aggregated_output": "Failed to create unified exec process: "
+                                 "helper_unknown_error: setup refresh had errors",
+        }},
+        {"type": "turn.completed", "usage": {}},
+    ]
+    script = service.root.parent / "blocked_runtime.py"
+    script.write_text("\n".join(f"print({json.dumps(event)!r})" for event in events), "utf-8")
+    runtime = object.__new__(CodexRuntime)
+    runtime.model, runtime.timeout_seconds = None, 10
+    runtime.command = lambda *_: [sys.executable, str(script)]
+    service.runtime = runtime
+    identity = service.submit("Investigate the target")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "failed"
+    assert turn["error"]["type"] == "RuntimeError"
+    assert "Windows sandbox setup" in turn["error"]["message"]
+    assert "repair_attempts" not in turn and "answer" not in turn
+    directory = service.root / identity / "turns" / turn["id"]
+    assert not (directory / "repair-1").exists()
+    assert not any(event.kind == "agent_answer_rejected"
+                   for event in ScientificWorkspace(service.root / identity).store.events())
+
+
 def test_provider_model_rejection_reaches_conversation_api(service: ConversationService) -> None:
     reason = "The 'requested-model' model is not supported when using Codex with a ChatGPT account."
     event = {"type": "turn.failed", "error": {"message": json.dumps({

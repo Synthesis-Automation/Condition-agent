@@ -18,6 +18,7 @@ from ..answers.answer_contracts import ANSWER_SCHEMA
 from ..answers.answer_handoff import (
     ANSWER_HANDOFF_SCHEMA,
     ANSWER_HANDOFF_VERSION,
+    AnswerSubmissionError,
     answer_handoff_prompt,
     load_answer_handoff,
     load_text_answer,
@@ -115,6 +116,21 @@ def _runtime_error_message(value: Any) -> str:
         else:
             return ""
     return value.strip()[:2000] if isinstance(value, str) else ""
+
+
+def _execution_setup_error(item: dict[str, Any]) -> str:
+    """Recognize an execution setup failure from tool output, never agent prose."""
+    if item.get("status") != "failed":
+        return ""
+    if item.get("type") == "command_execution":
+        detail = item.get("aggregated_output", "")
+    elif item.get("type") == "mcp_tool_call":
+        detail = _runtime_error_message(item.get("error"))
+    else:
+        return ""
+    if isinstance(detail, str) and "helper_unknown_error: setup refresh had errors" in detail:
+        return detail.strip()[:2000]
+    return ""
 
 
 class CodexRuntime:
@@ -303,6 +319,7 @@ class CodexRuntime:
         failure_detail = ""
         event_error = ""
         item_error = ""
+        execution_setup_error = ""
         process_options = hidden_process_options()
         if os.name != "nt":
             process_options["start_new_session"] = True
@@ -336,6 +353,16 @@ class CodexRuntime:
                         if not isinstance(event, dict):
                             continue
                         item = event.get("item")
+                        if event.get("type") == "item.completed" and isinstance(item, dict):
+                            setup_error = _execution_setup_error(item)
+                            if setup_error:
+                                execution_setup_error = setup_error
+                            elif (
+                                item.get("type") == "command_execution"
+                                and item.get("exit_code") == 0
+                                and item.get("status") == "completed"
+                            ):
+                                execution_setup_error = ""
                         if event.get("type") in {"item.started", "item.updated", "item.completed"} and isinstance(item, dict):
                             identity = item.get("id")
                             if isinstance(identity, str):
@@ -384,6 +411,7 @@ class CodexRuntime:
                     "runtime_error": failure_detail or event_error or (
                         item_error if process.returncode or not completed else None
                     ),
+                    "execution_setup_error": execution_setup_error or None,
                     "tool_events": counts,
                     "limitations": [
                         "Counts reflect unique tool item IDs in observed JSONL events, not successful scientific checks.",
@@ -407,7 +435,19 @@ class CodexRuntime:
                 )
             raise RuntimeError(message)
         if mode.structured_answer:
-            answer = load_answer_handoff(workspace, turn_directory, thread_id=runtime_thread, usage=usage)
+            try:
+                answer = load_answer_handoff(workspace, turn_directory, thread_id=runtime_thread, usage=usage)
+            except AnswerSubmissionError as exc:
+                if (execution_setup_error and exc.payload.get("issue") == "FileNotFoundError"
+                        and not (turn_directory / "answer-draft.json").exists()):
+                    raise RuntimeError(
+                        "Local execution failed during Windows sandbox setup; no answer was submitted. "
+                        "Answer correction cannot repair this runtime failure. "
+                        f"{execution_setup_error} "
+                        "Inspect the Codex .sandbox logs for the underlying setup error, "
+                        "restore local execution, then retry the investigation."
+                    ) from exc
+                raise
         else:
             answer = load_text_answer(workspace, turn_directory)
         return AgentResult(answer, runtime_thread, usage)
