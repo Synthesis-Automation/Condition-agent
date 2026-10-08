@@ -29,6 +29,8 @@ the same time in different PowerShell terminals.
 | Agent web UI / scientific workspace | `python -m app.web_api --scientific-chat --port 8011` | http://127.0.0.1:8011/scientific |
 | Focused condition recommendation UI | `python -m app.web_api --port 8000` | http://127.0.0.1:8000/ |
 
+python -m app.web_api --workbench --build --port 8000
+
 The default command opens **Condition Desk**. Use `--workbench` to expose the
 research tools, including **Fragment search**. These are different deployment
 profiles; changing the browser URL alone does not switch profiles.
