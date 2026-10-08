@@ -113,10 +113,16 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
     if type(timeout_seconds) is not int or not 1 <= timeout_seconds <= 30:
         raise ValueError("timeout_seconds must be an integer between 1 and 30")
     started = monotonic()
-    compiled = compile_fragment_query(query, query_format, topology)
+    try:
+        compiled = compile_fragment_query(query, query_format, topology)
+    except ValueError as exc:
+        raise ValueError(f"Core fragment (query): {exc}") from exc
     target_validation = None
     if target_smiles is not None:
-        target_validation = validate_fragment_target(compiled, target_smiles)
+        try:
+            target_validation = validate_fragment_target(compiled, target_smiles)
+        except ValueError as exc:
+            raise ValueError(f"Target molecule (target_smiles): {exc}") from exc
         if not target_validation.matches_target:
             raise ValueError(
                 "Fragment query does not match target_smiles under the requested "

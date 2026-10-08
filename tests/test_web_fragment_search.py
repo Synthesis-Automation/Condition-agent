@@ -52,6 +52,39 @@ def test_invalid_queries_are_422(runtime, payload):
     assert client.post("/api/v1/fragments/search", json=payload).status_code == 422
 
 
+@pytest.mark.parametrize("field,value,label", [
+    ("query", "bad smiles", "Core fragment (query)"),
+    ("target_smiles", "n1c2c(cncc2)c2C(CCCc12)=O", "Target molecule (target_smiles)"),
+])
+def test_search_errors_identify_field_in_response_and_log(runtime, caplog, field, value, label):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    payload = {"query": "CO", field: value}
+    response = client.post("/api/v1/fragments/search", json=payload)
+    assert response.status_code == 422
+    assert label in response.json()["detail"]["message"]
+    assert label in caplog.text
+    assert "/api/v1/fragments/search -> 422" in caplog.text
+
+
+def test_search_request_validation_preserves_details_and_logs_field(runtime, caplog):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post("/api/v1/fragments/search", json={"query": "CO", "timeout_seconds": 31})
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["body", "timeout_seconds"]
+    assert "body.timeout_seconds" in caplog.text
+    assert "less than or equal to 30" in caplog.text
+
+
+def test_drawn_explicit_hydrogen_core_is_accepted(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post("/api/v1/fragments/search", json={
+        "query": "[n]1([H])c2c(C(=O)CCC2)c2cnccc12",
+        "target_smiles": "CC1(C)CC(C)(C)c2[nH]c3ccncc3c2C1=O",
+    })
+    assert response.status_code == 200
+    assert response.json()["data"]["search_status"] == "complete"
+
+
 def test_explicit_smarts_and_partial_status_are_preserved(runtime, monkeypatch):
     import condition_recommender.fragment_search as search
 

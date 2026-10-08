@@ -56,8 +56,11 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const payload = await response.json()
   if (!response.ok) {
     const detail = payload.detail ?? payload
+    const message = Array.isArray(detail)
+      ? detail.map(issue => `${(issue.loc ?? []).filter((part: unknown) => part !== 'body').join('.')}: ${issue.msg ?? 'Invalid value'}`).join('; ')
+      : typeof detail === 'string' ? detail : detail.message
     throw new ApiError(
-      detail.message ?? `Request failed with status ${response.status}`,
+      message || `Request failed with status ${response.status}`,
       detail.code ?? 'REQUEST_FAILED',
       response.status,
     )

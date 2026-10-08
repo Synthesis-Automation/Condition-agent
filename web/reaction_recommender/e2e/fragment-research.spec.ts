@@ -125,10 +125,22 @@ test('records query errors, restores an attempt, and blocks partial evidence fro
   await expect(page.getByRole('heading', { name: 'Partial search results' })).toBeVisible()
   await expect(page.getByRole('checkbox', { name: /source-1/ })).toBeDisabled()
   await expect(page.getByRole('button', { name: 'Assess selected precedents on target' })).toBeDisabled()
-  await page.getByText(/attempt-1 .* search .* error/).click()
+  await expect(page.getByRole('button', { name: 'Restore attempt-1' })).toBeVisible()
   await page.getByRole('button', { name: 'Restore attempt-1' }).click()
   await expect(page.getByLabel('Core fragment', { exact: true })).toHaveValue('CN')
   await expect(page.getByRole('heading', { name: 'Research history (2/20)' })).toBeVisible()
+})
+
+test('schema validation names the rejected field and expands the failed attempt', async ({ page }) => {
+  await page.route('**/api/v1/fragments/search', route => route.fulfill({ status: 422,
+    json: { detail: [{ loc: ['body', 'target_smiles'], msg: 'String should have at least 1 character', type: 'string_too_short' }] } }))
+  await page.getByLabel('Core fragment', { exact: true }).fill('[n]1([H])c2c(C(=O)CCC2)c2cnccc12')
+  await page.getByRole('button', { name: 'Search chosen fragment' }).click()
+  await expect(page.getByRole('alert')).toHaveText('target_smiles: String should have at least 1 character')
+  const attempt = page.locator('.research-history details').first()
+  await expect(attempt).toHaveAttribute('open', '')
+  await expect(attempt.getByText('target_smiles: String should have at least 1 character', { exact: true })).toBeVisible()
+  await expect(attempt.getByRole('button', { name: 'Restore attempt-1' })).toBeVisible()
 })
 
 test('SMARTS stays explicit and optional baseline is sent', async ({ page }) => {

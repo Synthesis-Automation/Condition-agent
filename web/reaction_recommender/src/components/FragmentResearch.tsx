@@ -223,7 +223,6 @@ export function FragmentResearchOptions({ state, children }: { state: State; chi
       <label className="check-option fragment-retro-wide"><input type="checkbox" disabled={state.busy} checked={state.includeBaseline} onChange={event => { state.setIncludeBaseline(event.target.checked); state.invalidateTransfer() }} /><span>Include bounded unrestricted baseline when assessing transfer</span></label>
       <p className="fragment-note fragment-retro-wide">SMILES searches allow extra substitution unless constrained. Removing a substituent from the query stops requiring it; it does not require its absence. SMARTS changes are explicit. Up to 10 source hits are shown.</p>
     </div></details>
-    {state.error && <div className="alert error" role="alert">{state.error}</div>}
   </>
 }
 
@@ -261,6 +260,7 @@ export function FragmentResearch({ state, searchAvailable, transferAvailable, li
         <span role="status">{state.busy ? 'Searching or assessing selected sources…' : 'The query is validated against the full target before index search.'}</span>
       </div>
     </div>
+    {state.error && <div className="alert error" role="alert">{state.error}</div>}
     {state.alternatives && <section className="results-card fragment-results fragment-query-alternatives" aria-label="Query alternatives">
       <h2>Choose an explicit relaxation</h2>
       <p>Each choice matches the target. Highlighting shows one possible alignment; choosing a query does not run a search.</p>
@@ -305,7 +305,7 @@ export function FragmentResearch({ state, searchAvailable, transferAvailable, li
         <button className="button quiet" disabled={state.busy || !state.history.length} onClick={state.clearHistory}>Clear history</button>
       </div></div>
       <p>Completed searches and errors remain here while you revise queries. History stays in this browser session; export before closing the page. Query edits are not automatically certified as broader searches.</p>
-      {state.history.map(attempt => <details key={attempt.id}><summary>{attempt.id} · {attempt.kind} · {attempt.error ? 'error' : attempt.kind === 'search' ? (attempt.result as FragmentSearchResult).search_status : 'assessed'} · {attempt.request.query}</summary>
+      {state.history.map(attempt => <details key={attempt.id} open={Boolean(attempt.error)}><summary>{attempt.id} · {attempt.kind} · {attempt.error ? 'error' : attempt.kind === 'search' ? (attempt.result as FragmentSearchResult).search_status : 'assessed'} · {attempt.request.query}</summary>
         <p>Target: <code>{attempt.request.target_smiles}</code></p><p>Note: {attempt.note || 'Not recorded'} · Parent: {attempt.parent_id ?? 'none'}</p>
         {attempt.error && <p>{attempt.error}</p>}
         <button className="button quiet" disabled={state.busy} onClick={() => {

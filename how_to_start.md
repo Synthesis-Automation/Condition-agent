@@ -134,6 +134,16 @@ On later starts, omit `--build` unless the frontend source has changed:
 python -m app.web_api --workbench --port 8000
 ```
 
+If fragment search returns HTTP 422, read the message beside the search controls
+or in the expanded failed attempt. The server console also prints the rejection
+reason before its access-log line. `Core fragment (query)` identifies a rejected
+core; `Target molecule (target_smiles)` identifies a rejected full target. Both
+structures must be valid, and the query must match the target under the selected
+constraints. Request-field errors name the field, such as `timeout_seconds`.
+After updating backend code, stop and restart the server; after rebuilding the
+frontend, refresh the browser with **Ctrl+F5**. HTTP status and response shapes
+remain unchanged; the added diagnostics identify the failing input.
+
 The default fragment index is
 `results/ai_native/indexes/fragment_precedents.sqlite`. To use a different
 **already prepared** index:

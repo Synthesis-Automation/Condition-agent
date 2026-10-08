@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
+import logging
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -43,6 +46,7 @@ from .conditions import router as conditions_router
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_FRONTEND_DIST = PROJECT_ROOT / "web" / "reaction_recommender" / "dist"
+LOGGER = logging.getLogger(__name__)
 
 
 def create_app(
@@ -79,6 +83,24 @@ def create_app(
         app.include_router(create_scientific_router(scientific_service))
     profile = "recommendation_only" if recommendation_only else "research_workbench"
     app.state.deployment_profile = profile
+
+    @app.exception_handler(HTTPException)
+    async def reported_http_error(request: Request, exc: HTTPException) -> Response:
+        if request.url.path.startswith("/api/v1/fragments/"):
+            LOGGER.warning("%s %s -> %s: %s", request.method, request.url.path,
+                           exc.status_code, exc.detail)
+        return await http_exception_handler(request, exc)
+
+    @app.exception_handler(RequestValidationError)
+    async def reported_validation_error(request: Request, exc: RequestValidationError) -> Response:
+        if request.url.path.startswith("/api/v1/fragments/"):
+            reasons = "; ".join(
+                f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}"
+                for error in exc.errors()
+            )
+            LOGGER.warning("%s %s -> 422: %s", request.method, request.url.path, reasons)
+        return await request_validation_exception_handler(request, exc)
+
     app.include_router(conditions_router)
     if not recommendation_only:
         from .planner import router as planning_router
