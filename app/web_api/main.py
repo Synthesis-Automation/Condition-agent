@@ -20,6 +20,7 @@ from .contracts import (
     CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
     FragmentSearchRequest,
+    SynthesisPrecedentRequest,
     FragmentSuggestionRequest,
     FragmentTransferRequest,
     FragmentQueryAlternativesRequest,
@@ -274,6 +275,14 @@ def create_app(
             return envelope(active_runtime(request).suggest_fragments(payload))
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
+
+    @app.post("/api/v1/fragments/discover")
+    def discover_precedents(payload: SynthesisPrecedentRequest, request: Request) -> dict[str, Any]:
+        try:
+            return envelope(active_runtime(request).find_synthesis_precedents(payload))
+        except (ValueError, OSError, RuntimeError) as exc:
+            raise HTTPException(status_code=422 if isinstance(exc, ValueError) else 503,
+                                detail=error_payload(exc)) from exc
 
     @app.post("/api/v1/fragments/search")
     def search_fragments(

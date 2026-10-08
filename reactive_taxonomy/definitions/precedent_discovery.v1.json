@@ -1,0 +1,16 @@
+{
+  "schema_version": "precedent_discovery_policy.v1",
+  "definition_version": "precedent_discovery.v1@1.0",
+  "max_cores": 3,
+  "max_steps_per_core": 4,
+  "min_core_atoms": 4,
+  "max_target_atoms": 100,
+  "refine_above_products": 40,
+  "sufficient_construction_references": 3,
+  "default_timeout_seconds": 90,
+  "max_timeout_seconds": 120,
+  "relationship_order": ["constructed", "modified", "boundary_changed", "carried_through", "unresolved"],
+  "core_priority": ["heteroatoms", "atom_count", "ring_junctions"],
+  "levels": ["core", "multiple_bond_context", "neighbor_context", "target_context"],
+  "relaxations": ["omitted_peripheral_atoms", "unconstrained_hydrogen_count", "additional_ring_fusion"]
+}

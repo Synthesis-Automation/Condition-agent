@@ -1479,3 +1479,17 @@ export interface FragmentSearchResult {
   output_truncated?: boolean
   execution: { elapsed_seconds: number }
 }
+
+export interface SynthesisPrecedentResult {
+  target_smiles: string
+  search_status: 'complete' | 'partial'
+  returned_count: number
+  exact_target: { status: string }
+  attempts: JsonObject[]
+  limitations: string[]
+  execution: { elapsed_seconds: number; library_loads: number; candidate_reuses: number }
+  hits: Array<FragmentSearchResult['hits'][number] & { discovery: {
+    query: string; core_relationship: string; explanation: string; alignment_ambiguous: boolean
+    nitrogen_hydrogen_differences: Array<{ target_atom_id: number; target_hydrogens: number; source_hydrogen_counts: number[] }>
+  } }>
+}

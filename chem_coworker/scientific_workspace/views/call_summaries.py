@@ -283,11 +283,11 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
                         "right_coverage", "alignment_ambiguous", "warnings"), path)
         view.add_nested(summary, value, "transfer", ("status", "core_admission_policy",
                         "compiled_source_template_count", "source_admissions", "arms", "limitations"), path)
-    elif operation == "search_fragment_precedents":
+    elif operation in {"search_fragment_precedents", "find_synthesis_precedents"}:
         summary.update(view.pick(value, (
             "search_status", "stop_reason", "query", "index_id", "source_scope", "source_coverage_complete",
             "counts", "relationship_groups", "group_count_scope", "ranking_scope", "returned_count",
-            "refinement_hints", "output_truncated", "target_validation",
+            "refinement_hints", "output_truncated", "target_validation", "target_smiles", "definition_version", "limitations",
         ), path))
         view.add_list(summary, value, "hits", (
             "hit_id", "observation_id", "reaction_id", "reference_id", "relationships",
@@ -295,7 +295,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "product_smiles", "relationship_summary",
             "citation_availability",
             "warnings", "admission_tier", "admission_reasons", "procedure_availability",
-            "procedure_match_scope", "inspect_paths",
+            "procedure_match_scope", "inspect_paths", "discovery",
         ), path)
     elif operation == "inspect_condition_precedents":
         summary.update(view.pick(value, (

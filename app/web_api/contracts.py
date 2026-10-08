@@ -22,6 +22,14 @@ class PrepareReactionRequest(StrictRequest):
     reaction_smiles: str = Field(min_length=1, max_length=20_000)
 
 
+class SynthesisPrecedentRequest(StrictRequest):
+    """Target-only automatic construction precedent discovery."""
+
+    target_smiles: str = Field(min_length=1, max_length=5000)
+    limit: int = Field(default=10, ge=1, le=10, strict=True)
+    timeout_seconds: int = Field(default=90, ge=1, le=120, strict=True)
+
+
 class FragmentSearchRequest(StrictRequest):
     """Explicit core query against a prepared product precedent index."""
 

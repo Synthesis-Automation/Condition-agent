@@ -42,6 +42,7 @@ test.beforeEach(async ({ page }) => {
     body: '<svg xmlns="http://www.w3.org/2000/svg" width="260" height="120"><text x="10" y="30">Preview</text></svg>' }))
   await page.goto('/')
   await page.getByRole('radio', { name: 'Fragment-guided retro', exact: true }).check()
+  await page.getByLabel('Workflow', { exact: true }).selectOption('manual')
   await expect(page.getByLabel('Workflow', { exact: true })).toHaveValue('manual')
   await page.getByLabel('Target molecule SMILES', { exact: true }).fill('CCOCC')
 })
@@ -224,6 +225,7 @@ test('leaving the mode aborts a pending revision and preserves completed history
   await page.getByRole('radio', { name: 'Analyze reactions', exact: true }).check()
   release(); await completed
   await page.getByRole('radio', { name: 'Fragment-guided retro', exact: true }).check()
+  await page.getByLabel('Workflow', { exact: true }).selectOption('manual')
   await expect(page.getByLabel('Core fragment', { exact: true })).toHaveValue('CO')
   await expect(page.getByRole('heading', { name: 'Research history (1/20)' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Fragment precedents', exact: true })).toBeHidden()

@@ -386,8 +386,8 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             "precursor_smiles", "proposed_reaction_smiles", "forward_validation_status", "abstraction_level"))
             for arm in transfer.get("arms", []) for candidate in arm.get("candidates", [])][:3]
         overview["hint"] = "Inspect source, comparison and transfer paths for full procedures, differences and diagnostics."
-    elif operation == "search_fragment_precedents":
-        overview.update(_brief_fields(source, ("counts", "refinement_hints", "output_truncated")))
+    elif operation in {"search_fragment_precedents", "find_synthesis_precedents"}:
+        overview.update(_brief_fields(source, ("counts", "refinement_hints", "output_truncated", "target_smiles", "ranking_scope")))
         if isinstance(source.get("target_validation"), Mapping):
             overview["target_validation"] = _brief_fields(source["target_validation"], (
                 "matches_target", "target_smiles", "query_id", "schema_version",
@@ -404,7 +404,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             compact = _brief_fields(item, ("hit_id", "reaction_id", "observation_id", "reference_id",
                                           "matched_side", "matched_sides", "match_extents", "matched_molecule_smiles",
                                           "product_smiles", "relationship_summary",
-                                          "procedure_availability", "warnings"))
+                                          "procedure_availability", "warnings", "discovery"))
             record = item.get("record", {})
             compact.update(_brief_fields(record, ("reaction_smiles", "yield_pct", "temperature_c", "time_h")))
             compact["publication"] = _publication(record)

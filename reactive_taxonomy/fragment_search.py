@@ -18,7 +18,7 @@ from .chemistry.smarts_cache import compile_smarts
 from .reaction_models import ReactionAtomReference
 
 
-QUERY_COMPILER_VERSION = "fragment_query_compiler.v2"
+QUERY_COMPILER_VERSION = "fragment_query_compiler.v3"
 
 
 def fragment_search_policy() -> dict[str, Any]:
@@ -86,7 +86,7 @@ def compile_fragment_query(
             description = atom.DescribeQuery()
             if (not atom.IsInRing() and (atom.GetIsAromatic() or "Ring" in description)) or "AtomOr" in description:
                 raise ValueError("Partial/alternative ring SMARTS require topology='subgraph'")
-        if any("BondOr" in bond.DescribeQuery() for bond in mol.GetBonds()):
+        if any(any(line.strip() == "BondOr" for line in bond.DescribeQuery().splitlines()) for bond in mol.GetBonds()):
             raise ValueError("Alternative bond SMARTS require topology='subgraph'")
     if query_format == "smiles":
         if any(atom.GetNumRadicalElectrons() for atom in mol.GetAtoms()):

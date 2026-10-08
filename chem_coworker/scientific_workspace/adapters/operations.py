@@ -20,6 +20,15 @@ def _fragment_replay_result(result: Any) -> Any:
     return result
 
 
+def _discovery_replay_result(result: Any) -> Any:
+    """Exclude attempt timings while preserving decisions, scope and chemistry."""
+    if isinstance(result, dict):
+        return {key: _discovery_replay_result(value) for key, value in result.items() if key != "execution"}
+    if isinstance(result, list):
+        return [_discovery_replay_result(value) for value in result]
+    return result
+
+
 def _forward_replay_result(result: Any) -> Any:
     """Compare forward stage outcomes without attempt-specific logs and timings."""
     if not isinstance(result, dict):
@@ -68,6 +77,10 @@ class ScientificOperations:
                             execution_status_field="execution_status",
                             replay_comparison="scientific_result_excluding_fragment_execution_telemetry",
                             replay_projection=_fragment_replay_result),
+        OperationDefinition("find_synthesis_precedents", required_artifacts=("fragment_index",),
+                            execution_status_field="execution_status",
+                            replay_comparison="scientific_result_excluding_discovery_execution_telemetry",
+                            replay_projection=_discovery_replay_result),
         OperationDefinition("suggest_search_fragments"),
         OperationDefinition("propose_fragment_queries"),
         OperationDefinition("investigate_fragment_precedent", evidence_arguments=("source_ref",)),
@@ -392,6 +405,14 @@ class ScientificOperations:
                 missing.append(identity)
         return {"records": records, "missing_route_ids": missing, "total": len(ids), "offset": offset,
                 "next_offset": offset + limit if offset + limit < len(ids) else None}
+
+    def find_synthesis_precedents(self, target_smiles: str, limit: int = 10,
+                                 timeout_seconds: int = 90) -> dict[str, Any]:
+        """Automatically search cores and add context; inspect source hits before proposing a route."""
+        from .fragment_search import run_fragment_search
+
+        return run_fragment_search(self, {"target_smiles": target_smiles, "limit": limit,
+                                         "timeout_seconds": timeout_seconds}, automatic=True)
 
     def suggest_search_fragments(
         self, target_smiles: str, limit: int = 5, selected_atom_ids: list[int] | None = None,

@@ -21,17 +21,20 @@ def _worker_command(directory: Path) -> list[str]:
     return [sys.executable, "-m", __name__, str(directory)]
 
 
-def run_fragment_search(operations: ScientificOperations, arguments: dict[str, Any]) -> dict[str, Any]:
+def run_fragment_search(operations: ScientificOperations, arguments: dict[str, Any], *, automatic: bool = False) -> dict[str, Any]:
     """Run one prepared-index query in a killable child; never build an index."""
     from ..core.process_utils import hidden_process_options, stop_process_tree
 
     timeout = arguments["timeout_seconds"]
-    if type(timeout) is not int or not 1 <= timeout <= 30:
-        raise ValueError("timeout_seconds must be an integer between 1 and 30")
+    maximum = 120 if automatic else 30
+    if type(timeout) is not int or not 1 <= timeout <= maximum:
+        raise ValueError(f"timeout_seconds must be an integer between 1 and {maximum}")
     path = operations._path("fragment_index")
     directory = operations.store.root / "diagnostics" / "fragment_search" / uuid4().hex
     directory.mkdir(parents=True)
     request = {"index_path": str(path), **arguments}
+    if automatic:
+        request["operation"] = "find_synthesis_precedents"
     (directory / "request.json").write_text(json.dumps(request), "utf-8")
     repository = str(REPOSITORY_ROOT)
     environment = os.environ.copy()
@@ -74,7 +77,14 @@ def _worker(directory: Path) -> None:
 
     try:
         request = json.loads((directory / "request.json").read_text("utf-8"))
-        result = search_fragment_precedents(**request, progress=progress)
+        operation = request.pop("operation", "search_fragment_precedents")
+        if operation == "find_synthesis_precedents":
+            from condition_recommender.precedent_discovery import find_synthesis_precedents
+            result = find_synthesis_precedents(**request, progress=progress)
+        elif operation == "search_fragment_precedents":
+            result = search_fragment_precedents(**request, progress=progress)
+        else:
+            raise ValueError("Unsupported fragment worker operation")
         timed_out = "deadline" in str(result.get("stop_reason"))
         result["execution_status"] = "timed_out" if timed_out else "completed"
         if timed_out:

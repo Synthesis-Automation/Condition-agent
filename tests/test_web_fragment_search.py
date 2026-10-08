@@ -42,6 +42,34 @@ def test_workbench_search_and_empty_result(runtime):
     assert empty.json()["data"]["hits"] == []
 
 
+def test_target_only_discovery_and_request_bounds(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post("/api/v1/fragments/discover", json={"target_smiles": "COC"})
+    assert response.status_code == 200
+    assert response.json()["data"]["schema_version"] == "synthesis_precedent_discovery.v1"
+    assert response.json()["data"]["hits"]
+    assert response.json()["data"]["execution"]["library_loads"] == 1
+    assert client.post("/api/v1/fragments/discover", json={"target_smiles": "bad"}).status_code == 422
+    assert client.post("/api/v1/fragments/discover", json={"target_smiles": "CO", "timeout_seconds": 121}).status_code == 422
+    focused = TestClient(create_app(runtime=runtime))
+    assert focused.post("/api/v1/fragments/discover", json={"target_smiles": "COC"}).status_code == 404
+
+
+def test_workspace_target_only_discovery_records_evidence(runtime, tmp_path):
+    from chem_coworker.scientific_workspace import ScientificWorkspace
+    from pathlib import Path
+
+    workspace = ScientificWorkspace.create(tmp_path / "investigation", objective="Discovery fixture",
+                                           repository=Path.cwd(), artifacts={"fragment_index": runtime.fragment_index_path})
+    event = workspace.run("find_synthesis_precedents", {"target_smiles": "COC", "timeout_seconds": 30})
+    payload = workspace.store.read_artifact(event.artifact_ref)
+    assert payload["execution_status"] == "completed"
+    assert payload["result"]["hits"][0]["observation_id"] == "obs-1"
+    assert payload["result"]["execution"]["diagnostics"]
+    replay = workspace.replay(event.artifact_ref)
+    assert workspace.store.read_artifact(replay.artifact_ref)["matches"]
+
+
 @pytest.mark.parametrize("payload", [
     {"query": "bad smiles"}, {"query": ""}, {"query": "CO", "limit": 11},
     {"query": "CO", "timeout_seconds": 31}, {"query": "CO", "query_format": "fuzzy"},

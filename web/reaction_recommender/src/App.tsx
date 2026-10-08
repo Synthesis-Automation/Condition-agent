@@ -525,7 +525,7 @@ function App() {
   const selectedLibraryAvailable = mode === 'interactive_planning'
     ? Boolean(capabilities?.retrosynthesis_library_modes?.[planner.settings.library_mode]?.library_available)
     : mode === 'fragment_guided_retro'
-    ? Boolean(capabilities?.fragment_search && capabilities.retrosynthesis_library_modes?.[fragmentRetro.library]?.library_available)
+    ? Boolean(capabilities?.fragment_search && (fragmentRetro.workflow === 'discovery' || capabilities.retrosynthesis_library_modes?.[fragmentRetro.library]?.library_available))
     : mode === 'weak_label'
     ? capabilities?.weak_label_recommendation ?? false
     : isForwardMode
@@ -551,7 +551,9 @@ function App() {
   const serviceStatus = mode === 'interactive_planning'
     ? `Interactive planning ${selectedLibraryAvailable ? 'ready' : 'library unavailable'}`
     : mode === 'fragment_guided_retro'
-    ? fragmentRetro.workflow === 'manual'
+    ? fragmentRetro.workflow === 'discovery'
+      ? `Precedent discovery ${capabilities?.fragment_search ? 'ready' : 'unavailable'}`
+      : fragmentRetro.workflow === 'manual'
       ? `Fragment discovery ${capabilities?.fragment_search ? 'ready' : 'unavailable'} · transfer ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
       : `Fragment-guided retro ${selectedLibraryAvailable ? 'ready' : 'unavailable'}`
     : mode === 'weak_label'
@@ -574,7 +576,7 @@ function App() {
         <section className="control-card" aria-labelledby="analysis-title">
         <div className="section-heading">
           <div><span className="step-number">1</span><h2 id="analysis-title">Analysis mode</h2></div>
-          {(result || (mode === 'fragment_guided_retro' && (fragmentRetro.result || (fragmentRetro.workflow === 'manual' && fragmentRetro.research.history.length > 0)))) && <button className="button quiet" type="button" onClick={mode === 'fragment_guided_retro' ? fragmentRetro.exportResult : exportResult}>Export JSON</button>}
+          {(result || (mode === 'fragment_guided_retro' && (fragmentRetro.discovery.result || fragmentRetro.result || (fragmentRetro.workflow === 'manual' && fragmentRetro.research.history.length > 0)))) && <button className="button quiet" type="button" onClick={mode === 'fragment_guided_retro' ? fragmentRetro.exportResult : exportResult}>Export JSON</button>}
         </div>
         <div className="analysis-control-layout">
           <fieldset className="mode-switch" aria-labelledby="analysis-title">

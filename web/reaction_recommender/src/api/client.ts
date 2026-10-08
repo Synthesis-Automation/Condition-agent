@@ -10,6 +10,7 @@ import type {
   FragmentInvestigation,
   FragmentTransferRequest,
   FragmentSearchResult,
+  SynthesisPrecedentResult,
   FragmentSuggestionsResult,
   FragmentGuidedRetroRequest,
   FragmentGuidedRetroResult,
@@ -69,6 +70,10 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  findSynthesisPrecedents: (target: string, signal?: AbortSignal) =>
+    jsonRequest<SynthesisPrecedentResult>('/fragments/discover', {
+      method: 'POST', body: JSON.stringify({ target_smiles: target }), signal,
+    }),
   planningAction: (request: PlanningRequest, signal?: AbortSignal) =>
     jsonRequest<PlanningResponse>('/retrosynthesis/planner', {
       method: 'POST', body: JSON.stringify(request), signal,

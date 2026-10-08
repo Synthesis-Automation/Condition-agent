@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import type { Capabilities, FragmentGuidedRetroRequest, FragmentGuidedRetroResult, FragmentRetroArm } from '../api/types'
 import { FragmentResearch, FragmentResearchOptions, useFragmentResearch } from './FragmentResearch'
+import { PrecedentDiscovery, usePrecedentDiscovery } from './PrecedentDiscovery'
 import { ReactionEditor } from './ReactionEditor'
 import { ReactionImage } from './ReactionImage'
 import './fragment-guided-retro.css'
@@ -10,7 +11,8 @@ const EXAMPLE = 'Fc(cn1)cc2c1c(c3ccccc3OC)n[nH]2'
 const readable = (value: string) => value.replaceAll('_', ' ').toLowerCase()
 
 export function useFragmentGuidedRetro(active: boolean) {
-  const [workflow, setWorkflow] = useState<'manual' | 'automatic'>('manual')
+  const [workflow, setWorkflow] = useState<'discovery' | 'manual' | 'automatic'>('discovery')
+  const discovery = usePrecedentDiscovery(active && workflow === 'discovery')
   const research = useFragmentResearch(active && workflow === 'manual')
   const [target, setTarget] = useState('')
   const [library, setLibrary] = useState<FragmentGuidedRetroRequest['library_mode']>('full')
@@ -55,6 +57,7 @@ export function useFragmentGuidedRetro(active: boolean) {
     }
   }
   const exportResult = () => {
+    if (workflow === 'discovery') { discovery.exportResult(); return }
     if (workflow === 'manual') { research.exportHistory(); return }
     if (!result) return
     const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }))
@@ -64,7 +67,7 @@ export function useFragmentGuidedRetro(active: boolean) {
     link.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
-  return { workflow, setWorkflow, research, target, changeTarget, library, setLibrary, queryLimit, setQueryLimit,
+  return { workflow, setWorkflow, discovery, research, target, changeTarget, library, setLibrary, queryLimit, setQueryLimit,
     focusLimit, setFocusLimit, topK, setTopK, busy, error, setError, result, reset, run, exportResult }
 }
 
@@ -74,10 +77,10 @@ export function FragmentGuidedRetroOptions({ state, capabilities }: { state: Sta
   const available = capabilities?.fragment_search && capabilities.retrosynthesis_library_modes?.[state.library]?.library_available
   return <div className="analysis-options fragment-retro-options">
     <div className="option-grid fragment-retro-primary">
-    <label><span>Workflow</span><select aria-label="Workflow" value={state.workflow} disabled={state.busy || state.research.busy} onChange={event => { state.setWorkflow(event.target.value as State['workflow']); state.reset() }}><option value="manual">Assisted fragment research</option><option value="automatic">Automatic POC comparison</option></select></label>
-    <div className="feature-mode-note"><strong>{state.workflow === 'manual' ? 'Assisted fragment research' : 'Experimental single-step comparison'}</strong><span>{state.workflow === 'manual' ? 'Search a chosen core, inspect source reactions, and assess construction precedents against your target.' : 'Compare source transfers and fragment-guided proposals with an unrestricted baseline.'}</span></div>
+    <label><span>Workflow</span><select aria-label="Workflow" value={state.workflow} disabled={state.busy || state.research.busy || state.discovery.busy} onChange={event => { state.setWorkflow(event.target.value as State['workflow']); state.reset() }}><option value="discovery">Find synthesis precedents</option><option value="manual">Refine search / assisted research</option><option value="automatic">Automatic POC comparison</option></select></label>
+    <div className="feature-mode-note"><strong>{state.workflow === 'discovery' ? 'Automatic core-first discovery' : state.workflow === 'manual' ? 'Assisted fragment research' : 'Experimental single-step comparison'}</strong><span>{state.workflow === 'discovery' ? 'Enter a target to find related construction precedents. Queries and refinements are selected automatically.' : state.workflow === 'manual' ? 'Search a chosen core, inspect source reactions, and assess construction precedents against your target.' : 'Compare source transfers and fragment-guided proposals with an unrestricted baseline.'}</span></div>
     </div>
-    {state.workflow === 'manual' ? <>
+    {state.workflow === 'discovery' ? null : state.workflow === 'manual' ? <>
       <FragmentResearchOptions state={state.research}>
         <label><span>Construction bonds</span><select value={state.focusLimit} onChange={event => { state.setFocusLimit(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 4, 5].map(value => <option key={value}>{value}</option>)}</select></label>
         <label><span>Proposals per search arm</span><select value={state.topK} onChange={event => { state.setTopK(Number(event.target.value)); state.reset() }}>{[1, 2, 3, 5, 10].map(value => <option key={value}>{value}</option>)}</select></label>
@@ -176,6 +179,8 @@ function Evidence({ result, showQueries = true }: { result: FragmentGuidedRetroR
 }
 
 export function FragmentGuidedRetro({ state, available, searchAvailable }: { state: State; available: boolean; searchAvailable: boolean }) {
+  if (state.workflow === 'discovery') return <PrecedentDiscovery state={state.discovery} available={searchAvailable}
+    onRefine={(target, query) => { state.research.changeTarget(target); state.research.changeQuery(query); state.research.setFormat('smarts'); state.research.setTopology('subgraph'); state.setWorkflow('manual') }} />
   if (state.workflow === 'manual') return <FragmentResearch state={state.research} searchAvailable={searchAvailable}
     transferAvailable={available} library={state.library} focusLimit={state.focusLimit} topK={state.topK}
     onRestoreSettings={request => { state.setLibrary(request.library_mode); state.setFocusLimit(request.max_focus_bonds); state.setTopK(request.top_k) }}

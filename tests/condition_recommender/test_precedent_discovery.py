@@ -1,0 +1,74 @@
+"""Automatic discovery retains construction evidence through query refinement."""
+
+from dataclasses import asdict
+import json
+
+import pytest
+
+from condition_recommender.fragment_index import build_fragment_index
+from condition_recommender.precedent_discovery import find_synthesis_precedents
+from reactive_taxonomy import featurize_reaction
+
+
+@pytest.fixture
+def discovery_index(tmp_path):
+    # Synthetic graph fixtures test observation/ranking, not experimental feasibility.
+    ring = "[CH2:1]1[CH2:2][NH:3][CH2:4][CH2:5]1"
+    reactions = [
+        ("construction", "ref-build", "[CH3:1][CH2:2][NH:3][CH2:4][CH3:5]>>" + ring),
+        ("retention", "ref-acyl", ring + ".[CH3:6][C:7](=[O:8])[Cl:9]>>[CH2:1]1[CH2:2][N:3]([C:7]([CH3:6])=[O:8])[CH2:4][CH2:5]1"),
+        ("unknown", "ref-unknown", "NCCCC>>C1CCNC1"),
+    ]
+    source = tmp_path / "source.jsonl"
+    source.write_text("\n".join(json.dumps({"observation_id": oid, "reaction_id": oid,
+        "reference_id": ref, "reaction_smiles": reaction, "admission_tier": "review",
+        "reaction_observation": asdict(featurize_reaction(reaction).observation)})
+        for oid, ref, reaction in reactions), encoding="utf-8")
+    index = tmp_path / "fragments.sqlite"
+    build_fragment_index(source, index)
+    return index
+
+
+def test_construction_survives_acetyl_refinement_and_library_is_loaded_once(discovery_index):
+    result = find_synthesis_precedents(discovery_index, "CC(=O)N1CCCC1")
+    assert result["search_status"] == "complete"
+    assert result["execution"]["library_loads"] == 1
+    assert result["execution"]["candidate_reuses"] > 0
+    assert result["hits"][0]["observation_id"] == "construction"
+    assert result["hits"][0]["discovery"]["core_relationship"] == "constructed"
+    assert result["hits"][0]["discovery"]["nitrogen_hydrogen_differences"]
+    retention = next(h for h in result["hits"] if h["observation_id"] == "retention")
+    assert retention["discovery"]["core_relationship"] != "constructed"
+    unknown = next(h for h in result["hits"] if h["observation_id"] == "unknown")
+    assert unknown["discovery"]["core_relationship"] == "unresolved"
+    assert result["exact_target"]["status"] == "matched"
+
+
+def test_no_matches_stops_a_ladder_without_claiming_literature_absence(discovery_index):
+    result = find_synthesis_precedents(discovery_index, "c1ccncc1")
+    assert result["hits"] == []
+    assert len(result["attempts"]) == 1
+    assert result["attempts"][0]["decision"] == "no_matches_try_next_core"
+    assert any("absence" in text for text in result["limitations"])
+
+
+def test_partial_candidates_are_not_reused(discovery_index, monkeypatch):
+    import condition_recommender.fragment_search as search
+    original = search.fragment_search_policy
+    monkeypatch.setattr(search, "fragment_search_policy", lambda: {**original(), "max_matched_products": 1})
+    result = find_synthesis_precedents(discovery_index, "CC(=O)N1CCCC1")
+    assert result["attempts"][0]["search_status"] == "too_broad"
+    assert not result["attempts"][1]["execution"]["candidate_set_reused"]
+
+
+def test_complete_candidate_reuse_matches_fresh_search(discovery_index):
+    from condition_recommender.fragment_search import FragmentSearchSession, search_fragment_precedents
+    from reactive_taxonomy.precedent_queries import plan_precedent_queries
+    steps = plan_precedent_queries("CC(=O)N1CCCC1")["ladders"][0]
+    with FragmentSearchSession(discovery_index) as session:
+        parent = search_fragment_precedents(discovery_index, steps[0]["query"], "smarts", "subgraph", _session=session)
+        ids = session.candidates[parent["query"]["query_id"]]
+        reused = search_fragment_precedents(discovery_index, steps[-1]["query"], "smarts", "subgraph", _session=session, _candidate_ids=ids)
+    fresh = search_fragment_precedents(discovery_index, steps[-1]["query"], "smarts", "subgraph")
+    assert reused["counts"] == fresh["counts"]
+    assert reused["hits"] == fresh["hits"]

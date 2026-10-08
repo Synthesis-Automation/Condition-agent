@@ -1,8 +1,30 @@
-# Fragment precedent adviser v2
+# Fragment precedent adviser v3
 
 Optional supporting advice for `retrosynthesis`. Use it when constructing an unfamiliar
 core is a decision-changing uncertainty. A supported route or clear disconnection may
 already answer the question.
+
+## Automatic target-first entry
+
+Start with `find_synthesis_precedents(target_smiles=...)` when the user wants
+relevant construction precedents without choosing query syntax. It selects
+informative ring subsets, samples broad matches, adds context, and retains earlier
+construction leads. It loads the fragment index once and reuses only completely
+enumerated candidate sets for nested refinements. The default budget is 90 seconds.
+
+Inspect `hits[].discovery`, references, source records and procedures. Explicit
+relaxations include peripheral substitution, hydrogen counts and additional ring
+fusion; N-H analogues can therefore appear for N-acetyl targets. Broad samples
+remain partial, counts retain their precision, and unresolved correspondence is
+not construction evidence. Ranking is a heuristic over retrieved candidates,
+not independent chemistry validation or proof of a feasible route.
+
+Use `call_summary`/`run_summary` for a compact view. For a promising source, copy
+its `discovery.query`, `query_format` and `topology` into a recorded
+`search_fragment_precedents` call with the target, then investigate the returned
+observation using the detailed workflow below. No production retro library is
+needed for discovery. Use custom query edits only when the automatic result leaves
+a concrete question unresolved.
 
 ## Purpose and context
 

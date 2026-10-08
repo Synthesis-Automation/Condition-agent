@@ -65,6 +65,7 @@ from .contracts import (
     CoupledStrategyRetrosynthesisRequest,
     FeatureAnalysisRequest,
     FragmentSearchRequest,
+    SynthesisPrecedentRequest,
     FragmentSuggestionRequest,
     FragmentTransferRequest,
     FragmentQueryAlternativesRequest,
@@ -207,6 +208,8 @@ class WebRuntime(Protocol):
     """Narrow application runtime consumed by the HTTP routes."""
 
     def capabilities(self) -> Dict[str, Any]: ...
+
+    def find_synthesis_precedents(self, request: SynthesisPrecedentRequest) -> Dict[str, Any]: ...
 
     def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]: ...
 
@@ -466,6 +469,17 @@ class LocalRecommendationRuntime:
                 highlight_atom_indices=tuple(candidate["target_atom_ids"]),
             ).decode("utf-8")
         return result
+
+    def find_synthesis_precedents(self, request: SynthesisPrecedentRequest) -> Dict[str, Any]:
+        """Compose one bounded discovery request; no operator library required."""
+        from condition_recommender.precedent_discovery import find_synthesis_precedents
+
+        if not self._fragment_search_lock.acquire(blocking=False):
+            raise RuntimeError("A fragment search is already running. Try again shortly.")
+        try:
+            return find_synthesis_precedents(self.fragment_index_path, **request.model_dump())
+        finally:
+            self._fragment_search_lock.release()
 
     def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]:
         """Use the standalone search with one active library load per runtime.
@@ -1056,6 +1070,7 @@ class LocalRecommendationRuntime:
         return {
             "service": "reaction-condition-recommender",
             "fragment_search": self.fragment_index_path.is_file(),
+            "synthesis_precedent_discovery": self.fragment_index_path.is_file(),
             "fragment_suggestions": True,
             "fragment_guided_retrosynthesis": (
                 self.fragment_index_path.is_file()

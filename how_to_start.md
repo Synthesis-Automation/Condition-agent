@@ -41,6 +41,13 @@ including compilation rejections. It requires the fragment index but no producti
 operator library. Export research JSON to keep the session history. See the
 [recorded workspace workflow](docs/AI-native/readme.md) for the same agent operations.
 
+The agent equivalent is `w.run("find_synthesis_precedents", {"target_smiles": target})`.
+The HTTP endpoint is `POST /api/v1/fragments/discover` with `target_smiles`;
+optional `limit` (1–10) and `timeout_seconds` (1–120, default 90) are bounded.
+Restart the backend and rebuild/refresh the frontend after this update. Existing
+fragment indexes remain compatible; no index rebuild is required. The query
+compiler is now v3, correcting rejection of ordinary SMARTS bond-order predicates.
+
 ## First-time preparation
 
 Use the existing project environment; `requirements-web.txt` supplies the web
@@ -97,7 +104,20 @@ and **Search fragments**. Suggestions work without an index and never launch a
 search automatically. You can still enter your own core directly.
 
 To combine fragment discovery with **single-step retrosynthesis**, select
-**Fragment-guided retro**. **Assisted fragment research** is the default workflow:
+**Fragment-guided retro**. **Find synthesis precedents** is now the default:
+enter or draw the target and click the matching button. No core or SMARTS settings
+are required. Results prioritize observed construction of informative cores,
+retain useful broader hits, and show substitution differences. Inspect source
+records/conditions directly, or open **Refine search or investigate transfer**
+for a selected query. **Export search evidence** saves the queries and decisions.
+Discovery requires only the fragment index, not an operator library.
+
+The search permits peripheral substitution, unconstrained hydrogen counts and
+additional ring fusion. Broad queries inspect bounded samples and remain marked
+partial. A hit is a source lead, not a validated synthetic step; ranking is over
+retrieved candidates, not a guarantee of the globally best precedents.
+
+For explicit control, select **Refine search / assisted research** in Workflow:
 
 1. Enter or draw the full target, or load **Fragment research example**.
 2. Click **Suggest strategic regions**, choose a region, or draw/type your own
