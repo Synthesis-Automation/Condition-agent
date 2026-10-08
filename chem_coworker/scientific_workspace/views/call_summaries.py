@@ -270,6 +270,19 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
                                          "generation_truncated", "output_truncated", "limitations"), path))
         view.add_list(summary, value, "candidates", ("candidate_id", "kind", "query", "query_format",
                       "topology", "target_atom_ids", "features", "reasons", "cautions", "matches_target"), path)
+    elif operation == "propose_fragment_queries":
+        summary.update(view.pick(value, ("target_smiles", "definition_version", "parent_query",
+                                         "query_atoms", "aromatic_atom_ids", "output_truncated", "limitations"), path))
+        view.add_list(summary, value, "variants", ("variant_id", "query", "query_format", "topology",
+                      "relaxations", "reason", "alignment_ambiguous", "target_alignments_truncated"), path)
+    elif operation == "investigate_fragment_precedent":
+        summary.update(view.pick(value, ("source_ref", "target_smiles", "search_scope", "limitations"), path))
+        view.add_nested(summary, value, "source", ("observation_id", "reaction_id", "reference_id",
+                        "relationships", "procedure_availability", "warnings"), path)
+        view.add_nested(summary, value, "comparison", ("status", "core_atom_count", "left_coverage",
+                        "right_coverage", "alignment_ambiguous", "warnings"), path)
+        view.add_nested(summary, value, "transfer", ("status", "core_admission_policy",
+                        "compiled_source_template_count", "source_admissions", "arms", "limitations"), path)
     elif operation == "search_fragment_precedents":
         summary.update(view.pick(value, (
             "search_status", "stop_reason", "query", "index_id", "source_scope", "source_coverage_complete",

@@ -67,6 +67,8 @@ from .contracts import (
     FragmentSearchRequest,
     FragmentSuggestionRequest,
     FragmentTransferRequest,
+    FragmentQueryAlternativesRequest,
+    FragmentInvestigationRequest,
     FragmentGuidedRetrosynthesisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -209,6 +211,10 @@ class WebRuntime(Protocol):
     def search_fragments(self, request: FragmentSearchRequest) -> Dict[str, Any]: ...
 
     def suggest_fragments(self, request: FragmentSuggestionRequest) -> Dict[str, Any]: ...
+
+    def propose_fragment_queries(self, request: FragmentQueryAlternativesRequest) -> Dict[str, Any]: ...
+
+    def investigate_fragment_precedent(self, request: FragmentInvestigationRequest) -> Dict[str, Any]: ...
 
     def fragment_guided_retrosynthesize(
         self, request: FragmentGuidedRetrosynthesisRequest,
@@ -380,6 +386,73 @@ class LocalRecommendationRuntime:
         self._compound_registry_identities: (
             tuple[frozenset[str], frozenset[str]] | None
         ) = None
+
+    def propose_fragment_queries(self, request: FragmentQueryAlternativesRequest) -> Dict[str, Any]:
+        """Preview query edits through the shared taxonomy implementation."""
+        from reactive_taxonomy.fragment_broadening import propose_fragment_queries
+
+        result = propose_fragment_queries(**request.model_dump())
+        if request.query_format == "smiles":
+            result["query_atom_indices_svg"] = render_molecule_image_bytes(
+                request.query, size=(520, 300), image_format="svg",
+                render_preset="current", show_atom_indices=True,
+            ).decode("utf-8")
+        for variant in result["variants"]:
+            variant["target_highlight_svg"] = render_molecule_image_bytes(
+                result["target_smiles"], size=(420, 220), image_format="svg",
+                render_preset="web_consistent", highlight_atom_indices=tuple(variant["target_atom_ids"]),
+            ).decode("utf-8")
+        return result
+
+    def investigate_fragment_precedent(self, request: FragmentInvestigationRequest) -> Dict[str, Any]:
+        """Read current indexed evidence and test the selected source in memory."""
+        from condition_recommender.fragment_search import search_fragment_precedents
+        from core_retrosynthesis.fragment_investigation import investigate_fragment_precedent
+        from core_retrosynthesis.fragment_guidance import restore_source_smiles
+
+        if not self.fragment_index_path.is_file():
+            raise FileNotFoundError("Fragment index unavailable; configure --fragment-index")
+        if not self._fragment_search_lock.acquire(blocking=False):
+            raise RuntimeError("A fragment search is already running. Try again shortly.")
+        try:
+            search = search_fragment_precedents(
+                self.fragment_index_path, **request.model_dump(exclude={"observation_id"}),
+            )
+            result = investigate_fragment_precedent(search, request.observation_id, request.target_smiles)
+            result["construction_previews"] = []
+            seen: set[tuple[int, tuple[int, ...]]] = set()
+            try:
+                reaction = restore_source_smiles(result["source"]["record"].get("reaction_smiles"))
+                products = reaction.split(">")[2].split(".")
+                for match in result["source"]["matches"]:
+                    if match.get("matched_side", "product") != "product":
+                        continue
+                    component = match["product_component_index"]
+                    for witness in match["witnesses"]:
+                        if witness["relationship"] != "constructed" or witness["kind"] != "formed":
+                            continue
+                        atoms = tuple(sorted(witness["product_atoms"]))
+                        key = (component, atoms)
+                        if key in seen or len(seen) >= 3:
+                            continue
+                        seen.add(key)
+                        result["construction_previews"].append({
+                            "component_index": component, "product_atom_ids": list(atoms),
+                            "svg": render_molecule_image_bytes(
+                                products[component], size=(420, 240), image_format="svg",
+                                render_preset="web_consistent", highlight_atom_indices=atoms,
+                            ).decode("utf-8"),
+                        })
+                for arm in result["transfer"].get("arms", []):
+                    arm["target_highlight_svg"] = render_molecule_image_bytes(
+                        result["target_smiles"], size=(420, 240), image_format="svg",
+                        render_preset="web_consistent", highlight_atom_indices=tuple(arm["target_atom_ids"]),
+                    ).decode("utf-8")
+            except (ValueError, IndexError) as exc:
+                result["preview_error"] = str(exc)
+            return result
+        finally:
+            self._fragment_search_lock.release()
 
     def suggest_fragments(self, request: FragmentSuggestionRequest) -> Dict[str, Any]:
         """Generate optional target-derived search regions without loading an index."""

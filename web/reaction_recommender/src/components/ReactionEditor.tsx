@@ -62,8 +62,16 @@ export function DrawingDialog({
   const moleculeLabel = fragment ? 'core fragment' : isStartingMaterials ? 'starting materials' : 'target molecule'
   const [ketcher, setKetcher] = useState<Ketcher | null>(null)
   const [draftSmiles, setDraftSmiles] = useState(value)
+  const [draftEdited, setDraftEdited] = useState(false)
+  const [editorError, setEditorError] = useState('')
   const [status, setStatus] = useState('Loading editor…')
   const [loading, setLoading] = useState(true)
+
+  const reportError = (message: string) => {
+    setEditorError(message)
+    if (message) setStatus(message)
+    onError(message)
+  }
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -80,18 +88,20 @@ export function DrawingDialog({
   const load = async (smiles: string) => {
     if (!ketcher) return
     if (!smiles.trim()) {
-      onError(`Enter ${moleculeOnly ? moleculeLabel : 'a reaction'} SMILES before loading it.`)
+      reportError(`Enter ${moleculeOnly ? moleculeLabel : 'a reaction'} SMILES before loading it.`)
       return
     }
     setLoading(true)
+    reportError('')
     setStatus('Loading drawing…')
     try {
       await ketcher.setMolecule(smiles.trim())
       setDraftSmiles(smiles.trim())
+      setDraftEdited(false)
       setStatus(`${fragment ? 'Fragment' : isStartingMaterials ? 'Starting materials' : moleculeOnly ? 'Target' : 'Reaction'} loaded into the drawing canvas.`)
       onError('')
-    } catch {
-      onError('Ketcher could not load this reaction SMILES.')
+    } catch (error) {
+      reportError(error instanceof Error ? error.message : 'Ketcher could not load these SMILES.')
     } finally {
       setLoading(false)
     }
@@ -99,29 +109,47 @@ export function DrawingDialog({
 
   const clear = async () => {
     if (!ketcher) return
-    await ketcher.setMolecule('')
-    setDraftSmiles('')
-    setStatus('Canvas cleared.')
-    onError('')
+    setLoading(true)
+    reportError('')
+    try {
+      await ketcher.setMolecule('')
+      setDraftSmiles('')
+      setDraftEdited(false)
+      setStatus('Canvas cleared.')
+    } catch (error) {
+      reportError(error instanceof Error ? error.message : 'Could not clear the canvas.')
+    } finally { setLoading(false) }
   }
 
   const finish = async () => {
-    if (!ketcher) return
+    if (!ketcher || loading) return
+    setLoading(true)
+    reportError('')
+    setStatus('Saving structure…')
     try {
+      // Text edits are a separate draft until explicitly loaded. Never export
+      // the stale canvas when the user finishes with pending SMILES changes.
+      if (draftEdited) {
+        const draft = draftSmiles.trim()
+        const error = !draft ? 'Enter SMILES or load a drawing before saving.'
+          : inputFormatError(draft, allowMolecule, moleculeOnly)
+        if (error) { reportError(error); return }
+        await ketcher.setMolecule(draft)
+        setDraftEdited(false)
+      }
       const smiles = (await ketcher.getSmiles()).trim()
       const error = inputFormatError(smiles, allowMolecule, moleculeOnly)
         || (fragment && (!smiles || smiles.includes('.')) ? 'Draw one connected core fragment.' : null)
       if (error) {
-        onError(error)
-        setStatus(error)
+        reportError(error)
         return
       }
       onChange(smiles)
       onError('')
       onClose()
     } catch (error) {
-      onError(error instanceof Error ? error.message : 'Could not export drawing.')
-    }
+      reportError(error instanceof Error ? error.message : 'Could not export drawing.')
+    } finally { setLoading(false) }
   }
 
   return (
@@ -183,14 +211,14 @@ export function DrawingDialog({
                 void instance
                   .setMolecule(value.trim())
                   .then(() => setStatus(fragment ? 'Existing fragment loaded.' : 'Existing reaction loaded.'))
-                  .catch(() => onError('Ketcher could not load the existing reaction.'))
+                  .catch(() => reportError('Ketcher could not load the existing structure. Edit the SMILES or draw a replacement.'))
                   .finally(() => setLoading(false))
               } else {
                 setStatus('Editor ready.')
                 setLoading(false)
               }
             }}
-            onError={onError}
+            onError={reportError}
           /></Suspense>
           </DrawingEditorBoundary>
         </div>
@@ -200,8 +228,10 @@ export function DrawingDialog({
             <span>{fragment ? 'Fragment SMILES' : isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : 'Reaction SMILES'}</span>
             <textarea
               id="drawing-reaction-smiles"
+              aria-label={fragment ? 'Fragment SMILES' : isStartingMaterials ? 'Starting-material SMILES' : moleculeOnly ? 'Target molecule SMILES' : 'Reaction SMILES'}
               value={draftSmiles}
-              onChange={(event) => setDraftSmiles(event.target.value)}
+              disabled={loading}
+              onChange={(event) => { setDraftSmiles(event.target.value); setDraftEdited(true); reportError('') }}
               placeholder={fragment ? 'connected core fragment' : isStartingMaterials ? 'starting.materials' : moleculeOnly ? 'target product' : 'reactants>>products'}
               spellCheck={false}
             />
@@ -216,12 +246,15 @@ export function DrawingDialog({
           </button>
         </div>
 
+        {draftEdited && <p className="drawing-draft-notice">Edited SMILES have not been loaded into the canvas. “Use edited SMILES” will load and save this text.</p>}
+        {editorError && <div className="alert error drawing-error" role="alert">{editorError}</div>}
+
         <div className="modal-actions drawing-actions">
           <span>{status}</span>
           <div className="button-row">
             <button className="button quiet" type="button" onClick={onClose}>Cancel</button>
             <button className="button primary" type="button" onClick={finish} disabled={!ketcher || loading}>
-              Use drawing
+              {loading && ketcher ? 'Working…' : draftEdited ? 'Use edited SMILES' : 'Use drawing'}
             </button>
           </div>
         </div>

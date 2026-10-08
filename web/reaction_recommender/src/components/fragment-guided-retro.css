@@ -29,4 +29,14 @@
 .research-history p, .research-history > details { margin: 12px 18px; font-size: .8rem; overflow-wrap: anywhere; }
 .research-history pre { max-height: 350px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
 .fragment-retro-results > .section-heading { padding: 14px 20px; }
+.fragment-query-alternatives, .fragment-investigation { padding: 18px; }
+.fragment-query-alternatives > h2, .fragment-investigation > h2 { margin-top: 0; }
+.fragment-query-alternatives > p, .fragment-investigation > p,
+.fragment-investigation > details { margin-left: 0; margin-right: 0; }
+.fragment-query-alternatives fieldset { border: 1px solid #d7e0da; border-radius: 8px; padding: 14px; }
+.fragment-query-alternatives .query-atom-map { max-width: 520px; height: 300px; }
+.fragment-query-alternatives .fragment-atom-choice { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; }
+.fragment-query-alternatives .fragment-atom-choice input { width: 18px; height: 18px; min-height: 0; margin: 0; }
+.fragment-query-alternatives fieldset > button { margin-top: 12px; }
+.fragment-investigation figcaption { font-size: .78rem; line-height: 1.5; }
 @media (max-width: 650px) { .fragment-retro-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fragment-retro-body { padding: 12px; } }

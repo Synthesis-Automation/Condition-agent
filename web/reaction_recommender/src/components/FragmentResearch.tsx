@@ -4,15 +4,19 @@ import { api } from '../api/client'
 import type { FragmentGuidedRetroResult, FragmentSearchRequest, FragmentSearchResult, FragmentSuggestionsResult, FragmentTransferRequest, SuggestedSearchFragment } from '../api/types'
 import { FragmentSearchResults } from './FragmentSearchResults'
 import { ReactionEditor } from './ReactionEditor'
+import { ReactionImage } from './ReactionImage'
+import type { FragmentQueryAlternatives, FragmentQueryVariant, FragmentInvestigation } from '../api/types'
+import { sourceText, sourceCitation } from './FragmentSearchResults'
 
 interface Attempt {
   id: string
   parent_id: string | null
   created_at: string
-  kind: 'search' | 'transfer'
+  kind: 'search' | 'transfer' | 'investigation'
   note: string
-  request: FragmentSearchRequest | FragmentTransferRequest
-  result?: FragmentSearchResult | FragmentGuidedRetroResult
+  request: FragmentSearchRequest | FragmentTransferRequest | (FragmentSearchRequest & { observation_id: string })
+  result?: FragmentSearchResult | FragmentGuidedRetroResult | FragmentInvestigation
+  query_revision?: FragmentQueryVariant
   error?: string
 }
 
@@ -36,11 +40,15 @@ export function useFragmentResearch(active: boolean) {
   const [transfer, setTransfer] = useState<FragmentGuidedRetroResult | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [alternatives, setAlternatives] = useState<FragmentQueryAlternatives | null>(null)
+  const [aromaticAtoms, setAromaticAtoms] = useState<number[]>([])
+  const [revision, setRevision] = useState<FragmentQueryVariant | undefined>()
+  const [investigation, setInvestigation] = useState<FragmentInvestigation | null>(null)
   const pending = useRef<AbortController | null>(null)
   const counter = useRef(0)
   useEffect(() => () => pending.current?.abort(), [])
   useEffect(() => { if (!active) { pending.current?.abort(); setBusy(false); setError('') } }, [active])
-  const reset = () => { setCurrent(null); setSelected([]); setTransfer(null); setError('') }
+  const reset = () => { setCurrent(null); setSelected([]); setTransfer(null); setError(''); setInvestigation(null); setAlternatives(null); setAromaticAtoms([]); setRevision(undefined) }
   const changeTarget = (value: string) => {
     pending.current?.abort(); setBusy(false); setTarget(value); setSuggestions(null); setParentId(null); reset()
   }
@@ -60,23 +68,41 @@ export function useFragmentResearch(active: boolean) {
     changeQuery(candidate.query); setFormat('smiles'); setTopology('preserve_rings')
     setNote(suggestionScope === 'query' ? 'Chose a smaller suggested query; removed context is unconstrained.' : 'Chose a target-derived strategic region.')
   }
+  const broaden = async (selectedAtoms?: number[]) => {
+    const controller = new AbortController()
+    pending.current?.abort(); pending.current = controller
+    setBusy(true); setError('')
+    try {
+      const next = await api.proposeFragmentQueries({ target_smiles: target.trim(), query: query.trim(),
+        query_format: format, topology, ...(selectedAtoms?.length ? { aromatic_atom_ids: selectedAtoms } : {}) }, controller.signal)
+      if (!controller.signal.aborted) setAlternatives(next)
+    } catch (reason) {
+      if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'Query preview failed')
+    } finally { if (!controller.signal.aborted) setBusy(false) }
+  }
+  const chooseVariant = (variant: FragmentQueryVariant) => {
+    changeQuery(variant.query); setFormat(variant.query_format); setTopology(variant.topology)
+    setRevision(variant); setNote(variant.reason)
+  }
   const execute = async (kind: Attempt['kind'], request: Attempt['request']) => {
     if (history.length >= HISTORY_LIMIT) { setError('History is full. Export and clear it before another attempt.'); return }
     const controller = new AbortController()
     pending.current?.abort(); pending.current = controller
     const attempt: Attempt = { id: `attempt-${++counter.current}`, parent_id: parentId,
-      created_at: new Date().toISOString(), kind, note, request }
-    setBusy(true); setError(''); setTransfer(null)
+      created_at: new Date().toISOString(), kind, note, request, query_revision: revision }
+    setBusy(true); setError(''); setTransfer(null); setInvestigation(null)
     if (kind === 'search') { setCurrent(null); setSelected([]) }
     try {
       const result = kind === 'search'
         ? await api.searchFragments(request, controller.signal)
-        : await api.transferFragmentPrecedents(request as FragmentTransferRequest, controller.signal)
+        : kind === 'transfer' ? await api.transferFragmentPrecedents(request as FragmentTransferRequest, controller.signal)
+        : await api.investigateFragment(request as FragmentSearchRequest & { observation_id: string }, controller.signal)
       if (!controller.signal.aborted) {
         const completed = { ...attempt, result }
         setHistory(previous => [...previous, completed])
         if (kind === 'search') { setCurrent(completed); setParentId(completed.id) }
-        else setTransfer(result as FragmentGuidedRetroResult)
+        else if (kind === 'transfer') setTransfer(result as FragmentGuidedRetroResult)
+        else setInvestigation(result as FragmentInvestigation)
       }
     } catch (reason) {
       if (!controller.signal.aborted) {
@@ -104,6 +130,7 @@ export function useFragmentResearch(active: boolean) {
     setFormat(attempt.request.query_format); setTopology(attempt.request.topology)
     setTimeoutBudget(attempt.request.timeout_seconds); setNote(attempt.note)
     setSuggestions(null); setParentId(attempt.id); reset()
+    setRevision(attempt.query_revision)
     if (attempt.kind === 'search' && attempt.result) setCurrent(attempt)
     if (attempt.kind === 'transfer' && attempt.result) {
       const result = attempt.result as FragmentGuidedRetroResult
@@ -111,10 +138,11 @@ export function useFragmentResearch(active: boolean) {
       setTransfer(result); setSelected(request.selected_observation_ids); setIncludeBaseline(request.include_baseline)
       if (result.query_search) setCurrent({ ...attempt, kind: 'search', result: result.query_search })
     }
+    if (attempt.kind === 'investigation' && attempt.result) setInvestigation(attempt.result as FragmentInvestigation)
   }
   const exportHistory = () => {
     const content = { schema_version: 'fragment_research_session.v1', history,
-      draft: { ...request(), note }, limitations: [
+      draft: { ...request(), note, query_revision: revision }, limitations: [
         'Interactive browser history, not a pinned scientific-workspace investigation.',
         'Query revisions record user edits; logical broadening is not automatically established.',
         'Construction witnesses and graph validation do not establish experimental feasibility.',
@@ -127,12 +155,60 @@ export function useFragmentResearch(active: boolean) {
     timeout, setTimeoutBudget, note, setNote, includeBaseline, setIncludeBaseline, suggestions,
     suggestionScope, suggest, choose, current, history, selected, toggleSource, transfer,
     busy, error, setError, reset, search, assess, restore, exportHistory,
+    alternatives, aromaticAtoms, setAromaticAtoms, broaden, chooseVariant, investigation,
+    investigate: (observation_id: string) => execute('investigation', { ...request(), observation_id }),
     invalidateTransfer: () => setTransfer(null),
     example: () => { changeTarget(EXAMPLE); setQuery(EXAMPLE); setFormat('smiles'); setTopology('preserve_rings') },
     clearHistory: () => { setHistory([]); setParentId(null); reset() } }
 }
 
 type State = ReturnType<typeof useFragmentResearch>
+
+function FragmentInvestigationPanel({ result }: { result: FragmentInvestigation }) {
+  const outcomes: Record<string, string> = {
+    graph_validated_proposals: 'Source transformation produces graph-validated proposals',
+    source_compilation_rejected: 'Source is inspectable; operator compilation rejected it',
+    no_resolved_construction: 'No resolved construction witness can seed this transfer',
+    incomplete_search: 'Partial search: source is inspectable; transfer was not run',
+    product_search_required: 'Product-side evidence is required for transfer',
+    no_verified_transfer_within_budget: 'No verified transfer within the tested budget',
+  }
+  const source = result.source
+  const record = source.record
+  const show = (value: unknown) => value === null || value === undefined ? 'Not recorded' : sourceText(value) || JSON.stringify(value)
+  const conditions = record.conditions ?? record.resolved_recipe
+  const hasConditions = conditions && typeof conditions === 'object'
+    ? Object.values(conditions).some(value => Array.isArray(value) ? value.length > 0 : value !== null && value !== '')
+    : Boolean(conditions)
+  return <section className="results-card fragment-results fragment-investigation" aria-label="Precedent investigation">
+    <h2>Selected construction precedent</h2>
+    <p><strong>{outcomes[result.transfer.status] ?? result.transfer.status}</strong></p>
+    <ReactionImage smiles={sourceText(record.reaction_smiles)} label="Investigated source reaction" />
+    <p>Reference: <strong>{sourceCitation(record, source.reference_id)}</strong> · Reaction: {show(record.reaction_id)}</p>
+    <p>Reported yield (%): {show(record.yield_pct)} · Temperature (°C): {show(record.temperature_c)} · Time (h): {show(record.time_h)}</p>
+    <details open><summary>Reported conditions</summary><pre>{hasConditions ? show(conditions) : 'Not recorded'}</pre></details>
+    <p>Source evidence: {source.relationships.join(', ')}. Search: {result.search_scope.search_status}.</p>
+    {!!result.construction_previews?.length && <div className="fragment-suggestion-grid">{result.construction_previews.map((preview, index) => <figure key={index}>
+      <img className="fragment-highlight" alt={`Observed source construction ${index + 1}`} src={`data:image/svg+xml,${encodeURIComponent(preview.svg)}`} />
+      <figcaption>Observed formed bond at source product atoms {preview.product_atom_ids.join('–')} (component {preview.component_index}). Up to three distinct witnesses shown.</figcaption>
+    </figure>)}</div>}
+    <p>Structural comparison: {result.comparison.status}{result.comparison.core_atom_count !== undefined ? ` · ${result.comparison.core_atom_count} common-core atoms` : ''}{result.comparison.alignment_ambiguous ? ' · Multiple alignments' : ''}.</p>
+    {result.comparison.left_coverage !== undefined && result.comparison.right_coverage !== undefined && <p>The compared common core covers {Math.round(result.comparison.left_coverage * 100)}% of the source product and {Math.round(result.comparison.right_coverage * 100)}% of the target.</p>}
+    {result.comparison.alignments?.[0] && <p>In the first possible alignment, {result.comparison.alignments[0].left_only_atom_ids.length} source atoms and {result.comparison.alignments[0].right_only_atom_ids.length} target atoms lie outside the common core. Inspect the differences below before transferring the chemistry.</p>}
+    {result.comparison.warnings?.map(warning => <p key={warning}>{warning.replaceAll('_', ' ')}</p>)}
+    <details><summary>Substrate differences and construction witnesses</summary><pre>{JSON.stringify({ comparison: result.comparison, witnesses: source.matches }, null, 2)}</pre></details>
+    {source.procedures.map((procedure, index) => <details key={index}><summary>Source procedure {index + 1} · {procedure.link_scope}</summary><pre>{JSON.stringify(procedure.record, (_key, value) => value && typeof value === 'object' && 'chunks' in value ? sourceText(value) + (value.truncated ? '\n[Truncated]' : '') : value, 2)}</pre></details>)}
+    {!source.procedures.length && <p>Procedure: {source.procedure_availability.replaceAll('_', ' ')}.</p>}
+    {result.transfer.source_admissions?.map((admission, index) => <p key={index}>{admission.reaction_id}: {admission.status} · {admission.reason}</p>)}
+    {result.transfer.arms?.map((arm, index) => <section key={index}>
+      <h3>Proposed construction at target atoms {arm.target_atom_ids.join('–')}</h3>
+      {arm.target_highlight_svg && <img className="fragment-highlight" alt={`Proposed target construction ${index + 1}`} src={`data:image/svg+xml,${encodeURIComponent(arm.target_highlight_svg)}`} />}
+      {arm.candidates.map((candidate, i) => <article key={i}><ReactionImage smiles={candidate.proposed_reaction_smiles} label={`Selected source proposal ${index + 1}.${i + 1}`} /><p>{candidate.forward_validation_status} · {candidate.abstraction_level}</p><code>{candidate.precursor_smiles}</code></article>)}
+    </section>)}
+    <p>Source conditions are observed for the source substrate. Target transfers are hypotheses; graph validation does not establish experimental feasibility.</p>
+    <details><summary>Full investigation and transfer diagnostics</summary><pre>{JSON.stringify(result, null, 2)}</pre></details>
+  </section>
+}
 
 export function FragmentResearchOptions({ state, children }: { state: State; children: ReactNode }) {
   return <>
@@ -181,9 +257,31 @@ export function FragmentResearch({ state, searchAvailable, transferAvailable, li
       <div className="run-control workbench-action-row">
         <button className="button primary run-button" disabled={state.busy || !searchAvailable || !state.target.trim() || !state.query.trim()} onClick={() => void state.search()}>Search chosen fragment</button>
         <button className="button quiet" disabled={state.busy || state.format !== 'smiles' || !state.query.trim()} onClick={() => void state.suggest('query')}>Suggest simpler queries</button>
+        <button className="button secondary" disabled={state.busy || !state.target.trim() || !state.query.trim()} onClick={() => void state.broaden()}>Preview query alternatives</button>
         <span role="status">{state.busy ? 'Searching or assessing selected sources…' : 'The query is validated against the full target before index search.'}</span>
       </div>
     </div>
+    {state.alternatives && <section className="results-card fragment-results fragment-query-alternatives" aria-label="Query alternatives">
+      <h2>Choose an explicit relaxation</h2>
+      <p>Each choice matches the target. Highlighting shows one possible alignment; choosing a query does not run a search.</p>
+      <div className="fragment-suggestion-grid">{state.alternatives.variants.map((variant, index) => <article key={variant.variant_id}>
+        <h3>{variant.relaxations.map(value => value.replaceAll('_', ' ')).join(' + ')}</h3>
+        {variant.target_highlight_svg && <img className="fragment-highlight" alt={`Query alternative ${index + 1}`} src={`data:image/svg+xml,${encodeURIComponent(variant.target_highlight_svg)}`} />}
+        <code>{variant.query}</code><p>{variant.reason}</p>
+        {variant.alignment_ambiguous && <p>Multiple target alignments are possible{variant.target_alignments_truncated ? '; enumeration was truncated' : ''}.</p>}
+        <button className="button secondary" disabled={state.busy} onClick={() => state.chooseVariant(variant)}>Use alternative {index + 1}</button>
+      </article>)}</div>
+      {!state.alternatives.variants.length && <p>No automatic alternatives are available. Edit custom SMARTS to investigate a different hypothesis.</p>}
+      {state.alternatives.query_atoms.some(atom => atom.allows_carbon_nitrogen) && <fieldset disabled={state.busy}>
+        <legend>Optional C/N alternatives at selected query atoms</legend>
+        {state.alternatives.query_atom_indices_svg && <img className="fragment-highlight query-atom-map" alt="Query with atom indices" src={`data:image/svg+xml,${encodeURIComponent(state.alternatives.query_atom_indices_svg)}`} />}
+        <p>Zero-based atom IDs follow the input query SMILES order. Pyrrole [nH], charge, isotope and stereochemical constraints are preserved.</p>
+        <div className="research-actions">{state.alternatives.query_atoms.filter(atom => atom.allows_carbon_nitrogen).map(atom => <label className="fragment-atom-choice" key={atom.query_atom_id}>
+          <input type="checkbox" checked={state.aromaticAtoms.includes(atom.query_atom_id)} onChange={() => state.setAromaticAtoms(state.aromaticAtoms.includes(atom.query_atom_id) ? state.aromaticAtoms.filter(i => i !== atom.query_atom_id) : [...state.aromaticAtoms, atom.query_atom_id])} />Atom {atom.query_atom_id} ({atom.element})
+        </label>)}</div>
+        <button className="button quiet" disabled={!state.aromaticAtoms.length} onClick={() => void state.broaden(state.aromaticAtoms)}>Preview selected C/N alternatives</button>
+      </fieldset>}
+    </section>}
     <label className="research-note"><span>Why this region or query revision?</span><textarea disabled={state.busy} maxLength={5000} value={state.note} onChange={event => state.setNote(event.target.value)} placeholder="For example: retain the fused core, omit the peripheral methoxy group." /></label>
     {result && <>
       <section className="results-card research-selection">
@@ -197,8 +295,9 @@ export function FragmentResearch({ state, searchAvailable, transferAvailable, li
         <button className="button primary" disabled={state.busy || !transferAvailable || !state.selected.length || result.search_status !== 'complete'} onClick={() => void state.assess(library, focusLimit, topK)}>Assess selected precedents on target</button>
         {!transferAvailable && <p>Transfer requires the selected operator library; source discovery remains available independently.</p>}
       </section>
-      <FragmentSearchResults result={result} />
+      <FragmentSearchResults result={result} onInvestigate={id => void state.investigate(id)} busy={state.busy} />
     </>}
+    {state.investigation && <FragmentInvestigationPanel result={state.investigation} />}
     {transferView}
     <section className="results-card research-history">
       <div className="results-summary"><h2>Research history ({state.history.length}/{HISTORY_LIMIT})</h2><div className="research-actions">

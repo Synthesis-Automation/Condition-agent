@@ -1315,6 +1315,45 @@ export interface FragmentTransferRequest extends FragmentSearchRequest {
   include_baseline: boolean
 }
 
+export interface FragmentQueryVariant {
+  variant_id: string
+  parent_query_id: string
+  query: string
+  query_format: 'smiles' | 'smarts'
+  topology: 'preserve_rings' | 'subgraph'
+  relaxations: string[]
+  reason: string
+  alignment_ambiguous: boolean
+  target_alignments_truncated: boolean
+  target_highlight_svg?: string
+}
+
+export interface FragmentQueryAlternatives {
+  query_atom_indices_svg?: string
+  target_smiles: string
+  parent_query: { expression: string; query_id: string }
+  query_atoms: Array<{ query_atom_id: number; element: string; allows_carbon_nitrogen: boolean }>
+  variants: FragmentQueryVariant[]
+  limitations: string[]
+}
+
+export interface FragmentInvestigation {
+  target_smiles: string
+  source: FragmentSearchResult['hits'][number]
+  construction_previews?: Array<{ component_index: number; product_atom_ids: number[]; svg: string }>
+  comparison: { status: string; core_atom_count?: number; alignment_ambiguous?: boolean; warnings?: string[];
+    left_coverage?: number; right_coverage?: number;
+    alignments?: Array<{ left_only_atom_ids: number[]; right_only_atom_ids: number[] }> }
+  search_scope: { search_status: string; stop_reason: string | null }
+  transfer: {
+    status: string
+    source_admissions?: Array<{ reaction_id: string; status: string; reason: string }>
+    arms?: Array<FragmentRetroArm & { target_atom_ids: number[]; target_highlight_svg?: string }>
+    guidance?: { exclusions: JsonObject[]; target_alignment_count?: number; target_alignments_truncated?: boolean }
+  }
+  limitations: string[]
+}
+
 export interface FragmentGuidedRetroRequest {
   target_smiles: string
   library_mode: 'compact' | 'full'
@@ -1415,6 +1454,7 @@ export interface FragmentSearchResult {
   relationship_groups: Record<string, FragmentCount>
   hits: Array<{
     hit_id: string
+    transformation_key?: string
     observation_id: string
     reference_id: string | null
     product_smiles?: string

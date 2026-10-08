@@ -366,6 +366,26 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             _brief_fields(item, ("field", "basis", "reason"))
             for item in source.get("changes", [])[:3] if isinstance(item, Mapping)
         ]
+    elif operation == "propose_fragment_queries":
+        overview.update(_brief_fields(source, ("target_smiles", "definition_version", "parent_query",
+                                               "aromatic_atom_ids", "output_truncated")))
+        overview["variants"] = [_brief_fields(item, ("variant_id", "query", "query_format", "topology",
+                                                    "relaxations", "reason", "alignment_ambiguous"))
+                                for item in source.get("variants", [])]
+        overview["eligible_aromatic_atom_ids"] = [item["query_atom_id"] for item in source.get("query_atoms", [])
+                                                  if item.get("allows_carbon_nitrogen")]
+    elif operation == "investigate_fragment_precedent":
+        overview.update(_brief_fields(source, ("source_ref", "target_smiles", "limitations")))
+        overview["source"] = _brief_fields(source.get("source", {}), (
+            "observation_id", "reaction_id", "reference_id", "relationships", "procedure_availability"))
+        overview["comparison"] = _brief_fields(source.get("comparison", {}), (
+            "status", "core_atom_count", "alignment_ambiguous", "warnings"))
+        transfer = source.get("transfer", {})
+        overview["transfer"] = _brief_fields(transfer, ("status", "core_admission_policy", "source_admissions"))
+        overview["transfer"]["proposals"] = [_brief_fields(candidate, (
+            "precursor_smiles", "proposed_reaction_smiles", "forward_validation_status", "abstraction_level"))
+            for arm in transfer.get("arms", []) for candidate in arm.get("candidates", [])][:3]
+        overview["hint"] = "Inspect source, comparison and transfer paths for full procedures, differences and diagnostics."
     elif operation == "search_fragment_precedents":
         overview.update(_brief_fields(source, ("counts", "refinement_hints", "output_truncated")))
         if isinstance(source.get("target_validation"), Mapping):

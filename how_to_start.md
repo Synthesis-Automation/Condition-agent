@@ -33,6 +33,14 @@ The default command opens **Condition Desk**. Use `--workbench` to expose the
 research tools, including **Fragment search**. These are different deployment
 profiles; changing the browser URL alone does not switch profiles.
 
+For construction-precedent research, choose **Fragment-guided retro → Assisted
+fragment research**. Set the target and core, use **Preview query alternatives**,
+then search the chosen relaxation. **Investigate this precedent** shows source
+conditions, structural differences, and a bounded source-only transfer assessment,
+including compilation rejections. It requires the fragment index but no production
+operator library. Export research JSON to keep the session history. See the
+[recorded workspace workflow](docs/AI-native/readme.md) for the same agent operations.
+
 ## First-time preparation
 
 Use the existing project environment; `requirements-web.txt` supplies the web

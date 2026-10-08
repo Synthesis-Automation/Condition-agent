@@ -1,0 +1,8 @@
+{
+  "schema_version": "fragment_broadening_policy.v1",
+  "definition_version": "fragment_broadening.v1@1.0",
+  "max_variants": 7,
+  "max_target_alignments": 64,
+  "aromatic_alternative": "[c,n;+0]",
+  "relaxations": ["peripheral_context", "ring_boundary", "aromatic_carbon_nitrogen"]
+}

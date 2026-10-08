@@ -46,6 +46,11 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
         "fragment_suggestions": {
             "status": "implemented", "requires_index": False, "automatic_search": False,
         },
+        "fragment_investigation": {
+            "status": "implemented", "query_operation": "propose_fragment_queries",
+            "source_operation": "investigate_fragment_precedent",
+            "requires_saved_target_search": True, "requires_retro_library": False,
+        },
         "starting_material_assessment": {
             "status": "implemented", "operation": "assess_starting_material",
             "optional_artifact": "fragment_index", "exact_product_lookup": True,

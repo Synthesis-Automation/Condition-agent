@@ -16,6 +16,7 @@ from reactive_taxonomy import featurize_reaction
 
 ENDPOINT = "/api/v1/retrosynthesis/fragment-guided"
 TRANSFER = "/api/v1/retrosynthesis/fragment-transfer"
+INVESTIGATE = "/api/v1/fragments/investigate"
 RING_REACTION = (
     "[CH2:1]=[CH2:2].[CH2:3]=[CH2:4]>>[CH2:1]1[CH2:2][CH2:3][CH2:4]1"
 )
@@ -115,6 +116,60 @@ def test_no_matches_is_complete_empty_guidance(runtime):
     assert not data["guidance"]["focus_bonds"]
     assert not data["transfers"]["guided"]
     assert data["transfers"]["comparison"]["additional_guided_precursor_sets"] == []
+
+
+def test_query_alternatives_endpoint_validates_target_and_selected_atom_ids(runtime):
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    url = "/api/v1/fragments/query-alternatives"
+    response = client.post(url, json={"target_smiles": "c1ccncc1", "query": "c1ccncc1", "aromatic_atom_ids": [3]})
+    assert response.status_code == 200, response.text
+    data = response.json()["data"]
+    assert data["variants"][-1]["target_validation"]["matches_target"]
+    assert data["variants"][0]["target_highlight_svg"].startswith("<?xml")
+    assert client.post(url, json={"target_smiles": "CC", "query": "CO"}).status_code == 422
+    assert client.post(url, json={"target_smiles": "c1ccncc1", "query": "c1ccncc1", "aromatic_atom_ids": [True]}).status_code == 422
+
+
+def test_investigate_source_without_production_library_retains_ambiguity(runtime):
+    runtime._get_retrosynthesis_library = lambda *args: pytest.fail("Must not load production library")
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post(INVESTIGATE, json={"target_smiles": "C1CCC1", "query": "C1CCC1", "observation_id": "obs-1"})
+    assert response.status_code == 200, response.text
+    data = response.json()["data"]
+    assert data["source"]["reaction_id"] == "source-1"
+    assert data["transfer"]["status"] == "graph_validated_proposals"
+    assert data["transfer"]["guidance"]["target_alignment_count"] > 1
+    assert not runtime._fragment_search_lock.locked()
+
+
+def test_rejected_source_remains_inspectable(tmp_path):
+    reaction = "[CH3:1][CH2:2][Br:5].[NH2:3][CH3:4]>>[CH3:1][CH2:2][NH:3][CH3:4]"
+    runtime = make_runtime(tmp_path, reaction)
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post(INVESTIGATE, json={"target_smiles": "CCNC", "query": "CCNC", "observation_id": "obs-1"})
+    assert response.status_code == 200, response.text
+    data = response.json()["data"]
+    assert data["source"]["record"]["reaction_smiles"]
+    assert data["transfer"]["status"] == "source_compilation_rejected"
+    assert data["transfer"]["source_admissions"][0]["reason"] == "materialized_core_not_verified"
+
+
+def test_partial_search_can_be_inspected_but_not_transferred(runtime, monkeypatch):
+    import condition_recommender.fragment_search as search
+    original = search.search_fragment_precedents
+
+    def partial(*args, **kwargs):
+        return {**original(*args, **kwargs), "search_status": "partial", "stop_reason": "deadline"}
+
+    monkeypatch.setattr(search, "search_fragment_precedents", partial)
+    client = TestClient(create_app(runtime=runtime, recommendation_only=False))
+    response = client.post(INVESTIGATE, json={"target_smiles": "C1CCC1", "query": "C1CCC1", "observation_id": "obs-1"})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["transfer"]["status"] == "incomplete_search"
+    assert data["source"]["matches"]
+    assert client.post(INVESTIGATE, json={"target_smiles": "C1CCC1", "query": "C1CCC1", "observation_id": "invented"}).status_code == 422
+    assert not runtime._fragment_search_lock.locked()
 
 
 @pytest.mark.parametrize("payload", [

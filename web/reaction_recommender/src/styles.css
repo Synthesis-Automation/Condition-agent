@@ -429,6 +429,8 @@ footer { padding: 4px 4px 0; color: #77877e; font-size: .7rem; text-align: cente
 .drawing-actions { align-items: center; justify-content: space-between; margin-top: 10px; }
 .drawing-actions > span { overflow: hidden; color: #6a7b72; font-size: .71rem; text-overflow: ellipsis; white-space: nowrap; }
 .drawing-actions .button.primary { min-width: 120px; }
+.drawing-draft-notice { flex: 0 0 auto; margin: 8px 0 0; color: #385646; font-size: .76rem; }
+.drawing-error { flex: 0 0 auto; margin: 8px 0 0; max-height: 80px; overflow: auto; }
 
 @media (max-width: 1040px) {
   .option-grid { grid-template-columns: 110px minmax(240px,1fr); }

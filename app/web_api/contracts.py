@@ -34,6 +34,23 @@ class FragmentSearchRequest(StrictRequest):
     target_smiles: str | None = Field(default=None, min_length=1, max_length=5000)
 
 
+class FragmentQueryAlternativesRequest(StrictRequest):
+    """Preview explicit query relaxations, without accessing a corpus."""
+
+    target_smiles: str = Field(min_length=1, max_length=5000)
+    query: str = Field(min_length=1, max_length=2000)
+    query_format: Literal["smiles", "smarts"] = "smiles"
+    topology: Literal["preserve_rings", "subgraph"] = "preserve_rings"
+    aromatic_atom_ids: list[StrictInt] | None = Field(default=None, max_length=100)
+
+
+class FragmentInvestigationRequest(FragmentSearchRequest):
+    """Re-read one indexed source; do not accept client-authored source chemistry."""
+
+    target_smiles: str = Field(min_length=1, max_length=5000)
+    observation_id: str = Field(min_length=1, max_length=300)
+
+
 class FragmentTransferRequest(FragmentSearchRequest):
     """Recheck a chosen target query and selected indexed source observations."""
 

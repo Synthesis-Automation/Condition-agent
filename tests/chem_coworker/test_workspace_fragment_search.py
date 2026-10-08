@@ -70,6 +70,48 @@ def test_invalid_query_is_error_not_zero_hits(workspace):
     assert "connected" in payload["error"]["message"]
 
 
+def test_query_preview_and_saved_source_investigation_are_recorded_and_replayable(workspace):
+    preview = workspace.run("propose_fragment_queries", {"target_smiles": "CCOC", "query": "COC"})
+    assert workspace.store.read_artifact(preview.artifact_ref)["execution_status"] == "completed"
+    search = workspace.run("search_fragment_precedents", {"query": "COC", "target_smiles": "CCOC"})
+    inspection = workspace.run("investigate_fragment_precedent", {
+        "source_ref": search.artifact_ref, "observation_id": "test-observation",
+    })
+    payload = workspace.store.read_artifact(inspection.artifact_ref)
+    assert payload["execution_status"] == "completed", payload
+    assert payload["result"]["source_ref"] == search.artifact_ref
+    assert payload["result"]["source"]["procedures"]
+    assert payload["result"]["transfer"]["status"] == "source_compilation_rejected"
+    summary = workspace.call_summary(inspection)["result_summary"]
+    assert summary["source"]["observation_id"] == "test-observation"
+    for event in (preview, inspection):
+        replay = workspace.replay(event.artifact_ref)
+        assert workspace.store.read_artifact(replay.artifact_ref)["matches"] is True
+
+
+def test_investigation_rejects_forged_source_or_non_search_call(workspace):
+    preview = workspace.run("propose_fragment_queries", {"target_smiles": "CCOC", "query": "COC"})
+    invalid = workspace.run("investigate_fragment_precedent", {"source_ref": preview.artifact_ref, "observation_id": "test-observation"})
+    assert workspace.store.read_artifact(invalid.artifact_ref)["execution_status"] == "error"
+
+
+def test_search_validates_and_records_selected_preview(workspace):
+    preview = workspace.run("propose_fragment_queries", {"target_smiles": "CCOC", "query": "COC"})
+    variant = workspace.store.read_artifact(preview.artifact_ref)["result"]["variants"][0]
+    request = {"target_smiles": "CCOC", **{key: variant[key] for key in ("query", "query_format", "topology")},
+               "query_variant_ref": preview.artifact_ref, "query_variant_id": variant["variant_id"]}
+    search = workspace.run("search_fragment_precedents", request)
+    assert workspace.store.read_artifact(search.artifact_ref)["execution_status"] == "completed"
+    assert preview.artifact_ref in search.evidence_refs
+    bad = workspace.run("search_fragment_precedents", {**request, "query": "CO"})
+    payload = workspace.store.read_artifact(bad.artifact_ref)
+    assert payload["execution_status"] == "error"
+    assert "differs from" in payload["error"]["message"]
+    search = workspace.run("search_fragment_precedents", {"query": "COC", "target_smiles": "CCOC"})
+    invalid = workspace.run("investigate_fragment_precedent", {"source_ref": search.artifact_ref, "observation_id": "forged"})
+    assert workspace.store.read_artifact(invalid.artifact_ref)["execution_status"] == "error"
+
+
 def test_target_mismatch_is_recorded_as_error_not_absence(workspace):
     event = workspace.run("search_fragment_precedents", {
         "query": "O=C1CCCC2OC3CCC(C3)N12",

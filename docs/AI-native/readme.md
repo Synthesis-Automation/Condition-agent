@@ -169,6 +169,64 @@ no validation of membership in a particular target. Existing index and query
 identities are unchanged; no index rebuild is needed.
 
 Supporting reactions can now be inspected for each proposed route step with
+`inspect_step_precedents`. For fragment discovery, the following separate workflow
+retains query changes and investigates an actual returned source before a route
+step has been selected:
+
+```python
+preview = w.run("propose_fragment_queries", {
+    "target_smiles": target_smiles, "query": chosen_core,
+})
+variants = w.store.read_artifact(preview.artifact_ref)["result"]["variants"]
+variant = variants[0]  # Inspect its reason/relaxations before selecting.
+search = w.run("search_fragment_precedents", {
+    "target_smiles": target_smiles,
+    **{key: variant[key] for key in ("query", "query_format", "topology")},
+    "query_variant_ref": preview.artifact_ref, "query_variant_id": variant["variant_id"],
+    "limit": 10,
+})
+# Choose an observation_id from the saved search's returned hits.
+inspection = w.run("investigate_fragment_precedent", {
+    "source_ref": search.artifact_ref, "observation_id": selected_observation_id,
+})
+```
+
+The preview supports peripheral context removal and explicit ring-boundary
+relaxation. To investigate heteroatom analogues, pass `aromatic_atom_ids` selected
+from its eligible `query_atoms` (input-query SMILES order). Neutral aromatic c/n
+positions can become `[c,n]`; pyrrole `[nH]`, charged and isotopic positions cannot.
+Custom SMARTS remains available. Query alternatives use
+`fragment_query_alternatives.v1` and `fragment_broadening.v1@1.0`; no corpus rebuild
+is required. Every alternative is checked against the target, and ambiguous or
+truncated alignments remain explicit. These are declared edits, not a general
+proof that an arbitrary SMARTS expression is broader than another.
+
+The inspection uses `fragment_precedent_inspection.v1`: source records and scoped
+procedures, product comparison, source compilation decisions and bounded transfer
+arms. It reuses the strict `pass_only` compiler and source round-trip/signature
+checks in memory. No production retro library is required or changed. Partial
+searches remain inspectable but do not seed transfer. A compilation rejection
+preserves the observed reaction for literature investigation. Inspect full saved
+`source`, `comparison` and `transfer` paths for details. Source conditions/yields
+are not target conditions/yields, and graph validation is not feasibility.
+
+In the workbench, choose **Fragment-guided retro → Assisted fragment research**,
+then **Preview query alternatives**, choose a variant and search. **Investigate
+this precedent** operates on an individual result, independently of the optional
+production-library comparison. Evidence filters and representative grouping apply
+only to returned cards, not the entire index. Export research JSON to retain
+query revisions, selected sources, outcomes and parent attempts; browser history
+is not a pinned workspace investigation.
+
+The research API adds `POST /api/v1/fragments/query-alternatives` and
+`POST /api/v1/fragments/investigate`. The latter takes the search request plus
+`observation_id`, re-reads the canonical index and rejects IDs missing from the
+fresh returned sample. It never accepts client-authored source reactions. These
+routes are unavailable in the focused condition-only deployment. Rebuild the
+frontend and restart the server; start a fresh scientific workspace after code
+changes. Existing saved investigations remain readable.
+
+For route-step inspection, use
 `inspect_step_precedents(source_ref=..., realization_id=...)` for a saved
 `disconnect_target` result. Use `step_id` for `assess_route_proposal` or
 `revise_route_branch`; use only `source_ref` for `assess_route_step`. The operation

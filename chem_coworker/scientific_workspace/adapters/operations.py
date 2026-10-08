@@ -64,10 +64,13 @@ class ScientificOperations:
         OperationDefinition("inspect_route_inputs", evidence_arguments=("source_ref", "source_refs"),
                             result_evidence_field="evidence_refs"),
         OperationDefinition("search_fragment_precedents", required_artifacts=("fragment_index",),
+                            evidence_arguments=("query_variant_ref",),
                             execution_status_field="execution_status",
                             replay_comparison="scientific_result_excluding_fragment_execution_telemetry",
                             replay_projection=_fragment_replay_result),
         OperationDefinition("suggest_search_fragments"),
+        OperationDefinition("propose_fragment_queries"),
+        OperationDefinition("investigate_fragment_precedent", evidence_arguments=("source_ref",)),
         OperationDefinition("inspect_condition_precedents", contract_version="2",
                             required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("propose_condition_adaptation", evidence_arguments=("source_ref", "evidence_refs")),
@@ -404,10 +407,41 @@ class ScientificOperations:
 
         return suggest_search_fragments(target_smiles, limit, selected_atom_ids).to_dict()
 
+    def propose_fragment_queries(
+        self, target_smiles: str, query: str, query_format: str = "smiles",
+        topology: str = "preserve_rings", aromatic_atom_ids: list[int] | None = None,
+    ) -> dict[str, Any]:
+        """Preview target-validated peripheral, ring-boundary and selected C/N edits.
+
+        C/N positions use query atom IDs from this operation. Choose a returned
+        variant for search_fragment_precedents; no search is executed here.
+        """
+        from reactive_taxonomy.fragment_broadening import propose_fragment_queries
+
+        return propose_fragment_queries(target_smiles, query, query_format, topology, aromatic_atom_ids)
+
+    def investigate_fragment_precedent(self, source_ref: str, observation_id: str) -> dict[str, Any]:
+        """Inspect and test a selected observation from a saved target-derived search.
+
+        Source conditions, procedures and comparisons survive compilation failure.
+        Only admitted source operators are tested, in memory; no production library
+        or global search is required. Partial searches remain inspectable.
+        """
+        from core_retrosynthesis.fragment_investigation import investigate_fragment_precedent
+        from .step_selection import _call
+
+        payload = _call(self.store, source_ref, {"search_fragment_precedents"})
+        search = payload["result"]
+        target = (search.get("target_validation") or {}).get("target_smiles")
+        if not target:
+            raise ValueError("Choose a saved fragment search with target_smiles")
+        return {**investigate_fragment_precedent(search, observation_id, target), "source_ref": source_ref}
+
     def search_fragment_precedents(
         self, query: str, query_format: str = "smiles", topology: str = "preserve_rings",
         limit: int = 5, timeout_seconds: int = 30, target_smiles: str | None = None,
         search_side: str = "product",
+        query_variant_ref: str | None = None, query_variant_id: str | None = None,
     ) -> dict[str, Any]:
         """Find product cores and local construction evidence in a prebuilt fragment_index.
 
@@ -420,6 +454,18 @@ class ScientificOperations:
         """
         from .fragment_search import run_fragment_search
 
+        if query_variant_ref is not None or query_variant_id is not None:
+            from reactive_taxonomy.fragment_search import indexed_product
+            from .step_selection import _call
+
+            if not query_variant_ref or not query_variant_id or not target_smiles:
+                raise ValueError("Supply query_variant_ref, query_variant_id and target_smiles together")
+            preview = _call(self.store, query_variant_ref, {"propose_fragment_queries"})["result"]
+            selected = [item for item in preview["variants"] if item["variant_id"] == query_variant_id]
+            if (len(selected) != 1 or preview["target_smiles"] != indexed_product(target_smiles)[0]
+                    or any(selected[0][key] != value for key, value in (
+                        ("query", query), ("query_format", query_format), ("topology", topology)))):
+                raise ValueError("Query request differs from the selected saved variant")
         return run_fragment_search(self, {"query": query, "query_format": query_format,
                                          "topology": topology, "limit": limit,
                                          "timeout_seconds": timeout_seconds,

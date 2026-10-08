@@ -19,6 +19,8 @@ from .contracts import (
     FragmentSearchRequest,
     FragmentSuggestionRequest,
     FragmentTransferRequest,
+    FragmentQueryAlternativesRequest,
+    FragmentInvestigationRequest,
     FragmentGuidedRetrosynthesisRequest,
     ForwardSynthesisRequest,
     MultistepRetrosynthesisRequest,
@@ -219,6 +221,25 @@ def create_app(
     ) -> dict[str, Any]:
         try:
             return envelope(active_runtime(request).transfer_fragment_precedents(payload))
+        except (ValueError, OSError, RuntimeError) as exc:
+            status = 422 if isinstance(exc, ValueError) else 503
+            raise HTTPException(status_code=status, detail=error_payload(exc)) from exc
+
+    @app.post("/api/v1/fragments/query-alternatives")
+    def propose_fragment_queries(
+        payload: FragmentQueryAlternativesRequest, request: Request,
+    ) -> dict[str, Any]:
+        try:
+            return envelope(active_runtime(request).propose_fragment_queries(payload))
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=error_payload(exc)) from exc
+
+    @app.post("/api/v1/fragments/investigate")
+    def investigate_fragment_precedent(
+        payload: FragmentInvestigationRequest, request: Request,
+    ) -> dict[str, Any]:
+        try:
+            return envelope(active_runtime(request).investigate_fragment_precedent(payload))
         except (ValueError, OSError, RuntimeError) as exc:
             status = 422 if isinstance(exc, ValueError) else 503
             raise HTTPException(status_code=status, detail=error_payload(exc)) from exc

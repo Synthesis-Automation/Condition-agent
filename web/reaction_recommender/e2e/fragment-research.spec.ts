@@ -153,6 +153,44 @@ test('SMARTS stays explicit and optional baseline is sent', async ({ page }) => 
   await expect(page.getByRole('heading', { name: 'Selected precedent transfer assessment' })).toBeVisible()
 })
 
+test('previews an explicit relaxation and preserves a rejected precedent investigation', async ({ page }) => {
+  await page.route('**/api/v1/fragments/query-alternatives', async route => {
+    expect(route.request().postDataJSON()).toEqual({ target_smiles: 'CCOCC', query: 'COC', query_format: 'smiles', topology: 'preserve_rings' })
+    await route.fulfill({ json: { data: { target_smiles: 'CCOCC', parent_query: { expression: 'COC', query_id: 'q1' }, query_atoms: [], limitations: [],
+      variants: [{ variant_id: 'v1', parent_query_id: 'q1', query: 'COC', query_format: 'smiles', topology: 'subgraph', relaxations: ['ring_boundary'], reason: 'Allow extra ring fusion.', alignment_ambiguous: true, target_alignments_truncated: false }] } } })
+  })
+  await page.route('**/api/v1/fragments/search', route => route.fulfill({ json: { data: search } }))
+  await page.route('**/api/v1/fragments/investigate', async route => {
+    expect(route.request().postDataJSON().observation_id).toBe('obs-1')
+    expect(route.request().postDataJSON().topology).toBe('subgraph')
+    await route.fulfill({ json: { data: { target_smiles: 'CCOCC', source: search.hits[0],
+      comparison: { status: 'completed', alignment_ambiguous: true }, search_scope: { search_status: 'complete', stop_reason: null },
+      transfer: { status: 'source_compilation_rejected', source_admissions: [{ reaction_id: 'source-1', status: 'rejected', reason: 'materialized_core_not_verified' }] }, limitations: [] } } })
+  })
+  await page.getByLabel('Core fragment', { exact: true }).fill('COC')
+  await page.getByRole('button', { name: 'Preview query alternatives' }).click()
+  await expect(page.getByRole('region', { name: 'Query alternatives' })).toContainText('ring boundary')
+  await page.getByRole('button', { name: 'Use alternative 1' }).click()
+  await expect(page.getByLabel('Query topology', { exact: true })).toHaveValue('subgraph')
+  await page.getByRole('button', { name: 'Search chosen fragment' }).click()
+  await page.getByRole('button', { name: 'Investigate this precedent' }).click()
+  await expect(page.getByRole('region', { name: 'Precedent investigation' })).toContainText('operator compilation rejected it')
+  await expect(page.getByRole('region', { name: 'Precedent investigation' })).toContainText('materialized_core_not_verified')
+  await expect(page.getByRole('heading', { name: 'Research history (2/20)' })).toBeVisible()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Export research JSON' }).click()
+  const download = await downloadPromise
+  const saved = JSON.parse(await readFile((await download.path())!, 'utf8'))
+  expect(saved.history[0].query_revision.variant_id).toBe('v1')
+  expect(saved.history[1].parent_id).toBe(saved.history[0].id)
+  expect(saved.history[1].result.source.observation_id).toBe('obs-1')
+  await page.getByLabel('Core fragment', { exact: true }).fill('CC')
+  await expect(page.getByRole('region', { name: 'Precedent investigation' })).toBeHidden()
+  await page.getByText(/attempt-2 .* investigation .* assessed/).click()
+  await page.getByRole('button', { name: 'Restore attempt-2' }).click()
+  await expect(page.getByRole('region', { name: 'Precedent investigation' })).toBeVisible()
+})
+
 test('leaving the mode aborts a pending revision and preserves completed history', async ({ page }) => {
   let calls = 0
   let release!: () => void

@@ -514,6 +514,7 @@ def render_molecule_image_bytes(
     render_preset: str = "current",
     expand_canvas: bool = False,
     highlight_atom_indices: tuple[int, ...] = (),
+    show_atom_indices: bool = False,
 ) -> bytes:
     """Render PNG or SVG bytes; optionally grow an SVG at its preset bond scale.
 
@@ -532,8 +533,8 @@ def render_molecule_image_bytes(
     molecule = _prepare_molecule(smiles, kekulize=style.kekulize)
     if any(type(i) is not int or not 0 <= i < molecule.GetNumAtoms() for i in highlight_atom_indices):
         raise ValueError("Invalid highlight atom index")
-    if expand_canvas and highlight_atom_indices:
-        raise ValueError("Atom highlighting requires a fixed canvas")
+    if expand_canvas and (highlight_atom_indices or show_atom_indices):
+        raise ValueError("Atom highlighting and index labels require a fixed canvas")
     if expand_canvas:
         width, height = style.validated_size()
         preset = style.validated_preset()
@@ -549,6 +550,7 @@ def render_molecule_image_bytes(
             f'{content}</g></svg>'
         ).encode("utf-8")
     drawer = _make_molecule_drawer(style, molecule)
+    drawer.drawOptions().addAtomIndices = show_atom_indices
     highlighted = set(highlight_atom_indices)
     bonds = [b.GetIdx() for b in molecule.GetBonds()
              if b.GetBeginAtomIdx() in highlighted and b.GetEndAtomIdx() in highlighted]

@@ -6,6 +6,8 @@ import type {
   FeatureAnalysisRequest,
   FeatureAnalysisResult,
   FragmentSearchRequest,
+  FragmentQueryAlternatives,
+  FragmentInvestigation,
   FragmentTransferRequest,
   FragmentSearchResult,
   FragmentSuggestionsResult,
@@ -74,6 +76,14 @@ export const api = {
     }),
   fragmentGuidedRetro: (request: FragmentGuidedRetroRequest, signal?: AbortSignal) =>
     jsonRequest<FragmentGuidedRetroResult>('/retrosynthesis/fragment-guided', {
+      method: 'POST', body: JSON.stringify(request), signal,
+    }),
+  proposeFragmentQueries: (request: Pick<FragmentSearchRequest, 'query' | 'query_format' | 'topology' | 'target_smiles'> & { aromatic_atom_ids?: number[] }, signal?: AbortSignal) =>
+    jsonRequest<FragmentQueryAlternatives>('/fragments/query-alternatives', {
+      method: 'POST', body: JSON.stringify(request), signal,
+    }),
+  investigateFragment: (request: FragmentSearchRequest & { observation_id: string }, signal?: AbortSignal) =>
+    jsonRequest<FragmentInvestigation>('/fragments/investigate', {
       method: 'POST', body: JSON.stringify(request), signal,
     }),
   suggestFragments: (target: string, signal?: AbortSignal) =>
