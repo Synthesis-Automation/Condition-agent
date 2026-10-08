@@ -2,6 +2,20 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+Fragment investigations now support an agent-chosen search/inspect/revise loop in
+one [persistent scientific console](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis_fragments.md).
+Run `python -u -m chem_coworker.scientific_workspace.console WORKSPACE` in a
+persistent terminal and send one JSON request at a time. The first search loads
+the index; later queries reuse it while searching the full eligible corpus.
+Every request retains the existing chemistry validation and evidence recording.
+Deadlines kill the worker and the next request restarts it. Send `{"action":"quit"}`
+when finished. Ordinary workspace calls still work with one worker per search.
+The agent selects fragments and revisions; automatic discovery remains optional.
+The opt-in [live pilot](../../examples/ai_native/fragment_loop_pilot.py) exercises
+this loop on target-only development cases; it is not a chemistry release gate.
+Restart the application and start a new investigation after this code update.
+No dataset rebuild is needed.
+
 Route answers now show only route SVGs, reaction SMILES and precedent support.
 Conditions are optional; the agent supplies reaction SMILES and saved support once.
 `w.route_answer(...)` assembles molecule/source/step IDs, shared intermediates

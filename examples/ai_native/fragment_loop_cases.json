@@ -1,0 +1,16 @@
+{
+  "schema_version": "fragment_agent_cases.v1",
+  "scope": "Newly authored development targets; not an untouched evaluation or a training-novelty claim.",
+  "cases": [
+    {
+      "case_id": "brominated_n_heterocycle",
+      "target_smiles": "CC(=O)N1CCc2cc(Br)ccc2C1",
+      "question": "Investigate construction of the fused core and identify a supported starting strategy, with adaptation gaps."
+    },
+    {
+      "case_id": "oxygen_heterocycle",
+      "target_smiles": "COc1ccc2c(c1)OCC(CO)O2",
+      "question": "Investigate construction of the fused core and identify a supported starting strategy, with adaptation gaps."
+    }
+  ]
+}

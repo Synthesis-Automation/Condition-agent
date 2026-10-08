@@ -169,3 +169,91 @@ def test_suggestion_is_recorded_replayable_and_requires_no_index(tmp_path, monke
     assert workspace.store.read_artifact(replay.artifact_ref)["matches"] is True
     invalid = workspace.run("suggest_search_fragments", {"target_smiles": "C.O"})
     assert workspace.store.read_artifact(invalid.artifact_ref)["execution_status"] == "error"
+
+
+def test_console_reuses_library_preserves_evidence_and_records_inspection(workspace):
+    from chem_coworker.scientific_workspace.adapters.fragment_search import FragmentWorker
+    from chem_coworker.scientific_workspace.adapters.operations import _fragment_replay_result
+    from chem_coworker.scientific_workspace.console import ScientificConsole
+
+    arguments = {"query": "COC", "target_smiles": "CCOC"}
+    cold = workspace.run("search_fragment_precedents", arguments)
+    cold_result = workspace.store.read_artifact(cold.artifact_ref)["result"]
+    with FragmentWorker() as worker:
+        workspace.operations.fragment_worker = worker
+        console = ScientificConsole(workspace)
+        first = console.dispatch({"operation": "search_fragment_precedents", "arguments": arguments,
+                                  "reason": "Find ether construction"})
+        first_ref = first["event"]["artifact_ref"]
+        preview = console.dispatch({"operation": "propose_fragment_queries", "arguments": arguments,
+                                    "parent_ref": first_ref, "reason": "Check the saved query semantics"})
+        second = console.dispatch({"action": "search_prepared", "query_ref": preview["event"]["artifact_ref"],
+                                   "reason": "Replay the exact saved parent query"})
+        for response in (first, second):
+            result = workspace.store.read_artifact(response["event"]["artifact_ref"])["result"]
+            assert _fragment_replay_result(result) == _fragment_replay_result(cold_result)
+            assert result["execution"]["candidate_set_reused"] is False
+        assert first["search_execution"]["library_reused"] is False
+        assert second["search_execution"]["library_reused"] is True
+        assert second["search_execution"]["session_library_loads"] == 1
+        assert first["search_execution"]["session_id"] == second["search_execution"]["session_id"]
+        inspected = console.dispatch({"action": "inspect", "source_ref": first_ref,
+                                      "path": ["result", "hits", 0, "matches"]})
+        assert workspace.store.read_artifact(inspected["inspection_ref"])["review_status"] == "opened_not_adjudicated"
+        process = worker.process
+    assert process.poll() is not None
+
+
+def test_warm_worker_deadline_kills_and_next_call_restarts(workspace, monkeypatch):
+    import chem_coworker.scientific_workspace.adapters.fragment_search as adapter
+
+    original = adapter._session_worker_command
+    with adapter.FragmentWorker() as worker:
+        workspace.operations.fragment_worker = worker
+        monkeypatch.setattr(adapter, "_session_worker_command", lambda path: [sys.executable, "-c", "import time; time.sleep(60)"])
+        started = monotonic()
+        event = workspace.run("search_fragment_precedents", {"query": "CO", "timeout_seconds": 1})
+        assert monotonic() - started < 8
+        payload = workspace.store.read_artifact(event.artifact_ref)
+        assert payload["execution_status"] == "timed_out"
+        assert payload["result"]["counts"]["products"]["precision"] == "unknown"
+        assert worker.process is None
+        monkeypatch.setattr(adapter, "_session_worker_command", original)
+        event = workspace.run("search_fragment_precedents", {"query": "COC"})
+        result = workspace.store.read_artifact(event.artifact_ref)
+        assert result["execution_status"] == "completed"
+        assert result["result"]["execution"]["library_reused"] is False
+
+
+def test_console_rejects_invalid_saved_query_and_requires_reason(workspace):
+    from chem_coworker.scientific_workspace.console import ScientificConsole
+
+    console = ScientificConsole(workspace)
+    with pytest.raises(ValueError, match="chemical search question"):
+        console.dispatch({"operation": "search_fragment_precedents", "arguments": {"query": "CO"}})
+    bad = workspace.run("propose_fragment_queries", {"query": "c1ccccc1", "target_smiles": "COC"})
+    with pytest.raises(ValueError, match="completed query preview"):
+        console.dispatch({"action": "search_prepared", "query_ref": bad.artifact_ref, "reason": "Must reject"})
+
+
+def test_lazy_session_validates_target_before_opening_index(tmp_path):
+    from condition_recommender.fragment_search import FragmentSearchSession, search_fragment_precedents
+
+    missing = tmp_path / "missing.sqlite"
+    session = FragmentSearchSession(missing)
+    with pytest.raises(ValueError, match="does not match target_smiles"):
+        search_fragment_precedents(missing, "c1ccccc1", target_smiles="COC", _session=session)
+    assert session.connection is None
+    session.__exit__(None, None, None)
+
+
+def test_session_cannot_search_another_index(workspace, tmp_path):
+    from condition_recommender.fragment_search import FragmentSearchSession, search_fragment_precedents
+
+    path = workspace.store.manifest["baseline"]["artifacts"]["fragment_index"]["path"]
+    with FragmentSearchSession(path) as session:
+        with pytest.raises(ValueError, match="different index"):
+            search_fragment_precedents(tmp_path / "another.sqlite", "CO", _session=session)
+    assert session.connection is None
+    assert session.library is None
+    assert session.candidates == {}

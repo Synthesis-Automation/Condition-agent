@@ -7,10 +7,13 @@ import inspect
 import json
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Literal, Mapping
+from typing import TYPE_CHECKING, Any, Literal, Mapping
 
 from ..core.operation_contracts import OperationDefinition
 from ..core.store import InvestigationStore
+
+if TYPE_CHECKING:
+    from .fragment_search import FragmentWorker
 
 
 def _fragment_replay_result(result: Any) -> Any:
@@ -122,13 +125,14 @@ class ScientificOperations:
         OperationDefinition("compare_route_proposals", evidence_arguments=("source_refs",)),
     )
 
-    def __init__(self, store: InvestigationStore) -> None:
+    def __init__(self, store: InvestigationStore, *, fragment_worker: FragmentWorker | None = None) -> None:
         names = tuple(item.name for item in self.DEFINITIONS)
         if len(set(names)) != len(names):
             raise ValueError("Scientific operation names must be unique")
         if any(not callable(getattr(self, name, None)) for name in names):
             raise ValueError("Every scientific operation requires a registered implementation")
         self.store = store
+        self.fragment_worker = fragment_worker
         self._recommender: Any = None
         self._proposal_library: Any = None
 

@@ -24,6 +24,12 @@ Choose an initial investigation budget suited to the question; broaden it for a
 decision-changing gap. Reuse explicit source-supported steps and unchanged results.
 Keep branch choices, alternatives and stopping reasons in recorded notes; avoid cycles.
 
+When precedent discovery is the gap, propose a key fragment for that chemical
+question, search it, inspect the actual reactions, and choose the next query from
+the result. Use `w.task_guide('retrosynthesis_fragments')` for the persistent console
+and explicit query-edit workflow. Automatic fragment selection is optional; a
+target-first automatic call is not a prerequisite for agent-chosen searches.
+
 Use `assess_retro_validity` when choosing which concrete realization to pursue.
 Select a saved `disconnect_target` realization with `source_ref` and `realization_id`,
 or supply a precursor/target proposal. Its evidence grades distinguish whole-reaction

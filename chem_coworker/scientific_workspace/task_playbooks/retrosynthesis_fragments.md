@@ -1,12 +1,57 @@
-# Fragment precedent adviser v3
+# Fragment precedent adviser v4
 
 Optional supporting advice for `retrosynthesis`. Use it when constructing an unfamiliar
 core is a decision-changing uncertainty. A supported route or clear disconnection may
 already answer the question.
 
-## Automatic target-first entry
+## Agent-chosen fragment loop
 
-Start with `find_synthesis_precedents(target_smiles=...)` when the user wants
+Propose a connected key fragment for a concrete question: formation of a ring or
+junction, preparation of an intermediate, or installation of a functional group.
+The fragment is a search hypothesis, not necessarily a precursor. Explain which
+heteroatom positions, ring boundaries, valence and stereo constraints matter.
+Search once, inspect actual source reactions, then decide whether to narrow,
+broaden, change the selected region, follow a precursor, or stop. Do not execute
+a predetermined ladder or require a minimum number of queries when evidence is
+already sufficient. `suggest_search_fragments` is optional assistance.
+
+For multiple searches, use one persistent terminal session:
+
+```text
+python -u -m chem_coworker.scientific_workspace.console WORKSPACE
+```
+
+Start with a persistent terminal (`tty=true` if the execution tool requires it),
+then send one JSON line through that terminal's input tool and read the response
+before choosing another query. Reuse this process; restarting it reloads the
+index. The first search includes library loading; allow 30 seconds. Later calls
+reuse the same library but search the full eligible index. Example request shapes:
+
+```json
+{"operation":"search_fragment_precedents","arguments":{"target_smiles":"TARGET","query":"AGENT_CHOSEN_CORE","timeout_seconds":30},"reason":"Find construction of the selected ring junction"}
+{"operation":"propose_fragment_queries","arguments":{"target_smiles":"TARGET","query":"REVISED_CORE","query_format":"smarts","topology":"subgraph"},"parent_ref":"SEARCH_REF","reason":"Previous hits retained the ring; select the region around its formation instead"}
+{"action":"search_prepared","query_ref":"PREVIEW_REF","reason":"Search the validated revised core"}
+{"action":"inspect","source_ref":"SEARCH_REF","path":["result","hits",0,"matches"],"reason":"Check which bonds were actually formed"}
+{"action":"quit"}
+```
+
+Response `event.artifact_ref` is the saved call ID. Inspect `record`, `procedures`
+and other hit paths similarly; bounded inspection supports `offset` and `limit`.
+`search_prepared` can select a saved `variant_id` without recopying SMARTS.
+Errors, deadlines and empty results remain distinct. A killed worker restarts on
+the next request. Quit when finished. Ordinary `w.run` calls remain available
+when a persistent terminal is unavailable, with a fresh worker per search.
+
+SMILES substructure queries do not automatically constrain carbon hydrogen count
+or prohibit extra carbonyl substitution. If returned lactams differ from a target
+amine, inspect that difference and add an explicit valence constraint where useful.
+Omitting stereo permits discovery without establishing stereochemical transfer.
+Changing a ring size or heteroatom position creates an analogue hypothesis: do not
+claim it is a matching target fragment or silently replace the target.
+
+## Optional automatic target-first entry
+
+Use `find_synthesis_precedents(target_smiles=...)` as an optional aid when the user wants
 relevant construction precedents without choosing query syntax. It selects
 informative ring subsets, samples broad matches, adds context, and retains earlier
 construction leads. It loads the fragment index once and reuses only completely
@@ -23,8 +68,8 @@ Use `call_summary`/`run_summary` for a compact view. For a promising source, cop
 its `discovery.query`, `query_format` and `topology` into a recorded
 `search_fragment_precedents` call with the target, then investigate the returned
 observation using the detailed workflow below. No production retro library is
-needed for discovery. Use custom query edits only when the automatic result leaves
-a concrete question unresolved.
+needed for discovery. The agent may choose its own fragments and query edits
+directly; running automatic discovery first is not required.
 
 ## Purpose and context
 

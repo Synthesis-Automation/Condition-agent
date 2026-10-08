@@ -120,7 +120,8 @@ scientific answer schema and runtime handoff, retaining actual evidence referenc
 """
 
 
-def collect_metrics(workspace: ScientificWorkspace, arm: str, answer: dict[str, Any] | None) -> dict[str, Any]:
+def collect_metrics(workspace: ScientificWorkspace, arm: str, answer: dict[str, Any] | None,
+                    *, call_budget: int = 4) -> dict[str, Any]:
     """Count observable events; leave scientific quality and actual inspection to review."""
     calls, constructed, excerpts = [], set(), 0
     for event in workspace.store.events():
@@ -143,7 +144,7 @@ def collect_metrics(workspace: ScientificWorkspace, arm: str, answer: dict[str, 
         "fragment_call_count": sum(row["operation"] in FRAGMENT_OPERATIONS for row in calls),
         "returned_construction_observation_ids": sorted(constructed),
         "recorded_excerpt_count": excerpts, "recorded_arm_violations": prohibited,
-        "scientific_call_budget_exceeded": len(calls) > 4,
+        "scientific_call_budget_exceeded": len(calls) > call_budget,
         "answer_step_count": len((answer or {}).get("steps", [])),
         "manual_review": {"status": "pending", "useful_inspected_construction_precedents": None,
                           "unsupported_route_steps": None, "transfer_argument_supported": None},
@@ -153,9 +154,11 @@ def collect_metrics(workspace: ScientificWorkspace, arm: str, answer: dict[str, 
 def run_trial(
     directory: Path, case: ComparisonCase, arm: str, baseline: dict[str, Any],
     runtime: AgentRuntime, timeout_seconds: float,
+    *, question_override: str | None = None, task_names: tuple[str, ...] = (),
+    call_budget: int = 4,
 ) -> dict[str, Any]:
     """Run one fresh agent thread with production validation and persistent failure evidence."""
-    question = comparison_question(case, arm, timeout_seconds)
+    question = question_override or comparison_question(case, arm, timeout_seconds)
     InvestigationStore.create(directory, objective=question, baseline=deepcopy(baseline),
                               agent_metadata=runtime.describe())
     workspace = ScientificWorkspace(directory)
@@ -169,7 +172,7 @@ def run_trial(
     print(json.dumps({"case": case.case_id, "arm": arm, "status": "running"}), flush=True)
     try:
         verify_baseline(baseline)
-        result = runtime.run(prompt=investigation_prompt(workspace, question), workspace=directory,
+        result = runtime.run(prompt=investigation_prompt(workspace, question, task_names=task_names), workspace=directory,
                              turn_directory=turn, thread_id=None, cancel=Event(), on_event=lambda _: None)
         usage, thread_id = result.usage, result.thread_id
         (turn / "submitted-answer.json").write_text(json.dumps(result.answer, indent=2), "utf-8")
@@ -192,7 +195,7 @@ def run_trial(
               "thread_id": thread_id, "usage": usage, "answer_ref": answer_ref,
               "runtime_requested": runtime.describe(),
               "baseline_sha256": hashlib.sha256(canonical_bytes(baseline)).hexdigest(),
-              "metrics": collect_metrics(workspace, arm, answer)}
+              "metrics": collect_metrics(workspace, arm, answer, call_budget=call_budget)}
     (directory / "trial_report.json").write_text(json.dumps(report, indent=2), "utf-8")
     (directory / "answer.md").write_text((answer or {}).get("answer_markdown") or
                                          f"No validated answer. Status: {status}. See trial_report.json.", "utf-8")

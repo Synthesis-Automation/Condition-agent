@@ -110,8 +110,13 @@ class FragmentSearchSession:
         self.candidates: dict[str, tuple[int, ...]] = {}
 
     def __enter__(self) -> "FragmentSearchSession":
-        self.connection, self.manifest = open_fragment_index(self.index_path)
+        self.ensure_open()
         return self
+
+    def ensure_open(self) -> None:
+        """Open lazily so query/target validation can precede index access."""
+        if self.connection is None:
+            self.connection, self.manifest = open_fragment_index(self.index_path)
 
     def load_library(self) -> Any:
         """Deserialize the integrity-checked library once in this session."""
@@ -123,7 +128,9 @@ class FragmentSearchSession:
     def __exit__(self, *args: Any) -> None:
         if self.connection is not None:
             self.connection.close()
+        self.connection = None
         self.library = None
+        self.candidates.clear()
 
 
 def search_fragment_precedents(
@@ -175,6 +182,9 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
 
     stage("query_validated")
     with (nullcontext(_session) if _session is not None else FragmentSearchSession(index_path)) as session:
+        if session.index_path.resolve() != Path(index_path).resolve():
+            raise ValueError("Fragment session is bound to a different index")
+        session.ensure_open()
         connection, manifest = session.connection, session.manifest
         stage("index_opened")
         dependency = manifest.get("evidence_catalog")
