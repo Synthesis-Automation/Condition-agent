@@ -10,6 +10,20 @@ const EXAMPLE_REACTION =
 const EXAMPLE_TARGET = 'Cc1ccnc(-c2ccccc2)c1'
 const EXAMPLE_STARTING_MATERIALS = 'Brc1ccccc1.OB(O)c1ccccc1'
 
+async function loadDrawing(instance: Ketcher, smiles: string): Promise<void> {
+  // Ketcher 3.17 resolves setMolecule even on parser failure. Its event bus is
+  // the failure signal; without this check the old canvas can be saved instead.
+  let failed = false
+  const onFailure = () => { failed = true }
+  instance.eventBus.once('FAILURE', onFailure)
+  try {
+    await instance.setMolecule(smiles)
+    if (failed) throw new Error('The drawing editor could not load these SMILES. Check the text or load a valid structure before saving.')
+  } finally {
+    instance.eventBus.removeListener('FAILURE', onFailure)
+  }
+}
+
 interface ReactionEditorProps {
   value: string
   onChange: (value: string) => void
@@ -95,7 +109,7 @@ export function DrawingDialog({
     reportError('')
     setStatus('Loading drawing…')
     try {
-      await ketcher.setMolecule(smiles.trim())
+      await loadDrawing(ketcher, smiles.trim())
       setDraftSmiles(smiles.trim())
       setDraftEdited(false)
       setStatus(`${fragment ? 'Fragment' : isStartingMaterials ? 'Starting materials' : moleculeOnly ? 'Target' : 'Reaction'} loaded into the drawing canvas.`)
@@ -112,7 +126,7 @@ export function DrawingDialog({
     setLoading(true)
     reportError('')
     try {
-      await ketcher.setMolecule('')
+      await loadDrawing(ketcher, '')
       setDraftSmiles('')
       setDraftEdited(false)
       setStatus('Canvas cleared.')
@@ -134,7 +148,7 @@ export function DrawingDialog({
         const error = !draft ? 'Enter SMILES or load a drawing before saving.'
           : inputFormatError(draft, allowMolecule, moleculeOnly)
         if (error) { reportError(error); return }
-        await ketcher.setMolecule(draft)
+        await loadDrawing(ketcher, draft)
         setDraftEdited(false)
       }
       const smiles = (await ketcher.getSmiles()).trim()
@@ -208,8 +222,7 @@ export function DrawingDialog({
                 value.trim()
                 && inputFormatError(value.trim(), allowMolecule, moleculeOnly) === null
               ) {
-                void instance
-                  .setMolecule(value.trim())
+                void loadDrawing(instance, value.trim())
                   .then(() => setStatus(fragment ? 'Existing fragment loaded.' : 'Existing reaction loaded.'))
                   .catch(() => reportError('Ketcher could not load the existing structure. Edit the SMILES or draw a replacement.'))
                   .finally(() => setLoading(false))

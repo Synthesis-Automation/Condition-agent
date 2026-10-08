@@ -3,6 +3,23 @@ import { expect, test } from '@playwright/test'
 const reaction = 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1'
 const profile = process.env.WEBUI_TEST_PROFILE ?? 'recommendation_only'
 
+test('fragment drawn on the canvas appears in the core fragment box', async ({ page }) => {
+  test.skip(profile !== 'research_workbench', 'Fragment research is a workbench feature')
+  await page.goto('/')
+  await page.getByRole('radio', { name: 'Fragment-guided retro', exact: true }).check()
+  const region = page.getByRole('region', { name: 'Define the core fragment', exact: true })
+  await region.getByRole('button', { name: 'Draw', exact: true }).click()
+  const dialog = page.getByRole('dialog', { name: 'Draw the core fragment' })
+  await expect(dialog.getByText('Editor ready.', { exact: true })).toBeVisible()
+  await dialog.getByTestId('template-0').click()
+  await dialog.getByTestId('canvas').click({ position: { x: 300, y: 180 } })
+  await dialog.getByRole('button', { name: 'Use drawing', exact: true }).click()
+  await expect(dialog).toBeHidden()
+  // Ketcher exports noncanonical SMILES; each spelling is the same benzene ring.
+  await expect(region.getByLabel('Core fragment', { exact: true })).toHaveValue(/^(c1ccccc1|C1=CC=CC=C1|C1C=CC=CC=1)$/)
+  await expect(region.getByRole('img', { name: 'Current fragment drawing', exact: true })).toBeVisible()
+})
+
 test('fragment drawing saves edited SMILES and displays the changed structure', async ({ page }) => {
   test.skip(profile !== 'research_workbench', 'Fragment research is a workbench feature')
   await page.goto('/')
@@ -44,7 +61,7 @@ test('fragment drawing shows validation errors in the dialog and preserves input
   await expect(input).toHaveValue('CCO')
   await dialog.getByLabel('Fragment SMILES', { exact: true }).fill('invalid structure')
   await dialog.getByRole('button', { name: 'Use edited SMILES', exact: true }).click()
-  await expect(dialog.getByRole('alert')).toBeVisible()
+  await expect(dialog.getByRole('alert')).toContainText('could not load these SMILES')
   await expect(dialog.getByRole('button', { name: 'Use edited SMILES', exact: true })).toBeEnabled()
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).click()
   await expect(input).toHaveValue('CCO')
@@ -76,7 +93,9 @@ for (const path of ['/', '/workbench.html']) {
     await page.getByRole('button', { name: 'Edit drawing', exact: true }).click()
     await expect(dialog.getByText('Existing reaction loaded.', { exact: true })).toBeVisible()
     await dialog.getByRole('button', { name: 'Use drawing', exact: true }).click()
-    await expect(input).toHaveValue(exported)
+    await expect(dialog).toBeHidden()
+    // Reopening can change the branch order on boron without changing the graph.
+    expect([exported, reaction]).toContain(await input.inputValue())
     expect(errors).toEqual([])
   })
 
