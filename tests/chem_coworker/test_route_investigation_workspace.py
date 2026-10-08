@@ -290,11 +290,10 @@ def test_prompt_compact_route_example_validates_against_real_contract(workspace)
     expression = ast.Expression(ast.parse(snippet).body[0].value.args[0])
     request = eval(compile(expression, "prompt-example", "eval"), {"__builtins__": {}}, {
         "target_smiles": "CC=O", "reactants": "CCO", "product": "CC=O",
-        "captured_source_ref": source.artifact_ref,
+        "saved_ref": source.artifact_ref,
     })
     answer = ScientificAnswer.model_validate(workspace.route_answer(request))
-    assert answer.steps[0].conditions[0].text == "Conditions to develop"
-    assert answer.steps[0].conditions[0].basis == "unknown"
+    assert not answer.steps[0].conditions
     assert answer.routes[0].step_ids == [answer.steps[0].id]
     assert answer.sources[0].artifact_ref == source.artifact_ref
     assert not answer.steps[0].literature_reactions

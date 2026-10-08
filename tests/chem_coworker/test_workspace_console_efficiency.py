@@ -70,6 +70,10 @@ def test_batch_budget_is_shared_and_omitted_references_remain_inspectable(tmp_pa
     help_entries = workspace.help(["capture_source_file", "assess_proposed_recipe"])
     assert "never a DOI" in help_entries[0]["description"]
     assert "operating_conditions" in help_entries[1]["signature"]
+    entries = workspace.help(["run", "run_summary", "call_summary"])
+    assert [entry["name"] for entry in entries] == ["run", "run_summary", "call_summary"]
+    assert all(entry["signature"] and entry["example"] for entry in entries)
+    assert len(store.events()) == before
 
 
 def test_network_denial_is_not_repeated_without_explicit_transport_change(tmp_path, monkeypatch):

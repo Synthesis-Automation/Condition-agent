@@ -10,7 +10,7 @@ from typing import Any, Mapping
 
 from ..core.store import SCHEMA_VERSION, InvestigationStore, _read_json
 
-ACTIVITY_VERSION = 5
+ACTIVITY_VERSION = 6
 _EVENTS = {"item.started", "item.updated", "item.completed", "item.failed"}
 _KINDS = {"command_execution", "web_search", "mcp_tool_call", "file_change", "todo_list", "agent_message"}
 
@@ -168,6 +168,34 @@ def _failure(item: Mapping[str, Any]) -> str:
     return f"Process exited with code {code}; no diagnostic was provided." if type(code) is int else "No failure diagnostic was provided."
 
 
+def _nested_process_failure(result: Mapping[str, Any]) -> str:
+    """Read explicit process receipts, never infer failure from arbitrary prose.
+
+    A wrapper may finish successfully after its subprocess fails. Only structured
+    receipts with process output fields are eligible; omitted stderr is unrecoverable.
+    """
+    candidates = [result.get("structuredContent"), result.get("structured_content")]
+    for block in result.get("content", []) or []:
+        if isinstance(block, Mapping) and block.get("type") == "text":
+            try:
+                candidates.append(json.loads(block.get("text", "")))
+            except (TypeError, ValueError):
+                pass
+    for receipt in candidates:
+        if not isinstance(receipt, Mapping):
+            continue
+        code = receipt.get("exit_code", receipt.get("returncode"))
+        if type(code) is int and code != 0 and any(
+            key in receipt for key in ("stdout", "stderr", "out", "err")
+        ):
+            detail = receipt.get("stderr") or receipt.get("err") or receipt.get("error")
+            return f"Subprocess exited with code {code}. " + (_preview(detail, 400) or "No diagnostic was provided.")
+        if receipt.get("error") and "out" in receipt and "err" in receipt:
+            return "Subprocess failed: " + (_preview(receipt.get("err") or receipt["error"], 400)
+                                             or "No diagnostic was provided.")
+    return ""
+
+
 class ActivityHistory:
     """Merge an action's lifecycle into one row, scoped to its runtime attempt."""
 
@@ -203,6 +231,14 @@ class ActivityHistory:
         result = result if isinstance(result, Mapping) else {}
         if merged["type"] == "mcp_tool_call" and (merged.get("error") or result.get("isError") is True):
             merged["status"] = "failed"
+        if merged["type"] == "command_execution" and type(merged.get("exit_code")) is int and merged["exit_code"] != 0:
+            merged["status"] = "failed"
+        nested_failure = ""
+        if merged.get("server") == "node_repl" and merged.get("tool") == "js":
+            nested_failure = _nested_process_failure(result)
+            if nested_failure:
+                merged["status"] = "failed"
+                merged["error"] = nested_failure
         detail = activity_detail(merged)
         row = {"kind": merged["type"], "status": merged.get("status", "in_progress"),
                "at": at, "updated_at": at, "detail": detail, "title": _title(merged, detail),

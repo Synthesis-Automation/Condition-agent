@@ -50,7 +50,7 @@ class RouteAnswerInput(AnswerObject):
     schema_version: Literal["route_answer_input.v1"] = "route_answer_input.v1"
     target_smiles: str = Field(min_length=1, max_length=4000)
     routes: list[RouteInput] = Field(min_length=1, max_length=10)
-    summary: str = Field(default="Proposed routes, conditions and supporting literature.", min_length=1)
+    summary: str = Field(default="Proposed routes and precedent support.", min_length=1)
     limitations: list[str] = Field(default_factory=list, max_length=30)
 
 

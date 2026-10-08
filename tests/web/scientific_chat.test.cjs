@@ -520,10 +520,9 @@ test('reaction schemes are visible with details collapsed and references human-r
   assert.equal(alternatives[0].open, true);
   assert.equal(alternatives[1].open, false);
   assert.equal(byClass(alternatives[0], 'scientific-step').length, 2, 'keep both steps of a connected route visible');
-  const footer = byClass(routedCard, 'answer-details')[0];
   assert.ok(alternatives[0].descendants().some(node => node.textContent === 'Supply unconfirmed'));
-  assert.equal(Boolean(footer.open), false);
-  assert.equal(routedCard.children.filter(node => node.tag === 'details').length, 2);
+  assert.equal(byClass(routedCard, 'answer-details').length, 0);
+  assert.equal(routedCard.children.filter(node => node.tag === 'details').length, 0);
   assert.ok(!routedCard.querySelectorAll('summary').some(node => /Step connections|Molecules & SMILES|Route limitations|Uncertainty &|Additional scientific/.test(node.textContent)));
   assert.ok(alternatives[1].descendants().some(node => node.textContent.includes('Incomplete route: does not reach Final product')));
   context.fixture.question = 'Investigate this route';
@@ -674,7 +673,7 @@ test('a busy response from another tab reveals that investigation and keeps the 
 });
 
 
-test('linear routes show source SVGs and actual conditions with diagnostics collapsed', () => {
+test('linear routes show SVGs, reaction SMILES and precedents without diagnostic panels', () => {
   const {run, context} = harness();
   const attribution = {basis:'proposed',source_ids:[],limitations:['Target feasibility unresolved']};
   const step = {id:'s1',title:'First step',...attribution,reactant_ids:['a'],product_ids:['b'],after_step_ids:[],
@@ -682,6 +681,7 @@ test('linear routes show source SVGs and actual conditions with diagnostics coll
     image_url:'data:image/svg+xml;base64,target-step',conditions:[{text:'Target recipe',...attribution}],
     yield_info:{text:'Yield not established',basis:'unknown',source_ids:[],limitations:[]},
     rationale:{text:'Reason for this step',...attribution},
+    assessment_evidence:{status:'recorded',structural_assessments:[{status:'ambiguous',admission_eligible:false}],recipe_assessments:[]},
     supporting_evidence:[{status:'precedents_available',saved_match_count:1,precedents:[{
       reaction_id:'p1',reference_title:'Source experiment',image_url:'data:image/svg+xml;base64,source',
       observations:[{yield_pct:72}],compatibility:{status:'unknown',analysis_warnings:['Transfer remains uncertain']},
@@ -707,14 +707,17 @@ test('linear routes show source SVGs and actual conditions with diagnostics coll
     return false;
   };
   assert.ok(!inDetails(sourceFigure), 'source reaction SVG must be visible');
-  for (const text of ['Reason for this step','Target recipe','No inspected experimental support supplied for this step.',
+  for (const text of ['No inspected experimental support supplied for this step.',
     'Reported yield: 72%']) {
     const nodes = card.descendants().filter(node => node.textContent === text);
     assert.ok(nodes.some(node => !inDetails(node)), text + ' must remain visible');
   }
-  for (const text of ['Transfer remains uncertain','Target feasibility unresolved']) {
-    assert.ok(card.descendants().filter(node => node.textContent === text).every(inDetails), text + ' is retained in cautions');
+  for (const text of ['Reason for this step','Target recipe','Transfer remains uncertain','Target feasibility unresolved']) {
+    assert.ok(!card.descendants().some(node => node.textContent === text), text + ' remains in saved evidence, outside the compact view');
   }
+  assert.ok(!card.querySelectorAll('summary').some(node => /Match details|Search scope|Step cautions|Assessment/.test(node.textContent)));
+  assert.equal(card.descendants().filter(node => node.textContent === 'Provisional route: validation incomplete.').length, 1);
+  assert.ok(card.descendants().some(node => node.textContent === 'Unresolved step.' && !inDetails(node)));
   assert.ok(!card.descendants().some(node => node.textContent.startsWith('Conditions: Proposed')));
   assert.equal(JSON.stringify(context.routeView), original);
   context.routeView.routes[0].drawing_status = 'dependency_overview';
@@ -794,16 +797,19 @@ test('retrosynthesis leads with chemistry, retains cautions, and exposes request
   };
   const card = run('answerCard(chemistryTurn)');
   assert.equal(card.children[0].className, 'scientific-view');
-  for (const text of ['Long written explanation','Select a solvent','Research log','No applicable reaction capability requirement was checked.']) {
+  for (const text of ['Research log']) {
     const nodes = card.descendants().filter(n=>n.textContent===text);
     assert.ok(nodes.length && nodes.every(inClosedDetails), text + ' stays in details');
   }
-  for (const text of ['Replace the leaving group','EtOH, 80 °C, 2 h','Known incompatible condition']) {
+  for (const text of ['Select a solvent','Known incompatible condition']) {
     assert.ok(card.descendants().some(n=>n.textContent===text && !inClosedDetails(n)), text + ' must be visible');
   }
   assert.ok(card.querySelectorAll('img').some(n=>n.src==='source.svg' && !inClosedDetails(n)));
   assert.ok(card.querySelectorAll('a').some(n=>n.href==='https://example.org/paper' && !inClosedDetails(n)));
-  assert.equal(byClass(card,'step-conditions')[0].querySelectorAll('a').length, 0, 'source links are collected in support, not repeated per condition');
+  assert.equal(byClass(card,'step-conditions').length, 0);
+  for (const text of ['Long written explanation','Replace the leaving group','No applicable reaction capability requirement was checked.']) {
+    assert.ok(!card.descendants().some(n=>n.textContent===text));
+  }
   assert.equal(JSON.stringify(context.chemistryTurn), original);
   context.chemistryTurn.answer.needs_user_input = true;
   const needsInput = run('answerCard(chemistryTurn)');

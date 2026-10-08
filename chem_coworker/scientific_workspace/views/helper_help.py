@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 HELPER_EXAMPLES = {
+    "run": "event = w.run(operation_name, parameters)",
+    "run_summary": "print(w.run_summary(operation_name, parameters))",
+    "call_summary": "print(w.call_summary(saved_ref))",
     "fetch_source": "source = w.fetch_source(paper_url); print(w.call_summary(source))",
     "capture_source_file": "source = w.capture_source_file('browser.json', url=paper_url, text_path=['text'])",
     "capture_source": "source = w.capture_source(text, url=paper_url, locator='Example 1')",
@@ -16,7 +19,7 @@ HELPER_EXAMPLES = {
     "attach_literature_reaction": "draft = w.attach_literature_reaction(draft, 's1', preparation_ref)",
     "attach_recipe_check": "draft = w.attach_recipe_check(draft, 's1', recipe_check_ref)",
     "answer_template": "draft = w.answer_template('An evidence-linked proposal with explicit gaps.')",
-    "route_answer": "draft = w.route_answer({'target_smiles': 'CC=O', 'routes': [{'steps': [{'reaction_smiles': 'CCO>>CC=O', 'conditions': 'Conditions to develop', 'conditions_basis': 'unknown'}]}]})",
+    "route_answer": "draft = w.route_answer({'target_smiles': 'CC=O', 'routes': [{'steps': [{'reaction_smiles': 'CCO>>CC=O'}]}]})",
     "inspect_artifact": "print(w.inspect_artifact(ref, path=('result',), offset=0, limit=3))",
     "answer_preflight": "print(w.answer_preflight(draft))",
     "finalize_answer": "receipt = w.finalize_answer(draft_path, draft, findings=findings)",
@@ -30,7 +33,7 @@ def nested_input_help(name: str) -> dict[str, Any]:
         from ..answers.route_authoring import RouteAnswerInput
 
         return {"input_schema": RouteAnswerInput.model_json_schema(), "input_notes": [
-            "Use reactants>>products; supply conditions as text and support as ref/locator/optional note.",
+            "Supply reactants>>products and inspected support as ref/locator; conditions, titles and notes are optional.",
             "Steps and conditions default to proposed. Reported labels require support; missing conditions stay missing.",
             "after_steps optionally names earlier steps by one-based route-local position; otherwise unique exact intermediate links are assembled.",
             "No science or source drawings run. finalize_answer still checks citations and required exact-step inspections.",

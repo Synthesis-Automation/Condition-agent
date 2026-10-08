@@ -84,7 +84,12 @@ def investigation_prompt(
         "drops it, insert the repository into sys.path before importing.\n"
         f"Discovered local tools: {json.dumps(tools, ensure_ascii=False)}\n"
         "If rg cannot be found, use its recorded executable (PowerShell: & 'path/rg.exe').\n"
-        "If unavailable, use Select-String, Get-ChildItem or Python."
+        "If unavailable, use Select-String, Get-ChildItem or Python.\n"
+        "Subprocess execution: check exit status and retain stderr; never print only stdout\n"
+        "from a wrapper that converts failures into successful results. With Node execFile,\n"
+        "reject on callback error (including stderr in the Error); resolve stdout only on success.\n"
+        "For long jobs, save the promise, then await it in a later call with an adequate timeout.\n"
+        "After a tool timeout, inspect saved events before retrying scientific work."
     )
     output_sections = [
         _resource(context, "agent_instructions/answer_authoring.md"),

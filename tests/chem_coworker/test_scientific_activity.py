@@ -11,6 +11,54 @@ from chem_coworker.scientific_workspace.runtime.activity import (
 )
 
 
+@pytest.mark.parametrize("receipt", [
+    {"exit_code": 1, "stdout": "", "stderr": "ValueError: invalid request"},
+    {"returncode": 2, "stdout": "", "stderr": "ValueError: invalid request"},
+    {"error": "Command failed", "out": "", "err": "ValueError: invalid request"},
+])
+@pytest.mark.parametrize("structured", [False, True])
+def test_nested_process_failure_is_visible_and_recoverable(tmp_path, receipt, structured):
+    result = {"structured_content": receipt} if structured else {
+        "content": [{"type": "text", "text": json.dumps(receipt)}],
+    }
+    event = {"type": "item.completed", "item": {
+        "id": "node", "type": "mcp_tool_call", "server": "node_repl", "tool": "js",
+        "status": "completed", "result": result,
+    }}
+    row = ActivityHistory().observe(event, "now")
+    assert row["status"] == "failed"
+    assert "ValueError: invalid request" in row["failure_detail"]
+    path = tmp_path / "runtime.jsonl"
+    path.write_text(json.dumps(event), encoding="utf-8")
+    before = path.read_bytes()
+    assert recover_activity([path], [])[0]["status"] == "failed"
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize("text", [
+    'Example traceback: ValueError: invalid request',
+    '{"error": "unresolved chemistry", "status": "review"}',
+    '{"exit_code": 0, "stdout": "ok", "stderr": "warning"}',
+    '',
+])
+def test_node_output_is_not_guessed_to_be_a_process_failure(text):
+    row = ActivityHistory().observe({"type": "item.completed", "item": {
+        "id": "node", "type": "mcp_tool_call", "server": "node_repl", "tool": "js",
+        "status": "completed", "result": {"content": [{"type": "text", "text": text}]},
+    }}, "now")
+    assert row["status"] == "completed"
+    assert not row["failure_detail"]
+
+
+def test_nonzero_exit_overrides_outer_completed_event():
+    row = ActivityHistory().observe({"type": "item.completed", "item": {
+        "id": "shell", "type": "command_execution", "status": "completed",
+        "exit_code": 1, "aggregated_output": "ValueError: invalid request",
+    }}, "now")
+    assert row["status"] == "failed"
+    assert row["failure_detail"] == "ValueError: invalid request"
+
+
 @pytest.mark.parametrize("prefix", [
     "pydantic_core._pydantic_core.ValidationError: 10 validation errors for ScientificAnswer\n",
     "pydantic_core.ValidationError: 10 validation errors for ScientificAnswer\n" + "x" * 5000 + "\n",

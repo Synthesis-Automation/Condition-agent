@@ -2,12 +2,16 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
-Route answers now use compact authoring: route SMILES, conditions and literature
-support. `w.route_answer(...)` assembles molecule/source/step IDs, shared intermediates
+Route answers now show only route SVGs, reaction SMILES and precedent support.
+Conditions are optional; the agent supplies reaction SMILES and saved support once.
+`w.route_answer(...)` assembles molecule/source/step IDs, shared intermediates
 and the existing `scientific_answer.v2` view. The browser generates SVGs and exposes
 each step's reaction SMILES. Separate rationales, reconstructed literature drawings,
 full procedures and five-area self-review are optional, not required formatting work.
-Evidence validation remains unchanged; missing evidence and material caveats must
+Match details, search scope, step-assessment panels, repeated prose and source
+footers are omitted from route answers. Saved admission failures and hard recipe
+conflicts remain visible as concise notices; complete diagnostics remain in saved
+evidence. Evidence validation is unchanged; missing support and shared route gaps
 remain explicit. This supersedes older default-authoring advice below that requested
 these optional details for every synthesis. Restart the server, refresh the browser
 and start a new investigation after this update. No dataset rebuild is required.
@@ -17,8 +21,6 @@ draft = w.route_answer({
     "target_smiles": target_smiles,
     "routes": [{"title": "Proposed route", "steps": [{
         "reaction_smiles": reactants + ">>" + product,
-        "conditions": "Conditions to develop",
-        "conditions_basis": "unknown",
         "support": [{"ref": source_ref, "locator": "Example 1",
                      "note": "Analogue; exact-substrate transfer is unresolved."}],
         "limitations": ["Starting-material preparation remains unresolved."],

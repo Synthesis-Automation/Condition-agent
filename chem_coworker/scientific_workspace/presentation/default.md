@@ -1,19 +1,13 @@
-Default answer presentation (follow explicit user requests for more detail):
+Default answer presentation (follow explicit requests for more detail):
 
-For synthesis, show the route SVG, reaction SMILES, conditions and supporting
-literature. Use w.route_answer to supply this content once. The browser draws the
-route automatically. Keep any summary to one or two sentences; no separate step
-rationale, repeated route description or detailed experimental procedure is needed.
-
-Give concise conditions for each step, with proposed/reported status and source
-links. Leave unknown values absent. Retain material substrate differences,
-counterevidence, unresolved steps and starting-material gaps as short limitations.
-Reported yields belong to their actual experiments, never to a proposed target.
-Literature citations are sufficient; reconstructed source reaction drawings are
-optional. Existing indexed source drawings can be displayed from saved inspections.
+For synthesis, supply only the route SVG inputs, reaction SMILES and inspected
+precedent support through w.route_answer. Titles, summary prose, conditions,
+reagents, step rationales and reconstructed source drawings are optional. The
+browser draws the routes and indexed source reactions, with publication links.
+It omits match details, search scope and assessment panels from route answers.
+Saved evidence remains intact. Preserve material unresolved chemistry briefly in
+limitations; do not duplicate it across steps or write UI status explanations.
 
 For condition questions, show the preferred recipe and its evidence first. Keep
-alternatives brief. General questions can use concise prose without route objects.
-Use familiar chemical names and readable source labels. Keep hashes and technical
-identifiers in metadata or link targets. Do not narrate schema checks or validation
-bookkeeping. Explain a chemical limitation once, where it affects the decision.
+alternatives brief and attribute source conditions/yields to their experiments.
+General questions can use concise prose without route objects.

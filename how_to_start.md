@@ -236,11 +236,13 @@ filesystem security boundary against an agent deliberately reading guide files.
 Tools + formatting adds the same answer-authoring instructions, presentation
 profile, structured handoff, evidence validation and single repair attempt as
 normal mode, while keeping task playbooks and procedural learning disabled.
-For route answers, the agent now supplies compact reaction SMILES, conditions and
-saved source references through `w.route_answer(...)`. The application assembles
-the canonical answer and draws the SVG; each step exposes its reaction SMILES.
-Separate step rationales, reconstructed literature drawings and a five-area
-self-review are optional. Evidence validation and exact-step inspection requirements
+For route answers, the agent supplies reaction SMILES and saved precedent references
+through `w.route_answer(...)`. The page shows route SVGs, reaction SMILES and
+precedent support. Conditions are optional; separate rationale, match details,
+search scope, assessment panels and repeated written answers are omitted. Saved
+admission failures and known recipe conflicts appear as short notices, with full
+diagnostics retained in the evidence artifacts. The agent does not need to write
+UI diagnostics, source drawings or a self-review. Evidence validation and exact-step inspection requirements
 still apply. Restart the server, refresh the browser and start a new chat after
 updating; existing saved answers remain readable and no index rebuild is needed.
 
@@ -321,8 +323,10 @@ server supports loopback hosts only; keep the default `127.0.0.1`.
 
 Tool activity uses the recorded action title when available. Expand a
 `node_repl / js` action to inspect its call ID, tool execution time, and bounded
-code/output previews. A completed tool call can still contain a nested process
-error; inspect the output and scientific call records. Full code and results
+code/output previews. Explicit subprocess failure receipts and nonzero exit codes are shown as failures
+even when an outer tool reports completion. Arbitrary prose is not classified as
+an execution error. A wrapper that discards stderr cannot be reconstructed from
+its log; new prompts require subprocess errors to propagate, preserving stderr. Full code and results
 remain in the turn's `runtime.jsonl`. Existing conversation timelines recover
 these details from their saved logs after restarting the server and refreshing
 the page; the original logs are preserved.

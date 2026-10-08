@@ -87,7 +87,7 @@ function reactionFigure(item, label) {
   image.alt = label; image.loading = 'lazy'; scroll.append(image); figure.append(scroll);
   return figure;
 }
-function precedentCard(precedent, record, key) {
+function precedentCard(precedent, record, key, compact = false) {
   const entry = element('article', '', 'precedent-card');
   const title = element('h5');
   const reference = element(precedent.reference_url ? 'a' : 'span', precedent.reference_title || 'Publication details unavailable');
@@ -98,7 +98,7 @@ function precedentCard(precedent, record, key) {
   if (precedent.image_url) {
     entry.append(reactionFigure(precedent, 'Supporting source reaction'));
   }
-  else entry.append(element('p', 'Source drawing unavailable; notation is available in details.', 'muted'));
+  else entry.append(element('p', 'Source drawing unavailable.', 'muted'));
   const isCondition = precedent.support_kind === 'condition_observation';
   const observed = element('div', '', 'precedent-conditions');
   observed.append(element('h5', 'Reported conditions & yield'));
@@ -131,6 +131,11 @@ function precedentCard(precedent, record, key) {
   const compatibility = precedent.compatibility;
   if (compatibility) {
     scientificNotes(entry, compatibility.hard_conflicts || []);
+  }
+  if (compact) {
+    if (precedent.reaction_smiles) entry.append(disclosure('Reaction SMILES', key + ':smiles',
+      element('code', precedent.reaction_smiles, 'precedent-smiles')));
+    return entry;
   }
   const structural = precedent.structural_comparison;
   if (isCondition) {
@@ -180,7 +185,7 @@ function precedentCard(precedent, record, key) {
   entry.append(disclosure('Match details & cautions', key + ':match', detail));
   return entry;
 }
-function literatureReactionCard(reaction, sources, key) {
+function literatureReactionCard(reaction, sources, key, compact = false) {
   const card = element('article', '', 'precedent-card literature-reaction-card');
   const source = sources.get(reaction.source_id);
   card.append(element('h5', reaction.title));
@@ -218,6 +223,10 @@ function literatureReactionCard(reaction, sources, key) {
     }
   }
   scientificNotes(card, reaction.limitations || []);
+  if (compact) {
+    card.append(disclosure('Reaction SMILES', key + ':smiles', element('code', reaction.reaction_smiles, 'precedent-smiles')));
+    return card;
+  }
   const details = element('div');
   details.append(element('p', 'Captured structure evidence'), element('p', reaction.structure_evidence),
     element('div', 'Reaction SMILES', 'precedent-label'), element('code', reaction.reaction_smiles, 'precedent-smiles'));
@@ -243,16 +252,16 @@ function literatureReactionCard(reaction, sources, key) {
   card.append(disclosure('Source structures & evidence', key, details));
   return card;
 }
-function supportingEvidence(step, sources, key) {
+function supportingEvidence(step, sources, key, compact = false) {
   const support = element('section', '', 'step-precedents');
   support.append(element('h5', 'Precedent support', 'support-heading'));
   const records = step.supporting_evidence || [];
   const drawings = step.literature_reactions || [];
-  const cards = drawings.map((reaction, index) => literatureReactionCard(reaction, sources, key + ':literature:' + index));
+  const cards = drawings.map((reaction, index) => literatureReactionCard(reaction, sources, key + ':literature:' + index, compact));
   const scope = element('div');
   for (const [index, record] of records.entries()) {
     for (const [position, precedent] of (record.precedents || []).entries()) {
-      cards.push(precedentCard(precedent, record, key + ':support:' + index + ':' + position));
+      cards.push(precedentCard(precedent, record, key + ':support:' + index + ':' + position, compact));
     }
     if (record.status === 'evidence_unavailable') support.append(element('p', 'Saved evidence could not be loaded. Its support remains unresolved.', 'scientific-note'));
     if (record.status === 'no_precedents_retrieved') support.append(element('p', 'No supporting experiment found in this recorded search.', 'scientific-note'));
@@ -282,7 +291,7 @@ function supportingEvidence(step, sources, key) {
     }
   } else if (literature.length) support.append(element('p', 'Source reaction structures were not supplied for these literature citations.', 'muted'));
   else if (!records.length) support.append(element('p', 'No inspected experimental support supplied for this step.', 'scientific-note'));
-  if (records.length) support.append(disclosure('Search scope', key + ':scope', scope));
+  if (!compact && records.length) support.append(disclosure('Search scope', key + ':scope', scope));
   return support;
 }
 function compatibilityCoverage(parent, assessment) {
@@ -339,7 +348,7 @@ function stepAssessmentEvidence(step, key) {
   if (structural.length || recipes.length) section.append(element('p', 'Experimental feasibility is not established by these checks.', 'scientific-note'));
   return section;
 }
-function reactionCard(step, sources, molecules, key, number, showScheme = true) {
+function reactionCard(step, sources, molecules, key, number, showScheme = true, compact = false) {
   const card = element('article', '', 'scientific-step');
   const heading = element('div', '', 'step-heading');
   heading.append(element('span', String(number), 'step-number'), element('h4', step.title),
@@ -348,7 +357,19 @@ function reactionCard(step, sources, molecules, key, number, showScheme = true) 
   if (showScheme) {
     const label = step.reactant_ids.map(id => molecules.get(id).name).join(' + ') + ' → ' + step.product_ids.map(id => molecules.get(id).name).join(' + ');
     if (step.image_url) card.append(reactionFigure(step, label));
-    else card.append(element('p', 'Scheme unavailable for the supplied structures. Conditions remain available below.', 'scientific-note'));
+    else card.append(element('p', 'Scheme unavailable for the supplied structures.', 'scientific-note'));
+  }
+  if (compact) {
+    if (step.reaction_smiles) card.append(disclosure('Reaction SMILES', key + ':smiles',
+      element('code', step.reaction_smiles, 'precedent-smiles')));
+    const evidence = step.assessment_evidence || {};
+    if (evidence.status === 'evidence_unavailable') card.append(element('p', 'Assessment unavailable; this step remains unverified.', 'scientific-note'));
+    if ((evidence.structural_assessments || []).some(record => ['ambiguous', 'unresolved', 'unsupported', 'conflicting', 'rejected'].includes(record.status))) {
+      card.append(element('p', 'Unresolved step.', 'scientific-note'));
+    }
+    for (const record of evidence.recipe_assessments || []) scientificNotes(card, record.hard_conflicts || []);
+    card.append(supportingEvidence(step, sources, key, true));
+    return card;
   }
   if (step.rationale) {
     const rationale = element('div', '', 'step-rationale');
@@ -406,12 +427,13 @@ function showStructured(view, key = 'science') {
       if (hasRouteScheme) figure.append(element('figcaption', label, 'route-scheme-caption'));
       box.append(figure);
     }
-    if (route.limitations.length) {
-      const cautions = element('div'); scientificNotes(cautions, route.limitations);
-      box.append(disclosure('Route cautions (' + new Set(route.limitations).size + ')', routeKey + ':cautions', cautions));
+    scientificNotes(box, route.limitations);
+    if (route.step_ids.some(id => (steps.get(id)?.assessment_evidence?.structural_assessments || [])
+      .some(record => record.admission_eligible === false))) {
+      box.append(element('p', 'Provisional route: validation incomplete.', 'scientific-note'));
     }
     if (route.drawing_warning) box.append(element('p', 'Continuous scheme unavailable: ' + route.drawing_warning, 'scientific-note'));
-    route.step_ids.forEach((id, position) => { box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1, !hasRouteScheme)); routed.add(id); });
+    route.step_ids.forEach((id, position) => { box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1, !hasRouteScheme, true)); routed.add(id); });
     if (view.routes.length === 1) section.append(element('h3', route.title), box);
     else {
       const alternative = disclosure(route.title + ' · ' + route.step_ids.length + ' steps', routeKey, box);
@@ -544,16 +566,16 @@ function answerCard(turn) {
     if (view && (view.error || view.steps?.length)) {
       card.append(showStructured(view, turn.id + ':science'));
     }
-    if (routeFirst) {
+    if (routeFirst && (!retrospective || answer.needs_user_input)) {
       const written = formattedMessage(answer.answer_markdown, turn.answer_presentation);
       card.append(retrospective && !answer.needs_user_input ? disclosure('Full written answer', turn.id + ':written', written) : written);
     }
     if (answer.uncertainties?.length) {
       const questions = element('section', '', 'answer-uncertainties');
       questions.append(element('h5', 'Open questions')); scientificNotes(questions, answer.uncertainties);
-      card.append(retrospective && !answer.needs_user_input ? disclosure('Open questions (' + answer.uncertainties.length + ')', turn.id + ':questions', questions) : questions);
+      card.append(questions);
     }
-    const details = answerDetails(turn);
+    const details = retrospective ? null : answerDetails(turn);
     if (details) card.append(details);
     if (savedTimeline) card.append(savedTimeline);
     if (answer.needs_user_input) card.append(element('p', 'Add the requested information below to continue.', 'muted'));
@@ -561,7 +583,9 @@ function answerCard(turn) {
     const copy = element('button', 'Copy', 'copy-button'); copy.type = 'button';
     copy.setAttribute('aria-label', 'Copy answer');
     copy.onclick = async () => {
-      try { await navigator.clipboard.writeText(answer.answer_markdown); copy.textContent = 'Copied'; }
+      const text = retrospective ? view.routes.map(route => route.title + '\n' + route.step_ids.map(id =>
+        view.steps.find(step => step.id === id)?.reaction_smiles || '').join('\n')).join('\n\n') : answer.answer_markdown;
+      try { await navigator.clipboard.writeText(text); copy.textContent = 'Copied'; }
       catch { copy.textContent = 'Unable to copy'; }
       setTimeout(() => { copy.textContent = 'Copy'; }, 2000);
     };
