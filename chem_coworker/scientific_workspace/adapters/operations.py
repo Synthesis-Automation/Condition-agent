@@ -86,7 +86,7 @@ class ScientificOperations:
                             replay_projection=_discovery_replay_result),
         OperationDefinition("suggest_search_fragments"),
         OperationDefinition("propose_fragment_queries"),
-        OperationDefinition("investigate_fragment_precedent", evidence_arguments=("source_ref",)),
+        OperationDefinition("investigate_fragment_precedent", contract_version="2", evidence_arguments=("source_ref",)),
         OperationDefinition("inspect_condition_precedents", contract_version="2",
                             required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("propose_condition_adaptation", evidence_arguments=("source_ref", "evidence_refs")),
@@ -119,7 +119,7 @@ class ScientificOperations:
                             replay_comparison="scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry",
                             replay_projection=_forward_replay_result),
         OperationDefinition("inspect_route_step", evidence_arguments=("source_ref",)),
-        OperationDefinition("inspect_step_precedents", contract_version="2", evidence_arguments=("source_ref",)),
+        OperationDefinition("inspect_step_precedents", contract_version="3", evidence_arguments=("source_ref",)),
         OperationDefinition("revise_route_branch", contract_version="2", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "evidence_refs"), result_evidence_field="evidence_refs"),
         OperationDefinition("compare_route_proposals", evidence_arguments=("source_refs",)),
@@ -449,15 +449,17 @@ class ScientificOperations:
         """Inspect and test a selected observation from a saved target-derived search.
 
         Source conditions, procedures and comparisons survive compilation failure.
+        Accepts search_fragment_precedents or find_synthesis_precedents source_ref.
         Only admitted source operators are tested, in memory; no production library
         or global search is required. Partial searches remain inspectable.
         """
         from core_retrosynthesis.fragment_investigation import investigate_fragment_precedent
         from .step_selection import _call
 
-        payload = _call(self.store, source_ref, {"search_fragment_precedents"})
+        payload = _call(self.store, source_ref, {"search_fragment_precedents", "find_synthesis_precedents"})
         search = payload["result"]
-        target = (search.get("target_validation") or {}).get("target_smiles")
+        target = (search.get("target_smiles") if payload["operation"] == "find_synthesis_precedents"
+                  else (search.get("target_validation") or {}).get("target_smiles"))
         if not target:
             raise ValueError("Choose a saved fragment search with target_smiles")
         return {**investigate_fragment_precedent(search, observation_id, target), "source_ref": source_ref}
@@ -746,6 +748,8 @@ class ScientificOperations:
         for a consequential uncertainty in one eligible saved step.
         Each step may include saved_candidate={source_ref, realization_id, strategy_id}
         to retain an exact disconnection's mapping and provenance during reassessment.
+        After finding new candidate evidence for an unresolved step, explicitly
+        reassess or revise the saved route; precedent inspection alone does not update it.
         """
         from .route_investigation import assess_route
 

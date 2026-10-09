@@ -82,6 +82,8 @@ def investigation_prompt(
         f"Python interpreter: {sys.executable}\n"
         "Use this interpreter; PYTHONPATH includes the repository. If a subprocess\n"
         "drops it, insert the repository into sys.path before importing.\n"
+        "Name temporary scripts task-specific names such as route_probe.py; avoid inspect.py,\n"
+        "json.py, typing.py and other Python module names, which shadow installed modules.\n"
         f"Discovered local tools: {json.dumps(tools, ensure_ascii=False)}\n"
         "If rg cannot be found, use its recorded executable (PowerShell: & 'path/rg.exe').\n"
         "If unavailable, use Select-String, Get-ChildItem or Python.\n"

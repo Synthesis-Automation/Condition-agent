@@ -97,6 +97,11 @@ def inspect_step_precedents(
         })
     return {
         "schema_version": SCHEMA_VERSION, "source_ref": source_ref,
+        "assessment_proposal": ({
+            "target_smiles": target, "precursor_smiles": precursors,
+            "saved_candidate": {"source_ref": source_ref, "realization_id": realization_id,
+                                "strategy_id": strategy_id},
+        } if realization_id and selected.get("condition_query_reaction_smiles") else None),
         "selection": {"step_id": step_id, "realization_id": realization_id,
                       "strategy_id": strategy_id,
                       "target_smiles": target, "precursor_smiles": precursors},

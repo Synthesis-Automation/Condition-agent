@@ -10,6 +10,12 @@ Set-Location "C:\Git-softwares\Condition-agent"
 
 ## Quick start
 
+The latest workspace fixes connect automatic precedent discovery to source
+inspection and attach existing exact-step inspections to compact route answers.
+Saved candidate inspections also provide reassessment inputs; unresolved checks
+require explicit reassessment, not just a citation. Restart the agent server and
+start a new investigation. No dataset rebuild is required.
+
 The [October 9 workspace fixes](docs/new/agent_log_review_fixes_20261009.md)
 correct scaffold-query stereo, recover omitted validation notices, and reduce
 route-input tool errors. Restart the scientific server and refresh the browser;
@@ -411,7 +417,7 @@ Omit `--build` on subsequent starts when the frontend has not changed.
   explicitly choose a model supported by that CLI's login, for example:
 
   ```powershell
-  python -m app.web_api --scientific-chat --port 8011 --agent-model gpt-6-sol
+  python -m app.web_api --scientific-chat --port 8011 --agent-model gpt-6.1-sol
   ```
 
   Model availability depends on the account and provider. The adapter does not

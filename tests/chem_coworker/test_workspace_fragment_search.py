@@ -95,6 +95,22 @@ def test_investigation_rejects_forged_source_or_non_search_call(workspace):
     assert workspace.store.read_artifact(invalid.artifact_ref)["execution_status"] == "error"
 
 
+def test_automatic_discovery_can_feed_the_recorded_investigation_tool(workspace):
+    search = workspace.run("find_synthesis_precedents", {"target_smiles": "COC"})
+    payload = workspace.store.read_artifact(search.artifact_ref)
+    assert payload["execution_status"] == "completed", payload
+    assert payload["result"]["hits"][0]["observation_id"] == "test-observation"
+    inspection = workspace.run("investigate_fragment_precedent", {
+        "source_ref": search.artifact_ref, "observation_id": "test-observation",
+    })
+    result = workspace.store.read_artifact(inspection.artifact_ref)
+    assert result["execution_status"] == "completed", result
+    assert result["result"]["source"]["procedures"]
+    assert search.artifact_ref in inspection.evidence_refs
+    replay = workspace.replay(inspection.artifact_ref)
+    assert workspace.store.read_artifact(replay.artifact_ref)["matches"] is True
+
+
 def test_search_validates_and_records_selected_preview(workspace):
     preview = workspace.run("propose_fragment_queries", {"target_smiles": "CCOC", "query": "COC"})
     variant = workspace.store.read_artifact(preview.artifact_ref)["result"]["variants"][0]

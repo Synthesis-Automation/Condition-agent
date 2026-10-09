@@ -139,8 +139,11 @@ def test_saved_inspections_attach_and_exact_step_publication_rules_still_apply(w
                    "precedents": [{"reaction_id": "fixture"}]},
     })
     request = {"target_smiles": "CC=O", "routes": [{"steps": [{"reaction_smiles": "OCC>>O=CC"}]}]}
-    with pytest.raises(ValueError, match="Available supporting reactions"):
-        w.finalize_answer(path, w.route_answer(request))
+    before_events = w.store.events()
+    automatic = w.route_answer(request)
+    assert automatic["steps"][0]["precedent_refs"] == [inspection.artifact_ref]
+    w.finalize_answer(path, automatic)
+    assert w.store.events() == before_events
     request["routes"][0]["steps"][0]["support"] = [{"ref": inspection.artifact_ref, "locator": "result.precedents"}]
     draft = w.route_answer(request)
     assert draft["steps"][0]["precedent_refs"] == [inspection.artifact_ref]
@@ -150,6 +153,27 @@ def test_saved_inspections_attach_and_exact_step_publication_rules_still_apply(w
     with pytest.raises(ValueError, match="does not match"):
         w.finalize_answer(path, w.route_answer(request))
     assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize("left,right", [("CCO", "CC(=O)O"), ("C[C@H](O)Cl", "CC=O")])
+def test_unrelated_inspections_are_not_attached(workspace, left, right):
+    w, _ = workspace
+    w.store.append("call", {"operation": "inspect_step_precedents", "execution_status": "completed",
+        "result": {"schema_version": SCHEMA_VERSION, "selection": {
+            "precursor_smiles": left, "target_smiles": right}, "precedents": [{"reaction_id": "fixture"}]}})
+    request = {"target_smiles": "CC=O", "routes": [{"steps": [{"reaction_smiles": "CCO>>CC=O"}]}]}
+    assert w.route_answer(request)["steps"][0]["precedent_refs"] == []
+
+
+def test_automatic_inspection_does_not_enable_reported_claims(workspace):
+    w, _ = workspace
+    w.store.append("call", {"operation": "inspect_step_precedents", "execution_status": "completed",
+        "result": {"schema_version": SCHEMA_VERSION, "selection": {
+            "precursor_smiles": "CCO", "target_smiles": "CC=O"}, "precedents": [{"reaction_id": "fixture"}]}})
+    for fields in ({"basis": "reported"}, {"conditions": "Invented", "conditions_basis": "reported"}):
+        with pytest.raises(ValueError):
+            w.route_answer({"target_smiles": "CC=O", "routes": [{"steps": [
+                {"reaction_smiles": "CCO>>CC=O", **fields}]}]})
 
 
 def test_failed_scientific_source_cannot_become_route_support(workspace):

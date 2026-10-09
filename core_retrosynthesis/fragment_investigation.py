@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from condition_recommender.fragment_investigation import inspect_fragment_precedent
+from condition_recommender.fragment_investigation import inspect_fragment_precedent, selected_fragment_search
 
 from .fragment_guidance import DEFAULT_POLICY, evaluate_transfers, load_policy, project_selected_query_guidance
 from .generic_library import build_generic_library
@@ -18,6 +18,7 @@ def investigate_fragment_precedent(
 Production libraries and admission policies are unchanged. Source compilation
 rejections, incomplete evidence and ambiguous alignments retain the inspection.
 """
+    search = selected_fragment_search(search, observation_id, target_smiles)
     inspection = inspect_fragment_precedent(search, observation_id, target_smiles)
     policy = load_policy(DEFAULT_POLICY)
     policy.update(max_focus_bonds=3, top_k=3)

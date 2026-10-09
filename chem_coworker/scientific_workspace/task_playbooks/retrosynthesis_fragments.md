@@ -95,6 +95,8 @@ Try a small number of informative alternatives; do not exhaust every variant.
 
 For an interesting returned observation, call
 `investigate_fragment_precedent(source_ref=search_ref, observation_id=...)`.
+The source may be an explicit fragment search or automatic synthesis-precedent
+discovery. Automatic hits retain their originating query and incomplete scope.
 It preserves the actual source record/procedures, compares its product with the
 target, and runs a bounded source-only transfer using the existing strict compiler.
 It needs no production retro library. Inspect `source`, `comparison` and `transfer`

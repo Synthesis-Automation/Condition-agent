@@ -12,6 +12,7 @@ from ..adapters.literature import load_source_passage
 from ..core.store import InvestigationStore
 from .answer_contracts import AnswerObject, ScientificAnswer
 from .answer_finalization import _complete_empty_fields
+from .step_precedents import _saved_support, _structure_key
 
 
 class RouteSupport(AnswerObject):
@@ -67,9 +68,9 @@ def _components(smiles: str) -> list[str]:
 def route_answer(store: InvestigationStore, proposal: Mapping[str, Any]) -> dict[str, Any]:
     """Assemble IDs, dependencies and citations; never infer conditions or feasibility.
 
-    Only the supplied sources are attached. Existing inspection references retain
-    the canonical finalizer's exact-structure checks. Missing required inspections
-    still fail publication. No retrieval, assessment, source reconstruction or
+    Supplied sources and existing exact-step inspections for proposed steps are
+    attached. Inspection references retain the canonical finalizer's checks.
+    Missing required inspections still fail publication. No retrieval, assessment, source reconstruction or
     self-review is performed. Canonicalization identifies display molecules only.
     """
     request = RouteAnswerInput.model_validate(dict(proposal))
@@ -78,6 +79,7 @@ def route_answer(store: InvestigationStore, proposal: Mapping[str, Any]) -> dict
     molecule_ids: dict[str, str] = {}
     source_ids: dict[tuple[str, str], str] = {}
     kinds = {event.artifact_ref: event.kind for event in store.events()}
+    saved_support = _saved_support(store)
 
     def molecule(smiles: str, *, target: bool = False) -> str:
         if smiles not in molecule_ids:
@@ -147,7 +149,20 @@ def route_answer(store: InvestigationStore, proposal: Mapping[str, Any]) -> dict
                 field = link_fields.get(operation)
                 if field and support.ref not in links[field]:
                     links[field].append(support.ref)
-            condition_fields = {"basis": step.conditions_basis, "source_ids": citations}
+            condition_sources = list(citations)
+            if step.basis == "proposed" and not links["precedent_refs"]:
+                # Reuse an already recorded inspection, never an uninspected match
+                # or a source for different stereochemistry or chemical form.
+                existing = next((item for item in saved_support.get(
+                    _structure_key(".".join(left), ".".join(right)), [],
+                ) if item["inspection"] and item["inspection"].get("precedents")), None)
+                if existing is not None:
+                    reference = existing["source_ref"]
+                    citation_id, _ = source(RouteSupport(ref=reference, locator="Saved step precedent inspection"))
+                    if citation_id not in citations:
+                        citations.append(citation_id)
+                    links["precedent_refs"].append(reference)
+            condition_fields = {"basis": step.conditions_basis, "source_ids": condition_sources}
             draft["steps"].append({
                 "id": identity, "title": step.title or f"Step {step_number}",
                 "basis": step.basis, "source_ids": citations, "limitations": notes,

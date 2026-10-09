@@ -80,6 +80,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         ))
         overview["hint"] = "Attach with w.attach_recipe_check(draft, step_id, ref); inspect full coverage/stages before relying on it."
     elif operation == "inspect_step_precedents":
+        overview.update(_brief_fields(source, ("assessment_proposal",)))
         overview.update(_brief_fields(source, ("scope", "saved_match_count", "available_template_records",
                                               "retrieval_truncated", "page", "distinct_references_on_page",
                                               "observation_page", "reference_catalog_status", "procedure_catalog_status",

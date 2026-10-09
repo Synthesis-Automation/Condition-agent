@@ -87,6 +87,12 @@ def test_real_selection_page_sources_summary_and_replay(workspace):
     brief = workspace.call_summary(event)["result_summary"]
     assert brief["precedents"][0]["reaction_smiles"] == first["reaction_smiles"]
     assert brief["page"]["next_offset"] == 2
+    assert brief["assessment_proposal"] == record["assessment_proposal"]
+    proposal = record["assessment_proposal"]
+    assert proposal["saved_candidate"]["source_ref"] == source.artifact_ref
+    _, reassessed = run(workspace, "assess_route_step", proposal=proposal)
+    assert reassessed["assessment"]["canonical_target_smiles"] == record["selection"]["target_smiles"]
+    assert reassessed["assessment"]["admission_eligible"] is True
     _, second = run(workspace, "inspect_step_precedents", source_ref=source.artifact_ref,
                     realization_id=selected["realization_id"], offset=2, limit=2)
     assert second["page"]["next_offset"] is None

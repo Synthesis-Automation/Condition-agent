@@ -19,6 +19,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
     path = "$.result"
     summary = view.pick(value, _COMMON, path)
     if operation == "inspect_step_precedents":
+        summary.update(view.pick(value, ("assessment_proposal",), path))
         summary.update(view.pick(value, ("selection", "scope", "saved_match_count", "available_template_records",
                                          "retrieval_truncated", "page", "distinct_references_on_page",
                                          "assessment_status", "assessment_warnings"), path))

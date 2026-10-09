@@ -22,12 +22,17 @@ conditions, source identities or yields. Use reported basis only for the actual
 inspected experiment. Preserve material gaps or conflicts in limitations, briefly;
 use route/global limitations for a shared unresolved preparation or supply gap.
 The application displays saved admission failures without agent-authored diagnostics.
+If a later candidate addresses an unresolved step, reuse its assessment_proposal
+(including saved_candidate) in an explicit step reassessment or route revision.
+Inspecting a precedent alone does not update an earlier assessment. Retain remaining
+experimental and stereochemical gaps; do not invent a mapping to clear a warning.
 
 Support refs must be saved captured literature/excerpts or completed scientific
 calls. Capture exact inspected passages with w.capture_source or
 w.capture_source_file; a bare URL is insufficient. Titles and URLs come from the
-saved source. A support note is optional. Saved inspections and recipe checks attach
-automatically and must match the final structures including stereo. If local support
+saved source. A support note is optional. Previously recorded nonempty inspections
+attach to proposed steps with exactly matching structures including stereo. Explicit
+support refs remain authoritative; recipe checks attach only when supplied. If local support
 exists, publication still requires a matching
 nonempty inspect_step_precedents inspection. Reuse saved matching evidence.
 

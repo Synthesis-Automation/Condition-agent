@@ -2,6 +2,16 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+Saved `find_synthesis_precedents` hits now feed `investigate_fragment_precedent`
+directly. Inspection binds the selected observation to its original recorded query;
+partial discovery stays partial and cannot authorize transfer. Candidate precedent
+inspections expose `assessment_proposal` for explicit reassessment or route revision.
+Inspecting alone never clears an earlier assessment gap. `w.route_answer` reuses
+already-recorded nonempty inspections for exact matching proposed steps, reducing
+missing-attachment retries without inventing support or performing more searches.
+Explicit recipe attribution and reported claims still require supplied support.
+Restart the server and use a new investigation; no dataset rebuild is required.
+
 The [October 9 workspace corrections](../new/agent_log_review_fixes_20261009.md)
 preserve scaffold-query stereochemistry, recover exact-step assessment notices,
 make route-leaf source searches optional, and retain explicitly selected operator

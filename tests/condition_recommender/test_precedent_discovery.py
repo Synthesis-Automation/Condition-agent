@@ -1,6 +1,7 @@
 """Automatic discovery retains construction evidence through query refinement."""
 
 from dataclasses import asdict
+from copy import deepcopy
 import json
 
 import pytest
@@ -50,6 +51,40 @@ def test_no_matches_stops_a_ladder_without_claiming_literature_absence(discovery
     assert len(result["attempts"]) == 1
     assert result["attempts"][0]["decision"] == "no_matches_try_next_core"
     assert any("absence" in text for text in result["limitations"])
+
+
+def test_discovery_hit_inspection_preserves_source_and_partial_scope(discovery_index):
+    from core_retrosynthesis.fragment_investigation import investigate_fragment_precedent
+    result = find_synthesis_precedents(discovery_index, "CC(=O)N1CCCC1")
+    original = deepcopy(result)
+    inspected = investigate_fragment_precedent(result, "construction", result["target_smiles"])
+    assert inspected["source"] == result["hits"][0]
+    assert inspected["query"]["expression"] == result["hits"][0]["discovery"]["query"]
+    assert result == original
+    result["search_status"] = "partial"
+    result["stop_reason"] = "deadline"
+    inspected = investigate_fragment_precedent(result, "construction", result["target_smiles"])
+    assert inspected["transfer"]["status"] == "incomplete_search"
+    assert inspected["search_scope"]["search_status"] == "partial"
+
+
+@pytest.mark.parametrize("mutation", ["forged_id", "missing_attempt", "ambiguous_attempt", "wrong_query", "wrong_target"])
+def test_discovery_inspection_rejects_unbound_evidence(discovery_index, mutation):
+    from condition_recommender.fragment_investigation import inspect_fragment_precedent
+    result = find_synthesis_precedents(discovery_index, "CC(=O)N1CCCC1")
+    target, observation = result["target_smiles"], "construction"
+    if mutation == "forged_id":
+        observation = "not-returned"
+    elif mutation == "missing_attempt":
+        result["attempts"] = []
+    elif mutation == "ambiguous_attempt":
+        result["attempts"] *= 2
+    elif mutation == "wrong_query":
+        result["hits"][0]["discovery"]["query"] = "[#6]"
+    else:
+        target = "c1ccccc1"
+    with pytest.raises(ValueError):
+        inspect_fragment_precedent(result, observation, target)
 
 
 def test_partial_candidates_are_not_reused(discovery_index, monkeypatch):
