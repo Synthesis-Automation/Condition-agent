@@ -8,7 +8,7 @@ from core_retrosynthesis.chemistry import canonical_smiles
 from core_retrosynthesis.retro_validity import RetroForwardEvidence, assess_retro_validity
 
 from .route_investigation import _evidence, _step, _strings
-from .step_selection import SOURCE_OPERATIONS, _call, _selection
+from .step_selection import SOURCE_OPERATIONS, _call, _selection, resolve_saved_candidate
 
 if TYPE_CHECKING:
     from .operations import ScientificOperations
@@ -24,12 +24,17 @@ def assess_validity(
     """Resolve saved inputs and pinned artifacts; delegate all chemistry to packages."""
     if (proposal is None) == (source_ref is None):
         raise ValueError("Supply exactly one of proposal or source_ref")
+    mapping_evidence = None
     if source_ref:
         payload = _call(operations.store, source_ref, SOURCE_OPERATIONS)
         selected, _ = _selection(payload, step_id, realization_id, strategy_id, precursor_smiles)
         proposal = {key: selected[key] for key in (
             "target_smiles", "precursor_smiles", "mapped_reaction_smiles", "proposed_conditions",
         ) if key in selected}
+        if payload["operation"] == "disconnect_target" and selected.get("condition_query_reaction_smiles"):
+            proposal["saved_candidate"] = {"source_ref": source_ref, "realization_id": realization_id,
+                                           "strategy_id": strategy_id}
+            proposal, mapping_evidence = resolve_saved_candidate(operations.store, proposal)
     elif any(value is not None for value in (step_id, realization_id, strategy_id, precursor_smiles)):
         raise ValueError("step_id and realization_id require a saved source_ref")
     step = _step(proposal)
@@ -92,6 +97,7 @@ def assess_validity(
         "schema_version": "retro_validity_investigation.v1", "proposal": step.to_dict(),
         "validity": result.to_dict(), "source_ref": source_ref,
         "selection": {"step_id": step_id, "realization_id": realization_id, "strategy_id": strategy_id},
+        "mapping_evidence": mapping_evidence,
         "forward_ref": forward_ref,
         "artifact_warnings": (["CORPUS_ARTIFACT_PAIR_INCOMPLETE"]
                               if any(available) and not all(available) else []),

@@ -29,6 +29,16 @@ HELPER_EXAMPLES = {
 
 def nested_input_help(name: str) -> dict[str, Any]:
     """Expose actual nested contracts only when their operation is requested."""
+    if name in {"assess_route_step", "assess_route_proposal", "revise_route_branch"}:
+        from ..adapters.step_selection import SavedCandidateSelection
+
+        return {"nested_inputs": {"saved_candidate": SavedCandidateSelection.model_json_schema()},
+                "input_notes": [
+                    "Put saved_candidate inside a step proposal alongside target_smiles and precursor_smiles.",
+                    "Use a completed disconnect_target source_ref and the actual realization_id/strategy_id.",
+                    "The selected mapping is proposed operator reconstruction, not observed chemistry; it is revalidated.",
+                    "Do not also supply mapped_reaction_smiles. Changed graphs or stereo require a new explicit proposal.",
+                ]}
     if name == "route_answer":
         from ..answers.route_authoring import RouteAnswerInput
 
@@ -57,6 +67,20 @@ def nested_input_help(name: str) -> dict[str, Any]:
                             "Represent all evidence-backed atom contributors and required multiplicity in reaction_smiles. "
                             "Recipe amounts do not add atoms to that graph; never invent a donor or mapping.",
                             "Try one input before batching the same new nested format."],
+        }
+    if name == "inspect_route_inputs":
+        from ..adapters.investigation_checks import RouteLeafQuery
+
+        return {
+            "nested_inputs": {"leaf_queries[]": RouteLeafQuery.model_json_schema()},
+            "example_arguments": {"source_ref": "sha256:SAVED_ROUTE_ASSESSMENT",
+                                  "leaf_queries": [{"smiles": "CC=O", "terms": ["acetaldehyde"]}]},
+            "input_notes": [
+                "All saved route leaves are inspected. Omit leaf_queries for structural/starting-material checks only.",
+                "Omitted terms or terms=[] skips source text search for that leaf; it does not establish absence of evidence.",
+                "Use 1..10 nonblank literal names or labels of at most 500 characters when searching captured sources.",
+                "smiles must match an actual route leaf including stereochemistry; unknown fields are rejected before checks.",
+            ],
         }
     if name == "prepare_literature_reaction":
         from ..adapters.literature_reactions import ParticipantInput, SourceConflict

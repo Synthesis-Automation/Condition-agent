@@ -100,7 +100,7 @@ def compile_fragment_query(
                       atom.GetSymbol().lower() if atom.GetIsAromatic() else atom.GetSymbol())
             isotope = str(atom.GetIsotope()) if atom.GetIsotope() else ""
             hydrogen = f";H{atom.GetNumExplicitHs()}" if atom.GetNoImplicit() or atom.GetNumExplicitHs() else ""
-            pattern = compile_smarts(f"[{isotope}{symbol}{hydrogen};{atom.GetFormalCharge():+d}]", validate=True)
+            pattern = Chem.Mol(compile_smarts(f"[{isotope}{symbol}{hydrogen};{atom.GetFormalCharge():+d}]", validate=True))
             replacement = pattern.GetAtomWithIdx(0)
             replacement.SetChiralTag(atom.GetChiralTag())
             editable = Chem.RWMol(mol)

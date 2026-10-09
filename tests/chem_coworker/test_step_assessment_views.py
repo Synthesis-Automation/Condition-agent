@@ -48,17 +48,39 @@ def _structural(store: InvestigationStore, precursors: str, status: str = "prece
 def test_exact_structure_matching_does_not_hide_conflicting_assessments(saved) -> None:
     store, answer = saved
     unrelated = _structural(store, "CCCl.N")
-    uncited = _structural(store, "CCBr.N", "uncited")
+    uncited = _structural(store, "CCBr.N", "conflicting")
     first = _structural(store, "N.CCBr")
     second = _structural(store, "CCBr.N", "ambiguous")
     answer["evidence_refs"] = [unrelated, first, second]
     view = answer_step_assessments(store, answer)["s1"]
     assert view["status"] == "recorded"
-    assert {r["artifact_ref"] for r in view["structural_assessments"]} == {first, second}
-    assert uncited not in str(view)
-    assert {r["status"] for r in view["structural_assessments"]} == {"precedent_supported", "ambiguous"}
+    assert {r["artifact_ref"] for r in view["structural_assessments"]} == {first, second, uncited}
+    assert next(r for r in view["structural_assessments"] if r["artifact_ref"] == uncited)["attribution"] == "saved_exact_step_check"
+    assert {r["status"] for r in view["structural_assessments"]} == {"precedent_supported", "ambiguous", "conflicting"}
     assert not view["recipe_assessments"]
     assert all(r["gates"][0]["status"] == "not_run" for r in view["structural_assessments"])
+
+
+def test_uncited_route_failure_is_visible_but_later_checks_and_recipes_are_excluded(saved):
+    store, answer = saved
+    before = deepcopy(answer)
+    proposal = {"external_step_id": "original", "precursor_smiles": "N.CCBr", "target_smiles": "CCN"}
+    failed = store.append("call", {
+        "operation": "assess_route_proposal", "execution_status": "completed",
+        "result": {"proposal": {"steps": [proposal]}, "assessment": {"step_assessments": [{
+            "external_step_id": "original", "assessment": {"status": "ambiguous", "admission_eligible": False,
+            "gates": [{"gate_id": "atom_correspondence", "status": "unresolved"}]}}]},
+            "proposed_recipe_assessments": {"original": {"status": "conflicting"}}},
+    }).artifact_ref
+    receipt = store.append("assistant_answer", answer)
+    later = _structural(store, "CCBr.N")
+    view = answer_step_assessments(store, answer, answer_ref=receipt.artifact_ref)["s1"]
+    assert view["status"] == "recorded"
+    assert [r["artifact_ref"] for r in view["structural_assessments"]] == [failed]
+    assert view["structural_assessments"][0]["admission_eligible"] is False
+    assert not view["recipe_assessments"]
+    assert later not in str(view)
+    assert answer == before
 
 
 def test_recipe_coverage_reaches_presentation_without_modifying_saved_answer(saved) -> None:

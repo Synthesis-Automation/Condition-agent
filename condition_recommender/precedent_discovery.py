@@ -59,7 +59,7 @@ def _explain_hit(hit: dict[str, Any], step: dict[str, Any], target: Any) -> dict
         "target_core_atom_ids": step["core_atom_ids"], "nitrogen_hydrogen_differences": differences,
         "alignment_ambiguous": len(embeddings) > 1 or truncated,
         "explanation": f"Same selected core ({len(positions)} atoms); {relationship.replace('_', ' ')} evidence. "
-                       f"Matches {len(step['target_atom_ids'])} target-context atoms. Peripheral substitution, hydrogen counts and extra ring fusion were unconstrained.",
+                       f"Matches {len(step['target_atom_ids'])} target-context atoms. Peripheral substitution, nonstereo hydrogen counts and extra ring fusion were unconstrained; specified stereo hydrogen counts were retained.",
     }
     return hit
 
@@ -168,7 +168,7 @@ def find_synthesis_precedents(
             "execution": {"elapsed_seconds": round(monotonic() - started, 6), "library_loads": loads,
                           "candidate_reuses": sum(a["execution"]["candidate_set_reused"] for a in attempts)},
             "limitations": ["Ranked discovery hypotheses, not validated synthetic steps or condition recommendations.",
-                            "Hydrogen counts and omitted peripheral groups are unconstrained; inspect source differences.",
+                            "Nonstereo hydrogen counts and omitted peripheral groups are unconstrained; specified stereo hydrogen counts are retained. Inspect source differences.",
                             "Unresolved atom correspondence cannot establish construction of the selected core.",
                             "Ranking uses at most ten hydrated hits per query, not every indexed observation.",
                             "Broad queries inspect a bounded product sample; their ranks and counts are incomplete.",

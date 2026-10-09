@@ -10,6 +10,11 @@ Set-Location "C:\Git-softwares\Condition-agent"
 
 ## Quick start
 
+The [October 9 workspace fixes](docs/new/agent_log_review_fixes_20261009.md)
+correct scaffold-query stereo, recover omitted validation notices, and reduce
+route-input tool errors. Restart the scientific server and refresh the browser;
+use a new investigation for scientific calls. No index rebuild is needed.
+
 After updating scientific tools, restart the agent server and create a new
 investigation. The [literature preparation and compact inspection
 workflow](docs/new/literature_preparation_and_console_efficiency.md) preserves

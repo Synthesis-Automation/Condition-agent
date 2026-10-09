@@ -103,6 +103,35 @@ def test_route_leaf_report_retains_assumed_terminal_and_unsearched_leaves(worksp
     assert workspace.store.read_artifact(invalid.artifact_ref)["execution_status"] == "error"
 
 
+@pytest.mark.parametrize("queries", [None, [], [{"smiles": "CC=O"}], [{"smiles": "CC=O", "terms": []}]])
+def test_route_leaf_optional_search_does_not_fail_or_invent_search_results(workspace, queries):
+    route, _ = call(workspace, "assess_route_proposal", proposal={"target_smiles": "CCN", "steps": [
+        {"external_step_id": "s1", "target_smiles": "CCN", "precursor_smiles": "CC=O.N"}]})
+    arguments = {} if queries is None else {"leaf_queries": queries}
+    _, result = call(workspace, "inspect_route_inputs", source_ref=route.artifact_ref, **arguments)
+    assert len(result["leaves"]) == 2
+    assert all(item["source_search_status"] == "terms_not_supplied" for item in result["leaves"])
+    assert all(item["captured_source_search"] is None for item in result["leaves"])
+    help_entry = workspace.help("inspect_route_inputs")[0]
+    assert "leaf_queries[]" in help_entry["nested_inputs"]
+
+
+@pytest.mark.parametrize("query", [
+    {"smiles": "CC=O", "terms": "acetaldehyde"}, {"smiles": "CC=O", "terms": [""]},
+    {"smiles": "CC=O", "terms": ["   "]}, {"smiles": "CC=O", "terms": [3]},
+    {"smiles": "CC=O", "terms": ["x" * 501]}, {"smiles": "CC=O", "terms": ["x"] * 11},
+    {"smiles": "CC=O", "term": "acetaldehyde"},
+])
+def test_route_leaf_bad_search_is_rejected_before_material_checks(workspace, monkeypatch, query):
+    route, _ = call(workspace, "assess_route_proposal", proposal={"target_smiles": "CCN", "steps": [
+        {"external_step_id": "s1", "target_smiles": "CCN", "precursor_smiles": "CC=O.N"}]})
+    monkeypatch.setattr(workspace.operations, "assess_starting_material", lambda *a, **k: pytest.fail("late validation"))
+    event = workspace.run("inspect_route_inputs", {"source_ref": route.artifact_ref, "leaf_queries": [query]})
+    saved = workspace.store.read_artifact(event.artifact_ref)
+    assert saved["execution_status"] == "error"
+    assert "leaf_queries[0]" in saved["error"]["message"]
+
+
 def proposed_draft():
     return _complete_empty_fields({"answer_markdown": "Proposed reaction; evidence is incomplete.",
         "molecules": [{"id": "r", "name": "Inputs", "smiles": "CCBr.N", "basis": "proposed"},

@@ -73,7 +73,7 @@ class ScientificOperations:
         OperationDefinition("assess_proposed_recipe", contract_version="2", evidence_arguments=("evidence_refs",)),
         OperationDefinition("search_captured_sources", evidence_arguments=("source_refs",),
                             result_evidence_field="evidence_refs"),
-        OperationDefinition("inspect_route_inputs", evidence_arguments=("source_ref", "source_refs"),
+        OperationDefinition("inspect_route_inputs", contract_version="2", evidence_arguments=("source_ref", "source_refs"),
                             result_evidence_field="evidence_refs"),
         OperationDefinition("search_fragment_precedents", required_artifacts=("fragment_index",),
                             evidence_arguments=("query_variant_ref",),
@@ -98,9 +98,9 @@ class ScientificOperations:
                 "including through custom Python scripts."
             ),
         ),
-        OperationDefinition("assess_route_step", required_artifacts=("retro_library",),
-                            evidence_arguments=("evidence_refs",)),
-        OperationDefinition("assess_retro_validity", contract_version="2", required_artifacts=("retro_library",),
+        OperationDefinition("assess_route_step", contract_version="2", required_artifacts=("retro_library",),
+                            evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
+        OperationDefinition("assess_retro_validity", contract_version="3", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "forward_ref", "evidence_refs"),
                             usage_policy="Assess concrete realizations; ordinal evidence is not success probability. "
                             "Use a saved bounded forward check only for consequential uncertainties."),
@@ -112,16 +112,16 @@ class ScientificOperations:
                 "steps; inspect both reactions and conditions before selecting a route."
             ),
         ),
-        OperationDefinition("assess_route_proposal", required_artifacts=("retro_library",),
-                            evidence_arguments=("evidence_refs",)),
+        OperationDefinition("assess_route_proposal", contract_version="2", required_artifacts=("retro_library",),
+                            evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
         OperationDefinition("assess_route_step_forward", required_artifacts=("forward_library",),
                             evidence_arguments=("source_ref",), execution_status_field="execution_status",
                             replay_comparison="scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry",
                             replay_projection=_forward_replay_result),
         OperationDefinition("inspect_route_step", evidence_arguments=("source_ref",)),
         OperationDefinition("inspect_step_precedents", contract_version="2", evidence_arguments=("source_ref",)),
-        OperationDefinition("revise_route_branch", required_artifacts=("retro_library",),
-                            evidence_arguments=("source_ref", "evidence_refs")),
+        OperationDefinition("revise_route_branch", contract_version="2", required_artifacts=("retro_library",),
+                            evidence_arguments=("source_ref", "evidence_refs"), result_evidence_field="evidence_refs"),
         OperationDefinition("compare_route_proposals", evidence_arguments=("source_refs",)),
     )
 
@@ -573,12 +573,13 @@ class ScientificOperations:
         return search_captured_sources(self, queries, source_refs, offset, limit)
 
     def inspect_route_inputs(
-        self, source_ref: str, leaf_queries: list[dict[str, Any]], source_refs: list[str] | None = None,
+        self, source_ref: str, leaf_queries: list[dict[str, Any]] | None = None, source_refs: list[str] | None = None,
     ) -> dict[str, Any]:
         """Inspect all route leaves and search saved sources before deciding to stop.
 
         Use source_ref from assess_route_proposal/revise_route_branch. leaf_queries
-        uses {smiles: actual_leaf, terms: [literal_source_name_or_label]}. Missing
+        uses {smiles: actual_leaf, terms: [literal_source_name_or_label]}. Omit
+        leaf_queries to inspect all leaves without text search. Missing or empty
         terms remain unsearched; stock assumptions are retained, not promoted.
         Follow source-search next_offset using search_captured_sources for details.
         """
@@ -723,6 +724,9 @@ class ScientificOperations:
         retrieval is opt-in; supplied recipes are assessed separately. Forward
         prediction is a separate bounded assess_route_step_forward call after
         a saved route assessment. include_forward must remain False.
+        Instead of copying a mapping, saved_candidate={source_ref, realization_id,
+        strategy_id} reuses that exact disconnection's reconstruction and revalidates
+        it. Keep target_smiles/precursor_smiles; they must match the saved candidate.
         """
         from .route_investigation import assess_step
 
@@ -740,6 +744,8 @@ class ScientificOperations:
         The returned artifact is the source_ref for inspection, revision and comparison.
         include_forward must remain False; use assess_route_step_forward only
         for a consequential uncertainty in one eligible saved step.
+        Each step may include saved_candidate={source_ref, realization_id, strategy_id}
+        to retain an exact disconnection's mapping and provenance during reassessment.
         """
         from .route_investigation import assess_route
 

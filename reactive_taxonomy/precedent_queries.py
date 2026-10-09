@@ -2,7 +2,7 @@
 
 Queries are graph hypotheses, not precursor molecules. They retain elements,
 aromaticity, charge, isotope, bond order and selected stereo environments while
-leaving hydrogen counts and omitted substituents unconstrained.
+leaving nonstereo hydrogen counts and omitted substituents unconstrained.
 """
 
 from __future__ import annotations
@@ -26,7 +26,8 @@ def discovery_policy() -> dict[str, Any]:
     """Load the versioned core-selection and bounded search policy."""
     value = json.loads((Path(__file__).parent / "definitions/precedent_discovery.v1.json").read_text("utf-8"))
     if (value.get("schema_version") != "precedent_discovery_policy.v1"
-            or value.get("definition_version") != "precedent_discovery.v1@1.0"
+            or value.get("definition_version") != "precedent_discovery.v1@1.1"
+            or value.get("stereo_hydrogen_policy") != "preserve_at_specified_centers"
             or value.get("levels") != ["core", "multiple_bond_context", "neighbor_context", "target_context"]
             or value.get("relaxations") != ["omitted_peripheral_atoms", "unconstrained_hydrogen_count", "additional_ring_fusion"]
             or value.get("core_priority") != ["heteroatoms", "atom_count", "ring_junctions"]
@@ -76,8 +77,14 @@ def _query(mol: Any, selected: set[int]) -> tuple[str, tuple[int, ...]]:
     for atom in mol.GetAtoms():
         isotope = str(atom.GetIsotope()) if atom.GetIsotope() else ""
         aromaticity = "a" if atom.GetIsAromatic() else "A"
-        pattern = compile_smarts(_ATOM_QUERY.format(isotope=isotope, element=atom.GetAtomicNum(),
-                                                     aromaticity=aromaticity, charge=atom.GetFormalCharge()), validate=True)
+        expression = _ATOM_QUERY.format(isotope=isotope, element=atom.GetAtomicNum(),
+                                        aromaticity=aromaticity, charge=atom.GetFormalCharge())
+        if atom.GetChiralTag() != Chem.ChiralType.CHI_UNSPECIFIED:
+            # A virtual H is part of tetrahedral neighbor ordering. Dropping it
+            # can invert a ring-junction query on SMARTS serialization/parsing.
+            expression = expression[:-1] + f";H{atom.GetTotalNumHs(includeNeighbors=True)}]"
+        # Cached patterns are shared; never mutate their atoms' chiral tags.
+        pattern = Chem.Mol(compile_smarts(expression, validate=True))
         replacement = pattern.GetAtomWithIdx(0)
         replacement.SetChiralTag(atom.GetChiralTag())
         editable.ReplaceAtom(atom.GetIdx(), replacement)
@@ -142,4 +149,5 @@ def plan_precedent_queries(target_smiles: str) -> dict[str, Any]:
         ladders.append(steps[:policy["max_steps_per_core"]])
     return {"schema_version": "precedent_query_plan.v1", "definition_version": policy["definition_version"],
             "target_smiles": canonical, "ladders": ladders, "cores_truncated": len(ordered) > len(ladders),
-            "relaxations": policy["relaxations"], "target_atom_count": mol.GetNumAtoms()}
+            "relaxations": policy["relaxations"], "stereo_hydrogen_policy": policy["stereo_hydrogen_policy"],
+            "target_atom_count": mol.GetNumAtoms()}

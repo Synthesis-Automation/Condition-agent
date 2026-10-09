@@ -1,6 +1,7 @@
 {
   "schema_version": "precedent_discovery_policy.v1",
-  "definition_version": "precedent_discovery.v1@1.0",
+  "definition_version": "precedent_discovery.v1@1.1",
+  "stereo_hydrogen_policy": "preserve_at_specified_centers",
   "max_cores": 3,
   "max_steps_per_core": 4,
   "min_core_atoms": 4,

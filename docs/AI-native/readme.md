@@ -2,6 +2,12 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+The [October 9 workspace corrections](../new/agent_log_review_fixes_20261009.md)
+preserve scaffold-query stereochemistry, recover exact-step assessment notices,
+make route-leaf source searches optional, and retain explicitly selected operator
+mappings during assessment. Exploration and ranking policies are unchanged.
+Restart the server and begin a new investigation for new scientific calls.
+
 Fragment investigations now support an agent-chosen search/inspect/revise loop in
 one [persistent scientific console](../../chem_coworker/scientific_workspace/task_playbooks/retrosynthesis_fragments.md).
 Run `python -u -m chem_coworker.scientific_workspace.console WORKSPACE` in a

@@ -8,6 +8,8 @@ import math
 import re
 from typing import TYPE_CHECKING, Any, Iterator
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from condition_registry import ConditionComponentInput, build_resolved_recipe_from_inputs
 from condition_registry.models import ConditionProcessStage
 from reactive_taxonomy.structure_audit import audit_structure
@@ -18,6 +20,22 @@ from .route_investigation import _record
 if TYPE_CHECKING:
     from .operations import ScientificOperations
     from ..core.store import InvestigationStore
+
+
+class RouteLeafQuery(BaseModel):
+    """Optional literal source searches for an actual route leaf, never an identity guess."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+    smiles: str = Field(min_length=1, max_length=12000)
+    terms: list[str] = Field(default_factory=list, max_length=10)
+
+    @field_validator("terms")
+    @classmethod
+    def validate_terms(cls, terms: list[str]) -> list[str]:
+        """Allow no search, but reject malformed search requests before any chemistry."""
+        if any(not term.strip() or len(term) > 500 for term in terms):
+            raise ValueError("terms must contain nonblank literal strings of at most 500 characters; use [] to skip searching")
+        return terms
 
 
 def load_proposed_recipe_check(
@@ -87,23 +105,27 @@ def search_captured_sources(
 
 
 def inspect_route_inputs(
-    operations: ScientificOperations, source_ref: str, leaf_queries: list[dict[str, Any]],
+    operations: ScientificOperations, source_ref: str, leaf_queries: list[dict[str, Any]] | None,
     source_refs: list[str] | None,
 ) -> dict[str, Any]:
     """Inspect every recorded route leaf, preserving assumptions and source-search gaps."""
     route = _record(operations, source_ref)
     leaves = route["assessment"]["leaf_smiles"]
     identities = {audit_structure(smiles).canonical_smiles: smiles for smiles in leaves}
+    if leaf_queries is None:
+        leaf_queries = []
     if not isinstance(leaf_queries, list) or len(leaf_queries) > 100:
         raise ValueError("leaf_queries must contain at most 100 {smiles, terms} objects")
     queries = {}
-    for item in leaf_queries:
-        if not isinstance(item, dict) or set(item) != {"smiles", "terms"}:
-            raise ValueError("Each leaf query needs exactly smiles and terms")
-        audit = audit_structure(item["smiles"])
+    for index, item in enumerate(leaf_queries):
+        try:
+            query = RouteLeafQuery.model_validate(item)
+        except ValueError as exc:
+            raise ValueError(f"leaf_queries[{index}]: {exc}") from exc
+        audit = audit_structure(query.smiles)
         if not audit.valid or audit.canonical_smiles not in identities or audit.canonical_smiles in queries:
-            raise ValueError("Each query must identify one distinct actual route leaf, including stereochemistry")
-        queries[audit.canonical_smiles] = item["terms"]
+            raise ValueError(f"leaf_queries[{index}].smiles must identify one distinct actual route leaf, including stereochemistry")
+        queries[audit.canonical_smiles] = query.terms
     results, refs = [], [source_ref]
     unavailable = route.get("material_constraints", {}).get("unavailable_starting_materials", [])
     for identity, smiles in identities.items():
@@ -122,7 +144,7 @@ def inspect_route_inputs(
                       else operations.assess_starting_material(smiles, unavailable_starting_materials=unavailable))
         if previous:
             refs.append(previous.artifact_ref)
-        search = search_captured_sources(operations, queries[identity], source_refs, 0, 3) if identity in queries else None
+        search = search_captured_sources(operations, queries[identity], source_refs, 0, 3) if queries.get(identity) else None
         if search:
             refs.extend(search["evidence_refs"])
         results.append({"smiles": smiles, "starting_material_assessment": assessment,

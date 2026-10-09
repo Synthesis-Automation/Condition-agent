@@ -10,13 +10,15 @@ from ..core.store import InvestigationStore
 
 
 def answer_step_assessments(
-    store: InvestigationStore, answer: dict[str, Any],
+    store: InvestigationStore, answer: dict[str, Any], *, answer_ref: str | None = None,
 ) -> dict[str, dict[str, Any]]:
-    """Expose cited structural gates and same-reaction recipe checks separately.
+    """Expose all exact-step structural gates and cited recipe checks separately.
 
     Both complete sides, including stereo and chemical form, must match. Recipe
     checks describe their saved recipe, not necessarily the answer's prose recipe.
-    Older records without coverage remain explicitly unreported.
+    Uncited structural checks cannot be hidden by citing only an inspection.
+    An answer event bounds historical views so later checks do not rewrite them.
+    Recipe checks remain citation-bound: matching graphs do not identify a recipe.
     """
     molecules = {item["id"]: item["smiles"] for item in answer.get("molecules", [])}
     result = {}
@@ -38,7 +40,13 @@ def answer_step_assessments(
     references.update(ref for step in answer.get("steps", []) for ref in step.get("precedent_refs", []))
     references.update(ref for step in answer.get("steps", []) for ref in step.get("recipe_assessment_refs", []))
     try:
-        recorded_calls = {event.artifact_ref for event in store.events() if event.kind == "call"}
+        events = store.events()
+        if answer_ref is not None:
+            boundary = next((event.sequence for event in events if event.artifact_ref == answer_ref), None)
+            if boundary is None:
+                raise ValueError("Saved answer event is unavailable")
+            events = [event for event in events if event.sequence <= boundary]
+        recorded_calls = {event.artifact_ref for event in events if event.kind == "call"}
         calls = {reference: store.read_artifact(reference)
                  for reference in sorted(references & recorded_calls)}
         # An attached inspection may cite its parent assessment indirectly.
@@ -46,8 +54,14 @@ def answer_step_assessments(
                           if ref in calls and calls[ref].get("operation") == "inspect_step_precedents")
         calls.update({reference: store.read_artifact(reference)
                       for reference in sorted((references & recorded_calls) - calls.keys())})
+        # Recover assessment receipts independently of the agent's citation choices.
+        # These are diagnostics, not newly inferred precedent or recipe support.
+        for reference in sorted(recorded_calls - calls.keys()):
+            payload = store.read_artifact(reference)
+            if payload.get("operation") in SOURCE_OPERATIONS - {"disconnect_target"}:
+                calls[reference] = payload
         for reference, payload in calls.items():
-            if reference not in references or payload.get("execution_status") != "completed":
+            if payload.get("execution_status") != "completed":
                 continue
             operation = payload.get("operation")
             saved = payload.get("result", {})
@@ -80,6 +94,7 @@ def answer_step_assessments(
                     if assessment:
                         view["structural_assessments"].append({
                             "artifact_ref": reference,
+                            "attribution": "cited" if reference in references else "saved_exact_step_check",
                             **{name: assessment.get(name) for name in (
                                 "status", "actionable", "admission_eligible", "warnings",
                             )},
@@ -87,7 +102,7 @@ def answer_step_assessments(
                                 "gate_id", "status", "summary", "warnings",
                             )} for gate in assessment.get("gates", [])],
                         })
-                    if recipe:
+                    if recipe and reference in references:
                         view["recipe_assessments"].append({
                             "artifact_ref": reference, "recipe_id": recipe_id,
                             **({"process_coverage": saved.get("process_coverage")}
@@ -98,7 +113,7 @@ def answer_step_assessments(
                                 "evidence",
                             )},
                         })
-                    if assessment or recipe:
+                    if assessment or (recipe and reference in references):
                         view["status"] = "recorded"
     except (OSError, ValueError, KeyError, TypeError) as exc:
         # Fail closed rather than display a partial success after corrupt evidence.

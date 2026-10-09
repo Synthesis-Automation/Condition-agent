@@ -5,6 +5,7 @@ from rdkit import Chem
 
 from reactive_taxonomy.fragment_search import compile_fragment_query, validate_fragment_target
 from reactive_taxonomy.precedent_queries import plan_precedent_queries
+from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
 
 TARGET = "CC1(CC(C)(C)C(c(c1n2C(C)=O)c3c2ccnc3)=O)C"
 NH_CORE = "[H][n]1c2c(cncc2)c2C(CCCc12)=O"
@@ -46,3 +47,35 @@ def test_smarts_bond_order_is_not_an_alternative_bond():
     assert compile_fragment_query("[#6]1-[#6]-[#6]-[#6]-[#6]-[#6]-1", "smarts")
     with pytest.raises(ValueError, match="Alternative bond"):
         compile_fragment_query("C-,=C", "smarts")
+
+
+@pytest.mark.parametrize("target", [
+    "CC(C)C[C@@H]1CN2[C@@H](c3c(C2)cccc3)CC1=O",
+    "CC(C)C[C@H]1CN2[C@H](c3c(C2)cccc3)CC1=O",
+    "C[C@]1(O)CCC[C@@H]1F",
+    "[2H][C@](F)(Cl)Br",
+    "[13CH3][C@@H](O)c1ccccc1",
+])
+def test_stereo_ring_queries_survive_serialization_and_reject_inversion(target):
+    molecule = Chem.MolFromSmiles(target)
+    plan = plan_precedent_queries(target)
+    assert plan["definition_version"] == "precedent_discovery.v1@1.1"
+    assert plan == plan_precedent_queries(Chem.MolToSmiles(molecule, rootedAtAtom=4))
+    canonical = Chem.MolFromSmiles(plan["target_smiles"])
+    for ladder in plan["ladders"]:
+        for step in ladder:
+            query = compile_fragment_query(step["query"], "smarts", "subgraph")
+            assert validate_fragment_target(query, target).matches_target
+            assert step["target_atom_ids"] in canonical.GetSubstructMatches(
+                query.molecule, useChirality=True, uniquify=False,
+            )
+        full = compile_fragment_query(ladder[-1]["query"], "smarts", "subgraph")
+        for atom in molecule.GetAtoms():
+            if atom.GetChiralTag() == Chem.ChiralType.CHI_UNSPECIFIED:
+                continue
+            inverted = Chem.Mol(molecule)
+            inverted.GetAtomWithIdx(atom.GetIdx()).InvertChirality()
+            assert not validate_fragment_target(full, Chem.MolToSmiles(inverted)).matches_target
+    # Query creation must not inject stereo into shared cached atom templates.
+    for expression in ("[#6;A;+0]", "[#6;A;+0;H1]", "[C;H1;+0]"):
+        assert compile_smarts(expression).GetAtomWithIdx(0).GetChiralTag() == Chem.ChiralType.CHI_UNSPECIFIED

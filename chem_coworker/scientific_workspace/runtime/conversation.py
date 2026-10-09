@@ -485,7 +485,9 @@ class ConversationService:
                 turn["step_precedent_evidence"] = answer_step_precedents(
                     store, turn["answer"],
                 )
-                turn["step_assessment_evidence"] = answer_step_assessments(store, turn["answer"])
+                turn["step_assessment_evidence"] = answer_step_assessments(
+                    store, turn["answer"], answer_ref=turn.get("answer_ref"),
+                )
                 from ..views.literature_images import answer_literature_images
 
                 turn["literature_image_evidence"] = answer_literature_images(store, turn["answer"])

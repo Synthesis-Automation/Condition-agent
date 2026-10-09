@@ -21,6 +21,8 @@ from core_retrosynthesis.route_proposal_revision import (
     revise_external_route_proposal,
 )
 
+from .step_selection import resolve_saved_candidate
+
 if TYPE_CHECKING:
     from .operations import ScientificOperations
 
@@ -169,7 +171,11 @@ def assess_step(
     include_forward: bool, evidence_refs: list[str] | None,
 ) -> dict[str, Any]:
     """Compose canonical single-step assessment and supplied-recipe checks."""
-    evidence = _evidence(operations, evidence_refs)
+    proposal, mapping_evidence = resolve_saved_candidate(operations.store, proposal)
+    refs = _strings(evidence_refs, "evidence_refs")
+    if mapping_evidence:
+        refs.append(mapping_evidence["source_ref"])
+    evidence = _evidence(operations, refs)
     step = _step(proposal)
     assessment = assess_external_retrosynthesis_proposal(
         step, **_assessment_arguments(operations, include_conditions, include_forward),
@@ -178,6 +184,7 @@ def assess_step(
         "schema_version": "route_step_investigation.v1", "origin": "agent_proposal",
         "review_status": "unreviewed", "proposal": step.to_dict(),
         "assessment": assessment.to_dict(), "proposed_recipe_assessment": _recipe(operations, step),
+        "mapping_evidence": mapping_evidence,
         **evidence, "experimental_feasibility": "not_established",
     }
 
@@ -187,7 +194,18 @@ def assess_route(
     include_conditions: bool, include_forward: bool, evidence_refs: list[str] | None,
 ) -> dict[str, Any]:
     """Retain the submitted hypothesis and full authoritative assessment side by side."""
-    evidence = _evidence(operations, evidence_refs)
+    mapping_evidence = {}
+    refs = _strings(evidence_refs, "evidence_refs")
+    if isinstance(proposal, dict) and isinstance(proposal.get("steps"), list):
+        steps = []
+        for value in proposal["steps"]:
+            step, mapping = resolve_saved_candidate(operations.store, value)
+            steps.append(step)
+            if mapping:
+                mapping_evidence[step.get("external_step_id", "")] = mapping
+                refs.append(mapping["source_ref"])
+        proposal = {**proposal, "steps": steps}
+    evidence = _evidence(operations, refs)
     route = _proposal(proposal)
     unavailable = _strings(unavailable_starting_materials, "unavailable_starting_materials")
     if len(unavailable) > 100:
@@ -198,6 +216,7 @@ def assess_route(
     return {
         "schema_version": "route_investigation.v1", "origin": "agent_proposal",
         "review_status": "unreviewed", "proposal": route.to_dict(), "assessment": assessment.to_dict(),
+        "mapping_evidence": mapping_evidence,
         "assessment_options": {"include_conditions": include_conditions, "include_forward": include_forward},
         "material_constraints": assess_declared_route_materials(assessment, tuple(unavailable)).to_dict(),
         "proposed_recipe_assessments": {
@@ -260,9 +279,18 @@ def revise_branch(
     if not risks:
         raise ValueError("Revision requires explicit unresolved risks")
     refs = [source_ref, *source["evidence_refs"], *_strings(evidence_refs, "evidence_refs")]
+    mapping_evidence = {key: value for key, value in source.get("mapping_evidence", {}).items()
+                        if key not in remove_step_ids}
+    replacements = []
+    for value in replacement_steps:
+        value, mapping = resolve_saved_candidate(operations.store, value)
+        replacements.append(_step(value, named=True))
+        if mapping:
+            mapping_evidence[value["external_step_id"]] = mapping
+            refs.append(mapping["source_ref"])
     revision = revise_external_route_proposal(
         _proposal(source["proposal"]), remove_step_ids=tuple(_strings(remove_step_ids, "remove_step_ids")),
-        replacement_steps=tuple(_step(value, named=True) for value in replacement_steps),
+        replacement_steps=tuple(replacements),
     )
     record = assess_route(
         operations, revision.proposal.to_dict(), source["material_constraints"]["unavailable_starting_materials"],
@@ -272,7 +300,7 @@ def revise_branch(
     change = revision.to_dict()
     del change["proposal"]
     return {
-        **record, "source_ref": source_ref,
+        **record, "source_ref": source_ref, "mapping_evidence": mapping_evidence,
         "revision": {**change, "reason": reason, "assumptions": assumptions, "risks": risks,
                      "basis": "proposed", "reassessment_scope": "all_steps_and_route_topology",
                      "improvement_status": "not_automatically_established"},
