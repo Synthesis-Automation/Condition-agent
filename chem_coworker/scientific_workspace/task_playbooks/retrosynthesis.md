@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v10
+# Retrosynthesis investigation adviser v11
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -11,6 +11,30 @@ stereochemistry. Consider material, condition and scope constraints. Define what
 a terminal material acceptable; a vendor listing does not confirm stock.
 
 ## Scientific questions
+
+Develop an explicit core-construction hypothesis and a credible entry material
+before expanding finishing variants. Prioritize the unresolved question shared
+by the routes: precursor preparation, substitution position, partner compatibility,
+or selectivity. Search for an experiment that addresses that particular question.
+If a consequential gap has a plausible alternative, revise and assess that branch
+before treating a limitation note as the endpoint. A bounded unsuccessful search
+may still justify stopping with the gap explicit.
+
+Compare candidate precursors using the saved strategic-complexity trace as well
+as structural support. A negative graph_complexity_reduction_fraction and extra
+precursor atoms expose added preparation burden; neither proves infeasibility.
+Do not select a more elaborate precursor solely because its template has more
+references. Protection/deprotection and functional-group interconversions can be
+useful despite little scaffold simplification. Consider protected and unprotected
+partners when multiple reactive sites make selectivity consequential; do not
+automatically add protection without checking its compatibility and step cost.
+
+For literature search, distinguish positional scaffold evidence, reaction-partner
+evidence and their joint compatibility. Combining two analogue examples does not
+establish the exact proposed reaction. Read experimental passages for the critical
+steps and use graph identity to check names, linkers and protection states.
+Compare routes from equally justified starting materials, including preparation
+and protection steps. Label finishing variants that share the same bottleneck.
 
 - Is there an exact inspected route, a transferable analogue, or only a hypothesis?
 - Which construction or unresolved step is the current synthesis bottleneck?

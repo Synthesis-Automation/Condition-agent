@@ -59,7 +59,7 @@ def test_smarts_bond_order_is_not_an_alternative_bond():
 def test_stereo_ring_queries_survive_serialization_and_reject_inversion(target):
     molecule = Chem.MolFromSmiles(target)
     plan = plan_precedent_queries(target)
-    assert plan["definition_version"] == "precedent_discovery.v1@1.1"
+    assert plan["definition_version"] == "precedent_discovery.v1@1.2"
     assert plan == plan_precedent_queries(Chem.MolToSmiles(molecule, rootedAtAtom=4))
     canonical = Chem.MolFromSmiles(plan["target_smiles"])
     for ladder in plan["ladders"]:
@@ -79,3 +79,53 @@ def test_stereo_ring_queries_survive_serialization_and_reject_inversion(target):
     # Query creation must not inject stereo into shared cached atom templates.
     for expression in ("[#6;A;+0]", "[#6;A;+0;H1]", "[C;H1;+0]"):
         assert compile_smarts(expression).GetAtomWithIdx(0).GetChiralTag() == Chem.ChiralType.CHI_UNSPECIFIED
+
+
+def test_focused_context_retains_ester_position_without_other_substituents():
+    target = "COc1cc(C(=O)OCC)ccn1"
+    plan = plan_precedent_queries(target)
+    focused = plan["focused_queries"]
+    assert 1 <= len(focused) <= 3
+    ester_queries = [compile_fragment_query(step["query"], "smarts", "subgraph")
+                     for step in focused if validate_fragment_target(
+                         compile_fragment_query(step["query"], "smarts", "subgraph"),
+                         "CCOC(=O)c1ccncc1").matches_target]
+    assert ester_queries
+    for query in ester_queries:
+        assert validate_fragment_target(query, target).matches_target
+        assert not validate_fragment_target(query, "CCOC(=O)c1ccccn1").matches_target
+        assert not validate_fragment_target(query, "CCOC(=O)c1ccccc1").matches_target
+    assert plan == plan_precedent_queries(Chem.MolToSmiles(Chem.MolFromSmiles(target), rootedAtAtom=3))
+
+
+def test_focused_context_keeps_stereo_and_explicit_atom_correspondence():
+    target = "COc1cc([C@H](O)C)ccn1"
+    plan = plan_precedent_queries(target)
+    molecule = Chem.MolFromSmiles(plan["target_smiles"])
+    stereo_queries = []
+    for step in plan["focused_queries"]:
+        query = compile_fragment_query(step["query"], "smarts", "subgraph")
+        assert step["target_atom_ids"] in molecule.GetSubstructMatches(
+            query.molecule, useChirality=True, uniquify=False)
+        if any(molecule.GetAtomWithIdx(i).GetChiralTag() != Chem.ChiralType.CHI_UNSPECIFIED
+               for i in step["target_atom_ids"]):
+            stereo_queries.append(query)
+    assert stereo_queries
+    assert all(not validate_fragment_target(query, "COc1cc([C@@H](O)C)ccn1").matches_target
+               for query in stereo_queries)
+
+
+@pytest.mark.parametrize("key,value", [
+    ("max_focused_queries_per_core", 0), ("max_focused_queries_per_core", 4),
+    ("focused_context_radius", True), ("focused_context_radius", 4),
+    ("focused_context_priority", ["atom_count"]),
+])
+def test_focused_policy_rejects_invalid_definitions(monkeypatch, key, value):
+    import json
+    from reactive_taxonomy.precedent_queries import discovery_policy
+
+    policy = discovery_policy()
+    policy[key] = value
+    monkeypatch.setattr(json, "loads", lambda _: policy)
+    with pytest.raises(ValueError, match="policy"):
+        discovery_policy()

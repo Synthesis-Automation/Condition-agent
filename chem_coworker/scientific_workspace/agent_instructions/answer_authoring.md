@@ -4,11 +4,14 @@ For synthesis routes, spend the investigation on route generation and precedent
 inspection. The answer needs only route SVGs, reaction SMILES and precedent support.
 Use w.route_answer once; the application assembles IDs, shared intermediates,
 citations and scientific_answer.v2, and draws the SVGs. Do not write SVG, a custom
-builder, a second prose route, step rationales or diagnostic-panel text.
+builder or diagnostic-panel text. A short summary may explain the preferred route,
+its shared bottleneck and why an alternative changes that risk; do not duplicate
+the full route in prose. Step-by-step rationales remain optional.
 
 ```python
 draft = w.route_answer({
     'target_smiles': target_smiles,
+    'summary': 'Preferred proposal and its main unresolved bottleneck.',
     'routes': [{'title': 'Top pick', 'steps': [
         {'reaction_smiles': reactants + '>>' + product,
          'support': [{'ref': saved_ref, 'locator': 'Example 1'}]}

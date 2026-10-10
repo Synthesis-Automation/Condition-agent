@@ -1,9 +1,12 @@
 {
   "schema_version": "precedent_discovery_policy.v1",
-  "definition_version": "precedent_discovery.v1@1.1",
+  "definition_version": "precedent_discovery.v1@1.2",
   "stereo_hydrogen_policy": "preserve_at_specified_centers",
   "max_cores": 3,
   "max_steps_per_core": 4,
+  "max_focused_queries_per_core": 3,
+  "focused_context_radius": 3,
+  "focused_context_priority": ["heteroatoms", "multiple_bonds", "atom_count"],
   "min_core_atoms": 4,
   "max_target_atoms": 100,
   "refine_above_products": 40,

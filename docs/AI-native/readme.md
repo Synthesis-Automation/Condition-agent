@@ -2,6 +2,23 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+2026-10-10: automatic precedent discovery now tries bounded queries retaining
+one attached region at a time before combining all peripheral context. The
+`precedent_discovery.v1@1.2` definition retains positional and stereo constraints;
+sibling queries reuse only completely enumerated ancestor results. Earlier
+partial searches remain partial and cannot authorize transfer. No index rebuild
+is required; restart the server and start a new investigation for scientific calls.
+
+New chats default to **Normal**, enabling recorded optional planning guides and
+structured answers. Explicit mode selections and existing conversations retain
+their mode. The retrosynthesis guide prioritizes shared bottlenecks, credible
+entry materials and selectivity-driven revisions. Compact disconnection summaries
+now expose existing precursor-complexity evidence; ranking weights, admission
+and chemistry release gates are unchanged. A brief route preference can be saved
+in `route_answer.summary`. Persistent-console and event-reference examples reduce
+setup/serialization mistakes. These changes are engineering corrections, not
+evidence of improved chemist acceptance or measured model-run latency.
+
 Saved `find_synthesis_precedents` hits now feed `investigate_fragment_precedent`
 directly. Inspection binds the selected observation to its original recorded query;
 partial discovery stays partial and cannot authorize transfer. Candidate precedent

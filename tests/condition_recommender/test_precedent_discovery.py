@@ -107,3 +107,54 @@ def test_complete_candidate_reuse_matches_fresh_search(discovery_index):
     fresh = search_fragment_precedents(discovery_index, steps[-1]["query"], "smarts", "subgraph")
     assert reused["counts"] == fresh["counts"]
     assert reused["hits"] == fresh["hits"]
+
+
+@pytest.mark.parametrize("include_ester", [True, False])
+@pytest.mark.parametrize("product_cap", [1, 500])
+def test_sibling_contexts_do_not_prune_each_other(tmp_path, include_ester, product_cap, monkeypatch):
+    import condition_recommender.fragment_search as search
+    from condition_recommender.fragment_search import search_fragment_precedents
+
+    original_policy = search.fragment_search_policy
+    monkeypatch.setattr(search, "fragment_search_policy", lambda: {
+        **original_policy(), "max_matched_products": product_cap,
+    })
+
+    products = ["COc1ccccn1"]
+    if include_ester:
+        products.append("CCOC(=O)c1ccncc1")
+    source = tmp_path / "source.jsonl"
+    source.write_text("\n".join(json.dumps({
+        "observation_id": str(i), "reaction_id": str(i), "reference_id": str(i),
+        "reaction_smiles": "CC>>" + product, "admission_tier": "review",
+        "reaction_observation": asdict(featurize_reaction("CC>>" + product).observation),
+    }) for i, product in enumerate(products)), encoding="utf-8")
+    index = tmp_path / "fragments.sqlite"
+    build_fragment_index(source, index)
+    result = find_synthesis_precedents(index, "COc1cc(C(=O)OCC)ccn1")
+    focused = [a for a in result["attempts"] if a["level"] == "focused_context"]
+    assert len(focused) == 2
+    assert focused[0]["counts"]["products"]["value"] == int(include_ester)
+    assert focused[1]["counts"]["products"]["value"] == 1
+    if not include_ester:
+        assert focused[0]["decision"] == "no_matches_try_next_context"
+    for attempt in focused:
+        fresh = search_fragment_precedents(index, attempt["query"], "smarts", "subgraph")
+        assert attempt["counts"] == fresh["counts"]
+        assert attempt["returned_observation_ids"] == [hit["observation_id"] for hit in fresh["hits"]]
+    assert result["execution"]["library_loads"] == 1
+    assert result["search_status"] == ("partial" if include_ester and product_cap == 1 else "complete")
+    assert all(hit["discovery"]["core_relationship"] == "unresolved" for hit in result["hits"])
+
+
+def test_focused_schedule_preserves_deadline_and_saved_hits(discovery_index, monkeypatch):
+    from itertools import chain, repeat
+    import condition_recommender.precedent_discovery as discovery
+
+    clock = chain([0.0, 0.0, 0.0], repeat(2.0))
+    monkeypatch.setattr(discovery, "monotonic", lambda: next(clock))
+    result = discovery.find_synthesis_precedents(discovery_index, "CC(=O)N1CCCC1", timeout_seconds=1)
+    assert len(result["attempts"]) == 1
+    assert result["hits"]
+    assert result["search_status"] == "partial"
+    assert result["stop_reason"] == "deadline"

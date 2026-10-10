@@ -190,6 +190,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "forward_validation_status", "precedent_reaction_ids", "selectivity_warnings",
             "precursor_compatibility_disposition", "reaction_compatibility_disposition",
             "bond_focus_check",
+            "strategic_class", "strategic_complexity_score", "strategic_candidate",
         )
 
         def strategy(item: Any, child: str) -> Any:
@@ -200,6 +201,12 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             ), child)
             if isinstance(item, Mapping):
                 view.add_nested(result, item, "representative", realization_fields, child)
+                representative = item.get("representative")
+                if isinstance(representative, Mapping):
+                    view.add_nested(result["representative"], representative, "strategic_complexity", (
+                        "definition_id", "evidence", "graph_complexity_reduction_fraction",
+                        "extra_precursor_heavy_atom_count", "warnings",
+                    ), f"{child}.representative")
                 view.add_list(result, item, "alternate_realizations", realization_fields, child, limit=2)
             return result
 

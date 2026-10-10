@@ -135,7 +135,7 @@ def test_api_validates_modes_and_serves_free_answers(service):
         assert [item["mode"] for item in config["workspace_modes"]] == [
             "pure_agent", "tools_only", "normal", "tools_formatting", "tools_guidance",
         ]
-        assert config["default_workspace_mode"] == "tools_formatting"
+        assert config["default_workspace_mode"] == "normal"
         assert 'id="workspace-mode"' in client.get("/scientific").text
         headers = {"x-scientific-token": config["token"]}
         endpoint = "/api/v1/scientific/turns"
@@ -277,6 +277,21 @@ class StructuredRuntime(FreeRuntime):
         }, "thread", {"input_tokens": 3})
 
 
+def test_new_chat_default_records_guidance_and_keeps_it_on_followup(service):
+    service.runtime = StructuredRuntime()
+    identity = service.submit("Find a route")["conversation_id"]
+    first = finish(service, identity)
+    assert first["status"] == "completed", first.get("error")
+    assert first["mode_policy"]["task_guidance"] is True
+    assert first["mode_policy"]["structured_answer"] is True
+    workspace = ScientificWorkspace(service.root / identity)
+    assert "shared" in workspace.task_guide("retrosynthesis")["text"]
+    service.submit("Compare the alternatives", identity)
+    second = finish(service, identity)
+    assert second["workspace_mode"] == "normal"
+    assert second["thread_resume"] == "resumed"
+
+
 @pytest.mark.parametrize("mode,guidance,formatting", [
     (WorkspaceMode.TOOLS, False, False),
     (WorkspaceMode.TOOLS_FORMATTING, False, True),
@@ -338,7 +353,7 @@ def test_formatting_repair_does_not_enable_task_guidance(service, recover):
             return result
 
     service.runtime = RepairRuntime()
-    identity = service.submit("Explain")["conversation_id"]
+    identity = service.submit("Explain", mode="tools_formatting")["conversation_id"]
     turn = finish(service, identity)
     assert turn["status"] == ("completed" if recover else "failed"), turn.get("error")
     assert turn["repair_attempts"] == 1

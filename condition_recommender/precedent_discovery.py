@@ -89,8 +89,19 @@ def find_synthesis_precedents(
         if monotonic() - started < timeout_seconds:
             session.load_library()
         for ladder in plan["ladders"]:
-            parent_ids = None
-            for step in ladder:
+            # Focused contexts are siblings. Only a fully enumerated query
+            # whose selected target atoms are a subset may constrain another.
+            enumerated = []
+            focus = [step for step in plan["focused_queries"]
+                     if step["core_id"] == ladder[0]["core_id"]]
+            insertion = next((i for i, step in enumerate(ladder)
+                              if step["level"] in {"neighbor_context", "target_context"}), len(ladder))
+            schedule = ladder[:insertion] + focus + ladder[insertion:]
+            for position, step in enumerate(schedule):
+                selected_atoms = set(step["target_atom_ids"])
+                reusable = [(atoms, ids) for atoms, ids in enumerated
+                            if atoms <= selected_atoms]
+                parent_ids = max(reusable, key=lambda item: len(item[0]))[1] if reusable else None
                 remaining = timeout_seconds - (monotonic() - started)
                 if remaining < 1:
                     timed_out = True
@@ -122,7 +133,10 @@ def find_synthesis_precedents(
                     decision = "deadline"
                     timed_out = True
                 elif current_ids is not None and not current_ids:
-                    decision = "no_matches_try_next_core"
+                    has_alternative = any(not selected_atoms <= set(later["target_atom_ids"])
+                                          for later in schedule[position + 1:])
+                    decision = ("no_matches_try_next_context" if has_alternative
+                                else "no_matches_try_next_core")
                 elif search["search_status"] == "too_broad" or count["value"] > policy["refine_above_products"]:
                     decision = "add_context"
                 elif len(construction_refs) >= policy["sufficient_construction_references"]:
@@ -138,8 +152,8 @@ def find_synthesis_precedents(
                                  "returned_observation_ids": [h["observation_id"] for h in search["hits"]]})
                 if decision in {"deadline", "no_matches_try_next_core", "enough_construction_references"}:
                     break
-                # Only complete product enumeration can safely restrict a nested query.
-                parent_ids = current_ids
+                if current_ids is not None:
+                    enumerated.append((selected_atoms, current_ids))
             if timed_out:
                 break
         loads = session.library_loads

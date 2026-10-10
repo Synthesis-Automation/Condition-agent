@@ -1,4 +1,4 @@
-# Fragment precedent adviser v4
+# Fragment precedent adviser v5
 
 Optional supporting advice for `retrosynthesis`. Use it when constructing an unfamiliar
 core is a decision-changing uncertainty. A supported route or clear disconnection may
@@ -14,6 +14,13 @@ Search once, inspect actual source reactions, then decide whether to narrow,
 broaden, change the selected region, follow a precursor, or stop. Do not execute
 a predetermined ladder or require a minimum number of queries when evidence is
 already sufficient. `suggest_search_fragments` is optional assistance.
+
+If a bare core is too broad but all neighboring substituents give zero hits,
+retain one decision-relevant attached region at a time. Preserve core topology
+and the position of that region while relaxing unrelated substituents. For an
+intermediate-preparation question, search the explicit proposed intermediate;
+do not silently substitute a different functional group in a target-derived query.
+Inspect formation versus retention of the relevant bonds in each source.
 
 For multiple searches, use one persistent terminal session:
 
@@ -56,6 +63,10 @@ relevant construction precedents without choosing query syntax. It selects
 informative ring subsets, samples broad matches, adds context, and retains earlier
 construction leads. It loads the fragment index once and reuses only completely
 enumerated candidate sets for nested refinements. The default budget is 90 seconds.
+Definition v1@1.2 also tries up to three sibling queries per core, each retaining
+one attached region before combining all neighboring context. A zero-hit sibling
+does not suppress another region. These graph-selected regions are hypotheses;
+the agent may choose a different query for the actual chemical question.
 
 Inspect `hits[].discovery`, references, source records and procedures. Explicit
 relaxations include peripheral substitution, hydrogen counts and additional ring
@@ -70,6 +81,9 @@ its `discovery.query`, `query_format` and `topology` into a recorded
 observation using the detailed workflow below. No production retro library is
 needed for discovery. The agent may choose its own fragments and query edits
 directly; running automatic discovery first is not required.
+When automatic discovery is partial, inspect the source as a lead, then run a
+more focused explicit search if transfer evidence could change the route. Never
+clear the partial flag or treat source inspection as completed transfer.
 
 ## Purpose and context
 

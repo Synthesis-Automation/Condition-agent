@@ -10,6 +10,14 @@ Set-Location "C:\Git-softwares\Condition-agent"
 
 ## Quick start
 
+The October 10 route-workflow update adds one-region-at-a-time precedent queries,
+visible precursor-complexity evidence in agent summaries, and revised planning
+guidance for shared bottlenecks and starting materials. **Normal** is now the
+default for new agent chats so the optional guides are available. Restart the
+agent server, refresh the browser and create a new investigation. Existing chats
+keep their saved mode; no dataset rebuild or frontend build is required for the
+agent page. Ranking weights and admission checks are unchanged.
+
 The latest workspace fixes connect automatic precedent discovery to source
 inspection and attach existing exact-step inspections to compact route answers.
 Saved candidate inspections also provide reassessment inputs; unresolved checks
@@ -212,8 +220,8 @@ Use **Workspace mode** in the top bar before sending the first message:
 | --- | --- | --- | --- |
 | 1. Pure agent | Disabled | Disabled | None |
 | 2. Tools and data | Enabled | Disabled | None |
-| 3. Normal | Enabled | Enabled | Existing structured answer |
-| 4. Tools + formatting (default) | Enabled | Disabled | Existing structured answer |
+| 3. Normal (default) | Enabled | Enabled | Existing structured answer |
+| 4. Tools + formatting | Enabled | Disabled | Existing structured answer |
 | 5. Tools + guidance | Enabled | Enabled | None |
 
 The mode is saved with the conversation and every turn. Start a **New chat**
@@ -221,7 +229,7 @@ to change it; follow-ups keep the same mode and runtime thread when possible.
 Existing conversations keep their saved mode; legacy conversations without a
 saved mode remain in Normal. The turns API accepts an optional
 `mode` value (`pure_agent`, `tools_only`, `normal`, `tools_formatting`, or
-`tools_guidance`); omitting it uses Tools + formatting
+`tools_guidance`); omitting it uses Normal
 for new conversations and the saved mode for follow-ups. A mode change within
 an existing conversation returns HTTP 422.
 

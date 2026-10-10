@@ -17,6 +17,12 @@ For public workspace helpers, use w.help(['capture_source_file', 'finalize_answe
 to read signatures and examples; they are separate from the scientific catalogue.
 When running several calls in one script, collect their artifact refs and print
 w.batch_summary(refs) once instead of concatenating many individually bounded views.
+`w.run(...)` returns an InvestigationEvent, not a JSON object. Save
+`event.artifact_ref` in JSON and use `w.call_summary(event)` for its result view.
+For repeated fragment queries, `python -u -m chem_coworker.scientific_workspace.console WORKSPACE`
+accepts one JSON line at a time and reuses its index worker. Send
+`{"operation":"search_fragment_precedents","arguments":{...},"reason":"..."}`;
+inspect each response before the next query, and send `{"action":"quit"}` at the end.
 
 Reuse saved calls for unchanged inputs: `w.call_summary(ref)` reads their brief
 decision views. `w.inspect_artifact(ref, path=('result', 'hits'), offset=0, limit=3)`

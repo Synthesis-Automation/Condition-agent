@@ -30,6 +30,28 @@ def _call(operation, result):
             "duration_seconds": 1.234, "result_bytes": 9876}
 
 
+@pytest.mark.parametrize("summarize", [summarize_call, summarize_call_brief])
+def test_disconnection_summary_retains_precursor_burden_without_reranking(summarize):
+    complexity = {
+        "definition_id": "strategic_complexity.v1", "evidence": "molecular_graph_only",
+        "graph_complexity_reduction_fraction": -0.4, "extra_precursor_heavy_atom_count": 12,
+        "warnings": ["RETROSYNTHETIC_COMPLEXITY_INCREASE", "STRATEGIC_COMPLEXITY_MAPPING_UNAVAILABLE"],
+    }
+    result = {"strategies": [{"strategy_id": "first", "strategy_rank": 1, "representative": {
+        "precursor_smiles": "CCO", "strategic_class": "complexity_increasing",
+        "strategic_complexity_score": 0.0, "strategic_candidate": False,
+        "strategic_complexity": complexity,
+    }}, {"strategy_id": "second", "strategy_rank": 2, "representative": {"precursor_smiles": "CO"}}]}
+    original = deepcopy(result)
+    summary = summarize(_call("disconnect_target", result))["result_summary"]
+    assert [s["strategy_id"] for s in summary["strategies"]] == ["first", "second"]
+    representative = summary["strategies"][0]["representative"]
+    assert representative["strategic_complexity"] == complexity
+    assert representative["strategic_class"] == "complexity_increasing"
+    assert "strategic_complexity" not in summary["strategies"][1]["representative"]
+    assert result == original
+
+
 def test_recipe_summary_exposes_coverage_without_reading_complete_artifact() -> None:
     assessment = asdict(assess_reaction_recipe("CCBr.N>>CCN", {
         "solvents": [{"identity_status": "resolved", "substance_id": "cas:64-17-5"}],

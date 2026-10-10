@@ -6,7 +6,7 @@ let token = '', identity = null, active = null, conversation = null, displayed =
 let loaded = false, submitting = false, polling = false, pollAgain = false;
 let pollTimer = null, navigation = 0, stopping = null, sidebarOpen = false, activityVersion = 0;
 const drafts = new Map();
-let workspaceModes = [], newMode = 'tools_formatting';
+let workspaceModes = [], newMode = 'normal';
 function updateMode() {
   const selected = identity ? (conversation?.workspace_mode || 'normal') : newMode;
   $('workspace-mode').value = selected;

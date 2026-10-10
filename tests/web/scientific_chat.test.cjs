@@ -99,7 +99,7 @@ function harness() {
 test('workspace mode is selectable for new chats and locked to a reopened conversation', async () => {
   const {ids, run, respond} = harness();
   run('loaded=true; updateControls()');
-  assert.equal(ids['workspace-mode'].value, 'tools_formatting');
+  assert.equal(ids['workspace-mode'].value, 'normal');
   assert.equal(ids['workspace-mode'].disabled, false);
   ids['workspace-mode'].value = 'pure_agent';
   ids['workspace-mode'].onchange();
@@ -648,7 +648,7 @@ test('sending a question opens its chat and replaces Send with live progress and
     throw new Error('Unexpected route: ' + route);
   });
   await ids.form.onsubmit({preventDefault() {}});
-  assert.deepEqual(submitted, {question:'Analyze CCO',conversation_id:null,mode:'tools_formatting'});
+  assert.deepEqual(submitted, {question:'Analyze CCO',conversation_id:null,mode:'normal'});
   assert.equal(ids.question.value, '');
   assert.equal(run('identity'), 'created');
   assert.equal(ids.cancel.hidden, false);

@@ -20,6 +20,10 @@ signatures and callable examples. Helpers are not in w.operations.catalog().
 Do not guess old module paths or read implementation files to learn these APIs.
 For several results, collect event.artifact_ref and print w.batch_summary(refs)
 once. Its 16 KiB budget applies to the entire batch, with every omitted ref retained.
+`w.run(...)` returns an InvestigationEvent, not a JSON object. Save only
+`event.artifact_ref` in JSON; `w.call_summary(event)` reads the recorded result.
+For repeated fragment queries, use the persistent scientific console described in
+`w.task_guide('retrosynthesis_fragments')` to reuse the loaded index worker.
 
 Manifest investigation.json identifies selected datasets, versions and limitations.
 Events and artifacts retain complete calls and notes. Start with w.run_summary(...)

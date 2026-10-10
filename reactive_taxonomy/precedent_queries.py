@@ -26,7 +26,8 @@ def discovery_policy() -> dict[str, Any]:
     """Load the versioned core-selection and bounded search policy."""
     value = json.loads((Path(__file__).parent / "definitions/precedent_discovery.v1.json").read_text("utf-8"))
     if (value.get("schema_version") != "precedent_discovery_policy.v1"
-            or value.get("definition_version") != "precedent_discovery.v1@1.1"
+            or value.get("definition_version") != "precedent_discovery.v1@1.2"
+            or value.get("focused_context_priority") != ["heteroatoms", "multiple_bonds", "atom_count"]
             or value.get("stereo_hydrogen_policy") != "preserve_at_specified_centers"
             or value.get("levels") != ["core", "multiple_bond_context", "neighbor_context", "target_context"]
             or value.get("relaxations") != ["omitted_peripheral_atoms", "unconstrained_hydrogen_count", "additional_ring_fusion"]
@@ -35,10 +36,14 @@ def discovery_policy() -> dict[str, Any]:
         raise ValueError("Invalid precedent discovery policy")
     for key in ("max_cores", "max_steps_per_core", "min_core_atoms", "max_target_atoms",
                 "refine_above_products", "sufficient_construction_references",
-                "default_timeout_seconds", "max_timeout_seconds"):
+                "default_timeout_seconds", "max_timeout_seconds",
+                "max_focused_queries_per_core", "focused_context_radius"):
         if type(value.get(key)) is not int or value[key] < 1:
             raise ValueError(f"Invalid discovery policy: {key}")
-    if value["default_timeout_seconds"] > value["max_timeout_seconds"] or value["max_steps_per_core"] > 4:
+    if (value["default_timeout_seconds"] > value["max_timeout_seconds"]
+            or value["max_steps_per_core"] > 4
+            or value["max_focused_queries_per_core"] > 3
+            or value["focused_context_radius"] > 3):
         raise ValueError("Invalid discovery policy bounds")
     return value
 
@@ -99,6 +104,46 @@ def _query(mol: Any, selected: set[int]) -> tuple[str, tuple[int, ...]]:
     return expression, tuple(original[i] for i in order)
 
 
+def _focused_contexts(mol: Any, core: set[int], radius: int) -> list[set[int]]:
+    """Keep one attached region at a time without changing the core graph.
+
+    Traverse outside the core only. Multiple attachments into the same region
+    are grouped, rather than silently opening a ring or crossing to a sibling.
+    These are query alternatives, not a nested sequence or chemical handles.
+    """
+    remaining = set(range(mol.GetNumAtoms())) - core
+    regions = []
+    while remaining:
+        pending = [min(remaining)]
+        region: set[int] = set()
+        while pending:
+            atom_id = pending.pop()
+            if atom_id not in remaining:
+                continue
+            remaining.remove(atom_id)
+            region.add(atom_id)
+            pending.extend(n.GetIdx() for n in mol.GetAtomWithIdx(atom_id).GetNeighbors()
+                           if n.GetIdx() in remaining)
+        boundary = {i for i in region if any(
+            n.GetIdx() in core for n in mol.GetAtomWithIdx(i).GetNeighbors())}
+        selected, frontier = set(boundary), boundary
+        for _ in range(radius - 1):
+            frontier = {n.GetIdx() for i in frontier
+                        for n in mol.GetAtomWithIdx(i).GetNeighbors()
+                        if n.GetIdx() in region and n.GetIdx() not in selected}
+            selected.update(frontier)
+        if selected:
+            regions.append(selected)
+
+    def priority(region: set[int]) -> tuple[Any, ...]:
+        return (-sum(mol.GetAtomWithIdx(i).GetAtomicNum() not in (1, 6) for i in region),
+                -sum(b.GetBondTypeAsDouble() > 1 for b in mol.GetBonds()
+                     if b.GetBeginAtomIdx() in region and b.GetEndAtomIdx() in region),
+                len(region), tuple(sorted(region)))
+
+    return [core | region for region in sorted(regions, key=priority)]
+
+
 def plan_precedent_queries(target_smiles: str) -> dict[str, Any]:
     """Generate bounded core-first ladders; every query must match the target."""
     policy = discovery_policy()
@@ -127,7 +172,7 @@ def plan_precedent_queries(target_smiles: str) -> dict[str, Any]:
 
     unique = {tuple(sorted(_complete_context(mol, c, rings))) for c in cores}
     ordered = sorted((set(c) for c in unique), key=priority)
-    ladders = []
+    ladders, focused_queries = [], []
     for number, core in enumerate(ordered[:policy["max_cores"]]):
         multiple = core | {b.GetOtherAtomIdx(i) for i in core for b in mol.GetAtomWithIdx(i).GetBonds()
                            if b.GetBondTypeAsDouble() > 1}
@@ -147,7 +192,22 @@ def plan_precedent_queries(target_smiles: str) -> dict[str, Any]:
             steps.append(asdict(CoreQuery(f"core-{number + 1}", label, expression, order, tuple(sorted(core)))))
             seen.add(expression)
         ladders.append(steps[:policy["max_steps_per_core"]])
+        focused = []
+        for selected in _focused_contexts(mol, core, policy["focused_context_radius"]):
+            selected = _complete_context(mol, selected, rings)
+            expression, order = _query(mol, selected)
+            if expression in seen:
+                continue
+            compiled = compile_fragment_query(expression, "smarts", "subgraph")
+            if not validate_fragment_target(compiled, canonical).matches_target:
+                raise ValueError("Focused query lost target correspondence")
+            focused.append(asdict(CoreQuery(
+                f"core-{number + 1}", "focused_context", expression, order, tuple(sorted(core)),
+            )))
+            seen.add(expression)
+        focused_queries.extend(focused[:policy["max_focused_queries_per_core"]])
     return {"schema_version": "precedent_query_plan.v1", "definition_version": policy["definition_version"],
-            "target_smiles": canonical, "ladders": ladders, "cores_truncated": len(ordered) > len(ladders),
+            "target_smiles": canonical, "ladders": ladders, "focused_queries": focused_queries,
+            "cores_truncated": len(ordered) > len(ladders),
             "relaxations": policy["relaxations"], "stereo_hydrogen_policy": policy["stereo_hydrogen_policy"],
             "target_atom_count": mol.GetNumAtoms()}

@@ -62,7 +62,7 @@ class ConversationService:
             **self.runtime.describe(), "local_only": True,
             "validation_status": "development_snapshot_not_release_validated",
             "artifacts": {name: (self.repository / path).is_file() for name, path in self.artifacts.items()},
-            "workspace_modes": available_modes(), "default_workspace_mode": WorkspaceMode.TOOLS_FORMATTING.value,
+            "workspace_modes": available_modes(), "default_workspace_mode": WorkspaceMode.NORMAL.value,
         }
 
     def _directory(self, conversation_id: str) -> Path:
@@ -94,7 +94,7 @@ class ConversationService:
                 if selected != WorkspaceMode.PURE and not (directory / "investigation.json").is_file():
                     raise ValueError("Investigation preparation failed; start a new conversation")
             else:
-                selected = WorkspaceMode(WorkspaceMode.TOOLS_FORMATTING if mode is None else mode)
+                selected = WorkspaceMode(WorkspaceMode.NORMAL if mode is None else mode)
                 directory.mkdir(exist_ok=False)
                 _write_json(directory / "conversation.json", {
                     "id": identity, "title": question[:100], "created_at": _now(),

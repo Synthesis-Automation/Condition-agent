@@ -210,7 +210,14 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                     "precursor_compatibility_disposition", "reaction_compatibility_disposition",
                     "template_id", "operator_id", "precedent_reaction_ids",
                     "bond_focus_check",
+                    "strategic_class", "strategic_complexity_score", "strategic_candidate",
                 ))
+                complexity = strategy["representative"].get("strategic_complexity")
+                if isinstance(complexity, Mapping):
+                    item["representative"]["strategic_complexity"] = _brief_fields(complexity, (
+                        "definition_id", "evidence", "graph_complexity_reduction_fraction",
+                        "extra_precursor_heavy_atom_count", "warnings",
+                    ))
                 warnings = strategy["representative"].get("selectivity_warnings", [])
                 if warnings:
                     item["representative"]["selectivity_warnings"] = [
