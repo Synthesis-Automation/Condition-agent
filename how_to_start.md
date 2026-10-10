@@ -13,7 +13,10 @@ Set-Location "C:\Git-softwares\Condition-agent"
 The October 10 route-workflow update adds one-region-at-a-time precedent queries,
 visible precursor-complexity evidence in agent summaries, and revised planning
 guidance for shared bottlenecks and starting materials. **Normal** is now the
-default for new agent chats so the optional guides are available. Restart the
+default for new agent chats. Essential checks for the shared bottleneck,
+starting-material access and consequential incomplete searches now appear directly
+in the guided prompt; reading an optional guide is no longer needed to receive
+them. The saved route preference summary is visible below the route diagram. Restart the
 agent server, refresh the browser and create a new investigation. Existing chats
 keep their saved mode; no dataset rebuild or frontend build is required for the
 agent page. Ranking weights and admission checks are unchanged.

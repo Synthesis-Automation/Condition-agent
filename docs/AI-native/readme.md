@@ -11,11 +11,15 @@ is required; restart the server and start a new investigation for scientific cal
 
 New chats default to **Normal**, enabling recorded optional planning guides and
 structured answers. Explicit mode selections and existing conversations retain
-their mode. The retrosynthesis guide prioritizes shared bottlenecks, credible
-entry materials and selectivity-driven revisions. Compact disconnection summaries
-now expose existing precursor-complexity evidence; ranking weights, admission
+their mode. Normal and Tools + guidance include essential route decision checks
+directly in the recorded prompt, without an optional guide call: investigate the
+shared bottleneck, establish starting-material access, and retry consequential
+incomplete searches explicitly. Follow-up work remains bounded, with attempted
+checks and stopping reasons recorded. Detailed guides remain optional. Compact
+disconnection summaries now expose existing precursor-complexity evidence; ranking weights, admission
 and chemistry release gates are unchanged. A brief route preference can be saved
-in `route_answer.summary`. Persistent-console and event-reference examples reduce
+in `route_answer.summary` and is displayed below the route diagram. Persistent-console
+startup and event-reference examples are included directly in the prompt to reduce
 setup/serialization mistakes. These changes are engineering corrections, not
 evidence of improved chemist acceptance or measured model-run latency.
 

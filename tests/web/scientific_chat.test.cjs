@@ -771,11 +771,11 @@ test('condition choices share a scheme and expose two precedents with attributed
     'different explicit transformations must not share a target scheme');
 });
 
-test('retrosynthesis leads with chemistry, retains cautions, and exposes requests for user input', () => {
+test('retrosynthesis leads with chemistry, shows its summary once, and retains cautions and requests', () => {
   const {run, context} = harness();
   const claim = {basis:'proposed',source_ids:['paper'],limitations:[]};
   context.chemistryTurn = {id:'retro',status:'completed',progress:[{kind:'agent_update',detail:'Research log'}],
-    answer:{answer_markdown:'Long written explanation',uncertainties:['Select a solvent'],evidence_refs:[]},
+    answer:{answer_markdown:'Prefer route A; starting-material access remains unresolved.',uncertainties:['Select a solvent'],evidence_refs:[]},
     structured_presentation:{sources:[{id:'paper',kind:'external_source',title:'Paper Example 3',url:'https://example.org/paper',locator:'Example 3'}],
       molecules:[{id:'a',name:'A',limitations:[]},{id:'b',name:'B',limitations:[]}],claims:[],
       routes:[{id:'route',title:'Route',step_ids:['s'],image_url:'route.svg',drawing_status:'linear_scheme',limitations:[],unreached_target_ids:[]}],
@@ -797,6 +797,9 @@ test('retrosynthesis leads with chemistry, retains cautions, and exposes request
   };
   const card = run('answerCard(chemistryTurn)');
   assert.equal(card.children[0].className, 'scientific-view');
+  const summary = context.chemistryTurn.answer.answer_markdown;
+  assert.equal(card.children.filter(n=>n.textContent===summary).length, 1);
+  assert.ok(card.children.some(n=>n.textContent===summary && !inClosedDetails(n)));
   for (const text of ['Research log']) {
     const nodes = card.descendants().filter(n=>n.textContent===text);
     assert.ok(nodes.length && nodes.every(inClosedDetails), text + ' stays in details');
@@ -807,14 +810,14 @@ test('retrosynthesis leads with chemistry, retains cautions, and exposes request
   assert.ok(card.querySelectorAll('img').some(n=>n.src==='source.svg' && !inClosedDetails(n)));
   assert.ok(card.querySelectorAll('a').some(n=>n.href==='https://example.org/paper' && !inClosedDetails(n)));
   assert.equal(byClass(card,'step-conditions').length, 0);
-  for (const text of ['Long written explanation','Replace the leaving group','No applicable reaction capability requirement was checked.']) {
+  for (const text of ['Replace the leaving group','No applicable reaction capability requirement was checked.']) {
     assert.ok(!card.descendants().some(n=>n.textContent===text));
   }
   assert.equal(JSON.stringify(context.chemistryTurn), original);
   context.chemistryTurn.answer.needs_user_input = true;
   const needsInput = run('answerCard(chemistryTurn)');
   assert.ok(needsInput.descendants().some(n=>n.textContent==='Select a solvent' && !inClosedDetails(n)));
-  assert.ok(needsInput.children.some(n=>n.textContent==='Long written explanation'));
+  assert.equal(needsInput.children.filter(n=>n.textContent===summary).length, 1);
 });
 
 test('literature SVGs show their own source structures and retain reconstruction uncertainty', () => {

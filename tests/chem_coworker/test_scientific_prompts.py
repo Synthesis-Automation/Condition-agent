@@ -64,6 +64,23 @@ def test_recorded_empty_runtime_does_not_revive_stale_tool_metadata(prompt_conte
     assert "old/rg.exe" not in text
 
 
+@pytest.mark.parametrize("mode", ["normal", "tools_guidance"])
+def test_route_decision_checks_are_in_prompt_without_loading_guides(prompt_context, mode):
+    workspace, context, _ = prompt_context
+    workspace.task_guide = lambda _: pytest.fail("Core checks must not require a guide call")
+    text = prompts.investigation_prompt(workspace, "Find routes", mode=mode)
+    usage = context["resources"]["agent_instructions/workspace_usage.md"]["text"]
+    route_checks = usage.split("For route-finding tasks,")[1].split("\nNotes use")[0]
+    assert "For route-finding tasks," + route_checks in text
+    for requirement in (
+        "shared synthesis bottleneck", "inspect_route_inputs", "revise the branch",
+        "incomplete_search", "search_fragment_precedents", "reason for stopping",
+        "route from advanced", "preferred",
+    ):
+        assert requirement in route_checks
+    assert "scientific_workspace.console WORKSPACE" in text
+
+
 def test_explicit_guidance_is_optional_deduplicated_and_frozen(prompt_context, monkeypatch):
     workspace, _, guides = prompt_context
     # An application context uses snapshots, even if current files cannot be read.

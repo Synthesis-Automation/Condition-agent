@@ -22,8 +22,15 @@ For several results, collect event.artifact_ref and print w.batch_summary(refs)
 once. Its 16 KiB budget applies to the entire batch, with every omitted ref retained.
 `w.run(...)` returns an InvestigationEvent, not a JSON object. Save only
 `event.artifact_ref` in JSON; `w.call_summary(event)` reads the recorded result.
-For repeated fragment queries, use the persistent scientific console described in
-`w.task_guide('retrosynthesis_fragments')` to reuse the loaded index worker.
+For repeated fragment queries, reuse one persistent terminal process:
+`python -u -m chem_coworker.scientific_workspace.console WORKSPACE`, using the
+recorded interpreter and investigation directory. Send one JSON line at a time:
+`{"operation":"search_fragment_precedents","arguments":{"target_smiles":"TARGET","query":"CORE","timeout_seconds":30},"reason":"Construction question"}`.
+Read each response before choosing the next query; allow time for the first index
+load. Use the catalogue for query arguments and
+`w.task_guide('retrosynthesis_fragments')` for additional console examples.
+If a persistent terminal is unavailable, batch independent calls in one saved
+Python process and reuse recorded results.
 
 Manifest investigation.json identifies selected datasets, versions and limitations.
 Events and artifacts retain complete calls and notes. Start with w.run_summary(...)
@@ -62,14 +69,37 @@ repeat across different concrete precursor sets. Select with strategy_id AND
 precursor_smiles from the chosen saved candidate for inspect_step_precedents or
 assess_retro_validity. Ambiguous IDs are rejected, not silently selected.
 
-Before stopping at advanced route inputs, use inspect_route_inputs on the saved
-route assessment, supplying leaf_queries=[{'smiles': leaf, 'terms': [source_name]}].
-Search captured sources for preparation of unresolved/assumed-terminal inputs.
-Literal matches are leads: inspect exact passages, assign explicit structures and
-assess any upstream reactions before extending with revise_route_branch. Do not
-promote a molecular-weight stop to availability or let a reaction name override
-contradictory graphs. If upstream work remains unresolved, describe the answer as
-a route from advanced inputs and compare alternatives on that same starting scope.
+For route-finding tasks, apply these decision checks without needing to load a guide:
+
+- Identify the shared synthesis bottleneck and a credible starting-material entry
+  before expanding finishing variants. Spend the next search on the unresolved
+  question most likely to change the route choice. Distinguish evidence for the
+  scaffold, substitution position and partner compatibility from evidence for
+  their combination in the proposed step.
+- Before stopping at advanced route inputs, use inspect_route_inputs on the saved
+  route assessment, supplying leaf_queries=[{'smiles': leaf, 'terms': [source_name]}].
+  For unresolved preparation or supply, search exact structures/names in captured
+  sources and accessible primary literature. Inspect the passages behind a lead;
+  a name match, molecular-weight stop or vendor listing does not establish access.
+  If a plausible upstream preparation or alternative entry addresses the gap,
+  assign explicit structures, assess it and revise the branch. A limitation note
+  alone should not replace an available decision-changing check.
+- If discovery is partial or transfer reports incomplete_search, keep the source
+  as a lead. When transfer could change the route choice, run an explicit
+  search_fragment_precedents query using the promising hit's discovery.query,
+  query_format and topology, with the target. Narrow a still-broad query to one
+  relevant attached region while preserving the core and substitution position.
+  Investigate the new search result; inspecting an old artifact does not complete
+  a search. Never clear a partial flag or infer absence from a bounded empty result.
+- Compare precursor complexity and preparation burden, including protection and
+  deprotection costs, alongside structural support. Reassess a proposed change;
+  more references or structural admission do not establish experimental feasibility.
+- Keep follow-up work bounded to a question that could change the decision. Stop
+  when evidence resolves it or distinct reasonable searches leave an explicit gap;
+  record the attempted check, remaining uncertainty and reason for stopping. If
+  upstream access remains unresolved, label the proposal as a route from advanced
+  inputs and compare alternatives on that same starting scope. State the preferred
+  route and its shared bottleneck in the concise answer summary.
 
 Notes use w.store.note(kind, text, evidence_refs=(ref,)); kinds are 'hypothesis',
 'decision', 'question', 'limitation' and 'review'. Record branch choices as 'decision'.

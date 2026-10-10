@@ -566,10 +566,7 @@ function answerCard(turn) {
     if (view && (view.error || view.steps?.length)) {
       card.append(showStructured(view, turn.id + ':science'));
     }
-    if (routeFirst && (!retrospective || answer.needs_user_input)) {
-      const written = formattedMessage(answer.answer_markdown, turn.answer_presentation);
-      card.append(retrospective && !answer.needs_user_input ? disclosure('Full written answer', turn.id + ':written', written) : written);
-    }
+    if (routeFirst) card.append(formattedMessage(answer.answer_markdown, turn.answer_presentation));
     if (answer.uncertainties?.length) {
       const questions = element('section', '', 'answer-uncertainties');
       questions.append(element('h5', 'Open questions')); scientificNotes(questions, answer.uncertainties);
