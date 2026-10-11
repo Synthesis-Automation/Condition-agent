@@ -184,6 +184,20 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             )) for step in item.get("physical_steps", [])]
             overview["actions"].append(action)
         overview["dependency_reviews"] = source.get("dependency_reviews", [])[:3]
+    elif operation == "predict_retrochimera":
+        candidates = source.get("candidates", [])
+        overview.update(_brief_fields(source, ("supplier", "request", "raw_candidate_count", "config_sha256")))
+        overview["candidate_count"] = len(candidates)
+        overview["rejected_count"] = len(source.get("rejected", []))
+        overview["duplicate_count"] = len(source.get("duplicates", []))
+        overview["candidates"] = [_brief_fields(item, (
+            "candidate_id", "supplier_rank", "proposed_reaction_smiles", "model_score",
+            "model_probability", "component_ranks", "validation_status",
+        )) for item in candidates[:10]]
+        overview["candidates_omitted"] = max(0, len(candidates) - 10)
+        overview["execution"] = _brief_fields(source.get("execution", {}), (
+            "model_reused", "model_load_seconds", "inference_seconds", "elapsed_seconds", "worker_pid",
+        ))
     elif operation == "disconnect_target":
         overview.update(_brief_fields(source, ("bond_focus",)))
         if source.get("search_diagnostics"):

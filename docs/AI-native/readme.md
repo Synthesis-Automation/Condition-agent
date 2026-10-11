@@ -2,6 +2,13 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+The optional [RetroChimera supplier](../new/retrochimera_supplier.md) adds recorded
+`predict_retrochimera` calls alongside `disconnect_target`. Configure an existing
+isolated installation and checkpoint, pin it as `retrochimera_config`, and start a
+new investigation. The persistent console reuses the model; predictions remain
+unverified and model scores are not chemistry confidence. Existing defaults stay
+unchanged. Tools + guidance is suitable for exploratory supplier comparisons.
+
 2026-10-10: automatic precedent discovery now tries bounded queries retaining
 one attached region at a time before combining all peripheral context. The
 `precedent_discovery.v1@1.2` definition retains positional and stereo constraints;

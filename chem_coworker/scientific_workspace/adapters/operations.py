@@ -14,6 +14,7 @@ from ..core.store import InvestigationStore
 
 if TYPE_CHECKING:
     from .fragment_search import FragmentWorker
+    from .retrochimera import RetroChimeraWorker
 
 
 def _fragment_replay_result(result: Any) -> Any:
@@ -54,6 +55,19 @@ class ScientificOperations:
     """Lazy application adapters; no LLM, scientific rule, or network dependency."""
 
     DEFINITIONS = (
+        OperationDefinition(
+            "predict_retrochimera", required_artifacts=("retrochimera_config",),
+            execution_status_field="execution_status",
+            replay_comparison="supplier_predictions_excluding_execution_telemetry",
+            replay_projection=_fragment_replay_result,
+            usage_policy=(
+                "Optional additional single-step supplier. Prefer 5-10 candidates. "
+                "Predictions and model probabilities are not validated reactions or success rates. "
+                "Compare with disconnect_target without combining their numeric scores. "
+                "Use the persistent console to reuse model loading. Review selected reaction SMILES "
+                "with assess_retro_validity; missing operator support remains unresolved."
+            ),
+        ),
         OperationDefinition("analyze_reaction"),
         OperationDefinition("analyze_molecule"),
         OperationDefinition("prepare_literature_reaction", contract_version="3", evidence_arguments=("source_ref", "indexed_ref"),
@@ -125,7 +139,8 @@ class ScientificOperations:
         OperationDefinition("compare_route_proposals", evidence_arguments=("source_refs",)),
     )
 
-    def __init__(self, store: InvestigationStore, *, fragment_worker: FragmentWorker | None = None) -> None:
+    def __init__(self, store: InvestigationStore, *, fragment_worker: FragmentWorker | None = None,
+                 retrochimera_worker: RetroChimeraWorker | None = None) -> None:
         names = tuple(item.name for item in self.DEFINITIONS)
         if len(set(names)) != len(names):
             raise ValueError("Scientific operation names must be unique")
@@ -133,6 +148,7 @@ class ScientificOperations:
             raise ValueError("Every scientific operation requires a registered implementation")
         self.store = store
         self.fragment_worker = fragment_worker
+        self.retrochimera_worker = retrochimera_worker
         self._recommender: Any = None
         self._proposal_library: Any = None
 
@@ -195,6 +211,20 @@ class ScientificOperations:
         if not entry or entry["status"] != "present":
             raise FileNotFoundError(f"Capability requires configured artifact: {name}")
         return Path(entry["path"])
+
+    def predict_retrochimera(
+        self, target_smiles: str, num_results: int = 10,
+        timeout_seconds: int = 300, consensus_only: bool = False,
+    ) -> dict[str, Any]:
+        """Propose external single-step reactions, with separate model ranks and uncertainty.
+
+        Requires a pinned retrochimera_config artifact. Startup is included in the
+        hard deadline; use the persistent console for successive expansions.
+        No library membership, atom mapping, feasibility or source support is inferred.
+        """
+        from .retrochimera import predict_retrochimera
+
+        return predict_retrochimera(self, target_smiles, num_results, timeout_seconds, consensus_only)
 
     def _conditions(self) -> Any:
         if self._recommender is None:

@@ -255,6 +255,17 @@ def capture_baseline(
         if configured != catalog:
             raise ValueError("weak_label_recipe_catalog must be the catalog beside weak_label_records")
         paths["weak_label_recipe_catalog"] = catalog
+    if "retrochimera_config" in paths:
+        from ..adapters.retrochimera_config import load_config
+
+        config = load_config(paths["retrochimera_config"])
+        for index, entry in enumerate(config["pinned_files"]):
+            selected = Path(entry["path"]).resolve()
+            name = f"retrochimera_dependency_{index:04d}"
+            if name in paths and paths[name].resolve() != selected:
+                raise ValueError(f"Conflicting pinned supplier artifact: {name}")
+            paths[name] = selected
+            expected_hashes[selected] = entry["sha256"]
     fingerprints: dict[Path, dict[str, Any]] = {}
     cache = FingerprintCache(fingerprint_cache) if fingerprint_cache is not None else None
     identities = {}

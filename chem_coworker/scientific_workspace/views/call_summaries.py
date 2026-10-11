@@ -178,6 +178,14 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         view.add_list(summary, value, "one_step_fallbacks", (
             "precursor_smiles", "proposed_reaction_smiles", "forward_validation_status",
         ), path, limit=3)
+    elif operation == "predict_retrochimera":
+        summary.update(view.pick(value, ("supplier", "target_smiles", "request", "raw_candidate_count",
+                                         "limitations", "execution_status", "error", "execution"), path))
+        view.add_list(summary, value, "candidates", (
+            "candidate_id", "supplier_rank", "proposed_reaction_smiles", "model_score",
+            "model_probability", "component_ranks", "validation_status",
+        ), path, limit=10)
+        view.add_list(summary, value, "rejected", ("supplier_rank", "reason"), path, limit=3)
     elif operation == "disconnect_target":
         summary.update(view.pick(value, ("bond_focus", "search_diagnostics"), path))
         view.add_nested(summary, value, "request", (
