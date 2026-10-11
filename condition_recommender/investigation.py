@@ -8,6 +8,7 @@ import json
 from typing import Any, Sequence
 
 from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy.precedent_transfer import review_precedent_transfer
 
 from .generic_indexing import GenericIndexedReaction
 from .recipe_assessment import _assess_analyzed_recipe
@@ -30,7 +31,7 @@ class ConditionEvidenceComparison:
         "Distinct indexed references are not proof of independent experiments or patent families.",
         "Missing indexed fields do not establish absence from the original publication.",
     )
-    schema_version: str = "condition_evidence_comparison.v1"
+    schema_version: str = "condition_evidence_comparison.v2"
 
 
 def _difference(left: Sequence[Any], right: Sequence[Any]) -> dict[str, Any]:
@@ -48,7 +49,15 @@ def compare_condition_evidence(
     analysis = featurize_reaction(reaction_smiles)
     query = asdict(analysis.reaction_signature) if analysis.reaction_signature else None
     rows = []
+    proposed_parts = reaction_smiles.split(">")
     for row in precedents:
+        recorded_parts = row.reaction_smiles.split(">")
+        transfer_review = review_precedent_transfer(
+            proposed_parts[0] if len(proposed_parts) == 3 else "",
+            proposed_parts[2] if len(proposed_parts) == 3 else "",
+            recorded_parts[0] if len(recorded_parts) == 3 else "",
+            recorded_parts[2] if len(recorded_parts) == 3 else "",
+        )
         differences = None
         if query and row.signature:
             differences = {key: _difference(query.get(key) or (), row.signature.get(key) or ())
@@ -57,6 +66,7 @@ def compare_condition_evidence(
         rows.append({
             "observation": asdict(row),
             "structural_comparison": differences,
+            "transfer_review": transfer_review.to_dict(),
             "compatibility": asdict(_assess_analyzed_recipe(analysis, row.resolved_recipe)),
             "missing_operating_fields": [key for key in ("temperature_c", "time_h", "concentration_m", "atmosphere")
                                          if row.resolved_recipe.get(key) in (None, "")],

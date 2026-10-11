@@ -1,6 +1,21 @@
 {
   "schema_version": "1.0",
+  "definition_version": "1.1",
   "groups": [
+    {
+      "id": "pyridin_2_one",
+      "label": "2-pyridone",
+      "smarts": "[c:1]1(=[O:2])[n:3][c][c][c][c]1",
+      "priority": 110,
+      "tags": []
+    },
+    {
+      "id": "aromatic_lactam",
+      "label": "aromatic ring C(=O)-N",
+      "smarts": "[c:1](=[O:2])@[n:3]",
+      "priority": 109,
+      "tags": []
+    },
     {
       "id": "acid_anhydride",
       "label": "(CO)2O",

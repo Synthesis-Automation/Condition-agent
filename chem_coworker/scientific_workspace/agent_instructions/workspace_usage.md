@@ -71,6 +71,30 @@ assess_retro_validity. Ambiguous IDs are rejected, not silently selected.
 
 For route-finding tasks, apply these decision checks without needing to load a guide:
 
+- Establish chemical identity with analyze_molecule. Its v2 atom IDs refer to the
+  map-free canonical SMILES; motif/site indices are component-local and project
+  through components. Do not use input SMILES indices for a focused disconnection.
+  Inspect coverage and graph observations even when no named motif is recognized.
+  Use inspect_reactive_sites or compare_molecules for a concrete local question.
+- Track genuinely different construction strategies in decision notes: core
+  construction or entry material, key disconnection, preparation burden, supporting
+  refs, weakest step, next decisive question, and stop/revisit reason. Changes only
+  in halide, boron form or catalyst are usually realizations of the same strategy.
+  Consider alternative core construction and literature-derived intermediates;
+  use focused SSR to test concrete precursor choices. Keep a bounded open SSR
+  probe when it could reveal an overlooked strategy; supplier agreement is not
+  independent experimental support. Do not require every tool for every target.
+- Inspect transfer_review in step/condition precedents before borrowing conditions.
+  Same product with changed precursors is not an exact reaction precedent. A
+  transfer-group inventory change (for example B versus Sn) requires checking
+  the actual donor and reaction center. Equal inventories are not proof of transfer.
+  Record exact inspected experiment, inspected analogue with explicit differences,
+  generic transformation support, or unsupported proposal separately from graph
+  admission. No automatic similarity threshold establishes a close analogue.
+- A recipe's no_known_conflict only means the covered rules found no conflict.
+  Inspect compatibility.coverage and missing procedures/operating fields; do not
+  turn not_covered into a positive feasibility judgment. Reconcile formula, chemical
+  form and source quantities before converting them into a proposed protocol.
 - Identify the shared synthesis bottleneck and a credible starting-material entry
   before expanding finishing variants. Spend the next search on the unresolved
   question most likely to change the route choice. Distinguish evidence for the
@@ -148,6 +172,9 @@ Literature access is an application capability, independent of deterministic che
   Use retry_network=True only after a concrete network-permission change.
 - w.capabilities() checks local imports and data presence. Requested web/model settings
   do not establish working tools; disclose unavailable search, full text or PDF parsing.
+  Check operation_readiness for the tools needed by the current question. Missing
+  pinned artifacts need a correctly configured new investigation; do not edit the
+  fixed baseline or repeat the same failing call. Presence is not index compatibility.
 
 Search snippets are leads, not inspected experiments. Source snapshots can omit
 drawings, tables or scans; inspect the original when these matter. An unspecified

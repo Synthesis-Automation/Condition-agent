@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from core_retrosynthesis.chemistry import canonical_smiles
 from core_retrosynthesis.step_precedents import lookup_reaction_precedents
+from reactive_taxonomy.precedent_transfer import review_precedent_transfer
 
 from .source_catalogs import reference_records
 
@@ -61,8 +62,14 @@ def inspect_step_precedents(
     if ids:
         try:
             observations = operations.get_precedents(ids, limit=20)
-        except FileNotFoundError:
-            observations = {"records": [], "availability": "index_unavailable"}
+        except (FileNotFoundError, ValueError) as exc:
+            # Condition enrichment is optional. Never admit stale index rows,
+            # but retain independently loaded template and source evidence.
+            observations = {
+                "records": [], "availability": "index_unavailable",
+                "error": {"type": type(exc).__name__, "message": str(exc)},
+                "condition_transfer": "not_assessed",
+            }
         try:
             procedures = operations.get_procedures(ids)
         except FileNotFoundError:
@@ -87,6 +94,9 @@ def inspect_step_precedents(
             "same_recorded_product": canonical_smiles(match["product_smiles"]) == target,
             "same_recorded_precursors": canonical_smiles(match["precursor_smiles"]) == precursors,
             "product_comparison": comparison,
+            "transfer_review": review_precedent_transfer(
+                precursors, target, match["precursor_smiles"], match["product_smiles"]
+            ).to_dict(),
             "template_context": {"edit_tokens": list(template.edit_tokens), "handle_signature": template.handle_signature,
                                  "stereo_policy": template.stereo_policy} if template else None,
             "observations": rows, "procedures": source_procedures,
@@ -114,6 +124,8 @@ def inspect_step_precedents(
         "distinct_references_on_page": len({item["reference_id"] for item in page if item["reference_id"]}),
         "reference_catalog_status": reference_status,
         "observation_page": {key: value for key, value in observations.items() if key != "records"},
+        "warnings": (["OPTIONAL_CONDITION_OBSERVATIONS_UNAVAILABLE"]
+                     if observations.get("availability") == "index_unavailable" else []),
         "procedure_catalog_status": procedures.get("availability", "catalog_available" if ids else "not_requested"),
         "precedents": records, "experimental_feasibility": "not_established",
         "limitations": ["Counts describe the selected template or saved assessment, not an exhaustive literature search.",

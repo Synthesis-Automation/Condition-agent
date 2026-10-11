@@ -229,6 +229,8 @@ def validate_taxonomy() -> List[str]:
         }:
             errors.append(f"invalid_heteroatom_environment_roles:{family_id}")
     group_records = payload["molecular_motifs.v1"].get("groups") or []
+    if not payload["molecular_motifs.v1"].get("definition_version"):
+        errors.append("missing_molecular_motif_definition_version")
     group_ids = [str(record.get("id") or "") for record in group_records]
     if not group_records:
         errors.append("missing_molecular_motifs")

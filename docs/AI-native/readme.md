@@ -2,6 +2,17 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+2026-10-11 [completion fix](../new/workspace_completion_fix_20261011.md): prompt
+startup now checks SQLite condition-index metadata. Incompatible optional condition
+enrichment no longer aborts selected-step/source inspection. Normal and Tools +
+formatting receive a finalization deadline; a timed-out attempt can display its own
+saved draft only after baseline, answer-schema and evidence checks, explicitly
+marked incomplete and unreviewed. Cancelled runs and invalid drafts are not published.
+Restart the server and start a new investigation. The current condition index still
+requires a versioned refresh/rebuild for recommendation use; source inspection does
+not bypass stale-descriptor validation. Older "no rebuild" notes below describe their
+individual earlier changes, not the October 11 motif-definition update.
+
 The optional [RetroChimera supplier](../new/retrochimera_supplier.md) adds recorded
 `predict_retrochimera` calls alongside `disconnect_target`. Configure an existing
 isolated installation and checkpoint, pin it as `retrochimera_config`, and start a

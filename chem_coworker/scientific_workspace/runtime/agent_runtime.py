@@ -8,6 +8,7 @@ import re
 import shutil
 import subprocess
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Event
 from tempfile import TemporaryDirectory
@@ -300,8 +301,20 @@ class CodexRuntime:
             "mode_policy": mode_policy(mode),
         }, indent=2), "utf-8")
         prompt_path = turn_directory / "prompt.txt"
-        prompt_path.write_text(answer_handoff_prompt(prompt, turn_directory)
-                               if mode.structured_answer else prompt, "utf-8")
+        deadline = datetime.now(timezone.utc) + timedelta(seconds=self.timeout_seconds)
+        reserve = min(120, self.timeout_seconds * 0.2)
+        budget_notice = (
+            f"\n\nExecution deadline: {deadline.isoformat()} (UTC). "
+            f"Reserve the last {reserve:g} seconds for finalization. "
+            "Stop new research in that period and deliver the supported findings with remaining gaps explicit. "
+            + ("Save and validate the draft before the deadline, then emit the final handoff receipt immediately. "
+               "Printing the receipt from a shell is not the final assistant response."
+               if mode.structured_answer else "Write the final response before the deadline.")
+        )
+        if not mode.structured_answer:
+            budget_notice = ""
+        prompt_path.write_text((answer_handoff_prompt(prompt, turn_directory)
+                               if mode.structured_answer else prompt) + budget_notice, "utf-8")
         output_path = turn_directory / "runtime.jsonl"
         stderr_path = turn_directory / "runtime.stderr.txt"
         environment = runtime_environment(

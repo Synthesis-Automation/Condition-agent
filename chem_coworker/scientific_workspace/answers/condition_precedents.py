@@ -25,7 +25,8 @@ def load_condition_precedent_evidence(
             or payload.get("execution_status") != "completed"):
         raise ValueError("Condition precedents require a completed inspect_condition_precedents call")
     result = payload["result"]
-    if result.get("schema_version") != "condition_evidence_comparison.v1":
+    # Historical evidence remains readable; only new calls include transfer review.
+    if result.get("schema_version") not in {"condition_evidence_comparison.v1", "condition_evidence_comparison.v2"}:
         raise ValueError("Unsupported condition precedent evidence schema")
     query = result.get("query_reaction_smiles", "")
     sides = query.split(">")

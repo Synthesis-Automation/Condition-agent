@@ -69,10 +69,38 @@ def test_success_reads_draft_once_and_preserves_full_schema_for_agent(tmp_path, 
     assert prompt.startswith("Investigate the target.")
     assert json.dumps(str(attempt / "answer-draft.json")) in prompt
     assert json.dumps(HANDOFF) in prompt
+    assert "Execution deadline:" in prompt
+    assert "Reserve the last" in prompt
+    assert "emit the final handoff receipt immediately" in prompt
     assert runtime.describe()["answer_transport"]["schema_version"] == ANSWER_HANDOFF_VERSION
     # Later file changes cannot change the already loaded result used by validation.
     (attempt / "answer-draft.json").write_text("{}", "utf-8")
     assert result.answer == ANSWER
+
+
+def test_real_child_timeout_preserves_readable_partial_without_fabricating_receipt(tmp_path):
+    from chem_coworker.scientific_workspace.runtime.agent_runtime import AgentStopped
+    from chem_coworker.scientific_workspace.answers.answer_handoff import load_partial_answer_draft
+
+    runtime, attempt = fake_runtime(tmp_path, write_output("answer-draft.json", json.dumps(ANSWER))
+                                    + "import time\ntime.sleep(20)")
+    runtime.timeout_seconds = 2
+    with pytest.raises(AgentStopped) as stopped:
+        submit(runtime, tmp_path, attempt)
+    assert stopped.value.status == "timed_out"
+    assert load_partial_answer_draft(tmp_path, attempt) == ANSWER
+    assert not (attempt / "agent-final.json").exists()
+
+
+@pytest.mark.parametrize("text", ["[]", '{"a":1,"a":2}', "{", '{"x":NaN}'])
+def test_partial_reader_rejects_invalid_json(tmp_path, text):
+    from chem_coworker.scientific_workspace.answers.answer_handoff import load_partial_answer_draft
+
+    attempt = tmp_path / "turns" / "attempt"
+    attempt.mkdir(parents=True)
+    (attempt / "answer-draft.json").write_text(text, "utf-8")
+    with pytest.raises(ValueError):
+        load_partial_answer_draft(tmp_path, attempt)
 
 
 def test_cli_uses_small_receipt_schema_for_both_new_and_resumed_threads(tmp_path):

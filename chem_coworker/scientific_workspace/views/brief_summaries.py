@@ -94,6 +94,10 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             "limitations",
         )) for item in source.get("precedents", [])[:3]]
         for brief, item in zip(overview["precedents"], source.get("precedents", [])):
+            brief["transfer_review"] = _brief_fields(item.get("transfer_review", {}), (
+                "structure_scope", "experimental_transfer", "warnings", "coverage",
+                "proposed_only_components", "recorded_only_components",
+            ))
             brief["product_comparison"] = _brief_fields(item.get("product_comparison", {}), (
                 "status", "same_constitution", "stereo_relationship", "left_coverage", "right_coverage",
                 "alignment_ambiguous", "search_timed_out", "warnings",
@@ -101,10 +105,16 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             brief["observation_count"] = len(item.get("observations", []))
             brief["procedure_count"] = len(item.get("procedures", []))
     elif operation == "analyze_molecule":
-        overview.update(_brief_fields(source, ("formal_charge", "stereocenters")))
+        overview.update(_brief_fields(source, (
+            "formal_charge", "stereocenters", "molecular_formula", "molecular_weight",
+            "atom_index_scope", "motif_site_index_scope", "coverage", "rdkit_version",
+        )))
+        overview["ring_count"] = len(source.get("rings", []))
+        overview["carbonyl_nitrogen_observation_count"] = len(source.get("carbonyl_nitrogen_observations", []))
         for key, fields in (("motifs", ("motif_id", "chemist_label")),
                             ("reactive_sites", ("chemist_label", "availability", "warnings"))):
             overview[f"{key}_count"] = len(source.get(key, []))
+            overview[f"{key}_omitted"] = max(0, len(source.get(key, [])) - 3)
             overview[key] = [_brief_fields(item, fields) for item in source.get(key, [])[:3]]
     elif operation == "assess_starting_material":
         overview.update(_brief_fields(source, (
@@ -471,7 +481,8 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             precedent = _brief_fields(item, ("missing_operating_fields", "procedure_link_scope"))
             for key, fields in (
                 ("observation", ("observation_id", "reaction_id", "reference_id", "chemistry_status", "condition_status")),
-                ("compatibility", ("status", "compatible", "hard_conflicts")),
+                ("compatibility", ("status", "compatible", "hard_conflicts", "coverage")),
+                ("transfer_review", ("structure_scope", "experimental_transfer", "warnings", "coverage")),
             ):
                 if isinstance(item.get(key), Mapping):
                     precedent[key] = _brief_fields(item[key], fields)

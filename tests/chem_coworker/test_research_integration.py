@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
+import sqlite3
 
 import pytest
 
@@ -133,3 +135,42 @@ def test_capability_probe_does_not_promote_file_presence_or_requested_web_access
     assert report["artifacts"]["missing"]["status"] == "missing"
     assert report["agent_web_search"]["status"] == "not_checked"
     assert report["model_and_reasoning"]["status"] == "not_confirmed"
+    ready = report["operation_readiness"]
+    assert ready["analyze_molecule"]["missing_artifacts"] == []
+    assert ready["analyze_molecule"]["status"] == "prerequisites_present_not_validated"
+    assert set(ready["inspect_condition_precedents"]["missing_artifacts"]) == {"condition_index", "shared_core_index"}
+
+
+def test_index_preflight_detects_definition_drift_without_admitting_stale_rows(tmp_path):
+    from condition_recommender.generic_indexing import build_generic_index
+    from condition_recommender.sqlite_indexing import load_sqlite_generic_index, save_sqlite_generic_index
+    from chem_coworker.scientific_workspace.agent_context.prompts import investigation_prompt
+
+    path = tmp_path / "index.sqlite"
+    save_sqlite_generic_index(build_generic_index(()), path)
+    baseline = {"repository": str(Path(__file__).resolve().parents[2]), "artifacts": {
+        "condition_index": {"path": str(path)},
+        "shared_core_index": {"path": str(path)},
+    }}
+    assert local_capabilities(baseline)["index_compatibility"]["condition_index"]["status"] == "compatible_metadata"
+    with sqlite3.connect(path) as connection:
+        metadata = json.loads(connection.execute("SELECT payload FROM metadata WHERE singleton = 1").fetchone()[0])
+        metadata["fallback_definition_versions"]["molecular_motifs.v1.json"] = "stale-test-definition"
+        connection.execute("UPDATE metadata SET payload = ? WHERE singleton = 1", (json.dumps(metadata),))
+    report = local_capabilities(baseline)
+    assert report["index_compatibility"]["condition_index"]["status"] == "incompatible_or_invalid"
+    assert report["operation_readiness"]["recommend_conditions"]["status"] == "incompatible_artifacts"
+    assert report["operation_readiness"]["inspect_step_precedents"]["optional_enrichment"]["condition_observations"] == "unavailable"
+    with pytest.raises(ValueError, match="fallback descriptor definitions"):
+        load_sqlite_generic_index(path)
+    store = InvestigationStore.create(tmp_path / "preflight", objective="Preflight", baseline=baseline)
+    prompt = investigation_prompt(ScientificWorkspace(store.root), "Find routes")
+    assert "Incompatible fallback descriptor definitions" in prompt
+    assert "Do not retry it unchanged" in prompt
+
+
+def test_invalid_index_is_reported_without_crashing_capabilities(tmp_path):
+    path = tmp_path / "broken.sqlite"
+    path.write_text("not a database", "utf-8")
+    report = local_capabilities({"artifacts": {"condition_index": {"path": str(path)}}})
+    assert report["index_compatibility"]["condition_index"]["status"] == "incompatible_or_invalid"

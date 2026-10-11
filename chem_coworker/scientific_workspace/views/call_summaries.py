@@ -22,14 +22,18 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         summary.update(view.pick(value, ("assessment_proposal",), path))
         summary.update(view.pick(value, ("selection", "scope", "saved_match_count", "available_template_records",
                                          "retrieval_truncated", "page", "distinct_references_on_page",
-                                         "assessment_status", "assessment_warnings"), path))
+                                         "assessment_status", "assessment_warnings", "observation_page"), path))
         view.add_list(summary, value, "precedents", ("match_id", "reaction_id", "reference_id", "reaction_smiles",
                       "support_kind", "product_similarity", "precursor_similarity", "same_recorded_product",
-                      "same_recorded_precursors", "product_comparison", "limitations"), path)
+                      "same_recorded_precursors", "product_comparison", "transfer_review", "limitations"), path)
     elif operation == "analyze_molecule":
         summary.update(view.pick(value, (
             "canonical_smiles", "component_count", "atom_count", "heavy_atom_count", "formal_charge",
+            "molecular_formula", "molecular_weight", "coverage",
+            "atom_index_scope", "motif_site_index_scope", "definition_versions", "rdkit_version", "limitations",
         ), path))
+        summary["ring_count"] = len(value.get("rings", []))
+        summary["carbonyl_nitrogen_observation_count"] = len(value.get("carbonyl_nitrogen_observations", []))
         for key, fields in (
             ("stereocenters", ("atom_index", "assignment", "assigned")),
             ("double_bond_stereo", ("bond_index", "assignment")),
@@ -321,7 +325,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         view.add_nested(summary, value, "procedure_catalog", ("availability", "missing_reaction_ids"), path)
 
         def precedent(item: Any, child: str) -> Any:
-            result = view.pick(item, ("missing_operating_fields", "procedure_link_scope"), child)
+            result = view.pick(item, ("missing_operating_fields", "procedure_link_scope", "transfer_review"), child)
             if isinstance(item, Mapping):
                 view.add_nested(result, item, "observation", _PRECEDENT, child)
                 view.add_nested(result, item, "compatibility", _COMPATIBILITY, child)

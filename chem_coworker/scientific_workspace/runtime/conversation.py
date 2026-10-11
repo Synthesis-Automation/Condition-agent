@@ -17,6 +17,7 @@ from uuid import uuid4
 from ..answers.answer_contracts import ScientificAnswer, validate_answer_evidence
 from ..answers.answer_handoff import AnswerSubmissionError
 from ..answers.evidence_review import matching_evidence_review
+from ..answers.answer_handoff import load_partial_answer_draft
 from ..core.baseline import sha256_file, verify_baseline
 from ..core.store import _read_json, _write_json
 from ..agent_context.context import record_application_context
@@ -134,6 +135,7 @@ class ConversationService:
         workspace: ScientificWorkspace | None = None
         history = ActivityHistory()
         attempt = 0
+        attempt_directory: Path | None = None
         scientific_cursor: ScientificActivityCursor | None = None
         last_activity_error: str | None = None
         last_preparation_update = 0.0
@@ -395,7 +397,39 @@ class ConversationService:
                     workspace.store.append("agent_turn_error", {"turn_id": turn_id, "status": status, "error": error})
                 except (OSError, ValueError, RuntimeError):
                     pass
-            save(status=status, error=error)
+            recovered = {}
+            if (status == "timed_out" and not cancel.is_set() and mode.structured_answer
+                    and workspace is not None and attempt_directory is not None):
+                try:
+                    # Recover this attempt only, never an earlier rejected draft.
+                    # The runtime has stopped its child process before raising.
+                    verify_baseline(workspace.store.manifest["baseline"])
+                    partial = ScientificAnswer.model_validate(load_partial_answer_draft(directory, attempt_directory))
+                    partial.evidence_refs = validate_answer_evidence(partial, workspace.store)
+                    if cancel.is_set():
+                        raise ValueError("Partial recovery cancelled")
+                    event = workspace.store.append("agent_answer", {
+                        **partial.model_dump(), "turn_id": turn_id,
+                        "origin": "agent_authored", "review_status": "unreviewed",
+                        "completion_status": "timed_out", "partial": True,
+                        "recovery_status": "validated_partial_draft",
+                        "evidence_status": "linked_unreviewed" if partial.evidence_refs else "no_local_evidence",
+                        "workspace_mode": mode.value, "mode_policy": mode_policy(mode),
+                        "application_context_ref": state.get("application_context_ref"),
+                        "thread_id": state.get("thread_id"),
+                        "runtime": runtime_configuration(self.runtime.describe(), mode),
+                        "scientific_identity": workspace.store.manifest["baseline"].get("scientific_identity"),
+                        "recovery_notice": "Incomplete: time limit reached. Saved draft passed schema and evidence-reference checks; chemistry remains unreviewed.",
+                    }, evidence_refs=tuple(partial.evidence_refs))
+                    recovered = {"answer_ref": event.artifact_ref,
+                                 "answer": workspace.store.read_artifact(event.artifact_ref),
+                                 "recovery_status": "validated_partial_draft"}
+                except (ValueError, OSError, RuntimeError) as recovery_error:
+                    debug("partial_answer_recovery_rejected", error={
+                        "type": type(recovery_error).__name__, "message": str(recovery_error),
+                    })
+                    recovered = {"recovery_status": "no_valid_partial_draft"}
+            save(status=status, error=error, **recovered)
         finally:
             if scientific_progress():
                 save()

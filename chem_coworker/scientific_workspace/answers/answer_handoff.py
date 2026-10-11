@@ -141,6 +141,20 @@ def load_text_answer(workspace: Path, turn_directory: Path) -> dict[str, Any]:
     return {"schema_version": "agent_text.v1", "answer_markdown": text}
 
 
+def load_partial_answer_draft(workspace: Path, turn_directory: Path) -> dict[str, Any]:
+    """Read only the stopped attempt's fixed draft, with normal file safeguards.
+
+    This does not invent a completion receipt or validate scientific evidence.
+    The caller must stop execution, verify the baseline and validate the complete
+    answer/evidence contract before displaying it as an explicitly partial result.
+    """
+    directory = _attempt_directory(workspace, turn_directory)
+    answer = _read_json_file(workspace, directory, ANSWER_FILENAME, _MAX_ANSWER_BYTES)
+    if not isinstance(answer, dict):
+        raise ValueError("Partial draft must be a ScientificAnswer JSON object")
+    return answer
+
+
 def load_answer_handoff(
     workspace: Path, turn_directory: Path, *, thread_id: str, usage: dict[str, Any],
 ) -> dict[str, Any]:

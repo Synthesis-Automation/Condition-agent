@@ -10,6 +10,15 @@ Set-Location "C:\Git-softwares\Condition-agent"
 
 ## Quick start
 
+The October 11 completion fix checks condition-index metadata at prompt startup,
+preserves step/source inspection when optional condition enrichment is unavailable,
+and displays a validated saved draft as **incomplete** if a structured run times out.
+Restart the agent server, refresh the browser and use a **new Normal investigation**.
+The existing condition index predates the molecular-motif definition change and
+remains incompatible: source inspection works, but condition recommendations need
+a versioned corpus refresh/rebuild. Do not relabel old index metadata as current.
+See [the completion fix](docs/new/workspace_completion_fix_20261011.md).
+
 The October 10 route-workflow update adds one-region-at-a-time precedent queries,
 visible precursor-complexity evidence in agent summaries, and revised planning
 guidance for shared bottlenecks and starting materials. **Normal** is now the

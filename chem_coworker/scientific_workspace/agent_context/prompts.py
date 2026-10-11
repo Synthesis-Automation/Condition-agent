@@ -76,6 +76,14 @@ def investigation_prompt(
         else workspace.store.manifest.get("agent_metadata", {})
     )
     tools = metadata.get("local_tools", {})
+    preflight = workspace.capabilities().get("index_compatibility", {})
+    preflight_notice = (
+        "Index compatibility preflight (metadata only; not corpus or chemistry validation):\n"
+        + json.dumps(preflight, ensure_ascii=False)
+        + "\nAn incompatible index cannot supply recommendations. Do not retry it unchanged or alter "
+        "the baseline. Step/template/source inspection can retain evidence while reporting unavailable "
+        "optional condition observations. Preserve that gap in the answer.\n"
+    ) if preflight else ""
     environment = (
         f"Repository (read only): {repository}\n"
         f"Investigation directory (all new files): {root}\n"
@@ -85,6 +93,7 @@ def investigation_prompt(
         "Name temporary scripts task-specific names such as route_probe.py; avoid inspect.py,\n"
         "json.py, typing.py and other Python module names, which shadow installed modules.\n"
         f"Discovered local tools: {json.dumps(tools, ensure_ascii=False)}\n"
+        f"{preflight_notice}"
         "If rg cannot be found, use its recorded executable (PowerShell: & 'path/rg.exe').\n"
         "If unavailable, use Select-String, Get-ChildItem or Python.\n"
         "Subprocess execution: check exit status and retain stderr; never print only stdout\n"

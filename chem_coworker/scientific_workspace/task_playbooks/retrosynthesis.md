@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v11
+# Retrosynthesis investigation adviser v12
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -11,6 +11,26 @@ stereochemistry. Consider material, condition and scope constraints. Define what
 a terminal material acceptable; a vendor listing does not confirm stock.
 
 ## Scientific questions
+
+Use a strategy ledger in recorded decision notes. For each materially different
+construction strategy, retain: core/entry material, key disconnection, evidence refs,
+weakest step, preparation burden, next decisive question, and stop/revisit reason.
+Alternate halides, donor forms and conditions sharing one construction bottleneck
+are realizations, not independent route discoveries. Compare the same justified
+starting scope. Allocate the next search to a gap that could change the decision;
+do not increase SSR top-k merely to inflate the number of routes.
+
+Start with the general molecular audit, then focused graph inspection, then custom
+RDKit only for a named unanswered question. Preserve canonical/input atom projection,
+chemical form, definition versions and RDKit version. No detected motif means
+limited dictionary coverage, not absent functionality. For recurring custom checks,
+record the gap and tests needed for later promotion into the owning domain package;
+do not edit chemistry definitions during a fixed-baseline investigation.
+
+Reuse saved calls only for unchanged inputs and baseline identity (including schema,
+definitions and chemistry-engine version). Do not copy atom-indexed results from
+another serialization without the saved atom projection. Existing workspace evidence,
+SMARTS and index caches are sufficient for this workflow; no new result cache is required.
 
 Develop an explicit core-construction hypothesis and a credible entry material
 before expanding finishing variants. Prioritize the unresolved question shared

@@ -31,6 +31,7 @@ def prompt_context(tmp_path, monkeypatch):
             "usage_policy": "Respect this capability's evidence limitations.",
         }]),
         task_guide=lambda name: deepcopy(guides[name]),
+        capabilities=lambda: {"index_compatibility": {}},
     )
     monkeypatch.setattr(prompts, "current_application_context", lambda _: context)
     monkeypatch.setattr(prompts, "available_task_guides", lambda _: tuple(guides))
@@ -141,6 +142,7 @@ def test_legacy_investigation_without_guidance_can_still_compose(tmp_path, monke
     workspace = SimpleNamespace(
         store=SimpleNamespace(root=tmp_path, manifest={"baseline": {"repository": str(tmp_path)}}),
         operations=SimpleNamespace(catalog=lambda: []),
+        capabilities=lambda: {"index_compatibility": {}},
     )
     monkeypatch.setattr(prompts, "current_application_context", lambda _: None)
     monkeypatch.setattr(prompts, "available_task_guides", lambda _: pytest.fail("No legacy guides"))

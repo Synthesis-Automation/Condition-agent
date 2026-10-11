@@ -40,6 +40,8 @@ def test_comparison_keeps_duplicates_source_counts_missingness_and_structural_di
     assert entry["structural_comparison"]["formed_bond_types"]["shared"]
     assert row == original
     assert entry["observation"]["reaction_smiles"] == row.reaction_smiles
+    assert entry["transfer_review"]["structure_scope"] == "different_product_requires_review"
+    assert entry["transfer_review"]["experimental_transfer"] == "not_established"
 
 
 def test_unresolved_query_keeps_all_observations_and_abstains_from_comparison() -> None:

@@ -6,6 +6,17 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../..');
 
+test('timed-out recovered answer retains an explicit incomplete notice', () => {
+  const {run} = harness();
+  const card = run(`answerCard({id:'partial',status:'timed_out',
+    answer:{answer_markdown:'Supported findings',partial:true,
+      recovery_notice:'Incomplete: time limit reached. Chemistry remains unreviewed.'},
+    error:{type:'AgentStopped',message:'timed_out'}})`);
+  const texts = card.descendants().map(node => node.textContent);
+  assert.ok(texts.includes('Incomplete: time limit reached. Chemistry remains unreviewed.'));
+  assert.ok(texts.includes('Supported findings'));
+});
+
 test('prepared literature cards distinguish indexed graphs, acquisition and conflicting evidence', () => {
   const {run, context} = harness();
   context.prepared = {

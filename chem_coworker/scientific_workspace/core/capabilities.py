@@ -11,7 +11,7 @@ from .baseline import environment_versions
 
 
 def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
-    """Probe RDKit and input presence without loading datasets or contacting a provider.
+    """Probe RDKit, input presence, and index metadata without scanning datasets.
 
     File presence is deliberately not index compatibility, admission, stock
     availability, or a claim that the model can execute a particular tool.
@@ -24,11 +24,57 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
                  "probe": "parse_ethanol", "experimental_validation": False}
     except Exception as exc:
         rdkit = {"status": "failed", "error_type": type(exc).__name__, "message": str(exc)}
+    # Read prerequisites from the operation catalog rather than duplicating them.
+    from ..adapters.operations import ScientificOperations
+
+    artifacts = baseline.get("artifacts", {})
+    index_compatibility = {}
+    condition_path = artifacts.get("condition_index", {}).get("path")
+    if condition_path and Path(condition_path).is_file():
+        if Path(condition_path).suffix.lower() in {".sqlite", ".sqlite3", ".db"}:
+            from condition_recommender.sqlite_indexing import load_sqlite_generic_index
+
+            try:
+                # This loader validates metadata and returns lazy row/lookups;
+                # it does not scan the corpus or bypass the normal checks.
+                load_sqlite_generic_index(condition_path)
+            except (ValueError, OSError) as exc:
+                index_compatibility["condition_index"] = {
+                    "status": "incompatible_or_invalid",
+                    "error": {"type": type(exc).__name__, "message": str(exc)},
+                    "scope": "metadata_contract_only",
+                }
+            else:
+                index_compatibility["condition_index"] = {
+                    "status": "compatible_metadata", "scope": "metadata_contract_only",
+                }
+        else:
+            index_compatibility["condition_index"] = {"status": "not_checked", "scope": "non_sqlite_artifact"}
+    operation_readiness = {}
+    for definition in ScientificOperations.DEFINITIONS:
+        missing = [name for name in definition.required_artifacts
+                   if name not in artifacts or not Path(artifacts[name]["path"]).is_file()]
+        incompatible = [name for name in definition.required_artifacts
+                        if index_compatibility.get(name, {}).get("status") == "incompatible_or_invalid"]
+        operation_readiness[definition.name] = {
+            "required_artifacts": list(definition.required_artifacts),
+            "missing_artifacts": missing,
+            "incompatible_artifacts": incompatible,
+            "status": ("missing_artifacts" if missing else "incompatible_artifacts" if incompatible
+                       else "prerequisites_present_not_validated"),
+            "content_validation": "checked_on_call",
+        }
+    if index_compatibility.get("condition_index", {}).get("status") == "incompatible_or_invalid":
+        operation_readiness["inspect_step_precedents"]["optional_enrichment"] = {
+            "condition_observations": "unavailable", "template_and_source_inspection": "available_if_configured",
+        }
     return {
         "schema_version": "scientific_capabilities.v1",
         "python": {"executable": sys.executable, "status": "running"},
         "versions": environment_versions(),
         "rdkit": rdkit,
+        "operation_readiness": operation_readiness,
+        "index_compatibility": index_compatibility,
         "pdf_text_extraction": {
             "status": "available" if importlib.util.find_spec("pypdf") else "not_installed",
             "ocr": "not_available", "document_access": "not_checked",

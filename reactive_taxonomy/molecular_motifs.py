@@ -19,6 +19,21 @@ def load_molecular_motif_definitions() -> Tuple[Dict[str, Any], ...]:
     """Load ordered molecular-motif definitions."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
+    if payload.get("schema_version") != "1.0" or not payload.get("definition_version"):
+        raise ValueError("Molecular motifs require supported schema and definition versions")
+    seen: set[str] = set()
+    for item in payload.get("groups", []):
+        if not item.get("id") or item["id"] in seen or not item.get("label"):
+            raise ValueError("Molecular motifs require unique IDs and labels")
+        seen.add(item["id"])
+        patterns = item.get("smarts")
+        patterns = patterns if isinstance(patterns, list) else [patterns]
+        if not patterns or any(not isinstance(value, str) or not value for value in patterns):
+            raise ValueError(f"Missing motif SMARTS: {item['id']}")
+        for pattern in patterns:
+            compile_smarts(pattern, validate=True)
+    if not seen or any(set(item.get("suppresses_on_overlap", [])) - seen for item in payload["groups"]):
+        raise ValueError("Missing motifs or unknown overlap suppression IDs")
     return tuple(sorted(
         (dict(item) for item in payload.get("groups", [])),
         key=lambda item: (-int(item.get("priority", 0)), str(item.get("id", ""))),

@@ -29,7 +29,7 @@
 {"aliases":[{"type":"abbreviation","value":"HOSu"}],"cas":"6066-82-6","id":"cas:6066-82-6","name":"HOSu","roles":["additive"],"smiles":"Oc1ccc(O)n1O"}
 {"aliases":[{"type":"abbreviation","value":"Im"}],"cas":"288-32-4","id":"cas:288-32-4","name":"Imidazole","roles":["additive"],"smiles":"c1c[nH]cn1"}
 {"aliases":[{"type":"abbreviation","value":"iPrOH"}],"cas":"67-63-0","id":"cas:67-63-0","name":"iPrOH","roles":["additive","solvent"],"smiles":"CC(C)O"}
-{"aliases":[{"type":"abbreviation","value":"KOAc"}],"cas":"127-08-2","id":"cas:127-08-2","name":"KOAc","roles":["additive","base"],"smiles":"[K+].CC(=O)[O-]"}
+{"aliases":[{"type":"abbreviation","value":"KOAc"},{"type":"common_name","value":"potassium acetate"}],"cas":"127-08-2","id":"cas:127-08-2","name":"KOAc","roles":["additive","base"],"smiles":"[K+].CC(=O)[O-]"}
 {"aliases":[{"type":"abbreviation","value":"LiBr"}],"cas":"7550-35-8","id":"cas:7550-35-8","name":"Lithium bromide","roles":["additive"],"smiles":"[Li+].[Br-]"}
 {"aliases":[{"type":"abbreviation","value":"LiCl"}],"cas":"7447-41-8","id":"cas:7447-41-8","name":"Lithium chloride","roles":["additive"],"smiles":"[Li+].[Cl-]"}
 {"aliases":[{"type":"abbreviation","value":"LiI"}],"cas":"10377-51-2","id":"cas:10377-51-2","name":"Lithium iodide","roles":["additive"],"smiles":"[Li+].[I-]"}
@@ -115,7 +115,7 @@
 {"aliases":[{"type":"abbreviation","value":"TMCD"},{"type":"legacy_name","value":"trans-NN-Dimethylcyclohexane-12-diamine"}],"cas":"67579-81-1","id":"cas:67579-81-1","name":"trans-N,N'-dimethyl-1,2-cyclohexanediamine","roles":["base"]}
 {"aliases":[{"type":"abbreviation","value":"Bu3N"}],"cas":"102-82-9","id":"cas:102-82-9","name":"Tributylamine","roles":["base"],"smiles":"CCCCN(CCCC)CCCC"}
 {"aliases":[{"type":"abbreviation","value":"Et3N"},{"type":"legacy_name","value":"NEt3"}],"cas":"121-44-8","id":"cas:121-44-8","name":"Triethylamine","roles":["base","solvent"],"smiles":"CCN(CC)CC"}
-{"aliases":[{"type":"abbreviation","value":"K3PO4"}],"cas":"7778-53-2","id":"cas:7778-53-2","name":"Tripotassium phosphate","roles":["base"],"smiles":"[K+].[K+].[K+].[O-]P(=O)([O-])[O-]"}
+{"aliases":[{"type":"abbreviation","value":"K3PO4"},{"type":"common_name","value":"potassium phosphate tribasic"}],"cas":"7778-53-2","id":"cas:7778-53-2","name":"Tripotassium phosphate","roles":["base"],"smiles":"[K+].[K+].[K+].[O-]P(=O)([O-])[O-]"}
 {"aliases":[{"type":"abbreviation","value":"XtalFluor-E"}],"cas":"63517-29-3","id":"cas:63517-29-3","name":"(Diethylamino)difluorosulfonium tetrafluoroborate","roles":["condensation_agent"]}
 {"aliases":[{"type":"abbreviation","value":"CDI"}],"cas":"530-62-1","id":"cas:530-62-1","name":"1,1---Carbonyldiimidazole","roles":["condensation_agent"],"smiles":"O=C(n1ccnc1)n1ccnc1"}
 {"aliases":[{"type":"abbreviation","value":"DMTMM-Cl"},{"language":"en","type":"legacy_name","value":"DMTMM"}],"cas":"3945-69-5","id":"cas:3945-69-5","name":"4-(4,6-Dimethoxy-1,3,5-triazin-2-yl)-4-methylmorpholinium chloride","roles":["condensation_agent"],"smiles":"COc1nc(OC)nc([N+]2(C)CCOCC2)n1"}
@@ -1189,7 +1189,7 @@
 {"cas":"167693-36-9","id":"cas:167693-36-9","name":"Doyle dirhodium catalyst - RH2(4S-MEOX)4","roles":["metal_catalyst"],"smiles":"CC#N.CC#N.COC(=O)C1COC(=O)[N-]1.COC(=O)C1COC(=O)[N-]1.COC(=O)C1COC(=O)[N-]1.COC(=O)C1COC(=O)[N-]1.[Rh+2].[Rh+2]"}
 {"cas":"131796-58-2","id":"cas:131796-58-2","name":"Doyle dirhodium catalyst - RH2(5R-MEPY)4","roles":["metal_catalyst"],"smiles":"COC(=O)C1CCC(=O)[N-]1.COC(=O)C1CCC(=O)[N-]1.COC(=O)C1CCC(=O)[N-]1.COC(=O)C1CCC(=O)[N-]1.[Rh+2].[Rh+2]"}
 {"cas":"132435-65-5","id":"cas:132435-65-5","name":"Doyle dirhodium catalyst - RH2(5S-MEPY)4","roles":["metal_catalyst"],"smiles":"COC(=O)C1CCC(=O)[N-]1.COC(=O)C1CCC(=O)[N-]1.COC(=O)C1CCC(=O)[N-]1.COC(=O)C1CCC(=O)[N-]1.[Rh+2].[Rh+2]"}
-{"aliases":[{"type":"legacy_name","value":"dppfPdCl2"}],"cas":"72287-26-4","id":"cas:72287-26-4","name":"dppf-PdCl2","roles":["metal_catalyst"],"smiles":"C1=CC(P(c2ccccc2)c2ccccc2)=CC1.C1=CC(P(c2ccccc2)c2ccccc2)=CC1.[Fe+2].[Pd+2]"}
+{"aliases":[{"type":"legacy_name","value":"dppfPdCl2"},{"type":"abbreviation","value":"Pd(dppf)Cl2"},{"type":"abbreviation","value":"[Pd(dppf)Cl2]"}],"cas":"72287-26-4","id":"cas:72287-26-4","name":"dppf-PdCl2","roles":["metal_catalyst"],"smiles":"[Cl-].[Cl-].[Fe+2].[Pd+2].c1ccc(P(c2ccccc2)[c-]2cccc2)cc1.c1ccc(P(c2ccccc2)[c-]2cccc2)cc1"}
 {"cas":"1287255-62-2","id":"cas:1287255-62-2","name":"DPPFRuCl2AMPY","roles":["metal_catalyst"],"smiles":"[CH-]1C=CC(=C1)P(C2=CC=CC=C2)C3=CC=CC=C3.[CH-]1C=CC(=C1)P(C2=CC=CC=C2)C3=CC=CC=C3.C1=CC=NC(=C1)CN.[Cl-].[Cl-].[Fe+2].[Ru+2]"}
 {"cas":"68993-46-4","id":"cas:68993-46-4","name":"dysprosium(III) oxide; titanium dioxide","roles":["metal_catalyst"],"smiles":"[O]=[Dy][O][Dy]=[O].[Ti+4]"}
 {"cas":"15375-84-5","id":"cas:15375-84-5","name":"Ethylenediaminetetraacetic Acid Manganese Disodium Salt Hydrate","roles":["metal_catalyst"],"smiles":"O=C([O-])CN(CCN(CC(=O)O)CC(=O)O)CC(=O)[O-].[Mn+2]"}
@@ -4104,7 +4104,7 @@
 {"cas":"604-53-5","id":"cas:604-53-5","name":"1,1'-Binaphthyl","smiles":"c1ccc2c(-c3cccc4ccccc34)cccc2c1"}
 {"cas":"81793-57-9","id":"cas:81793-57-9","name":"1,1'-biphenyl, 4-(trans-4-ethylcyclohexyl)-4'-fluoro-","smiles":"CCC1CCC(c2ccc(-c3ccc(F)cc3)cc2)CC1"}
 {"cas":"81793-59-1","id":"cas:81793-59-1","name":"1,1'-biphenyl, 4-fluoro-4'-(trans-4-pentylcyclohexyl)-","smiles":"CCCCCC1CCC(c2ccc(-c3ccc(F)cc3)cc2)CC1"}
-{"aliases":[{"type":"abbreviation","value":"Pd(dppf)2Cl2"}],"cas":"95464-05-4","id":"cas:95464-05-4","name":"1,1'-Bis(diphenylphosphino)ferrocene-palladium(II)dichloridedichloromethanecomplex","smiles":"C1=CC(=CC=C1N)Br"}
+{"aliases":[{"type":"abbreviation","value":"Pd(dppf)Cl2.CH2Cl2"},{"type":"abbreviation","value":"Pd(dppf)Cl2·CH2Cl2"},{"type":"abbreviation","value":"Pd(dppf)Cl2.DCM"}],"cas":"95464-05-4","id":"cas:95464-05-4","name":"1,1'-Bis(diphenylphosphino)ferrocene-palladium(II)dichloridedichloromethanecomplex","roles":["metal_catalyst"],"smiles":"[Cl-].[Cl-].[Fe+2].[Pd+2].c1ccc(P(c2ccccc2)[c-]2cccc2)cc1.c1ccc(P(c2ccccc2)[c-]2cccc2)cc1.ClCCl"}
 {"cas":"41864-22-6","id":"cas:41864-22-6","name":"1,1'-Carbonyl-di(1,2,4-triazole)","smiles":"O=C(n1cncn1)n1cncn1"}
 {"cas":"5395-04-0","id":"cas:5395-04-0","name":"1,1'-Carbonyldipiperidine","smiles":"O=C(N1CCCCC1)N1CCCCC1"}
 {"cas":"405-31-2","id":"cas:405-31-2","name":"1,1'-disulfanediylbis(4-fluorobenzene)","smiles":"Fc1ccc(SSc2ccc(F)cc2)cc1"}

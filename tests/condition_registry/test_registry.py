@@ -46,6 +46,30 @@ def test_invalid_cas_is_not_silently_resolved() -> None:
     assert result.status == "invalid_identifier"
 
 
+@pytest.mark.parametrize("query,cas,formula,mw", [
+    ("Pd(dppf)Cl2", "72287-26-4", "C34H28Cl2FeP2Pd", 731.70),
+    ("Pd(dppf)Cl2.CH2Cl2", "95464-05-4", "C35H30Cl4FeP2Pd", 816.64),
+    ("potassium acetate", "127-08-2", "C2H3KO2", 98.14),
+    ("potassium phosphate tribasic", "7778-53-2", "K3O4P", 212.27),
+])
+def test_planning_condition_identities_have_consistent_composition(query, cas, formula, mw) -> None:
+    from rdkit import Chem
+    from rdkit.Chem import Descriptors, rdMolDescriptors
+    result = resolve_identifier(query, identifier_type="name")
+    assert result.status == "resolved"
+    assert result.substance.cas == cas
+    mol = Chem.MolFromSmiles(result.substance.smiles)
+    assert rdMolDescriptors.CalcMolFormula(mol) == formula
+    assert Descriptors.MolWt(mol) == pytest.approx(mw, abs=0.05)
+    assert Chem.GetFormalCharge(mol) == 0
+    if cas in {"72287-26-4", "95464-05-4"}:
+        assert "metal_catalyst" in {role.role_id for role in result.substance.roles}
+
+
+def test_incorrect_dppf_stoichiometry_alias_is_not_resolved_to_dcm_adduct() -> None:
+    assert resolve_identifier("Pd(dppf)2Cl2", identifier_type="name").status != "resolved"
+
+
 @pytest.mark.parametrize("query,expected_id", [("acetic acid", "cas:64-19-7"),
                                                 ("AcOH", "cas:64-19-7"),
                                                 ("methyl iodide", "cas:74-88-4"),

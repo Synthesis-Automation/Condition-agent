@@ -213,6 +213,71 @@ def test_invented_citation_is_a_failed_turn_not_a_supported_answer(service: Conv
     assert any(event.kind == "call" for event in ScientificWorkspace(service.root / identity).store.events())
 
 
+@pytest.mark.parametrize("draft_state", ["valid", "bad_reference", "malformed", "missing"])
+def test_timeout_recovers_only_validated_current_draft(service, draft_state):
+    class TimeoutRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            result = super().run(**kwargs)
+            draft = dict(result.answer)
+            if draft_state == "bad_reference":
+                draft["evidence_refs"] = ["sha256:" + "0" * 64]
+            if draft_state != "missing":
+                text = "{" if draft_state == "malformed" else json.dumps(draft)
+                (kwargs["turn_directory"] / "answer-draft.json").write_text(text, "utf-8")
+            raise AgentStopped("timed_out")
+
+    service.runtime = TimeoutRuntime()
+    identity = service.submit("Analyze a reaction")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "timed_out", turn
+    assert turn["error"]["type"] == "AgentStopped"
+    assert len(service.runtime.threads) == 1
+    if draft_state == "valid":
+        assert turn["answer"]["partial"] is True
+        assert turn["answer"]["completion_status"] == "timed_out"
+        assert turn["answer"]["review_status"] == "unreviewed"
+        assert turn["recovery_status"] == "validated_partial_draft"
+        assert turn["answer"]["evidence_refs"]
+        assert not (service.root / identity / "turns" / turn["id"] / "agent-final.json").exists()
+    else:
+        assert "answer" not in turn
+        assert turn["recovery_status"] == "no_valid_partial_draft"
+
+
+def test_repair_timeout_does_not_recover_previous_attempt_draft(service):
+    class RepairTimeoutRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            if self.threads:
+                raise AgentStopped("timed_out")
+            result = super().run(**kwargs)
+            (kwargs["turn_directory"] / "answer-draft.json").write_text(json.dumps(result.answer), "utf-8")
+            # A good old draft is still not the latest attempt's submitted work.
+            return AgentResult({**result.answer, "evidence_refs": ["sha256:" + "0" * 64]}, result.thread_id, {})
+
+    service.runtime = RepairTimeoutRuntime()
+    identity = service.submit("Analyze a reaction")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "timed_out", turn
+    assert turn["repair_attempts"] == 1
+    assert "answer" not in turn
+    assert turn["recovery_status"] == "no_valid_partial_draft"
+
+
+def test_cancelled_run_does_not_publish_draft(service):
+    class CancelledRuntime(RecordedRuntime):
+        def run(self, **kwargs):
+            result = super().run(**kwargs)
+            (kwargs["turn_directory"] / "answer-draft.json").write_text(json.dumps(result.answer), "utf-8")
+            kwargs["cancel"].set()
+            raise AgentStopped("cancelled")
+
+    service.runtime = CancelledRuntime()
+    identity = service.submit("Analyze a reaction")["conversation_id"]
+    turn = finish(service, identity)
+    assert turn["status"] == "cancelled", turn
+    assert "answer" not in turn
+
+
 def test_activity_history_survives_beyond_thirty_events(service: ConversationService) -> None:
     class ActivityRuntime(RecordedRuntime):
         def run(self, **kwargs):

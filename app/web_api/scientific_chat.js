@@ -560,6 +560,8 @@ function answerCard(turn) {
   }
   if (turn.answer) {
     const answer = turn.answer;
+    if (answer.partial) card.append(element('p', answer.recovery_notice ||
+      'Incomplete result recovered after the time limit. Chemistry remains unreviewed.', 'error'));
     const view = turn.structured_presentation;
     const routeFirst = !view?.error && view?.steps?.length > 0;
     if (!routeFirst) card.append(formattedMessage(answer.answer_markdown, turn.answer_presentation));

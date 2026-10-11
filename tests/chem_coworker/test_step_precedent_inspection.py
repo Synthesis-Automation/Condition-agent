@@ -84,8 +84,11 @@ def test_real_selection_page_sources_summary_and_replay(workspace):
     assert first["observations"] == []
     assert first["product_comparison"]["same_constitution"] is True
     assert first["support_kind"] == "template_precedent"
+    assert first["transfer_review"]["same_product"] is True
+    assert first["transfer_review"]["experimental_transfer"] == "not_established"
     brief = workspace.call_summary(event)["result_summary"]
     assert brief["precedents"][0]["reaction_smiles"] == first["reaction_smiles"]
+    assert brief["precedents"][0]["transfer_review"]["structure_scope"] == first["transfer_review"]["structure_scope"]
     assert brief["page"]["next_offset"] == 2
     assert brief["assessment_proposal"] == record["assessment_proposal"]
     proposal = record["assessment_proposal"]
@@ -115,6 +118,45 @@ def test_assessed_step_and_route_preserve_support_and_unknown(workspace):
     assert gap["status"] == "no_precedents_retrieved"
     assert gap["precedents"] == []
     assert gap["experimental_feasibility"] == "not_established"
+
+
+def test_incompatible_optional_index_preserves_inspection_and_answer_binding(workspace, monkeypatch):
+    source, selected = disconnection(workspace)
+
+    def incompatible(*args, **kwargs):
+        raise ValueError("Incompatible fallback descriptor definitions; rebuild the index")
+
+    monkeypatch.setattr(workspace.operations, "get_precedents", incompatible)
+    event, record = run(workspace, "inspect_step_precedents", source_ref=source.artifact_ref,
+                        realization_id=selected["realization_id"], limit=1)
+    assert record["warnings"] == ["OPTIONAL_CONDITION_OBSERVATIONS_UNAVAILABLE"]
+    page = record["observation_page"]
+    assert page["availability"] == "index_unavailable"
+    assert page["condition_transfer"] == "not_assessed"
+    assert "rebuild the index" in page["error"]["message"]
+    assert workspace.call_summary(event, detailed=True)["result_summary"]["observation_page"] == page
+    precedent = record["precedents"][0]
+    assert precedent["observations"] == []
+    assert precedent["procedures"][0]["observation_id"] == "obs-a"
+    assert precedent["reference_record"]["patent_number"] == "US12341B2"
+    assert precedent["transfer_review"]["experimental_transfer"] == "not_established"
+    answer = ScientificAnswer.model_validate(draft_for(record, event.artifact_ref))
+    assert event.artifact_ref in validate_answer_evidence(answer, workspace.store)
+
+
+def test_unexpected_inspection_error_is_not_silently_swallowed(workspace, monkeypatch):
+    source, selected = disconnection(workspace)
+
+    def broken(*args, **kwargs):
+        raise RuntimeError("Unexpected implementation failure")
+
+    monkeypatch.setattr(workspace.operations, "get_precedents", broken)
+    event = workspace.run("inspect_step_precedents", {
+        "source_ref": source.artifact_ref, "realization_id": selected["realization_id"],
+    })
+    record = workspace.store.read_artifact(event.artifact_ref)
+    assert record["execution_status"] == "error"
+    assert "Unexpected implementation failure" in str(record["error"])
 
 
 def test_strategy_and_precursor_selectors_propagate_to_inspection(workspace):
@@ -306,13 +348,14 @@ def test_empty_inspection_cannot_hide_known_matches(workspace):
         validate_answer_evidence(ScientificAnswer.model_validate(draft), workspace.store)
 
 
-def test_condition_inspection_does_not_replace_available_route_support(workspace):
+@pytest.mark.parametrize("schema_version", ["condition_evidence_comparison.v1", "condition_evidence_comparison.v2"])
+def test_condition_inspection_does_not_replace_available_route_support(workspace, schema_version):
     _, selected = disconnection(workspace)
     query = selected["precursor_smiles"] + ">>" + selected["target_smiles"]
     condition = workspace.store.append("call", {
         "operation": "inspect_condition_precedents", "execution_status": "completed",
         "arguments": {"reaction_smiles": query},
-        "result": {"schema_version": "condition_evidence_comparison.v1", "query_reaction_smiles": query,
+        "result": {"schema_version": schema_version, "query_reaction_smiles": query,
                    "precedents": []},
     })
     draft = draft_for({"selection": selected}, condition.artifact_ref)

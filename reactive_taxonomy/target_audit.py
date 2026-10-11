@@ -5,11 +5,34 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any, Optional, Tuple
 
-from .api import analyze_molecule
+from .api import analyze_molecule, observe_molecular_structure
 from .chemistry.rdkit_utils import parse_smiles
+from .fragment_search import indexed_product
+from .descriptors.registry import descriptor_definition_versions
 
 
-TARGET_AUDIT_SCHEMA_VERSION = "target_audit.v1"
+TARGET_AUDIT_SCHEMA_VERSION = "target_audit.v2"
+
+
+@dataclass(frozen=True)
+class TargetComponent:
+    """Component-local atom/bond index -> whole canonical molecule index."""
+
+    component_index: int
+    canonical_atom_indices: Tuple[int, ...]
+    canonical_bond_indices: Tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class CarbonylNitrogenObservation:
+    """Observed C(=O)-N adjacency, independent of motif interpretation."""
+
+    carbon_index: int
+    oxygen_index: int
+    nitrogen_index: int
+    cn_bond_in_ring: bool
+    carbon_aromatic: bool
+    nitrogen_aromatic: bool
 
 
 @dataclass(frozen=True)
@@ -75,6 +98,25 @@ class TargetAudit:
     reactive_sites: Tuple[TargetReactiveSite, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
+    molecular_formula: Optional[str] = None
+    molecular_weight: Optional[float] = None
+    canonical_atom_to_input_atom: Tuple[int, ...] = ()
+    input_atom_map_numbers: Tuple[int, ...] = ()
+    components: Tuple[TargetComponent, ...] = ()
+    rings: Tuple[Tuple[int, ...], ...] = ()
+    carbonyl_nitrogen_observations: Tuple[CarbonylNitrogenObservation, ...] = ()
+    definition_versions: Tuple[Tuple[str, str], ...] = ()
+    rdkit_version: str = ""
+    atom_index_scope: str = "zero_based_canonical_smiles"
+    motif_site_index_scope: str = "component_local_in_canonical_smiles"
+    coverage: str = "registered_patterns_only_not_exhaustive"
+    limitations: Tuple[str, ...] = (
+        "No motif match is not evidence of absent functionality or inertness.",
+        "Motifs and sites are observations/hypotheses, not experimental feasibility or selectivity.",
+        "Tautomers, protonation states and salt components are not merged or stripped.",
+        "Rings are the RDKit perceived ring basis, not an exhaustive set of cycles.",
+        "Use components to project motif/site indices; all other atom indices use canonical SMILES.",
+    )
     schema_version: str = TARGET_AUDIT_SCHEMA_VERSION
 
     def to_dict(self) -> dict[str, Any]:
@@ -86,8 +128,7 @@ class TargetAudit:
 def audit_target(smiles: str) -> TargetAudit:
     """Audit one target without proposing or changing molecular structure."""
 
-    analysis = analyze_molecule(smiles, include_context_features=False)
-    structure = analysis.structure
+    structure = observe_molecular_structure(smiles)
     if not structure.valid or not structure.canonical_smiles:
         return TargetAudit(
             input_smiles=structure.input_smiles,
@@ -96,7 +137,10 @@ def audit_target(smiles: str) -> TargetAudit:
             warnings=tuple(structure.warnings),
             error=structure.error,
         )
-    molecule = parse_smiles(structure.canonical_smiles)
+    # Use the same map-free indexing contract as focused inspection/disconnection.
+    canonical, input_order = indexed_product(smiles)
+    analysis = analyze_molecule(canonical, include_context_features=False)
+    molecule = parse_smiles(canonical)
     if molecule is None:
         return TargetAudit(
             input_smiles=structure.input_smiles,
@@ -106,7 +150,34 @@ def audit_target(smiles: str) -> TargetAudit:
             error="CANONICAL_SMILES_REPARSE_FAILED",
         )
 
-    from rdkit import Chem  # type: ignore
+    from rdkit import Chem, rdBase  # type: ignore
+    from rdkit.Chem import Descriptors, rdMolDescriptors  # type: ignore
+
+    original = parse_smiles(smiles)
+    component_atoms: list[tuple[int, ...]] = []
+    fragments = Chem.GetMolFrags(molecule, asMols=True, fragsMolAtomMapping=component_atoms)
+    components = tuple(
+        TargetComponent(
+            index, tuple(atoms), tuple(
+                molecule.GetBondBetweenAtoms(
+                    atoms[b.GetBeginAtomIdx()], atoms[b.GetEndAtomIdx()]
+                ).GetIdx() for b in fragment.GetBonds()
+            ),
+        ) for index, (fragment, atoms) in enumerate(zip(fragments, component_atoms))
+    )
+    carbonyl_nitrogen = tuple(
+        CarbonylNitrogenObservation(
+            carbon.GetIdx(), oxygen.GetIdx(), nitrogen.GetIdx(),
+            molecule.GetBondBetweenAtoms(carbon.GetIdx(), nitrogen.GetIdx()).IsInRing(),
+            carbon.GetIsAromatic(), nitrogen.GetIsAromatic(),
+        )
+        for carbon in molecule.GetAtoms() if carbon.GetAtomicNum() == 6
+        for oxygen in carbon.GetNeighbors()
+        if oxygen.GetAtomicNum() == 8 and molecule.GetBondBetweenAtoms(
+            carbon.GetIdx(), oxygen.GetIdx()
+        ).GetBondType() == Chem.BondType.DOUBLE
+        for nitrogen in carbon.GetNeighbors() if nitrogen.GetAtomicNum() == 7
+    )
 
     Chem.AssignStereochemistry(molecule, cleanIt=True, force=True)
     stereocenters = tuple(
@@ -158,7 +229,7 @@ def audit_target(smiles: str) -> TargetAudit:
     )
     return TargetAudit(
         input_smiles=structure.input_smiles,
-        canonical_smiles=structure.canonical_smiles,
+        canonical_smiles=canonical,
         valid=True,
         component_count=len(structure.components),
         atom_count=int(molecule.GetNumAtoms()),
@@ -171,12 +242,23 @@ def audit_target(smiles: str) -> TargetAudit:
         motifs=motifs,
         reactive_sites=reactive_sites,
         warnings=tuple(structure.warnings),
+        molecular_formula=rdMolDescriptors.CalcMolFormula(molecule),
+        molecular_weight=round(Descriptors.MolWt(molecule), 4),
+        canonical_atom_to_input_atom=input_order,
+        input_atom_map_numbers=tuple(a.GetAtomMapNum() for a in original.GetAtoms()),
+        components=components,
+        rings=tuple(sorted(tuple(sorted(ring)) for ring in molecule.GetRingInfo().AtomRings())),
+        carbonyl_nitrogen_observations=carbonyl_nitrogen,
+        definition_versions=descriptor_definition_versions(),
+        rdkit_version=rdBase.rdkitVersion,
     )
 
 
 __all__ = [
     "TARGET_AUDIT_SCHEMA_VERSION",
     "TargetAudit",
+    "TargetComponent",
+    "CarbonylNitrogenObservation",
     "TargetDoubleBondStereo",
     "TargetMotif",
     "TargetReactiveSite",

@@ -9,6 +9,8 @@ from .api import (
 from .target_audit import (
     TARGET_AUDIT_SCHEMA_VERSION,
     TargetAudit,
+    TargetComponent,
+    CarbonylNitrogenObservation,
     TargetDoubleBondStereo,
     TargetMotif,
     TargetReactiveSite,
@@ -18,6 +20,7 @@ from .target_audit import (
 from .reaction_api import featurize_reaction, identify_reaction_patterns
 from .molecule_comparison import MoleculeComparison, compare_molecules
 from .molecule_inspection import SiteInspection, inspect_reactive_sites
+from .precedent_transfer import PrecedentTransferReview, SiteInventoryDifference, review_precedent_transfer
 from .material_identity import MaterialIdentity, identify_material
 from .departing_fragments import (
     DEPARTING_FRAGMENT_TOKEN_VERSION,
@@ -265,6 +268,11 @@ __all__ = [
     "inspect_reactive_sites",
     "TARGET_AUDIT_SCHEMA_VERSION",
     "TargetAudit",
+    "TargetComponent",
+    "CarbonylNitrogenObservation",
+    "PrecedentTransferReview",
+    "SiteInventoryDifference",
+    "review_precedent_transfer",
     "TargetDoubleBondStereo",
     "TargetMotif",
     "TargetReactiveSite",
