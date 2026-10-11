@@ -264,6 +264,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                     "candidate_count", "qualified_count", "candidate_truncated", "matches_truncated", "scope",
                 ))
         overview["artifact_warnings"] = source.get("artifact_warnings", [])
+        overview["corpus_availability"] = source.get("corpus_availability", {})
     elif operation in {"assess_route_step", "inspect_route_step", "assess_route_proposal", "revise_route_branch"}:
         assessment = source.get("assessment")
         if isinstance(assessment, Mapping):

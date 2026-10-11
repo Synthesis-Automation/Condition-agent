@@ -88,6 +88,7 @@ def investigation_prompt(
         f"Repository (read only): {repository}\n"
         f"Investigation directory (all new files): {root}\n"
         f"Python interpreter: {sys.executable}\n"
+        "For UTC time use Python datetime.now(timezone.utc); Windows PowerShell 5.1 does not support Get-Date -AsUTC.\n"
         "Use this interpreter; PYTHONPATH includes the repository. If a subprocess\n"
         "drops it, insert the repository into sys.path before importing.\n"
         "Name temporary scripts task-specific names such as route_probe.py; avoid inspect.py,\n"

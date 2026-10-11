@@ -228,7 +228,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "strategy_id", "evidence", "condition_selectivity_assessment",
         ), path, limit=3)
     elif operation == "assess_retro_validity":
-        summary.update(view.pick(value, ("source_ref", "selection", "forward_ref", "artifact_warnings"), path))
+        summary.update(view.pick(value, ("source_ref", "selection", "forward_ref", "artifact_warnings", "corpus_availability"), path))
         view.add_nested(summary, value, "validity", (
             "status", "structural_status", "precedent_grade", "evidence_rank", "suggested_action",
             "forward_status", "forward_execution_status", "cautions", "unresolved_checks", "warnings",

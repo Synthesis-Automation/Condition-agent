@@ -58,3 +58,13 @@ The local production-data regression is recorded in
 It re-runs the original target disconnection and formerly failing selected-step
 inspection in a fresh pinned workspace, then validates a proposed-step answer.
 It is an engineering regression, not a new model trial or chemistry release gate.
+
+The production-data inspection returned **3 precedents in 0.563 seconds**; the
+proposed-step answer passed schema and evidence validation. No procedure rows were
+returned for these selected records, and condition enrichment remained explicitly
+unavailable. The complete smoke run took 28.922 seconds including disconnection.
+
+Final validation: `python -m pytest -q` — **2995 passed, 4 skipped**, 810.72 seconds.
+An initial run exposed outdated prompt-only test doubles; those now provide the
+new capability probe. The complete suite was rerun successfully after correction.
+No chemistry snapshots or production index metadata were rewritten.

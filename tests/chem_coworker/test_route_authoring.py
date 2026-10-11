@@ -165,6 +165,25 @@ def test_unrelated_inspections_are_not_attached(workspace, left, right):
     assert w.route_answer(request)["steps"][0]["precedent_refs"] == []
 
 
+def test_reported_steps_reuse_inspections_without_replacing_literature_support(workspace):
+    w, path = workspace
+    source = w.capture_source("Example 1: ethanol was oxidized to acetaldehyde.",
+                              url="https://example.org/experiment", title="Fixture experiment", locator="Example 1")
+    inspection = w.store.append("call", {"operation": "inspect_step_precedents", "execution_status": "completed",
+        "result": {"schema_version": SCHEMA_VERSION, "selection": {
+            "precursor_smiles": "CCO", "target_smiles": "CC=O"}, "precedents": [{"reaction_id": "fixture"}]}})
+    draft = w.route_answer({"target_smiles": "CC=O", "routes": [{"steps": [{
+        "reaction_smiles": "OCC>>O=CC", "basis": "reported", "conditions": "Source conditions",
+        "conditions_basis": "reported", "support": [{"ref": source.artifact_ref, "locator": "Example 1"}],
+    }]}]})
+    step = draft["steps"][0]
+    assert step["basis"] == "reported"
+    assert step["precedent_refs"] == [inspection.artifact_ref]
+    assert step["conditions"][0]["source_ids"] == ["source1"]
+    assert draft["sources"][0]["artifact_ref"] == source.artifact_ref
+    w.finalize_answer(path, draft)
+
+
 def test_automatic_inspection_does_not_enable_reported_claims(workspace):
     w, _ = workspace
     w.store.append("call", {"operation": "inspect_step_precedents", "execution_status": "completed",

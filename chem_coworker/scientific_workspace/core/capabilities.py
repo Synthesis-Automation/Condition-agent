@@ -68,6 +68,9 @@ def local_capabilities(baseline: Mapping[str, Any]) -> dict[str, Any]:
         operation_readiness["inspect_step_precedents"]["optional_enrichment"] = {
             "condition_observations": "unavailable", "template_and_source_inspection": "available_if_configured",
         }
+        operation_readiness["assess_retro_validity"]["optional_enrichment"] = {
+            "corpus_evidence": "unavailable", "structural_and_template_assessment": "available_if_configured",
+        }
     return {
         "schema_version": "scientific_capabilities.v1",
         "python": {"executable": sys.executable, "status": "running"},

@@ -43,6 +43,15 @@ print(w.inspect_artifact(event.artifact_ref, path=('result', 'warnings'), limit=
 ```
 Paths are literal JSON keys/list indices, not expressions; next_offset continues a
 selected page. Read warnings and non-passing gates before relying on results.
+`inspect_artifact` accepts `path`, `offset`, and `limit`; it has no `keys_only` or
+`max_bytes` argument. Read `w.help('inspect_artifact')` before changing the call.
+For fragment searches, use `limit=1..10`, `query_format='smiles'` or `'smarts'`,
+and `topology='preserve_rings'` or `'subgraph'`; `topology='exact'` is not supported.
+A target-bound fragment must actually match the target graph: `[nH]` is not an
+N-methyl nitrogen and `c` is not an aromatic nitrogen. Use `propose_fragment_queries`
+to inspect explicit broadenings instead of guessing incompatible fragments.
+Pass the parent search call's `artifact_ref` to `investigate_fragment_precedent`,
+not a nested artifact or literature-source ref; preserve its selected observation ID.
 Counts refer to saved results; displayed lists may contain only a preview. Do not
 dump whole analyses, manifests or route trees to stdout or rerun a tool for detail.
 Use w.store.read_artifact(ref) for complete data in custom analysis. The store

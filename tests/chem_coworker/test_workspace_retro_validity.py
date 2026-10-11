@@ -74,6 +74,53 @@ def test_saved_disconnection_and_route_selection_bind_concrete_realizations(work
     assert step["validity"]["precedent_grade"] == "exact_reaction"
 
 
+@pytest.mark.parametrize("failure", [ValueError("Incompatible fallback descriptor definitions"),
+                                     FileNotFoundError("Optional corpus missing")])
+def test_optional_corpus_failure_retains_structural_assessment(workspace, tmp_path, monkeypatch, failure):
+    from chem_coworker.scientific_workspace import InvestigationStore
+    marker = tmp_path / "optional-index.sqlite"
+    marker.write_text("Fixture: loading is replaced below", "utf-8")
+    baseline = {**workspace.store.manifest["baseline"], "artifacts": {
+        **workspace.store.manifest["baseline"]["artifacts"],
+        "condition_index": artifact_identity(marker), "shared_core_index": artifact_identity(marker),
+    }}
+    store = InvestigationStore.create(tmp_path / "unavailable-corpus", objective="Preserve structural review", baseline=baseline)
+    current = ScientificWorkspace(store.root)
+
+    def unavailable():
+        raise failure
+
+    monkeypatch.setattr(current.operations, "_conditions", unavailable)
+    event, result = call(current, "assess_retro_validity", proposal=PROPOSAL)
+    assert result["validity"]["precedent_grade"] == "exact_reaction"
+    assert result["validity"]["structural_status"] == "verified"
+    assert result["experimental_feasibility"] == "not_established"
+    assert result["corpus_availability"]["status"] == "unavailable"
+    assert result["corpus_availability"]["error"]["message"] == str(failure)
+    assert result["artifact_warnings"] == ["OPTIONAL_CORPUS_EVIDENCE_UNAVAILABLE"]
+    for detailed in (False, True):
+        assert current.call_summary(event, detailed=detailed)["result_summary"]["corpus_availability"] == result["corpus_availability"]
+
+
+def test_optional_corpus_unexpected_failure_is_not_hidden(workspace, tmp_path, monkeypatch):
+    from chem_coworker.scientific_workspace import InvestigationStore
+    marker = tmp_path / "unexpected.sqlite"
+    marker.write_text("Fixture", "utf-8")
+    baseline = {**workspace.store.manifest["baseline"], "artifacts": {
+        **workspace.store.manifest["baseline"]["artifacts"],
+        "condition_index": artifact_identity(marker), "shared_core_index": artifact_identity(marker),
+    }}
+    store = InvestigationStore.create(tmp_path / "unexpected-corpus", objective="Preserve errors", baseline=baseline)
+    current = ScientificWorkspace(store.root)
+
+    def broken():
+        raise RuntimeError("Unexpected failure")
+
+    monkeypatch.setattr(current.operations, "_conditions", broken)
+    event = current.run("assess_retro_validity", {"proposal": PROPOSAL})
+    assert store.read_artifact(event.artifact_ref)["execution_status"] == "error"
+
+
 def test_optional_pinned_corpus_is_used_without_recipe_ranking(workspace, tmp_path, monkeypatch):
     index = build_generic_index([record(1, "CC=O.N>>CCN")])
     index_path, shared_path = tmp_path / "index.sqlite", tmp_path / "shared.sqlite"

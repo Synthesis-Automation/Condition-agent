@@ -85,9 +85,21 @@ def assess_validity(
     available = [artifacts.get(name, {}).get("status") == "present"
                  for name in ("condition_index", "shared_core_index")]
     arguments = {}
+    artifact_warnings = ["CORPUS_ARTIFACT_PAIR_INCOMPLETE"] if any(available) and not all(available) else []
+    corpus_availability = {"status": "not_configured" if not any(available) else "incomplete"}
     if all(available):
-        engine = operations._conditions()
-        arguments = {"condition_index": engine.index, "shared_core_index": engine.shared_core_index}
+        try:
+            engine = operations._conditions()
+            arguments = {"condition_index": engine.index, "shared_core_index": engine.shared_core_index}
+        except (FileNotFoundError, ValueError) as exc:
+            # Corpus enrichment is optional; structural/template checks remain
+            # useful without admitting incompatible index rows.
+            artifact_warnings.append("OPTIONAL_CORPUS_EVIDENCE_UNAVAILABLE")
+            corpus_availability = {"status": "unavailable", "error": {
+                "type": type(exc).__name__, "message": str(exc),
+            }}
+        else:
+            corpus_availability = {"status": "available"}
     result = assess_retro_validity(
         step, operations._external_route_library(), **arguments,
         forward_evidence=forward, forward_execution_status=forward_execution,
@@ -99,8 +111,8 @@ def assess_validity(
         "selection": {"step_id": step_id, "realization_id": realization_id, "strategy_id": strategy_id},
         "mapping_evidence": mapping_evidence,
         "forward_ref": forward_ref,
-        "artifact_warnings": (["CORPUS_ARTIFACT_PAIR_INCOMPLETE"]
-                              if any(available) and not all(available) else []),
+        "artifact_warnings": artifact_warnings,
+        "corpus_availability": corpus_availability,
         "forward_execution": ({"execution_status": forward_execution, "error": forward_record.get("error")}
                               if forward_record else None),
         "experimental_feasibility": "not_established", **context,

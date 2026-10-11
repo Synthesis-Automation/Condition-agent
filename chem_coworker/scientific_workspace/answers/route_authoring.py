@@ -68,7 +68,7 @@ def _components(smiles: str) -> list[str]:
 def route_answer(store: InvestigationStore, proposal: Mapping[str, Any]) -> dict[str, Any]:
     """Assemble IDs, dependencies and citations; never infer conditions or feasibility.
 
-    Supplied sources and existing exact-step inspections for proposed steps are
+    Supplied sources and existing exact-step inspections for all steps are
     attached. Inspection references retain the canonical finalizer's checks.
     Missing required inspections still fail publication. No retrieval, assessment, source reconstruction or
     self-review is performed. Canonicalization identifies display molecules only.
@@ -150,7 +150,9 @@ def route_answer(store: InvestigationStore, proposal: Mapping[str, Any]) -> dict
                 if field and support.ref not in links[field]:
                     links[field].append(support.ref)
             condition_sources = list(citations)
-            if step.basis == "proposed" and not links["precedent_refs"]:
+            if step.basis == "reported" and not citations:
+                raise ValueError("Reported steps require explicitly supplied source evidence")
+            if not links["precedent_refs"]:
                 # Reuse an already recorded inspection, never an uninspected match
                 # or a source for different stereochemistry or chemical form.
                 existing = next((item for item in saved_support.get(

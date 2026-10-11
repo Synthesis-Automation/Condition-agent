@@ -114,7 +114,7 @@ class ScientificOperations:
         ),
         OperationDefinition("assess_route_step", contract_version="2", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
-        OperationDefinition("assess_retro_validity", contract_version="3", required_artifacts=("retro_library",),
+        OperationDefinition("assess_retro_validity", contract_version="4", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "forward_ref", "evidence_refs"),
                             usage_policy="Assess concrete realizations; ordinal evidence is not success probability. "
                             "Use a saved bounded forward check only for consequential uncertainties."),
@@ -505,6 +505,9 @@ class ScientificOperations:
 
         Supply one connected core. SMILES permits peripheral substitution while
         preserving rings; explicit SMARTS/subgraph permits deliberate broadening.
+        limit is 1..10; query_format is smiles/smarts; topology is
+        preserve_rings/subgraph (not exact). Use propose_fragment_queries to
+        preview graph-compatible alternatives before an expensive search.
         Supply target_smiles when the query represents a core of that target;
         mismatches are recorded as errors before scanning, not zero-hit results.
         Inspect saved hits for source records and procedure chunks. No automatic

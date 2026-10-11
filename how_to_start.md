@@ -10,6 +10,13 @@ Set-Location "C:\Git-softwares\Condition-agent"
 
 ## Quick start
 
+The October 11 follow-up fixes optional-index failures in validity review and
+automatic evidence attachment for reported route steps. A full versioned dataset
+rebuild is running; see [status and validation files](docs/new/workspace_followup_and_index_rebuild_20261011.md).
+Do not assume the new index is active until the builder publishes it. Restart the
+server and use a new Normal investigation for the code changes, and restart pinned
+consumers again after the new release is published.
+
 The October 11 completion fix checks condition-index metadata at prompt startup,
 preserves step/source inspection when optional condition enrichment is unavailable,
 and displays a validated saved draft as **incomplete** if a structured run times out.
