@@ -72,3 +72,18 @@ code fixes. After publication, restart consumers that pinned the previous releas
 existing investigations retain their frozen data. No HTTP endpoint changed.
 Independent chemistry review, untouched evaluation and experimental route validation
 remain pending; a technically complete build does not satisfy those gates.
+
+## Resumed after editor closure (October 12)
+
+The original builder and verification watcher stopped when VS Code was closed.
+The fragment scan's last logged count was 1,158,000 observations. Conversion,
+route/evidence catalogs, condition index and shared-core index had completed.
+The fragment builder cannot resume an incomplete observation scan, so that stage
+must restart; completed stages are reused after their hashes are checked.
+
+At 23:13 Shanghai time, the same release identity was confirmed and the driver
+was relaunched with `--finish-only`, skipping conversion. Both the driver and
+verification watcher now run through hidden Windows `Start-Process` launches,
+independently of the VS Code terminal. Current PIDs are recorded in `jobs.json`;
+restart output is in `resume.stdout.log`, `resume.stderr.log`, and the corresponding
+`verify_resume` logs beside the driver. Publication and verification remain pending.
