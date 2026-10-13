@@ -182,3 +182,6 @@ tmpclaude-*
 # Consolidated local source corpora and RDF processing outputs
 /raw_datasets/
 /data-processor/reaction_dataset/
+
+# Local external RetroChimera checkout
+/retrochimera/
