@@ -91,15 +91,10 @@ def test_tafamidis_view_renders_steps_and_retains_incomplete_route(example) -> N
     assert "Aminophenol ester" in text and "Illustrative amide" in text
 
 
-@pytest.mark.parametrize("case", ["branch", "invalid", "ambiguous_product"])
+@pytest.mark.parametrize("case", ["invalid", "ambiguous_product"])
 def test_route_scheme_fallback_preserves_steps_and_explains_reason(example, case) -> None:
     _, payload = example
-    if case == "branch":
-        branch = deepcopy(payload["steps"][1])
-        branch["id"] = "s3"
-        payload["steps"].append(branch)
-        payload["routes"][0]["step_ids"].append("s3")
-    elif case == "invalid":
+    if case == "invalid":
         payload["molecules"][1]["smiles"] = "C1"
     else:
         payload["steps"][1]["product_ids"].append("target")
@@ -112,6 +107,32 @@ def test_route_scheme_fallback_preserves_steps_and_explains_reason(example, case
     assert route["drawing_warning"]
     assert "scheme_width" not in route
     assert len(view["steps"]) == len(payload["steps"])
+    assert payload == original
+
+
+@pytest.mark.parametrize("invalid", [False, True])
+def test_branched_route_draws_chemical_panels_or_preserves_invalid_fallback(example, invalid) -> None:
+    _, payload = example
+    branch = deepcopy(payload["steps"][1])
+    branch["id"] = "s3"
+    payload["steps"].append(branch)
+    payload["routes"][0]["step_ids"].append("s3")
+    if invalid:
+        payload["molecules"][1]["smiles"] = "C1"
+    original = deepcopy(payload)
+    view = present_conversation({"id": "a" * 32, "turns": [
+        {"question": "Q", "answer": payload},
+    ]})["turns"][0]["structured_presentation"]
+    route = view["routes"][0]
+    assert route["drawing_status"] == ("dependency_overview" if invalid else "branched_scheme")
+    if not invalid:
+        assert "drawing_warning" not in route
+        assert route["scheme_width"] > 0
+        root = ET.fromstring(base64.b64decode(route["image_url"].split(",", 1)[1]))
+        assert root.get("data-layout") == "layered-dependencies"
+        ns = "{http://www.w3.org/2000/svg}"
+        assert len(root.findall(f".//{ns}path[@data-role='reaction-arrow']")) == 3
+    assert route["unreached_target_ids"] == ["target"]
     assert payload == original
 
 

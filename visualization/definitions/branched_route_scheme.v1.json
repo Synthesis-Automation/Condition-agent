@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "branched_route_scheme.v1",
+  "padding": 24,
+  "column_gap": 48,
+  "row_gap": 72,
+  "lane_gap": 16,
+  "font_size": 18,
+  "line_height": 26,
+  "title_characters": 64,
+  "arrow_head_length": 12,
+  "arrow_head_half_width": 5,
+  "stroke_width": 2
+}

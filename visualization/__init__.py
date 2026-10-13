@@ -1,6 +1,11 @@
 """Standalone molecule and reaction visualization utilities."""
 
 from .html import svg_html
+from .branched_route_scheme import (
+    BranchedRouteStep,
+    load_branched_route_style,
+    render_branched_route_scheme_svg,
+)
 from .route_scheme import (
     RouteSchemeStep,
     load_route_scheme_style,
@@ -39,6 +44,9 @@ from .reaction_display_graphic import (
 )
 
 __all__ = [
+    "BranchedRouteStep",
+    "load_branched_route_style",
+    "render_branched_route_scheme_svg",
     "RouteSchemeStep",
     "load_route_scheme_style",
     "render_route_scheme_svg",

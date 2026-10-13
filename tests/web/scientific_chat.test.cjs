@@ -731,6 +731,12 @@ test('linear routes show SVGs, reaction SMILES and precedents without diagnostic
   assert.ok(card.descendants().some(node => node.textContent === 'Unresolved step.' && !inDetails(node)));
   assert.ok(!card.descendants().some(node => node.textContent.startsWith('Conditions: Proposed')));
   assert.equal(JSON.stringify(context.routeView), original);
+  context.routeView.routes[0].drawing_status = 'branched_scheme';
+  const branched = run('showStructured(routeView)');
+  assert.equal(branched.querySelectorAll('img').filter(node => node.src.endsWith('route')).length, 1);
+  assert.equal(branched.querySelectorAll('img').filter(node => node.src.endsWith('target-step')).length, 0);
+  assert.ok(branched.querySelectorAll('figcaption').some(node => node.textContent.includes('top to bottom')));
+  assert.ok(branched.descendants().some(node => node.textContent === 'Provisional route: validation incomplete.'));
   context.routeView.routes[0].drawing_status = 'dependency_overview';
   const fallback = run('showStructured(routeView)');
   assert.equal(fallback.querySelectorAll('img').filter(node => node.src.endsWith('target-step')).length, 2);

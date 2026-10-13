@@ -1,4 +1,9 @@
 {
+    "python.defaultInterpreterPath": "C:/Users/Desktop/AppData/Local/Programs/Python/Python312/python.exe",
+    "python.terminal.activateEnvironment": false,
+    "terminal.integrated.env.windows": {
+        "PATH": "C:\\Users\\Desktop\\AppData\\Local\\Programs\\Python\\Python312;C:\\Users\\Desktop\\AppData\\Local\\Programs\\Python\\Python312\\Scripts;${env:PATH}"
+    },
     "git.ignoredRepositories": [
         "retrochimera"
     ]

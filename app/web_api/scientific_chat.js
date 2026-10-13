@@ -418,11 +418,13 @@ function showStructured(view, key = 'science') {
     const box = element('section', '', 'route-section');
     const routeKey = key + ':' + route.id;
     if (route.unreached_target_ids.length) box.append(element('p', 'Incomplete route: does not reach ' + route.unreached_target_ids.map(id => molecules.get(id).name).join(', ') + '.', 'scientific-note'));
-    const hasRouteScheme = route.drawing_status === 'linear_scheme';
+    const hasRouteScheme = ['linear_scheme', 'branched_scheme'].includes(route.drawing_status);
     if (route.image_url) {
-      const label = hasRouteScheme
-        ? 'Read left to right, then continue at the left of the next row.'
-        : 'Declared route dependencies. Individual reaction schemes follow below.';
+      const label = route.drawing_status === 'branched_scheme'
+        ? 'Follow arrows from top to bottom; read each reaction left to right. Parallel preparations join at their consuming step.'
+        : hasRouteScheme
+          ? 'Read left to right, then continue at the left of the next row.'
+          : 'Declared route dependencies. Individual reaction schemes follow below.';
       const figure = reactionFigure(route, label);
       if (hasRouteScheme) figure.append(element('figcaption', label, 'route-scheme-caption'));
       box.append(figure);
@@ -432,7 +434,7 @@ function showStructured(view, key = 'science') {
       .some(record => record.admission_eligible === false))) {
       box.append(element('p', 'Provisional route: validation incomplete.', 'scientific-note'));
     }
-    if (route.drawing_warning) box.append(element('p', 'Continuous scheme unavailable: ' + route.drawing_warning, 'scientific-note'));
+    if (route.drawing_warning) box.append(element('p', 'Route scheme unavailable: ' + route.drawing_warning, 'scientific-note'));
     route.step_ids.forEach((id, position) => { box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1, !hasRouteScheme, true)); routed.add(id); });
     if (view.routes.length === 1) section.append(element('h3', route.title), box);
     else {

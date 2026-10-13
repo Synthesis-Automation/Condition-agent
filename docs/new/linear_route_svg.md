@@ -96,8 +96,9 @@ source identity and cautions remain visible.
 Individual step drawings remain available in the response. Agent presentation
 instructions request complete route objects rather than repeated target schemes
 or prose-only SMILES sequences.
-Branched dependencies, invalid structures or ambiguous connections retain the
-dependency overview and individual reaction drawings, with a display warning.
+Branched dependencies now use a chemical dependency diagram, described below.
+Invalid structures or ambiguous linear connections retain the dependency overview
+and individual reaction drawings, with a display warning.
 The browser preserves the scheme scale using horizontal scrolling when needed.
 
 Restart the workspace server and reload saved conversations to use the updated
@@ -107,7 +108,34 @@ remain readable without inferred reagent labels. API routes are unchanged; route
 presentation objects add `drawing_status`, `scheme_width` when drawn, and
 `drawing_warning` on fallback. No corpus conversion or index rebuild is required.
 
-This initial layout does not align common scaffolds across steps, abbreviate
-substructures, combine operations under one arrow, or draw convergent routes as
-a continuous molecular scheme. These can be added without replacing the public
-route renderer.
+This layout does not align common scaffolds across steps, abbreviate
+substructures, or combine operations under one arrow.
+
+## Branched routes (2026-10-13)
+
+`visualization.render_branched_route_scheme_svg` accepts immutable
+`BranchedRouteStep` objects. Each supplies reactant and product `SchemeMolecule`
+objects, an ID, and `after_step_ids`. Dependencies must share explicit molecule
+identifiers; missing parents, cycles, duplicate step IDs, and conflicting structure
+declarations for the same molecule ID are rejected. No dependency or chemistry is
+inferred from structure similarity.
+
+The SVG places independent preparations side by side and subsequent reactions
+below them. Arrows connect the declared dependency graph, including convergent
+steps. Dependencies that skip layers use exterior lanes. Each panel contains its
+complete reaction, so intermediate structures repeat at consuming steps. Step
+numbers match the supplied route order. Geometry is validated from
+`visualization/definitions/branched_route_scheme.v1.json`, schema 1.0; molecular
+drawings reuse the existing annotated-scheme renderer. Original structures,
+conditions, reagents, yields and their supplied attribution remain in metadata.
+As with linear routes, the workspace displays only explicit reagent labels on
+arrows, without inferring conditions or feasibility.
+
+The presentation API now returns `drawing_status="branched_scheme"` with SVG
+`image_url` and `scheme_width` for valid branched drawings. The browser shows one
+route SVG, its top-to-bottom reading caption, and the existing step evidence.
+Individual target reaction diagrams remain available in the response and are
+shown when route rendering falls back. Linear rendering is unchanged. There are
+no endpoint, scientific-answer schema, chemistry-definition, admission, or corpus
+changes. Restart the server and refresh the browser to render existing saved
+routes; a new investigation or index rebuild is unnecessary.

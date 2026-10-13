@@ -18,6 +18,7 @@ from visualization import (
     SchemeAnnotation, SchemeMolecule, render_annotated_scheme_svg,
     render_molecule_image_bytes, render_reaction_image_bytes,
     RouteSchemeStep, render_route_scheme_svg,
+    BranchedRouteStep, render_branched_route_scheme_svg,
 )
 
 from chem_coworker.scientific_workspace.answers.answer_contracts import ScientificAnswer
@@ -308,21 +309,36 @@ def _structured_view(
     for route in view["routes"]:
         route_steps = [steps[key] for key in route["step_ids"]]
         try:
-            # Declared branches must never be flattened into a linear scheme.
-            for index, step in enumerate(route_steps):
-                expected = {route_steps[index - 1]["id"]} if index else set()
-                if set(step["after_step_ids"]) != expected:
-                    raise ValueError("Route is not a declared linear sequence")
+            linear = all(
+                set(step["after_step_ids"]) == (
+                    {route_steps[index - 1]["id"]} if index else set()
+                ) for index, step in enumerate(route_steps)
+            )
             with rdBase.BlockLogs():
-                svg = render_route_scheme_svg(tuple(RouteSchemeStep(
-                    step["reaction_smiles"], basis=step["basis"],
-                    above=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["conditions"]),
-                    reagents=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["reagents"]),
-                    yield_info=SchemeAnnotation(step["yield_info"]["text"], step["yield_info"]["basis"]) if step["yield_info"] else None,
-                ) for step in route_steps), title=route["title"], reagents_only=True)
+                if linear:
+                    svg = render_route_scheme_svg(tuple(RouteSchemeStep(
+                        step["reaction_smiles"], basis=step["basis"],
+                        above=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["conditions"]),
+                        reagents=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["reagents"]),
+                        yield_info=SchemeAnnotation(step["yield_info"]["text"], step["yield_info"]["basis"]) if step["yield_info"] else None,
+                    ) for step in route_steps), title=route["title"], reagents_only=True)
+                else:
+                    svg = render_branched_route_scheme_svg(tuple(BranchedRouteStep(
+                        id=step["id"], title=step["title"], basis=step["basis"],
+                        after_step_ids=tuple(step["after_step_ids"]),
+                        reactants=tuple(SchemeMolecule(
+                            molecules[key]["name"], molecules[key]["smiles"], key,
+                        ) for key in step["reactant_ids"]),
+                        products=tuple(SchemeMolecule(
+                            molecules[key]["name"], molecules[key]["smiles"], key,
+                        ) for key in step["product_ids"]),
+                        conditions=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["conditions"]),
+                        reagents=tuple(SchemeAnnotation(item["text"], item["basis"]) for item in step["reagents"]),
+                        yield_info=SchemeAnnotation(step["yield_info"]["text"], step["yield_info"]["basis"]) if step["yield_info"] else None,
+                    ) for step in route_steps), title=route["title"], reagents_only=True)
             route["image_url"] = _svg_url(svg)
             route["scheme_width"] = float(ET.fromstring(svg).get("width"))
-            route["drawing_status"] = "linear_scheme"
+            route["drawing_status"] = "linear_scheme" if linear else "branched_scheme"
         except (ValueError, RuntimeError) as exc:
             route["image_url"] = _route_overview(route_steps)
             route["drawing_status"] = "dependency_overview"
