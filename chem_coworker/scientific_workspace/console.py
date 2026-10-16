@@ -33,6 +33,9 @@ class ScientificConsole:
         action = request.get("action", "run")
         if action == "help":
             return {"help": w.help(request["names"])}
+        if action in {"record_question", "update_question", "list_questions", "step_dossier"}:
+            result = getattr(w, action)(**request.get("arguments", {}))
+            return result if action == "list_questions" else w.call_summary(result)
         refs = tuple(request.get("evidence_refs", []))
         if request.get("parent_ref"):
             refs += (request["parent_ref"],)
@@ -74,7 +77,8 @@ class ScientificConsole:
         elif action == "run":
             operation, arguments = request["operation"], request.get("arguments", {})
         else:
-            raise ValueError("Use run, search_prepared, inspect, help, or quit")
+            raise ValueError("Use run, search_prepared, inspect, help, record_question, update_question, "
+                             "list_questions, step_dossier, or quit")
         reason = str(request.get("reason", "")).strip()
         if operation in {"search_fragment_precedents", "propose_fragment_queries"} and not reason:
             raise ValueError("State the chemical search question or query-revision reason")

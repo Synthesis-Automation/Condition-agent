@@ -18,6 +18,18 @@ Prefer saved Python files for structured inputs over nested shell quoting.
 Use w.help(['capture_source_file', 'attach_literature_reaction']) for public helper
 signatures and callable examples. Helpers are not in w.operations.catalog().
 Do not guess old module paths or read implementation files to learn these APIs.
+For a consequential unresolved question, optionally use `w.record_question` on
+the exact saved call (and `step_id` for a route). State the resolution criterion
+and next useful check. `w.list_questions()` restores current questions on resume;
+`w.update_question` requires the latest revision_ref, a status and rationale.
+Resolved questions require completed-call or captured-passage resolution_refs,
+but remain agent-assessed and unreviewed. Contradictions remain visible. Changed
+routes or recipes need new scoped questions; old resolutions never transfer.
+`w.step_dossier(source_ref, step_id=...)` saves existing assessment views and scoped
+questions without running science. Optional evidence_refs attach relevant context.
+Inspect its call_summary, then root sections with inspect_artifact as needed.
+Cite underlying scientific calls/sources; questions and dossiers are not evidence
+of chemical feasibility. Use these helpers when useful, not as a required checklist.
 For several results, collect event.artifact_ref and print w.batch_summary(refs)
 once. Its 16 KiB budget applies to the entire batch, with every omitted ref retained.
 `w.run(...)` returns an InvestigationEvent, not a JSON object. Save only

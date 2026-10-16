@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 HELPER_EXAMPLES = {
+    "record_question": "q = w.record_question(source_ref=ref, question='Is site selectivity supported?', resolution_criterion='An inspected comparable experiment addresses the competing site', next_check='Inspect the closest precedent')",
+    "update_question": "q = w.update_question(revision_ref, status='resolved', rationale='Explain how the evidence answers the criterion and any contradictions', resolution_refs=(evidence_ref,))",
+    "list_questions": "print(w.list_questions(source_ref=ref))",
+    "step_dossier": "print(w.call_summary(w.step_dossier(ref, evidence_refs=(recipe_check_ref,))))",
     "run": "event = w.run(operation_name, parameters)",
     "run_summary": "print(w.run_summary(operation_name, parameters))",
     "call_summary": "print(w.call_summary(saved_ref))",

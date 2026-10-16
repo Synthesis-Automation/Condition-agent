@@ -152,7 +152,8 @@ class ScientificWorkspace:
             if event is None:
                 raise ValueError("Summary requires a recorded artifact reference")
         value = self.store.read_artifact(event.artifact_ref)
-        project = summarize_call if detailed else summarize_call_brief
+        own_view = value.get("schema_version") in {"scientific_question.v1", "scientific_step_dossier.v1"}
+        project = summarize_call if detailed and not own_view else summarize_call_brief
         return bound_call_summary({"event": asdict(event), **project(value)}, value)
 
     def run_summary(
@@ -179,7 +180,64 @@ class ScientificWorkspace:
             "event_count": len(events),
             "recent_events": [asdict(event) for event in events[-5:]],
             "history_omitted": max(0, len(events) - 5),
+            "questions": {"total": self.list_questions(limit=1)["total"],
+                          "hint": "Use list_questions for current scopes, states and revision refs."},
         }
+
+    def record_question(
+        self, *, source_ref: str, question: str, resolution_criterion: str,
+        next_check: str, step_id: str | None = None,
+    ) -> InvestigationEvent:
+        """Record an optional scientific question scoped to an exact saved call/step."""
+        from .adapters.questions import record_question
+
+        return record_question(self.store, source_ref=source_ref, step_id=step_id, question=question,
+                               resolution_criterion=resolution_criterion, next_check=next_check)
+
+    def update_question(
+        self, reference: str, *, status: str, rationale: str, next_check: str | None = None,
+        evidence_refs: tuple[str, ...] = (), contradicting_refs: tuple[str, ...] = (),
+        resolution_refs: tuple[str, ...] = (),
+    ) -> InvestigationEvent:
+        """Update the current revision; resolved requires evidence and remains agent-assessed.
+
+        Status is open, investigating, resolved or withdrawn. Evidence and contradictions
+        accumulate; resolution_refs apply to this revision only. Use list_questions to
+        obtain the current revision_ref. A changed route/recipe needs a new scoped question.
+        """
+        from .adapters.questions import update_question
+
+        return update_question(self.store, reference, status=status, rationale=rationale,
+                               next_check=next_check, evidence_refs=evidence_refs,
+                               contradicting_refs=contradicting_refs, resolution_refs=resolution_refs)
+
+    def list_questions(
+        self, *, source_ref: str | None = None, step_id: str | None = None,
+        status: str | None = None, offset: int = 0, limit: int = 20,
+    ) -> dict[str, Any]:
+        """Page current questions, optionally filtered to an exact source and step.
+
+        With source_ref and no step_id, select call-level questions only. Without
+        source_ref, include all scopes. Resolved is an unreviewed agent judgment.
+        """
+        from .adapters.questions import list_questions
+
+        return list_questions(self.store, source_ref=source_ref, step_id=step_id,
+                              status=status, offset=offset, limit=limit)
+
+    def step_dossier(
+        self, source_ref: str, *, step_id: str | None = None, evidence_refs: tuple[str, ...] = (),
+    ) -> InvestigationEvent:
+        """Save a step evidence view without new science; inspect it with call_summary.
+
+        Select a completed step/route/retro-validity assessment, reaction analysis,
+        recommendation or recipe check. Route sources require step_id. Optional
+        evidence_refs attach context; only exact saved recipe checks apply. Full
+        sections remain available through inspect_artifact on the returned ref.
+        """
+        from .views.step_dossier import step_dossier
+
+        return step_dossier(self, source_ref, step_id=step_id, evidence_refs=evidence_refs)
 
     def help(self, names: str | list[str]) -> list[dict[str, Any]]:
         """Return signatures/examples for 1..10 named public helpers or scientific operations."""

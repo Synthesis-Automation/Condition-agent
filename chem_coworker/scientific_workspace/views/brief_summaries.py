@@ -17,6 +17,33 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
     result.update(_brief_fields(payload, (
         "operation", "execution_status", "error", "duration_seconds", "result_bytes",
     )))
+    if payload.get("schema_version") in {"scientific_question.v1", "scientific_step_dossier.v1"}:
+        result["result_summary"] = _brief_fields(payload, (
+            "schema_version", "question_id", "source_ref", "step_id", "question", "status",
+            "resolution_criterion", "next_check", "rationale", "resolution_refs", "contradicting_refs",
+            "proposal", "experimental_feasibility", "review_status", "limitations",
+        ))
+        if payload.get("schema_version") == "scientific_step_dossier.v1":
+            overview = result["result_summary"]
+            checks = payload["assessments"]
+            overview["assessment_status"] = checks["status"]
+            for name in ("structural_assessments", "recipe_assessments"):
+                overview[name] = [_brief_fields(item, (
+                    "artifact_ref", "status", "admission_eligible", "recipe_id", "hard_conflicts",
+                    "unresolved_requirements", "gates", "warnings", "coverage",
+                )) for item in checks[name][:3]]
+                overview[f"{name}_count"] = len(checks[name])
+            questions = payload["questions"]
+            overview["questions"] = [_brief_fields(item, (
+                "revision_ref", "question", "status", "next_check", "contradicting_refs", "review_status",
+            )) for item in questions["items"][:3]]
+            overview["question_count"] = questions["total"]
+            overview["questions_omitted"] = questions["total"] - len(overview["questions"])
+            overview["source_summary_ref"] = payload["source_ref"]
+            overview["linked_evidence_count"] = len(payload["linked_evidence"]["items"]) if payload["linked_evidence"] else 0
+        result["inspection"] = {"result_path": "$", "projection_only": True, "detail_available": True,
+                                "hint": "Inspect root sections source_summary, linked_evidence, assessments or questions; cite underlying science."}
+        return result
     if payload.get("schema_version") == "captured_source_image.v1":
         result["result_summary"] = _brief_fields(payload, (
             "source_ref", "locator", "mime_type", "width", "height", "source_bytes",

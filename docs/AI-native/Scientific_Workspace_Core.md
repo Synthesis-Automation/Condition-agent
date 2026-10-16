@@ -204,6 +204,35 @@ headless and legacy baseline behavior remains as described above.
 
 ## Extending the system
 
+### Scoped questions and saved step dossiers (2026-10-16)
+
+`adapters/questions.py` adds optional `scientific_question.v1` records to the
+existing event store. Each question binds to an exact source call or source record
+and an optional assessed route step. Updates append immutable revisions under the
+store's writer lock and reject stale revision references. They retain supporting
+and contradicting evidence, a resolution criterion, next check and rationale.
+Resolution requires a completed call or verified captured passage, but remains an
+agent-assessed, unreviewed judgment; it cannot change chemistry admission or scores.
+Withdrawn questions are not resolved questions. Reopening preserves past resolutions.
+Changing a route/recipe creates a different scope; resolutions are never copied.
+
+`views/step_dossier.py` saves `scientific_step_dossier.v1` using existing call
+summaries and exact-step assessment projections. It retains separate structural
+and cited recipe checks, linked context, scoped questions and missing-check
+limitations. It performs no new scientific calls. Its stored view stays unchanged
+after subsequent questions or assessments. Large views use existing summary and
+paged inspection helpers. Questions and dossiers cannot be cited as scientific
+evidence in final answers; use the underlying calls and captured sources.
+
+Python helpers and persistent-console actions share these implementations. No new
+database, search engine, model, chemistry schema or ranking policy is introduced.
+The new evidence-handling code changes scientific baseline identity: restart the
+server and begin a new investigation. Historical artifacts remain readable; no
+dataset rebuild is required. These engineering changes do not satisfy independent
+chemistry-review or untouched-evaluation release gates.
+
+### Extension procedure
+
 1. Add scientific behavior to its owning package with applicable chemistry tests.
 2. Add a thin adapter and an explicit capability declaration. Version breaking API
    changes and substantive scientific behavior; identify changed data snapshots.

@@ -2,6 +2,45 @@
 
 Status: local development implementation; independent chemistry review remains pending.
 
+2026-10-16: optional scoped scientific questions and saved step dossiers now reuse
+the existing event store. They track evidence, contradictions and agent-assessed
+resolutions without changing chemistry admission, retrieval or ranking. See
+[core ownership and semantics](Scientific_Workspace_Core.md#scoped-questions-and-saved-step-dossiers-2026-10-16).
+Restart the server and begin a new investigation after this evidence-handling
+change; datasets do not need rebuilding. Historical artifacts remain readable.
+
+```python
+q = w.record_question(
+    source_ref=assessment_ref,
+    question="Does the precedent address the competing reactive site?",
+    resolution_criterion="An inspected experiment addresses that site competition",
+    next_check="Inspect the closest source procedure",
+)
+print(w.list_questions())  # Current revisions; follow next_offset when present.
+q = w.update_question(
+    q.artifact_ref, status="resolved",
+    rationale="Explain how the inspected evidence answers the criterion and any contradictions.",
+    resolution_refs=(source_passage_ref,),
+)
+dossier = w.step_dossier(assessment_ref, evidence_refs=(recipe_check_ref,))
+print(w.call_summary(dossier))
+print(w.inspect_artifact(dossier.artifact_ref, path=("assessments",)))
+```
+
+For a saved route assessment, pass its exact `step_id` to both record_question and
+step_dossier. Single-step assessments and condition calls need no step_id.
+Supported dossier sources are assess_route_step, assess_route_proposal,
+revise_route_branch, assess_retro_validity, analyze_reaction, recommend_conditions,
+assess_recipe and assess_proposed_recipe. A disconnection candidate first needs its
+own assessment. `w.help` documents all four helpers. The persistent console accepts
+their names as `action` with helper parameters in `arguments`.
+Updates require the current question `revision_ref`; stale updates are rejected.
+States are open, investigating, resolved and withdrawn. Evidence/contradictions
+accumulate; each resolution supplies its own evidence. Resolutions remain unreviewed
+agent judgments, not chemistry validation. They apply only to their original scope.
+Use underlying calls and source passages as final-answer citations, never a question
+or dossier. These helpers are optional and do not impose a task sequence.
+
 2026-10-11 [completion fix](../new/workspace_completion_fix_20261011.md): prompt
 startup now checks SQLite condition-index metadata. Incompatible optional condition
 enrichment no longer aborts selected-step/source inspection. Normal and Tools +

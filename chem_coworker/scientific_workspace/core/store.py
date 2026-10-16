@@ -170,34 +170,40 @@ class InvestigationStore:
         self, kind: str, value: Any, *, evidence_refs: tuple[str, ...] = (),
     ) -> InvestigationEvent:
         """Atomically append an event whose evidence and complete payload are retrievable."""
+        with self._writer():
+            return self._append_locked(kind, value, evidence_refs=evidence_refs)
+
+    def _append_locked(
+        self, kind: str, value: Any, *, evidence_refs: tuple[str, ...] = (),
+    ) -> InvestigationEvent:
+        """Publish while the caller holds the writer lock, including revision checks."""
         from .artifact_storage import compact_route_artifact
 
         value, sections = compact_route_artifact(kind, json.loads(canonical_bytes(value)))
         data = canonical_bytes(value)
         digest = hashlib.sha256(data).hexdigest()
-        with self._writer():
-            for reference in evidence_refs:
-                self.read_artifact(reference)
-            events = self.events()
-            # Write immutable sections before publishing their root/event. A failed
-            # write may leave an unreferenced section, never a half-published call.
-            for reference, section in sections.items():
-                section_path = self.root / "artifacts" / f"{reference.split(':', 1)[1]}.json"
-                if section_path.exists():
-                    self._read_stored_artifact(reference)
-                else:
-                    _write_json(section_path, section)
-            artifact_path = self.root / "artifacts" / f"{digest}.json"
-            if not artifact_path.exists():
-                _write_json(artifact_path, value)
+        for reference in evidence_refs:
+            self.read_artifact(reference)
+        events = self.events()
+        # Write immutable sections before publishing their root/event. A failed
+        # write may leave an unreferenced section, never a half-published call.
+        for reference, section in sections.items():
+            section_path = self.root / "artifacts" / f"{reference.split(':', 1)[1]}.json"
+            if section_path.exists():
+                self._read_stored_artifact(reference)
             else:
-                self.read_artifact(f"sha256:{digest}")
-            event = InvestigationEvent(
-                sequence=len(events) + 1, kind=kind, artifact_ref=f"sha256:{digest}",
-                evidence_refs=evidence_refs, created_at=datetime.now(timezone.utc).isoformat(),
-            )
-            _write_json(self.root / "events" / f"{event.sequence:08d}.json", event)
-            return event
+                _write_json(section_path, section)
+        artifact_path = self.root / "artifacts" / f"{digest}.json"
+        if not artifact_path.exists():
+            _write_json(artifact_path, value)
+        else:
+            self.read_artifact(f"sha256:{digest}")
+        event = InvestigationEvent(
+            sequence=len(events) + 1, kind=kind, artifact_ref=f"sha256:{digest}",
+            evidence_refs=evidence_refs, created_at=datetime.now(timezone.utc).isoformat(),
+        )
+        _write_json(self.root / "events" / f"{event.sequence:08d}.json", event)
+        return event
 
     def note(
         self, kind: str, text: str, *, evidence_refs: tuple[str, ...] = (),

@@ -4,6 +4,18 @@
 **Status:** Proposed system design  
 **Scope:** Synthesis planning, reaction precedent investigation, condition recommendation, route assessment, and evidence management.
 
+**Repository adaptation (2026-10-16):** This remains a conceptual design, not a
+replacement architecture. The workspace already provides recorded calls, baseline
+identity, provider contracts, summaries, attributed claims and step assessments.
+The first incremental implementation adds scoped questions with immutable,
+evidence-linked revisions and saved step dossiers over those existing records.
+See [workspace usage](readme.md) and [core ownership](Scientific_Workspace_Core.md).
+Resolution remains agent-assessed and unreviewed; chemistry logic stays in its
+owning packages. "ConditionCore" below is conceptual shorthand for the existing
+registry/recommender responsibilities. Hard compatibility conflicts still exclude
+affected recipes before ranking. Existing route search remains in place; no new
+workflow engine or provider is required by this increment.
+
 > The agent directs the investigation; a chemistry service layer makes tools consistent and preserves evidence; specialized engines perform the underlying calculations, searches, and predictions.
 
 This design borrows REA’s architecture and evidence-handling discipline rather than its reverse-engineering code wholesale. REA’s actual implementation is more elaborate than a simple three-layer diagram: it separates interfaces, shared application workflows, provider adapters, domain logic, and investigation records. That separation is the useful architectural reference. [REA architecture][rea-architecture]
@@ -261,10 +273,6 @@ A model or agent should be allowed to propose an unusual disconnection. That pro
 Avoid both extremes. The agent should not need to call every low-level RDKit operation separately, but it should also not be trapped behind one opaque `plan_synthesis()` call.
 
 A composite `assess_step` tool can coordinate several checks while exposing each result and its origin.
-
-### 4.3. Role of the A–B/reactivity taxonomy
-
-The A–B/reactivity taxonomy can organize reaction classes, reactive-site candidates, and rule applicability. A taxonomy label should not substitute for the exact molecular graph or atom-level reaction-center description.
 
 ## 5. End-to-End Synthesis-Planning Workflow
 
