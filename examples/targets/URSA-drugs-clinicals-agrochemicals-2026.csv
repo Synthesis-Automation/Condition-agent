@@ -1,0 +1,334 @@
+Structure ID,SMILES,Category
+Compound 18,COc1cc(C)ccc1NC(=O)C1(c2ccccc2C(C)C)CCN(C(=O)CCC(=O)O)CC1,drugs&clinicals
+ACT-1016-0707,COc1cc(Cl)ncc1NC(=O)C1(c2ccccc2C(C)C)CN(S(N)(=O)=O)C1,drugs&clinicals
+Vaniprevir,CC[C@@H]1C[C@]1(NC(=O)[C@@H]1C[C@@H]2CN1C(=O)[C@H](C(C)(C)C)NC(=O)OCC(C)(C)CCCCc1cccc3c1CN(C3)C(=O)O2)C(=O)NS(=O)(=O)C1CC1,drugs&clinicals
+Glecaprevir,CC(C)(C)[C@@H]1NC(=O)O[C@@H]2CCC[C@H]2OCC=CC(F)(F)c2nc3ccccc3nc2O[C@@H]2C[C@@H](C(=O)N[C@]3(C(=O)NS(=O)(=O)C4(C)CC4)C[C@H]3C(F)F)N(C2)C1=O,drugs&clinicals
+Olmutinib,C=CC(=O)Nc1cccc(Oc2nc(Nc3ccc(N4CCN(C)CC4)cc3)nc3ccsc23)c1,drugs&clinicals
+Adavosertib,C=CCn1c(=O)c2cnc(Nc3ccc(N4CCN(C)CC4)cc3)nc2n1-c1cccc(C(C)(C)O)n1,drugs&clinicals
+volasertib,CC[C@@H]1C(=O)N(C)c2cnc(Nc3ccc(C(=O)N[C@H]4CC[C@H](N5CCN(CC6CC6)CC5)CC4)cc3OC)nc2N1C(C)C,drugs&clinicals
+Brigatinib,COc1cc(N2CCC(N3CCN(C)CC3)CC2)ccc1Nc1ncc(Cl)c(Nc2ccccc2P(C)(C)=O)n1,drugs&clinicals
+AZD1390,CC(C)n1c(=O)n(C)c2cnc3cc(F)c(-c4ccc(OCCCN5CCCCC5)nc4)cc3c21,drugs&clinicals
+lartesertib,COc1cc2ncc3c(c2cc1-c1cn(C)nc1C)n(-c1c(F)cncc1OC)c(=O)n3C,drugs&clinicals
+JAB-3312,Nc1nccc(Sc2cnc(N3CCC4(CC3)Cc3ncccc3[C@H]4N)cn2)c1Cl,drugs&clinicals
+RLY-1971,N[C@@H]1c2ccccc2OC12CCN(c1cnc3c(N4CCCc5ncccc54)n[nH]c3n1)CC2,drugs&clinicals
+xevinapant,CN[C@@H](C)C(=O)N[C@H]1CN(C(=O)CC(C)C)CC[C@H]2CC[C@@H](C(=O)NC(c3ccccc3)c3ccccc3)N2C1=O,drugs&clinicals
+MZ-101,CC(C)c1ccc([C@@H](NC(=O)[C@@H]2C[C@@H](F)CN2C(=O)Cc2cnn[nH]2)c2ccccc2)cc1,drugs&clinicals
+GLPG3970,COc1cc(-c2cnc3cc(OCCN4CCOCC4)ccn23)cc2c1C(=O)N(CC(F)(F)F)CC2,drugs&clinicals
+M4205,Cn1cc(-c2ccc(CNc3cc(-c4cnc5cc(OCCCN6CCCC6)ccn45)ncn3)cc2)cn1,drugs&clinicals
+Darovasertib,CC1(N)CCN(c2cccnc2NC(=O)c2nc(-c3ncccc3C(F)(F)F)cnc2N)CC1,drugs&clinicals
+CVN766,CCc1nc(C(F)(F)F)cnc1N[C@H]1CCC[C@@H]1NC(=O)c1ncccc1-n1nccn1,drugs&clinicals
+DS-9300,COc1ccc(C2(C(=O)N3C[C@H](F)C[C@@H]3C(=O)Nc3ccc4[nH]ncc4n3)CCC(F)(F)CC2)cc1,drugs&clinicals
+VU319,Cn1cc2c(-c3cc(F)c(CN4Cc5ncccc5C4=O)c(F)c3)cccc2n1,drugs&clinicals
+Compound 39,Cn1cc2c(n1)c(=O)n(-c1cccnc1C1CC1)c1cc(Cl)c(F)cc21,drugs&clinicals
+Ifebemtinib,COc1cc(C(=O)NC2CCN(C)CC2)c(F)cc1Nc1ncc(C(F)(F)F)c(Oc2cccc3c2C(=O)N(C)C3)n1,drugs&clinicals
+Vanzacaftor,CC1(C)C[C@@H]2CCC/N=C3/C=CC=C(N3)S(=O)(=O)NC(=O)c3ccc(-n4ccc(OCCC5C6(CC6)C56CC6)n4)nc3N1C2,drugs&clinicals
+Elexacaftor,Cc1nn(C)cc1S(=O)(=O)NC(=O)c1ccc(-n2ccc(OCC(C)(C)C(F)(F)F)n2)nc1N1C[C@@H](C)CC1(C)C,drugs&clinicals
+INS018_055,CC(C)n1cnc(-c2ccc(F)cc2)c1-c1nc(C(=O)Nc2ccc(N3CCN(C)CC3)cc2)c[nH]1,drugs&clinicals
+Trilaciclib,CN1CCN(c2ccc(Nc3ncc4cc5n(c4n3)C3(CCCCC3)CNC5=O)nc2)CC1,drugs&clinicals
+Alisertib,COc1cc(Nc2ncc3c(n2)-c2ccc(Cl)cc2C(c2c(F)cccc2OC)=NC3)ccc1C(=O)O,drugs&clinicals
+GSK329,CNc1cc(Oc2c(Cl)cc(NC(=O)Nc3cccc(C(F)(F)F)c3)cc2Cl)ncn1,drugs&clinicals
+LTGO-33,Cc1cc(F)ccc1Oc1ncc(C(F)(F)F)cc1C(=O)Nc1cccc([S@](C)(=N)=O)c1,drugs&clinicals
+Compound 17-1,CC(C)(O)c1cc(C(F)(F)F)ncc1-c1ccc(C2(C(=O)Nc3ccc(F)cc3)COC2)cc1,drugs&clinicals
+Tivozanib,COc1cc2nccc(Oc3ccc(NC(=O)Nc4cc(C)on4)c(Cl)c3)c2cc1OC,drugs&clinicals
+Compound 36,Cc1c(-c2ccc(NC(=O)c3c(F)cccc3F)cc2)cccc1-c1nn(C)c(=O)o1,drugs&clinicals
+Esaxerenone,Cc1c(C(=O)Nc2ccc(S(C)(=O)=O)cc2)cn(CCO)c1-c1ccccc1C(F)(F)F,drugs&clinicals
+Pirtobrutinib,COc1ccc(F)cc1C(=O)NCc1ccc(-c2nn([C@@H](C)C(F)(F)F)c(N)c2C(N)=O)cc1,drugs&clinicals
+JNJ-8003,COc1cc(C(=O)NC[C@](O)(c2cc(C(C)(C)O)c(F)c(-c3ccc(F)cc3)n2)C(F)(F)F)cc2cc(C)nnc12,drugs&clinicals
+Maraviroc,Cc1nnc(C(C)C)n1[C@@H]1C[C@H]2CC[C@@H](C1)N2CC[C@H](NC(=O)C1CCC(F)(F)CC1)c1ccccc1,drugs&clinicals
+CRNO04894,CCOc1ccccc1-c1ccc(N2CCN(C(=O)C3(C(F)(F)F)CCC3)C[C@H]2CC)c(C(=O)N[C@@H]2CN3CCC2CC3)n1,drugs&clinicals
+Compound 23-2,Cc1cc(Cl)ccc1CNC(=O)Nc1ccc2cc1OCCOCCNc1ccn3ncc-2c3n1,drugs&clinicals
+Repotrectinib,C[C@H]1CNC(=O)c2cnn3ccc(nc23)N[C@H](C)c2cc(F)ccc2O1,drugs&clinicals
+Zanubrutinib,C=CC(=O)N1CCC([C@@H]2CCNc3c(C(N)=O)c(-c4ccc(Oc5ccccc5)cc4)nn32)CC1,drugs&clinicals
+Compound 11,CC(C)(C)/C=C(\C#N)C(=O)N1CCC[C@@H](n2nc(-c3ccc(Oc4ccccc4)cc3F)c3c(N)ncnc32)C1,drugs&clinicals
+ABBV-CLS-484,CC(C)CCN[C@@H]1CCc2cc(O)c(N3CC(=O)NS3(=O)=O)c(F)c2C1,drugs&clinicals
+PF-03084014,CCC[C@H](N[C@H]1CCc2cc(F)cc(F)c2C1)C(=O)Nc1cn(C(C)(C)CNCC(C)(C)C)cn1,drugs&clinicals
+Sebetralstat,COCc1nn(Cc2ccc(Cn3ccccc3=O)cc2)cc1C(=O)NCc1nccc(OC)c1F,drugs&clinicals
+Osimertinib,C=CC(=O)Nc1cc(Nc2nccc(-c3cn(C)c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C,drugs&clinicals
+Encorafenib,COC(=O)N[C@@H](C)CNc1nccc(-c2cn(C(C)C)nc2-c2cc(Cl)cc(NS(C)(=O)=O)c2F)n1,drugs&clinicals
+Zabedosertib,CC(C)(O)c1cc2nn(CCS(C)(=O)=O)cc2cc1NC(=O)c1cccc(C(F)(F)F)n1,drugs&clinicals
+Icotinib hydrochloride,C#Cc1cccc(Nc2ncnc3cc4c(cc23)OCCOCCOCCO4)c1,drugs&clinicals
+BDTX-1535,CN1C[C@H]2C[C@@]2(C#Cc2cc3ncnc(Nc4cccc(Cl)c4F)c3cc2NC(=O)/C=C/CN2CCOCC2)C1,drugs&clinicals
+Larotrectinib,O=C(Nc1cnn2ccc(N3CCC[C@@H]3c3cc(F)ccc3F)nc12)N1CC[C@H](O)C1,drugs&clinicals
+Difamilast,CCOc1ccccc1C(=O)NCc1coc(-c2ccc(OC(F)F)c(OC(C)C)c2)n1,drugs&clinicals
+Glasdegib,CN1CC[C@@H](NC(=O)Nc2ccc(C#N)cc2)C[C@@H]1c1nc2ccccc2[nH]1,drugs&clinicals
+Ravidasvir,COC(=O)N[C@H](C(=O)N1CCC[C@H]1c1nc(-c2ccc3cc(-c4ccc5[nH]c([C@@H]6CCCN6C(=O)[C@@H](NC(=O)OC)C(C)C)nc5c4)ccc3c2)c[nH]1)C(C)C,drugs&clinicals
+PC14586,CNC(=O)c1ccc(NCC#Cc2cc3c(N[C@@H]4CCN(C)C[C@@H]4F)cccc3n2CC(F)(F)F)c(OC)c1,drugs&clinicals
+Zafirlukast,COc1cc(C(=O)NS(=O)(=O)c2ccccc2C)ccc1Cc1cn(C)c2ccc(NC(=O)OC3CCCC3)cc12,drugs&clinicals
+Arazasetron,CN1C(=O)COc2c(C(=O)N[C@H]3CN4CCC3CC4)cc(Cl)cc21,drugs&clinicals
+zilurgisertib,Nc1ncc(-c2ccc([C@@]34C[C@@H]3CN(C3CCOCC3)C4)cc2)cc1C(=O)NC12CCC(O)(CC1)CC2,drugs&clinicals
+A-910,Nc1ncc(-c2cccnc2F)cc1C(=O)N[C@H]1CCC[C@@H]1OCc1ccc(-c2ccc3c(c2)CCC[C@@H]3N2CCN(C[C@H](O)CO)CC2)cc1,drugs&clinicals
+FHD-286,COC[C@H](NC(=O)c1ccn(S(C)(=O)=O)c1)C(=O)Nc1nc(-c2cccc(N3C[C@@H](C)O[C@@H](C)C3)n2)cs1,drugs&clinicals
+Ozanimod,CC(C)Oc1ccc(-c2nc(-c3cccc4c3CC[C@@H]4NCCO)no2)cc1C#N,drugs&clinicals
+Tucatinib,Cc1cc(Nc2ncnc3ccc(NC4=NC(C)(C)CO4)cc23)ccc1Oc1ccn2ncnc2c1,drugs&clinicals
+Bazedoxifene acetate,Cc1c(-c2ccc(O)cc2)n(Cc2ccc(OCCN3CCCCCC3)cc2)c2ccc(O)cc12,drugs&clinicals
+IPG7236,Cc1cc(S(=O)(=O)N[C@H](C)C2CCN(C)CC2)ccc1NC(=O)c1ccccc1C,drugs&clinicals
+Conivaptan hydrochloride,Cc1nc2c([nH]1)-c1ccccc1N(C(=O)c1ccc(NC(=O)c3ccccc3-c3ccccc3)cc1)CC2,drugs&clinicals
+SNDX-5613,CCN(C(=O)c1cc(F)ccc1Oc1cncnc1N1CC2(CCN(C[C@H]3CC[C@H](NS(=O)(=O)CC)CC3)CC2)C1)C(C)C,drugs&clinicals
+AZD4604,COC[C@H](C(=O)Nc1cccc2c(-c3nc(Nc4cccc(S(C)(=O)=O)c4F)ncc3F)c[nH]c12)N1CCN(C)CC1,drugs&clinicals
+VVD-699,COc1ccc(S(=O)(=O)N2CC[C@@](F)(C(=O)N[C@H](C)/C=C\S(C)(=O)=O)C[C@H]2C)c(-c2ccccc2Cl)c1,drugs&clinicals
+GNE-7883,Cc1nccnc1-c1nn2c(=O)cc(-c3ccc(C4CCCCC4)cc3)[nH]c2c1C(=O)N1CC(CF)C1,drugs&clinicals
+Compound 39-1,CC(C)n1cc(-c2ccnc3[nH]c(C4CCN(CC(=O)N5CCCC5)CC4)cc23)ccc1=O,drugs&clinicals
+GFB-12811,CN1CCC([C@@](C)(O)c2ccc3cnc(Nc4cc(OC5CCC5)ncc4F)cc3n2)CC1,drugs&clinicals
+ANAVEX 3-71,C[C@@H]1SC2(CCN(C)CC2)CN1C(=O)CCc1c[nH]c2ccccc12,drugs&clinicals
+Aclidinium bromide,O=C(O[C@H]1C[N+]2(CCCOc3ccccc3)CCC1CC2)C(O)(c1cccs1)c1cccs1,drugs&clinicals
+Sofpironium bromide,CCOC(=O)C[N+]1(C)CC[C@@H](OC(=O)[C@](O)(c2ccccc2)C2CCCC2)C1,drugs&clinicals
+LY3154885,C[C@H]1c2cccc(-c3cnn(C)c3)c2C[C@H](CO)N1C(=O)Cc1c(Cl)cccc1Cl,drugs&clinicals
+Lomitapide,O=C(NC1CCN(CCCCC2(C(=O)NCC(F)(F)F)c3ccccc3-c3ccccc32)CC1)c1ccccc1-c1ccc(C(F)(F)F)cc1,drugs&clinicals
+Ebastine,CC(C)(C)c1ccc(C(=O)CCCN2CCC(OC(c3ccccc3)c3ccccc3)CC2)cc1,drugs&clinicals
+BIIB129,C=CC(=O)N(C)[C@H]1C[C@@](C)(Oc2nc(-c3cnn(C)c3)cn3nccc23)C1,drugs&clinicals
+JNJ-54175446,C[C@@H]1c2nnn(-c3ncc(F)cn3)c2CCN1C(=O)c1cccc(C(F)(F)F)c1Cl,drugs&clinicals
+JNJ-61393215,[2H]C1([2H])[C@H]2C[C@@H](Oc3ccc(C(F)(F)F)cn3)[C@H](C2)N1C(=O)c1cccc(F)c1-c1ncccn1,drugs&clinicals
+NVS-VHL720,CC(=O)N[C@H](C(=O)N1C[C@H](O)C[C@H]1C(=O)NCc1ccc(-c2ccn[nH]2)c2ccccc12)C(C)(C)C,drugs&clinicals
+Tezacaftor,CC(C)(CO)c1cc2cc(NC(=O)C3(c4ccc5c(c4)OC(F)(F)O5)CC3)c(F)cc2n1C[C@@H](O)CO,drugs&clinicals
+GNE684,COc1cc2c(cn1)N(C)C(=O)[C@@H](NC(=O)c1nc3n(n1)[C@H](c1ccccc1)CC3)CC2,drugs&clinicals
+Trifarotene,CC(C)(C)c1cc(-c2cc(-c3ccc(C(=O)O)cc3)ccc2OCCO)ccc1N1CCCC1,drugs&clinicals
+Acoramidis,Cc1n[nH]c(C)c1CCCOc1cc(C(=O)O)ccc1F,drugs&clinicals
+Pantoprazole,COc1ccnc(CS(=O)c2nc3cc(OC(F)F)ccc3[nH]2)c1OC,drugs&clinicals
+paltusotine,N#Cc1cccc(-c2ccc3ncc(-c4cc(F)cc(F)c4)c(N4CCC(N)CC4)c3c2)c1O,drugs&clinicals
+TAK-994,CC(C)(O)C(=O)N1CC[C@H](NS(C)(=O)=O)[C@@H]1Cc1cccc(-c2cc(F)cc(F)c2)c1F,drugs&clinicals
+CIN-107,CCC(=O)N[C@@H]1CCCc2c(-c3ccc4c(c3)CCC(=O)N4C)cncc21,drugs&clinicals
+BIO-8169,CC(C)Oc1nc2nc(C34COC(C)(C3)C4)cn2cc1C(=O)Nc1cccn(C2CC2)c1=O,drugs&clinicals
+PF-07202954,CCOc1cccnc1Oc1cncc(-c2ncc(C(=O)N[C@@H]3CNC[C@@H](F)C3)cn2)c1,drugs&clinicals
+Linerixibat,CCCC[C@]1(CC)CS(=O)(=O)c2cc(CNC(CC(=O)O)CC(=O)O)c(OC)cc2[C@@H](c2ccccc2)N1,drugs&clinicals
+GLPG3667,Cc1cc(C#N)ncc1Oc1cc(Nc2ccc(N3CCOCC3)nn2)c2ncn(C)c2n1,drugs&clinicals
+TAK-279,CNc1cc(Nc2cccn(-c3ccccn3)c2=O)nc2c(C(=O)N[C@@H]3CC[C@H]3OC)cnn12,drugs&clinicals
+GLPG2534,N#Cc1ccc(-n2cnc3cc(OCCOCCO)c(NC4CCOCC4)nc32)nc1,drugs&clinicals
+HC-7366,CNC(=O)c1ncn2cc(-c3c(F)ccc(NS(=O)(=O)c4cc(Cl)cnc4OC)c3F)ncc12,drugs&clinicals
+Sildenafil,CCCc1nn(C)c2c(=O)[nH]c(-c3cc(S(=O)(=O)N4CCN(C)CC4)ccc3OCC)nc12,drugs&clinicals
+SP-2577,C/C(=N\NC(=O)c1cccc(S(=O)(=O)N2CCN(C)CC2)c1)c1cc(Cl)ccc1O,drugs&clinicals
+JNT-517,NC(=O)N1CCC[C@@H](N(C(=O)NCc2ccc(OC(F)(F)F)cc2F)C2CC2)C1,drugs&clinicals
+Ramelteon,CCC(=O)NCC[C@@H]1CCc2ccc3c(c21)CCO3,drugs&clinicals
+CT3,N#Cc1ncn(CC(=O)N2Cc3ccc(-c4cc(F)cnc4C(F)(F)F)cc3C2)n1,drugs&clinicals
+GLPG1690,CCc1nc2c(C)cc(N3CCN(CC(=O)N4CC(O)C4)CC3)cn2c1N(C)c1nc(-c2ccc(F)cc2)c(C#N)s1,drugs&clinicals
+Sparsentan,CCCCC1=NC2(CCCC2)C(=O)N1Cc1ccc(-c2ccccc2S(=O)(=O)Nc2noc(C)c2C)c(COCC)c1,drugs&clinicals
+PF-9363,COc1cccc(OC)c1S(=O)(=O)Nc1noc2cc(Cn3cccn3)cc(OC)c12,drugs&clinicals
+ATX968,Cc1cccnc1-c1csc(C(=O)Nc2cc(Cl)cc(NS(C)(=O)=O)c2)c1,drugs&clinicals
+Apremilast,CCOc1cc([C@@H](CS(C)(=O)=O)N2C(=O)c3cccc(NC(C)=O)c3C2=O)ccc1OC,drugs&clinicals
+denifanstat,Cc1n[nH]c(-c2cc(C(=O)N3CCC(c4ccc(C#N)cc4)CC3)c(C)cc2C2CCC2)n1,drugs&clinicals
+ARRY-461,CCCS(=O)(=O)Nc1ccc(F)c(Nc2ccc3ncn(C4CC4)c(=O)c3c2C)c1Cl,drugs&clinicals
+CFT1946,CCN(C)S(=O)(=O)Nc1ccc(F)c(Oc2ccc3ncn([C@H]4COC5(CCN(C(=O)CC6(O)CCN(c7cc8c(cc7F)c(N7CCC(=O)NC7=O)nn8C)CC6)CC5)C4)c(=O)c3c2)c1C#N,drugs&clinicals
+ARV-766,COc1cc(O[C@H]2C(C)(C)[C@H](NC(=O)c3ccc(N4CCC(CN5CCN(c6ccc(C(=O)N[C@H]7CCC(=O)NC7=O)c(F)c6)CC5)CC4)cc3)C2(C)C)ccc1C#N,drugs&clinicals
+Lemborexant,Cc1ncc(OC[C@@]2(c3cccc(F)c3)C[C@H]2C(=O)Nc2ccc(F)cn2)c(C)n1,drugs&clinicals
+Compound 11c,CC(=O)N1CCC(COc2ccc(-c3ccn[nH]3)nc2)CC1,drugs&clinicals
+CEE321,Cc1cccc(Nc2cc(Nc3ccccc3Cl)c(C(N)=O)cn2)n1,drugs&clinicals
+Deucravacitinib,[2H]C([2H])([2H])NC(=O)c1nnc(NC(=O)C2CC2)cc1Nc1cccc(-c2ncn(C)n2)c1OC,drugs&clinicals
+AZD5462,COc1cc(F)c(O[C@H]2CC[C@@](C)(C(=O)O)CC2)cc1C(=O)N[C@@H]1[C@H]2CC[C@H](C2)[C@@H]1C(=O)NCC1(C)CCC1,drugs&clinicals
+Compound 13,CN1CC(F)(F)CCN(C)[C@H]2CC[C@@H](C2)Nc2ncc(C(F)(F)F)c(n2)-c2c[nH]c3c(P(C)(C)=O)c(ccc23)C1=O,drugs&clinicals
+Encaleret,Cc1cc(-c2ccccc2[C@@H](C)OC[C@H](O)CNC(C)(C)Cc2ccc(Cl)c(F)c2)ccc1C(=O)O,drugs&clinicals
+Exarafenib,Cc1ccc(NC(=O)N2CC[C@@H](CC(F)(F)F)C2)cc1-c1cc(N[C@H](C)CO)nc(N2CCOCC2)c1,drugs&clinicals
+Inavolisib,C[C@H](Nc1ccc2c(c1)OCCn1cc(N3C(=O)OC[C@H]3C(F)F)nc1-2)C(N)=O,drugs&clinicals
+BIIB-024,C[C@@H](NC(=O)c1ncnc(N)c1Cl)c1ncc(C(=O)Nc2cc(C(F)(F)F)c(Cl)cn2)s1,drugs&clinicals
+Afuresertib,Cn1ncc(Cl)c1-c1cc(C(=O)N[C@H](CN)Cc2cccc(F)c2)sc1Cl,drugs&clinicals
+Compound 38,Cc1c(C(=O)Nc2c(C)n(C)n(C3CCCCC3)c2=O)nnn1-c1ccc(C2CC2)cc1Cl,drugs&clinicals
+GLPG2737,COC1CCN(C2CCN(c3cc(C(=O)NS(=O)(=O)N(C)C)nc4c3c(C3CCC3)nn4-c3ccc(F)cc3)CC2)CC1,drugs&clinicals
+Compound 17-3,CC(C)(O)Cn1cc(-c2nc(NC3CCN(S(=O)(=O)C4CC4)CC3)ncc2C(F)(F)F)cn1,drugs&clinicals
+(R)-Crizotinib,C[C@@H](Oc1cc(-c2cnn(C3CCNCC3)c2)cnc1N)c1c(Cl)ccc(F)c1Cl,drugs&clinicals
+Compound 17-2,CCS(=O)(=O)c1ccc([C@@H](CO)NC(=O)c2ccc3c(c2)cc(Cc2ccc(Cl)cc2C(F)(F)F)n3CCF)cc1,drugs&clinicals
+PF-06648671,Cc1cn(-c2ccc3n(c2=O)CCN([C@@H](C)[C@@H]2CC[C@H](c4cc(F)c(Cl)cc4C(F)(F)F)O2)C3=O)cn1,drugs&clinicals
+TYRA-300,C[C@@H](Oc1ccc2[nH]nc(-c3ccc(N4CC5(C4)CN(S(C)(=O)=O)C5)nc3)c2c1)c1c(Cl)cncc1Cl,drugs&clinicals
+Relugolix,CONC(=O)Nc1ccc(-c2sc3c(c2CN(C)C)c(=O)n(-c2ccc(OC)nn2)c(=O)n3Cc2c(F)cccc2F)cc1,drugs&clinicals
+AZD9574,CNC(=O)c1ccc(N2CCN(Cc3ccc4nc(C)c(=O)[nH]c4c3F)CC2)c(F)n1,drugs&clinicals
+Prulifloxacin,Cc1oc(=O)oc1CN1CCN(c2cc3c(cc2F)c(=O)c(C(=O)O)c2n3C(C)S2)CC1,drugs&clinicals
+compound 34,CC(C)C[C@@H]1NC(=O)[C@@H](N(C)C(=O)[C@@H](NC(=O)[C@@H]2C[C@@H](F)CN2C(=O)C2(C(F)(F)F)CC3(CCC3)C2)C2CC2)CCCCNC(=O)C(C)(C)NC(=O)[C@H](Cc2cc(Cl)ccc2Cl)N(C)C1=O,drugs&clinicals
+ISM5939,COc1ncc2nc(C)n(Cc3ncc(S(N)(=O)=O)cc3F)c2c1-c1ccccc1,drugs&clinicals
+SNT-5382,Cc1ccc2c(n1)c(-c1cccc(S(C)(=O)=O)c1)c(C)n2C/C(F)=C/CN,drugs&clinicals
+Copanlisib,COc1c(OCCCN2CCOCC2)ccc2c1N=C(NC(=O)c1cnc(N)nc1)N1CCN=C21,drugs&clinicals
+HPG1860,COc1cc(C(=O)O)cc2sc(N3CCN(Cc4c(-c5c(Cl)cccc5Cl)noc4C4CC4)C[C@H]3C)nc12,drugs&clinicals
+PF-06882961,N#Cc1ccc(COc2cccc(C3CCN(Cc4nc5ccc(C(=O)O)cc5n4C[C@@H]4CCO4)CC3)n2)c(F)c1,drugs&clinicals
+BAY-9835,Cn1nccc1[C@]1(CNC(=O)c2ccc(F)c(F)c2-c2ccc(C(F)(F)F)cc2)NC(=O)NC1=O,drugs&clinicals
+Apalutamide,CNC(=O)c1ccc(N2C(=S)N(c3cnc(C#N)c(C(F)(F)F)c3)C(=O)C23CCC3)cc1F,drugs&clinicals
+Compound 23-1,Cc1n[nH]c2ccc(-c3nnc(C)n3Cc3ccc(C(F)(F)F)cc3)cc12,drugs&clinicals
+TM38837,C[C@@H](NC(=O)c1nn(-c2ccccc2Cl)c(-c2ccc(Cl)cc2)c1Cc1nn[nH]n1)c1ccc(C(F)(F)F)cc1,drugs&clinicals
+STX-478,Cc1c([C@@H](NC(=O)Nc2cnc(N)nc2)C(F)(F)F)oc2c(F)cc(F)cc12,drugs&clinicals
+Silodosin,C[C@H](Cc1cc2c(c(C(N)=O)c1)N(CCCO)CC2)NCCOc1ccccc1OCC(F)(F)F,drugs&clinicals
+Compound 23-3,CCS(=O)(=O)c1nc(S(=O)(=O)c2ccccc2Cl)c(N2CCN(C)C(=O)[C@H]2C)s1,drugs&clinicals
+MRT-5702D,C[C@H]1c2ccccc2C[C@@H](C(=O)NCc2ccn3c(N4CCC(=O)NC4=O)cnc3c2)N1S(=O)(=O)Cc1ccccc1Cl,drugs&clinicals
+Abemaciclib,CCN1CCN(Cc2ccc(Nc3ncc(F)c(-c4cc(F)c5nc(C)n(C(C)C)c5c4)n3)nc2)CC1,drugs&clinicals
+PF-07258669,COc1cc([C@@H](C)C(=O)N2CC[C@@]3(CCc4cc(-c5ncccn5)c(C)nc4N3)C2)c(F)cn1,drugs&clinicals
+JNJ-1802,COc1cc(N[C@H](C(=O)c2c[nH]c3ccc(OC(F)(F)F)cc23)c2ccc(Cl)cc2OC)cc(S(C)(=O)=O)c1,drugs&clinicals
+Compound 31,Cn1cc(Nc2ncc(C3CN(c4nc5ccc(OCC(C)(C)O)cc5o4)C3)nc2C(N)=O)cn1,drugs&clinicals
+Selpercatinib,COc1ccc(CN2C3CC2CN(c2ccc(-c4cc(OCC(C)(C)O)cn5ncc(C#N)c45)cn2)C3)cn1,drugs&clinicals
+BDM2,Cc1ccc(C2CC2)c(-c2ccc3c(c2)CCCO3)c1[C@H](OC(C)(C)C)C(=O)O,drugs&clinicals
+BAY-747,CC[C@](C)(N)CNC(=O)c1c(C)nc2c(OCc3c(F)cccc3F)cc(C)cn12,drugs&clinicals
+KT-474,Cn1c(=O)n(C2CCC(=O)NC2=O)c2cccc(C#CCOC3CCN(C[C@H]4CC[C@H](n5cc(NC(=O)c6cnn7ccc(N8C[C@H]9C[C@@H]8CO9)nc67)c(C(F)F)n5)CC4)CC3)c21,drugs&clinicals
+BMS-742413,Cc1cc(C[C@@H](NC(=O)N2CCC(c3cc4ccccc4[nH]c3=O)CC2)C(=O)N2CCN(C3CCN(C)CC3)CC2)cc2cn[nH]c12,drugs&clinicals
+Nintedanib,COC(=O)c1ccc2c(c1)NC(=O)/C2=C(\Nc1ccc(N(C)C(=O)CN2CCN(C)CC2)cc1)c1ccccc1,drugs&clinicals
+VX-548,COc1c([C@H]2[C@H](C(=O)Nc3ccnc(C(N)=O)c3)O[C@@](C)(C(F)(F)F)[C@H]2C)ccc(F)c1F,drugs&clinicals
+BAY-2925976,C[C@@H]1CCCN(C2CCN(c3ncc(C(=O)NCc4ncc(F)cc4F)s3)CC2)C1,drugs&clinicals
+AZD4747,C=CC(=O)N1CCN2Cc3cc(C#CC)c(-c4c(O)cccc4Cl)c(F)c3OC[C@H]2C1,drugs&clinicals
+Divarasib,C=CC(=O)N1CCN(c2nc(OC[C@@H]3CCCN3C)nc3c(F)c(-c4nc(N)cc(C)c4C(F)(F)F)c(Cl)cc23)[C@@H](C)C1,drugs&clinicals
+NTQ1062,CC(C)NC[C@@H](C(=O)N1CCN(c2ncnc3c2[C@H](C)CC(=O)N3)[C@H]2C[C@H]21)c1ccc(Cl)cc1,drugs&clinicals
+Selexipag,CC(C)N(CCCCOCC(=O)NS(C)(=O)=O)c1cnc(-c2ccccc2)c(-c2ccccc2)n1,drugs&clinicals
+BLU-5937,CNC(=O)c1cc(F)c(-c2nc3cc(C)ccn3c2C[C@H]2CN(C(=O)OC)CCO2)c(F)c1,drugs&clinicals
+BAY-6096,CNc1cc[n+](CCNC(=O)c2ccn3c(-c4c(C)noc4C)cnc3c2)cc1,drugs&clinicals
+Amenamevir,Cc1cccc(C)c1N(CC(=O)Nc1ccc(-c2ncon2)cc1)C(=O)C1CCS(=O)(=O)CC1,drugs&clinicals
+JDQ443,C=CC(=O)N1CC2(CC(n3nc(-c4ccc5c(cnn5C)c4)c(-c4c(Cl)c(C)cc5[nH]ncc45)c3C)C2)C1,drugs&clinicals
+Riociguat,COC(=O)N(C)c1c(N)nc(-c2nn(Cc3ccccc3F)c3ncccc23)nc1N,drugs&clinicals
+Alpelisib,Cc1nc(NC(=O)N2CCC[C@H]2C(N)=O)sc1-c1ccnc(C(C)(C)C(F)(F)F)c1,drugs&clinicals
+Compound 17,Cc1cnn(-c2ccncc2N2CCC(C(=O)N(C)C)CC2)c1,drugs&clinicals
+Delamanid,C[C@]1(COc2ccc(N3CCC(Oc4ccc(OC(F)(F)F)cc4)CC3)cc2)Cn2cc([N+](=O)[O-])nc2O1,drugs&clinicals
+PCO371,Cc1cc(N2C(=O)NC(=O)C2(C)C)cc(C)c1CCS(=O)(=O)N1CCC2(CC1)N=C(c1ccc(OC(F)(F)F)cc1)NC2=O,drugs&clinicals
+Teneligliptin,Cc1cc(N2CCN([C@@H]3CN[C@H](C(=O)N4CCSC4)C3)CC2)n(-c2ccccc2)n1,drugs&clinicals
+ensitrelvir,Cn1cnc(Cn2c(=O)nc(Nc3cc4cn(C)nc4cc3Cl)n(Cc3cc(F)c(F)cc3F)c2=O)n1,drugs&clinicals
+avacopan,Cc1ccc(NC(=O)[C@H]2CCCN(C(=O)c3c(C)cccc3F)[C@H]2c2ccc(NC3CCCC3)cc2)cc1C(F)(F)F,drugs&clinicals
+BAY-184,CN(C)c1ccc2cc(C(=O)NS(=O)(=O)c3ccccc3-c3ccccc3)oc2c1,drugs&clinicals
+Boceprevir,CC(C)(C)NC(=O)N[C@H](C(=O)N1C[C@H]2[C@@H]([C@H]1C(=O)NC(CC1CCC1)C(=O)C(N)=O)C2(C)C)C(C)(C)C,drugs&clinicals
+Compound 8,CCCOc1ccc(CNC(=O)N(Cc2ccn(C)n2)[C@H]2CCN(C)CC23CC3)cc1,drugs&clinicals
+Lobeglitazone sulfate,COc1ccc(Oc2cc(N(C)CCOc3ccc(CC4SC(=O)NC4=O)cc3)ncn2)cc1,drugs&clinicals
+RLY4008,C=C(C)C(=O)Nc1ccc(-c2c(-c3ccc(Oc4nccc(C)n4)c(F)c3)c3c(N)ncnc3n2C)cc1,drugs&clinicals
+Pralsetinib,CO[C@]1(C(=O)N[C@@H](C)c2ccc(-n3cc(F)cn3)nc2)CC[C@@H](c2nc(C)cc(Nc3cc(C)[nH]n3)n2)CC1,drugs&clinicals
+LY3509754,COC[C@H](c1cnn2cc([C@@H](NC(=O)c3nonc3C)C3CCC(F)(F)CC3)nc2c1)N1C[C@@H](C(F)(F)F)NC1=O,drugs&clinicals
+IAG933,CNC(=O)c1cnc(OCCO)c(F)c1-c1c(Cl)c(F)cc2c1C[C@](c1ccccc1)([C@@H]1CCCN1)O2,drugs&clinicals
+BMS-986308,Cc1cc(-n2ncc(CN3C[C@@H](c4ccc5c(c4C)COC5=O)N[C@@H](C)C3)n2)ncc1C#N,drugs&clinicals
+AGN-190205,CC1(C)CCC(C)(C)c2cc(C#Cc3ccc(C(=O)O)cc3)ccc21,drugs&clinicals
+Reldesemtiv,NC(=O)c1ccn(-c2cnc(NC[C@]3(c4ncccc4F)C[C@H](F)C3)nc2)c1,drugs&clinicals
+HM-279,CC#CCn1cc(N(c2nc(C(N)=O)c(-c3cc(C(=O)N(C)C)c[nH]3)s2)C2CC2)cn1,drugs&clinicals
+Nivasorexant,Cc1ccc(C(=O)N2CCOC[C@H]2Cc2cccc(-n3nccn3)c2)c(-n2nccn2)c1,drugs&clinicals
+Ioflupane,COC(=O)[C@H]1[C@@H](c2ccc(I)cc2)C[C@@H]2CC[C@H]1N2CCCF,drugs&clinicals
+clazosentan,COc1ccccc1Oc1c(NS(=O)(=O)c2ccc(C)cn2)nc(-c2ccnc(-c3nnn[nH]3)c2)nc1OCCO,drugs&clinicals
+balinatunfib,CN1C(=O)c2cccc(OC(F)F)c2[C@H]2C[C@@H]1c1nc3ccc(-c4cnc(C5(N)CCC5)nc4)cc3n12,drugs&clinicals
+(+)-(S)-Citalopram oxalate,CN(C)CCC[C@@]1(c2ccc(F)cc2)OCc2cc(C#N)ccc21,drugs&clinicals
+FX-909,CS(=O)(=O)c1ccc(C#N)cc1-c1cc(=O)c2c(F)cc(F)cc2[nH]1,drugs&clinicals
+NT-0796,CC(C)OC(=O)[C@@H](Cc1ncccn1)OC(=O)Nc1c2c(cc3c1CCC3)CCC2,drugs&clinicals
+Paxalisib,CC1(C)OCCn2c1nc1c(N3CCOCC3)nc(-c3cnc(N)nc3)nc12,drugs&clinicals
+Trametinib dimethyl sulfoxide,CC(=O)Nc1cccc(-n2c(=O)n(C3CC3)c(=O)c3c(Nc4ccc(I)cc4F)n(C)c(=O)c(C)c32)c1,drugs&clinicals
+BHV-7000,CC(C)(C)CC(=O)Nc1nc2c(F)cc(C#N)c(F)c2n1C(C)(C)C,drugs&clinicals
+Compound 35,CNC(=O)[C@@H](NC(=O)c1cc(NC(=O)c2cc(C)c3ccccc3n2)cc(B(O)O)c1)C1CCCCC1,drugs&clinicals
+TNG908_rac,Cc1cc(NC(=O)C(=O)N2CC(C)CCC2c2ccc3scnc3c2)cnc1N,drugs&clinicals
+Zunsemetinib,Cc1cnc(-c2ccnc(C(C)(C)O)n2)cc1-n1c(C)cc(OCc2ncc(F)cc2F)c(Cl)c1=O,drugs&clinicals
+Berotralstat,N#Cc1cccc([C@@H](NCC2CC2)c2ccc(F)c(NC(=O)c3cc(C(F)(F)F)nn3-c3cccc(CN)c3)c2)c1,drugs&clinicals
+Telotristat ethyl,CCOC(=O)[C@@H](N)Cc1ccc(-c2cc(O[C@H](c3ccc(Cl)cc3-n3ccc(C)n3)C(F)(F)F)nc(N)n2)cc1,drugs&clinicals
+PF-6870961,Cc1cc(-c2ccc3c(c2)CC[C@H]3N2CC3(CCN(C(=O)Cc4cn5cc(C)sc5n4)CC3)C2)nc(O)n1,drugs&clinicals
+Tipranavir,CCC[C@@]1(CCc2ccccc2)CC(O)=C([C@H](CC)c2cccc(NS(=O)(=O)c3ccc(C(F)(F)F)cn3)c2)C(=O)O1,drugs&clinicals
+GDC-0853,C[C@H]1CN(C2COC2)CCN1c1ccc(Nc2cc(-c3ccnc(N4CCn5c(cc6c5CC(C)(C)C6)C4=O)c3CO)cn(C)c2=O)nc1,drugs&clinicals
+Fulacimstat,Cn1c(=O)oc2cc(-n3cc(C(=O)O)c(=O)n([C@@H]4CCc5c4cccc5C(F)(F)F)c3=O)ccc21,drugs&clinicals
+RO7049389,CCOC(=O)C1=C(CN2CCN3C(=O)N(CC(C)(C)C(=O)O)C[C@@H]3C2)N=C(c2nccs2)N[C@H]1c1cccc(F)c1C,drugs&clinicals
+RP-6685,Nc1ccc(C#CCN(C(=O)Cc2ncc(C(F)(F)F)cc2C(F)(F)F)c2ccc(F)cc2)nn1,drugs&clinicals
+Ezetimibe,O=C1[C@H](CC[C@H](O)c2ccc(F)cc2)[C@@H](c2ccc(O)cc2)N1c1ccc(F)cc1,drugs&clinicals
+Aprepitant,C[C@@H](O[C@H]1OCCN(Cc2nc(=O)[nH][nH]2)[C@H]1c1ccc(F)cc1)c1cc(C(F)(F)F)cc(C(F)(F)F)c1,drugs&clinicals
+Compound 10,CCN1C[C@H](C)C[C@@H](Oc2ccc3c(c2)CN(C2CCC(=O)NC2=O)C3=O)C1,drugs&clinicals
+Binimetinib,Cn1cnc2c(F)c(Nc3ccc(Br)cc3F)c(C(=O)NOCCO)cc21,drugs&clinicals
+pimitestib,CCc1cc(C(N)=O)ccc1-n1nc(C(C)C)c2c(-n3cnc(-c4cnn(C)c4)c3)ccnc21,drugs&clinicals
+Compound 13-1,CC(=O)N1CCN(c2ccc3c(NCCN)nc(C4(c5ccc(Cl)cc5)CCCCC4)nc3c2)CC1,drugs&clinicals
+Anagliptin,Cc1cc2ncc(C(=O)NCC(C)(C)NCC(=O)N3CCC[C@H]3C#N)cn2n1,drugs&clinicals
+Siponimod,CCc1cc(/C(C)=N/OCc2ccc(C3CCCCC3)c(C(F)(F)F)c2)ccc1CN1CC(C(=O)O)C1,drugs&clinicals
+AZD0095,Cc1nc2nc(C)c(O[C@@H]3CCN(c4ccc(-c5ccc(CN6CCOCC6)nn5)cc4)C3)c(C)n2n1,drugs&clinicals
+KW-6356,Cc1ccc(C(=O)Nc2nc(-c3ccco3)c(C(=O)C3CCOCC3)s2)cn1,drugs&clinicals
+CVN293,Nc1nonc1-c1nc2cccc(F)c2n1Cc1cccnn1,drugs&clinicals
+RLY-2608,N#Cc1c(-c2cc(NC(=O)c3cc(F)cc(C(F)(F)F)c3)c3c(c2)C(=O)N[C@H]3c2cc(F)ccc2Cl)ccc2ncnn12,drugs&clinicals
+Vadadustat,O=C(O)CNC(=O)c1ncc(-c2cccc(Cl)c2)cc1O,drugs&clinicals
+Crinecerfont,C#CCN(c1nc(-c2cc(C)c(OC)cc2Cl)c(C)s1)[C@@H](CC1CC1)c1ccc(C)c(F)c1,drugs&clinicals
+Compound 27,N#Cc1cc(-c2ccc(C(=O)O)c(O)c2)c2oc(F)cc2c1,drugs&clinicals
+AMG487,CCOc1ccc(-n2c([C@@H](C)N(Cc3cccnc3)C(=O)Cc3ccc(OC(F)(F)F)cc3)nc3ncccc3c2=O)cc1,drugs&clinicals
+pamiparib,C[C@]12CCCN1CC1=NNC(=O)c3cc(F)cc4[nH]c2c1c34,drugs&clinicals
+IOA-244,O=C(c1nn(-c2ccc(CN3CCOCC3)cc2)c2c1CS(=O)(=O)c1c(F)cccc1-2)N1CCOCC1,drugs&clinicals
+Baricitinib,CCS(=O)(=O)N1CC(CC#N)(n2cc(-c3ncnc4[nH]ccc34)cn2)C1,drugs&clinicals
+Compound (S)-20,COc1cc([C@H](CC(=O)O)CN2CC(C(F)(F)CCc3ccc4c(n3)NCCC4)C2)ccc1F,drugs&clinicals
+iclepertin,C[C@@H](Oc1ccc(S(C)(=O)=O)cc1C(=O)N1C[C@@H]2C[C@]2(c2cc(C(F)(F)F)on2)C1)C(F)(F)F,drugs&clinicals
+Compound 39-2,CC(C)c1c(F)ccc2c1CC(=O)NS(=O)(=O)c1cn(nc1F)C(C)(C)COc1cc-2ccn1,drugs&clinicals
+Gepotidacin,O=c1ccc2ncc(=O)n3c2n1C[C@H]3CN1CCC(NCc2cc3c(cn2)OCCC3)CC1,drugs&clinicals
+Fosravuconazole,C[C@@H](c1nc(-c2ccc(C#N)cc2)cs1)[C@@](Cn1cncn1)(OCOP(=O)(O)O)c1ccc(F)cc1F,drugs&clinicals
+Ivosidenib,N#Cc1ccnc(N2C(=O)CC[C@H]2C(=O)N(c2cncc(F)c2)[C@H](C(=O)NC2CC(F)(F)C2)c2ccccc2Cl)c1,drugs&clinicals
+MAK683,Cc1ncccc1-c1cnc(NCc2c(F)ccc3c2CCO3)n2cnnc12,drugs&clinicals
+NITD-688,CC1(C)Cc2sc(NC(=O)Cc3ccc(S(N)(=O)=O)cc3)c(C#N)c2CN1CC1CCCCC1,drugs&clinicals
+BAY-805,CC(C)C[C@@H](NC(=O)C1(C(F)(F)F)CCCCC1)C(=O)Nc1nnc(Cc2ccc(C#N)cc2)s1,drugs&clinicals
+KSQ-4279,COc1ncnc(C2CC2)c1-c1ncc2cnn(Cc3ccc(-c4nc(C(F)(F)F)cn4C(C)C)cc3)c2n1,drugs&clinicals
+Brigimadlin,Cc1c(C(=O)O)ccc2c3n(nc12)[C@@H]1[C@H](C3)N(CC2CC2)[C@@]2(C(=O)Nc3cc(Cl)ccc32)[C@H]1c1cccc(Cl)c1F,drugs&clinicals
+Upadacitinib,CC[C@@H]1CN(C(=O)NCC(F)(F)F)C[C@@H]1c1cnc2cnc3[nH]ccc3n12,drugs&clinicals
+HRO761,CCc1c(N2CCN(C(=O)c3ncnc(C)c3O)CC2)c(=O)n2nc(C3=CCOCC3)nc2n1CC(=O)Nc1ccc(C(F)(F)F)cc1Cl,drugs&clinicals
+Efavirenz,O=C1Nc2ccc(Cl)cc2[C@@](C#CC2CC2)(C(F)(F)F)O1,drugs&clinicals
+Vactosertib,Cc1cccc(-c2nc(CNc3ccccc3F)[nH]c2-c2ccc3ncnn3c2)n1,drugs&clinicals
+ABBV-467,Cc1c(Cl)c2c(Cl)c(C)c1-c1c(-c3ccc(F)cc3)sc3ncnc(c13)O[C@@H](C(=O)O)Cc1cc(ccc1OCc1ccnc(-c3ccc(OC[C@@H]4COCCO4)cc3)n1)OC[C@@H](CN1CCN(C)CC1)O2,drugs&clinicals
+LY3502970,Cc1cc(-n2nc3c(c2-n2ccn(-c4ccc5c(cnn5C)c4F)c2=O)[C@H](C)N(C(=O)c2cc4cc([C@H]5CCOC(C)(C)C5)ccc4n2[C@@]2(c4noc(=O)[nH]4)C[C@@H]2C)CC3)cc(C)c1F,drugs&clinicals
+ТР0473292,N[C@]1(C(=O)O)[C@H]2[C@@H](C[C@H]1OCc1ccc(F)cc1)[C@]2(F)C(=O)O,drugs&clinicals
+Bedaquiline fumarate,COc1nc2ccc(Br)cc2cc1[C@@H](c1ccccc1)[C@@](O)(CCN(C)C)c1cccc2ccccc12,drugs&clinicals
+Compound 21,CN(CCc1ccccc1)CCS(=O)(=O)c1ccc(C(=O)N2CCC(c3csc4c(N)ncnc34)CC2)cc1,drugs&clinicals
+Compound 21-1,[2H]C([2H])([2H])C1(C([2H])([2H])[2H])Cn2nc(-c3ccc(F)cn3)c(-c3ccnc4[nH]ncc34)c2CO1,drugs&clinicals
+FLX475,C[C@H](c1ccc(Cl)cc1Cl)n1nc(C(F)(F)F)c2ncc(N3CC([C@H]4CCCN(CCO)C4)C3)nc21,drugs&clinicals
+Risdiplam,Cc1cn2nc(-c3cc(=O)n4cc(N5CCNC6(CC6)C5)ccc4n3)cc(C)c2n1,drugs&clinicals
+Rupatadine fumarate,Cc1cncc(CN2CCC(=C3c4ccc(Cl)cc4CCc4cccnc43)CC2)c1,drugs&clinicals
+Compound 29,Cc1nc(C)n(CC(=O)N2CCN(c3sc(C(F)(F)F)nc3-c3nc4ccc(-c5noc(C)n5)cc4[nH]3)C[C@H]2C)n1,drugs&clinicals
+lenacapavir,CC(C)(C#Cc1ccc(-c2ccc(Cl)c3c(NS(C)(=O)=O)nn(CC(F)(F)F)c23)c([C@H](Cc2cc(F)cc(F)c2)NC(=O)Cn2nc(C(F)(F)F)c3c2C(F)(F)[C@@H]2C[C@H]32)n1)S(C)(=O)=O,drugs&clinicals
+Gemifloxacin mesilate,CON=C1CN(c2nc3c(cc2F)c(=O)c(C(=O)O)cn3C2CC2)CC1CN,drugs&clinicals
+DNL343,O=C(COc1ccc(Cl)cc1)NC12CC(c3nnc([C@H]4C[C@@H](OC(F)(F)F)C4)o3)(C1)C2,drugs&clinicals
+JNJ-65234637,C[C@H]1CN(C)CCN1c1cc(NC(=O)Cn2cc(-c3cc(C(N)=O)c(O)c(F)c3F)c3c(=O)n4c(nc32)CCC4)c(Cl)c(F)n1,drugs&clinicals
+Lesinurad,O=C(O)CSc1nnc(Br)n1-c1ccc(C2CC2)c2ccccc12,drugs&clinicals
+AZ-PRMT5i-1,Nc1nc2cc(CN3C(=O)c4cc(F)ccc4[C@]34CCN(Cc3ccc(F)cc3)C4=O)[nH]c2cc1F,drugs&clinicals
+BMS-502,Cn1c(=O)c([N+](=O)[O-])c(N2CCN(C(c3ccc(F)cc3)c3ccc(F)cc3)CC2)c2nc(C#N)ccc21,drugs&clinicals
+Lotilaner,Cc1cc(C2=NO[C@@](c3cc(Cl)c(Cl)c(Cl)c3)(C(F)(F)F)C2)sc1C(=O)NCC(=O)NCC(F)(F)F,drugs&clinicals
+Cobicistat,CC(C)c1nc(CN(C)C(=O)N[C@@H](CCN2CCOCC2)C(=O)N[C@H](CC[C@H](Cc2ccccc2)NC(=O)OCc2cncs2)Cc2ccccc2)cs1,drugs&clinicals
+LX9211,CC(C)C[C@](C)(N)COc1ccc(-c2ccnc(C(F)F)c2)nc1C(F)F,drugs&clinicals
+Voxelotor,CC(C)n1nccc1-c1ncccc1COc1cccc(O)c1C=O,drugs&clinicals
+Netarsudil,Cc1ccc(C(=O)OCc2ccc([C@@H](CN)C(=O)Nc3ccc4cnccc4c3)cc2)c(C)c1,drugs&clinicals
+Sibutramine mesylate,CC(C)CC(N(C)C)C1(c2ccc(Cl)cc2)CCC1,drugs&clinicals
+Vernakalant hydrochloride,COc1ccc(CCO[C@@H]2CCCC[C@H]2N2CC[C@@H](O)C2)cc1OC,drugs&clinicals
+TYA-018,CCS(=O)(=O)N(Cc1ncc(-c2nnc(C(F)F)o2)s1)c1cccc(Cl)c1,drugs&clinicals
+Duvelisib,C[C@H](Nc1ncnc2nc[nH]c12)c1cc2cccc(Cl)c2c(=O)n1-c1ccccc1,drugs&clinicals
+Nerandomilast,O=[S@@]1CCc2nc(N3CCC(c4ncc(Cl)cn4)CC3)nc(NC3(CO)CCC3)c21,drugs&clinicals
+Vorasidenib,C[C@@H](Nc1nc(N[C@H](C)C(F)(F)F)nc(-c2cccc(Cl)n2)n1)C(F)(F)F,drugs&clinicals
+Tulmimetostat,COC1CN([C@H]2CC[C@H]([C@@]3(C)Oc4c(Cl)cc(C(=O)NCc5c(SC)cc(C)[nH]c5=O)c(C)c4O3)CC2)C1,drugs&clinicals
+Compound 32,C#Cc1n[nH]c2c(-c3cn([C@@H](C)c4ccccn4)c(=O)[nH]c3=O)cc(F)cc12,drugs&clinicals
+GDC-0919,O[C@H](C[C@H]1c2c(F)cccc2-c2cncn21)[C@H]1CC[C@H](O)CC1,drugs&clinicals
+IDOR-1117-2520,CC(C)c1ccc([C@](O)(c2cncc(-c3noc(C(C)(C)O)n3)c2)C2(C)CN(C)C2)cc1,drugs&clinicals
+RMC-6291,CCn1c(-c2cccnc2[C@H](C)OC)c2c3cc(ccc31)N1CCO[C@@H](C[C@H](NC(=O)[C@H](C(C)C)N(C)C(=O)C3(F)CCN(C(=O)C#CC(C)(C)N(C)C)CC3)C(=O)N3CCC[C@H](N3)C(=O)OCC(C)(C)C2)C1,drugs&clinicals
+SPH3127,COC(=O)NCCCn1nc([C@@H](C)N(C(=O)[C@H]2CNCCO2)C2CC2)c2ccc(C)nc21,drugs&clinicals
+Apararenone,CC1(C)Oc2cc(NS(C)(=O)=O)ccc2N(c2ccc(F)cc2)C1=O,drugs&clinicals
+Camizestrant,C[C@@H]1Cc2c(ccc3[nH]ncc23)[C@@H](c2ccc(NC3CN(CCCF)C3)cn2)N1CC(F)(F)F,drugs&clinicals
+BMS-986278,CCCN(C)C(=O)OCc1c(-c2ccc(O[C@H]3CCC[C@H](C(=O)O)C3)c(C)n2)nnn1C,drugs&clinicals
+BMS-986141,COc1cc(OCc2csc(-c3ccc(C(=O)N(C)C)cc3)n2)c2cc(-c3cn4nc(OC)sc4n3)oc2c1,drugs&clinicals
+AZD4831,C[C@@H](N)c1cc(Cl)ccc1Cn1c(=S)[nH]c(=O)c2[nH]ccc21,drugs&clinicals
+Elacestrant,CCNCCc1ccc(CN(CC)c2cc(OC)ccc2[C@@H]2CCc3cc(O)ccc3C2)cc1,drugs&clinicals
+Mirabegron,Nc1nc(CC(=O)Nc2ccc(CCNC[C@H](O)c3ccccc3)cc2)cs1,drugs&clinicals
+MK-8189,Cc1ccc([C@H]2C[C@@H]2COc2cc(NCc3nnc(C)s3)nc(C)n2)nc1,drugs&clinicals
+BMS-986172,O=C1N[C@@](c2ccc(OCCCC(F)(F)F)cc2F)(C(F)(F)F)CC(c2ccn(CC3CC3)n2)=C1n1nn[nH]c1=O,drugs&clinicals
+Linagliptin,CC#CCn1c(N2CCC[C@@H](N)C2)nc2c1c(=O)n(Cc1nc(C)c3ccccc3n1)c(=O)n2C,drugs&clinicals
+PYR01,Cc1c(C#N)cc(C(F)F)cc1Oc1c(C(F)(F)C(F)F)ncn(Cc2cc(F)c[nH]c2=O)c1=O,drugs&clinicals
+Macitentan,CCCNS(=O)(=O)Nc1ncnc(OCCOc2ncc(Br)cn2)c1-c1ccc(Br)cc1,drugs&clinicals
+contezolid,O=C1C=CN(c2c(F)cc(N3C[C@H](CNc4ccon4)OC3=O)c(F)c2F)CC1,drugs&clinicals
+PF-07054894,Cc1cn(C)nc1[C@H](Nc1c(Nc2ccnc(C(=O)N(C)C)c2O)c(=O)c1=O)C1(C)CCCC1,drugs&clinicals
+OBI-3424,C[C@@H](OP(=O)(N1CC1)N1CC1)c1ccc([N+](=O)[O-])c(Oc2cccc(C(=O)N(C)C)c2)c1,drugs&clinicals
+QR-6401,O=C1N[C@H]2C[C@@H](C2)OCc2cccc(n2)Nc2cc([nH]n2)[C@H]2CC[C@H](C2)O1,drugs&clinicals
+Compound 23,C[C@]1(N2CCN(c3cc4c(cnn4-c4cnn(C56CC(C5)C6)c4)cc3Cl)CC2)COC[C@H]1O,drugs&clinicals
+KB-0742,CCC(CC)c1cc(N[C@H]2CC[C@H](N)C2)n2nccc2n1,drugs&clinicals
+AG-946,Cn1c2nc(Cc3cc[nH]n3)sc2c2cnn(Cc3cccc(N)n3)c(=O)c21,drugs&clinicals
+BAY-7081,CCC[C@@H]1CNCc2c1[nH]c(=O)c(C#N)c2N1CCC2(CC1)CC2,drugs&clinicals
+BI-2493,C[C@H]1CNCCN1c1nccc(-c2noc3c2CCC[C@@]32CCCc3sc(N)c(C#N)c32)n1,drugs&clinicals
+Oliceridine,COc1ccsc1CNCC[C@@]1(c2ccccn2)CCOC2(CCCC2)C1,drugs&clinicals
+Opicapone,Cc1c(Cl)c(C)[n+]([O-])c(Cl)c1-c1noc(-c2cc(O)c(O)c([N+](=O)[O-])c2)n1,drugs&clinicals
+12126065,N#C/C=C/c1ccc2c(S(=O)(=O)n3nc(Nc4ccc(C#N)c(Cl)c4)nc3N)cccc2c1,drugs&clinicals
+Entecavir,C=C1[C@H](CO)[C@@H](O)C[C@@H]1n1cnc2c(=O)[nH]c(N)nc21,drugs&clinicals
+RP-6306,CC1=C(n2c(N)c(C(N)=O)c3cc(C)c(C)nc32)[C@H](C)CC=C1O,drugs&clinicals
+Asundexian_rac,CCCC(C(=O)Nc1ccc(C(N)=O)c(F)c1)n1cc(OC)c(-c2cc(Cl)ccc2-n2cc(Cl)nn2)cc1=O,drugs&clinicals
+Broflanilide,CN(C(=O)c1ccccc1)c1cccc(C(=O)Nc2c(Br)cc(C(F)(C(F)(F)F)C(F)(F)F)cc2C(F)(F)F)c1F,agrochemicals
+Zoxamide,CCC(C)(NC(=O)c1cc(Cl)c(C)c(Cl)c1)C(=O)CCl,agrochemicals
+Famoxadone,CC1(c2ccc(Oc3ccccc3)cc2)OC(=O)N(Nc2ccccc2)C1=O,agrochemicals
+Cyflufenamid,O=C(Cc1ccccc1)N/C(=N\OCC1CC1)c1c(C(F)(F)F)ccc(F)c1F,agrochemicals
+Bifenazate,COc1ccc(-c2ccccc2)cc1NNC(=O)OC(C)C,agrochemicals
+Mandipropamid,C#CCOc1ccc(CCNC(=O)C(OCC#C)c2ccc(Cl)cc2)cc1OC,agrochemicals
+Isofetamid,Cc1cc(OC(C)C)ccc1C(=O)C(C)(C)NC(=O)c1sccc1C,agrochemicals
+Isoflucypram,CC(C)c1ccc(Cl)cc1CN(C(=O)c1c(C(F)F)nn(C)c1F)C1CC1,agrochemicals
+Pyriproxyfen,CC(COc1ccc(Oc2ccccc2)cc1)Oc1ccccn1,agrochemicals
+Benzobicyclon,CS(=O)(=O)c1ccc(C(=O)C2=C(Sc3ccccc3)C3CCC(C3)C2=O)c(Cl)c1,agrochemicals
+Bicyclopyrone,COCCOCc1nc(C(F)(F)F)ccc1C(O)=C1C(=O)[C@@H]2CC[C@@H](C2)C1=O,agrochemicals
+Sulfoxaflor,CC(c1ccc(C(F)(F)F)nc1)S(C)(=O)=NC#N,agrochemicals
+Dimethomorph,COc1ccc(C(=CC(=O)N2CCOCC2)c2ccc(Cl)cc2)cc1OC,agrochemicals
+Pyrifluquinazon,CC(=O)N1C(=O)N(NCc2cccnc2)Cc2cc(C(F)(C(F)(F)F)C(F)(F)F)ccc21,agrochemicals
+Proquinazid,CCCOc1nc2ccc(I)cc2c(=O)n1CCC,agrochemicals
+Pyridaben,CC(C)(C)c1ccc(CSc2cnn(C(C)(C)C)c(=O)c2Cl)cc1,agrochemicals
+Cyclobutrifluram,O=C(N[C@@H]1CC[C@@H]1c1ccc(Cl)cc1Cl)c1cccnc1C(F)(F)F,agrochemicals
+Indaziflam,Cc1ccc2c(c1)[C@H](Nc1nc(N)nc(C(C)F)n1)[C@@H](C)C2,agrochemicals
+Pyroxasulfone,Cn1nc(C(F)(F)F)c(CS(=O)(=O)C2=NOC(C)(C)C2)c1OC(F)F,agrochemicals
+Flupyradifurone,O=C1C=C(N(Cc2ccc(Cl)nc2)CC(F)F)CO1,agrochemicals
+Fluazinam,O=[N+]([O-])c1cc(C(F)(F)F)c(Cl)c([N+](=O)[O-])c1Nc1ncc(C(F)(F)F)cc1Cl,agrochemicals
+Fluazaindolizine,COc1ccc(Cl)c(S(=O)(=O)NC(=O)c2cn3cc(C(F)(F)F)cc(Cl)c3n2)c1,agrochemicals
+Metaflumizone,N#Cc1ccc(C/C(=N\NC(=O)Nc2ccc(OC(F)(F)F)cc2)c2cccc(C(F)(F)F)c2)cc1,agrochemicals
+Ethiprole,CCS(=O)c1c(C#N)nn(-c2c(Cl)cc(C(F)(F)F)cc2Cl)c1N,agrochemicals
+Quinoxyfen,Fc1ccc(Oc2ccnc3cc(Cl)cc(Cl)c23)cc1,agrochemicals
+Indoxacarb,COC(=O)N(C(=O)N1CO[C@@]2(C(=O)OC)Cc3cc(Cl)ccc3C2=N1)c1ccc(OC(F)(F)F)cc1,agrochemicals
+Picarbutrazox,Cn1nnnc1/C(=N\OCc1cccc(NC(=O)OC(C)(C)C)n1)c1ccccc1,agrochemicals
+Ametoctradin,CCCCCCCCc1c(CC)nc2ncnn2c1N,agrochemicals
+Fenpyroximate,Cc1nn(C)c(Oc2ccccc2)c1/C=N/OCc1ccc(C(=O)OC(C)(C)C)cc1,agrochemicals
+Saflufenacil,CC(C)N(C)S(=O)(=O)NC(=O)c1cc(-n2c(=O)cc(C(F)(F)F)n(C)c2=O)c(F)cc1Cl,agrochemicals
+Chlorfenapyr,CCOCn1c(-c2ccc(Cl)cc2)c(C#N)c(Br)c1C(F)(F)F,agrochemicals
+Florpyrauxifen-benzyl,COc1c(Cl)ccc(-c2nc(C(=O)OCc3ccccc3)c(Cl)c(N)c2F)c1F,agrochemicals
+Amisulbrom,Cc1c(Br)c2ccc(F)cc2n1S(=O)(=O)c1ncn(S(=O)(=O)N(C)C)n1,agrochemicals
