@@ -78,9 +78,12 @@ from .weak_label_indexing import (
 from .reaction_precedent_support import (
     ReactionPrecedentEvidence, ReactionPrecedentSupport, assess_reaction_precedent_support,
 )
+from .step_plausibility import StepPlausibilityAssessment, assess_step_plausibility
 
 __all__ = [
     "ReactionPrecedentEvidence", "ReactionPrecedentSupport", "assess_reaction_precedent_support",
+    "StepPlausibilityAssessment",
+    "assess_step_plausibility",
     "StartingMaterialAssessment",
     "StartingMaterialPolicy",
     "assess_starting_material",

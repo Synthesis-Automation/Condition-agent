@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "step_precedent_context.v1",
+  "definition_version": "1.2",
+  "motif_source": "molecular_motifs.v1.json",
+  "competing_site_types": ["leaving_group", "transfer_group"],
+  "departure_equivalences": {"halogen": ["F", "Cl", "Br", "I"]},
+  "element_resolved_motifs": {"aryl_halide": ["F", "Cl", "Br", "I"]},
+  "fingerprint": {"radius": 2, "bits": 2048, "use_chirality": true},
+  "positional_context": {
+    "max_exact_heavy_bonds": 3,
+    "exclude_composite_features": ["ortho_free_hydroxybenzoic_acid_or_ion"]
+  },
+  "additional_contexts": [
+    {
+      "id": "carboxylate",
+      "smarts": "[CX3:1](=[OX1:2])[O-:3]",
+      "context_atom_maps": [1, 2, 3],
+      "supersedes_at_same_atoms": ["ester"]
+    },
+    {
+      "id": "phenoxide",
+      "smarts": "[c:1][O-:2]",
+      "context_atom_maps": [1, 2],
+      "supersedes_at_same_atoms": []
+    },
+    {
+      "id": "ortho_free_hydroxybenzoic_acid_or_ion",
+      "smarts": "[O;H1,-1:1][CX3:2](=[OX1:3])c1[c:4]([O;H1,-1:5])cccc1",
+      "context_atom_maps": [1, 2, 3, 4, 5],
+      "supersedes_at_same_atoms": []
+    }
+  ]
+}

@@ -611,6 +611,8 @@ python -m condition_recommender.generic_recommend_cli `
 The active manifest selects a complete processed release, including its condition
 index. Publish a complete release before using the default app/agent paths.
 
+For a structure-based assessment of a proposed route step, see the [standalone step plausibility CLI and examples](../docs/new/standalone_step_plausibility.md).
+
 ### Desktop recommender
 
 Launch the simpler Qt6 interface:

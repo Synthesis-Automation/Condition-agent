@@ -6,7 +6,8 @@ import pytest
 
 from condition_recommender.generic_indexing import build_generic_index
 from condition_recommender.reaction_precedent_support import (
-    assess_reaction_precedent_support, qualify_reaction_precedent, reaction_evidence_core,
+    assess_reaction_precedent_support, collect_reaction_precedent_support,
+    qualify_reaction_precedent, reaction_evidence_core,
 )
 from condition_recommender.shared_core_index import build_shared_core_index, load_shared_core_index
 from tests.condition_recommender.test_shared_core_retrieval import QUERY, record
@@ -69,6 +70,11 @@ def test_candidate_cap_and_display_cap_do_not_claim_exhaustive_support(tmp_path)
     assert result.candidate_truncated and result.matches_truncated
     assert result.candidate_count == result.qualified_count == result.distinct_reference_count == 2
     assert len(result.matches) == 1
+    collected = collect_reaction_precedent_support(QUERY, index, shared, candidate_limit=2)
+    assert collected.matches[:1] == result.matches
+    assert len(collected.matches) == collected.qualified_count == 2
+    assert collected.level_counts == result.level_counts
+    assert collected.candidate_truncated and not collected.matches_truncated
 
 
 def test_projection_binding_errors_are_not_empty_results(tmp_path):

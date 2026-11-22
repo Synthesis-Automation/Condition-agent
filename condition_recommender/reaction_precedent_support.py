@@ -153,15 +153,32 @@ def assess_reaction_precedent_support(
     independent replication. Source recipes are retained without filtering on a
     different proposed recipe; recipe applicability is a separate assessment.
     """
-    if type(candidate_limit) is not int or not 1 <= candidate_limit <= 512:
-        raise ValueError("candidate_limit must be an integer between 1 and 512")
     if type(match_limit) is not int or not 1 <= match_limit <= 50:
         raise ValueError("match_limit must be an integer between 1 and 50")
+    support = collect_reaction_precedent_support(
+        reaction_smiles, index, shared_index, candidate_limit=candidate_limit,
+    )
+    if support.qualified_count <= match_limit:
+        return support
+    return replace(support, matches=support.matches[:match_limit], matches_truncated=True)
+
+
+def collect_reaction_precedent_support(
+    reaction_smiles: str, index: GenericReactionIndex, shared_index: SharedCoreIndex,
+    *, candidate_limit: int = 128,
+) -> ReactionPrecedentSupport:
+    """Collect all qualified observations visited within one bounded graph lookup.
+
+    Callers can evaluate functional-group context and outcome evidence across
+    the visited pool before imposing their own display limit.
+    """
+    if type(candidate_limit) is not int or not 1 <= candidate_limit <= 512:
+        raise ValueError("candidate_limit must be an integer between 1 and 512")
     shared_index.validate_binding(index)
     query = reaction_evidence_core(reaction_smiles)
     if query is None or not query.levels:
         empty = summarize_reaction_support(
-            (), match_limit=match_limit, candidate_count=0, candidate_truncated=False,
+            (), match_limit=candidate_limit, candidate_count=0, candidate_truncated=False,
             warnings=("QUERY_GRAPH_EVIDENCE_UNAVAILABLE",),
         )
         return replace(empty, status="unresolved")
@@ -201,7 +218,7 @@ def assess_reaction_precedent_support(
             for reason in comparison.reasons:
                 exclusions[reason] = exclusions.get(reason, 0) + 1
     return summarize_reaction_support(
-        tuple(matches), match_limit=match_limit, candidate_count=len(positions),
+        tuple(matches), match_limit=candidate_limit, candidate_count=len(positions),
         candidate_truncated=truncated, exclusions=tuple(sorted(exclusions.items())),
         warnings=(*query.warnings, "SHARED_CORE_PENDING_INDEPENDENT_REVIEW",
                   "COUNTS_DESCRIBE_VISITED_OBSERVATIONS_NOT_FULL_CORPUS"),
