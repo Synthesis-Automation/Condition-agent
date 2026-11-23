@@ -1,21 +1,21 @@
 {
-  "definition_id": "step_plausibility.v1",
-  "definition_version": "1.1",
-  "schema_version": "1.0",
+  "definition_id": "step_plausibility.v2",
+  "definition_version": "2.0",
+  "schema_version": "2.0",
   "score_semantics": "ordinal_strength_of_documented_structural_support",
   "status": "development_pending_independent_review",
   "close_levels": ["whole_reaction", "observed_local", "retained_local"],
-  "measured_levels": ["whole_reaction", "observed_local"],
-  "measured_analogue_context": "bidirectional",
+  "transferable_levels": ["whole_reaction", "observed_local"],
+  "transferable_analogue_context": "bidirectional",
   "minimum_partner_similarity": 0.5,
-  "positive_yield_strictly_above_pct": 10.0,
+  "low_yield_below_pct": 10.0,
   "repeated_support_minimum_source_groups": 3,
   "ranks": {
     "unresolved": null,
     "no_qualified_precedent": 0,
     "structural_analogue": 1,
     "context_supported": 2,
-    "measured_support": 3,
-    "repeated_measured_support": 4
+    "transferable_precedent": 3,
+    "repeated_transferable_precedent": 4
   }
 }

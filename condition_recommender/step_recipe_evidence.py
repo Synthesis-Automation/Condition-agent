@@ -62,7 +62,7 @@ class RecipeOutcomeCounts:
     status: str
     experiment_count: int
     transferable_count: int
-    above_threshold: int
+    at_or_above_threshold: int
     low_yield: int
     zero_yield: int
     trace: int
@@ -93,7 +93,7 @@ class StepRecipeEvidence:
     display_truncated: bool
     search_scopes: tuple[ExperimentSearchScope, ...]
     warnings: tuple[str, ...]
-    schema_version: str = "step_recipe_evidence.v1"
+    schema_version: str = "step_recipe_evidence.v2"
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize source locators, experiment conditions and all comparison evidence."""
@@ -216,7 +216,7 @@ def _experiment(match: StepPlausibilityMatch, record: Mapping[str, Any], query: 
                locator, row.resolved_recipe, row.outcome_status, row.yield_pct, raw, reported_conditions)
     digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return RecipeExperiment(
-        row, match.context, match.comparable_for_measured_support, comparison, outcome,
+        row, match.context, match.structurally_comparable, comparison, outcome,
         raw, reported_conditions, locator, reference, digest, record.get("index_eligibility"),
         tuple(record.get("admission_reasons") or ()), tuple(sorted(warnings)),
     )
@@ -225,7 +225,7 @@ def _experiment(match: StepPlausibilityMatch, record: Mapping[str, Any], query: 
 def _counts(status: str, experiments: list[RecipeExperiment]) -> RecipeOutcomeCounts:
     sub = [e for e in experiments if e.recipe_comparison.status == status]
     counts = Counter(e.outcome for e in sub if e.eligible_for_measured_transfer)
-    return RecipeOutcomeCounts(status, len(sub), sum(counts.values()), counts["above_threshold"],
+    return RecipeOutcomeCounts(status, len(sub), sum(counts.values()), counts["at_or_above_threshold"],
                                counts["low_yield"], counts["zero_yield"], counts["trace"],
                                counts["unreported"], counts["unusable"])
 
@@ -240,22 +240,26 @@ def _projection_key(row: ReactionPrecedentEvidence) -> tuple:
 def _display(experiments: list[RecipeExperiment], limit: int) -> tuple[RecipeExperiment, ...]:
     def priority(e: RecipeExperiment) -> tuple:
         sim = e.context.minimum_partner_similarity
-        return (not e.eligible_for_measured_transfer, _COMPARISONS.index(e.recipe_comparison.status),
-                ("whole_reaction", *LEVELS).index(e.precedent.level),
-                -(sim if sim is not None else -1), len(e.recipe_comparison.differences),
-                len(e.recipe_comparison.unknowns), -len(e.recipe_comparison.agreements), e.precedent.reference_id,
-                e.precedent.reaction_id, e.record_sha256)
+        closeness = (not e.eligible_for_measured_transfer, _COMPARISONS.index(e.recipe_comparison.status),
+                     ("whole_reaction", *LEVELS).index(e.precedent.level), -(sim if sim is not None else -1),
+                     len(e.recipe_comparison.differences), len(e.recipe_comparison.unknowns),
+                     -len(e.recipe_comparison.agreements))
+        source = (e.precedent.reference_id, e.precedent.reaction_id, e.precedent.observation_id or "",
+                  e.record_sha256)
+        return closeness, source
 
     ordered = sorted(experiments, key=priority)
-    # Keep opposed outcomes visible among equally close, recipe-matched experiments.
+    # Surface a reported sub-threshold yield alongside another equally close experiment.
     if ordered:
-        best = priority(ordered[0])[:-3]
-        peers = [e for e in ordered if priority(e)[:-3] == best]
-        adverse = next((e for e in peers if e.outcome in ("zero_yield", "low_yield", "trace")), None)
-        positive = next((e for e in peers if e.outcome == "above_threshold"), None)
-        leading = [e for e in (adverse, positive) if e is not None]
-        seen = {e.record_sha256 for e in leading}
-        ordered = leading + [e for e in ordered if e.record_sha256 not in seen]
+        best = priority(ordered[0])[0]
+        peers = [e for e in ordered if priority(e)[0] == best]
+        adverse_outcomes = ("zero_yield", "low_yield")
+        adverse = next((e for e in peers if e.outcome in adverse_outcomes), None)
+        if adverse is not None:
+            other = next((e for e in peers if e.outcome not in adverse_outcomes), None)
+            leading = [adverse] if other is None else [adverse, other]
+            seen = {e.record_sha256 for e in leading}
+            ordered = leading + [e for e in ordered if e.record_sha256 not in seen]
     return tuple(ordered[:limit])
 
 
@@ -278,7 +282,7 @@ def assess_step_recipe_evidence(
     )
     core_for = lru_cache(maxsize=None)(reaction_evidence_core)
     context_for = lru_cache(maxsize=None)(build_step_context)
-    threshold = assessment.policy.positive_yield_strictly_above_pct
+    threshold = assessment.policy.low_yield_below_pct
     graph_resolved = assessment.grade != "unresolved"
     scopes = [ExperimentSearchScope("canonical_condition_index",
                                     "bounded_shared_cores" if graph_resolved else "query_graph_unresolved",

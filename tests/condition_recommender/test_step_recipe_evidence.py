@@ -13,7 +13,7 @@ from tests.condition_recommender.test_shared_core_retrieval import QUERY, record
 
 def assay(number, *, product=None, kind="reported_product_yield_pct"):
     return {"outcome_type": kind, "unit": "percent",
-            "value": number if isinstance(number, int) else None,
+            "value": number if isinstance(number, (float, int)) else None,
             "raw_value": str(number), "source_field": "assay",
             "metadata": {"measurement_basis": "NMR", **({"product_smiles": product} if product else {})}}
 
@@ -68,7 +68,7 @@ def test_recorded_zero_and_trace_under_query_without_changing_grade(tmp_path):
     assert result.experiments[0].source_locator["source_location"].startswith("Plate")
     groups = {c.status: c for c in result.outcome_counts}
     assert groups["matches_stated_fields"].zero_yield == groups["matches_stated_fields"].trace == 1
-    assert groups["partially_reported"].above_threshold == 1
+    assert groups["partially_reported"].at_or_above_threshold == 1
     assert result.experiments[0].index_eligibility == "review_only"
 
 
@@ -83,7 +83,7 @@ def test_target_assays_survive_zero_conversion_byproduct_and_conflicting_trace(t
     result = assess_step_recipe_evidence(QUERY, {"temperature_c": 25}, *indexes, catalog=Catalog(rows))
     assert result.experiment_count == 3  # Indexed projection and exact catalog hit are one experiment.
     group = result.outcome_counts[0]
-    assert group.above_threshold == group.unreported == group.unusable == 1 and group.zero_yield == 0
+    assert group.at_or_above_threshold == group.unreported == group.unusable == 1 and group.zero_yield == 0
     by_id = {e.precedent.observation_id: e for e in result.experiments}
     assert by_id["obs-1"].precedent.yield_pct == 41 and len(by_id["obs-1"].reported_outcomes) == 3
     assert by_id["b"].precedent.yield_pct is None and by_id["c"].precedent.yield_pct is None
@@ -112,7 +112,7 @@ def test_more_explicit_recipe_agreement_precedes_adverse_vaguely_reported_condit
     query = {"temperature_c": 25, "time_h": 1, "illumination": "white LEDs"}
     result = assess_step_recipe_evidence(QUERY, query, *indexes, catalog=Catalog([one, two]), match_limit=1)
     assert result.outcome_counts[1].transferable_count == 2
-    assert result.experiments[0].outcome == "above_threshold"
+    assert result.experiments[0].outcome == "at_or_above_threshold"
 
 
 def test_unresolved_target_explains_that_catalogs_were_not_searched(tmp_path):
@@ -139,4 +139,25 @@ def test_unattributed_scalar_cannot_override_product_specific_offtarget_yield(tm
     observed = run_source(row, assay(98, kind="reported_yield_pct"), assay(98, product="CCO"))
     result = assess_step_recipe_evidence(QUERY, {"temperature_c": 25}, *indexes, catalog=Catalog([observed]))
     assert result.experiments[0].outcome == "unreported"
-    assert len(result.experiments[0].reported_outcomes) == 2 and result.outcome_counts[0].above_threshold == 0
+    assert len(result.experiments[0].reported_outcomes) == 2 and result.outcome_counts[0].at_or_above_threshold == 0
+
+
+def test_recipe_yield_boundary_and_missing_measurements(tmp_path):
+    source = record(1, QUERY)
+    values = (9.99, None, 10, "Trace")
+    rows = []
+    for i, value in enumerate(values):
+        numeric = isinstance(value, (int, float))
+        observation = {**source, "observation_id": f"well-{i}", "yield_pct": value if numeric else None,
+                       "outcome_status": "usable" if numeric else "unreported"}
+        outcomes = () if value is None else (assay(value),)
+        rows.append(run_source(observation, *outcomes, well=f"A{i + 1}"))
+    indexes = pair(tmp_path, [rows[0]])
+    result = assess_step_recipe_evidence(QUERY, {"temperature_c": 25}, *indexes, catalog=Catalog(rows))
+    assert result.schema_version == "step_recipe_evidence.v2"
+    counts = result.outcome_counts[0]
+    assert counts.transferable_count == 4
+    assert counts.low_yield == counts.at_or_above_threshold == counts.unreported == counts.trace == 1
+    assert counts.zero_yield == counts.unusable == 0
+    assert [e.outcome for e in result.experiments] == ["low_yield", "unreported", "at_or_above_threshold", "trace"]
+    assert result.experiments[2].precedent.yield_pct == 10

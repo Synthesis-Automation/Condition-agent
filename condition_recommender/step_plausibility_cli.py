@@ -6,10 +6,12 @@ import argparse
 import json
 from pathlib import Path
 import sqlite3
+from textwrap import shorten
 
 from .generic_indexing import load_generic_index
 from .processed_catalog import ProcessedCatalog
 from .processed_release import DEFAULT_PROCESSED_ROOT, resolve_processed_release
+from .reaction_precedent_support import ReactionPrecedentEvidence
 from .shared_core_index import load_shared_core_index
 from .step_plausibility import StepPlausibilityAssessment, assess_step_plausibility
 from .step_recipe_evidence import StepRecipeEvidence, assess_step_recipe_evidence
@@ -26,8 +28,99 @@ def _graph_diagnostic(assessment: StepPlausibilityAssessment) -> str | None:
     return None
 
 
+def _brief_precedent(
+    source: ReactionPrecedentEvidence, outcome: str, comparable: bool, reference: dict,
+    *, agreement: str = "", location: str = "",
+) -> str:
+    """Fit the structural match, observed yield and a findable citation on one line."""
+    fields = [agreement] if agreement else []
+    fields.append("Exact reaction" if source.level == "whole_reaction" else "Reaction-core analogue")
+    if not comparable:
+        fields.append("outside transfer criteria")
+    if outcome == "trace":
+        fields.append("trace yield")
+    elif outcome == "unusable":
+        fields.append("yield unusable")
+    elif source.yield_pct is None:
+        fields.append("yield unreported")
+    else:
+        fields.append(f"{source.yield_pct:g}% yield")
+
+    citation = reference.get("doi") or reference.get("patent_number")
+    if not citation:
+        raw = reference.get("raw_reference") or reference.get("normalized_citation") or ""
+        # The catalog's "title | authors | journal" form has a short, locatable last field.
+        parts = raw.split(" | ")
+        label = parts[-1] if len(parts) == 3 and parts[-1].strip() else raw
+        citation = shorten(label, width=76, placeholder="...") or source.reference_id or "reference unavailable"
+    fields.append(citation)
+    if location:
+        fields.append(shorten(str(location), width=50, placeholder="..."))
+    return " | ".join(fields)
+
+
+def _concise_summary(
+    step: StepPlausibilityAssessment, citations: dict[str, dict], recipe: StepRecipeEvidence | None = None,
+) -> str:
+    """Print the step grade and one line per selected source measurement."""
+    if step.evidence_rank is None:
+        reason = _graph_diagnostic(step)
+        if not reason:
+            reason = (
+                "Supply a forward reaction as reactants>>product."
+                if "INVALID_REACTION_FORMAT" in step.warnings else
+                "The reaction graph could not be verified from the supplied structures."
+            )
+        return f"Ungraded  |  Unresolved reaction\n{reason}"
+
+    counts = step.support_counts
+    threshold = step.policy.low_yield_below_pct
+    lines = [f"{step.evidence_rank}/4  |  {step.grade.replace('_', ' ').capitalize()}"]
+    if recipe is None:
+        groups = counts.supporting_source_group_count
+        summary = (f"{step.qualified_count} qualified {'precedent' if step.qualified_count == 1 else 'precedents'}"
+                   f" | {groups} supporting source {'group' if groups == 1 else 'groups'}")
+        adverse = counts.low_yield_count + counts.zero_yield_count
+        if adverse:
+            summary += f" | {adverse} comparable {'yield' if adverse == 1 else 'yields'} below {threshold:g}%"
+        if "LOW_YIELD_REPORTED_FOR_SAME_OBSERVATION" in step.warnings:
+            summary += " | low yield also applies to duplicate observations"
+        rows = [
+            _brief_precedent(m.precedent, m.outcome, m.structurally_comparable,
+                             citations.get(m.precedent.reference_id, {}))
+            for m in step.matches
+        ]
+        truncated = step.candidate_truncated
+    else:
+        group = next(g for g in recipe.outcome_counts if g.status == "matches_stated_fields")
+        subject = "experiment matches" if group.transferable_count == 1 else "experiments match"
+        summary = f"{group.transferable_count} comparable {subject} the stated recipe"
+        outcomes = (
+            (group.at_or_above_threshold, f"at or above {threshold:g}%"),
+            (group.low_yield, f"nonzero below {threshold:g}%"), (group.zero_yield, "zero"), (group.trace, "trace"),
+            (group.unreported, "unreported"), (group.unusable, "unusable"),
+        )
+        if group.transferable_count:
+            summary += " | " + ", ".join(f"{n} {label}" for n, label in outcomes if n)
+        rows = [
+            _brief_precedent(m.precedent, m.outcome, m.eligible_for_measured_transfer, m.reference,
+                             agreement=m.recipe_comparison.status.replace("_", " "),
+                             location=m.source_locator.get("source_location") or m.source_locator.get("source_record_id", ""))
+            for m in recipe.experiments
+        ]
+        truncated = any(scope.truncated for scope in recipe.search_scopes)
+        if not truncated and any(not scope.lookup_complete for scope in recipe.search_scopes):
+            summary += " | partial search coverage"
+    if truncated:
+        summary += " | search limit reached"
+    lines.append(summary)
+    lines.extend(f"  {number}. {row}" for number, row in enumerate(rows, 1))
+    return "\n".join(lines)
+
+
 def _summary(assessment: StepPlausibilityAssessment, citations: dict[str, dict]) -> str:
     counts = assessment.support_counts
+    threshold = assessment.policy.low_yield_below_pct
     rank = "ungraded" if assessment.evidence_rank is None else f"{assessment.evidence_rank}/4"
     lines = [
         f"Precedent support: {assessment.grade} ({rank})",
@@ -35,13 +128,15 @@ def _summary(assessment: StepPlausibilityAssessment, citations: dict[str, dict])
         f"Qualified observations: {assessment.qualified_count} of {assessment.candidate_count} visited",
         f"References among qualified observations: {counts.distinct_reference_count}",
         f"Close observations covering the query context: {counts.context_covered_close_observation_count}",
-        f"Measured evidence: {assessment.measured_evidence_status}",
+        f"Comparable observations eligible for source grouping: {counts.supporting_observation_count}"
+        f" ({counts.missing_reference_supporting_count} missing a reference)",
+        f"Source groups supporting the rank: {counts.supporting_source_group_count}",
+        f"Distinct reactions represented by supporting references: {counts.supporting_distinct_reaction_count}",
+        f"Yield rule: a reported target yield below {threshold:g}% excludes that observation from rank 3/4 support.",
         f"Outcomes in {counts.comparable_observation_count} comparable observations: "
-        f"{counts.positive_yield_count} above {assessment.policy.positive_yield_strictly_above_pct:g}%, "
-        f"{counts.low_yield_count} low but nonzero, {counts.zero_yield_count} zero, "
+        f"{counts.at_or_above_threshold_yield_count} at or above {threshold:g}%, "
+        f"{counts.low_yield_count} nonzero below {threshold:g}%, {counts.zero_yield_count} zero, "
         f"{counts.unreported_yield_count} unreported, {counts.unusable_yield_count} unusable",
-        f"Positive source groups contributing to the rank: {counts.positive_source_group_count}",
-        f"Distinct positive source reactions: {counts.positive_distinct_reaction_count}",
         f"Candidate search truncated: {assessment.candidate_truncated}",
         f"Displayed matches truncated: {assessment.matches_truncated}",
     ]
@@ -70,6 +165,8 @@ def _summary(assessment: StepPlausibilityAssessment, citations: dict[str, dict])
             f"weakest partner similarity {similarity_text} | {outcome} | "
             f"{source.reference_id or 'reference unknown'} | {source.observation_id or source.reaction_id}"
         )
+        if match.excluded_by_low_yield and match.outcome not in ("zero_yield", "low_yield"):
+            lines.append(f"    The same observation also has a reported yield below {threshold:g}%.")
         if match.context.missing:
             lines.append("    Missing source context: " + ", ".join(match.context.missing))
         if match.context.unresolved:
@@ -95,6 +192,7 @@ def _summary(assessment: StepPlausibilityAssessment, citations: dict[str, dict])
 def _recipe_summary(view: StepRecipeEvidence) -> str:
     """Show the measured outcomes behind each recipe comparison."""
     step = view.step_assessment
+    threshold = step.policy.low_yield_below_pct
     rank = "ungraded" if step.evidence_rank is None else f"{step.evidence_rank}/4"
     lines = [
         f"Step precedent support: {step.grade} ({rank})",
@@ -109,8 +207,8 @@ def _recipe_summary(view: StepRecipeEvidence) -> str:
     for group in view.outcome_counts:
         lines.append(
             f"  {group.status.replace('_', ' ')} | {group.transferable_count} comparable of "
-            f"{group.experiment_count} | {group.above_threshold} above {step.policy.positive_yield_strictly_above_pct:g}%, "
-            f"{group.low_yield} low nonzero, {group.zero_yield} zero, {group.trace} trace, "
+            f"{group.experiment_count} | {group.at_or_above_threshold} at or above {threshold:g}%, "
+            f"{group.low_yield} nonzero below {threshold:g}%, {group.zero_yield} zero, {group.trace} trace, "
             f"{group.unreported} unreported, {group.unusable} unusable"
         )
     for match in view.experiments:
@@ -182,9 +280,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--recipe", type=Path, help="Compare the conditions in this recipe JSON with reported experiments")
     parser.add_argument("--experiment-catalog", type=Path, help="Additional evidence SQLite catalog to search with --recipe")
     parser.add_argument("--candidate-limit", type=int, default=128, help="Maximum candidates visited")
-    parser.add_argument("--match-limit", type=int, default=20, help="Maximum matching source records displayed")
-    parser.add_argument("--json", action="store_true", help="Print complete machine-readable evidence")
+    parser.add_argument("--match-limit", type=int, help="Maximum records displayed (default: 3 with --concise, otherwise 20)")
+    output = parser.add_mutually_exclusive_group()
+    output.add_argument("--concise", action="store_true", help="Show the score and one short line per precedent")
+    output.add_argument("--json", action="store_true", help="Print complete machine-readable evidence")
     args = parser.parse_args(argv)
+    if args.match_limit is None:
+        args.match_limit = 3 if args.concise else 20
     if (args.index is None) != (args.shared_index is None):
         parser.error("--index and --shared-index must be supplied together")
     if args.experiment_catalog and not args.recipe:
@@ -214,7 +316,10 @@ def main(argv: list[str] | None = None) -> int:
                 experiment_catalog=ProcessedCatalog(args.experiment_catalog) if args.experiment_catalog else None,
                 candidate_limit=args.candidate_limit, match_limit=args.match_limit,
             )
-            print(json.dumps(view.to_dict(), indent=2, ensure_ascii=True) if args.json else _recipe_summary(view))
+            if args.concise:
+                print(_concise_summary(view.step_assessment, {}, recipe=view))
+            else:
+                print(json.dumps(view.to_dict(), indent=2, ensure_ascii=True) if args.json else _recipe_summary(view))
             return 0
         result = assess_step_plausibility(
             args.reaction_smiles, index, shared_index,
@@ -225,7 +330,10 @@ def main(argv: list[str] | None = None) -> int:
         ) if catalog is not None and result.matches else {}
     except (OSError, ValueError, sqlite3.Error) as exc:
         parser.error(str(exc))
-    print(json.dumps(result.to_dict(), indent=2, ensure_ascii=True) if args.json else _summary(result, citations))
+    if args.concise:
+        print(_concise_summary(result, citations))
+    else:
+        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=True) if args.json else _summary(result, citations))
     return 0
 
 

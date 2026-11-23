@@ -61,11 +61,11 @@ help and explicit aliases for methyl iodide and acetic acid.
 Choose one server command. The separate ports below let both interfaces run at
 the same time in different PowerShell terminals.
 
-| Interface | PowerShell command | Browser URL |
-| --- | --- | --- |
-| Regular research web UI, including fragment search | `python -m app.web_api --workbench --port 8000` | http://127.0.0.1:8000/ |
-| Agent web UI / scientific workspace | `python -m app.web_api --scientific-chat --port 8011` | http://127.0.0.1:8011/scientific |
-| Focused condition recommendation UI | `python -m app.web_api --port 8000` | http://127.0.0.1:8000/ |
+| Interface                                          | PowerShell command                                      | Browser URL                      |
+| -------------------------------------------------- | ------------------------------------------------------- | -------------------------------- |
+| Regular research web UI, including fragment search | `python -m app.web_api --workbench --port 8000`       | http://127.0.0.1:8000/           |
+| Agent web UI / scientific workspace                | `python -m app.web_api --scientific-chat --port 8011` | http://127.0.0.1:8011/scientific |
+| Focused condition recommendation UI                | `python -m app.web_api --port 8000`                   | http://127.0.0.1:8000/           |
 
 python -m app.web_api --workbench --build --port 8000
 
@@ -235,13 +235,13 @@ by the Python app.
 
 Use **Workspace mode** in the top bar before sending the first message:
 
-| Mode | Project tools/data | Task guidance | Required answer format |
-| --- | --- | --- | --- |
-| 1. Pure agent | Disabled | Disabled | None |
-| 2. Tools and data | Enabled | Disabled | None |
-| 3. Normal (default) | Enabled | Enabled | Existing structured answer |
-| 4. Tools + formatting | Enabled | Disabled | Existing structured answer |
-| 5. Tools + guidance | Enabled | Enabled | None |
+| Mode                  | Project tools/data | Task guidance | Required answer format     |
+| --------------------- | ------------------ | ------------- | -------------------------- |
+| 1. Pure agent         | Disabled           | Disabled      | None                       |
+| 2. Tools and data     | Enabled            | Disabled      | None                       |
+| 3. Normal (default)   | Enabled            | Enabled       | Existing structured answer |
+| 4. Tools + formatting | Enabled            | Disabled      | Existing structured answer |
+| 5. Tools + guidance   | Enabled            | Enabled       | None                       |
 
 The mode is saved with the conversation and every turn. Start a **New chat**
 to change it; follow-ups keep the same mode and runtime thread when possible.

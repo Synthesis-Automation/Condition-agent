@@ -10,6 +10,13 @@ From the repository root, give the reaction in the forward direction, even when 
 python -m condition_recommender.step_plausibility_cli 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1' --match-limit 3
 ```
 
+For a short terminal report, add `--concise`. The first line gives the step score out of four. The next line gives the evidence counts, followed by one line per displayed precedent with the graph match, source yield and citation. Concise mode shows three precedents by default. Set `--match-limit` to display a different number. With `--recipe`, the short report shows which measurements match the proposed conditions.
+
+```powershell
+$rxn = 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1'
+python -m condition_recommender.step_plausibility_cli $rxn --concise
+```
+
 The default uses the active processed release. The text output includes literature citations when its evidence catalog supplies them. To pin a release, pass `--release PATH` with a dataset root or release manifest. To supply your own indexes, use the explicitly bound pair. Add `--json` for the versioned Python assessment, including individual source observations, reference IDs, source reaction structures and available recipes.
 
 ```powershell
@@ -50,8 +57,12 @@ In Python, call `condition_recommender.assess_step_recipe_evidence(reaction_smil
 | 0 | `no_qualified_precedent` | The bounded lookup found zero qualifying transformations. |
 | 1 | `structural_analogue` | A source matches the transformation at a qualified graph level. |
 | 2 | `context_supported` | A sufficiently close reaction-core match retains the queried functional-group context on the corresponding reacting partner or partners. |
-| 3 | `measured_support` | A qualifying source group reports an outcome above 10% on an exact or sufficiently similar, context-covered analogue. |
-| 4 | `repeated_measured_support` | At least three qualifying source groups supply such measurements. |
+| 3 | `transferable_precedent` | One or two source groups document an exact reaction or a structurally transferable analogue that qualifies under the yield rule below. |
+| 4 | `repeated_transferable_precedent` | At least three source groups document qualifying exact reactions or transferable analogues. |
+
+**Yield affects the score only when a comparable source has a usable numeric target yield below 10%.** A cited exact precedent with an unreported yield, 10% yield or 90% yield contributes equally. A 0% or 9.9% observation is adverse evidence for its recorded recipe. It remains visible and cannot supply rank 3 or 4 support. A separate qualifying experiment can still support the step. A step supported only by low-yield observations can reach rank 2 on its structural evidence. Qualitative or unusable measurements carry no assumed percentage.
+
+The standalone grade reads the yield value and its usability flag from the bound condition index. Older index records can lack assay details or a link to the measured product. Use the source record or the recipe evidence view to check attribution when a low yield affects an important decision.
 
 For an unresolved query, the CLI reports any product atom counts that exceed the
 submitted reactant inventory. JSON exposes the element and count pairs in
@@ -59,17 +70,17 @@ submitted reactant inventory. JSON exposes the element and count pairs in
 and stoichiometry when a deficit is reported. A balanced inventory can also
 remain unresolved if the atom correspondence is ambiguous.
 
-The levels describe the strength of evidence that the intended transformation has worked in related chemistry. A score of 4 leaves open the yield of a proposed recipe, selectivity on new substrates, and experimental feasibility on a particular scale. The >10% yield threshold and three-group rule are explicit development choices. A source above 10% can still be a poor preparative result.
+The grade describes the structural support for a transformation in the records visited. Check `measured_evidence_status` for the availability of numeric outcomes. A step can earn 4/4 even if every supporting source omits yield. Its expected yield, selectivity and performance under a particular recipe remain separate experimental questions.
 
-Read the grade together with `measured_evidence_status` and the counts of above-threshold, low, zero, unreported and unusable yields among comparable observations. Repeated positive reports can coexist with many low-yield experiments. The grade captures precedent for achieving the transformation under some source recipes. The distribution and the cited source conditions reveal where that evidence is mixed.
+For mixed evidence, inspect the counts of low nonzero, zero, unreported, unusable and at-least-10% yields, together with the cited recipes. Each sub-10% observation is excluded from the support count. The grade can still reflect other experiments on the same chemistry.
 
-The lookup uses observed edits and a verified reaction core, the same qualification used by the condition recommender. Product-only hits involving different edits cannot raise the grade. A detailed local analogue needs a minimum reacting-partner Morgan fingerprint similarity of 0.50 to count toward measured support. This cutoff applies individually to each aligned reacting partner. The source substrate must retain the required context on the corresponding participant. A free acid and a phenol on unrelated source components cannot establish tolerance of an ortho-hydroxybenzoic acid on the aryl substrate. For queries with specified stereochemistry, v1 requires an exact whole-reaction identity for measured support. The functional-group vocabulary and explicit positional relationships limit what v1 can assess. Inspect reported differences, unreported outcomes and measured low yields alongside positive examples.
+The lookup qualifies the observed bond edits and reaction core. For an analogue to count toward rank 3 or 4, each aligned reacting partner must have a Morgan fingerprint similarity of at least 0.50 and cover the tracked functional groups on the corresponding partner. For example, evidence for an ortho-hydroxybenzoic acid requires the acid and phenol on the same aryl substrate in the appropriate positions. A query with specified stereochemistry requires an exact whole-reaction match for ranks 3 and 4.
 
-Measured support from a nonexact analogue also requires coverage in the reverse direction. Extra source features can make an analogy misleading, such as an electron-withdrawing cyano group on the source aryl chloride that is absent from the proposed substrate. The text and JSON list extra source features and unresolved differences. Rank 2 requires only that the source covers the query's tracked context.
+A transferable analogue also requires functional-group coverage in the reverse direction. For example, a cyano group present only on the source aryl chloride can make the precedent a poor model for the proposed substrate. The text and JSON show extra source features and unresolved differences. Rank 2 requires only that the source covers the query's tracked context.
 
-Multiple observations from one reference contribute at most one positive source group. The grouping also merges detected copies of the same experiment across references. Separate groups are evidence of depth within the catalog. Independent laboratories, unreported failed attempts, publication bias, equivalent experiments encoded differently, and transfer of an exact operating procedure require additional review.
+Multiple observations from a reference contribute at most one supporting source group. Grouping also merges probable copies across references using source observation identity or matching reaction graphs and a known recipe ID. The magnitude or availability of a yield does not distinguish groups. The count is a proxy for depth of documentation. Claims about independent replication require inspection of the underlying publications.
 
-Read positive source groups alongside the distinct positive source reaction count. Reports of one successful substrate pair can establish repeat support under reported conditions while leaving broad substrate tolerance uncertain.
+Read `support_counts.supporting_source_group_count` alongside `support_counts.supporting_distinct_reaction_count`. Multiple groups can document one substrate pair while leaving tolerance of other substrates uncertain. The JSON assessment identifies this scoring contract as `step_plausibility.v2`.
 
 ## Development examples
 
@@ -90,14 +101,15 @@ $controls.cases | Where-Object { $_.case_id -in 'ketone_alpha_arylation', 'beta_
 
 The real-data examples use a pinned processed release. The Suzuki coupling to biphenyl illustrates a transformation with exact source records. The salicylate borylation asks how far the many core matches transfer to a free acid adjacent to a phenol. An analogous benzonitrile borylation changes the aryl context. A constructed ethoxy homologue of a reported methoxypyridyl sulfonamide tests transfer from close analogues. Omitting the salicylate query's boron reagent illustrates a missing atom source. These examples exercise the implementation. Independent chemist review and held-out measured experiments are still needed to evaluate predictive value.
 
-Release `05fd3b97e436c3ba79147e26` produced these results with a 128-candidate budget. Each structurally resolved query reached the search cap.
+Policy 2.0 produced these results on release `05fd3b97e436c3ba79147e26` with a 128-candidate budget. Each structurally resolved query reached the search cap.
 
 | Proposed reaction | Rank | Evidence among visited records |
 |---|---:|---|
-| Bromobenzene + phenylboronic acid → biphenyl | 4 | 73 exact records, 69 with usable yield above 10%, in 65 positive source groups. |
+| Saved route step T01-R1-S01, preparation of a Weinreb amide | 3 | The exact precursor and product pair is indexed to US 9,029,536 B2. Its yield is unreported. One source group supplies transferable precedent. |
+| Bromobenzene + phenylboronic acid → biphenyl | 4 | 73 exact records across 67 supporting groups. Of these records, 69 report a yield of at least 10% and four omit yield. |
 | Free 4-bromosalicylic acid → aryl Bpin | 1 | 128 detailed local matches from 113 reference IDs. None covered the free salicylic-acid context on the reacting aryl partner. |
 | 4-Bromobenzonitrile → aryl Bpin | 2 | One of 128 detailed local matches covered the nitrile and its tracked positional context. Its weakest-partner similarity was 0.275. |
-| Ethoxy-substituted bromopyridyl sulfonamide → aryl Bpin | 4 | Zero exact hits. Four observations all document one closely related methoxy substrate pair. The source yields were 60%, 75%, 75% and 77%, contributing three positive source groups and one distinct positive reaction. |
+| Ethoxy-substituted bromopyridyl sulfonamide → aryl Bpin | 3 | Four observations document the same closely related methoxy substrate pair across two supporting groups. The different reported yields do not establish additional groups. |
 | Same salicylate target, diboron reagent omitted | — | The product graph could not be accounted for from the supplied precursor. |
 
 Replay the borylation inputs against a local release using PowerShell.

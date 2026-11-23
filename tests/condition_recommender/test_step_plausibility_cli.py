@@ -1,6 +1,7 @@
-"""Exercise standalone CLI validation and both output forms on bound SQLite files."""
+"""Exercise standalone CLI validation and output formats on bound SQLite files."""
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -13,12 +14,14 @@ from condition_recommender.step_plausibility_cli import main
 from tests.condition_recommender.test_shared_core_retrieval import QUERY, record
 
 
-@pytest.mark.parametrize(("percent", "status", "printed"), [
-    (70, "usable", "source yield 70%"),
-    (98, "invalid", "yield unusable (raw 98"),
-    (None, "missing", "yield unreported"),
+@pytest.mark.parametrize(("percent", "status", "printed", "rank"), [
+    (70, "usable", "source yield 70%", 3),
+    (10, "usable", "source yield 10%", 3),
+    (9.99, "usable", "source yield 9.99%", 2),
+    (98, "invalid", "yield unusable (raw 98", 3),
+    (None, "missing", "yield unreported", 3),
 ])
-def test_explicit_bound_files_supply_summary_and_json(tmp_path, capsys, percent, status, printed):
+def test_explicit_bound_files_supply_summary_and_json(tmp_path, capsys, percent, status, printed, rank):
     canonical = tmp_path / "index.sqlite"
     shared = tmp_path / "core.sqlite"
     source_row = {**record(1, QUERY), "yield_pct": percent, "outcome_status": status}
@@ -27,14 +30,56 @@ def test_explicit_bound_files_supply_summary_and_json(tmp_path, capsys, percent,
     args = [QUERY, "--index", str(canonical), "--shared-index", str(shared)]
     assert main(args + ["--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
-    assert payload["qualified_count"] == 1
+    assert payload["qualified_count"] == 1 and payload["evidence_rank"] == rank
     assert payload["matches"][0]["precedent"]["observation_id"] == "obs-1"
     assert main(args) == 0
     summary = capsys.readouterr().out
     assert payload["grade"] in summary and "REF1:1" in summary
     assert printed in summary
+    assert "below 10%" in summary
     if status == "invalid":
         assert "source yield 98" not in summary
+    assert main(args + ["--concise"]) == 0
+    compact = capsys.readouterr().out.splitlines()
+    assert f"{payload['evidence_rank']}/4" in compact[0]
+    assert f"{int(rank == 3)} supporting source group" in compact[1]
+    if rank == 2:
+        assert "1 comparable yield below 10%" in compact[1]
+    row = next(line.lower() for line in compact if "REF1:1" in line)
+    if status == "usable":
+        assert f"{percent}%" in row
+    else:
+        assert ("unusable" if status == "invalid" else "unreported") in row
+        assert "98%" not in row
+    assert len(compact) < len(summary.splitlines())
+
+
+def test_concise_display_limit_preserves_the_grade_and_total(tmp_path, capsys):
+    canonical = tmp_path / "index.sqlite"
+    shared = tmp_path / "core.sqlite"
+    records = [{**record(i, QUERY), "yield_pct": 60 + i} for i in range(1, 6)]
+    save_sqlite_generic_index(build_generic_index(records), canonical)
+    build_shared_core_index(load_generic_index(canonical), shared)
+    args = [QUERY, "--index", str(canonical), "--shared-index", str(shared)]
+    assert main(args + ["--json"]) == 0
+    full = json.loads(capsys.readouterr().out)
+    assert full["qualified_count"] == len(records) == len(full["matches"])
+    for limit_args, expected in (([], 3), (["--match-limit", "1"], 1), (["--match-limit", "4"], 4)):
+        assert main(args + ["--concise", *limit_args]) == 0
+        lines = capsys.readouterr().out.splitlines()
+        assert f"{full['evidence_rank']}/4" in lines[0]
+        rows = [line for line in lines if "REF1:" in line]
+        assert len(rows) == expected
+        assert all(re.search(r"6[1-5]%", line) for line in rows)
+        assert re.search(r"\b5\b", " ".join(line for line in lines[1:] if line not in rows))
+
+
+def test_concise_and_json_are_mutually_exclusive(capsys):
+    with pytest.raises(SystemExit) as exc:
+        main([QUERY, "--concise", "--json"])
+    assert exc.value.code == 2
+    message = capsys.readouterr().err
+    assert "--json" in message and "--concise" in message
 
 
 @pytest.mark.parametrize("argument", ["--index", "--shared-index"])
@@ -65,6 +110,12 @@ def test_ungraded_queries_explain_graph_evidence(tmp_path, capsys, query, excess
     assert warning in payload["warnings"]
     assert main(args) == 0
     assert message in capsys.readouterr().out
+    assert main(args + ["--concise"]) == 0
+    concise = capsys.readouterr().out
+    assert "ungraded" in concise.splitlines()[0].lower()
+    assert "0/4" not in concise
+    for symbol, count in excess:
+        assert symbol in concise and str(count) in concise
 
 
 def test_experiment_catalog_requires_an_explicit_recipe(capsys):
@@ -106,11 +157,12 @@ def test_published_no_base_experiment_in_text_and_json(tmp_path, capsys):
     save_sqlite_generic_index(build_generic_index([record(1, QUERY)]), canonical)
     build_shared_core_index(load_generic_index(canonical), shared)
     build_experiment_catalog(source, supplement)
-    args = [
+    base_args = [
         reaction, "--index", str(canonical), "--shared-index", str(shared),
-        "--experiment-catalog", str(supplement),
-        "--recipe", str(examples / "liu_thioether_no_base_recipe.json"), "--match-limit", "1",
+        "--experiment-catalog", str(supplement), "--match-limit", "1",
     ]
+    no_base = examples / "liu_thioether_no_base_recipe.json"
+    args = base_args + ["--recipe", str(no_base)]
     assert main(args + ["--json"]) == 0
     result = json.loads(capsys.readouterr().out)
     first = result["experiments"][0]
@@ -122,3 +174,15 @@ def test_published_no_base_experiment_in_text_and_json(tmp_path, capsys):
     summary = capsys.readouterr().out
     for detail in ("0%", "NMR yield, internal standard", "S5 Table S1 entry 5", "10.1021/jacs.7b07390.s001"):
         assert detail in summary
+    dark_recipe = json.loads((examples / "liu_thioether_standard_recipe.json").read_text())
+    dark_recipe["illumination"] = "no light"
+    dark_path = tmp_path / "dark.json"
+    dark_path.write_text(json.dumps(dark_recipe), encoding="utf-8")
+    for recipe, outcome, entry in ((no_base, "0%", 5), (dark_path, "trace", 2)):
+        assert main(base_args + ["--recipe", str(recipe), "--concise"]) == 0
+        compact = capsys.readouterr().out.lower()
+        row = next(line for line in compact.splitlines() if f"entry {entry}" in line)
+        assert outcome in row
+        assert "match" in compact
+        if outcome == "trace":
+            assert "0%" not in row

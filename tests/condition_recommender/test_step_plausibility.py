@@ -1,6 +1,6 @@
 """Regression cases for bounded, source-backed structural plausibility grades."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
 
 import pytest
@@ -19,6 +19,7 @@ class Source:
     recipe: str = "recipe-A"
     status: str = "usable"
     reaction: str = QUERY
+    observation: str | None = None
 
 
 def evaluate(tmp_path, sources, *, query=QUERY, **limits):
@@ -28,6 +29,8 @@ def evaluate(tmp_path, sources, *, query=QUERY, **limits):
         row.update(reference_id=source.reference, yield_pct=source.yield_pct,
                    outcome_status=source.status, resolved_recipe_id=source.recipe)
         row["resolved_recipe"]["recipe_id"] = source.recipe
+        if source.observation:
+            row["observation_id"] = source.observation
         rows.append(row)
     index = build_generic_index(rows)
     path = tmp_path / "core.sqlite"
@@ -37,34 +40,88 @@ def evaluate(tmp_path, sources, *, query=QUERY, **limits):
 
 
 def test_display_limit_does_not_change_repeated_support(tmp_path):
-    result = evaluate(tmp_path, [Source("paper-A", 61), Source("paper-B", 63),
-                                 Source("paper-C", 84)], match_limit=1)
-    assert result.grade == "repeated_measured_support"
+    result = evaluate(tmp_path, [Source("paper-A", 61), Source("paper-B", 63, "recipe-B"),
+                                 Source("paper-C", 84, "recipe-C")], match_limit=1)
+    assert result.grade == "repeated_transferable_precedent"
     assert result.evidence_rank == 4
     assert result.qualified_count == 3 and result.matches_truncated
-    assert result.support_counts.positive_source_group_count == 3
-    assert result.support_counts.positive_distinct_reaction_count == 1
+    assert result.support_counts.supporting_source_group_count == 3
+    assert result.support_counts.supporting_distinct_reaction_count == 1
     assert len(result.matches) == 1
 
 
 def test_same_reference_and_copied_experiment_do_not_inflate_depth(tmp_path):
     result = evaluate(tmp_path, [Source("paper-A", 61), Source("paper-A", 73),
                                  Source("translation-of-A", 73)])
-    assert result.grade == "measured_support"
-    assert result.support_counts.positive_source_group_count == 1
-    assert result.support_counts.positive_reference_count == 2
+    assert result.grade == "transferable_precedent"
+    assert result.support_counts.supporting_source_group_count == 1
+    assert result.support_counts.supporting_reference_count == 2
 
 
 def test_zero_threshold_missing_and_invalid_outcomes_stay_separate(tmp_path):
-    result = evaluate(tmp_path, [Source("A", 0), Source("B", 10),
+    result = evaluate(tmp_path, [Source("A", 0), Source("B", 10), Source("E", 9.99),
                                  Source("C", None, status="missing"),
                                  Source("D", 98, status="invalid")])
-    assert result.evidence_rank < 3
-    assert result.support_counts.positive_source_group_count == 0
+    assert result.evidence_rank == 3
+    assert result.support_counts.supporting_source_group_count == 1
+    assert result.support_counts.supporting_observation_count == 3
+    assert result.support_counts.at_or_above_threshold_yield_count == 1
     assert result.support_counts.zero_yield_count == 1
     assert result.support_counts.low_yield_count == 1
     assert result.support_counts.unknown_yield_count == 2
-    assert result.measured_evidence_status == "only_low_or_zero"
+    assert result.measured_evidence_status == "mixed_at_or_above_threshold_and_low_or_zero"
+
+
+@pytest.mark.parametrize(("number", "status", "expected", "outcome"), [
+    (None, "missing", 3, "unreported"),
+    (10, "usable", 3, "at_or_above_threshold"),
+    (100, "usable", 3, "at_or_above_threshold"),
+    (0, "usable", 2, "zero_yield"),
+    (9.99, "usable", 2, "low_yield"),
+    (2, "invalid", 3, "unusable"),
+    (None, "invalid", 3, "unusable"),
+])
+def test_only_reliable_report_below_ten_excludes_comparable_source(tmp_path, number, status, expected, outcome):
+    result = evaluate(tmp_path, [Source("A", number, status=status)])
+    assert result.evidence_rank == expected
+    match, = result.matches
+    assert match.structurally_comparable
+    assert match.outcome == outcome
+    assert match.contributes_to_support == (expected == 3)
+    assert match.excluded_by_low_yield == (expected == 2)
+    assert result.support_counts.supporting_source_group_count == int(expected == 3)
+
+
+@pytest.mark.parametrize("values", [(None, None, None, None), (10, 11.1, 75, 100), (60, None, 10, None)])
+def test_missing_and_nonlow_yield_change_neither_copy_groups_nor_rank(tmp_path, values):
+    sources = [
+        Source(ref, n, recipe=recipe, status="usable" if n is not None else "missing")
+        for n, (ref, recipe) in zip(values, (("A", "1"), ("copy-A", "1"), ("B", "2"), ("C", "3")))
+    ]
+    result = evaluate(tmp_path, sources)
+    assert result.grade == "repeated_transferable_precedent"
+    assert result.supporting_source_groups == (("A", "copy-A"), ("B",), ("C",))
+    assert result.support_counts.supporting_observation_count == 4
+    assert result.support_counts.at_or_above_threshold_yield_count == sum(n is not None for n in values)
+
+
+def test_missing_recipe_cannot_bridge_distinct_documented_recipes(tmp_path):
+    result = evaluate(tmp_path, [Source("A", None, "recipe-A", "missing"),
+                                 Source("B", None, "recipe-B", "missing")])
+    first = result.matches[0]
+    incomplete = replace(first, precedent=replace(first.precedent, reference_id="C",
+                                                  observation_id=None, resolved_recipe=None))
+    groups = step_module._source_groups([*result.matches, incomplete], step_module._normalized_reaction)
+    assert groups == {"A": "A", "B": "B", "C": "C"}
+
+
+def test_copied_observation_with_measured_low_yield_cannot_regain_support(tmp_path):
+    result = evaluate(tmp_path, [Source("A", 4, observation="identical-experiment"),
+                                 Source("B", None, status="missing", observation="identical-experiment")])
+    assert result.support_counts.supporting_source_group_count == 0 and result.evidence_rank == 2
+    assert result.support_counts.unreported_yield_count == result.support_counts.low_yield_count == 1
+    assert all(m.excluded_by_low_yield and not m.contributes_to_support for m in result.matches)
+    assert "LOW_YIELD_REPORTED_FOR_SAME_OBSERVATION" in result.warnings
 
 
 def test_product_without_matching_transformation_is_not_positive_support(tmp_path):
@@ -100,19 +157,20 @@ def test_additional_para_nitrile_on_every_source_limits_transfer(tmp_path):
     assert context.status == "covered" and context.reverse_status == "missing"
     assert any("nitrile" in requirement for requirement in context.source_only)
     assert result.grade == "context_supported"
-    assert result.support_counts.positive_source_group_count == 0
+    assert result.support_counts.supporting_source_group_count == 0
 
 
 def test_multiple_close_but_nonexact_examples_can_earn_repeated_support(tmp_path):
     query = "CCCc1ccc(I)cc1.N#C[Cu]>>CCCc1ccc(C#N)cc1"
     analogue = "CCCCc1ccc(I)cc1.N#C[Cu]>>CCCCc1ccc(C#N)cc1"
     homologue = "CCCCCc1ccc(I)cc1.N#C[Cu]>>CCCCCc1ccc(C#N)cc1"
-    result = evaluate(tmp_path, [Source("A", 60, reaction=analogue), Source("B", 64, reaction=analogue),
+    result = evaluate(tmp_path, [Source("A", None, status="missing", reaction=analogue),
+                                 Source("B", 64, recipe="recipe-B", reaction=analogue),
                                  Source("C", 80, reaction=homologue)],
                       query=query)
     assert result.strongest_level == "observed_local"
-    assert result.evidence_rank == 4 and result.support_counts.positive_source_group_count == 3
-    assert result.support_counts.positive_distinct_reaction_count == 2
+    assert result.evidence_rank == 4 and result.support_counts.supporting_source_group_count == 3
+    assert result.support_counts.supporting_distinct_reaction_count == 2
 
 
 def test_highly_similar_opposite_stereoisomer_remains_analogue_evidence(tmp_path):
@@ -121,15 +179,15 @@ def test_highly_similar_opposite_stereoisomer_remains_analogue_evidence(tmp_path
     result = evaluate(tmp_path, [Source("A", 90, reaction=other)], query=query)
     assert result.strongest_level == "observed_local"
     assert result.matches[0].context.minimum_partner_similarity > 0.5
-    assert result.support_counts.positive_source_group_count == 0
+    assert result.support_counts.supporting_source_group_count == 0
     assert "ANALOGUE_STEREOCHEMICAL_TRANSFER_UNVERIFIED" in result.warnings
 
 
 def test_anonymous_measured_observation_cannot_create_attributed_support(tmp_path):
     result = evaluate(tmp_path, [Source("", 88)])
-    assert result.support_counts.positive_yield_count == 1
-    assert result.support_counts.missing_reference_positive_count == 1
-    assert result.support_counts.positive_source_group_count == 0
+    assert result.support_counts.at_or_above_threshold_yield_count == 1
+    assert result.support_counts.missing_reference_supporting_count == 1
+    assert result.support_counts.supporting_source_group_count == 0
     assert result.evidence_rank < 3
 
 
@@ -137,8 +195,8 @@ def test_displays_a_measured_counterexample_beside_a_positive(tmp_path):
     result = evaluate(tmp_path, [Source("A", 70), Source("B", 71), Source("C", 0)],
                       match_limit=2)
     assert result.support_counts.zero_yield_count == 1
-    assert result.measured_evidence_status == "mixed_above_threshold_and_low_or_zero"
-    assert {m.outcome for m in result.matches} == {"above_threshold", "zero_yield"}
+    assert result.measured_evidence_status == "mixed_at_or_above_threshold_and_low_or_zero"
+    assert {m.outcome for m in result.matches} == {"at_or_above_threshold", "zero_yield"}
     assert "COMPARABLE_LOW_OR_ZERO_OUTCOMES_INSPECT_SOURCE_CONDITIONS" in result.warnings
 
 
@@ -169,8 +227,8 @@ def test_limits_reject_invalid_inputs(tmp_path, limit):
 @pytest.mark.parametrize(("field", "invalid_value"), [
     ("repeated_support_minimum_source_groups", 1),
     ("minimum_partner_similarity", 1.1),
-    ("positive_yield_strictly_above_pct", 150),
-    ("measured_levels", ["retained_typed"]),
+    ("low_yield_below_pct", 150),
+    ("transferable_levels", ["retained_typed"]),
 ])
 def test_invalid_definition_rejected(tmp_path, monkeypatch, field, invalid_value):
     definition = json.loads(step_module._POLICY_PATH.read_text(encoding="utf-8"))
