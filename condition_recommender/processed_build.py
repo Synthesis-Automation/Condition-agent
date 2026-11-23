@@ -12,6 +12,7 @@ from .conversion.atomic import atomic_json
 from .conversion.input_schema import discover_conversion_datasets
 from .conversion.sharded import _definition_contract, convert_datasets_sharded
 from .corpus_io import file_sha256
+from .processed_catalog import CATALOG_SCHEMA_VERSION
 from .record_storage import STORAGE_SCHEMA_VERSION
 
 DEFAULT_INPUT_ROOT = Path("datasets/intermediate_datasets")
@@ -41,6 +42,7 @@ def prepare_release(
                         if "definitions" in path.parts}
     identity = {"sources": [entry["sha256"] for entry in inventory],
                 "definition_contract": contract, "storage_schema": STORAGE_SCHEMA_VERSION,
+                "evidence_catalog_schema": CATALOG_SCHEMA_VERSION,
                 "definition_files": definition_files,
                 "route_sources": [entry["sha256"] for entry in route_inventory],
                 "pipeline_generation": "processed_pipeline.v4", "release_schema": RELEASE_SCHEMA_VERSION}
@@ -53,6 +55,7 @@ def prepare_release(
                 "definition_files": definition_files,
                 "route_sources": route_inventory, "pipeline_generation": "processed_pipeline.v4",
                 "storage_schema": STORAGE_SCHEMA_VERSION,
+                "evidence_catalog_schema": CATALOG_SCHEMA_VERSION,
                 "independent_chemistry_review": "pending",
                 "conversion_authorization": "user_requested_full_corpus_conversion_2026-10-05"}
     return release, manifest

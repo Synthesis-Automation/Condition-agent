@@ -248,6 +248,24 @@ def _display_sample(
     return tuple(matches[i] for i in list(priority_ids)[:limit])
 
 
+def _assess_structural_match(
+    query: StepPrecedentContext, source: StepPrecedentContext,
+    row: ReactionPrecedentEvidence, policy: StepPlausibilityPolicy,
+) -> StepPlausibilityMatch:
+    context = compare_step_contexts(query, source)
+    covered = context.status == "covered" and row.level in policy.close_levels
+    min_similarity = context.minimum_partner_similarity
+    transferable_analogue = (
+        min_similarity is not None and min_similarity >= policy.minimum_partner_similarity
+        and context.reverse_status == "covered" and not query.has_specified_stereo
+    )
+    return StepPlausibilityMatch(
+        row, context, _classify_outcome(row, policy.positive_yield_strictly_above_pct),
+        covered, covered and row.level in policy.measured_levels
+        and (row.level == "whole_reaction" or transferable_analogue),
+    )
+
+
 def assess_step_plausibility(
     reaction_smiles: str, index: GenericReactionIndex, shared_index: SharedCoreIndex,
     *, candidate_limit: int = 128, match_limit: int = 20,
@@ -258,6 +276,17 @@ def assess_step_plausibility(
     qualified visited row enters the assessment before the evidence display cap.
     A numeric yield describes the source experiment under its own recipe.
     """
+    assessment, _ = _assess_step_and_pool(
+        reaction_smiles, index, shared_index, candidate_limit=candidate_limit, match_limit=match_limit,
+    )
+    return assessment
+
+
+def _assess_step_and_pool(
+    reaction_smiles: str, index: GenericReactionIndex, shared_index: SharedCoreIndex,
+    *, candidate_limit: int, match_limit: int,
+) -> tuple[StepPlausibilityAssessment, list[StepPlausibilityMatch]]:
+    """Return the display and the same full pool for downstream evidence views."""
     if type(match_limit) is not int or not 1 <= match_limit <= 50:
         raise ValueError("match_limit must be an integer between 1 and 50")
     policy = load_step_plausibility_policy()
@@ -266,23 +295,8 @@ def assess_step_plausibility(
     )
     context_for = lru_cache(maxsize=None)(build_step_context)
     query = context_for(reaction_smiles)
-    matches = []
-    for row in pool.matches:
-        context = compare_step_contexts(query, context_for(row.reaction_smiles))
-        covered = context.status == "covered" and row.level in policy.close_levels
-        min_similarity = context.minimum_partner_similarity
-        similar_partners = (
-            min_similarity is not None and min_similarity >= policy.minimum_partner_similarity
-        )
-        transferable_analogue = (
-            similar_partners and context.reverse_status == "covered"
-            and not query.has_specified_stereo
-        )
-        matches.append(StepPlausibilityMatch(
-            row, context, _classify_outcome(row, policy.positive_yield_strictly_above_pct),
-            covered, covered and row.level in policy.measured_levels
-            and (row.level == "whole_reaction" or transferable_analogue),
-        ))
+    matches = [_assess_structural_match(query, context_for(row.reaction_smiles), row, policy)
+               for row in pool.matches]
     normalized_reaction = lru_cache(maxsize=None)(_normalized_reaction)
     groups = _source_groups(matches, normalized_reaction)
     matches = [replace(m, source_group_id=groups.get(m.precedent.reference_id)) for m in matches]
@@ -362,7 +376,7 @@ def assess_step_plausibility(
         warnings.add("ANALOGUE_STEREOCHEMICAL_TRANSFER_UNVERIFIED")
     if query.status != "resolved":
         warnings.add("QUERY_FUNCTIONAL_CONTEXT_UNRESOLVED")
-    return StepPlausibilityAssessment(
+    assessment = StepPlausibilityAssessment(
         grade=grade, evidence_rank=dict(policy.ranks)[grade], strongest_level=pool.strongest_level,
         measured_evidence_status=measured_status, query_reaction_smiles=reaction_smiles,
         candidate_count=pool.candidate_count, qualified_count=pool.qualified_count,
@@ -374,3 +388,4 @@ def assess_step_plausibility(
         warnings=tuple(sorted(warnings)), policy=policy, index_source_identity=shared_index.source_identity,
         shared_core_definition_hash=pool.definition_hash,
     )
+    return assessment, matches

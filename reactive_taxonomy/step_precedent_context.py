@@ -13,6 +13,7 @@ from typing import Iterator, get_args
 from rdkit import Chem, rdBase
 from rdkit.Chem import rdFingerprintGenerator
 
+from .api import component_annotation_atom_order
 from .chemistry.rdkit_utils import parse_smiles
 from .chemistry.smarts_cache import compile_smarts
 from .molecular_motifs import load_molecular_motif_definitions
@@ -158,6 +159,7 @@ class StepPrecedentContext:
     definition_version: str
     has_specified_stereo: bool = False
     schema_version: str = "step_precedent_context.v1"
+    product_element_excess: tuple[tuple[str, int], ...] = ()
 
     def to_dict(self) -> dict:
         """Serialize the molecular evidence and version."""
@@ -223,11 +225,14 @@ def _component_anchors(analysis: ReactionAnalysis) -> dict[int, dict[int, str]]:
 def _feature_occurrences(
     component: ReactionComponent, mol: Chem.Mol
 ) -> set[tuple[str, frozenset[int]]]:
+    # A noncanonical SMILES traversal can still reorder branches. Molecular
+    # annotations refer to that traversal; edits and continuity use the input mol.
+    annotation_to_input = component_annotation_atom_order(mol)
     observed = set()
     element_motifs = dict(_rules().element_motifs)
     for motif in component.molecule_analysis.interpretation.motifs:
         feature = motif.motif_id
-        atoms = frozenset(motif.atom_indices)
+        atoms = frozenset(annotation_to_input[i] for i in motif.atom_indices)
         allowed = element_motifs.get(feature)
         if allowed:
             actual = sorted(
@@ -240,7 +245,7 @@ def _feature_occurrences(
     motif_atoms = {atoms for _, atoms in observed}
     for site in component.molecule_analysis.reactive_site_hypotheses:
         if site.site_type in _rules().competing_site_types:
-            atoms = frozenset(site.atom_indices)
+            atoms = frozenset(annotation_to_input[i] for i in site.atom_indices)
             if atoms not in motif_atoms:
                 observed.add((site.canonical_signature, atoms))
     for row in _rules().additions:
@@ -393,8 +398,18 @@ def context_from_reaction_analysis(analysis: ReactionAnalysis) -> StepPrecedentC
         or not analysis.reaction_completeness
         or analysis.reaction_completeness.status != "verified"
     ):
+        completeness = analysis.reaction_completeness
+        warnings = {"VERIFIED_EDIT_CONTEXT_UNAVAILABLE"}
+        if analysis.error:
+            warnings.add(analysis.error)
+        if completeness:
+            warnings.update(completeness.warnings)
         return StepPrecedentContext(
-            "unresolved", (), (), ("VERIFIED_EDIT_CONTEXT_UNAVAILABLE",), version
+            "unresolved", (), (), tuple(sorted(warnings)), version,
+            product_element_excess=(
+                tuple(sorted(completeness.product_element_excess.items()))
+                if completeness else ()
+            ),
         )
     anchors = _component_anchors(analysis)
     partners = tuple(

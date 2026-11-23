@@ -1,0 +1,21 @@
+{
+  "components": [
+    {
+      "raw_identifier": "dimethyl sulfoxide",
+      "identifier_type": "name",
+      "source_role_hint": "solvent"
+    },
+    {
+      "raw_identifier": "cesium carbonate",
+      "identifier_type": "name",
+      "source_role_hint": "base",
+      "amount": 1.5,
+      "amount_unit": "equiv"
+    }
+  ],
+  "temperature_c": 25,
+  "time_h": 1,
+  "atmosphere": "N2",
+  "illumination": "white LEDs",
+  "declared_absences": []
+}

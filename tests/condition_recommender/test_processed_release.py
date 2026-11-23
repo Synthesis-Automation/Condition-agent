@@ -81,3 +81,18 @@ def test_builder_resume_publishes_already_complete_release(tmp_path, monkeypatch
     result = builder.build_processed_datasets(tmp_path / "input", tmp_path)
     assert result["release_id"] == "id"
     assert resolve_processed_release(tmp_path, verify_artifacts=True).root == path.parent
+
+
+def test_evidence_catalog_schema_selects_a_distinct_build_directory(tmp_path, monkeypatch):
+    from condition_recommender import processed_build
+
+    observation = tmp_path / "input.csv"
+    observation.write_text("reaction_smiles\n", encoding="utf-8")
+    output = tmp_path / "output"
+    current, manifest = processed_build.prepare_release(observation, output)
+    assert manifest["evidence_catalog_schema"] == processed_build.CATALOG_SCHEMA_VERSION
+
+    monkeypatch.setattr(processed_build, "CATALOG_SCHEMA_VERSION", "older_schema")
+    previous, previous_manifest = processed_build.prepare_release(observation, output)
+    assert current != previous
+    assert manifest["sources"] == previous_manifest["sources"]

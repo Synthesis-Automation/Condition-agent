@@ -16,7 +16,7 @@ from condition_recommender.generic_indexing import load_generic_index
 from condition_recommender.processed_build import (
     DEFAULT_INPUT_ROOT, DEFAULT_OUTPUT_ROOT, convert_release, prepare_release,
 )
-from condition_recommender.processed_catalog import build_processed_catalog
+from condition_recommender.processed_catalog import CATALOG_SCHEMA_VERSION, build_processed_catalog
 from condition_recommender.processed_release import publish_processed_release, resolve_processed_release
 from condition_recommender.shared_core_index import build_shared_core_index, load_shared_core_index
 from condition_recommender.sqlite_indexing import build_sqlite_generic_index
@@ -103,7 +103,7 @@ def build_processed_datasets(
                       workers=workers, progress=lambda event: emit("route_rows", report=event)), "processed_routes.v1.1")
     catalog_report = stage("catalogs", {"evidence_catalog": indexes / "catalogs.sqlite"},
           lambda: build_processed_catalog(canonical, indexes / "catalogs.sqlite",
-                      progress=lambda event: emit("catalog_rows", report=event)), "evidence.v2")
+                      progress=lambda event: emit("catalog_rows", report=event)), CATALOG_SCHEMA_VERSION)
     condition_report = stage("conditions", {"condition_index": indexes / "generic_index.sqlite"},
           lambda: build_sqlite_generic_index(iter_canonical_records(canonical), indexes / "generic_index.sqlite",
                                               progress_callback=lambda phase, count: emit("condition_" + phase, rows=count),

@@ -81,6 +81,33 @@ def test_distance_to_reacting_atom_distinguishes_three_nitrile_regioisomers():
         )
 
 
+def test_para_ester_distance_is_invariant_to_branch_order_partner_order_and_maps():
+    para = build_step_context("BrC1=CC=C(C=C1)C(OC)=O.CN>>CNC1=CC=C(C=C1)C(OC)=O")
+    reordered = build_step_context("NC.COC(=O)c1ccc(Br)cc1>>COC(=O)c1ccc(NC)cc1")
+    mapped = build_step_context(
+        "[CH3:1][O:2][C:3](=[O:4])[c:5]1[cH:6][cH:7][c:8]([Br:9])[cH:10][cH:11]1."
+        "[CH3:12][NH2:13]>>"
+        "[CH3:1][O:2][C:3](=[O:4])[c:5]1[cH:6][cH:7][c:8]([NH:13][CH3:12])[cH:10][cH:11]1"
+    )
+    assert para == reordered == mapped
+    assert any(r.endswith(" / ester to edit > 3 bonds") for r in para.requirements)
+    result = compare_step_contexts(para, mapped)
+    assert result.status == result.reverse_status == "covered"
+    assert result.minimum_partner_similarity == 1.0
+
+    ortho = build_step_context("Brc1ccccc1C(=O)OC.CN>>CNc1ccccc1C(=O)OC")
+    mismatch = compare_step_contexts(para, ortho)
+    assert mismatch.status == mismatch.reverse_status == "missing"
+    assert [r.split(" / ")[1] for r in mismatch.missing] == ["ester to edit > 3 bonds"]
+    assert [r.split(" / ")[1] for r in mismatch.source_only] == ["ester to edit = 2 bonds"]
+
+
+def test_competing_site_distance_uses_the_original_reactant_graph():
+    context = build_step_context("IC1=CC=C(C=C1)CBr.CN>>CNC1=CC=C(C=C1)CBr")
+    assert features(context.requirements) == {"LG|Alkyl|Br"}
+    assert any(r.endswith(" / LG|Alkyl|Br to edit > 3 bonds") for r in context.requirements)
+
+
 def test_missing_pairwise_proximity_despite_both_groups_far_from_the_reacting_center():
     near, far = [
         build_step_context(f"Br{ring}.CN>>CN{ring}")

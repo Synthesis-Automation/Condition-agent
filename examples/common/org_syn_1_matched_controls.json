@@ -1,0 +1,233 @@
+{
+  "dataset": "Seven published Organic Syntheses parent steps and eleven single-side perturbations.",
+  "design": "Development set selected after inspection of the original CSV evaluation. Cases and endpoints were fixed before scoring these counterfactuals. No negative yields or experimentally failed attempts are asserted.",
+  "original_csv_sha256": "1834572888715bfe13c1a4e3a5319e899b37d176dd8307580a216271601761bd",
+  "atom_inventory_scope": "Only molecules supplied in the reaction SMILES. An element absent from every listed input cannot be supplied by changing their stoichiometric coefficients. An omitted reagent can remedy an incomplete record.",
+  "pair_endpoint": {
+    "order": "Compare the standard ordinal ranks only if both ranks are numeric. Higher parent = win; equal = tie; lower = reversal. Null rank on either side = abstained pair, reported separately, never imputed.",
+    "strict_separation": "Report wins over all pairs and win/tie/reversal counts over comparable pairs. No credit for ties or abstentions in the all-pair strict count.",
+    "warning_endpoint": "Report fraction of four missing-element controls with no positive support rank and fraction explicitly identifying that product elements lack an atom source; a generic abstention is not an element-specific warning.",
+    "specificity_endpoint": "For each of seven alternate products, record rank and any exact, measured, or repeated support. A match for the alternate product under other conditions does not contradict the cited preparation."
+  },
+  "cases": [
+    {
+      "case_id": "octyl_bpin",
+      "group": "reported_parent",
+      "csv_row": 1,
+      "reaction_smiles": "CCCCCCCCI.CC1(C)OB(B2OC(C)(C(C)(O2)C)C)OC1(C)C>>CCCCCCCCB3OC(C)(C(C)(O3)C)C",
+      "source_doi": "10.15227/orgsyn.099.0015",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v99p0015",
+      "locator": "Checked preparation of the terminal octyl pinacol boronate from 1-iodooctane and diboron.",
+      "graph_origin": "as supplied in CSV",
+      "expected_review_action": "recognize documented product; absence of a catalog hit reflects coverage"
+    },
+    {
+      "case_id": "ketone_alpha_arylation",
+      "group": "reported_parent",
+      "csv_row": 2,
+      "reaction_smiles": "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
+      "source_doi": "10.15227/orgsyn.100.0099",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v100p0099",
+      "locator": "Checked mono-alpha-arylation of cyclopentanone with 4-bromoacetophenone.",
+      "graph_origin": "as supplied in CSV",
+      "expected_review_action": "recognize documented product; absence of a catalog hit reflects coverage"
+    },
+    {
+      "case_id": "z_vinyl_cyanation",
+      "group": "reported_parent",
+      "csv_row": 5,
+      "reaction_smiles": "I/C=C\\CCCCCC.CC(C)(O)C#N>>N#C/C=C\\CCCCCC",
+      "source_doi": "10.15227/orgsyn.093.0163",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v93p0163",
+      "locator": "Part A identifies (Z)-1-iodooct-1-ene and the isolated (Z)-non-2-enenitrile. Notes describe a minor positional-isomer impurity.",
+      "graph_origin": "source-corrected",
+      "expected_review_action": "recognize documented product; absence of a catalog hit reflects coverage"
+    },
+    {
+      "case_id": "pyrroline_rcm",
+      "group": "reported_parent",
+      "csv_row": 6,
+      "reaction_smiles": "CC(C)(C)OC(=O)N(CC=C)CC=C>>CC(C)(C)OC(=O)N1CC=CC1",
+      "source_doi": "10.15227/orgsyn.080.0085",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v80p0085",
+      "locator": "The checked procedure identifies N-Boc-diallylamine and N-Boc-3-pyrroline. The isolated product has its alkene opposite nitrogen.",
+      "graph_origin": "source-corrected",
+      "expected_review_action": "recognize documented product; absence of a catalog hit reflects coverage"
+    },
+    {
+      "case_id": "styrene_hydroacylation",
+      "group": "reported_parent",
+      "csv_row": 7,
+      "reaction_smiles": "CC(=O)Oc1ccc(C=C)cc1.O=C(F)c2ccccc2>>CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1",
+      "source_doi": "10.15227/orgsyn.102.0367",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v102p0367",
+      "locator": "Checked reaction of 4-acetoxystyrene and benzoyl fluoride gives 4-(1-oxo-1-phenylpropan-2-yl)phenyl acetate, the branched ketone.",
+      "graph_origin": "as supplied in CSV",
+      "expected_review_action": "recognize documented product; absence of a catalog hit reflects coverage"
+    },
+    {
+      "case_id": "furyl_suzuki",
+      "group": "reported_parent",
+      "csv_row": 9,
+      "reaction_smiles": "Brc1cncnc1.OB(O)c1ccoc1>>C1(C2=COC=C2)=CN=CN=C1",
+      "source_doi": "10.15227/orgsyn.093.0306",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v93p0306",
+      "locator": "Checked coupling of 5-bromopyrimidine with furan-3-boronic acid gives 5-(furan-3-yl)pyrimidine.",
+      "graph_origin": "as supplied in CSV",
+      "expected_review_action": "recognize documented product; absence of a catalog hit reflects coverage"
+    },
+    {
+      "case_id": "diaryl_sulfide",
+      "group": "reported_parent",
+      "csv_row": 20,
+      "reaction_smiles": "Brc1ccc(C(=O)C)cc1.Clc1ccccc1S>>CC(=O)c1ccc(S-c2ccccc2Cl)cc1",
+      "source_doi": "10.15227/orgsyn.100.0234",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v100p0234",
+      "locator": "Part A reports substitution of the acetophenone aryl bromide by 2-chlorobenzenethiol and retention of the aryl chloride.",
+      "graph_origin": "as supplied in CSV",
+      "expected_review_action": "recognize documented product; absence of a catalog hit reflects coverage"
+    },
+    {
+      "case_id": "no_diboron",
+      "parent_id": "octyl_bpin",
+      "group": "missing_element",
+      "csv_row": 1,
+      "reaction_smiles": "CCCCCCCCI>>CCCCCCCCB3OC(C)(C(C)(O3)C)C",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v99p0015",
+      "source_doi": "10.15227/orgsyn.099.0015",
+      "rationale": "No boron or oxygen occurs in the remaining molecular input; the product contains B and O.",
+      "unrepresented_product_elements": [
+        "B",
+        "O"
+      ],
+      "expected_review_action": "Flag an incomplete atom-source list and withhold a support grade."
+    },
+    {
+      "case_id": "secondary_borylation",
+      "parent_id": "octyl_bpin",
+      "group": "different_outcome",
+      "csv_row": 1,
+      "reaction_smiles": "CCCCCCCCI.CC1(C)OB(B2OC(C)(C(C)(O2)C)C)OC1(C)C>>CCCCCCC(C)B1OC(C)(C)C(C)(C)O1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v99p0015",
+      "source_doi": "10.15227/orgsyn.099.0015",
+      "rationale": "Moves Bpin from terminal carbon 1 to carbon 2 without changing the inputs. The cited preparation reports octan-1-yl Bpin.",
+      "unrepresented_product_elements": [],
+      "expected_review_action": "Withhold attribution to the parent report. Seek evidence that distinguishes the proposed site or stereochemistry."
+    },
+    {
+      "case_id": "beta_arylation",
+      "parent_id": "ketone_alpha_arylation",
+      "group": "different_outcome",
+      "csv_row": 2,
+      "reaction_smiles": "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>CC(=O)c1ccc(C2CCC(=O)C2)cc1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v100p0099",
+      "source_doi": "10.15227/orgsyn.100.0099",
+      "rationale": "Changes the ketone-ring attachment from alpha to beta. The cited procedure isolates the mono-alpha isomer.",
+      "unrepresented_product_elements": [],
+      "expected_review_action": "Withhold attribution to the parent report. Seek evidence that distinguishes the proposed site or stereochemistry."
+    },
+    {
+      "case_id": "no_cn_donor",
+      "parent_id": "z_vinyl_cyanation",
+      "group": "missing_element",
+      "csv_row": 5,
+      "reaction_smiles": "I/C=C\\CCCCCC>>N#C/C=C\\CCCCCC",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v93p0163",
+      "source_doi": "10.15227/orgsyn.093.0163",
+      "rationale": "Deleting the cyanohydrin leaves no nitrogen-bearing input for the nitrile.",
+      "unrepresented_product_elements": [
+        "N"
+      ],
+      "expected_review_action": "Flag an incomplete atom-source list and withhold a support grade."
+    },
+    {
+      "case_id": "e_product",
+      "parent_id": "z_vinyl_cyanation",
+      "group": "different_outcome",
+      "csv_row": 5,
+      "reaction_smiles": "I/C=C\\CCCCCC.CC(C)(O)C#N>>N#C/C=C/CCCCCC",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v93p0163",
+      "source_doi": "10.15227/orgsyn.093.0163",
+      "rationale": "Inverts only the product alkene geometry. Part A isolates the Z nitrile; an E outcome is not established by this report.",
+      "unrepresented_product_elements": [],
+      "expected_review_action": "Withhold attribution to the parent report. Seek evidence that distinguishes the proposed site or stereochemistry."
+    },
+    {
+      "case_id": "double_bond_migrated",
+      "parent_id": "pyrroline_rcm",
+      "group": "different_outcome",
+      "csv_row": 6,
+      "reaction_smiles": "CC(C)(C)OC(=O)N(CC=C)CC=C>>CC(C)(C)OC(=O)N1CCC=C1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v80p0085",
+      "source_doi": "10.15227/orgsyn.080.0085",
+      "rationale": "Moves the newly formed ring alkene next to nitrogen. It is the raw CSV product, distinct from the primary source's 3-pyrroline.",
+      "unrepresented_product_elements": [],
+      "expected_review_action": "Withhold attribution to the parent report. Seek evidence that distinguishes the proposed site or stereochemistry."
+    },
+    {
+      "case_id": "linear_ketone",
+      "parent_id": "styrene_hydroacylation",
+      "group": "different_outcome",
+      "csv_row": 7,
+      "reaction_smiles": "CC(=O)Oc1ccc(C=C)cc1.O=C(F)c2ccccc2>>CC(=O)Oc1ccc(CCC(=O)c2ccccc2)cc1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v102p0367",
+      "source_doi": "10.15227/orgsyn.102.0367",
+      "rationale": "Switches the acylation site on the styrene to give the linear isomer. The source isolates the branched ketone.",
+      "unrepresented_product_elements": [],
+      "expected_review_action": "Withhold attribution to the parent report. Seek evidence that distinguishes the proposed site or stereochemistry."
+    },
+    {
+      "case_id": "no_furyl_donor",
+      "parent_id": "furyl_suzuki",
+      "group": "missing_element",
+      "csv_row": 9,
+      "reaction_smiles": "Brc1cncnc1>>C1(C2=COC=C2)=CN=CN=C1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v93p0306",
+      "source_doi": "10.15227/orgsyn.093.0306",
+      "rationale": "No oxygen occurs in the remaining molecular input; the product has a furan oxygen.",
+      "unrepresented_product_elements": [
+        "O"
+      ],
+      "expected_review_action": "Flag an incomplete atom-source list and withhold a support grade."
+    },
+    {
+      "case_id": "furyl_2_linkage",
+      "parent_id": "furyl_suzuki",
+      "group": "different_outcome",
+      "csv_row": 9,
+      "reaction_smiles": "Brc1cncnc1.OB(O)c1ccoc1>>c1ncc(-c2ccco2)cn1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v93p0306",
+      "source_doi": "10.15227/orgsyn.093.0306",
+      "rationale": "The product is attached at furan C2 despite boron being at C3 in the unaltered precursor. The checked example isolates the C3-linked product.",
+      "unrepresented_product_elements": [],
+      "expected_review_action": "Withhold attribution to the parent report. Seek evidence that distinguishes the proposed site or stereochemistry."
+    },
+    {
+      "case_id": "no_thiol",
+      "parent_id": "diaryl_sulfide",
+      "group": "missing_element",
+      "csv_row": 20,
+      "reaction_smiles": "Brc1ccc(C(=O)C)cc1>>CC(=O)c1ccc(S-c2ccccc2Cl)cc1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v100p0234",
+      "source_doi": "10.15227/orgsyn.100.0234",
+      "rationale": "The remaining aryl bromide has neither sulfur nor chlorine; both occur in the product.",
+      "unrepresented_product_elements": [
+        "Cl",
+        "S"
+      ],
+      "expected_review_action": "Flag an incomplete atom-source list and withhold a support grade."
+    },
+    {
+      "case_id": "br_retained_ch_thiolation",
+      "parent_id": "diaryl_sulfide",
+      "group": "different_outcome",
+      "csv_row": 20,
+      "reaction_smiles": "Brc1ccc(C(=O)C)cc1.Clc1ccccc1S>>CC(=O)c1cc(Sc2ccccc2Cl)c(Br)cc1",
+      "source": "https://www.orgsyn.org/demo.aspx?prep=v100p0234",
+      "source_doi": "10.15227/orgsyn.100.0234",
+      "rationale": "Retains bromine while installing sulfur at an adjacent aryl C-H site. The source reports ipso C-Br substitution; another method could access C-H thiolation.",
+      "unrepresented_product_elements": [],
+      "expected_review_action": "Withhold attribution to the parent report. Seek evidence that distinguishes the proposed site or stereochemistry."
+    }
+  ]
+}

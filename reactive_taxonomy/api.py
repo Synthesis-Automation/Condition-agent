@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import json
 from typing import Any, Iterable, List, Optional, Set, Tuple
 
 from .chemistry.rdkit_utils import mol_to_canonical_smiles, parse_smiles, rdkit_available
@@ -39,20 +40,27 @@ def _component_molecules(molecule: Any) -> List[Any]:
     return list(Chem.GetMolFrags(molecule, asMols=True, sanitizeFrags=True))
 
 
+def _component_annotation_smiles(molecule: Any) -> str:
+    """Write the component traversal used by molecular motifs and reactive sites."""
+    from rdkit import Chem  # type: ignore
+
+    return Chem.MolToSmiles(molecule, canonical=False, isomericSmiles=True)
+
+
+def component_annotation_atom_order(molecule: Any) -> Tuple[int, ...]:
+    """Map indices in the annotated component SMILES to indices in the input graph."""
+    _component_annotation_smiles(molecule)
+    return tuple(json.loads(molecule.GetProp("_smilesAtomOutputOrder")))
+
+
 def _component_structure(
     molecule: Any,
     *,
     component_index: int,
     atom_offset: int,
 ) -> MolecularComponentStructure:
-    from rdkit import Chem  # type: ignore
-
     canonical = mol_to_canonical_smiles(molecule) or ""
-    ordered = Chem.MolToSmiles(
-        molecule,
-        canonical=False,
-        isomericSmiles=True,
-    )
+    ordered = _component_annotation_smiles(molecule)
     atoms = tuple(
         MolecularAtomObservation(
             atom_index=int(atom.GetIdx()),

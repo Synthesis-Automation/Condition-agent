@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, OrderedDict
 from collections.abc import Mapping, Iterator
 from contextlib import closing
+from dataclasses import dataclass
 from functools import lru_cache
 import hashlib
 import json
@@ -13,20 +14,45 @@ import sqlite3
 from typing import Any, Iterable, Callable
 import zstandard
 
+from reactive_taxonomy.shared_reaction_core import build_shared_reaction_core, shared_core_definition_hash
+
 from .conversion.atomic import atomic_output_path
+from .conversion.identities import canonical_reaction_identity
 from .corpus_io import canonical_source_files, file_sha256
 from .record_storage import iter_record_events, json_bytes
 
-CATALOG_SCHEMA_VERSION = "processed_evidence_catalog.v2"
+CATALOG_SCHEMA_VERSION = "processed_evidence_catalog.v3"
+_LEGACY_SCHEMA = "processed_evidence_catalog.v2"
+EXPERIMENT_FIELDS = (
+    "observation_id", "reaction_id", "reaction_smiles", "canonical_reaction_id",
+    "reference_id", "reference_identity", "source_dataset", "source_path", "source_row_number",
+    "source", "resolved_recipe", "resolved_recipe_id", "outcome_status", "yield_pct",
+    "temperature_c", "time_h", "conditions",
+    "index_eligibility", "admission_tier", "admission_reasons", "chemistry_status",
+)
+
+
+@dataclass(frozen=True)
+class ExperimentLookup:
+    """Source records in a bounded exact or graph-local experimental search."""
+
+    records: tuple[dict[str, Any], ...]
+    truncated: bool
+    candidates_examined: int
+    lookup_complete: bool
+    scope: str
 
 
 def build_processed_catalog(source: str | Path, destination: str | Path, *,
+                            include_local_cores: bool = True,
                             progress: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
     """Materialize canonical shared objects and indexed observation metadata once."""
     output = Path(destination)
     output.parent.mkdir(parents=True, exist_ok=True)
     counts: Counter[str] = Counter()
     shards = canonical_source_files(source, strict=True)
+    if output.resolve() == Path(source).resolve() or output.resolve() in shards:
+        raise ValueError("Evidence catalog destination cannot overwrite a source")
     samples = []
     for shard in shards:
         for event in iter_record_events(shard):
@@ -48,6 +74,12 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
     def encode(value: Any) -> bytes:
         return compressor.compress(json_bytes(value))
 
+    # Repeated wells share a graph but each has a distinct source observation.
+    @lru_cache(maxsize=1024)
+    def exact_key(smiles: str) -> str | None:
+        identity = canonical_reaction_identity(smiles)
+        return identity.reaction_id if identity is not None else None
+
     with atomic_output_path(output) as temporary:
         with closing(sqlite3.connect(temporary)) as db:
             db.executescript("""
@@ -62,12 +94,16 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                     has_procedure INTEGER NOT NULL,payload BLOB NOT NULL) WITHOUT ROWID;
                 CREATE INDEX observation_reaction ON observations(reaction_id);
                 CREATE INDEX observation_reference ON observations(reference_id);
+                CREATE TABLE experiment_lookup(kind TEXT NOT NULL, key TEXT NOT NULL,
+                    observation_id TEXT NOT NULL,
+                    PRIMARY KEY(kind, key, observation_id)) WITHOUT ROWID;
                 CREATE TABLE reference_records(id TEXT PRIMARY KEY,payload BLOB NOT NULL) WITHOUT ROWID;
                 CREATE TABLE recipe_records(id TEXT PRIMARY KEY,payload BLOB NOT NULL) WITHOUT ROWID;
             """)
             db.execute("INSERT INTO compression_dictionary VALUES (?)", (dictionary,))
             for shard in shards:
                 local: dict[str, Any] = {}
+                projections: OrderedDict[tuple, tuple[tuple[str, str], ...]] = OrderedDict()
 
                 def restore(value: Any) -> Any:
                     if isinstance(value, dict):
@@ -80,6 +116,26 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                     if isinstance(value, list):
                         return [restore(v) for v in value]
                     return value
+
+                def local_keys(row: Mapping[str, Any], smiles: str) -> tuple[tuple[str, str], ...]:
+                    # Reuse the verified conversion evidence. Repeated wells normally
+                    # share object IDs, so project their graph only once per shard.
+                    if not row.get("reaction_signature") or not row.get("reaction_core"):
+                        return ()
+                    if restore(row.get("reaction_completeness") or {}).get("status") != "verified":
+                        return ()
+                    inputs = (row["reaction_signature"], row["reaction_core"])
+                    key = (smiles, *(item.get("$reaction_object") or hashlib.sha256(json_bytes(item)).digest()
+                                     for item in inputs))
+                    if key in projections:
+                        projections.move_to_end(key)
+                        return projections[key]
+                    projection = build_shared_reaction_core(smiles, *(restore(item) for item in inputs))
+                    levels = tuple((level.level, level.key) for level in projection.levels)
+                    projections[key] = levels
+                    if len(projections) > 1024:
+                        projections.popitem(last=False)
+                    return levels
 
                 for event in iter_record_events(shard):
                     if "reset_objects" in event:
@@ -101,6 +157,16 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                         int(bool(str(source_row.get("experimental_procedure") or "").strip())),
                         encode(row)))
                     counts["observations"] += 1
+                    smiles = str(row.get("reaction_smiles") or "")
+                    identity = exact_key(smiles)
+                    keys = [("whole_reaction", identity)] if identity else []
+                    if identity and include_local_cores:
+                        levels = local_keys(row, smiles)
+                        keys.extend(levels)
+                        counts["experiments_with_local_core"] += bool(levels)
+                    db.executemany("INSERT INTO experiment_lookup VALUES (?,?,?)",
+                                   ((kind, key, oid) for kind, key in keys))
+                    counts["experiments_with_graph"] += bool(keys)
                     counts["procedures"] += int(bool(str(source_row.get("experimental_procedure") or "").strip()))
                     for table, id_field, value_field in (
                         ("reference_records", "reference_id", "reference_identity"),
@@ -116,9 +182,13 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
             for key, table in (("shared_objects", "objects"), ("references", "reference_records"),
                                ("recipes", "recipe_records")):
                 counts[key] = db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
-            catalog_id = hashlib.sha256((file_sha256(Path(source)) + CATALOG_SCHEMA_VERSION).encode()).hexdigest()
+            local_hash = shared_core_definition_hash() if include_local_cores else None
+            catalog_id = hashlib.sha256(json_bytes(
+                [file_sha256(Path(source)), CATALOG_SCHEMA_VERSION, local_hash]
+            )).hexdigest()
             report = {"schema_version": CATALOG_SCHEMA_VERSION, "build_complete": True,
                       "catalog_id": catalog_id,
+                      "experiment_local_core_definition": local_hash,
                       "payload_encoding": "zstandard_dictionary.v1",
                       "dictionary_sha256": hashlib.sha256(dictionary).hexdigest(),
                       "counts": dict(counts)}
@@ -132,16 +202,54 @@ class ProcessedCatalog:
 
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path).resolve()
+        self._file_identity = self._identity()
+
+    def _identity(self) -> tuple[int, int, int]:
+        stat = self.path.stat()
+        return stat.st_ino, stat.st_size, stat.st_mtime_ns
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self.path.as_uri() + "?mode=ro&immutable=1", uri=True)
+        db = sqlite3.connect(self.path.as_uri() + "?mode=ro&immutable=1", uri=True)
+        try:
+            if self._identity() != self._file_identity:
+                raise ValueError("Evidence catalog changed; reopen it before reading")
+            return db
+        except BaseException:
+            db.close()
+            raise
+
+    @lru_cache(maxsize=1)
+    def _metadata(self) -> dict[str, Any]:
+        with closing(self._connect()) as db:
+            try:
+                row = db.execute("SELECT payload FROM metadata").fetchone()
+                metadata = json.loads(row[0]) if row else None
+            except (sqlite3.DatabaseError, ValueError) as exc:
+                raise ValueError("File is not a readable evidence catalog") from exc
+        if (not isinstance(metadata, dict)
+                or metadata.get("schema_version") not in (CATALOG_SCHEMA_VERSION, _LEGACY_SCHEMA)
+                or not metadata.get("build_complete")):
+            raise ValueError("Evidence catalog is incompatible or incomplete")
+        return metadata
+
+    @property
+    def supports_experiment_analogues(self) -> bool:
+        """Whether the artifact has a graph-local experimental lookup.
+
+        A changed chemistry definition requires rebuilding the derived keys.
+        """
+        metadata = self._metadata()
+        definition = metadata.get("experiment_local_core_definition")
+        if metadata["schema_version"] == _LEGACY_SCHEMA or definition is None:
+            return False
+        if definition != shared_core_definition_hash():
+            raise ValueError("Experiment local-core definition mismatch; rebuild the experiment catalog")
+        return True
 
     @lru_cache(maxsize=1)
     def _dictionary(self) -> bytes:
+        metadata = self._metadata()
         with closing(self._connect()) as db:
-            metadata = json.loads(db.execute("SELECT payload FROM metadata").fetchone()[0])
-            if metadata.get("schema_version") != CATALOG_SCHEMA_VERSION or not metadata.get("build_complete"):
-                raise ValueError("Evidence catalog is incompatible or incomplete")
             dictionary = db.execute("SELECT payload FROM compression_dictionary").fetchone()[0]
         if hashlib.sha256(dictionary).hexdigest() != metadata.get("dictionary_sha256"):
             raise ValueError("Evidence compression dictionary checksum mismatch")
@@ -181,6 +289,99 @@ class ProcessedCatalog:
             selected = set(fields) | {"observation_id", "reaction_id"}
             value = {k: v for k, v in value.items() if k in selected}
         return self.restore(value)
+
+    def experiment_candidates(
+        self, reaction_smiles: str, *, fragment_index: str | Path | None = None,
+        limit: int = 128, include_analogues: bool = False,
+    ) -> ExperimentLookup:
+        """Find observations of the intended graph regardless of recipe admission.
+
+        Latest catalogs also index verified local reaction edits. Candidate
+        generation precedes structural qualification and recipe comparison. A
+        yield measurement of zero never establishes formation of the target.
+        """
+        if type(limit) is not int or not 1 <= limit <= 512:
+            raise ValueError("experiment candidate limit must be between 1 and 512")
+        metadata = self._metadata()
+        legacy = metadata["schema_version"] == _LEGACY_SCHEMA
+        if include_analogues:
+            if legacy and fragment_index is None:
+                raise ValueError("Legacy experiment catalog requires its bound fragment index")
+            if not legacy and not self.supports_experiment_analogues:
+                raise ValueError("Local experiment lookup unavailable; rebuild the experiment catalog")
+        identity = canonical_reaction_identity(reaction_smiles)
+        if identity is None:
+            return ExperimentLookup((), False, 0, False, "invalid_reaction_graph")
+        if legacy:
+            if fragment_index is None:
+                return ExperimentLookup((), False, 0, False, "exact_graph_index_unavailable")
+            return self._legacy_experiments(identity.reaction_id, identity.products, fragment_index, limit)
+
+        keys = [("whole_reaction", identity.reaction_id)]
+        scope = "exact_graph"
+        if include_analogues:
+            from .reaction_precedent_support import reaction_evidence_core
+
+            core = reaction_evidence_core(reaction_smiles)
+            if core is not None and core.levels:
+                keys.extend((level.level, level.key) for level in core.levels)
+                scope = "exact_and_indexed_local_cores"
+        found: dict[str, None] = {}
+        with closing(self._connect()) as db:
+            for kind, key in keys:
+                cursor = db.execute(
+                    "SELECT observation_id FROM experiment_lookup WHERE kind=? AND key=? "
+                    "ORDER BY observation_id LIMIT ?", (kind, key, limit + 1),
+                )
+                for (obs_id,) in cursor:
+                    found[obs_id] = None
+                    if len(found) > limit:
+                        break
+                if len(found) > limit:
+                    break
+        truncated = len(found) > limit
+        records = tuple(self.observation(i, EXPERIMENT_FIELDS) for i in list(found)[:limit])
+        return ExperimentLookup(records, truncated, len(records), not truncated, scope)
+
+    def _legacy_experiments(
+        self, reaction_id: str, products: tuple[str, ...], fragment_index: str | Path, limit: int,
+    ) -> ExperimentLookup:
+        """Use a catalog-bound product index and verify both molecular sides."""
+        from reactive_taxonomy.fragment_search import indexed_product
+        from .fragment_index import open_fragment_index, unpack
+
+        fragment_db, fragment = open_fragment_index(fragment_index)
+        with closing(fragment_db):
+            binding = fragment.get("evidence_catalog") or {}
+            if binding.get("catalog_id") != self._metadata()["catalog_id"]:
+                raise ValueError("Fragment index is not bound to this experiment catalog")
+            # The full product multiset, stereo and both precursor identity and
+            # multiplicity are verified below, including for multi-product steps.
+            product_key, _ = indexed_product(products[0])
+            scan_limit = min(512, 4 * limit)
+            occurrences = fragment_db.execute(
+                "SELECT observation_id FROM links WHERE side='product' AND product_id="
+                "(SELECT id FROM products WHERE smiles=?) ORDER BY rowid LIMIT ?",
+                (product_key, scan_limit + 1),
+            ).fetchall()
+            capped = len(occurrences) > scan_limit
+            visited = set()
+            matched = []
+            for (obs_id,) in occurrences[:scan_limit]:
+                if obs_id in visited:
+                    continue
+                visited.add(obs_id)
+                packed = fragment_db.execute("SELECT payload FROM observations WHERE id=?", (obs_id,)).fetchone()
+                source = canonical_reaction_identity(unpack(packed[0])["reaction_smiles"])
+                if source is not None and source.reaction_id == reaction_id:
+                    matched.append(obs_id)
+                    if len(matched) > limit:
+                        capped = True
+                        break
+        records = tuple(self.observation(i, EXPERIMENT_FIELDS) for i in matched[:limit])
+        return ExperimentLookup(records, capped, len(visited),
+                                not capped and bool(fragment.get("source_coverage_complete")),
+                                "bound_fragment_exact_graph")
 
     def references(self, identities: Iterable[str]) -> dict[str, dict[str, Any]]:
         """Fetch exact source reference records without loading the entire catalog."""

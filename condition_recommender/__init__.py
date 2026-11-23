@@ -79,11 +79,14 @@ from .reaction_precedent_support import (
     ReactionPrecedentEvidence, ReactionPrecedentSupport, assess_reaction_precedent_support,
 )
 from .step_plausibility import StepPlausibilityAssessment, assess_step_plausibility
+from .step_recipe_evidence import StepRecipeEvidence, assess_step_recipe_evidence
 
 __all__ = [
     "ReactionPrecedentEvidence", "ReactionPrecedentSupport", "assess_reaction_precedent_support",
     "StepPlausibilityAssessment",
     "assess_step_plausibility",
+    "StepRecipeEvidence",
+    "assess_step_recipe_evidence",
     "StartingMaterialAssessment",
     "StartingMaterialPolicy",
     "assess_starting_material",

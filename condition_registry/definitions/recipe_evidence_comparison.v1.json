@@ -1,0 +1,14 @@
+{
+  "definition_version": "recipe_evidence_comparison.v1@1.0",
+  "atmosphere_aliases": {"n2": "nitrogen", "nitrogen": "nitrogen", "ar": "argon", "argon": "argon", "air": "air"},
+  "illumination_on": ["on", "yes", "illuminated", "light"],
+  "illumination_off": ["off", "no", "no light", "dark", "darkness"],
+  "illumination_aliases": {"white led": "white LEDs", "white leds": "white LEDs"},
+  "illumination_sources": ["white LEDs", "blue led", "blue leds", "red led", "red leds", "green led", "green leds", "sunlight", "uv light", "visible light"],
+  "unreported_values": ["unknown", "unreported", "not reported", "unspecified", "not specified", "not given", "none reported", "n/a", "na", "-", "not applicable"],
+  "role_omissions": {
+    "catalyst": "catalysts", "ligand": "ligands", "base": "bases", "acid": "acids",
+    "condensation_agent": "condensation_agents", "oxidant": "oxidants", "reductant": "reductants",
+    "additive": "additives", "solvent": "solvents"
+  }
+}

@@ -18,6 +18,30 @@ python -m condition_recommender.step_plausibility_cli '<reactants>>product>' --i
 
 The public Python entry point is `condition_recommender.assess_step_plausibility(reaction_smiles, index, shared_index, *, candidate_limit=128, match_limit=20)`. It returns an immutable assessment with a `to_dict()` method. Use `candidate_limit` to bound the search, and `match_limit` to select the number of evidence rows displayed. All graph-qualified candidates visited contribute to the statistics before the display limit is applied. The result records both truncation flags.
 
+## Compare a proposed recipe with measured controls
+
+Add `--recipe` to see what happened on the same substrates or close analogues under the specified conditions. For a reproducible example, build the small experiment catalog from the six published observations in [Liu et al., Supporting Information, Table S1](https://doi.org/10.1021/jacs.7b07390.s001). Run these commands from the repository root with an active processed release.
+
+```powershell
+$rxn = 'CC(=O)c1ccc(Br)cc1.Cc1ccc(S)cc1>>CC(=O)c1ccc(Sc2ccc(C)cc2)cc1'
+$catalog = 'results/ai_native/recipe_step_evidence_20261123/liu.sqlite'
+python -m condition_recommender.experiment_catalog examples/common/liu_thioether_controls.jsonl $catalog
+python -m condition_recommender.step_plausibility_cli $rxn --recipe examples/common/liu_thioether_standard_recipe.json --experiment-catalog $catalog --match-limit 6
+python -m condition_recommender.step_plausibility_cli $rxn --recipe examples/common/liu_thioether_no_base_recipe.json --experiment-catalog $catalog --match-limit 6
+```
+
+The source reports 97% isolated yield under the standard conditions, 0% for the no-base experiment, and trace product in the dark. Each refers to a distinct experiment for the same target product. The analysis preserves the original measurement and its source. It also keeps the route-step grade so you can distinguish precedent for making a bond from evidence for making it under a particular recipe.
+
+The [standard recipe](../../examples/common/liu_thioether_standard_recipe.json) specifies component identities, base equivalents, solvent, illumination, atmosphere, temperature and time. The [no-base recipe](../../examples/common/liu_thioether_no_base_recipe.json) explicitly declares the base absent. Leaving a role blank leaves its presence open. A result of `matches_stated_fields` means all the conditions you specified agree. Read the additional conditions reported by the source before transferring a procedure. An observed difference, an incompletely reported procedure and a procedure with no comparable fields each have their own comparison status.
+
+Where the registry identifies an ingredient but cannot establish its role, the comparison can still confirm the ingredient and its amount. A query requiring that role can remain a partial match. The JSON field `reported_conditions` retains the original structured source information when available. Check it for details outside the comparison, such as pressure and reactor setup.
+
+The output shows each experiment's source structure, weakest reacting-partner similarity, functional-group differences, recipe agreement and observed outcome. For an analogue, the yield belongs to the displayed source substrates. Counts are grouped by recipe agreement and include all structurally comparable experiments retrieved, even when `--match-limit` shortens the display. The step grade draws on the bound recommendation index. Supplemental measurements appear in the recipe view. Estimating a success probability requires an independently evaluated set of attempted reactions.
+
+Use `--json` for the full evidence and source locators. The active release supplies its admitted precedents and evidence catalog. The older v2 evidence catalog can additionally recover exact reactions through its release's fragment index. Newly built v3 evidence catalogs also index local-core analogues, including verified observations excluded from condition recommendation. Use `--experiment-catalog` to add local studies independently of a release rebuild. Its input is a JSON array or JSONL of canonical `source_observation.v1` records, such as the [six transcribed controls](../../examples/common/liu_thioether_controls.jsonl).
+
+In Python, call `condition_recommender.assess_step_recipe_evidence(reaction_smiles, recipe, index, shared_index, *, catalog=None, fragment_index=None, experiment_catalog=None, candidate_limit=128, match_limit=20)`. The returned `StepRecipeEvidence` includes the original `step_assessment`, the normalized query recipe, experiment-level evidence, counts and the scope of each search. Each index receives its own candidate budget.
+
 ## Read the result
 
 | Rank | Grade | Interpretation |
@@ -28,6 +52,12 @@ The public Python entry point is `condition_recommender.assess_step_plausibility
 | 2 | `context_supported` | A sufficiently close reaction-core match retains the queried functional-group context on the corresponding reacting partner or partners. |
 | 3 | `measured_support` | A qualifying source group reports an outcome above 10% on an exact or sufficiently similar, context-covered analogue. |
 | 4 | `repeated_measured_support` | At least three qualifying source groups supply such measurements. |
+
+For an unresolved query, the CLI reports any product atom counts that exceed the
+submitted reactant inventory. JSON exposes the element and count pairs in
+`query_context.product_element_excess`. Check the structures, donor assignment
+and stoichiometry when a deficit is reported. A balanced inventory can also
+remain unresolved if the atom correspondence is ambiguous.
 
 The levels describe the strength of evidence that the intended transformation has worked in related chemistry. A score of 4 leaves open the yield of a proposed recipe, selectivity on new substrates, and experimental feasibility on a particular scale. The >10% yield threshold and three-group rule are explicit development choices. A source above 10% can still be a poor preparative result.
 
@@ -42,6 +72,21 @@ Multiple observations from one reference contribute at most one positive source 
 Read positive source groups alongside the distinct positive source reaction count. Reports of one successful substrate pair can establish repeat support under reported conditions while leaving broad substrate tolerance uncertain.
 
 ## Development examples
+
+The [matched Organic Syntheses controls](../../examples/common/org_syn_1_matched_controls.json)
+contain seven literature-backed substrate–product pairs, four donor omissions
+and seven alternative products. The source citation and row number identify each
+parent. A different product is a challenge to selectivity under the published
+conditions. Its experimental yield is unknown. To inspect the α- versus
+β-arylation pair with the active local release, run from the repository root.
+
+```powershell
+$controls = Get-Content examples/common/org_syn_1_matched_controls.json -Raw -Encoding utf8 | ConvertFrom-Json
+$controls.cases | Where-Object { $_.case_id -in 'ketone_alpha_arylation', 'beta_arylation' } | ForEach-Object {
+    Write-Output $_.case_id
+    python -m condition_recommender.step_plausibility_cli $_.reaction_smiles --match-limit 1
+}
+```
 
 The real-data examples use a pinned processed release. The Suzuki coupling to biphenyl illustrates a transformation with exact source records. The salicylate borylation asks how far the many core matches transfer to a free acid adjacent to a phenol. An analogous benzonitrile borylation changes the aryl context. A constructed ethoxy homologue of a reported methoxypyridyl sulfonamide tests transfer from close analogues. Omitting the salicylate query's boron reagent illustrates a missing atom source. These examples exercise the implementation. Independent chemist review and held-out measured experiments are still needed to evaluate predictive value.
 
