@@ -34,5 +34,5 @@ CC(C)(C)OC(=O)NCCN.O=c1oc2cc(Br)ccc2cc1-c1ccccc1>>NCCNc1ccc2cc(-c3ccccc3)c(=O)oc
 
 Brc1ccc(Br)cc1.CC(N)=O>>CC(=O)Nc1ccc(NC(C)=O)cc1
 
-
+$rxn = 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1'
 python -m condition_recommender.step_plausibility_cli $rxn --concise
