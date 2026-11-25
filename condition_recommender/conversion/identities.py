@@ -9,6 +9,7 @@ from functools import lru_cache
 from typing import Any, Iterable, Optional, Tuple
 
 from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 
 from .input_schema import RawReactionRecord
 
@@ -62,14 +63,10 @@ def canonical_reaction_identity(
 ) -> Optional[CanonicalReactionIdentity]:
     """Canonicalize unmapped components with order-invariant reaction sides."""
     text = str(reaction_smiles or "").strip()
-    if ">>" in text:
-        left, right = text.split(">>", 1)
-        middle = ""
-    else:
-        parts = text.split(">")
-        if len(parts) != 3:
-            return None
-        left, middle, right = parts
+    parts = split_reaction_fields(text)
+    if len(parts) != 3:
+        return None
+    left, middle, right = parts
     reactants = _canonical_side(left)
     agents = _canonical_side(middle)
     products = _canonical_side(right)

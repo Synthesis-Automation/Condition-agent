@@ -14,6 +14,7 @@ import math
 from pathlib import Path
 from typing import Any, Mapping, Tuple
 
+from .chemistry.reaction_smiles import split_reaction_fields
 from .chemistry.rdkit_utils import mol_to_canonical_smiles, parse_smiles
 
 
@@ -342,7 +343,7 @@ def _induced_cycle_rank(molecule: Any, retained_maps: frozenset[int]) -> int:
 
 
 def _reaction_parts(reaction_smiles: str) -> tuple[tuple[Any, ...], tuple[Any, ...]]:
-    sections = str(reaction_smiles or "").split(">")
+    sections = split_reaction_fields(str(reaction_smiles or ""))
     if len(sections) != 3 or not sections[0].strip() or not sections[2].strip():
         raise ValueError("strategic-complexity assessment requires a reaction SMILES")
     precursors = tuple(

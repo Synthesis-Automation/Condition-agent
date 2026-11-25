@@ -16,6 +16,7 @@ from rdchiral.template_extractor import extract_from_reaction
 
 from condition_recommender.conversion.source_evidence import structural_search_exclusions
 from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy.reaction_operators import operator_stereo_match
 from reactive_taxonomy.reaction_identity_graphs import (
     product_edit_site_graph,
     retained_precursor_graph,
@@ -589,14 +590,6 @@ def _generalized_product_atoms(
     return editable.GetMol()
 
 
-def _without_stereo(smiles: str) -> str | None:
-    molecule = Chem.MolFromSmiles(smiles)
-    if molecule is None:
-        return None
-    Chem.RemoveStereochemistry(molecule)
-    return Chem.MolToSmiles(molecule, canonical=True, isomericSmiles=False)
-
-
 def _round_trip_assessment(
     reaction_smarts: str,
     product_smiles: str,
@@ -622,12 +615,7 @@ def _round_trip_assessment(
     }))
     if expected_precursors in canonical_outcomes:
         return _RoundTripAssessment("exact", canonical_outcomes)
-    expected_relaxed = _without_stereo(expected_precursors)
-    if expected_relaxed and expected_relaxed in {
-        relaxed
-        for outcome in canonical_outcomes
-        if (relaxed := _without_stereo(outcome)) is not None
-    }:
+    if any(operator_stereo_match(expected_precursors, outcome) != "absent" for outcome in canonical_outcomes):
         return _RoundTripAssessment("relaxed", canonical_outcomes)
     return _RoundTripAssessment(None, canonical_outcomes)
 

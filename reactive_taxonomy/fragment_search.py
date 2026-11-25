@@ -14,6 +14,7 @@ from typing import Any, Mapping
 
 from rdkit import Chem
 
+from .chemistry.reaction_smiles import split_reaction_fields
 from .chemistry.smarts_cache import compile_smarts
 from .reaction_models import ReactionAtomReference
 
@@ -196,7 +197,7 @@ def project_fragment_evidence(reaction_smiles: str, observation: Mapping[str, An
 Unmapped/reconstructed observations retain unresolved evidence in this initial
 implementation. Independent graph checks prevent stale supplied-map claims.
 """
-    parts = reaction_smiles.split(">")
+    parts = split_reaction_fields(reaction_smiles)
     if len(parts) != 3:
         return []
     sides = [[Chem.MolFromSmiles(s) for s in parts[index].split(".") if s] for index in (0, 2)]

@@ -14,6 +14,7 @@ from typing import Any, Mapping
 
 from rdkit import Chem
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .chemistry import canonical_smiles, digest
 from .route_contract import (
     MoleculeOccurrenceNode,
@@ -244,7 +245,7 @@ def candidate_for_choice(
             for fragment in Chem.GetMolFrags(mol, asMols=True, sanitizeFrags=True)
         )
     )
-    reaction = _text(candidate.get("proposed_reaction_smiles")).split(">")
+    reaction = split_reaction_fields(_text(candidate.get("proposed_reaction_smiles")))
     if len(reaction) != 3 or _molecule(reaction[2]) != target:
         raise ValueError("Reaction product contradicts the candidate target")
     if canonical_smiles(reaction[0]) != ".".join(precursors):

@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from typing import Any, Literal
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy import canonical_molecule_collection, featurize_reaction
 from reactive_taxonomy.shared_reaction_core import (
     SharedReactionCore,
@@ -51,7 +52,7 @@ def load_reaction_context_policy() -> dict[str, Any]:
 
 def reaction_sides(reaction: str) -> tuple[str, str]:
     """Validate and canonicalize complete sides without inventing missing inputs."""
-    parts = reaction.split(">")
+    parts = split_reaction_fields(reaction)
     if len(parts) != 3 or not parts[0] or not parts[2]:
         raise ValueError("reaction context requires complete reactants and products")
     sides = tuple(canonical_molecule_collection(p) for p in (parts[0], parts[2]))

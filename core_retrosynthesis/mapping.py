@@ -8,6 +8,7 @@ from typing import Optional
 
 from rdkit import Chem
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy.reaction_edits import resolve_structural_evidence
 from reactive_taxonomy.reaction_parser import parse_reaction_smiles
 
@@ -33,7 +34,7 @@ def _without_reagent_field(reaction_smiles: str) -> str:
     malformed strings untouched so their normal parser rejects them.
     """
 
-    fields = reaction_smiles.split(">")
+    fields = split_reaction_fields(reaction_smiles)
     if len(fields) != 3:
         return reaction_smiles
     reactants, _, products = fields

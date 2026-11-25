@@ -865,7 +865,10 @@ def assess_external_retrosynthesis_proposal(
         )
         gates["forward_reproduction"] = _gate(
             "forward_reproduction",
-            "pass" if reproduced else "fail",
+            ("pass" if reproduced else "unresolved" if (
+                forward_assessment.intended_match == "connectivity_only"
+                or forward_assessment.targeted_replay_status == "stereo_unresolved"
+            ) else "fail"),
             (
                 "The intended product was independently reproduced in the forward system."
                 if reproduced

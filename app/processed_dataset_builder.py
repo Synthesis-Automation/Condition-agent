@@ -139,7 +139,7 @@ def build_processed_datasets(
     stage("operators", {
         "retro_library": release / "operators" / "retrosynthesis" / "operator_library_v3.json.gz",
         "forward_library": release / "operators" / "forward" / "forward_operator_library_v1.json.gz",
-    }, operators, "operators.v3")
+    }, operators, "operators.v4")
 
     load_shared_core_index(indexes / "generic_index.shared_core.sqlite", index)
     emit("validation", message="Checking complete source coverage and all canonical shard identities")

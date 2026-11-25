@@ -19,6 +19,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable, Iterator, TextIO
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .adapters.base import observation_id, supplied_mapping_status
 from .artifacts import PreprocessingCancelled, PreprocessingProgress, _sha256
 from .models import (
@@ -58,7 +59,7 @@ def _compressed_writer(path: Path) -> Iterator[TextIO]:
 
 
 def _reaction_fields(reaction: str) -> tuple[str, str]:
-    parts = reaction.split(">")
+    parts = split_reaction_fields(reaction)
     if len(parts) != 3 or not parts[0] or not parts[2]:
         return reaction, ""
     return f"{parts[0]}>>{parts[2]}", parts[1]
@@ -90,7 +91,7 @@ def _step_observation(
         for index, value in enumerate(filter(None, middle.split(".")), start=1)
     )
     warnings = []
-    parts = reaction.split(">")
+    parts = split_reaction_fields(reaction)
     if len(parts) != 3 or not parts[0] or not parts[2]:
         warnings.append("MISSING_OR_INCOMPLETE_REACTION_SMILES")
     if conflicting:

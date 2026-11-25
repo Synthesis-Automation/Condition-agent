@@ -11,6 +11,7 @@ from typing import Sequence
 
 from rdkit import Chem
 
+from .chemistry.reaction_smiles import split_reaction_fields
 from .chemistry.rdkit_utils import parse_smiles
 
 
@@ -70,7 +71,7 @@ def connect_reaction_sequence(
     for number, reaction in enumerate(reactions, 1):
         if not isinstance(reaction, str):
             raise ValueError(f"Step {number}: reaction SMILES must be text")
-        sections = reaction.strip().split(">")
+        sections = split_reaction_fields(reaction.strip())
         if len(sections) != 3 or not sections[0] or not sections[2]:
             raise ValueError(f"Step {number}: expected reactants>agents>products")
         try:

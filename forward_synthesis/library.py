@@ -21,7 +21,7 @@ from reactive_taxonomy import (
     canonical_molecule_collection,
     reverse_recovers_precursors,
 )
-from reactive_taxonomy.reaction_operators import clear_operator_application_cache
+from reactive_taxonomy.reaction_operators import clear_operator_application_cache, operator_stereo_match
 
 from .models import (
     FORWARD_LIBRARY_SCHEMA_VERSION,
@@ -36,26 +36,13 @@ def _value(source: Any, name: str, default: Any = None) -> Any:
     return getattr(source, name, default)
 
 
-def _without_stereo(smiles: str) -> Optional[str]:
-    molecule = Chem.MolFromSmiles(smiles)
-    if molecule is None:
-        return None
-    Chem.RemoveStereochemistry(molecule)
-    return canonical_molecule_collection(
-        Chem.MolToSmiles(molecule, canonical=True, isomericSmiles=False)
-    )
-
-
 def _product_matches(expected: str, observed: str, stereo_policy: str) -> bool:
     expected_canonical = canonical_molecule_collection(expected)
     if expected_canonical is None:
         return False
     if expected_canonical == observed:
         return True
-    return bool(
-        stereo_policy == "relaxed"
-        and _without_stereo(expected_canonical) == _without_stereo(observed)
-    )
+    return stereo_policy == "relaxed" and operator_stereo_match(expected_canonical, observed) != "absent"
 
 
 def _as_precedent(value: Any) -> ReactionOperatorPrecedent:

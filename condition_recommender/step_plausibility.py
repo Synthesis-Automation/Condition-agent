@@ -16,6 +16,7 @@ from math import isfinite
 from pathlib import Path
 from typing import Any
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy.fragment_search import indexed_product
 from reactive_taxonomy.step_precedent_context import (
     StepContextComparison,
@@ -168,7 +169,7 @@ def _classify_outcome(row: ReactionPrecedentEvidence, threshold: float) -> str:
 
 def _normalized_reaction(reaction_smiles: str) -> tuple[str, str]:
     """Canonical map-free reactants and products retaining charge, stereo and multiplicity."""
-    left, _, right = reaction_smiles.split(">")
+    left, _, right = split_reaction_fields(reaction_smiles)
     return indexed_product(left)[0], indexed_product(right)[0]
 
 

@@ -7,6 +7,7 @@ from dataclasses import dataclass, replace
 from typing import List, Tuple
 
 from .api import interpret_molecular_reactivity, observe_molecular_structure
+from .chemistry.reaction_smiles import split_reaction_fields
 from .models import MoleculeAnalysis, MolecularInterpretation
 from .reaction_models import ReactionComponent
 
@@ -51,14 +52,10 @@ def parse_reaction_smiles(
     text = str(reaction_smiles or "").strip()
     if not text:
         return ParsedReaction(False, error="EMPTY_REACTION_SMILES")
-    if ">>" in text:
-        left, right = text.split(">>", 1)
-        middle = ""
-    else:
-        parts = text.split(">")
-        if len(parts) != 3:
-            return ParsedReaction(False, error="INVALID_REACTION_FORMAT")
-        left, middle, right = parts
+    parts = split_reaction_fields(text)
+    if len(parts) != 3:
+        return ParsedReaction(False, error="INVALID_REACTION_FORMAT")
+    left, middle, right = parts
     if not left.strip(): return ParsedReaction(False, error="EMPTY_REACTANT_SIDE")
     if not right.strip(): return ParsedReaction(False, error="EMPTY_PRODUCT_SIDE")
     reactants, rw = _components(left, "reactant")

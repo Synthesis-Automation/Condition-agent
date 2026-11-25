@@ -6,11 +6,11 @@ from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import lru_cache
-import re
 
 from rdkit import Chem
 
 from .rdkit_utils import parse_smiles
+from .reaction_smiles import split_reaction_fields
 
 
 SOURCE_MAPPING_SCREEN_VERSION = "source_mapping_screen.v1"
@@ -66,7 +66,7 @@ def source_material_graphs(value: str) -> tuple[str, ...]:
 
 
 def _reaction_sides(value: str) -> tuple | None:
-    fields = re.split(r"(?<!-)>", value)
+    fields = split_reaction_fields(value)
     if len(fields) != 3 or not fields[0] or not fields[2]:
         return None
     sides = tuple(_fragments(side) for side in fields)

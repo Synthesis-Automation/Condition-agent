@@ -13,7 +13,7 @@ import itertools
 import json
 from dataclasses import asdict, dataclass
 from functools import lru_cache
-from typing import Any, Mapping, Optional, Sequence, Tuple
+from typing import Any, Literal, Mapping, Optional, Sequence, Tuple
 
 from rdkit import Chem
 from rdkit.Chem import rdChemReactions
@@ -57,6 +57,41 @@ def canonical_molecule_collection(smiles: str) -> Optional[str]:
     """Canonicalize a molecule or dot-separated molecule collection."""
 
     return _canonical_molecule_collection(smiles)
+
+
+@lru_cache(maxsize=16_384)
+def operator_stereo_match(
+    expected: str, observed: str,
+) -> Literal["exact", "stereo_relaxed", "connectivity_only", "absent"]:
+    """Compare map-free operator outputs, retaining isotopes and specified stereo.
+
+    A more specific observed graph can satisfy an underspecified target. An
+    observation missing stereo requested by the target supplies connectivity
+    evidence only. Opposite assignments at a shared stereoelement conflict.
+    """
+    target = Chem.MolFromSmiles(expected)
+    product = Chem.MolFromSmiles(observed)
+    if target is None or product is None or not target.GetNumAtoms() or not product.GetNumAtoms():
+        return "absent"
+    for molecule in (target, product):
+        for atom in molecule.GetAtoms():
+            atom.SetAtomMapNum(0)
+    if Chem.MolToSmiles(target) == Chem.MolToSmiles(product):
+        return "exact"
+    def constitution(molecule: Chem.Mol) -> str:
+        copy = Chem.Mol(molecule)
+        Chem.RemoveStereochemistry(copy)
+        # Isomeric serialization still distinguishes isotope mass numbers.
+        return Chem.MolToSmiles(copy, isomericSmiles=True)
+
+    if constitution(target) != constitution(product):
+        return "absent"
+    params = Chem.SubstructMatchParameters()
+    params.useChirality = True
+    if product.HasSubstructMatch(target, params):
+        return "stereo_relaxed"
+    params.specifiedStereoQueryMatchesUnspecified = True
+    return "connectivity_only" if product.HasSubstructMatch(target, params) else "absent"
 
 
 @dataclass(frozen=True)
@@ -514,6 +549,7 @@ __all__ = [
     "apply_forward_operator",
     "apply_reaction_smarts",
     "canonical_molecule_collection",
+    "operator_stereo_match",
     "clear_operator_application_cache",
     "precursor_pattern_tokens",
     "reverse_recovers_precursors",

@@ -7,6 +7,7 @@ from typing import Any, Mapping
 
 from rdkit import Chem
 
+from .chemistry.reaction_smiles import split_reaction_fields
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_parser import parse_reaction_smiles
 
@@ -105,7 +106,7 @@ def aromatic_leaving_handle_variant(
         for reference, atom in ((leaving, root), (center, anchor))
     ):
         return None
-    parts = reaction_smiles.split(">")
+    parts = split_reaction_fields(reaction_smiles)
     if len(parts) != 3:
         return None
     if root.GetAtomMapNum():

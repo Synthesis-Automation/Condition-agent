@@ -47,7 +47,7 @@ class FullScaleBuildConfig:
     core_admission_policy: CoreAdmissionPolicyName = "pass_only"
     max_precedents_per_template: int = 8
     max_rows_per_shard: int | None = None
-    definition_id: str = "full_scale_operator_build.v3"
+    definition_id: str = "full_scale_operator_build.v4"
 
     @property
     def config_id(self) -> str:

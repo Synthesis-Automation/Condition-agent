@@ -16,6 +16,7 @@ from condition_registry.models import ResolvedConditionRecipe
 from condition_registry.recipe_evidence import (
     RecipeComparison, compare_evidence_recipes, normalize_evidence_recipe,
 )
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy.fragment_search import indexed_product
 from reactive_taxonomy.shared_reaction_core import LEVELS
 from reactive_taxonomy.step_precedent_context import StepContextComparison, build_step_context
@@ -104,7 +105,7 @@ def _reported_outcome(
     precedent: ReactionPrecedentEvidence, raw: tuple[dict, ...], threshold: float,
 ) -> tuple[str, float | None, set[str]]:
     """Interpret a yield only for the specified source target and measurement basis."""
-    target = indexed_product(precedent.reaction_smiles.split(">")[-1])[0]
+    target = indexed_product(split_reaction_fields(precedent.reaction_smiles)[-1])[0]
     values: set[float] = set()
     trace = invalid = False
     warnings: set[str] = set()

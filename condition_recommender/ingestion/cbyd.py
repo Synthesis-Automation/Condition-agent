@@ -18,6 +18,8 @@ from pathlib import Path, PurePosixPath
 from tempfile import TemporaryDirectory
 from typing import Any, Callable
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
+
 from .adapters.base import observation_id, supplied_mapping_status
 from .artifacts import PreprocessingCancelled, PreprocessingProgress, _sha256
 from .models import (
@@ -99,7 +101,7 @@ def _reference(background: dict[str, Any]) -> str:
 
 
 def _reaction_parts(value: str) -> tuple[str, str, str] | None:
-    parts = re.split(r"(?<!-)>(?!-)", value)
+    parts = split_reaction_fields(value)
     if len(parts) == 3 and parts[0] and parts[2]:
         return parts[0], parts[1], parts[2]
     return None

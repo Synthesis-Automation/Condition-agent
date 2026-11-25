@@ -21,6 +21,7 @@ import zstandard
 from rdkit import Chem, rdBase
 from rdkit.Chem import rdSubstructLibrary
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy.fragment_search import (
     fragment_search_policy, indexed_product, project_fragment_evidence,
 )
@@ -208,7 +209,7 @@ def build_fragment_index(
                 counts["source_screen_excluded"] += 1
                 continue
             raw = str(record.get("reaction_smiles") or "")
-            parts = raw.split(">")
+            parts = split_reaction_fields(raw)
             if len(parts) != 3:
                 counts["invalid_reactions"] += 1
                 continue

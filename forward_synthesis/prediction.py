@@ -21,6 +21,7 @@ from reactive_taxonomy import (
     featurize_reaction,
     reverse_recovers_precursors,
 )
+from reactive_taxonomy.reaction_operators import operator_stereo_match
 
 from .library import indexed_forward_operators
 from .condition_profiles import (
@@ -544,27 +545,12 @@ def predict_products(
     )
 
 
-def _without_stereo(smiles: str) -> Optional[str]:
-    molecule = Chem.MolFromSmiles(smiles)
-    if molecule is None:
-        return None
-    Chem.RemoveStereochemistry(molecule)
-    return Chem.MolToSmiles(molecule, canonical=True, isomericSmiles=False)
-
-
-def _match_kind(expected: str, candidate: str) -> str:
-    if expected == candidate:
-        return "exact"
-    if _without_stereo(expected) == _without_stereo(candidate):
-        return "stereo_relaxed"
-    return "absent"
-
-
 def _forward_validity_checks(
     *,
     blind: ForwardPredictionResult,
     targeted_status: str,
     matched: ForwardProductCandidate | None,
+    match_kind: str,
     best_competitor: ForwardProductCandidate | None,
     margin: float | None,
     score_band_width: float,
@@ -590,6 +576,10 @@ def _forward_validity_checks(
         "not_reproduced": (
             "fail",
             "The proposed operator did not reproduce the intended product.",
+        ),
+        "stereo_unresolved": (
+            "warning",
+            "The proposed operator reproduced the constitution with incomplete target stereochemistry.",
         ),
         "operator_hint_not_found": (
             "not_evaluated",
@@ -644,8 +634,12 @@ def _forward_validity_checks(
             (
                 ForwardValidityCheck(
                     check_id="blind_target_recovery",
-                    status="pass",
-                    detail=f"Blind forward search recovered the target at rank {matched.rank}.",
+                    status="warning" if match_kind == "connectivity_only" else "pass",
+                    detail=(
+                        f"Rank {matched.rank} reproduces the constitution with unresolved target stereochemistry."
+                        if match_kind == "connectivity_only"
+                        else f"Blind forward search recovered the target at rank {matched.rank}."
+                    ),
                 ),
                 ForwardValidityCheck(
                     check_id="reaction_signature",
@@ -809,7 +803,7 @@ def assess_proposed_step(
     if operator_hint and not hinted:
         targeted_status = "operator_hint_not_found"
     elif hinted:
-        targeted_matches = []
+        targeted_matches = set()
         for operator in hinted:
             for outcome in apply_forward_operator(
                 operator,
@@ -818,32 +812,27 @@ def assess_proposed_step(
                 max_outcomes=max_outcomes_per_operator,
                 allow_self_reaction=include_self_reactions,
             ):
-                if _match_kind(canonical_target, outcome.product_smiles) != "absent":
-                    targeted_matches.append(outcome)
-        targeted_status = (
-            "structurally_reproduced" if targeted_matches else "not_reproduced"
-        )
+                targeted_matches.add(operator_stereo_match(canonical_target, outcome.product_smiles))
+        if targeted_matches.intersection(("exact", "stereo_relaxed")):
+            targeted_status = "structurally_reproduced"
+        elif "connectivity_only" in targeted_matches:
+            targeted_status = "stereo_unresolved"
+        else:
+            targeted_status = "not_reproduced"
     else:
         targeted_status = "not_requested"
-    matched = tuple(
-        candidate
-        for candidate in blind.candidates
-        if _match_kind(canonical_target, candidate.product_smiles) != "absent"
-    )
-    match_kind = (
-        _match_kind(canonical_target, matched[0].product_smiles)
-        if matched
-        else "absent"
-    )
-    intended_rank = matched[0].rank if matched else None
-    competitors = tuple(
-        candidate
-        for candidate in blind.candidates
-        if _match_kind(canonical_target, candidate.product_smiles) == "absent"
-    )
-    best_competitor = competitors[0] if competitors else None
+    by_match = defaultdict(list)
+    for candidate in blind.candidates:
+        by_match[operator_stereo_match(canonical_target, candidate.product_smiles)].append(candidate)
+    match_kind = next((kind for kind in ("exact", "stereo_relaxed", "connectivity_only") if by_match[kind]), "absent")
+    matched = by_match[match_kind][0] if match_kind != "absent" else None
+    intended_rank = matched.rank if matched else None
+    competitors = list(by_match["absent"])
+    if match_kind in {"exact", "stereo_relaxed"}:
+        competitors.extend(by_match["connectivity_only"])
+    best_competitor = min(competitors, key=lambda item: item.rank, default=None)
     margin = (
-        round(matched[0].score - best_competitor.score, 8)
+        round(matched.score - best_competitor.score, 8)
         if matched and best_competitor is not None
         else None
     )
@@ -863,7 +852,7 @@ def assess_proposed_step(
         disposition = "condition_incompatible"
     elif not blind.candidates:
         disposition = "out_of_scope"
-    elif not matched:
+    elif not matched or match_kind == "connectivity_only" or targeted_status == "stereo_unresolved":
         disposition = "unsupported"
     elif intended_rank == 1 and (
         best_competitor is None
@@ -876,6 +865,8 @@ def assess_proposed_step(
     warnings = []
     if disposition == "competitive":
         warnings.append("COMPETING_FORWARD_PRODUCTS")
+    elif match_kind == "connectivity_only" or targeted_status == "stereo_unresolved":
+        warnings.append("INTENDED_PRODUCT_STEREOCHEMISTRY_UNRESOLVED")
     elif disposition == "unsupported":
         warnings.append("INTENDED_PRODUCT_NOT_FOUND_BY_BLIND_FORWARD_SEARCH")
     elif disposition == "structurally_inconsistent":
@@ -897,7 +888,8 @@ def assess_proposed_step(
     checks = _forward_validity_checks(
         blind=blind,
         targeted_status=targeted_status,
-        matched=matched[0] if matched else None,
+        matched=matched,
+        match_kind=match_kind,
         best_competitor=best_competitor,
         margin=margin,
         score_band_width=policy.score_band_width,

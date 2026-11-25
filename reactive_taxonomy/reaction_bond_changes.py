@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
+from .chemistry.reaction_smiles import split_reaction_fields
 
 
 def _mapped_bonds(side: str) -> Dict[Tuple[int, int], str]:
@@ -20,11 +21,10 @@ def _mapped_bonds(side: str) -> Dict[Tuple[int, int], str]:
 
 
 def supplied_map_bond_changes(reaction_smiles: str) -> List[Dict[str, Any]]:
-    if ">>" in reaction_smiles: left, right = reaction_smiles.split(">>", 1)
-    else:
-        parts = reaction_smiles.split(">")
-        if len(parts) != 3: return []
-        left, right = parts[0], parts[2]
+    parts = split_reaction_fields(reaction_smiles)
+    if len(parts) != 3:
+        return []
+    left, _, right = parts
     reactant, product = _mapped_bonds(left), _mapped_bonds(right)
     changes: List[Dict[str, Any]] = []
     for pair in sorted(set(reactant) | set(product)):

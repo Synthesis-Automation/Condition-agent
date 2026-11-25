@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 import json
 from typing import Any, Sequence
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy import featurize_reaction
 from reactive_taxonomy.precedent_transfer import review_precedent_transfer
 
@@ -49,9 +50,9 @@ def compare_condition_evidence(
     analysis = featurize_reaction(reaction_smiles)
     query = asdict(analysis.reaction_signature) if analysis.reaction_signature else None
     rows = []
-    proposed_parts = reaction_smiles.split(">")
+    proposed_parts = split_reaction_fields(reaction_smiles)
     for row in precedents:
-        recorded_parts = row.reaction_smiles.split(">")
+        recorded_parts = split_reaction_fields(row.reaction_smiles)
         transfer_review = review_precedent_transfer(
             proposed_parts[0] if len(proposed_parts) == 3 else "",
             proposed_parts[2] if len(proposed_parts) == 3 else "",
