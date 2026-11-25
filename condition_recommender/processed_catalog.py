@@ -15,10 +15,12 @@ from typing import Any, Iterable, Callable
 import zstandard
 
 from reactive_taxonomy.shared_core_graph import shared_core_availability
+from reactive_taxonomy.chemistry.source_mapping import SOURCE_MAPPING_SCREEN_VERSION
 from reactive_taxonomy.shared_reaction_core import build_shared_reaction_core, shared_core_definition_hash
 
 from .conversion.atomic import atomic_output_path
 from .conversion.identities import canonical_reaction_identity
+from .conversion.source_evidence import structural_search_exclusions
 from .corpus_io import canonical_source_files, file_sha256
 from .record_storage import iter_record_events, json_bytes
 
@@ -161,7 +163,12 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                         encode(row)))
                     counts["observations"] += 1
                     smiles = str(row.get("reaction_smiles") or "")
-                    identity = exact_key(smiles)
+                    excluded = structural_search_exclusions({
+                        **row, "source": source_row, "admission_reasons": restore(row.get("admission_reasons")),
+                    })
+                    if excluded:
+                        counts["source_screen_excluded"] += 1
+                    identity = None if excluded else exact_key(smiles)
                     keys = [("whole_reaction", identity)] if identity else []
                     if identity and include_local_cores:
                         levels, limits = local_keys(row, smiles)
@@ -189,10 +196,12 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
             local_hash = shared_core_definition_hash() if include_local_cores else None
             availability = shared_core_availability().fingerprint if include_local_cores else None
             catalog_id = hashlib.sha256(json_bytes(
-                [file_sha256(Path(source)), CATALOG_SCHEMA_VERSION, local_hash, availability]
+                [file_sha256(Path(source)), CATALOG_SCHEMA_VERSION, local_hash, availability,
+                 SOURCE_MAPPING_SCREEN_VERSION]
             )).hexdigest()
             report = {"schema_version": CATALOG_SCHEMA_VERSION, "build_complete": True,
                       "catalog_id": catalog_id,
+                      "source_mapping_screen": SOURCE_MAPPING_SCREEN_VERSION,
                       "experiment_local_core_definition": local_hash,
                       "experiment_local_core_availability": availability,
                       "local_core_limit_reasons": dict(sorted(local_core_limit_reasons.items())),
@@ -297,6 +306,37 @@ class ProcessedCatalog:
             value = {k: v for k, v in value.items() if k in selected}
         return self.restore(value)
 
+    def source_step_dispositions(self, dataset: str | None = None) -> Iterator[tuple[str, str, tuple[str, ...]]]:
+        """Stream source occurrence IDs and structural exclusions without loading whole procedures."""
+        with closing(self._connect()) as db:
+            def unwrap(value: Any) -> Any:
+                if isinstance(value, dict) and set(value) == {"$reaction_object"}:
+                    encoded = db.execute("SELECT payload FROM objects WHERE id=?",
+                                         (value["$reaction_object"],)).fetchone()
+                    if encoded is None:
+                        raise ValueError("Canonical source assessment refers to a missing object")
+                    return self._decode(encoded[0])
+                return value
+
+            query = "SELECT id,reaction_id,payload FROM observations"
+            if dataset is not None:
+                query += " WHERE source_dataset=?"
+            for oid, rid, payload in db.execute(query + " ORDER BY id", () if dataset is None else (dataset,)):
+                record = self._decode(payload)
+                raw_source = unwrap(record.get("source"))
+                source = raw_source if isinstance(raw_source, Mapping) else {}
+                # Only the source assessment participates in the decision. Other nested
+                # source objects (such as complete procedures) can be much larger.
+                assessment = unwrap(source.get("source_transfer_assessment"))
+                if isinstance(assessment, Mapping):
+                    mapping = unwrap(assessment.get("mapping"))
+                    if isinstance(mapping, Mapping):
+                        mapping = {"issues": self.restore(mapping.get("issues"))}
+                    assessment = {"mapping": mapping}
+                record["source"] = {"source_transfer_assessment": assessment, "source_dataset": source.get("source_dataset")}
+                record["admission_reasons"] = self.restore(record.get("admission_reasons"))
+                yield oid, rid, structural_search_exclusions(record)
+
     def experiment_candidates(
         self, reaction_smiles: str, *, fragment_index: str | Path | None = None,
         limit: int = 128, include_analogues: bool = False,
@@ -366,9 +406,13 @@ class ProcessedCatalog:
             # multiplicity are verified below, including for multi-product steps.
             product_key, _ = indexed_product(products[0])
             scan_limit = min(512, 4 * limit)
+            base_scope = (
+                "AND NOT EXISTS (SELECT 1 FROM supplemental_observations s WHERE s.id=links.observation_id) "
+                if "supplemental_evidence_catalog" in fragment else ""
+            )
             occurrences = fragment_db.execute(
                 "SELECT observation_id FROM links WHERE side='product' AND product_id="
-                "(SELECT id FROM products WHERE smiles=?) ORDER BY rowid LIMIT ?",
+                "(SELECT id FROM products WHERE smiles=?) " + base_scope + "ORDER BY rowid LIMIT ?",
                 (product_key, scan_limit + 1),
             ).fetchall()
             capped = len(occurrences) > scan_limit

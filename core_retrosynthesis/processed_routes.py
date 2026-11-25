@@ -269,7 +269,7 @@ def build_processed_route_catalog(
 def build_route_bundle_catalog(
     bundles: Sequence[tuple[str | Path, str | Path]], destination: str | Path, *,
     workers: int = 1, progress: Callable[[dict[str, Any]], None] | None = None,
-    reuse_release: str | Path | None = None,
+    reuse_release: str | Path | None = None, evidence_catalog: str | Path | None = None,
 ) -> dict[str, Any]:
     """Build one atomic, resumable catalog over ordered, independently scoped route sources."""
     if not bundles or workers < 1:
@@ -278,7 +278,12 @@ def build_route_bundle_catalog(
     output.parent.mkdir(parents=True, exist_ok=True)
     pairs = [(Path(routes).resolve(), Path(steps).resolve()) for routes, steps in bundles]
     hashes = [(file_sha256(routes), file_sha256(steps)) for routes, steps in pairs]
-    binding = hashlib.sha256(json.dumps([ROUTE_CATALOG_VERSION, hashes]).encode()).hexdigest()
+    inputs = [ROUTE_CATALOG_VERSION, hashes]
+    if evidence_catalog is not None:
+        from reactive_taxonomy.chemistry.source_mapping import SOURCE_MAPPING_SCREEN_VERSION
+
+        inputs.extend((SOURCE_MAPPING_SCREEN_VERSION, file_sha256(evidence_catalog)))
+    binding = hashlib.sha256(json.dumps(inputs).encode()).hexdigest()
     if output.is_file():
         with closing(sqlite3.connect(output.as_uri() + "?mode=ro", uri=True)) as existing:
             report = json.loads(existing.execute("SELECT payload FROM metadata").fetchone()[0])
@@ -373,6 +378,10 @@ def build_route_bundle_catalog(
                   "bundles": bundle_reports, "unresolved_reasons": reasons, "missing_memberships": missing,
                   "ambiguous_step_aliases": ambiguous, "conflicting_memberships": conflicts,
                   "composite_promotion": "unavailable_no_declared_training_scope_or_independent_support_review"}
+        if evidence_catalog is not None:
+            from .route_step_screen import apply_route_step_screen
+
+            apply_route_step_screen(db, Path(evidence_catalog), report)
         db.execute("CREATE TABLE IF NOT EXISTS metadata(payload TEXT NOT NULL)")
         db.execute("DELETE FROM metadata")
         db.execute("INSERT INTO metadata VALUES (?)", (json.dumps(report, sort_keys=True),))
@@ -425,6 +434,18 @@ class ProcessedRouteCatalog:
                 if position is not None:
                     member.update(source_row_number=position, expected_observation_id=expected)
                 memberships.append(member)
+            if not legacy and db.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='route_step_screen'"
+            ).fetchone():
+                screened = {oid: (disposition, json.loads(reasons)) for oid, disposition, reasons in db.execute(
+                    """SELECT x.observation_id,x.disposition,x.reasons FROM route_steps s JOIN route_step_screen x
+                       ON s.reaction_id=x.reaction_id AND s.expected_obs=x.observation_id WHERE s.route_id=?""",
+                    (identity,),
+                )}
+                for member in memberships:
+                    screen = screened.get(member.get("expected_observation_id"))
+                    if screen:
+                        member.update(structural_disposition=screen[0], structural_exclusion_reasons=screen[1])
         result = {"route_id": identity, "status": row[0], "unresolved_reason": row[1],
                   "memberships": memberships, "tree_available": row[3] is not None,
                   "publisher_graph_available": bool(row[5]),

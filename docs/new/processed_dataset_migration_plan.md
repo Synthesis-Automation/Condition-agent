@@ -572,3 +572,20 @@ checks cannot reconstruct the tree. The step converter records paired
 identifier evidence, mapped atom contributions, outcome scope and reasons
 for retaining a recipe for review. Route connectivity and recipe admission
 are assessed independently.
+
+### Screened CbyD reference data (2026-11-25)
+
+The local curated package combines the older corpus with 54,317 CbyD steps
+for structural precedent search, adding 42,293 distinct product structures.
+The step ledger records 1,855 quarantined occurrences and 468 further
+occurrences available for source lookup. The combined route catalog exposes
+the disposition and reasons at each original CbyD position. A gap prevents
+whole-route qualification. [Usage and query examples](../../datasets/processed_datasets/curation/cbyd-v2026.11/README.md)
+
+The full-reference CbyD operator library has 4,626 operators supported by
+40,705 screened steps. The active condition index uses the older trusted
+corpus. The CbyD condition review queue is development-only and records
+independent mapping checks, registry rechecks and source procedure evidence.
+Use partition-specific libraries for held-out evaluation.
+[Operator audit](../../datasets/processed_datasets/curation/cbyd-v2026.11/retrosynthesis/full/screening_audit.json) ·
+[Condition review](../../datasets/processed_datasets/curation/cbyd-v2026.11/conditions/README.md)

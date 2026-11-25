@@ -297,6 +297,17 @@ def capture_baseline(
                     columns = {row[1] for row in connection.execute("PRAGMA table_info(metadata)")}
                     if "payload" in columns:
                         value["metadata"] = [json.loads(row[0]) for row in connection.execute("SELECT payload FROM metadata")]
+    fragment = identities.get("fragment_index", {})
+    if any("supplemental_evidence_catalog" in item for item in fragment.get("metadata", ())):
+        from condition_recommender.fragment_index import bound_evidence_catalog_paths
+
+        for position, path in enumerate(bound_evidence_catalog_paths(fragment["path"])):
+            name = f"fragment_source_catalog_{position}"
+            if name in paths and paths[name].resolve() != path:
+                raise ValueError(f"Conflicting source catalog for combined fragment index: {name}")
+            if path not in fingerprints:
+                fingerprints[path] = artifact_identity(path, cache=cache)
+            identities[name] = dict(fingerprints[path])
     report("validating")
     baseline = {
         "schema_version": BASELINE_SCHEMA,

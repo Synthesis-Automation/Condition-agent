@@ -108,7 +108,7 @@
 {"aliases":[{"type":"abbreviation","value":"NaH"}],"cas":"7646-69-7","id":"cas:7646-69-7","name":"Sodium hydride (60% dispersion in mineral oil)","roles":["base"],"smiles":"[HH]"}
 {"aliases":[{"type":"abbreviation","value":"NaHCO3"}],"cas":"144-55-8","id":"cas:144-55-8","name":"Sodium hydrogen carbonate","roles":["base"],"smiles":"O=C(O)O"}
 {"aliases":[{"type":"abbreviation","value":"NaOH"}],"cas":"1310-73-2","id":"cas:1310-73-2","name":"Sodium hydroxide","roles":["base"],"smiles":"[Na+].[OH-]"}
-{"aliases":[{"type":"abbreviation","value":"NaOMe"}],"cas":"124-41-4","id":"cas:124-41-4","name":"Sodium methoxide","roles":["base"],"smiles":"CO"}
+{"aliases":[{"type":"abbreviation","value":"NaOMe"}],"cas":"124-41-4","id":"cas:124-41-4","name":"Sodium methoxide","roles":["base"],"smiles":"C[O-].[Na+]"}
 {"aliases":[{"type":"abbreviation","value":"NaOtBu"}],"cas":"865-48-5","id":"cas:865-48-5","name":"Sodium tert-butoxide","roles":["base"],"smiles":"CC(C)(C)O"}
 {"aliases":[{"type":"abbreviation","value":"TMSONa"}],"cas":"18027-10-6","id":"cas:18027-10-6","name":"Sodium trimethylsilanolate","roles":["base"]}
 {"aliases":[{"type":"abbreviation","value":"TMEDA"}],"cas":"110-18-9","id":"cas:110-18-9","name":"TMEDA","roles":["base","ligand"],"smiles":"CN(C)CCN(C)C"}
@@ -19472,7 +19472,7 @@
 {"cas":"76649-16-6","id":"cas:76649-16-6","name":"ethyl trans-4-decenoate","smiles":"CCCCCC=CCCC(=O)OCC"}
 {"cas":"515-84-4","id":"cas:515-84-4","name":"Ethyl trichloroacetate","smiles":"CCOC(=O)C(Cl)(Cl)Cl"}
 {"cas":"28267-29-0","id":"cas:28267-29-0","name":"Ethyl Tridecanoate","smiles":"CCCCCCCCCCCCC(=O)OCC"}
-{"cas":"383-63-1","id":"cas:383-63-1","name":"Ethyl trifluoroacetate","smiles":"CCOC(=O)C(F)(F)F"}
+{"aliases":[{"type":"abbreviation","value":"CF3CO2Et"}],"cas":"383-63-1","id":"cas:383-63-1","name":"Ethyl trifluoroacetate","smiles":"CCOC(=O)C(F)(F)F"}
 {"cas":"425-75-2","id":"cas:425-75-2","name":"Ethyl trifluoromethanesulphonate","smiles":"CCOS(=O)(=O)C(F)(F)F"}
 {"cas":"13081-18-0","id":"cas:13081-18-0","name":"ethyl trifluoropyruvate","smiles":"CCOC(=O)C(=O)C(F)(F)F"}
 {"cas":"3938-95-2","id":"cas:3938-95-2","name":"Ethyl trimethylacetate","smiles":"CCOC(=O)C(C)(C)C"}

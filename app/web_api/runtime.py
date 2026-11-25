@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import ChainMap
 import os
 import sqlite3
 import time
@@ -1350,6 +1351,17 @@ class LocalRecommendationRuntime:
         )
         index_path = self._index_path(request.library_mode)
         reference_catalog = self._get_reference_catalog(index_path)
+        operator_source = self._retrosynthesis_library_path(request.library_mode)
+        if (
+            self._operator_release is not None
+            and self._operator_release is not self._processed_release
+            and "evidence_catalog" in self._operator_release.manifest["artifacts"]
+        ):
+            operator_source = self._operator_release.artifact("evidence_catalog")
+        if operator_source.parent != index_path.parent:
+            reference_catalog = ChainMap(
+                self._get_reference_catalog(operator_source), reference_catalog,
+            )
         templates = {template.template_id: template for template in library.templates}
         forward_library = None
         forward_setup_warning = None

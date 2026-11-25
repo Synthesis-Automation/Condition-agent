@@ -18,7 +18,7 @@ from .record_storage import STORAGE_SCHEMA_VERSION
 DEFAULT_INPUT_ROOT = Path("datasets/intermediate_datasets")
 DEFAULT_OUTPUT_ROOT = Path("datasets/processed_datasets")
 RELEASE_SCHEMA_VERSION = "processed_reaction_release.v1"
-PIPELINE_GENERATION = "processed_pipeline.v5"
+PIPELINE_GENERATION = "processed_pipeline.v6"
 ROUTE_ARCHIVE = "routes.source.jsonl.gz"
 ROUTE_STEPS = "route_steps.observations.jsonl.gz"
 

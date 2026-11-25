@@ -189,6 +189,46 @@ def test_literature_raw_chemistry_and_repeated_edges_cannot_silently_qualify():
         normalize_released_route(route)
 
 
+@pytest.mark.parametrize(("issues", "signature", "disposition"), [
+    ([], True, "structural_precedent"),
+    ([], False, "source_lookup_only"),
+    (["source_mapped_products_disagree"], True, "quarantined"),
+    (None, True, "quarantined"),
+])
+def test_screen_preserves_route_positions_and_blocks_trees_across_gaps(
+    tmp_path, issues, signature, disposition,
+):
+    from condition_recommender.processed_catalog import build_processed_catalog
+    from condition_recommender.record_storage import write_object_records
+
+    wrapper = _literature_wrapper()
+    members = wrapper["step_memberships"]
+    routes, steps, evidence, records, output = [tmp_path / p for p in
+        ("route.gz", "steps.gz", "evidence.sqlite", "records.jsonl", "routes.sqlite")]
+    _write(routes, [wrapper])
+    _write(steps, [{"observation_id": m["observation_id"], "source": m} for m in members])
+    rows = []
+    for i, member in enumerate(members):
+        mapping = issues if i == 0 else []
+        assessment = {"mapping": {"issues": mapping}} if mapping is not None else None
+        rows.append({"observation_id": member["observation_id"], "reaction_id": member["source_record_id"],
+                     "source_dataset": "cbyd", "source": {"source_transfer_assessment": assessment},
+                     "reaction_signature": {"id": "signature"} if signature or i else None,
+                     "admission_reasons": ["partial_atom_mapping", "source_model_mapping_requires_review"]})
+    with records.open("w", encoding="utf-8") as stream:
+        write_object_records(stream, rows)
+    build_processed_catalog(records, evidence)
+    build_route_bundle_catalog([(routes, steps)], output, evidence_catalog=evidence)
+    catalog = ProcessedRouteCatalog(output)
+    route = catalog.route(wrapper["route_id"], include_tree=True, include_source=True)
+    assert route["source"] == wrapper
+    assert [m["source_row_number"] for m in route["memberships"]] == [1, 2]
+    assert [m["structural_disposition"] for m in route["memberships"]] == [disposition, "structural_precedent"]
+    eligible = disposition == "structural_precedent"
+    assert ("tree" in route) == eligible
+    assert len(list(catalog.iter_trees())) == int(eligible)
+
+
 def test_unchanged_verified_legacy_catalog_can_seed_new_build(tmp_path, monkeypatch):
     from core_retrosynthesis import processed_routes
 

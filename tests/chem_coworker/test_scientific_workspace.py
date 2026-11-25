@@ -40,6 +40,36 @@ def test_create_captures_real_code_versions_registry_and_missing_inputs(tmp_path
     verify_baseline(baseline)
 
 
+def test_combined_fragment_workspace_pins_and_finds_excluded_source_by_id(tmp_path: Path) -> None:
+    from condition_recommender.fragment_index import build_fragment_index
+    from condition_recommender.processed_catalog import build_processed_catalog
+    from condition_recommender.screened_fragment_extension import extend_fragment_index
+
+    indexes = []
+    for dataset in ("older", "cbyd"):
+        folder = tmp_path / dataset
+        folder.mkdir()
+        row = {"observation_id": dataset, "source_dataset": dataset, "reaction_id": dataset,
+               "reaction_smiles": "CCBr>>CCO", "source": {}}
+        source = folder / "rows.jsonl"
+        source.write_text(json.dumps(row) + "\n", encoding="utf-8")
+        evidence = folder / "catalogs.sqlite"
+        build_processed_catalog(source, evidence)
+        indexes.append(folder / "fragment.sqlite")
+        build_fragment_index(source, indexes[-1], evidence_catalog=evidence)
+    directory = tmp_path / "combined"
+    extend_fragment_index(*indexes, directory)
+    workspace = ScientificWorkspace.create(
+        tmp_path / "workspace", objective="Verify exact occurrence provenance", repository=ROOT,
+        artifacts={"fragment_index": directory / "fragment_index.sqlite",
+                   "evidence_catalog": indexes[0].with_name("catalogs.sqlite")},
+    )
+    result = workspace.operations.get_observations(["cbyd", "older", "unknown"], ["source_dataset"])
+    assert [r["observation_id"] for r in result["records"]] == ["cbyd", "older"]
+    assert result["missing_observation_ids"] == ["unknown"]
+    assert workspace.operations._path("fragment_source_catalog_1") == directory / "catalogs.sqlite"
+
+
 @pytest.fixture
 def workspace(tmp_path: Path) -> ScientificWorkspace:
     baseline = {

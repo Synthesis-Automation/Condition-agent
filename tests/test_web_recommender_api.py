@@ -885,8 +885,12 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
     }
     runtime = LocalRecommendationRuntime(
         library_root=tmp_path,
-        retrosynthesis_library_root=tmp_path,
+        retrosynthesis_library_root=tmp_path / "operators",
     )
+    operator_mode = tmp_path / "operators" / "compact"
+    operator_mode.mkdir(parents=True)
+    with gzip.open(operator_mode / "reference_catalog.jsonl.gz", "wt", encoding="utf-8") as handle:
+        handle.write(json.dumps(reference) + "\n")
     monkeypatch.setattr(runtime, "_get_retrosynthesis_library", lambda mode: library)
     monkeypatch.setattr(
         runtime,
@@ -894,11 +898,6 @@ def test_local_retrosynthesis_returns_hits_before_condition_lookup(
         lambda **options: (_ for _ in ()).throw(
             AssertionError("condition lookup must not block retrosynthesis")
         ),
-    )
-    monkeypatch.setattr(
-        runtime,
-        "_get_reference_catalog",
-        lambda path: {"REF1:paper": reference},
     )
     search_options = {}
 

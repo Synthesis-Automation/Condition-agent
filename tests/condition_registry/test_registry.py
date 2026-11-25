@@ -13,6 +13,7 @@ from condition_registry import (
     validate_registry,
 )
 from condition_registry.normalization import normalize_cas
+from condition_registry.paired_identifiers import paired_identifier_evidence
 
 
 def _identifier(
@@ -51,6 +52,7 @@ def test_invalid_cas_is_not_silently_resolved() -> None:
     ("Pd(dppf)Cl2.CH2Cl2", "95464-05-4", "C35H30Cl4FeP2Pd", 816.64),
     ("potassium acetate", "127-08-2", "C2H3KO2", 98.14),
     ("potassium phosphate tribasic", "7778-53-2", "K3O4P", 212.27),
+    ("NaOMe", "124-41-4", "CH3NaO", 54.02),
 ])
 def test_planning_condition_identities_have_consistent_composition(query, cas, formula, mw) -> None:
     from rdkit import Chem
@@ -68,6 +70,35 @@ def test_planning_condition_identities_have_consistent_composition(query, cas, f
 
 def test_incorrect_dppf_stoichiometry_alias_is_not_resolved_to_dcm_adduct() -> None:
     assert resolve_identifier("Pd(dppf)2Cl2", identifier_type="name").status != "resolved"
+
+
+@pytest.mark.parametrize("name,smiles,status,substance_id", [
+    ("NaOMe", "[Na+].C[O-]", "corroborated", "cas:124-41-4"),
+    ("NaOMe", "CO", "conflict", None),
+    ("MeOH", "CO", "corroborated", "cas:67-56-1"),
+    ("MeOH", "C[O-].[Na+]", "conflict", None),
+])
+def test_methoxide_and_methanol_source_pairs(
+    name: str, smiles: str, status: str, substance_id: str | None,
+) -> None:
+    evidence = paired_identifier_evidence({"source_identifiers": [
+        {"identifier_type": "name", "value": name},
+        {"identifier_type": "smiles", "value": smiles},
+    ]})
+    assert evidence.status == status
+    assert evidence.corroborated_substance_id == substance_id
+
+
+def test_ethyl_trifluoroacetate_abbreviation_requires_matching_structure() -> None:
+    def compare(smiles: str):
+        return paired_identifier_evidence({"source_identifiers": [
+            {"identifier_type": "name", "value": "CF3CO2Et"},
+            {"identifier_type": "smiles", "value": smiles},
+        ]})
+
+    assert compare("CCOC(=O)C(F)(F)F").corroborated_substance_id == "cas:383-63-1"
+    assert compare("CCOC(=O)C").status == "conflict"
+    assert resolve_identifier("CF3CO2Et", identifier_type="name").substance.roles == ()
 
 
 @pytest.mark.parametrize("query,expected_id", [("acetic acid", "cas:64-19-7"),

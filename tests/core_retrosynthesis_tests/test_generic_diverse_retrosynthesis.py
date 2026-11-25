@@ -256,6 +256,39 @@ def test_missing_serialized_core_is_recomputed_only_when_verified() -> None:
     assert rejected.rejection_stage == "mapping"
 
 
+def test_source_screen_precedes_operator_round_trip_and_support() -> None:
+    row = {**_row("carbonyl_reduction"), "source_dataset": "cbyd",
+           "reaction_signature": {"signature_id": "fixture"}}
+    consistent = {"source_transfer_assessment": {"mapping": {"issues": []}}}
+    conflicting = {"source_transfer_assessment": {"mapping": {"issues": [
+        "source_product_atom_origin_unverified", "source_mapped_inputs_disagree",
+    ]}}}
+    records = [
+        {**row, "source": consistent, "reaction_id": "clean",
+         "admission_reasons": ["partial_atom_mapping", "source_model_mapping_requires_review"]},
+        {**row, "source": conflicting, "reaction_id": "conflict"},
+        {**row, "source": consistent, "reaction_signature": None, "reaction_id": "lookup"},
+        {**row, "reaction_id": "unassessed"},
+        {**_row("carbonyl_reduction"), "reaction_id": "older"},
+    ]
+    ledger = []
+    library = build_generic_library(records, admission_mode="data_driven", admission_callback=ledger.append)
+    assert library.accepted_observation_count == 2
+    assert {p.reaction_id for t in library.templates for p in t.precedents} == {"clean", "older"}
+    assert all(t.observation_support == 2 for t in library.templates)
+    rejected = {entry["reaction_id"]: entry for entry in ledger if entry["status"] == "rejected"}
+    assert {name: entry["reason"] for name, entry in rejected.items()} == {
+        "conflict": "source_mapping_conflict",
+        "lookup": "source_reaction_signature_unavailable",
+        "unassessed": "source_mapping_conflict",
+    }
+    assert all(entry["stage"] == "source" for entry in rejected.values())
+    assert rejected["conflict"]["diagnostics"] == {
+        "source_exclusions": ["source_mapped_inputs_disagree", "source_product_atom_origin_unverified"],
+        "recomputed_evidence": False,
+    }
+
+
 def test_product_index_preserves_results_and_reports_pruning() -> None:
     library = build_generic_library(
         (_row("carbonyl_reduction"), _row("carbonyl_condensation")),

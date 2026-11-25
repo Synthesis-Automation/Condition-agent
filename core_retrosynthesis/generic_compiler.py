@@ -14,6 +14,7 @@ from rdkit import Chem
 from rdchiral.main import rdchiralReactants, rdchiralReaction, rdchiralRun
 from rdchiral.template_extractor import extract_from_reaction
 
+from condition_recommender.conversion.source_evidence import structural_search_exclusions
 from reactive_taxonomy import featurize_reaction
 from reactive_taxonomy.reaction_identity_graphs import (
     product_edit_site_graph,
@@ -126,6 +127,8 @@ def _source_reaction(row: Dict[str, Any], observation: Dict[str, Any]) -> str:
 
 
 _REJECTION_STAGES = {
+    "source_mapping_conflict": "source",
+    "source_reaction_signature_unavailable": "source",
     "missing_source_reaction": "source",
     "atom_mapping_unavailable": "mapping",
     "materialized_analysis_invalid": "observation",
@@ -660,6 +663,15 @@ def compile_generic_templates(
         raise ValueError("levels must contain L0, L1, and/or L2")
     if admission_mode not in {"supported", "data_driven"}:
         raise ValueError("unsupported generic admission mode")
+
+    exclusions = structural_search_exclusions(row)
+    if exclusions:
+        reason = (
+            "source_reaction_signature_unavailable"
+            if exclusions == ("source_reaction_signature_unavailable",)
+            else "source_mapping_conflict"
+        )
+        return _rejection(reason, {"source_exclusions": list(exclusions), "recomputed_evidence": False})
 
     source_core = dict(row.get("reaction_core") or {})
     source_observation = _observation(row)

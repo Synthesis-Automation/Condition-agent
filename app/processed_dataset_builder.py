@@ -95,22 +95,24 @@ def build_processed_datasets(
 
     indexes = release / "indexes"
     indexes.mkdir(exist_ok=True)
+    availability = shared_core_availability().fingerprint
+    catalog_report = stage("catalogs", {"evidence_catalog": indexes / "catalogs.sqlite"},
+          lambda: build_processed_catalog(canonical, indexes / "catalogs.sqlite",
+                      progress=lambda event: emit("catalog_rows", report=event)), f"{CATALOG_SCHEMA_VERSION}/{availability}")
     route_sources = manifest["route_sources"]
     route_report = None
     if route_sources:
         pairs = [(item["path"], item["step_path"]) for item in route_sources]
         route_report = stage("routes", {"route_catalog": indexes / "route_catalog.sqlite"},
               lambda: build_route_bundle_catalog(pairs, indexes / "route_catalog.sqlite",
-                      workers=workers, progress=lambda event: emit("route_rows", report=event)), ROUTE_CATALOG_VERSION)
+                      workers=workers, evidence_catalog=indexes / "catalogs.sqlite",
+                      progress=lambda event: emit("route_rows", report=event)), ROUTE_CATALOG_VERSION,
+                      ("evidence_catalog",))
         for source_entry, result in zip(route_sources, route_report["bundles"], strict=True):
             for count in ("route_count", "observation_count"):
                 expected = source_entry.get("expected_" + count)
                 if expected is not None and result[count] != expected:
                     raise ValueError(f"Route bundle {count} differs from its intermediate manifest")
-    availability = shared_core_availability().fingerprint
-    catalog_report = stage("catalogs", {"evidence_catalog": indexes / "catalogs.sqlite"},
-          lambda: build_processed_catalog(canonical, indexes / "catalogs.sqlite",
-                      progress=lambda event: emit("catalog_rows", report=event)), f"{CATALOG_SCHEMA_VERSION}/{availability}")
     condition_report = stage("conditions", {"condition_index": indexes / "generic_index.sqlite"},
           lambda: build_sqlite_generic_index(iter_canonical_records(canonical), indexes / "generic_index.sqlite",
                                               progress_callback=lambda phase, count: emit("condition_" + phase, rows=count),
@@ -137,7 +139,7 @@ def build_processed_datasets(
     stage("operators", {
         "retro_library": release / "operators" / "retrosynthesis" / "operator_library_v3.json.gz",
         "forward_library": release / "operators" / "forward" / "forward_operator_library_v1.json.gz",
-    }, operators, "operators.v2")
+    }, operators, "operators.v3")
 
     load_shared_core_index(indexes / "generic_index.shared_core.sqlite", index)
     emit("validation", message="Checking complete source coverage and all canonical shard identities")

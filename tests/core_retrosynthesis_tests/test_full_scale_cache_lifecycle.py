@@ -8,6 +8,14 @@ import pytest
 from core_retrosynthesis import full_scale, generic_compiler
 
 
+def test_merge_rejects_pre_screen_shards_before_touching_output(tmp_path) -> None:
+    legacy = full_scale.FullScaleBuildConfig(definition_id="full_scale_operator_build.v2")
+    output = tmp_path / "screened"
+    with pytest.raises(ValueError, match="configuration mismatch"):
+        full_scale.merge_operator_shards([{"config_id": legacy.config_id}], output)
+    assert not output.exists()
+
+
 def test_shard_cleanup_preserves_compilation_and_reuse(tmp_path) -> None:
     source = tmp_path / "source.jsonl.gz"
     row = {"reaction_id": "reduction", "reaction_smiles": "CC=O>>CCO"}

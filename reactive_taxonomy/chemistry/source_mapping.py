@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import lru_cache
 import re
@@ -10,6 +11,19 @@ import re
 from rdkit import Chem
 
 from .rdkit_utils import parse_smiles
+
+
+SOURCE_MAPPING_SCREEN_VERSION = "source_mapping_screen.v1"
+_SOURCE_MAPPING_CONFLICTS = frozenset({
+    "source_mapping_unavailable_or_unreadable", "source_mapped_inputs_disagree",
+    "source_mapped_products_disagree", "source_duplicate_atom_maps",
+    "source_product_atom_origin_unverified",
+})
+
+
+def source_mapping_conflicts(reasons: Iterable[str]) -> tuple[str, ...]:
+    """Return source contradictions and missing map evidence that preclude transfer."""
+    return tuple(sorted(_SOURCE_MAPPING_CONFLICTS.intersection(reasons)))
 
 
 @dataclass(frozen=True)

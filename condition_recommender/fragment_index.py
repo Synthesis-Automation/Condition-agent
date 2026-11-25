@@ -24,6 +24,8 @@ from rdkit.Chem import rdSubstructLibrary
 from reactive_taxonomy.fragment_search import (
     fragment_search_policy, indexed_product, project_fragment_evidence,
 )
+from reactive_taxonomy.chemistry.source_mapping import SOURCE_MAPPING_SCREEN_VERSION
+from .conversion.source_evidence import structural_search_exclusions
 from .corpus_io import canonical_source_files, file_sha256, iter_canonical_records
 
 import sqlite3
@@ -142,6 +144,7 @@ def build_fragment_index(
             pending = json.loads(pending[0]) if pending else None
             if pending and pending.get("scan_complete"):
                 if (pending.get("sources") != identities or pending.get("policy") != policy
+                    or pending.get("source_mapping_screen") != SOURCE_MAPPING_SCREEN_VERSION
                     or pending.get("schema_version") != SCHEMA_VERSION
                     or pending.get("rdkit_version") != rdBase.rdkitVersion
                     or pending.get("requested_max_records") != max_records):
@@ -201,6 +204,9 @@ def build_fragment_index(
             identity = record.get("observation_id")
             if not isinstance(identity, str) or not identity:
                 raise ValueError("Canonical observation_id is required; reconvert this source")
+            if structural_search_exclusions(record):
+                counts["source_screen_excluded"] += 1
+                continue
             raw = str(record.get("reaction_smiles") or "")
             parts = raw.split(">")
             if len(parts) != 3:
@@ -218,6 +224,9 @@ def build_fragment_index(
             fields = ("observation_id", "reaction_id", "reference_id", "reaction_smiles",
                       "admission_tier", "admission_reasons", "evidence_quality") if evidence_catalog else _RECORD_FIELDS
             details = {key: record.get(key) for key in fields}
+            source_data = record.get("source")
+            if not evidence_catalog and isinstance(source_data, dict) and source_data.get("source_transfer_assessment"):
+                details["reaction_signature"] = record.get("reaction_signature")
             details["discovery_projection_sha256"] = hashlib.sha256(json.dumps(details, sort_keys=True).encode()).hexdigest()
             details["warnings"] = list((record.get("reaction_observation") or {}).get("warnings") or ())
             connection.execute("INSERT INTO observations VALUES (?,?,?,?)", (
@@ -268,6 +277,7 @@ def build_fragment_index(
                     "record_scope": "discovery_fields_not_complete_canonical_record",
                     "correspondence_scope": "validated_supplied_maps_only"}
         manifest["search_sides"] = ["product", "reactant"]
+        manifest["source_mapping_screen"] = SOURCE_MAPPING_SCREEN_VERSION
         manifest["counts"]["distinct_molecules"] = len(products)
         manifest["counts"]["distinct_products"] = connection.execute(
             "SELECT count(DISTINCT product_id) FROM links WHERE side='product'").fetchone()[0]
@@ -305,8 +315,8 @@ def open_fragment_index(path: str | Path) -> tuple[sqlite3.Connection, dict[str,
                 or manifest.get("rdkit_version") != rdBase.rdkitVersion
                 or manifest.get("policy") != fragment_search_policy()):
             raise ValueError("Fragment index is incompatible or incomplete; rebuild offline")
-        dependency = manifest.get("evidence_catalog")
-        if dependency:
+        for dependency in (manifest[key] for key in ("evidence_catalog", "supplemental_evidence_catalog")
+                           if key in manifest):
             catalog_path = (path.parent / dependency["relative_path"]).resolve()
             if not catalog_path.is_file() or catalog_path.stat().st_size != dependency["size_bytes"]:
                 raise ValueError("Fragment evidence catalog is missing or incompatible")
@@ -318,3 +328,12 @@ def open_fragment_index(path: str | Path) -> tuple[sqlite3.Connection, dict[str,
     except BaseException:
         connection.close()
         raise
+
+
+def bound_evidence_catalog_paths(index_path: str | Path) -> tuple[Path, ...]:
+    """Return the checked source catalogs in a single or combined fragment index."""
+    path = Path(index_path).resolve()
+    connection, manifest = open_fragment_index(path)
+    connection.close()
+    return tuple((path.parent / manifest[key]["relative_path"]).resolve()
+                 for key in ("evidence_catalog", "supplemental_evidence_catalog") if key in manifest)

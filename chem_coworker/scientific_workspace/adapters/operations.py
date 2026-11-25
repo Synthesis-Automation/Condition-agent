@@ -397,12 +397,26 @@ class ScientificOperations:
                     "resolved_recipe", "yield_pct", "chemistry_status", "condition_status", "admission_tier",
                     "admission_reasons", "warnings"]
         ids = list(dict.fromkeys(observation_ids))
-        catalog = ProcessedCatalog(self._path("evidence_catalog"))
+        paths = [self._path("evidence_catalog")]
+        artifacts = self.store.manifest["baseline"]["artifacts"]
+        fragment = artifacts.get("fragment_index", {})
+        if any("supplemental_evidence_catalog" in item for item in fragment.get("metadata", ())):
+            from condition_recommender.fragment_index import bound_evidence_catalog_paths
+
+            for position, path in enumerate(bound_evidence_catalog_paths(fragment["path"])):
+                if path != self._path(f"fragment_source_catalog_{position}").resolve():
+                    raise ValueError("Fragment source catalog differs from the pinned investigation")
+                paths.append(path)
+        catalogs = [ProcessedCatalog(path) for path in dict.fromkeys(paths)]
         records, missing, consumed, size = [], [], 0, 0
         for identity in ids[offset:offset + limit]:
-            try:
-                row = catalog.observation(identity, selected)
-            except KeyError:
+            for catalog in catalogs:
+                try:
+                    row = catalog.observation(identity, selected)
+                    break
+                except KeyError:
+                    continue
+            else:
                 missing.append(identity)
                 consumed += 1
                 continue

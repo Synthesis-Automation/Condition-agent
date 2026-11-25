@@ -47,7 +47,7 @@ class FullScaleBuildConfig:
     core_admission_policy: CoreAdmissionPolicyName = "pass_only"
     max_precedents_per_template: int = 8
     max_rows_per_shard: int | None = None
-    definition_id: str = "full_scale_operator_build.v2"
+    definition_id: str = "full_scale_operator_build.v3"
 
     @property
     def config_id(self) -> str:
@@ -334,6 +334,9 @@ def merge_operator_shards(
     """Merge shard artifacts with exact observation/reference deduplication."""
 
     settings = config or FullScaleBuildConfig()
+    config_id = settings.config_id
+    if any(manifest.get("config_id") != config_id for manifest in manifests):
+        raise ValueError("Operator shard build configuration mismatch; rebuild the affected shards")
     output = Path(output_directory)
     output.mkdir(parents=True, exist_ok=True)
     database_path = output / "support.sqlite3"

@@ -187,8 +187,8 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
         session.ensure_open()
         connection, manifest = session.connection, session.manifest
         stage("index_opened")
-        dependency = manifest.get("evidence_catalog")
-        catalog = ProcessedCatalog(Path(index_path).parent / dependency["relative_path"]) if dependency else None
+        catalogs = [ProcessedCatalog(Path(index_path).parent / manifest[key]["relative_path"])
+                    for key in ("evidence_catalog", "supplemental_evidence_catalog") if key in manifest]
         library = session.load_library()
         stage("library_loaded")
         status, reason = "complete", None
@@ -348,9 +348,17 @@ Supply target_smiles for target-derived queries; mismatches fail before index ac
             hit["transformation_key"] = "FT1:" + hashlib.sha256(transformation(hit).encode()).hexdigest()
             details = unpack(connection.execute("SELECT payload FROM observations WHERE id=?",
                                                  (hit["observation_id"],)).fetchone()[0])
+            catalog = catalogs[0] if catalogs else None
+            if len(catalogs) > 1 and connection.execute(
+                "SELECT 1 FROM supplemental_observations WHERE id=?", (hit["observation_id"],)
+            ).fetchone():
+                catalog = catalogs[1]
             if catalog:
                 from .fragment_index import _RECORD_FIELDS
                 details = catalog.observation(hit["observation_id"], _RECORD_FIELDS)
+                source_data = details.get("source")
+                if isinstance(source_data, dict) and source_data.get("source_transfer_assessment"):
+                    details.update(catalog.observation(hit["observation_id"], ("reaction_signature",)))
             hit["admission_tier"] = details.get("admission_tier")
             hit["admission_reasons"] = details.get("admission_reasons")
             hit["record"] = _text_chunks(details, [policy["max_procedure_characters"]])

@@ -3,15 +3,41 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import Any
 
 from condition_registry.models import ConditionComponentInput
 from condition_registry.paired_identifiers import paired_identifier_evidence
 from reactive_taxonomy.chemistry.source_mapping import (
-    SourceMappingEvidence, assess_source_mapping, source_material_graphs,
+    SourceMappingEvidence, assess_source_mapping, source_mapping_conflicts, source_material_graphs,
 )
 
 from .input_schema import RawReactionRecord
+
+
+def structural_search_exclusions(record: Mapping[str, Any]) -> tuple[str, ...]:
+    """Screen deposited graph pairs before analogue retrieval or operator learning.
+
+    Pass the hydrated canonical source field. Historical CbyD rows lacking the
+    source assessment require review. Other corpora without paired source
+    representations retain their established structural admission policy.
+    """
+    source_value = record.get("source")
+    source = source_value if isinstance(source_value, Mapping) else {}
+    assessment = source.get("source_transfer_assessment")
+    if assessment is None and "cbyd" not in (record.get("source_dataset"), source.get("source_dataset")):
+        return ()
+    mapping = assessment.get("mapping") if isinstance(assessment, Mapping) else None
+    issues = mapping.get("issues") if isinstance(mapping, Mapping) else None
+    if not isinstance(issues, (tuple, list)) or not all(isinstance(issue, str) for issue in issues):
+        issues = ("source_mapping_unavailable_or_unreadable",)
+    admitted = record.get("admission_reasons")
+    flattened = admitted if isinstance(admitted, (list, tuple)) else ()
+    conflicts = source_mapping_conflicts((*issues, *flattened))
+    if conflicts:
+        return conflicts
+    return () if record.get("reaction_signature") else ("source_reaction_signature_unavailable",)
 
 
 @dataclass(frozen=True)
