@@ -29,7 +29,7 @@ from .row_io import iter_rows
 
 DEFAULT_OBSERVED_ROUTE_DATASET_ID = "higher_level_retrosynthesis_figshare_v2"
 DEFAULT_OBSERVED_ROUTE_SAMPLE_SEED = 20_260_814
-ROUTE_CONVERTER_VERSION = "1.0"
+ROUTE_CONVERTER_VERSION = "1.1"
 
 
 class ObservedRouteConversionError(ValueError):
@@ -66,12 +66,25 @@ def _required_string_list(source: Mapping[str, Any], key: str) -> tuple[str, ...
 def build_observed_route_tree(
     record: Mapping[str, Any],
     *,
-    source_dataset_id: str = DEFAULT_OBSERVED_ROUTE_DATASET_ID,
+    source_dataset_id: str | None = None,
 ) -> ReactionRouteTree:
     """Build one observed route tree without trusting source step order."""
 
     route_id = _required_string(record, "route_id")
-    patent_id = _required_string(record, "patent_id")
+    literature = record.get("source_kind") == "literature"
+    if literature:
+        dataset = _required_string(record, "source_dataset_id")
+        if source_dataset_id is not None and dataset != source_dataset_id:
+            raise ObservedRouteConversionError("source_dataset_mismatch", route_id)
+        source_dataset_id = dataset
+        source_reference = _required_string(record, "source_reference")
+        patent_id = None
+    else:
+        source_dataset_id = source_dataset_id or DEFAULT_OBSERVED_ROUTE_DATASET_ID
+        source_reference = None
+        patent_id = _required_string(record, "patent_id")
+    connectivity = ("canonical_identity_verified_against_publisher_graph" if literature
+                    else "reconstructed_from_canonical_molecule_identity")
     target_smiles = _required_string(record, "target_smiles")
     split = _required_string(record, "split")
     steps_value = record.get("steps")
@@ -161,9 +174,8 @@ def build_observed_route_tree(
             source_route_id=route_id,
             source_reaction_id=source_reaction_id,
             patent_id=patent_id,
-            connectivity_method=(
-                "reconstructed_from_canonical_molecule_identity"
-            ),
+            source_reference=source_reference,
+            connectivity_method=connectivity,
             confidence=None,
             reactants_smiles=_required_string(step, "reactants_smiles"),
             reagents_smiles=_required_string(
@@ -177,13 +189,13 @@ def build_observed_route_tree(
             ),
             abstracted_reaction_smiles=abstracted,
             abstraction_status=(
-                "archived_algorithmic_annotation"
+                "none" if literature else "archived_algorithmic_annotation"
                 if step.get("abstraction_archived") is True
                 else "algorithm_generated"
                 if abstracted
                 else "absorbed_by_algorithmic_abstraction"
             ),
-            warnings=(
+            warnings=() if literature else (
                 "Route connectivity is inferred from patent-local molecular identity.",
                 "Higher-level abstraction is an algorithm-generated weak label.",
             ),
@@ -255,14 +267,15 @@ def build_observed_route_tree(
         source_dataset_id=source_dataset_id,
         source_route_id=route_id,
         patent_id=patent_id,
+        source_reference=source_reference,
         split=split,
         source_record_schema_version=str(record.get("schema_version") or ""),
-        connectivity_method="reconstructed_from_canonical_molecule_identity",
+        connectivity_method=connectivity,
         confidence=None,
         higher_level_reaction_count=record.get("higher_level_reaction_count"),
         higher_level_depth=record.get("higher_level_depth"),
         abstraction_reduction=record.get("abstraction_reduction"),
-        warnings=(
+        warnings=("Publisher graph connections are inferred from the reported synthesis.",) if literature else (
             "Source reactions are observed, but route connectivity is inferred.",
             "Higher-level abstractions are algorithm-generated weak labels.",
             "One-pot and tandem source records remain atomic reaction steps.",

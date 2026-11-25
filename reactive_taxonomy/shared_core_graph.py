@@ -7,12 +7,47 @@ their side identity; no correspondence is inferred for unmapped surroundings.
 from __future__ import annotations
 
 import json
+from collections import Counter
+from dataclasses import dataclass
+from functools import lru_cache
 from itertools import combinations
+from pathlib import Path
 from typing import Any, Mapping
 
 from rdkit import Chem
 
 AtomPoint = tuple[int, int]
+
+
+class SharedCoreProjectionLimit(ValueError):
+    """The exact local graph exceeds a declared projection resource limit."""
+
+
+@dataclass(frozen=True)
+class SharedCoreAvailability:
+    """Resource bounds on the incidence graph used by the exact canonicalizer."""
+
+    definition_id: str
+    maximum_center_distance_pairs: int
+    maximum_incidence_vertices: int
+
+    @property
+    def fingerprint(self) -> str:
+        """Bind derived coverage to its limits independently of chemistry identity."""
+        return f"{self.definition_id}:{self.maximum_center_distance_pairs}:{self.maximum_incidence_vertices}"
+
+
+@lru_cache(maxsize=1)
+def shared_core_availability() -> SharedCoreAvailability:
+    """Load the versioned local projection availability policy."""
+    path = Path(__file__).with_name("definitions") / "shared_core_availability.v1.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if data.pop("schema_version") != "1.0" or data.get("definition_id") != "shared_core_availability.v1":
+        raise ValueError("Invalid shared-core availability definition")
+    for field in ("maximum_center_distance_pairs", "maximum_incidence_vertices"):
+        if type(data.get(field)) is not int or data[field] < 1:
+            raise ValueError(f"Invalid shared-core availability limit {field}")
+    return SharedCoreAvailability(**data)
 
 
 def atom_label(atom: Chem.Atom) -> list[Any]:
@@ -104,6 +139,14 @@ def observed_edit_graph(
         centers[point] = len(labels)
         labels.append(["center", *state_labels])
 
+    availability = shared_core_availability()
+    center_pairs = sum(
+        count * (count - 1) // 2
+        for points in side_centers.values()
+        for count in Counter(component for component, _ in points).values()
+    )
+    if center_pairs > availability.maximum_center_distance_pairs:
+        raise SharedCoreProjectionLimit("LOCAL_CORE_CENTER_DISTANCE_PAIR_LIMIT")
     for side, molecules in (("before", reactants), ("after", products)):
         if product_only and side == "before":
             continue
@@ -136,7 +179,7 @@ def observed_edit_graph(
                     - excluded
                 )
                 if len(expanded) > limit:
-                    raise ValueError("CORE_SIZE_LIMIT")
+                    raise SharedCoreProjectionLimit("CORE_SIZE_LIMIT")
                 if expanded == selected:
                     break
                 selected = expanded
@@ -188,4 +231,7 @@ def observed_edit_graph(
                 else "qualified_realization_port"
             )
             edges.append((node, centers[point], "attachment"))
+    # Every labeled edge becomes a separate vertex in the incidence graph.
+    if len(labels) + len(edges) > availability.maximum_incidence_vertices:
+        raise SharedCoreProjectionLimit("LOCAL_CORE_INCIDENCE_VERTEX_LIMIT")
     return canonical_graph(labels, edges)

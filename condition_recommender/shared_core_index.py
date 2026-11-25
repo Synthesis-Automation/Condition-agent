@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
+from reactive_taxonomy.shared_core_graph import shared_core_availability
 from reactive_taxonomy.shared_reaction_core import (
     SharedReactionCore,
     build_shared_reaction_core,
@@ -287,6 +288,7 @@ def build_shared_core_index(
         storage_version=STORAGE_VERSION,
         source_identity=_index_identity(index),
         definition_hash=shared_core_definition_hash(),
+        availability_definition=shared_core_availability().fingerprint,
         reactant_projection_hash=reactant_projection_definition_hash(),
         row_count=len(index.rows),
         status="experimental_pending_independent_review",
@@ -307,6 +309,7 @@ def build_shared_core_index(
                     "storage_version",
                     "source_identity",
                     "definition_hash",
+                    "availability_definition",
                     "reactant_projection_hash",
                     "row_count",
                 ):

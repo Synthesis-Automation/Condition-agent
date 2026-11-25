@@ -14,6 +14,7 @@ import sqlite3
 from typing import Any, Iterable, Callable
 import zstandard
 
+from reactive_taxonomy.shared_core_graph import shared_core_availability
 from reactive_taxonomy.shared_reaction_core import build_shared_reaction_core, shared_core_definition_hash
 
 from .conversion.atomic import atomic_output_path
@@ -50,6 +51,7 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
     output = Path(destination)
     output.parent.mkdir(parents=True, exist_ok=True)
     counts: Counter[str] = Counter()
+    local_core_limit_reasons: Counter[str] = Counter()
     shards = canonical_source_files(source, strict=True)
     if output.resolve() == Path(source).resolve() or output.resolve() in shards:
         raise ValueError("Evidence catalog destination cannot overwrite a source")
@@ -103,7 +105,7 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
             db.execute("INSERT INTO compression_dictionary VALUES (?)", (dictionary,))
             for shard in shards:
                 local: dict[str, Any] = {}
-                projections: OrderedDict[tuple, tuple[tuple[str, str], ...]] = OrderedDict()
+                projections: OrderedDict[tuple, tuple[tuple[tuple[str, str], ...], tuple[str, ...]]] = OrderedDict()
 
                 def restore(value: Any) -> Any:
                     if isinstance(value, dict):
@@ -117,13 +119,13 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                         return [restore(v) for v in value]
                     return value
 
-                def local_keys(row: Mapping[str, Any], smiles: str) -> tuple[tuple[str, str], ...]:
+                def local_keys(row: Mapping[str, Any], smiles: str) -> tuple[tuple[tuple[str, str], ...], tuple[str, ...]]:
                     # Reuse the verified conversion evidence. Repeated wells normally
                     # share object IDs, so project their graph only once per shard.
                     if not row.get("reaction_signature") or not row.get("reaction_core"):
-                        return ()
+                        return (), ()
                     if restore(row.get("reaction_completeness") or {}).get("status") != "verified":
-                        return ()
+                        return (), ()
                     inputs = (row["reaction_signature"], row["reaction_core"])
                     key = (smiles, *(item.get("$reaction_object") or hashlib.sha256(json_bytes(item)).digest()
                                      for item in inputs))
@@ -132,10 +134,11 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                         return projections[key]
                     projection = build_shared_reaction_core(smiles, *(restore(item) for item in inputs))
                     levels = tuple((level.level, level.key) for level in projection.levels)
-                    projections[key] = levels
+                    limits = tuple(reason for reason in projection.unavailable_reasons if reason.endswith("_LIMIT"))
+                    projections[key] = levels, limits
                     if len(projections) > 1024:
                         projections.popitem(last=False)
-                    return levels
+                    return levels, limits
 
                 for event in iter_record_events(shard):
                     if "reset_objects" in event:
@@ -161,7 +164,8 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                     identity = exact_key(smiles)
                     keys = [("whole_reaction", identity)] if identity else []
                     if identity and include_local_cores:
-                        levels = local_keys(row, smiles)
+                        levels, limits = local_keys(row, smiles)
+                        local_core_limit_reasons.update(limits)
                         keys.extend(levels)
                         counts["experiments_with_local_core"] += bool(levels)
                     db.executemany("INSERT INTO experiment_lookup VALUES (?,?,?)",
@@ -183,12 +187,15 @@ def build_processed_catalog(source: str | Path, destination: str | Path, *,
                                ("recipes", "recipe_records")):
                 counts[key] = db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
             local_hash = shared_core_definition_hash() if include_local_cores else None
+            availability = shared_core_availability().fingerprint if include_local_cores else None
             catalog_id = hashlib.sha256(json_bytes(
-                [file_sha256(Path(source)), CATALOG_SCHEMA_VERSION, local_hash]
+                [file_sha256(Path(source)), CATALOG_SCHEMA_VERSION, local_hash, availability]
             )).hexdigest()
             report = {"schema_version": CATALOG_SCHEMA_VERSION, "build_complete": True,
                       "catalog_id": catalog_id,
                       "experiment_local_core_definition": local_hash,
+                      "experiment_local_core_availability": availability,
+                      "local_core_limit_reasons": dict(sorted(local_core_limit_reasons.items())),
                       "payload_encoding": "zstandard_dictionary.v1",
                       "dictionary_sha256": hashlib.sha256(dictionary).hexdigest(),
                       "counts": dict(counts)}

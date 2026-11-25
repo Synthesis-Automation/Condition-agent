@@ -17,6 +17,10 @@ def main() -> None:
     parser.add_argument("--raw-root", default="raw_datasets")
     parser.add_argument("--output-root", default="datasets/intermediate_datasets")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument(
+        "--cbyd-release",
+        help="Select a tag when the raw tree contains multiple CbyD releases",
+    )
     args = parser.parse_args()
     last = 0.0
 
@@ -34,6 +38,7 @@ def main() -> None:
             args.raw_root,
             args.output_root,
             force=args.force,
+            cbyd_release=args.cbyd_release,
             progress_callback=progress,
         )
         report = {key: value for key, value in report.items() if key != "sources"}

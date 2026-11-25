@@ -141,12 +141,17 @@ def assess_core_eligibility(
     external_mapping_used = bool(
         mapping_status and not mapping_status.startswith("not_requested_")
     )
-    if index_eligibility == "eligible" and not external_mapping_used:
+    source_blocked = bool(
+        record.get("source_transfer_blocked") or (record.get("source") or {}).get("source_transfer_blocked")
+    )
+    if index_eligibility == "eligible" and not external_mapping_used and not source_blocked:
         return CoreEligibilityAssessment(
             CoreEligibility.TRUSTED_CORE, (), True, True, False
         )
 
     review_reasons = []
+    if source_blocked:
+        review_reasons.append("source_evidence_requires_review")
     unresolved_policy = dict(
         rules.get("mapper_supported_unresolved_requirements") or {}
     )

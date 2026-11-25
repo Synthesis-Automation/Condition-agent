@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Callable, Dict, Hashable, TypeVar
 
 from condition_registry import (
@@ -31,6 +31,7 @@ from .input_schema import RawReactionRecord
 from .references import normalize_reference
 from .reference_series import reference_condition_series_id
 from .signature_serialization import signature_record_fields
+from .source_evidence import assess_source_claims
 
 _T = TypeVar("_T")
 
@@ -182,6 +183,9 @@ def convert_record(
             record.reference,
             lambda: normalize_reference(record.reference),
         )
+    recipe_inputs, source_assessment = assess_source_claims(record, analysis.evidence_quality)
+    if source_assessment and "source_mapped_products_disagree" in source_assessment.chemistry_reasons:
+        record = replace(record, yield_pct=None, primary_outcome_type="")
     conditions = _normalized_conditions(record)
     recipe_key = (
         record.catalyst_cas,
@@ -197,7 +201,7 @@ def convert_record(
                 item.amount_unit,
                 repr(sorted(item.provenance.items())),
             )
-            for item in record.condition_component_inputs
+            for item in recipe_inputs
         ),
         analysis.transformation_class,
         analysis.named_family,
@@ -222,7 +226,7 @@ def convert_record(
         )
         if record.condition_component_inputs:
             return build_resolved_recipe_from_inputs(
-                record.condition_component_inputs,
+                recipe_inputs,
                 preferred_roles=preferred_roles,
                 temperature_c=record.temperature_c,
                 time_h=record.time_h,
@@ -254,6 +258,16 @@ def convert_record(
         source_requirements,
         resolved_recipe,
     )
+    if source_assessment and any(c.role_status != "assigned" for c in resolved_recipe.components):
+        source_assessment = replace(source_assessment, condition_reasons=tuple(sorted({
+            *source_assessment.condition_reasons, "source_material_roles_unverified",
+        })))
+    chemistry_issues = source_assessment.chemistry_reasons if source_assessment else ()
+    condition_issues = set(source_assessment.condition_reasons if source_assessment else ())
+    for component in resolved_recipe.components:
+        condition_issues.update(
+            warning.lower() for warning in component.warnings if warning.startswith("PAIRED_IDENTIFIER_")
+        )
     decision = decide_admission(
         record=record,
         analysis=analysis,
@@ -261,6 +275,8 @@ def convert_record(
         conditions=conditions,
         resolved_recipe=resolved_recipe,
         fragment_source_support=fragment_source_support,
+        source_chemistry_issues=chemistry_issues,
+        source_condition_issues=tuple(sorted(condition_issues)),
     )
     signature_fields = signature_record_fields(analysis)
     if (
@@ -295,6 +311,7 @@ def convert_record(
             "reaction_completeness": completeness_payload,
             "partial_product_transformation": partial_payload,
             "external_atom_mapping": external_mapping_payload,
+            "source_transfer_blocked": bool(chemistry_issues or condition_issues),
         }
     )
     condition_series_id = reference_condition_series_id(
@@ -335,6 +352,10 @@ def convert_record(
         "input_schema_version": record.schema_version,
         "admission_policy_version": decision.policy_version,
     }
+    if source_assessment:
+        source["source_transfer_assessment"] = asdict(source_assessment)
+    if chemistry_issues or condition_issues:
+        source["source_transfer_blocked"] = True
     if (
         record.primary_outcome_type
         or record.condition_component_inputs

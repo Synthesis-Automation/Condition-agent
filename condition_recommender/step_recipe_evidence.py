@@ -21,6 +21,7 @@ from reactive_taxonomy.shared_reaction_core import LEVELS
 from reactive_taxonomy.step_precedent_context import StepContextComparison, build_step_context
 
 from .generic_indexing import GenericReactionIndex, _valid_yield
+from .conversion.outcomes import has_step_yield_scope
 from .processed_catalog import EXPERIMENT_FIELDS, ProcessedCatalog
 from .reaction_precedent_support import (
     ReactionPrecedentEvidence, qualify_reaction_precedent, reaction_evidence_core,
@@ -33,7 +34,6 @@ from .step_plausibility import (
 
 
 _COMPARISONS = ("matches_stated_fields", "partially_reported", "different", "unknown")
-_TARGET_YIELDS = frozenset(("reported_yield_pct", "reported_product_yield_pct", "uv_area_yield_pct"))
 
 
 @dataclass(frozen=True)
@@ -110,12 +110,12 @@ def _reported_outcome(
     warnings: set[str] = set()
     product_fields = ("product_smiles", "target_smiles", "product_position", "product_cas")
     attributed = any(
-        item.get("outcome_type") in _TARGET_YIELDS and
+        has_step_yield_scope(item) and
         any((item.get("metadata") or {}).get(key) is not None for key in product_fields)
         for item in raw
     )
     for item in raw:
-        if item.get("outcome_type") not in _TARGET_YIELDS:
+        if not has_step_yield_scope(item):
             continue
         metadata = item.get("metadata") or {}
         if attributed and not any(metadata.get(key) is not None for key in product_fields):
@@ -215,8 +215,11 @@ def _experiment(match: StepPlausibilityMatch, record: Mapping[str, Any], query: 
     payload = (row.observation_id, row.reaction_id, row.reaction_smiles, row.reference_id,
                locator, row.resolved_recipe, row.outcome_status, row.yield_pct, raw, reported_conditions)
     digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    blocked = bool(source.get("source_transfer_blocked"))
+    if blocked:
+        warnings.add("SOURCE_EVIDENCE_REQUIRES_REVIEW")
     return RecipeExperiment(
-        row, match.context, match.structurally_comparable, comparison, outcome,
+        row, match.context, match.structurally_comparable and not blocked, comparison, outcome,
         raw, reported_conditions, locator, reference, digest, record.get("index_eligibility"),
         tuple(record.get("admission_reasons") or ()), tuple(sorted(warnings)),
     )

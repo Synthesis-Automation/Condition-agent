@@ -545,3 +545,30 @@ published `datasets/processed_datasets` release remain available. Earlier mentio
 of retained literature artifacts describe the migration-time state; those local
 rollback artifacts are no longer available. Historical investigations pinned to
 them must start a new baseline against the processed release.
+
+### Chemistry by Design route releases
+
+Place the CbyD release tarball and its pinned `provenance.json` together under
+`raw_datasets/routes/cbyd/<tag>/`. Run the standard intermediate migration:
+
+```powershell
+python -m condition_recommender.ingestion regenerate --cbyd-release v2026.11
+python -m condition_recommender.ingestion validate
+```
+
+The migration records one source with two linked outputs under
+`datasets/intermediate_datasets/routes/cbyd/<tag>/`. The source archive
+`routes.source.jsonl.gz` retains the publication metadata, original synthesis,
+publisher's display graph and occurrence IDs. `route_steps.observations.jsonl.gz`
+contains one standard observation per deposited step. Each route membership
+identifies that observation by its `SOBS1` ID and one-based source position.
+An author's reaction ID can recur. The two compressed-file hashes, source
+archive hash, commit and attribution are in `route_release.manifest.json`.
+
+The processed builder accepts either the combined intermediate root or the
+CbyD bundle directory. Use a separate output root to inspect a CbyD-only
+release. The route catalog exposes the publisher graph even when local
+checks cannot reconstruct the tree. The step converter records paired
+identifier evidence, mapped atom contributions, outcome scope and reasons
+for retaining a recipe for review. Route connectivity and recipe admission
+are assessed independently.

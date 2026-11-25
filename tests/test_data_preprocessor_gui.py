@@ -102,3 +102,20 @@ def test_preprocessor_folder_includes_released_route_jsonl(
     window.add_source_folder(str(tmp_path))
     assert window.source_files() == (str(source.resolve()),)
     assert "higher_level_route_source.v1" in window.source_summary.text()
+
+
+def test_folder_selects_cbyd_release_once(qtbot, tmp_path: Path) -> None:
+    release = tmp_path / "cbyd" / "v2026.11"
+    members = release / "snapshot" / "data" / "routes"
+    members.mkdir(parents=True)
+    (members / "one.json").write_text("{}")
+    (release / "provenance.json").write_text("{}")
+    archive = release / "cbyd-v2026.11.tar.gz"
+    archive.touch()
+    window = gui.SourceDataPreprocessorWindow()
+    qtbot.addWidget(window)
+
+    window.add_source_folder(str(tmp_path))
+
+    assert window.source_files() == (str(archive.resolve()),)
+    assert "cbyd_release.v1" in window.source_summary.text()

@@ -13,6 +13,7 @@ from typing import Any, Callable, Dict, Iterable, Mapping, Optional
 
 from .models import INTERMEDIATE_OBSERVATION_SCHEMA_VERSION
 from .registry import detect_adapter, get_adapter
+from .released_sources import released_source
 
 PREPROCESSOR_DEFINITION_VERSION = "source_preprocessor.v1.2"
 
@@ -300,12 +301,11 @@ def preprocess_files(
             "Selected source files have colliding names: "
             + ", ".join(sorted(duplicate_names))
         )
-    route_sources = tuple(
-        path for path in sources if path.name == "uspto.higher-level.routes.jsonl.gz"
-    )
+    route_sources = {
+        path: release for path in sources if (release := released_source(path, root))
+    }
     original_exports = {
-        (path.parent.parent / "reactions" / "uspto_original.csv").resolve()
-        for path in route_sources
+        release.step_export for release in route_sources.values() if release.step_export
     }
     sources = tuple(path for path in sources if path.resolve() not in original_exports)
     reports = []
@@ -317,18 +317,10 @@ def preprocess_files(
                 raise ValueError(
                     "Route preparation requires automatic adapter selection"
                 )
-            from .route_release import prepare_route_release
-
-            route_relative = (
-                source.resolve().parent.parent.relative_to(root / "routes")
-                if root is not None
-                else Path(source.parent.parent.name)
-            )
-            route_output = Path(output_dir) / "routes" / route_relative
-            route_report = prepare_route_release(
-                source,
-                source.parent.parent / "reactions" / "uspto_original.csv",
-                route_output,
+            release = route_sources[source]
+            route_output = Path(output_dir) / release.bundle_relative_path
+            route_report = release.prepare(
+                Path(output_dir),
                 force=force,
                 progress_callback=progress_callback,
                 cancel_check=cancel_check,

@@ -52,6 +52,8 @@ def decide_admission(
     conditions: ConditionIdentity,
     resolved_recipe: ResolvedConditionRecipe,
     fragment_source_support: Tuple[FragmentSourceSupport, ...] = (),
+    source_chemistry_issues: Tuple[str, ...] = (),
+    source_condition_issues: Tuple[str, ...] = (),
 ) -> AdmissionDecision:
     """Assess independent evidence dimensions and derive an admission tier."""
     policy = load_admission_policy()
@@ -154,6 +156,12 @@ def decide_admission(
         if chemistry_status == ChemistryStatus.VERIFIED:
             chemistry_status = ChemistryStatus.REVIEW
 
+    if source_chemistry_issues:
+        external_mapping_review_required = True
+        chemistry_reasons.extend(source_chemistry_issues)
+        if chemistry_status == ChemistryStatus.VERIFIED:
+            chemistry_status = ChemistryStatus.REVIEW
+
     if record.yield_pct is None:
         outcome_status = OutcomeStatus.MISSING
         outcome_reasons = ["missing_yield"]
@@ -194,6 +202,10 @@ def decide_admission(
             condition_status = ConditionStatus.RESOLVED_COMPLETE
     if condition_stage_status == ConditionStageStatus.UNASSIGNED_MULTISTAGE:
         condition_reasons.append("multistage_conditions_not_structured")
+    if source_condition_issues:
+        condition_reasons.extend(source_condition_issues)
+        if condition_status != ConditionStatus.UNUSABLE:
+            condition_status = ConditionStatus.RESOLVED_PARTIAL
 
     raw_identifier_count = sum(
         len(values)

@@ -1,0 +1,6 @@
+{
+  "definition_id": "shared_core_availability.v1",
+  "schema_version": "1.0",
+  "maximum_center_distance_pairs": 256,
+  "maximum_incidence_vertices": 512
+}

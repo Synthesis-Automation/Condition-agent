@@ -18,7 +18,7 @@ from rdkit import Chem, rdBase
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_parser import parse_reaction_smiles
-from .shared_core_graph import observed_edit_graph
+from .shared_core_graph import SharedCoreProjectionLimit, observed_edit_graph
 from .reaction_models import (
     REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
     REACTION_CORE_PROJECTION_SCHEMA_VERSION,
@@ -438,6 +438,7 @@ def build_shared_reaction_core(
     )
     transitions = {}
     product_references = set()
+    levels = []
     try:
         for transition in core.get("atom_transitions", ()):
             before, after = (
@@ -541,7 +542,6 @@ def build_shared_reaction_core(
         )
         ports, removed, generalized = qualified or ({}, frozenset(), frozenset())
         product_graphs = {}
-        levels = []
         for ordinal, name in enumerate(LEVELS):
             relaxed = ordinal > 0
             graph = observed_edit_graph(
@@ -604,5 +604,8 @@ def build_shared_reaction_core(
                 ),
             }
         )
+    except SharedCoreProjectionLimit as exc:
+        base["levels"] = tuple(levels)
+        return unavailable(str(exc))
     except (KeyError, IndexError, TypeError, ValueError, RuntimeError):
         return unavailable("INCONSISTENT_OR_UNSUPPORTED_GRAPH_EVIDENCE")

@@ -31,6 +31,7 @@ class RouteStepEvidence:
     reaction_signature_schema_version: Optional[str] = None
     condition_recipe_id: Optional[str] = None
     warnings: tuple[str, ...] = ()
+    source_reference: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.evidence_kind not in ROUTE_EVIDENCE_KINDS:
@@ -44,6 +45,8 @@ class RouteStepEvidence:
         """Return a JSON-compatible evidence record."""
 
         value = asdict(self)
+        if self.source_reference is None:
+            value.pop("source_reference")
         value["warnings"] = list(self.warnings)
         return value
 
@@ -55,6 +58,7 @@ class RouteStepEvidence:
             evidence_kind=str(value["evidence_kind"]),
             source_dataset_id=value.get("source_dataset_id"),
             source_route_id=value.get("source_route_id"),
+            source_reference=value.get("source_reference"),
             source_reaction_id=value.get("source_reaction_id"),
             patent_id=value.get("patent_id"),
             connectivity_method=str(value.get("connectivity_method") or "explicit"),
@@ -267,6 +271,7 @@ class ReactionRouteTree:
     abstraction_reduction: Optional[int] = None
     warnings: tuple[str, ...] = ()
     schema_version: str = ROUTE_TREE_SCHEMA_VERSION
+    source_reference: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.route_kind not in ROUTE_KINDS:
@@ -287,6 +292,7 @@ class ReactionRouteTree:
             "fingerprint_tokens": list(self.fingerprint_tokens),
             "source_dataset_id": self.source_dataset_id,
             "source_route_id": self.source_route_id,
+            **({"source_reference": self.source_reference} if self.source_reference else {}),
             "patent_id": self.patent_id,
             "split": self.split,
             "source_record_schema_version": self.source_record_schema_version,
@@ -318,6 +324,7 @@ class ReactionRouteTree:
             ),
             source_dataset_id=value.get("source_dataset_id"),
             source_route_id=value.get("source_route_id"),
+            source_reference=value.get("source_reference"),
             patent_id=value.get("patent_id"),
             split=value.get("split"),
             source_record_schema_version=value.get(

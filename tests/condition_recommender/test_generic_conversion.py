@@ -115,7 +115,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "10.3"
-    assert record.converter_definition_version == "generic_conversion.v10.3"
+    assert record.converter_definition_version == "generic_conversion.v10.4"
     assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None

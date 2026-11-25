@@ -89,6 +89,24 @@ def test_target_assays_survive_zero_conversion_byproduct_and_conflicting_trace(t
     assert by_id["b"].precedent.yield_pct is None and by_id["c"].precedent.yield_pct is None
 
 
+def test_blocked_source_claims_and_sequence_assays_do_not_transfer(tmp_path):
+    src = record(1, QUERY)
+    blocked = run_source(src, assay(72))
+    blocked["source"]["source_transfer_blocked"] = True
+    pooled_yield = assay(98)
+    pooled_yield["metadata"]["scope"] = "sequence"
+    pooled = run_source({**src, "observation_id": "pooled"}, pooled_yield, well="B1")
+    indexes = pair(tmp_path, [src])
+    result = assess_step_recipe_evidence(
+        QUERY, {"temperature_c": 25}, *indexes, catalog=Catalog([blocked, pooled]),
+    )
+    by_id = {e.precedent.observation_id: e for e in result.experiments}
+    assert not by_id["obs-1"].eligible_for_measured_transfer
+    assert "SOURCE_EVIDENCE_REQUIRES_REVIEW" in by_id["obs-1"].warnings
+    assert by_id["pooled"].precedent.yield_pct is None
+    assert by_id["pooled"].reported_outcomes == (pooled_yield,)
+
+
 def test_reused_observation_ids_preserve_record_hashes_and_reordered_counts(tmp_path):
     row = run_source(record(1, QUERY), assay(70))
     distinct = deepcopy(row)

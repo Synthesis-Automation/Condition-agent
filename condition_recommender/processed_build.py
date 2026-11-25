@@ -18,6 +18,43 @@ from .record_storage import STORAGE_SCHEMA_VERSION
 DEFAULT_INPUT_ROOT = Path("datasets/intermediate_datasets")
 DEFAULT_OUTPUT_ROOT = Path("datasets/processed_datasets")
 RELEASE_SCHEMA_VERSION = "processed_reaction_release.v1"
+PIPELINE_GENERATION = "processed_pipeline.v5"
+ROUTE_ARCHIVE = "routes.source.jsonl.gz"
+ROUTE_STEPS = "route_steps.observations.jsonl.gz"
+
+
+def discover_route_bundles(source: str | Path) -> list[tuple[Path, Path]]:
+    """Resolve declared route/observation pairs, including older migration inventories."""
+    root = Path(source).resolve()
+    if not root.is_dir():
+        return []
+    archives = set(root.rglob(ROUTE_ARCHIVE))
+    for release_manifest in root.rglob("route_release.manifest.json"):
+        if release_manifest.with_name(ROUTE_ARCHIVE) not in archives:
+            raise ValueError("Missing route archive declared by route release manifest")
+    inventory = root / "migration.manifest.json"
+    if inventory.exists():
+        manifest = json.loads(inventory.read_text(encoding="utf-8"))
+        if not manifest.get("coverage_complete"):
+            raise ValueError("Migration source coverage is incomplete")
+        declared = []
+        total = 0
+        for entry in manifest["sources"]:
+            if entry["category"] != "routes_and_single_step":
+                continue
+            relative = entry.get("bundle_relative_path") or Path(entry["source_relative_path"]).parent.parent
+            folder = (root / relative).resolve()
+            if not folder.is_relative_to(root):
+                raise ValueError("Route bundle escapes its intermediate root")
+            declared.append(folder / ROUTE_ARCHIVE)
+            total += entry["report"]["counts"]["route_count"]
+        if (len(declared) != len(set(declared)) or set(declared) != archives
+            or total != manifest["route_count"] or (total > 0 and not archives)):
+            raise ValueError("Declared route bundles do not match migration inventory")
+    pairs = [(archive, archive.with_name(ROUTE_STEPS)) for archive in sorted(archives)]
+    if any(not steps.is_file() for _, steps in pairs):
+        raise ValueError("Missing observation archive for a route bundle")
+    return pairs
 
 
 def prepare_release(
@@ -30,9 +67,23 @@ def prepare_release(
         raise ValueError("No physical reaction observations found")
     inventory = [{"path": str(p.resolve()), "sha256": file_sha256(p),
                   "size_bytes": p.stat().st_size} for p in sources]
-    route_sources = sorted(root.rglob("routes.source.jsonl.gz")) if root.is_dir() else []
-    route_inventory = [{"path": str(p.resolve()), "sha256": file_sha256(p),
-                        "size_bytes": p.stat().st_size} for p in route_sources]
+    pairs = discover_route_bundles(root)
+    observation_hashes = {row["path"]: row["sha256"] for row in inventory}
+    route_inventory = []
+    for routes, steps in pairs:
+        item = {"path": str(routes), "sha256": file_sha256(routes),
+                "size_bytes": routes.stat().st_size, "step_path": str(steps),
+                "step_sha256": observation_hashes[str(steps)]}
+        release_manifest = routes.with_name("route_release.manifest.json")
+        if release_manifest.is_file():
+            declared = json.loads(release_manifest.read_text(encoding="utf-8"))
+            hashes = declared["output_sha256"]
+            if (not declared["coverage_complete"] or hashes[ROUTE_ARCHIVE] != item["sha256"]
+                or hashes[ROUTE_STEPS] != item["step_sha256"]):
+                raise ValueError(f"Route bundle differs from its complete manifest: {routes.parent}")
+            item.update(expected_route_count=declared["counts"]["route_count"],
+                        expected_observation_count=declared["counts"]["output_step_observations"])
+        route_inventory.append(item)
     contract = _definition_contract()
     repository = Path(__file__).resolve().parents[1]
     definition_files = {path.relative_to(repository).as_posix(): file_sha256(path)
@@ -44,8 +95,9 @@ def prepare_release(
                 "definition_contract": contract, "storage_schema": STORAGE_SCHEMA_VERSION,
                 "evidence_catalog_schema": CATALOG_SCHEMA_VERSION,
                 "definition_files": definition_files,
-                "route_sources": [entry["sha256"] for entry in route_inventory],
-                "pipeline_generation": "processed_pipeline.v4", "release_schema": RELEASE_SCHEMA_VERSION}
+                "route_sources": [(e["sha256"], e["step_sha256"], e.get("expected_route_count"),
+                                   e.get("expected_observation_count")) for e in route_inventory],
+                "pipeline_generation": PIPELINE_GENERATION, "release_schema": RELEASE_SCHEMA_VERSION}
     release_id = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()[:24]
     release = Path(output_root).resolve() / "releases" / release_id
     release.mkdir(parents=True, exist_ok=True)
@@ -53,11 +105,11 @@ def prepare_release(
                 "build_complete": False, "source_coverage": "all_physical_observations",
                 "sources": inventory, "definition_contract": contract,
                 "definition_files": definition_files,
-                "route_sources": route_inventory, "pipeline_generation": "processed_pipeline.v4",
+                "route_sources": route_inventory, "pipeline_generation": PIPELINE_GENERATION,
                 "storage_schema": STORAGE_SCHEMA_VERSION,
                 "evidence_catalog_schema": CATALOG_SCHEMA_VERSION,
                 "independent_chemistry_review": "pending",
-                "conversion_authorization": "user_requested_full_corpus_conversion_2026-10-05"}
+                "conversion_authorization": "requested_build"}
     return release, manifest
 
 

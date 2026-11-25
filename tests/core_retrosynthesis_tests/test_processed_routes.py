@@ -2,15 +2,19 @@
 
 from copy import deepcopy
 import gzip
+import hashlib
 import json
 import sqlite3
 import zlib
 
 import pytest
 
-from core_retrosynthesis.processed_routes import normalize_released_route, build_processed_route_catalog, ProcessedRouteCatalog
+from core_retrosynthesis.processed_routes import (
+    build_processed_route_catalog, build_route_bundle_catalog, normalize_released_route, ProcessedRouteCatalog,
+)
 from core_retrosynthesis.route_conversion import build_observed_route_tree, iter_route_trees
 from core_retrosynthesis.route_curation import RouteQualityError
+from condition_recommender.corpus_io import file_sha256
 
 
 def _wrapper():
@@ -92,3 +96,137 @@ def test_missing_step_observations_remain_review_evidence(tmp_path):
     row = ProcessedRouteCatalog(output).route("US_TEST_0", include_tree=True)
     assert row["status"] == "unresolved" and row["tree_available"]
     assert not list(iter_route_trees(output))
+
+
+def _literature_wrapper():
+    route_id = "cbyd:vTest:route"
+    rows = [{"reaction_id": "duplicated author id", "reaction_smiles_mapped": smiles} for smiles in (
+        "[CH3:1][OH:2]>>[CH2:1]=[O:2]", "[CH3:1][Br:2].[OH2:3]>>[CH3:1][OH:3]")]
+    rows[0]["reaction_smiles"] = "CO>>C=O"
+    rows[1]["reaction_smiles"] = "CBr.O>>CO"
+    nodes = [{"id": name, "t": "m", "s": smiles, "r": role} for name, smiles, role in (
+        ("target", "C=O", "target"), ("methanol", "CO", "intermediate"),
+        ("start1", "CBr", "start"), ("start2", "O", "start"))]
+    graph = {"rx": [{"rid": r["reaction_id"], "m": r["reaction_smiles_mapped"]} for r in rows],
+             "nodes": nodes + [{"id": "rx1", "t": "r", "i": 0}, {"id": "rx2", "t": "r", "i": 1}],
+             "edges": [["rx1", "target"], ["methanol", "rx1"], ["rx2", "methanol"],
+                       ["start1", "rx2"], ["start2", "rx2"]], "warn": []}
+    return {"schema_version": "cbyd_route_source.v1", "route_id": route_id,
+            "source": {"corpus_id": "cbyd", "release_id": "vTest", "reference": "Test article"},
+            "raw_route": {"synthesis": rows}, "publisher_graph": graph,
+            "step_memberships": [{"source_row_number": i, "source_record_id": f"{route_id}:step:{i}",
+                                  "observation_id": f"obs-{i}", "source_reaction_id": "duplicated author id"}
+                                 for i in (1, 2)]}
+
+
+def test_mixed_catalog_reconstructs_literature_tree_and_scopes_memberships(tmp_path):
+    patent, literature = _wrapper(), _literature_wrapper()
+    pairs = []
+    for name, route in [("patent", patent), ("literature", literature)]:
+        routes, steps = tmp_path / f"{name}.gz", tmp_path / f"{name}_steps.gz"
+        pairs.append((routes, steps))
+        _write(routes, [route])
+    members = literature["step_memberships"]
+    legacy_ids = patent["raw_route"]["original_tree"]["reaction_ids"]
+    # The same source-record alias is present in another bundle. Its observation cannot join here.
+    _write(pairs[0][1], [{"source": {"source_record_id": i}, "observation_id": "patent-" + i}
+                         for i in legacy_ids + [members[0]["source_record_id"]]])
+    _write(pairs[1][1], [{"source": m, "observation_id": m["observation_id"]} for m in members])
+    destination = tmp_path / "catalog.sqlite"
+
+    def interrupt(event):
+        if event["bundle"] == 1:
+            raise InterruptedError()
+
+    with pytest.raises(InterruptedError):
+        build_route_bundle_catalog(pairs, destination, progress=interrupt)
+    assert not destination.exists()
+    report = build_route_bundle_catalog(pairs, destination)
+    assert report["counts"] == {"validated_tree": 2}
+    catalog = ProcessedRouteCatalog(destination)
+    summary = catalog.route(literature["route_id"], include_tree=True, include_source=True)
+    assert summary["source"]["publisher_graph"] == literature["publisher_graph"]
+    assert summary["publisher_graph_available"]
+    assert [m["observation_ids"] for m in summary["memberships"]] == [["obs-1"], ["obs-2"]]
+    assert catalog.routes_for_observation("obs-2") == [literature["route_id"]]
+    assert not catalog.routes_for_observation("patent-" + members[0]["source_record_id"])
+    tree = summary["tree"]
+    assert tree["patent_id"] is None and tree["source_reference"] == "Test article"
+    assert tree["source_dataset_id"] == "cbyd:vTest" and tree["maximum_depth"] == 2
+    assert "patent" not in json.dumps(tree["warnings"]).lower()
+    assert tree["root"]["reaction"]["evidence"]["abstraction_status"] == "none"
+    assert len(list(catalog.iter_trees())) == 2
+    with pytest.raises(ValueError, match="different sources"):
+        build_route_bundle_catalog(list(reversed(pairs)), destination)
+
+
+def test_literature_source_graph_conflicts_and_observation_mismatch_are_preserved(tmp_path):
+    route = _literature_wrapper()
+    route["publisher_graph"]["nodes"][0]["s"] = "C"
+    routes, steps, output = [tmp_path / name for name in ("routes.gz", "steps.gz", "routes.sqlite")]
+    _write(routes, [route])
+    _write(steps, [{"source": m, "observation_id": "inconsistent-" + m["observation_id"]}
+                   for m in route["step_memberships"]])
+    report = build_processed_route_catalog(routes, steps, output)
+    assert report["conflicting_memberships"] == 2
+    catalog = ProcessedRouteCatalog(output)
+    result = catalog.route(route["route_id"], include_source=True)
+    assert result["status"] == "unresolved" and result["unresolved_reason"] == "source_graph_product_mismatch"
+    assert result["source"] == route and result["publisher_graph_available"]
+    assert all(m["join_status"] == "conflicting_expected_observation" for m in result["memberships"])
+    assert not catalog.routes_for_observation("inconsistent-obs-1")
+    assert not list(catalog.iter_trees())
+
+
+def test_literature_raw_chemistry_and_repeated_edges_cannot_silently_qualify():
+    route = _literature_wrapper()
+    route["raw_route"]["synthesis"][0]["reaction_smiles"] = "CO>>C"
+    with pytest.raises(RouteQualityError, match="source_mapped_products_disagree"):
+        normalize_released_route(route)
+    route = _literature_wrapper()
+    route["publisher_graph"]["edges"].append(route["publisher_graph"]["edges"][0])
+    with pytest.raises(RouteQualityError, match="publisher_graph_repeated_edge"):
+        normalize_released_route(route)
+
+
+def test_unchanged_verified_legacy_catalog_can_seed_new_build(tmp_path, monkeypatch):
+    from core_retrosynthesis import processed_routes
+
+    wrapper = _wrapper()
+    routes, steps = tmp_path / "routes.gz", tmp_path / "steps.gz"
+    aliases = wrapper["raw_route"]["original_tree"]["reaction_ids"]
+    _write(routes, [wrapper])
+    _write(steps, [{"observation_id": a, "source": {"source_record_id": a}} for a in aliases])
+    old_version = processed_routes.LEGACY_ROUTE_CATALOG_VERSION
+    binding = hashlib.sha256((file_sha256(routes) + file_sha256(steps) + old_version).encode()).hexdigest()
+    metadata = {"schema_version": old_version, "build_complete": True, "source_binding": binding}
+    release = tmp_path / "old"
+    release.mkdir()
+    legacy = release / "routes.sqlite"
+    tree = build_observed_route_tree(normalize_released_route(wrapper)).to_dict()
+    with sqlite3.connect(legacy) as db:
+        db.executescript("""
+            CREATE TABLE metadata(payload);
+            CREATE TABLE routes(id,status,reason,source,tree);
+            CREATE TABLE route_steps(route_id,reaction_id);
+            CREATE TABLE step_observations(reaction_id,observation_id);
+        """)
+        db.execute("INSERT INTO metadata VALUES (?)", (json.dumps(metadata),))
+        db.execute("INSERT INTO routes VALUES ('US_TEST_0','validated_tree',NULL,?,?)",
+                   (processed_routes._encode(wrapper), processed_routes._encode(tree)))
+        db.executemany("INSERT INTO route_steps VALUES ('US_TEST_0',?)", [(a,) for a in aliases])
+        db.executemany("INSERT INTO step_observations VALUES (?,?)", [(a, a) for a in aliases])
+    manifest = {"schema_version": "processed_reaction_release.v1", "build_complete": True,
+                "artifacts": {"route_catalog": {"relative_path": legacy.name, "size_bytes": legacy.stat().st_size,
+                                                "sha256": file_sha256(legacy)}}}
+    (release / "manifest.json").write_text(json.dumps(manifest))
+
+    def unexpected_conversion(*args):
+        pytest.fail("Checksum-bound patent bundle should have been reused")
+
+    monkeypatch.setattr(processed_routes, "_convert_wrapper", unexpected_conversion)
+    dest = tmp_path / "new.sqlite"
+    report = build_route_bundle_catalog([(routes, steps)], dest, reuse_release=release)
+    assert report["counts"] == {"validated_tree": 1}
+    assert ProcessedRouteCatalog(legacy).routes_for_observation("root") == ["US_TEST_0"]
+    assert ProcessedRouteCatalog(dest).route("US_TEST_0", include_tree=True)["tree"] == tree

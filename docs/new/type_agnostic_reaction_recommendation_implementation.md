@@ -168,7 +168,7 @@ The current code declares:
 | Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `2.2` |
 | Recommendation record | `10.3` |
-| Generic converter definition | `generic_conversion.v10.3` |
+| Generic converter definition | `generic_conversion.v10.4` |
 | Core eligibility policy | `core_eligibility.v1@1.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v5.0` |
 | Concise reaction review | `12.0` |

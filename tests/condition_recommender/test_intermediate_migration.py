@@ -215,3 +215,20 @@ def test_cancelled_route_preparation_discards_temporary_files(tmp_path: Path) ->
         prepare_route_release(route, original, output, cancel_check=lambda: True)
     assert not list(output.glob("*.tmp"))
     assert not (output / "route_release.manifest.json").exists()
+
+
+def test_migration_keeps_previous_inventory_when_output_has_extra_observations(
+    tmp_path: Path,
+) -> None:
+    raw = tmp_path / "raw"
+    _csv(
+        raw / "uspto_higher-level.csv", [{"id": "a", "rxn_smiles": "[CH3:1]>>[CH3:1]"}]
+    )
+    output = tmp_path / "intermediate"
+    regenerate_intermediate_datasets(raw, output)
+    previous = (output / "migration.manifest.json").read_bytes()
+    extra = output / "previous.observations.jsonl.gz"
+    extra.touch()
+    with pytest.raises(ValueError, match="different observation inventory"):
+        regenerate_intermediate_datasets(raw, output)
+    assert (output / "migration.manifest.json").read_bytes() == previous

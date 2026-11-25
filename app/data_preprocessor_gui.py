@@ -20,6 +20,7 @@ from condition_recommender.ingestion import (  # noqa: E402
     detect_adapter,
     preprocess_files,
 )
+from condition_recommender.ingestion.released_sources import released_source  # noqa: E402
 
 
 def _human_size(size_bytes: int) -> str:
@@ -163,7 +164,7 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         title.setStyleSheet("font-size: 20px; font-weight: 600;")
         layout.addWidget(title)
         description = QtWidgets.QLabel(
-            "Normalize raw CSVs and released route JSONL into reusable source "
+            "Normalize raw CSVs and released route archives into reusable source "
             "observations. Route steps retain agent structures and membership; "
             "higher-level abstractions are archived separately. Molecular "
             "analysis and condition-registry "
@@ -259,7 +260,7 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
             self,
             "Choose source datasets",
             str(PROJECT_ROOT / "raw_datasets"),
-            "Source datasets (*.csv *.CSV *.jsonl.gz)",
+            "Source datasets (*.csv *.CSV *.jsonl.gz cbyd-v*.tar.gz)",
         )
         if files:
             self.add_source_files(files)
@@ -284,7 +285,7 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
                 if path.is_file()
                 and (
                     path.suffix.casefold() == ".csv"
-                    or path.name == "uspto.higher-level.routes.jsonl.gz"
+                    or released_source(path) is not None
                 )
             ),
             key=lambda path: path.relative_to(root).as_posix().casefold(),
@@ -320,8 +321,9 @@ class SourceDataPreprocessorWindow(QtWidgets.QWidget):
         detected = []
         failures = 0
         for value in paths:
-            if Path(value).name == "uspto.higher-level.routes.jsonl.gz":
-                detected.append("higher_level_route_source.v1")
+            release = released_source(Path(value))
+            if release:
+                detected.append(release.adapter_id)
                 continue
             try:
                 detected.append(detect_adapter(value).adapter_id)

@@ -12,6 +12,7 @@ from condition_registry import ConditionComponentInput, ConditionProcessStage
 from ..condition_normalization import normalize_cas_list
 from ..ingestion.models import INTERMEDIATE_OBSERVATION_SCHEMA_VERSION
 from .input_schema import RawReactionRecord
+from .outcomes import has_step_yield_scope
 
 
 _IDENTIFIER_PRIORITY = {
@@ -127,7 +128,9 @@ def _primary_yield(
 ) -> tuple[Optional[float], str]:
     for outcome in outcomes:
         outcome_type = str(outcome.get("outcome_type") or "")
-        if outcome_type.endswith("yield_pct"):
+        if has_step_yield_scope(outcome) and str(outcome.get("unit") or "").casefold() in {
+            "percent", "%", "pct",
+        }:
             return _float(outcome.get("value")), outcome_type
     return None, ""
 

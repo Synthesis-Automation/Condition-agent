@@ -14,15 +14,16 @@ from condition_recommender.corpus_io import file_sha256, iter_canonical_records
 from condition_recommender.fragment_index import build_fragment_index
 from condition_recommender.generic_indexing import load_generic_index
 from condition_recommender.processed_build import (
-    DEFAULT_INPUT_ROOT, DEFAULT_OUTPUT_ROOT, convert_release, prepare_release,
+    DEFAULT_INPUT_ROOT, DEFAULT_OUTPUT_ROOT, PIPELINE_GENERATION, convert_release, prepare_release,
 )
 from condition_recommender.processed_catalog import CATALOG_SCHEMA_VERSION, build_processed_catalog
 from condition_recommender.processed_release import publish_processed_release, resolve_processed_release
 from condition_recommender.shared_core_index import build_shared_core_index, load_shared_core_index
 from condition_recommender.sqlite_indexing import build_sqlite_generic_index
 from core_retrosynthesis.full_scale import build_full_scale_operator_library
-from core_retrosynthesis.processed_routes import build_processed_route_catalog
+from core_retrosynthesis.processed_routes import ROUTE_CATALOG_VERSION, build_route_bundle_catalog
 from forward_synthesis import build_forward_library, save_forward_library
+from reactive_taxonomy.shared_core_graph import shared_core_availability
 
 
 def build_processed_datasets(
@@ -40,7 +41,7 @@ def build_processed_datasets(
     state = json.loads(state_path.read_text()) if state_path.exists() else {}
     if (release / "manifest.json").exists():
         previous = json.loads((release / "manifest.json").read_text())
-        if previous.get("build_complete") and previous.get("builder_version") == "processed_pipeline.v4":
+        if previous.get("build_complete") and previous.get("builder_version") == PIPELINE_GENERATION:
             return publish_processed_release(release, output_root).manifest
 
     def emit(phase: str, **values: Any) -> None:
@@ -94,16 +95,22 @@ def build_processed_datasets(
 
     indexes = release / "indexes"
     indexes.mkdir(exist_ok=True)
-    route_source = Path(source) / "routes" / "higher_level_retrosynthesis"
+    route_sources = manifest["route_sources"]
     route_report = None
-    if (route_source / "routes.source.jsonl.gz").exists():
+    if route_sources:
+        pairs = [(item["path"], item["step_path"]) for item in route_sources]
         route_report = stage("routes", {"route_catalog": indexes / "route_catalog.sqlite"},
-              lambda: build_processed_route_catalog(route_source / "routes.source.jsonl.gz",
-                      route_source / "route_steps.observations.jsonl.gz", indexes / "route_catalog.sqlite",
-                      workers=workers, progress=lambda event: emit("route_rows", report=event)), "processed_routes.v1.1")
+              lambda: build_route_bundle_catalog(pairs, indexes / "route_catalog.sqlite",
+                      workers=workers, progress=lambda event: emit("route_rows", report=event)), ROUTE_CATALOG_VERSION)
+        for source_entry, result in zip(route_sources, route_report["bundles"], strict=True):
+            for count in ("route_count", "observation_count"):
+                expected = source_entry.get("expected_" + count)
+                if expected is not None and result[count] != expected:
+                    raise ValueError(f"Route bundle {count} differs from its intermediate manifest")
+    availability = shared_core_availability().fingerprint
     catalog_report = stage("catalogs", {"evidence_catalog": indexes / "catalogs.sqlite"},
           lambda: build_processed_catalog(canonical, indexes / "catalogs.sqlite",
-                      progress=lambda event: emit("catalog_rows", report=event)), CATALOG_SCHEMA_VERSION)
+                      progress=lambda event: emit("catalog_rows", report=event)), f"{CATALOG_SCHEMA_VERSION}/{availability}")
     condition_report = stage("conditions", {"condition_index": indexes / "generic_index.sqlite"},
           lambda: build_sqlite_generic_index(iter_canonical_records(canonical), indexes / "generic_index.sqlite",
                                               progress_callback=lambda phase, count: emit("condition_" + phase, rows=count),
@@ -113,7 +120,7 @@ def build_processed_datasets(
           lambda: build_shared_core_index(index, indexes / "generic_index.shared_core.sqlite",
                                           workers=workers, resume=True,
                                           progress_callback=lambda count: emit("shared_core_rows", rows=count),
-                                          cancel_check=cancel_check), "shared_core.v3", ("condition_index",))
+                                          cancel_check=cancel_check), f"shared_core.v3/{availability}", ("condition_index",))
     fragment_report = stage("fragments", {"fragment_index": indexes / "fragment_index.sqlite"},
           lambda: build_fragment_index(canonical, indexes / "fragment_index.sqlite",
                                         evidence_catalog=indexes / "catalogs.sqlite",
@@ -123,7 +130,7 @@ def build_processed_datasets(
         library, report = build_full_scale_operator_library(
             canonical, release / "operators" / "retrosynthesis", workers=workers,
             progress_callback=lambda event: emit("retro_" + event.get("phase", "build"), report=event))
-        forward = build_forward_library(library)
+        forward = build_forward_library(library, workers=workers)
         save_forward_library(forward, release / "operators" / "forward" / "forward_operator_library_v1.json.gz")
         return report
 
@@ -146,7 +153,7 @@ def build_processed_datasets(
         expected = expected_manifest["single_step_observation_count"]
         if total != expected:
             raise ValueError(f"Expected {expected} physical observations; converted {total}")
-        if route_report and route_report["route_count"] != expected_manifest["route_count"]:
+        if (route_report or {}).get("route_count", 0) != expected_manifest["route_count"]:
             raise ValueError("Source route count does not match migration inventory")
     coverage = {"observation_count": total, "source_count": len(conversion["source_files"]),
                 "source_coverage_complete": True, "validation": integrity,
@@ -159,7 +166,7 @@ def build_processed_datasets(
     atomic_json(reports / "coverage.json", coverage)
     artifacts["canonical_records"] = entry(canonical)
     artifacts["coverage_report"] = entry(reports / "coverage.json")
-    manifest.update(build_complete=True, builder_version="processed_pipeline.v4", artifacts=artifacts, coverage=coverage,
+    manifest.update(build_complete=True, builder_version=PIPELINE_GENERATION, artifacts=artifacts, coverage=coverage,
                     capabilities={**{name: True for name in artifacts}, "composite_promotion": False},
                     capability_limits={"composite_promotion": "Requires declared training scope and independent support review; source routes remain accessible."})
     atomic_json(release / "manifest.json", manifest)

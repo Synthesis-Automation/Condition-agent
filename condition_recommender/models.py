@@ -8,10 +8,11 @@ from typing import Any, Dict, Literal, Optional, Tuple
 
 
 RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.3"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.3"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.4"
 COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS = frozenset({"10.0", "10.1", "10.2", "10.3"})
 COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
-    {"generic_conversion.v10.0", "generic_conversion.v10.1", "generic_conversion.v10.2", "generic_conversion.v10.3"}
+    {"generic_conversion.v10.0", "generic_conversion.v10.1", "generic_conversion.v10.2",
+     "generic_conversion.v10.3", GENERIC_CONVERTER_DEFINITION_VERSION}
 )
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"

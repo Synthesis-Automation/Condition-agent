@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import asdict
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Tuple
@@ -14,7 +15,9 @@ from .models import (
     CONDITION_IDENTIFIER_TYPES,
     ContextualRoleAssignment,
     ResolvedConditionComponent,
+    ResolutionResult,
 )
+from .paired_identifiers import paired_identifier_evidence
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "role_resolution.v2.json"
 
@@ -198,6 +201,17 @@ def resolve_contextual_component(
     else:
         result = resolve_identifier(identifier, identifier_type=resolved_identifier_type)
 
+    pair = paired_identifier_evidence(provenance)
+    if pair is not None:
+        provenance = {**(provenance or {}), "paired_identifier_evidence": asdict(pair)}
+        if pair.corroborated_substance_id:
+            result = resolve_substance_id(pair.corroborated_substance_id)
+        else:
+            result = ResolutionResult(
+                query=identifier,
+                status="ambiguous" if pair.status in {"conflict", "ambiguous"} else "unresolved",
+                candidates=tuple(sorted(set(pair.name_candidates + pair.structure_candidates))),
+            )
     if result.status == "resolved" and result.substance is not None:
         substance = result.substance
         roles = _ranked_roles(
@@ -286,7 +300,9 @@ def resolve_contextual_component(
         amount=amount,
         amount_unit=amount_unit,
         source_role_hint=source_role_hint,
-        warnings=("CONDITION_IDENTITY_UNCERTAINTY",),
+        warnings=("CONDITION_IDENTITY_UNCERTAINTY",) + (
+            (f"PAIRED_IDENTIFIER_{pair.status.upper()}",) if pair is not None else ()
+        ),
         provenance=_resolution_provenance(
             base=provenance,
             result=result,

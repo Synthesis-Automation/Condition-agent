@@ -69,7 +69,7 @@ def test_builder_resume_publishes_already_complete_release(tmp_path, monkeypatch
     from app import processed_dataset_builder as builder
 
     path, manifest = _release(tmp_path)
-    manifest["builder_version"] = "processed_pipeline.v4"
+    manifest["builder_version"] = builder.PIPELINE_GENERATION
     path.write_text(json.dumps(manifest), encoding="utf-8")
     (tmp_path / "manifest.json").unlink()
     monkeypatch.setattr(builder, "prepare_release", lambda *args: (path.parent, manifest))
@@ -96,3 +96,28 @@ def test_evidence_catalog_schema_selects_a_distinct_build_directory(tmp_path, mo
     previous, previous_manifest = processed_build.prepare_release(observation, output)
     assert current != previous
     assert manifest["sources"] == previous_manifest["sources"]
+
+
+def test_declared_route_bundles_require_both_archives_and_match_manifest_count(tmp_path):
+    from condition_recommender.processed_build import discover_route_bundles
+
+    folder = tmp_path / "routes" / "cbyd" / "vTest"
+    folder.mkdir(parents=True)
+    archive = folder / "routes.source.jsonl.gz"
+    steps = folder / "route_steps.observations.jsonl.gz"
+    manifest = {"coverage_complete": True, "route_count": 2, "sources": [{
+        "category": "routes_and_single_step", "bundle_relative_path": "routes/cbyd/vTest",
+        "report": {"counts": {"route_count": 2}}}]}
+    inventory = tmp_path / "migration.manifest.json"
+    inventory.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="migration inventory"):
+        discover_route_bundles(tmp_path)
+    archive.touch()
+    with pytest.raises(ValueError, match="Missing observation"):
+        discover_route_bundles(tmp_path)
+    steps.touch()
+    assert discover_route_bundles(tmp_path) == [(archive, steps)]
+    manifest["route_count"] = 3
+    inventory.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="migration inventory"):
+        discover_route_bundles(tmp_path)
