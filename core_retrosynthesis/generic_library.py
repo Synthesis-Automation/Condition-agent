@@ -10,6 +10,8 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Literal
 
+from reactive_taxonomy.reaction_operators import SOURCE_STEREO_MATCH_VERSION
+
 from .chemistry import digest
 from .core_admission import CoreAdmissionPolicyName
 
@@ -35,6 +37,7 @@ GENERIC_LIBRARY_DEFINITION = {
     "routing_source": "normalized_graph_edits",
     "named_families_used_for_routing": False,
     "source_round_trip_required": True,
+    "source_stereo_match_version": SOURCE_STEREO_MATCH_VERSION,
     "operator_identity": "handle_independent_normalized_graph_edits",
     "supported_transformations": [
         "acyl_substitution",
@@ -220,6 +223,7 @@ def build_generic_library(
             )
             templates[compiled.template_id] = replace(
                 current,
+                stereo_policy="relaxed" if "relaxed" in (compiled.stereo_policy, current.stereo_policy) else "exact",
                 observation_support=current.observation_support + 1,
                 precedents=tuple(precedents),
             )

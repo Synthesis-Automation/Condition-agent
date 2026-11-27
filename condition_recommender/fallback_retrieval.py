@@ -22,7 +22,11 @@ from .fallback_similarity import (
 from .generic_indexing import GenericReactionIndex
 from .generic_retrieval import CompatibleRetrievalResult
 from .models import RetrievalLevelTrace
-from .support import summarize_evidence_support
+from .support import (
+    summarize_evidence_support,
+    summarize_recipe_support,
+    supports_condition_recipe,
+)
 
 
 def retrieve_fallback_pool_with_trace(
@@ -215,24 +219,30 @@ def retrieve_fallback_pool_with_trace(
             evidence=("Condition compatibility gates were explicitly bypassed",),
         )
         accepted = tuple((row, neutral_compatibility) for row in matched_rows)
+        recipe_support = summarize_recipe_support(matched_rows)
         support = summarize_evidence_support(matched_rows)
         trace = RetrievalLevelTrace(
             level="unrestricted_unverified_structure_similarity",
             candidate_count=len(matched_rows),
             independent_candidate_count=support.independent_count,
             compatible_candidate_count=len(matched_rows),
-            independent_compatible_candidate_count=support.independent_count,
+            independent_compatible_candidate_count=recipe_support.independent_count,
             excluded_candidate_count=0,
             minimum_independent_support=0,
-            status="selected_without_gates",
+            status=(
+                "only_zero_yield_outcomes" if matched_rows and not recipe_support.independent_count
+                else "selected_without_gates"
+            ),
         )
         return CompatibleRetrievalResult(
-            level="unrestricted_unverified_structure_fallback",
-            pool=accepted,
+            level="only_zero_yield_outcomes"
+            if trace.status == "only_zero_yield_outcomes"
+            else "unrestricted_unverified_structure_fallback",
+            pool=accepted if recipe_support.independent_count else (),
             candidate_count=len(matched_rows),
             independent_candidate_count=support.independent_count,
             excluded_candidate_count=0,
-            independent_compatible_candidate_count=support.independent_count,
+            independent_compatible_candidate_count=recipe_support.independent_count,
             trace=(candidate_trace, trace),
         )
 
@@ -281,15 +291,18 @@ def retrieve_fallback_pool_with_trace(
     )
     excluded_count = len(compatibility_excluded) + source_excluded_count
     accepted_rows = tuple(row for row, _ in accepted)
-    accepted_support = summarize_evidence_support(accepted_rows)
+    accepted_support = summarize_recipe_support(accepted_rows)
     matched_support = summarize_evidence_support(matched_rows)
-    if not accepted:
-        status = "no_compatible_recipe" if matched_rows else "below_similarity_gate"
+    if not accepted_support.independent_count:
+        status = (
+            "only_zero_yield_outcomes" if accepted
+            else "no_compatible_recipe" if matched_rows else "below_similarity_gate"
+        )
         trace = RetrievalLevelTrace(
             level="unverified_structure_similarity",
             candidate_count=len(matched_rows),
             independent_candidate_count=matched_support.independent_count,
-            compatible_candidate_count=0,
+            compatible_candidate_count=len(accepted),
             independent_compatible_candidate_count=0,
             excluded_candidate_count=excluded_count,
             minimum_independent_support=minimum,
@@ -297,7 +310,9 @@ def retrieve_fallback_pool_with_trace(
         )
         return CompatibleRetrievalResult(
             level=(
-                "no_compatible_condition_precedent"
+                "only_zero_yield_outcomes"
+                if accepted
+                else "no_compatible_condition_precedent"
                 if matched_rows
                 else "no_safe_fallback_similarity_match"
             ),
@@ -339,7 +354,7 @@ def retrieve_fallback_pool_with_trace(
                     descriptor,
                     row.fallback_descriptor,
                 ).score
-                for row in accepted_rows
+                for row in accepted_rows if supports_condition_recipe(row)
             )
             if best_score < float(rules["limited_support_minimum_similarity"]):
                 trace = RetrievalLevelTrace(

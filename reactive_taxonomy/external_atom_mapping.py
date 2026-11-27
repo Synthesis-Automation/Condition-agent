@@ -26,6 +26,7 @@ from typing import (
 )
 
 from .chemistry.rdkit_utils import parse_smiles
+from .chemistry.reaction_smiles import split_reaction_fields
 from .reaction_connectivity import build_connectivity_edit_graph
 from .reaction_edits import EditNormalizationResult, normalize_mapped_edits
 from .reaction_models import (
@@ -385,16 +386,10 @@ def _project_reactant_boundary_atoms(
     """
     from rdkit import Chem
 
-    if ">>" in mapped_reaction_smiles:
-        left, right = mapped_reaction_smiles.split(">>", 1)
-        middle = ""
-        separator = ">>"
-    else:
-        parts = mapped_reaction_smiles.split(">")
-        if len(parts) != 3:
-            return mapped_reaction_smiles, 0
-        left, middle, right = parts
-        separator = ">"
+    parts = split_reaction_fields(mapped_reaction_smiles)
+    if len(parts) != 3:
+        return mapped_reaction_smiles, 0
+    left, middle, right = parts
     molecules = [
         molecule
         for token in tuple(left.split(".")) + tuple(right.split("."))
@@ -444,8 +439,6 @@ def _project_reactant_boundary_atoms(
             Chem.MolToSmiles(molecule, canonical=False, isomericSmiles=True)
         )
     rendered_left = ".".join(rendered_reactants)
-    if separator == ">>":
-        return f"{rendered_left}>>{right}", projected
     return f"{rendered_left}>{middle}>{right}", projected
 
 
@@ -662,12 +655,8 @@ def _reconcile_equivalent_product_atom_maps(
         rendered_products.append(
             Chem.MolToSmiles(copy, canonical=False, isomericSmiles=True)
         )
-    if ">>" in mapped_reaction_smiles:
-        left, _ = mapped_reaction_smiles.split(">>", 1)
-        reconciled = f"{left}>>{'.'.join(rendered_products)}"
-    else:
-        left, middle, _ = mapped_reaction_smiles.split(">", 2)
-        reconciled = f"{left}>{middle}>{'.'.join(rendered_products)}"
+    left, middle, _ = split_reaction_fields(mapped_reaction_smiles)
+    reconciled = f"{left}>{middle}>{'.'.join(rendered_products)}"
     warnings.add(
         "EXTERNAL_MAPPING_RECONCILED_EQUIVALENT_ATOMS:"
         f"{changed_atom_count}"

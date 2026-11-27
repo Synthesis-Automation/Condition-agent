@@ -45,8 +45,9 @@ def observation(components=(), agents="", *, warnings=(), raw=None, outcomes=())
 
 
 def test_paired_registry_conflict_blocks_transfer_and_preserves_both_channels():
-    item = claim("s1", "DMSO", "CS(C)=O")
-    payload = observation([item], "CS(C)=O")
+    isotope_labelled = "[2H]C([2H])([2H])S(=O)C([2H])([2H])[2H]"
+    item = claim("s1", "DMSO", isotope_labelled)
+    payload = observation([item], isotope_labelled)
     record = convert_record(raw_record_from_intermediate(payload))
     evidence = record.source["source_transfer_assessment"]
     assert evidence["claims"][0]["identifier_status"] == "conflict"
@@ -61,6 +62,13 @@ def test_paired_registry_conflict_blocks_transfer_and_preserves_both_channels():
     assert component["provenance"]["source_identifiers"] == tuple(item["identifiers"])
     assert not build_generic_index([record.to_dict()]).rows
     assert record.precedent_tier is None
+
+
+def test_ordinary_dmso_name_and_structure_corroborate_without_isotopes():
+    payload = observation([claim("s1", "DMSO", "CS(C)=O")], "CS(C)=O")
+    record = convert_record(raw_record_from_intermediate(payload))
+    assert record.source["source_transfer_assessment"]["claims"][0]["identifier_status"] == "corroborated"
+    assert "source_material_identity_conflict" not in record.admission_reasons
 
 
 def test_donor_removed_with_auditable_claim_and_unlisted_middle_retained():

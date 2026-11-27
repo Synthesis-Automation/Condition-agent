@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import gzip
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -31,6 +32,7 @@ from core_retrosynthesis.operator_benchmark import (
     run_operator_coverage_benchmark,
 )
 from core_retrosynthesis import generic_search as generic_search_module
+from core_retrosynthesis.step_precedents import lookup_reaction_precedents
 from core_retrosynthesis.sources import (
     iter_library_rows,
     resolve_library_mode,
@@ -59,6 +61,27 @@ REACTIONS = {
     ),
     "ring_formation": "C#CC.[N-]=[N+]=NCC>>CCn1cc(C)nn1",
 }
+
+
+@pytest.mark.parametrize("policy,support", [("exact", 2), ("relaxed", 1)])
+def test_legacy_mixed_and_relaxed_templates_cannot_cite_failed_source_witnesses(policy, support) -> None:
+    library = build_generic_library(
+        [{"reaction_id": "r1", "reference_id": "ref1", "reaction_smiles": "CCBr.N>>CCN"}],
+        levels=("L1",), admission_mode="data_driven",
+    )
+    original = library.templates[0]
+    witness = replace(original.precedents[0], precursor_smiles="[13CH3]CBr.N")
+    template = replace(original, precedents=(witness,), stereo_policy=policy, observation_support=support)
+    old = replace(library, definition={}, templates=(template,))
+    candidates, diagnostics = disconnect_generic_target_detailed("CCN", old)
+    assert not candidates
+    assert diagnostics.source_revalidation_failure_count == 1
+    assert diagnostics.template_budget_excluded_count == 0
+    lookup = lookup_reaction_precedents(
+        step_id="s", template_id=template.template_id, operator_id=template.operator_id,
+        product_smiles="CCN", precursor_smiles="CCBr.N", library=old,
+    )
+    assert lookup.available_precedent_count == 0 and not lookup.matches
 
 
 def _row(kind: str, *, ordinal: int = 1) -> dict:

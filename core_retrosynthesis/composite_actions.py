@@ -13,6 +13,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .chemistry import canonical_smiles, digest
 from .coupled_strategy_search import V1_ADMITTED_RELATIONSHIPS
 from .coupled_route_strategy import extract_coupled_route_strategies
@@ -288,7 +289,7 @@ class CompositeRetrosyntheticAction:
             self.second_operator_id,
             canonical_smiles(self.intermediate_smiles) or "",
             canonical_smiles(self.terminal_precursor_smiles) or "",
-            canonical_smiles(self.second_reaction_smiles.split(">")[2]) or "",
+            canonical_smiles(split_reaction_fields(self.second_reaction_smiles)[2]) or "",
         )
 
     @property
@@ -461,7 +462,7 @@ def _reaction_matches_candidate(candidate: GenericDisconnectionCandidate) -> boo
     ):
         if not reaction:
             continue
-        sides = reaction.split(">")
+        sides = split_reaction_fields(reaction)
         if len(sides) != 3:
             return False
         if canonical_smiles(sides[0]) != canonical_smiles(

@@ -997,7 +997,7 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
 
     assert result.valid
     assert result.retrieval_level == "environment_neighbors"
-    assert result.retrieval_definition_version == "1.8"
+    assert result.retrieval_definition_version == "1.9"
     assert "REACTION_TOPOLOGY_FALLBACK_USED" in result.warnings
     assert any(
         caution.startswith("Reaction-scope mismatch:")

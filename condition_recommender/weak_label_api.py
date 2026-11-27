@@ -22,6 +22,7 @@ from .models import (
     WeakLabelRecommendationResult,
     WeakLabelSourceMatch,
 )
+from .support import load_evidence_support_rules, supports_condition_recipe
 from .weak_label_indexing import (
     WeakLabelIndexedObservation,
     WeakLabelParticipant,
@@ -45,10 +46,12 @@ def load_weak_label_retrieval_rules() -> Dict[str, Any]:
     """Load and validate weak-label retrieval and screening policy."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if rules.get("schema_version") != "1.0" or rules.get(
+    if rules.get("schema_version") != "1.1" or rules.get(
         "definition_id"
     ) != "weak_label_retrieval.v1":
         raise ValueError("unsupported weak-label retrieval definition")
+    if rules.get("zero_yield_policy") != load_evidence_support_rules()["zero_yield_policy"]:
+        raise ValueError("unsupported weak-label outcome evidence policy")
     known_type_ids = {
         str(value["type_id"])
         for value in load_reaction_type_hint_definitions().values()
@@ -353,6 +356,12 @@ def _rank_recipes(
                 item[-1].source_row_number,
             )
         )
+        supporting = [item for item in members if supports_condition_recipe(item[-1])]
+        if not supporting:
+            continue
+        failed_rows = tuple(
+            item[-1].source_row_number for item in members if item[-1].yield_pct == 0
+        )
         similarity_weights = tuple(max(item[0], 0.05) for item in members)
         weight_sum = sum(similarity_weights)
         expected_yield = sum(
@@ -377,8 +386,8 @@ def _rank_recipes(
             _best_order,
             compatibility,
             best_row,
-        ) = members[0]
-        support_score = min(1.0, math.log1p(len(members)) / math.log1p(10))
+        ) = supporting[0]
+        support_score = min(1.0, math.log1p(len(supporting)) / math.log1p(10))
         score = (
             float(weights["label_similarity"]) * best_label
             + float(weights["compatibility"]) * compatibility.score
@@ -398,12 +407,15 @@ def _rank_recipes(
                 compatibility_score=compatibility.score,
                 historical_yield_pct=round(expected_yield, 2),
                 mean_z_score=round(mean_z, 3) if mean_z is not None else None,
-                support=len(members),
+                support=len(supporting),
+                historical_observation_count=len(members),
+                zero_yield_count=len(failed_rows),
+                zero_yield_source_row_numbers=failed_rows[:maximum],
                 source_reaction_types=tuple(
-                    sorted({item[-1].reaction_type for item in members})
+                    sorted({item[-1].reaction_type for item in supporting})
                 ),
                 source_row_numbers=tuple(
-                    item[-1].source_row_number for item in members[:maximum]
+                    item[-1].source_row_number for item in supporting[:maximum]
                 ),
                 source_matches=tuple(
                     WeakLabelSourceMatch(
@@ -425,7 +437,7 @@ def _rank_recipes(
                         signature_similarity=round(item[1], 6),
                         qualifier_similarity=round(item[2], 6),
                     )
-                    for item in members[:maximum]
+                    for item in supporting[:maximum]
                 ),
                 explanation=(
                     "Compatible graph-derived reaction-type hint",
@@ -435,12 +447,14 @@ def _rank_recipes(
                         else "Compatible unordered participant-signature pair"
                     ),
                     f"Recipe compatibility score {compatibility.score:.2f}",
-                    f"Supported by {len(members)} weak-label observation(s)",
+                    f"Supported by {len(supporting)} weak-label observation(s)",
                 ),
                 compatibility_evidence=compatibility.evidence,
                 cautions=(
                     "Source reactions are not structure-verified",
                     "Reaction-type labels are weak evidence",
+                    *(("Historical yield includes reported zero-yield trials "
+                       f"(n = {len(failed_rows)}).",) if failed_rows else ()),
                 ),
             )
         )
@@ -575,7 +589,10 @@ def recommend_weak_label_conditions(
         recipe_count=len(ranked),
         recommendations=recommendations,
         warnings=tuple(warnings),
-        error=None if recommendations else "NO_COMPATIBLE_WEAK_LABEL_RECIPE",
+        error=None if recommendations else (
+            "ONLY_ZERO_YIELD_CONDITION_OUTCOMES" if compatible_count
+            else "NO_COMPATIBLE_WEAK_LABEL_RECIPE"
+        ),
     )
 
 

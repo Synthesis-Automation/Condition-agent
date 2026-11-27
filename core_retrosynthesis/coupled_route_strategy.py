@@ -11,6 +11,7 @@ from typing import Any, Iterable, Mapping, Optional, Sequence
 
 from rdkit import Chem
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .chemistry import canonical_smiles, digest
 from .route_core import (
     RouteAtomLineageCandidate,
@@ -194,12 +195,10 @@ class CoupledRouteStrategyOccurrence:
 
 
 def _reaction_sides(reaction_smiles: str) -> Optional[tuple[str, str]]:
-    if reaction_smiles.count(">>") == 1:
-        reactants, products = reaction_smiles.split(">>", 1)
-    elif reaction_smiles.count(">") == 2:
-        reactants, _, products = reaction_smiles.split(">", 2)
-    else:
+    fields = split_reaction_fields(reaction_smiles)
+    if len(fields) != 3:
         return None
+    reactants, _, products = fields
     return (reactants, products) if reactants and products else None
 
 

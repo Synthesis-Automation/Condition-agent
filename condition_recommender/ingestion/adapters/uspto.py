@@ -14,6 +14,7 @@ from ..models import (
     ReactionEvidenceInput,
     SourceIdentifier,
 )
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .base import (
     clean_text,
     observation_id,
@@ -34,10 +35,7 @@ def _present(value: object) -> bool:
 
 def _complete_reaction_smiles(value: str) -> bool:
     """Check only that source text supplies nonempty reactant and product sides."""
-    if ">>" in value:
-        reactants, products = value.split(">>", 1)
-        return bool(reactants.strip() and products.strip())
-    parts = value.split(">")
+    parts = split_reaction_fields(value)
     return len(parts) == 3 and bool(parts[0].strip() and parts[2].strip())
 
 
@@ -45,7 +43,7 @@ class UsptoConditionCsvAdapter:
     """Preserve USPTO mapped structures and SMILES condition claims."""
 
     adapter_id = "uspto_condition_csv.v1"
-    adapter_version = "1.0"
+    adapter_version = "1.1"
     corpus_id = "uspto_condition_reactions_cleaned"
     required_columns = (
         "source",

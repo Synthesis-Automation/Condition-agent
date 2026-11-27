@@ -171,7 +171,7 @@ def test_fallback_requires_graph_hint_and_matches_unordered_sites(
         "RCR1:b",
     ]
     assert result.recommendations[0].support == 2
-    assert result.schema_version == "2.0"
+    assert result.schema_version == "2.1"
     assert result.recommendations[0].source_matches[0].source_reaction_type == (
         "CN-Coupling"
     )
@@ -208,6 +208,30 @@ def test_source_hint_can_narrow_but_cannot_contradict_graph(tmp_path: Path) -> N
     assert [item.recipe_id for item in narrowed.recommendations] == ["RCR1:b"]
     assert contradicted.valid is False
     assert contradicted.error == "INCOMPATIBLE_SOURCE_REACTION_TYPE_HINT"
+
+
+def test_failed_weak_label_trials_only_contribute_historical_outcomes(tmp_path: Path) -> None:
+    path = _dataset(tmp_path)
+    with path.open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    rows[0]["yield_pct"] = rows[2]["yield_pct"] = "0"
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
+    for mode in ("fallback", "screening"):
+        result = recommend_weak_label_conditions(QUERY, records_path=path, mode=mode)
+        recipe, = result.recommendations
+        assert result.valid and recipe.recipe_id == "RCR1:a"
+        assert recipe.support == 1 and recipe.source_row_numbers == (3,)
+        assert recipe.historical_yield_pct == 45
+        assert recipe.historical_observation_count == 2 and recipe.zero_yield_count == 1
+        assert recipe.zero_yield_source_row_numbers == (2,)
+        only_failed = recommend_weak_label_conditions(
+            QUERY, records_path=path, source_reaction_type_hint="SNAr", mode=mode
+        )
+        assert not only_failed.valid and not only_failed.recommendations
+        assert only_failed.error == "ONLY_ZERO_YIELD_CONDITION_OUTCOMES"
 
 
 def test_screening_array_is_deterministic_and_diversified(tmp_path: Path) -> None:

@@ -1,5 +1,6 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
+  "zero_yield_policy": "historical_outcome_only",
   "definition_id": "weak_label_retrieval.v1",
   "calibration_status": "chemistry_prior_not_statistically_calibrated",
   "supported_reaction_scopes": ["intermolecular"],

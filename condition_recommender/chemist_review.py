@@ -12,6 +12,7 @@ from typing import Any, Dict, Mapping, Optional, Sequence
 from rdkit import Chem
 from rdkit.Chem import Draw
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .compatibility import assess_recipe_compatibility
 from .evaluation import grouped_holdout_split
 from .generic_api import recommend_indexed_signature
@@ -37,11 +38,7 @@ def _file_sha256(path: Path) -> str:
 
 
 def _reactant_components(reaction_smiles: str) -> tuple[str, ...]:
-    left = (
-        reaction_smiles.split(">>", maxsplit=1)[0]
-        if ">>" in reaction_smiles
-        else reaction_smiles.split(">", maxsplit=1)[0]
-    )
+    left = split_reaction_fields(reaction_smiles)[0]
     return tuple(value for value in left.split(".") if value)
 
 

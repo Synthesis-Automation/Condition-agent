@@ -9,6 +9,7 @@ from typing import Any
 
 from condition_registry import resolve_identifier, resolve_substance_id
 from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 
 from .fragment_source_support import matching_fragment_source_capabilities
 from .models import (
@@ -299,14 +300,10 @@ def build_completed_reaction_smiles(
     if not source_smiles:
         return None, tuple(warnings)
 
-    if ">>" in reaction_smiles:
-        reactants, products = reaction_smiles.split(">>", 1)
-        existing_agents = None
-    else:
-        parts = reaction_smiles.split(">")
-        if len(parts) != 3:
-            raise ValueError("INVALID_REACTION_FORMAT")
-        reactants, existing_agents, products = parts
+    parts = split_reaction_fields(reaction_smiles)
+    if len(parts) != 3:
+        raise ValueError("INVALID_REACTION_FORMAT")
+    reactants, existing_agents, products = parts
     reactant_components = tuple(
         component
         for value in (reactants, *source_smiles)
@@ -314,8 +311,6 @@ def build_completed_reaction_smiles(
         if component
     )
     completed_reactants = ".".join(dict.fromkeys(reactant_components))
-    if existing_agents is None:
-        return f"{completed_reactants}>>{products}", tuple(warnings)
     return (
         f"{completed_reactants}>{existing_agents.strip()}>{products}",
         tuple(warnings),

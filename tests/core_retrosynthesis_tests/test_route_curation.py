@@ -124,6 +124,16 @@ def test_normalization_rejects_an_ambiguous_target() -> None:
     assert error.value.reason == "ambiguous_route_target"
 
 
+@pytest.mark.parametrize("atom", ["[NH3:2]", "[13CH4:2]"])
+def test_mapped_product_requires_matching_element_and_isotope(atom: str) -> None:
+    route = _route("US00000001A1", 0, 100)
+    leaf = route["subtrees"][0]["reactions"][0]
+    leaf["reaction_smiles"] = f"[CH4:1].{atom}>[Na+]>[CH3:1][CH3:2]"
+    with pytest.raises(RouteQualityError) as error:
+        normalize_linear_route_record(route, split="train")
+    assert error.value.reason == "mapped_element_or_isotope_mismatch"
+
+
 def test_curator_is_deterministic_and_patent_disjoint(tmp_path: Path) -> None:
     source = tmp_path / "source.jsonl.gz"
     first_output = tmp_path / "first.jsonl.gz"

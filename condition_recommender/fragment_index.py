@@ -21,7 +21,7 @@ import zstandard
 from rdkit import Chem, rdBase
 from rdkit.Chem import rdSubstructLibrary
 
-from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
+from reactive_taxonomy.chemistry.reaction_smiles import REACTION_FIELD_PARSER_VERSION, split_reaction_fields
 from reactive_taxonomy.fragment_search import (
     fragment_search_policy, indexed_product, project_fragment_evidence,
 )
@@ -146,6 +146,7 @@ def build_fragment_index(
             if pending and pending.get("scan_complete"):
                 if (pending.get("sources") != identities or pending.get("policy") != policy
                     or pending.get("source_mapping_screen") != SOURCE_MAPPING_SCREEN_VERSION
+                    or pending.get("reaction_field_parser") != REACTION_FIELD_PARSER_VERSION
                     or pending.get("schema_version") != SCHEMA_VERSION
                     or pending.get("rdkit_version") != rdBase.rdkitVersion
                     or pending.get("requested_max_records") != max_records):
@@ -279,6 +280,7 @@ def build_fragment_index(
                     "correspondence_scope": "validated_supplied_maps_only"}
         manifest["search_sides"] = ["product", "reactant"]
         manifest["source_mapping_screen"] = SOURCE_MAPPING_SCREEN_VERSION
+        manifest["reaction_field_parser"] = REACTION_FIELD_PARSER_VERSION
         manifest["counts"]["distinct_molecules"] = len(products)
         manifest["counts"]["distinct_products"] = connection.execute(
             "SELECT count(DISTINCT product_id) FROM links WHERE side='product'").fetchone()[0]

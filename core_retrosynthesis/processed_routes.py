@@ -19,10 +19,11 @@ import zlib
 from condition_recommender.corpus_io import file_sha256
 from condition_recommender.ingestion.cbyd import CBYD_ROUTE_SCHEMA_VERSION
 from reactive_taxonomy.chemistry.source_mapping import assess_source_mapping
+from reactive_taxonomy.chemistry.reaction_smiles import REACTION_FIELD_PARSER_VERSION
 from .route_conversion import build_observed_route_tree, ObservedRouteConversionError
 from .route_curation import (
     _canonical_unmapped_smiles, _parse_reaction, _patent_id, _source_reaction_id,
-    RouteQualityError,
+    ROUTE_CURATION_POLICY_VERSION, RouteQualityError,
 )
 
 LEGACY_ROUTE_CATALOG_VERSION = "processed_routes.v1.1"
@@ -241,7 +242,9 @@ def _verified_legacy_catalog(release_root: str | Path) -> tuple[Path, str] | Non
         raise ValueError("Reusable route catalog checksum mismatch")
     with closing(sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)) as db:
         metadata = json.loads(db.execute("SELECT payload FROM metadata").fetchone()[0])
-    if metadata["schema_version"] == LEGACY_ROUTE_CATALOG_VERSION and metadata.get("build_complete"):
+    if (metadata["schema_version"] == LEGACY_ROUTE_CATALOG_VERSION and metadata.get("build_complete")
+            and metadata.get("route_curation_policy") == ROUTE_CURATION_POLICY_VERSION
+            and metadata.get("reaction_field_parser") == REACTION_FIELD_PARSER_VERSION):
         return path, metadata["source_binding"]
     return None
 
@@ -278,7 +281,7 @@ def build_route_bundle_catalog(
     output.parent.mkdir(parents=True, exist_ok=True)
     pairs = [(Path(routes).resolve(), Path(steps).resolve()) for routes, steps in bundles]
     hashes = [(file_sha256(routes), file_sha256(steps)) for routes, steps in pairs]
-    inputs = [ROUTE_CATALOG_VERSION, hashes]
+    inputs = [ROUTE_CATALOG_VERSION, hashes, REACTION_FIELD_PARSER_VERSION, ROUTE_CURATION_POLICY_VERSION]
     if evidence_catalog is not None:
         from reactive_taxonomy.chemistry.source_mapping import SOURCE_MAPPING_SCREEN_VERSION
 
@@ -374,6 +377,8 @@ def build_route_bundle_catalog(
             bundle_reports.append({"route_sha256": route_hash, "step_sha256": step_hash, "route_count": nroute,
                                    "observation_count": nsteps, "counts": states})
         report = {"schema_version": ROUTE_CATALOG_VERSION, "build_complete": True,
+                  "route_curation_policy": ROUTE_CURATION_POLICY_VERSION,
+                  "reaction_field_parser": REACTION_FIELD_PARSER_VERSION,
                   "source_binding": binding, "route_count": sum(counts.values()), "counts": counts,
                   "bundles": bundle_reports, "unresolved_reasons": reasons, "missing_memberships": missing,
                   "ambiguous_step_aliases": ambiguous, "conflicting_memberships": conflicts,
@@ -392,6 +397,16 @@ def build_route_bundle_catalog(
     return report
 
 
+@lru_cache(maxsize=128)
+def _historical_route_issue(source: bytes) -> str | None:
+    """Requalify a saved tree's actual source before using an older validation result."""
+    try:
+        normalize_released_route(json.loads(zlib.decompress(source)))
+    except RouteQualityError as error:
+        return error.reason
+    return None
+
+
 class ProcessedRouteCatalog:
     """Indexed route source, membership and qualified-tree access."""
 
@@ -402,18 +417,19 @@ class ProcessedRouteCatalog:
         return sqlite3.connect(self.path.as_uri() + "?mode=ro&immutable=1", uri=True)
 
     @staticmethod
-    def _version(db: sqlite3.Connection) -> str:
+    def _metadata(db: sqlite3.Connection) -> dict[str, Any]:
         report = json.loads(db.execute("SELECT payload FROM metadata").fetchone()[0])
         version = report.get("schema_version")
         if version not in {ROUTE_CATALOG_VERSION, LEGACY_ROUTE_CATALOG_VERSION} or not report.get("build_complete"):
             raise ValueError("Route catalog is incompatible or incomplete")
-        return version
+        return report
 
     def route(self, identity: str, *, include_tree: bool = False,
               include_source: bool = False) -> dict[str, Any]:
         """Fetch one route with exact original-step aliases and observation joins."""
         with closing(self._connect()) as db:
-            legacy = self._version(db) == LEGACY_ROUTE_CATALOG_VERSION
+            metadata = self._metadata(db)
+            legacy = metadata["schema_version"] == LEGACY_ROUTE_CATALOG_VERSION
             columns = "0,0" if legacy else "bundle,publisher_graph"
             row = db.execute(f"SELECT status,reason,source,tree,{columns} FROM routes WHERE id=?", (identity,)).fetchone()
             if row is None:
@@ -446,12 +462,18 @@ class ProcessedRouteCatalog:
                     screen = screened.get(member.get("expected_observation_id"))
                     if screen:
                         member.update(structural_disposition=screen[0], structural_exclusion_reasons=screen[1])
-        result = {"route_id": identity, "status": row[0], "unresolved_reason": row[1],
-                  "memberships": memberships, "tree_available": row[3] is not None,
+        status, reason = row[:2]
+        tree_available = row[3] is not None
+        if tree_available and metadata.get("route_curation_policy") != ROUTE_CURATION_POLICY_VERSION:
+            if issue := _historical_route_issue(row[2]):
+                status, reason = "unresolved", issue
+                tree_available = False
+        result = {"route_id": identity, "status": status, "unresolved_reason": reason,
+                  "memberships": memberships, "tree_available": tree_available,
                   "publisher_graph_available": bool(row[5]),
                   "connectivity_scope": ("publisher_inferred_from_reported_synthesis" if row[5]
                                          else "inferred_from_source_molecular_identity")}
-        if include_tree and row[3] is not None:
+        if include_tree and tree_available:
             result["tree"] = json.loads(zlib.decompress(row[3]))
         if include_source:
             result["source"] = json.loads(zlib.decompress(row[2]))
@@ -461,7 +483,7 @@ class ProcessedRouteCatalog:
     def routes_for_observation(self, observation_id: str) -> list[str]:
         """Look up route memberships for an exact intermediate observation identity."""
         with closing(self._connect()) as db:
-            version = self._version(db)
+            version = self._metadata(db)["schema_version"]
             scope = "" if version == LEGACY_ROUTE_CATALOG_VERSION else (
                 "AND o.bundle=r.bundle AND (s.expected_obs IS NULL OR s.expected_obs=o.observation_id)"
             )
@@ -474,8 +496,11 @@ class ProcessedRouteCatalog:
         """Stream qualified trees through the existing validated typed contract."""
         from .route_contract import ReactionRouteTree
         with closing(self._connect()) as db:
-            self._version(db)
-            for (payload,) in db.execute("SELECT tree FROM routes WHERE status='validated_tree' ORDER BY id"):
+            current = self._metadata(db).get("route_curation_policy") == ROUTE_CURATION_POLICY_VERSION
+            source_column = "NULL" if current else "source"
+            for payload, source in db.execute(f"SELECT tree,{source_column} FROM routes WHERE status='validated_tree' ORDER BY id"):
+                if source is not None and _historical_route_issue(source):
+                    continue
                 yield ReactionRouteTree.from_dict(json.loads(zlib.decompress(payload)))
 
 

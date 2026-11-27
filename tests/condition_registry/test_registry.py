@@ -72,8 +72,49 @@ def test_incorrect_dppf_stoichiometry_alias_is_not_resolved_to_dcm_adduct() -> N
     assert resolve_identifier("Pd(dppf)2Cl2", identifier_type="name").status != "resolved"
 
 
+@pytest.mark.parametrize(("graph", "cas"), [
+    ("CO", "67-56-1"),
+    ("[2H]OC", "1455-13-6"),
+    ("[2H]OC([2H])([2H])[2H]", "811-98-3"),
+    ("CC(C)(C)O", "75-65-0"),
+    ("CC(C)(C)[O-].[K+]", "865-47-4"),
+    ("CC(C)(C)[O-].[Li+]", "1907-33-1"),
+    ("CC(C)(C)[O-].[Na+]", "865-48-5"),
+])
+def test_salt_and_isotope_graphs_resolve_to_distinct_materials(graph: str, cas: str) -> None:
+    identity = resolve_identifier(graph, identifier_type="smiles")
+    assert identity.status == "resolved" and identity.substance.cas == cas
+
+
+def test_a_counterion_free_methoxide_graph_cannot_identify_a_specific_salt() -> None:
+    assert resolve_identifier("C[O-]", identifier_type="smiles").status == "unresolved"
+
+
+@pytest.mark.parametrize(("alias", "correct", "previous_cas", "previous_name"), [
+    ("AgBF4", "14104-20-2", "7775-27-1", "Sodium persulfate"),
+    ("MesCO2H", "480-63-7", "576-26-1", "2,6-Dimethylphenol"),
+])
+def test_aliases_reference_the_compound_described_by_their_cas(
+    alias: str, correct: str, previous_cas: str, previous_name: str,
+) -> None:
+    assert resolve_identifier(alias, identifier_type="name").substance.cas == correct
+    assert resolve_substance(cas=previous_cas).substance.canonical_name == previous_name
+
+
+def test_canonical_formula_in_smiles_field_is_reported_on_its_own_row(tmp_path) -> None:
+    path = tmp_path / "registry.jsonl"
+    path.write_text('{"id":"test:1","name":"coordination complex","smiles":"C8H12CuF6N4P"}\n'
+                    '{"id":"test:2","name":"formulation awaiting a structure"}\n', encoding="utf-8")
+    audit = validate_registry(substances_path=path)
+    assert audit["issue_counts"] == {"INVALID_CANONICAL_SMILES": 1}
+    assert audit["issues"][0]["substance_id"] == "test:1"
+    assert audit["accepted_rows"] == 1
+
+
 @pytest.mark.parametrize("name,smiles,status,substance_id", [
     ("NaOMe", "[Na+].C[O-]", "corroborated", "cas:124-41-4"),
+    ("MeONa", "[Na+].C[O-]", "corroborated", "cas:124-41-4"),
+    ("MeONa", "CO", "conflict", None),
     ("NaOMe", "CO", "conflict", None),
     ("MeOH", "CO", "corroborated", "cas:67-56-1"),
     ("MeOH", "C[O-].[Na+]", "conflict", None),

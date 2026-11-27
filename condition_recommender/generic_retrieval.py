@@ -34,7 +34,11 @@ from .reaction_facets import (
     reaction_facet_keys,
 )
 from .similarity import generic_signature_similarity, reaction_scope
-from .support import summarize_evidence_support
+from .support import (
+    summarize_evidence_support,
+    summarize_recipe_support,
+    supports_condition_recipe,
+)
 from .related_handles import SearchScope, related_handle_positions, validate_search_scope
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_retrieval.v1.json"
@@ -70,7 +74,7 @@ RETROSYNTHESIS_PRECEDENT_BRIDGE_VERSION = "1.0"
 def load_generic_retrieval_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.8":
+    if str(rules.get("schema_version") or "") != "1.9":
         raise ValueError("unsupported generic retrieval definition schema")
     if str(rules.get("definition_id") or "") != "generic_retrieval.v1":
         raise ValueError("unexpected generic retrieval definition ID")
@@ -547,7 +551,7 @@ def retrieve_generic_pool_with_trace(
             )
         )
         raw_support = summarize_evidence_support(raw_rows)
-        support = summarize_evidence_support(rows)
+        support = summarize_recipe_support(rows)
         trace = RetrievalLevelTrace(
             level=level,
             candidate_count=len(raw_rows),
@@ -559,8 +563,9 @@ def retrieve_generic_pool_with_trace(
             status="insufficient_independent_support",
         )
         traces.append(trace)
-        if not rows:
-            traces[-1] = replace(trace, status="no_compatible_recipe")
+        if not support.independent_count:
+            status = "only_zero_yield_outcomes" if rows else "no_compatible_recipe"
+            traces[-1] = replace(trace, status=status)
             continue
         if fallback is None or (
             support.independent_count,
@@ -664,7 +669,7 @@ def retrieve_preferred_reaction_pool_with_trace(
         condition_constraints=condition_constraints,
     )
     raw_support = summarize_evidence_support(raw_rows)
-    accepted_support = summarize_evidence_support(tuple(row for row, _ in accepted))
+    accepted_support = summarize_recipe_support(row for row, _ in accepted)
     excluded_count = (
         len(raw_positions) - len(structural_positions) + len(recipe_excluded)
     )
@@ -672,6 +677,8 @@ def retrieve_preferred_reaction_pool_with_trace(
         "selected"
         if accepted_support.independent_count >= minimum
         else "selected_limited_support"
+        if accepted_support.independent_count
+        else "only_zero_yield_outcomes"
         if accepted
         else "no_compatible_precedent"
         if raw_positions
@@ -680,7 +687,7 @@ def retrieve_preferred_reaction_pool_with_trace(
     base_level = "retrosynthesis_precedent"
     level = (
         f"{base_level}_limited_support"
-        if accepted and accepted_support.independent_count < minimum
+        if 0 < accepted_support.independent_count < minimum
         else base_level
     )
     trace = RetrievalLevelTrace(
@@ -695,7 +702,7 @@ def retrieve_preferred_reaction_pool_with_trace(
     )
     return CompatibleRetrievalResult(
         level=level,
-        pool=accepted,
+        pool=accepted if accepted_support.independent_count else (),
         candidate_count=len(raw_rows),
         independent_candidate_count=raw_support.independent_count,
         excluded_candidate_count=excluded_count,
@@ -725,6 +732,9 @@ class ProgressiveCompatibleRetrievalResult:
     @property
     def level(self) -> str:
         if not self.tiers:
+            if (self.compatible_candidate_count
+                    and not self.independent_compatible_candidate_count):
+                return "only_zero_yield_outcomes"
             return (
                 "no_compatible_condition_precedent" if self.candidate_count
                 else "no_chemically_compatible_precedent"
@@ -826,14 +836,14 @@ def retrieve_progressive_compatible_pools_with_trace(
         excluded_total += len(excluded)
         raw_support = summarize_evidence_support(rows)
         accepted_rows = tuple(row for row, _ in accepted)
-        accepted_support = summarize_evidence_support(accepted_rows)
+        accepted_support = summarize_recipe_support(accepted_rows)
         new_recipe_cores = {
-            row.recipe_core_id for row in accepted_rows
+            row.recipe_core_id for row in accepted_rows if supports_condition_recipe(row)
         } - seen_recipe_cores
         if accepted and new_recipe_cores:
             tiers.append((level, accepted))
             seen_recipe_cores.update(new_recipe_cores)
-            enough_support = summarize_evidence_support(
+            enough_support = summarize_recipe_support(
                 accepted_rows_by_position.values()
             ).independent_count >= minimum
             status = (
@@ -843,8 +853,10 @@ def retrieve_progressive_compatible_pools_with_trace(
                 if accepted_support.independent_count >= minimum
                 else "selected_limited_support"
             )
-        elif accepted:
+        elif accepted_support.independent_count:
             status = "no_new_recipe_core"
+        elif accepted:
+            status = "only_zero_yield_outcomes"
         else:
             status = "no_compatible_recipe"
         traces.append(
@@ -870,7 +882,7 @@ def retrieve_progressive_compatible_pools_with_trace(
         )
         return (
             len(seen_recipe_cores) >= target_recipe_count
-            and summarize_evidence_support(
+            and summarize_recipe_support(
                 accepted_rows_by_position.values()
             ).independent_count >= minimum
         )
@@ -889,7 +901,7 @@ def retrieve_progressive_compatible_pools_with_trace(
         )
         if target_reached:
             break
-    same_handle_support = summarize_evidence_support(
+    same_handle_support = summarize_recipe_support(
         accepted_rows_by_position.values()
     ).independent_count
     if search_scope == "broad" or (
@@ -903,7 +915,7 @@ def retrieve_progressive_compatible_pools_with_trace(
             # A requested display limit must not force a still broader search
             # after the permitted analogue tier has sufficient evidence.
             target_reached = target_reached or (
-                summarize_evidence_support(
+                summarize_recipe_support(
                     accepted_rows_by_position.values()
                 ).independent_count >= minimum
             )
@@ -925,7 +937,7 @@ def retrieve_progressive_compatible_pools_with_trace(
     raw_rows = tuple(raw_rows_by_position.values())
     compatible_rows = tuple(accepted_rows_by_position.values())
     raw_support = summarize_evidence_support(raw_rows)
-    compatible_support = summarize_evidence_support(compatible_rows)
+    compatible_support = summarize_recipe_support(compatible_rows)
     return ProgressiveCompatibleRetrievalResult(
         tiers=tuple(tiers),
         candidate_count=len(raw_rows),
@@ -984,9 +996,10 @@ def retrieve_compatible_generic_pool_with_trace(
         )
         raw_support = summarize_evidence_support(rows)
         accepted_rows = tuple(row for row, _ in accepted)
-        accepted_support = summarize_evidence_support(accepted_rows)
+        accepted_support = summarize_recipe_support(accepted_rows)
         status = (
-            "insufficient_independent_support" if accepted else "no_compatible_recipe"
+            "insufficient_independent_support" if accepted_support.independent_count
+            else "only_zero_yield_outcomes" if accepted else "no_compatible_recipe"
         )
         trace = RetrievalLevelTrace(
             level=level,
@@ -999,7 +1012,7 @@ def retrieve_compatible_generic_pool_with_trace(
             status=status,
         )
         traces.append(trace)
-        if not accepted:
+        if not accepted_support.independent_count:
             continue
         candidate = (
             level,
@@ -1052,7 +1065,9 @@ def retrieve_compatible_generic_pool_with_trace(
         )
         support = summarize_evidence_support(bond_rows)
         return CompatibleRetrievalResult(
-            "no_compatible_condition_precedent",
+            "only_zero_yield_outcomes"
+            if any(item.status == "only_zero_yield_outcomes" for item in traces)
+            else "no_compatible_condition_precedent",
             (),
             len(bond_rows),
             support.independent_count,

@@ -302,6 +302,7 @@ class GenericSearchDiagnostics:
     focus_unresolved_count: int = 0
     focus_validation_rejected_count: int = 0
     focus_rejection_examples: Tuple[DisconnectionBondCheck, ...] = ()
+    source_revalidation_failure_count: int = 0
 
     def to_dict(self) -> Dict[str, int]:
         """Return integer stage counters; detailed witnesses are exposed separately."""

@@ -14,7 +14,8 @@ from condition_recommender.corpus_io import file_sha256, iter_canonical_records
 from condition_recommender.fragment_index import build_fragment_index
 from condition_recommender.generic_indexing import load_generic_index
 from condition_recommender.processed_build import (
-    DEFAULT_INPUT_ROOT, DEFAULT_OUTPUT_ROOT, PIPELINE_GENERATION, convert_release, prepare_release,
+    DEFAULT_INPUT_ROOT, DEFAULT_OUTPUT_ROOT, PIPELINE_GENERATION, convert_release,
+    observation_source_binding, prepare_release, verify_route_bundle_report,
 )
 from condition_recommender.processed_catalog import CATALOG_SCHEMA_VERSION, build_processed_catalog
 from condition_recommender.processed_release import publish_processed_release, resolve_processed_release
@@ -22,6 +23,7 @@ from condition_recommender.shared_core_index import build_shared_core_index, loa
 from condition_recommender.sqlite_indexing import build_sqlite_generic_index
 from core_retrosynthesis.full_scale import build_full_scale_operator_library
 from core_retrosynthesis.processed_routes import ROUTE_CATALOG_VERSION, build_route_bundle_catalog
+from core_retrosynthesis.route_curation import ROUTE_CURATION_POLICY_VERSION
 from forward_synthesis import build_forward_library, save_forward_library
 from reactive_taxonomy.shared_core_graph import shared_core_availability
 
@@ -62,6 +64,8 @@ def build_processed_datasets(
         or any(not s.get("coverage_complete") for s in conversion["source_files"])
         or any(s.get("status") != "complete" for s in conversion["shards"])):
         raise ValueError("Canonical conversion is unfinished")
+    if observation_source_binding(conversion["source_files"]) != observation_source_binding(manifest["sources"]):
+        raise ValueError("Canonical source hashes differ from the selected release inventory")
     binding = file_sha256(canonical)
     artifacts: dict[str, dict[str, Any]] = {}
 
@@ -106,13 +110,11 @@ def build_processed_datasets(
         route_report = stage("routes", {"route_catalog": indexes / "route_catalog.sqlite"},
               lambda: build_route_bundle_catalog(pairs, indexes / "route_catalog.sqlite",
                       workers=workers, evidence_catalog=indexes / "catalogs.sqlite",
-                      progress=lambda event: emit("route_rows", report=event)), ROUTE_CATALOG_VERSION,
+                      progress=lambda event: emit("route_rows", report=event)),
+                      f"{ROUTE_CATALOG_VERSION}/curation.v{ROUTE_CURATION_POLICY_VERSION}",
                       ("evidence_catalog",))
         for source_entry, result in zip(route_sources, route_report["bundles"], strict=True):
-            for count in ("route_count", "observation_count"):
-                expected = source_entry.get("expected_" + count)
-                if expected is not None and result[count] != expected:
-                    raise ValueError(f"Route bundle {count} differs from its intermediate manifest")
+            verify_route_bundle_report(source_entry, result)
     condition_report = stage("conditions", {"condition_index": indexes / "generic_index.sqlite"},
           lambda: build_sqlite_generic_index(iter_canonical_records(canonical), indexes / "generic_index.sqlite",
                                               progress_callback=lambda phase, count: emit("condition_" + phase, rows=count),
@@ -126,7 +128,7 @@ def build_processed_datasets(
     fragment_report = stage("fragments", {"fragment_index": indexes / "fragment_index.sqlite"},
           lambda: build_fragment_index(canonical, indexes / "fragment_index.sqlite",
                                         evidence_catalog=indexes / "catalogs.sqlite",
-                                        progress=lambda event: emit("fragment_rows", **event)), "fragments.v3", ("evidence_catalog",))
+                                        progress=lambda event: emit("fragment_rows", **event)), "fragments.v4", ("evidence_catalog",))
 
     def operators() -> dict[str, Any]:
         library, report = build_full_scale_operator_library(

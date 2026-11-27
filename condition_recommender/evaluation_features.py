@@ -8,6 +8,8 @@ from typing import Any, Mapping, Tuple
 from rdkit import Chem
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
+
 
 def reactive_component_indices(signature: Mapping[str, Any]) -> Tuple[int, ...]:
     """Return reactant component indices supported by partners or bond edits."""
@@ -32,9 +34,7 @@ def reactive_component_indices(signature: Mapping[str, Any]) -> Tuple[int, ...]:
 
 
 def _reactant_text(reaction_smiles: str) -> str:
-    if ">>" in reaction_smiles:
-        return reaction_smiles.split(">>", maxsplit=1)[0]
-    parts = reaction_smiles.split(">")
+    parts = split_reaction_fields(reaction_smiles)
     return parts[0] if len(parts) == 3 else ""
 
 

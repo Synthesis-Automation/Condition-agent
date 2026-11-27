@@ -162,10 +162,46 @@ def test_selected_variant_does_not_borrow_other_temperature_yields():
     assert recommendation.historical_yield_summary["observation_count"] == 1
 
 
+def test_zero_yield_is_an_observed_failure_and_does_not_vote_for_the_recipe():
+    rows = [
+        _record(1, yield_pct=0),
+        _record(2, yield_pct=80),
+        _record(3, temperature=80, yield_pct=0),
+        _record(4, core="failed", yield_pct=0),
+    ]
+    recommendation, = _rank(rows)
+    assert recommendation.recipe_id == "same-ingredients:25"
+    assert recommendation.recipe_variant_ids == ("same-ingredients:25",)
+    assert recommendation.observation_support == recommendation.reference_support == 1
+    assert recommendation.precedent_reaction_ids == ("r-002",)
+    assert recommendation.historical_yield_pct == 40
+    assert recommendation.score_trace.observed_outcome_count == 2
+    assert recommendation.historical_yield_summary["zero_yield_count"] == 1
+    assert recommendation.historical_yield_summary["zero_yield_observation_ids"] == ("obs-001",)
+    assert _rank([_record(1, yield_pct=None)])[0].historical_yield_pct is None
+
+
+def test_baseline_engine_abstains_when_compatible_trials_only_report_zero_yield():
+    index = build_generic_index([_record(1, yield_pct=0), _record(2, yield_pct=0)])
+    result = GenericConditionRecommender(index).recommend(REACTION, minimum_pool_size=1)
+    assert not result.valid and not result.recommendations
+    assert result.error == "ONLY_ZERO_YIELD_CONDITION_OUTCOMES"
+    assert any(t.status == "only_zero_yield_outcomes" for t in result.retrieval_trace)
+
+
 def test_missing_conditions_have_unknown_coverage_without_becoming_hard_conflict():
     assessment = assess_recipe_compatibility(_base_record()["reaction_signature"], {})
     assert assessment.compatible and assessment.status == "unknown"
     assert assessment.score == 0 and assessment.evidence
+
+
+def test_selected_ambiguous_ingredient_is_named_for_review():
+    row = _record(1)
+    material = row["resolved_recipe"]["solvents"][0]
+    material.update(raw_identifier="CO", identity_status="ambiguous", substance_id=None)
+    result, = _rank([row])
+    assert result.compatibility_status == "unknown"
+    assert any("solvents[0]: CO" in warning for warning in result.cautions)
 
 
 def test_hydrogen_source_check_is_structure_backed_and_preserves_ambiguity():

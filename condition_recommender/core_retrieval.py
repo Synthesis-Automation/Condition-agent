@@ -18,7 +18,7 @@ from reactive_taxonomy import (
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
 from .generic_indexing import GenericIndexedReaction, GenericReactionIndex
 from .models import RetrievalLevelTrace
-from .support import summarize_evidence_support
+from .support import summarize_evidence_support, summarize_recipe_support
 
 
 _RULES_PATH = (
@@ -194,11 +194,13 @@ def retrieve_core_pool_with_trace(
         accepted, excluded = filter_compatible_precedents(
             compatibility_signature, rows, condition_constraints=condition_constraints
         )
-        accepted_support = summarize_evidence_support(tuple(row for row, _ in accepted))
+        accepted_support = summarize_recipe_support(row for row, _ in accepted)
         if not rows:
             status = "empty"
         elif not accepted:
             status = "no_compatible_recipe"
+        elif not accepted_support.independent_count:
+            status = "only_zero_yield_outcomes"
         elif accepted_support.independent_count >= minimum:
             status = "selected"
         else:
@@ -226,13 +228,15 @@ def retrieve_core_pool_with_trace(
         )
         if status == "selected":
             return result
-        if accepted and limited is None:
+        if accepted_support.independent_count and limited is None:
             limited = result
 
     if limited is not None:
         return replace(limited, trace=tuple(trace))
     return CoreRetrievalResult(
-        "no_reaction_core_precedent",
+        "only_zero_yield_outcomes"
+        if any(t.status == "only_zero_yield_outcomes" for t in trace)
+        else "no_reaction_core_precedent",
         (),
         0,
         0,

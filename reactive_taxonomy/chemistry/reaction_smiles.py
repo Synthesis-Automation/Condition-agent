@@ -4,6 +4,7 @@ import re
 
 
 _FIELD_SEPARATOR = re.compile(r"(?<!-)>")
+REACTION_FIELD_PARSER_VERSION = "reaction_smiles_fields.v2"
 
 
 def split_reaction_fields(value: str) -> list[str]:

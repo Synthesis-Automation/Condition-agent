@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .generic_indexing import GenericIndexedReaction
+from .weak_label_indexing import WeakLabelIndexedObservation
 
 
 @dataclass(frozen=True)
@@ -52,6 +53,8 @@ def load_evidence_support_rules() -> dict[str, Any]:
         raise ValueError("evidence-support policy must preserve observations")
     if rules.get("mapping_equivalence_applies_without_reference") is not True:
         raise ValueError("mapping equivalence must deduplicate unreferenced rows")
+    if rules.get("zero_yield_policy") != "historical_outcome_only":
+        raise ValueError("unsupported zero-yield evidence policy")
     return rules
 
 
@@ -80,6 +83,16 @@ def evidence_unit(row: GenericIndexedReaction) -> str:
     return "reaction:" + (
         row.canonical_reaction_id or row.observation_id or row.reaction_id
     )
+
+
+def supports_condition_recipe(row: GenericIndexedReaction | WeakLabelIndexedObservation) -> bool:
+    """A reported zero yield is counterevidence. An unreported yield is unknown."""
+    return row.yield_pct is None or row.yield_pct > 0
+
+
+def summarize_recipe_support(rows: Iterable[GenericIndexedReaction]) -> EvidenceSupport:
+    """Count independent support without turning failed trials into votes."""
+    return summarize_evidence_support(row for row in rows if supports_condition_recipe(row))
 
 
 def summarize_evidence_support(
@@ -128,4 +141,6 @@ __all__ = [
     "load_evidence_support_rules",
     "mapping_equivalence_key",
     "summarize_evidence_support",
+    "summarize_recipe_support",
+    "supports_condition_recipe",
 ]

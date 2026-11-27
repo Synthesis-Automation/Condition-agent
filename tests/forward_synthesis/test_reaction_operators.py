@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from rdkit import Chem
 
 from reactive_taxonomy import (
@@ -11,6 +12,21 @@ from reactive_taxonomy import (
     apply_reaction_smarts,
     reverse_recovers_precursors,
 )
+from reactive_taxonomy.reaction_operators import operator_stereo_match
+
+
+def test_matching_symmetric_spectators_preserves_opposite_assigned_stereo() -> None:
+    spectators = ".".join(["CC(C)C"] * 18)
+    assert operator_stereo_match("C[C@H](F)Br." + spectators, "C[C@@H](F)Br." + spectators) == "absent"
+
+
+def test_partially_assigned_equivalent_centers_preserve_ambiguity_and_bound_search() -> None:
+    a = "NC(F)C(Cl)[C@H](F)N"
+    b = "NC(F)C(Cl)[C@@H](F)N"
+    assert operator_stereo_match(a, b) == "connectivity_only"
+    a = a.replace("(Cl)", "(C(F)C(Cl)C(F)C(Cl)C(F)C(Cl)C(F)O)")
+    b = b.replace("(Cl)", "(C(F)C(Cl)C(F)C(Cl)C(F)C(Cl)C(F)O)")
+    assert operator_stereo_match(a, b) == "unresolved"
 
 
 def _operator() -> BidirectionalReactionOperator:
@@ -120,3 +136,21 @@ def test_forward_application_can_use_virtual_copies_for_self_reaction() -> None:
     )
     assert explicit_copies
     assert all(not item.uses_virtual_copies for item in explicit_copies)
+
+
+@pytest.mark.parametrize(("expected", "observed", "match"), [
+    ("[13CH3]CO", "OCC", "absent"),
+    ("[13CH3]CO", "C[13CH2]O", "absent"),
+    ("[13CH3]CO", "OC[13CH3]", "exact"),
+    ("[CH3:7][C@H:1](F)O", "C[C@H](F)O", "exact"),
+    ("C[C@H](F)O", "C[C@@H](F)O", "absent"),
+    ("C/C=C/C", "C/C=C\\C", "absent"),
+    ("C/C=C/C", "CC=CC", "connectivity_only"),
+    ("CC=CC", "C/C=C/C", "stereo_relaxed"),
+    ("C[C@H](F)C[C@H](F)O", "C[C@@H](F)CC(F)O", "absent"),
+    ("C[C@H](F)C[C@H](F)O", "C[C@H](F)CC(F)O", "connectivity_only"),
+    ("CCO.[Na+].[Na+]", "CCO.[Na+]", "absent"),
+    ("C(", "C(", "absent"),
+])
+def test_operator_stereo_match_preserves_constitution_and_requested_assignments(expected, observed, match):
+    assert operator_stereo_match(expected, observed) == match

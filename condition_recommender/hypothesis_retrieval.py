@@ -28,7 +28,7 @@ from .generic_indexing import GenericIndexedReaction, GenericReactionIndex
 from .generic_retrieval import CompatibleRetrievalResult
 from .models import RetrievalLevelTrace
 from .similarity import SimilarityAssessment
-from .support import summarize_evidence_support
+from .support import summarize_evidence_support, summarize_recipe_support
 
 
 _RULES_PATH = (
@@ -218,11 +218,13 @@ def retrieve_hypothesis_consensus_pool_with_trace(
         condition_constraints=condition_constraints,
     )
     accepted_rows = tuple(row for row, _ in accepted)
-    accepted_support = summarize_evidence_support(accepted_rows)
+    accepted_support = summarize_recipe_support(accepted_rows)
     if not rows:
         status = "no_consensus_candidate"
     elif not accepted:
         status = "no_compatible_recipe"
+    elif not accepted_support.independent_count:
+        status = "only_zero_yield_outcomes"
     elif accepted_support.independent_count >= minimum:
         status = "selected"
     else:
@@ -254,7 +256,9 @@ def retrieve_hypothesis_consensus_pool_with_trace(
         )
     if accepted_support.independent_count < minimum:
         return CompatibleRetrievalResult(
-            level="insufficient_edit_hypothesis_consensus_support",
+            level="only_zero_yield_outcomes"
+            if not accepted_support.independent_count
+            else "insufficient_edit_hypothesis_consensus_support",
             pool=(),
             candidate_count=len(rows),
             independent_candidate_count=raw_support.independent_count,

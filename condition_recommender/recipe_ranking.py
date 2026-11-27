@@ -38,11 +38,12 @@ from .support import (
     evidence_unit,
     load_evidence_support_rules,
     summarize_evidence_support,
+    supports_condition_recipe,
 )
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_ranking.v1.json"
 _DEFINITION_ID = "generic_ranking.v1"
-_SCHEMA_VERSION = "1.2"
+_SCHEMA_VERSION = "1.3"
 _RANKING_COMPONENTS = RANKING_COMPONENTS
 
 
@@ -233,6 +234,7 @@ def _historical_yield_summary(members: Iterable[ScoredPrecedent]) -> Dict[str, A
     """
     units: Dict[str, Dict[str, float]] = defaultdict(dict)
     variant_ids = set()
+    zero_observations = set()
     for member in members:
         if member.row.yield_pct is None:
             continue
@@ -241,6 +243,8 @@ def _historical_yield_summary(members: Iterable[ScoredPrecedent]) -> Dict[str, A
             observation, float(member.row.yield_pct)
         )
         variant_ids.add(member.row.recipe_id)
+        if member.row.yield_pct == 0:
+            zero_observations.add(observation)
     values = [
         value for observations in units.values() for value in observations.values()
     ]
@@ -252,6 +256,8 @@ def _historical_yield_summary(members: Iterable[ScoredPrecedent]) -> Dict[str, A
         "maximum_pct": max(values) if values else None,
         "observation_count": len(values),
         "independent_evidence_count": len(units),
+        "zero_yield_count": len(zero_observations),
+        "zero_yield_observation_ids": tuple(sorted(zero_observations)[:5]),
         "recipe_variant_ids": tuple(sorted(variant_ids)),
         "method": "equal_reference_mean_within_selected_variant",
         "is_prediction": False,
@@ -439,16 +445,18 @@ def rank_condition_recipes(
     pool_prior = None  # Historical summaries do not borrow unrelated pool yields.
     saturation = rules["support_saturation"]
     ranking_rows = []
-    for recipe_core_id, members in groups.items():
-        members = _representative_variant(members, query_identity=query_identity)
+    for recipe_core_id, observations in groups.items():
+        supporting = [item for item in observations if supports_condition_recipe(item.row)]
+        if not supporting:
+            continue
+        members = _representative_variant(supporting, query_identity=query_identity)
         independent = _best_by_evidence_unit(members)[:maximum]
         yield_summary = _historical_yield_summary(
             member
-            for member in members
+            for member in observations
             if member.row.recipe_id == members[0].row.recipe_id
         )
         expected_yield = yield_summary["mean_pct"]
-        outcome_count = yield_summary["observation_count"]
         similarity_score = _mean(member.similarity.score for member in independent)
         compatibility_score = _mean(
             member.compatibility.score for member in independent
@@ -523,7 +531,7 @@ def rank_condition_recipes(
                 similarity_score,
                 compatibility_score,
                 condition_certainty,
-                outcome_count,
+                yield_summary,
                 recipe_variants,
                 components,
                 applied_weights,
@@ -570,7 +578,7 @@ def rank_condition_recipes(
             similarity_score,
             compatibility_score,
             condition_certainty,
-            outcome_count,
+            yield_summary,
             recipe_variants,
             components,
             applied_weights,
@@ -582,6 +590,11 @@ def rank_condition_recipes(
         ) = item
         best = members[0]
         cautions = []
+        if yield_summary["zero_yield_count"]:
+            cautions.append(
+                "Historical yield includes trials that reported 0% for this condition "
+                f"variant (n = {yield_summary['zero_yield_count']})."
+            )
         if any(member.row.precedent_tier.value == "review_core" for member in members):
             cautions.append(
                 "Recipe support includes core-qualified review precedents; "
@@ -590,6 +603,12 @@ def rank_condition_recipes(
         if condition_certainty < 1.0:
             cautions.append(
                 "Condition identity, contextual role, or stage assignment is uncertain"
+            )
+        if best.compatibility.coverage.unresolved_components:
+            cautions.append(
+                "Confirm the reported identities of "
+                + ", ".join(best.compatibility.coverage.unresolved_components)
+                + " before using this recipe."
             )
         if any(
             member.row.condition_stage_status == "unassigned_multistage"
@@ -733,7 +752,7 @@ def rank_condition_recipes(
             ranking_contributions=ranking_contributions,
             applied_ranking_weights=applied_weights,
             independent_evidence_count=support.independent_count,
-            observed_outcome_count=outcome_count,
+            observed_outcome_count=yield_summary["observation_count"],
             pool_yield_prior_pct=(
                 round(pool_prior, 6) if pool_prior is not None else None
             ),
@@ -775,11 +794,7 @@ def rank_condition_recipes(
                 if any(member.compatibility.status == "unknown" for member in members)
                 else "no_known_conflict",
                 compatibility_score=round(compatibility_score, 6),
-                historical_yield_summary=_historical_yield_summary(
-                    member
-                    for member in members
-                    if member.row.recipe_id == best.row.recipe_id
-                ),
+                historical_yield_summary=yield_summary,
                 historical_yield_pct=(
                     round(expected_yield, 2) if expected_yield is not None else None
                 ),

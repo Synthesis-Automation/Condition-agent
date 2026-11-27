@@ -197,6 +197,29 @@ def test_automatic_counts_aggregated_recipes_instead_of_precedents(tmp_path):
     assert result.retrieval_trace[0].independent_compatible_candidate_count == 2
 
 
+def test_zero_yield_seed_cannot_stop_broadening_or_supply_a_recipe(tmp_path):
+    failed = {**record(1, QUERY), "yield_pct": 0}
+    recommender = engine(tmp_path, [failed, record(2, BROMIDE)])
+    result = recommender.recommend(
+        QUERY, top_k=1, minimum_pool_size=1, preferred_reaction_ids=("reaction-1",)
+    )
+    recommendation, = result.recommendations
+    assert recommendation.precedent_reaction_ids == ("reaction-2",)
+    assert result.retrieval_trace[0].status == "only_zero_yield_outcomes"
+    assert result.independent_compatible_candidate_count == 1
+    strict = recommender.recommend(QUERY, search_scope="same_handle")
+    assert not strict.valid and strict.error == "ONLY_ZERO_YIELD_CONDITION_OUTCOMES"
+
+
+def test_experiment_provenance_uses_observation_identity_with_duplicate_source_ids(tmp_path):
+    failed = {**record(1, QUERY), "yield_pct": 0}
+    successful = {**failed, "observation_id": "successful-run", "yield_pct": 75}
+    result = engine(tmp_path, [failed, successful]).recommend(QUERY)
+    recipe, = result.recommendations
+    assert recipe.historical_yield_pct == 37.5
+    assert [r["observation_id"] for r in recipe.source_input_requirements] == ["successful-run"]
+
+
 def test_recipe_target_does_not_replace_independent_support_requirement(tmp_path):
     result = engine(
         tmp_path,
@@ -229,7 +252,7 @@ def test_automatic_suzuki_expands_five_local_recipes_to_ten(tmp_path, sqlite):
     assert expanded.recommendations[:5] == limited.recommendations
     assert [item.match_level for item in expanded.recommendations] == [1] * 5 + [3] * 5
     assert expanded.retrieval_definition_version.startswith(
-        "shared_core_retrieval.v3@3.1;"
+        "shared_core_retrieval.v3@3.2;"
     )
 
 

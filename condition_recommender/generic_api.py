@@ -364,7 +364,9 @@ def recommend_indexed_signature(
                 )
                 if value is not None
             ),
-            error="NO_COMPATIBLE_CONDITION_PRECEDENT"
+            error="ONLY_ZERO_YIELD_CONDITION_OUTCOMES"
+            if level == "only_zero_yield_outcomes"
+            else "NO_COMPATIBLE_CONDITION_PRECEDENT"
             if compatibility_failure
             else "NO_CHEMICALLY_COMPATIBLE_PRECEDENT",
         )
@@ -1092,7 +1094,9 @@ def _recommend_core_with_index(
                 "QUERY_TRANSFORMATION_NOT_VERIFIED",
                 "REACTION_CORE_RETRIEVAL_ATTEMPTED",
             ),
-            error="QUERY_REACTION_CORE_NOT_RETRIEVABLE",
+            error="ONLY_ZERO_YIELD_CONDITION_OUTCOMES"
+            if retrieval.level == "only_zero_yield_outcomes"
+            else "QUERY_REACTION_CORE_NOT_RETRIEVABLE",
         )
 
     query = {
@@ -1293,7 +1297,9 @@ def _recommend_hypotheses_with_index(
                 )
             ),
             error=(
-                "NO_COMPATIBLE_CONDITION_PRECEDENT"
+                "ONLY_ZERO_YIELD_CONDITION_OUTCOMES"
+                if retrieval.level == "only_zero_yield_outcomes"
+                else "NO_COMPATIBLE_CONDITION_PRECEDENT"
                 if compatibility_failure
                 else "NO_ROBUST_EDIT_HYPOTHESIS_PRECEDENT"
             ),
@@ -1475,7 +1481,9 @@ def _recommend_fallback_with_index(
             retrieval_trace=retrieval.trace,
             warnings=tuple(base_warnings),
             error=(
-                "NO_UNRESTRICTED_FALLBACK_PRECEDENT"
+                "ONLY_ZERO_YIELD_CONDITION_OUTCOMES"
+                if retrieval.level == "only_zero_yield_outcomes"
+                else "NO_UNRESTRICTED_FALLBACK_PRECEDENT"
                 if unrestricted
                 else "NO_SAFE_FALLBACK_PRECEDENT"
             ),

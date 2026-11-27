@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional
 
 from cas_tools import open_stock_lookup
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy import canonical_molecule_collection
 
 from forward_synthesis import build_forward_library, predict_products
@@ -491,9 +492,7 @@ def _combine_intermediate_and_partner(
 
 
 def _reaction_without_reagents(reaction_smiles: str) -> str:
-    if reaction_smiles.count(">>") == 1:
-        return reaction_smiles
-    fields = reaction_smiles.split(">")
+    fields = split_reaction_fields(reaction_smiles)
     if len(fields) == 3 and fields[0] and fields[2]:
         return f"{fields[0]}>>{fields[2]}"
     return ""

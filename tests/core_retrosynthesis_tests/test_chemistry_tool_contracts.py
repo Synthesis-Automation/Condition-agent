@@ -23,9 +23,9 @@ class _NoMatches:
 
 def _candidate() -> GenericDisconnectionCandidate:
     return GenericDisconnectionCandidate(
-        target_smiles="CCCC",
-        precursor_smiles="C.CC",
-        proposed_reaction_smiles="C.CC>>CCCC",
+        target_smiles="C1=CCCCC1",
+        precursor_smiles="C=C.C=CC=C",
+        proposed_reaction_smiles="C=C.C=CC=C>>C1=CCCCC1",
         transformation_kind=None,
         abstraction_level="L2",
         compiler_engine="reaction_core",
@@ -50,46 +50,55 @@ def _candidate() -> GenericDisconnectionCandidate:
 def _route():
     candidate = _candidate()
     result = plan_multistep_routes(
-        "CCCC",
+        candidate.target_smiles,
         object(),
         _NoMatches(),
         max_depth=2,
-        molecular_weight_threshold=50.0,
-        expander=lambda product, top_k: (candidate,) if product == "CCCC" else (),
+        molecular_weight_threshold=60.0,
+        expander=lambda product, top_k: (candidate,) if product == candidate.target_smiles else (),
     )
     assert result.routes
     return result.routes[0]
 
 
 def _library() -> GenericTemplateLibrary:
+    """Two atom-balanced cycloadditions with an exactly replayable shared disconnection."""
     context = TemplateContext((), (), ())
     precedents = (
         GenericTemplatePrecedent(
             reaction_id="reaction:analog",
             reference_id="reference:B",
-            product_smiles="CCCCC",
-            precursor_smiles="C.CCC",
-            mapped_reaction_smiles="[CH4:1].[CH3:2][CH2:3][CH3:4]>>CCCCC",
+            product_smiles="CC1CC=CCC1",
+            precursor_smiles="C=CC.C=CC=C",
+            mapped_reaction_smiles=(
+                "[CH2:1]=[CH:2][CH:3]=[CH2:4].[CH:5]([CH3:7])=[CH2:6]>>"
+                "[CH2:1]1[CH:2]=[CH:3][CH2:4][CH:5]([CH3:7])[CH2:6]1"
+            ),
             context=context,
         ),
         GenericTemplatePrecedent(
             reaction_id="reaction:exact",
             reference_id="reference:A",
-            product_smiles="CCCC",
-            precursor_smiles="C.CC",
-            mapped_reaction_smiles="[CH4:1].[CH3:2][CH3:3]>>CCCC",
+            product_smiles="C1=CCCCC1",
+            precursor_smiles="C=C.C=CC=C",
+            mapped_reaction_smiles=(
+                "[CH2:1]=[CH:2][CH:3]=[CH2:4].[CH2:5]=[CH2:6]>>"
+                "[CH2:1]1[CH:2]=[CH:3][CH2:4][CH2:5][CH2:6]1"
+            ),
             context=context,
         ),
     )
+    product_smarts = "[#6:1]1-[#6:2]=[#6:3]-[#6:4]-[#6:5]-[#6:6]-1"
+    precursor_smarts = "[#6:1]=[#6:2]-[#6:3]=[#6:4].[#6:5]=[#6:6]"
     template = GenericCoreTemplate(
         template_id="template:tool-test",
         operator_id="operator:tool-test",
         transformation_kind=None,
         abstraction_level="L2",
         compiler_engine="reaction_core",
-        reaction_smarts="[*:1]>>[*:1]",
-        product_smarts="[*:1]",
-        precursor_smarts="[*:1]",
+        reaction_smarts=f"{product_smarts}>>{precursor_smarts}",
+        product_smarts=product_smarts,
+        precursor_smarts=precursor_smarts,
         edit_tokens=("formed:C-C",),
         handle_signature="test",
         stereo_policy="exact",

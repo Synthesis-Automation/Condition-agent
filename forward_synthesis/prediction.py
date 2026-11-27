@@ -8,7 +8,7 @@ import math
 from collections import Counter, defaultdict
 from dataclasses import dataclass, replace
 from functools import lru_cache
-from typing import Any, Mapping, Optional, Protocol
+from typing import Any, Mapping, Protocol
 
 from rdkit import Chem, DataStructs
 from rdkit.Chem import rdFingerprintGenerator, rdChemReactions
@@ -23,7 +23,7 @@ from reactive_taxonomy import (
 )
 from reactive_taxonomy.reaction_operators import operator_stereo_match
 
-from .library import indexed_forward_operators
+from .library import indexed_forward_operators, operator_source_verified
 from .condition_profiles import (
     ForwardConditionProfile,
     assess_condition_profile,
@@ -419,10 +419,18 @@ def predict_products(
             -item.independent_reference_support,
             item.forward_operator_id,
         ),
-    )[:max_operators_to_apply]
+    )
     counters = Counter()
     seeds = []
+    verified_operators = []
     for operator in ordered_operators:
+        if len(verified_operators) >= max_operators_to_apply:
+            break
+        if operator_source_verified(operator, library):
+            verified_operators.append(operator)
+        else:
+            counters["failed_source_revalidation"] += 1
+    for operator in verified_operators:
         outcomes = apply_forward_operator(
             operator,
             canonical,
@@ -514,10 +522,13 @@ def predict_products(
         valid_pathway_count=len(seeds),
         self_reaction_pathway_count=counters["self_reaction_pathway"],
         unique_product_count=len(by_product),
+        source_revalidation_failure_count=counters["failed_source_revalidation"],
     )
     warnings = []
-    if len(retrieved) > len(ordered_operators):
+    if len(retrieved) > len(verified_operators) + counters["failed_source_revalidation"]:
         warnings.append("FORWARD_OPERATOR_SEARCH_TRUNCATED")
+    if counters["failed_source_revalidation"]:
+        warnings.append("HISTORICAL_OPERATOR_SOURCE_REVALIDATION_FAILED")
     if recipe is None:
         warnings.append("CONDITIONS_NOT_SUPPLIED_PRODUCTS_ARE_POSSIBILITIES")
     if counters["self_reaction_pathway"]:
@@ -584,6 +595,10 @@ def _forward_validity_checks(
         "operator_hint_not_found": (
             "not_evaluated",
             "The proposed operator is absent from the forward-admitted library.",
+        ),
+        "operator_source_revalidation_failed": (
+            "not_evaluated",
+            "Historical source representatives failed the current chemistry check.",
         ),
         "not_requested": (
             "not_evaluated",
@@ -800,11 +815,14 @@ def assess_proposed_step(
         if operator_hint
         and operator_hint in {operator.operator_id, operator.forward_operator_id}
     )
+    verified_hints = tuple(operator for operator in hinted if operator_source_verified(operator, library))
     if operator_hint and not hinted:
         targeted_status = "operator_hint_not_found"
-    elif hinted:
+    elif hinted and not verified_hints:
+        targeted_status = "operator_source_revalidation_failed"
+    elif verified_hints:
         targeted_matches = set()
-        for operator in hinted:
+        for operator in verified_hints:
             for outcome in apply_forward_operator(
                 operator,
                 starting_materials,
@@ -815,15 +833,20 @@ def assess_proposed_step(
                 targeted_matches.add(operator_stereo_match(canonical_target, outcome.product_smiles))
         if targeted_matches.intersection(("exact", "stereo_relaxed")):
             targeted_status = "structurally_reproduced"
-        elif "connectivity_only" in targeted_matches:
+        elif targeted_matches.intersection(("connectivity_only", "unresolved")):
             targeted_status = "stereo_unresolved"
         else:
             targeted_status = "not_reproduced"
     else:
         targeted_status = "not_requested"
     by_match = defaultdict(list)
+    comparison_limit = False
     for candidate in blind.candidates:
-        by_match[operator_stereo_match(canonical_target, candidate.product_smiles)].append(candidate)
+        kind = operator_stereo_match(canonical_target, candidate.product_smiles)
+        if kind == "unresolved":
+            comparison_limit = True
+            kind = "connectivity_only"
+        by_match[kind].append(candidate)
     match_kind = next((kind for kind in ("exact", "stereo_relaxed", "connectivity_only") if by_match[kind]), "absent")
     matched = by_match[match_kind][0] if match_kind != "absent" else None
     intended_rank = matched.rank if matched else None
@@ -839,7 +862,7 @@ def assess_proposed_step(
     policy = load_forward_ranking_policy()
     if targeted_status == "not_reproduced":
         disposition = "structurally_inconsistent"
-    elif targeted_status == "operator_hint_not_found":
+    elif targeted_status in {"operator_hint_not_found", "operator_source_revalidation_failed"}:
         disposition = "out_of_scope"
     elif (
         not blind.candidates
@@ -863,6 +886,8 @@ def assess_proposed_step(
     else:
         disposition = "competitive"
     warnings = []
+    if comparison_limit or (verified_hints and "unresolved" in targeted_matches):
+        warnings.append("STEREOCHEMISTRY_COMPARISON_LIMIT_REACHED")
     if disposition == "competitive":
         warnings.append("COMPETING_FORWARD_PRODUCTS")
     elif match_kind == "connectivity_only" or targeted_status == "stereo_unresolved":
@@ -877,6 +902,8 @@ def assess_proposed_step(
         )
     elif targeted_status == "operator_hint_not_found":
         warnings.append("RETROSYNTHESIS_OPERATOR_NOT_FORWARD_ADMITTED")
+    elif targeted_status == "operator_source_revalidation_failed":
+        warnings.append("HISTORICAL_OPERATOR_SOURCE_REVALIDATION_FAILED")
     validity = {
         "clear": "structurally_supported",
         "competitive": "structurally_supported_with_competition",

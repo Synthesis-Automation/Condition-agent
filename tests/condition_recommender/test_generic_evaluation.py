@@ -553,10 +553,10 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert report["schema_version"] == "1.6"
     assert report["definition_versions"] == {
         "compatibility": "1.3",
-        "retrieval": "1.8",
+        "retrieval": "1.9",
         "similarity": "1.0",
-        "ranking": "1.2",
-        "evidence_support": "1.0",
+        "ranking": "1.3",
+        "evidence_support": "1.1",
     }
     assert (output / "evaluation_report.json").is_file()
     cases = [

@@ -269,13 +269,13 @@ def test_operator_scheduler_preserves_order_and_does_not_starve_other_edits() ->
 def test_validation_budget_visits_other_operators_and_sites(
     reduction_library, monkeypatch,
 ) -> None:
-    from types import SimpleNamespace
     from core_retrosynthesis import generic_search
 
     template = next(
         t for t in reduction_library.templates if t.abstraction_level == "L2"
     )
-    library = SimpleNamespace(
+    library = replace(
+        reduction_library,
         templates=tuple(
             replace(template, template_id=key, operator_id=key, reaction_smarts=key)
             for key in ("A", "B")

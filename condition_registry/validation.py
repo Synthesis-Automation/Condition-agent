@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, DefaultDict, Dict, List, Tuple
 
@@ -13,7 +14,13 @@ from .loader import (
     record_to_substance,
 )
 from .models import CONDITION_NAME_IDENTIFIER_TYPES
-from .normalization import normalize_identifier
+from .normalization import normalize_identifier, normalize_smiles
+
+
+@lru_cache(maxsize=32768)
+def _valid_registry_structure(smiles: str) -> bool:
+    """Reuse parsing for the versioned registry across repeated validation calls."""
+    return bool(normalize_smiles(smiles))
 
 
 def validate_registry(
@@ -77,6 +84,8 @@ def validate_registry(
         if substance.substance_id in substance_ids:
             row_issues.append(f"DUPLICATE_SUBSTANCE_ID:{substance.substance_id}")
         substance_ids.add(substance.substance_id)
+        if substance.smiles and not _valid_registry_structure(substance.smiles):
+            row_issues.append("INVALID_CANONICAL_SMILES")
         if substance.cas:
             cas_counts[substance.cas] += 1
         canonical_key = normalize_identifier(substance.canonical_name, "canonical_name")

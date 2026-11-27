@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Iterable, TYPE_CHECKING
 
 from .chemistry import digest, maximum_similarity
+from .generic_compiler import template_source_verified
 from .generic_models import GenericTemplateLibrary
 
 if TYPE_CHECKING:
@@ -110,7 +111,7 @@ def lookup_reaction_precedents(
         item
         for item in template.precedents
         if not admitted or item.reaction_id in admitted
-    )
+    ) if template_source_verified(template, library) else ()
     ranked = sorted(
         (
             (

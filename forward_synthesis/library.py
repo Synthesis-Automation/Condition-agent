@@ -8,8 +8,9 @@ from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 from contextlib import nullcontext
 from dataclasses import replace
+from functools import lru_cache
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Optional
+from typing import Any, Iterable, Mapping
 
 from rdkit import Chem
 from rdkit.Chem import rdChemReactions
@@ -21,7 +22,11 @@ from reactive_taxonomy import (
     canonical_molecule_collection,
     reverse_recovers_precursors,
 )
-from reactive_taxonomy.reaction_operators import clear_operator_application_cache, operator_stereo_match
+from reactive_taxonomy.reaction_operators import (
+    SOURCE_STEREO_MATCH_VERSION,
+    clear_operator_application_cache,
+    operator_stereo_match,
+)
 
 from .models import (
     FORWARD_LIBRARY_SCHEMA_VERSION,
@@ -42,7 +47,9 @@ def _product_matches(expected: str, observed: str, stereo_policy: str) -> bool:
         return False
     if expected_canonical == observed:
         return True
-    return stereo_policy == "relaxed" and operator_stereo_match(expected_canonical, observed) != "absent"
+    return stereo_policy == "relaxed" and operator_stereo_match(
+        expected_canonical, observed
+    ) in {"exact", "stereo_relaxed", "connectivity_only"}
 
 
 def _as_precedent(value: Any) -> ReactionOperatorPrecedent:
@@ -212,6 +219,22 @@ def _worker_source_round_trip(operator: BidirectionalReactionOperator) -> bool:
         clear_operator_application_cache()
 
 
+@lru_cache(maxsize=8192)
+def _legacy_forward_source_reproduced(operator: BidirectionalReactionOperator) -> bool:
+    return _source_round_trip_passes(operator)
+
+
+def operator_source_verified(
+    operator: BidirectionalReactionOperator, library: ForwardOperatorLibrary,
+) -> bool:
+    """Recheck serialized witnesses from older relaxed and merged projections on first use."""
+    if library.source_stereo_match_version == SOURCE_STEREO_MATCH_VERSION:
+        return True
+    if operator.stereo_policy == "exact" and len(operator.precedents) == 1:
+        return True
+    return _legacy_forward_source_reproduced(operator)
+
+
 def _required_atomic_numbers(
     operator: BidirectionalReactionOperator,
 ) -> tuple[int, ...]:
@@ -341,6 +364,7 @@ def build_forward_library(
         admitted_operator_count=len(operators),
         rejection_counts=dict(sorted(rejection_counts.items())),
         precursor_index=build_forward_precursor_index(operators),
+        source_stereo_match_version=SOURCE_STEREO_MATCH_VERSION if require_source_round_trip else "",
         source_library_definition_id=str(
             _value(source_definition, "definition_id", "")
             if not isinstance(source_definition, Mapping)
@@ -393,6 +417,7 @@ def _library_from_dict(value: Mapping[str, Any]) -> ForwardOperatorLibrary:
             value.get("source_library_definition_id") or ""
         ),
         schema_version=str(value.get("schema_version") or "1.0"),
+        source_stereo_match_version=str(value.get("source_stereo_match_version") or ""),
     )
 
 

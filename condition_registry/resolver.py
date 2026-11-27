@@ -56,6 +56,9 @@ class ConditionRegistry:
             identifiers = list(substance.identifiers)
             if substance.smiles and not any(
                 identifier.identifier_type == "smiles"
+                and identifier.status == "active"
+                and normalize_identifier(identifier.value, "smiles")
+                == normalize_identifier(substance.smiles, "smiles")
                 for identifier in identifiers
             ):
                 identifiers.append(

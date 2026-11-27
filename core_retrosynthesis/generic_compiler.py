@@ -16,7 +16,8 @@ from rdchiral.template_extractor import extract_from_reaction
 
 from condition_recommender.conversion.source_evidence import structural_search_exclusions
 from reactive_taxonomy import featurize_reaction
-from reactive_taxonomy.reaction_operators import operator_stereo_match
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
+from reactive_taxonomy.reaction_operators import SOURCE_STEREO_MATCH_VERSION, operator_stereo_match
 from reactive_taxonomy.reaction_identity_graphs import (
     product_edit_site_graph,
     retained_precursor_graph,
@@ -40,7 +41,7 @@ from .compiler import (
     _selected_atoms,
 )
 from .context import context_from_analysis
-from .generic_models import GenericCoreTemplate, GenericTemplatePrecedent
+from .generic_models import GenericCoreTemplate, GenericTemplateLibrary, GenericTemplatePrecedent
 
 
 SUPPORTED_TRANSFORMATIONS = frozenset(
@@ -615,9 +616,31 @@ def _round_trip_assessment(
     }))
     if expected_precursors in canonical_outcomes:
         return _RoundTripAssessment("exact", canonical_outcomes)
-    if any(operator_stereo_match(expected_precursors, outcome) != "absent" for outcome in canonical_outcomes):
+    if any(
+        operator_stereo_match(expected_precursors, outcome) in {"exact", "stereo_relaxed", "connectivity_only"}
+        for outcome in canonical_outcomes
+    ):
         return _RoundTripAssessment("relaxed", canonical_outcomes)
     return _RoundTripAssessment(None, canonical_outcomes)
+
+
+@lru_cache(maxsize=32_768)
+def _legacy_source_reproduced(smarts: str, product: str, precursors: str) -> bool:
+    return _round_trip_assessment(smarts, product, precursors).policy is not None
+
+
+def template_source_verified(template: GenericCoreTemplate, library: GenericTemplateLibrary) -> bool:
+    """Recheck retained witnesses before older relaxed or mixed templates can supply evidence."""
+    if library.definition.get("source_stereo_match_version") == SOURCE_STEREO_MATCH_VERSION:
+        return True
+    if template.stereo_policy == "exact" and template.observation_support == 1:
+        return True
+    # Historical aggregates kept the policy of the first row. Its other
+    # witnesses can include relaxed admissions even when the label is exact.
+    return bool(template.precedents) and all(
+        _legacy_source_reproduced(template.reaction_smarts, p.product_smiles, p.precursor_smiles)
+        for p in template.precedents
+    )
 
 
 def _round_trip_diagnostics(
@@ -1012,13 +1035,10 @@ def generic_operator_identity_from_observation(
     operator identity identical to the generic-template compiler.
     """
 
-    if reaction_smiles.count(">>") == 1:
-        _, product_smiles = reaction_smiles.split(">>", 1)
-    elif reaction_smiles.count(">") == 2:
-        _, _, product_smiles = reaction_smiles.split(">", 2)
-    else:
+    fields = split_reaction_fields(reaction_smiles)
+    if len(fields) != 3:
         return None
-    product = Chem.MolFromSmiles(product_smiles)
+    product = Chem.MolFromSmiles(fields[2])
     if product is None:
         return None
     signature = _generic_operator_signature(observation, product)

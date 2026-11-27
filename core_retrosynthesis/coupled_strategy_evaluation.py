@@ -18,6 +18,7 @@ from typing import Any, Iterable, Mapping, Sequence
 from rdkit import Chem
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .chemistry import canonical_smiles, digest
 from .coupled_route_strategy import extract_coupled_route_strategies
 from .composite_actions import (
@@ -210,19 +211,13 @@ def _sha256(path: Path) -> str:
 
 
 def _reaction_product(reaction_smiles: str) -> str:
-    if reaction_smiles.count(">>") == 1:
-        return reaction_smiles.split(">>", 1)[1]
-    if reaction_smiles.count(">") == 2:
-        return reaction_smiles.split(">", 2)[2]
-    return ""
+    fields = split_reaction_fields(reaction_smiles)
+    return fields[2] if len(fields) == 3 else ""
 
 
 def _reaction_reactants(reaction_smiles: str) -> str:
-    if reaction_smiles.count(">>") == 1:
-        return reaction_smiles.split(">>", 1)[0]
-    if reaction_smiles.count(">") == 2:
-        return reaction_smiles.split(">", 2)[0]
-    return ""
+    fields = split_reaction_fields(reaction_smiles)
+    return fields[0] if len(fields) == 3 else ""
 
 
 def _scaffold(smiles: str) -> str:

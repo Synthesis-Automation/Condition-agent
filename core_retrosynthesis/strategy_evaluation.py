@@ -14,6 +14,7 @@ from pathlib import Path
 from time import perf_counter
 from typing import Any, Iterable
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from condition_recommender.evaluation import grouped_holdout_split, _leakage_summary
 from condition_recommender.evaluation_panel import _tokens
 from condition_recommender.generic_indexing import load_generic_index
@@ -166,7 +167,7 @@ def evaluate_strategy_panel(panel_path: str | Path) -> dict[str, Any]:
         identity = None
         expected_strategy = ""
         expected_precursors = None
-        sides = row["reaction_smiles"].split(">")
+        sides = split_reaction_fields(row["reaction_smiles"])
         target = canonical_smiles(sides[2]) if len(sides) == 3 else None
         if not target or "." in target:
             case["target_rejection"] = "single_valid_product_required"

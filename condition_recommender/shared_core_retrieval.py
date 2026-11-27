@@ -28,7 +28,11 @@ from .models import (
 )
 from .recipe_ranking import rank_condition_recipes
 from .shared_core_index import SharedCoreIndex
-from .support import summarize_evidence_support
+from .support import (
+    summarize_evidence_support,
+    summarize_recipe_support,
+    supports_condition_recipe,
+)
 
 
 def load_shared_retrieval_rules() -> dict[str, Any]:
@@ -41,7 +45,7 @@ def load_shared_retrieval_rules() -> dict[str, Any]:
     if (
         rules.get("definition_id") != "shared_core_retrieval.v3"
         or rules.get("schema_version") != "3.0"
-        or rules.get("definition_version") != "3.1"
+        or rules.get("definition_version") != "3.2"
         or rules.get("automatic_stopping_policy")
         != "independent_support_and_recipe_target"
         or rules.get("auxiliary_scheduling") != "round_robin"
@@ -181,15 +185,18 @@ def recommend_from_shared_core(
             audited[position] = record
 
     def support() -> int:
-        return summarize_evidence_support(
-            tuple(row for row, _ in eligible.values())
+        return summarize_recipe_support(
+            row for row, _ in eligible.values()
         ).independent_count
 
     def needs_more_candidates() -> bool:
         # Count the same source-context recipe groups used by final ranking,
         # after graph and condition qualification, rather than raw precedents.
         recipe_count = sum(
-            len({eligible[p][0].recipe_core_id for p in positions})
+            len({
+                eligible[p][0].recipe_core_id
+                for p in positions if supports_condition_recipe(eligible[p][0])
+            })
             for positions in groups.values()
         )
         return support() < minimum or (
@@ -223,8 +230,8 @@ def recommend_from_shared_core(
                 "selected"
                 if count >= minimum
                 else "selected_limited_support"
-                if eligible
-                else "empty",
+                if count
+                else "only_zero_yield_outcomes" if eligible else "empty",
             )
         )
         if not needs_more_candidates() and search_scope != "broad":
@@ -304,10 +311,14 @@ def recommend_from_shared_core(
         )
         ordinal = rules["levels"].index(level) + 1
         for item in ranked:
+            cited = {
+                (context["reaction_id"], context["observation_id"])
+                for context in item.precedent_reaction_contexts
+            }
             members = [
                 p
                 for p in positions
-                if eligible[p][0].reaction_id in item.precedent_reaction_ids
+                if (eligible[p][0].reaction_id, eligible[p][0].observation_id) in cited
                 and eligible[p][0].recipe_core_id == item.recipe_core_id
             ]
             differences = tuple(
@@ -369,7 +380,8 @@ def recommend_from_shared_core(
         )
     )
     warnings = list(base.pop("warnings"))
-    if support() < minimum:
+    final_support = support()
+    if final_support < minimum:
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     if truncated:
         warnings.append("SHARED_CORE_CANDIDATE_BUDGET_REACHED")
@@ -381,25 +393,28 @@ def recommend_from_shared_core(
                 index.select(sorted(channels))
             ).independent_count,
             len(eligible),
-            support(),
+            final_support,
             len(channels) - len(eligible),
             minimum,
             "selected"
-            if support() >= minimum
+            if final_support >= minimum
             else "selected_limited_support"
-            if eligible
-            else "empty",
+            if final_support
+            else "only_zero_yield_outcomes" if eligible else "empty",
         )
     )
     return GenericRecommendationResult(
         **base,
         valid=bool(recommendations),
-        error=None if recommendations else "NO_QUALIFIED_SHARED_CORE_PRECEDENT",
+        error=None if recommendations else (
+            "ONLY_ZERO_YIELD_CONDITION_OUTCOMES" if eligible
+            else "NO_QUALIFIED_SHARED_CORE_PRECEDENT"
+        ),
         retrieval_level="shared_core:qualified_union",
         candidate_count=len(channels),
         independent_candidate_count=traces[-1].independent_candidate_count,
         compatible_candidate_count=len(eligible),
-        independent_compatible_candidate_count=support(),
+        independent_compatible_candidate_count=final_support,
         excluded_candidate_count=len(channels) - len(eligible),
         retrieval_trace=tuple(traces),
         shared_core_trace=tuple(diagnostics),

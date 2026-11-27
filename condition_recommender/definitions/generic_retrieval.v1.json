@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.8",
+  "schema_version": "1.9",
   "definition_id": "generic_retrieval.v1",
   "calibration_status": "calibrated_sample_v1",
   "minimum_pool_size": 2,

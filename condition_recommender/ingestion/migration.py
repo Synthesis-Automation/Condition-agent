@@ -194,15 +194,15 @@ def regenerate_intermediate_datasets(
     return report
 
 
-def validate_intermediate_manifest(output_root: str | Path) -> dict[str, Any]:
-    """Verify all prepared output hashes against the completed migration manifest."""
+def verified_intermediate_artifacts(output_root: str | Path) -> dict[Path, str]:
+    """Verify each declared intermediate output and return its absolute path and digest."""
     root = Path(output_root).resolve()
     report = json.loads((root / "migration.manifest.json").read_text(encoding="utf-8"))
     if not report["coverage_complete"] or any(
         report.get(k) != v for k, v in _inventory_counts(report["sources"]).items()
     ):
         raise ValueError("Migration coverage or inventory counts are inconsistent")
-    verified = 0
+    verified: dict[Path, str] = {}
     expected_inputs = set()
     for entry in report["sources"]:
         item = entry.get("report")
@@ -238,15 +238,22 @@ def validate_intermediate_manifest(output_root: str | Path) -> dict[str, Any]:
         else:
             raise ValueError(f"Unknown intermediate category: {entry['category']}")
         for path, digest in outputs.items():
+            path = path.resolve()
             if (
-                not path.resolve().is_relative_to(root)
+                path in verified or not path.is_relative_to(root)
                 or not path.is_file()
                 or _sha256(path) != digest
             ):
                 raise ValueError(f"Invalid intermediate artifact: {path}")
             if path.name.endswith(".observations.jsonl.gz"):
                 expected_inputs.add(path.resolve())
-            verified += 1
+            verified[path] = digest
     if expected_inputs != {p.resolve() for p in root.rglob("*.observations.jsonl.gz")}:
         raise ValueError("Physical observation files do not match migration inventory")
-    return {"verified_artifact_count": verified, "coverage_complete": True}
+    return verified
+
+
+def validate_intermediate_manifest(output_root: str | Path) -> dict[str, Any]:
+    """Verify all prepared output hashes against the completed migration manifest."""
+    verified = verified_intermediate_artifacts(output_root)
+    return {"verified_artifact_count": len(verified), "coverage_complete": True}

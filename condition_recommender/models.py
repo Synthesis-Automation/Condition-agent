@@ -8,16 +8,16 @@ from typing import Any, Dict, Literal, Optional, Tuple
 
 
 RECOMMENDATION_RECORD_SCHEMA_VERSION = "10.3"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.4"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v10.5"
 COMPATIBLE_RECOMMENDATION_RECORD_SCHEMA_VERSIONS = frozenset({"10.0", "10.1", "10.2", "10.3"})
 COMPATIBLE_GENERIC_CONVERTER_DEFINITION_VERSIONS = frozenset(
     {"generic_conversion.v10.0", "generic_conversion.v10.1", "generic_conversion.v10.2",
-     "generic_conversion.v10.3", GENERIC_CONVERTER_DEFINITION_VERSION}
+     "generic_conversion.v10.3", "generic_conversion.v10.4", GENERIC_CONVERTER_DEFINITION_VERSION}
 )
 CORE_ELIGIBILITY_DEFINITION_VERSION = "core_eligibility.v1@1.0"
 CHEMIST_RANKING_PREFERENCES_SCHEMA_VERSION = "1.0"
 GENERIC_RECOMMENDATION_RESULT_SCHEMA_VERSION = "4.2"
-WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "2.0"
+WEAK_LABEL_RECOMMENDATION_RESULT_SCHEMA_VERSION = "2.1"
 REACTION_COMPLETION_PROPOSAL_SCHEMA_VERSION = "1.0"
 FRAGMENT_SOURCE_CAPABILITY_DEFINITION_VERSION = (
     "fragment_source_capabilities.v1@1.3"
@@ -496,6 +496,9 @@ class WeakLabelConditionRecommendation:
     explanation: Tuple[str, ...]
     compatibility_evidence: Tuple[str, ...] = ()
     cautions: Tuple[str, ...] = ()
+    historical_observation_count: int = 0
+    zero_yield_count: int = 0
+    zero_yield_source_row_numbers: Tuple[int, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

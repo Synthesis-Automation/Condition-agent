@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping, Optional
 
 from rdkit import Chem
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy import featurize_reaction
 
 from .chemistry import canonical_smiles, contributing_reactants, digest, split_reaction_smiles
@@ -169,12 +170,10 @@ class ObservedRouteActionLabel:
 def normalize_observed_reaction(reaction_smiles: str) -> Optional[str]:
     """Remove the condition middle field while preserving reaction participants."""
 
-    if reaction_smiles.count(">>") == 1:
-        reactants, products = reaction_smiles.split(">>")
-    elif reaction_smiles.count(">") == 2:
-        reactants, _, products = reaction_smiles.split(">")
-    else:
+    fields = split_reaction_fields(reaction_smiles)
+    if len(fields) != 3:
         return None
+    reactants, _, products = fields
     if not reactants or not products:
         return None
     return f"{reactants}>>{products}"

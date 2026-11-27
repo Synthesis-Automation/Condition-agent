@@ -43,6 +43,20 @@ class _Fragment:
     atoms: tuple[tuple[int, int, int], ...]
 
 
+def mapped_atom_identities(molecule: Chem.Mol) -> tuple[tuple[int, int, int], ...]:
+    """Return map number, atomic number and isotope for each observed atom."""
+    return tuple((a.GetAtomMapNum(), a.GetAtomicNum(), a.GetIsotope()) for a in molecule.GetAtoms())
+
+
+def product_atom_origins_agree(
+    reactants: Iterable[tuple[int, int, int]], products: Iterable[tuple[int, int, int]],
+) -> bool:
+    """Check observed nuclei for every product heavy atom and every explicitly mapped atom."""
+    origins = {number: (element, isotope) for number, element, isotope in reactants if number}
+    return all(number and origins.get(number) == (element, isotope)
+               for number, element, isotope in products if element > 1 or number)
+
+
 @lru_cache(maxsize=8192)
 def _fragments(value: str) -> tuple[_Fragment, ...] | None:
     if not value:
@@ -52,11 +66,10 @@ def _fragments(value: str) -> tuple[_Fragment, ...] | None:
         return None
     result = []
     for fragment in Chem.GetMolFrags(molecule, asMols=True, sanitizeFrags=False):
-        atoms = []
+        atoms = mapped_atom_identities(fragment)
         for atom in fragment.GetAtoms():
-            atoms.append((atom.GetAtomMapNum(), atom.GetAtomicNum(), atom.GetIsotope()))
             atom.SetAtomMapNum(0)
-        result.append(_Fragment(Chem.MolToSmiles(fragment), tuple(atoms)))
+        result.append(_Fragment(Chem.MolToSmiles(fragment), atoms))
     return tuple(result)
 
 
@@ -88,7 +101,6 @@ def assess_source_mapping(unmapped: str, mapped: str) -> SourceMappingEvidence:
         issues.append("source_mapped_products_disagree")
     left_atoms = [atom for f in left for atom in f.atoms]
     product_atoms = [atom for f in right for atom in f.atoms]
-    left_maps = {number: (element, isotope) for number, element, isotope in left_atoms if number}
     right_maps = {number for number, _, _ in product_atoms if number}
     all_inputs = left_atoms + [atom for f in agents for atom in f.atoms]
     for atoms in (all_inputs, product_atoms):
@@ -96,8 +108,7 @@ def assess_source_mapping(unmapped: str, mapped: str) -> SourceMappingEvidence:
         if len(numbers) != len(set(numbers)):
             issues.append("source_duplicate_atom_maps")
             break
-    if any((not n or left_maps.get(n) != (element, isotope))
-           for n, element, isotope in product_atoms if element > 1 or n):
+    if not product_atom_origins_agree(left_atoms, product_atoms):
         issues.append("source_product_atom_origin_unverified")
     contributors = []
     noncontributors = []

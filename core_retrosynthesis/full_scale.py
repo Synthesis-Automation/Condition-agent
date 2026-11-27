@@ -16,6 +16,8 @@ from itertools import islice
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Iterator, Literal, Sequence
 
+from reactive_taxonomy.reaction_operators import SOURCE_STEREO_MATCH_VERSION
+
 from .chemistry import digest
 from .core_admission import CoreAdmissionPolicyName
 from .generic_compiler import clear_generic_compilation_cache
@@ -316,6 +318,7 @@ def _merge_template(
 ) -> GenericCoreTemplate:
     return replace(
         current,
+        stereo_policy="relaxed" if "relaxed" in (current.stereo_policy, incoming.stereo_policy) else "exact",
         precedents=select_context_representatives(
             (*current.precedents, *incoming.precedents),
             max_precedents,
@@ -345,6 +348,7 @@ def merge_operator_shards(
     templates: dict[str, GenericCoreTemplate] = {}
     rejection_counts: Counter[str] = Counter()
     source_rows = 0
+    current_stereo_rule = True
     duplicate_accepted = 0
     merge_started = progress_started_at or time.monotonic()
     ordered_manifests = sorted(
@@ -366,6 +370,7 @@ def merge_operator_shards(
         for ordinal, manifest in enumerate(ordered_manifests, start=1):
             source_rows += int(manifest.get("source_rows") or 0)
             partial = load_generic_library(str(manifest["library_path"]))
+            current_stereo_rule &= partial.definition.get("source_stereo_match_version") == SOURCE_STEREO_MATCH_VERSION
             for template in partial.templates:
                 current = templates.get(template.template_id)
                 templates[template.template_id] = (
@@ -516,6 +521,7 @@ def merge_operator_shards(
         rejection_counts=dict(sorted(rejection_counts.items())),
         definition={
             "definition_id": "generic_core_retrosynthesis_full_scale.v3",
+            "source_stereo_match_version": SOURCE_STEREO_MATCH_VERSION if current_stereo_rule else "",
             "build_config_id": settings.config_id,
             "routing_source": "normalized_graph_edits",
             "admission_mode": settings.admission_mode,

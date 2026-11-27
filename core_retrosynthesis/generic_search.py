@@ -30,7 +30,7 @@ from reactive_taxonomy.strategic_complexity import (
 from .chemistry import canonical_smiles, maximum_similarity
 
 from .context import context_similarity
-from .generic_compiler import analyze_generic_reaction
+from .generic_compiler import analyze_generic_reaction, template_source_verified
 from .generic_models import (
     GenericDisconnectionCandidate,
     GenericSearchDiagnostics,
@@ -247,7 +247,15 @@ def disconnect_generic_target_detailed(
         _interleave_operators(applicable, lambda item: item[2].operator_id)
         if balance_operator_budget else applicable
     )
-    templates_to_apply = scheduled_templates[:max_templates_to_apply]
+    templates_to_apply = []
+    source_failures = 0
+    for item in scheduled_templates:
+        if len(templates_to_apply) >= max_templates_to_apply:
+            break
+        if template_source_verified(item[2], library):
+            templates_to_apply.append(item)
+        else:
+            source_failures += 1
     for product_similarity, specificity, template in templates_to_apply:
         outcomes = (
             _apply(template.reaction_smarts, canonical_target, preserve_correspondences=True)
@@ -487,7 +495,7 @@ def disconnect_generic_target_detailed(
         operator_mismatch_count=operator_mismatch_count,
         duplicate_proposal_count=eligible_precursor_count - len(seeds),
         template_budget_excluded_count=max(
-            0, len(applicable) - len(templates_to_apply),
+            0, len(applicable) - len(templates_to_apply) - source_failures,
         ),
         validation_budget_excluded_count=max(0, len(seeds) - len(validation_seeds)),
         provisional_site_group_count=len(site_keys) if balance_operator_budget else 0,
@@ -497,6 +505,7 @@ def disconnect_generic_target_detailed(
         focus_unresolved_count=focus_counts["unresolved"],
         focus_validation_rejected_count=focus_validation_rejected_count,
         focus_rejection_examples=tuple(focus_examples),
+        source_revalidation_failure_count=source_failures,
     )
 
 

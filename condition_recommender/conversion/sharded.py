@@ -651,6 +651,7 @@ def validate_sharded_conversion(
         issues.append("stale_definition_contract")
     observation_ids = set()
     duplicate_observations = 0
+    missing_observations = 0
     verified_rows = 0
     covered_source_rows = Counter()
     source_checksums = {}
@@ -680,16 +681,21 @@ def validate_sharded_conversion(
                     GENERIC_CONVERTER_DEFINITION_VERSION
                 ):
                     issues.append(f"converter_version_mismatch:{entry['shard_id']}")
-                observation_id = str(record.get("observation_id") or "")
-                if observation_id in observation_ids:
+                observation_id = record.get("observation_id")
+                if not isinstance(observation_id, str) or not observation_id.strip():
+                    missing_observations += 1
+                elif observation_id in observation_ids:
                     duplicate_observations += 1
-                elif observation_id:
+                else:
                     observation_ids.add(observation_id)
             verified_rows += row_count
             if row_count != int(entry["output_row_count"]):
                 issues.append(f"row_count_mismatch:{entry['shard_id']}")
     for source_entry in manifest.get("source_files") or ():
         source_path = str(source_entry["path"])
+        if (Path(source_path) in source_checksums
+                and source_checksums[Path(source_path)] != source_entry.get("sha256")):
+            issues.append(f"declared_source_checksum_mismatch:{source_path}")
         if covered_source_rows[source_path] != int(source_entry["covered_row_count"]):
             issues.append(f"source_coverage_mismatch:{source_path}")
         if source_entry.get("coverage_complete"):
@@ -705,11 +711,12 @@ def validate_sharded_conversion(
         "schema_version": "1.0",
         "artifact_type": "sharded_conversion_integrity",
         "manifest_path": str(source),
-        "valid": not issues and duplicate_observations == 0,
+        "valid": not issues and duplicate_observations == 0 and missing_observations == 0,
         "issues": sorted(set(issues)),
         "shard_count": len(manifest.get("shards") or ()),
         "verified_row_count": verified_rows if verify_rows else None,
         "duplicate_observation_count": duplicate_observations,
+        "missing_observation_count": missing_observations,
     }
     _atomic_json(destination / "integrity_report.json", report)
     return report

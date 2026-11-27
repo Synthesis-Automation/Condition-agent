@@ -14,6 +14,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Sequence
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from .chemistry import canonical_smiles
 
 
@@ -184,12 +185,10 @@ class CoupledStrategyPolicyComparison:
 
 
 def _reaction_sides(reaction_smiles: str) -> tuple[str, str] | None:
-    if reaction_smiles.count(">>") == 1:
-        reactants, products = reaction_smiles.split(">>", 1)
-    elif reaction_smiles.count(">") == 2:
-        reactants, _, products = reaction_smiles.split(">", 2)
-    else:
+    fields = split_reaction_fields(reaction_smiles)
+    if len(fields) != 3:
         return None
+    reactants, _, products = fields
     if not reactants or not products:
         return None
     return reactants, products

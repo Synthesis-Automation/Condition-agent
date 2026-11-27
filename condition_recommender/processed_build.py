@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import Any, Callable
 
@@ -12,15 +13,34 @@ from .conversion.atomic import atomic_json
 from .conversion.input_schema import discover_conversion_datasets
 from .conversion.sharded import _definition_contract, convert_datasets_sharded
 from .corpus_io import file_sha256
+from .ingestion.migration import verified_intermediate_artifacts
 from .processed_catalog import CATALOG_SCHEMA_VERSION
 from .record_storage import STORAGE_SCHEMA_VERSION
 
 DEFAULT_INPUT_ROOT = Path("datasets/intermediate_datasets")
 DEFAULT_OUTPUT_ROOT = Path("datasets/processed_datasets")
 RELEASE_SCHEMA_VERSION = "processed_reaction_release.v1"
-PIPELINE_GENERATION = "processed_pipeline.v6"
+PIPELINE_GENERATION = "processed_pipeline.v7"
 ROUTE_ARCHIVE = "routes.source.jsonl.gz"
 ROUTE_STEPS = "route_steps.observations.jsonl.gz"
+
+
+def observation_source_binding(sources: list[dict[str, Any]]) -> list[tuple[str, str]]:
+    """Bind each input's position in the source tree to its digest across root relocation."""
+    paths = [Path(item["path"]).resolve() for item in sources]
+    root = Path(os.path.commonpath([p.parent for p in paths]))
+    return sorted((path.relative_to(root).as_posix(), item["sha256"])
+                  for path, item in zip(paths, sources, strict=True))
+
+
+def verify_route_bundle_report(source: dict[str, Any], result: dict[str, Any]) -> None:
+    """Bind the completed route catalog's source pair and counts to the selected release."""
+    if (result["route_sha256"], result["step_sha256"]) != (source["sha256"], source["step_sha256"]):
+        raise ValueError("Route bundle checksums differ from the selected intermediate inventory")
+    for count in ("route_count", "observation_count"):
+        expected = source.get("expected_" + count)
+        if expected is not None and result[count] != expected:
+            raise ValueError(f"Route bundle {count} differs from its intermediate manifest")
 
 
 def discover_route_bundles(source: str | Path) -> list[tuple[Path, Path]]:
@@ -62,27 +82,33 @@ def prepare_release(
 ) -> tuple[Path, dict[str, Any]]:
     """Fingerprint all declared observations and choose a reproducible build root."""
     root = Path(source).resolve()
-    sources = discover_conversion_datasets(root)
+    declared = None
+    if (root / "migration.manifest.json").is_file():
+        declared = verified_intermediate_artifacts(root)
+        sources = sorted((p for p in declared if p.name.endswith(".observations.jsonl.gz")),
+                         key=lambda p: p.relative_to(root).as_posix().casefold())
+    else:
+        sources = discover_conversion_datasets(root)
     if not sources:
         raise ValueError("No physical reaction observations found")
-    inventory = [{"path": str(p.resolve()), "sha256": file_sha256(p),
+    inventory = [{"path": str(p.resolve()), "sha256": declared[p] if declared is not None else file_sha256(p),
                   "size_bytes": p.stat().st_size} for p in sources]
     pairs = discover_route_bundles(root)
     observation_hashes = {row["path"]: row["sha256"] for row in inventory}
     route_inventory = []
     for routes, steps in pairs:
-        item = {"path": str(routes), "sha256": file_sha256(routes),
+        item = {"path": str(routes), "sha256": declared[routes] if declared is not None else file_sha256(routes),
                 "size_bytes": routes.stat().st_size, "step_path": str(steps),
                 "step_sha256": observation_hashes[str(steps)]}
         release_manifest = routes.with_name("route_release.manifest.json")
         if release_manifest.is_file():
-            declared = json.loads(release_manifest.read_text(encoding="utf-8"))
-            hashes = declared["output_sha256"]
-            if (not declared["coverage_complete"] or hashes[ROUTE_ARCHIVE] != item["sha256"]
+            route_declaration = json.loads(release_manifest.read_text(encoding="utf-8"))
+            hashes = route_declaration["output_sha256"]
+            if (not route_declaration["coverage_complete"] or hashes[ROUTE_ARCHIVE] != item["sha256"]
                 or hashes[ROUTE_STEPS] != item["step_sha256"]):
                 raise ValueError(f"Route bundle differs from its complete manifest: {routes.parent}")
-            item.update(expected_route_count=declared["counts"]["route_count"],
-                        expected_observation_count=declared["counts"]["output_step_observations"])
+            item.update(expected_route_count=route_declaration["counts"]["route_count"],
+                        expected_observation_count=route_declaration["counts"]["output_step_observations"])
         route_inventory.append(item)
     contract = _definition_contract()
     repository = Path(__file__).resolve().parents[1]
@@ -91,7 +117,7 @@ def prepare_release(
                                         "core_retrosynthesis", "forward_synthesis")
                         for path in sorted((repository / package).rglob("*.json"))
                         if "definitions" in path.parts}
-    identity = {"sources": [entry["sha256"] for entry in inventory],
+    identity = {"sources": observation_source_binding(inventory),
                 "definition_contract": contract, "storage_schema": STORAGE_SCHEMA_VERSION,
                 "evidence_catalog_schema": CATALOG_SCHEMA_VERSION,
                 "definition_files": definition_files,
@@ -127,7 +153,8 @@ def convert_release(
         if progress:
             progress({"phase": event.phase, "rows": event.row_count,
                       "shards": event.shard_count, "message": event.message})
-    report = convert_datasets_sharded(source, release / "records", workers=workers,
+    selected = tuple(Path(entry["path"]) for entry in manifest["sources"])
+    report = convert_datasets_sharded(selected, release / "records", workers=workers,
                                      shard_size=shard_size, merge_records=False,
                                      build_catalogs=False, progress_callback=emit,
                                      cancel_check=cancel_check)

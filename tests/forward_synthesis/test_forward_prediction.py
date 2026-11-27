@@ -44,6 +44,72 @@ def test_forward_library_requires_independent_source_round_trip() -> None:
     assert all(operator.forward_smarts for operator in library.operators)
 
 
+def test_legacy_relaxed_operator_with_wrong_source_isotope_cannot_supply_forward_evidence(tmp_path) -> None:
+    library = _library("CCBr.N>>CCN")
+    operators = tuple(
+        replace(
+            operator, stereo_policy="relaxed",
+            precedents=(replace(operator.precedents[0], product_smiles="[13CH3]CN"),),
+        )
+        for operator in library.operators
+    )
+    path = tmp_path / "historical.json.gz"
+    save_forward_library(replace(library, operators=operators, source_stereo_match_version=""), path)
+    restored = load_forward_library(path)
+    result = assess_proposed_step("CCBr.N", "CCN", restored, operator_hint=operators[0].operator_id)
+    assert result.blind_prediction.candidates == ()
+    assert result.blind_prediction.diagnostics.source_revalidation_failure_count == len(operators)
+    assert result.targeted_replay_status == "operator_source_revalidation_failed"
+    assert result.validity == "out_of_scope"
+
+
+def test_targeted_replay_and_blind_search_keep_isotope_and_stereochemical_identity():
+    library = _library("CCBr.N>>CCN")
+    hint = library.operators[0].forward_operator_id
+    for target in ("C[C@@H](F)CN", "[13CH3][C@H](F)CN"):
+        result = assess_proposed_step("C[C@H](F)CBr.N", target, library, operator_hint=hint)
+        assert result.targeted_replay_status == "not_reproduced"
+        assert result.intended_match == "absent" and result.validity == "contradicted"
+        assert result.best_competitor_product == "C[C@H](F)CN"
+    result = assess_proposed_step("CC(F)CBr.N", "C[C@H](F)CN", library, operator_hint=hint)
+    assert result.targeted_replay_status == "stereo_unresolved"
+    assert result.intended_match == "connectivity_only" and result.validity == "inconclusive"
+    assert {c.check_id: c.status for c in result.checks}["blind_target_recovery"] == "warning"
+    assert "INTENDED_PRODUCT_STEREOCHEMISTRY_UNRESOLVED" in result.warnings
+
+
+def test_exact_stereoisomer_gets_its_own_rank_among_competing_predictions(monkeypatch):
+    from forward_synthesis import prediction
+
+    library = _library("CCBr.N>>CCN")
+    starting = "C[C@H](F)CBr.N"
+    blind = predict_products(starting, library)
+    exact = blind.candidates[0]
+    candidates = (
+        replace(exact, product_smiles="CC(F)CN", rank=1),
+        replace(exact, product_smiles="C[C@@H](F)CN", rank=2),
+        replace(exact, rank=3),
+    )
+    monkeypatch.setattr(prediction, "predict_products", lambda *a, **kw: replace(blind, candidates=candidates))
+    result = assess_proposed_step(starting, "C[C@H](F)CN", library)
+    assert result.intended_match == "exact" and result.intended_product_rank == 3
+    assert result.best_competitor_product == "CC(F)CN" and result.disposition == "competitive"
+
+
+def test_bounded_unknown_stereo_is_inconclusive_and_cannot_admit_a_source(monkeypatch) -> None:
+    from forward_synthesis import prediction
+    from forward_synthesis.library import _product_matches
+
+    a = "NC(F)C(C(F)C(Cl)C(F)C(Cl)C(F)C(Cl)C(F)O)[C@H](F)N"
+    b = a.replace("[C@H]", "[C@@H]")
+    assert not _product_matches(a, b, "relaxed")
+    library = _library("CCBr.N>>CCN")
+    monkeypatch.setattr(prediction, "operator_stereo_match", lambda *args: "unresolved")
+    result = assess_proposed_step("CCBr.N", "CCN", library, operator_hint=library.operators[0].operator_id)
+    assert result.validity == "inconclusive" and result.targeted_replay_status == "stereo_unresolved"
+    assert "STEREOCHEMISTRY_COMPARISON_LIMIT_REACHED" in result.warnings
+
+
 def test_forward_library_round_trips_through_json_gzip(tmp_path) -> None:
     library = _library("CCBr.N>>CCN")
     path = tmp_path / "forward-library.json.gz"

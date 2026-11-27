@@ -32,7 +32,8 @@ from .models import (
     SourceProvenance,
 )
 
-ROUTE_RELEASE_DEFINITION_VERSION = "higher_level_route_source.v1"
+ROUTE_RELEASE_ADAPTER_ID = "higher_level_route_source.v1"
+ROUTE_RELEASE_DEFINITION_VERSION = "higher_level_route_source.v1.1"
 
 
 def _json(value: Any) -> str:
@@ -102,7 +103,7 @@ def _step_observation(
         record_id += f":variant-{_text_hash(reaction)}"
     return CanonicalSourceObservation(
         observation_id=observation_id(
-            adapter_id=ROUTE_RELEASE_DEFINITION_VERSION,
+            adapter_id=ROUTE_RELEASE_ADAPTER_ID,
             source_sha256=source_hash,
             row_number=line,
             record_id=record_id,
@@ -111,8 +112,8 @@ def _step_observation(
         source=SourceProvenance(
             corpus_id="higher_level_original_route_steps",
             release_id=source.name,
-            adapter_id=ROUTE_RELEASE_DEFINITION_VERSION,
-            adapter_version="1.0",
+            adapter_id=ROUTE_RELEASE_ADAPTER_ID,
+            adapter_version="1.1",
             source_file=source.name,
             source_file_sha256=source_hash,
             source_row_number=line,

@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Sequence, Tuple
 
 from condition_registry import CONDITION_RECIPE_COMPONENT_BUCKETS
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy import analyze_molecule, featurize_reaction
 from reactive_taxonomy.reaction_graph_editing import bond_type, set_total_hydrogens
 
@@ -49,7 +50,7 @@ def _digest(value: Any, *, length: int = 20) -> str:
 
 
 def _reaction_sides(reaction_smiles: str) -> tuple[str, str]:
-    parts = reaction_smiles.split(">")
+    parts = split_reaction_fields(reaction_smiles)
     if len(parts) != 3 or not parts[0] or not parts[2]:
         raise ValueError("reaction SMILES must contain reactants>agents>products")
     return parts[0], parts[2]

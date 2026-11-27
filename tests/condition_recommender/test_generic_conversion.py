@@ -115,7 +115,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "10.3"
-    assert record.converter_definition_version == "generic_conversion.v10.4"
+    assert record.converter_definition_version == "generic_conversion.v10.5"
     assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
@@ -1125,6 +1125,23 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     assert manifest["definition_contract"][
         "fragment_source_capability_definition_version"
     ] == "fragment_source_capabilities.v1@changed"
+    manifest_path = output / "shard_manifest.json"
+    original_manifest = manifest_path.read_bytes()
+    manifest["source_files"][0]["sha256"] = "0" * 64
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with monkeypatch.context() as patch:
+        original_reader = sharded_module.iter_record_shard
+
+        def omit_observation_id(path, *, fields):
+            for record in original_reader(path, fields=fields):
+                yield {**record, "observation_id": ""}
+
+        patch.setattr(sharded_module, "iter_record_shard", omit_observation_id)
+        invalid = validate_sharded_conversion(manifest_path, verify_rows=True)
+    assert invalid["missing_observation_count"] == 4
+    assert not invalid["valid"]
+    assert any(issue.startswith("declared_source_checksum_mismatch:") for issue in invalid["issues"])
+    manifest_path.write_bytes(original_manifest)
     first_shard = output / manifest["shards"][0]["output_path"]
     first_shard.write_bytes(first_shard.read_bytes() + b"tamper")
     integrity = validate_sharded_conversion(

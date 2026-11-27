@@ -7,6 +7,10 @@
 
 ## 1. Purpose and authority
 
+The [November 2026 registry and dataset review](condition_registry_and_dataset_review_20261125.md)
+records verified corrections to reagent identities, failed-experiment support, patent route
+mapping, coordinate-bond parsing and stereochemical validation.
+
 2026-10-07: [interactive route planning](interactive_route_planning.md) adds a
 human-selected Workbench route tree over the existing single-step engine,
 with branch revision, undo/redo, resumable sessions, and canonical route export.
@@ -168,7 +172,7 @@ The current code declares:
 | Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `2.2` |
 | Recommendation record | `10.3` |
-| Generic converter definition | `generic_conversion.v10.4` |
+| Generic converter definition | `generic_conversion.v10.5` |
 | Core eligibility policy | `core_eligibility.v1@1.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v5.0` |
 | Concise reaction review | `12.0` |
@@ -178,14 +182,14 @@ The current code declares:
 | SQLite index storage | `1.0` |
 | Generic recommendation result | `4.2` |
 | Reaction correspondence definitions | `2.8` |
-| Generic retrieval definition | `1.8` |
+| Generic retrieval definition | `1.9` |
 | Reaction-facet retrieval definition | `reaction_facet_retrieval.v1@1.1` |
-| Generic ranking definition | `1.2` |
+| Generic ranking definition | `1.3` |
 | Chemist ranking preferences / profiles | `1.0` / `chemist_ranking_profiles.v1@1.1` |
 | Ordinal precedent match levels | `precedent_match_levels.v1@1.0` |
 | Related aromatic I/Br handle retrieval | `related_handle_retrieval.v1@1.0` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v3@1.0` |
-| Evidence-support policy | `evidence_support.v1@1.0` |
+| Evidence-support policy | `evidence_support.v1@1.1` |
 | Generic held-out evaluation | `generic_leakage_safe.v1.5` |
 | Reaction-core calibration | `reaction_core_calibration.v1` |
 | Generic admission policy | `generic_admission.v4.0` |

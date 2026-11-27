@@ -1,6 +1,8 @@
 """Publication binding, relocation, and incomplete-release protection."""
 
+import gzip
 import json
+from pathlib import Path
 
 import pytest
 
@@ -96,6 +98,53 @@ def test_evidence_catalog_schema_selects_a_distinct_build_directory(tmp_path, mo
     previous, previous_manifest = processed_build.prepare_release(observation, output)
     assert current != previous
     assert manifest["sources"] == previous_manifest["sources"]
+
+
+def test_release_uses_only_checksum_verified_inventory_inputs(tmp_path):
+    from condition_recommender.processed_build import prepare_release
+
+    root = tmp_path / "input"
+    root.mkdir()
+    observations = root / "one.observations.jsonl.gz"
+    observations.write_bytes(gzip.compress(b'{"experiment":1}\n', mtime=0))
+    report = {"coverage_complete": True, "output_row_count": 1, "output_sha256": file_sha256(observations)}
+    inventory = {"coverage_complete": True, "source_dataset_count": 1, "single_step_observation_count": 1,
+                 "abstraction_count": 0, "route_count": 0, "sources": [
+                     {"category": "single_step", "report": report, "output_relative_path": observations.name}]}
+    (root / "migration.manifest.json").write_text(json.dumps(inventory), encoding="utf-8")
+    (root / "review.csv").write_text("reaction_smiles\nC>>CC\n", encoding="utf-8")
+    _, manifest = prepare_release(root, tmp_path / "out")
+    assert [Path(source["path"]) for source in manifest["sources"]] == [observations]
+
+    size = observations.stat().st_size
+    observations.write_bytes(gzip.compress(b'{"experiment":2}\n', mtime=0))
+    assert observations.stat().st_size == size
+    with pytest.raises(ValueError, match="Invalid intermediate artifact"):
+        prepare_release(root, tmp_path / "out")
+
+
+def test_observation_binding_survives_relocation_and_detects_a_source_swap(tmp_path):
+    from condition_recommender.processed_build import observation_source_binding
+
+    def files(root, first, second):
+        return [{"path": str(root / "a" / "records.gz"), "sha256": first},
+                {"path": str(root / "b" / "records.gz"), "sha256": second}]
+
+    original = observation_source_binding(files(tmp_path / "input", "left", "right"))
+    assert observation_source_binding(files(tmp_path / "moved", "left", "right")[::-1]) == original
+    assert observation_source_binding(files(tmp_path / "input", "right", "left")) != original
+
+
+@pytest.mark.parametrize("digest", ["route_sha256", "step_sha256"])
+def test_route_publication_rechecks_digests_even_when_counts_match(digest):
+    from condition_recommender.processed_build import verify_route_bundle_report
+
+    selected = {"sha256": "route", "step_sha256": "steps", "expected_route_count": 1,
+                "expected_observation_count": 2}
+    actual = {"route_sha256": "route", "step_sha256": "steps", "route_count": 1, "observation_count": 2}
+    verify_route_bundle_report(selected, actual)
+    with pytest.raises(ValueError, match="checksums differ"):
+        verify_route_bundle_report(selected, {**actual, digest: "other"})
 
 
 def test_declared_route_bundles_require_both_archives_and_match_manifest_count(tmp_path):

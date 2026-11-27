@@ -22,10 +22,12 @@ from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping, Optional, Sequence, TextIO
 
 from rdkit import Chem, rdBase
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
+from reactive_taxonomy.chemistry.source_mapping import mapped_atom_identities, product_atom_origins_agree
 
 
 ROUTE_CORPUS_SCHEMA_VERSION = "1.0"
-ROUTE_CURATION_POLICY_VERSION = "1.0"
+ROUTE_CURATION_POLICY_VERSION = "1.1"
 DEFAULT_SELECTION_SEED = "higher-level-route-corpus-v1"
 DEFAULT_SPLIT_SEED = "higher-level-route-splits-v1"
 
@@ -165,8 +167,10 @@ def _validate_complete_mapping(
     reactants: Chem.Mol,
     product: Chem.Mol,
 ) -> None:
-    reactant_maps = [atom.GetAtomMapNum() for atom in reactants.GetAtoms()]
-    product_maps = [atom.GetAtomMapNum() for atom in product.GetAtoms()]
+    reactant_atoms = mapped_atom_identities(reactants)
+    product_atoms = mapped_atom_identities(product)
+    reactant_maps = [atom[0] for atom in reactant_atoms]
+    product_maps = [atom[0] for atom in product_atoms]
     if (
         not reactant_maps
         or not product_maps
@@ -179,12 +183,15 @@ def _validate_complete_mapping(
         raise RouteQualityError("duplicate_product_atom_map")
     if not set(product_maps).issubset(reactant_maps):
         raise RouteQualityError("product_atom_without_reactant_source")
+    if not product_atom_origins_agree(reactant_atoms, product_atoms):
+        raise RouteQualityError("mapped_element_or_isotope_mismatch")
 
 
 def _validate_abstracted_reaction(reaction_smiles: str) -> None:
-    if reaction_smiles.count(">") != 2:
+    fields = split_reaction_fields(reaction_smiles)
+    if len(fields) != 3:
         raise RouteQualityError("invalid_abstracted_reaction_syntax")
-    reactants, reagents, products = reaction_smiles.split(">")
+    reactants, reagents, products = fields
     if (
         not reactants
         or not products
@@ -200,9 +207,10 @@ def _parse_reaction(
     subtree_id: str,
 ) -> _ParsedReaction:
     reaction_smiles = reaction.get("reaction_smiles")
-    if not isinstance(reaction_smiles, str) or reaction_smiles.count(">") != 2:
+    fields = split_reaction_fields(reaction_smiles) if isinstance(reaction_smiles, str) else []
+    if len(fields) != 3:
         raise RouteQualityError("invalid_reaction_syntax")
-    reactants, reagents, product = reaction_smiles.split(">")
+    reactants, reagents, product = fields
     if not reactants or not product:
         raise RouteQualityError("empty_reactant_or_product")
     reactant_molecule = Chem.MolFromSmiles(reactants)
@@ -296,7 +304,7 @@ def _cheap_rejection_reason(
         if not isinstance(reaction, dict):
             return "invalid_reaction_record"
         reaction_smiles = reaction.get("reaction_smiles")
-        if not isinstance(reaction_smiles, str) or reaction_smiles.count(">") != 2:
+        if not isinstance(reaction_smiles, str) or len(split_reaction_fields(reaction_smiles)) != 3:
             return "invalid_reaction_syntax"
     return None
 
@@ -440,7 +448,7 @@ def normalize_linear_route_record(
         "higher_level_depth": subtree_depths[1],
         "abstraction_reduction": len(parsed) - subtree_counts[1],
         "quality": {
-            "atom_mapping": "complete_unique_product_subset",
+            "atom_mapping": "complete_unique_product_subset_with_conserved_elements_and_isotopes",
             "topology": "connected_linear_unique_target",
             "source_reaction_ids_verified": True,
             "source_array_order_used": False,
@@ -450,9 +458,10 @@ def normalize_linear_route_record(
 
 
 def _canonical_reaction_identity(reaction_smiles: str) -> tuple[str, str]:
-    if reaction_smiles.count(">") != 2:
+    fields = split_reaction_fields(reaction_smiles)
+    if len(fields) != 3:
         raise RouteQualityError("invalid_test_reaction_syntax")
-    reactants, _, product = reaction_smiles.split(">")
+    reactants, _, product = fields
     precursor_values = sorted(
         _canonical_unmapped_smiles(value) for value in reactants.split(".")
     )

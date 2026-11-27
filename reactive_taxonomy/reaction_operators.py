@@ -11,18 +11,24 @@ from __future__ import annotations
 import hashlib
 import itertools
 import json
+from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from functools import lru_cache
 from typing import Any, Literal, Mapping, Optional, Sequence, Tuple
 
 from rdkit import Chem
 from rdkit.Chem import rdChemReactions
+from rdkit.Chem.EnumerateStereoisomers import (
+    EnumerateStereoisomers, GetStereoisomerCount, StereoEnumerationOptions,
+)
 
 from .chemistry.smarts_cache import compile_smarts
 
 
 REACTION_OPERATOR_SCHEMA_VERSION = "1.0"
 REACTION_OPERATOR_APPLICATION_VERSION = "reaction_operator_application.v2"
+SOURCE_STEREO_MATCH_VERSION = "operator_source_stereo_match.v2"
+_MAX_STEREO_CONFIGURATIONS = 64
 
 
 def _digest(namespace: str, *values: str) -> str:
@@ -59,10 +65,47 @@ def canonical_molecule_collection(smiles: str) -> Optional[str]:
     return _canonical_molecule_collection(smiles)
 
 
+def _stereo_sites(mol: Chem.Mol) -> tuple[dict, Counter]:
+    """Group assigned stereo sites by their stereo-independent graph symmetry classes."""
+    ranks = Chem.CanonicalRankAtoms(mol, breakTies=False, includeChirality=False)
+    sites = defaultdict(list)
+    capacity = Counter()
+    for atom in mol.GetAtoms():
+        key = ("atom", ranks[atom.GetIdx()])
+        capacity[key] += 1
+        if atom.GetChiralTag() != Chem.ChiralType.CHI_UNSPECIFIED:
+            sites[key].append(atom.GetIdx())
+    for bond in mol.GetBonds():
+        ends = sorted((ranks[bond.GetBeginAtomIdx()], ranks[bond.GetEndAtomIdx()]))
+        key = ("bond", bond.GetBondType(), *ends)
+        capacity[key] += 1
+        if bond.GetStereo() not in (Chem.BondStereo.STEREONONE, Chem.BondStereo.STEREOANY):
+            sites[key].append(bond.GetIdx())
+    return dict(sites), capacity
+
+
+def _shared_stereo_smiles(mol: Chem.Mol, sites: dict, shared: set) -> str:
+    projected = Chem.Mol(mol)
+    Chem.RemoveStereochemistry(projected)
+    for key in shared:
+        for index in sites[key]:
+            if key[0] == "atom":
+                projected.GetAtomWithIdx(index).SetChiralTag(mol.GetAtomWithIdx(index).GetChiralTag())
+            else:
+                bond = mol.GetBondWithIdx(index)
+                dest = projected.GetBondWithIdx(index)
+                neighbors = tuple(bond.GetStereoAtoms())
+                if len(neighbors) == 2:
+                    dest.SetStereoAtoms(*neighbors)
+                dest.SetStereo(bond.GetStereo())
+    Chem.SetDoubleBondNeighborDirections(projected)
+    return Chem.MolToSmiles(projected)
+
+
 @lru_cache(maxsize=16_384)
 def operator_stereo_match(
     expected: str, observed: str,
-) -> Literal["exact", "stereo_relaxed", "connectivity_only", "absent"]:
+) -> Literal["exact", "stereo_relaxed", "connectivity_only", "absent", "unresolved"]:
     """Compare map-free operator outputs, retaining isotopes and specified stereo.
 
     A more specific observed graph can satisfy an underspecified target. An
@@ -78,6 +121,7 @@ def operator_stereo_match(
             atom.SetAtomMapNum(0)
     if Chem.MolToSmiles(target) == Chem.MolToSmiles(product):
         return "exact"
+
     def constitution(molecule: Chem.Mol) -> str:
         copy = Chem.Mol(molecule)
         Chem.RemoveStereochemistry(copy)
@@ -86,12 +130,27 @@ def operator_stereo_match(
 
     if constitution(target) != constitution(product):
         return "absent"
-    params = Chem.SubstructMatchParameters()
-    params.useChirality = True
-    if product.HasSubstructMatch(target, params):
-        return "stereo_relaxed"
-    params.specifiedStereoQueryMatchesUnspecified = True
-    return "connectivity_only" if product.HasSubstructMatch(target, params) else "absent"
+    target_sites, capacity = _stereo_sites(target)
+    product_sites, _ = _stereo_sites(product)
+    shared = target_sites.keys() & product_sites.keys()
+    if _shared_stereo_smiles(target, target_sites, shared) == _shared_stereo_smiles(product, product_sites, shared):
+        return "connectivity_only" if target_sites.keys() - shared else "stereo_relaxed"
+    # Every member of these symmetry classes carries an assignment on both
+    # graphs. Unequal projected canonical strings prove a shared conflict.
+    if all(len(target_sites[k]) == len(product_sites[k]) == capacity[k] for k in shared):
+        return "absent"
+    # Partially assigned symmetry-equivalent sites can match under another
+    # alignment. Compare complete configuration sets only when both are bounded.
+    options = StereoEnumerationOptions(onlyUnassigned=True, maxIsomers=0, unique=True)
+    if max(GetStereoisomerCount(m, options) for m in (target, product)) > _MAX_STEREO_CONFIGURATIONS:
+        return "unresolved"
+    possible = [
+        {Chem.MolToSmiles(item) for item in EnumerateStereoisomers(m, options)}
+        for m in (target, product)
+    ]
+    if not possible[0].intersection(possible[1]):
+        return "absent"
+    return "stereo_relaxed" if possible[1] <= possible[0] else "connectivity_only"
 
 
 @dataclass(frozen=True)
@@ -545,6 +604,7 @@ __all__ = [
     "OperatorApplicationOutcome",
     "REACTION_OPERATOR_APPLICATION_VERSION",
     "REACTION_OPERATOR_SCHEMA_VERSION",
+    "SOURCE_STEREO_MATCH_VERSION",
     "ReactionOperatorPrecedent",
     "apply_forward_operator",
     "apply_reaction_smarts",

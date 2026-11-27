@@ -24,7 +24,7 @@ from reactive_taxonomy import (
 
 from .chemistry import canonical_smiles, digest
 from .condition_ranking import RetrosynthesisConditionEvidence
-from .generic_compiler import GenericReactionIdentity, analyze_generic_reaction
+from .generic_compiler import GenericReactionIdentity, analyze_generic_reaction, template_source_verified
 from .generic_models import GenericTemplateLibrary
 from .mapping import materialize_atom_mapping
 from .precursor_compatibility import (
@@ -447,9 +447,16 @@ def _operator_matches(
             level = "same_edit_archetype_only"
         else:
             continue
-        template_ids = tuple(
-            sorted(item.template_id for item in templates_by_operator.get(operator_id, ()))
-        )
+        templates = templates_by_operator.get(operator_id, ())
+        verified = tuple(item for item in templates if template_source_verified(item, library))
+        if not verified:
+            continue
+        template_ids = tuple(sorted(item.template_id for item in verified))
+        if len(verified) < len(templates):
+            # The aggregate includes rejected evidence. Report a known lower
+            # bound from the surviving templates instead of the historic sum.
+            observations = max(item.observation_support for item in verified)
+            references = max(item.independent_reference_support for item in verified)
         matches.append(
             ExternalOperatorMatch(
                 match_id=digest(
@@ -863,17 +870,21 @@ def assess_external_retrosynthesis_proposal(
             forward_assessment.targeted_replay_status == "structurally_reproduced"
             or forward_assessment.intended_match in {"exact", "stereo_relaxed"}
         )
+        reproduction_status: GateStatus = "fail"
+        detail = "Forward replay did not recover the intended product."
+        if reproduced:
+            reproduction_status = "pass"
+            detail = "Forward replay recovered the intended product."
+        elif (
+            forward_assessment.intended_match == "connectivity_only"
+            or forward_assessment.targeted_replay_status == "stereo_unresolved"
+        ):
+            reproduction_status = "unresolved"
+            detail = "Forward replay recovered the connectivity and left the intended stereochemistry unresolved."
         gates["forward_reproduction"] = _gate(
             "forward_reproduction",
-            ("pass" if reproduced else "unresolved" if (
-                forward_assessment.intended_match == "connectivity_only"
-                or forward_assessment.targeted_replay_status == "stereo_unresolved"
-            ) else "fail"),
-            (
-                "The intended product was independently reproduced in the forward system."
-                if reproduced
-                else "The intended product was not independently reproduced in the forward system."
-            ),
+            reproduction_status,
+            detail,
             warnings=tuple(forward_assessment.warnings),
         )
         competition_status: GateStatus = (

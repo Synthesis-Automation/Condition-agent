@@ -12,12 +12,12 @@
 {"cas":"294-93-9","id":"cas:294-93-9","name":"12-Crown-4","roles":["additive"],"smiles":"C1COCCOCCOCCO1"}
 {"cas":"33100-27-5","id":"cas:33100-27-5","name":"15-Crown-5","roles":["additive"],"smiles":"C1COCCOCCOCCOCCO1"}
 {"aliases":[{"type":"abbreviation","value":"18C6"}],"cas":"17455-13-9","id":"cas:17455-13-9","name":"18-Crown-6","roles":["additive"],"smiles":"C1COCCOCCOCCOCCOCCO1"}
-{"aliases":[{"type":"abbreviation","value":"MesCO2H"}],"cas":"576-26-1","id":"cas:576-26-1","name":"2,4,6-Trimethylbenzoic acid","roles":["additive"],"smiles":"Cc1cccc(C)c1O"}
+{"cas":"576-26-1","id":"cas:576-26-1","name":"2,6-Dimethylphenol","smiles":"Cc1cccc(C)c1O"}
 {"cas":"557-91-5","id":"cas:557-91-5","name":"2-dibromoethane","roles":["additive"]}
 {"aliases":[{"type":"abbreviation","value":"AcOH"},{"type":"common_name","value":"Acetic acid"}],"cas":"64-19-7","id":"cas:64-19-7","name":"AcOH","roles":["additive","solvent"],"smiles":"CC(=O)O"}
 {"aliases":[{"type":"abbreviation","value":"Al(HCO3)3"}],"cas":"1066-33-7","id":"cas:1066-33-7","name":"Ammonium Bicarbonate","roles":["additive"],"smiles":"C(=O)(O)[O-].[NH4+]"}
 {"aliases":[{"type":"abbreviation","value":"NH4Cl"}],"cas":"12125-02-9","id":"cas:12125-02-9","name":"Ammonium Chloride","roles":["additive"]}
-{"aliases":[{"type":"abbreviation","value":"NH4-PF6"}],"cas":"16941-11-0","id":"cas:16941-11-0","name":"Ammonium hexafluorophosphate","roles":["additive"]}
+{"aliases":[{"type":"abbreviation","value":"NH4-PF6"}],"cas":"16941-11-0","id":"cas:16941-11-0","name":"Ammonium hexafluorophosphate","roles":["additive"],"smiles":"F[P-](F)(F)(F)(F)F.[NH4+]"}
 {"cas":"110-46-3","id":"cas:110-46-3","name":"amyl nitrite","roles":["additive"],"smiles":"CC(C)CCON=O"}
 {"cas":"10043-35-3","id":"cas:10043-35-3","name":"B(OH)3","roles":["additive"],"smiles":"B(O)(O)O"}
 {"aliases":[{"type":"abbreviation","value":"TMB"}],"cas":"121-43-7","id":"cas:121-43-7","name":"B(OMe)3","roles":["additive"],"smiles":"COB(OC)OC"}
@@ -26,7 +26,7 @@
 {"aliases":[{"type":"abbreviation","value":"DMAP"}],"cas":"1122-58-3","id":"cas:1122-58-3","name":"DMAP","roles":["additive","base"],"smiles":"CN(C)c1ccncc1"}
 {"aliases":[{"type":"abbreviation","value":"HFIP"}],"cas":"920-66-1","id":"cas:920-66-1","name":"HFIP","roles":["additive","solvent"],"smiles":"OC(C(F)(F)F)C(F)(F)F"}
 {"aliases":[{"type":"abbreviation","value":"HOPO"}],"cas":"14097-15-5","id":"cas:14097-15-5","name":"HOPO","roles":["additive"]}
-{"aliases":[{"type":"abbreviation","value":"HOSu"}],"cas":"6066-82-6","id":"cas:6066-82-6","name":"HOSu","roles":["additive"],"smiles":"Oc1ccc(O)n1O"}
+{"aliases":[{"type":"abbreviation","value":"HOSu"}],"cas":"6066-82-6","id":"cas:6066-82-6","name":"HOSu","roles":["additive"],"smiles":"O=C1CCC(=O)N1O"}
 {"aliases":[{"type":"abbreviation","value":"Im"}],"cas":"288-32-4","id":"cas:288-32-4","name":"Imidazole","roles":["additive"],"smiles":"c1c[nH]cn1"}
 {"aliases":[{"type":"abbreviation","value":"iPrOH"}],"cas":"67-63-0","id":"cas:67-63-0","name":"iPrOH","roles":["additive","solvent"],"smiles":"CC(C)O"}
 {"aliases":[{"type":"abbreviation","value":"KOAc"},{"type":"common_name","value":"potassium acetate"}],"cas":"127-08-2","id":"cas:127-08-2","name":"KOAc","roles":["additive","base"],"smiles":"[K+].CC(=O)[O-]"}
@@ -40,28 +40,28 @@
 {"cas":"124-07-2","id":"cas:124-07-2","name":"Octanoic acid","roles":["additive","solvent"],"smiles":"CCCCCCCC(=O)O"}
 {"aliases":[{"type":"abbreviation","value":"Oxyma"},{"type":"legacy_name","value":"OxymaPure"}],"cas":"3849-21-6","id":"cas:3849-21-6","name":"Oxyma Pure","roles":["additive"],"smiles":"CCOC(=O)C(C#N)=NO"}
 {"aliases":[{"type":"abbreviation","value":"PivOH"}],"cas":"75-98-9","id":"cas:75-98-9","name":"Pivalic acid","roles":["additive"],"smiles":"CC(C)(C)C(=O)O"}
-{"aliases":[{"type":"abbreviation","value":"KOEtHex"}],"cas":"3164-85-0","id":"cas:3164-85-0","name":"Potassium 2-ethylhexanoate","roles":["additive","base"],"smiles":"CCCCC(CC)C(=O)O"}
+{"aliases":[{"type":"abbreviation","value":"KOEtHex"}],"cas":"3164-85-0","id":"cas:3164-85-0","name":"Potassium 2-ethylhexanoate","roles":["additive","base"],"smiles":"CCCCC(CC)C(=O)[O-].[K+]"}
 {"aliases":[{"type":"abbreviation","value":"KI"}],"cas":"7681-11-0","id":"cas:7681-11-0","name":"Potassium iodide","roles":["additive"],"smiles":"[K+].[I-]"}
 {"aliases":[{"type":"abbreviation","value":"Ag2CO3"}],"cas":"534-16-7","id":"cas:534-16-7","name":"Silver carbonate","roles":["additive","oxidant"],"smiles":"O=C([O-])[O-].[Ag+].[Ag+]"}
 {"aliases":[{"type":"abbreviation","value":"AgSbF6"}],"cas":"26042-64-8","id":"cas:26042-64-8","name":"Silver hexafluoroantimonate","roles":["additive"],"smiles":"[Ag+].[F][Sb-]([F])([F])([F])([F])[F]"}
-{"aliases":[{"shared":true,"type":"abbreviation","value":"Ag2O"}],"cas":"20667-12-3","id":"cas:20667-12-3","name":"Silver oxide","roles":["additive"],"smiles":"[Ag].[Ag]"}
-{"aliases":[{"type":"abbreviation","value":"Silver sulfate"}],"cas":"10294-26-5","id":"cas:10294-26-5","name":"Silver sulfate","roles":["additive"],"smiles":"[Ag+].[Ag+]"}
-{"aliases":[{"type":"abbreviation","value":"AgBF4"}],"cas":"7775-27-1","id":"cas:7775-27-1","name":"Silver tetrafluoroborate","roles":["additive"],"smiles":"[O-]S(=O)(=O)OOS(=O)(=O)[O-].[Na+].[Na+]"}
+{"aliases":[{"shared":true,"type":"abbreviation","value":"Ag2O"}],"cas":"20667-12-3","id":"cas:20667-12-3","name":"Silver oxide","roles":["additive"],"smiles":"[O-2].[Ag+].[Ag+]"}
+{"aliases":[{"type":"abbreviation","value":"Silver sulfate"}],"cas":"10294-26-5","id":"cas:10294-26-5","name":"Silver sulfate","roles":["additive"],"smiles":"O=S(=O)([O-])[O-].[Ag+].[Ag+]"}
+{"cas":"7775-27-1","id":"cas:7775-27-1","name":"Sodium persulfate","roles":["oxidant"],"smiles":"[O-]S(=O)(=O)OOS(=O)(=O)[O-].[Na+].[Na+]"}
 {"aliases":[{"type":"abbreviation","value":"NaBr"}],"cas":"7647-15-6","id":"cas:7647-15-6","name":"Sodium Bromide","roles":["additive"],"smiles":"[Na+].[Br-]"}
 {"aliases":[{"type":"abbreviation","value":"NaCl"}],"cas":"7647-14-5","id":"cas:7647-14-5","name":"Sodium Chloride","roles":["additive"]}
-{"aliases":[{"type":"abbreviation","value":"HCOONa"}],"cas":"141-53-7","id":"cas:141-53-7","name":"Sodium formate","roles":["additive"],"smiles":"O=C[O-]"}
+{"aliases":[{"type":"abbreviation","value":"HCOONa"}],"cas":"141-53-7","id":"cas:141-53-7","name":"Sodium formate","roles":["additive"],"smiles":"O=C[O-].[Na+]"}
 {"aliases":[{"type":"abbreviation","value":"NaI"}],"cas":"7681-82-5","id":"cas:7681-82-5","name":"Sodium iodide","roles":["additive"],"smiles":"[Na+].[I-]"}
 {"aliases":[{"type":"abbreviation","value":"NaTFA"}],"cas":"2923-18-4","id":"cas:2923-18-4","name":"Sodium trifluoroacetate","roles":["additive"]}
 {"aliases":[{"type":"abbreviation","value":"TEMPO"}],"cas":"2564-83-2","id":"cas:2564-83-2","name":"TEMPO","roles":["additive","oxidant"],"smiles":"CC1(C)CCCC(C)(C)N1[O]"}
-{"aliases":[{"type":"abbreviation","value":"TBAB"}],"cas":"1643-19-2","id":"cas:1643-19-2","name":"Tetrabutylammonium bromide","roles":["additive"],"smiles":"CCCC[N+](CCCC)(CCCC)CCCC"}
-{"aliases":[{"type":"abbreviation","value":"TBACl"},{"type":"legacy_name","value":"TBAC"}],"cas":"1112-67-0","id":"cas:1112-67-0","name":"Tetrabutylammonium chloride","roles":["additive"],"smiles":"CCCC[N+](CCCC)(CCCC)CCCC"}
+{"aliases":[{"type":"abbreviation","value":"TBAB"}],"cas":"1643-19-2","id":"cas:1643-19-2","name":"Tetrabutylammonium bromide","roles":["additive"],"smiles":"CCCC[N+](CCCC)(CCCC)CCCC.[Br-]"}
+{"aliases":[{"type":"abbreviation","value":"TBACl"},{"type":"legacy_name","value":"TBAC"}],"cas":"1112-67-0","id":"cas:1112-67-0","name":"Tetrabutylammonium chloride","roles":["additive"],"smiles":"CCCC[N+](CCCC)(CCCC)CCCC.[Cl-]"}
 {"cas":"29536-33-2","id":"cas:29536-33-2","name":"Tetrabutylammonium dibutyl phosphate","roles":["additive"]}
 {"aliases":[{"type":"abbreviation","value":"TBAF"}],"cas":"429-41-4","id":"cas:429-41-4","name":"Tetrabutylammonium fluoride (anhydrous)","roles":["additive"],"smiles":"CCCC[N+](CCCC)(CCCC)CCCC.[F-]"}
-{"aliases":[{"type":"abbreviation","value":"TBAI"}],"cas":"311-28-4","id":"cas:311-28-4","name":"Tetrabutylammonium Iodide","roles":["additive"],"smiles":"CCCC[N+](CCCC)(CCCC)CCCC"}
+{"aliases":[{"type":"abbreviation","value":"TBAI"}],"cas":"311-28-4","id":"cas:311-28-4","name":"Tetrabutylammonium Iodide","roles":["additive"],"smiles":"CCCC[N+](CCCC)(CCCC)CCCC.[I-]"}
 {"aliases":[{"type":"abbreviation","value":"TFA"}],"cas":"76-05-1","id":"cas:76-05-1","name":"TFA","roles":["additive","solvent"],"smiles":"FC(F)(F)C(=O)O"}
 {"aliases":[{"type":"abbreviation","value":"TFE"}],"cas":"75-89-8","id":"cas:75-89-8","name":"TFE","roles":["additive","solvent"],"smiles":"OCC(F)(F)F"}
 {"aliases":[{"type":"abbreviation","value":"TMSCl"}],"cas":"75-77-4","id":"cas:75-77-4","name":"TMSCl","roles":["additive"],"smiles":"C[Si](C)(C)Cl"}
-{"aliases":[{"type":"abbreviation","value":"ZnCl2"}],"cas":"7646-85-7","id":"cas:7646-85-7","name":"Zinc chloride","roles":["additive"],"smiles":"[Zn+2]"}
+{"aliases":[{"type":"abbreviation","value":"ZnCl2"}],"cas":"7646-85-7","id":"cas:7646-85-7","name":"Zinc chloride","roles":["additive"],"smiles":"[Zn+2].[Cl-].[Cl-]"}
 {"aliases":[{"type":"abbreviation","value":"Zn"}],"cas":"7440-66-6","id":"cas:7440-66-6","name":"Zn","roles":["additive","reductant"],"smiles":"[Zn]"}
 {"aliases":[{"type":"abbreviation","value":"Tetramethylguanidine"},{"type":"legacy_name","value":"TMG"}],"cas":"80-70-6","id":"cas:80-70-6","name":"1,1,3,3-Tetramethylguanidine","roles":["base"],"smiles":"CN(C)C(=N)N(C)C"}
 {"aliases":[{"type":"abbreviation","value":"DBN"}],"cas":"3001-72-7","id":"cas:3001-72-7","name":"1,5-Diazabicyclo[4.3.0]non-5-ene","roles":["base"],"smiles":"C1CN=C2CCCN2C1"}
@@ -73,43 +73,43 @@
 {"aliases":[{"type":"abbreviation","value":"NH4OH"}],"cas":"1336-21-6","id":"cas:1336-21-6","name":"Ammonium hydroxide","roles":["base"],"smiles":"[NH4+].[OH-]"}
 {"aliases":[{"type":"abbreviation","value":"Ba(OH)2"}],"cas":"17194-00-2","id":"cas:17194-00-2","name":"Barium hydroxide","roles":["base"],"smiles":"[OH-].[OH-].[Ba+2]"}
 {"aliases":[{"type":"abbreviation","value":"CaCO3"}],"cas":"471-34-1","id":"cas:471-34-1","name":"Calcium Carbonate","roles":["base"],"smiles":"C(=O)([O-])[O-].[Ca+2]"}
-{"aliases":[{"type":"abbreviation","value":"CsOAc"}],"cas":"3396-11-0","id":"cas:3396-11-0","name":"Cesium acetate","roles":["base"],"smiles":"[Cs+]"}
+{"aliases":[{"type":"abbreviation","value":"CsOAc"}],"cas":"3396-11-0","id":"cas:3396-11-0","name":"Cesium acetate","roles":["base"],"smiles":"CC(=O)[O-].[Cs+]"}
 {"aliases":[{"type":"abbreviation","value":"CsHCO3"}],"cas":"15519-28-5","id":"cas:15519-28-5","name":"Cesium bicarbonate","roles":["base"]}
 {"aliases":[{"type":"abbreviation","value":"Cs2CO3"}],"cas":"534-17-8","id":"cas:534-17-8","name":"Cesium carbonate","roles":["base"],"smiles":"O=C([O-])[O-].[Cs+].[Cs+]"}
 {"aliases":[{"type":"abbreviation","value":"CsF"}],"cas":"13400-13-0","id":"cas:13400-13-0","name":"Cesium fluoride","roles":["base"],"smiles":"[Cs+].[F-]"}
-{"aliases":[{"type":"abbreviation","value":"CsOH"},{"language":"en","type":"common_name","value":"Cesium hydroxide monohydrate"},{"language":"en","type":"legacy_name","value":"CsOH.H2O"}],"cas":"35103-79-8","id":"cas:35103-79-8","name":"Cesium hydroxide","roles":["base"],"smiles":"[Cs+]"}
+{"aliases":[{"language":"en","type":"legacy_name","value":"CsOH.H2O"}],"cas":"35103-79-8","id":"cas:35103-79-8","name":"Cesium hydroxide monohydrate","roles":["base"],"smiles":"O.[OH-].[Cs+]"}
 {"aliases":[{"type":"abbreviation","value":"CsOPiv"}],"cas":"20442-70-0","id":"cas:20442-70-0","name":"Cesium pivalate","roles":["base"]}
 {"aliases":[{"type":"abbreviation","value":"DABCO"}],"cas":"280-57-9","id":"cas:280-57-9","name":"Dabco","roles":["base"],"smiles":"C1CN2CCN1CC2"}
-{"aliases":[{"type":"abbreviation","value":"KHMDS"}],"cas":"40949-94-8","id":"cas:40949-94-8","name":"KHMDS","roles":["base"],"smiles":"C[Si](C)(C)N[Si](C)(C)C"}
-{"aliases":[{"type":"abbreviation","value":"Li2CO3"}],"cas":"554-13-2","id":"cas:554-13-2","name":"Li2CO3","roles":["base"],"smiles":"O=C([O-])[O-]"}
+{"aliases":[{"type":"abbreviation","value":"KHMDS"}],"cas":"40949-94-8","id":"cas:40949-94-8","name":"KHMDS","roles":["base"],"smiles":"C[Si](C)(C)[N-][Si](C)(C)C.[K+]"}
+{"aliases":[{"type":"abbreviation","value":"Li2CO3"}],"cas":"554-13-2","id":"cas:554-13-2","name":"Li2CO3","roles":["base"],"smiles":"O=C([O-])[O-].[Li+].[Li+]"}
 {"aliases":[{"type":"abbreviation","value":"LiOAc"}],"cas":"546-89-4","id":"cas:546-89-4","name":"Lithium acetate","roles":["base"],"smiles":"[Li+].CC(=O)[O-]"}
-{"aliases":[{"type":"abbreviation","value":"LiHMDS"}],"cas":"4039-32-1","id":"cas:4039-32-1","name":"Lithium hexamethyldisilazide","roles":["base"],"smiles":"C[Si](C)(C)N[Si](C)(C)C"}
+{"aliases":[{"type":"abbreviation","value":"LiHMDS"}],"cas":"4039-32-1","id":"cas:4039-32-1","name":"Lithium hexamethyldisilazide","roles":["base"],"smiles":"C[Si](C)(C)[N-][Si](C)(C)C.[Li+]"}
 {"aliases":[{"type":"abbreviation","value":"LiOH"},{"language":"en","type":"common_name","value":"Lithium hydroxide, anhydrous"},{"language":"en","type":"legacy_name","value":"LiOH anh"}],"cas":"1310-65-2","id":"cas:1310-65-2","name":"Lithium Hydroxide","roles":["base"]}
-{"aliases":[{"type":"abbreviation","value":"t-BuOLi"},{"type":"legacy_name","value":"LiOtBu"}],"cas":"1907-33-1","id":"cas:1907-33-1","name":"Lithium tert-butoxide","roles":["base"],"smiles":"CC(C)(C)O"}
+{"aliases":[{"type":"abbreviation","value":"t-BuOLi"},{"type":"legacy_name","value":"LiOtBu"}],"cas":"1907-33-1","id":"cas:1907-33-1","name":"Lithium tert-butoxide","roles":["base"],"smiles":"CC(C)(C)[O-].[Li+]"}
 {"aliases":[{"type":"abbreviation","value":"DIPEA"}],"cas":"7087-68-5","id":"cas:7087-68-5","name":"N,N-Diisopropylethylamine","roles":["base"],"smiles":"CCN(C(C)C)C(C)C"}
-{"aliases":[{"type":"abbreviation","value":"n-BuLi"}],"cas":"109-72-8","id":"cas:109-72-8","name":"n-Butyllithium (in hexanes)","roles":["base"],"smiles":"[CH2]CCC"}
+{"aliases":[{"type":"abbreviation","value":"n-BuLi"}],"cas":"109-72-8","id":"cas:109-72-8","name":"n-Butyllithium (in hexanes)","roles":["base"]}
 {"aliases":[{"type":"legacy_name","value":"NMM"}],"cas":"109-02-4","id":"cas:109-02-4","name":"N-methylmorpholine","roles":["base"],"smiles":"CN1CCOCC1"}
 {"cas":"7664-41-7","id":"cas:7664-41-7","name":"NH3","roles":["base"],"smiles":"N"}
 {"aliases":[{"type":"abbreviation","value":"BHT-Na"},{"language":"en","type":"common_name","value":"Sodium 2,6-di-tert-butyl-4-methylphenoxide (sodium BHT)"},{"language":"en","type":"legacy_name","value":"NaBHT"}],"cas":"16654-89-0","id":"cas:16654-89-0","name":"Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium salt","roles":["base"]}
 {"cas":"110-89-4","id":"cas:110-89-4","name":"Piperidine","roles":["base"],"smiles":"C1CCNCC1"}
-{"aliases":[{"type":"abbreviation","value":"KHCO3"}],"cas":"298-14-6","id":"cas:298-14-6","name":"Potassium Bicarbonate","roles":["base"],"smiles":"O=C([O-])O"}
-{"aliases":[{"type":"abbreviation","value":"K2CO3"},{"language":"en","type":"systematic_name","value":"Dipotassium carbonate"}],"cas":"584-08-7","id":"cas:584-08-7","name":"Potassium carbonate","roles":["base"],"smiles":"O=C(O)O"}
-{"aliases":[{"type":"abbreviation","value":"KF"}],"cas":"7789-23-3","id":"cas:7789-23-3","name":"Potassium Fluoride","roles":["base"],"smiles":"F"}
+{"aliases":[{"type":"abbreviation","value":"KHCO3"}],"cas":"298-14-6","id":"cas:298-14-6","name":"Potassium Bicarbonate","roles":["base"],"smiles":"O=C([O-])O.[K+]"}
+{"aliases":[{"type":"abbreviation","value":"K2CO3"},{"language":"en","type":"systematic_name","value":"Dipotassium carbonate"}],"cas":"584-08-7","id":"cas:584-08-7","name":"Potassium carbonate","roles":["base"],"smiles":"O=C([O-])[O-].[K+].[K+]"}
+{"aliases":[{"type":"abbreviation","value":"KF"}],"cas":"7789-23-3","id":"cas:7789-23-3","name":"Potassium Fluoride","roles":["base"],"smiles":"[F-].[K+]"}
 {"aliases":[{"type":"abbreviation","value":"KH"}],"cas":"7693-26-7","id":"cas:7693-26-7","name":"Potassium hydride","roles":["base"],"smiles":"[H-].[K+]"}
 {"aliases":[{"type":"abbreviation","value":"KOH"}],"cas":"1310-58-3","id":"cas:1310-58-3","name":"Potassium hydroxide","roles":["base"],"smiles":"[K+].[OH-]"}
-{"aliases":[{"type":"abbreviation","value":"KOPh"}],"cas":"100-67-4","id":"cas:100-67-4","name":"Potassium phenoxide","roles":["base"]}
-{"aliases":[{"type":"abbreviation","value":"KOtBu"}],"cas":"865-47-4","id":"cas:865-47-4","name":"Potassium tert-butoxide","roles":["base"],"smiles":"CC(C)(C)O"}
-{"aliases":[{"type":"abbreviation","value":"TMSOK"}],"cas":"10519-96-7","id":"cas:10519-96-7","name":"Potassium trimethylsilanolate","roles":["base"],"smiles":"C[Si](C)(C)[O-]"}
+{"aliases":[{"type":"abbreviation","value":"KOPh"}],"cas":"100-67-4","id":"cas:100-67-4","name":"Potassium phenoxide","roles":["base"],"smiles":"[K+].[O-]c1ccccc1"}
+{"aliases":[{"type":"abbreviation","value":"KOtBu"}],"cas":"865-47-4","id":"cas:865-47-4","name":"Potassium tert-butoxide","roles":["base"],"smiles":"CC(C)(C)[O-].[K+]"}
+{"aliases":[{"type":"abbreviation","value":"TMSOK"}],"cas":"10519-96-7","id":"cas:10519-96-7","name":"Potassium trimethylsilanolate","roles":["base"],"smiles":"C[Si](C)(C)[O-].[K+]"}
 {"cas":"110-86-1","id":"cas:110-86-1","name":"Pyridine","roles":["base","solvent"],"smiles":"c1ccncc1"}
 {"cas":"100-76-5","id":"cas:100-76-5","name":"Quinuclidine","roles":["base"],"smiles":"C1CN2CCC1CC2"}
-{"aliases":[{"type":"abbreviation","value":"t-PentONa"},{"type":"legacy_name","value":"NaOtPent"}],"cas":"14593-46-5","id":"cas:14593-46-5","name":"Sodium 2-methylbutan-2-olate","roles":["base"],"smiles":"CCC(C)(C)O"}
-{"aliases":[{"type":"abbreviation","value":"NaOAc"}],"cas":"127-09-3","id":"cas:127-09-3","name":"Sodium acetate","roles":["base"]}
-{"aliases":[{"type":"abbreviation","value":"Na2CO3"}],"cas":"497-19-8","id":"cas:497-19-8","name":"Sodium carbonate","roles":["base"],"smiles":"O=C([O-])[O-]"}
-{"aliases":[{"type":"abbreviation","value":"NaH"}],"cas":"7646-69-7","id":"cas:7646-69-7","name":"Sodium hydride (60% dispersion in mineral oil)","roles":["base"],"smiles":"[HH]"}
-{"aliases":[{"type":"abbreviation","value":"NaHCO3"}],"cas":"144-55-8","id":"cas:144-55-8","name":"Sodium hydrogen carbonate","roles":["base"],"smiles":"O=C(O)O"}
+{"aliases":[{"type":"abbreviation","value":"t-PentONa"},{"type":"legacy_name","value":"NaOtPent"}],"cas":"14593-46-5","id":"cas:14593-46-5","name":"Sodium 2-methylbutan-2-olate","roles":["base"],"smiles":"CCC(C)(C)[O-].[Na+]"}
+{"aliases":[{"type":"abbreviation","value":"NaOAc"}],"cas":"127-09-3","id":"cas:127-09-3","name":"Sodium acetate","roles":["base"],"smiles":"CC(=O)[O-].[Na+]"}
+{"aliases":[{"type":"abbreviation","value":"Na2CO3"}],"cas":"497-19-8","id":"cas:497-19-8","name":"Sodium carbonate","roles":["base"],"smiles":"O=C([O-])[O-].[Na+].[Na+]"}
+{"aliases":[{"type":"abbreviation","value":"NaH"}],"cas":"7646-69-7","id":"cas:7646-69-7","name":"Sodium hydride (60% dispersion in mineral oil)","roles":["base"]}
+{"aliases":[{"type":"abbreviation","value":"NaHCO3"}],"cas":"144-55-8","id":"cas:144-55-8","name":"Sodium hydrogen carbonate","roles":["base"],"smiles":"O=C([O-])O.[Na+]"}
 {"aliases":[{"type":"abbreviation","value":"NaOH"}],"cas":"1310-73-2","id":"cas:1310-73-2","name":"Sodium hydroxide","roles":["base"],"smiles":"[Na+].[OH-]"}
-{"aliases":[{"type":"abbreviation","value":"NaOMe"}],"cas":"124-41-4","id":"cas:124-41-4","name":"Sodium methoxide","roles":["base"],"smiles":"C[O-].[Na+]"}
-{"aliases":[{"type":"abbreviation","value":"NaOtBu"}],"cas":"865-48-5","id":"cas:865-48-5","name":"Sodium tert-butoxide","roles":["base"],"smiles":"CC(C)(C)O"}
+{"aliases":[{"type":"abbreviation","value":"NaOMe"},{"type":"abbreviation","value":"MeONa"}],"cas":"124-41-4","id":"cas:124-41-4","name":"Sodium methoxide","roles":["base"],"smiles":"C[O-].[Na+]"}
+{"aliases":[{"type":"abbreviation","value":"NaOtBu"}],"cas":"865-48-5","id":"cas:865-48-5","name":"Sodium tert-butoxide","roles":["base"],"smiles":"CC(C)(C)[O-].[Na+]"}
 {"aliases":[{"type":"abbreviation","value":"TMSONa"}],"cas":"18027-10-6","id":"cas:18027-10-6","name":"Sodium trimethylsilanolate","roles":["base"]}
 {"aliases":[{"type":"abbreviation","value":"TMEDA"}],"cas":"110-18-9","id":"cas:110-18-9","name":"TMEDA","roles":["base","ligand"],"smiles":"CN(C)CCN(C)C"}
 {"aliases":[{"type":"abbreviation","value":"TMCD"},{"type":"legacy_name","value":"trans-NN-Dimethylcyclohexane-12-diamine"}],"cas":"67579-81-1","id":"cas:67579-81-1","name":"trans-N,N'-dimethyl-1,2-cyclohexanediamine","roles":["base"]}
@@ -118,8 +118,8 @@
 {"aliases":[{"type":"abbreviation","value":"K3PO4"},{"type":"common_name","value":"potassium phosphate tribasic"}],"cas":"7778-53-2","id":"cas:7778-53-2","name":"Tripotassium phosphate","roles":["base"],"smiles":"[K+].[K+].[K+].[O-]P(=O)([O-])[O-]"}
 {"aliases":[{"type":"abbreviation","value":"XtalFluor-E"}],"cas":"63517-29-3","id":"cas:63517-29-3","name":"(Diethylamino)difluorosulfonium tetrafluoroborate","roles":["condensation_agent"]}
 {"aliases":[{"type":"abbreviation","value":"CDI"}],"cas":"530-62-1","id":"cas:530-62-1","name":"1,1---Carbonyldiimidazole","roles":["condensation_agent"],"smiles":"O=C(n1ccnc1)n1ccnc1"}
-{"aliases":[{"type":"abbreviation","value":"DMTMM-Cl"},{"language":"en","type":"legacy_name","value":"DMTMM"}],"cas":"3945-69-5","id":"cas:3945-69-5","name":"4-(4,6-Dimethoxy-1,3,5-triazin-2-yl)-4-methylmorpholinium chloride","roles":["condensation_agent"],"smiles":"COc1nc(OC)nc([N+]2(C)CCOCC2)n1"}
-{"aliases":[{"type":"abbreviation","value":"BOP"}],"cas":"56602-33-6","id":"cas:56602-33-6","name":"BOP (legacy)","roles":["condensation_agent"],"smiles":"CCOC(=O)C(=O)C"}
+{"aliases":[{"type":"abbreviation","value":"DMTMM-Cl"},{"language":"en","type":"legacy_name","value":"DMTMM"}],"cas":"3945-69-5","id":"cas:3945-69-5","name":"4-(4,6-Dimethoxy-1,3,5-triazin-2-yl)-4-methylmorpholinium chloride","roles":["condensation_agent"],"smiles":"COc1nc(OC)nc([N+]2(C)CCOCC2)n1.[Cl-]"}
+{"aliases":[{"type":"abbreviation","value":"BOP"}],"cas":"56602-33-6","id":"cas:56602-33-6","name":"BOP (legacy)","roles":["condensation_agent"],"smiles":"CN(C)[P+](On1nnc2ccccc21)(N(C)C)N(C)C.F[P-](F)(F)(F)(F)F"}
 {"aliases":[{"type":"abbreviation","value":"BOP-Cl"}],"cas":"68641-49-6","id":"cas:68641-49-6","name":"BOP-Cl","roles":["condensation_agent"],"smiles":"O=C1OCCN1P(=O)(Cl)N1CCOC1=O"}
 {"aliases":[{"type":"abbreviation","value":"CDMT"}],"cas":"3140-73-6","id":"cas:3140-73-6","name":"CDMT (triazine additive/activator)","roles":["condensation_agent"],"smiles":"COc1nc(Cl)nc(OC)n1"}
 {"aliases":[{"type":"abbreviation","value":"CH3CHClCH2N(CH3)2\u9420\u8679\u6799Cl"}],"cas":"4584-49-0","id":"cas:4584-49-0","name":"CH3CHClCH2N(CH3)2\u9420\u8679\u6799Cl","roles":["condensation_agent"],"smiles":"CC(Cl)CN(C)C"}
@@ -139,15 +139,15 @@
 {"aliases":[{"type":"abbreviation","value":"MsCl"}],"cas":"124-63-0","id":"cas:124-63-0","name":"MsCl","roles":["condensation_agent"],"smiles":"CS(=O)(=O)Cl"}
 {"aliases":[{"type":"abbreviation","value":"Piv-Cl"}],"cas":"3282-30-2","id":"cas:3282-30-2","name":"PivCl","roles":["condensation_agent"],"smiles":"CC(C)(C)C(=O)Cl"}
 {"cas":"10025-87-3","id":"cas:10025-87-3","name":"POCl3","roles":["condensation_agent"],"smiles":"O=P(Cl)(Cl)Cl"}
-{"aliases":[{"type":"abbreviation","value":"PyAOP"}],"cas":"156311-83-0","id":"cas:156311-83-0","name":"PyAOP","roles":["condensation_agent"],"smiles":"C1CCN(C1)[P+](N2CCCC2)(N3CCCC3)ON4C5=C(C=CC=N5)N=N4"}
-{"aliases":[{"type":"abbreviation","value":"PyBOP"}],"cas":"128625-52-5","id":"cas:128625-52-5","name":"PyBOP","roles":["condensation_agent"],"smiles":"c1ccc2c(c1)nnn2O[P+](N1CCCC1)(N1CCCC1)N1CCCC1"}
+{"aliases":[{"type":"abbreviation","value":"PyAOP"}],"cas":"156311-83-0","id":"cas:156311-83-0","name":"PyAOP","roles":["condensation_agent"],"smiles":"F[P-](F)(F)(F)(F)F.c1cnc2c(c1)nnn2O[P+](N1CCCC1)(N1CCCC1)N1CCCC1"}
+{"aliases":[{"type":"abbreviation","value":"PyBOP"}],"cas":"128625-52-5","id":"cas:128625-52-5","name":"PyBOP","roles":["condensation_agent"],"smiles":"F[P-](F)(F)(F)(F)F.c1ccc2c(c1)nnn2O[P+](N1CCCC1)(N1CCCC1)N1CCCC1"}
 {"aliases":[{"type":"abbreviation","value":"PyBrOP"}],"cas":"132705-51-2","id":"cas:132705-51-2","name":"PyBrOP","roles":["condensation_agent"],"smiles":"C1CCN(C1)[P+](N2CCCC2)(N3CCCC3)Br.F[P-](F)(F)(F)(F)F"}
 {"aliases":[{"type":"abbreviation","value":"PyClOP"}],"cas":"133894-48-1","id":"cas:133894-48-1","name":"PyClOP","roles":["condensation_agent"],"smiles":"C1CCN(C1)[P+](N2CCCC2)(N3CCCC3)Cl.F[P-](F)(F)(F)(F)F"}
 {"aliases":[{"type":"abbreviation","value":"PyOxim"}],"cas":"153433-21-7","id":"cas:153433-21-7","name":"PyOxim","roles":["condensation_agent"]}
 {"cas":"2837-76-5","id":"cas:2837-76-5","name":"sec-Buutyl chloroformate","roles":["condensation_agent"]}
 {"aliases":[{"type":"abbreviation","value":"T3P"}],"cas":"68957-94-8","id":"cas:68957-94-8","name":"T3P","roles":["condensation_agent"],"smiles":"CCCP1(=O)OP(=O)(CCC)OP(=O)(CCC)O1"}
 {"aliases":[{"type":"abbreviation","value":"TBTU"}],"cas":"125700-67-6","id":"cas:125700-67-6","name":"TBTU","roles":["condensation_agent"],"smiles":"CN(C)C(On1nnc2ccccc21)=[N+](C)C.F[B-](F)(F)F"}
-{"aliases":[{"type":"abbreviation","value":"TFFH"}],"cas":"164298-23-1","id":"cas:164298-23-1","name":"Tetramethylfluoroformamidinium hexafluorophosphate","roles":["condensation_agent"],"smiles":"CN(C)C(F)=[N+](C)C"}
+{"aliases":[{"type":"abbreviation","value":"TFFH"}],"cas":"164298-23-1","id":"cas:164298-23-1","name":"Tetramethylfluoroformamidinium hexafluorophosphate","roles":["condensation_agent"],"smiles":"CN(C)C(F)=[N+](C)C.F[P-](F)(F)(F)(F)F"}
 {"aliases":[{"type":"abbreviation","value":"B(OCH2CF3)3"}],"cas":"659-18-7","id":"cas:659-18-7","name":"Tris(2,2,2-trifluoroethyl) Borate","roles":["condensation_agent"]}
 {"cas":"9001-22-3","id":"cas:9001-22-3","name":"Alcohol dehydrogenase","roles":["enzyme"]}
 {"aliases":[{"type":"abbreviation","value":"NaN3"}],"cas":"26628-22-8","id":"cas:26628-22-8","name":"NaN3","roles":["additive"],"smiles":"[Na+].[N-]=[N+]=[N-]"}
@@ -290,7 +290,7 @@
 {"aliases":[{"type":"abbreviation","value":"P(p-tol)3"}],"cas":"1038-95-5","id":"cas:1038-95-5","name":"Tris(p-tolyl)phosphine","roles":["ligand"],"smiles":"CC1=CC=C(C=C1)P(C2=CC=C(C=C2)C)C3=CC=C(C=C3)C"}
 {"aliases":[{"type":"abbreviation","value":"P(p-CF3-Ph)3"}],"cas":"13406-29-6","id":"cas:13406-29-6","name":"Tris(p-trifluoromethylphenyl)phosphine","roles":["ligand"],"smiles":"FC(F)(F)c1ccc(P(c2ccc(C(F)(F)F)cc2)c2ccc(C(F)(F)F)cc2)cc1"}
 {"aliases":[{"type":"abbreviation","value":"P(C6F5)3"}],"cas":"1259-35-4","id":"cas:1259-35-4","name":"Tris(pentafluorophenyl)phosphine","roles":["ligand"],"smiles":"Fc1c(F)c(F)c(P(c2c(F)c(F)c(F)c(F)c2F)c2c(F)c(F)c(F)c(F)c2F)c(F)c1F"}
-{"aliases":[{"type":"abbreviation","value":"TPPTS"}],"cas":"63995-70-0","id":"cas:63995-70-0","name":"Trisodium 3,3',3''-phosphinetriyltris(benzene-1-sulphonate)","roles":["ligand"],"smiles":"O=S(=O)([O-])c1cccc(P(c2cccc(S(=O)(=O)[O-])c2)c2cccc(S(=O)(=O)[O-])c2)c1"}
+{"aliases":[{"type":"abbreviation","value":"TPPTS"}],"cas":"63995-70-0","id":"cas:63995-70-0","name":"Trisodium 3,3',3''-phosphinetriyltris(benzene-1-sulphonate)","roles":["ligand"],"smiles":"O=S(=O)([O-])c1cccc(P(c2cccc(S(=O)(=O)[O-])c2)c2cccc(S(=O)(=O)[O-])c2)c1.[Na+].[Na+].[Na+]"}
 {"aliases":[{"type":"abbreviation","value":"TrixiePhos"}],"cas":"255836-67-0","id":"cas:255836-67-0","name":"TrixiePhos","roles":["ligand"]}
 {"aliases":[{"type":"abbreviation","value":"VPhos"}],"cas":"1848244-75-6","id":"cas:1848244-75-6","name":"VPhos","roles":["ligand"]}
 {"aliases":[{"type":"abbreviation","value":"XantPhos"}],"cas":"161265-03-8","id":"cas:161265-03-8","name":"Xantphos","roles":["ligand"],"smiles":"CC1(C)c2cccc(P(c3ccccc3)c3ccccc3)c2Oc2c(P(c3ccccc3)c3ccccc3)cccc21"}
@@ -344,7 +344,7 @@
 {"aliases":[{"type":"abbreviation","value":"Fe(R,R-PDP)"}],"cas":"959395-10-9","id":"cas:959395-10-9","name":"(2S,2'S-()-[N,N'?Bis(2-pyridylmethyl)]-2,2'?bipyrrolidinebis(acetonitrile)iron(II) hexafluoroantimonate","roles":["metal_catalyst"],"smiles":"CC#N.CC#N.C1CC(N(C1)CC2=CC=CC=N2)C3CCCN3CC4=CC=CC=N4.F[Sb-](F)(F)(F)(F)F.F[Sb-](F)(F)(F)(F)F.[Fe+2]"}
 {"cas":"78355-59-6","id":"cas:78355-59-6","name":"(2S,3S)-(+)-2,3-Bis(diphenylphosphino)bicyclo[2.2.1]hept-5-ene(1,5-cyclooctadiene)rhodium(I)tetrafluoroborate,min.97(S,S)-NORPHOS-Rh","roles":["metal_catalyst"],"smiles":"[B-](F)(F)(F)F.C1CC=CCCC=C1.C1C2C=CC1C(C2P(C3=CC=CC=C3)C4=CC=CC=C4)P(C5=CC=CC=C5)C6=CC=CC=C6.[Rh]"}
 {"cas":"250220-36-1","id":"cas:250220-36-1","name":"(3-Phenyl-1H-inden-1-ylidene)bis(tricyclohexylphosphine)ruthenium(IV) dichloride tetrahydrofuran adduct","roles":["metal_catalyst"],"smiles":"C1CCC(CC1)P(C2CCCCC2)C3CCCCC3.C1CCC(CC1)P(C2CCCCC2)C3CCCCC3.C1=CC=C(C=C1)C2=CC(=[Ru](Cl)Cl)C3=CC=CC=C32"}
-{"cas":"870987-63-6","id":"cas:870987-63-6","name":"(4,4'-Di-t-butyl-2,2'-bipyridine)bis[3,5-difluoro-2-[5-trifluoromethyl-2-pyridinyl-kN)phenyl-kC]iridium(III) hexafluorophosphate","roles":["metal_catalyst"],"smiles":"F[P-](F)(F)(F)(F)F"}
+{"aliases":[{"type":"abbreviation","value":"Ir[dF(CF3)ppy]2(dtbbpy)PF6"}],"cas":"870987-63-6","id":"cas:870987-63-6","name":"(4,4'-Di-t-butyl-2,2'-bipyridine)bis[3,5-difluoro-2-[5-trifluoromethyl-2-pyridinyl-kN)phenyl-kC]iridium(III) hexafluorophosphate","roles":["metal_catalyst"],"smiles":"CC(C)(C)c1ccnc(-c2cc(C(C)(C)C)ccn2)c1.F[P-](F)(F)(F)(F)F.Fc1c[c-]c(-c2ccc(C(F)(F)F)cn2)c(F)c1.Fc1c[c-]c(-c2ccc(C(F)(F)F)cn2)c(F)c1.[Ir+3]"}
 {"aliases":[{"type":"abbreviation","value":"[Ir(dtbbpy)(ppy)2][PF6]"}],"cas":"676525-77-2","id":"cas:676525-77-2","name":"(4,4'-di-tert-butyl-2,2'-dipyridyl)-bis-(2-phenylpyridine(-1H))-iridium(III) hexafluorophosphate","roles":["metal_catalyst"],"smiles":"CC(C)(C)C1=CC(=NC=C1)C2=NC=CC(=C2)C(C)(C)C.C1=CC=C([C-]=C1)C2=CC=CC=N2.C1=CC=C([C-]=C1)C2=CC=CC=N2.F[P-](F)(F)(F)(F)F.[Ir+3]"}
 {"cas":"1101230-25-4","id":"cas:1101230-25-4","name":"(4,5-bis-(di-iso-propylphosphinomethyl)acridine)RuH(CO)Cl","roles":["metal_catalyst"],"smiles":"CC(C)P(CC1=CC=CC2=C1N=C3C(=C2)C=CC=C3CP(C(C)C)C(C)C)C(C)C.[C-]#[O+].Cl[Ru]"}
 {"cas":"197389-47-2","id":"cas:197389-47-2","name":"(4R,5R)-(-)-2,2-DIMETHYL-A,A,A',A'-TETRA(1-NAPHTHYL)-1,3-DIOXOLANE-4,5-DIMETHANOLATOTITANIUM(IV) DICHLORIDE ACETONITRILE ADDUCT","roles":["metal_catalyst"],"smiles":"CC#N.CC1(NC(C(O1)C(C2=CC=CC3=CC=CC=C32)(C4=CC=CC5=CC=CC=C54)O)C(C6=CC=CC7=CC=CC=C76)(C8=CC=CC9=CC=CC=C98)O)C.Cl[Ti]Cl"}
@@ -1012,7 +1012,7 @@
 {"cas":"19004-19-4","id":"cas:19004-19-4","name":"Copper(II) nitrate, hemipentahydrate","roles":["metal_catalyst"],"smiles":"[Cu+2].[Cu+2]"}
 {"cas":"10294-46-9","id":"cas:10294-46-9","name":"Copper(II) perchlorate hexahydrate","roles":["metal_catalyst"],"smiles":"[Cu+2].[O-][Cl+3]([O-])([O-])[O-].[O-][Cl+3]([O-])([O-])[O-]"}
 {"cas":"14324-82-4","id":"cas:14324-82-4","name":"Copper(II) trifluoroacetylacetonate","roles":["metal_catalyst"],"smiles":"CC(=O)C=C([O-])C(F)(F)F.CC(=O)C=C([O-])C(F)(F)F.[Cu+2]"}
-{"aliases":[{"type":"abbreviation","value":"Cu(OTf)2"}],"cas":"34946-82-2","id":"cas:34946-82-2","name":"Copper(II) trifluoromethanesulfonate","roles":["metal_catalyst"],"smiles":"CCOC(=O)OC1(CCC2C1(CC(C3C2CCC4=CC(=O)C=CC34C)O)C)C(=O)OCCl"}
+{"aliases":[{"type":"abbreviation","value":"Cu(OTf)2"}],"cas":"34946-82-2","id":"cas:34946-82-2","name":"Copper(II) trifluoromethanesulfonate","roles":["metal_catalyst"],"smiles":"O=S(=O)([O-])C(F)(F)F.O=S(=O)([O-])C(F)(F)F.[Cu+2]"}
 {"cas":"38465-60-0","id":"cas:38465-60-0","name":"copper(II)borofluoride","roles":["metal_catalyst"],"smiles":"F[B-](F)(F)F.F[B-](F)(F)F.[Cu+2]"}
 {"cas":"12069-69-1","id":"cas:12069-69-1","name":"Copper(II)carbonatedihydroxide,Cumin","roles":["metal_catalyst"],"smiles":"C(=O)([O-])[O-].[Cu+2]"}
 {"cas":"2218-80-6","id":"cas:2218-80-6","name":"Copper(II)cyclohexanebutyrate,AAS,Cu","roles":["metal_catalyst"],"smiles":"C1CCC(CC1)CCCC(=O)[O-].C1CCC(CC1)CCCC(=O)[O-].[Cu+2]"}
@@ -1491,7 +1491,7 @@
 {"cas":"12035-38-0","id":"cas:12035-38-0","name":"nickel(2+) ion oxostannanebis(olate)","roles":["metal_catalyst"],"smiles":"[Ni+3].[Sn+4]"}
 {"cas":"14177-51-6","id":"cas:14177-51-6","name":"nickel(2+) ion tungstate","roles":["metal_catalyst"],"smiles":"[Ni+2].[W+8]"}
 {"aliases":[{"type":"abbreviation","value":"Ni(OAc)2-4H2O"}],"cas":"6018-89-9","id":"cas:6018-89-9","name":"Nickel(II) acetate tetrahydrate","roles":["metal_catalyst"],"smiles":"[Ni+2]"}
-{"aliases":[{"type":"abbreviation","value":"Ni(acac)2"}],"cas":"3264-82-2","id":"cas:3264-82-2","name":"Nickel(II) acetylacetonate","roles":["metal_catalyst"],"smiles":"C1=CC=C(C=C1)C2(C3=CC=CC=C3C4=CC=CC=C42)Br"}
+{"aliases":[{"type":"abbreviation","value":"Ni(acac)2"}],"cas":"3264-82-2","id":"cas:3264-82-2","name":"Nickel(II) acetylacetonate","roles":["metal_catalyst"],"smiles":"CC(=O)[CH-]C(C)=O.CC(=O)[CH-]C(C)=O.[Ni+2]"}
 {"aliases":[{"type":"abbreviation","value":"NiBr2"}],"cas":"13462-88-9","id":"cas:13462-88-9","name":"Nickel(II) bromide","roles":["metal_catalyst"],"smiles":"[Ni+2]"}
 {"aliases":[{"type":"abbreviation","value":"NiBr2(dme)"},{"type":"legacy_name","value":"NiBr2-glyme"}],"cas":"28923-39-9","id":"cas:28923-39-9","name":"Nickel(II) bromide dimethoxyethane complex","roles":["metal_catalyst"]}
 {"cas":"7789-49-3","id":"cas:7789-49-3","name":"Nickel(II) bromide trihydrate","roles":["metal_catalyst"],"smiles":"[Ni+2]"}
@@ -1625,7 +1625,7 @@
 {"cas":"921213-39-0","id":"cas:921213-39-0","name":"Polyesteracrylate/methacrylate,PEAM-541","roles":["metal_catalyst"],"smiles":"[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf].[Rf]"}
 {"cas":"10025-99-7","id":"cas:10025-99-7","name":"Potasium tetrachloroplatinate (I)","roles":["metal_catalyst"],"smiles":"[Pt+4]"}
 {"cas":"16037-50-6","id":"cas:16037-50-6","name":"Potassium chlorochromate","roles":["metal_catalyst"],"smiles":"[Cr+6]"}
-{"cas":"13746-66-2","id":"cas:13746-66-2","name":"Potassium ferricyanide","roles":["metal_catalyst"],"smiles":"C#N.C#N.C#N.[C-]#N.[C-]#N.[C-]#N.[Fe+3]"}
+{"cas":"13746-66-2","id":"cas:13746-66-2","name":"Potassium ferricyanide","roles":["metal_catalyst"],"smiles":"[C-]#N.[C-]#N.[C-]#N.[C-]#N.[C-]#N.[C-]#N.[Fe+3].[K+].[K+].[K+]"}
 {"cas":"14459-95-1","id":"cas:14459-95-1","name":"Potassium ferrocyanide trihyrate","roles":["metal_catalyst"],"smiles":"[C-]#N.[C-]#N.[C-]#N.[C-]#N.[C-]#N.[C-]#N.[Fe+2]"}
 {"cas":"16924-03-1","id":"cas:16924-03-1","name":"Potassium heptafluoroniobate(V)","roles":["metal_catalyst"],"smiles":"F.F.F.F.F.F.F.[Nb+5]"}
 {"cas":"16924-00-8","id":"cas:16924-00-8","name":"Potassium heptafluorotantalate(V)","roles":["metal_catalyst"],"smiles":"F.F.F.F.F.F.F.[Ta+7]"}
@@ -1644,10 +1644,10 @@
 {"cas":"13769-43-2","id":"cas:13769-43-2","name":"Potassium metavanadate","roles":["metal_catalyst"],"smiles":"[V+6]"}
 {"cas":"13446-49-6","id":"cas:13446-49-6","name":"Potassium molybdate","roles":["metal_catalyst"],"smiles":"[Mo+8]"}
 {"cas":"12030-85-2","id":"cas:12030-85-2","name":"Potassium niobate","roles":["metal_catalyst"],"smiles":"[Nb+5].[Nb+5].[Nb+5].[Nb+5].[Nb+5].[Nb+5]"}
-{"cas":"10022-66-9","id":"cas:10022-66-9","name":"Potassium osmate(VI) dihydrate","roles":["metal_catalyst"],"smiles":"[Os+8]"}
+{"cas":"10022-66-9","id":"cas:10022-66-9","name":"Potassium osmate(VI) dihydrate","roles":["metal_catalyst"],"smiles":"O.O.[K+].[K+].[O]=[Os](=[O])([O-])[O-]"}
 {"cas":"14404-33-2","id":"cas:14404-33-2","name":"Potassium pentachloroaquaruthenium(III)","roles":["metal_catalyst"],"smiles":"[Ru+5]"}
 {"cas":"14854-54-7","id":"cas:14854-54-7","name":"Potassium pentachloronitrosylruthenate(II)","roles":["metal_catalyst"],"smiles":"N#[O+].[Ru+2]"}
-{"cas":"7722-64-7","id":"cas:7722-64-7","name":"Potassium permanganate","roles":["metal_catalyst"],"smiles":"[Mn+8]"}
+{"cas":"7722-64-7","id":"cas:7722-64-7","name":"Potassium permanganate","roles":["metal_catalyst"],"smiles":"[K+].[O]=[Mn](=[O])(=[O])[O-]"}
 {"cas":"10466-65-6","id":"cas:10466-65-6","name":"Potassium perrhenate","roles":["metal_catalyst"],"smiles":"[Re+8]"}
 {"cas":"12030-91-0","id":"cas:12030-91-0","name":"Potassium tantalate","roles":["metal_catalyst"],"smiles":"[Ta+5]"}
 {"cas":"14323-32-1","id":"cas:14323-32-1","name":"Potassium tetrabromoaurate(III) dihydrate","roles":["metal_catalyst"],"smiles":"[Au+3]"}
@@ -1765,7 +1765,7 @@
 {"cas":"20654-56-2","id":"cas:20654-56-2","name":"Silver perrhenate","roles":["metal_catalyst"],"smiles":"[Ag+].[Re+8]"}
 {"cas":"7784-09-0","id":"cas:7784-09-0","name":"Silver phosphate","roles":["metal_catalyst"],"smiles":"[Ag+].[Ag+].[Ag+]"}
 {"cas":"528-93-8","id":"cas:528-93-8","name":"silver salicylate hydrate","roles":["metal_catalyst"],"smiles":"O=C([O-])c1ccccc1O.[Ag+]"}
-{"cas":"14104-20-2","id":"cas:14104-20-2","name":"Silver tetrafluoroborate","roles":["metal_catalyst"],"smiles":"F[B-](F)(F)F.[Ag+]"}
+{"aliases":[{"type":"abbreviation","value":"AgBF4"}],"cas":"14104-20-2","id":"cas:14104-20-2","name":"Silver tetrafluoroborate","roles":["additive","metal_catalyst"],"smiles":"F[B-](F)(F)F.[Ag+]"}
 {"cas":"1701-93-5","id":"cas:1701-93-5","name":"silver thiocyanate","roles":["metal_catalyst"],"smiles":"N#C[S-].[Ag+]"}
 {"cas":"2966-50-9","id":"cas:2966-50-9","name":"Silver trifluoroacetate","roles":["metal_catalyst"],"smiles":"[Ag+]"}
 {"aliases":[{"language":"en","type":"legacy_name","value":"AgOTf"}],"cas":"2923-28-6","id":"cas:2923-28-6","name":"Silver trifluoromethanesulfonate","roles":["metal_catalyst"],"smiles":"O=S(=O)([O-])C(F)(F)F.[Ag+]"}
@@ -1797,7 +1797,7 @@
 {"cas":"199684-47-4","id":"cas:199684-47-4","name":"SODIUM ORTHOSILICATE","roles":["metal_catalyst"],"smiles":"C[NH2+]C.C1=CC=C(C=C1)P(C2=CC=CC=C2)C3=C(C4=CC=CC=C4C=C3)C5=C(C=CC6=CC=CC=C65)P(C7=CC=CC=C7)C8=CC=CC=C8.C1=CC=C(C=C1)P(C2=CC=CC=C2)C3=C(C4=CC=CC=C4C=C3)C5=C(C=CC6=CC=CC=C65)P(C7=CC=CC=C7)C8=CC=CC=C8.[Cl-].Cl[Ru]Cl.Cl[Ru]Cl"}
 {"cas":"13721-39-6","id":"cas:13721-39-6","name":"Sodium orthovanadate","roles":["metal_catalyst"],"smiles":"[V+8]"}
 {"cas":"13472-33-8","id":"cas:13472-33-8","name":"Sodium perrhenate","roles":["metal_catalyst"],"smiles":"[Re+8]"}
-{"cas":"13820-53-6","id":"cas:13820-53-6","name":"Sodium tetrachloropalladate(II)","roles":["metal_catalyst"],"smiles":"[Pd+4]"}
+{"cas":"13820-53-6","id":"cas:13820-53-6","name":"Sodium tetrachloropalladate(II)","roles":["metal_catalyst"],"smiles":"[Cl][Pd-2]([Cl])([Cl])[Cl].[Na+].[Na+]"}
 {"cas":"207683-21-4","id":"cas:207683-21-4","name":"Sodium tetrachloroplatinate(II) hydrate","roles":["metal_catalyst"],"smiles":"[Pt+4]"}
 {"cas":"10213-10-2","id":"cas:10213-10-2","name":"Sodium tungstate dihydrate","roles":["metal_catalyst"],"smiles":"[W+8]"}
 {"cas":"12244-57-4","id":"cas:12244-57-4","name":"Sodiumaurothiomalate(I),(metalsbasis)","roles":["metal_catalyst"],"smiles":"C(C(C(=O)[O-])[S-])C(=O)[O-].[Na+].[Na+].[Au+]"}
@@ -1955,7 +1955,7 @@
 {"aliases":[{"type":"abbreviation","value":"Co(acac)3"}],"cas":"21679-46-9","id":"cas:21679-46-9","name":"Tris(acetylacetonato)cobalt(III)","roles":["metal_catalyst"],"smiles":"CC(=O)[CH-]C(C)=O.[CH2-]C(=O)CC(C)=O.[CH2-]C(=O)CC(C)=O.[Co+3]"}
 {"aliases":[{"type":"abbreviation","value":"Fe(acac)3"}],"cas":"14024-18-1","id":"cas:14024-18-1","name":"Tris(acetylacetonato)iron(III)","roles":["metal_catalyst"],"smiles":"CC(=O)C=C(C)[O-].CC(=O)C=C(C)[O-].CC(=O)C=C(C)[O-].[Fe+3]"}
 {"cas":"37265-86-4","id":"cas:37265-86-4","name":"tris(barium oxide); oxo[(oxoyttrio)oxy]yttrium; tungsten trioxide","roles":["metal_catalyst"],"smiles":"[Ba+2].[Ba+2].[Ba+2].[W].[Y].[Y]"}
-{"aliases":[{"type":"abbreviation","value":"Pd2(dba)3"}],"cas":"51364-51-3","id":"cas:51364-51-3","name":"Tris(dibenzylideneacetone)dipalladium(0)","roles":["metal_catalyst"],"smiles":"C1=CC=C(C=C1)P(C2=CC=CC=C2)C3=CC=CC=C3"}
+{"aliases":[{"type":"abbreviation","value":"Pd2(dba)3"},{"type":"abbreviation","value":"Pd2dba3"}],"cas":"51364-51-3","id":"cas:51364-51-3","name":"Tris(dibenzylideneacetone)dipalladium(0)","roles":["metal_catalyst"],"smiles":"O=C(/C=C/c1ccccc1)/C=C/c1ccccc1.O=C(/C=C/c1ccccc1)/C=C/c1ccccc1.O=C(/C=C/c1ccccc1)/C=C/c1ccccc1.[Pd].[Pd]"}
 {"aliases":[{"type":"abbreviation","value":"Pd2(dba)3  CHCl3"},{"type":"legacy_name","value":"Pd2dba3.CHCl3"}],"cas":"52522-40-4","id":"cas:52522-40-4","name":"Tris(dibenzylideneacetone)dipalladium(0)-Chloroform adduct","roles":["metal_catalyst"],"smiles":"C1=CC=C(C=C1)C=CC(=O)C=CC2=CC=CC=C2.C1=CC=C(C=C1)C=CC(=O)C=CC2=CC=CC=C2.C1=CC=C(C=C1)C=CC(=O)C=CC2=CC=CC=C2.[Pd].[Pd]"}
 {"cas":"16165-32-5","id":"cas:16165-32-5","name":"Tris(ethylenediamine)chromium(III) chloride hemiheptahydrate","roles":["metal_catalyst"],"smiles":"NCCN.NCCN.NCCN.[Cr+3]"}
 {"cas":"14883-80-8","id":"cas:14883-80-8","name":"tris(ethylenediamine)cobalt(III) chloride trihydrate","roles":["metal_catalyst"],"smiles":"NCCN.NCCN.NCCN.[Co+3]"}
@@ -3089,7 +3089,7 @@
 {"cas":"330469-30-2","id":"cas:330469-30-2","name":"(4-Fluorobenzoyl)-2-methylpiperidine","smiles":"CC1CCCCN1C(=O)C2=CC=C(C=C2)F"}
 {"cas":"330469-25-5","id":"cas:330469-25-5","name":"(4-Fluorobenzoyl)-3-methylpiperidine","smiles":"CC1CCCN(C1)C(=O)C2=CC=C(C=C2)F"}
 {"cas":"349643-97-6","id":"cas:349643-97-6","name":"(4-Fluorobenzoyl)-4-methylpiperidine","smiles":"CC1CCN(CC1)C(=O)C2=CC=C(C=C2)F"}
-{"cas":"149437-76-3","id":"cas:149437-76-3","name":"(4-Fluorobenzoyl)butyricacid","smiles":"CO"}
+{"cas":"149437-76-3","id":"cas:149437-76-3","name":"(4-Fluorobenzoyl)butyricacid","smiles":"O=C(O)CCCC(=O)c1ccc(F)cc1"}
 {"cas":"41538-36-7","id":"cas:41538-36-7","name":"(4-Fluorobenzoyl)pyridine","smiles":"C1=CC(=CC=C1C(=O)C2=CC=NC=C2)F"}
 {"cas":"174561-11-6","id":"cas:174561-11-6","name":"(4-Fluorobenzyl)-4-(2-hydroxyethyl)piperazine","smiles":"C1CN(CCN1CCO)CC2=CC=C(C=C2)F"}
 {"cas":"637020-68-9","id":"cas:637020-68-9","name":"(4-Fluorobenzyl)-L-prolinehydrochloride","smiles":"C1CC(NC1)(CC2=CC=C(C=C2)F)C(=O)O.Cl"}
@@ -3165,7 +3165,7 @@
 {"cas":"871332-80-8","id":"cas:871332-80-8","name":"(4-Morpholinylcarbonyl)-5-nitrobenzeneboronicacid","smiles":"B(C1=CC(=CC(=C1)[N+](=O)[O-])C(=O)N2CCOCC2)(O)O"}
 {"cas":"723281-55-8","id":"cas:723281-55-8","name":"(4-Morpholinylcarbonyl)benzeneboronicacid","smiles":"B(C1=CC(=CC=C1)C(=O)N2CCOCC2)(O)O"}
 {"cas":"874219-17-7","id":"cas:874219-17-7","name":"(4-Morpholinylcarbonyl)benzeneboronicacid","smiles":"B(C1=CC=CC=C1C(=O)N2CCOCC2)(O)O"}
-{"cas":"183193-59-1","id":"cas:183193-59-1","name":"(4-Morpholinylmethyl)-3-(2-nitrobenzylidenamino)-2-","smiles":"CO"}
+{"cas":"183193-59-1","id":"cas:183193-59-1","name":"(4-Morpholinylmethyl)-3-(2-nitrobenzylidenamino)-2-","smiles":"O=C1OC(CN2CCOCC2)CN1/N=C/c1ccccc1[N+](=O)[O-]"}
 {"cas":"364794-79-6","id":"cas:364794-79-6","name":"(4-Morpholinylmethyl)benzeneboronicacidpinacolester","smiles":"B1(OC(C(O1)(C)C)(C)C)C2=CC=C(C=C2)CN3CCOCC3"}
 {"cas":"364794-80-9","id":"cas:364794-80-9","name":"(4-Morpholinylmethyl)benzeneboronicacidpinacolester","smiles":"B1(OC(C(O1)(C)C)(C)C)C2=CC(=CC=C2)CN3CCOCC3"}
 {"cas":"876316-33-5","id":"cas:876316-33-5","name":"(4-Morpholinylmethyl)benzeneboronicacidpinacolester","smiles":"B1(OC(C(O1)(C)C)(C)C)C2=CC=CC=C2CN3CCOCC3"}
@@ -3412,7 +3412,7 @@
 {"cas":"3020-28-8","id":"cas:3020-28-8","name":"(iodomethyl)(triphenyl)phosphonium iodide","smiles":"IC[P+](c1ccccc1)(c1ccccc1)c1ccccc1"}
 {"cas":"33574-02-6","id":"cas:33574-02-6","name":"(Iodomethyl)cyclopropane","smiles":"ICC1CC1"}
 {"cas":"4206-67-1","id":"cas:4206-67-1","name":"(Iodomethyl)trimethylsilane","smiles":"C[Si](C)(C)CI"}
-{"cas":"1735-17-7","id":"cas:1735-17-7","name":"(Isotopic)","smiles":"C1CCCCC1"}
+{"cas":"1735-17-7","id":"cas:1735-17-7","name":"Cyclohexane-d12","smiles":"[2H]C1([2H])C([2H])([2H])C([2H])([2H])C([2H])([2H])C([2H])([2H])C1([2H])[2H]"}
 {"cas":"102-39-6","id":"cas:102-39-6","name":"(m-Phenylenedioxy)diacetic acid","smiles":"O=C(O)COc1cccc(OCC(=O)O)c1"}
 {"cas":"50257-39-1","id":"cas:50257-39-1","name":"(Mesitylenesulfonyl)imidazole","smiles":"CC1=CC(=C(C(=C1)C)S(=O)(=O)N2C=CN=C2)C"}
 {"cas":"5039-78-1","id":"cas:5039-78-1","name":"(Methacryloyloxy)ethyltrimethylammoniumchloride","smiles":"CC(=C)C(=O)OCC[N+](C)(C)C.[Cl-]"}
@@ -4093,7 +4093,7 @@
 {"cas":"1099-02-1","id":"cas:1099-02-1","name":"({4-[bis(carboxymethyl)amino]phenyl}(carboxymethyl)amino)acetic acid","smiles":"O=C(O)CN(CC(=O)O)c1ccc(N(CC(=O)O)CC(=O)O)cc1"}
 {"cas":"941-98-0","id":"cas:941-98-0","name":"1'-Acetonaphthone","smiles":"CC(=O)c1cccc2ccccc12"}
 {"cas":"35193-63-6","id":"cas:35193-63-6","name":"1'-Binaphthyl-2,2'-diylhydrogenphosphate","smiles":"C1=CC=C2C(=C1)C=CC3=C2C4=C(C=CC5=CC=CC=C54)OP(=O)(O3)O"}
-{"aliases":[{"language":"en","type":"common_name","value":"Dichloro[1,1\u2032-bis(di-tert-butylphosphino)ferrocene]palladium(II)"},{"language":"en","type":"legacy_name","value":"dtbpfPdCl2"}],"cas":"95408-45-0","id":"cas:95408-45-0","name":"1'-Bis(di-tert-butylphosphino)ferrocenepalladiumdichloride","smiles":"CC(C)(C)P(C1=CC=CC1)C(C)(C)C"}
+{"aliases":[{"language":"en","type":"common_name","value":"Dichloro[1,1′-bis(di-tert-butylphosphino)ferrocene]palladium(II)"},{"language":"en","type":"legacy_name","value":"dtbpfPdCl2"}],"cas":"95408-45-0","id":"cas:95408-45-0","name":"1'-Bis(di-tert-butylphosphino)ferrocenepalladiumdichloride","smiles":"CC(C)(C)P(c1ccc[cH-]1)C(C)(C)C.CC(C)(C)P(c1ccc[cH-]1)C(C)(C)C.[Cl][Pd][Cl].[Fe+2]"}
 {"cas":"2670-67-9","id":"cas:2670-67-9","name":"1'-Diethyl-2,2'-carbocyaninebromide","smiles":"CCN1C(=CC=CC2=[N+](C3=CC=CC=C3C=C2)CC)C=CC4=CC=CC=C41.[Br-]"}
 {"cas":"977-96-8","id":"cas:977-96-8","name":"1'-Diethyl-2,2'-cyanineiodide","smiles":"CC1=C(C=CC(=C1)C2=CC(=C(C=C2)NC(=O)CC(=O)C)C)NC(=O)CC(=O)C"}
 {"cas":"78-54-6","id":"cas:78-54-6","name":"1'-Ethynylenedicyclohexanol","smiles":"C1CCC(CC1)(C#CC2(CCCCC2)O)O"}
@@ -5613,7 +5613,7 @@
 {"cas":"23616-29-7","id":"cas:23616-29-7","name":"1H-1,6-naphthyridin-2-one","smiles":"O=c1ccc2cnccc2[nH]1"}
 {"cas":"703-59-3","id":"cas:703-59-3","name":"1H-2-Benzopyran-1,3(4H)-dione","smiles":"O=c1cc2ccccc2c(O)o1"}
 {"cas":"5763-49-5","id":"cas:5763-49-5","name":"1H-Cyclopenta[c]furan-1,3(3aH)-dione,tetrahydro-","smiles":"Oc1oc(O)c2c1CCC2"}
-{"cas":"5587-42-8","id":"cas:5587-42-8","name":"1H-Imidazole, sodiumsalt (1:1)","smiles":"c1c[n-]cn1"}
+{"cas":"5587-42-8","id":"cas:5587-42-8","name":"1H-Imidazole, sodiumsalt (1:1)","smiles":"[Na+].c1c[n-]cn1"}
 {"cas":"1739-83-9","id":"cas:1739-83-9","name":"1H-Imidazole,1,2,4,5-tetramethyl-","smiles":"Cc1nc(C)n(C)c1C"}
 {"cas":"1467-16-9","id":"cas:1467-16-9","name":"1H-Imidazole,hydrochloride (1:1)","smiles":"c1c[nH]cn1"}
 {"cas":"58767-51-4","id":"cas:58767-51-4","name":"1H-imidazole-4-sulfonyl chloride","smiles":"O=S(=O)(Cl)c1c[nH]cn1"}
@@ -5880,8 +5880,8 @@
 {"cas":"332-34-3","id":"cas:332-34-3","name":"2,2-Trifluoro-4'-methoxyacetanilide","smiles":"C1=CC=C(C=C1)C(=O)NC2=CC=CC3=C2C(=O)C4=C(C=CC(=C4C3=O)Cl)Cl"}
 {"cas":"401575-24-4","id":"cas:401575-24-4","name":"2,2-Trifluoro-N-(2-pyridylmethyl)acetamide","smiles":"C1=CC=NC(=C1)CNC(=O)C(F)(F)F"}
 {"cas":"14815-19-1","id":"cas:14815-19-1","name":"2,2-Trifluoro-N-(3-pyridyl)acetamide","smiles":"C1=CC(=CN=C1)NC(=O)C(F)(F)F"}
-{"cas":"132248-58-9","id":"cas:132248-58-9","name":"2,2-Trifluoroethanol-d,(Isotopic)","smiles":"C(C(F)(F)F)O"}
-{"cas":"77253-67-9","id":"cas:77253-67-9","name":"2,2-Trifluoroethanol-d,(Isotopic)","smiles":"C(C(F)(F)F)O"}
+{"cas":"132248-58-9","id":"cas:132248-58-9","name":"2,2,2-Trifluoroethanol-1,1-d2","smiles":"[2H]C([2H])(O)C(F)(F)F"}
+{"cas":"77253-67-9","id":"cas:77253-67-9","name":"2,2,2-Trifluoroethanol-1,1,O-d3","smiles":"[2H]OC([2H])([2H])C(F)(F)F"}
 {"cas":"407-47-6","id":"cas:407-47-6","name":"2,2-Trifluoroethylacrylate,,stab.with200ppm","smiles":"C=CC(=O)OCC(F)(F)F"}
 {"cas":"373-88-6","id":"cas:373-88-6","name":"2,2-Trifluoroethylaminehydrochloride","smiles":"C(C(F)(F)F)N.Cl"}
 {"cas":"352-87-4","id":"cas:352-87-4","name":"2,2-Trifluoroethylmethacrylate,,stab.with30-50ppm","smiles":"CC(=C)C(=O)OCC(F)(F)F"}
@@ -6216,7 +6216,7 @@
 {"cas":"14227-18-0","id":"cas:14227-18-0","name":"2,4,6-Trimethoxynitrobenzene","smiles":"COc1cc(OC)c([N+](=O)[O-])c(OC)c1"}
 {"cas":"79604-66-3","id":"cas:79604-66-3","name":"2,4,6-Trimethyl-1,6-Heptadien-4-Ol","smiles":"C=C(C)CC(C)(O)CC(=C)C"}
 {"cas":"835617-36-2","id":"cas:835617-36-2","name":"2,4,6-trimethylbenzenesulfonic acid dihydrate","smiles":"Cc1cc(C)c(S(=O)(=O)O)c(C)c1"}
-{"cas":"480-63-7","id":"cas:480-63-7","name":"2,4,6-Trimethylbenzoic acid","smiles":"Cc1cc(C)c(C(=O)O)c(C)c1"}
+{"aliases":[{"type":"abbreviation","value":"MesCO2H"}],"cas":"480-63-7","id":"cas:480-63-7","name":"2,4,6-Trimethylbenzoic acid","roles":["additive"],"smiles":"Cc1cc(C)c(C(=O)O)c(C)c1"}
 {"cas":"4170-90-5","id":"cas:4170-90-5","name":"2,4,6-Trimethylbenzyl Alcohol","smiles":"Cc1cc(C)c(CO)c(C)c1"}
 {"cas":"1585-16-6","id":"cas:1585-16-6","name":"2,4,6-Trimethylbenzyl chloride","smiles":"Cc1cc(C)c(CCl)c(C)c1"}
 {"cas":"60836-07-9","id":"cas:60836-07-9","name":"2,4,6-trimethylheptan-4-ol","smiles":"CC(C)CC(C)(O)CC(C)C"}
@@ -8090,7 +8090,7 @@
 {"cas":"827-08-7","id":"cas:827-08-7","name":"2-Dibromotetrafluorobenzene","smiles":"C1(=C(C(=C(C(=C1F)Br)Br)F)F)F"}
 {"cas":"99-54-7","id":"cas:99-54-7","name":"2-Dichloro-4-nitrobenzene","smiles":"C1=CC(=C(C=C1[N+](=O)[O-])Cl)Cl"}
 {"cas":"683-72-7","id":"cas:683-72-7","name":"2-Dichloroacetamide","smiles":"C(C(=O)N)(Cl)Cl"}
-{"cas":"2199-69-1","id":"cas:2199-69-1","name":"2-Dichlorobenzene-d,(Isotopic)","smiles":"C1=CC=C(C(=C1)Cl)Cl"}
+{"cas":"2199-69-1","id":"cas:2199-69-1","name":"1,2-Dichlorobenzene-d4","smiles":"[2H]c1c([2H])c([2H])c(Cl)c(Cl)c1[2H]"}
 {"cas":"616-21-7","id":"cas:616-21-7","name":"2-Dichlorobutane","smiles":"CCC(CCl)Cl"}
 {"cas":"706-79-6","id":"cas:706-79-6","name":"2-Dichlorohexafluorocyclopentene","smiles":"C1(=C(C(C(C1(F)F)(F)F)(F)F)Cl)Cl"}
 {"cas":"78-87-5","id":"cas:78-87-5","name":"2-Dichloropropane","smiles":"CC(CCl)Cl"}
@@ -11179,7 +11179,7 @@
 {"cas":"15869-95-1","id":"cas:15869-95-1","name":"4,4-Dimethyloctane","smiles":"CCCCC(C)(C)CCC"}
 {"cas":"66899-02-3","id":"cas:66899-02-3","name":"4,4-dimethylpyrrolidin-2-one","smiles":"CC1(C)CNC(=O)C1"}
 {"cas":"5409-60-9","id":"cas:5409-60-9","name":"4,4-Diphenyl-2-butanone","smiles":"CC(=O)CC(c1ccccc1)c1ccccc1"}
-{"cas":"720-94-5","id":"cas:720-94-5","name":"4,4-Trifluoro-1-(4-methylphenyl)butane-1,3-dione","smiles":"CO"}
+{"cas":"720-94-5","id":"cas:720-94-5","name":"4,4-Trifluoro-1-(4-methylphenyl)butane-1,3-dione","smiles":"Cc1ccc(C(=O)CC(=O)C(F)(F)F)cc1"}
 {"cas":"461-18-7","id":"cas:461-18-7","name":"4,4-Trifluoro-1-butanol","smiles":"C(CC(F)(F)F)CO"}
 {"cas":"2366-70-3","id":"cas:2366-70-3","name":"4,4-Trifluoro-2-butanone","smiles":"CC(=O)CC(F)(F)F"}
 {"cas":"1547-36-0","id":"cas:1547-36-0","name":"4,4-Trifluoro-3-hydroxy-3-(trifluoromethyl)butyricacid","smiles":"C(C(=O)O)C(C(F)(F)F)(C(F)(F)F)O"}
@@ -13357,7 +13357,7 @@
 {"cas":"98-29-3","id":"cas:98-29-3","name":"4-tert-Butylpyrocatechol","smiles":"CC(C)(C)c1ccc(O)c(O)c1"}
 {"cas":"1746-23-2","id":"cas:1746-23-2","name":"4-tert-Butylstyrene","smiles":"C=Cc1ccc(C(C)(C)C)cc1"}
 {"cas":"98-51-1","id":"cas:98-51-1","name":"4-tert-Butyltoluene","smiles":"Cc1ccc(C(C)(C)C)cc1"}
-{"cas":"2295-31-0","id":"cas:2295-31-0","name":"4-Thiazolidinedione","smiles":"CO"}
+{"cas":"2295-31-0","id":"cas:2295-31-0","name":"4-Thiazolidinedione","smiles":"O=C1CSC(=O)N1"}
 {"cas":"29886-62-2","id":"cas:29886-62-2","name":"4-Thiophen-2-yl-benzoic acid","smiles":"O=C(O)c1ccc(-c2cccs2)cc1"}
 {"cas":"28989-50-6","id":"cas:28989-50-6","name":"4-Thiophen-2-yl-thiazol-2-ylamine","smiles":"Nc1nc(-c2cccs2)cs1"}
 {"cas":"496-74-2","id":"cas:496-74-2","name":"4-Toluenedithiol","smiles":"CC12CCC(CC1CCC3C2CCC4(C3(CC(C4C5=COC(=O)C=C5)O)O)C)O"}
@@ -14930,7 +14930,7 @@
 {"cas":"2916-76-9","id":"cas:2916-76-9","name":"Acetic acid,2-(trimethylsilyl)-, methyl ester","smiles":"COC(=O)C[Si](C)(C)C"}
 {"cas":"24074-26-8","id":"cas:24074-26-8","name":"Acetic acid,2-[bis(1-methylethoxy)phosphinyl]-, ethyl ester","smiles":"CCOC(=O)CP(=O)(OC(C)C)OC(C)C"}
 {"cas":"2769-72-4","id":"cas:2769-72-4","name":"Acetic acid,2-isocyano-, 1,1-dimethylethyl ester","smiles":"[C-]#[N+]CC(=O)OC(C)(C)C"}
-{"cas":"1186-52-3","id":"cas:1186-52-3","name":"Aceticacid-d,(Isotopic)","smiles":"CC(=O)O"}
+{"cas":"1186-52-3","id":"cas:1186-52-3","name":"Acetic acid-d4","smiles":"[2H]OC(=O)C([2H])([2H])[2H]"}
 {"cas":"26446-35-5","id":"cas:26446-35-5","name":"acetin","smiles":"CC(=O)OCC(O)CO"}
 {"cas":"5977-14-0","id":"cas:5977-14-0","name":"Acetoacetamide","smiles":"CC(=O)CC(N)=O"}
 {"cas":"102-01-2","id":"cas:102-01-2","name":"Acetoacetanilide","smiles":"CC(=O)CC(=O)Nc1ccccc1"}
@@ -14940,9 +14940,9 @@
 {"cas":"546-88-3","id":"cas:546-88-3","name":"Acetohydroxamic Acid","smiles":"CC(O)=NO"}
 {"cas":"75-86-5","id":"cas:75-86-5","name":"Acetone cyanohydrin","smiles":"CC(C)(O)C#N"}
 {"cas":"127-06-0","id":"cas:127-06-0","name":"Acetone oxime","smiles":"CC(C)=NO"}
-{"cas":"666-52-4","id":"cas:666-52-4","name":"Acetone-d,(Isotopic)","smiles":"CC(=O)C"}
+{"cas":"666-52-4","id":"cas:666-52-4","name":"Acetone-d6","smiles":"[2H]C([2H])([2H])C(=O)C([2H])([2H])[2H]"}
 {"cas":"110-20-3","id":"cas:110-20-3","name":"acetonesemicarbazone","smiles":"CC(C)=NNC(N)=O"}
-{"cas":"2206-26-0","id":"cas:2206-26-0","name":"Acetonitrile-d3","smiles":"CC#N"}
+{"cas":"2206-26-0","id":"cas:2206-26-0","name":"Acetonitrile-d3","smiles":"[2H]C([2H])([2H])C#N"}
 {"id":"registry-row:14947","name":"Acetonyltriphenylphosphoniumbromide","smiles":"CC(=O)C[P+](C1=CC=CC=C1)(C2=CC=CC=C2)C3=CC=CC=C3.[Br-]"}
 {"cas":"1235-21-8","id":"cas:1235-21-8","name":"Acetonyltriphenylphosphoniumchloride","smiles":"CC(=O)C=P(C1=CC=CC=C1)(C2=CC=CC=C2)C3=CC=CC=C3"}
 {"cas":"98-86-2","id":"cas:98-86-2","name":"Acetophenone","smiles":"CC(=O)c1ccccc1"}
@@ -15490,7 +15490,7 @@
 {"cas":"55870-50-3","id":"cas:55870-50-3","name":"Ammonium (-)-3-bromo-8-camphorsulfonate","smiles":"CC12CCC(C(Br)C1=O)C2(C)CS(=O)(=O)O"}
 {"cas":"631-61-8","id":"cas:631-61-8","name":"Ammonium acetate","smiles":"[NH4+].CC(=O)[O-]"}
 {"cas":"12124-97-9","id":"cas:12124-97-9","name":"Ammonium bromide"}
-{"cas":"506-87-6","id":"cas:506-87-6","name":"Ammonium carbonate","smiles":"O=C(O)O"}
+{"cas":"506-87-6","id":"cas:506-87-6","name":"Ammonium carbonate","smiles":"O=C([O-])[O-].[NH4+].[NH4+]"}
 {"cas":"540-69-2","id":"cas:540-69-2","name":"Ammonium formate","smiles":"O=CO"}
 {"cas":"2235-54-3","id":"cas:2235-54-3","name":"Ammonium lauryl sulfate","smiles":"CCCCCCCCCCCCOS(=O)(=O)O"}
 {"cas":"1762-95-4","id":"cas:1762-95-4","name":"Ammonium thiocyanate","smiles":"N#CS"}
@@ -16158,7 +16158,7 @@
 {"cas":"18306-29-1","id":"cas:18306-29-1","name":"Bis(trimethylsilyl)sulfate","smiles":"C[Si](C)(C)OS(=O)(=O)O[Si](C)(C)C"}
 {"aliases":[{"language":"en","type":"legacy_name","value":"(TMS)2S"}],"cas":"3385-94-2","id":"cas:3385-94-2","name":"Bis(trimethylsilyl)sulfide","smiles":"C[Si](C)(C)S[Si](C)(C)C"}
 {"cas":"4712-51-0","id":"cas:4712-51-0","name":"Bis(trimethylsilylmethyl) sulphide","smiles":"C[Si](C)(C)CSC[Si](C)(C)C"}
-{"aliases":[{"language":"en","type":"common_name","value":"Bis(triphenylphosphine)palladium(II) dichloride"},{"language":"en","type":"legacy_name","value":"PPh3)2PdCl2"}],"cas":"13965-03-2","id":"cas:13965-03-2","name":"Bis(triphenylphosphine) Palladium (II) Chloride","smiles":"C1CCC2=NCCCN2CC1"}
+{"aliases":[{"language":"en","type":"common_name","value":"Bis(triphenylphosphine)palladium(II) dichloride"},{"language":"en","type":"legacy_name","value":"PPh3)2PdCl2"},{"type":"abbreviation","value":"PdCl2(PPh3)2"}],"cas":"13965-03-2","id":"cas:13965-03-2","name":"Bis(triphenylphosphine) Palladium (II) Chloride","smiles":"[Cl][Pd][Cl].c1ccc(P(c2ccccc2)c2ccccc2)cc1.c1ccc(P(c2ccccc2)c2ccccc2)cc1"}
 {"cas":"21050-13-5","id":"cas:21050-13-5","name":"Bis(triphenylphosphine)iminium chloride","smiles":"c1ccc(P(=N[P+](c2ccccc2)(c2ccccc2)c2ccccc2)(c2ccccc2)c2ccccc2)cc1"}
 {"cas":"14264-16-5","id":"cas:14264-16-5","name":"Bis(triphenylphosphine)nickel(II)chloride","smiles":"C1=CC=C(C=C1)P(C2=CC=CC=C2)C3=CC=CC=C3"}
 {"cas":"1262-21-1","id":"cas:1262-21-1","name":"Bis(triphenyltin)oxide","smiles":"C1=CC=C(C=C1)[Sn+](C2=CC=CC=C2)C3=CC=CC=C3.C1=CC=C(C=C1)[Sn+](C2=CC=CC=C2)C3=CC=CC=C3.[O-2]"}
@@ -16912,7 +16912,7 @@
 {"cas":"4426-47-5","id":"cas:4426-47-5","name":"Butylboronic acid","smiles":"CCCCB(O)O"}
 {"cas":"1678-93-9","id":"cas:1678-93-9","name":"Butylcyclohexane","smiles":"CCCCC1CCCCC1"}
 {"cas":"551-08-6","id":"cas:551-08-6","name":"butylidene phthalide","smiles":"CCCC=C1OC(=O)c2ccccc21"}
-{"cas":"693-04-9","id":"cas:693-04-9","name":"butylmagnesium chloride","smiles":"[CH2-]CCC"}
+{"cas":"693-04-9","id":"cas:693-04-9","name":"butylmagnesium chloride","smiles":"[CH2-]CCC.[Cl-].[Mg+2]"}
 {"cas":"3321-64-0","id":"cas:3321-64-0","name":"Butylphosphonicacid","smiles":"CCCCP(=O)(O)O"}
 {"cas":"123-95-5","id":"cas:123-95-5","name":"Butylstearate,tech.","smiles":"CCCCCCCCCCCCCCCCCCCC(=O)OCC"}
 {"cas":"13028-69-8","id":"cas:13028-69-8","name":"butyltriethylazanium bromide","smiles":"CCCC[N+](CC)(CC)CC"}
@@ -16941,7 +16941,7 @@
 {"cas":"1492-18-8","id":"cas:1492-18-8","name":"Calcium Folinate","smiles":"Nc1nc(=O)c2c([nH]1)NCC(CNc1ccc(C(=O)NC(CCC(=O)O)C(=O)O)cc1)N2C=O"}
 {"cas":"544-17-2","id":"cas:544-17-2","name":"Calcium formate","smiles":"O=C[O-].O=C[O-]"}
 {"cas":"28917-82-0","id":"cas:28917-82-0","name":"calcium glycerol 1-phosphate hydrate","smiles":"O=P(O)(O)OCC(O)CO"}
-{"cas":"7789-78-8","id":"cas:7789-78-8","name":"Calcium hydride","smiles":"NC(CC(=O)O)C(=O)O"}
+{"cas":"7789-78-8","id":"cas:7789-78-8","name":"Calcium hydride","smiles":"[Ca+2].[H-].[H-]"}
 {"cas":"814-80-2","id":"cas:814-80-2","name":"Calcium lactate","smiles":"CC(O)C(=O)O.CC(O)C(=O)O"}
 {"cas":"52009-14-0","id":"cas:52009-14-0","name":"Calcium Pyruvate","smiles":"CC(=O)C(=O)[O-].CC(=O)C(=O)[O-]"}
 {"cas":"55120-75-7","id":"cas:55120-75-7","name":"Calcium trifluoromethanesulfonate","smiles":"O=S(=O)(O)C(F)(F)F.O=S(=O)(O)C(F)(F)F"}
@@ -17865,7 +17865,7 @@
 {"cas":"7642-15-1","id":"cas:7642-15-1","name":"cis-4-Octene","smiles":"CCCC=CCCC"}
 {"cas":"3853-88-1","id":"cas:3853-88-1","name":"cis-5-Norbornene-endo-2,3-dicarboxylicacid","smiles":"C1C2C=CC1C(C2C(=O)O)C(=O)O"}
 {"cas":"129-64-6","id":"cas:129-64-6","name":"cis-5-Norbornene-endo-2,3-dicarboxylicanhydride","smiles":"C1C2C=CC1C3C2C(=O)OC3=O"}
-{"cas":"2746-19-2","id":"cas:2746-19-2","name":"cis-5-Norbornene-exo-2,3-dicarboxylicanhydride","smiles":"CO"}
+{"cas":"2746-19-2","id":"cas:2746-19-2","name":"cis-5-Norbornene-exo-2,3-dicarboxylicanhydride","smiles":"O=C1OC(=O)[C@H]2[C@@H]1[C@@H]1C=C[C@H]2C1"}
 {"cas":"64275-73-6","id":"cas:64275-73-6","name":"cis-5-octen-1-ol","smiles":"CCC=CCCCCO"}
 {"cas":"35854-86-5","id":"cas:35854-86-5","name":"cis-6-Nonen-1-ol","smiles":"CCC=CCCCCCO"}
 {"cas":"2277-19-2","id":"cas:2277-19-2","name":"cis-6-Nonenal","smiles":"CCC=CCCCCC=O"}
@@ -18408,7 +18408,7 @@
 {"cas":"2893-78-9","id":"cas:2893-78-9","name":"dichloroisocyanuric acid, sodium salt","smiles":"O=c1[nH]c(=O)n(Cl)c(=O)n1Cl"}
 {"cas":"1122-17-4","id":"cas:1122-17-4","name":"Dichloromaleic anhydride","smiles":"O=C1OC(=O)C(Cl)=C1Cl"}
 {"cas":"13063-43-9","id":"cas:13063-43-9","name":"Dichloromalononitrile","smiles":"N#CC(Cl)(Cl)C#N"}
-{"cas":"1665-00-5","id":"cas:1665-00-5","name":"Dichloromethane-d2","smiles":"ClCCl"}
+{"cas":"1665-00-5","id":"cas:1665-00-5","name":"Dichloromethane-d2","smiles":"[2H]C([2H])(Cl)Cl"}
 {"cas":"18171-59-0","id":"cas:18171-59-0","name":"Dichloromethyldimethylchlorosilane","smiles":"C[Si](C)(Cl)C(Cl)Cl"}
 {"cas":"149-74-6","id":"cas:149-74-6","name":"Dichloromethylphenylsilane","smiles":"C[Si](C1=CC=CC=C1)(Cl)Cl"}
 {"cas":"75-54-7","id":"cas:75-54-7","name":"Dichloromethylsilane","smiles":"C[SiH](Cl)Cl"}
@@ -18418,7 +18418,7 @@
 {"cas":"16069-36-6","id":"cas:16069-36-6","name":"dicyclohexano-18-crown-6","smiles":"C1CCC2OCCOCCOC3CCCCC3OCCOCCOC2C1"}
 {"cas":"2550-40-5","id":"cas:2550-40-5","name":"Dicyclohexyl Disulfide","smiles":"C1CCC(SSC2CCCCC2)CC1"}
 {"cas":"119-60-8","id":"cas:119-60-8","name":"Dicyclohexyl Ketone","smiles":"O=C(C1CCCCC1)C1CCCCC1"}
-{"cas":"1148148-01-9","id":"cas:1148148-01-9","name":"Dicyclohexyl(2',4',6'-triisopropyl-3,6-dimethoxy-[1,1'-biphenyl]-2-yl)phosphine-(2-(2-aminoethyl)phenyl)palladium(II) chloride","smiles":"C1=CN=CC(=C1C=O)F"}
+{"cas":"1148148-01-9","id":"cas:1148148-01-9","name":"Dicyclohexyl(2',4',6'-triisopropyl-3,6-dimethoxy-[1,1'-biphenyl]-2-yl)phosphine-(2-(2-aminoethyl)phenyl)palladium(II) chloride"}
 {"cas":"52034-92-1","id":"cas:52034-92-1","name":"Dicyclohexylacetic acid","smiles":"O=C(O)C(C1CCCCC1)C1CCCCC1"}
 {"aliases":[{"type":"abbreviation","value":"DCHA"}],"cas":"101-83-7","id":"cas:101-83-7","name":"Dicyclohexylamine","roles":["base"]}
 {"cas":"5124-30-1","id":"cas:5124-30-1","name":"Dicyclohexylmethane4,4'-diisocyanate,mixtureofisomers","smiles":"C1CC(CCC1CC2CCC(CC2)N=C=O)N=C=O"}
@@ -18701,7 +18701,7 @@
 {"cas":"99-64-9","id":"cas:99-64-9","name":"Dimethylaminobenzoicacid","smiles":"CN(C)C1=CC=CC(=C1)C(=O)O"}
 {"cas":"4629-50-9","id":"cas:4629-50-9","name":"Dimethylaminobenzoicanhydride","smiles":"CN(C)C1=CC=CC(=C1)C(=O)OC(=O)C2=CC(=CC=C2)N(C)C"}
 {"cas":"530-44-9","id":"cas:530-44-9","name":"Dimethylaminobenzophenone","smiles":"CN(C)C1=CC=C(C=C1)C(=O)C2=CC=CC=C2"}
-{"cas":"1116-77-4","id":"cas:1116-77-4","name":"Dimethylaminobutyraldehydediethylacetal","smiles":"CO"}
+{"cas":"1116-77-4","id":"cas:1116-77-4","name":"Dimethylaminobutyraldehydediethylacetal","smiles":"CCOC(CCCN(C)C)OCC"}
 {"cas":"1552-96-1","id":"cas:1552-96-1","name":"Dimethylaminocinnamicacid","smiles":"CN(C)C1=CC=C(C=C1)C=CC(=O)O"}
 {"cas":"107-99-3","id":"cas:107-99-3","name":"dimethylaminoethyl chloride","smiles":"CN(C)CCCl"}
 {"cas":"4584-46-7","id":"cas:4584-46-7","name":"Dimethylaminoethylchloridehydrochloride","smiles":"C(CC(=O)N)C(C(=O)O)N"}
@@ -18731,7 +18731,7 @@
 {"cas":"13686-66-3","id":"cas:13686-66-3","name":"Dimethylsilyldiethylamine","smiles":"CCN(CC)[Si](C)C"}
 {"cas":"106-65-0","id":"cas:106-65-0","name":"Dimethylsuccinate","smiles":"COC(=O)CCC(=O)OC"}
 {"cas":"871332-99-9","id":"cas:871332-99-9","name":"Dimethylsulfamoyl-2-methylbenzeneboronicacid","smiles":"B(C1=C(C=CC(=C1)S(=O)(=O)N(C)C)C)(O)O"}
-{"cas":"2206-27-1","id":"cas:2206-27-1","name":"Dimethylsulfoxide-d,(Isotopic)","smiles":"CS(=O)C"}
+{"cas":"2206-27-1","id":"cas:2206-27-1","name":"Dimethyl sulfoxide-d6","smiles":"[2H]C([2H])([2H])S(=O)C([2H])([2H])[2H]"}
 {"cas":"1861-32-1","id":"cas:1861-32-1","name":"Dimethyltetrachloroterephthalate","smiles":"COC(=O)C1=C(C(=C(C(=C1Cl)Cl)C(=O)OC)Cl)Cl"}
 {"cas":"16420-13-6","id":"cas:16420-13-6","name":"Dimethylthiocarbamoyl chloride","smiles":"CN(C)C(=S)Cl"}
 {"cas":"155632-41-0","id":"cas:155632-41-0","name":"dimethylthiophene-2,5-dicarbonitrile","smiles":"Cc1c(C#N)sc(C#N)c1C"}
@@ -18816,7 +18816,7 @@
 {"cas":"28048-33-1","id":"cas:28048-33-1","name":"disodium ferrozine(2-)","smiles":"O=S(=O)(O)c1ccc(-c2nnc(-c3ccccn3)nc2-c2ccc(S(=O)(=O)O)cc2)cc1"}
 {"cas":"34369-07-8","id":"cas:34369-07-8","name":"disodium hydrate hydrogen {[(2R,3S,4R,5R)-5-(6-aminopurin-9-yl)-3,4-dihydroxyoxolan-2-yl]methoxy(hydroxy)phosphoryl phosphonato}oxyphosphonate","smiles":"Nc1ncnc2c1ncn2C1OC(COP(=O)(O)OP(=O)(O)OP(=O)(O)O)C(O)C1O"}
 {"cas":"17593-73-6","id":"cas:17593-73-6","name":"disodium hydrate iminodiacetate","smiles":"O=C(O)CNCC(=O)O"}
-{"cas":"141-95-7","id":"cas:141-95-7","name":"Disodium Malonate","smiles":"O=C([O-])CC(=O)[O-]"}
+{"cas":"141-95-7","id":"cas:141-95-7","name":"Disodium Malonate","smiles":"O=C([O-])CC(=O)[O-].[Na+].[Na+]"}
 {"cas":"66778-08-3","id":"cas:66778-08-3","name":"Disodium phenyl phosphate dihydrate","smiles":"O=P([O-])([O-])Oc1ccccc1"}
 {"cas":"76836-02-7","id":"cas:76836-02-7","name":"Disodium piperazine-1,4-diethanesulphonate","smiles":"O=S(=O)([O-])CCN1CCN(CCS(=O)(=O)[O-])CC1"}
 {"cas":"10028-70-3","id":"cas:10028-70-3","name":"Disodium Terephthalate","smiles":"O=C([O-])c1ccc(C(=O)[O-])cc1"}
@@ -20407,14 +20407,14 @@
 {"cas":"52356-01-1","id":"cas:52356-01-1","name":"Hydrazinobenzoicacidhydrochloride","smiles":"C1=CC=C(C(=C1)C(=O)O)NN"}
 {"cas":"615-21-4","id":"cas:615-21-4","name":"Hydrazinobenzothiazole","smiles":"C1=CC=C2C(=C1)N=C(S2)NN"}
 {"cas":"15793-77-8","id":"cas:15793-77-8","name":"Hydrazinoquinoline","smiles":"C1=CC=C2C(=C1)C=CC(=N2)NN"}
-{"cas":"122-66-7","id":"cas:122-66-7","name":"Hydrazobenzene,tech.,remaindermainlyazobenzene","smiles":"CO"}
+{"cas":"122-66-7","id":"cas:122-66-7","name":"Hydrazobenzene,tech.,remaindermainlyazobenzene"}
 {"cas":"173416-05-2","id":"cas:173416-05-2","name":"HYDRIDO(DIMETHYLPHOSPHINOUS ACID-KP)[HYDROGEN BIS(DIMETHYLPHOSPHINITO-KP)]PLATINUM (II)","smiles":"CC(C)(C1=CC=C(C=C1)Br)C(=O)OC"}
 {"cas":"5950-69-6","id":"cas:5950-69-6","name":"hydrindantin dihydrate","smiles":"O=C1c2ccccc2C(O)(O)C1(O)C1(O)C(=O)c2ccccc2C1(O)O"}
 {"cas":"92-29-5","id":"cas:92-29-5","name":"Hydrobenzamide","smiles":"C(=NC(N=Cc1ccccc1)c1ccccc1)c1ccccc1"}
 {"cas":"58-93-5","id":"cas:58-93-5","name":"Hydrochlorothiazide","smiles":"C1NC2=CC(=C(C=C2S(=O)(=O)N1)S(=O)(=O)N)Cl"}
 {"cas":"645-59-0","id":"cas:645-59-0","name":"Hydrocinnamonitrile","smiles":"N#CCCc1ccccc1"}
 {"cas":"50-23-7","id":"cas:50-23-7","name":"Hydrocortisone","smiles":"CC12CCC(=O)C=C1CCC3C2C(CC4(C3CCC4(C(=O)CO)O)C)O"}
-{"cas":"50-03-3","id":"cas:50-03-3","name":"Hydrocortisoneacetate","smiles":"CO"}
+{"cas":"50-03-3","id":"cas:50-03-3","name":"Hydrocortisoneacetate","smiles":"CC(=O)OCC(=O)[C@@]1(O)CC[C@H]2[C@@H]3CCC4=CC(=O)CC[C@]4(C)[C@H]3[C@@H](O)C[C@@]21C"}
 {"cas":"10034-85-2","id":"cas:10034-85-2","name":"Hydroiodic acid"}
 {"cas":"123-31-9","id":"cas:123-31-9","name":"Hydroquinone","smiles":"Oc1ccc(O)cc1"}
 {"cas":"2245-53-6","id":"cas:2245-53-6","name":"Hydroquinone-O,O'-diaceticacid","smiles":"C1=CC(=CC=C1OCC(=O)O)OCC(=O)O"}
@@ -20998,20 +20998,20 @@
 {"cas":"653-14-5","id":"cas:653-14-5","name":"Lithium 3,5-diiodosalicylate","smiles":"O=C([O-])c1cc(I)cc(I)c1O"}
 {"cas":"18115-70-3","id":"cas:18115-70-3","name":"lithium acetylacetonate","smiles":"CC(=O)CC(C)=O"}
 {"cas":"7782-89-0","id":"cas:7782-89-0","name":"Lithium amide"}
-{"cas":"553-54-8","id":"cas:553-54-8","name":"Lithium benzoate","smiles":"O=C([O-])c1ccccc1"}
+{"cas":"553-54-8","id":"cas:553-54-8","name":"Lithium benzoate","smiles":"O=C([O-])c1ccccc1.[Li+]"}
 {"cas":"85144-11-2","id":"cas:85144-11-2","name":"Lithium chloride hydrate"}
 {"cas":"65567-96-6","id":"cas:65567-96-6","name":"Lithium chloride/potassium chloride eutectic"}
-{"aliases":[{"type":"legacy_name","value":"LDA"}],"cas":"4111-54-0","id":"cas:4111-54-0","name":"Lithium diisopropylamide","smiles":"CC(C)NC(C)C"}
+{"aliases":[{"type":"legacy_name","value":"LDA"}],"cas":"4111-54-0","id":"cas:4111-54-0","name":"Lithium diisopropylamide","smiles":"CC(C)[N-]C(C)C.[Li+]"}
 {"cas":"85017-80-7","id":"cas:85017-80-7","name":"Lithium iodide hydrate"}
 {"cas":"27848-80-2","id":"cas:27848-80-2","name":"Lithium L-Lactate","smiles":"CC(O)C(=O)O"}
-{"cas":"865-34-9","id":"cas:865-34-9","name":"Lithium methoxide","smiles":"C[O-]"}
+{"cas":"865-34-9","id":"cas:865-34-9","name":"Lithium methoxide","smiles":"C[O-].[Li+]"}
 {"cas":"16577-52-9","id":"cas:16577-52-9","name":"lithium octanoate","smiles":"CCCCCCCC(=O)O"}
 {"cas":"30903-87-8","id":"cas:30903-87-8","name":"Lithium oxalate"}
 {"cas":"552-38-5","id":"cas:552-38-5","name":"lithium salicylate","smiles":"O=C([O-])c1ccccc1O"}
 {"cas":"123333-85-7","id":"cas:123333-85-7","name":"lithium thiocyanate hydrate","smiles":"N#CS"}
-{"cas":"38721-52-7","id":"cas:38721-52-7","name":"lithium tri-sec-butylborohydride","smiles":"CCC(C)[B-](C(C)CC)C(C)CC"}
+{"cas":"38721-52-7","id":"cas:38721-52-7","name":"lithium tri-sec-butylborohydride","smiles":"CCC(C)[BH-](C(C)CC)C(C)CC.[Li+]"}
 {"cas":"17476-04-9","id":"cas:17476-04-9","name":"lithium tri-tert-butoxyaluminohydride","smiles":"CCCCCCCCOC1OC(CO)C(O)C(O)C1O"}
-{"cas":"22560-16-3","id":"cas:22560-16-3","name":"lithium triethylborohydride","smiles":"CC[B-](CC)CC"}
+{"cas":"22560-16-3","id":"cas:22560-16-3","name":"lithium triethylborohydride","smiles":"CC[BH-](CC)CC.[Li+]"}
 {"cas":"2923-17-3","id":"cas:2923-17-3","name":"lithium trifluoroacetate","smiles":"[Li+].FC(F)(F)C(=O)[O-]"}
 {"cas":"33454-82-9","id":"cas:33454-82-9","name":"Lithium trifluoromethanesulfonate","smiles":"O=S(=O)(O)C(F)(F)F"}
 {"cas":"85017-82-9","id":"cas:85017-82-9","name":"lithium(1+) ion hydrate bromide"}
@@ -21077,14 +21077,14 @@
 {"cas":"100-59-4","id":"cas:100-59-4","name":"magnesium benzene chloride","smiles":"[c-]1ccccc1"}
 {"cas":"56812-60-3","id":"cas:56812-60-3","name":"magnesium bromide (2-bromophenyl)methanide","smiles":"[CH2-]c1ccccc1Br"}
 {"cas":"79175-35-2","id":"cas:79175-35-2","name":"magnesium bromide 3,4-dichlorobenzenide","smiles":"Clc1c[c-]ccc1Cl"}
-{"cas":"29858-07-9","id":"cas:29858-07-9","name":"magnesium bromide ethyl etherate","smiles":"CCOCC"}
+{"cas":"29858-07-9","id":"cas:29858-07-9","name":"magnesium bromide ethyl etherate","smiles":"CCOCC.[Br-].[Br-].[Mg+2]"}
 {"cas":"56378-72-4","id":"cas:56378-72-4","name":"magnesium carbonate hydroxide pentahydrate","smiles":"O=C([O-])[O-]"}
 {"cas":"26905-40-8","id":"cas:26905-40-8","name":"magnesium chloride (3-methoxyphenyl)methanide","smiles":"COc1cccc(C)c1"}
 {"cas":"480424-74-6","id":"cas:480424-74-6","name":"magnesium chloride 3-fluoro-2-methylbenzenide","smiles":"Cc1[c-]cccc1F"}
 {"cas":"7791-18-6","id":"cas:7791-18-6","name":"Magnesium chloride hexahydrate"}
 {"cas":"18917-93-6","id":"cas:18917-93-6","name":"Magnesium lactate trihydrate","smiles":"CC(O)C(=O)O.CC(O)C(=O)O"}
 {"cas":"14640-21-2","id":"cas:14640-21-2","name":"Magnesium meso-tetraphenylporphine","smiles":"C1=Cc2nc1c(-c1ccccc1)c1ccc([n-]1)c(-c1ccccc1)c1nc(c(-c3ccccc3)c3ccc([n-]3)c2-c2ccccc2)C=C1"}
-{"cas":"109-88-6","id":"cas:109-88-6","name":"magnesium methoxide","smiles":"C[O-].C[O-]"}
+{"cas":"109-88-6","id":"cas:109-88-6","name":"magnesium methoxide","smiles":"C[O-].C[O-].[Mg+2]"}
 {"cas":"547-66-0","id":"cas:547-66-0","name":"magnesium oxalate"}
 {"cas":"18917-95-8","id":"cas:18917-95-8","name":"Magnesium Salicylate","smiles":"O=C(O)c1ccccc1O.O=C(O)c1ccccc1O"}
 {"cas":"60871-83-2","id":"cas:60871-83-2","name":"MAGNESIUM TRIFLUOROMETHANESULFONATE","smiles":"O=S(=O)([O-])C(F)(F)F.O=S(=O)([O-])C(F)(F)F"}
@@ -21097,7 +21097,7 @@
 {"cas":"5698-98-6","id":"cas:5698-98-6","name":"Magnesiumacrylate","smiles":"C=CC(=O)[O-].C=CC(=O)[O-].[Mg+2]"}
 {"cas":"39409-82-0","id":"cas:39409-82-0","name":"Magnesiumcarbonatetetrahydrate,ReagentGrade,MgO","smiles":"C(=O)([O-])[O-].[Mg+2]"}
 {"cas":"120156-45-8","id":"cas:120156-45-8","name":"Magnesiumcitratehydrate,Mgca(drywt.)","smiles":"C(C(=O)[O-])C(CC(=O)[O-])(C(=O)[O-])O.C(C(=O)[O-])C(CC(=O)[O-])(C(=O)[O-])O.[Mg+2].[Mg+2].[Mg+2]"}
-{"cas":"2414-98-4","id":"cas:2414-98-4","name":"Magnesiumethoxide,Mg21-","smiles":"C.C1CCC(CC1)NCCCNCCSS(=O)(=O)O.C1CCC(CC1)NCCCNCCSS(=O)(=O)O"}
+{"cas":"2414-98-4","id":"cas:2414-98-4","name":"Magnesiumethoxide,Mg21-","smiles":"CC[O-].CC[O-].[Mg+2]"}
 {"cas":"7693-27-8","id":"cas:7693-27-8","name":"Magnesiumhydride","smiles":"CCCCCCCC(=O)OCC(C)OC(=O)CCCCCCC"}
 {"cas":"557-04-0","id":"cas:557-04-0","name":"Magnesiumstearate","smiles":"CCCCCCCCCCCCCCCCCC(=O)[O-].CCCCCCCCCCCCCCCCCC(=O)[O-].[Mg+2]"}
 {"cas":"23221-99-0","id":"cas:23221-99-0","name":"Magnesiumsulfamatehydrate","smiles":"C1=CC(=CC=C1S(=O)(=O)NC(=O)N)Cl"}
@@ -21183,8 +21183,8 @@
 {"aliases":[{"type":"abbreviation","value":"Ms2O"}],"id":"registry-row:21184","name":"Methanesulfonic anhydride","smiles":"CS(=O)(=O)OS(C)(=O)=O"}
 {"cas":"2516-97-4","id":"cas:2516-97-4","name":"methanesulfonylacetic acid","smiles":"CS(=O)(=O)CC(=O)O"}
 {"cas":"1067-12-5","id":"cas:1067-12-5","name":"Methanol,1,1',1''-phosphinylidynetris-","smiles":"O=P(CO)(CO)CO"}
-{"cas":"1455-13-6","id":"cas:1455-13-6","name":"Methanol-d,(Isotopic)","smiles":"CO"}
-{"cas":"811-98-3","id":"cas:811-98-3","name":"Methanol-d,(Isotopic)","smiles":"CO"}
+{"cas":"1455-13-6","id":"cas:1455-13-6","name":"Methanol-O-d1","smiles":"[2H]OC"}
+{"cas":"811-98-3","id":"cas:811-98-3","name":"Methanol-d4","smiles":"[2H]OC([2H])([2H])[2H]"}
 {"cas":"1182284-28-1","id":"cas:1182284-28-1","name":"Methanone, (5-fluoro-2-hydroxyphenyl)-4-piperidinyl-,hydrochloride (1:1)","smiles":"O=C(c1cc(F)ccc1O)C1CCNCC1"}
 {"cas":"7781-49-9","id":"cas:7781-49-9","name":"Methanone,[2-(4-iodophenyl)diazenyl]phenyl-, 2-(4-nitrophenyl)hydrazone","smiles":"O=[N+]([O-])c1ccc(N=NC(=NNc2ccc(I)cc2)c2ccccc2)cc1"}
 {"cas":"60-56-0","id":"cas:60-56-0","name":"Methimazole","smiles":"Cn1cc[nH]c1=S"}
@@ -21743,7 +21743,7 @@
 {"cas":"1826-17-1","id":"cas:1826-17-1","name":"Methyl-2-phenylthiazole","smiles":"CC1=CSC(=N1)C2=CC=CC=C2"}
 {"cas":"33763-20-1","id":"cas:33763-20-1","name":"Methyl-2-phenylthiazole-5-carboxylicacid","smiles":"C=CCOC1=C(C=CC(=C1)Cl)C(=O)NCCN"}
 {"cas":"108-26-9","id":"cas:108-26-9","name":"Methyl-2-pyrazolin-5-one","smiles":"CC1=NNC(=O)C1"}
-{"cas":"185964-60-7","id":"cas:185964-60-7","name":"Methyl-2-pyrrolidinone-d,(Isotopic)","smiles":"CN1CCCC1=O"}
+{"cas":"185964-60-7","id":"cas:185964-60-7","name":"N-Methyl-2-pyrrolidone-d9","smiles":"[2H]C([2H])([2H])N1C(=O)C([2H])([2H])C([2H])([2H])C1([2H])[2H]"}
 {"cas":"56-04-2","id":"cas:56-04-2","name":"Methyl-2-thiouracil","smiles":"C(C(=O)CO)O"}
 {"cas":"13327-27-0","id":"cas:13327-27-0","name":"Methyl-3(2H)-pyridazinone","smiles":"CC1=NNC(=O)C=C1"}
 {"cas":"28169-46-2","id":"cas:28169-46-2","name":"Methyl-3,5-dinitrobenzoicacid","smiles":"CC1=C(C=C(C=C1[N+](=O)[O-])[N+](=O)[O-])C(=O)O"}
@@ -21865,7 +21865,7 @@
 {"cas":"184174-81-0","id":"cas:184174-81-0","name":"Methyl2-amino-5,6,7,8-tetrahydro-4H-cyclohepta[b]thiophene-","smiles":"COC(=O)C1=C(SC2=C1CCCCC2)N"}
 {"cas":"184174-80-9","id":"cas:184174-80-9","name":"Methyl2-amino-5,6-dihydro-4H-cyclopenta[b]thiophene-3-","smiles":"COC(=O)C1=C(SC2=C1CCC2)N"}
 {"cas":"52727-57-8","id":"cas:52727-57-8","name":"Methyl2-amino-5-bromobenzoate","smiles":"CCCCCCCCCCCCCCCCCC(=O)OCC(COC(=O)C(C(C(=O)O)OC(=O)C)OC(=O)C)O"}
-{"cas":"5202-89-1","id":"cas:5202-89-1","name":"Methyl2-amino-5-chlorobenzoate","smiles":"CO"}
+{"cas":"5202-89-1","id":"cas:5202-89-1","name":"Methyl2-amino-5-chlorobenzoate","smiles":"COC(=O)c1cc(Cl)ccc1N"}
 {"id":"registry-row:21870","name":"Methyl2-aminopyridine-4-carboxylate","smiles":"C1=CC2=NSN=C2C(=C1)[N+](=O)[O-]"}
 {"cas":"4651-81-4","id":"cas:4651-81-4","name":"Methyl2-aminothiophene-3-carboxylate","smiles":"COC(=O)C1=C(SC=C1)N"}
 {"cas":"6942-36-5","id":"cas:6942-36-5","name":"Methyl2-bromo-5-nitrobenzoate","smiles":"C1=CC2=C(C=C1F)C=C(N2)C(=O)O"}
@@ -22098,8 +22098,8 @@
 {"cas":"556-24-1","id":"cas:556-24-1","name":"Methylisovalerate","smiles":"CC(C)CC(=O)OC"}
 {"cas":"39499-34-8","id":"cas:39499-34-8","name":"Methylisoxazole-3-carbonylchloride","smiles":"CC1=CC(=NO1)C(=O)Cl"}
 {"cas":"42831-50-5","id":"cas:42831-50-5","name":"Methylisoxazole-4-carboxylicacid","smiles":"CC1=CC(=NO1)C(=O)O"}
-{"cas":"917-54-4","id":"cas:917-54-4","name":"Methyllithium, 1.6 M sol. in diethyl ether","smiles":"C"}
-{"cas":"676-58-4","id":"cas:676-58-4","name":"Methylmagnesium chloride","smiles":"[CH3-]"}
+{"cas":"917-54-4","id":"cas:917-54-4","name":"Methyllithium, 1.6 M sol. in diethyl ether"}
+{"cas":"676-58-4","id":"cas:676-58-4","name":"Methylmagnesium chloride","smiles":"[CH3-].[Cl-].[Mg+2]"}
 {"cas":"75-16-1","id":"cas:75-16-1","name":"Methylmagnesiumbromide,3Minether","smiles":"[CH3-].[Mg+2].[Br-]"}
 {"cas":"516-05-2","id":"cas:516-05-2","name":"Methylmalonic Acid","smiles":"CC(C(=O)O)C(=O)O"}
 {"cas":"2365-48-2","id":"cas:2365-48-2","name":"Methylmercaptoacetate","smiles":"COC(=O)CS"}
@@ -22417,7 +22417,7 @@
 {"cas":"1643-20-5","id":"cas:1643-20-5","name":"N,N-Dimethyldodecylamine N-oxide","smiles":"CCCCCCCCCCCC[N+](C)(C)[O-]"}
 {"cas":"598-56-1","id":"cas:598-56-1","name":"N,N-Dimethylethylamine","smiles":"CCN(C)C"}
 {"cas":"4909-78-8","id":"cas:4909-78-8","name":"N,N-Dimethylformamide dineopentyl acetal","smiles":"CN(C)C(OCC(C)(C)C)OCC(C)(C)C"}
-{"cas":"4472-41-7","id":"cas:4472-41-7","name":"N,N-Dimethylformamide-d,(Isotopic)","smiles":"CN(C)C=O"}
+{"cas":"4472-41-7","id":"cas:4472-41-7","name":"N,N-Dimethylformamide-d7","smiles":"[2H]C(=O)N(C([2H])([2H])[2H])C([2H])([2H])[2H]"}
 {"cas":"6006-65-1","id":"cas:6006-65-1","name":"N,N-Dimethylformamidedi-n-propylacetal","smiles":"CCCOC(N(C)C)OCCC"}
 {"cas":"36805-97-7","id":"cas:36805-97-7","name":"N,N-Dimethylformamidedi-tert-butylacetal,tech.","smiles":"CC(C)(C)OC(N(C)C)OC(C)(C)C"}
 {"id":"registry-row:22424","name":"N,N-Dimethylformamidedibenzylacetal,tech.","smiles":"CN(C)C(OCC1=CC=CC=C1)OCC2=CC=CC=C2"}
@@ -23303,7 +23303,7 @@
 {"cas":"106454-69-7","id":"cas:106454-69-7","name":"N-Boc-D-phenylalaninol","smiles":"CC(C)(C)OC(=O)NC(CO)Cc1ccccc1"}
 {"cas":"37784-17-1","id":"cas:37784-17-1","name":"N-boc-D-proline","smiles":"CC(C)(C)OC(=O)N1CCCC1C(=O)O"}
 {"cas":"83435-58-9","id":"cas:83435-58-9","name":"N-Boc-D-prolinol","smiles":"CC(C)(C)OC(=O)N1CCCC1C(=O)O"}
-{"cas":"6368-20-3","id":"cas:6368-20-3","name":"N-Boc-D-serine","smiles":"CO"}
+{"cas":"6368-20-3","id":"cas:6368-20-3","name":"N-Boc-D-serine","smiles":"CC(C)(C)OC(=O)N[C@H](CO)C(=O)O"}
 {"cas":"22838-58-0","id":"cas:22838-58-0","name":"N-Boc-D-valine","smiles":"CC(C)C(C(=O)O)NC(=O)OC(C)(C)C"}
 {"cas":"79513-35-2","id":"cas:79513-35-2","name":"N-Boc-Ethane-1,2-diamine hydrochloride","smiles":"CC(C)(C)OC(=O)NCCN"}
 {"cas":"57260-73-8","id":"cas:57260-73-8","name":"N-Boc-ethylenediamine","smiles":"CC(C)(C)OC(=O)NCCN"}
@@ -23944,7 +23944,7 @@
 {"cas":"6635-41-2","id":"cas:6635-41-2","name":"Nitrobenzaldoxime","smiles":"C1=CC=C(C(=C1)C=NO)[N+](=O)[O-]"}
 {"cas":"619-80-7","id":"cas:619-80-7","name":"Nitrobenzamide","smiles":"C1=CC(=CC=C1C(=O)N)[N+](=O)[O-]"}
 {"cas":"1613-86-1","id":"cas:1613-86-1","name":"Nitrobenzamidoxime","smiles":"C1=CC(=CC=C1C(=NO)N)[N+](=O)[O-]"}
-{"cas":"4165-60-0","id":"cas:4165-60-0","name":"Nitrobenzene-d,(Isotopic)","smiles":"C1=CC=C(C=C1)[N+](=O)[O-]"}
+{"cas":"4165-60-0","id":"cas:4165-60-0","name":"Nitrobenzene-d5","smiles":"[2H]c1c([2H])c([2H])c([N+](=O)[O-])c([2H])c1[2H]"}
 {"cas":"13331-27-6","id":"cas:13331-27-6","name":"Nitrobenzeneboronicacid","smiles":"B(C1=CC(=CC=C1)[N+](=O)[O-])(O)O"}
 {"cas":"456-27-9","id":"cas:456-27-9","name":"Nitrobenzenediazoniumtetrafluoroborate","smiles":"C1=CC(=CC=C1[N+]#N)[N+](=O)[O-]"}
 {"cas":"5455-59-4","id":"cas:5455-59-4","name":"Nitrobenzenesulfonamide","smiles":"C1=CC=C(C(=C1)[N+](=O)[O-])S(=O)(=O)N"}
@@ -24452,7 +24452,7 @@
 {"cas":"835-64-3","id":"cas:835-64-3","name":"Phenol,2-(2-benzoxazolyl)-","smiles":"Oc1ccccc1-c1nc2ccccc2o1"}
 {"cas":"609-19-8","id":"cas:609-19-8","name":"Phenol,3,4,5-trichloro-","smiles":"Oc1cc(Cl)c(Cl)c(Cl)c1"}
 {"cas":"539-12-8","id":"cas:539-12-8","name":"Phenol,4-(1-propen-1-yl)-","smiles":"CC=Cc1ccc(O)cc1"}
-{"cas":"1003-66-3","id":"cas:1003-66-3","name":"Phenol-d,(Isotopic)","smiles":"C1=CC=C(C=C1)O"}
+{"cas":"1003-66-3","id":"cas:1003-66-3","name":"Phenol-O-d1","smiles":"[2H]Oc1ccccc1"}
 {"cas":"62625-16-5","id":"cas:62625-16-5","name":"Phenolphthalein Disulfate Potassium Salt Hydrate","smiles":"O=C([O-])c1ccccc1C(O)(c1ccc(OS(=O)(=O)[O-])cc1)c1ccc(OS(=O)(=O)[O-])cc1"}
 {"cas":"77-09-8","id":"cas:77-09-8","name":"Phenolphthalein,w/vinalcohol","smiles":"C1=CC=C2C(=C1)C(=O)OC2(C3=CC=C(C=C3)O)C4=CC=C(C=C4)O"}
 {"cas":"92-84-2","id":"cas:92-84-2","name":"Phenothiazine","smiles":"c1ccc2c(c1)Nc1ccccc1S2"}
@@ -24792,10 +24792,10 @@
 {"cas":"201852-49-5","id":"cas:201852-49-5","name":"potassium beta-styryltrifluoroborate","smiles":"F[B-](F)(F)C=Cc1ccccc1"}
 {"cas":"7447-40-7","id":"cas:7447-40-7","name":"Potassium chloride"}
 {"cas":"866-83-1","id":"cas:866-83-1","name":"Potassium citrate monobasic","smiles":"O=C([O-])CC(O)(CC(=O)O)C(=O)O"}
-{"cas":"590-28-3","id":"cas:590-28-3","name":"potassium cyanate","smiles":"N#C[O-]"}
+{"cas":"590-28-3","id":"cas:590-28-3","name":"potassium cyanate","smiles":"N#C[O-].[K+]"}
 {"cas":"33494-80-3","id":"cas:33494-80-3","name":"potassium di-tert-butylphosphate","smiles":"CC(C)(C)OP(=O)(O)OC(C)(C)C"}
-{"cas":"917-58-8","id":"cas:917-58-8","name":"potassium ethoxide","smiles":"CC[O-]"}
-{"cas":"140-89-6","id":"cas:140-89-6","name":"Potassium ethylxanthate","smiles":"CCOC(=S)[S-]"}
+{"cas":"917-58-8","id":"cas:917-58-8","name":"potassium ethoxide","smiles":"CC[O-].[K+]"}
+{"cas":"140-89-6","id":"cas:140-89-6","name":"Potassium ethylxanthate","smiles":"CCOC(=S)[S-].[K+]"}
 {"cas":"590-29-4","id":"cas:590-29-4","name":"potassium formate","smiles":"O=C[O-]"}
 {"cas":"5399-63-3","id":"cas:5399-63-3","name":"potassium hydrogen 4-sulphonatobenzoate","smiles":"O=C(O)c1ccc(S(=O)(=O)[O-])cc1"}
 {"cas":"877-24-7","id":"cas:877-24-7","name":"Potassium hydrogen phthalate, acidimetric standard, (trace metal basis)","smiles":"O=C([O-])c1ccccc1C(=O)O"}
@@ -24803,7 +24803,7 @@
 {"cas":"2642-37-7","id":"cas:2642-37-7","name":"potassium indol-3-yl sulphate","smiles":"O=S(=O)(O)Oc1c[nH]c2ccccc12"}
 {"cas":"12015-61-1","id":"cas:12015-61-1","name":"potassium magnesium chloride chloride"}
 {"cas":"2386-56-3","id":"cas:2386-56-3","name":"Potassium Methanesulfonate"}
-{"cas":"865-33-8","id":"cas:865-33-8","name":"Potassium methoxide","smiles":"C[O-]"}
+{"cas":"865-33-8","id":"cas:865-33-8","name":"Potassium methoxide","smiles":"C[O-].[K+]"}
 {"cas":"29420-49-3","id":"cas:29420-49-3","name":"Potassium nonafluoro-1-butanesulfonate","smiles":"O=S(=O)([O-])C(F)(F)C(F)(F)C(F)(F)C(F)(F)F"}
 {"cas":"6487-48-5","id":"cas:6487-48-5","name":"Potassium oxalate monohydrate"}
 {"cas":"10378-50-4","id":"cas:10378-50-4","name":"Potassium perruthenate","smiles":"CC(C)N(C(=O)CCCN1C(=O)c2c(OCc3ccccc3)ccc(OCc3ccccc3)c2C1=O)C(C)C"}
@@ -24983,7 +24983,7 @@
 {"cas":"181219-01-2","id":"cas:181219-01-2","name":"Pyridine-4-boronicacidpinacolester","smiles":"B1(OC(C(O1)(C)C)(C)C)C2=CC=NC=C2"}
 {"cas":"6345-27-3","id":"cas:6345-27-3","name":"pyridine-4-carboximidamide hydrochloride","smiles":"N=C(N)c1ccncc1"}
 {"cas":"586-95-8","id":"cas:586-95-8","name":"Pyridine-4-methanol","smiles":"OCc1ccncc1"}
-{"cas":"7291-22-7","id":"cas:7291-22-7","name":"Pyridine-d,(Isotopic)","smiles":"C1=CC=NC=C1"}
+{"cas":"7291-22-7","id":"cas:7291-22-7","name":"Pyridine-d5","smiles":"[2H]c1nc([2H])c([2H])c([2H])c1[2H]"}
 {"cas":"694-59-7","id":"cas:694-59-7","name":"pyridine-N-oxide","smiles":"[O-][n+]1ccccc1"}
 {"cas":"3724-16-1","id":"cas:3724-16-1","name":"Pyridineacetamide","smiles":"C1=CC(=CC=C1CCCC(=O)O)[N+](=O)[O-]"}
 {"cas":"5451-39-8","id":"cas:5451-39-8","name":"Pyridineacetamide","smiles":"C1=CC=NC(=C1)CC(=O)N"}
@@ -25221,7 +25221,7 @@
 {"cas":"55788-44-8","id":"cas:55788-44-8","name":"sodium 3-bromopropanesulfonate","smiles":"O=S(=O)([O-])CCCBr"}
 {"cas":"143218-48-8","id":"cas:143218-48-8","name":"sodium 3-chloro-2-hydroxypropanesulphonate hemihydrate","smiles":"O=S(=O)([O-])CC(O)CCl"}
 {"cas":"13615-46-8","id":"cas:13615-46-8","name":"sodium 3-indoleacrylate","smiles":"O=C([O-])C=Cc1c[nH]c2ccccc12"}
-{"cas":"127-68-4","id":"cas:127-68-4","name":"Sodium 3-nitrobenzenesulfonate","smiles":"O=[N+]([O-])c1cccc(S(=O)(=O)[O-])c1"}
+{"cas":"127-68-4","id":"cas:127-68-4","name":"Sodium 3-nitrobenzenesulfonate","smiles":"O=[N+]([O-])c1cccc(S(=O)(=O)[O-])c1.[Na+]"}
 {"cas":"827-95-2","id":"cas:827-95-2","name":"Sodium 3-Nitrobenzoate","smiles":"O=C([O-])c1cccc([N+](=O)[O-])c1"}
 {"cas":"128-44-9","id":"cas:128-44-9","name":"Sodium 3-oxo-3H-benzo[d]isothiazol-2-ide 1,1-dioxide","smiles":"O=C1NS(=O)(=O)c2ccccc21"}
 {"cas":"17625-03-5","id":"cas:17625-03-5","name":"Sodium 3-sulfobenzoate","smiles":"O=C(O)c1cccc(S(=O)(=O)O)c1"}
@@ -25237,20 +25237,20 @@
 {"cas":"6131-90-4","id":"cas:6131-90-4","name":"Sodium Acetate Trihydrate"}
 {"cas":"1066-26-8","id":"cas:1066-26-8","name":"Sodium acetylide","smiles":"[C-]#C"}
 {"cas":"9005-38-3","id":"cas:9005-38-3","name":"Sodium alginate","smiles":"CC1C(c2ccccc2)OCCN1C"}
-{"cas":"134-03-2","id":"cas:134-03-2","name":"Sodium ascorbate","smiles":"O=C1OC(C(O)CO)C([O-])C1=O"}
+{"cas":"134-03-2","id":"cas:134-03-2","name":"Sodium ascorbate","smiles":"O=C1O[C@H]([C@@H](O)CO)C([O-])=C1O.[Na+]"}
 {"cas":"873-55-2","id":"cas:873-55-2","name":"Sodium benzenesulfinate","smiles":"O=S([O-])c1ccccc1"}
 {"cas":"25932-11-0","id":"cas:25932-11-0","name":"Sodium Benzenesulfinate Dihydrate","smiles":"O=S(O)c1ccccc1"}
 {"cas":"515-42-4","id":"cas:515-42-4","name":"sodium benzenesulfonate","smiles":"O=S(=O)(O)c1ccccc1"}
-{"cas":"22722-98-1","id":"cas:22722-98-1","name":"sodium bis(2-methoxyethoxy)aluminumhydride","smiles":"COCCO.COCCO.[AlH3]"}
-{"aliases":[{"type":"legacy_name","value":"NaHMDS"}],"cas":"1070-89-9","id":"cas:1070-89-9","name":"Sodium bis(trimethylsilyl)amide","smiles":"C[Si](C)(C)N[Si](C)(C)C"}
+{"cas":"22722-98-1","id":"cas:22722-98-1","name":"sodium bis(2-methoxyethoxy)aluminumhydride","smiles":"COCC[O-].COCC[O-].[AlH2+].[Na+]"}
+{"aliases":[{"type":"legacy_name","value":"NaHMDS"}],"cas":"1070-89-9","id":"cas:1070-89-9","name":"Sodium bis(trimethylsilyl)amide","smiles":"C[Si](C)(C)[N-][Si](C)(C)C.[Na+]"}
 {"cas":"1068-52-6","id":"cas:1068-52-6","name":"sodium bromoacetate","smiles":"O=C([O-])CBr"}
 {"cas":"9004-32-4","id":"cas:9004-32-4","name":"Sodium carboxymethyl cellulose","smiles":"O=C(C(O)CO)C(O)C(O)CO"}
 {"cas":"3926-62-3","id":"cas:3926-62-3","name":"Sodium chloroacetate","smiles":"O=C([O-])CCl"}
 {"cas":"1895-39-2","id":"cas:1895-39-2","name":"Sodium Chlorodifluoroacetate","smiles":"O=C([O-])C(F)(F)Cl"}
 {"cas":"206986-87-0","id":"cas:206986-87-0","name":"sodium cholate hydrate","smiles":"CC(CCC(=O)[O-])C1CCC2C3C(O)CC4CC(O)CCC4(C)C3CC(O)C12C"}
 {"cas":"71519-72-7","id":"cas:71519-72-7","name":"Sodium creatine phosphate dibasic tetrahydrate","smiles":"CN(CC(=O)[O-])C(=N)NP(=O)([O-])O"}
-{"cas":"143-33-9","id":"cas:143-33-9","name":"sodium cyanide","smiles":"[C-]#N"}
-{"cas":"25895-60-7","id":"cas:25895-60-7","name":"Sodium cyanoborohydride","smiles":"BC#N"}
+{"cas":"143-33-9","id":"cas:143-33-9","name":"sodium cyanide","smiles":"[C-]#N.[Na+]"}
+{"cas":"25895-60-7","id":"cas:25895-60-7","name":"Sodium cyanoborohydride","smiles":"[BH3-]C#N.[Na+]"}
 {"cas":"61886-29-1","id":"cas:61886-29-1","name":"Sodium cyclohexanebutyrate","smiles":"O=C([O-])CCCC1CCCCC1"}
 {"cas":"2156-56-1","id":"cas:2156-56-1","name":"sodium dichloroacetate","smiles":"O=C([O-])C(Cl)Cl"}
 {"cas":"1934-75-4","id":"cas:1934-75-4","name":"Sodium Dicyanamide","smiles":"N#C[N-]C#N"}
@@ -25260,10 +25260,10 @@
 {"cas":"128-04-1","id":"cas:128-04-1","name":"Sodium dimethyldithiocarbamate","smiles":"CN(C)C(=S)[S-]"}
 {"cas":"207233-91-8","id":"cas:207233-91-8","name":"Sodium DL-2,3-dithiopropanesulphonate monohydrate","smiles":"O=S(=O)([O-])CC(S)CS"}
 {"cas":"5094-24-6","id":"cas:5094-24-6","name":"Sodium DL-2-Hydroxybutyrate","smiles":"CCC(O)C(=O)[O-]"}
-{"aliases":[{"type":"abbreviation","value":"SDS"}],"cas":"151-21-3","id":"cas:151-21-3","name":"sodium dodecyl sulfate","smiles":"CCCCCCCCCCCCOS(=O)(=O)[O-]"}
+{"aliases":[{"type":"abbreviation","value":"SDS"}],"cas":"151-21-3","id":"cas:151-21-3","name":"sodium dodecyl sulfate","smiles":"CCCCCCCCCCCCOS(=O)(=O)[O-].[Na+]"}
 {"cas":"25155-30-0","id":"cas:25155-30-0","name":"sodium dodecyl-benzenesulfonate","smiles":"CCCCCCCCCCCCc1ccccc1S(=O)(=O)[O-]"}
 {"cas":"5324-47-0","id":"cas:5324-47-0","name":"sodium ethanesulphonate","smiles":"CCS(=O)(=O)[O-]"}
-{"cas":"141-52-6","id":"cas:141-52-6","name":"Sodium ethylate","smiles":"CC[O-].[Na+]"}
+{"aliases":[{"type":"common_name","value":"Sodium ethylate"},{"type":"abbreviation","value":"NaOEt"},{"type":"abbreviation","value":"EtONa"}],"cas":"141-52-6","id":"cas:141-52-6","name":"Sodium ethoxide","smiles":"CC[O-].[Na+]"}
 {"cas":"17013-01-3","id":"cas:17013-01-3","name":"sodium fumarate"}
 {"cas":"532-94-5","id":"cas:532-94-5","name":"sodium hippurate","smiles":"O=C([O-])CNC(=O)c1ccccc1"}
 {"cas":"62625-22-3","id":"cas:62625-22-3","name":"sodium hydrogen 2-[1-(2-hydroxy-5-sulphonatophenyl)-3-phenyl-5-formazano]benzoate","smiles":"O=C(O)c1ccccc1N=NC(=NNc1cc(S(=O)(=O)[O-])ccc1O)c1ccccc1"}
@@ -25271,26 +25271,26 @@
 {"cas":"870-72-4","id":"cas:870-72-4","name":"Sodium hydroxymethanesulfonate","smiles":"O=S(=O)(O)CO"}
 {"cas":"10421-49-5","id":"cas:10421-49-5","name":"Sodium Hyodeoxycholate","smiles":"CC(CCC(=O)O)C1CCC2C3CC(O)C4CC(O)CCC4(C)C3CCC12C"}
 {"cas":"867-56-1","id":"cas:867-56-1","name":"Sodium L-lactate","smiles":"CC(O)C(=O)[O-]"}
-{"cas":"6148-75-0","id":"cas:6148-75-0","name":"Sodium Mesitylenesulfonate","smiles":"Cc1cc(C)c(S(=O)(=O)[O-])c(C)c1"}
+{"cas":"6148-75-0","id":"cas:6148-75-0","name":"Sodium Mesitylenesulfonate","smiles":"Cc1cc(C)c(S(=O)(=O)[O-])c(C)c1.[Na+]"}
 {"cas":"5536-61-8","id":"cas:5536-61-8","name":"sodium methacrylate","smiles":"C=C(C)C(=O)[O-]"}
-{"cas":"20277-69-4","id":"cas:20277-69-4","name":"Sodium Methanesulfinate","smiles":"CS(=O)O"}
+{"cas":"20277-69-4","id":"cas:20277-69-4","name":"Sodium Methanesulfinate","smiles":"CS(=O)[O-].[Na+]"}
 {"cas":"2386-57-4","id":"cas:2386-57-4","name":"sodium methanesulfonate"}
 {"cas":"13755-38-9","id":"cas:13755-38-9","name":"Sodium Nitroprusside","smiles":"CCCCCCCCCC(=O)C(C(=O)[O-])C(O)C[N+](C)(C)C"}
 {"cas":"62-76-0","id":"cas:62-76-0","name":"Sodium oxalate"}
 {"cas":"565-73-1","id":"cas:565-73-1","name":"Sodium oxamate","smiles":"NC(=O)C(=O)[O-]"}
 {"cas":"824-79-3","id":"cas:824-79-3","name":"sodium p-tolylsulfinate","smiles":"Cc1ccc(S(=O)O)cc1"}
-{"aliases":[{"language":"en","type":"common_name","value":"Sodium phenoxide"}],"cas":"139-02-6","id":"cas:139-02-6","name":"sodium phenolate","smiles":"Oc1ccccc1"}
+{"aliases":[{"language":"en","type":"common_name","value":"Sodium phenoxide"}],"cas":"139-02-6","id":"cas:139-02-6","name":"sodium phenolate","smiles":"[Na+].[O-]c1ccccc1"}
 {"cas":"114-76-1","id":"cas:114-76-1","name":"Sodium phenylpyruvate","smiles":"O=C([O-])C(=O)Cc1ccccc1"}
-{"cas":"683-60-3","id":"cas:683-60-3","name":"sodium propan-2-olate","smiles":"CC(C)[O-]"}
+{"cas":"683-60-3","id":"cas:683-60-3","name":"sodium propan-2-olate","smiles":"CC(C)[O-].[Na+]"}
 {"cas":"822-16-2","id":"cas:822-16-2","name":"Sodium stearate","smiles":"CCCCCCCCCCCCCCCCCC(=O)[O-]"}
 {"cas":"145-42-6","id":"cas:145-42-6","name":"Sodium taurocholate","smiles":"CC(CCC(=O)NCCS(=O)(=O)[O-])C1CCC2C3C(O)CC4CC(O)CCC4(C)C3CC(O)C12C"}
 {"cas":"79060-88-1","id":"cas:79060-88-1","name":"Sodium Tetrakis[3,5-bis(trifluoromethyl)phenyl]borate Hydrate","smiles":"FC(F)(F)c1cc([B-](c2cc(C(F)(F)F)cc(C(F)(F)F)c2)(c2cc(C(F)(F)F)cc(C(F)(F)F)c2)c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc(C(F)(F)F)c1"}
 {"aliases":[{"type":"abbreviation","value":"NaBPh4"}],"cas":"143-66-8","id":"cas:143-66-8","name":"Sodium tetraphenylborate","smiles":"c1ccc([B-](c2ccccc2)(c2ccccc2)c2ccccc2)cc1"}
 {"cas":"540-72-7","id":"cas:540-72-7","name":"Sodium thiocyanate","smiles":"N#CS"}
 {"cas":"367-51-1","id":"cas:367-51-1","name":"sodium thioglycolate","smiles":"O=C([O-])CS"}
-{"cas":"930-69-8","id":"cas:930-69-8","name":"sodium thiophenolate","smiles":"Sc1ccccc1"}
+{"cas":"930-69-8","id":"cas:930-69-8","name":"sodium thiophenolate","smiles":"[Na+].[S-]c1ccccc1"}
 {"cas":"650-51-1","id":"cas:650-51-1","name":"Sodium trichloroacetate","smiles":"O=C([O-])C(Cl)(Cl)Cl"}
-{"cas":"2926-30-9","id":"cas:2926-30-9","name":"Sodium trifluoromethanesulphonate","smiles":"O=S(=O)(O)C(F)(F)F"}
+{"cas":"2926-30-9","id":"cas:2926-30-9","name":"Sodium trifluoromethanesulphonate","smiles":"O=S(=O)([O-])C(F)(F)F.[Na+]"}
 {"cas":"1072-24-8","id":"cas:1072-24-8","name":"sodium undecyl sulfate","smiles":"CCCCCCCCCCCOS(=O)(=O)[O-]"}
 {"cas":"30587-85-0","id":"cas:30587-85-0","name":"SODIUM XYLENESULFONATE","smiles":"Cc1ccc(CS(=O)(=O)[O-])cc1"}
 {"cas":"2386-54-1","id":"cas:2386-54-1","name":"Sodium1-butanesulfonate","smiles":"CC12CCC3C(C1CCC2=O)CC=C4C3(C(CC(C4)O)O)C"}
@@ -25547,7 +25547,7 @@
 {"cas":"40052-13-9","id":"cas:40052-13-9","name":"tert-Butylhydrogenmalonate","smiles":"CC(C)(C)OC(=O)CC(=O)O"}
 {"cas":"1948-33-0","id":"cas:1948-33-0","name":"tert-Butylhydroquinone","smiles":"CC(C)(C)C1=C(C=CC(=C1)O)O"}
 {"cas":"590-42-1","id":"cas:590-42-1","name":"tert-Butylisothiocyanate","smiles":"CC(C)(C)N=C=S"}
-{"cas":"594-19-4","id":"cas:594-19-4","name":"tert-Butyllithium","smiles":"C[C](C)C"}
+{"cas":"594-19-4","id":"cas:594-19-4","name":"tert-Butyllithium","smiles":"C[C-](C)C.[Li+]"}
 {"cas":"6163-64-0","id":"cas:6163-64-0","name":"tert-Butylmethylsulfide","smiles":"CCCCSC"}
 {"cas":"128231-55-0","id":"cas:128231-55-0","name":"tert-Butylphenylhydrazinehydrochloride","smiles":"CC(C)(C)C1=CC=C(C=C1)N[NH3+].[Cl-]"}
 {"cas":"4707-95-3","id":"cas:4707-95-3","name":"tert-Butylphosphonicdichloride","smiles":"CC(C)(C)P(=O)(Cl)Cl"}
@@ -25676,7 +25676,7 @@
 {"cas":"1194-16-7","id":"cas:1194-16-7","name":"Tetrahydro-2,2-dimethyl-4H-pyran-4-one","smiles":"CC1(CC(=O)CCO1)C"}
 {"cas":"29943-42-8","id":"cas:29943-42-8","name":"Tetrahydro-4H-pyran-4-one","smiles":"O=C1CCOCC1"}
 {"cas":"1072-72-6","id":"cas:1072-72-6","name":"Tetrahydro-4H-thiopyran-4-one","smiles":"O=C1CCSCC1"}
-{"cas":"1693-74-9","id":"cas:1693-74-9","name":"Tetrahydrofuran-d,(Isotopic)","smiles":"C1CCOC1"}
+{"cas":"1693-74-9","id":"cas:1693-74-9","name":"Tetrahydrofuran-d8","smiles":"[2H]C1([2H])OC([2H])([2H])C([2H])([2H])C1([2H])[2H]"}
 {"cas":"637-64-9","id":"cas:637-64-9","name":"tetrahydrofurfuryl acetate","smiles":"CC(=O)OCC1CCCO1"}
 {"cas":"97-99-4","id":"cas:97-99-4","name":"tetrahydrofurfuryl alcohol","smiles":"OCC1CCCO1"}
 {"cas":"36810-87-4","id":"cas:36810-87-4","name":"tetrahydrofurfuryl isothiocyanate","smiles":"S=C=NCC1CCCO1"}
@@ -25866,8 +25866,8 @@
 {"cas":"36809-75-3","id":"cas:36809-75-3","name":"Tin(IV)tert-butoxide","smiles":"CC(C)(C)O[Sn](OC(C)(C)C)(OC(C)(C)C)OC(C)(C)C"}
 {"cas":"39332-13-3","id":"cas:39332-13-3","name":"Tinarsenide,(metalsbasis)","smiles":"C1=NC2=C(N1)C(=NC=N2)SCC(CO)O"}
 {"cas":"681-98-1","id":"cas:681-98-1","name":"titanium isobutoxide","smiles":"CC(C)CO[Si](OCC(C)C)(OCC(C)C)OCC(C)C"}
-{"cas":"546-68-9","id":"cas:546-68-9","name":"Titanium(4+) tetrapropan-2-olate","smiles":"C1CCC(CC1)C(=O)N2CC3C4=CC=CC=C4CCN3C(=O)C2"}
-{"cas":"992-92-7","id":"cas:992-92-7","name":"Titanium(IV)methoxide","smiles":"C1=C(NC=N1)CC(C(=O)O)NC(=O)CNC(=O)CN"}
+{"cas":"546-68-9","id":"cas:546-68-9","name":"Titanium(4+) tetrapropan-2-olate","smiles":"CC(C)[O-].CC(C)[O-].CC(C)[O-].CC(C)[O-].[Ti+4]"}
+{"cas":"992-92-7","id":"cas:992-92-7","name":"Titanium(IV)methoxide","smiles":"C[O-].C[O-].C[O-].C[O-].[Ti+4]"}
 {"cas":"1271-19-8","id":"cas:1271-19-8","name":"Titanocene dichloride","smiles":"C1=C(C=C(C=C1C(F)(F)F)C(F)(F)F)C(=O)Cl"}
 {"cas":"64-77-7","id":"cas:64-77-7","name":"Tolbutamide","smiles":"CCCCNC(=O)NS(=O)(=O)C1=CC=C(C=C1)C"}
 {"cas":"91-08-7","id":"cas:91-08-7","name":"Toluene-2,6-diisocyanate","smiles":"CC1=C(C=CC=C1N=C=O)N=C=O"}
@@ -26102,7 +26102,7 @@
 {"cas":"3699-66-9","id":"cas:3699-66-9","name":"Triethyl2-phosphonopropionate","smiles":"CCOC(=O)C(C)P(=O)(OCC)OCC"}
 {"cas":"3699-67-0","id":"cas:3699-67-0","name":"Triethyl3-phosphonopropionate","smiles":"COC1(C2CC(C1C=C2)C3OCCO3)OC"}
 {"cas":"2327-69-7","id":"cas:2327-69-7","name":"Triethyl4-phosphonobutyrate","smiles":"C[Sn](=O)C"}
-{"cas":"97-93-8","id":"cas:97-93-8","name":"Triethylaluminum,w/winhexane","smiles":"COCCCCCCCCCCCC(=O)O"}
+{"cas":"97-93-8","id":"cas:97-93-8","name":"Triethylaluminum,w/winhexane"}
 {"cas":"636-70-4","id":"cas:636-70-4","name":"Triethylamine hydrobromide","smiles":"CC[NH+](CC)CC.[Br-]"}
 {"cas":"554-68-7","id":"cas:554-68-7","name":"Triethylamine hydrochloride","smiles":"CC[NH+](CC)CC.[Cl-]"}
 {"aliases":[{"language":"en","type":"legacy_name","value":"Et3N.3HF"}],"cas":"73602-61-6","id":"cas:73602-61-6","name":"Triethylamine trihydrofluoride","smiles":"CCN(CC)CC.F.F.F"}
@@ -26141,7 +26141,7 @@
 {"cas":"354-37-0","id":"cas:354-37-0","name":"Trifluoroacetamidine,tech.","smiles":"C(=O)(C(F)(F)F)N"}
 {"cas":"3336-58-1","id":"cas:3336-58-1","name":"Trifluoroacetic acid, ammonium salt","smiles":"[NH4+].FC(F)(F)C(=O)[O-]"}
 {"aliases":[{"language":"en","type":"legacy_name","value":"Triflouroacetic anhydride"}],"cas":"407-25-0","id":"cas:407-25-0","name":"Trifluoroacetic anhydride","smiles":"O=C(OC(=O)C(F)(F)F)C(F)(F)F"}
-{"cas":"599-00-8","id":"cas:599-00-8","name":"Trifluoroaceticacid-d,(Isotopic)","smiles":"C(=O)(C(F)(F)F)O"}
+{"cas":"599-00-8","id":"cas:599-00-8","name":"Trifluoroacetic acid-O-d1","smiles":"[2H]OC(=O)C(F)(F)F"}
 {"cas":"359-37-5","id":"cas:359-37-5","name":"Trifluoroiodoethylene,,stab.withcopper","smiles":"C(=C(F)I)(F)F"}
 {"cas":"421-85-2","id":"cas:421-85-2","name":"Trifluoromethanesulfonamide","smiles":"C(F)(F)(F)S(=O)(=O)N"}
 {"cas":"74974-61-1","id":"cas:74974-61-1","name":"Trifluoromethanesulfonate","smiles":"O=S(=O)([O-])C(F)(F)F.O=S(=O)([O-])C(F)(F)F.O=S(=O)([O-])C(F)(F)F.[Al+3]"}
@@ -26341,7 +26341,7 @@
 {"cas":"41836-21-9","id":"cas:41836-21-9","name":"Tris[N,N-bis(trimethylsilyl)amide]cerium(III)","smiles":"C[Si](C)(C)[N-][Si](C)(C)C.C[Si](C)(C)[N-][Si](C)(C)C.C[Si](C)(C)[N-][Si](C)(C)C.[Ce+3]"}
 {"cas":"103457-72-3","id":"cas:103457-72-3","name":"Tris[N,N-bis(trimethylsilyl)amide]erbium(III)","smiles":"C[Si](C)(C)[N-][Si](C)(C)C.C[Si](C)(C)[N-][Si](C)(C)C.C[Si](C)(C)[N-][Si](C)(C)C.[Er+3]"}
 {"cas":"5182-30-9","id":"cas:5182-30-9","name":"Trisodium 1,3,6-naphthalenetrisulfonate","smiles":"O=S(=O)([O-])c1ccc2c(S(=O)(=O)[O-])cc(S(=O)(=O)[O-])cc2c1"}
-{"id":"registry-row:26345","name":"Trisodium citrate dihydrate","smiles":"O=C([O-])CC(O)(CC(=O)[O-])C(=O)[O-]"}
+{"cas":"6132-04-3","id":"registry-row:26345","name":"Trisodium citrate dihydrate","smiles":"O.O.O=C([O-])CC(O)(CC(=O)[O-])C(=O)[O-].[Na+].[Na+].[Na+]"}
 {"cas":"18662-53-8","id":"cas:18662-53-8","name":"Trisodium Nitrilotriacetate Monohydrate","smiles":"O=C(O)CN(CC(=O)O)CC(=O)O"}
 {"cas":"68-04-2","id":"cas:68-04-2","name":"Trisodiumcitrate,anhydrous","smiles":"C(C(=O)[O-])C(CC(=O)[O-])(C(=O)[O-])O.[Na+].[Na+].[Na+]"}
 {"cas":"1330-78-5","id":"cas:1330-78-5","name":"Tritolylphosphate,mixtureofisomers,,ortho-isomers","smiles":"C1=CC(=C(C=C1Cl)O)OC2=C(C=C(C=C2)Cl)Cl"}
@@ -26475,7 +26475,7 @@
 {"cas":"2389-60-8","id":"cas:2389-60-8","name":"Z-lys(boc)-OH","smiles":"CC(C)(C)OC(=O)NCCCCC(NC(=O)OCc1ccccc1)C(=O)O"}
 {"cas":"13139-17-8","id":"cas:13139-17-8","name":"Z-OSu","smiles":"O=C(OCc1ccccc1)On1c(O)ccc1O"}
 {"cas":"21209-51-8","id":"cas:21209-51-8","name":"Z-ser-OBzl","smiles":"O=C(NC(CO)C(=O)OCc1ccccc1)OCc1ccccc1"}
-{"cas":"54010-75-2","id":"cas:54010-75-2","name":"Zinc trifluoromethanesulfonate","smiles":"C1=CC=C(C=C1)[Sb](C2=CC=CC=C2)C3=CC=CC=C3"}
+{"cas":"54010-75-2","id":"cas:54010-75-2","name":"Zinc trifluoromethanesulfonate","smiles":"O=S(=O)([O-])C(F)(F)F.O=S(=O)([O-])C(F)(F)F.[Zn+2]"}
 {"cas":"16853-74-0","id":"cas:16853-74-0","name":"zirconium(4+) ion ditungstate","smiles":"O=P(O)(O)C(O)P(=O)(O)O"}
 {"cas":"10026-11-6","id":"cas:10026-11-6","name":"Zirconium(IV)chloride,,cont.1-hafnium(IV)chloride","smiles":"CC1=NC=C(N1CCO)[N+](=O)[O-]"}
 {"aliases":[{"type":"abbreviation","value":"ZSM-5"}],"cas":"308081-08-5","id":"cas:308081-08-5","name":"ZSM-5","smiles":"CCC1(c2c[nH]cn2)Cc2ccccc2C1"}
@@ -26537,7 +26537,7 @@
 {"cas":"7803-63-6","id":"cas:7803-63-6","name":"Ammonium bisulfate","smiles":"[NH4+].[O-]S(=O)(=O)O"}
 {"cas":"13083-04-0","id":"cas:13083-04-0","name":"AMMONIUM CERIUM(III) NITRATE TETRAHYDRATE","smiles":"[Ce+3]"}
 {"cas":"10378-47-9","id":"cas:10378-47-9","name":"Ammonium cerium(IV) sulfate dihydrate","smiles":"[Ce+4]"}
-{"cas":"12125-01-8","id":"cas:12125-01-8","name":"Ammonium fluoride","smiles":"F"}
+{"cas":"12125-01-8","id":"cas:12125-01-8","name":"Ammonium fluoride","smiles":"[F-].[NH4+]"}
 {"cas":"13826-83-0","id":"cas:13826-83-0","name":"Ammonium fluoroborate","smiles":"F[B-](F)(F)F"}
 {"cas":"7784-19-2","id":"cas:7784-19-2","name":"ammonium hexafluoroaluminate","smiles":"F.F.F.[Al+3].[F-].[F-].[F-]"}
 {"cas":"13446-09-8","id":"cas:13446-09-8","name":"Ammonium iodate","smiles":"[O-][I+2]([O-])O"}
@@ -26552,7 +26552,7 @@
 {"cas":"7722-76-1","id":"cas:7722-76-1","name":"Ammoniumdihydrogenphosphate","smiles":"[NH4+].OP(=O)(O)[O-]"}
 {"cas":"16960-53-5","id":"cas:16960-53-5","name":"Ammoniumhexachlorostannate(IV)","smiles":"[NH4+].[NH4+].[Cl-].[Cl-].[Cl-].[Cl-].[Cl-].[Cl-].[Sn+4]"}
 {"cas":"16962-47-3","id":"cas:16962-47-3","name":"Ammoniumhexafluorogermanate,min(metalsbasis)","smiles":"[NH4+].[NH4+].[F-].[F-].F[Ge](F)(F)F"}
-{"cas":"16919-19-0","id":"cas:16919-19-0","name":"Ammoniumhexafluorosilicate","smiles":"F"}
+{"cas":"16919-19-0","id":"cas:16919-19-0","name":"Ammoniumhexafluorosilicate","smiles":"F[Si-2](F)(F)(F)(F)F.[NH4+].[NH4+]"}
 {"cas":"1341-49-7","id":"cas:1341-49-7","name":"Ammoniumhydrogenfluoride,tech.","smiles":"[NH4+].F.[F-]"}
 {"cas":"7783-28-0","id":"cas:7783-28-0","name":"Ammoniumhydrogenphosphate,tech.,PO","smiles":"[NH4+].[NH4+].OP(=O)([O-])[O-]"}
 {"cas":"6484-52-2","id":"cas:6484-52-2","name":"Ammoniumnitrate,ACS,min","smiles":"[NH4+].[N+](=O)([O-])[O-]"}
@@ -26715,8 +26715,8 @@
 {"cas":"7790-94-5","id":"cas:7790-94-5","name":"Chlorosulfonic acid","smiles":"O=S(=O)(O)Cl"}
 {"cas":"17702-41-9","id":"cas:17702-41-9","name":"Decaborane","smiles":"[B][B][B][B][B][B][B][B]B=[B]"}
 {"cas":"13536-59-9","id":"cas:13536-59-9","name":"Deuterium Bromide","smiles":"Br[2H]"}
-{"id":"registry-row:26719","name":"Deuteriumchloride,w/winDO,(Isotopic)","smiles":"Cl"}
-{"cas":"7789-20-0","id":"cas:7789-20-0","name":"Deuteriumoxide,(Isotopic)","smiles":"O"}
+{"id":"registry-row:26719","name":"Deuteriumchloride,w/winDO,(Isotopic)"}
+{"cas":"7789-20-0","id":"cas:7789-20-0","name":"Deuterium oxide","smiles":"[2H]O[2H]"}
 {"cas":"17927-65-0","id":"cas:17927-65-0","name":"dialuminium(3+) ion hydrate trisulfate","smiles":"[Al+3].[Al+3]"}
 {"cas":"10031-52-4","id":"cas:10031-52-4","name":"dierbium(3+) ion octahydrate trisulfate","smiles":"[Er+3].[Er+3]"}
 {"cas":"12134-75-7","id":"cas:12134-75-7","name":"digadoliniumylidenesilane","smiles":"[Gd+3].[Si].[Si]"}
@@ -26904,7 +26904,7 @@
 {"cas":"1309-60-0","id":"cas:1309-60-0","name":"Lead(IV) oxide","smiles":"[Pb+4]"}
 {"cas":"12627-53-1","id":"cas:12627-53-1","name":"LeishmanStain"}
 {"cas":"12003-67-7","id":"cas:12003-67-7","name":"Lithium aluminate","smiles":"[Al+3]"}
-{"cas":"16949-15-8","id":"cas:16949-15-8","name":"lithium borohydride","smiles":"[BH4-]"}
+{"aliases":[{"type":"abbreviation","value":"LiBH4"}],"cas":"16949-15-8","id":"cas:16949-15-8","name":"lithium borohydride","smiles":"[BH4-].[Li+]"}
 {"cas":"16712-20-2","id":"cas:16712-20-2","name":"lithium chloride hydrate","smiles":"[Li+].[Cl-].O"}
 {"cas":"13587-16-1","id":"cas:13587-16-1","name":"lithium deuteride","smiles":"[HH]"}
 {"cas":"7789-24-4","id":"cas:7789-24-4","name":"Lithium fluoride","smiles":"[F-]"}
@@ -26913,7 +26913,7 @@
 {"cas":"17029-16-2","id":"cas:17029-16-2","name":"Lithium hexafluorostannate(IV)"}
 {"cas":"7580-67-8","id":"cas:7580-67-8","name":"Lithium hydride","smiles":"[HH]"}
 {"aliases":[{"language":"en","type":"legacy_name","value":"LiOH.H2O"}],"cas":"1310-66-3","id":"cas:1310-66-3","name":"Lithium hydroxide monohydrate"}
-{"cas":"13453-69-5","id":"cas:13453-69-5","name":"Lithium metaborate","smiles":"O=B[O-]"}
+{"cas":"13453-69-5","id":"cas:13453-69-5","name":"Lithium metaborate","smiles":"O=B[O-].[Li+]"}
 {"cas":"10102-24-6","id":"cas:10102-24-6","name":"Lithium Metasilicate","smiles":"O=[Si]([O-])[O-]"}
 {"cas":"7790-69-4","id":"cas:7790-69-4","name":"Lithium nitrate"}
 {"cas":"26134-62-3","id":"cas:26134-62-3","name":"Lithium nitride"}
@@ -26922,10 +26922,10 @@
 {"cas":"12031-80-0","id":"cas:12031-80-0","name":"Lithium peroxide","smiles":"OO"}
 {"cas":"13453-80-0","id":"cas:13453-80-0","name":"Lithium phosphate monobasic"}
 {"cas":"10102-25-7","id":"cas:10102-25-7","name":"Lithium sulfate monohydrate"}
-{"cas":"12136-58-2","id":"cas:12136-58-2","name":"lithium sulfide","smiles":"S"}
+{"cas":"12136-58-2","id":"cas:12136-58-2","name":"lithium sulfide","smiles":"[Li+].[Li+].[S-2]"}
 {"cas":"12007-60-2","id":"cas:12007-60-2","name":"Lithium tetraborate","smiles":"[O-]B1OB2OB([O-])OB(O1)O2"}
 {"cas":"37195-62-3","id":"cas:37195-62-3","name":"Lithium Tetraborate Trihydrate","smiles":"[O-]B1OB2OB([O-])OB(O1)O2"}
-{"aliases":[{"language":"en","type":"legacy_name","value":"LiBF4"}],"cas":"14283-07-9","id":"cas:14283-07-9","name":"Lithium tetrafluoroborate","smiles":"F[B-](F)(F)F"}
+{"aliases":[{"language":"en","type":"legacy_name","value":"LiBF4"}],"cas":"14283-07-9","id":"cas:14283-07-9","name":"Lithium tetrafluoroborate","smiles":"F[B-](F)(F)F.[Li+]"}
 {"cas":"7439-93-2","id":"cas:7439-93-2","name":"Lithiumgranules,1-6mm(0.04-0.2in),(metalsbasis)","smiles":"[Li+]"}
 {"cas":"17347-95-4","id":"cas:17347-95-4","name":"Lithiumhexafluorosilicate","smiles":"[Li+].[Li+].F[Si-2](F)(F)(F)(F)F"}
 {"cas":"944251-30-3","id":"cas:944251-30-3","name":"Lithiummetagallate"}
@@ -27011,15 +27011,15 @@
 {"cas":"39365-88-3","id":"cas:39365-88-3","name":"potash,sulfurated","smiles":"O=S(O)S.S"}
 {"cas":"28300-74-5","id":"cas:28300-74-5","name":"Potassium antimonyl tartrate sesquihydrate","smiles":"[Sb+3].[Sb+3]"}
 {"cas":"7646-93-7","id":"cas:7646-93-7","name":"Potassium bisulfate","smiles":"[K+].[O-]S(=O)(=O)O"}
-{"cas":"13455-21-5","id":"cas:13455-21-5","name":"Potassium fluoride dihydrate","smiles":"F"}
+{"cas":"13455-21-5","id":"cas:13455-21-5","name":"Potassium fluoride dihydrate","smiles":"O.O.[F-].[K+]"}
 {"cas":"13455-22-6","id":"cas:13455-22-6","name":"Potassium fluorosulfate","smiles":"O=S(=O)(O)F"}
 {"cas":"16893-92-8","id":"cas:16893-92-8","name":"Potassium hexafluoroantimonate","smiles":"[F][Sb-]([F])([F])([F])([F])[F]"}
 {"cas":"17029-22-0","id":"cas:17029-22-0","name":"Potassium hexafluoroarsenate(V)","smiles":"F[As-](F)(F)(F)(F)F"}
 {"aliases":[{"language":"en","type":"legacy_name","value":"KPF6"}],"cas":"17084-13-8","id":"cas:17084-13-8","name":"Potassium hexafluorophosphate"}
 {"cas":"13455-24-8","id":"cas:13455-24-8","name":"Potassium hydrogen diiodate","smiles":"[O-][I+2]([O-])O.[O-][I+2]([O-])O"}
-{"cas":"7789-29-9","id":"cas:7789-29-9","name":"Potassium hydrogen fluoride","smiles":"F.F"}
+{"cas":"7789-29-9","id":"cas:7789-29-9","name":"Potassium hydrogen fluoride","smiles":"F.[F-].[K+]"}
 {"cas":"7757-79-1","id":"cas:7757-79-1","name":"potassium nitrate"}
-{"cas":"7758-09-0","id":"cas:7758-09-0","name":"Potassium nitrite","smiles":"O=N[O-]"}
+{"aliases":[{"type":"abbreviation","value":"KNO2"}],"cas":"7758-09-0","id":"cas:7758-09-0","name":"Potassium nitrite","smiles":"O=N[O-].[K+]"}
 {"cas":"12229-13-9","id":"cas:12229-13-9","name":"potassium pentaborate octahydrate","smiles":"O=BOB([O-])OB(OB=O)OB([O-])OB(OB=O)OB(OB=O)OB=O"}
 {"cas":"7778-74-7","id":"cas:7778-74-7","name":"Potassium perchlorate","smiles":"[O-][Cl+3]([O-])([O-])O"}
 {"cas":"70693-62-8","id":"cas:70693-62-8","name":"Potassium peroxymonosulfate","smiles":"O=S(=O)([O-])OO.O=S(=O)([O-])OO"}
@@ -27029,7 +27029,7 @@
 {"cas":"10431-47-7","id":"cas:10431-47-7","name":"Potassium selenite","smiles":"O=[Se](O)O"}
 {"cas":"13823-50-2","id":"cas:13823-50-2","name":"Potassium Sulfamate","smiles":"NS(=O)(=O)O"}
 {"cas":"7778-80-5","id":"cas:7778-80-5","name":"Potassium sulfate","smiles":"[K+].[K+].[O-]S(=O)(=O)[O-]"}
-{"cas":"12030-88-5","id":"cas:12030-88-5","name":"potassium superoxide","smiles":"O=O"}
+{"cas":"12030-88-5","id":"cas:12030-88-5","name":"potassium superoxide","smiles":"[K+].[O][O-]"}
 {"cas":"14075-53-7","id":"cas:14075-53-7","name":"Potassium tetrafluoroborate","smiles":"F[B-](F)(F)F"}
 {"id":"registry-row:27035","name":"Potassium,solid,(metalsbasis)","smiles":"[K+]"}
 {"cas":"329976-74-1","id":"cas:329976-74-1","name":"Potassium2-phenylethyltrifluoroborate","smiles":"[K]"}
@@ -27116,25 +27116,25 @@
 {"cas":"15681-89-7","id":"cas:15681-89-7","name":"sodium borodeuteride","smiles":"B"}
 {"cas":"14014-06-3","id":"cas:14014-06-3","name":"sodium deuteroxide"}
 {"cas":"7558-80-7","id":"cas:7558-80-7","name":"Sodium dihydngen phoshate"}
-{"cas":"7681-49-4","id":"cas:7681-49-4","name":"Sodium fluoride","smiles":"[F-]"}
+{"cas":"7681-49-4","id":"cas:7681-49-4","name":"Sodium fluoride","smiles":"[F-].[Na+]"}
 {"cas":"13775-53-6","id":"cas:13775-53-6","name":"Sodium hexafluoroaluminate","smiles":"F.F.F.[Al+3].[F-].[F-].[F-]"}
 {"cas":"12005-86-6","id":"cas:12005-86-6","name":"Sodium hexafluoroarsenate(V)","smiles":"F[As-](F)(F)(F)(F)F"}
 {"cas":"12325-31-4","id":"cas:12325-31-4","name":"Sodium hexahydroxyplatinate(IV)","smiles":"[Na][Na]"}
 {"cas":"7782-82-3","id":"cas:7782-82-3","name":"Sodium hydrogen selenite","smiles":"O=[Se]([O-])O"}
-{"cas":"16721-80-5","id":"cas:16721-80-5","name":"Sodium hydrosulfide","smiles":"[SH-]"}
-{"cas":"7775-14-6","id":"cas:7775-14-6","name":"Sodium hydrosulfite","smiles":"O=S([O-])S(=O)[O-]"}
+{"cas":"16721-80-5","id":"cas:16721-80-5","name":"Sodium hydrosulfide","smiles":"[Na+].[SH-]"}
+{"cas":"7775-14-6","id":"cas:7775-14-6","name":"Sodium hydrosulfite","smiles":"O=S([O-])S(=O)[O-].[Na+].[Na+]"}
 {"cas":"12179-02-1","id":"cas:12179-02-1","name":"sodium hydroxide monohydrate"}
-{"cas":"7681-52-9","id":"cas:7681-52-9","name":"Sodium hypochlorite","smiles":"[O-]Cl"}
+{"cas":"7681-52-9","id":"cas:7681-52-9","name":"Sodium hypochlorite","smiles":"[Na+].[O-]Cl"}
 {"cas":"10039-56-2","id":"cas:10039-56-2","name":"Sodium hypophosphite monohydrate","smiles":"O=P[O-]"}
 {"cas":"10555-76-7","id":"cas:10555-76-7","name":"Sodium metaborate tetrahydrate","smiles":"O=BO"}
 {"cas":"6834-92-0","id":"cas:6834-92-0","name":"Sodium Metasilicate","smiles":"O=[Si]([O-])[O-]"}
 {"cas":"10213-79-3","id":"cas:10213-79-3","name":"Sodium metasilicate pentahydrate","smiles":"O=[Si](O)O"}
 {"cas":"7631-99-4","id":"cas:7631-99-4","name":"sodium nitrate"}
-{"cas":"7632-00-0","id":"cas:7632-00-0","name":"sodium nitrite","smiles":"O=NO"}
+{"aliases":[{"type":"abbreviation","value":"NaNO2"}],"cas":"7632-00-0","id":"cas:7632-00-0","name":"sodium nitrite","smiles":"O=N[O-].[Na+]"}
 {"cas":"13472-30-5","id":"cas:13472-30-5","name":"Sodium orthosilicate","smiles":"O[Si](O)(O)O"}
 {"cas":"1313-59-3","id":"cas:1313-59-3","name":"Sodium oxide"}
 {"cas":"10486-00-7","id":"cas:10486-00-7","name":"Sodium perborate tetrahydrate","smiles":"O=BOO"}
-{"cas":"7790-28-5","id":"cas:7790-28-5","name":"Sodium periodate","smiles":"[O-][I+3]([O-])([O-])O"}
+{"cas":"7790-28-5","id":"cas:7790-28-5","name":"Sodium periodate","smiles":"[Na+].[O-][I+3]([O-])([O-])[O-]"}
 {"aliases":[{"language":"en","type":"common_name","value":"Trisodium phosphate, anhydrous"},{"language":"en","type":"legacy_name","value":"Na3PO4"}],"cas":"7601-54-9","id":"cas:7601-54-9","name":"Sodium phosphate","smiles":"[Na+][Na+][Na+].[O-]P(=O)([O-])[O-]"}
 {"aliases":[{"type":"abbreviation","value":"NaH2PO4"}],"cas":"13472-35-0","id":"cas:13472-35-0","name":"Sodium phosphate monobasic dihydrate"}
 {"cas":"10101-89-0","id":"cas:10101-89-0","name":"Sodium phosphate tribasic dodecahydrate"}
@@ -27146,8 +27146,8 @@
 {"aliases":[{"type":"abbreviation","value":"Na2SO4"}],"cas":"7757-82-6","id":"cas:7757-82-6","name":"Sodium sulfate","smiles":"[Na+].[Na+].[O-]S(=O)(=O)[O-]"}
 {"cas":"1313-84-4","id":"cas:1313-84-4","name":"Sodium sulphide hydrate","smiles":"[S-2]"}
 {"cas":"13755-29-8","id":"cas:13755-29-8","name":"Sodium tetrafluoroborate","smiles":"F[B-](F)(F)F"}
-{"cas":"10102-17-7","id":"cas:10102-17-7","name":"Sodium thiosulfate pentahydrate","smiles":"O=S([O-])([O-])=S"}
-{"cas":"7758-29-4","id":"cas:7758-29-4","name":"Sodium tripolyphosphate","smiles":"O=P([O-])([O-])OP(=O)([O-])OP(=O)([O-])[O-]"}
+{"cas":"10102-17-7","id":"cas:10102-17-7","name":"Sodium thiosulfate pentahydrate","smiles":"O.O.O.O.O.O=S([O-])([O-])=S.[Na+].[Na+]"}
+{"cas":"7758-29-4","id":"cas:7758-29-4","name":"Sodium tripolyphosphate","smiles":"O=P([O-])([O-])OP(=O)([O-])OP(=O)([O-])[O-].[Na+].[Na+].[Na+].[Na+].[Na+]"}
 {"cas":"207596-29-0","id":"cas:207596-29-0","name":"Sodium1-octanesulfonatemonohydrate","smiles":"[Na]"}
 {"cas":"1302-42-7","id":"cas:1302-42-7","name":"Sodiumaluminumoxide,tech.","smiles":"O=[Al-]=O.[Na+]"}
 {"cas":"7783-13-3","id":"cas:7783-13-3","name":"Sodiumammoniumhydrogenphosphatetetrahydrate","smiles":"N.O.OP(=O)(O)O.[Na]"}
@@ -27302,19 +27302,19 @@
 {"aliases":[{"type":"abbreviation","value":"DMP"}],"cas":"87413-09-0","id":"cas:87413-09-0","name":"Dess--artin periodinane","roles":["oxidant"],"smiles":"CC(=O)OI1(OC(C)=O)(OC(C)=O)OC(=O)c2ccccc21"}
 {"aliases":[{"type":"abbreviation","value":"Oxone"}],"cas":"37222-66-5","id":"cas:37222-66-5","name":"Oxone (2KHSO5HSO42SO4)","roles":["oxidant"]}
 {"aliases":[{"type":"abbreviation","value":"O2"}],"cas":"7782-44-7","id":"cas:7782-44-7","name":"Oxygen (g)","roles":["oxidant"]}
-{"aliases":[{"type":"abbreviation","value":"K2S2O8"}],"cas":"7727-21-1","id":"cas:7727-21-1","name":"Potassium persulfate","roles":["oxidant"],"smiles":"O=S(=O)(O)OOS(=O)(=O)O"}
+{"aliases":[{"type":"abbreviation","value":"K2S2O8"}],"cas":"7727-21-1","id":"cas:7727-21-1","name":"Potassium persulfate","roles":["oxidant"],"smiles":"O=S(=O)([O-])OOS(=O)(=O)[O-].[K+].[K+]"}
 {"cas":"140681-55-6","id":"cas:140681-55-6","name":"Selectfluor","roles":["oxidant"],"smiles":"F[B-](F)(F)F.F[B-](F)(F)F.F[N+]12CC[N+](CCl)(CC1)CC2"}
 {"aliases":[{"type":"abbreviation","value":"TBHP"}],"cas":"75-91-2","id":"cas:75-91-2","name":"tert-Butyl hydroperoxide (neat / in solution)","roles":["oxidant"],"smiles":"CC(C)(C)OO"}
 {"aliases":[{"type":"abbreviation","value":"SOCl2"}],"id":"registry-row:27309","name":"Thionyl Chloride","roles":["oxidant"]}
-{"aliases":[{"type":"abbreviation","value":"[Cu(CH3CN)4]PF6"}],"id":"registry-row:27310","name":"tetrakis(acetonitrile)copper(I) hexafluorophosphate","smiles":"C8H12CuF6N4P"}
+{"aliases":[{"type":"abbreviation","value":"[Cu(CH3CN)4]PF6"}],"id":"registry-row:27310","name":"tetrakis(acetonitrile)copper(I) hexafluorophosphate"}
 {"cas":"3277-26-7","id":"cas:3277-26-7","name":"1,1,3,3-Tetramethyldisiloxane","roles":["reductant"],"smiles":"C[Si](C)O[Si](C)C"}
 {"cas":"1149-23-1","id":"cas:1149-23-1","name":"Hantzsch ester","roles":["reductant"],"smiles":"CCOC(=O)C1=C(C)N=C(C)C(C(=O)OCC)C1"}
 {"aliases":[{"type":"abbreviation","value":"H2"}],"cas":"1333-74-0","id":"cas:1333-74-0","name":"Hydrogen (g)","roles":["reductant"]}
 {"aliases":[{"type":"abbreviation","value":"Fe"}],"cas":"7439-89-6","id":"cas:7439-89-6","name":"Iron","roles":["reductant"],"smiles":"[Fe]"}
-{"aliases":[{"type":"abbreviation","value":"LiAlH4"}],"cas":"16853-85-3","id":"cas:16853-85-3","name":"Lithium aluminum hydride","roles":["reductant"],"smiles":"[AlH3]"}
+{"aliases":[{"type":"abbreviation","value":"LiAlH4"}],"cas":"16853-85-3","id":"cas:16853-85-3","name":"Lithium aluminum hydride","roles":["reductant"],"smiles":"[AlH4-].[Li+]"}
 {"aliases":[{"type":"abbreviation","value":"Mn"}],"cas":"7439-96-5","id":"cas:7439-96-5","name":"Manganese powder","roles":["reductant"],"smiles":"[Mn]"}
 {"aliases":[{"type":"abbreviation","value":"PMHS"}],"cas":"63148-57-2","id":"cas:63148-57-2","name":"Polymethylhydrosiloxane","roles":["reductant"]}
-{"aliases":[{"type":"abbreviation","value":"NaBH4"}],"cas":"16940-66-2","id":"cas:16940-66-2","name":"Sodium borohydride","roles":["reductant"],"smiles":"B"}
+{"aliases":[{"type":"abbreviation","value":"NaBH4"}],"cas":"16940-66-2","id":"cas:16940-66-2","name":"Sodium borohydride","roles":["reductant"],"smiles":"[BH4-].[Na+]"}
 {"cas":"95-50-1","id":"cas:95-50-1","name":"1,2-Dichlorobenzene","roles":["solvent"],"smiles":"Clc1ccccc1Cl"}
 {"aliases":[{"type":"abbreviation","value":"DCE"}],"cas":"107-06-2","id":"cas:107-06-2","name":"1,2-Dichloroethane","roles":["solvent"],"smiles":"ClCCCl"}
 {"aliases":[{"type":"abbreviation","value":"DME"}],"cas":"110-71-4","id":"cas:110-71-4","name":"1,2-Dimethoxyethane","roles":["solvent"],"smiles":"COCCOC"}
@@ -27333,7 +27333,7 @@
 {"aliases":[{"type":"abbreviation","value":"MeCN"}],"cas":"75-05-8","id":"cas:75-05-8","name":"Acetonitrile","roles":["solvent"],"smiles":"CC#N"}
 {"aliases":[{"type":"abbreviation","value":"PhOMe"}],"cas":"100-66-3","id":"cas:100-66-3","name":"anisole","roles":["solvent"],"smiles":"COC1=CC=CC=C1"}
 {"aliases":[{"type":"abbreviation","value":"PhH"}],"cas":"71-43-2","id":"cas:71-43-2","name":"Benzene","roles":["solvent"],"smiles":"c1ccccc1"}
-{"aliases":[{"type":"abbreviation","value":"C6D6"}],"cas":"1076-43-3","id":"cas:1076-43-3","name":"Benzene-d6","roles":["solvent"],"smiles":"c1ccccc1"}
+{"aliases":[{"type":"abbreviation","value":"C6D6"}],"cas":"1076-43-3","id":"cas:1076-43-3","name":"Benzene-d6","roles":["solvent"],"smiles":"[2H]c1c([2H])c([2H])c([2H])c([2H])c1[2H]"}
 {"aliases":[{"type":"abbreviation","value":"PhCN"}],"cas":"100-47-0","id":"cas:100-47-0","name":"Benzonitrile","roles":["solvent"],"smiles":"N#Cc1ccccc1"}
 {"aliases":[{"type":"abbreviation","value":"CCl4"}],"cas":"56-23-5","id":"cas:56-23-5","name":"Carbon tetrachloride","roles":["solvent"],"smiles":"ClC(Cl)(Cl)Cl"}
 {"aliases":[{"type":"abbreviation","value":"PhCl"}],"cas":"108-90-7","id":"cas:108-90-7","name":"Chlorobenzene","roles":["solvent"],"smiles":"Clc1ccccc1"}
@@ -27348,7 +27348,7 @@
 {"aliases":[{"type":"abbreviation","value":"Et2O"}],"cas":"60-29-7","id":"cas:60-29-7","name":"Diethyl ether","roles":["solvent"],"smiles":"CCOCC"}
 {"cas":"111-46-6","id":"cas:111-46-6","name":"Diethylene glycol","roles":["solvent"],"smiles":"OCCOCCO"}
 {"aliases":[{"type":"abbreviation","value":"DIPE"}],"cas":"108-20-3","id":"cas:108-20-3","name":"Diisopropyl ether","roles":["solvent"],"smiles":"CC(C)OC(C)C"}
-{"aliases":[{"type":"abbreviation","value":"DMSO"}],"cas":"67-68-5","id":"cas:67-68-5","name":"Dimethyl sulfoxide","roles":["solvent"],"smiles":"C[S+](C)[O-]"}
+{"aliases":[{"type":"abbreviation","value":"DMSO"},{"type":"smiles","value":"CS(C)=O"}],"cas":"67-68-5","id":"cas:67-68-5","name":"Dimethyl sulfoxide","roles":["solvent"],"smiles":"C[S+](C)[O-]"}
 {"aliases":[{"type":"abbreviation","value":"EtOH"}],"cas":"64-17-5","id":"cas:64-17-5","name":"Ethanol","roles":["solvent"],"smiles":"CCO"}
 {"aliases":[{"type":"abbreviation","value":"EtOAc"}],"cas":"141-78-6","id":"cas:141-78-6","name":"Ethyl acetate","roles":["solvent"],"smiles":"CCOC(C)=O"}
 {"cas":"107-21-1","id":"cas:107-21-1","name":"Ethylene glycol","roles":["solvent"],"smiles":"OCCO"}

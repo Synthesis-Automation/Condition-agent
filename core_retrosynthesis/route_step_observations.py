@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from condition_recommender.ingestion.adapters.base import (
     observation_id,
     supplied_mapping_status,
@@ -101,13 +102,10 @@ def _sha256(path: Path) -> str:
 def _two_part_reaction(reaction_smiles: str) -> tuple[str, str, str] | None:
     """Return mapped transformation and the source middle field separately."""
 
-    if reaction_smiles.count(">>") == 1:
-        reactants, products = reaction_smiles.split(">>", 1)
-        reagents = ""
-    elif reaction_smiles.count(">") == 2:
-        reactants, reagents, products = reaction_smiles.split(">", 2)
-    else:
+    fields = split_reaction_fields(reaction_smiles)
+    if len(fields) != 3:
         return None
+    reactants, reagents, products = fields
     if not reactants or not products:
         return None
     return f"{reactants}>>{products}", reagents, products

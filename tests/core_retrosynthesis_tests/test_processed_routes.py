@@ -62,6 +62,28 @@ def _write(path, rows):
             handle.write(json.dumps(row) + "\n")
 
 
+def test_stale_validated_tree_rechecks_nuclear_identity_at_read_time(tmp_path):
+    wrapper = _wrapper()
+    routes, steps, index = (tmp_path / name for name in ("routes.gz", "steps.gz", "catalog.sqlite"))
+    aliases = wrapper["raw_route"]["original_tree"]["reaction_ids"]
+    _write(routes, [wrapper])
+    _write(steps, [{"observation_id": a, "source": {"source_record_id": a}} for a in aliases])
+    report = build_processed_route_catalog(routes, steps, index)
+    catalog = ProcessedRouteCatalog(index)
+    assert len(list(catalog.iter_trees())) == 1
+    # Simulate an old catalog whose validator accepted map 1 changing nitrogen into carbon.
+    wrapper["raw_route"]["subtrees"][0]["reactions"][0]["reaction_smiles"] = "[NH3:1].[OH2:2]>>[CH3:1][OH:2]"
+    report.pop("route_curation_policy")
+    with sqlite3.connect(index) as db:
+        db.execute("UPDATE metadata SET payload=?", (json.dumps(report),))
+        db.execute("UPDATE routes SET source=?", (zlib.compress(json.dumps(wrapper).encode()),))
+    result = catalog.route("US_TEST_0", include_tree=True, include_source=True)
+    assert result["status"] == "unresolved" and result["unresolved_reason"] == "mapped_element_or_isotope_mismatch"
+    assert not result["tree_available"] and "tree" not in result
+    assert result["source"] == wrapper and len(result["memberships"]) == 3
+    assert not list(catalog.iter_trees())
+
+
 def test_catalog_keeps_rejected_sources_and_exact_step_joins(tmp_path):
     wrapper = _wrapper()
     invalid = deepcopy(wrapper)
@@ -229,7 +251,8 @@ def test_screen_preserves_route_positions_and_blocks_trees_across_gaps(
     assert len(list(catalog.iter_trees())) == int(eligible)
 
 
-def test_unchanged_verified_legacy_catalog_can_seed_new_build(tmp_path, monkeypatch):
+@pytest.mark.parametrize("matching_policy", [False, True])
+def test_verified_legacy_catalog_reuse_requires_same_chemistry(tmp_path, monkeypatch, matching_policy):
     from core_retrosynthesis import processed_routes
 
     wrapper = _wrapper()
@@ -240,6 +263,9 @@ def test_unchanged_verified_legacy_catalog_can_seed_new_build(tmp_path, monkeypa
     old_version = processed_routes.LEGACY_ROUTE_CATALOG_VERSION
     binding = hashlib.sha256((file_sha256(routes) + file_sha256(steps) + old_version).encode()).hexdigest()
     metadata = {"schema_version": old_version, "build_complete": True, "source_binding": binding}
+    if matching_policy:
+        metadata.update(route_curation_policy=processed_routes.ROUTE_CURATION_POLICY_VERSION,
+                        reaction_field_parser=processed_routes.REACTION_FIELD_PARSER_VERSION)
     release = tmp_path / "old"
     release.mkdir()
     legacy = release / "routes.sqlite"
@@ -261,12 +287,17 @@ def test_unchanged_verified_legacy_catalog_can_seed_new_build(tmp_path, monkeypa
                                                 "sha256": file_sha256(legacy)}}}
     (release / "manifest.json").write_text(json.dumps(manifest))
 
-    def unexpected_conversion(*args):
-        pytest.fail("Checksum-bound patent bundle should have been reused")
+    conversions = []
+    original = processed_routes._convert_wrapper
 
-    monkeypatch.setattr(processed_routes, "_convert_wrapper", unexpected_conversion)
+    def track_conversion(*args):
+        conversions.append(1)
+        return original(*args)
+
+    monkeypatch.setattr(processed_routes, "_convert_wrapper", track_conversion)
     dest = tmp_path / "new.sqlite"
     report = build_route_bundle_catalog([(routes, steps)], dest, reuse_release=release)
+    assert len(conversions) == (0 if matching_policy else 1)
     assert report["counts"] == {"validated_tree": 1}
     assert ProcessedRouteCatalog(legacy).routes_for_observation("root") == ["US_TEST_0"]
     assert ProcessedRouteCatalog(dest).route("US_TEST_0", include_tree=True)["tree"] == tree

@@ -14,7 +14,7 @@ from .condition_profiles import (
 
 
 FORWARD_LIBRARY_SCHEMA_VERSION = "1.0"
-FORWARD_PREDICTION_SCHEMA_VERSION = "1.2"
+FORWARD_PREDICTION_SCHEMA_VERSION = "1.3"
 FORWARD_ROUTE_ASSESSMENT_SCHEMA_VERSION = "1.4"
 
 ForwardDisposition = Literal[
@@ -76,6 +76,7 @@ class ForwardOperatorLibrary:
     definition_id: str = "forward_operator_library.v1"
     source_library_definition_id: str = ""
     schema_version: str = FORWARD_LIBRARY_SCHEMA_VERSION
+    source_stereo_match_version: str = ""
 
     def __post_init__(self) -> None:
         if self.schema_version != FORWARD_LIBRARY_SCHEMA_VERSION:
@@ -168,6 +169,7 @@ class ForwardSearchDiagnostics:
     valid_pathway_count: int = 0
     self_reaction_pathway_count: int = 0
     unique_product_count: int = 0
+    source_revalidation_failure_count: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
