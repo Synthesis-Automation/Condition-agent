@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Callable, Literal, Mapping, Protocol, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -194,6 +194,7 @@ def _build_evidence_packet(
                     "independent_reference_support": (
                         candidate.independent_reference_support
                     ),
+                    **({"migration_geometry": asdict(candidate.migration_geometry)} if candidate.migration_geometry else {}),
                     "selectivity_warnings": [
                         warning.to_dict() for warning in candidate.selectivity_warnings
                     ],

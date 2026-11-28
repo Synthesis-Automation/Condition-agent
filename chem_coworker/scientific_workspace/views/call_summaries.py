@@ -9,9 +9,11 @@ from typing import Any
 from .projection import (
     _COMMON,
     _COMPATIBILITY,
+    _MIGRATION_GEOMETRY,
     _PRECEDENT,
     _RECOMMENDATION,
     _Projection,
+    validity_migration_geometry,
 )
 
 
@@ -201,7 +203,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "realization_id", "target_smiles", "precursor_smiles", "proposed_reaction_smiles",
             "forward_validation_status", "independent_reference_support", "precedent_reaction_ids", "selectivity_warnings",
             "precursor_compatibility_disposition", "reaction_compatibility_disposition",
-            "bond_focus_check",
+            "bond_focus_check", "migration_geometry",
             "strategic_class", "strategic_complexity_score", "strategic_candidate",
         )
 
@@ -247,6 +249,10 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         ), path)
         validity = value.get("validity", {})
         if isinstance(validity, Mapping):
+            if geometry := validity_migration_geometry(validity):
+                summary["validity"]["migration_geometry"] = view.pick(
+                    geometry, _MIGRATION_GEOMETRY, f"{path}.validity.structural_assessment.compatibility_evidence.migration_geometry",
+                )
             for name in ("operator_precedent_support", "corpus_precedent_support"):
                 view.add_nested(summary["validity"], validity, name, (
                     "status", "strongest_level", "level_counts", "distinct_reference_count",
@@ -264,6 +270,11 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             result = view.pick(item, ("step_id", "structural_status", "compatibility", "recipe_status",
                                       "recipe_conflicts"), child)
             if isinstance(item, Mapping):
+                geometry = item.get("compatibility", {}).get("checks", {}).get("migration_geometry")
+                if isinstance(geometry, Mapping):
+                    result["compatibility"]["checks"]["migration_geometry"] = view.pick(
+                        geometry, _MIGRATION_GEOMETRY, f"{child}.compatibility.checks.migration_geometry",
+                    )
                 view.add_nested(result, item, "precedent", (
                     "status", "reason", "missing_indexes", "unverified_gates", "grade", "candidate_truncated",
                     "measured_evidence_status", "closest_match", "support_counts",

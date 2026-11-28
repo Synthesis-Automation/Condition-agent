@@ -437,6 +437,9 @@ class RichResponseRenderer:
                         for warning in candidate.selectivity_warnings
                     )
                 )
+            if candidate.migration_geometry:
+                details.append("\nMigration geometry\n", style="bold cyan")
+                details.append(candidate.migration_geometry.summary)
             self.console.print(
                 Panel(
                     details,

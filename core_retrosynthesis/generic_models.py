@@ -18,6 +18,7 @@ from reactive_taxonomy.strategic_complexity import (
 )
 
 from .models import CenterReactivityContext, TemplateContext
+from .migration_geometry import MigrationGeometryReview
 from .selectivity_poc import FunctionalGroupCompetitionWarning
 from .strategy_identity import build_strategy_id
 
@@ -440,6 +441,7 @@ class GenericDisconnectionCandidate:
     hierarchical_rank: int = 0
     hierarchical_ranking_definition_id: str = ""
     bond_focus_check: DisconnectionBondCheck | None = None
+    migration_geometry: MigrationGeometryReview | None = None
 
     def __post_init__(self) -> None:
         """Materialize and validate the handle-independent strategy identity."""

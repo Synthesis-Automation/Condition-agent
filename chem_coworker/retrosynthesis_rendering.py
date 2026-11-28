@@ -102,6 +102,8 @@ def render_retrosynthesis(response: RetrosynthesisResponse) -> str:
                         str(item.message) for item in candidate.selectivity_warnings
                     )
                 )
+            if candidate.migration_geometry:
+                lines.append("   " + candidate.migration_geometry.summary)
             if candidate.precursor_compatibility_disposition != "pass":
                 lines.append(
                     "   Precursor compatibility: "

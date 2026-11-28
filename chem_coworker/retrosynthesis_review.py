@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Callable, Dict, Literal, Mapping, Protocol, Sequence, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -262,6 +262,7 @@ def _evidence_packet(
                     candidate.precursor_compatibility_disposition
                 ),
                 "selectivity_warnings": warning_values,
+                **({"migration_geometry": asdict(candidate.migration_geometry)} if candidate.migration_geometry else {}),
                 "precursor_compatibility_assessments": compatibility_values,
                 "condition_evidence": {
                     "evidence_id": condition_id,

@@ -35,6 +35,7 @@ from .reaction_compatibility import (
     ReactionCompatibilityResult,
     assess_candidate_reaction_compatibility,
 )
+from .migration_geometry import MigrationGeometryReview, assess_migration_geometry
 from .selectivity_poc import (
     FUNCTIONAL_GROUP_COMPETITION_AUDIT_ID,
     FunctionalGroupCompetitionWarning,
@@ -262,6 +263,7 @@ class ExternalCompatibilityEvidence:
     precursor: PrecursorCompatibilityResult
     reaction: ReactionCompatibilityResult
     functional_group_competition: FunctionalGroupCompetitionWarning | None
+    migration_geometry: MigrationGeometryReview | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -818,6 +820,7 @@ def assess_external_retrosynthesis_proposal(
         precursor=precursor_compatibility,
         reaction=reaction_compatibility,
         functional_group_competition=selectivity.warning,
+        migration_geometry=assess_migration_geometry(normalized_mapped),
     )
     gates["precursor_compatibility"] = _compatibility_gate(
         "precursor_compatibility",

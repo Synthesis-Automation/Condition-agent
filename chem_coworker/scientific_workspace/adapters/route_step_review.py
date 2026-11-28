@@ -98,6 +98,10 @@ def review_steps(
                                "severity": issue.intrinsic_severity} for issue in group.assessments)
             if competition := compatibility.functional_group_competition:
                 alerts.append({"code": competition.code, "message": competition.message})
+            if geometry := compatibility.migration_geometry:
+                checks["migration_geometry"] = asdict(geometry)
+                if geometry.requires_caution:
+                    alerts.append({"code": geometry.audit_id, "message": geometry.summary})
         reviews.append({
             "step_id": step_id, "structural_status": assessment.status,
             "compatibility": {"checks": checks, "alerts": alerts},

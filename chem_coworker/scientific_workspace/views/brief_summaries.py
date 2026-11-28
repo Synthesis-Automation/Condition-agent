@@ -7,6 +7,8 @@ from itertools import islice
 import json
 from typing import Any
 
+from .projection import _MIGRATION_GEOMETRY, validity_migration_geometry
+
 
 def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
     """Project saved results directly; never count or select from an earlier preview."""
@@ -274,6 +276,9 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                     "strategic_class", "strategic_complexity_score", "strategic_candidate",
                 ))
                 complexity = strategy["representative"].get("strategic_complexity")
+                geometry = strategy["representative"].get("migration_geometry")
+                if isinstance(geometry, Mapping):
+                    item["representative"]["migration_geometry"] = _brief_fields(geometry, _MIGRATION_GEOMETRY)
                 if isinstance(complexity, Mapping):
                     item["representative"]["strategic_complexity"] = _brief_fields(complexity, (
                         "definition_id", "evidence", "graph_complexity_reduction_fraction",
@@ -292,11 +297,14 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
 
         overview.update(step_plausibility_summary(source))
     elif operation == "assess_retro_validity":
-        overview["validity"] = _brief_fields(source.get("validity", {}), (
+        validity = source.get("validity", {})
+        overview["validity"] = _brief_fields(validity, (
             "status", "structural_status", "precedent_grade", "evidence_rank", "suggested_action",
             "forward_status", "forward_execution_status", "cautions", "unresolved_checks", "warnings",
             "score_semantics", "ranking_influence",
         ))
+        if geometry := validity_migration_geometry(validity):
+            overview["validity"]["migration_geometry"] = _brief_fields(geometry, _MIGRATION_GEOMETRY)
         for name in ("operator_precedent_support", "corpus_precedent_support"):
             support = source.get("validity", {}).get(name)
             if isinstance(support, Mapping):
@@ -313,6 +321,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             reviews = source["step_reviews"]
             weakest = source.get("weakest_steps", {})
             priorities = set(weakest.get("step_ids", ())) | set(weakest.get("unassessed_precedent_step_ids", ()))
+            priorities.update(weakest.get("compatibility_alert_step_ids", ()))
             ordered = sorted(reviews, key=lambda item: item.get("step_id") not in priorities)
             overview["step_reviews"] = [_brief_step_review(item) for item in ordered[:3]]
             overview["step_review_count"] = len(reviews)
@@ -693,6 +702,9 @@ def _brief_step_review(review: Mapping[str, Any]) -> dict[str, Any]:
                    for name, check in compatibility.get("checks", {}).items()},
         **_brief_fields(compatibility, ("alerts",)),
     }
+    geometry = compatibility.get("checks", {}).get("migration_geometry")
+    if isinstance(geometry, Mapping):
+        result["compatibility"]["checks"]["migration_geometry"] = _brief_fields(geometry, _MIGRATION_GEOMETRY)
     precedent = review.get("precedent", {})
     summary = _brief_fields(precedent, (
         "status", "reason", "missing_indexes", "unverified_gates", "grade", "measured_evidence_status",

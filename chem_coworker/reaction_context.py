@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import Any, Callable
 
 from condition_recommender.reaction_context import (
@@ -111,6 +112,7 @@ def explore_reaction_context(
             ),
             "supporting_operator_ids": sorted({c.operator_id for c in group}),
             "selectivity_warnings": candidate.to_dict()["selectivity_warnings"],
+            **({"migration_geometry": asdict(candidate.migration_geometry)} if candidate.migration_geometry else {}),
             "forward_validation_status": candidate.forward_validation_status,
             "evidence_kind": "generated_hypothesis",
             "conditions": None,

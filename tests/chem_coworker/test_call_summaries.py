@@ -31,6 +31,17 @@ def _call(operation, result):
 
 
 @pytest.mark.parametrize("summarize", [summarize_call, summarize_call_brief])
+def test_disconnection_summary_shows_geometry_and_the_alternative_product(summarize):
+    geometry = {"status": "unspecified", "summary": "The cyclic oxime has unspecified C=N geometry.",
+                "alternative_product_smiles": "O=C1NCCCc2ccccc21", "audit_id": "cyclic_oxime_migration.v1"}
+    source = {"strategies": [{"strategy_rank": 1, "representative": {"migration_geometry": geometry}},
+                             {"strategy_rank": 2, "representative": {"precursor_smiles": "CCN"}}]}
+    strategies = summarize(_call("disconnect_target", source))["result_summary"]["strategies"]
+    assert strategies[0]["representative"]["migration_geometry"] == geometry
+    assert "migration_geometry" not in strategies[1]["representative"]
+
+
+@pytest.mark.parametrize("summarize", [summarize_call, summarize_call_brief])
 def test_disconnection_summary_retains_precursor_burden_without_reranking(summarize):
     complexity = {
         "definition_id": "strategic_complexity.v1", "evidence": "molecular_graph_only",

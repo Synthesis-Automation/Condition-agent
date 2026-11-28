@@ -7,10 +7,13 @@ import pytest
 from chem_coworker.scientific_workspace import InvestigationStore, ScientificWorkspace
 from chem_coworker.scientific_workspace.core.baseline import artifact_identity
 from chem_coworker.scientific_workspace.core.store import canonical_bytes
+from chem_coworker.scientific_workspace.views.call_summaries import summarize_call
+from chem_coworker.scientific_workspace.views.brief_summaries import summarize_call_brief
 from condition_recommender import assess_step_plausibility
 from condition_recommender.generic_indexing import build_generic_index
 from condition_recommender.shared_core_index import build_shared_core_index
 from condition_recommender.sqlite_indexing import load_sqlite_generic_index, save_sqlite_generic_index
+from core_retrosynthesis.chemistry import canonical_smiles
 from tests.chem_coworker import test_route_investigation_workspace as route_tests
 from tests.chem_coworker.test_route_investigation_workspace import call
 from tests.condition_recommender.test_shared_core_retrieval import record
@@ -19,6 +22,38 @@ from tests.core_retrosynthesis_tests.test_external_proposal_admission import _ro
 
 library = route_tests.library
 workspace = route_tests.workspace
+
+
+@pytest.mark.parametrize(("oxime", "status"), (
+    ("[CH2:3][C:4](=[N:5][OH:6])", "unspecified"),
+    (r"[CH2:3]/[C:4](=[N:5]\[OH:6])", "anti_aligned"),
+    ("[CH2:3]/[C:4](=[N:5]/[OH:6])", "syn_aligned"),
+))
+def test_step_and_route_surface_migration_geometry(workspace, oxime, status):
+    ring = "[c:7]2[cH:8][cH:9][cH:10][cH:11][c:12]21"
+    precursor = "[CH2:1]1[CH2:2]" + oxime + ring
+    product = "[CH2:1]1[CH2:2][CH2:3][C:4](=[O:6])[NH:5]" + ring
+    step = {"precursor_smiles": canonical_smiles(precursor), "target_smiles": canonical_smiles(product),
+            "mapped_reaction_smiles": precursor + ">>" + product}
+    _, single = call(workspace, "assess_route_step", proposal=step)
+    event, route = call(workspace, "assess_route_proposal", proposal={
+        "target_smiles": step["target_smiles"], "steps": [{"external_step_id": "closure", **step}],
+    })
+    check = single["step_review"]["compatibility"]
+    assert route["step_reviews"][0]["compatibility"] == check
+    geometry = check["checks"]["migration_geometry"]
+    assert geometry["status"] == status
+    assert geometry["alternative_product_smiles"] == "O=C1NCCCc2ccccc21"
+    assert check["checks"]["functional_group_selectivity"]["status"] == "out_of_scope"
+    flagged = status in {"unspecified", "syn_aligned"}
+    assert any(alert.get("code") == geometry["audit_id"] for alert in check["alerts"]) == flagged
+    assert ("closure" in route["weakest_steps"]["compatibility_alert_step_ids"]) == flagged
+    summary = workspace.call_summary(event)["result_summary"]["step_reviews"][0]
+    assert summary["compatibility"]["checks"]["migration_geometry"] == geometry
+    validity_event, _ = call(workspace, "assess_retro_validity", source_ref=event.artifact_ref, step_id="closure")
+    payload = workspace.store.read_artifact(validity_event.artifact_ref)
+    for project in (summarize_call, summarize_call_brief):
+        assert project(payload)["result_summary"]["validity"]["migration_geometry"] == geometry
 
 
 def test_replay_preserves_selected_route_step_and_complete_domain_evidence(

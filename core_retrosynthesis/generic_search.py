@@ -52,6 +52,7 @@ from .ranking_policy import (
     structural_score_bands,
 )
 from .search import _forward_analysis
+from .migration_geometry import assess_migration_geometry
 from .selectivity_poc import (
     FunctionalGroupCompetitionWarning,
     detect_functional_group_competition,
@@ -415,6 +416,7 @@ def disconnect_generic_target_detailed(
             bond_focus_check=focus_check,
             condition_query_reaction_smiles=mapped_proposed,
             selectivity_warnings=_selectivity_warnings(mapped_proposed),
+            migration_geometry=assess_migration_geometry(mapped_proposed),
             precursor_compatibility_assessments=compatibility.assessments,
             precursor_compatibility_disposition=compatibility.disposition,
             precursor_compatibility_warning_strength=compatibility.warning_strength,

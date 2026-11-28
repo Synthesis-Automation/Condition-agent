@@ -105,18 +105,18 @@ class ScientificOperations:
                             required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("propose_condition_adaptation", evidence_arguments=("source_ref", "evidence_refs")),
         OperationDefinition(
-            "disconnect_target", contract_version="3", required_artifacts=("retro_library",),
+            "disconnect_target", contract_version="4", required_artifacts=("retro_library",),
             usage_policy=(
                 "Retrosynthesis in this workspace uses single-step calls; the agent owns "
                 "multi-step planning. Do not invoke the built-in multistep planner, "
                 "including through custom Python scripts."
             ),
         ),
-        OperationDefinition("assess_route_step", contract_version="3", required_artifacts=("retro_library",),
+        OperationDefinition("assess_route_step", contract_version="4", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
         OperationDefinition("assess_step_plausibility", contract_version="2", required_artifacts=("condition_index", "shared_core_index"),
                             evidence_arguments=("source_ref",)),
-        OperationDefinition("assess_retro_validity", contract_version="5", required_artifacts=("retro_library",),
+        OperationDefinition("assess_retro_validity", contract_version="6", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "forward_ref", "evidence_refs"),
                             usage_policy="Assess concrete realizations; ordinal evidence is not success probability. "
                             "Use a saved bounded forward check only for consequential uncertainties."),
@@ -128,7 +128,7 @@ class ScientificOperations:
                 "steps; inspect both reactions and conditions before selecting a route."
             ),
         ),
-        OperationDefinition("assess_route_proposal", contract_version="3", required_artifacts=("retro_library",),
+        OperationDefinition("assess_route_proposal", contract_version="4", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
         OperationDefinition("assess_route_step_forward", required_artifacts=("forward_library",),
                             evidence_arguments=("source_ref",), execution_status_field="execution_status",
@@ -137,7 +137,7 @@ class ScientificOperations:
         OperationDefinition("inspect_route_step", contract_version="2", evidence_arguments=("source_ref",)),
         OperationDefinition("inspect_step_precedents", contract_version="5", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref",)),
-        OperationDefinition("revise_route_branch", contract_version="3", required_artifacts=("retro_library",),
+        OperationDefinition("revise_route_branch", contract_version="4", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "evidence_refs"), result_evidence_field="evidence_refs"),
         OperationDefinition("compare_route_proposals", contract_version="3", evidence_arguments=("source_refs",)),
     )

@@ -44,6 +44,16 @@ _PRECEDENT = (
     "admission_status", "product_similarity", "precursor_similarity",
 )
 
+_MIGRATION_GEOMETRY = ("audit_id", "status", "summary", "alternative_product_smiles")
+
+
+def validity_migration_geometry(validity: Mapping[str, Any]) -> Mapping[str, Any] | None:
+    """Read the structural review from current and historical validity payloads."""
+    assessment = validity.get("structural_assessment") or {}
+    compatibility = assessment.get("compatibility_evidence") or {}
+    return compatibility.get("migration_geometry")
+
+
 class _Projection:
     """Per-call bounds and inspection metadata; never retains mutable globals."""
 
@@ -178,6 +188,9 @@ class _Projection:
                     self.add_nested(compact, evidence, "functional_group_competition", (
                         "code", "message", "assessment_mode", "conditions_evaluated", "ranking_impact",
                     ), f"{path}.compatibility_evidence")
+                    if evidence.get("migration_geometry"):
+                        self.add_nested(compact, evidence, "migration_geometry", _MIGRATION_GEOMETRY,
+                                        f"{path}.compatibility_evidence")
                     summary["compatibility_evidence"] = compact
                 else:
                     summary["compatibility_evidence"] = self.value(evidence, f"{path}.compatibility_evidence")

@@ -1309,6 +1309,14 @@ is accepted through the operation dispatcher.
 | `revise_route_branch` | Core explicit route edit plus complete reassessment; `source_ref`, `remove_step_ids`, `replacement_steps`, `reason`, `risks`, optional `assumptions`, `evidence_refs` | Preserves the source, inherits material constraints and condition settings, reassesses all steps and topology. Optional forward challenges are separate and not inherited. Empty removals can extend a leaf branch. No automatic improvement or admission claim. |
 | `compare_route_proposals` | Recorded results for 2–5 `source_refs` | Compares alternatives for the same target under the same settings. Shows shared exact reactions and independently traces shared constructed bonds into the final target, including when donors or step depths differ. Each route lists its entry fragments, weakest steps and unresolved assignments. |
 
+For a mapped cyclic ketoxime ring expansion, `migration_geometry` checks the
+ring carbon that moves to nitrogen and reports the lactam that the other
+migration would give when it has distinct connectivity. An unspecified C=N
+geometry leaves the migration unresolved. For an explicitly drawn oxime, the
+review compares the migrating bond with the oxime O across C=N. Anti alignment
+is consistent with the conventional migration. Substrate preparation,
+isomerization and the observed product distribution need separate evidence.
+
 For an absolute R/S assignment, inspect the submitted precursor and product
 with `inspect_reactive_sites`. The mapped reaction signature in release
 `05fd3b97e436c3ba79147e26` can record a different CIP descriptor. For example,

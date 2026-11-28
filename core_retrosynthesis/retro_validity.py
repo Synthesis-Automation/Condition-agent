@@ -311,6 +311,9 @@ def assess_retro_validity(
             hard_conflict |= item.disposition == "reject"
         if compatibility.functional_group_competition:
             cautions.add(compatibility.functional_group_competition.code)
+        geometry = compatibility.migration_geometry
+        if geometry and geometry.requires_caution:
+            cautions.add(geometry.summary)
     else:
         unresolved.add("compatibility")
     for support in (operator_support, corpus):

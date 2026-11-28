@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, replace
 from io import StringIO
 import json
 
@@ -35,7 +35,9 @@ from chem_coworker.retrosynthesis_review import (
     RetrosynthesisCandidatePayload,
     RetrosynthesisReviewPayload,
     RetrosynthesisReviewTransportResult,
+    _evidence_packet,
 )
+from core_retrosynthesis.migration_geometry import MigrationGeometryReview
 from tests.core_retrosynthesis_tests import test_focused_disconnection
 
 library = test_focused_disconnection.library
@@ -312,6 +314,18 @@ def test_llm_review_can_reorder_but_not_modify_validated_strategies() -> None:
     ))
     assert "2 template references" in answer and "precedent-1" in answer
     assert "only-for-alternate" not in answer
+
+
+def test_reviewer_packet_keeps_the_geometry_of_the_selected_oxime() -> None:
+    geometry = MigrationGeometryReview("unspecified", "The cyclic oxime has unspecified C=N geometry.",
+                                      "O=C1NCCCc2ccccc21")
+    precursor = "ON=C1CCCc2ccccc21"
+    product = "O=C1CCCc2ccccc2N1"
+    candidate = replace(_candidate(1, precursor=precursor), target_smiles=product,
+                        proposed_reaction_smiles=f"{precursor}>>{product}", migration_geometry=geometry)
+    group = group_strategy_candidates((candidate,), top_k_strategies=1)
+    packet, *_ = _evidence_packet(group, (), ConditionReviewSettings(mode="always"))
+    assert packet["strategies"][0]["migration_geometry"] == asdict(geometry)
 
 
 def test_llm_review_rejects_invented_evidence() -> None:
