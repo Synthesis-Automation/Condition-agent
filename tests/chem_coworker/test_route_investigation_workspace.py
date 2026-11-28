@@ -116,6 +116,18 @@ def test_branch_revision_rechecks_preserved_downstream_step_and_replays_after_re
         {"source_ref": source.artifact_ref, "step_id": "step-2"},
         {"source_ref": revision.artifact_ref, "step_id": "step-2"},
     ]
+    shared_bonds = table["shared_constructions"]
+    assert len(shared_bonds) == 2
+    assert {
+        tuple((item["source_ref"], item["step_id"]) for item in bond["occurrences"])
+        for bond in shared_bonds
+    } == {
+        ((source.artifact_ref, step_id), (revision.artifact_ref, step_id))
+        for step_id in ("step-1", "step-2")
+    }
+    for alternative in table["alternatives"]:
+        assert len(alternative["key_constructions"]) == 2
+        assert alternative["unresolved_construction_step_ids"] == []
     brief = reopened.call_summary(compare)["result_summary"]
     assert brief["shared_exact_step_count"] == 1
     assert brief["shared_exact_steps"][0]["occurrences"] == table["shared_exact_steps"][0]["occurrences"]
@@ -163,6 +175,7 @@ def test_exact_step_comparison_uses_directed_graph_pairs_across_distinct_routes(
     assert other["route_specific_step_ids"] == ["other", "repeat"]
     assert other["uncomparable_step_ids"] == ["same-id"]
     assert left["status"] == right["status"] == "invalid"
+    assert result["shared_constructions"] == []
 
 
 def test_unsupported_revision_remains_inspectable_and_noop_is_an_error(workspace) -> None:

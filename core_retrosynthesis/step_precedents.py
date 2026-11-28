@@ -7,7 +7,7 @@ from typing import Any, Iterable, TYPE_CHECKING
 
 from .chemistry import digest, maximum_similarity
 from .generic_compiler import template_source_verified
-from .generic_models import GenericTemplateLibrary
+from .generic_models import GenericCoreTemplate, GenericTemplateLibrary
 
 if TYPE_CHECKING:
     from .multistep import RetrosynthesisRouteStep
@@ -96,12 +96,25 @@ def lookup_reaction_precedents(
 ) -> StepPrecedentLookupResult:
     """Look up admitted precedents from a persisted planned reaction node."""
 
-    if limit < 1 or limit > 20:
-        raise ValueError("step precedent limit must be between one and twenty")
     template = next(
         (item for item in library.templates if item.template_id == template_id),
         None,
     )
+    return _lookup_template_precedents(
+        template=template, step_id=step_id, operator_id=operator_id, product_smiles=product_smiles,
+        precursor_smiles=precursor_smiles, library=library, admitted_reaction_ids=admitted_reaction_ids,
+        limit=limit,
+    )
+
+
+def _lookup_template_precedents(
+    *, template: GenericCoreTemplate | None, step_id: str, operator_id: str, product_smiles: str,
+    precursor_smiles: str, library: GenericTemplateLibrary, admitted_reaction_ids: Iterable[str] = (),
+    limit: int,
+) -> StepPrecedentLookupResult:
+    """Rank the retained, source-verified witnesses of a template resolved from the library."""
+    if limit < 1 or limit > 20:
+        raise ValueError("step precedent limit must be between one and twenty")
     if template is None:
         raise ValueError("route step template is unavailable in the loaded library")
     if template.operator_id != operator_id:

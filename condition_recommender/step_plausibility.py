@@ -149,6 +149,7 @@ class StepPlausibilityAssessment:
     index_source_identity: str
     shared_core_definition_hash: str | None
     schema_version: str = "step_plausibility.v2"
+    closest_match: StepPlausibilityMatch | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return source-linked evidence and the rules that assigned its grade."""
@@ -219,18 +220,20 @@ def _source_groups(
     return {reference: representative(reference) for reference in parents}
 
 
+def _structural_priority(match: StepPlausibilityMatch) -> tuple:
+    """Order qualified observations by the existing partner, context and core criteria."""
+    row = match.precedent
+    similarity = match.context.minimum_partner_similarity
+    return (not match.structurally_comparable, not match.context_covered_close,
+            _LEVELS.index(row.level), -(similarity if similarity is not None else -1),
+            row.reference_id, row.reaction_id, row.observation_id or "", row.reaction_smiles)
+
+
 def _display_sample(
     matches: list[StepPlausibilityMatch], limit: int,
 ) -> tuple[StepPlausibilityMatch, ...]:
     """Show a matched counterexample early and avoid filling the page with one report."""
-    def priority(m: StepPlausibilityMatch) -> tuple:
-        row = m.precedent
-        similarity = m.context.minimum_partner_similarity
-        return (not m.structurally_comparable, not m.context_covered_close,
-                _LEVELS.index(row.level), -(similarity if similarity is not None else -1),
-                row.reference_id, row.reaction_id, row.observation_id or "", row.reaction_smiles)
-
-    ordered = sorted(range(len(matches)), key=lambda i: priority(matches[i]))
+    ordered = sorted(range(len(matches)), key=lambda i: _structural_priority(matches[i]))
     first_support: dict[str, int] = {}
     adverse = []
     for i in ordered:
@@ -396,6 +399,7 @@ def _assess_step_and_pool(
     if query.status != "resolved":
         warnings.add("QUERY_FUNCTIONAL_CONTEXT_UNRESOLVED")
     assessment = StepPlausibilityAssessment(
+        closest_match=min(matches, key=_structural_priority, default=None),
         grade=grade, evidence_rank=dict(policy.ranks)[grade], strongest_level=pool.strongest_level,
         measured_evidence_status=measured_status, query_reaction_smiles=reaction_smiles,
         candidate_count=pool.candidate_count, qualified_count=pool.qualified_count,

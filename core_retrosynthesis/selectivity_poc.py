@@ -19,7 +19,7 @@ import math
 from dataclasses import asdict, dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Sequence, Tuple
+from typing import Any, Dict, Iterable, Literal, Mapping, Sequence, Tuple
 
 from condition_registry import CONDITION_RECIPE_COMPONENT_BUCKETS
 from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
@@ -185,6 +185,19 @@ class FunctionalGroupCompetitionWarning:
 
 
 @dataclass(frozen=True)
+class FunctionalGroupSelectivityScreen:
+    """Coverage and findings of the structural endpoint screen for one reaction."""
+
+    status: Literal["pass", "warn", "out_of_scope", "unresolved"]
+    summary: str
+    warning: FunctionalGroupCompetitionWarning | None = None
+
+
+class _OutsideEndpointTopology(ValueError):
+    """Observed graph edits fall outside the endpoint replacement model."""
+
+
+@dataclass(frozen=True)
 class ReactionChoiceSet:
     """Observed selection and all structurally available competing endpoints."""
 
@@ -285,6 +298,10 @@ def _single_connection_replacement(analysis: Any) -> tuple[Any, Any, Any]:
     observation = analysis.observation
     if observation is None or not observation.valid:
         raise ValueError("reaction does not have a valid graph observation")
+    if not observation.edits:
+        raise ValueError(
+            "no graph edits could establish the one formed and one broken bond required for endpoint screening"
+        )
     formed = tuple(
         edit
         for edit in observation.edits
@@ -296,14 +313,18 @@ def _single_connection_replacement(analysis: Any) -> tuple[Any, Any, Any]:
         if edit.edit_type == "broken" and edit.atom_1 and edit.atom_2
     )
     if len(formed) != 1 or len(broken) != 1:
-        raise ValueError(
-            "selectivity POC requires one formed and one broken heavy-atom bond"
+        raise _OutsideEndpointTopology(
+            "Endpoint screening requires one formed and one broken heavy-atom bond."
+        )
+    if any(edit.edit_type == "order_changed" for edit in observation.edits):
+        raise _OutsideEndpointTopology(
+            "Endpoint screening does not cover an additional heavy-atom bond-order change."
         )
     formed_atoms = {_atom_key(formed[0].atom_1), _atom_key(formed[0].atom_2)}
     broken_atoms = {_atom_key(broken[0].atom_1), _atom_key(broken[0].atom_2)}
     shared = formed_atoms.intersection(broken_atoms)
     if len(shared) != 1:
-        raise ValueError("formed and broken bonds must share one endpoint")
+        raise _OutsideEndpointTopology("The formed and broken bonds must share one endpoint.")
     electrophile_key = next(iter(shared))
     electrophile = next(
         atom
@@ -750,20 +771,17 @@ def _competition_outcome(
 
 
 @lru_cache(maxsize=20_000)
-def detect_functional_group_competition(
+def assess_functional_group_selectivity(
     reaction_smiles: str,
-) -> FunctionalGroupCompetitionWarning | None:
-    """Return a review-only warning for distinct alternative endpoint products.
-
-    Unsupported edit topologies do not produce a warning. This audit uses only
-    graph-derived endpoint availability; it deliberately does not estimate
-    condition-dependent selectivity and cannot affect retrosynthesis ranking.
-    """
+) -> FunctionalGroupSelectivityScreen:
+    """Screen supported endpoint replacements and retain reasons for incomplete checks."""
 
     try:
         choice_set = build_reaction_choice_set(reaction_smiles, ())
-    except ValueError:
-        return None
+    except _OutsideEndpointTopology as exc:
+        return FunctionalGroupSelectivityScreen("out_of_scope", str(exc))
+    except (ValueError, RuntimeError) as exc:
+        return FunctionalGroupSelectivityScreen("unresolved", f"Endpoint screening was unresolved: {exc}")
     selected = choice_set.selected_candidate
     competitors = tuple(
         candidate
@@ -772,7 +790,9 @@ def detect_functional_group_competition(
         and candidate.product_smiles != selected.product_smiles
     )
     if not competitors:
-        return None
+        return FunctionalGroupSelectivityScreen(
+            "pass", "No distinct alternative product was found among the screened endpoints."
+        )
     competitor_elements = ", ".join(
         sorted({candidate.element for candidate in competitors})
     )
@@ -786,7 +806,7 @@ def detect_functional_group_competition(
         "This is a screening warning only; reaction conditions and relative "
         "outcome probabilities have not been evaluated."
     )
-    return FunctionalGroupCompetitionWarning(
+    warning = FunctionalGroupCompetitionWarning(
         code="POSSIBLE_FUNCTIONAL_GROUP_COMPETITION",
         message=message,
         selected_outcome=_competition_outcome(selected),
@@ -794,6 +814,15 @@ def detect_functional_group_competition(
             _competition_outcome(candidate) for candidate in competitors
         ),
     )
+    return FunctionalGroupSelectivityScreen("warn", message, warning)
+
+
+def detect_functional_group_competition(
+    reaction_smiles: str,
+) -> FunctionalGroupCompetitionWarning | None:
+    """Return the advisory warning for callers that only display detected alternatives."""
+
+    return assess_functional_group_selectivity(reaction_smiles).warning
 
 
 def _hashed_index(token: str, feature_dimension: int) -> tuple[int, float]:
@@ -1046,12 +1075,14 @@ class ConditionalEditChoiceModel:
 __all__ = [
     "ChoiceModelTrainingReport",
     "ConditionalEditChoiceModel",
+    "FunctionalGroupSelectivityScreen",
     "RankedReactionOutcome",
     "ReactionChoiceSet",
     "ReactionOutcomeCandidate",
     "SELECTIVITY_POC_MODEL_ID",
     "SELECTIVITY_POC_SCHEMA_VERSION",
     "SelectivityAssessment",
+    "assess_functional_group_selectivity",
     "build_reaction_choice_set",
     "build_reaction_choice_set_from_record",
     "condition_tokens_from_mapping",

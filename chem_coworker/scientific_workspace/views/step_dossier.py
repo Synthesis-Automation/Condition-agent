@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 
 from ..adapters.step_selection import SOURCE_OPERATIONS, _call, _selection
+from ..adapters.route_step_review import compact_precedent
 from ..core.store import InvestigationEvent
 from .step_assessments import answer_step_assessments
 
@@ -28,18 +29,7 @@ def step_plausibility_summary(result: Mapping[str, Any]) -> dict[str, Any]:
         "zero_yield_count", "unreported_yield_count", "unknown_yield_count",
     )}
     if assessment["matches"]:
-        match = assessment["matches"][0]
-        row, context = match["precedent"], match["context"]
-        first = {key: row[key] for key in ("reference_id", "reaction_id", "observation_id", "reaction_smiles", "level")}
-        first.update(source_yield_pct=row["yield_pct"], outcome=match["outcome"],
-                     contributes_to_support=match["contributes_to_support"],
-                     differences=row["differences"][:3], difference_count=len(row["differences"]))
-        first["context"] = {key: context[key] for key in ("status", "reverse_status", "minimum_partner_similarity")}
-        for key in ("missing", "unresolved", "source_only", "source_unresolved"):
-            first["context"][key] = context[key][:3]
-            if len(context[key]) > 3:
-                first["context"][f"{key}_count"] = len(context[key])
-        summary["first_match"] = first
+        summary["first_match"] = compact_precedent(assessment["matches"][0])
     return summary
 
 
@@ -74,6 +64,14 @@ def step_dossier(
     source_summary = workspace.call_summary(source_ref)
     linked = workspace.batch_summary(list(evidence_refs)) if evidence_refs else None
     assessments = answer_step_assessments(store, answer)["step"]
+    recorded = payload["result"]
+    if step_id is None:
+        embedded = recorded.get("step_review")
+    else:
+        matches = [item for item in recorded.get("step_reviews", ()) if item["step_id"] == step_id]
+        embedded = matches[0] if len(matches) == 1 else None
+    if embedded is not None:
+        assessments["embedded_step_review"] = {"source_ref": source_ref, **embedded}
     assessments["step_plausibility"] = []
     if evidence_refs:
         cited = set(evidence_refs)

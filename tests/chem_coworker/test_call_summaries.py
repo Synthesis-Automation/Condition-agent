@@ -52,6 +52,39 @@ def test_disconnection_summary_retains_precursor_burden_without_reranking(summar
     assert result == original
 
 
+@pytest.mark.parametrize("summarize", [summarize_call_brief, summarize_call])
+def test_route_summary_keeps_step_scope_and_closest_adverse_precedent(summarize):
+    step = {"step_id": "amide", "structural_status": "actionable", "recipe_status": "not_supplied",
+            "compatibility": {"checks": {"functional_group_selectivity": {"status": "out_of_scope"}}},
+            "precedent": {"status": "assessed", "grade": "context_supported", "candidate_truncated": True,
+                          "closest_match": {"reaction_id": "r1", "reference_id": "paper1", "source_yield_pct": 0,
+                                            "context": {"status": "missing", "missing": ["phenol on reacting partner"]}}}}
+    call = _call("assess_route_proposal", {
+        "step_reviews": [step], "weakest_steps": {"basis": "lowest_assessed_precedent_grade", "step_ids": ["amide"]},
+        "construction_review": {"key_constructions": [], "leaf_smiles": ["CCN"], "unresolved_construction_step_ids": ["amide"]},
+    })
+    result = summarize(call)["result_summary"]
+    assert result["weakest_steps"]["step_ids"] == ["amide"]
+    assert result["construction_review"]["leaf_smiles"] == ["CCN"]
+    row, = result["step_reviews"]
+    assert row["step_id"] == "amide"
+    assert "out_of_scope" in str(row["compatibility"]["checks"])
+    assert row["precedent"]["candidate_truncated"]
+    assert row["precedent"]["closest_match"]["source_yield_pct"] == 0
+    assert row["precedent"]["closest_match"]["context"]["missing"] == ["phenol on reacting partner"]
+
+
+def test_compact_route_comparison_preserves_equivalent_target_bond_locations():
+    bond = {"bond_id": "b", "elements": ["C", "C"], "target_atom_indices": [0, 1],
+            "equivalent_target_atom_pairs": [[0, 1], [1, 2]]}
+    brief = summarize_call_brief(_call("compare_route_proposals", {
+        "shared_constructions": [bond], "alternatives": [{"key_constructions": [{**bond, "step_id": "one"}]}],
+    }))["result_summary"]
+    for shown in (brief["shared_constructions"][0], brief["alternatives"][0]["key_constructions"][0]):
+        assert shown["equivalent_site_count"] == 2
+        assert shown["equivalent_target_atom_pairs"] == [[0, 1], [1, 2]]
+
+
 def test_recipe_summary_exposes_coverage_without_reading_complete_artifact() -> None:
     assessment = asdict(assess_reaction_recipe("CCBr.N>>CCN", {
         "solvents": [{"identity_status": "resolved", "substance_id": "cas:64-17-5"}],

@@ -50,6 +50,14 @@ def test_display_limit_does_not_change_repeated_support(tmp_path):
     assert len(result.matches) == 1
 
 
+def test_closest_qualified_observation_can_be_adverse_and_outside_display(tmp_path):
+    result = evaluate(tmp_path, [Source("A", 0), Source("B", 60, "recipe-B")], match_limit=1)
+    assert result.matches[0].precedent.reference_id == "B"
+    assert result.closest_match.precedent.reference_id == "A"
+    assert result.closest_match.outcome == "zero_yield"
+    assert not result.closest_match.contributes_to_support
+
+
 def test_same_reference_and_copied_experiment_do_not_inflate_depth(tmp_path):
     result = evaluate(tmp_path, [Source("paper-A", 61), Source("paper-A", 73),
                                  Source("translation-of-A", 73)])

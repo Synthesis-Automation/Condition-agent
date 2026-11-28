@@ -112,11 +112,11 @@ class ScientificOperations:
                 "including through custom Python scripts."
             ),
         ),
-        OperationDefinition("assess_route_step", contract_version="2", required_artifacts=("retro_library",),
+        OperationDefinition("assess_route_step", contract_version="3", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
-        OperationDefinition("assess_step_plausibility", required_artifacts=("condition_index", "shared_core_index"),
+        OperationDefinition("assess_step_plausibility", contract_version="2", required_artifacts=("condition_index", "shared_core_index"),
                             evidence_arguments=("source_ref",)),
-        OperationDefinition("assess_retro_validity", contract_version="4", required_artifacts=("retro_library",),
+        OperationDefinition("assess_retro_validity", contract_version="5", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "forward_ref", "evidence_refs"),
                             usage_policy="Assess concrete realizations; ordinal evidence is not success probability. "
                             "Use a saved bounded forward check only for consequential uncertainties."),
@@ -128,18 +128,18 @@ class ScientificOperations:
                 "steps; inspect both reactions and conditions before selecting a route."
             ),
         ),
-        OperationDefinition("assess_route_proposal", contract_version="2", required_artifacts=("retro_library",),
+        OperationDefinition("assess_route_proposal", contract_version="3", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
         OperationDefinition("assess_route_step_forward", required_artifacts=("forward_library",),
                             evidence_arguments=("source_ref",), execution_status_field="execution_status",
                             replay_comparison="scientific_result_and_stage_outcomes_excluding_forward_execution_telemetry",
                             replay_projection=_forward_replay_result),
-        OperationDefinition("inspect_route_step", evidence_arguments=("source_ref",)),
+        OperationDefinition("inspect_route_step", contract_version="2", evidence_arguments=("source_ref",)),
         OperationDefinition("inspect_step_precedents", contract_version="5", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref",)),
-        OperationDefinition("revise_route_branch", contract_version="2", required_artifacts=("retro_library",),
+        OperationDefinition("revise_route_branch", contract_version="3", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "evidence_refs"), result_evidence_field="evidence_refs"),
-        OperationDefinition("compare_route_proposals", contract_version="2", evidence_arguments=("source_refs",)),
+        OperationDefinition("compare_route_proposals", contract_version="3", evidence_arguments=("source_refs",)),
     )
 
     def __init__(self, store: InvestigationStore, *, fragment_worker: FragmentWorker | None = None,
@@ -783,6 +783,8 @@ class ScientificOperations:
         Instead of copying a mapping, saved_candidate={source_ref, realization_id,
         strategy_id} reuses that exact disconnection's reconstruction and revalidates
         it. Keep target_smiles/precursor_smiles; they must match the saved candidate.
+        step_review reports compatibility coverage, supplied-recipe conflicts
+        and the closest graph-qualified precedent when both corpus indexes are pinned.
         """
         from .route_investigation import assess_step
 
@@ -798,6 +800,8 @@ class ScientificOperations:
         Preserve unsupported steps as hypotheses. Declared unavailable starting
         materials are graph-matched against route leaves; this is not a stock lookup.
         The returned artifact is the source_ref for inspection, revision and comparison.
+        construction_review traces formed bonds into the final target. step_reviews
+        and weakest_steps identify the supporting evidence and outstanding gaps.
         include_forward must remain False; use assess_route_step_forward only
         for a consequential uncertainty in one eligible saved step.
         Each step may include saved_candidate={source_ref, realization_id, strategy_id}
@@ -938,7 +942,7 @@ class ScientificOperations:
         return revise_branch(self, source_ref, remove_step_ids, replacement_steps, reason, evidence_refs, assumptions, risks)
 
     def compare_route_proposals(self, source_refs: list[str]) -> dict[str, Any]:
-        """Compare 2–5 recorded alternatives for the same target, checks and constraints; no automatic winner."""
+        """Compare 2–5 recorded alternatives by shared target bonds, exact steps, leaves and weakest steps."""
         from .route_investigation import compare_routes
 
         return compare_routes(self, source_refs)

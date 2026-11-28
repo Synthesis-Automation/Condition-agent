@@ -27,6 +27,8 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             overview = result["result_summary"]
             checks = payload["assessments"]
             overview["assessment_status"] = checks["status"]
+            if "embedded_step_review" in checks:
+                overview["embedded_step_review"] = _brief_step_review(checks["embedded_step_review"])
             for name in ("structural_assessments", "recipe_assessments"):
                 overview[name] = [_brief_fields(item, (
                     "artifact_ref", "status", "admission_eligible", "recipe_id", "hard_conflicts",
@@ -305,6 +307,20 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         overview["artifact_warnings"] = source.get("artifact_warnings", [])
         overview["corpus_availability"] = source.get("corpus_availability", {})
     elif operation in {"assess_route_step", "inspect_route_step", "assess_route_proposal", "revise_route_branch"}:
+        if isinstance(source.get("step_review"), Mapping):
+            overview["step_review"] = _brief_step_review(source["step_review"])
+        if "step_reviews" in source:
+            reviews = source["step_reviews"]
+            weakest = source.get("weakest_steps", {})
+            priorities = set(weakest.get("step_ids", ())) | set(weakest.get("unassessed_precedent_step_ids", ()))
+            ordered = sorted(reviews, key=lambda item: item.get("step_id") not in priorities)
+            overview["step_reviews"] = [_brief_step_review(item) for item in ordered[:3]]
+            overview["step_review_count"] = len(reviews)
+            overview["weakest_steps"] = _brief_fields(weakest, (
+                "basis", "step_ids", "ambiguous_step_ids", "unassessed_precedent_step_ids", "compatibility_alert_step_ids",
+            ))
+        if isinstance(source.get("construction_review"), Mapping):
+            overview["construction_review"] = _brief_constructions(source["construction_review"])
         assessment = source.get("assessment")
         if isinstance(assessment, Mapping):
             overview["assessment"] = _brief_fields(assessment, (
@@ -424,9 +440,9 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         alternatives = source.get("alternatives", [])
         overview["alternative_count"] = len(alternatives)
         overview["alternatives"] = [
-            _brief_fields(item, ("status", "source_ref", "route_id", "step_count",
+            {**_brief_fields(item, ("status", "source_ref", "route_id", "step_count",
                                  "unresolved_step_ids", "route_specific_step_ids", "uncomparable_step_ids",
-                                 "limitations"))
+                                 "weakest_steps", "limitations")), **_brief_constructions(item)}
             for item in alternatives[:5] if isinstance(item, Mapping)
         ]
         if "shared_exact_steps" in source:
@@ -435,6 +451,10 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             overview["shared_exact_steps"] = [
                 _brief_fields(step, ("precursor_smiles", "target_smiles", "occurrences")) for step in shared[:3]
             ]
+        if "shared_constructions" in source:
+            bonds = source["shared_constructions"]
+            overview["shared_construction_count"] = len(bonds)
+            overview["shared_constructions"] = [_brief_bond(bond) for bond in bonds[:3]]
     elif operation == "propose_condition_adaptation":
         overview.update(_brief_fields(source, ("transfer_status", "assumptions", "risks")))
         if isinstance(source.get("compatibility"), Mapping):
@@ -646,6 +666,56 @@ def _brief_fields(
         else:
             selected[key] = value
     return selected
+
+def _brief_constructions(inventory: Mapping[str, Any]) -> dict[str, Any]:
+    result = _brief_fields(inventory, ("leaf_smiles", "unresolved_construction_step_ids"))
+    if "key_constructions" in inventory:
+        bonds = inventory["key_constructions"]
+        result["key_construction_count"] = len(bonds)
+        result["key_constructions"] = [_brief_bond(bond) for bond in bonds[:3]]
+    return result
+
+
+def _brief_bond(bond: Mapping[str, Any]) -> dict[str, Any]:
+    result = _brief_fields(bond, ("step_id", "bond_id", "elements", "bond_type", "target_atom_indices", "occurrences"))
+    if "equivalent_target_atom_pairs" in bond:
+        pairs = bond["equivalent_target_atom_pairs"]
+        result["equivalent_target_atom_pairs"] = pairs[:3]
+        result["equivalent_site_count"] = len(pairs)
+    return result
+
+
+def _brief_step_review(review: Mapping[str, Any]) -> dict[str, Any]:
+    result = _brief_fields(review, ("step_id", "structural_status", "recipe_status", "recipe_conflicts"))
+    compatibility = review.get("compatibility", {})
+    result["compatibility"] = {
+        "checks": {name: _brief_fields(check, ("status",) if check.get("status") == "pass" else ("status", "summary"))
+                   for name, check in compatibility.get("checks", {}).items()},
+        **_brief_fields(compatibility, ("alerts",)),
+    }
+    precedent = review.get("precedent", {})
+    summary = _brief_fields(precedent, (
+        "status", "reason", "missing_indexes", "unverified_gates", "grade", "measured_evidence_status",
+        "candidate_truncated",
+    ))
+    if isinstance(precedent.get("support_counts"), Mapping):
+        summary["support_counts"] = _brief_fields(precedent["support_counts"], (
+            "comparable_observation_count", "supporting_source_group_count", "zero_yield_count", "low_yield_count",
+        ))
+    match = precedent.get("closest_match")
+    if isinstance(match, Mapping):
+        closest = _brief_fields(match, (
+            "reaction_id", "reference_id", "observation_id", "reaction_smiles", "level",
+            "source_yield_pct", "outcome", "contributes_to_support", "differences", "difference_count",
+        ))
+        closest["context"] = _brief_fields(match.get("context", {}), (
+            "status", "reverse_status", "minimum_partner_similarity", "missing", "unresolved", "source_only",
+            "source_unresolved", "missing_count", "unresolved_count", "source_only_count", "source_unresolved_count",
+        ))
+        summary["closest_match"] = closest
+    result["precedent"] = summary
+    return result
+
 
 def _brief_value(value: Any, depth: int) -> Any:
     """Bound arbitrary nested payloads inside explicitly selected brief fields."""

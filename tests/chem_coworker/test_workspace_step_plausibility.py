@@ -36,7 +36,17 @@ def test_replay_preserves_selected_route_step_and_complete_domain_evidence(
     }
     store = InvestigationStore.create(tmp_path / "with-corpus", objective="Check a route step", baseline=baseline)
     study = ScientificWorkspace(store.root)
-    route, _ = call(study, "assess_route_proposal", proposal=_route_value())
+    route, route_result = call(study, "assess_route_proposal", proposal=_route_value())
+    reviews = {item["step_id"]: item for item in route_result["step_reviews"]}
+    supported = reviews["step-1"]
+    assert supported["recipe_status"] == "not_supplied"
+    assert supported["precedent"]["status"] == "assessed"
+    assert supported["precedent"]["closest_match"]["reference_id"] == "REF1:1"
+    assert supported["precedent"]["closest_match"]["level"] == "whole_reaction"
+    assert reviews["step-2"]["precedent"]["evidence_rank"] < supported["precedent"]["evidence_rank"]
+    assert route_result["weakest_steps"]["step_ids"] == ["step-2"]
+    _, inspected = call(study, "inspect_route_step", source_ref=route.artifact_ref, step_id="step-1")
+    assert inspected["step_review"] == supported
     event, result = call(study, "assess_step_plausibility", source_ref=route.artifact_ref, step_id="step-1",
                          candidate_limit=8, match_limit=1)
     selected = result["proposal"]
@@ -69,6 +79,9 @@ def test_replay_preserves_selected_route_step_and_complete_domain_evidence(
     saved, structural = call(study, "assess_route_step", proposal=proposal)
     _, mapped = call(study, "assess_step_plausibility", source_ref=saved.artifact_ref)
     assert mapped["assessment"]["query_reaction_smiles"] == structural["assessment"]["normalized_mapped_reaction_smiles"]
+    assert structural["step_review"]["precedent"]["query_reaction_smiles"] == mapped["assessment"]["query_reaction_smiles"]
+    assert structural["step_review"]["precedent"]["query_basis"] == "validated_supplied_mapping"
+    assert structural["step_review"]["precedent"]["grade"] == mapped["assessment"]["grade"]
     assert mapped["proposal"]["mapped_reaction_smiles"] == proposal["mapped_reaction_smiles"]
 
     # Direct assessment needs only the bound indexes and preserves maps and middle-field coordinate bonds.
@@ -92,15 +105,66 @@ def test_selector_and_mapping_conflicts_cannot_produce_another_steps_grade(works
     for step_id, message in (("step-1", "ambiguous"), ("unknown", "not present")):
         with pytest.raises(ValueError, match=message):
             workspace.operations.assess_step_plausibility(source.artifact_ref, step_id=step_id)
-    conflicting, _ = call(workspace, "assess_route_step", proposal={
+    conflicting, conflict_result = call(workspace, "assess_route_step", proposal={
         "target_smiles": "CCO", "precursor_smiles": "CC=O.N",
         "mapped_reaction_smiles": "[CH3:1][CH:2]=[O:3].[NH3:4]>>[CH3:1][CH2:2][NH2:4]",
     })
+    assert conflict_result["step_review"]["precedent"]["status"] == "unresolved_structure"
+    assert "reaction_side_consistency" in conflict_result["step_review"]["precedent"]["unverified_gates"]
     failed = workspace.run("assess_step_plausibility", {"source_ref": conflicting.artifact_ref})
     failure = workspace.store.read_artifact(failed.artifact_ref)
     assert failure["execution_status"] == "error"
     assert "no validated mapping" in failure["error"]["message"]
     assert "result" not in failure
+
+
+def test_absent_optional_corpus_preserves_seen_gates_and_unknown_support(workspace):
+    _, result = call(workspace, "assess_route_proposal", proposal=_route_value())
+    weak = result["weakest_steps"]
+    assert weak["step_ids"] == [] and weak["basis"] == "insufficient_evidence"
+    assert set(weak["unassessed_precedent_step_ids"]) == {"step-1", "step-2"}
+    for review in result["step_reviews"]:
+        assert review["precedent"] == {"status": "not_configured", "missing_indexes": ["condition_index", "shared_core_index"]}
+        assert review["compatibility"]["checks"]["reaction_compatibility"]["status"] == "pass"
+
+
+@pytest.mark.parametrize("paired,expected", [(False, "incomplete"), (True, "unavailable")])
+def test_optional_corpus_failure_preserves_step_review(workspace, tmp_path, monkeypatch, paired, expected):
+    dummy = tmp_path / "invalid-index.sqlite"
+    dummy.write_bytes(b"incompatible development fixture")
+    baseline = dict(workspace.store.manifest["baseline"])
+    baseline["artifacts"] = {**baseline["artifacts"], "condition_index": artifact_identity(dummy)}
+    if paired:
+        baseline["artifacts"]["shared_core_index"] = artifact_identity(dummy)
+    store = InvestigationStore.create(tmp_path / "incompatible", objective="Retain structural review", baseline=baseline)
+    study = ScientificWorkspace(store.root)
+
+    def refuse_index():
+        assert paired
+        raise ValueError("Incompatible indices")
+
+    monkeypatch.setattr(study.operations, "_conditions", refuse_index)
+    _, result = call(study, "assess_route_step", proposal={"precursor_smiles": "CC=O.N", "target_smiles": "CCN"})
+    assert result["step_review"]["precedent"]["status"] == expected
+    assert result["assessment"]["canonical_target_smiles"] == "CCN"
+
+
+def test_review_distinguishes_conflicts_ties_unassessed_and_ambiguous_steps():
+    from chem_coworker.scientific_workspace.adapters.route_step_review import weakest_steps
+
+    first = {"step_id": "make-amine", "structural_status": "verified_with_cautions", "recipe_conflicts": [],
+             "precedent": {"evidence_rank": 2}, "compatibility": {"alerts": [{"rule_id": "advisory"}]}}
+    second = {**first, "step_id": "make-amide", "compatibility": {"alerts": []}}
+    unknown = {**second, "step_id": "unsearched", "precedent": {"status": "unavailable"}}
+    tied = weakest_steps([first, second, unknown])
+    assert tied["step_ids"] == ["make-amine", "make-amide"]
+    assert tied["basis"] == "lowest_assessed_precedent_grade"
+    assert tied["unassessed_precedent_step_ids"] == ["unsearched"]
+    assert tied["compatibility_alert_step_ids"] == ["make-amine"]
+    conflict = weakest_steps([first, {**second, "recipe_conflicts": ["documented-rule"]}])
+    assert conflict["basis"] == "structural_or_recipe_conflict" and conflict["step_ids"] == ["make-amide"]
+    ambiguous = weakest_steps([first, first])
+    assert ambiguous["step_ids"] == [] and ambiguous["ambiguous_step_ids"] == ["make-amine"]
 
 
 @pytest.mark.parametrize(("arguments", "error"), [

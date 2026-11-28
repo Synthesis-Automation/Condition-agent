@@ -12,6 +12,7 @@ from core_retrosynthesis import (
     condition_tokens_from_recipe,
     detect_functional_group_competition,
 )
+from core_retrosynthesis.selectivity_poc import assess_functional_group_selectivity
 
 
 S_ALKYLATION = (
@@ -114,6 +115,22 @@ def test_cysteamine_competition_warning_is_review_only_and_explained() -> None:
 
 def test_single_endpoint_reaction_has_no_competition_warning() -> None:
     assert detect_functional_group_competition("CCBr.N>>CCN") is None
+
+
+@pytest.mark.parametrize(("reaction", "status"), [
+    ("CCBr.N>>CCN", "pass"),
+    (S_ALKYLATION, "warn"),
+    ("[CH3:1][CH:2]=[O:3]>>[CH3:1][CH2:2][OH:3]", "out_of_scope"),
+    ("[CH3:1][CH:2]=[CH:3][CH2:4][Br:5].[NH3:6]>>[CH3:1][CH2:2][CH2:3][CH2:4][NH2:6]",
+     "out_of_scope"),
+    ("C>>CCCCC", "unresolved"),
+])
+def test_endpoint_screen_reports_coverage_separately_from_competition(reaction, status):
+    screen = assess_functional_group_selectivity(reaction)
+    assert screen.status == status
+    assert screen.summary
+    assert screen.warning is detect_functional_group_competition(reaction)
+    assert (screen.warning is not None) == (status == "warn")
 
 
 def test_same_enumerator_handles_n_o_competition() -> None:

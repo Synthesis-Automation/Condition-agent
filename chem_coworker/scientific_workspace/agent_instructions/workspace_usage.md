@@ -117,10 +117,12 @@ For route-finding tasks, apply these decision checks without needing to load a g
   turn not_covered into a positive feasibility judgment. Reconcile formula, chemical
   form and source quantities before converting them into a proposed protocol.
 - Identify the shared synthesis bottleneck and a credible starting-material entry
-  before expanding finishing variants. Compare saved alternatives with
-  compare_route_proposals. For a quick precedent check, give assess_step_plausibility
-  the proposed reaction SMILES directly. For a saved route, select its step by ID.
-  Check source outcomes and search limits before judging how well the precedent transfers.
+  before expanding finishing variants. In compare_route_proposals, check shared
+  target bonds across steps and the entry fragments each route assumes. Read
+  weakest_steps and the individual step_reviews for conflicts, detector coverage
+  and the closest precedent's substrate differences and measured outcome.
+  For a separate or expanded precedent check, give assess_step_plausibility the
+  proposed reaction SMILES directly or select a saved route step by ID.
 - Before stopping at advanced route inputs, use inspect_route_inputs on the saved
   route assessment, supplying leaf_queries=[{'smiles': leaf, 'terms': [source_name]}].
   For unresolved preparation or supply, search exact structures/names in captured

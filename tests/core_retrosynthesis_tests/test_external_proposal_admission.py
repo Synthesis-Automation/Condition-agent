@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -36,6 +37,7 @@ from core_retrosynthesis.multistep import (
 )
 from core_retrosynthesis.route_contract import validate_route_tree
 from core_retrosynthesis.route_tree import build_canonical_route_tree
+from core_retrosynthesis.step_precedents import lookup_reaction_precedents
 
 
 FIRST_REACTION = "CC=O.N>>CCN"
@@ -146,6 +148,57 @@ def test_unmapped_step_recovers_internal_operator_and_precedent(
     assert tuple(gate.gate_id for gate in assessment.gates) == (
         load_external_proposal_admission_policy().required_gate_order
     )
+
+
+@pytest.mark.parametrize("legacy_operators", [False, True])
+def test_batch_precedents_match_first_id_lookup_and_deduplication(operator_library, legacy_operators):
+    proposal = ExternalRetrosynthesisProposal(target_smiles="CCN", precursor_smiles="N.CC=O")
+    original = assess_external_retrosynthesis_proposal(proposal, operator_library)
+    exact, = [m for m in original.operator_matches if m.match_level == "exact_operator_signature"]
+    assert len(exact.template_ids) > 1
+    template_id = exact.template_ids[0]
+    first = next(t for t in operator_library.templates if t.template_id == template_id)
+    # The first row with this ID is empty. A later duplicate must not supply
+    # the source, and the next resolved template should become the selection.
+    lib = replace(operator_library,
+                  templates=(replace(first, precedents=()), *operator_library.templates),
+                  operators=() if legacy_operators else operator_library.operators)
+    audited = assess_external_retrosynthesis_proposal(proposal, lib)
+    matches = {}
+    selected = None
+    for group in audited.operator_matches:
+        if group.match_level == "exact_operator_signature":
+            for key in group.template_ids:
+                result = lookup_reaction_precedents(
+                    step_id=audited.proposal_id, template_id=key, operator_id=group.operator_id,
+                    product_smiles=audited.canonical_target_smiles, precursor_smiles=audited.canonical_precursor_smiles,
+                    library=lib, limit=10,
+                )
+                if result.matches and selected is None:
+                    selected = key
+                matches.update((m.match_id, m) for m in result.matches)
+    expected = sorted(matches.values(), key=lambda m: (
+        -m.product_similarity, -m.precursor_similarity, m.reference_id, m.reaction_id, m.template_id,
+    ))
+    assert selected is not None and selected != template_id
+    assert audited.selected_template_id == selected
+    assert audited.precedent_matches == tuple(expected[:10])
+
+
+def test_unsupported_selectivity_preserves_admission_and_explains_coverage():
+    reaction = "[CH3:1][CH:2]=[O:3]>>[CH3:1][CH2:2][OH:3]"
+    library = build_generic_library((_row(reaction, 3),), levels=("L0", "L1", "L2"))
+    assessment = assess_external_retrosynthesis_proposal(
+        ExternalRetrosynthesisProposal(target_smiles="CCO", precursor_smiles="CC=O",
+                                      mapped_reaction_smiles=reaction),
+        library,
+    )
+    assert assessment.admission_eligible
+    gate = next(g for g in assessment.gates if g.gate_id == "functional_group_selectivity")
+    assert gate.status == "out_of_scope"
+    assert "one formed and one broken" in gate.summary
+    assert "FUNCTIONAL_GROUP_SELECTIVITY_OUT_OF_SCOPE" in gate.warnings
+    assert assessment.compatibility_evidence.functional_group_competition is None
 
 
 def test_source_wording_and_external_id_do_not_change_chemical_identity(

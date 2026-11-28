@@ -258,6 +258,22 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         summary.update(view.pick(value, (
             "source_ref", "step_id", "upstream_step_ids", "downstream_step_ids", "assessment_options", "evidence_refs", "evidence_warnings",
         ), path))
+        summary.update(view.pick(value, ("construction_review", "weakest_steps"), path))
+
+        def reviewed_step(item: Any, child: str) -> Any:
+            result = view.pick(item, ("step_id", "structural_status", "compatibility", "recipe_status",
+                                      "recipe_conflicts"), child)
+            if isinstance(item, Mapping):
+                view.add_nested(result, item, "precedent", (
+                    "status", "reason", "missing_indexes", "unverified_gates", "grade", "candidate_truncated",
+                    "measured_evidence_status", "closest_match", "support_counts",
+                ), child)
+            return result
+
+        if "step_review" in value:
+            summary["step_review"] = reviewed_step(value["step_review"], f"{path}.step_review")
+        if "step_reviews" in value:
+            summary["step_reviews"] = view.preview(value["step_reviews"], f"{path}.step_reviews", reviewed_step)
         view.add_list(summary, value, "evidence_provenance", (
             "artifact_ref", "kind", "role", "source_url", "acquisition", "retrieval_status",
             "extraction_status", "claim_support", "warnings",
@@ -282,10 +298,15 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "removed_step_ids", "added_step_ids", "replaced_step_ids", "preserved_step_ids",
         ), path)
     elif operation == "compare_route_proposals":
+        view.add_list(summary, value, "shared_constructions", (
+            "bond_id", "target_atom_indices", "elements", "bond_type", "equivalent_target_atom_pairs", "occurrences",
+        ), path)
         view.add_list(summary, value, "shared_exact_steps", ("precursor_smiles", "target_smiles", "occurrences"), path)
         def alternative(item: Any, child: str) -> Any:
             result = view.pick(item, ("status", "source_ref", "route_id", "step_count", "unresolved_step_ids",
-                                      "route_specific_step_ids", "uncomparable_step_ids", "limitations"), child)
+                                      "route_specific_step_ids", "uncomparable_step_ids", "leaf_smiles",
+                                      "key_constructions", "unresolved_construction_step_ids", "weakest_steps",
+                                      "limitations"), child)
             if isinstance(item, Mapping):
                 view.add_nested(result, item, "material_constraints", ("status", "stock_availability", "blocked_leaf_smiles"), child)
                 view.gates(result, item, "topology_gates", child)

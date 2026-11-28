@@ -16,6 +16,7 @@ from core_retrosynthesis.external_route_admission import (
     ExternalRouteStepProposal,
     assess_external_route_proposal,
 )
+from core_retrosynthesis.route_constructions import construction_inventory
 from core_retrosynthesis.route_proposal_revision import (
     assess_declared_route_materials,
     external_route_step_neighbors,
@@ -23,6 +24,7 @@ from core_retrosynthesis.route_proposal_revision import (
 )
 
 from .step_selection import resolve_saved_candidate
+from .route_step_review import review_steps, weakest_steps
 
 if TYPE_CHECKING:
     from .operations import ScientificOperations
@@ -181,10 +183,12 @@ def assess_step(
     assessment = assess_external_retrosynthesis_proposal(
         step, **_assessment_arguments(operations, include_conditions, include_forward),
     )
+    recipe = _recipe(operations, step)
+    review, = review_steps(operations, [(None, step, assessment, recipe)])
     return {
         "schema_version": "route_step_investigation.v1", "origin": "agent_proposal",
         "review_status": "unreviewed", "proposal": step.to_dict(),
-        "assessment": assessment.to_dict(), "proposed_recipe_assessment": _recipe(operations, step),
+        "assessment": assessment.to_dict(), "proposed_recipe_assessment": recipe, "step_review": review,
         "mapping_evidence": mapping_evidence,
         **evidence, "experimental_feasibility": "not_established",
     }
@@ -214,15 +218,21 @@ def assess_route(
     assessment = assess_external_route_proposal(
         route, **_assessment_arguments(operations, include_conditions, include_forward),
     )
+    recipes = [_recipe(operations, step.proposal) for step in route.steps]
+    reviews = review_steps(operations, [
+        (step.external_step_id, submitted.proposal, step.assessment, recipe)
+        for submitted, step, recipe in zip(route.steps, assessment.step_assessments, recipes, strict=True)
+    ])
+    route_assessment = assessment.to_dict()
     return {
         "schema_version": "route_investigation.v1", "origin": "agent_proposal",
-        "review_status": "unreviewed", "proposal": route.to_dict(), "assessment": assessment.to_dict(),
+        "review_status": "unreviewed", "proposal": route.to_dict(), "assessment": route_assessment,
+        "construction_review": construction_inventory(route_assessment),
         "mapping_evidence": mapping_evidence,
         "assessment_options": {"include_conditions": include_conditions, "include_forward": include_forward},
         "material_constraints": assess_declared_route_materials(assessment, tuple(unavailable)).to_dict(),
-        "proposed_recipe_assessments": {
-            step.external_step_id: _recipe(operations, step.proposal) for step in route.steps
-        },
+        "proposed_recipe_assessments": dict(zip((s.external_step_id for s in route.steps), recipes, strict=True)),
+        "step_reviews": reviews, "weakest_steps": weakest_steps(reviews),
         **evidence, "experimental_feasibility": "not_established",
         "limitations": [
             "An assessed proposal remains a hypothesis, not an observed or experimentally validated route.",
@@ -253,6 +263,7 @@ def inspect_step(operations: ScientificOperations, source_ref: str, step_id: str
     return {
         "schema_version": "route_step_inspection.v1", "source_ref": source_ref,
         **neighbors, "proposal": step.to_dict(), "assessment": assessment,
+        "step_review": next((item for item in record.get("step_reviews", []) if item["step_id"] == step_id), None),
         "molecule_audits": {smiles: operations.analyze_molecule(smiles) for smiles in dict.fromkeys(molecules) if smiles},
         "proposed_recipe_assessment": record["proposed_recipe_assessments"].get(step_id),
         "route_topology_gates": record["assessment"]["topology_gates"],
@@ -343,7 +354,9 @@ def _exact_step_overlap(
 
 
 def compare_routes(operations: ScientificOperations, source_refs: list[str]) -> dict[str, Any]:
-    """Compare exact precursor and product graphs while retaining each route's assessment."""
+    """Compare concrete steps and the bonds their assessed mappings build on the target."""
+    from core_retrosynthesis.route_constructions import construction_inventory
+
     refs = _strings(source_refs, "source_refs")
     if not 2 <= len(refs) <= 5 or len(set(refs)) != len(refs):
         raise ValueError("Compare two to five distinct recorded route alternatives")
@@ -357,17 +370,34 @@ def compare_routes(operations: ScientificOperations, source_refs: list[str]) -> 
            record["material_constraints"]["unavailable_starting_materials"] != constraints for record in records):
         raise ValueError("Compare routes assessed with the same options and declared material constraints")
     shared, by_route = _exact_step_overlap(refs, records)
+    bonds = {}
+    inventories = {}
+    for ref, record in zip(refs, records):
+        inventory = record.get("construction_review")
+        if inventory is None:
+            inventory = construction_inventory(record["assessment"])
+        inventories[ref] = inventory
+        for construction in inventory["key_constructions"]:
+            step_id = construction["step_id"]
+            bond = bonds.setdefault(construction["bond_id"], {
+                **{k: v for k, v in construction.items() if k != "step_id"}, "occurrences": [],
+            })
+            bond["occurrences"].append({"source_ref": ref, "step_id": step_id})
     return {
         "schema_version": "route_comparison.v1", "target_smiles": next(iter(targets)),
         "source_refs": refs, "ranking": "not_performed", "experimental_feasibility": "not_established",
         "shared_exact_steps": shared,
+        "shared_constructions": [
+            bond for bond in bonds.values() if len({v["source_ref"] for v in bond["occurrences"]}) > 1
+        ],
         "alternatives": [{
             "source_ref": ref, "route_id": record["assessment"]["route_id"],
-            **by_route[ref],
+            **by_route[ref], **inventories[ref],
             "status": record["assessment"]["status"], "step_count": len(record["proposal"]["steps"]),
             "topology_gates": record["assessment"]["topology_gates"],
             "unresolved_step_ids": record["assessment"]["unresolved_step_ids"],
-            "leaf_smiles": record["assessment"]["leaf_smiles"], "material_constraints": record["material_constraints"],
+            "weakest_steps": record.get("weakest_steps", {"step_ids": [], "basis": "not_assessed"}),
+            "material_constraints": record["material_constraints"],
             "assessment_options": record["assessment_options"],
             "steps": [{"step_id": item["external_step_id"],
                        **{key: item["assessment"][key] for key in ("status", "strongest_evidence_tier", "gates", "warnings")}}

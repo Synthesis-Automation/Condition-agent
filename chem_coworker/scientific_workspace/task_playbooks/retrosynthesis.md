@@ -12,14 +12,20 @@ a terminal material acceptable; a vendor listing does not confirm stock.
 
 ## Scientific questions
 
-Compare routes from the same justified starting materials. Use
-`compare_route_proposals` to see which steps have identical precursors and products.
-Different donors or leaving groups can still depend on the same difficult bond formation.
-Identify the step whose uncertainty could change the route choice. When precedent
-would help decide, use `assess_step_plausibility` with the proposed reaction SMILES
-or the saved route and step ID. Check the
-reacting partners and the source outcome. State which alternative avoids the
-difficulty or what evidence would settle it.
+Compare routes from equally justified starting materials. Read the target bonds
+assembled in each route, its required starting fragments and its weakest steps in
+`compare_route_proposals`. A shared construction can occur at different depths
+or use a different donor. Trace the availability of an advanced fragment that
+already contains the difficult bond. Unresolved atom correspondence leaves an
+open comparison.
+
+Read each `step_review` for the scope of the compatibility screen, the closest
+precedent, differences on the reacting partners, and any source yield. A supplied
+recipe has its own compatibility assessment. When both corpus indexes are pinned,
+route assessment runs the precedent check automatically for structurally eligible
+steps. Use `assess_step_plausibility` for more source observations or a different
+search limit. Use the weakest-step basis and the explicit gaps to explain which
+uncertainty could change the route choice.
 
 Start with the general molecular audit, then focused graph inspection, then custom
 RDKit only for a named unanswered question. Preserve canonical/input atom projection,

@@ -72,6 +72,20 @@ def test_cited_plausibility_is_bound_to_exact_source_and_route_step(workspace):
     assert dossier["experimental_feasibility"] == "not_established"
 
 
+def test_dossier_selects_embedded_review_outside_the_route_preview(workspace):
+    steps = [{"external_step_id": f"s{i}", "precursor_smiles": "CCBr.N", "target_smiles": "CCN"} for i in range(4)]
+    route = {"proposal": {"steps": steps}, "assessment": {"step_assessments": [
+        {"external_step_id": s["external_step_id"], "assessment": {}} for s in steps]},
+        "step_reviews": [{"step_id": s["external_step_id"], "precedent": {"status": "assessed", "grade": str(i)}}
+                         for i, s in enumerate(steps)]}
+    source = save(workspace, "assess_route_proposal", route)
+    event = workspace.step_dossier(source, step_id="s3")
+    result = workspace.store.read_artifact(event.artifact_ref)
+    assert result["assessments"]["embedded_step_review"] == {"source_ref": source, **route["step_reviews"][3]}
+    assert result["assessments"]["step_plausibility"] == []
+    assert workspace.call_summary(event)["result_summary"]["embedded_step_review"]["precedent"]["grade"] == "3"
+
+
 @pytest.mark.parametrize(("grade", "rank"), [("unresolved", None), ("no_qualified_precedent", 0)])
 def test_empty_plausibility_keeps_the_engine_grade(grade, rank):
     result = plausibility("source", {"precursor_smiles": "CCBr.N", "target_smiles": "CCN"})

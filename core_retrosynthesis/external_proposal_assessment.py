@@ -36,10 +36,12 @@ from .reaction_compatibility import (
     assess_candidate_reaction_compatibility,
 )
 from .selectivity_poc import (
+    FUNCTIONAL_GROUP_COMPETITION_AUDIT_ID,
     FunctionalGroupCompetitionWarning,
-    detect_functional_group_competition,
+    FunctionalGroupSelectivityScreen,
+    assess_functional_group_selectivity,
 )
-from .step_precedents import StepPrecedentMatch, lookup_reaction_precedents
+from .step_precedents import StepPrecedentMatch, _lookup_template_precedents
 
 
 EXTERNAL_PROPOSAL_ASSESSMENT_SCHEMA_VERSION = "1.0"
@@ -494,11 +496,19 @@ def _precedents(
 ) -> tuple[tuple[StepPrecedentMatch, ...], str | None]:
     matches: list[StepPrecedentMatch] = []
     selected_template_id: str | None = None
+    if not exact_matches:
+        return (), None
+    needed = {template_id for match in exact_matches for template_id in match.template_ids}
+    # Preserve the public lookup's first-match semantics for duplicate IDs.
+    templates = {}
+    for template in library.templates:
+        if template.template_id in needed:
+            templates.setdefault(template.template_id, template)
     for operator_match in exact_matches:
         for template_id in operator_match.template_ids:
-            lookup = lookup_reaction_precedents(
+            lookup = _lookup_template_precedents(
                 step_id=proposal_id,
-                template_id=template_id,
+                template=templates.get(template_id),
                 operator_id=operator_match.operator_id,
                 product_smiles=target_smiles,
                 precursor_smiles=precursor_smiles,
@@ -798,14 +808,16 @@ def assess_external_retrosynthesis_proposal(
         normalized_mapped
     )
     try:
-        competition = detect_functional_group_competition(normalized_mapped)
-    except Exception:
-        competition = None
-        warnings.add("FUNCTIONAL_GROUP_SELECTIVITY_OUT_OF_SCOPE")
+        selectivity = assess_functional_group_selectivity(normalized_mapped)
+    except Exception as exc:
+        # This advisory check can fail independently of graph reconstruction.
+        selectivity = FunctionalGroupSelectivityScreen(
+            "unresolved", f"Endpoint screening failed ({type(exc).__name__})."
+        )
     compatibility = ExternalCompatibilityEvidence(
         precursor=precursor_compatibility,
         reaction=reaction_compatibility,
-        functional_group_competition=competition,
+        functional_group_competition=selectivity.warning,
     )
     gates["precursor_compatibility"] = _compatibility_gate(
         "precursor_compatibility",
@@ -819,20 +831,16 @@ def assess_external_retrosynthesis_proposal(
         "reaction-regime",
         reaction_compatibility.policy_definition_id,
     )
-    if competition is None:
-        gates["functional_group_selectivity"] = _gate(
-            "functional_group_selectivity",
-            "pass",
-            "No distinct alternative endpoint product was detected by the review-only selectivity audit.",
-        )
-    else:
-        gates["functional_group_selectivity"] = _gate(
-            "functional_group_selectivity",
-            "warn",
-            competition.message,
-            warnings=(competition.code,),
-        )
-        warnings.add(competition.code)
+    selectivity_warnings = ()
+    if selectivity.warning is not None:
+        selectivity_warnings = (selectivity.warning.code,)
+    elif selectivity.status in {"out_of_scope", "unresolved"}:
+        selectivity_warnings = (f"FUNCTIONAL_GROUP_SELECTIVITY_{selectivity.status.upper()}",)
+    gates["functional_group_selectivity"] = _gate(
+        "functional_group_selectivity", selectivity.status, selectivity.summary,
+        warnings=selectivity_warnings, definition_id=FUNCTIONAL_GROUP_COMPETITION_AUDIT_ID,
+    )
+    warnings.update(selectivity_warnings)
 
     selected_match = exact[0] if exact else None
     forward_assessment = None
