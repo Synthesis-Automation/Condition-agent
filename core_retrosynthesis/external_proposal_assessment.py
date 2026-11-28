@@ -25,7 +25,7 @@ from reactive_taxonomy import (
 from .chemistry import canonical_smiles, digest
 from .condition_ranking import RetrosynthesisConditionEvidence
 from .generic_compiler import GenericReactionIdentity, analyze_generic_reaction, template_source_verified
-from .generic_models import GenericTemplateLibrary
+from .generic_models import GenericCoreTemplate, GenericTemplateLibrary
 from .mapping import materialize_atom_mapping
 from .precursor_compatibility import (
     PrecursorCompatibilityResult,
@@ -45,7 +45,7 @@ from .selectivity_poc import (
 from .step_precedents import StepPrecedentMatch, _lookup_template_precedents
 
 
-EXTERNAL_PROPOSAL_ASSESSMENT_SCHEMA_VERSION = "1.0"
+EXTERNAL_PROPOSAL_ASSESSMENT_SCHEMA_VERSION = "1.1"
 EXTERNAL_PROPOSAL_ADMISSION_POLICY_PATH = (
     Path(__file__).with_name("definitions")
     / "external_proposal_admission_policy.v1.json"
@@ -320,6 +320,8 @@ def validate_external_proposal_admission_policy(
         raise ValueError("unexpected external proposal admission policy ID")
     if value.get("schema_version") != "1.0":
         raise ValueError("unsupported external proposal admission policy schema")
+    if value.get("assessment_schema_version") != EXTERNAL_PROPOSAL_ASSESSMENT_SCHEMA_VERSION:
+        raise ValueError("external assessment schema version disagrees with admission policy")
     gates = tuple(value.get("required_gate_order") or ())
     expected = (
         "input_structure",
@@ -420,7 +422,8 @@ def _operator_matches(
     *,
     limit: int,
 ) -> tuple[ExternalOperatorMatch, ...]:
-    templates_by_operator: dict[str, list[Any]] = {}
+    """Return verified exact operators, falling back to broad diagnostic matches."""
+    templates_by_operator: dict[str, list[GenericCoreTemplate]] = {}
     for template in library.templates:
         templates_by_operator.setdefault(template.operator_id, []).append(template)
     operator_rows: dict[str, tuple[str, int, int]] = {
@@ -442,49 +445,36 @@ def _operator_matches(
             max(item.observation_support for item in templates),
             max(item.independent_reference_support for item in templates),
         )
-    query_archetype = _operator_archetype(identity.operator_signature)
-    matches = []
-    for operator_id, (signature, observations, references) in operator_rows.items():
-        if signature == identity.operator_signature:
-            level: OperatorMatchLevel = "exact_operator_signature"
-        elif query_archetype and _operator_archetype(signature) == query_archetype:
-            level = "same_edit_archetype_only"
-        else:
-            continue
-        templates = templates_by_operator.get(operator_id, ())
-        verified = tuple(item for item in templates if template_source_verified(item, library))
-        if not verified:
-            continue
-        template_ids = tuple(sorted(item.template_id for item in verified))
-        if len(verified) < len(templates):
-            # The aggregate includes rejected evidence. Report a known lower
-            # bound from the surviving templates instead of the historic sum.
-            observations = max(item.observation_support for item in verified)
-            references = max(item.independent_reference_support for item in verified)
-        matches.append(
-            ExternalOperatorMatch(
-                match_id=digest(
-                    "EXTOPM1", identity.operator_signature, operator_id, level
-                ),
-                match_level=level,
-                operator_id=operator_id,
-                operator_signature=signature,
-                template_ids=template_ids,
-                observation_support=int(observations),
-                independent_reference_support=int(references),
-            )
-        )
-    return tuple(
-        sorted(
-            matches,
-            key=lambda item: (
-                item.match_level != "exact_operator_signature",
-                -item.independent_reference_support,
-                -item.observation_support,
-                item.operator_id,
-            ),
-        )[:limit]
-    )
+    def verified_matches(operator_ids: list[str], level: OperatorMatchLevel) -> tuple[ExternalOperatorMatch, ...]:
+        matches = []
+        for operator_id in operator_ids:
+            signature, observations, references = operator_rows[operator_id]
+            templates = templates_by_operator.get(operator_id, ())
+            verified = [item for item in templates if template_source_verified(item, library)]
+            if not verified:
+                continue
+            if len(verified) < len(templates):
+                # Exclude historical support counts belonging to rejected witnesses.
+                observations = max(item.observation_support for item in verified)
+                references = max(item.independent_reference_support for item in verified)
+            matches.append(ExternalOperatorMatch(
+                match_id=digest("EXTOPM1", identity.operator_signature, operator_id, level),
+                match_level=level, operator_id=operator_id, operator_signature=signature,
+                template_ids=tuple(sorted(item.template_id for item in verified)),
+                observation_support=int(observations), independent_reference_support=int(references),
+            ))
+        return tuple(sorted(matches, key=lambda item: (
+            -item.independent_reference_support, -item.observation_support, item.operator_id,
+        ))[:limit])
+
+    exact_ids = [key for key, row in operator_rows.items() if row[0] == identity.operator_signature]
+    exact = verified_matches(exact_ids, "exact_operator_signature")
+    if exact:
+        return exact
+    archetype = _operator_archetype(identity.operator_signature)
+    broad_ids = [key for key, row in operator_rows.items()
+                 if archetype and row[0] != identity.operator_signature and _operator_archetype(row[0]) == archetype]
+    return verified_matches(broad_ids, "same_edit_archetype_only")
 
 
 def _precedents(
@@ -754,7 +744,7 @@ def assess_external_retrosynthesis_proposal(
         gates["operator_support"] = _gate(
             "operator_support",
             "pass",
-            f"Recovered signature exactly matches {len(exact)} admitted internal operator(s).",
+            f"Verified {len(exact)} exact operator match(es). Broader edit-archetype search was skipped.",
             evidence_ids=tuple(item.operator_id for item in exact),
         )
     else:
@@ -764,7 +754,9 @@ def assess_external_retrosynthesis_proposal(
         gates["operator_support"] = _gate(
             "operator_support",
             "unresolved",
-            "No exact admitted operator signature was found; analogical matches remain non-validating evidence.",
+            (f"No exact operator passed source checks. The edit-archetype search returned "
+             f"{len(analogical)} diagnostic match(es)." if identity and _operator_archetype(identity.operator_signature)
+             else "No exact operator was available. The step lacks a comparable edit archetype."),
             evidence_ids=tuple(item.operator_id for item in analogical),
         )
 

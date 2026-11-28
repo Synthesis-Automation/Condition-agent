@@ -81,6 +81,48 @@ def test_route_assessment_and_inspection_preserve_domain_evidence(workspace, lib
     assert inspected.evidence_refs == (event.artifact_ref,)
 
 
+def test_interrupted_route_exposes_verified_steps_and_resumes_after_reopen(workspace, library, monkeypatch):
+    from core_retrosynthesis import external_route_admission
+    from chem_coworker.scientific_workspace.views.step_assessments import answer_step_assessments
+
+    route = _route_value()
+    first, second = route["steps"]
+    assess = external_route_admission.assess_external_retrosynthesis_proposal
+    seen = []
+
+    def interrupt(proposal, *args, **kwargs):
+        seen.append(proposal.target_smiles)
+        if len(seen) == 2:
+            raise RuntimeError("Simulated interruption after the first physical step")
+        return assess(proposal, *args, **kwargs)
+
+    monkeypatch.setattr(external_route_admission, "assess_external_retrosynthesis_proposal", interrupt)
+    failed = workspace.run("assess_route_proposal", {"proposal": route})
+    assert workspace.store.read_artifact(failed.artifact_ref)["execution_status"] == "error"
+    answer = {"molecules": [{"id": f"{n}-{key}", "smiles": step[key]}
+                            for n, step in enumerate(route["steps"]) for key in ("precursor_smiles", "target_smiles")],
+              "steps": [{"id": step["external_step_id"], "reactant_ids": [f"{n}-precursor_smiles"],
+                         "product_ids": [f"{n}-target_smiles"]} for n, step in enumerate(route["steps"])]}
+    boundary = workspace.store.append("answer", answer)
+    partial = answer_step_assessments(workspace.store, answer, answer_ref=boundary.artifact_ref)
+    assert partial[first["external_step_id"]]["status"] == "recorded"
+    assert partial[second["external_step_id"]]["status"] == "not_recorded"
+    partial_ref = partial[first["external_step_id"]]["structural_assessments"][0]["artifact_ref"]
+    resumed = ScientificWorkspace(workspace.store.root)
+    final, value = call(resumed, "assess_route_proposal", proposal=route)
+    assert seen == [first["target_smiles"], second["target_smiles"], second["target_smiles"]]
+    assert partial_ref == value["step_checkpoint_refs"][0]
+    reference = assess_external_route_proposal(ExternalRouteProposal.from_dict(route), library)
+    assert canonical_bytes(value["assessment"]) == canonical_bytes(reference.to_dict())
+    for step in answer_step_assessments(workspace.store, answer).values():
+        assert len(step["structural_assessments"]) == 1
+        assert step["structural_assessments"][0]["artifact_ref"] == final.artifact_ref
+    assert answer_step_assessments(workspace.store, answer, answer_ref=boundary.artifact_ref) == partial
+    count = len(seen)
+    replay = resumed.store.read_artifact(resumed.replay(final.artifact_ref).artifact_ref)
+    assert replay["matches"] and len(seen) == count + 2
+
+
 def test_branch_revision_rechecks_preserved_downstream_step_and_replays_after_reopen(workspace, monkeypatch) -> None:
     source, before = call(workspace, "assess_route_proposal", proposal=_route_value(), unavailable_starting_materials=["CC=O"])
     source_bytes = canonical_bytes(workspace.store.read_artifact(source.artifact_ref))

@@ -1,7 +1,7 @@
 {
   "definition_id": "external_proposal_admission_policy.v1",
   "schema_version": "1.0",
-  "assessment_schema_version": "1.0",
+  "assessment_schema_version": "1.1",
   "required_gate_order": [
     "input_structure",
     "reaction_side_consistency",

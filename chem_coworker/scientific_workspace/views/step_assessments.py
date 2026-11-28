@@ -62,30 +62,43 @@ def answer_step_assessments(
             payload = store.read_artifact(reference)
             if payload.get("operation") in SOURCE_OPERATIONS - {"disconnect_target"}:
                 calls[reference] = payload
+        completed_checkpoints = {ref for call in calls.values()
+                                 for ref in call.get("result", {}).get("step_checkpoint_refs", [])}
+        for event in events:
+            if event.kind == "route_step_checkpoint" and event.artifact_ref not in completed_checkpoints:
+                checkpoint = store.read_artifact(event.artifact_ref)
+                calls[event.artifact_ref] = {"operation": "route_step_checkpoint", "execution_status": "completed",
+                                             "result": checkpoint["result"]}
         for reference, payload in calls.items():
             if payload.get("execution_status") != "completed":
                 continue
             operation = payload.get("operation")
             saved = payload.get("result", {})
             selections = []
-            if operation in {"assess_recipe", "assess_proposed_recipe"}:
+            if operation == "route_step_checkpoint":
+                selections.append((saved["proposal"], saved["assessment"], None, None, saved["step_review"]))
+            elif operation in {"assess_recipe", "assess_proposed_recipe"}:
                 sides = split_reaction_fields(payload.get("arguments", {}).get("reaction_smiles", ""))
                 if len(sides) == 3:
                     selections.append((
                         {"precursor_smiles": sides[0], "target_smiles": sides[2]}, {},
                         saved.get("compatibility", saved),
-                        saved.get("proposed_recipe", payload.get("arguments", {}).get("recipe", {})).get("recipe_id"),
+                        saved.get("proposed_recipe", payload.get("arguments", {}).get("recipe", {})).get("recipe_id"), None,
                     ))
             elif operation in SOURCE_OPERATIONS and operation != "disconnect_target":
                 for selector in _assessed_step_ids(payload):
                     selected, assessment = _selection(payload, selector, None)
                     recipe = (saved.get("proposed_recipe_assessment") if selector is None else
                               saved.get("proposed_recipe_assessments", {}).get(selector))
-                    selections.append((selected, assessment, recipe, None))
-            for selected, assessment, recipe, recipe_id in selections:
+                    review = (saved.get("step_review") if selector is None else
+                              next((row for row in saved.get("step_reviews", []) if row["step_id"] == selector), None))
+                    selections.append((selected, assessment, recipe, None, review))
+            for selected, assessment, recipe, recipe_id, review in selections:
                 key = _structure_key(selected["precursor_smiles"], selected["target_smiles"])
                 if key is None:
                     continue
+                precedent = (review or {}).get("precedent", {})
+                grade = {name: precedent[name] for name in ("status", "grade", "evidence_rank") if name in precedent}
                 for step_id, expected in keys.items():
                     if key != expected:
                         continue
@@ -94,6 +107,7 @@ def answer_step_assessments(
                         view["structural_assessments"].append({
                             "artifact_ref": reference,
                             "attribution": "cited" if reference in references else "saved_exact_step_check",
+                            **({"step_review": {"precedent": grade}} if grade else {}),
                             **{name: assessment.get(name) for name in (
                                 "status", "actionable", "admission_eligible", "warnings",
                             )},

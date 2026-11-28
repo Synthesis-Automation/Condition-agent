@@ -23,6 +23,8 @@ For repeated fragment queries, `python -u -m chem_coworker.scientific_workspace.
 accepts one JSON line at a time and reuses its index worker. Send
 `{"operation":"search_fragment_precedents","arguments":{...},"reason":"..."}`;
 inspect each response before the next query, and send `{"action":"quit"}` at the end.
+In a Python script, `with ScientificWorkspace.session(@INVESTIGATION_ROOT@) as w:`
+reuses the same workers for successive calls.
 
 Reuse saved calls for unchanged inputs: `w.call_summary(ref)` reads their brief
 decision views. `w.inspect_artifact(ref, path=('result', 'hits'), offset=0, limit=3)`

@@ -150,8 +150,8 @@ class InvestigationStore:
             raise ValueError(f"Artifact checksum mismatch: {reference}")
         return json.loads(data)
 
-    def events(self) -> tuple[InvestigationEvent, ...]:
-        """Load history in sequence order, detecting missing or invalid events."""
+    def events(self, *, verify_artifacts: bool = True) -> tuple[InvestigationEvent, ...]:
+        """Read contiguous event headers; by default verify every receipt and evidence link."""
         result = []
         for sequence, path in enumerate(sorted((self.root / "events").glob("*.json")), 1):
             value = json.loads(path.read_text("utf-8"))
@@ -160,9 +160,10 @@ class InvestigationStore:
             if value["schema_version"] != SCHEMA_VERSION:
                 raise ValueError("Unsupported event schema")
             value["evidence_refs"] = tuple(value["evidence_refs"])
-            self.read_artifact(value["artifact_ref"])
-            for reference in value["evidence_refs"]:
-                self.read_artifact(reference)
+            if verify_artifacts:
+                self.read_artifact(value["artifact_ref"])
+                for reference in value["evidence_refs"]:
+                    self.read_artifact(reference)
             result.append(InvestigationEvent(**value))
         return tuple(result)
 
@@ -184,7 +185,9 @@ class InvestigationStore:
         digest = hashlib.sha256(data).hexdigest()
         for reference in evidence_refs:
             self.read_artifact(reference)
-        events = self.events()
+        # A running route already verified its baseline and history on entry. Its
+        # incremental receipts need only the next contiguous event slot here.
+        events = self.events(verify_artifacts=kind != "route_step_checkpoint")
         # Write immutable sections before publishing their root/event. A failed
         # write may leave an unreferenced section, never a half-published call.
         for reference, section in sections.items():

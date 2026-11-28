@@ -348,7 +348,29 @@ function stepAssessmentEvidence(step, key) {
   if (structural.length || recipes.length) section.append(element('p', 'Experimental feasibility is not established by these checks.', 'scientific-note'));
   return section;
 }
-function reactionCard(step, sources, molecules, key, number, showScheme = true, compact = false) {
+function routeStepCheck(step) {
+  const evidence = step.assessment_evidence || {};
+  const records = evidence.structural_assessments || [];
+  if (!records.length) {
+    const unavailable = evidence.status === 'evidence_unavailable';
+    return {checked:false, needsReview:false, unavailable, note:unavailable
+      ? 'Saved structural check unavailable.' : 'No structural check recorded.'};
+  }
+  const problems = records.filter(record => record.admission_eligible === false ||
+    ['invalid', 'ambiguous', 'unresolved', 'unsupported', 'conflicting', 'rejected',
+      'rejected_by_compatibility', 'verified_with_cautions'].includes(record.status));
+  const reasons = problems.flatMap(record => {
+    const gates = (record.gates || []).filter(gate => ['fail', 'unresolved', 'warn'].includes(gate.status));
+    return gates.length ? gates.map(gate => gate.gate_id + ' ' + gate.status) : [record.status || 'unresolved'];
+  });
+  const verdicts = [...new Set(reasons.map(reason => reason.replaceAll('_', ' ')))];
+  const precedent = records.map(record => record.step_review?.precedent)
+    .filter(item => item?.grade && Number.isFinite(item.evidence_rank))
+    .sort((a, b) => a.evidence_rank - b.evidence_rank)[0];
+  return {checked:true, needsReview:!!problems.length, precedent, note:problems.length
+    ? 'Structural review needed (' + verdicts.join(', ') + ').' : ''};
+}
+function reactionCard(step, sources, molecules, key, number, showScheme = true, routeCheck = null) {
   const card = element('article', '', 'scientific-step');
   const heading = element('div', '', 'step-heading');
   heading.append(element('span', String(number), 'step-number'), element('h4', step.title),
@@ -359,15 +381,13 @@ function reactionCard(step, sources, molecules, key, number, showScheme = true, 
     if (step.image_url) card.append(reactionFigure(step, label));
     else card.append(element('p', 'Scheme unavailable for the supplied structures.', 'scientific-note'));
   }
-  if (compact) {
+  if (routeCheck) {
     if (step.reaction_smiles) card.append(disclosure('Reaction SMILES', key + ':smiles',
       element('code', step.reaction_smiles, 'precedent-smiles')));
     const evidence = step.assessment_evidence || {};
-    if (evidence.status === 'evidence_unavailable') card.append(element('p', 'Assessment unavailable; this step remains unverified.', 'scientific-note'));
-    if ((evidence.structural_assessments || []).some(record => ['ambiguous', 'unresolved', 'unsupported', 'conflicting', 'rejected'].includes(record.status))) {
-      card.append(element('p', 'Unresolved step.', 'scientific-note'));
-    }
+    if (routeCheck.note) card.append(element('p', routeCheck.note, 'scientific-note'));
     for (const record of evidence.recipe_assessments || []) scientificNotes(card, record.hard_conflicts || []);
+    scientificNotes(card, step.limitations);
     card.append(supportingEvidence(step, sources, key, true));
     return card;
   }
@@ -417,6 +437,14 @@ function showStructured(view, key = 'science') {
   for (const [index, route] of view.routes.entries()) {
     const box = element('section', '', 'route-section');
     const routeKey = key + ':' + route.id;
+    const checks = route.step_ids.map(id => routeStepCheck(steps.get(id)));
+    const checked = checks.filter(check => check.checked).length;
+    const unavailable = checks.filter(check => check.unavailable).length;
+    let title = route.title;
+    if (checks.length) {
+      title += ' · ' + checked + '/' + checks.length + (checks.length === 1 ? ' step' : ' steps');
+      title += unavailable ? ' with confirmed structural checks · ' + unavailable + ' unavailable' : ' structurally assessed';
+    }
     if (route.unreached_target_ids.length) box.append(element('p', 'Incomplete route: does not reach ' + route.unreached_target_ids.map(id => molecules.get(id).name).join(', ') + '.', 'scientific-note'));
     const hasRouteScheme = ['linear_scheme', 'branched_scheme'].includes(route.drawing_status);
     if (route.image_url) {
@@ -430,15 +458,25 @@ function showStructured(view, key = 'science') {
       box.append(figure);
     }
     scientificNotes(box, route.limitations);
-    if (route.step_ids.some(id => (steps.get(id)?.assessment_evidence?.structural_assessments || [])
-      .some(record => record.admission_eligible === false))) {
-      box.append(element('p', 'Provisional route: validation incomplete.', 'scientific-note'));
+    const flagged = checks.flatMap((check, i) => check.needsReview ? [i + 1] : []);
+    if (flagged.length) box.append(element('p', 'Structural checks flagged ' +
+      (flagged.length === 1 ? 'step ' : 'steps ') + flagged.join(', ') + ' for review.', 'scientific-note'));
+    const graded = checks.map((check, i) => ({step:i + 1, precedent:check.precedent})).filter(item => item.precedent);
+    if (graded.length) {
+      const lowest = Math.min(...graded.map(item => item.precedent.evidence_rank));
+      const weak = graded.filter(item => item.precedent.evidence_rank === lowest);
+      const grades = [...new Set(weak.map(item => item.precedent.grade.replaceAll('_', ' ')))];
+      box.append(element('p', 'Lowest recorded local precedent grade at ' + (weak.length === 1 ? 'step ' : 'steps ') +
+        weak.map(item => item.step).join(', ') + ' (' + grades.join(', ') + ').', 'match-summary'));
     }
     if (route.drawing_warning) box.append(element('p', 'Route scheme unavailable: ' + route.drawing_warning, 'scientific-note'));
-    route.step_ids.forEach((id, position) => { box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1, !hasRouteScheme, true)); routed.add(id); });
-    if (view.routes.length === 1) section.append(element('h3', route.title), box);
+    route.step_ids.forEach((id, position) => {
+      box.append(reactionCard(steps.get(id), sources, molecules, routeKey + ':' + id, position + 1, !hasRouteScheme, checks[position]));
+      routed.add(id);
+    });
+    if (view.routes.length === 1) section.append(element('h3', title), box);
     else {
-      const alternative = disclosure(route.title + ' · ' + route.step_ids.length + ' steps', routeKey, box);
+      const alternative = disclosure(title, routeKey, box);
       alternative.className += ' route-choice'; alternative.open = index === 0; section.append(alternative);
     }
   }

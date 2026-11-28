@@ -24,6 +24,76 @@ library = route_tests.library
 workspace = route_tests.workspace
 
 
+@pytest.fixture
+def acid_study(workspace, tmp_path):
+    from tests.condition_recommender.test_exact_reaction_mapping import MAPPED, QUERY
+
+    row = record(1, MAPPED)
+    row.update(yield_pct=None, outcome_status="missing")
+    index_path, core_path = tmp_path / "conditions.sqlite", tmp_path / "cores.sqlite"
+    save_sqlite_generic_index(build_generic_index([row]), index_path)
+    build_shared_core_index(load_sqlite_generic_index(index_path), core_path)
+    baseline = dict(workspace.store.manifest["baseline"])
+    baseline["artifacts"] = {**baseline["artifacts"], "condition_index": artifact_identity(index_path),
+                             "shared_core_index": artifact_identity(core_path)}
+    store = InvestigationStore.create(tmp_path / "recovery", objective="Verify exact-source map", baseline=baseline)
+    return ScientificWorkspace(store.root), QUERY
+
+
+def test_exact_source_map_is_revalidated_for_route_and_single_step(acid_study):
+    study, query = acid_study
+    store = study.store
+    precursors, target = query.split(">>")
+    proposal = {"precursor_smiles": precursors, "target_smiles": target}
+    _, single = call(study, "assess_route_step", proposal=proposal)
+    mapping = single["mapping_evidence"]
+    assert mapping["basis"] == "exact_source_mapping" and mapping["original_gate"]["status"] == "unresolved"
+    assert [source["observation_id"] for source in mapping["sources"]] == ["obs-1"]
+    assert next(gate for gate in single["assessment"]["gates"] if gate["gate_id"] == "atom_correspondence")["status"] == "pass"
+    _, route = call(study, "assess_route_proposal", proposal={"target_smiles": target, "steps": [
+        {"external_step_id": "acid", **proposal}]})
+    assert route["mapping_evidence"]["acid"] == mapping
+    assert route["assessment"]["step_assessments"][0]["assessment"] == single["assessment"]
+    review = route["step_reviews"][0]["precedent"]
+    assert review["query_basis"] == "validated_exact_source_mapping"
+    assert review["measured_evidence_status"] == "no_comparable_numeric_outcome"
+    _, invalid = call(study, "assess_route_proposal", proposal={"target_smiles": target, "steps": [
+        {"external_step_id": "repeated", **proposal},
+        {"external_step_id": "repeated", "precursor_smiles": "CCBr.N", "target_smiles": "CCN"}]})
+    assert invalid["assessment"]["status"] == "invalid" and invalid["mapping_evidence"] == {}
+    receipts = [store.read_artifact(ref)["result"] for ref in invalid["step_checkpoint_refs"]]
+    assert receipts[0]["mapping_evidence"] == mapping and receipts[1]["mapping_evidence"] is None
+
+
+@pytest.mark.parametrize("unavailable", ["exact_source_mapping", "precedent"])
+def test_unavailable_step_evidence_is_retried_after_reopen(acid_study, monkeypatch, unavailable):
+    import sqlite3
+    import condition_recommender.exact_reaction_mapping as source_maps
+    from chem_coworker.scientific_workspace.adapters import route_step_review
+
+    study, query = acid_study
+    reactants, product = query.split(">>")
+    proposal = {"target_smiles": product, "steps": [
+        {"external_step_id": "acid", "target_smiles": product, "precursor_smiles": reactants}]}
+    with monkeypatch.context() as fault:
+        if unavailable == "exact_source_mapping":
+            def temporary_lock(*args, **kwargs):
+                raise sqlite3.OperationalError("Temporary database lock")
+
+            fault.setattr(source_maps, "recover_exact_reaction_mapping", temporary_lock)
+        else:
+            fault.setattr(route_step_review, "_precedent", lambda *args: {"status": "unavailable", "reason": "Temporary database lock"})
+        _, before = call(study, "assess_route_proposal", proposal=proposal)
+    original, = before["step_checkpoint_refs"]
+    saved = study.store.read_artifact(original)
+    assert saved["result"]["step_review"][unavailable]["status"] == "unavailable"
+    _, after = call(ScientificWorkspace(study.store.root), "assess_route_proposal", proposal=proposal)
+    assert after["step_checkpoint_refs"] != [original]
+    assert after["mapping_evidence"]["acid"]["status"] == "recovered"
+    assert after["step_reviews"][0]["precedent"]["status"] == "assessed"
+    assert study.store.read_artifact(original) == saved
+
+
 @pytest.mark.parametrize(("oxime", "status"), (
     ("[CH2:3][C:4](=[N:5][OH:6])", "unspecified"),
     (r"[CH2:3]/[C:4](=[N:5]\[OH:6])", "anti_aligned"),

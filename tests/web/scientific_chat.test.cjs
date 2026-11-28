@@ -718,17 +718,18 @@ test('linear routes show SVGs, reaction SMILES and precedents without diagnostic
     return false;
   };
   assert.ok(!inDetails(sourceFigure), 'source reaction SVG must be visible');
-  for (const text of ['No inspected experimental support supplied for this step.',
+  for (const text of ['No inspected experimental support supplied for this step.', 'Target feasibility unresolved',
     'Reported yield: 72%']) {
     const nodes = card.descendants().filter(node => node.textContent === text);
     assert.ok(nodes.some(node => !inDetails(node)), text + ' must remain visible');
   }
-  for (const text of ['Reason for this step','Target recipe','Transfer remains uncertain','Target feasibility unresolved']) {
+  for (const text of ['Reason for this step','Target recipe','Transfer remains uncertain']) {
     assert.ok(!card.descendants().some(node => node.textContent === text), text + ' remains in saved evidence, outside the compact view');
   }
   assert.ok(!card.querySelectorAll('summary').some(node => /Match details|Search scope|Step cautions|Assessment/.test(node.textContent)));
-  assert.equal(card.descendants().filter(node => node.textContent === 'Provisional route: validation incomplete.').length, 1);
-  assert.ok(card.descendants().some(node => node.textContent === 'Unresolved step.' && !inDetails(node)));
+  assert.ok(card.querySelectorAll('h3').some(node => node.textContent === 'Complete route · 2/2 steps structurally assessed'));
+  assert.equal(card.descendants().filter(node => node.textContent === 'Structural checks flagged steps 1, 2 for review.').length, 1);
+  assert.ok(card.descendants().some(node => node.textContent === 'Structural review needed (ambiguous).' && !inDetails(node)));
   assert.ok(!card.descendants().some(node => node.textContent.startsWith('Conditions: Proposed')));
   assert.equal(JSON.stringify(context.routeView), original);
   context.routeView.routes[0].drawing_status = 'branched_scheme';
@@ -736,10 +737,53 @@ test('linear routes show SVGs, reaction SMILES and precedents without diagnostic
   assert.equal(branched.querySelectorAll('img').filter(node => node.src.endsWith('route')).length, 1);
   assert.equal(branched.querySelectorAll('img').filter(node => node.src.endsWith('target-step')).length, 0);
   assert.ok(branched.querySelectorAll('figcaption').some(node => node.textContent.includes('top to bottom')));
-  assert.ok(branched.descendants().some(node => node.textContent === 'Provisional route: validation incomplete.'));
+  assert.ok(branched.descendants().some(node => node.textContent === 'Structural checks flagged steps 1, 2 for review.'));
   context.routeView.routes[0].drawing_status = 'dependency_overview';
   const fallback = run('showStructured(routeView)');
   assert.equal(fallback.querySelectorAll('img').filter(node => node.src.endsWith('target-step')).length, 2);
+});
+
+test('route headings count unique assessed steps and keep unchecked alternatives visible', () => {
+  const {run, context} = harness();
+  const step = {title:'Step',basis:'proposed',reactant_ids:[],product_ids:[],conditions:[],limitations:[]};
+  const partial = {status:'recorded',structural_assessments:[
+    {status:'precedent_supported',admission_eligible:true,
+      step_review:{precedent:{grade:'structural_analogue',evidence_rank:1}}},
+    {status:'ambiguous',admission_eligible:false,gates:[{gate_id:'atom_correspondence',status:'unresolved'}]},
+  ]};
+  const qualification = 'The C1-H analogue gave a 2:1 C5:C7 mixture. The required C7 isomer was minor.';
+  const unchecked = [
+    {status:'not_recorded'},
+    {status:'recorded',recipe_assessments:[{status:'supported'}]},
+    undefined,
+  ];
+  const second = Array.from({length:7}, (_, i) => ({...step,id:'b' + i,
+    assessment_evidence:unchecked[i % unchecked.length],limitations:i === 1 ? [qualification] : []}));
+  const annulation = {status:'structurally_verified',admission_eligible:false,
+    step_review:{precedent:{grade:'no_qualified_precedent',evidence_rank:0}}};
+  const steps = [{...step,id:'a',assessment_evidence:partial},
+    {...step,id:'annulate',assessment_evidence:{status:'recorded',structural_assessments:[annulation]}}, ...second];
+  const route = {limitations:[],unreached_target_ids:[],drawing_status:'linear_scheme'};
+  context.view = {sources:[],molecules:[],steps,routes:[
+    {...route,id:'r1',title:'Route A',step_ids:['a', 'annulate', 'b0']},
+    {...route,id:'r2',title:'Route B',step_ids:second.map(s => s.id)},
+  ]};
+  const routes = byClass(run('showStructured(view)'), 'route-choice');
+  assert.equal(routes[0].firstElementChild.textContent, 'Route A · 2/3 steps structurally assessed');
+  assert.equal(routes[1].firstElementChild.textContent, 'Route B · 0/7 steps structurally assessed');
+  assert.equal(routes[1].open, false);
+  assert.ok(routes[0].descendants().some(n => n.textContent === 'Structural checks flagged steps 1, 2 for review.'));
+  assert.ok(routes[0].descendants().some(n => n.textContent === 'Structural review needed (atom correspondence unresolved).'));
+  assert.ok(routes[0].descendants().some(n => n.textContent === 'Lowest recorded local precedent grade at step 2 (no qualified precedent).'));
+  assert.ok(!routes[1].descendants().some(n => n.textContent.includes('Lowest recorded local precedent')));
+  const secondCards = byClass(routes[1], 'scientific-step');
+  assert.ok(secondCards[1].descendants().some(n => n.textContent === 'No structural check recorded.'));
+  assert.ok(secondCards[1].descendants().some(n => n.textContent === qualification));
+  assert.equal(secondCards.filter(card => card.descendants().some(n => n.textContent === qualification)).length, 1);
+  second[2].assessment_evidence = {status:'evidence_unavailable'};
+  const unavailable = byClass(run('showStructured(view)'), 'route-choice')[1];
+  assert.equal(unavailable.firstElementChild.textContent, 'Route B · 0/7 steps with confirmed structural checks · 1 unavailable');
+  assert.ok(byClass(unavailable, 'scientific-step')[2].descendants().some(n => n.textContent === 'Saved structural check unavailable.'));
 });
 
 test('condition choices share a scheme and expose two precedents with attributed rationale', () => {

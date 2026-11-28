@@ -46,8 +46,9 @@ Response `event.artifact_ref` is the saved call ID. Inspect `record`, `procedure
 and other hit paths similarly; bounded inspection supports `offset` and `limit`.
 `search_prepared` can select a saved `variant_id` without recopying SMARTS.
 Errors, deadlines and empty results remain distinct. A killed worker restarts on
-the next request. Quit when finished. Ordinary `w.run` calls remain available
-when a persistent terminal is unavailable, with a fresh worker per search.
+the next request. Quit when finished. Python scripts can use
+`with ScientificWorkspace.session(workspace_path) as w:` for the same worker
+reuse and per-call deadlines.
 
 SMILES substructure queries do not automatically constrain carbon hydrogen count
 or prohibit extra carbonyl substitution. If returned lactams differ from a target

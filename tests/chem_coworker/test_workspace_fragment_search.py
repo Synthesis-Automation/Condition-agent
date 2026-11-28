@@ -188,16 +188,14 @@ def test_suggestion_is_recorded_replayable_and_requires_no_index(tmp_path, monke
 
 
 def test_console_reuses_library_preserves_evidence_and_records_inspection(workspace):
-    from chem_coworker.scientific_workspace.adapters.fragment_search import FragmentWorker
     from chem_coworker.scientific_workspace.adapters.operations import _fragment_replay_result
     from chem_coworker.scientific_workspace.console import ScientificConsole
 
     arguments = {"query": "COC", "target_smiles": "CCOC"}
     cold = workspace.run("search_fragment_precedents", arguments)
     cold_result = workspace.store.read_artifact(cold.artifact_ref)["result"]
-    with FragmentWorker() as worker:
-        workspace.operations.fragment_worker = worker
-        console = ScientificConsole(workspace)
+    with ScientificWorkspace.session(workspace.store.root) as session:
+        console = ScientificConsole(session)
         first = console.dispatch({"operation": "search_fragment_precedents", "arguments": arguments,
                                   "reason": "Find ether construction"})
         first_ref = first["event"]["artifact_ref"]
@@ -216,7 +214,7 @@ def test_console_reuses_library_preserves_evidence_and_records_inspection(worksp
         inspected = console.dispatch({"action": "inspect", "source_ref": first_ref,
                                       "path": ["result", "hits", 0, "matches"]})
         assert workspace.store.read_artifact(inspected["inspection_ref"])["review_status"] == "opened_not_adjudicated"
-        process = worker.process
+        process = session.operations.fragment_worker.process
     assert process.poll() is not None
 
 

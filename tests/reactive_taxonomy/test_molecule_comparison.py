@@ -35,6 +35,20 @@ def test_symmetric_aromatic_core_retains_multiple_attachments():
     assert compare_molecules('Cc1ccccc1', 'Clc1ccccc1') == result
 
 
+@pytest.mark.parametrize("proposed,parent,fused", [
+    ("Cc1nc2cccc(C(=O)O)c2o1", "O=C(O)c1ccccc1", "O=C(O)c1cccc2ccccc12"),
+    ("Cc1nc2ccc3cc[nH]c(=O)c3c2o1", "O=c1[nH]ccc2ccccc12", "O=c1[nH]ccc2ccc3ccccc3c12"),
+])
+def test_annulation_analogues_preserve_adjacent_fusion(proposed, parent, fused):
+    """CN110746353A Examples 1 and 21 share the annulation but differ at its ring junction."""
+    parent_match = compare_molecules(proposed, parent)
+    fused_match = compare_molecules(proposed, fused)
+    assert not (parent_match.search_timed_out or fused_match.search_timed_out)
+    assert fused_match.left_coverage > parent_match.left_coverage
+    assert fused_match.core_atom_count > parent_match.core_atom_count
+    assert not fused_match.same_constitution
+
+
 @pytest.mark.parametrize('left,right', [
     ('C', 'N'), ('[13CH4]', 'C'), ('N', '[NH4+]'),
     ('c1ccccc1', 'C1CCCCC1'), ('C1CCCCC1', 'C1CCCC1'),

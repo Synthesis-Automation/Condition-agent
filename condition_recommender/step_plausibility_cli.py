@@ -18,6 +18,11 @@ from .step_recipe_evidence import StepRecipeEvidence, assess_step_recipe_evidenc
 
 
 def _graph_diagnostic(assessment: StepPlausibilityAssessment) -> str | None:
+    recovery = assessment.mapping_recovery
+    if recovery and recovery.status == "conflicting_mappings":
+        return "Exact source reactions disagree on the atom correspondence."
+    if recovery and recovery.status == "truncated":
+        return "The exact-source lookup reached its limit before agreement could be established."
     if assessment.query_context.product_element_excess:
         deficits = ", ".join(
             f"{symbol} ({count})" for symbol, count in assessment.query_context.product_element_excess
@@ -114,6 +119,8 @@ def _concise_summary(
     if truncated:
         summary += " | search limit reached"
     lines.append(summary)
+    if step.mapping_recovery and step.mapping_recovery.mapped_reaction_smiles:
+        lines.append("Atom correspondence recovered from an identical reported reaction.")
     lines.extend(f"  {number}. {row}" for number, row in enumerate(rows, 1))
     return "\n".join(lines)
 
@@ -143,6 +150,9 @@ def _summary(assessment: StepPlausibilityAssessment, citations: dict[str, dict])
     diagnostic = _graph_diagnostic(assessment)
     if diagnostic:
         lines.append(diagnostic)
+    if assessment.mapping_recovery and assessment.mapping_recovery.mapped_reaction_smiles:
+        sources = ", ".join(source.reaction_id for source in assessment.mapping_recovery.sources)
+        lines.append(f"Atom correspondence recovered from exact source reactions: {sources}")
     if assessment.query_context.requirements:
         lines.append("Retained context required on the reacting partners:")
         lines.extend(f"  {requirement}" for requirement in assessment.query_context.requirements)

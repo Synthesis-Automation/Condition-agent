@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from forward_synthesis import ForwardOperatorLibrary
 
@@ -207,8 +207,12 @@ def assess_external_route_proposal(
     forward_library: ForwardOperatorLibrary | None = None,
     condition_evaluator: ConditionEvidenceEvaluator | None = None,
     limits: ExternalProposalAssessmentLimits | None = None,
+    step_reviewer: Callable[
+        [ExternalRouteStepProposal, Callable[[ExternalRetrosynthesisProposal], ExternalRetrosynthesisAssessment]],
+        ExternalRetrosynthesisAssessment,
+    ] | None = None,
 ) -> ExternalRouteAssessment:
-    """Assess each step independently, then assemble only a consistent route."""
+    """Assess each step independently, optionally checkpointing through a trusted reviewer."""
 
     policy = load_external_proposal_admission_policy()
     bounded = limits or policy.limits
@@ -221,16 +225,16 @@ def assess_external_route_proposal(
     duplicate_ids = tuple(
         sorted({item for item in step_ids if step_ids.count(item) > 1})
     )
+    def evaluate(proposal: ExternalRetrosynthesisProposal) -> ExternalRetrosynthesisAssessment:
+        return assess_external_retrosynthesis_proposal(
+            proposal, operator_library, forward_library=forward_library,
+            condition_evaluator=condition_evaluator, limits=bounded,
+        )
+
     step_assessments = tuple(
         ExternalRouteStepAssessment(
             external_step_id=item.external_step_id,
-            assessment=assess_external_retrosynthesis_proposal(
-                item.proposal,
-                operator_library,
-                forward_library=forward_library,
-                condition_evaluator=condition_evaluator,
-                limits=bounded,
-            ),
+            assessment=evaluate(item.proposal) if step_reviewer is None else step_reviewer(item, evaluate),
         )
         for item in route.steps
     )

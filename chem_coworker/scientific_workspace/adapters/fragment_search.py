@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from threading import Lock
 from time import monotonic, sleep
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
@@ -26,7 +27,7 @@ def _session_worker_command(directory: Path) -> list[str]:
 
 
 class FragmentWorker:
-    """One console-owned child; reuse only the index with a hard per-call deadline.
+    """One session-owned child; reuse the index with a hard per-call deadline.
 
     Closing stdin or the console closes the child. Timeouts terminate the entire
     child and the next request starts fresh. There is no daemon or global cache.
@@ -37,6 +38,7 @@ class FragmentWorker:
         self.streams: list[Any] = []
         self.root: Path | None = None
         self.log_paths: dict[str, str] = {}
+        self._request_lock = Lock()
 
     def __enter__(self) -> "FragmentWorker":
         return self
@@ -62,6 +64,14 @@ class FragmentWorker:
 
     def request(self, directory: Path, timeout: int) -> dict[str, Any]:
         """Submit one immutable request directory and wait for its atomic result."""
+        if not self._request_lock.acquire(blocking=False):
+            raise RuntimeError("Fragment worker already has an active request")
+        try:
+            return self._request(directory, timeout)
+        finally:
+            self._request_lock.release()
+
+    def _request(self, directory: Path, timeout: int) -> dict[str, Any]:
         from ..core.process_utils import hidden_process_options
 
         started = monotonic()

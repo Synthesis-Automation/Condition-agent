@@ -25,6 +25,7 @@ from reactive_taxonomy.step_precedent_context import (
     compare_step_contexts,
 )
 
+from .exact_reaction_mapping import ExactReactionMapping, recover_exact_reaction_mapping
 from .generic_indexing import GenericReactionIndex
 from .reaction_precedent_support import (
     ReactionPrecedentEvidence,
@@ -150,6 +151,8 @@ class StepPlausibilityAssessment:
     shared_core_definition_hash: str | None
     schema_version: str = "step_plausibility.v2"
     closest_match: StepPlausibilityMatch | None = None
+    mapping_recovery: ExactReactionMapping | None = None
+    original_query_warnings: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Return source-linked evidence and the rules that assigned its grade."""
@@ -297,6 +300,17 @@ def _assess_step_and_pool(
     )
     context_for = lru_cache(maxsize=None)(build_step_context)
     query = context_for(reaction_smiles)
+    recovery = None
+    original_warnings = ()
+    if pool.status == "unresolved":
+        recovery = recover_exact_reaction_mapping(reaction_smiles, index, shared_index,
+                                                  candidate_limit=candidate_limit)
+        if recovery.mapped_reaction_smiles:
+            original_warnings = tuple(sorted(set(pool.warnings) | set(query.warnings)))
+            pool = collect_reaction_precedent_support(
+                recovery.mapped_reaction_smiles, index, shared_index, candidate_limit=candidate_limit,
+            )
+            query = context_for(recovery.mapped_reaction_smiles)
     matches = [_assess_structural_match(query, context_for(row.reaction_smiles), row, policy)
                for row in pool.matches]
     normalized_reaction = lru_cache(maxsize=None)(_normalized_reaction)
@@ -368,6 +382,8 @@ def _assess_step_and_pool(
     elif matches:
         grade = "structural_analogue"
     warnings = set(pool.warnings) | set(query.warnings)
+    if recovery and recovery.mapped_reaction_smiles:
+        warnings.add("QUERY_ATOM_MAPPING_FROM_EXACT_SOURCE_REACTION")
     warnings.update(("REFERENCE_GROUPS_ARE_PROXIES_FOR_INDEPENDENT_REPORTS",
                      "SOURCE_OUTCOMES_APPLY_TO_RECORDED_RECIPES"))
     if has_adverse:
@@ -410,5 +426,6 @@ def _assess_step_and_pool(
         matches=_display_sample(matches, match_limit), exclusions=pool.exclusions,
         warnings=tuple(sorted(warnings)), policy=policy, index_source_identity=shared_index.source_identity,
         shared_core_definition_hash=pool.definition_hash,
+        mapping_recovery=recovery, original_query_warnings=original_warnings,
     )
     return assessment, matches

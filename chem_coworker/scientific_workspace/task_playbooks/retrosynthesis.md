@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v13
+# Retrosynthesis investigation adviser v14
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -59,7 +59,12 @@ automatically add protection without checking its compatibility and step cost.
 For literature search, distinguish positional scaffold evidence, reaction-partner
 evidence and their joint compatibility. Combining two analogue examples does not
 establish the exact proposed reaction. Read experimental passages for the critical
-steps and use graph identity to check names, linkers and protection states.
+steps and use graph identity to check names, linkers and protection states. In a
+source with multiple examples of the same bond edits, compare the reacting
+substrates and products with `compare_molecules`. Prefer the example that preserves
+the adjacent ring junctions and functional groups, and record the differences.
+If the source reports multiple products, give the competing structures or sites,
+ratio, and isolation status in the cited step's support note.
 Compare routes from equally justified starting materials, including preparation
 and protection steps. Label finishing variants that share the same bottleneck.
 

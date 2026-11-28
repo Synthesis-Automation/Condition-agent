@@ -12,6 +12,7 @@ from reactive_taxonomy import featurize_reaction
 
 from core_retrosynthesis.external_proposal_assessment import (
     ExternalRetrosynthesisProposal,
+    _operator_matches,
     assess_external_retrosynthesis_proposal,
     load_external_proposal_admission_policy,
     validate_external_proposal_admission_policy,
@@ -136,6 +137,9 @@ def test_unmapped_step_recovers_internal_operator_and_precedent(
     assert assessment.status == "precedent_supported"
     assert assessment.strongest_evidence_tier == "precedent_supported"
     assert assessment.admission_eligible
+    assert assessment.schema_versions["external_proposal_assessment"] == "1.1"
+    operator_gate = next(gate for gate in assessment.gates if gate.gate_id == "operator_support")
+    assert "Broader edit-archetype search was skipped" in operator_gate.summary
     assert not assessment.actionable
     assert assessment.internal_confidence_parity
     assert assessment.reaction_identity is not None
@@ -148,6 +152,52 @@ def test_unmapped_step_recovers_internal_operator_and_precedent(
     assert tuple(gate.gate_id for gate in assessment.gates) == (
         load_external_proposal_admission_policy().required_gate_order
     )
+
+
+@pytest.mark.parametrize(("valid_templates", "expected", "witness_checks"), [
+    ({"exact-a", "exact-b", "broad"}, ["exact-b", "exact-a"], ["exact-a", "exact-b"]),
+    ({"exact-b", "broad"}, ["exact-b"], ["exact-a", "exact-b"]),
+    ({"broad"}, ["broad"], ["exact-a", "exact-b", "broad"]),
+    (set(), [], ["exact-a", "exact-b", "broad"]),
+])
+def test_exact_first_operator_lookup_checks_legacy_witnesses(
+    operator_library, monkeypatch, valid_templates, expected, witness_checks,
+):
+    # Construct competing templates with the same edit archetype but different
+    # signatures. Force historical verification so every expensive call is visible.
+    mapped = materialize_atom_mapping(FIRST_REACTION)
+    identity = analyze_generic_reaction(mapped.reaction_smiles)
+    template = next(t for t in operator_library.templates if t.operator_signature == identity.operator_signature)
+    broad_tokens = json.loads(identity.operator_signature)
+    broad_tokens[0][1] = "other-atom-environment"
+    broad_signature = json.dumps(broad_tokens)
+    templates = tuple(replace(template, operator_id=key, template_id=key, reaction_smarts=key,
+                              operator_signature=sig, observation_support=count,
+                              independent_reference_support=count, stereo_policy="relaxed")
+                      for key, sig, count in (("broad", broad_signature, 100),
+                                              ("exact-a", identity.operator_signature, 3),
+                                              ("exact-b", identity.operator_signature, 4)))
+    legacy = replace(operator_library, operators=(), templates=templates, definition={})
+    calls = []
+
+    def source_reproduced(smarts, product, reactants):
+        calls.append(smarts)
+        return smarts in valid_templates
+
+    monkeypatch.setattr("core_retrosynthesis.generic_compiler._legacy_source_reproduced", source_reproduced)
+    matches = _operator_matches(identity, legacy, limit=20)
+    assert [m.operator_id for m in matches] == expected
+    assert calls == witness_checks
+    calls.clear()
+    assert _operator_matches(identity, legacy, limit=1) == matches[:1]
+    assert calls == witness_checks
+    if expected == ["broad"]:
+        # A historical exact candidate whose witnesses fail cannot admit the step.
+        result = assess_external_retrosynthesis_proposal(
+            ExternalRetrosynthesisProposal(target_smiles="CCN", precursor_smiles="CC=O.N"), legacy)
+        gate = next(gate for gate in result.gates if gate.gate_id == "operator_support")
+        assert gate.status == "unresolved" and "1 diagnostic match" in gate.summary
+        assert not result.admission_eligible and result.precedent_matches == ()
 
 
 @pytest.mark.parametrize("legacy_operators", [False, True])

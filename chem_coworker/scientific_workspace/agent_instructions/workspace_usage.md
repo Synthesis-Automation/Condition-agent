@@ -41,8 +41,8 @@ recorded interpreter and investigation directory. Send one JSON line at a time:
 Read each response before choosing the next query; allow time for the first index
 load. Use the catalogue for query arguments and
 `w.task_guide('retrosynthesis_fragments')` for additional console examples.
-If a persistent terminal is unavailable, batch independent calls in one saved
-Python process and reuse recorded results.
+In a Python investigation script, use `with ScientificWorkspace.session(@INVESTIGATION_ROOT@) as w:`
+around repeated searches. The index loads once and the worker closes on exit.
 
 Manifest investigation.json identifies selected datasets, versions and limitations.
 Events and artifacts retain complete calls and notes. Start with w.run_summary(...)
@@ -112,6 +112,12 @@ For route-finding tasks, apply these decision checks without needing to load a g
   Record exact inspected experiment, inspected analogue with explicit differences,
   generic transformation support, or unsupported proposal separately from graph
   admission. No automatic similarity threshold establishes a close analogue.
+  For a decisive step with a published substrate series, compare examples sharing
+  the bond edits. Use compare_molecules on the reacting substrates and products to
+  find the example that preserves the nearby groups and ring junctions. Put its
+  locator, reported outcome and remaining substrate differences in the step's
+  support note. For mixtures, include the competing site, observed ratio, and
+  whether the desired isomer was isolated on that substrate.
 - A recipe's no_known_conflict only means the covered rules found no conflict.
   Inspect compatibility.coverage and missing procedures/operating fields; do not
   turn not_covered into a positive feasibility judgment. Reconcile formula, chemical

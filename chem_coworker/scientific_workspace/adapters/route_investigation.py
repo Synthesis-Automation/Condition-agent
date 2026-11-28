@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
-from dataclasses import fields
+from collections.abc import Callable
+from dataclasses import fields, replace
+from sqlite3 import DatabaseError
 from typing import TYPE_CHECKING, Any
 
+from pydantic import TypeAdapter
+
 from core_retrosynthesis.external_proposal_assessment import (
+    ExternalRetrosynthesisAssessment,
     ExternalRetrosynthesisProposal,
     assess_external_retrosynthesis_proposal,
     load_external_proposal_admission_policy,
@@ -24,7 +29,9 @@ from core_retrosynthesis.route_proposal_revision import (
 )
 
 from .step_selection import resolve_saved_candidate
-from .route_step_review import review_steps, weakest_steps
+from .route_checkpoints import RouteCheckpoints
+from .route_step_review import _corpus, review_steps, weakest_steps
+from ..core.store import canonical_bytes
 
 if TYPE_CHECKING:
     from .operations import ScientificOperations
@@ -169,6 +176,55 @@ def _recipe(operations: ScientificOperations, proposal: ExternalRetrosynthesisPr
     )
 
 
+def _review_step(
+    operations: ScientificOperations, step_id: str | None, step: ExternalRetrosynthesisProposal,
+    evaluate: Callable[[ExternalRetrosynthesisProposal], ExternalRetrosynthesisAssessment],
+    mapping_evidence: dict[str, Any] | None,
+) -> tuple[ExternalRetrosynthesisAssessment, dict[str, Any]]:
+    """Use a source mapping only after the original, unsupplied correspondence is unresolved."""
+    assessment = evaluate(step)
+    gate = next(gate for gate in assessment.gates if gate.gate_id == "atom_correspondence")
+    recovery = None
+    if not step.mapped_reaction_smiles and gate.status == "unresolved":
+        engine, corpus_status = _corpus(operations)
+        if corpus_status.get("status") == "unavailable":
+            recovery = corpus_status
+        if engine is not None:
+            from condition_recommender.exact_reaction_mapping import recover_exact_reaction_mapping
+
+            reaction = f"{step.precursor_smiles}>>{step.target_smiles}"
+            try:
+                candidate = recover_exact_reaction_mapping(reaction, engine.index, engine.shared_core_index)
+            except (ValueError, OSError, DatabaseError) as exc:
+                recovery = {"status": "unavailable", "reason": str(exc)}
+            else:
+                recovery = candidate.to_dict()
+                if candidate.status == "recovered":
+                    mapped = replace(step, mapped_reaction_smiles=candidate.mapped_reaction_smiles)
+                    checked = evaluate(mapped)
+                    if checked.normalized_mapped_reaction_smiles:
+                        mapping_evidence = {"basis": "exact_source_mapping", **recovery,
+                                            "original_assessment_id": assessment.assessment_id,
+                                            "original_status": assessment.status, "original_gate": gate.to_dict()}
+                        step, assessment = mapped, checked
+                    else:
+                        recovery = {**recovery, "status": "rejected_by_structural_validation",
+                                    "validation_warnings": list(checked.warnings)}
+    recipe = _recipe(operations, step)
+    review, = review_steps(operations, [(step_id, step, assessment, recipe)])
+    if recovery and not mapping_evidence:
+        review["exact_source_mapping"] = recovery
+    if mapping_evidence and mapping_evidence.get("basis") == "exact_source_mapping":
+        if review["precedent"].get("status") == "assessed":
+            review["precedent"]["query_basis"] = "validated_exact_source_mapping"
+    return assessment, {
+        "schema_version": "route_step_investigation.v1", "origin": "agent_proposal",
+        "review_status": "unreviewed", "proposal": step.to_dict(),
+        "assessment": assessment.to_dict(), "proposed_recipe_assessment": recipe, "step_review": review,
+        "mapping_evidence": mapping_evidence, "experimental_feasibility": "not_established",
+    }
+
+
 def assess_step(
     operations: ScientificOperations, proposal: dict[str, Any], include_conditions: bool,
     include_forward: bool, evidence_refs: list[str] | None,
@@ -180,18 +236,12 @@ def assess_step(
         refs.append(mapping_evidence["source_ref"])
     evidence = _evidence(operations, refs)
     step = _step(proposal)
-    assessment = assess_external_retrosynthesis_proposal(
-        step, **_assessment_arguments(operations, include_conditions, include_forward),
+    arguments = _assessment_arguments(operations, include_conditions, include_forward)
+    _, result = _review_step(
+        operations, None, step, lambda value: assess_external_retrosynthesis_proposal(value, **arguments),
+        mapping_evidence,
     )
-    recipe = _recipe(operations, step)
-    review, = review_steps(operations, [(None, step, assessment, recipe)])
-    return {
-        "schema_version": "route_step_investigation.v1", "origin": "agent_proposal",
-        "review_status": "unreviewed", "proposal": step.to_dict(),
-        "assessment": assessment.to_dict(), "proposed_recipe_assessment": recipe, "step_review": review,
-        "mapping_evidence": mapping_evidence,
-        **evidence, "experimental_feasibility": "not_established",
-    }
+    return {**result, **evidence}
 
 
 def assess_route(
@@ -199,15 +249,15 @@ def assess_route(
     include_conditions: bool, include_forward: bool, evidence_refs: list[str] | None,
 ) -> dict[str, Any]:
     """Retain the submitted hypothesis and full authoritative assessment side by side."""
-    mapping_evidence = {}
+    submitted_mappings = []
     refs = _strings(evidence_refs, "evidence_refs")
     if isinstance(proposal, dict) and isinstance(proposal.get("steps"), list):
         steps = []
         for value in proposal["steps"]:
             step, mapping = resolve_saved_candidate(operations.store, value)
             steps.append(step)
+            submitted_mappings.append(mapping)
             if mapping:
-                mapping_evidence[step.get("external_step_id", "")] = mapping
                 refs.append(mapping["source_ref"])
         proposal = {**proposal, "steps": steps}
     evidence = _evidence(operations, refs)
@@ -215,18 +265,50 @@ def assess_route(
     unavailable = _strings(unavailable_starting_materials, "unavailable_starting_materials")
     if len(unavailable) > 100:
         raise ValueError("At most 100 unavailable starting materials may be declared")
+    arguments = _assessment_arguments(operations, include_conditions, include_forward)
+    checkpoints = RouteCheckpoints(operations.store, {
+        "route": route.to_dict(), "submitted_mappings": submitted_mappings,
+        "evidence_refs": refs, "unavailable_starting_materials": unavailable,
+        "include_conditions": include_conditions, "include_forward": include_forward,
+        "baseline": operations.store.manifest["baseline"],
+    })
+    step_records = []
+
+    def reviewed(
+        step: ExternalRouteStepProposal,
+        evaluate: Callable[[ExternalRetrosynthesisProposal], ExternalRetrosynthesisAssessment],
+    ) -> ExternalRetrosynthesisAssessment:
+        ordinal = len(step_records)
+        if ordinal in checkpoints.saved:
+            reference, result = checkpoints.saved[ordinal]
+            checked = TypeAdapter(ExternalRetrosynthesisAssessment).validate_json(
+                canonical_bytes(result["assessment"]), strict=True,
+            )
+            checkpoints.references.append(reference)
+        else:
+            checked, result = _review_step(operations, step.external_step_id, step.proposal, evaluate,
+                                           submitted_mappings[ordinal])
+            checkpoints.record(ordinal, result)
+        step_records.append(result)
+        return checked
+
     assessment = assess_external_route_proposal(
-        route, **_assessment_arguments(operations, include_conditions, include_forward),
+        route, **arguments, step_reviewer=reviewed,
     )
-    recipes = [_recipe(operations, step.proposal) for step in route.steps]
-    reviews = review_steps(operations, [
-        (step.external_step_id, submitted.proposal, step.assessment, recipe)
-        for submitted, step, recipe in zip(route.steps, assessment.step_assessments, recipes, strict=True)
-    ])
+    recipes = [row["proposed_recipe_assessment"] for row in step_records]
+    reviews = [row["step_review"] for row in step_records]
+    effective_steps = [{"external_step_id": step.external_step_id, **row["proposal"]}
+                       for step, row in zip(route.steps, step_records, strict=True)]
+    id_counts = Counter(step.external_step_id for step in route.steps)
+    mapping_evidence = {step.external_step_id: row["mapping_evidence"]
+                        for step, row in zip(route.steps, step_records, strict=True)
+                        if id_counts[step.external_step_id] == 1 and row["mapping_evidence"]}
     route_assessment = assessment.to_dict()
     return {
         "schema_version": "route_investigation.v1", "origin": "agent_proposal",
-        "review_status": "unreviewed", "proposal": route.to_dict(), "assessment": route_assessment,
+        "review_status": "unreviewed", "proposal": {**route.to_dict(), "steps": effective_steps},
+        "assessment": route_assessment, "route_check_key": checkpoints.key,
+        "step_checkpoint_refs": checkpoints.references,
         "construction_review": construction_inventory(route_assessment),
         "mapping_evidence": mapping_evidence,
         "assessment_options": {"include_conditions": include_conditions, "include_forward": include_forward},
@@ -312,7 +394,7 @@ def revise_branch(
     change = revision.to_dict()
     del change["proposal"]
     return {
-        **record, "source_ref": source_ref, "mapping_evidence": mapping_evidence,
+        **record, "source_ref": source_ref, "mapping_evidence": {**record["mapping_evidence"], **mapping_evidence},
         "revision": {**change, "reason": reason, "assumptions": assumptions, "risks": risks,
                      "basis": "proposed", "reassessment_scope": "all_steps_and_route_topology",
                      "improvement_status": "not_automatically_established"},

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import asdict
 from pathlib import Path
 from threading import Event
@@ -21,6 +23,18 @@ class ScientificWorkspace:
     def __init__(self, root: str | Path, *, operations: OperationProvider | None = None) -> None:
         self.store = InvestigationStore(root)
         self.operations: OperationProvider = operations if operations is not None else ScientificOperations(self.store)
+
+    @classmethod
+    @contextmanager
+    def session(cls, root: str | Path) -> Iterator["ScientificWorkspace"]:
+        """Open an existing investigation and reuse its lazy workers across calls."""
+        from .adapters.fragment_search import FragmentWorker
+        from .adapters.retrochimera import RetroChimeraWorker
+
+        store = InvestigationStore(root)
+        with FragmentWorker() as fragment, RetroChimeraWorker() as retro:
+            operations = ScientificOperations(store, fragment_worker=fragment, retrochimera_worker=retro)
+            yield cls(root, operations=operations)
 
     @classmethod
     def create(
@@ -113,6 +127,8 @@ class ScientificWorkspace:
 
     def replay(self, reference: str) -> InvestigationEvent:
         """Recompute a saved successful call against full baseline hashes and compare results."""
+        from .adapters.route_checkpoints import recompute_route_steps
+
         source = self.store.read_artifact(reference)
         if source.get("execution_status") != "completed" or "operation" not in source:
             raise ValueError("Only completed scientific calls can be replayed")
@@ -121,7 +137,8 @@ class ScientificWorkspace:
         saved_version = source.get("operation_contract_version")
         if saved_version is not None and saved_version != definition.contract_version:
             raise ValueError("Operation contract changed; replay requires the recorded contract version")
-        actual = self.operations.invoke(source["operation"], source["arguments"])
+        with recompute_route_steps():
+            actual = self.operations.invoke(source["operation"], source["arguments"])
         return self.store.append("replay", {
             "source_ref": reference,
             "operation_contract_version": definition.contract_version,

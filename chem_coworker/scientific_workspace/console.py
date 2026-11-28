@@ -14,10 +14,6 @@ from pathlib import Path
 import sys
 from typing import Any
 
-from .adapters.fragment_search import FragmentWorker
-from .adapters.retrochimera import RetroChimeraWorker
-from .adapters.operations import ScientificOperations
-from .core.store import InvestigationStore
 from .workspace import ScientificWorkspace
 
 
@@ -102,10 +98,8 @@ def main() -> None:
     args = parser.parse_args()
     if not 1 <= args.max_requests <= 200:
         parser.error("max-requests must be in 1..200")
-    store = InvestigationStore(args.workspace)
-    with FragmentWorker() as worker, RetroChimeraWorker() as retrochimera_worker:
-        operations = ScientificOperations(store, fragment_worker=worker, retrochimera_worker=retrochimera_worker)
-        console = ScientificConsole(ScientificWorkspace(args.workspace, operations=operations))
+    with ScientificWorkspace.session(args.workspace) as workspace:
+        console = ScientificConsole(workspace)
         print(json.dumps({"status": "ready", "protocol": "scientific_console.v1",
                           "max_requests": args.max_requests}), flush=True)
         for _ in range(args.max_requests):

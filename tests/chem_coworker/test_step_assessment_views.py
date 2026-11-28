@@ -108,6 +108,24 @@ def test_uncited_route_failure_is_visible_but_later_checks_and_recipes_are_exclu
     assert answer == before
 
 
+@pytest.mark.parametrize("receipt_kind", ["call", "route_step_checkpoint"])
+def test_uncited_step_review_exposes_only_its_precedent_grade(saved, receipt_kind):
+    store, answer = saved
+    grade = {"status": "assessed", "grade": "structural_analogue", "evidence_rank": 2}
+    scoped_recipe = {"status": "conflicting", "hard_conflicts": ["recipe-specific conflict"]}
+    result = {
+        "proposal": {"precursor_smiles": "N.CCBr", "target_smiles": "CCN"},
+        "assessment": {"status": "structurally_verified", "gates": []},
+        "step_review": {"precedent": {**grade, "closest_match": {"source_yield_pct": 67}},
+                        "recipe_status": scoped_recipe["status"], "recipe_conflicts": scoped_recipe["hard_conflicts"]},
+        "proposed_recipe_assessment": scoped_recipe,
+    }
+    store.append(receipt_kind, {"operation": "assess_route_step", "execution_status": "completed", "result": result})
+    view = answer_step_assessments(store, answer)["s1"]
+    assert view["structural_assessments"][0]["step_review"] == {"precedent": grade}
+    assert not view["recipe_assessments"] and "recipe-specific conflict" not in str(view)
+
+
 def test_recipe_coverage_reaches_presentation_without_modifying_saved_answer(saved) -> None:
     store, answer = saved
     recipe = {"recipe_id": "test-recipe", "solvents": [{"identity_status": "resolved"}]}

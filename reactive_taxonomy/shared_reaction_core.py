@@ -38,6 +38,13 @@ def _digest(namespace: str, value: Any) -> str:
     return namespace + ":" + hashlib.sha256(_json(value).encode()).hexdigest()
 
 
+def whole_reaction_graph_key(
+    reactant_graphs: tuple[str, ...] | list[str], product_graphs: tuple[str, ...] | list[str],
+) -> str:
+    """Index key for two full multisets of canonical, map-free molecular graphs."""
+    return _digest("SCR1", [sorted(reactant_graphs), sorted(product_graphs)])
+
+
 @lru_cache(maxsize=1)
 def _definition_text() -> str:
     path = Path(__file__).with_name("definitions") / "shared_reaction_core.v2.json"
@@ -432,7 +439,7 @@ def build_shared_reaction_core(
     inputs = sorted(_canonical_molecule(m) for m in reactants.values())
     outputs = sorted(_canonical_molecule(m) for m in products.values())
     base.update(
-        reaction_identity=_digest("SCR1", [inputs, outputs]),
+        reaction_identity=whole_reaction_graph_key(inputs, outputs),
         input_identity=_digest("SCI1", inputs),
         product_identity=_digest("SCP1", outputs),
     )

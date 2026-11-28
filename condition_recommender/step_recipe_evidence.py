@@ -284,6 +284,8 @@ def assess_step_recipe_evidence(
     assessment, pool = _assess_step_and_pool(
         reaction_smiles, index, shared_index, candidate_limit=candidate_limit, match_limit=match_limit,
     )
+    if assessment.mapping_recovery and assessment.mapping_recovery.mapped_reaction_smiles:
+        reaction_smiles = assessment.mapping_recovery.mapped_reaction_smiles
     core_for = lru_cache(maxsize=None)(reaction_evidence_core)
     context_for = lru_cache(maxsize=None)(build_step_context)
     threshold = assessment.policy.low_yield_below_pct
