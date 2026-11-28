@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 from ..adapters.step_selection import (
     SCHEMA_VERSION,
     SOURCE_OPERATIONS,
+    _assessed_step_ids,
     _call,
     _selection,
 )
@@ -66,11 +67,9 @@ def _saved_support(store: InvestigationStore) -> dict[tuple[str, str], list[dict
                                 "precursor_smiles": selected["precursor_smiles"],
                             }, None))
             elif operation in SOURCE_OPERATIONS:
-                selectors = [{}] if operation in {"assess_route_step", "assess_retro_validity"} else [
-                    {"step_id": item["external_step_id"]} for item in result.get("proposal", {}).get("steps", [])
-                ]
-                for selector in selectors:
-                    selected, assessment = _selection(payload, selector.get("step_id"), None)
+                for step_id in _assessed_step_ids(payload):
+                    selected, assessment = _selection(payload, step_id, None)
+                    selector = {} if step_id is None else {"step_id": step_id}
                     selections.append((selected, assessment, selector, None))
             for selected, assessment, selector, inspection in selections:
                 key = _structure_key(selected["precursor_smiles"], selected["target_smiles"])

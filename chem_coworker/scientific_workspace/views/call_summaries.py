@@ -199,7 +199,7 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         ), path)
         realization_fields = (
             "realization_id", "target_smiles", "precursor_smiles", "proposed_reaction_smiles",
-            "forward_validation_status", "precedent_reaction_ids", "selectivity_warnings",
+            "forward_validation_status", "independent_reference_support", "precedent_reaction_ids", "selectivity_warnings",
             "precursor_compatibility_disposition", "reaction_compatibility_disposition",
             "bond_focus_check",
             "strategic_class", "strategic_complexity_score", "strategic_candidate",
@@ -227,6 +227,17 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
         view.add_list(summary, value, "condition_evidence", (
             "strategy_id", "evidence", "condition_selectivity_assessment",
         ), path, limit=3)
+    elif operation == "assess_step_plausibility":
+        summary.update(view.pick(value, ("source_ref", "step_id"), path))
+        view.add_nested(summary, value, "assessment", (
+            "query_reaction_smiles", "grade", "evidence_rank", "measured_evidence_status",
+            "support_counts", "candidate_count", "qualified_count", "candidate_limit",
+            "candidate_truncated", "matches_truncated", "warnings",
+        ), path)
+        assessment = value["assessment"]
+        view.add_list(summary["assessment"], assessment, "matches", (
+            "precedent", "context", "outcome", "contributes_to_support", "excluded_by_low_yield",
+        ), f"{path}.assessment", limit=3)
     elif operation == "assess_retro_validity":
         summary.update(view.pick(value, ("source_ref", "selection", "forward_ref", "artifact_warnings", "corpus_availability"), path))
         view.add_nested(summary, value, "validity", (
@@ -271,8 +282,10 @@ def _result_summary(operation: str, value: Mapping[str, Any], view: _Projection)
             "removed_step_ids", "added_step_ids", "replaced_step_ids", "preserved_step_ids",
         ), path)
     elif operation == "compare_route_proposals":
+        view.add_list(summary, value, "shared_exact_steps", ("precursor_smiles", "target_smiles", "occurrences"), path)
         def alternative(item: Any, child: str) -> Any:
-            result = view.pick(item, ("status", "source_ref", "route_id", "step_count", "unresolved_step_ids", "limitations"), child)
+            result = view.pick(item, ("status", "source_ref", "route_id", "step_count", "unresolved_step_ids",
+                                      "route_specific_step_ids", "uncomparable_step_ids", "limitations"), child)
             if isinstance(item, Mapping):
                 view.add_nested(result, item, "material_constraints", ("status", "stock_availability", "blocked_leaf_smiles"), child)
                 view.gates(result, item, "topology_gates", child)

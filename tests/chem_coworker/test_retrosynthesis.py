@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from io import StringIO
 import json
 
@@ -29,12 +29,16 @@ from chem_coworker.contracts import (
     RetrosynthesisReview,
 )
 from chem_coworker.retrosynthesis import RetrosynthesisCoworker
+from chem_coworker.retrosynthesis_rendering import render_retrosynthesis
 from chem_coworker.retrosynthesis_review import (
     LLMRetrosynthesisReviewer,
     RetrosynthesisCandidatePayload,
     RetrosynthesisReviewPayload,
     RetrosynthesisReviewTransportResult,
 )
+from tests.core_retrosynthesis_tests import test_focused_disconnection
+
+library = test_focused_disconnection.library
 
 
 def _published_retro_release(tmp_path):
@@ -137,33 +141,15 @@ class FakeReviewer:
 
 
 def test_service_groups_validated_candidates_and_preserves_review_pool(
-    monkeypatch,
+    library,
 ) -> None:
-    candidates = (
-        _candidate(1, precursor="CCBr.N"),
-        _candidate(2, precursor="CCI.N"),
-    )
-    monkeypatch.setattr(
-        "chem_coworker.retrosynthesis.disconnect_operator_ladder",
-        lambda *args, **kwargs: candidates,
-    )
-    coworker = RetrosynthesisCoworker(
-        library=GenericTemplateLibrary(
-            templates=(),
-            source_row_count=0,
-            accepted_observation_count=0,
-            rejection_counts={},
-            definition={},
-        ),
-        reviewer=FakeReviewer(),
-    )
-
+    coworker = RetrosynthesisCoworker(library=library, reviewer=FakeReviewer())
     response = coworker.disconnect(
         RetrosynthesisRequest(
-            target_smiles="CCN",
+            target_smiles="CCNC",
             top_k=1,
             include_conditions=False,
-            review=ConditionReviewSettings(mode="always"),
+            review=ConditionReviewSettings(mode="always", max_candidates=2),
         )
     )
 
@@ -174,7 +160,68 @@ def test_service_groups_validated_candidates_and_preserves_review_pool(
         for item in response.strategies
     )
     assert response.review is not None
+    assert response.review.presentation_strategy_ids == tuple(
+        item.strategy_id for item in reversed(response.strategies)
+    )
+    assert [item.strategy_rank for item in response.strategies] == [1, 2]
+    assert {item.representative.precursor_smiles for item in response.strategies} == {
+        "CCBr.CN", "CBr.CCN",
+    }
+    diagnostics = response.to_dict()["search_diagnostics"]
+    assert diagnostics["requested_strategy_count"] == diagnostics["returned_strategy_count"] == 2
+    assert diagnostics["strategy_target_met"]
+    assert diagnostics["scheduling"] == "similarity_first_l2_then_operator_site_round_robin"
     assert "One-step retrosynthesis strategies" in response.answer
+
+
+@pytest.mark.parametrize("bond", [None, (1, 2)])
+def test_service_reports_per_level_caps_and_strategy_shortfall(library, bond) -> None:
+    response = RetrosynthesisCoworker(library).disconnect(
+        RetrosynthesisRequest(
+            target_smiles="CCNC", top_k=5,
+            max_templates_to_apply=1, max_candidates_to_validate=1,
+            max_realizations_per_strategy=1, include_l0=False, include_conditions=False,
+            required_disconnection_bond=bond, focus_target_smiles="CCNC" if bond else None,
+            review=ConditionReviewSettings(mode="off"),
+        )
+    )
+
+    assert response.valid, response.error
+    payload = response.to_dict()
+    diagnostics = payload["search_diagnostics"]
+    assert diagnostics["requested_strategy_count"] == 5
+    assert diagnostics["returned_strategy_count"] == len(response.strategies) < 5
+    assert not diagnostics["strategy_target_met"]
+    assert diagnostics["budget_limited"]
+    assert diagnostics["max_templates_per_level"] == diagnostics["max_validations_per_level"] == 1
+    assert diagnostics["max_realizations_per_strategy"] == 1
+    for level in diagnostics["level_diagnostics"].values():
+        assert level["applied_template_count"] <= 1
+        assert level["validation_attempt_count"] <= 1
+    if bond:
+        assert diagnostics["levels_attempted"] == ["L2"]
+        assert payload["bond_focus"]["atom_ids"] == bond
+        assert diagnostics["scheduling"] == "bond_focused_operator_ladder"
+    else:
+        assert diagnostics["levels_attempted"] == ["L2", "L1"]
+        assert "bond_focus" not in payload
+
+
+def test_service_returns_bounded_no_hit_with_search_evidence(library) -> None:
+    response = RetrosynthesisCoworker(library).disconnect(
+        RetrosynthesisRequest(
+            target_smiles="C", top_k=1, include_conditions=False,
+            review=ConditionReviewSettings(mode="off"),
+        )
+    )
+
+    assert response.valid and not response.strategies
+    assert "bounded search" in response.answer
+    diagnostics = response.to_dict()["search_diagnostics"]
+    assert diagnostics["levels_attempted"] == ["L2", "L1", "L0"]
+    assert diagnostics["returned_strategy_count"] == diagnostics["validation_attempt_count"] == 0
+    assert not diagnostics["strategy_target_met"]
+    assert not diagnostics["budget_limited"]
 
 
 @dataclass
@@ -192,9 +239,19 @@ class FakeTransport:
 
 
 def test_llm_review_can_reorder_but_not_modify_validated_strategies() -> None:
+    representative = _candidate(1, precursor="CCBr.N")
+    alternate = replace(
+        representative,
+        precursor_smiles="CCCl.N",
+        proposed_reaction_smiles="CCCl.N>>CCN",
+        template_id="another-template",
+        independent_reference_support=73,
+        precedent_reaction_ids=("only-for-alternate",),
+    )
     first, second = group_strategy_candidates(
         (
-            _candidate(1, precursor="CCBr.N"),
+            representative,
+            alternate,
             _candidate(2, precursor="CCI.N"),
         ),
         top_k_strategies=2,
@@ -245,6 +302,16 @@ def test_llm_review_can_reorder_but_not_modify_validated_strategies() -> None:
         for value in transport.packet["allowed_evidence_ids"]
     )
     assert first.representative.precursor_smiles == "CCBr.N"
+    assert first.independent_reference_support == 73
+    packet_candidate = transport.packet["strategies"][0]
+    assert packet_candidate["independent_reference_support"] == 2
+    assert packet_candidate["precedent_reaction_ids"] == ["precedent-1"]
+    answer = render_retrosynthesis(RetrosynthesisResponse(
+        request=RetrosynthesisRequest(target_smiles="CCN", include_conditions=False),
+        valid=True, strategies=(first,),
+    ))
+    assert "2 template references" in answer and "precedent-1" in answer
+    assert "only-for-alternate" not in answer
 
 
 def test_llm_review_rejects_invented_evidence() -> None:

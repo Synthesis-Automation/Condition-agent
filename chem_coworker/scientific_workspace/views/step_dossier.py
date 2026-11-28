@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any
+
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 
 from ..adapters.step_selection import SOURCE_OPERATIONS, _call, _selection
 from ..core.store import InvestigationEvent
@@ -10,6 +13,34 @@ from .step_assessments import answer_step_assessments
 
 if TYPE_CHECKING:
     from ..workspace import ScientificWorkspace
+
+
+def step_plausibility_summary(result: Mapping[str, Any]) -> dict[str, Any]:
+    """Show the recorded grade, search coverage and first source returned by the assessor."""
+    assessment = result["assessment"]
+    summary = {key: assessment[key] for key in (
+        "query_reaction_smiles", "grade", "evidence_rank", "measured_evidence_status", "qualified_count", "candidate_count",
+        "candidate_limit", "candidate_truncated", "matches_truncated", "warnings",
+    )}
+    summary.update(source_ref=result["source_ref"], step_id=result["step_id"], first_match=None)
+    summary["support_counts"] = {key: assessment["support_counts"][key] for key in (
+        "supporting_source_group_count", "comparable_observation_count", "low_yield_count",
+        "zero_yield_count", "unreported_yield_count", "unknown_yield_count",
+    )}
+    if assessment["matches"]:
+        match = assessment["matches"][0]
+        row, context = match["precedent"], match["context"]
+        first = {key: row[key] for key in ("reference_id", "reaction_id", "observation_id", "reaction_smiles", "level")}
+        first.update(source_yield_pct=row["yield_pct"], outcome=match["outcome"],
+                     contributes_to_support=match["contributes_to_support"],
+                     differences=row["differences"][:3], difference_count=len(row["differences"]))
+        first["context"] = {key: context[key] for key in ("status", "reverse_status", "minimum_partner_similarity")}
+        for key in ("missing", "unresolved", "source_only", "source_unresolved"):
+            first["context"][key] = context[key][:3]
+            if len(context[key]) > 3:
+                first["context"][f"{key}_count"] = len(context[key])
+        summary["first_match"] = first
+    return summary
 
 
 def step_dossier(
@@ -25,7 +56,7 @@ def step_dossier(
     if payload["operation"] in condition_operations:
         if step_id is not None:
             raise ValueError("A single reaction call does not require step_id")
-        sides = payload["arguments"]["reaction_smiles"].split(">")
+        sides = split_reaction_fields(payload["arguments"]["reaction_smiles"])
         if len(sides) != 3 or not sides[0] or not sides[2]:
             raise ValueError("Dossier requires a product-specified reaction")
         proposal = {"precursor_smiles": sides[0], "target_smiles": sides[2]}
@@ -43,6 +74,21 @@ def step_dossier(
     source_summary = workspace.call_summary(source_ref)
     linked = workspace.batch_summary(list(evidence_refs)) if evidence_refs else None
     assessments = answer_step_assessments(store, answer)["step"]
+    assessments["step_plausibility"] = []
+    if evidence_refs:
+        cited = set(evidence_refs)
+        for event in store.events():
+            if event.kind != "call" or event.artifact_ref not in cited:
+                continue
+            call = store.read_artifact(event.artifact_ref)
+            if call.get("operation") != "assess_step_plausibility" or call.get("execution_status") != "completed":
+                continue
+            result = call["result"]
+            if (result["source_ref"] == source_ref and result["step_id"] == step_id
+                    and result["proposal"] == proposal):
+                assessments["step_plausibility"].append({
+                    "artifact_ref": event.artifact_ref, **step_plausibility_summary(result),
+                })
     questions = workspace.list_questions(source_ref=source_ref, step_id=step_id)
     assessment_refs = tuple(item["artifact_ref"] for name in ("structural_assessments", "recipe_assessments")
                             for item in assessments[name])

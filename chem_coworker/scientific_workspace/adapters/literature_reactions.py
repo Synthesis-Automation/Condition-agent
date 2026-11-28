@@ -15,6 +15,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from condition_registry.quantity_audit import audit_source_quantities
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy.structure_audit import audit_structure
 
 from ..core.store import InvestigationStore
@@ -102,7 +103,7 @@ def prepare_literature_reaction(
         record = _indexed_record(store, indexed_ref, reaction_id)
         if source.get("reported_reference_id") != record["reference_id"]:
             raise ValueError("Captured publication attribution must match the indexed reference_id")
-        parts = record["reaction_smiles"].split(">")
+        parts = split_reaction_fields(record["reaction_smiles"])
         if len(parts) != 3 or not parts[0] or not parts[2]:
             raise ValueError("Indexed source reaction must contain explicit reactant/product graphs")
         structures = {"reactants": parts[0].split("."), "products": parts[2].split(".")}

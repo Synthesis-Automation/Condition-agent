@@ -333,9 +333,9 @@ class RetrosynthesisResponse:
             "warnings": list(self.warnings),
             "error": self.error,
             "library_path": self.library_path,
-            **({"bond_focus": self.bond_focus.to_dict(),
-                "search_diagnostics": self.search_diagnostics}
-               if self.bond_focus is not None else {}),
+            **({"bond_focus": self.bond_focus.to_dict()} if self.bond_focus is not None else {}),
+            **({"search_diagnostics": self.search_diagnostics}
+               if self.search_diagnostics is not None else {}),
         }
 
 

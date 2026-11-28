@@ -6,6 +6,7 @@ from typing import Any, Literal, Mapping
 
 from pydantic import Field
 
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy.reaction_operators import canonical_molecule_collection
 
 from ..adapters.literature import load_source_passage
@@ -118,7 +119,7 @@ def route_answer(store: InvestigationStore, proposal: Mapping[str, Any]) -> dict
         step_ids = []
         producers: dict[str, list[int]] = {}
         for step_number, step in enumerate(route.steps, 1):
-            parts = step.reaction_smiles.split(">")
+            parts = split_reaction_fields(step.reaction_smiles)
             if len(parts) != 3 or parts[1]:
                 raise ValueError("Use reactants>>products; put reagents and conditions in their separate fields")
             left, right = _components(parts[0]), _components(parts[2])

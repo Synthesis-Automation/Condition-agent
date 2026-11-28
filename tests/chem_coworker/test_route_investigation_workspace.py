@@ -111,8 +111,58 @@ def test_branch_revision_rechecks_preserved_downstream_step_and_replays_after_re
     compare, table = call(reopened, "compare_route_proposals", source_refs=[source.artifact_ref, revision.artifact_ref])
     assert len(table["alternatives"]) == 2 and table["ranking"] == "not_performed"
     assert compare.evidence_refs == (source.artifact_ref, revision.artifact_ref)
+    assert [row["route_specific_step_ids"] for row in table["alternatives"]] == [["step-1"], ["step-1"]]
+    assert table["shared_exact_steps"][0]["occurrences"] == [
+        {"source_ref": source.artifact_ref, "step_id": "step-2"},
+        {"source_ref": revision.artifact_ref, "step_id": "step-2"},
+    ]
+    brief = reopened.call_summary(compare)["result_summary"]
+    assert brief["shared_exact_step_count"] == 1
+    assert brief["shared_exact_steps"][0]["occurrences"] == table["shared_exact_steps"][0]["occurrences"]
+    detailed = reopened.call_summary(compare, detailed=True)["result_summary"]
+    assert detailed["shared_exact_steps"] == table["shared_exact_steps"]
+    for summary in (brief, detailed):
+        assert [row["route_specific_step_ids"] for row in summary["alternatives"]] == [["step-1"], ["step-1"]]
     replay = ScientificWorkspace(workspace.store.root).replay(revision.artifact_ref)
     assert workspace.store.read_artifact(replay.artifact_ref)["matches"] is True
+
+
+def test_exact_step_comparison_uses_directed_graph_pairs_across_distinct_routes(workspace) -> None:
+    def assess(steps: list[tuple[str, str, str]]) -> str:
+        event, _ = call(workspace, "assess_route_proposal", proposal={
+            "target_smiles": "CCN", "steps": [
+                {"external_step_id": name, "precursor_smiles": precursors, "target_smiles": product}
+                for name, precursors, product in steps
+            ],
+        })
+        return event.artifact_ref
+
+    first = assess([
+        ("amine", "CCBr.N", "CCN"), ("reverse", "CC", "C=C"),
+        ("chiral", "NC(C)=O", "N[C@@H](C)O"), ("isotope", "C=O", "CO"),
+        ("twice", "O.O", "OO"), ("invalid", "invalid", "CN"),
+    ])
+    second = assess([
+        ("renamed", "[NH3:8].BrCC", "NCC"), ("reverse", "C=C", "CC"),
+        ("chiral", "NC(C)=O", "N[C@H](C)O"), ("isotope", "[13CH2]=O", "CO"),
+        ("once", "O", "OO"), ("invalid", "invalid", "CN"),
+    ])
+    third = assess([
+        ("other", "CC=O.N", "CCN"), ("repeat", "CC=O.N", "CCN"),
+        ("same-id", "CCBr.N", "CCN"), ("same-id", "CC=O", "CCO"),
+    ])
+    _, result = call(workspace, "compare_route_proposals", source_refs=[first, second, third])
+    assert result["shared_exact_steps"] == [{
+        "precursor_smiles": "CCBr.N", "target_smiles": "CCN",
+        "occurrences": [{"source_ref": first, "step_id": "amine"}, {"source_ref": second, "step_id": "renamed"}],
+    }]
+    left, right, other = result["alternatives"]
+    assert left["uncomparable_step_ids"] == right["uncomparable_step_ids"] == ["invalid"]
+    assert set(left["route_specific_step_ids"]) == {"reverse", "chiral", "isotope", "twice"}
+    assert set(right["route_specific_step_ids"]) == {"reverse", "chiral", "isotope", "once"}
+    assert other["route_specific_step_ids"] == ["other", "repeat"]
+    assert other["uncomparable_step_ids"] == ["same-id"]
+    assert left["status"] == right["status"] == "invalid"
 
 
 def test_unsupported_revision_remains_inspectable_and_noop_is_an_error(workspace) -> None:

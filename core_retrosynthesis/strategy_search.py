@@ -27,6 +27,9 @@ from .hierarchical_ranking import (
 from .ranking_policy import load_retrosynthesis_ranking_policy
 
 
+_BALANCED_SCHEDULING = "operator_site_round_robin_then_verified_strategy_grouping"
+
+
 def group_strategy_candidates(
     candidates: Iterable[GenericDisconnectionCandidate],
     *,
@@ -111,15 +114,31 @@ class StrategySearchResult:
     max_realizations_per_strategy: int
     unresolved_candidates: tuple[GenericDisconnectionCandidate, ...] = ()
     definition_id: str = "single_step_strategy_search.v2"
+    scheduling: str = _BALANCED_SCHEDULING
 
-    def to_dict(self) -> dict[str, Any]:
-        """Serialize the canonical grouped result and its search limits."""
+    def search_diagnostics(self) -> dict[str, Any]:
+        """Describe the search effort, limits, and verified strategy shortfall."""
 
-        diagnostics = self.diagnostics.to_dict()
         limited = any(
             item.template_budget_excluded_count or item.validation_budget_excluded_count
             for _, item in self.diagnostics.level_diagnostics
         )
+        return {
+            **self.diagnostics.to_dict(),
+            "budget_limited": limited,
+            "requested_strategy_count": self.requested_strategy_count,
+            "returned_strategy_count": len(self.strategies),
+            "strategy_target_met": len(self.strategies) >= self.requested_strategy_count,
+            "max_templates_per_level": self.max_templates_per_level,
+            "max_validations_per_level": self.max_validations_per_level,
+            "max_realizations_per_strategy": self.max_realizations_per_strategy,
+            "scheduling": self.scheduling,
+            "incomplete_strategy_identity_count": len(self.unresolved_candidates),
+        }
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the canonical grouped result and its search limits."""
+
         return {
             "definition_id": self.definition_id,
             "strategies": [strategy.to_dict() for strategy in self.strategies],
@@ -131,17 +150,7 @@ class StrategySearchResult:
             "unresolved_candidates": [
                 candidate.to_dict() for candidate in self.unresolved_candidates
             ],
-            "search_diagnostics": {
-                **diagnostics,
-                "budget_limited": limited,
-                "strategy_target_met": len(self.strategies)
-                >= self.requested_strategy_count,
-                "max_templates_per_level": self.max_templates_per_level,
-                "max_validations_per_level": self.max_validations_per_level,
-                "max_realizations_per_strategy": self.max_realizations_per_strategy,
-                "scheduling": "operator_site_round_robin_then_verified_strategy_grouping",
-                "incomplete_strategy_identity_count": len(self.unresolved_candidates),
-            },
+            "search_diagnostics": self.search_diagnostics(),
         }
 
 
@@ -155,6 +164,7 @@ def disconnect_strategies_detailed(
     max_candidates_to_validate: int = 100,
     use_context: bool = True,
     include_l0: bool = True,
+    balance_only_on_fallback: bool = False,
     diversify: bool = True,
     use_hierarchical_ranking: bool = True,
     precursor_realism_scorer: (
@@ -164,6 +174,8 @@ def disconnect_strategies_detailed(
     """Search specificity tiers until enough verified strategies are found.
 
     Operators share template and validation budgets before final grouping.
+    With balance_only_on_fallback, L2 uses the ordinary similarity-led order,
+    and any broader tier shares its budget across operators and sites.
     Source correspondence and hard graph validation remain authoritative.
     Limits apply per attempted specificity tier, not to the entire request.
     """
@@ -196,7 +208,7 @@ def disconnect_strategies_detailed(
             max_templates_to_apply=max_templates_to_apply,
             max_candidates_to_validate=max_candidates_to_validate,
             use_context=use_context,
-            balance_operator_budget=True,
+            balance_operator_budget=not balance_only_on_fallback or level != "L2",
         )
         level_diagnostics.append((level, diagnostics))
         if precursor_realism_scorer is not None:
@@ -262,6 +274,10 @@ def disconnect_strategies_detailed(
         max_validations_per_level=max_candidates_to_validate,
         max_realizations_per_strategy=max_realizations_per_strategy,
         unresolved_candidates=tuple(unresolved.values()),
+        scheduling=(
+            "similarity_first_l2_then_operator_site_round_robin"
+            if balance_only_on_fallback else _BALANCED_SCHEDULING
+        ),
     )
 
 

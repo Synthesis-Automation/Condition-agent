@@ -33,6 +33,10 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                     "unresolved_requirements", "gates", "warnings", "coverage",
                 )) for item in checks[name][:3]]
                 overview[f"{name}_count"] = len(checks[name])
+            if "step_plausibility" in checks:
+                evidence = checks["step_plausibility"]
+                overview["step_plausibility"] = evidence[:3]
+                overview["step_plausibility_count"] = len(evidence)
             questions = payload["questions"]
             overview["questions"] = [_brief_fields(item, (
                 "revision_ref", "question", "status", "next_check", "contradicting_refs", "review_status",
@@ -241,6 +245,7 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
             diagnostics = source["search_diagnostics"]
             overview["search_diagnostics"] = _brief_fields(diagnostics, (
                 "levels_attempted", "proposed_action_count", "validation_attempt_count", "valid_action_count",
+                "budget_limited", "strategy_target_met", "max_templates_per_level", "max_validations_per_level",
             ))
             overview["search_diagnostics"]["level_diagnostics"] = {
                 level: _brief_fields(item, (
@@ -254,12 +259,15 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         overview["strategy_count"] = len(strategies)
         overview["strategies"] = []
         for strategy in strategies[:3]:
-            item = _brief_fields(strategy, ("strategy_id", "strategy_rank", "independent_reference_support"))
+            item = _brief_fields(strategy, ("strategy_id", "strategy_rank", "independent_reference_support",
+                                            "returned_realization_count", "total_realization_count"))
+            if "independent_reference_support" in item:
+                item["independent_reference_support_scope"] = "maximum_template_support_across_realizations"
             if isinstance(strategy.get("representative"), Mapping):
                 item["representative"] = _brief_fields(strategy["representative"], (
                     "realization_id", "precursor_smiles", "forward_validation_status",
                     "precursor_compatibility_disposition", "reaction_compatibility_disposition",
-                    "template_id", "operator_id", "precedent_reaction_ids",
+                    "template_id", "operator_id", "independent_reference_support", "precedent_reaction_ids",
                     "bond_focus_check",
                     "strategic_class", "strategic_complexity_score", "strategic_candidate",
                 ))
@@ -277,6 +285,10 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
                     ]
                     item["representative"]["selectivity_warning_count"] = len(warnings)
             overview["strategies"].append(item)
+    elif operation == "assess_step_plausibility":
+        from .step_dossier import step_plausibility_summary
+
+        overview.update(step_plausibility_summary(source))
     elif operation == "assess_retro_validity":
         overview["validity"] = _brief_fields(source.get("validity", {}), (
             "status", "structural_status", "precedent_grade", "evidence_rank", "suggested_action",
@@ -413,9 +425,16 @@ def summarize_call_brief(payload: Mapping[str, Any]) -> dict[str, Any]:
         overview["alternative_count"] = len(alternatives)
         overview["alternatives"] = [
             _brief_fields(item, ("status", "source_ref", "route_id", "step_count",
-                                 "unresolved_step_ids", "limitations"))
-            for item in alternatives[:3] if isinstance(item, Mapping)
+                                 "unresolved_step_ids", "route_specific_step_ids", "uncomparable_step_ids",
+                                 "limitations"))
+            for item in alternatives[:5] if isinstance(item, Mapping)
         ]
+        if "shared_exact_steps" in source:
+            shared = source["shared_exact_steps"]
+            overview["shared_exact_step_count"] = len(shared)
+            overview["shared_exact_steps"] = [
+                _brief_fields(step, ("precursor_smiles", "target_smiles", "occurrences")) for step in shared[:3]
+            ]
     elif operation == "propose_condition_adaptation":
         overview.update(_brief_fields(source, ("transfer_status", "assumptions", "risks")))
         if isinstance(source.get("compatibility"), Mapping):

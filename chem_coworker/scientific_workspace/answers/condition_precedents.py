@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from core_retrosynthesis.chemistry import canonical_smiles
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 
 if TYPE_CHECKING:
     from ..core.store import InvestigationStore
@@ -29,7 +30,7 @@ def load_condition_precedent_evidence(
     if result.get("schema_version") not in {"condition_evidence_comparison.v1", "condition_evidence_comparison.v2"}:
         raise ValueError("Unsupported condition precedent evidence schema")
     query = result.get("query_reaction_smiles", "")
-    sides = query.split(">")
+    sides = split_reaction_fields(query)
     if len(sides) != 3 or query != payload.get("arguments", {}).get("reaction_smiles"):
         raise ValueError("Condition inspection query does not match its recorded input")
     for actual, expected in ((precursor_smiles, sides[0]), (target_smiles, sides[2])):

@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 from app.web_api.main import create_app
 from app.web_api.scientific_presentation import present_conversation
+from chem_coworker.scientific_workspace.answers.step_precedents import require_available_step_precedents
 from chem_coworker.scientific_workspace.core.store import InvestigationStore
 from chem_coworker.scientific_workspace.runtime.activity import ACTIVITY_VERSION
 from chem_coworker.scientific_workspace.runtime.conversation import ConversationService
@@ -59,6 +60,30 @@ def test_exact_structure_matching_does_not_hide_conflicting_assessments(saved) -
     assert {r["status"] for r in view["structural_assessments"]} == {"precedent_supported", "ambiguous", "conflicting"}
     assert not view["recipe_assessments"]
     assert all(r["gates"][0]["status"] == "not_run" for r in view["structural_assessments"])
+
+
+def test_duplicate_route_step_ids_do_not_hide_unambiguous_saved_evidence(saved) -> None:
+    store, answer = saved
+    single = _structural(store, "CCBr.N", "single_step_check")
+    ids = ["duplicate", "retained", "duplicate"]
+    route = store.append("call", {
+        "operation": "assess_route_proposal", "execution_status": "completed",
+        "result": {
+            "proposal": {"steps": [{"external_step_id": key, "precursor_smiles": "CCBr.N", "target_smiles": "CCN"}
+                                   for key in ids]},
+            "assessment": {"step_assessments": [
+                {"external_step_id": key, "assessment": {"status": key, "precedent_matches": [{"match_id": "example"}]}}
+                for key in ids
+            ]},
+        },
+    })
+    view = answer_step_assessments(store, answer)["s1"]
+    assert view["status"] == "recorded"
+    assert sorted((item["artifact_ref"], item["status"]) for item in view["structural_assessments"]) == sorted(
+        [(single, "single_step_check"), (route.artifact_ref, "retained")]
+    )
+    with pytest.raises(ValueError, match='"step_id": "retained"'):
+        require_available_step_precedents(store, answer)
 
 
 def test_uncited_route_failure_is_visible_but_later_checks_and_recipes_are_excluded(saved):

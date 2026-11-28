@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter, defaultdict
 from dataclasses import fields
 from typing import TYPE_CHECKING, Any
 
@@ -307,8 +308,42 @@ def revise_branch(
     }
 
 
+def _exact_step_overlap(
+    refs: list[str], records: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, dict[str, list[str]]]]:
+    """Compare assessed directed graph pairs; each occurrence belongs to its saved route."""
+    occurrences: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    by_route = {ref: {"route_specific_step_ids": [], "uncomparable_step_ids": []} for ref in refs}
+    for ref, record in zip(refs, records):
+        steps = record["assessment"]["step_assessments"]
+        id_counts = Counter(step["external_step_id"] for step in steps)
+        uncomparable = by_route[ref]["uncomparable_step_ids"]
+        for step in steps:
+            step_id = step["external_step_id"]
+            assessment = step["assessment"]
+            precursors = assessment["canonical_precursor_smiles"]
+            target = assessment["canonical_target_smiles"]
+            input_valid = any(gate["gate_id"] == "input_structure" and gate["status"] == "pass"
+                              for gate in assessment["gates"])
+            if not precursors or not target or not input_valid or id_counts[step_id] != 1:
+                if step_id not in uncomparable:
+                    uncomparable.append(step_id)
+                continue
+            occurrences[precursors, target].append({"source_ref": ref, "step_id": step_id})
+
+    shared = []
+    for (precursors, target), members in occurrences.items():
+        route_refs = {member["source_ref"] for member in members}
+        if len(route_refs) > 1:
+            shared.append({"precursor_smiles": precursors, "target_smiles": target, "occurrences": members})
+        else:
+            ref = members[0]["source_ref"]
+            by_route[ref]["route_specific_step_ids"].extend(member["step_id"] for member in members)
+    return shared, by_route
+
+
 def compare_routes(operations: ScientificOperations, source_refs: list[str]) -> dict[str, Any]:
-    """Produce an evidence table without collapsing independent checks into a route score."""
+    """Compare exact precursor and product graphs while retaining each route's assessment."""
     refs = _strings(source_refs, "source_refs")
     if not 2 <= len(refs) <= 5 or len(set(refs)) != len(refs):
         raise ValueError("Compare two to five distinct recorded route alternatives")
@@ -321,11 +356,14 @@ def compare_routes(operations: ScientificOperations, source_refs: list[str]) -> 
     if any(record["assessment_options"] != options or
            record["material_constraints"]["unavailable_starting_materials"] != constraints for record in records):
         raise ValueError("Compare routes assessed with the same options and declared material constraints")
+    shared, by_route = _exact_step_overlap(refs, records)
     return {
         "schema_version": "route_comparison.v1", "target_smiles": next(iter(targets)),
         "source_refs": refs, "ranking": "not_performed", "experimental_feasibility": "not_established",
+        "shared_exact_steps": shared,
         "alternatives": [{
             "source_ref": ref, "route_id": record["assessment"]["route_id"],
+            **by_route[ref],
             "status": record["assessment"]["status"], "step_count": len(record["proposal"]["steps"]),
             "topology_gates": record["assessment"]["topology_gates"],
             "unresolved_step_ids": record["assessment"]["unresolved_step_ids"],

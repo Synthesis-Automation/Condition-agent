@@ -240,42 +240,48 @@ for _schema in (ANSWER_SCHEMA, *ANSWER_SCHEMA["$defs"].values()):
 
 def validate_answer_evidence(answer: ScientificAnswer, store: InvestigationStore) -> list[str]:
     """Verify recorded citations and their types; do not claim semantic fact-checking."""
+    from .condition_precedents import load_condition_precedent_evidence
+    from .step_precedents import _structure_key, load_step_precedent_evidence, require_available_step_precedents
+
     kinds = {event.artifact_ref: event.kind for event in store.events()}
     cited = set(answer.evidence_refs)
     cited.update(re.findall(r"sha256:[0-9a-f]{64}", answer.model_dump_json()))
+    plausibility_steps = {}
     for reference in cited:
-        store.read_artifact(reference)
+        saved = store.read_artifact(reference)
         if kinds.get(reference) not in {
             "call", "derived_file", "replay", "custom_execution", "literature_source", "literature_excerpt",
         }:
             raise ValueError("Answer must cite scientific evidence, not agent assertions")
-    from .condition_precedents import load_condition_precedent_evidence
-    from .step_precedents import (
-        load_step_precedent_evidence,
-        require_available_step_precedents,
-    )
+        if kinds[reference] == "call" and saved.get("operation") == "assess_step_plausibility":
+            proposal = saved.get("result", {}).get("proposal", {})
+            plausibility_steps[reference] = (
+                _structure_key(proposal["precursor_smiles"], proposal["target_smiles"])
+                if saved.get("execution_status") == "completed" else None
+            )
 
+    sources = {source.id: source for source in answer.sources}
     molecules = {item.id: item.smiles for item in answer.molecules}
     for step in answer.steps:
         from ..adapters.investigation_checks import load_proposed_recipe_check
 
+        precursors = ".".join(molecules[key] for key in step.reactant_ids)
+        target = ".".join(molecules[key] for key in step.product_ids)
+        step_refs = {sources[key].artifact_ref for key in step.source_ids}
+        checks = step_refs.intersection(plausibility_steps)
+        if checks:
+            expected = _structure_key(precursors, target)
+            if not expected or any(plausibility_steps[ref] != expected for ref in checks):
+                raise ValueError("Step plausibility citation requires a completed check for this exact reaction")
+            if step.basis == "reported" and step_refs == checks:
+                raise ValueError("A reported step needs source evidence beyond a proposed step's plausibility check")
         for reference in step.recipe_assessment_refs:
-            load_proposed_recipe_check(
-                store, reference, ".".join(molecules[key] for key in step.reactant_ids),
-                ".".join(molecules[key] for key in step.product_ids),
-            )
+            load_proposed_recipe_check(store, reference, precursors, target)
         for reference in step.precedent_refs:
-            load_step_precedent_evidence(
-                store, reference, ".".join(molecules[key] for key in step.reactant_ids),
-                ".".join(molecules[key] for key in step.product_ids),
-            )
+            load_step_precedent_evidence(store, reference, precursors, target)
         for reference in step.condition_precedent_refs:
-            load_condition_precedent_evidence(
-                store, reference, ".".join(molecules[key] for key in step.reactant_ids),
-                ".".join(molecules[key] for key in step.product_ids),
-            )
+            load_condition_precedent_evidence(store, reference, precursors, target)
     require_available_step_precedents(store, answer.model_dump())
-    sources = {source.id: source for source in answer.sources}
     for source in answer.sources:
         if source.kind != "external_source":
             continue

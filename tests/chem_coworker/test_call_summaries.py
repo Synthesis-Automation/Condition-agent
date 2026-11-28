@@ -387,6 +387,40 @@ def test_brief_disconnection_retains_selectivity_warning_without_large_nested_gr
     assert len(json.dumps(brief)) < 3000
 
 
+def test_disconnection_summaries_attribute_group_and_template_support_to_their_sources():
+    strategies = [{
+        "strategy_id": "s1", "independent_reference_support": 244,
+        "returned_realization_count": 2, "total_realization_count": 10,
+        "representative": {"template_id": "t1", "independent_reference_support": 17},
+        "alternate_realizations": [{"template_id": "t2", "independent_reference_support": 63}],
+    }, {
+        "strategy_id": "s2", "independent_reference_support": 5, "representative": {"template_id": "t3"},
+    }]
+    call = _call("disconnect_target", {"strategies": strategies})
+    brief = summarize_call_brief(call)
+    first, legacy = brief["result_summary"]["strategies"]
+    assert first["independent_reference_support"] == 244
+    assert first["independent_reference_support_scope"] == "maximum_template_support_across_realizations"
+    assert first["representative"]["independent_reference_support"] == 17
+    assert (first["returned_realization_count"], first["total_realization_count"]) == (2, 10)
+    assert "alternate_realizations" not in first
+    assert "independent_reference_support" not in legacy["representative"]
+    assert "total_realization_count" not in legacy
+    full = summarize_call(call)["result_summary"]["strategies"][0]
+    assert full["representative"]["independent_reference_support"] == 17
+    assert full["alternate_realizations"][0]["independent_reference_support"] == 63
+
+
+def test_brief_disconnection_keeps_search_caps_and_unmet_strategy_target():
+    diagnostics = {
+        "budget_limited": True, "strategy_target_met": False,
+        "max_templates_per_level": 80, "max_validations_per_level": 30,
+    }
+    call = _call("disconnect_target", {"strategies": [], "search_diagnostics": diagnostics})
+    projected = summarize_call_brief(call)["result_summary"]["search_diagnostics"]
+    assert {key: projected[key] for key in diagnostics} == diagnostics
+
+
 def test_brief_fragment_search_discloses_incomplete_source_coverage():
     brief = summarize_call_brief(_call("search_fragment_precedents", {
         "search_status": "partial", "source_coverage_complete": False,

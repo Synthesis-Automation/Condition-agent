@@ -105,7 +105,7 @@ class ScientificOperations:
                             required_artifacts=("condition_index", "shared_core_index")),
         OperationDefinition("propose_condition_adaptation", evidence_arguments=("source_ref", "evidence_refs")),
         OperationDefinition(
-            "disconnect_target", contract_version="2", required_artifacts=("retro_library",),
+            "disconnect_target", contract_version="3", required_artifacts=("retro_library",),
             usage_policy=(
                 "Retrosynthesis in this workspace uses single-step calls; the agent owns "
                 "multi-step planning. Do not invoke the built-in multistep planner, "
@@ -114,6 +114,8 @@ class ScientificOperations:
         ),
         OperationDefinition("assess_route_step", contract_version="2", required_artifacts=("retro_library",),
                             evidence_arguments=("evidence_refs",), result_evidence_field="evidence_refs"),
+        OperationDefinition("assess_step_plausibility", required_artifacts=("condition_index", "shared_core_index"),
+                            evidence_arguments=("source_ref",)),
         OperationDefinition("assess_retro_validity", contract_version="4", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "forward_ref", "evidence_refs"),
                             usage_policy="Assess concrete realizations; ordinal evidence is not success probability. "
@@ -137,7 +139,7 @@ class ScientificOperations:
                             evidence_arguments=("source_ref",)),
         OperationDefinition("revise_route_branch", contract_version="2", required_artifacts=("retro_library",),
                             evidence_arguments=("source_ref", "evidence_refs"), result_evidence_field="evidence_refs"),
-        OperationDefinition("compare_route_proposals", evidence_arguments=("source_refs",)),
+        OperationDefinition("compare_route_proposals", contract_version="2", evidence_arguments=("source_refs",)),
     )
 
     def __init__(self, store: InvestigationStore, *, fragment_worker: FragmentWorker | None = None,
@@ -704,6 +706,10 @@ class ScientificOperations:
         The agent chooses realizations, subsequent targets and stopping decisions.
         Requires retro_library only unless conditions are requested. Preserves the
         existing engine's evidence and warnings; internal LLM review is disabled.
+        In an unfocused search, top_k counts distinct validated strategies. Search
+        starts with the most specific templates and shares the budget across
+        operators and sites on broader tiers if more strategies are needed.
+        search_diagnostics reports the work and exclusions at each attempted tier.
         Optional required_disconnection_bond selects two zero-based canonical
         atom IDs. Supply focus_target_smiles from molecular inspection to bind
         the selection to that target. Only verified forward formation of that
@@ -802,6 +808,50 @@ class ScientificOperations:
         from .route_investigation import assess_route
 
         return assess_route(self, proposal, unavailable_starting_materials, include_conditions, include_forward, evidence_refs)
+
+    def assess_step_plausibility(
+        self, source_ref: str | None = None, step_id: str | None = None,
+        candidate_limit: int = 128, match_limit: int = 20, *, reaction_smiles: str | None = None,
+    ) -> dict[str, Any]:
+        """Inspect transferable precedent for a proposed or saved retrosynthetic step.
+
+        Pass reaction_smiles in the forward direction to check a proposal directly.
+        For a saved assessment, pass source_ref and the step_id for a route or revision.
+        The corpus grade measures documented structural support. Yields refer to
+        the individual source experiments. Both search and display limits are recorded.
+        """
+        from condition_recommender import assess_step_plausibility
+        from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
+        from .step_selection import SOURCE_OPERATIONS, _call, _selection
+
+        if (reaction_smiles is None) == (source_ref is None):
+            raise ValueError("Supply exactly one of reaction_smiles or source_ref")
+        if reaction_smiles is not None:
+            if step_id is not None:
+                raise ValueError("step_id requires a saved source_ref")
+            fields = split_reaction_fields(reaction_smiles) if isinstance(reaction_smiles, str) else []
+            if len(fields) != 3 or not fields[0].strip() or not fields[2].strip():
+                raise ValueError("reaction_smiles must contain precursors, an optional agent field, and a product")
+            proposal = {"precursor_smiles": fields[0], "target_smiles": fields[2]}
+            reaction = reaction_smiles
+        else:
+            source = _call(self.store, source_ref, SOURCE_OPERATIONS - {"disconnect_target"})
+            proposal, structural = _selection(source, step_id, None)
+            reaction = f"{proposal['precursor_smiles']}>>{proposal['target_smiles']}"
+            if proposal.get("mapped_reaction_smiles"):
+                # Bind a supplied mapping to the proposal using its saved structural validation.
+                reaction = structural.get("normalized_mapped_reaction_smiles")
+                if not reaction:
+                    raise ValueError("The saved step has no validated mapping for its supplied mapped reaction")
+        engine = self._conditions()
+        assessment = assess_step_plausibility(
+            reaction, engine.index, engine.shared_core_index,
+            candidate_limit=candidate_limit, match_limit=match_limit,
+        )
+        return {
+            "schema_version": "route_step_plausibility.v1", "source_ref": source_ref,
+            "step_id": step_id, "proposal": proposal, "assessment": assessment.to_dict(),
+        }
 
     def assess_retro_validity(
         self, proposal: dict[str, Any] | None = None, source_ref: str | None = None,

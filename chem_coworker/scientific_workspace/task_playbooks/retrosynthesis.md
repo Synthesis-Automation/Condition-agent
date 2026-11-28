@@ -1,4 +1,4 @@
-# Retrosynthesis investigation adviser v12
+# Retrosynthesis investigation adviser v13
 
 This is an optional menu. Choose the questions that matter to the user's decision;
 skip, reorder, repeat or replace suggestions. Shared scientific contracts still apply.
@@ -12,13 +12,14 @@ a terminal material acceptable; a vendor listing does not confirm stock.
 
 ## Scientific questions
 
-Use a strategy ledger in recorded decision notes. For each materially different
-construction strategy, retain: core/entry material, key disconnection, evidence refs,
-weakest step, preparation burden, next decisive question, and stop/revisit reason.
-Alternate halides, donor forms and conditions sharing one construction bottleneck
-are realizations, not independent route discoveries. Compare the same justified
-starting scope. Allocate the next search to a gap that could change the decision;
-do not increase SSR top-k merely to inflate the number of routes.
+Compare routes from the same justified starting materials. Use
+`compare_route_proposals` to see which steps have identical precursors and products.
+Different donors or leaving groups can still depend on the same difficult bond formation.
+Identify the step whose uncertainty could change the route choice. When precedent
+would help decide, use `assess_step_plausibility` with the proposed reaction SMILES
+or the saved route and step ID. Check the
+reacting partners and the source outcome. State which alternative avoids the
+difficulty or what evidence would settle it.
 
 Start with the general molecular audit, then focused graph inspection, then custom
 RDKit only for a named unanswered question. Preserve canonical/input atom projection,
@@ -73,6 +74,13 @@ question, search it, inspect the actual reactions, and choose the next query fro
 the result. Use `w.task_guide('retrosynthesis_fragments')` for the persistent console
 and explicit query-edit workflow. Automatic fragment selection is optional; a
 target-first automatic call is not a prerequisite for agent-chosen searches.
+
+For an unfocused `disconnect_target` call, `top_k` counts strategies. Inspect
+the displayed precursor pair's template references separately from the largest
+reference count among its strategy's variants. Verify materially different cuts
+on the target graph. Two strategies can still act at the same site. The search
+diagnostics show which specificity levels ran and where the budgets excluded
+candidates.
 
 Use `assess_retro_validity` when choosing which concrete realization to pursue.
 Select a saved `disconnect_target` realization with `source_ref` and `realization_id`,

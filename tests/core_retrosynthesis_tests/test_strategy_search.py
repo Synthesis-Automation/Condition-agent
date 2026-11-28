@@ -202,14 +202,15 @@ def test_disconnect_strategies_uses_a_bounded_diverse_candidate_pool(
     ]
 
 
+@pytest.mark.parametrize("balance_only_on_fallback", [False, True])
 def test_strategy_shortfall_broadens_even_when_realizations_fill_top_k(
-    monkeypatch,
+    monkeypatch, balance_only_on_fallback,
 ) -> None:
     calls = []
 
     def search(*args, **kwargs):
         level = kwargs["levels"][0]
-        calls.append(level)
+        calls.append((level, kwargs["balance_operator_budget"]))
         values = (
             (_candidate("Br", 0.9), _candidate("I", 0.8))
             if level == "L2"
@@ -221,9 +222,10 @@ def test_strategy_shortfall_broadens_even_when_realizations_fill_top_k(
         strategy_search_module, "disconnect_generic_target_detailed", search
     )
     result = disconnect_strategies_detailed(
-        "CC", object(), top_k_strategies=2, diversify=False
+        "CC", object(), top_k_strategies=2, diversify=False,
+        balance_only_on_fallback=balance_only_on_fallback,
     )
-    assert calls == ["L2", "L1"]
+    assert calls == [("L2", not balance_only_on_fallback), ("L1", True)]
     assert len(result.strategies) == 2
     assert len(result.strategies[0].realizations) == 2
     assert result.to_dict()["search_diagnostics"]["strategy_target_met"] is True

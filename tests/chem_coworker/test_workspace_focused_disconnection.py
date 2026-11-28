@@ -9,7 +9,9 @@ from chem_coworker.scientific_workspace.core.baseline import (
     artifact_identity, code_manifest, environment_versions,
 )
 from core_retrosynthesis.generic_library import save_generic_library
-from tests.core_retrosynthesis_tests.test_focused_disconnection import library
+from tests.core_retrosynthesis_tests import test_focused_disconnection
+
+library = test_focused_disconnection.library
 
 
 @pytest.fixture
@@ -37,7 +39,7 @@ def test_focused_tool_record_summary_and_replay(workspace):
     assert candidate["precursor_smiles"] == "CBr.CCN"
     assert candidate["bond_focus_check"]["status"] == "verified"
     assert result["search_diagnostics"]["validation_attempt_count"] == 1
-    assert payload["operation_contract_version"] == "2"
+    assert payload["operation_contract_version"] == "3"
     for detailed in (True, False):
         summary = workspace.call_summary(event, detailed=detailed)["result_summary"]
         assert summary["bond_focus"]["atom_ids"] == [2, 3]

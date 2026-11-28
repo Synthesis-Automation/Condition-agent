@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from condition_registry import ConditionComponentInput, build_resolved_recipe_from_inputs
 from condition_registry.models import ConditionProcessStage
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
 from reactive_taxonomy.structure_audit import audit_structure
 
 from .literature import load_source_passage
@@ -45,7 +46,7 @@ def load_proposed_recipe_check(
     from .step_selection import _call
 
     result = _call(store, reference, {"assess_proposed_recipe"})["result"]
-    sides = result["reaction_smiles"].split(">")
+    sides = split_reaction_fields(result["reaction_smiles"])
     if len(sides) != 3:
         raise ValueError("Recipe check must contain explicit reaction sides")
     for saved, expected in ((sides[0], precursors), (sides[2], target)):

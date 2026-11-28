@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -63,6 +64,13 @@ def _call(store: InvestigationStore, reference: str, operations: set[str]) -> di
         raise ValueError("Precedent source must be a completed supported scientific call")
     return payload
 
+def _assessed_step_ids(payload: dict[str, Any]) -> list[str | None]:
+    """List unambiguous selections from a saved assessment in proposal order."""
+    if payload["operation"] in {"assess_route_step", "assess_retro_validity"}:
+        return [None]
+    counts = Counter(step["external_step_id"] for step in payload["result"]["proposal"]["steps"])
+    return [step_id for step_id, count in counts.items() if count == 1]
+
 def _selection(
     payload: dict[str, Any], step_id: str | None, realization_id: str | None,
     strategy_id: str | None = None, precursor_smiles: str | None = None,
@@ -103,6 +111,10 @@ def _selection(
     proposals = [step for step in result["proposal"]["steps"] if step["external_step_id"] == step_id]
     if not proposals:
         raise ValueError("step_id is not present in this saved route")
-    assessment = next(item["assessment"] for item in result["assessment"]["step_assessments"]
-                      if item["external_step_id"] == step_id)
-    return proposals[0], assessment
+    if len(proposals) != 1:
+        raise ValueError("step_id is ambiguous in this saved route; give each physical step a unique ID")
+    assessments = [item["assessment"] for item in result["assessment"]["step_assessments"]
+                   if item["external_step_id"] == step_id]
+    if len(assessments) != 1:
+        raise ValueError("Expected exactly one saved assessment for the selected route step")
+    return proposals[0], assessments[0]

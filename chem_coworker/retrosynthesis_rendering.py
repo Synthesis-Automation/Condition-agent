@@ -52,7 +52,7 @@ def render_retrosynthesis(response: RetrosynthesisResponse) -> str:
         ),
     ]
     if not response.strategies:
-        lines.append("No forward-validated one-step disconnection was found.")
+        lines.append("This bounded search returned no forward-validated one-step disconnection.")
     else:
         lines.append("One-step retrosynthesis strategies:")
         review_by_id = {
@@ -70,7 +70,7 @@ def render_retrosynthesis(response: RetrosynthesisResponse) -> str:
             lines.append(
                 f"{display_rank}. {candidate.precursor_smiles} "
                 f"[score {candidate.score:.3f}, {candidate.abstraction_level}, "
-                f"{strategy.independent_reference_support} references]"
+                f"{candidate.independent_reference_support} template references]"
             )
             lines.append(
                 "   Forward check: " + candidate.forward_validation_status
@@ -107,10 +107,10 @@ def render_retrosynthesis(response: RetrosynthesisResponse) -> str:
                     "   Precursor compatibility: "
                     + candidate.precursor_compatibility_disposition
                 )
-            if strategy.precedent_reaction_ids:
+            if candidate.precedent_reaction_ids:
                 lines.append(
-                    "   Precedents: "
-                    + ", ".join(strategy.precedent_reaction_ids[:5])
+                    "   Template precedents: "
+                    + ", ".join(candidate.precedent_reaction_ids[:5])
                 )
     if response.review is not None:
         if response.review.status == "completed":

@@ -382,7 +382,7 @@ class RichResponseRenderer:
         table.add_column("Precursors", ratio=4)
         table.add_column("Score", justify="right")
         table.add_column("Level")
-        table.add_column("Refs", justify="right")
+        table.add_column("Template refs", justify="right")
         table.add_column("Conditions")
         table.add_column("LLM review")
         ordered = ordered_retrosynthesis_strategies(response)[: response.request.top_k]
@@ -404,7 +404,7 @@ class RichResponseRenderer:
                 candidate.precursor_smiles,
                 f"{candidate.score:.3f}",
                 candidate.abstraction_level,
-                str(strategy.independent_reference_support),
+                str(candidate.independent_reference_support),
                 condition_text,
                 review_text,
             )

@@ -11,8 +11,9 @@ from condition_recommender.processed_release import resolve_processed_release
 from core_retrosynthesis import (
     GenericTemplateLibrary,
     StrategyProposal,
-    disconnect_operator_ladder,
+    StrategySearchResult,
     disconnect_operator_ladder_detailed,
+    disconnect_strategies_detailed,
     group_strategy_candidates,
     load_generic_library,
     load_retrosynthesis_ranking_policy,
@@ -106,43 +107,56 @@ class RetrosynthesisCoworker:
             )
         try:
             focus = None
-            search_diagnostics = None
             if request.required_disconnection_bond is not None:
                 focus = prepare_disconnection_focus(
                     target, request.required_disconnection_bond, request.focus_target_smiles,
                 )
             elif request.focus_target_smiles is not None:
                 raise ValueError("focus_target_smiles requires required_disconnection_bond")
-            policy = load_retrosynthesis_ranking_policy()
-            flat_pool_size = min(
-                request.max_candidates_to_validate,
-                max(
-                    pool_size,
-                    pool_size * policy.candidate_pool_multiplier,
-                    pool_size * request.max_realizations_per_strategy,
-                ),
-            )
-            options = dict(top_k=flat_pool_size,
-                           max_templates_to_apply=request.max_templates_to_apply,
-                           max_candidates_to_validate=request.max_candidates_to_validate,
-                           use_context=request.use_context, include_l0=request.include_l0)
-            if focus is not None:
+            if focus is None:
+                result = disconnect_strategies_detailed(
+                    target, self.library,
+                    top_k_strategies=pool_size,
+                    max_realizations_per_strategy=request.max_realizations_per_strategy,
+                    max_templates_to_apply=request.max_templates_to_apply,
+                    max_candidates_to_validate=request.max_candidates_to_validate,
+                    use_context=request.use_context,
+                    include_l0=request.include_l0,
+                    balance_only_on_fallback=True,
+                )
+            else:
+                # Keep the focused ladder's candidate reservoir and mapped-bond checks.
+                policy = load_retrosynthesis_ranking_policy()
+                flat_pool_size = min(
+                    request.max_candidates_to_validate,
+                    pool_size * max(
+                        1, policy.candidate_pool_multiplier, request.max_realizations_per_strategy,
+                    ),
+                )
                 candidates, diagnostics = disconnect_operator_ladder_detailed(
-                    target, self.library, **options,
+                    target, self.library,
+                    top_k=flat_pool_size,
+                    max_templates_to_apply=request.max_templates_to_apply,
+                    max_candidates_to_validate=request.max_candidates_to_validate,
+                    use_context=request.use_context,
+                    include_l0=request.include_l0,
                     required_disconnection_bond=focus.atom_ids,
                     focus_target_smiles=focus.canonical_target_smiles,
                 )
-                search_diagnostics = diagnostics.to_dict()
-            else:
-                candidates = disconnect_operator_ladder(target, self.library, **options)
-            identity_candidates = tuple(
-                candidate for candidate in candidates if candidate.strategy_id
-            )
-            strategies = group_strategy_candidates(
-                identity_candidates,
-                top_k_strategies=pool_size,
-                max_realizations_per_strategy=request.max_realizations_per_strategy,
-            )
+                result = StrategySearchResult(
+                    strategies=group_strategy_candidates(
+                        (candidate for candidate in candidates if candidate.strategy_id),
+                        top_k_strategies=pool_size,
+                        max_realizations_per_strategy=request.max_realizations_per_strategy,
+                    ),
+                    diagnostics=diagnostics,
+                    requested_strategy_count=pool_size,
+                    max_templates_per_level=request.max_templates_to_apply,
+                    max_validations_per_level=request.max_candidates_to_validate,
+                    max_realizations_per_strategy=request.max_realizations_per_strategy,
+                    unresolved_candidates=tuple(c for c in candidates if not c.strategy_id),
+                    scheduling="bond_focused_operator_ladder",
+                )
         except ValueError as exc:
             response = RetrosynthesisResponse(
                 request=request,
@@ -152,15 +166,16 @@ class RetrosynthesisCoworker:
             )
             return replace(response, answer=render_retrosynthesis(response))
 
+        strategies = result.strategies
         condition_evidence = self._condition_evidence(strategies, request)
         review = self._review(strategies, condition_evidence, request)
         warnings = []
         if focus is not None:
             warnings.append(
-                "Focused search retains ordinary template retrieval and per-level budgets; "
-                "no qualifying result is a bounded search outcome, not synthetic impossibility."
+                "Focused search checks the requested target bond within bounded "
+                "template and validation budgets at each specificity level."
             )
-        omitted_identity_count = len(candidates) - len(identity_candidates)
+        omitted_identity_count = len(result.unresolved_candidates)
         if omitted_identity_count:
             warnings.append(
                 f"{omitted_identity_count} validated transformations without a "
@@ -169,8 +184,7 @@ class RetrosynthesisCoworker:
             )
         if not strategies:
             warnings.append(
-                "No forward-validated single-step strategy was found in the "
-                "loaded operator library."
+                "This bounded search returned no forward-validated single-step strategy."
             )
         if request.include_conditions and self.condition_recommender is None:
             warnings.append(
@@ -184,7 +198,7 @@ class RetrosynthesisCoworker:
             condition_evidence=condition_evidence,
             review=review,
             bond_focus=focus,
-            search_diagnostics=search_diagnostics,
+            search_diagnostics=result.search_diagnostics(),
             warnings=tuple(warnings),
             library_path=str(self.library_path) if self.library_path else None,
         )

@@ -1301,12 +1301,13 @@ is accepted through the operation dispatcher.
 | `assess_recipe` | `condition_recommender`; `reaction_smiles`, resolved `recipe` | Existing compatibility result; no yield or experimental-success prediction. |
 | `disconnect_target` | Existing single-step coworker and `core_retrosynthesis`; `target_smiles`, optional search limits and `include_conditions` | One target only: validated strategies, concrete precursor realizations, precedent IDs and warnings. Requires `retro_library`; conditions default off and require condition artifacts when enabled. No stock index, recursive expansion or internal LLM review. |
 | `assess_route_step` | Canonical external-proposal assessment; `proposal`, optional `include_conditions`, `evidence_refs` | Structural, operator, precedent and compatibility gates; optional forward challenge is separate. Requires `retro_library`; no stock index required. Supplied resolved recipes are assessed separately from retrieved conditions. |
+| `assess_step_plausibility` | [Standalone precedent assessment](../new/standalone_step_plausibility.md) using the pinned condition and shared-core indexes | Pass `reaction_smiles` to check a proposed step directly, or pass a saved assessment's `source_ref` and, for a route, its `step_id`. Returns the structural precedent grade, comparable source outcomes and search limits. A check made against a saved step can be linked in its dossier through `evidence_refs`. |
 | `assess_route_proposal` | Same assessor plus route topology; `proposal`, optional `unavailable_starting_materials` and assessment options | Retains invalid/unsupported proposals for inspection; declared material constraints are checked against graph-matched leaves. |
 | `inspect_route_step` | Saved proposal `source_ref`, `step_id` | Step gates, graph-matched upstream/downstream steps, molecular audits and supplied-recipe assessment. |
 | `inspect_step_precedents` | Saved `source_ref`, optional `realization_id` or `step_id`, `offset`, `limit` | Actual supporting reactions for a disconnection realization or assessed step. Use `realization_id` for disconnections, `step_id` for route assessments/revisions, and neither for a single-step assessment. Follow `page.next_offset`; the shared answer contract validates inspection links for final step structures. |
 | `assess_route_step_forward` | Saved route `source_ref`, eligible `step_id`, decision-changing `question`, optional `timeout_seconds` (1–30; default 30) | Optional single-step product-competition challenge using a prebuilt, baseline-pinned `forward_library`. A killable worker records stages and timeout/error; no route-wide prediction or library rebuilding. Does not upgrade the saved route's admission. |
 | `revise_route_branch` | Core explicit route edit plus complete reassessment; `source_ref`, `remove_step_ids`, `replacement_steps`, `reason`, `risks`, optional `assumptions`, `evidence_refs` | Preserves the source, inherits material constraints and condition settings, reassesses all steps and topology. Optional forward challenges are separate and not inherited. Empty removals can extend a leaf branch. No automatic improvement or admission claim. |
-| `compare_route_proposals` | Recorded results; 2–5 `source_refs` | Same-target comparison with identical settings/constraints; separate gates and missing evidence, no synthetic route score. |
+| `compare_route_proposals` | Recorded results for 2–5 `source_refs` | Compares alternatives for the same target under the same settings. Lists shared exact precursor/product pairs, steps specific to each route, and steps whose structures or identifiers prevent comparison. Different precursors can still share a strategic bottleneck. |
 
 Recipe input example:
 
@@ -1485,6 +1486,14 @@ comparison = workspace.run("compare_route_proposals", {
     "source_refs": [original.artifact_ref, revised.artifact_ref],
 })
 print(workspace.call_summary(comparison))
+```
+
+Here the two routes share the amide step. To examine how well documented the
+added amine preparation is, check that step against the workspace's pinned indexes.
+
+```python
+check = workspace.run("assess_step_plausibility", {"source_ref": revised.artifact_ref, "step_id": "amine"})
+print(workspace.call_summary(check)["result_summary"])
 ```
 
 Each proposed step requires `external_step_id`, `target_smiles` and dot-separated

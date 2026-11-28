@@ -24,7 +24,7 @@ from .contracts import (
 from .review import IncompleteReviewOutputError
 
 
-RETROSYNTHESIS_REVIEW_SCHEMA_VERSION = "retrosynthesis_llm_review.v2"
+RETROSYNTHESIS_REVIEW_SCHEMA_VERSION = "retrosynthesis_llm_review.v3"
 _VERDICT_PRIORITY = {
     "keep": 0,
     "downrank": 1,
@@ -253,10 +253,8 @@ def _evidence_packet(
                 "context_similarity": candidate.context_similarity,
                 "product_similarity": candidate.product_similarity,
                 "precursor_similarity": candidate.precursor_similarity,
-                "independent_reference_support": (
-                    strategy.independent_reference_support
-                ),
-                "precedent_reaction_ids": list(strategy.precedent_reaction_ids[:10]),
+                "independent_reference_support": candidate.independent_reference_support,
+                "precedent_reaction_ids": list(candidate.precedent_reaction_ids[:10]),
                 "concrete_realization_count": strategy.total_realization_count,
                 "strategic_class": candidate.strategic_class,
                 "strategic_complexity_score": candidate.strategic_complexity_score,

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..adapters.step_selection import SOURCE_OPERATIONS, _selection
+from reactive_taxonomy.chemistry.reaction_smiles import split_reaction_fields
+
+from ..adapters.step_selection import SOURCE_OPERATIONS, _assessed_step_ids, _selection
 from ..answers.step_precedents import _structure_key
 from ..core.store import InvestigationStore
 
@@ -67,7 +69,7 @@ def answer_step_assessments(
             saved = payload.get("result", {})
             selections = []
             if operation in {"assess_recipe", "assess_proposed_recipe"}:
-                sides = payload.get("arguments", {}).get("reaction_smiles", "").split(">")
+                sides = split_reaction_fields(payload.get("arguments", {}).get("reaction_smiles", ""))
                 if len(sides) == 3:
                     selections.append((
                         {"precursor_smiles": sides[0], "target_smiles": sides[2]}, {},
@@ -75,10 +77,7 @@ def answer_step_assessments(
                         saved.get("proposed_recipe", payload.get("arguments", {}).get("recipe", {})).get("recipe_id"),
                     ))
             elif operation in SOURCE_OPERATIONS and operation != "disconnect_target":
-                selectors = [None] if operation in {"assess_route_step", "assess_retro_validity"} else [
-                    item["external_step_id"] for item in saved.get("proposal", {}).get("steps", [])
-                ]
-                for selector in selectors:
+                for selector in _assessed_step_ids(payload):
                     selected, assessment = _selection(payload, selector, None)
                     recipe = (saved.get("proposed_recipe_assessment") if selector is None else
                               saved.get("proposed_recipe_assessments", {}).get(selector))
